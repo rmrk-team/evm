@@ -1,4 +1,4 @@
- // SPDX-License-Identifier: GNU GPL
+// SPDX-License-Identifier: Apache-2.0
 
 pragma solidity ^0.8.9;
 
@@ -10,7 +10,9 @@ import "./utils/Context.sol";
 import "./utils/Strings.sol";
 import "./utils/introspection/ERC165.sol";
 
-abstract contract RMRKNestable is Context, ERC165, IRMRKCore, IERC721Metadata {
+import "hardhat/console.sol";
+
+contract RMRKNestable is Context, ERC165, IRMRKCore {
   using Address for address;
   using Strings for uint256;
 
@@ -35,7 +37,11 @@ abstract contract RMRKNestable is Context, ERC165, IRMRKCore, IERC721Metadata {
 
   string private _symbol;
 
-  string private _tokenURI; //TODO: dummy variable, remove after fully implementing resources.
+  string private _tokenURI;
+
+  address private _issuer;
+
+  bytes32 private _nestFlag = keccak256(bytes("NEST"));
 
   RoyaltyData private _royalties;
 
@@ -45,60 +51,154 @@ abstract contract RMRKNestable is Context, ERC165, IRMRKCore, IERC721Metadata {
 
   mapping(uint256 => address) private _tokenApprovals;
 
-  mapping(address => mapping(address => bool)) private _operatorApprovals;
+  mapping(uint256 => address) private _nestApprovals;
 
   mapping(uint256 => NftOwner) private _nftOwners;
 
   mapping(uint256 => Child[]) private _children;
 
+  event ParentRemoved(address parentAddress, uint parentTokenId, uint childTokenId);
+
+  event ChildRemoved(address childAddress, uint parentTokenId, uint childTokenId);
+
   constructor(string memory name_, string memory symbol_) {
     _name = name_;
     _symbol = symbol_;
+    _issuer = msg.sender;
   }
 
    function tokenURI(uint256 tokenId) public virtual view returns(string memory){
      return _tokenURI;
    }
 
-   //TODOS:
-   //abstract "ERC721: transfer caller is not owner nor approved" to modifier
-   //Update transfer events for root and nested
-   //Isolate _transfer() branches in own functions
-   //Add preapproval to setChild
-   //Update functions that take address and use as interface to take interface instead
-   //update _checkOnERC721Received to be RMRKCoreReceived
-   //double check (this) in setChild() call functions appropriately
-   //MINTS/BURNS
+   /*
+   TODOS:
+   abstract "transfer caller is not owner nor approved" to modifier
+   Isolate _transfer() branches in own functions
+   Update functions that take address and use as interface to take interface instead
+   double check (this) in setChild() call functions appropriately
 
-   //VULNERABILITY CHECK NOTES:
-   //External calls:
-   // ownerOf() during _transfer
-   // setChild() during _transfer()
-   //
-   //Vulnerabilities to test:
-   // Greif during _transfer via setChild reentry?
+   VULNERABILITY CHECK NOTES:
+   External calls:
+    ownerOf() during _transfer
+    setChild() during _transfer()
 
-   /**
-   @dev Returns all children, even pending
+   Vulnerabilities to test:
+    Greif during _transfer via setChild reentry?
+
+   VERIFY w/ YURI/BRUNO:
+   Presence of _issuer field, since _issuer as rote in RMRK substrate sets minting perms; Standard for EVM is to gate
+   minting behind requirement. Consider change in nomenclature to 'owner' to match EVM standards.
+
+   EVENTUALLY:
+   Create minimal contract that relies on on-chain libraries for gas savings
+
    */
+   // change to ERC165 implementation of IRMRKCore
+   function isRMRKCore() public pure returns (bool){
+     return true;
+   }
 
-  function childrenOf (uint256 childIndex) public view returns (Child[] memory) {
-    Child[] memory children = _children[childIndex];
+   function findRootOwner(uint id) public view returns(address) {
+   //sloads up the chain, each sload operation is 2.1K gas, not great
+   //returns entry in 'owner' field in the event 'owner' does not implement isRMRKCore()
+   //Currently not really functional, will probably be scrapped.
+   //Currently returns `ownerOf` if 'owner' in struct is 0
+     address root;
+     address ownerAdd;
+     uint ownerId;
+     (ownerAdd, ownerId) = nftOwnerOf(id);
+
+     if(ownerAdd == address(0)) {
+       return ownerOf(id);
+     }
+
+     IRMRKCore nft = IRMRKCore(ownerAdd);
+
+     try nft.isRMRKCore() {
+       nft.findRootOwner(id);
+     }
+
+     catch (bytes memory) {
+       root = ownerAdd;
+     }
+
+     return root;
+   }
+
+  /**
+  @dev Returns all children, even pending
+  */
+
+  function childrenOf (uint256 parentTokenId) public view returns (Child[] memory) {
+    Child[] memory children = _children[parentTokenId];
     return children;
   }
 
-  function unParent(uint256 tokenId) public {
+  /**
+  @dev Removes an NFT from its parent, removing the nftOwnerOf entry.
+  */
+
+  function removeParent(uint256 tokenId) public {
     require(_isApprovedOrOwner(_msgSender(), tokenId), "ERC721: transfer caller is not owner nor approved");
+
     delete(_nftOwners[tokenId]);
-    //TODO: Remove child entry on parent contract
+    (address owner, uint parentTokenId) = nftOwnerOf(tokenId);
+
+    IRMRKCore(owner).removeChild(parentTokenId, address(this), tokenId);
+
+    emit ParentRemoved(owner, parentTokenId, tokenId);
   }
 
-  function supportsInterface(bytes4 interfaceId) public view virtual override(ERC165, IERC165) returns (bool) {
-    return
-      interfaceId == type(IERC721).interfaceId ||
-      interfaceId == type(IERC721Metadata).interfaceId ||
-      super.supportsInterface(interfaceId);
+  /**
+  @dev Removes a child NFT from children[].
+  * Designed to be called by the removeParent function on an IRMRKCore contract to manage child[] array.
+  * Iterates over an array. Innefficient, consider another pattern.
+  * TODO: Restrict to contracts first called by approved owner. Must implement pattern for this.
+  * Option: Find some way to identify child -- abi.encodePacked? Is more gas efficient than sloading the struct?
+  */
+
+  function removeChild(uint256 tokenId, address childAddress, uint256 childTokenId) public {
+    Child[] memory children = childrenOf(tokenId);
+    uint i;
+    while (i<children.length) {
+      if (children[i].contractAddress == childAddress && children[i].tokenId == childTokenId) {
+        //Remove item from array, does not preserve order.
+        //Double check this, hacky-feeling set to array storage from array memory.
+        _children[tokenId][i] = children[children.length-1];
+        _children[tokenId].pop();
+      }
+      i++;
+    }
+
+    emit ChildRemoved(childAddress, tokenId, childTokenId);
+
   }
+
+  /**
+  @dev Accepts a child, setting pending to false.
+  * Storing children as an array seems inefficient, consider keccak256(abi.encodePacked(parentAddr, tokenId)) as key for mapping(childKey => childObj)))
+  * This operation can make getChildren() operation wacky racers, test it
+  * mappings rule, iterating through arrays drools
+  * SSTORE and SLOAD are basically the same gas cost anyway
+  */
+
+  function acceptChild(uint256 tokenId, address childAddress, uint256 childTokenId) public {
+      require(_isApprovedOrOwner(_msgSender(), tokenId), "RMRKCore: Attempting to accept a child in non-owned NFT");
+      Child[] memory children = childrenOf(tokenId);
+      uint i = 0;
+      while (i<children.length) {
+        if (children[i].contractAddress == childAddress && children[i].tokenId == childTokenId) {
+          _children[tokenId][i].pending = false;
+        }
+        i++;
+    }
+  }
+
+  /**
+  @dev Returns NFT owner for a nested NFT.
+  * Returns a tuple of (address, uint), which is the address and token ID of the NFT owner.
+  */
 
   function nftOwnerOf(uint256 tokenId) public view virtual returns (address, uint256) {
     NftOwner memory owner = _nftOwners[tokenId];
@@ -106,183 +206,93 @@ abstract contract RMRKNestable is Context, ERC165, IRMRKCore, IERC721Metadata {
     return (owner.contractAddress, owner.tokenId);
   }
 
+  /**
+  @dev Returns root owner of token. Can be an ETH address with our without contract data.
+  */
+
   function ownerOf(uint256 tokenId) public view virtual override returns (address) {
     address owner = _owners[tokenId];
     require(owner != address(0), "ERC721: owner query for nonexistent token");
     return owner;
   }
 
-  function balanceOf(address owner) public view virtual override returns (uint256) {
+  /**
+  @dev Returns balance of tokens owner by a given rootOwner.
+  */
+
+  function balanceOf(address owner) public view virtual returns (uint256) {
       require(owner != address(0), "ERC721: balance query for the zero address");
       return _balances[owner];
   }
 
-  function name() public view virtual override returns (string memory) {
+  /**
+  @dev Returns name of NFT collection.
+  */
+
+  function name() public view virtual returns (string memory) {
       return _name;
   }
 
-  function symbol() public view virtual override returns (string memory) {
+  /**
+  @dev Returns symbol of NFT collection.
+  */
+
+  function symbol() public view virtual returns (string memory) {
       return _symbol;
   }
 
-  function approve(address to, uint256 tokenId) public virtual override {
-      address owner = RMRKNestable.ownerOf(tokenId);
-      require(to != owner, "ERC721: approval to current owner");
+  /**
+  @dev Returns issuer of NFT collection.
+  */
 
-      require(
-          _msgSender() == owner || isApprovedForAll(owner, _msgSender()),
-          "ERC721: approve caller is not owner nor approved for all"
-      );
-
-      _approve(to, tokenId);
-  }
-
-  function getApproved(uint256 tokenId) public view virtual override returns (address) {
-      require(_exists(tokenId), "ERC721: approved query for nonexistent token");
-
-      return _tokenApprovals[tokenId];
+  function issuer() public view virtual returns (address) {
+    return _issuer;
   }
 
   /**
-   * @dev See {IERC721-setApprovalForAll}.
-   */
-  function setApprovalForAll(address operator, bool approved) public virtual override {
-      _setApprovalForAll(_msgSender(), operator, approved);
-  }
+  @dev Mints an NFT.
+  * Can mint to a root owner or another NFT.
+  * If 'NEST' is passed via _data parameter, token is minted into another NFT if target contract implemnts RMRKCore (Latter not implemented)
+  *
+  */
 
-  /**
-   * @dev See {IERC721-isApprovedForAll}.
-   */
-  function isApprovedForAll(address owner, address operator) public view virtual override returns (bool) {
-      return _operatorApprovals[owner][operator];
-  }
+  function mint(address to, uint256 tokenId, uint256 destId, string memory _data) public virtual {
 
-  /**
-   * @dev See {IERC721-transferFrom}.
-   */
-  function transferFrom(
-      address from,
-      address to,
-      uint256 tokenId,
-      uint256 destId,
-      bytes memory _data
-  ) public virtual {
-      //solhint-disable-next-line max-line-length
-      require(_isApprovedOrOwner(_msgSender(), tokenId), "ERC721: transfer caller is not owner nor approved");
-
-      _transfer(from, to, tokenId, destId, _data);
-  }
-
-  /**
-   * @dev See {IERC721-safeTransferFrom}.
-   */
-  function safeTransferFrom(
-      address from,
-      address to,
-      uint256 tokenId,
-      uint256 destId,
-      bytes memory _data
-  ) public virtual {
-      require(_isApprovedOrOwner(_msgSender(), tokenId), "ERC721: transfer caller is not owner nor approved");
-      _safeTransfer(from, to, tokenId, destId, _data);
-  }
-
-  /**
-   * @dev Safely transfers `tokenId` token from `from` to `to`, checking first that contract recipients
-   * are aware of the ERC721 protocol to prevent tokens from being forever locked.
-   *
-   * `_data` is additional data, it has no specified format and it is sent in call to `to`.
-   *
-   * This internal function is equivalent to {safeTransferFrom}, and can be used to e.g.
-   * implement alternative mechanisms to perform token transfer, such as signature-based.
-   *
-   * Requirements:
-   *
-   * - `from` cannot be the zero address.
-   * - `to` cannot be the zero address.
-   * - `tokenId` token must exist and be owned by `from`.
-   * - If `to` refers to a smart contract, it must implement {IERC721Receiver-onERC721Received}, which is called upon a safe transfer.
-   *
-   * Emits a {Transfer} event.
-   */
-  function _safeTransfer(
-      address from,
-      address to,
-      uint256 tokenId,
-      uint256 destId,
-      bytes memory _data
-  ) internal virtual {
-      _transfer(from, to, tokenId, destId, _data);
-      require(_checkOnERC721Received(from, to, tokenId, _data), "ERC721: transfer to non ERC721Receiver implementer");
-  }
-
-  /**
-   * @dev Returns whether `tokenId` exists.
-   *
-   * Tokens can be managed by their owner or approved accounts via {approve} or {setApprovalForAll}.
-   *
-   * Tokens start existing when they are minted (`_mint`),
-   * and stop existing when they are burned (`_burn`).
-   */
-  function _exists(uint256 tokenId) internal view virtual returns (bool) {
-      return _owners[tokenId] != address(0);
-  }
-
-  /**
-   * @dev Returns whether `spender` is allowed to manage `tokenId`.
-   *
-   * Requirements:
-   *
-   * - `tokenId` must exist.
-   */
-  function _isApprovedOrOwner(address spender, uint256 tokenId) internal view virtual returns (bool) {
-      require(_exists(tokenId), "ERC721: operator query for nonexistent token");
-      address owner = this.ownerOf(tokenId);
-      return (spender == owner || getApproved(tokenId) == spender || isApprovedForAll(owner, spender));
-  }
-
-  /**
-   * @dev Safely mints `tokenId` and transfers it to `to`.
-   *
-   * Requirements:
-   *
-   * - `tokenId` must not exist.
-   * - If `to` refers to a smart contract, it must implement {IERC721Receiver-onERC721Received}, which is called upon a safe transfer.
-   *
-   * Emits a {Transfer} event.
-   */
-  function _safeMint(address to, uint256 tokenId) internal virtual {
-      _safeMint(to, tokenId, "");
-  }
-
-  /**
-   * @dev Same as {xref-ERC721-_safeMint-address-uint256-}[`_safeMint`], with an additional `data` parameter which is
-   * forwarded in {IERC721Receiver-onERC721Received} to contract recipients.
-   */
-  function _safeMint(
-      address to,
-      uint256 tokenId,
-      bytes memory _data
-  ) internal virtual {
+    //Gas saving here from string > bytes?
+    if (keccak256(bytes(_data)) == keccak256(bytes("NEST"))) {
+      _mintNest(to, tokenId, destId);
+    }
+    else{
       _mint(to, tokenId);
-      require(
-          _checkOnERC721Received(address(0), to, tokenId, _data),
-          "ERC721: transfer to non ERC721Receiver implementer"
-      );
+    }
   }
 
-  /**
-   * @dev Mints `tokenId` and transfers it to `to`.
-   *
-   * WARNING: Usage of this method is discouraged, use {_safeMint} whenever possible
-   *
-   * Requirements:
-   *
-   * - `tokenId` must not exist.
-   * - `to` cannot be the zero address.
-   *
-   * Emits a {Transfer} event.
-   */
+  function _mintNest(address to, uint256 tokenId, uint256 destId) internal virtual {
+      require(to != address(0), "ERC721: mint to the zero address");
+      require(!_exists(tokenId), "ERC721: token already minted");
+      require(to.isContract(), "Is not contract");
+      IRMRKCore destContract = IRMRKCore(to);
+      /* require(destContract.isRMRKCore(), "Not RMRK Core"); */ //Implement supportsInterface RMRKCore
+
+      _beforeTokenTransfer(address(0), to, tokenId);
+      address rootOwner = destContract.ownerOf(destId);
+      _balances[rootOwner] += 1;
+      _owners[tokenId] = rootOwner;
+
+      _nftOwners[tokenId] = NftOwner({
+        contractAddress: to,
+        tokenId: destId
+        });
+
+      bool pending = !destContract.isApprovedOrOwner(msg.sender, destId);
+
+      destContract.setChild(this, destId, tokenId, pending);
+
+      emit Transfer(address(0), to, tokenId);
+
+      _afterTokenTransfer(address(0), to, tokenId);
+  }
+
   function _mint(address to, uint256 tokenId) internal virtual {
       require(to != address(0), "ERC721: mint to the zero address");
       require(!_exists(tokenId), "ERC721: token already minted");
@@ -317,10 +327,26 @@ abstract contract RMRKNestable is Context, ERC165, IRMRKCore, IERC721Metadata {
 
       _balances[owner] -= 1;
       delete _owners[tokenId];
+      delete _nftOwners[tokenId];
 
       emit Transfer(owner, address(0), tokenId);
 
       _afterTokenTransfer(owner, address(0), tokenId);
+  }
+
+  /**
+   * @dev See {IERC721-transferFrom}.
+   */
+  function transferFrom(
+      address from,
+      address to,
+      uint256 tokenId,
+      uint256 destId,
+      string memory _data
+  ) public virtual {
+      //solhint-disable-next-line max-line-length
+      require(_isApprovedOrOwner(_msgSender(), tokenId), "ERC721: transfer caller is not owner nor approved");
+      _transfer(from, to, tokenId, destId, _data);
   }
 
   /**
@@ -334,36 +360,36 @@ abstract contract RMRKNestable is Context, ERC165, IRMRKCore, IERC721Metadata {
    *
    * Emits a {Transfer} event.
    */
+
+  //Convert string to bytes in calldata for gas saving
+  //Double check to make sure nested transfers update balanceOf correctly. Maybe add condition if rootOwner does not change for gas savings.
   function _transfer(
       address from,
       address to,
       uint256 tokenId,
       uint256 destId,
-      bytes memory _data
+      string memory _data
   ) internal virtual {
       require(this.ownerOf(tokenId) == from, "ERC721: transfer from incorrect owner");
       require(to != address(0), "ERC721: transfer to the zero address");
 
       _beforeTokenTransfer(from, to, tokenId);
 
-      // Clear approvals from the previous owner
-      _approve(address(0), tokenId);
-
-      if (keccak256(_data) == keccak256(bytes("NEST"))) {
+      if (keccak256(bytes(_data)) == _nestFlag) {
         _nftOwners[tokenId] = NftOwner({
           contractAddress: to,
           tokenId: destId
           });
 
         IRMRKCore destContract = IRMRKCore(to);
-
+        bool pending = !destContract.isApprovedOrOwner(msg.sender, destId);
         address rootOwner = destContract.ownerOf(destId);
 
         _balances[from] -= 1;
         _balances[rootOwner] += 1;
         _owners[tokenId] = rootOwner;
 
-        destContract.setChild(this, destId, tokenId);
+        destContract.setChild(this, destId, tokenId, pending);
 
       }
 
@@ -373,83 +399,14 @@ abstract contract RMRKNestable is Context, ERC165, IRMRKCore, IERC721Metadata {
         _owners[tokenId] = to;
       }
 
+      // Clear approvals from the previous owner
+      _approve(address(0), tokenId);
+
       emit Transfer(from, to, tokenId);
 
       _afterTokenTransfer(from, to, tokenId);
   }
 
-  /**
-   * @dev Approve `to` to operate on `tokenId`
-   *
-   * Emits a {Approval} event.
-   */
-  function _approve(address to, uint256 tokenId) internal virtual {
-      _tokenApprovals[tokenId] = to;
-      emit Approval(this.ownerOf(tokenId), to, tokenId);
-  }
-
-  /**
-   * @dev Approve `operator` to operate on all of `owner` tokens
-   *
-   * Emits a {ApprovalForAll} event.
-   */
-  function _setApprovalForAll(
-      address owner,
-      address operator,
-      bool approved
-  ) internal virtual {
-      require(owner != operator, "ERC721: approve to caller");
-      _operatorApprovals[owner][operator] = approved;
-      emit ApprovalForAll(owner, operator, approved);
-  }
-
-  /**
-   * @dev Internal function to invoke {IERC721Receiver-onERC721Received} on a target address.
-   * The call is not executed if the target address is not a contract.
-   *
-   * @param from address representing the previous owner of the given token ID
-   * @param to target address that will receive the tokens
-   * @param tokenId uint256 ID of the token to be transferred
-   * @param _data bytes optional data to send along with the call
-   * @return bool whether the call correctly returned the expected magic value
-   */
-  function _checkOnERC721Received(
-      address from,
-      address to,
-      uint256 tokenId,
-      bytes memory _data
-  ) private returns (bool) {
-      if (to.isContract()) {
-          try IERC721Receiver(to).onERC721Received(_msgSender(), from, tokenId, _data) returns (bytes4 retval) {
-              return retval == IERC721Receiver.onERC721Received.selector;
-          } catch (bytes memory reason) {
-              if (reason.length == 0) {
-                  revert("ERC721: transfer to non ERC721Receiver implementer");
-              } else {
-                  assembly {
-                      revert(add(32, reason), mload(reason))
-                  }
-              }
-          }
-      } else {
-          return true;
-      }
-  }
-
-  /**
-   * @dev Hook that is called before any token transfer. This includes minting
-   * and burning.
-   *
-   * Calling conditions:
-   *
-   * - When `from` and `to` are both non-zero, ``from``'s `tokenId` will be
-   * transferred to `to`.
-   * - When `from` is zero, `tokenId` will be minted for `to`.
-   * - When `to` is zero, ``from``'s `tokenId` will be burned.
-   * - `from` and `to` are never both zero.
-   *
-   * To learn more about hooks, head to xref:ROOT:extending-contracts.adoc#using-hooks[Using Hooks].
-   */
   function _beforeTokenTransfer(
       address from,
       address to,
@@ -475,17 +432,64 @@ abstract contract RMRKNestable is Context, ERC165, IRMRKCore, IERC721Metadata {
 
     /**
      * @dev Function designed to be used by other instances of RMRK-Core contracts to update children.
-     * Function can only be called when
+     * param1 childAddress is the address of the child contract as an IRMRKCore instance
+     * param2 parentTokenId is the tokenId of the parent token on (this).
+     * param3 childTokenId is the tokenId of the child instance
      */
-  function setChild(IRMRKCore childAddress, uint tokenId, uint childTokenId) public virtual {
+  function setChild(IRMRKCore childAddress, uint parentTokenId, uint childTokenId, bool isPending) public virtual {
     (address parent, ) = childAddress.nftOwnerOf(childTokenId);
     require(parent == address(this), "Parent-child mismatch");
+
+    //if parent token Id is same root owner as child
     Child memory child = Child({
         contractAddress: address(childAddress),
         tokenId: childTokenId,
-        pending: true
+        pending: isPending
       });
-    _children[tokenId].push(child);
+    _children[parentTokenId].push(child);
+  }
+
+  function _exists(uint256 tokenId) internal view virtual returns (bool) {
+      return _owners[tokenId] != address(0);
+  }
+
+  function approve(address to, uint256 tokenId) public virtual {
+      address owner = this.ownerOf(tokenId);
+      require(to != owner, "ERC721: approval to current owner");
+
+      require(
+          _msgSender() == owner,
+          "ERC721: approve caller is not owner"
+      );
+
+      _approve(to, tokenId);
+  }
+
+  function _approve(address to, uint256 tokenId) internal virtual {
+      _tokenApprovals[tokenId] = to;
+      emit Approval(ownerOf(tokenId), to, tokenId);
+  }
+
+  function _isApprovedOrOwner(address spender, uint256 tokenId) internal view virtual returns (bool) {
+      address owner = this.ownerOf(tokenId);
+      return (spender == owner || getApproved(tokenId) == spender);
+  }
+
+  //re-implement isApprovedForAll
+  function isApprovedOrOwner(address spender, uint256 tokenId) public view virtual returns (bool) {
+    bool res = _isApprovedOrOwner(spender, tokenId);
+    return res;
+  }
+
+  function getApproved(uint256 tokenId) public view virtual returns (address) {
+      require(_exists(tokenId), "ERC721: approved query for nonexistent token");
+
+      return _tokenApprovals[tokenId];
+  }
+
+  //big dumb stupid hack, fix
+  function supportsInterface() public returns (bool) {
+    return true;
   }
 
     /**
