@@ -1,15 +1,9 @@
 pragma solidity ^0.8.9;
 
-import "./utils/Strings.sol";
 //Just a storage contract for base items at the moment.
 //TODO: standardize access controls
 
 contract RMRKBase {
-  using Strings for uint256;
-
-
-  string commonSrcPrefix;
-  string commonSrcSuffix;
 
   //bytes8 is sort of arbitrary here--resource IDs in RMRK substrate are bytes8 for reference
   mapping (bytes8 => Base) private bases;
@@ -23,69 +17,45 @@ contract RMRKBase {
     Base base;
   }
 
-  //If IPFS storage as pure index is acceptable, this format is gas-efficient.
-  //Double check to make sure this is effectively one storage slot.
+  //Consider merkel tree for equippables array if stuff gets crazy
 
   struct Base {
     ItemType itemType; //1 byte
-    address equippableAddr; //20 bytes
-    uint256 src; //4 bytes -- supports collections of up to 4M+ individual items by index.
-    uint256 fallbackSrc; //4 bytes
     uint8 z; //1 byte
     bool exists; //1 byte
+    bytes8[] equippableIds; //n bytes, probably uses its own storage slot anyway
+    string src; //n bytes
+    string fallbackSrc; //n bytes
   }
 
   //Passing structs is messy Arrays of structs containing other structs a bit moreso. Make sure this is acceptable.
   constructor(IntakeStruct[] memory intakeStruct) {
-    addBaseResourceList(intakeStruct);
+    addBaseEntryList(intakeStruct);
   }
 
-  function addBaseResourceList (IntakeStruct[] memory intakeStruct) public {
+  function addBaseEntryList (IntakeStruct[] memory intakeStruct) private {
     for (uint i = 0; i<intakeStruct.length; i++) {
-      addBaseResource(intakeStruct[i]);
+      addBaseEntry(intakeStruct[i]);
     }
   }
 
-  function addBaseResource (IntakeStruct memory intakeStruct) public {
+  function addBaseEntry (IntakeStruct memory intakeStruct) private {
     require(!bases[intakeStruct.id].exists, "Base already exists");
     intakeStruct.base.exists = true; //enforce exists, can swap to require if need be.
     bases[intakeStruct.id] = intakeStruct.base;
     baseIds.push(intakeStruct.id);
   }
 
-  //Overloaded function to add items piecemeal
-  function addBaseResource (bytes8 _id, ItemType _itemType, address _equippableAddr, uint256 _src, uint256 _fallbackSrc, uint8 _z) public {
-    bases[_id] = Base({
-      itemType: _itemType,
-      equippableAddr: _equippableAddr,
-      src: _src,
-      fallbackSrc: _fallbackSrc,
-      z: _z,
-      exists: true
-      });
+  function getBaseEntry (bytes8 _id) external view returns (Base memory) {
+    return (bases[_id]);
   }
 
-  function removeBaseResource (bytes8 _id) public {
-    uint i;
-    while (i < baseIds.length) {
-      if (baseIds[i] == _id) {
-        baseIds[i] = baseIds[baseIds.length-1];
-        baseIds.pop();
-      }
-      i++;
-    delete bases[_id];
+  function getBaseEntries (bytes8[] calldata _ids) external view returns (Base[] memory) {
+    Base[] memory baseEntries;
+    for (uint i=0; i<_ids.length; i++) {
+      baseEntries[i] = bases[_ids[i]];
     }
-  }
-
-  //Constructs src and fallbakcSrc from global constants. Gas-efficient if strict indexing of base by uint on IPFS is an acceptabe standard.
-  //probably better if I reimplement Strings from uint256 to uint32, but this is still cheaper
-  function getBaseResource (bytes8 _id) public view returns (Base memory, string memory, string memory) {
-    Base memory base = bases[_id];
-    uint256 srcInt = uint256(base.src);
-    uint256 fallbackSrcInt = uint256(base.fallbackSrc);
-    string memory src = string(abi.encodePacked(commonSrcPrefix, srcInt.toString(), commonSrcSuffix));
-    string memory fallbackSrc = string(abi.encodePacked(commonSrcPrefix, fallbackSrcInt.toString(), commonSrcSuffix));
-    return (base, src, fallbackSrc);
+    return baseEntries;
   }
 
 }
