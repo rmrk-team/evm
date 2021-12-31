@@ -1,7 +1,9 @@
-import "./RMRKNestable.sol";
-import "./access/Ownable.sol";
+pragma solidity ^0.8.9;
 
-contract RMRKResource is RMRKNestable, Ownable {
+import "./RMRKNestable.sol";
+//import "./access/IssuerContext.sol";
+
+contract RMRKResource is RMRKNestable {
 
   //Heavily under construction here. Reconsidering splitting resource storage into two distinct types -
   //partate (inherits from base) and override(carries own src).
@@ -19,9 +21,9 @@ contract RMRKResource is RMRKNestable, Ownable {
 
   mapping(uint256 => mapping(bytes8 => Resource)) public _resources;
 
-  mapping(uint256 => bytes32[]) public priority;
+  mapping(uint256 => bytes8[]) public priority;
 
-  enum ResType { Partate, Override }
+  //enum ResType { Partate, Override }
 
   event ResAdd(uint256 indexed tokenId, bytes32 indexed uuid);
   event ResAccept(uint256 indexed tokenId, bytes32 indexed uuid);
@@ -35,73 +37,83 @@ contract RMRKResource is RMRKNestable, Ownable {
   Figure out how to set priority on resources of various types. Will an NFT ever display more than one resource?
   */
 
-  //Resource struct is a bit overloaded at the moment. Must contain all vars necessary for
+  //Resource struct is a bit overloaded at the moment. Must contain all vars necessary for all types.
+  //The resource is assumed to be alt art if parts.length returns zero.
+  /*
+  //Ideally a struct would contain only the data types to render a given asset. Consider implementing
+  //two standard resource types, partsResource and overrideResource, of the following forms:
+
+  struct partsResource {
+      uint32 slot;
+      bool pending;
+      bool exists;
+      bytes8[] parts;
+      string metadataURI;
+  }
+
+  struct overrideResource {
+      string src;
+      string thumb;
+      string metadataURI;
+  }
+  */
+
+  //indexed via TokenId (uint256) => ResourceId (bytes8) => Resource Mapping;
+
   struct Resource {
       uint32 slot; //4 bytes
-      uint32 z; //4 bytes
       bool pending; // 1 byte
       bool exists; //1 byte
-      bool isAltArt; //1 byte
       bytes8[] parts; // n bytes
-      bytes32 src; //32
-      bytes32 thumb; //32
+      string src; //32+
       string metadataURI; //32+
   }
 
-  struct PartResource {
-      
-  }
-
-  struct OverrideResource {
-
-  }
-
-  // Y I K E S -- gotta just redo resource storage / access
-  // Stack too deep territory for sure here
   function addResource(
       uint256 _tokenId,
       bytes8 _id, //Previously named _id, have seen it called id in RMRK examples / documentation, ask for clarification
-      uint32 slot,
-      uint32 z,
-      bool _pending, //Consider dropping pending and relying on a strict preapproval structure
-      bool _exists,
-      bool _isAltArt,
-      bytes8[] _parts,
-      bytes32 _src,
-      bytes32 _thumb,
+      uint32 _slot,
+      bytes8[] memory _parts,
+      string memory _src,
+      string memory _thumb,
       string memory _metadataURI
 
-  ) public onlyOwner {
-      bool p = false;
+  ) public onlyIssuer {
+      require(!_resources[_tokenId][_id].exists, "RMRK: resource already exists");
+      bool _pending = false;
       if (!isApprovedOrOwner(_msgSender(), _tokenId)) {
-          p = true;
+          _pending = true;
       }
-      Resource memory _r = Resource({
+      Resource memory resource_ = Resource({
+          slot: _slot,
+          pending: _pending,
+          exists: true,
+          parts: _parts,
           src: _src,
-          metadataURI: _metadataURI,
           thumb: _thumb,
-          pending: p,
-          exists: true
+          metadataURI: _metadataURI
       });
-      _resources[_tokenId][_id] = _r;
+      _resources[_tokenId][_id] = resource_;
+      priority[_tokenId].push(_id);
       emit ResAdd(_tokenId, _id);
   }
 
+  //Check to see if loading struct into memory first saves gas or not
   function acceptResource(uint256 _tokenId, bytes8 _id) public {
+      Resource memory resource = _resources[_tokenId][_id];
       require(
-          ownerOf(_tokenId) == msg.sender,
+        isApprovedOrOwner(_msgSender(), _tokenId),
           "RMRK: Attempting to accept a resource in non-owned NFT"
       );
-      if (_resources[_tokenId][_id].exists) {
-          _resources[_tokenId][_id].pending = false;
-          emit ResAccept(_tokenId, _id);
-          return;
-      }
+      require(resource.exists, "RMRK: resource does not exist");
+      require(!resource.pending, "RMRK: resource is already approved");
+      _resources[_tokenId][_id].pending = false;
+      emit ResAccept(_tokenId, _id);
   }
 
   function setPriority(uint256 _tokenId, bytes8[] memory _ids) public {
       require(
-          ownerOf(_tokenId) == msg.sender,
+        isApprovedOrOwner(_msgSender(), _tokenId),
           "RMRK: Attempting to set priority in non-owned NFT"
       );
       for (uint256 i = 0; i < _ids.length; i++) {
@@ -110,7 +122,6 @@ contract RMRKResource is RMRKNestable, Ownable {
               "RMRK: Trying to reprioritize a non-existant resource"
           );
       }
-      // @todo loop through _ids and make sure all exist
       priority[_tokenId] = _ids;
       emit ResPrio(_tokenId);
   }

@@ -9,10 +9,11 @@ import "./utils/Address.sol";
 import "./utils/Context.sol";
 import "./utils/Strings.sol";
 import "./utils/introspection/ERC165.sol";
+import "./access/IssuerControl.sol"; // double check, use owner if acceptable
 
-import "hardhat/console.sol";
+//import "hardhat/console.sol";
 
-contract RMRKNestable is Context, ERC165, IRMRKCore {
+contract RMRKNestable is Context, ERC165, IRMRKCore, IssuerControl  {
   using Address for address;
   using Strings for uint256;
 
@@ -67,6 +68,11 @@ contract RMRKNestable is Context, ERC165, IRMRKCore {
     _issuer = msg.sender;
   }
 
+  modifier onlyIssuer() {
+      require(issuer() == _msgSender(), "RMRK: caller is not the issuer");
+      _;
+  }
+
    function tokenURI(uint256 tokenId) public virtual view returns(string memory){
      return _tokenURI;
    }
@@ -94,7 +100,7 @@ contract RMRKNestable is Context, ERC165, IRMRKCore {
    Create minimal contract that relies on on-chain libraries for gas savings
 
    */
-   // change to ERC165 implementation of IRMRKCore
+   // change to ERC 165 implementation of IRMRKCore
    function isRMRKCore() public pure returns (bool){
      return true;
    }

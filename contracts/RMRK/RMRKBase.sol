@@ -3,7 +3,9 @@ pragma solidity ^0.8.9;
 //Just a storage contract for base items at the moment.
 //TODO: standardize access controls
 
-contract RMRKBase {
+import "./access/IssuerControl.sol";
+
+contract RMRKBase is IssuerControl {
 
   //bytes8 is sort of arbitrary here--resource IDs in RMRK substrate are bytes8 for reference
   mapping (bytes8 => Base) private bases;
@@ -12,6 +14,7 @@ contract RMRKBase {
 
   enum ItemType { Slot, Fixed }
 
+  //Inquire about using an index instead of hashed ID to prevent any chance of collision
   struct IntakeStruct {
     bytes8 id;
     Base base;
@@ -45,6 +48,10 @@ contract RMRKBase {
     bases[intakeStruct.id] = intakeStruct.base;
     baseIds.push(intakeStruct.id);
   }
+
+  /* function addEquippableIds (bytes8 _baseEntryid, bytes8[] _equippableIds) public {
+
+  } */
 
   function getBaseEntry (bytes8 _id) external view returns (Base memory) {
     return (bases[_id]);
