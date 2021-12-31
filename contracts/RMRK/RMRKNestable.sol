@@ -68,11 +68,6 @@ contract RMRKNestable is Context, ERC165, IRMRKCore, IssuerControl  {
     _issuer = msg.sender;
   }
 
-  modifier onlyIssuer() {
-      require(issuer() == _msgSender(), "RMRK: caller is not the issuer");
-      _;
-  }
-
    function tokenURI(uint256 tokenId) public virtual view returns(string memory){
      return _tokenURI;
    }
@@ -245,14 +240,6 @@ contract RMRKNestable is Context, ERC165, IRMRKCore, IssuerControl  {
 
   function symbol() public view virtual returns (string memory) {
       return _symbol;
-  }
-
-  /**
-  @dev Returns issuer of NFT collection.
-  */
-
-  function issuer() public view virtual returns (address) {
-    return _issuer;
   }
 
   /**

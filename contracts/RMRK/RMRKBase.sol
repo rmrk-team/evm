@@ -49,9 +49,9 @@ contract RMRKBase is IssuerControl {
     baseIds.push(intakeStruct.id);
   }
 
-  /* function addEquippableIds (bytes8 _baseEntryid, bytes8[] _equippableIds) public {
-
-  } */
+  function addEquippableIds (bytes8 _baseEntryid, bytes8[] memory _equippableIds) public {
+    bases[_baseEntryid].equippableIds = _equippableIds;
+  }
 
   function getBaseEntry (bytes8 _id) external view returns (Base memory) {
     return (bases[_id]);
