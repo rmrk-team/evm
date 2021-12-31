@@ -14,6 +14,9 @@ contract RMRKBase is IssuerControl {
 
   enum ItemType { Slot, Fixed }
 
+  event AddedEquippablesToEntry (bytes8 baseId, bytes8[] equippableIds);
+  event AddedEquippableToAll (bytes8 equippableId);
+
   //Inquire about using an index instead of hashed ID to prevent any chance of collision
   struct IntakeStruct {
     bytes8 id;
@@ -49,8 +52,22 @@ contract RMRKBase is IssuerControl {
     baseIds.push(intakeStruct.id);
   }
 
-  function addEquippableIds (bytes8 _baseEntryid, bytes8[] memory _equippableIds) public {
+  function addEquippableIds (bytes8 _baseEntryid, bytes8[] memory _equippableIds) public onlyIssuer {
+    require(_equippableIds.length > 0, "RMRK: Zero-length ids passed.");
+    require(bases[_baseEntryid].exists, "RMRK: Base entry does not exist.");
     bases[_baseEntryid].equippableIds = _equippableIds;
+    emit AddedEquippablesToEntry(_baseEntryid, _equippableIds);
+  }
+
+  //Handle this function with care, this function can be extremely gas-expensive.
+  function addEquippableIdToAll (bytes8 _equippableId) public onlyIssuer {
+    for(uint i=0; i<baseIds.length; i++) {
+      bytes8 baseId_ = baseIds[i];
+      if (bases[baseId_].itemType == ItemType.Slot) {
+        bases[baseId_].equippableIds.push(_equippableId);
+      }
+    }
+    emit AddedEquippableToAll(_equippableId);
   }
 
   function getBaseEntry (bytes8 _id) external view returns (Base memory) {
