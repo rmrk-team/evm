@@ -66,7 +66,16 @@ contract RMRKResource is RMRKNestable {
       bool exists; //1 byte
       bytes8[] parts; // n bytes
       string src; //32+
+      string thumb; //32+
       string metadataURI; //32+
+  }
+
+  function equip() public {
+
+  }
+
+  function unequip() public {
+
   }
 
   function addResource(

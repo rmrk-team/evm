@@ -20,6 +20,8 @@ contract RMRKNestable is Context, ERC165, IRMRKCore, IssuerControl  {
   struct Child {
     address contractAddress;
     uint256 tokenId;
+    bytes8 baseSlot;
+    bytes8 equipSlot;
     bool pending;
   }
 
@@ -437,6 +439,8 @@ contract RMRKNestable is Context, ERC165, IRMRKCore, IssuerControl  {
     Child memory child = Child({
         contractAddress: address(childAddress),
         tokenId: childTokenId,
+        baseSlot: bytes8(0),
+        equipSlot: bytes8(0),
         pending: isPending
       });
     _children[parentTokenId].push(child);
