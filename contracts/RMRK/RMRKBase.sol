@@ -92,7 +92,8 @@ contract RMRKBase is IssuerControl {
   }
 
   /**
-  @dev Public function which adds a number of equippableIds to a single base entry.
+  @dev Public function which adds a number of equippableIds to a single base entry. Only accessible by the contract
+  * deployer or transferred Issuer, designated by the modifier onlyIssuer as per the inherited contract issuerControl.
   */
 
   function addEquippableIds (bytes8 _baseEntryid, bytes8[] memory _equippableIds) public onlyIssuer {
@@ -104,7 +105,8 @@ contract RMRKBase is IssuerControl {
 
   /**
   @dev Public function which adds a single equippableId to every base item.
-  * Handle this function with care, this function can be extremely gas-expensive.
+  * Handle this function with care, this function can be extremely gas-expensive. Only accessible by the contract
+  * deployer or transferred Issuer, designated by the modifier onlyIssuer as per the inherited contract issuerControl.
   */
 
   function addEquippableIdToAll (bytes8 _equippableId) public onlyIssuer {
