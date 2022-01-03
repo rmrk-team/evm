@@ -18,44 +18,22 @@ contract RMRKResource is RMRKNestable {
   {
   }
 
-  mapping(uint256 => mapping(bytes8 => Resource)) public _resources;
+  mapping(uint256 => mapping(bytes8 => Resource)) private _resources;
 
   //Does double duty as a list of all resources. Potential greif vector if filled via unauthorized. Recommend only preauthorization.
-  mapping(uint256 => bytes8[]) public priority;
+  mapping(uint256 => bytes8[]) private _priority;
 
   //enum ResType { Partate, Override }
 
   event ResAdd(uint256 indexed tokenId, bytes32 indexed uuid);
   event ResAccept(uint256 indexed tokenId, bytes32 indexed uuid);
   event ResPrio(uint256 indexed tokenId);
+  event ResEquipped();
+  event ResUnequipped();
 
-  /**
-  Issue: Resource struct contains too much data generally, going to lead to inefficient storage.
-  src field is only used by resources that override those from base -- override also requires flag.
-  parts[] vice-versa.
-  Consider storage solution that splits resource into two types, overrides and non-overrides.
-  Figure out how to set priority on resources of various types. Will an NFT ever display more than one resource?
-  */
-
-  //Resource struct is a bit overloaded at the moment. Must contain all vars necessary for all types.
-  //The resource is assumed to be alt art if parts.length returns zero.
   /*
-  //Ideally a struct would contain only the data types to render a given asset. Consider implementing
-  //two standard resource types, partsResource and overrideResource, of the following forms:
-
-  struct partsResource {
-      uint32 slot;
-      bool pending;
-      bool exists;
-      bytes8[] parts;
-      string metadataURI;
-  }
-
-  struct overrideResource {
-      string src;
-      string thumb;
-      string metadataURI;
-  }
+  //Resource struct is a bit overloaded at the moment. Must contain all vars necessary for all types.
+  //The resource can be assumed to be alt art if parts.length returns zero.
   */
 
   //indexed via TokenId (uint256) => ResourceId (bytes8) => Resource Mapping;
@@ -74,11 +52,10 @@ contract RMRKResource is RMRKNestable {
   FROM SPEC:
   The value of baseslot can change from "" to "base-4477293-kanaria_superbird.machine_gun_scope"
   ONLY if one of this child NFT's resources has this value as a slot property
-
   */
 
   function equip() public {
-    
+
   }
 
   function unequip() public {
@@ -110,7 +87,7 @@ contract RMRKResource is RMRKNestable {
           metadataURI: _metadataURI
       });
       _resources[_tokenId][_id] = resource_;
-      priority[_tokenId].push(_id);
+      _priority[_tokenId].push(_id);
       emit ResAdd(_tokenId, _id);
   }
 
@@ -138,7 +115,20 @@ contract RMRKResource is RMRKNestable {
               "RMRK: Trying to reprioritize a non-existant resource"
           );
       }
-      priority[_tokenId] = _ids;
+      _priority[_tokenId] = _ids;
       emit ResPrio(_tokenId);
+  }
+
+  function getRenderableResource(uint256 tokenId) public view returns(Resource memory) {
+    bytes8 resourceId = _priority[tokenId][0];
+    return getResource(tokenId, resourceId);
+  }
+
+  function getResource(uint256 tokenId, bytes8 resourceId) public view returns(Resource memory) {
+    return _resources[tokenId][resourceId];
+  }
+
+  function getPriorities(uint256 tokenId) public view returns(bytes8[] memory) {
+    return _priority[tokenId];
   }
 }
