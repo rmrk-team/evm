@@ -1,7 +1,6 @@
 pragma solidity ^0.8.9;
 
 import "./RMRKNestable.sol";
-//import "./access/IssuerContext.sol";
 
 contract RMRKResource is RMRKNestable {
 
@@ -21,6 +20,7 @@ contract RMRKResource is RMRKNestable {
 
   mapping(uint256 => mapping(bytes8 => Resource)) public _resources;
 
+  //Does double duty as a list of all resources. Potential greif vector if filled via unauthorized. Recommend only preauthorization.
   mapping(uint256 => bytes8[]) public priority;
 
   //enum ResType { Partate, Override }
@@ -70,8 +70,15 @@ contract RMRKResource is RMRKNestable {
       string metadataURI; //32+
   }
 
-  function equip() public {
+  /*
+  FROM SPEC:
+  The value of baseslot can change from "" to "base-4477293-kanaria_superbird.machine_gun_scope"
+  ONLY if one of this child NFT's resources has this value as a slot property
 
+  */
+
+  function equip() public {
+    
   }
 
   function unequip() public {
