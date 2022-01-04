@@ -4,7 +4,7 @@ pragma solidity ^0.8.9;
 pragma abicoder v2;
 
 /**
-This is a new attempt at writing RMRK contracts 
+This is a new attempt at writing RMRK contracts
 without consideration of erc721 compatibility.
 
 TODO: approvals and safe transfers etc.
