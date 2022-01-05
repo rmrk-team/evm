@@ -12,6 +12,7 @@ interface IRMRKCore {
   function findRootOwner(uint id) external view returns(address);
   function isApprovedOrOwner(address addr, uint id) external view returns(bool);
   function removeChild(uint256 tokenId, address childAddress, uint256 childTokenId) external;
+  function _updateRootOwner(uint tokenId, address oldOwner, address newOwner) external;
 
   /**
    * @dev Returns the token collection name.

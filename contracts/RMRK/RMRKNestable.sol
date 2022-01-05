@@ -358,6 +358,7 @@ contract RMRKNestable is Context, ERC165, IRMRKCore, IssuerControl  {
 
   //Convert string to bytes in calldata for gas saving
   //Double check to make sure nested transfers update balanceOf correctly. Maybe add condition if rootOwner does not change for gas savings.
+  //All children of transferred NFT should also have owner updated.
   function _transfer(
       address from,
       address to,
@@ -386,6 +387,18 @@ contract RMRKNestable is Context, ERC165, IRMRKCore, IssuerControl  {
 
         destContract.setChild(this, destId, tokenId, pending);
 
+        //get children and initiate downstream rootOwner update
+        //WOWEE this is gettin' complicated
+        Child[] memory children = childrenOf(tokenId);
+        //Does this need an if statement if array is empty? Probably not
+        for (uint i; i<children.length; i++){
+          IRMRKCore(children[i].contractAddress)._updateRootOwner(
+            children[i].tokenId,
+            from,
+            rootOwner
+            );
+        }
+
       }
 
       else {
@@ -400,6 +413,29 @@ contract RMRKNestable is Context, ERC165, IRMRKCore, IssuerControl  {
       emit Transfer(from, to, tokenId);
 
       _afterTokenTransfer(from, to, tokenId);
+  }
+
+  //Only callable from the contract that owns the token.
+  //Pay extra attention to this function, as it DOES NOT QUERY THE OWNING NFT ITSELF
+  function _updateRootOwner(uint tokenId, address oldOwner, address newOwner) public {
+    //update self
+    (address nftOwner, )= nftOwnerOf(tokenId);
+    require(nftOwner == msg.sender, "Caller is not nftOwner contract");
+    _balances[oldOwner] -= 1;
+    _balances[newOwner] += 1;
+    _owners[tokenId] = newOwner;
+    //get any children and call self on children
+    Child[] memory children = childrenOf(tokenId);
+
+    for (uint i; i<children.length; i++){
+      IRMRKCore(children[i].contractAddress)._updateRootOwner(
+        children[i].tokenId,
+        oldOwner,
+        newOwner
+        );
+    }
+    //call self on children
+
   }
 
   function _beforeTokenTransfer(
@@ -504,7 +540,7 @@ contract RMRKNestable is Context, ERC165, IRMRKCore, IssuerControl  {
    * A numerator of 1*10**5 and a denominator of 1*10**6 is equal to 10 percent, or 100,000 parts per 1,000,000.
    */
    //TODO: Decide on default visiblity
-  function setRoyaltyData(address _royaltyAddress, uint32 _numerator, uint32 _denominator) external virtual {
+  function setRoyaltyData(address _royaltyAddress, uint32 _numerator, uint32 _denominator) external virtual onlyIssuer {
    _royalties = RoyaltyData ({
        royaltyAddress: _royaltyAddress,
        numerator: _numerator,
