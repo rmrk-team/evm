@@ -1,8 +1,8 @@
 pragma solidity ^0.8.9;
 
-import "./access/IssuerControl.sol";
+import "./access/AccessControl.sol";
 
-contract RMRKBase is IssuerControl {
+contract RMRKBase is AccessControl {
 
   /*
   REVIEW NOTES:
@@ -30,6 +30,8 @@ contract RMRKBase is IssuerControl {
   mapping (bytes8 => Base) private bases;
 
   bytes8[] private baseIds;
+
+  bytes32 public constant issuer = keccak256("ISSUER");
 
   enum ItemType { Slot, Fixed }
 
@@ -66,6 +68,8 @@ contract RMRKBase is IssuerControl {
   */
 
   constructor(IntakeStruct[] memory intakeStruct) {
+    _grantRole(issuer, msg.sender);
+    _setRoleAdmin(issuer, issuer);
     addBaseEntryList(intakeStruct);
   }
 
@@ -96,7 +100,7 @@ contract RMRKBase is IssuerControl {
   * deployer or transferred Issuer, designated by the modifier onlyIssuer as per the inherited contract issuerControl.
   */
 
-  function addEquippableIds (bytes8 _baseEntryid, bytes8[] memory _equippableIds) public onlyIssuer {
+  function addEquippableIds (bytes8 _baseEntryid, bytes8[] memory _equippableIds) public onlyRole(issuer) {
     require(_equippableIds.length > 0, "RMRK: Zero-length ids passed.");
     require(bases[_baseEntryid].exists, "RMRK: Base entry does not exist.");
     bases[_baseEntryid].equippableIds = _equippableIds;
@@ -109,7 +113,7 @@ contract RMRKBase is IssuerControl {
   * deployer or transferred Issuer, designated by the modifier onlyIssuer as per the inherited contract issuerControl.
   */
 
-  function addEquippableIdToAll (bytes8 _equippableId) public onlyIssuer {
+  function addEquippableIdToAll (bytes8 _equippableId) public onlyRole(issuer) {
     for(uint i=0; i<baseIds.length; i++) {
       bytes8 baseId_ = baseIds[i];
       if (bases[baseId_].itemType == ItemType.Slot) {

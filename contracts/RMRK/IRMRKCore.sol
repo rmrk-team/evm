@@ -9,7 +9,6 @@ interface IRMRKCore {
   function nftOwnerOf(uint256 tokenId) external view returns (address, uint256);
   function ownerOf(uint256 tokenId) external view returns(address);
   function isRMRKCore() external pure returns(bool);
-  function findRootOwner(uint id) external view returns(address);
   function isApprovedOrOwner(address addr, uint id) external view returns(bool);
   function removeChild(uint256 tokenId, address childAddress, uint256 childTokenId) external;
   function _updateRootOwner(uint tokenId, address oldOwner, address newOwner) external;

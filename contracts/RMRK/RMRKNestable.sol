@@ -9,11 +9,11 @@ import "./utils/Address.sol";
 import "./utils/Context.sol";
 import "./utils/Strings.sol";
 import "./utils/introspection/ERC165.sol";
-import "./access/IssuerControl.sol"; // double check, use owner if acceptable
+import "./access/AccessControl.sol";
 
 //import "hardhat/console.sol";
 
-contract RMRKNestable is Context, ERC165, IRMRKCore, IssuerControl  {
+contract RMRKNestable is Context, IRMRKCore, AccessControl {
   using Address for address;
   using Strings for uint256;
 
@@ -42,8 +42,6 @@ contract RMRKNestable is Context, ERC165, IRMRKCore, IssuerControl  {
 
   string private _tokenURI;
 
-  address private _issuer;
-
   bytes32 private _nestFlag = keccak256(bytes("NEST"));
 
   RoyaltyData private _royalties;
@@ -60,6 +58,12 @@ contract RMRKNestable is Context, ERC165, IRMRKCore, IssuerControl  {
 
   mapping(uint256 => Child[]) private _children;
 
+  // AccessControl roles
+
+  bytes32 public constant issuer = keccak256("ISSUER");
+
+  //events
+
   event ParentRemoved(address parentAddress, uint parentTokenId, uint childTokenId);
 
   event ChildRemoved(address childAddress, uint parentTokenId, uint childTokenId);
@@ -67,7 +71,9 @@ contract RMRKNestable is Context, ERC165, IRMRKCore, IssuerControl  {
   constructor(string memory name_, string memory symbol_) {
     _name = name_;
     _symbol = symbol_;
-    _issuer = msg.sender;
+
+    _grantRole(issuer, msg.sender);
+    _setRoleAdmin(issuer, issuer);
   }
 
    function tokenURI(uint256 tokenId) public virtual view returns(string memory){
@@ -89,10 +95,6 @@ contract RMRKNestable is Context, ERC165, IRMRKCore, IssuerControl  {
    Vulnerabilities to test:
     Greif during _transfer via setChild reentry?
 
-   VERIFY w/ YURI/BRUNO:
-   Presence of _issuer field, since _issuer as rote in RMRK substrate sets minting perms; Standard for EVM is to gate
-   minting behind requirement. Consider change in nomenclature to 'owner' to match EVM standards.
-
    EVENTUALLY:
    Create minimal contract that relies on on-chain libraries for gas savings
 
@@ -100,33 +102,6 @@ contract RMRKNestable is Context, ERC165, IRMRKCore, IssuerControl  {
    // change to ERC 165 implementation of IRMRKCore
    function isRMRKCore() public pure returns (bool){
      return true;
-   }
-
-   function findRootOwner(uint id) public view returns(address) {
-   //sloads up the chain, each sload operation is 2.1K gas, not great
-   //returns entry in 'owner' field in the event 'owner' does not implement isRMRKCore()
-   //Currently not really functional, will probably be scrapped.
-   //Currently returns `ownerOf` if 'owner' in struct is 0
-     address root;
-     address ownerAdd;
-     uint ownerId;
-     (ownerAdd, ownerId) = nftOwnerOf(id);
-
-     if(ownerAdd == address(0)) {
-       return ownerOf(id);
-     }
-
-     IRMRKCore nft = IRMRKCore(ownerAdd);
-
-     try nft.isRMRKCore() {
-       nft.findRootOwner(id);
-     }
-
-     catch (bytes memory) {
-       root = ownerAdd;
-     }
-
-     return root;
    }
 
   /**
@@ -389,8 +364,11 @@ contract RMRKNestable is Context, ERC165, IRMRKCore, IssuerControl  {
 
         //get children and initiate downstream rootOwner update
         //WOWEE this is gettin' complicated
+
         Child[] memory children = childrenOf(tokenId);
+
         //Does this need an if statement if array is empty? Probably not
+        //Consider try {} catch
         for (uint i; i<children.length; i++){
           IRMRKCore(children[i].contractAddress)._updateRootOwner(
             children[i].tokenId,
@@ -434,7 +412,6 @@ contract RMRKNestable is Context, ERC165, IRMRKCore, IssuerControl  {
         newOwner
         );
     }
-    //call self on children
 
   }
 
@@ -540,7 +517,7 @@ contract RMRKNestable is Context, ERC165, IRMRKCore, IssuerControl  {
    * A numerator of 1*10**5 and a denominator of 1*10**6 is equal to 10 percent, or 100,000 parts per 1,000,000.
    */
    //TODO: Decide on default visiblity
-  function setRoyaltyData(address _royaltyAddress, uint32 _numerator, uint32 _denominator) external virtual onlyIssuer {
+  function setRoyaltyData(address _royaltyAddress, uint32 _numerator, uint32 _denominator) external virtual onlyRole(issuer) {
    _royalties = RoyaltyData ({
        royaltyAddress: _royaltyAddress,
        numerator: _numerator,

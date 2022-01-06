@@ -63,7 +63,7 @@ contract RMRKResource is RMRKNestable {
       string memory _thumb,
       string memory _metadataURI
 
-  ) public onlyIssuer {
+  ) public onlyRole(issuer) {
       require(!_resources[_tokenId][_id].exists, "RMRK: resource already exists");
       bool _pending = false;
       if (!isApprovedOrOwner(_msgSender(), _tokenId)) {
