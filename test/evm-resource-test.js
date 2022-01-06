@@ -58,7 +58,7 @@ describe("init", async function () {
   beforeEach(async function () {
     [owner, ...addrs] = await ethers.getSigners();
 
-    const RMRK = await ethers.getContractFactory("RMRKResource");
+    const RMRK = await ethers.getContractFactory("RMRKCore");
     rmrkNft = await RMRK.deploy(name, symbol);
     await rmrkNft.deployed();
 

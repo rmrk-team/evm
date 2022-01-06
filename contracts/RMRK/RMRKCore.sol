@@ -13,7 +13,7 @@ import "./access/AccessControl.sol";
 
 //import "hardhat/console.sol";
 
-contract RMRKNestable is Context, IRMRKCore, AccessControl {
+contract RMRKCore is Context, IRMRKCore, AccessControl {
   using Address for address;
   using Strings for uint256;
 
@@ -46,7 +46,6 @@ contract RMRKNestable is Context, IRMRKCore, AccessControl {
       string thumb; //32+
       string metadataURI; //32+
   }
-
 
   string private _name;
 
@@ -401,7 +400,6 @@ contract RMRKNestable is Context, IRMRKCore, AccessControl {
           rootOwner
           );
       }
-
     }
 
     else {
@@ -421,22 +419,22 @@ contract RMRKNestable is Context, IRMRKCore, AccessControl {
   //Only callable from the contract that owns the token.
   //Pay extra attention to this function, as it DOES NOT QUERY THE OWNING NFT ITSELF
   function _updateRootOwner(uint tokenId, address oldOwner, address newOwner) public {
-  //update self
-  (address nftOwner, )= nftOwnerOf(tokenId);
-  require(nftOwner == msg.sender, "Caller is not nftOwner contract");
-  _balances[oldOwner] -= 1;
-  _balances[newOwner] += 1;
-  _owners[tokenId] = newOwner;
-  //get any children and call self on children
-  Child[] memory children = childrenOf(tokenId);
+    //update self
+    (address nftOwner, )= nftOwnerOf(tokenId);
+    require(nftOwner == msg.sender, "Caller is not nftOwner contract");
+    _balances[oldOwner] -= 1;
+    _balances[newOwner] += 1;
+    _owners[tokenId] = newOwner;
+    //get any children and call self on children
+    Child[] memory children = childrenOf(tokenId);
 
-  for (uint i; i<children.length; i++){
-    IRMRKCore(children[i].contractAddress)._updateRootOwner(
-      children[i].tokenId,
-      oldOwner,
-      newOwner
-      );
-    }
+    for (uint i; i<children.length; i++){
+      IRMRKCore(children[i].contractAddress)._updateRootOwner(
+        children[i].tokenId,
+        oldOwner,
+        newOwner
+        );
+      }
   }
 
   function _beforeTokenTransfer(
@@ -619,7 +617,7 @@ contract RMRKNestable is Context, IRMRKCore, AccessControl {
   * Recommended values are in Parts Per Million, E.G:
   * A numerator of 1*10**5 and a denominator of 1*10**6 is equal to 10 percent, or 100,000 parts per 1,000,000.
   */
-  
+
   function setRoyaltyData(address _royaltyAddress, uint32 _numerator, uint32 _denominator) public virtual onlyRole(issuer) {
     _royalties = RoyaltyData ({
        royaltyAddress: _royaltyAddress,
