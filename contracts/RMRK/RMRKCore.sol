@@ -153,7 +153,7 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
   */
 
   //CHECK: preload mappings into memory for gas savings
-  function sendPendingToChild(uint256 index, uint256 _tokenId) internal {
+  function commitPendingToChildren(uint256 index, uint256 _tokenId) internal {
     require(
       _pendingChildren[_tokenId].length < index,
       "RMRKcore: Pending child index out of range"
