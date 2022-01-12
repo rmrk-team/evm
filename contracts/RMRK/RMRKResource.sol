@@ -86,6 +86,12 @@ contract RMRKResource is AccessControl {
       allResources.push(_id);
   }
 
+  function getResource(bytes8 resourceId) public view returns (Resource memory) {
+    Resource memory resource_ = _resources[resourceId];
+    require(resource_.id != bytes8(0), "RMRKResource: No resource at index");
+    return resource_;
+  }
+
   /**
    * @dev Resource name getter
    */

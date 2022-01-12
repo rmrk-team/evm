@@ -66,8 +66,10 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
 
   //Resources
 
+  //mapping of tokenId to resourceId to resource entry
   mapping(uint256 => mapping(bytes8 => Resource)) private _resources;
 
+  //mapping of tokenId to all resources by priority
   mapping(uint256 => bytes8[]) private _priority;
 
   RMRKResource public resourceStorage;
@@ -129,7 +131,7 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
 
   function nftOwnerOf(uint256 tokenId) public view virtual returns (address, uint256) {
     NftOwner memory owner = _nftOwners[tokenId];
-    require(owner.contractAddress != address(0), "ERC721: owner query for nonexistent token");
+    require(owner.contractAddress != address(0), "RMRKCore: owner query for nonexistent token");
     return (owner.contractAddress, owner.tokenId);
   }
 
@@ -139,7 +141,7 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
 
   function ownerOf(uint256 tokenId) public view virtual override returns (address) {
     address owner = _owners[tokenId];
-    require(owner != address(0), "ERC721: owner query for nonexistent token");
+    require(owner != address(0), "RMRKCore: owner query for nonexistent token");
     return owner;
   }
 
@@ -148,7 +150,7 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
   */
 
   function balanceOf(address owner) public view virtual returns (uint256) {
-    require(owner != address(0), "ERC721: balance query for the zero address");
+    require(owner != address(0), "RMRKCore: balance query for the zero address");
     return _balances[owner];
   }
 
@@ -210,6 +212,11 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
       _pendingChildren[_tokenId].length < index,
       "RMRKcore: Pending child index out of range"
     );
+    //get owner of pendingChild
+    require(
+      ownerOf(_tokenId) == _msgSender(),
+      "RMRKcore: Bad owner"
+    );
     Child memory child_ = _pendingChildren[_tokenId][index];
     _pendingChildren[_tokenId][index] = Child({
       tokenId: 0,
@@ -256,7 +263,7 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
   //Currently passed into _burn function, will fail upon burning children. Must update require statement to
   //accommodate this.
   function removeParent(uint256 tokenId) public {
-    require(isApprovedOwnerOrNftOwner(_msgSender(), tokenId), "ERC721: transfer caller is not owner nor approved");
+    require(isApprovedOwnerOrNftOwner(_msgSender(), tokenId), "RMRKCore: transfer caller is not owner nor approved");
 
     delete(_nftOwners[tokenId]);
     (address owner, uint parentTokenId) = nftOwnerOf(tokenId);
@@ -291,7 +298,7 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
 
   }
 
-  /**
+  /* *
   @dev Accepts a child, setting pending to false.
   * Storing children as an array seems inefficient, consider keccak256(abi.encodePacked(parentAddr, tokenId)) as key for mapping(childKey => childObj)))
   * This operation can make getChildren() operation wacky racers, test it
@@ -299,7 +306,6 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
   * SSTORE and SLOAD are basically the same gas cost anyway
   */
 
-  //DONOW
   /* function acceptChild(uint256 tokenId, address childAddress, uint256 childTokenId) public {
     require(_isApprovedOrOwner(_msgSender(), tokenId), "RMRKCore: Attempting to accept a child in non-owned NFT");
     Child[] memory children = childrenOf(tokenId);
@@ -364,8 +370,8 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
   }
 
   function _mintToRootOwner(address to, uint256 tokenId) internal virtual {
-    require(to != address(0), "ERC721: mint to the zero address");
-    require(!_exists(tokenId), "ERC721: token already minted");
+    require(to != address(0), "RMRKCore: mint to the zero address");
+    require(!_exists(tokenId), "RMRKCore: token already minted");
 
     _beforeTokenTransfer(address(0), to, tokenId);
 
@@ -450,7 +456,7 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
     string memory _data
   ) public virtual {
     //solhint-disable-next-line max-line-length
-    require(_isApprovedOrOwner(_msgSender(), tokenId), "ERC721: transfer caller is not owner nor approved");
+    require(_isApprovedOrOwner(_msgSender(), tokenId), "RMRKCore: transfer caller is not owner nor approved");
     _transfer(from, to, tokenId, destinationId, _data);
   }
 
@@ -476,8 +482,8 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
     uint256 destinationId,
     string memory _data
   ) internal virtual {
-    require(this.ownerOf(tokenId) == from, "ERC721: transfer from incorrect owner");
-    require(to != address(0), "ERC721: transfer to the zero address");
+    require(this.ownerOf(tokenId) == from, "RMRKCore: transfer from incorrect owner");
+    require(to != address(0), "RMRKCore: transfer to the zero address");
 
     _beforeTokenTransfer(from, to, tokenId);
 
@@ -605,11 +611,11 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
 
   function approve(address to, uint256 tokenId) public virtual {
     address owner = this.ownerOf(tokenId);
-    require(to != owner, "ERC721: approval to current owner");
+    require(to != owner, "RMRKCore: approval to current owner");
 
     require(
         _msgSender() == owner,
-        "ERC721: approve caller is not owner"
+        "RMRKCore: approve caller is not owner"
     );
 
     _approve(to, tokenId);
@@ -638,7 +644,7 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
   }
 
   function getApproved(uint256 tokenId) public view virtual returns (address) {
-    require(_exists(tokenId), "ERC721: approved query for nonexistent token");
+    require(_exists(tokenId), "RMRKCore: approved query for nonexistent token");
 
     return _tokenApprovals[tokenId];
   }
@@ -678,11 +684,18 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
       bytes8 _resourceId
   ) public onlyRole(issuer) {
       require(
-        (_resources[_tokenId][_resourceId].resourceId != bytes8(0)),
-        "RMRK: resource already exists"
+        _resources[_tokenId][_resourceId].resourceId == bytes8(0),
+        "RMRKCore: Resource already exists on token"
+      );
+      //This error code will never be triggered because of the interior call of
+      //resourceStorage.getResource. Left in for posterity.
+      require(
+        resourceStorage.getResource(_resourceId).id != bytes8(0),
+        "RMRKCore: Resource not found in storage"
       );
 
-      bool _pending = false;
+
+      bool _pending;
       if (!isApprovedOrOwner(_msgSender(), _tokenId)) {
           _pending = true;
       }
@@ -744,6 +757,8 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
   function getTokenResource(uint256 tokenId, bytes8 resourceId) public virtual view returns(Resource memory) {
     return _resources[tokenId][resourceId];
   }
+
+  //Design decision note -- Mention differences between child and resource 'pending' handling
 
   function getPriorities(uint256 tokenId) public virtual view returns(bytes8[] memory) {
     return _priority[tokenId];
