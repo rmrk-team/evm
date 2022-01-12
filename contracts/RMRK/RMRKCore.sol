@@ -72,7 +72,7 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
 
   RMRKResource public resourceStorage;
 
-  // AccessControl roles
+  // AccessControl roles and nest flag constants
 
   bytes32 private constant issuer = keccak256("ISSUER");
 
@@ -313,18 +313,22 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
   *
   */
 
-  function mint(address to, uint256 tokenId, uint256 destinationId, string memory _data) public virtual {
+  function _mint(address to, uint256 tokenId) internal virtual {
+    _mint(to, tokenId, 0, "");
+  }
+
+  function _mint(address to, uint256 tokenId, uint256 destinationId, string memory _data) internal virtual {
 
     //Gas saving here from string > bytes?
     if (keccak256(bytes(_data)) == nestFlag) {
-      _mintNest(to, tokenId, destinationId);
+      _mintToNft(to, tokenId, destinationId);
     }
     else{
-      _mint(to, tokenId);
+      _mintToRootOwner(to, tokenId);
     }
   }
 
-  function _mintNest(address to, uint256 tokenId, uint256 destinationId) internal virtual {
+  function _mintToNft(address to, uint256 tokenId, uint256 destinationId) internal virtual {
     require(to != address(0), "RMRKCore: mint to the zero address");
     require(!_exists(tokenId), "RMRKCore: token already minted");
     require(to.isContract(), "RMRKCore: Is not contract");
@@ -349,7 +353,7 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
     _afterTokenTransfer(address(0), to, tokenId);
   }
 
-  function _mint(address to, uint256 tokenId) internal virtual {
+  function _mintToRootOwner(address to, uint256 tokenId) internal virtual {
     require(to != address(0), "ERC721: mint to the zero address");
     require(!_exists(tokenId), "ERC721: token already minted");
 
