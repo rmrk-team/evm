@@ -306,6 +306,10 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
     return _symbol;
   }
 
+  ////////////////////////////////////////
+  //              MINTING
+  ////////////////////////////////////////
+
   /**
   @dev Mints an NFT.
   * Can mint to a root owner or another NFT.
@@ -424,6 +428,10 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
     }
     removeParent(tokenId);
   }
+
+  ////////////////////////////////////////
+  //             TRANSFERS
+  ////////////////////////////////////////
 
 
   /**
@@ -582,6 +590,10 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
     }
   }
 
+  ////////////////////////////////////////
+  //      APPROVALS / PRE-CHECKING
+  ////////////////////////////////////////
+
   function _exists(uint256 tokenId) internal view virtual returns (bool) {
     return _owners[tokenId] != address(0);
   }
@@ -625,7 +637,9 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
     return true;
   }
 
-  //==========RESOURCE FUNCTIONS==========
+  ////////////////////////////////////////
+  //              RESOURCES
+  ////////////////////////////////////////
 
   function addResourceEntry(
       bytes8 _id,
@@ -697,7 +711,7 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
       );
       for (uint256 i = 0; i < _ids.length; i++) {
           require(
-              (_resources[_tokenId][_ids[i]].resourceId !=0),
+              (_resources[_tokenId][_ids[i]].resourceId !=bytes8(0)),
               "RMRK: Trying to reprioritize a non-existant resource"
           );
       }
@@ -705,26 +719,28 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
       emit ResourcePrioritySet(_tokenId);
   }
 
-  function getRenderableResource(uint256 tokenId) public view returns(Resource memory) {
+  function getRenderableResource(uint256 tokenId) public virtual view returns(Resource memory) {
     bytes8 resourceId = _priority[tokenId][0];
     return getTokenResource(tokenId, resourceId);
   }
 
-  function getTokenResource(uint256 tokenId, bytes8 resourceId) public view returns(Resource memory) {
+  function getTokenResource(uint256 tokenId, bytes8 resourceId) public virtual view returns(Resource memory) {
     return _resources[tokenId][resourceId];
   }
 
-  function getPriorities(uint256 tokenId) public view returns(bytes8[] memory) {
+  function getPriorities(uint256 tokenId) public virtual view returns(bytes8[] memory) {
     return _priority[tokenId];
   }
 
-  //==========ROYALTY FUNCTIONS==========
+  ////////////////////////////////////////
+  //              ROYALTIES
+  ////////////////////////////////////////
 
   /**
   * @dev Returns contract royalty data.
   * Returns a numerator and denominator for percentage calculations, as well as a desitnation address.
   */
-  function getRoyaltyData() public view returns(address royaltyAddress, uint256 numerator, uint256 denominator) {
+  function getRoyaltyData() public virtual view returns(address royaltyAddress, uint256 numerator, uint256 denominator) {
     RoyaltyData memory data = _royalties;
     return(data.royaltyAddress, uint256(data.numerator), uint256(data.denominator));
   }
@@ -735,7 +751,7 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
   * A numerator of 1*10**5 and a denominator of 1*10**6 is equal to 10 percent, or 100,000 parts per 1,000,000.
   */
 
-  function setRoyaltyData(address _royaltyAddress, uint32 _numerator, uint32 _denominator) public virtual onlyRole(issuer) {
+  function setRoyaltyData(address _royaltyAddress, uint32 _numerator, uint32 _denominator) internal virtual onlyRole(issuer) {
     _royalties = RoyaltyData ({
        royaltyAddress: _royaltyAddress,
        numerator: _numerator,
