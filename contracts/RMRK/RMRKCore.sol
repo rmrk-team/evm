@@ -99,10 +99,6 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
     _setRoleAdmin(issuer, issuer);
   }
 
-  function tokenURI(uint256 tokenId) public virtual view returns(string memory){
-   return _tokenURI;
-  }
-
   /*
   TODOS:
   abstract "transfer caller is not owner nor approved" to modifier
@@ -122,12 +118,68 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
   Create minimal contract that relies on on-chain libraries for gas savings
   */
 
+  ////////////////////////////////////////
+  //             PROVENANCE
+  ////////////////////////////////////////
+
+  /**
+  @dev Returns NFT owner for a nested NFT.
+  * Returns a tuple of (address, uint), which is the address and token ID of the NFT owner.
+  */
+
+  function nftOwnerOf(uint256 tokenId) public view virtual returns (address, uint256) {
+    NftOwner memory owner = _nftOwners[tokenId];
+    require(owner.contractAddress != address(0), "ERC721: owner query for nonexistent token");
+    return (owner.contractAddress, owner.tokenId);
+  }
+
+  /**
+  @dev Returns root owner of token. Can be an ETH address with our without contract data.
+  */
+
+  function ownerOf(uint256 tokenId) public view virtual override returns (address) {
+    address owner = _owners[tokenId];
+    require(owner != address(0), "ERC721: owner query for nonexistent token");
+    return owner;
+  }
+
+  /**
+  @dev Returns balance of tokens owner by a given rootOwner.
+  */
+
+  function balanceOf(address owner) public view virtual returns (uint256) {
+    require(owner != address(0), "ERC721: balance query for the zero address");
+    return _balances[owner];
+  }
+
+  /**
+  @dev Returns name of NFT collection.
+  */
+
+  function name() public view virtual returns (string memory) {
+    return _name;
+  }
+
+  /**
+  @dev Returns symbol of NFT collection.
+  */
+
+  function symbol() public view virtual returns (string memory) {
+    return _symbol;
+  }
+
   // change to ERC 165 implementation of IRMRKCore
   function isRMRKCore() public pure returns (bool){
     return true;
   }
 
-  //==========CHILD MANAGEMENT FUNCS==========
+  function tokenURI(uint256 tokenId) public virtual view returns(string memory){
+   return _tokenURI;
+  }
+
+  ////////////////////////////////////////
+  //          CHILD MANAGEMENT
+  ////////////////////////////////////////
 
   /**
   @dev Adds an instance of Child to the pending children array for _tokenId. In the event a space in the array is open, pulls from
@@ -259,52 +311,6 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
       i++;
     }
   } */
-
-  /**
-  @dev Returns NFT owner for a nested NFT.
-  * Returns a tuple of (address, uint), which is the address and token ID of the NFT owner.
-  */
-
-  function nftOwnerOf(uint256 tokenId) public view virtual returns (address, uint256) {
-    NftOwner memory owner = _nftOwners[tokenId];
-    require(owner.contractAddress != address(0), "ERC721: owner query for nonexistent token");
-    return (owner.contractAddress, owner.tokenId);
-  }
-
-  /**
-  @dev Returns root owner of token. Can be an ETH address with our without contract data.
-  */
-
-  function ownerOf(uint256 tokenId) public view virtual override returns (address) {
-    address owner = _owners[tokenId];
-    require(owner != address(0), "ERC721: owner query for nonexistent token");
-    return owner;
-  }
-
-  /**
-  @dev Returns balance of tokens owner by a given rootOwner.
-  */
-
-  function balanceOf(address owner) public view virtual returns (uint256) {
-    require(owner != address(0), "ERC721: balance query for the zero address");
-    return _balances[owner];
-  }
-
-  /**
-  @dev Returns name of NFT collection.
-  */
-
-  function name() public view virtual returns (string memory) {
-    return _name;
-  }
-
-  /**
-  @dev Returns symbol of NFT collection.
-  */
-
-  function symbol() public view virtual returns (string memory) {
-    return _symbol;
-  }
 
   ////////////////////////////////////////
   //              MINTING
