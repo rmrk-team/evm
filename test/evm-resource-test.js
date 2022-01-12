@@ -11,6 +11,7 @@ describe("init", async function () {
 
   const name = "RmrkTest";
   const symbol = "RMRKTST";
+  const resourceName = "TestResource";
   const nestFlag = "NEST";
 
   /*
@@ -59,7 +60,7 @@ describe("init", async function () {
     [owner, ...addrs] = await ethers.getSigners();
 
     const RMRK = await ethers.getContractFactory("RMRKCore");
-    rmrkNft = await RMRK.deploy(name, symbol);
+    rmrkNft = await RMRK.deploy(name, symbol, resourceName);
     await rmrkNft.deployed();
 
     let i = 1;

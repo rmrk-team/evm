@@ -256,7 +256,7 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
   //Currently passed into _burn function, will fail upon burning children. Must update require statement to
   //accommodate this.
   function removeParent(uint256 tokenId) public {
-    require(_isApprovedOrOwner(_msgSender(), tokenId), "ERC721: transfer caller is not owner nor approved");
+    require(isApprovedOwnerOrNftOwner(_msgSender(), tokenId), "ERC721: transfer caller is not owner nor approved");
 
     delete(_nftOwners[tokenId]);
     (address owner, uint parentTokenId) = nftOwnerOf(tokenId);
@@ -414,7 +414,6 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
     _afterTokenTransfer(owner, address(0), tokenId);
   }
 
-
   //Make sure to check permissions for this function and perms of removeParent function.
   //how could devs allow something like this, smh
   function _burnChildren(uint256 tokenId, address oldOwner) public {
@@ -486,7 +485,7 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
       _nftOwners[tokenId] = NftOwner({
         contractAddress: to,
         tokenId: destinationId
-        });
+      });
 
       IRMRKCore destContract = IRMRKCore(to);
       bool pending = !destContract.isApprovedOrOwner(msg.sender, destinationId);
@@ -510,7 +509,7 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
           children[i].tokenId,
           from,
           rootOwner
-          );
+        );
       }
     }
 
@@ -545,8 +544,8 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
         children[i].tokenId,
         oldOwner,
         newOwner
-        );
-      }
+      );
+    }
   }
 
   function _beforeTokenTransfer(
@@ -629,6 +628,12 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
   //re-implement isApprovedForAll
   function isApprovedOrOwner(address spender, uint256 tokenId) public view virtual returns (bool) {
     bool res = _isApprovedOrOwner(spender, tokenId);
+    return res;
+  }
+
+  function isApprovedOwnerOrNftOwner(address spender, uint256 tokenId) public view virtual returns (bool) {
+    (address nftOwner, ) = nftOwnerOf(tokenId);
+    bool res = (nftOwner == _msgSender() || _isApprovedOrOwner(spender, tokenId));
     return res;
   }
 
