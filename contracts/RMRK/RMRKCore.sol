@@ -695,13 +695,19 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
   }
 
   function acceptResource(uint256 _tokenId, bytes8 _id) public {
-      Resource memory resource = _resources[_tokenId][_id];
-      require(resource.resourceId != bytes8(0), "RMRK: resource does not exist");
       require(
         isApprovedOrOwner(_msgSender(), _tokenId),
           "RMRK: Attempting to accept a resource in non-owned NFT"
       );
-      require(resource.pending, "RMRK: resource is already accepted");
+      Resource memory resource = _resources[_tokenId][_id];
+      require(
+        resource.resourceId != bytes8(0),
+          "RMRK: resource does not exist"
+      );
+      require(
+        resource.pending,
+          "RMRK: resource is already accepted"
+      );
       _resources[_tokenId][_id].pending = false;
       emit ResourceAccepted(_tokenId, _id);
   }
@@ -717,7 +723,7 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
       );
       for (uint256 i = 0; i < _ids.length; i++) {
           require(
-              (_resources[_tokenId][_ids[i]].resourceId !=bytes8(0)),
+            (_resources[_tokenId][_ids[i]].resourceId !=bytes8(0)),
               "RMRK: Trying to reprioritize a non-existant resource"
           );
       }

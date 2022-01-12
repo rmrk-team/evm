@@ -15,9 +15,6 @@ contract RMRKResource is AccessControl {
 
   //TODO: Further abstract resource internals to be non-repeating (as much as possibe)
 
-  bytes32 private constant issuer = keccak256("ISSUER");
-
-  string private _resourceName;
 
   struct Resource {
       bytes8 id; //8 bytes
@@ -31,7 +28,14 @@ contract RMRKResource is AccessControl {
 
   //Mapping of bytes8 to Resource. Consider an incrementer for zero collision chance.
   mapping(bytes8 => Resource) private _resources;
+
+  //List of all resources
   bytes8[] private allResources;
+
+  //Name of resource collection
+  string private _resourceName;
+
+  bytes32 private constant issuer = keccak256("ISSUER");
 
   event ResourcePrioritySet(uint256 indexed tokenId);
 
@@ -40,6 +44,18 @@ contract RMRKResource is AccessControl {
     _setRoleAdmin(issuer, issuer);
     setResourceName(resourceName_);
   }
+
+  /**
+   * @dev Function to handle adding a resource entry to the storage contract. Callable by the issuer role, which may also
+   * be an instance of the CORE contract, if deployed by the CORE.
+   * param1 _id is a unique resource identifier.
+   * param2 _slot is the slot ID for equip logic.
+   * param3 _baseAddress is the address of the base contract from which this contract pulls.
+   * param4 _basePartIds is a list of base part IDs from which this contract pulls.
+   * param5 _src is the primary URI of the resource (used for non-base resources)
+   * param6 _thumb is the thumbnail URI of the resource
+   * param7 _metadataURI is the URI of the resource's metadata
+   */
 
   function addResourceEntry(
       bytes8 _id, //Previously named _id, have seen it called id in RMRK examples / documentation, ask for clarification
@@ -70,9 +86,17 @@ contract RMRKResource is AccessControl {
       allResources.push(_id);
   }
 
+  /**
+   * @dev Resource name getter
+   */
+
   function getResourceName () public view returns (string memory) {
     return _resourceName;
   }
+
+  /**
+   * @dev Resource name setter
+   */
 
   function setResourceName (string memory resourceName) internal {
     _resourceName = resourceName;
