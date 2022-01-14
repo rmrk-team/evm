@@ -18,6 +18,7 @@ contract RMRKCoreMock is RMRKCore {
     resourceName
   ) {}
 
+  //The preferred method here is to overload the function, but hardhat tests prevent this.
   function doMint(address to, uint256 tokenId) external {
     _mint(to, tokenId);
   }

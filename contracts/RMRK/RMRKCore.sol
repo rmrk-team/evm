@@ -207,12 +207,11 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
   */
 
   //CHECK: preload mappings into memory for gas savings
-  function commitPendingToChildren(uint256 index, uint256 _tokenId) internal {
+  function acceptChildFromPending(uint256 index, uint256 _tokenId) public {
     require(
-      _pendingChildren[_tokenId].length < index,
+      _pendingChildren[_tokenId].length > index,
       "RMRKcore: Pending child index out of range"
     );
-    //get owner of pendingChild
     require(
       ownerOf(_tokenId) == _msgSender(),
       "RMRKcore: Bad owner"
@@ -257,45 +256,70 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
   }
 
   /**
-  @dev Removes an NFT from its parent, removing the nftOwnerOf entry.
+  * removeChild and removeParent can be called from either side
   */
-
-  //Currently passed into _burn function, will fail upon burning children. Must update require statement to
-  //accommodate this.
-  function removeParent(uint256 tokenId) public {
-    require(isApprovedOwnerOrNftOwner(_msgSender(), tokenId), "RMRKCore: transfer caller is not owner nor approved");
-
-    delete(_nftOwners[tokenId]);
-    (address owner, uint parentTokenId) = nftOwnerOf(tokenId);
-
-    IRMRKCore(owner).removeChild(parentTokenId, address(this), tokenId);
-
-    emit ParentRemoved(owner, parentTokenId, tokenId);
-  }
 
   /**
   @dev Removes a child NFT from children[].
   * Designed to be called by the removeParent function on an IRMRKCore contract to manage child[] array.
-  * Iterates over an array. Innefficient, consider another pattern.
+  * Syncs parent-child relationship if used as a callback from its partner function.
   * TODO: Restrict to contracts first called by approved owner. Must implement pattern for this.
   * Option: Find some way to identify child -- abi.encodePacked? Is more gas efficient than sloading the struct?
+  * Note: Information shared between these two items is sometimes loaded twice.
+  * Find a way to pass information effectively in the event this is used as a callback.
   */
 
   function removeChild(uint256 tokenId, address childAddress, uint256 childTokenId) public {
+    require(
+      isApprovedOrOwner(msg.sender, tokenId) ||
+      _msgSender() == childAddress);
     Child[] memory children = childrenOf(tokenId);
     uint i;
     while (i<children.length) {
       if (children[i].contractAddress == childAddress && children[i].tokenId == childTokenId) {
-        //Remove item from array, does not preserve order.
         //Double check this, hacky-feeling set to array storage from array memory.
         _children[tokenId][i] = children[children.length-1];
         _children[tokenId].pop();
       }
       i++;
+    }
+    //Sync parent
+    IRMRKCore RMRKChild = IRMRKCore(childAddress);
+    (address ownerAddress, ) = RMRKChild.nftOwnerOf(childTokenId);
+    if (ownerAddress != address(0)) {
+      RMRKChild.removeParentCallback(childTokenId, this.removeParentCallback.selector);
+    }
+  emit ChildRemoved(childAddress, tokenId, childTokenId);
   }
 
-  emit ChildRemoved(childAddress, tokenId, childTokenId);
+  /**
+  @dev Removes an NFT from its parent, removing the nftOwnerOf entry.
+  */
 
+  function removeParent(uint256 tokenId) public {
+    _removeParent(tokenId, "");
+  }
+
+  function removeParentCallback(uint256 tokenId, bytes4 callback) public {
+    require(_msgSender().isContract(), "RMRKCORE: Caller is not a contract");
+    _removeParent(tokenId, callback);
+  }
+
+  //Currently passed into _burn function, will fail upon burning children. Must update require statement to
+  //accommodate this.
+  function _removeParent(uint256 tokenId, bytes4 callback) internal {
+    require(isApprovedOwnerOrNftOwner(_msgSender(), tokenId),
+      "RMRKCore: transfer caller is not owner nor approved"
+    );
+    (address owner, uint parentTokenId) = nftOwnerOf(tokenId);
+    require(owner != address(0), "Attempt to remove uninitialized parent");
+    delete(_nftOwners[tokenId]);
+
+    if (callback != this.removeParentCallback.selector){
+        IRMRKCore(owner).removeChild(parentTokenId, address(this), tokenId);
+    }
+
+    emit ParentRemoved(owner, parentTokenId, tokenId);
   }
 
   /* *

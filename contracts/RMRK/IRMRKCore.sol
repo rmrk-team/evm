@@ -14,6 +14,7 @@ interface IRMRKCore {
   function _updateRootOwner(uint tokenId, address oldOwner, address newOwner) external;
   function _burnChildren(uint256 tokenId, address oldOwner) external;
   function getRoyaltyData() external view returns(address royaltyAddress, uint256 numerator, uint256 denominator);
+  function removeParentCallback(uint256 tokenId, bytes4 callback) external;
 
   /**
    * @dev Returns the token collection name.
