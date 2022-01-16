@@ -279,18 +279,13 @@ describe("init", async function () {
       await rmrkNft.connect(addrs[0]).doMintNest(rmrkNft2.address, 1, destId, nestFlag);
       await rmrkNft.connect(addrs[0]).doMintNest(rmrkNft2.address, 2, destId, nestFlag);
 
-      pendingChildren = await rmrkNft2.pendingChildrenOf(destId);
-      expect(pendingChildren).to.eql([]);
-
+      await expect(rmrkNft2.connect(addrs[1]).removeChild(destId, rmrkNft.address, 1)).to.be.revertedWith(
+        "RMRKCore: bad owner"
+      );
+      await rmrkNft2.connect(addrs[0]).removeChild(destId, rmrkNft.address, 1);
       children = await rmrkNft2.childrenOf(destId);
       expect(children).to.eql(
         [
-          [
-              ethers.BigNumber.from(1),
-              rmrkNft.address,
-              0,
-              ethers.utils.hexZeroPad("0x0", 8),
-          ],
           [
               ethers.BigNumber.from(2),
               rmrkNft.address,
@@ -299,8 +294,170 @@ describe("init", async function () {
           ]
         ]
       );
-
-
     });
+
+    it("Mint child into child", async function() {
+      let destId, children1, children2;
+
+      destId = 10;
+      //mint token 1 into 10 of RMRKNFT2
+      await rmrkNft.connect(addrs[0]).doMintNest(rmrkNft2.address, 1, destId, nestFlag);
+      //mint token 21 into 1 of RMRKNFT
+      await rmrkNft2.connect(addrs[0]).doMintNest(rmrkNft.address, 21, 1, nestFlag);
+
+      children1 = await rmrkNft2.childrenOf(10);
+      children2 = await rmrkNft.childrenOf(1);
+
+      expect(children1).to.eql(
+        [
+          [
+              ethers.BigNumber.from(1),
+              rmrkNft.address,
+              0,
+              ethers.utils.hexZeroPad("0x0", 8),
+          ]
+        ]
+      );
+      expect(children2).to.eql(
+        [
+          [
+              ethers.BigNumber.from(21),
+              rmrkNft2.address,
+              0,
+              ethers.utils.hexZeroPad("0x0", 8),
+          ]
+        ]
+      );
+    });
+    it("Mint child into pending child", async function() {
+      let destId, children1, children2;
+
+      destId = 10;
+      //mint token 1 into 10 of RMRKNFT2
+      await rmrkNft.connect(addrs[1]).doMintNest(rmrkNft2.address, 1, destId, nestFlag);
+      //mint token 21 into 1 of RMRKNFT
+      await rmrkNft2.connect(addrs[1]).doMintNest(rmrkNft.address, 21, 1, nestFlag);
+
+      children1 = await rmrkNft2.pendingChildrenOf(10);
+      children2 = await rmrkNft.pendingChildrenOf(1);
+
+      expect(children1).to.eql(
+        [
+          [
+              ethers.BigNumber.from(1),
+              rmrkNft.address,
+              0,
+              ethers.utils.hexZeroPad("0x0", 8),
+          ]
+        ]
+      );
+      expect(children2).to.eql(
+        [
+          [
+              ethers.BigNumber.from(21),
+              rmrkNft2.address,
+              0,
+              ethers.utils.hexZeroPad("0x0", 8),
+          ]
+        ]
+      );
+    });
+  });
+  describe("Burning NFTS", async function() {
+    it("Burn NFT", async function() {
+      let children1, children2;
+
+      await rmrkNft.connect(addrs[1]).doMint(addrs[1].address, 1);
+      await expect(rmrkNft.connect(addrs[0]).burn(1)).to.be.revertedWith(
+        "RMRKCore: transfer caller is not owner nor approved"
+      );
+      await rmrkNft.connect(addrs[1]).burn(1);
+      await expect(rmrkNft.ownerOf(1)).to.be.revertedWith(
+        "RMRKCore: owner query for nonexistent token"
+      );
+      expect(await rmrkNft.nftOwnerOf(1)).to.eql(
+        [
+          ethers.BigNumber.from(0),
+          ethers.utils.hexZeroPad("0x0", 20)
+        ]
+      );
+      //let owner = await rmrkNft.nftOwnerOf(1);
+      console.log(owner);
+    });
+
+    // it("Burn nested NFT", async function() {
+    //   let destId, children1, children2;
+    //
+    //   destId = 10;
+    //   //mint token 1 into 10 of RMRKNFT2
+    //   await rmrkNft.connect(addrs[1]).doMintNest(rmrkNft2.address, 1, destId, nestFlag);
+    //   await expect(rmrkNft.connect(addrs[1]).burn(1)).to.be.revertedWith(
+    //     "RMRKCore: transfer caller is not owner nor approved"
+    //   );
+    //   await rmrkNft.connect(addrs[0]).burn(1);
+    //
+    //   await expect(rmrkNft.ownerOf(1)).to.be.revertedWith(
+    //     "RMRKCore: owner query for nonexistent token"
+    //   );
+    //   let owner = await rmrkNft.nftOwnerOf(1);
+    //   console.log(owner);
+    //   expect(await rmrkNft.nftOwnerOf(1)).to.be.empty;
+    // });
+    //
+    // it("Recursively burn nested NFT", async function() {
+    //   let destId, children1, children2;
+    //
+    //   destId = 10;
+    //   //mint token 1 into 10 of RMRKNFT2
+    //   await rmrkNft.connect(addrs[0]).doMintNest(rmrkNft2.address, 1, destId, nestFlag);
+    //   //mint token 21 into 1 of RMRKNFT
+    //   await rmrkNft2.connect(addrs[0]).doMintNest(rmrkNft.address, 21, 1, nestFlag);
+    //
+    //   children1 = await rmrkNft2.childrenOf(10);
+    //   children2 = await rmrkNft.childrenOf(1);
+    //
+    //   expect(children1).to.eql(
+    //     [
+    //       [
+    //           ethers.BigNumber.from(1),
+    //           rmrkNft.address,
+    //           0,
+    //           ethers.utils.hexZeroPad("0x0", 8),
+    //       ]
+    //     ]
+    //   );
+    //
+    //   expect(children2).to.eql(
+    //     [
+    //       [
+    //           ethers.BigNumber.from(21),
+    //           rmrkNft2.address,
+    //           0,
+    //           ethers.utils.hexZeroPad("0x0", 8),
+    //       ]
+    //     ]
+    //   );
+    //
+    //   let burn1 = await rmrkNft2.nftOwnerOf(21);
+    //   console.log(burn1);
+    //
+    //   expect(await rmrkNft2.nftOwnerOf(21)).to.eql(
+    //     [
+    //       rmrkNft.address,
+    //       ethers.BigNumber.from(1),
+    //     ]
+    //   );
+
+      // await rmrkNft.connect(addrs[0]).burn(1);
+      // await expect(rmrkNft.ownerOf(1)).to.be.revertedWith(
+      //   "RMRKCore: owner query for nonexistent token"
+      // );
+      // await expect(rmrkNft.nftOwnerOf(1)).to.be.empty;
+      // await expect(rmrkNft2.ownerOf(21)).to.be.revertedWith(
+      //   "RMRKCore: owner query for nonexistent token"
+      // );
+      // await expect(rmrkNft2.nftOwnerOf(21)).to.be.empty;
+
+    // });
   });
 });

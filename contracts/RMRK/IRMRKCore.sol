@@ -8,13 +8,13 @@ interface IRMRKCore {
   function setChild(IRMRKCore childAddress, uint tokenId, uint childTokenId, bool pending) external;
   function nftOwnerOf(uint256 tokenId) external view returns (address, uint256);
   function ownerOf(uint256 tokenId) external view returns(address);
-  function isRMRKCore() external pure returns(bool);
   function isApprovedOrOwner(address addr, uint id) external view returns(bool);
   function removeChild(uint256 tokenId, address childAddress, uint256 childTokenId) external;
   function _updateRootOwner(uint tokenId, address oldOwner, address newOwner) external;
   function _burnChildren(uint256 tokenId, address oldOwner) external;
   function getRoyaltyData() external view returns(address royaltyAddress, uint256 numerator, uint256 denominator);
-  function removeParentCallback(uint256 tokenId, bytes4 callback) external;
+  function removeParent(uint256 tokenId, address ownerAddress, uint256 ownerTokenId) external;
+  function isRMRKCore(address, address, uint256, bytes calldata) external returns (bytes4);
 
   /**
    * @dev Returns the token collection name.

@@ -27,4 +27,9 @@ contract RMRKCoreMock is RMRKCore {
     _mint(to, tokenId, destId, data);
   }
 
+  function burn(uint256 tokenId) public {
+    require(_isApprovedOrOwner(_msgSender(), tokenId), "RMRKCore: transfer caller is not owner nor approved");
+    _burn(tokenId);
+  }
+
 }

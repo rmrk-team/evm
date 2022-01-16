@@ -12,7 +12,7 @@ import "./utils/introspection/ERC165.sol";
 import "./access/AccessControl.sol";
 import "./RMRKResource.sol";
 
-import "hardhat/console.sol";
+//import "hardhat/console.sol";
 
 contract RMRKCore is Context, IRMRKCore, AccessControl {
   using Address for address;
@@ -121,19 +121,46 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
   */
 
   ////////////////////////////////////////
+  //           SELF-AWARENESS
+  ////////////////////////////////////////
+  // I'm afraid I can't do that, Dave.
+
+  function _checkRMRKCoreImplementer(
+      address from,
+      address to,
+      uint256 tokenId,
+      bytes memory _data
+  ) private returns (bool) {
+      if (to.isContract()) {
+          try IRMRKCore(to).isRMRKCore(_msgSender(), from, tokenId, _data) returns (bytes4 retval) {
+              return retval == this.isRMRKCore.selector;
+          } catch (bytes memory reason) {
+              if (reason.length == 0) {
+                  revert("RMRKCore: transfer to non RMRKCore implementer");
+              } else {
+                  assembly {
+                      revert(add(32, reason), mload(reason))
+                  }
+              }
+          }
+      } else {
+          return true;
+      }
+  }
+
+  //This is not 100% secure -- a bytes4 function signature is replicable via brute force attacks.
+  function isRMRKCore(
+      address,
+      address,
+      uint256,
+      bytes memory
+  ) public virtual override returns (bytes4) {
+      return this.isRMRKCore.selector;
+  }
+
+  ////////////////////////////////////////
   //             PROVENANCE
   ////////////////////////////////////////
-
-  /**
-  @dev Returns NFT owner for a nested NFT.
-  * Returns a tuple of (address, uint), which is the address and token ID of the NFT owner.
-  */
-
-  function nftOwnerOf(uint256 tokenId) public view virtual returns (address, uint256) {
-    NftOwner memory owner = _nftOwners[tokenId];
-    //require(owner.contractAddress != address(0), "RMRKCore: owner query for nonexistent token");
-    return (owner.contractAddress, owner.tokenId);
-  }
 
   /**
   @dev Returns root owner of token. Can be an ETH address with our without contract data.
@@ -170,7 +197,10 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
     return _symbol;
   }
 
-  //Implement to return fallback of present token resource or default collection URI
+  // change to ERC 165 implementation of IRMRKCore
+  function isRMRKCore() public pure returns (bool){
+    return true;
+  }
 
   function tokenURI(uint256 tokenId) public virtual view returns(string memory){
    return _tokenURI;
@@ -411,14 +441,14 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
     delete _owners[tokenId];
     delete _nftOwners[tokenId];
 
-    Child[] memory children = childrenOf(tokenId);
+    /* Child[] memory children = childrenOf(tokenId);
 
     for (uint i; i<children.length; i++){
       IRMRKCore(children[i].contractAddress)._burnChildren(
         children[i].tokenId,
         owner
       );
-    }
+    } */
 
     emit Transfer(owner, address(0), tokenId);
 
@@ -450,6 +480,7 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
   ////////////////////////////////////////
   //             TRANSFERS
   ////////////////////////////////////////
+
 
   /**
   * @dev See {IERC721-transferFrom}.
@@ -796,43 +827,4 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
        denominator: _denominator
      });
   }
-
-  ////////////////////////////////////////
-  //           SELF-AWARENESS
-  ////////////////////////////////////////
-  // I'm afraid I can't do that, Dave.
-
-  function _checkRMRKCoreImplementer(
-      address from,
-      address to,
-      uint256 tokenId,
-      bytes memory _data
-  ) private returns (bool) {
-      if (to.isContract()) {
-          try IRMRKCore(to).isRMRKCore(_msgSender(), from, tokenId, _data) returns (bytes4 retval) {
-              return retval == IRMRKCore.isRMRKCore.selector;
-          } catch (bytes memory reason) {
-              if (reason.length == 0) {
-                  revert("RMRKCore: transfer to non RMRKCore implementer");
-              } else {
-                  assembly {
-                      revert(add(32, reason), mload(reason))
-                  }
-              }
-          }
-      } else {
-          return true;
-      }
-  }
-
-  //This is not 100% secure -- a bytes4 function signature is replicable via brute force attacks.
-  function isRMRKCore(
-      address,
-      address,
-      uint256,
-      bytes memory
-  ) public virtual returns (bytes4) {
-      return IRMRKCore.isRMRKCore.selector;
-  }
-
 }
