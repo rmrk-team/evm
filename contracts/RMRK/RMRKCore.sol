@@ -364,8 +364,7 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
       tokenId: destinationId
       });
 
-    bool pending = !destContract.isApprovedOrOwner(msg.sender, destinationId);
-    destContract.setChild(this, destinationId, tokenId, pending);
+    destContract.setChild(this, destinationId, tokenId);
 
     emit Transfer(address(0), to, tokenId);
 
@@ -497,14 +496,13 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
       });
 
       IRMRKCore destContract = IRMRKCore(to);
-      bool pending = !destContract.isApprovedOrOwner(msg.sender, destinationId);
       address rootOwner = destContract.ownerOf(destinationId);
 
       _balances[from] -= 1;
       _balances[rootOwner] += 1;
       _owners[tokenId] = rootOwner;
 
-      destContract.setChild(this, destinationId, tokenId, pending);
+      destContract.setChild(this, destinationId, tokenId);
 
       //get children and initiate downstream rootOwner update
       //WOWEE this is gettin' complicated
@@ -586,10 +584,11 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
    * param2 parentTokenId is the tokenId of the parent token on (this).
    * param3 childTokenId is the tokenId of the child instance
    */
-  function setChild(IRMRKCore childAddress, uint parentTokenId, uint childTokenId, bool isPending) public virtual {
+  function setChild(IRMRKCore childAddress, uint parentTokenId, uint childTokenId) public virtual {
     (address parent, ) = childAddress.nftOwnerOf(childTokenId);
     require(parent == address(this), "Parent-child mismatch");
-
+    bool isPending = !isApprovedOrOwner(_msgSender(), parentTokenId) ||
+    isApprovedOrOwner(tx.origin, parentTokenId); //hate this, vulnerable?
     //if parent token Id is same root owner as child
     Child memory child = Child({
         contractAddress: address(childAddress),

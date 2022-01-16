@@ -5,7 +5,7 @@ pragma solidity ^0.8.0;
 //import "./IERC721.sol";
 
 interface IRMRKCore {
-  function setChild(IRMRKCore childAddress, uint tokenId, uint childTokenId, bool pending) external;
+  function setChild(IRMRKCore childAddress, uint tokenId, uint childTokenId) external;
   function nftOwnerOf(uint256 tokenId) external view returns (address, uint256);
   function ownerOf(uint256 tokenId) external view returns(address);
   function isApprovedOrOwner(address addr, uint id) external view returns(bool);
