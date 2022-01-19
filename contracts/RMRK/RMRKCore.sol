@@ -587,8 +587,7 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
   function setChild(IRMRKCore childAddress, uint parentTokenId, uint childTokenId) public virtual {
     (address parent, ) = childAddress.nftOwnerOf(childTokenId);
     require(parent == address(this), "Parent-child mismatch");
-    bool isPending = !isApprovedOrOwner(_msgSender(), parentTokenId) ||
-    isApprovedOrOwner(tx.origin, parentTokenId); //hate this, vulnerable?
+    bool isPending = !isApprovedOrOwner(_msgSender(), parentTokenId);
     //if parent token Id is same root owner as child
     Child memory child = Child({
         contractAddress: address(childAddress),
