@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
+//Generally all interactions should propagate downstream
+
 pragma solidity ^0.8.9;
 
 import "./IRMRKCore.sol";
@@ -22,9 +24,10 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
     bytes8 partId;
   }
 
-  struct NftOwner {
-    address contractAddress;
+  struct RMRKOwner {
     uint256 tokenId;
+    address ownerAddress;
+    bool isNft;
   }
 
   struct Resource {
@@ -47,13 +50,11 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
 
   RoyaltyData private _royalties;
 
-  mapping(uint256 => address) private _owners;
-
   mapping(address => uint256) private _balances;
 
   mapping(uint256 => address) private _tokenApprovals;
 
-  mapping(uint256 => NftOwner) private _nftOwners;
+  mapping(uint256 => RMRKOwner) private _RMRKOwners;
 
   mapping(uint256 => Child[]) private _children;
 
@@ -61,15 +62,11 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
 
   mapping(uint256 => uint8[]) private _emptyIndexes;
 
-  //Resources
-
   //mapping of tokenId to resourceId to resource entry
   mapping(uint256 => mapping(bytes8 => Resource)) private _resources;
 
   //mapping of tokenId to all resources by priority
   mapping(uint256 => bytes8[]) private _priority;
-
-  RMRKResource public resourceStorage;
 
   // AccessControl roles and nest flag constants
 
@@ -77,17 +74,19 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
 
   bytes32 private constant nestFlag = keccak256("NEST");
 
+  RMRKResource public resourceStorage;
+
+  //Migrate to constructor
+  uint8 private maxChildDepth = 5;
+
   //Resource events
   event ResourceAdded(uint256 indexed tokenId, bytes32 indexed uuid);
   event ResourceAccepted(uint256 indexed tokenId, bytes32 indexed uuid);
   event ResourcePrioritySet(uint256 indexed tokenId);
-  event ResourceEquipped();
-  event ResourceUnequipped();
 
   //Nesting events
-
-  event ParentRemoved(address ownerAddress, uint ownerTokenId, uint tokenId);
-  event ChildRemoved(address childAddress, uint parentTokenId, uint childTokenId);
+  event childRemoved(uint index, uint tokenId);
+  event pendingChildRemoved(uint index, uint tokenId);
 
   constructor(string memory name_, string memory symbol_, string memory resourceName) {
     resourceStorage = new RMRKResource(resourceName);
@@ -121,25 +120,19 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
   //             PROVENANCE
   ////////////////////////////////////////
 
-  /**
-  @dev Returns NFT owner for a nested NFT.
-  * Returns a tuple of (address, uint), which is the address and token ID of the NFT owner.
-  */
-
-  function nftOwnerOf(uint256 tokenId) public view virtual returns (address, uint256) {
-    NftOwner memory owner = _nftOwners[tokenId];
-    //require(owner.contractAddress != address(0), "RMRKCore: owner query for nonexistent token");
-    return (owner.contractAddress, owner.tokenId);
-  }
-
-  /**
-  @dev Returns root owner of token. Can be an ETH address with our without contract data.
-  */
-
-  function ownerOf(uint256 tokenId) public view virtual override returns (address) {
-    address owner = _owners[tokenId];
+  //user-facing access point
+  function ownerOf(uint256 tokenId) public view virtual returns(address) {
+    (address owner, uint256 ownerTokenId, bool isNft) = rmrkOwnerOf(tokenId);
+    if (isNft) {
+      owner = IRMRKCore(owner).ownerOf(ownerTokenId);
+    }
     require(owner != address(0), "RMRKCore: owner query for nonexistent token");
     return owner;
+  }
+
+  function rmrkOwnerOf(uint256 tokenId) public view virtual returns (address, uint256, bool) {
+    RMRKOwner memory owner = _RMRKOwners[tokenId];
+    return (owner.ownerAddress, owner.tokenId, owner.isNft);
   }
 
   /**
@@ -167,69 +160,9 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
     return _symbol;
   }
 
-  //Implement to return fallback of present token resource or default collection URI
-
-  function tokenURI(uint256 tokenId) public virtual view returns(string memory){
-   return _tokenURI;
-  }
-
   ////////////////////////////////////////
   //          CHILD MANAGEMENT
   ////////////////////////////////////////
-
-  /**
-  @dev Adds an instance of Child to the pending children array for _tokenId. In the event a space in the array is open, pulls from
-  * and updates the _emptyindexes array, which is an intermediate array used to preserve ordering.
-  */
-
-  //CHECK: preload mappings into memory for gas savings
-  function addChildToPending(Child memory _child, uint256 _tokenId) internal {
-    if(_pendingChildren[_tokenId].length < 128) {
-      _pendingChildren[_tokenId].push(_child);
-    }
-    else {
-      require(_emptyIndexes[_tokenId].length > 0, "No available slots!");
-      //wawawewa
-      _pendingChildren[_tokenId][_emptyIndexes[_tokenId][(_emptyIndexes[_tokenId].length-1)]] = _child;
-      _emptyIndexes[_tokenId].pop();
-    }
-  }
-
-  /**
-  @dev Sends an instance of Child from the pending children array at index to children array for _tokenId.
-  * Updates _emptyIndexes of tokenId to preserve ordering.
-  */
-
-  //CHECK: preload mappings into memory for gas savings
-  function acceptChildFromPending(uint256 index, uint256 _tokenId) public {
-    require(
-      _pendingChildren[_tokenId].length > index,
-      "RMRKcore: Pending child index out of range"
-    );
-    require(
-      ownerOf(_tokenId) == _msgSender(),
-      "RMRKcore: Bad owner"
-    );
-    Child memory child_ = _pendingChildren[_tokenId][index];
-    _pendingChildren[_tokenId][index] = Child({
-      tokenId: 0,
-      contractAddress: address(0),
-      slotEquipped: 0,
-      partId: bytes8(0)
-      });
-    _emptyIndexes[_tokenId].push(uint8(index));
-    _children[_tokenId].push(child_);
-  }
-
-  /**
-  @dev Sends an instance of Child from the pending children array at index to children array for _tokenId.
-  * Updates _emptyIndexes of tokenId to preserve ordering.
-  */
-
-  function deletePending(uint256 _tokenId) public {
-    require(_msgSender() == ownerOf(_tokenId), "RMRKCore: Bad owner");
-    delete(_pendingChildren[_tokenId]);
-}
 
   /**
   @dev Returns all confirmed children
@@ -245,82 +178,113 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
   */
 
   function pendingChildrenOf (uint256 parentTokenId) public view returns (Child[] memory) {
-    Child[] memory children = _pendingChildren[parentTokenId];
-    return children;
+    Child[] memory pendingChildren = _pendingChildren[parentTokenId];
+    return pendingChildren;
   }
 
   /**
-  * removeChild and removeParent can be called from either side
+  @dev Sends an instance of Child from the pending children array at index to children array for _tokenId.
+  * Updates _emptyIndexes of tokenId to preserve ordering.
   */
 
-  /**
-  @dev Removes a child NFT from children[].
-  * Designed to be called by the removeParent function on an IRMRKCore contract to manage child[] array.
-  * Syncs parent-child relationship if used as a callback from its partner function.
-  * TODO: Restrict to contracts first called by approved owner. Must implement pattern for this.
-  * Option: Find some way to identify child -- abi.encodePacked? Is more gas efficient than sloading the struct?
-  * Note: Information shared between these two items is sometimes loaded twice.
-  * Find a way to pass information effectively in the event this is used as a callback.
-  */
-
-  function removeChild(uint256 tokenId, address childAddress, uint256 childTokenId) public {
-    require(isApprovedOrOwner(_msgSender(), tokenId),
-      "RMRKCore: bad owner"
-      );
-    Child[] memory children = childrenOf(tokenId);
-    uint i;
-    while (i<children.length) {
-      if (children[i].contractAddress == childAddress && children[i].tokenId == childTokenId) {
-        //Double check this, hacky-feeling set to array storage from array memory.
-        _children[tokenId][i] = children[children.length-1];
-        _children[tokenId].pop();
-      }
-      i++;
-    }
-    //Sync parent
-    IRMRKCore RMRKChild = IRMRKCore(childAddress);
-    (address nftOwner, ) = RMRKChild.nftOwnerOf(childTokenId);
-    if (nftOwner != address(0)) {
-      RMRKChild.removeParent(childTokenId, nftOwner, tokenId);
-    }
-  emit ChildRemoved(childAddress, tokenId, childTokenId);
-  }
-
-  /**
-  @dev Removes an NFT from its parent, removing the nftOwnerOf entry.
-  */
-
-  //Currently passed into _burn function, will fail upon burning children. Must update require statement to
-  //accommodate this.
-  function removeParent(uint256 tokenId, address ownerAddress, uint256 ownerTokenId) public {
-    require(_msgSender() == ownerAddress,
-      "RMRKCore: transfer caller is not owner nor approved"
+  //CHECK: preload mappings into memory for gas savings
+  function acceptChildFromPending(uint256 index, uint256 _tokenId) public {
+    require(
+      _pendingChildren[_tokenId].length < index,
+      "RMRKcore: Pending child index out of range"
     );
-    require(ownerAddress != address(0), "Attempt to remove uninitialized parent");
-    delete(_nftOwners[tokenId]);
+    require(
+      ownerOf(_tokenId) == _msgSender(),
+      "RMRKcore: Bad owner"
+    );
 
-    emit ParentRemoved(ownerAddress, ownerTokenId, tokenId);
+    Child memory child_ = _pendingChildren[_tokenId][index];
+
+    _removeItemByIndex(index, _pendingChildren[_tokenId]);
+    _addChildToChildren(child_, _tokenId);
   }
 
-  /* *
-  @dev Accepts a child, setting pending to false.
-  * Storing children as an array seems inefficient, consider keccak256(abi.encodePacked(parentAddr, tokenId)) as key for mapping(childKey => childObj)))
-  * This operation can make getChildren() operation wacky racers, test it
-  * mappings rule, iterating through arrays drools
-  * SSTORE and SLOAD are basically the same gas cost anyway
+  /**
+  @dev Deletes all pending children.
   */
 
-  /* function acceptChild(uint256 tokenId, address childAddress, uint256 childTokenId) public {
-    require(_isApprovedOrOwner(_msgSender(), tokenId), "RMRKCore: Attempting to accept a child in non-owned NFT");
-    Child[] memory children = childrenOf(tokenId);
-    uint i = 0;
-    while (i<children.length) {
-      if (children[i].contractAddress == childAddress && children[i].tokenId == childTokenId) {
-        _children[tokenId][i].pending = false;
-      }
-      i++;
+  function deleteAllPending(uint256 _tokenId) public {
+    require(_msgSender() == ownerOf(_tokenId), "RMRKCore: Bad owner");
+    delete(_pendingChildren[_tokenId]);
+  }
+
+  /**
+  @dev Deletes a single child from the pending array by index.
+  */
+
+  function deleteChildFromPending(uint256 index, uint256 _tokenId) public {
+    require(
+      _pendingChildren[_tokenId].length < index,
+      "RMRKcore: Pending child index out of range"
+    );
+    require(
+      ownerOf(_tokenId) == _msgSender(),
+      "RMRKcore: Bad owner"
+    );
+
+    _removeItemByIndex(index, _pendingChildren[_tokenId]);
+    emit pendingChildRemoved(index, _tokenId);
+  }
+
+  /**
+  @dev Deletes a single child from the child array by index.
+  */
+
+  function deleteChildFromChildren(uint256 index, uint256 _tokenId) public {
+    require(
+      _pendingChildren[_tokenId].length < index,
+      "RMRKcore: Pending child index out of range"
+    );
+    require(
+      ownerOf(_tokenId) == _msgSender(),
+      "RMRKcore: Bad owner"
+    );
+
+    _removeItemByIndex(index, _children[_tokenId]);
+    emit childRemoved(index, _tokenId);
+  }
+
+  /**
+   * @dev Function designed to be used by other instances of RMRK-Core contracts to update children.
+   * param1 childAddress is the address of the child contract as an IRMRKCore instance
+   * param2 parentTokenId is the tokenId of the parent token on (this).
+   * param3 childTokenId is the tokenId of the child instance
+   */
+
+  function setChild(IRMRKCore childAddress, uint parentTokenId, uint childTokenId) public virtual {
+   (address parent, , ) = childAddress.rmrkOwnerOf(childTokenId);
+   require(parent == address(this), "Parent-child mismatch");
+   Child memory child = Child({
+       contractAddress: address(childAddress),
+       tokenId: childTokenId,
+       slotEquipped: 0,
+       partId: 0
+     });
+   _addChildToPending(child, parentTokenId);
+  }
+
+
+  /**
+  @dev Adds an instance of Child to the pending children array for _tokenId. In the event a space in the array is open, pulls from
+  * and updates the _emptyindexes array, which is an intermediate array used to preserve ordering.
+  */
+
+  function _addChildToPending(Child memory _child, uint256 _tokenId) internal {
+    if(_pendingChildren[_tokenId].length < 128) {
+      _pendingChildren[_tokenId].push(_child);
+    } else {
+      revert("RMRKCore: Max pending children reached");
     }
-  } */
+  }
+
+  function _addChildToChildren(Child memory _child, uint256 _tokenId) internal {
+    _children[_tokenId].push(_child);
+  }
 
   ////////////////////////////////////////
   //              MINTING
@@ -334,13 +298,12 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
   */
 
   function _mint(address to, uint256 tokenId) internal virtual {
-    _mint(to, tokenId, 0, "");
+    _mint(to, tokenId, 0, false);
   }
 
-  function _mint(address to, uint256 tokenId, uint256 destinationId, string memory _data) internal virtual {
+  function _mint(address to, uint256 tokenId, uint256 destinationId, bool isNft) internal virtual {
 
-    //Gas saving here from string > bytes?
-    if (keccak256(bytes(_data)) == nestFlag) {
+    if (isNft) {
       _mintToNft(to, tokenId, destinationId);
     }
     else{
@@ -352,17 +315,23 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
     require(to != address(0), "RMRKCore: mint to the zero address");
     require(!_exists(tokenId), "RMRKCore: token already minted");
     require(to.isContract(), "RMRKCore: Is not contract");
+    require(_checkRMRKCoreImplementer(_msgSender(), to, tokenId, ""),
+      "RMRKCore: Mint to non-RMRKCore implementer"
+    );
+
     IRMRKCore destContract = IRMRKCore(to);
 
     _beforeTokenTransfer(address(0), to, tokenId);
-    address rootOwner = destContract.ownerOf(destinationId);
-    _balances[rootOwner] += 1;
-    _owners[tokenId] = rootOwner;
 
-    _nftOwners[tokenId] = NftOwner({
-      contractAddress: to,
-      tokenId: destinationId
-      });
+    address rootOwner = destContract.ownerOf(destinationId);
+    //Is this necessary?
+    _balances[rootOwner] += 1;
+
+    _RMRKOwners[tokenId] = RMRKOwner({
+      ownerAddress: to,
+      tokenId: destinationId,
+      isNft: true
+    });
 
     destContract.setChild(this, destinationId, tokenId);
 
@@ -378,7 +347,11 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
     _beforeTokenTransfer(address(0), to, tokenId);
 
     _balances[to] += 1;
-    _owners[tokenId] = to;
+    _RMRKOwners[tokenId] = RMRKOwner({
+      ownerAddress: to,
+      tokenId: 0,
+      isNft: false
+    });
 
     emit Transfer(address(0), to, tokenId);
 
@@ -395,53 +368,58 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
   *
   * Emits a {Transfer} event.
   */
+
   function _burn(uint256 tokenId) internal virtual {
-    address owner = this.ownerOf(tokenId);
-    (address nftOwner, uint256 ownerTokenId) = nftOwnerOf(tokenId);
+    address owner = ownerOf(tokenId);
+    require(_isApprovedOrOwner(_msgSender(), tokenId), "RMRKCore: burn caller is not owner nor approved");
     _beforeTokenTransfer(owner, address(0), tokenId);
 
     // Clear approvals
     _approve(address(0), tokenId);
 
     _balances[owner] -= 1;
-    delete _owners[tokenId];
-    delete _nftOwners[tokenId];
 
     Child[] memory children = childrenOf(tokenId);
 
-    for (uint i; i<children.length; i++){
+    uint length = children.length; //gas savings
+    for (uint i; i<length; i++){
       IRMRKCore(children[i].contractAddress)._burnChildren(
         children[i].tokenId,
         owner
       );
     }
 
+    delete _RMRKOwners[tokenId];
     emit Transfer(owner, address(0), tokenId);
 
     _afterTokenTransfer(owner, address(0), tokenId);
   }
 
   //how could devs allow something like this, smh
+  //Checks that caller is current RMRKOnwerOf contract
+  //Updates rootOwner balance
+  //recursively calls _burnChildren on all children
   function _burnChildren(uint256 tokenId, address oldOwner) public virtual {
-    (address nftOwner, )= nftOwnerOf(tokenId);
-    require(nftOwner == _msgSender(), "Caller is not nftOwner contract");
+    (address _RMRKOwner, , ) = rmrkOwnerOf(tokenId);
+    require(_RMRKOwner == _msgSender(), "Caller is not RMRKOwner contract");
     _balances[oldOwner] -= 1;
-    delete _owners[tokenId];
-    delete _nftOwners[tokenId];
 
     Child[] memory children = childrenOf(tokenId);
 
-    for (uint i; i<children.length; i++){
+    uint256 length = children.length; //gas savings
+    for (uint i; i<length; i++){
       address childContractAddress = children[i].contractAddress;
       uint256 childTokenId = children[i].tokenId;
 
       IRMRKCore(childContractAddress)._burnChildren(
         childTokenId,
         oldOwner
-        );
-      removeChild(tokenId, childContractAddress, childTokenId);
+      );
     }
-  }
+    delete _RMRKOwners[tokenId];
+    //This can emit a lot of events.
+    emit Transfer(oldOwner, address(0), tokenId);
+    }
 
   ////////////////////////////////////////
   //             TRANSFERS
@@ -455,11 +433,11 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
     address to,
     uint256 tokenId,
     uint256 destinationId,
-    string memory _data
+    bool isNft
   ) public virtual {
     //solhint-disable-next-line max-line-length
     require(_isApprovedOrOwner(_msgSender(), tokenId), "RMRKCore: transfer caller is not owner nor approved");
-    _transfer(from, to, tokenId, destinationId, _data);
+    _transfer(from, to, tokenId, destinationId, isNft);
   }
 
   /**
@@ -482,77 +460,34 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
     address to,
     uint256 tokenId,
     uint256 destinationId,
-    string memory _data
+    bool isNft
   ) internal virtual {
-    require(this.ownerOf(tokenId) == from, "RMRKCore: transfer from incorrect owner");
+    require(ownerOf(tokenId) == from, "RMRKCore: transfer from incorrect owner");
     require(to != address(0), "RMRKCore: transfer to the zero address");
 
     _beforeTokenTransfer(from, to, tokenId);
 
-    if (keccak256(bytes(_data)) == nestFlag) {
-      _nftOwners[tokenId] = NftOwner({
-        contractAddress: to,
-        tokenId: destinationId
-      });
+    _balances[from] -= 1;
 
+    if (!isNft) {
+      _balances[to] += 1;
+    } else {
       IRMRKCore destContract = IRMRKCore(to);
       address rootOwner = destContract.ownerOf(destinationId);
-
-      _balances[from] -= 1;
       _balances[rootOwner] += 1;
-      _owners[tokenId] = rootOwner;
-
       destContract.setChild(this, destinationId, tokenId);
-
-      //get children and initiate downstream rootOwner update
-      //WOWEE this is gettin' complicated
-
-      Child[] memory children = childrenOf(tokenId);
-
-      //Does this need an if statement if array is empty? Probably not
-      //Consider try {} catch
-      for (uint i; i<children.length; i++){
-        IRMRKCore(children[i].contractAddress)._updateRootOwner(
-          children[i].tokenId,
-          from,
-          rootOwner
-        );
-      }
     }
-
-    else {
-      _balances[from] -= 1;
-      _balances[to] += 1;
-      _owners[tokenId] = to;
-    }
-
+    _RMRKOwners[tokenId] = RMRKOwner({
+      ownerAddress: to,
+      tokenId: destinationId,
+      isNft: isNft
+    });
     // Clear approvals from the previous owner
     _approve(address(0), tokenId);
 
     emit Transfer(from, to, tokenId);
 
     _afterTokenTransfer(from, to, tokenId);
-  }
-
-  //Only callable from the contract that owns the token.
-  //Pay extra attention to this function, as it DOES NOT QUERY THE OWNING NFT ITSELF
-  function _updateRootOwner(uint tokenId, address oldOwner, address newOwner) public {
-    //update self
-    (address nftOwner, )= nftOwnerOf(tokenId);
-    require(nftOwner == msg.sender, "Caller is not nftOwner contract");
-    _balances[oldOwner] -= 1;
-    _balances[newOwner] += 1;
-    _owners[tokenId] = newOwner;
-    //get any children and call self on children
-    Child[] memory children = childrenOf(tokenId);
-
-    for (uint i; i<children.length; i++){
-      IRMRKCore(children[i].contractAddress)._updateRootOwner(
-        children[i].tokenId,
-        oldOwner,
-        newOwner
-      );
-    }
   }
 
   function _beforeTokenTransfer(
@@ -563,7 +498,8 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
 
   /**
   * @dev Hook that is called after any transfer of tokens. This includes
-  * minting and burning.
+  * minting and burning.    address owner = this.ownerOf(tokenId);
+    return (spender == owner || getApproved(tokenId) == spender);
   *
   * Calling conditions:
   *
@@ -578,36 +514,12 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
     uint256 tokenId
   ) internal virtual {}
 
-  /**
-   * @dev Function designed to be used by other instances of RMRK-Core contracts to update children.
-   * param1 childAddress is the address of the child contract as an IRMRKCore instance
-   * param2 parentTokenId is the tokenId of the parent token on (this).
-   * param3 childTokenId is the tokenId of the child instance
-   */
-  function setChild(IRMRKCore childAddress, uint parentTokenId, uint childTokenId) public virtual {
-    (address parent, ) = childAddress.nftOwnerOf(childTokenId);
-    require(parent == address(this), "Parent-child mismatch");
-    bool isPending = !isApprovedOrOwner(_msgSender(), parentTokenId);
-    //if parent token Id is same root owner as child
-    Child memory child = Child({
-        contractAddress: address(childAddress),
-        tokenId: childTokenId,
-        slotEquipped: 0,
-        partId: 0
-      });
-    if (isPending) {
-      _pendingChildren[parentTokenId].push(child);
-    } else {
-    _children[parentTokenId].push(child);
-    }
-  }
-
   ////////////////////////////////////////
   //      APPROVALS / PRE-CHECKING
   ////////////////////////////////////////
 
   function _exists(uint256 tokenId) internal view virtual returns (bool) {
-    return _owners[tokenId] != address(0);
+    return _RMRKOwners[tokenId].ownerAddress != address(0);
   }
 
   function approve(address to, uint256 tokenId) public virtual {
@@ -627,32 +539,19 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
     emit Approval(ownerOf(tokenId), to, tokenId);
   }
 
+  function isApprovedOrOwner(address spender, uint256 tokenId) external view virtual returns (bool) {
+    return _isApprovedOrOwner(spender, tokenId);
+  }
+
   function _isApprovedOrOwner(address spender, uint256 tokenId) internal view virtual returns (bool) {
     address owner = this.ownerOf(tokenId);
     return (spender == owner || getApproved(tokenId) == spender);
-  }
-
-  //re-implement isApprovedForAll
-  function isApprovedOrOwner(address spender, uint256 tokenId) public view virtual returns (bool) {
-    bool res = _isApprovedOrOwner(spender, tokenId);
-    return res;
-  }
-
-  function isApprovedOwnerOrNftOwner(address spender, uint256 tokenId) public view virtual returns (bool) {
-    (address nftOwner, ) = nftOwnerOf(tokenId);
-    bool res = (nftOwner == _msgSender() || _isApprovedOrOwner(spender, tokenId));
-    return res;
   }
 
   function getApproved(uint256 tokenId) public view virtual returns (address) {
     require(_exists(tokenId), "RMRKCore: approved query for nonexistent token");
 
     return _tokenApprovals[tokenId];
-  }
-
-  //big dumb stupid hack, fix
-  function supportsInterface() public returns (bool) {
-    return true;
   }
 
   ////////////////////////////////////////
@@ -695,17 +594,11 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
         "RMRKCore: Resource not found in storage"
       );
 
-
-      bool _pending;
-      if (!isApprovedOrOwner(_msgSender(), _tokenId)) {
-          _pending = true;
-      }
-
       //Construct Resource object with pending
       Resource memory resource_ = Resource({
         resourceAddress: _resourceAddress,
         resourceId: _resourceId,
-        pending: _pending
+        pending: true
       });
       //Add resource entry to mapping and ID to priority
       _resources[_tokenId][_resourceId] = resource_;
@@ -715,7 +608,7 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
 
   function acceptResource(uint256 _tokenId, bytes8 _id) public {
       require(
-        isApprovedOrOwner(_msgSender(), _tokenId),
+        _isApprovedOrOwner(_msgSender(), _tokenId),
           "RMRK: Attempting to accept a resource in non-owned NFT"
       );
       Resource memory resource = _resources[_tokenId][_id];
@@ -737,7 +630,7 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
           "RMRK: Bad priority list length"
       );
       require(
-        isApprovedOrOwner(_msgSender(), _tokenId),
+        _isApprovedOrOwner(_msgSender(), _tokenId),
           "RMRK: Attempting to set priority in non-owned NFT"
       );
       for (uint256 i = 0; i < _ids.length; i++) {
@@ -829,5 +722,24 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
   ) public virtual returns (bytes4) {
       return IRMRKCore.isRMRKCore.selector;
   }
+
+  ////////////////////////////////////////
+  //              HELPERS
+  ////////////////////////////////////////
+
+  function _removeItemByIndex(uint256 index, Child[] storage array) internal {
+    //Check to see if this is already gated by require in all calls
+    require(index < array.length);
+    array[index] = array[array.length-1];
+    array.pop();
+  }
+
+  function _removeItemByIndexMulti(uint256[] memory indexes, Child[] storage array) internal {
+    uint256 length = indexes.length; //gas savings
+    for (uint i; i<length; i++) {
+      _removeItemByIndex(indexes[i], array);
+    }
+  }
+
 
 }

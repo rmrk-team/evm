@@ -2,17 +2,17 @@
 
 pragma solidity ^0.8.9;
 
-import "../RMRK/RMRKCoreSimple.sol";
+import "../RMRK/RMRKCore.sol";
 
 //Minimal public implementation of RMRKCore for testing.
 
-contract RMRKCoreSimpleMock is RMRKCoreSimple {
+contract RMRKCoreMock is RMRKCore {
 
   constructor(
     string memory name_,
     string memory symbol_,
     string memory resourceName
-  ) RMRKCoreSimple (
+  ) RMRKCore (
     name_,
     symbol_,
     resourceName
@@ -23,8 +23,8 @@ contract RMRKCoreSimpleMock is RMRKCoreSimple {
     _mint(to, tokenId);
   }
 
-  function doMintNest(address to, uint256 tokenId, uint256 destId, bool isNft) external {
-    _mint(to, tokenId, destId, isNft);
+  function doMintNest(address to, uint256 tokenId, uint256 destId, string calldata data) external {
+    _mint(to, tokenId, destId, data);
   }
 
   function burn(uint256 tokenId) public {
