@@ -33,7 +33,6 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
   struct Resource {
     address resourceAddress;
     bytes8 resourceId;
-    bool pending;
   }
 
   struct RoyaltyData {
@@ -65,19 +64,19 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
   //mapping of tokenId to resourceId to resource entry
   mapping(uint256 => mapping(bytes8 => Resource)) private _resources;
 
+  mapping(uint256 => mapping(bytes8 => bytes8)) private _resourceOverwrites;
+
   //mapping of tokenId to all resources by priority
-  mapping(uint256 => bytes8[]) private _priority;
+  mapping(uint256 => bytes8[]) private _activeResources;
+
+  //mapping of tokenId to all resources by priority
+  mapping(uint256 => bytes8[]) private _pendingResources;
 
   // AccessControl roles and nest flag constants
 
   bytes32 private constant issuer = keccak256("ISSUER");
 
-  bytes32 private constant nestFlag = keccak256("NEST");
-
   RMRKResource public resourceStorage;
-
-  //Migrate to constructor
-  uint8 private maxChildDepth = 5;
 
   //Resource events
   event ResourceAdded(uint256 indexed tokenId, bytes32 indexed uuid);
@@ -120,7 +119,9 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
   //             PROVENANCE
   ////////////////////////////////////////
 
-  //user-facing access point
+  /**
+  @dev Returns the root owner of a RMRKCore NFT.
+  */
   function ownerOf(uint256 tokenId) public view virtual returns(address) {
     (address owner, uint256 ownerTokenId, bool isNft) = rmrkOwnerOf(tokenId);
     if (isNft) {
@@ -130,6 +131,11 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
     return owner;
   }
 
+  /**
+  @dev Returns the immediate provenance data of the current RMRK NFT. In the event the NFT is owned
+  * by a wallet, tokenId will be zero and isNft will be false. Otherwise, the returned data is the
+  * contract address and tokenID of the owner NFT, as well as its isNft flag.
+  */
   function rmrkOwnerOf(uint256 tokenId) public view virtual returns (address, uint256, bool) {
     RMRKOwner memory owner = _RMRKOwners[tokenId];
     return (owner.ownerAddress, owner.tokenId, owner.isNft);
@@ -270,8 +276,7 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
 
 
   /**
-  @dev Adds an instance of Child to the pending children array for _tokenId. In the event a space in the array is open, pulls from
-  * and updates the _emptyindexes array, which is an intermediate array used to preserve ordering.
+  @dev Adds an instance of Child to the pending children array for _tokenId. This is hardcoded to be 128 by default.
   */
 
   function _addChildToPending(Child memory _child, uint256 _tokenId) internal {
@@ -281,6 +286,10 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
       revert("RMRKCore: Max pending children reached");
     }
   }
+
+  /**
+  @dev Adds an instance of Child to the children array for _tokenId.
+  */
 
   function _addChildToChildren(Child memory _child, uint256 _tokenId) internal {
     _children[_tokenId].push(_child);
@@ -293,25 +302,26 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
   /**
   @dev Mints an NFT.
   * Can mint to a root owner or another NFT.
-  * If 'NEST' is passed via _data parameter, token is minted into another NFT if target contract implemnts RMRKCore (Latter not implemented)
-  *
+  * Overloaded function _mint() can be used either to minto into a root owner or another NFT.
+  * If isNft contains any non-empty data, _mintToNft will be called and pass the extra data
+  * package to the function.
   */
 
   function _mint(address to, uint256 tokenId) internal virtual {
-    _mint(to, tokenId, 0, false);
+    _mint(to, tokenId, 0, "");
   }
 
-  function _mint(address to, uint256 tokenId, uint256 destinationId, bool isNft) internal virtual {
+  function _mint(address to, uint256 tokenId, uint256 destinationId, bytes memory data) internal virtual {
 
-    if (isNft) {
-      _mintToNft(to, tokenId, destinationId);
+    if (data.length > 0) {
+      _mintToNft(to, tokenId, destinationId, data);
     }
     else{
       _mintToRootOwner(to, tokenId);
     }
   }
 
-  function _mintToNft(address to, uint256 tokenId, uint256 destinationId) internal virtual {
+  function _mintToNft(address to, uint256 tokenId, uint256 destinationId, bytes memory data) internal virtual {
     require(to != address(0), "RMRKCore: mint to the zero address");
     require(!_exists(tokenId), "RMRKCore: token already minted");
     require(to.isContract(), "RMRKCore: Is not contract");
@@ -324,7 +334,6 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
     _beforeTokenTransfer(address(0), to, tokenId);
 
     address rootOwner = destContract.ownerOf(destinationId);
-    //Is this necessary?
     _balances[rootOwner] += 1;
 
     _RMRKOwners[tokenId] = RMRKOwner({
@@ -581,7 +590,8 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
   function addResourceToToken(
       uint256 _tokenId,
       address _resourceAddress,
-      bytes8 _resourceId
+      bytes8 _resourceId,
+      bytes8 _overwrites
   ) public onlyRole(issuer) {
       require(
         _resources[_tokenId][_resourceId].resourceId == bytes8(0),
@@ -597,16 +607,21 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
       //Construct Resource object with pending
       Resource memory resource_ = Resource({
         resourceAddress: _resourceAddress,
-        resourceId: _resourceId,
-        pending: true
+        resourceId: _resourceId
       });
-      //Add resource entry to mapping and ID to priority
+      //Add resource entry to mapping and ID to pending array.
       _resources[_tokenId][_resourceId] = resource_;
-      _priority[_tokenId].push(_resourceId);
+      _pendingResources[_tokenId].push(_resourceId);
+
+      if (_overwrites != bytes8(0)) {
+        _resourceOverwrites[_tokenId][_resourceId] = _overwrites;
+      }
+
       emit ResourceAdded(_tokenId, _resourceId);
   }
 
-  function acceptResource(uint256 _tokenId, bytes8 _id) public {
+  function acceptResource(uint256 _tokenId, uint256 index, bytes8 _id) public {
+
       require(
         _isApprovedOrOwner(_msgSender(), _tokenId),
           "RMRK: Attempting to accept a resource in non-owned NFT"
@@ -616,17 +631,15 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
         resource.resourceId != bytes8(0),
           "RMRK: resource does not exist"
       );
-      require(
-        resource.pending,
-          "RMRK: resource is already accepted"
-      );
-      _resources[_tokenId][_id].pending = false;
+
+      _removeItemByIndex(index, _pendingResources[_tokenId]);
+      _activeResources[_tokenId].push();
       emit ResourceAccepted(_tokenId, _id);
   }
 
   function setPriority(uint256 _tokenId, bytes8[] memory _ids) public {
       require(
-        _ids.length == _priority[_tokenId].length,
+        _ids.length == _activeResources[_tokenId].length,
           "RMRK: Bad priority list length"
       );
       require(
@@ -639,12 +652,12 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
               "RMRK: Trying to reprioritize a non-existant resource"
           );
       }
-      _priority[_tokenId] = _ids;
+      _activeResources[_tokenId] = _ids;
       emit ResourcePrioritySet(_tokenId);
   }
 
   function getRenderableResource(uint256 tokenId) public virtual view returns(Resource memory) {
-    bytes8 resourceId = _priority[tokenId][0];
+    bytes8 resourceId = _activeResources[tokenId][0];
     return getTokenResource(tokenId, resourceId);
   }
 
@@ -654,8 +667,12 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
 
   //Design decision note -- Mention differences between child and resource 'pending' handling
 
-  function getPriorities(uint256 tokenId) public virtual view returns(bytes8[] memory) {
-    return _priority[tokenId];
+  function getActiveResources(uint256 tokenId) public virtual view returns(bytes8[] memory) {
+    return _activeResources[tokenId];
+  }
+
+  function getPendingeResources(uint256 tokenId) public virtual view returns(bytes8[] memory) {
+    return _pendingResources[tokenId];
   }
 
   ////////////////////////////////////////
@@ -728,6 +745,13 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
   ////////////////////////////////////////
 
   function _removeItemByIndex(uint256 index, Child[] storage array) internal {
+    //Check to see if this is already gated by require in all calls
+    require(index < array.length);
+    array[index] = array[array.length-1];
+    array.pop();
+  }
+
+  function _removeItemByIndex(uint256 index, bytes8[] storage array) internal {
     //Check to see if this is already gated by require in all calls
     require(index < array.length);
     array[index] = array[array.length-1];

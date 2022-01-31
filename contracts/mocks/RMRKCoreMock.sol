@@ -23,8 +23,8 @@ contract RMRKCoreMock is RMRKCore {
     _mint(to, tokenId);
   }
 
-  function doMintNest(address to, uint256 tokenId, uint256 destId, bool isNft) external {
-    _mint(to, tokenId, destId, isNft);
+  function doMintNest(address to, uint256 tokenId, uint256 destId, bytes calldata data) external {
+    _mint(to, tokenId, destId, "data");
   }
 
   function burn(uint256 tokenId) public {
