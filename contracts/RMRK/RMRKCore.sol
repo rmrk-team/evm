@@ -391,7 +391,7 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
     Child[] memory children = childrenOf(tokenId);
 
     uint length = children.length; //gas savings
-    for (uint i; i<length; i++){
+    for (uint i; i<length; i = u_inc(i)){
       IRMRKCore(children[i].contractAddress)._burnChildren(
         children[i].tokenId,
         owner
@@ -416,7 +416,7 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
     Child[] memory children = childrenOf(tokenId);
 
     uint256 length = children.length; //gas savings
-    for (uint i; i<length; i++){
+    for (uint i; i<length; i = u_inc(i)){
       address childContractAddress = children[i].contractAddress;
       uint256 childTokenId = children[i].tokenId;
 
@@ -633,6 +633,11 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
       );
 
       _removeItemByIndex(index, _pendingResources[_tokenId]);
+      //This feels weird, test this
+      bytes8 overwrite = _resourceOverwrites[_tokenId][resource.resourceId];
+      if (overwrite != bytes8(0)) {
+        _removeItemByValue(overwrite, _activeResources[_tokenId]);
+      }
       _activeResources[_tokenId].push();
       emit ResourceAccepted(_tokenId, _id);
   }
@@ -646,7 +651,7 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
         _isApprovedOrOwner(_msgSender(), _tokenId),
           "RMRK: Attempting to set priority in non-owned NFT"
       );
-      for (uint256 i = 0; i < _ids.length; i++) {
+      for (uint256 i = 0; i < _ids.length; i = u_inc(i)) {
           require(
             (_resources[_tokenId][_ids[i]].resourceId !=bytes8(0)),
               "RMRK: Trying to reprioritize a non-existant resource"
@@ -744,6 +749,18 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
   //              HELPERS
   ////////////////////////////////////////
 
+  function _removeItemByValue(bytes8 value, bytes8[] storage array) internal {
+    bytes8[] memory memArr = array; //Copy array to memory, check for gas savings here
+    uint256 length = memArr.length; //gas savings
+    for (uint i; i<length; i = u_inc(i)) {
+      if (memArr[i] == value) {
+        _removeItemByIndex(i, array);
+        break;
+      }
+    }
+  }
+
+  // For child storage array
   function _removeItemByIndex(uint256 index, Child[] storage array) internal {
     //Check to see if this is already gated by require in all calls
     require(index < array.length);
@@ -751,6 +768,7 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
     array.pop();
   }
 
+  //For reasource storage array
   function _removeItemByIndex(uint256 index, bytes8[] storage array) internal {
     //Check to see if this is already gated by require in all calls
     require(index < array.length);
@@ -760,8 +778,15 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
 
   function _removeItemByIndexMulti(uint256[] memory indexes, Child[] storage array) internal {
     uint256 length = indexes.length; //gas savings
-    for (uint i; i<length; i++) {
+    for (uint i; i<length; i = u_inc(i)) {
       _removeItemByIndex(indexes[i], array);
+    }
+  }
+
+  //Gas saving iterator, consider conversion to assemby
+  function u_inc(uint i) private pure returns (uint) {
+    unchecked {
+        return i + 1;
     }
   }
 
