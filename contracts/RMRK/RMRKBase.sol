@@ -65,7 +65,7 @@ contract RMRKBase is IssuerControl {
   * This may need to be changed for contracts which would reach the block gas limit.
   */
 
-  constructor(IntakeStruct[] memory intakeStruct) {
+  constructor(IntakeStruct[] calldata intakeStruct) {
     addBaseEntryList(intakeStruct);
   }
 
@@ -73,7 +73,7 @@ contract RMRKBase is IssuerControl {
   @dev Private function for handling an array of base item inputs. Takes an array of type IntakeStruct.
   */
 
-  function addBaseEntryList (IntakeStruct[] memory intakeStruct) private {
+  function addBaseEntryList (IntakeStruct[] calldata intakeStruct) private {
     for (uint i = 0; i<intakeStruct.length; i++) {
       addBaseEntry(intakeStruct[i]);
     }
@@ -84,7 +84,7 @@ contract RMRKBase is IssuerControl {
   * a bytes8 identifier and a base struct object.
   */
 
-  function addBaseEntry (IntakeStruct memory intakeStruct) private {
+  function addBaseEntry (IntakeStruct calldata intakeStruct) private {
     require(!bases[intakeStruct.id].exists, "Base already exists");
     intakeStruct.base.exists = true; //enforce exists, can swap to require if need be.
     bases[intakeStruct.id] = intakeStruct.base;
@@ -96,7 +96,7 @@ contract RMRKBase is IssuerControl {
   * deployer or transferred Issuer, designated by the modifier onlyIssuer as per the inherited contract issuerControl.
   */
 
-  function addEquippableIds (bytes8 _baseEntryid, bytes8[] memory _equippableIds) public onlyIssuer {
+  function addEquippableIds (bytes8 _baseEntryid, bytes8[] calldata _equippableIds) public onlyIssuer {
     require(_equippableIds.length > 0, "RMRK: Zero-length ids passed.");
     require(bases[_baseEntryid].exists, "RMRK: Base entry does not exist.");
     bases[_baseEntryid].equippableIds = _equippableIds;
