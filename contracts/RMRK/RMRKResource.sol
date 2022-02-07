@@ -15,8 +15,8 @@ contract RMRKResource is AccessControl {
 
   //TODO: Further abstract resource internals to be non-repeating (as much as possibe)
 
-
-  struct Resource {
+  //Previous base resource before Equippables lego
+  /* struct Resource {
       bytes8 id; //8 bytes
       uint16 slot; //4 bytes
       address baseAddress; //20 bytes
@@ -24,7 +24,21 @@ contract RMRKResource is AccessControl {
       string src; //32+
       string thumb; //32+
       string metadataURI; //32+
+  } */
+
+  struct Resource {
+      bytes8 id; //8 bytes
+      string src; //32+
+      string thumb; //32+
+      string metadataURI; //32+
   }
+
+  /* struct baseResource {
+      bytes8 id; //8 bytes
+      uint16 slot; //4 bytes
+      address baseAddress; //20 bytes
+      bytes8[] basePartIds; // n bytes
+  } */
 
   //Mapping of bytes8 to Resource. Consider an incrementer for zero collision chance.
   mapping(bytes8 => Resource) private _resources;
@@ -59,9 +73,6 @@ contract RMRKResource is AccessControl {
 
   function addResourceEntry(
       bytes8 _id, //Previously named _id, have seen it called id in RMRK examples / documentation, ask for clarification
-      uint16 _slot,
-      address _baseAddress,
-      bytes8[] memory _basePartIds,
       string memory _src,
       string memory _thumb,
       string memory _metadataURI
@@ -75,9 +86,6 @@ contract RMRKResource is AccessControl {
       );
       Resource memory resource_ = Resource({
           id: _id,
-          slot: _slot,
-          baseAddress: _baseAddress,
-          basePartIds: _basePartIds,
           src: _src,
           thumb: _thumb,
           metadataURI: _metadataURI

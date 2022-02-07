@@ -437,6 +437,17 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
   /**
   * @dev See {IERC721-transferFrom}.
   */
+  function transfer(
+    address from,
+    address to,
+    uint256 tokenId,
+  ) public virtual {
+    _transferFrom(msg.sender, to, tokenId, 0, isNft);
+  }
+
+  /**
+  * @dev
+  */
   function transferFrom(
     address from,
     address to,
@@ -569,18 +580,12 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
 
   function addResourceEntry(
       bytes8 _id,
-      uint16 _slot,
-      address _baseAddress,
-      bytes8[] memory _basePartIds,
       string memory _src,
       string memory _thumb,
       string memory _metadataURI
   ) public onlyRole(issuer) {
     resourceStorage.addResourceEntry(
       _id,
-      _slot,
-      _baseAddress,
-      _basePartIds,
       _src,
       _thumb,
       _metadataURI
