@@ -127,7 +127,6 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
     if (isNft) {
       owner = IRMRKCore(owner).ownerOf(ownerTokenId);
     }
-    require(owner != address(0), "RMRKCore: owner query for nonexistent token");
     return owner;
   }
 
@@ -146,7 +145,6 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
   */
 
   function balanceOf(address owner) public view virtual returns (uint256) {
-    require(owner != address(0), "RMRKCore: balance query for the zero address");
     return _balances[owner];
   }
 
