@@ -17,6 +17,25 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
   using Address for address;
   using Strings for uint256;
 
+  error AddressIsNotAContract();
+  error ApprovalToCurrentOwner();
+  error CantAcceptResourceInNonOwnedNFT();
+  error IndexDoesNotExist();
+  error InvalidPriorityListLength();
+  error MintToNonRMRKCoreImplementer();
+  error MintToZeroAddress();
+  error MsgSenderNotOwnerOrApproved();
+  error NotAuthorizedToBurn();
+  error NotAuthorizedToTransfer();
+  error NotRMRKOwnerContract();
+  error ParentChildMismatch();
+  error PendingChildIndexOutOfRange();
+  error ResourceExists();
+  error ResourceNotFoundInStorage();
+  error TokenAlreadyMinted();
+  error TokenDoesNotExist();
+  error TransferToZeroAddress();
+
   struct Child {
     uint256 tokenId;
     address contractAddress;
@@ -193,14 +212,8 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
 
   //CHECK: preload mappings into memory for gas savings
   function acceptChildFromPending(uint256 index, uint256 _tokenId) public {
-    require(
-      _pendingChildren[_tokenId].length < index,
-      "RMRKcore: Pending child index out of range"
-    );
-    require(
-      ownerOf(_tokenId) == _msgSender(),
-      "RMRKcore: Bad owner"
-    );
+    if (_pendingChildren[_tokenId].length >= index) revert PendingChildIndexOutOfRange();
+    if (ownerOf(_tokenId) != _msgSender()) revert MsgSenderNotOwnerOrApproved();
 
     Child memory child_ = _pendingChildren[_tokenId][index];
 
@@ -213,7 +226,7 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
   */
 
   function deleteAllPending(uint256 _tokenId) public {
-    require(_msgSender() == ownerOf(_tokenId), "RMRKCore: Bad owner");
+    if (ownerOf(_tokenId) != _msgSender()) revert MsgSenderNotOwnerOrApproved();
     delete(_pendingChildren[_tokenId]);
   }
 
@@ -222,14 +235,8 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
   */
 
   function deleteChildFromPending(uint256 index, uint256 _tokenId) public {
-    require(
-      _pendingChildren[_tokenId].length < index,
-      "RMRKcore: Pending child index out of range"
-    );
-    require(
-      ownerOf(_tokenId) == _msgSender(),
-      "RMRKcore: Bad owner"
-    );
+    if (_pendingChildren[_tokenId].length <= index) revert PendingChildIndexOutOfRange();
+    if (ownerOf(_tokenId) != _msgSender()) revert MsgSenderNotOwnerOrApproved();
 
     _removeItemByIndex(index, _pendingChildren[_tokenId]);
     emit pendingChildRemoved(index, _tokenId);
@@ -240,14 +247,8 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
   */
 
   function deleteChildFromChildren(uint256 index, uint256 _tokenId) public {
-    require(
-      _pendingChildren[_tokenId].length < index,
-      "RMRKcore: Pending child index out of range"
-    );
-    require(
-      ownerOf(_tokenId) == _msgSender(),
-      "RMRKcore: Bad owner"
-    );
+    if (_pendingChildren[_tokenId].length >= index) revert PendingChildIndexOutOfRange();
+    if (ownerOf(_tokenId) != _msgSender()) revert MsgSenderNotOwnerOrApproved();
 
     _removeItemByIndex(index, _children[_tokenId]);
     emit childRemoved(index, _tokenId);
@@ -262,7 +263,7 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
 
   function setChild(IRMRKCore childAddress, uint parentTokenId, uint childTokenId) public virtual {
    (address parent, , ) = childAddress.rmrkOwnerOf(childTokenId);
-   require(parent == address(this), "Parent-child mismatch");
+   if (parent != address(this)) revert ParentChildMismatch();
    Child memory child = Child({
        contractAddress: address(childAddress),
        tokenId: childTokenId,
@@ -320,12 +321,15 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
   }
 
   function _mintToNft(address to, uint256 tokenId, uint256 destinationId, bytes memory data) internal virtual {
-    require(to != address(0), "RMRKCore: mint to the zero address");
-    require(!_exists(tokenId), "RMRKCore: token already minted");
-    require(to.isContract(), "RMRKCore: Is not contract");
-    require(_checkRMRKCoreImplementer(_msgSender(), to, tokenId, ""),
-      "RMRKCore: Mint to non-RMRKCore implementer"
-    );
+    if (to == address(0)) 
+    revert MintToZeroAddress();
+    if (_exists(tokenId)) 
+    revert TokenAlreadyMinted();
+    if (!to.isContract()) 
+    revert AddressIsNotAContract();
+    if (!_checkRMRKCoreImplementer(_msgSender(), to, tokenId, "")) 
+    revert MintToNonRMRKCoreImplementer();
+
 
     IRMRKCore destContract = IRMRKCore(to);
 
@@ -348,8 +352,10 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
   }
 
   function _mintToRootOwner(address to, uint256 tokenId) internal virtual {
-    require(to != address(0), "RMRKCore: mint to the zero address");
-    require(!_exists(tokenId), "RMRKCore: token already minted");
+    if (to == address(0)) 
+    revert MintToZeroAddress();
+    if (_exists(tokenId)) 
+    revert TokenAlreadyMinted();
 
     _beforeTokenTransfer(address(0), to, tokenId);
 
@@ -378,7 +384,7 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
 
   function _burn(uint256 tokenId) internal virtual {
     address owner = ownerOf(tokenId);
-    require(_isApprovedOrOwner(_msgSender(), tokenId), "RMRKCore: burn caller is not owner nor approved");
+    if (!_isApprovedOrOwner(_msgSender(), tokenId)) revert NotAuthorizedToBurn();
     _beforeTokenTransfer(owner, address(0), tokenId);
 
     // Clear approvals
@@ -408,7 +414,9 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
   //recursively calls _burnChildren on all children
   function _burnChildren(uint256 tokenId, address oldOwner) public virtual {
     (address _RMRKOwner, , ) = rmrkOwnerOf(tokenId);
-    require(_RMRKOwner == _msgSender(), "Caller is not RMRKOwner contract");
+    if (_RMRKOwner != _msgSender()) 
+    revert NotRMRKOwnerContract();
+
     _balances[oldOwner] -= 1;
 
     Child[] memory children = childrenOf(tokenId);
@@ -443,7 +451,9 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
     bool isNft
   ) public virtual {
     //solhint-disable-next-line max-line-length
-    require(_isApprovedOrOwner(_msgSender(), tokenId), "RMRKCore: transfer caller is not owner nor approved");
+    if (!_isApprovedOrOwner(_msgSender(), tokenId)) 
+    revert NotAuthorizedToTransfer();
+
     _transfer(from, to, tokenId, destinationId, isNft);
   }
 
@@ -469,8 +479,10 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
     uint256 destinationId,
     bool isNft
   ) internal virtual {
-    require(ownerOf(tokenId) == from, "RMRKCore: transfer from incorrect owner");
-    require(to != address(0), "RMRKCore: transfer to the zero address");
+    if (ownerOf(tokenId) != from) 
+    revert NotAuthorizedToTransfer();
+    if (to == address(0)) 
+    revert TransferToZeroAddress();
 
     _beforeTokenTransfer(from, to, tokenId);
 
@@ -531,12 +543,10 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
 
   function approve(address to, uint256 tokenId) public virtual {
     address owner = this.ownerOf(tokenId);
-    require(to != owner, "RMRKCore: approval to current owner");
-
-    require(
-        _msgSender() == owner,
-        "RMRKCore: approve caller is not owner"
-    );
+    if (to == owner) 
+    revert ApprovalToCurrentOwner();
+    if (_msgSender() != owner) 
+    revert MsgSenderNotOwnerOrApproved();
 
     _approve(to, tokenId);
   }
@@ -556,7 +566,8 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
   }
 
   function getApproved(uint256 tokenId) public view virtual returns (address) {
-    require(_exists(tokenId), "RMRKCore: approved query for nonexistent token");
+    /// @dev this check may be extraneous
+    if (!_exists(tokenId)) revert TokenDoesNotExist();
 
     return _tokenApprovals[tokenId];
   }
@@ -574,6 +585,8 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
       string memory _thumb,
       string memory _metadataURI
   ) public onlyRole(issuer) {
+
+    /// @dev should add checks around this even though it's a privileged setter
     resourceStorage.addResourceEntry(
       _id,
       _slot,
@@ -591,16 +604,13 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
       bytes8 _resourceId,
       bytes8 _overwrites
   ) public onlyRole(issuer) {
-      require(
-        _resources[_tokenId][_resourceId].resourceId == bytes8(0),
-        "RMRKCore: Resource already exists on token"
-      );
+      if (_resources[_tokenId][_resourceId].resourceId != bytes8(0))
+      revert ResourceExists();
+
       //This error code will never be triggered because of the interior call of
       //resourceStorage.getResource. Left in for posterity.
-      require(
-        resourceStorage.getResource(_resourceId).id != bytes8(0),
-        "RMRKCore: Resource not found in storage"
-      );
+      if (resourceStorage.getResource(_resourceId).id == bytes8(0))
+      revert ResourceNotFoundInStorage();
 
       //Construct Resource object with pending
       Resource memory resource_ = Resource({
@@ -619,16 +629,13 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
   }
 
   function acceptResource(uint256 _tokenId, uint256 index, bytes8 _id) public {
+      if (!_isApprovedOrOwner(_msgSender(), _tokenId))
+      revert CantAcceptResourceInNonOwnedNFT();
 
-      require(
-        _isApprovedOrOwner(_msgSender(), _tokenId),
-          "RMRK: Attempting to accept a resource in non-owned NFT"
-      );
       Resource memory resource = _resources[_tokenId][_id];
-      require(
-        resource.resourceId != bytes8(0),
-          "RMRK: resource does not exist"
-      );
+
+      if (resource.resourceId == bytes8(0))
+      revert ResourceNotFoundInStorage();
 
       _removeItemByIndex(index, _pendingResources[_tokenId]);
       //This feels weird, test this
@@ -641,19 +648,15 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
   }
 
   function setPriority(uint256 _tokenId, bytes8[] memory _ids) public {
-      require(
-        _ids.length == _activeResources[_tokenId].length,
-          "RMRK: Bad priority list length"
-      );
-      require(
-        _isApprovedOrOwner(_msgSender(), _tokenId),
-          "RMRK: Attempting to set priority in non-owned NFT"
-      );
+    if (_ids.length != _activeResources[_tokenId].length)
+    revert InvalidPriorityListLength();
+    if (!_isApprovedOrOwner(_msgSender(), _tokenId))
+    revert MsgSenderNotOwnerOrApproved();
+
       for (uint256 i = 0; i < _ids.length; i = u_inc(i)) {
-          require(
-            (_resources[_tokenId][_ids[i]].resourceId !=bytes8(0)),
-              "RMRK: Trying to reprioritize a non-existant resource"
-          );
+        if (_resources[_tokenId][_ids[i]].resourceId ==bytes8(0))
+        revert ResourceNotFoundInStorage();
+
       }
       _activeResources[_tokenId] = _ids;
       emit ResourcePrioritySet(_tokenId);
@@ -760,17 +763,22 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
 
   // For child storage array
   function _removeItemByIndex(uint256 index, Child[] storage array) internal {
+    uint256 length = indexes.length; //gas savings
     //Check to see if this is already gated by require in all calls
-    require(index < array.length);
-    array[index] = array[array.length-1];
+    if (index >= length)
+    revert IndexDoesNotExist();
+
+    array[index] = array[length-1];
     array.pop();
   }
 
   //For reasource storage array
   function _removeItemByIndex(uint256 index, bytes8[] storage array) internal {
-    //Check to see if this is already gated by require in all calls
-    require(index < array.length);
-    array[index] = array[array.length-1];
+    uint256 length = indexes.length; //gas savings
+    if (index >= length)
+    revert IndexDoesNotExist();
+
+    array[index] = array[length-1];
     array.pop();
   }
 
