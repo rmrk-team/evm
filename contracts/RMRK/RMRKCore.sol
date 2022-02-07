@@ -9,7 +9,7 @@ import "./utils/Address.sol";
 import "./utils/Context.sol";
 import "./utils/Strings.sol";
 import "./access/AccessControl.sol";
-import "./RMRKResource.sol";
+import "./RMRKResourceCore.sol";
 
 import "hardhat/console.sol";
 
@@ -76,7 +76,7 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
 
   bytes32 private constant issuer = keccak256("ISSUER");
 
-  RMRKResource public resourceStorage;
+  RMRKResourceCore public resourceStorage;
 
   //Resource events
   event ResourceAdded(uint256 indexed tokenId, bytes32 indexed uuid);
@@ -88,7 +88,7 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
   event pendingChildRemoved(uint index, uint tokenId);
 
   constructor(string memory name_, string memory symbol_, string memory resourceName) {
-    resourceStorage = new RMRKResource(resourceName);
+    resourceStorage = new RMRKResourceCore(resourceName);
     _name = name_;
     _symbol = symbol_;
 
@@ -438,11 +438,10 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
   * @dev See {IERC721-transferFrom}.
   */
   function transfer(
-    address from,
     address to,
-    uint256 tokenId,
+    uint256 tokenId
   ) public virtual {
-    _transferFrom(msg.sender, to, tokenId, 0, isNft);
+    transferFrom(msg.sender, to, tokenId, 0, new bytes(0));
   }
 
   /**
@@ -453,11 +452,11 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
     address to,
     uint256 tokenId,
     uint256 destinationId,
-    bool isNft
+    bytes memory data
   ) public virtual {
     //solhint-disable-next-line max-line-length
     require(_isApprovedOrOwner(_msgSender(), tokenId), "RMRKCore: transfer caller is not owner nor approved");
-    _transfer(from, to, tokenId, destinationId, isNft);
+    _transfer(from, to, tokenId, destinationId, data);
   }
 
   /**
@@ -480,7 +479,7 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
     address to,
     uint256 tokenId,
     uint256 destinationId,
-    bool isNft
+    bytes memory data
   ) internal virtual {
     require(ownerOf(tokenId) == from, "RMRKCore: transfer from incorrect owner");
     require(to != address(0), "RMRKCore: transfer to the zero address");
@@ -488,14 +487,16 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
     _beforeTokenTransfer(from, to, tokenId);
 
     _balances[from] -= 1;
+    bool isNft = false;
 
-    if (!isNft) {
+    if (data.length == 0) {
       _balances[to] += 1;
     } else {
       IRMRKCore destContract = IRMRKCore(to);
       address rootOwner = destContract.ownerOf(destinationId);
       _balances[rootOwner] += 1;
       destContract.setChild(this, destinationId, tokenId);
+      isNft = true;
     }
     _RMRKOwners[tokenId] = RMRKOwner({
       ownerAddress: to,

@@ -4,7 +4,7 @@ pragma solidity ^0.8.9;
 
 import "./access/AccessControl.sol";
 
-contract RMRKResource is AccessControl {
+contract RMRKResourceCore is AccessControl {
 
   /**
   @dev Ancillary RMRK resource storage contract. By default this is expected to be deployed

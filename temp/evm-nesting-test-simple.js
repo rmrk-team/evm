@@ -16,11 +16,11 @@ describe("init", async function () {
   beforeEach(async function () {
     [owner, ...addrs] = await ethers.getSigners();
 
-    const RMRK = await ethers.getContractFactory("RMRKCoreSimpleMock");
+    const RMRK = await ethers.getContractFactory("RMRKCoreMock");
     rmrkNft = await RMRK.deploy(name, symbol, resourceName);
     await rmrkNft.deployed();
 
-    const RMRK2 = await ethers.getContractFactory("RMRKCoreSimpleMock");
+    const RMRK2 = await ethers.getContractFactory("RMRKCoreMock");
     rmrkNft2 = await RMRK2.deploy(name, symbol, resourceName);
     await rmrkNft2.deployed();
 

@@ -33,6 +33,14 @@ describe("init", async function () {
     {
       tokenId: 1,
       id: ethers.utils.hexZeroPad("0x1", 8),
+      slot: 0,
+      baseAddress: ethers.utils.hexZeroPad("0x1111", 20),
+      basePartIds: [
+        ethers.utils.hexZeroPad("0x1111", 8),
+        ethers.utils.hexZeroPad("0x2222", 8),
+        ethers.utils.hexZeroPad("0x3333", 8),
+        ethers.utils.hexZeroPad("0x4444", 8),
+      ],
       src: "",
       thumb: 'ipfs://ipfs/QmR3rK1P4n24PPqvfjGYNXWixPJpyBKTV6rYzAS2TYHLpT',
       metadataURI: ""
@@ -40,6 +48,9 @@ describe("init", async function () {
     {
       tokenId: 1,
       id: ethers.utils.hexZeroPad("0x2", 8),
+      slot: 0,
+      baseAddress: ethers.utils.hexZeroPad("0x0", 20),
+      basePartIds: [],
       src: 'ipfs://ipfs/QmQBhz44R6K6DeKJCCycgAn9RxPo6tn8Tg7vsEX3wewupP/99.png',
       thumb: 'ipfs://ipfs/QmZFWSK9cyfSTgdDVWJucn1eNLtmkBaFEqM8CmfNrhkaZU/99_thumb.png',
       metadataURI: ""
