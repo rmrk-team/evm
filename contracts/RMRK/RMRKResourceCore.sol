@@ -51,8 +51,6 @@ contract RMRKResourceCore is AccessControl {
 
   bytes32 private constant issuer = keccak256("ISSUER");
 
-  event ResourcePrioritySet(uint256 indexed tokenId);
-
   constructor(string memory resourceName_) {
     _grantRole(issuer, msg.sender);
     _setRoleAdmin(issuer, issuer);
@@ -63,12 +61,9 @@ contract RMRKResourceCore is AccessControl {
    * @dev Function to handle adding a resource entry to the storage contract. Callable by the issuer role, which may also
    * be an instance of the CORE contract, if deployed by the CORE.
    * param1 _id is a unique resource identifier.
-   * param2 _slot is the slot ID for equip logic.
-   * param3 _baseAddress is the address of the base contract from which this contract pulls.
-   * param4 _basePartIds is a list of base part IDs from which this contract pulls.
-   * param5 _src is the primary URI of the resource (used for non-base resources)
-   * param6 _thumb is the thumbnail URI of the resource
-   * param7 _metadataURI is the URI of the resource's metadata
+   * param2 _src is the primary URI of the resource (used for non-base resources)
+   * param3 _thumb is the thumbnail URI of the resource
+   * param4 _metadataURI is the URI of the resource's metadata
    */
 
   function addResourceEntry(

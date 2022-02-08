@@ -5,6 +5,7 @@
 pragma solidity ^0.8.9;
 
 import "./IRMRKCore.sol";
+import "./IRMRKResourceCore.sol";
 import "./utils/Address.sol";
 import "./utils/Context.sol";
 import "./utils/Strings.sol";
@@ -59,18 +60,16 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
 
   mapping(uint256 => Child[]) private _pendingChildren;
 
-  mapping(uint256 => uint8[]) private _emptyIndexes;
+  //mapping resourceContract to resource entry
+  mapping(bytes16 => Resource) private _resources;
 
-  //mapping of tokenId to resourceId to resource entry
-  mapping(uint256 => mapping(bytes8 => Resource)) private _resources;
-
-  mapping(uint256 => mapping(bytes8 => bytes8)) private _resourceOverwrites;
+  mapping(uint256 => mapping(bytes16 => bytes16)) private _resourceOverwrites;
 
   //mapping of tokenId to all resources by priority
-  mapping(uint256 => bytes8[]) private _activeResources;
+  mapping(uint256 => bytes16[]) private _activeResources;
 
   //mapping of tokenId to all resources by priority
-  mapping(uint256 => bytes8[]) private _pendingResources;
+  mapping(uint256 => bytes16[]) private _pendingResources;
 
   // AccessControl roles and nest flag constants
 
@@ -599,67 +598,77 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
       bytes8 _resourceId,
       bytes8 _overwrites
   ) public onlyRole(issuer) {
+
+      bytes16 localResourceId = hashResource16(_resourceAddress, _resourceId);
+
+      //Dunno if this'll even work
       require(
-        _resources[_tokenId][_resourceId].resourceId == bytes8(0),
+        _resources[localResourceId].resourceAddress == address(0),
         "RMRKCore: Resource already exists on token"
       );
       //This error code will never be triggered because of the interior call of
       //resourceStorage.getResource. Left in for posterity.
+
+      //Abstract this out to IRMRKResourceStorage
       require(
         resourceStorage.getResource(_resourceId).id != bytes8(0),
         "RMRKCore: Resource not found in storage"
       );
 
-      //Construct Resource object with pending
+      //Construct Resource object
       Resource memory resource_ = Resource({
         resourceAddress: _resourceAddress,
         resourceId: _resourceId
       });
-      //Add resource entry to mapping and ID to pending array.
-      _resources[_tokenId][_resourceId] = resource_;
-      _pendingResources[_tokenId].push(_resourceId);
 
-      if (_overwrites != bytes8(0)) {
-        _resourceOverwrites[_tokenId][_resourceId] = _overwrites;
+      _resources[localResourceId] = resource_;
+
+      _pendingResources[_tokenId].push(localResourceId);
+
+      if (_overwrites != bytes16(0)) {
+        _resourceOverwrites[_tokenId][localResourceId] = _overwrites;
       }
 
       emit ResourceAdded(_tokenId, _resourceId);
   }
 
-  function acceptResource(uint256 _tokenId, uint256 index, bytes8 _id) public {
+  function acceptResource(uint256 _tokenId, uint256 index) public {
 
       require(
         _isApprovedOrOwner(_msgSender(), _tokenId),
           "RMRK: Attempting to accept a resource in non-owned NFT"
       );
-      Resource memory resource = _resources[_tokenId][_id];
+
+      bytes16 _localResourceId = _pendingResources[_tokenId][index];
+
       require(
-        resource.resourceId != bytes8(0),
+          _resources[_localResourceId].resourceAddress != address(0),
           "RMRK: resource does not exist"
       );
 
       _removeItemByIndex(index, _pendingResources[_tokenId]);
       //This feels weird, test this
-      bytes8 overwrite = _resourceOverwrites[_tokenId][resource.resourceId];
-      if (overwrite != bytes8(0)) {
+      bytes16 overwrite = _resourceOverwrites[_tokenId][_localResourceId];
+      if (overwrite != bytes16(0)) {
         _removeItemByValue(overwrite, _activeResources[_tokenId]);
       }
-      _activeResources[_tokenId].push();
-      emit ResourceAccepted(_tokenId, _id);
+      _activeResources[_tokenId].push(_localResourceId);
+      emit ResourceAccepted(_tokenId, _localResourceId);
   }
 
-  function setPriority(uint256 _tokenId, bytes8[] memory _ids) public {
+  function setPriority(uint256 _tokenId, bytes16[] memory _ids) public {
+      uint256 length = _ids.length;
       require(
-        _ids.length == _activeResources[_tokenId].length,
+        length == _activeResources[_tokenId].length,
           "RMRK: Bad priority list length"
       );
       require(
         _isApprovedOrOwner(_msgSender(), _tokenId),
           "RMRK: Attempting to set priority in non-owned NFT"
       );
-      for (uint256 i = 0; i < _ids.length; i = u_inc(i)) {
+      for (uint256 i = 0; i < length; i = u_inc(i)) {
           require(
-            (_resources[_tokenId][_ids[i]].resourceId !=bytes8(0)),
+            (_resources[_ids[i]].resourceId !=bytes16(0)),
               "RMRK: Trying to reprioritize a non-existant resource"
           );
       }
@@ -667,23 +676,34 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
       emit ResourcePrioritySet(_tokenId);
   }
 
-  function getRenderableResource(uint256 tokenId) public virtual view returns(Resource memory) {
-    bytes8 resourceId = _activeResources[tokenId][0];
-    return getTokenResource(tokenId, resourceId);
-  }
-
-  function getTokenResource(uint256 tokenId, bytes8 resourceId) public virtual view returns(Resource memory) {
-    return _resources[tokenId][resourceId];
-  }
-
-  //Design decision note -- Mention differences between child and resource 'pending' handling
-
-  function getActiveResources(uint256 tokenId) public virtual view returns(bytes8[] memory) {
+  function getActiveResources(uint256 tokenId) public virtual view returns(bytes16[] memory) {
     return _activeResources[tokenId];
   }
 
-  function getPendingeResources(uint256 tokenId) public virtual view returns(bytes8[] memory) {
+  function getPendingResources(uint256 tokenId) public virtual view returns(bytes16[] memory) {
     return _pendingResources[tokenId];
+  }
+
+  function getRenderableResource(uint256 tokenId) public virtual view returns (Resource memory resource) {
+    bytes16 resourceId = getActiveResources(tokenId)[0];
+    return _resources[resourceId];
+  }
+
+  function getResourceObject(address _storage, bytes8 _id) public virtual view returns (IRMRKResourceCore.Resource memory resource) {
+    IRMRKResourceCore resourceStorage = IRMRKResourceCore(_storage);
+    IRMRKResourceCore.Resource memory resource = resourceStorage.getResource(_id);
+    return resource;
+  }
+
+  function getResObjectByIndex(uint256 _tokenId, uint256 _index) public virtual view returns(IRMRKResourceCore.Resource memory resource) {
+    bytes16 localResourceId = getActiveResources(_tokenId)[_index];
+    Resource memory _resource = _resources[localResourceId];
+    (address _storage, bytes8 _id) = (_resource.resourceAddress, _resource.resourceId);
+    return getResourceObject(_storage, _id);
+  }
+
+  function hashResource16(address addr, bytes8 id) public pure returns (bytes16) {
+    return bytes16(keccak256(abi.encodePacked(addr, id)));
   }
 
   ////////////////////////////////////////
@@ -755,8 +775,8 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
   //              HELPERS
   ////////////////////////////////////////
 
-  function _removeItemByValue(bytes8 value, bytes8[] storage array) internal {
-    bytes8[] memory memArr = array; //Copy array to memory, check for gas savings here
+  function _removeItemByValue(bytes16 value, bytes16[] storage array) internal {
+    bytes16[] memory memArr = array; //Copy array to memory, check for gas savings here
     uint256 length = memArr.length; //gas savings
     for (uint i; i<length; i = u_inc(i)) {
       if (memArr[i] == value) {
@@ -775,7 +795,7 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
   }
 
   //For reasource storage array
-  function _removeItemByIndex(uint256 index, bytes8[] storage array) internal {
+  function _removeItemByIndex(uint256 index, bytes16[] storage array) internal {
     //Check to see if this is already gated by require in all calls
     require(index < array.length);
     array[index] = array[array.length-1];
