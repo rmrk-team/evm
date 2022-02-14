@@ -2,6 +2,14 @@
   "compilerOptions": {
     "target": "es2018",
     "module": "commonjs",
+    "moduleResolution": "node",
+    "lib": [
+      "es2017",
+      "dom",
+      "es2019",
+      "es2020",
+      "esnext"
+    ],
     "strict": true,
     "esModuleInterop": true,
     "outDir": "dist",
