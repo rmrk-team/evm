@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
+  "scripts": {
+    "test": "hardhat test"
+  },
   "dependencies": {
     "@openzeppelin/contracts": "^4.4.0",
     "hardhat": "^2.6.5",
