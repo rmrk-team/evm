@@ -50,7 +50,7 @@ An extension for the contracts to make them Harberger-taxable by default, integr
 
 ## Develop
 
-Just run `npx hardhar compile` to check if it works. Refer to the rest below.
+Just run `npx hardhat compile` to check if it works. Refer to the rest below.
 
 This project demonstrates an advanced Hardhat use case, integrating other tools commonly used alongside Hardhat in the ecosystem.
 
