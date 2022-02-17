@@ -1,45 +1,274 @@
 // SPDX-License-Identifier: Apache-2.0
 
-//Generally all interactions should propagate downstream
-
 pragma solidity ^0.8.9;
 
-import "./IRMRKCore.sol";
-import "./IRMRKResourceCore.sol";
-import "./utils/Address.sol";
-import "./utils/Context.sol";
-import "./utils/Strings.sol";
-import "./access/AccessControl.sol";
-import "./RMRKResourceCore.sol";
+interface IRMRKCore_vuln {
+  function ownerOf(uint256 tokenId) external view returns(address owner);
+  function rmrkOwnerOf(uint256 tokenId) external view returns (address, uint256, bool);
+  function setChild(IRMRKCore_vuln childAddress, uint tokenId, uint childTokenId) external;
+  function isApprovedOrOwner(address addr, uint id) external view returns(bool);
+  function _burnChildren(uint256 tokenId, address oldOwner) external;
+  function isRMRKCore(address, address, uint256, bytes calldata) external returns (bytes4);
 
-import "hardhat/console.sol";
+  /**
+   * @dev Returns the token collection name.
+   */
+  function name() external view returns (string memory);
 
-contract RMRKCore is Context, IRMRKCore, AccessControl {
+  /**
+   * @dev Returns the token collection symbol.
+   */
+  function symbol() external view returns (string memory);
+
+  event Transfer(address indexed from, address indexed to, uint256 indexed tokenId);
+  event Approval(address indexed owner, address indexed approved, uint256 indexed tokenId);
+}
+
+
+abstract contract Context {
+    function _msgSender() internal view virtual returns (address) {
+        return msg.sender;
+    }
+
+    function _msgData() internal view virtual returns (bytes calldata) {
+        return msg.data;
+    }
+}
+
+library Address {
+    /**
+     * @dev Returns true if `account` is a contract.
+     *
+     * [IMPORTANT]
+     * ====
+     * It is unsafe to assume that an address for which this function returns
+     * false is an externally-owned account (EOA) and not a contract.
+     *
+     * Among others, `isContract` will return false for the following
+     * types of addresses:
+     *
+     *  - an externally-owned account
+     *  - a contract in construction
+     *  - an address where a contract will be created
+     *  - an address where a contract lived, but was destroyed
+     * ====
+     *
+     * [IMPORTANT]
+     * ====
+     * You shouldn't rely on `isContract` to protect against flash loan attacks!
+     *
+     * Preventing calls from contracts is highly discouraged. It breaks composability, breaks support for smart wallets
+     * like Gnosis Safe, and does not provide security since it can be circumvented by calling from a contract
+     * constructor.
+     * ====
+     */
+    function isContract(address account) internal view returns (bool) {
+        // This method relies on extcodesize, which returns 0 for contracts in
+        // construction, since the code is only stored at the end of the
+        // constructor execution.
+
+        uint256 size;
+        assembly {
+            size := extcodesize(account)
+        }
+        return size > 0;
+    }
+
+    /**
+     * @dev Replacement for Solidity's `transfer`: sends `amount` wei to
+     * `recipient`, forwarding all available gas and reverting on errors.
+     *
+     * https://eips.ethereum.org/EIPS/eip-1884[EIP1884] increases the gas cost
+     * of certain opcodes, possibly making contracts go over the 2300 gas limit
+     * imposed by `transfer`, making them unable to receive funds via
+     * `transfer`. {sendValue} removes this limitation.
+     *
+     * https://diligence.consensys.net/posts/2019/09/stop-using-soliditys-transfer-now/[Learn more].
+     *
+     * IMPORTANT: because control is transferred to `recipient`, care must be
+     * taken to not create reentrancy vulnerabilities. Consider using
+     * {ReentrancyGuard} or the
+     * https://solidity.readthedocs.io/en/v0.5.11/security-considerations.html#use-the-checks-effects-interactions-pattern[checks-effects-interactions pattern].
+     */
+    function sendValue(address payable recipient, uint256 amount) internal {
+        require(address(this).balance >= amount, "Address: insufficient balance");
+
+        (bool success, ) = recipient.call{value: amount}("");
+        require(success, "Address: unable to send value, recipient may have reverted");
+    }
+
+    /**
+     * @dev Performs a Solidity function call using a low level `call`. A
+     * plain `call` is an unsafe replacement for a function call: use this
+     * function instead.
+     *
+     * If `target` reverts with a revert reason, it is bubbled up by this
+     * function (like regular Solidity function calls).
+     *
+     * Returns the raw returned data. To convert to the expected return value,
+     * use https://solidity.readthedocs.io/en/latest/units-and-global-variables.html?highlight=abi.decode#abi-encoding-and-decoding-functions[`abi.decode`].
+     *
+     * Requirements:
+     *
+     * - `target` must be a contract.
+     * - calling `target` with `data` must not revert.
+     *
+     * _Available since v3.1._
+     */
+    function functionCall(address target, bytes memory data) internal returns (bytes memory) {
+        return functionCall(target, data, "Address: low-level call failed");
+    }
+
+    /**
+     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`], but with
+     * `errorMessage` as a fallback revert reason when `target` reverts.
+     *
+     * _Available since v3.1._
+     */
+    function functionCall(
+        address target,
+        bytes memory data,
+        string memory errorMessage
+    ) internal returns (bytes memory) {
+        return functionCallWithValue(target, data, 0, errorMessage);
+    }
+
+    /**
+     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],
+     * but also transferring `value` wei to `target`.
+     *
+     * Requirements:
+     *
+     * - the calling contract must have an ETH balance of at least `value`.
+     * - the called Solidity function must be `payable`.
+     *
+     * _Available since v3.1._
+     */
+    function functionCallWithValue(
+        address target,
+        bytes memory data,
+        uint256 value
+    ) internal returns (bytes memory) {
+        return functionCallWithValue(target, data, value, "Address: low-level call with value failed");
+    }
+
+    /**
+     * @dev Same as {xref-Address-functionCallWithValue-address-bytes-uint256-}[`functionCallWithValue`], but
+     * with `errorMessage` as a fallback revert reason when `target` reverts.
+     *
+     * _Available since v3.1._
+     */
+    function functionCallWithValue(
+        address target,
+        bytes memory data,
+        uint256 value,
+        string memory errorMessage
+    ) internal returns (bytes memory) {
+        require(address(this).balance >= value, "Address: insufficient balance for call");
+        require(isContract(target), "Address: call to non-contract");
+
+        (bool success, bytes memory returndata) = target.call{value: value}(data);
+        return verifyCallResult(success, returndata, errorMessage);
+    }
+
+    /**
+     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],
+     * but performing a static call.
+     *
+     * _Available since v3.3._
+     */
+    function functionStaticCall(address target, bytes memory data) internal view returns (bytes memory) {
+        return functionStaticCall(target, data, "Address: low-level static call failed");
+    }
+
+    /**
+     * @dev Same as {xref-Address-functionCall-address-bytes-string-}[`functionCall`],
+     * but performing a static call.
+     *
+     * _Available since v3.3._
+     */
+    function functionStaticCall(
+        address target,
+        bytes memory data,
+        string memory errorMessage
+    ) internal view returns (bytes memory) {
+        require(isContract(target), "Address: static call to non-contract");
+
+        (bool success, bytes memory returndata) = target.staticcall(data);
+        return verifyCallResult(success, returndata, errorMessage);
+    }
+
+    /**
+     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],
+     * but performing a delegate call.
+     *
+     * _Available since v3.4._
+     */
+    function functionDelegateCall(address target, bytes memory data) internal returns (bytes memory) {
+        return functionDelegateCall(target, data, "Address: low-level delegate call failed");
+    }
+
+    /**
+     * @dev Same as {xref-Address-functionCall-address-bytes-string-}[`functionCall`],
+     * but performing a delegate call.
+     *
+     * _Available since v3.4._
+     */
+    function functionDelegateCall(
+        address target,
+        bytes memory data,
+        string memory errorMessage
+    ) internal returns (bytes memory) {
+        require(isContract(target), "Address: delegate call to non-contract");
+
+        (bool success, bytes memory returndata) = target.delegatecall(data);
+        return verifyCallResult(success, returndata, errorMessage);
+    }
+
+    /**
+     * @dev Tool to verifies that a low level call was successful, and revert if it wasn't, either by bubbling the
+     * revert reason using the provided one.
+     *
+     * _Available since v4.3._
+     */
+    function verifyCallResult(
+        bool success,
+        bytes memory returndata,
+        string memory errorMessage
+    ) internal pure returns (bytes memory) {
+        if (success) {
+            return returndata;
+        } else {
+            // Look for revert reason and bubble it up if present
+            if (returndata.length > 0) {
+                // The easiest way to bubble the revert reason is using memory via assembly
+
+                assembly {
+                    let returndata_size := mload(returndata)
+                    revert(add(32, returndata), returndata_size)
+                }
+            } else {
+                revert(errorMessage);
+            }
+        }
+    }
+}
+
+
+contract RMRKCore_vuln is Context, IRMRKCore_vuln {
   using Address for address;
-  using Strings for uint256;
 
   struct Child {
-    uint256 tokenId;
     address contractAddress;
+    uint256 tokenId;
     uint16 slotEquipped;
     bytes8 partId;
   }
 
   struct RMRKOwner {
-    uint256 tokenId;
     address ownerAddress;
+    uint256 tokenId;
     bool isNft;
-  }
-
-  struct Resource {
-    address resourceAddress;
-    bytes8 resourceId;
-  }
-
-  struct RoyaltyData {
-    address royaltyAddress;
-    uint32 numerator;
-    uint32 denominator;
   }
 
   string private _name;
@@ -47,8 +276,6 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
   string private _symbol;
 
   string private _tokenURI;
-
-  RoyaltyData private _royalties;
 
   mapping(address => uint256) private _balances;
 
@@ -60,23 +287,6 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
 
   mapping(uint256 => Child[]) private _pendingChildren;
 
-  //mapping resourceContract to resource entry
-  mapping(bytes16 => Resource) private _resources;
-
-  mapping(uint256 => mapping(bytes16 => bytes16)) private _resourceOverwrites;
-
-  //mapping of tokenId to all resources by priority
-  mapping(uint256 => bytes16[]) private _activeResources;
-
-  //mapping of tokenId to all resources by priority
-  mapping(uint256 => bytes16[]) private _pendingResources;
-
-  // AccessControl roles and nest flag constants
-
-  bytes32 private constant issuer = keccak256("ISSUER");
-
-  RMRKResourceCore public resourceStorage;
-
   //Resource events
   event ResourceAdded(uint256 indexed tokenId, bytes32 indexed uuid);
   event ResourceAccepted(uint256 indexed tokenId, bytes32 indexed uuid);
@@ -86,13 +296,9 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
   event childRemoved(uint index, uint tokenId);
   event pendingChildRemoved(uint index, uint tokenId);
 
-  constructor(string memory name_, string memory symbol_, string memory resourceName) {
-    resourceStorage = new RMRKResourceCore(resourceName);
+  constructor(string memory name_, string memory symbol_) {
     _name = name_;
     _symbol = symbol_;
-
-    _grantRole(issuer, msg.sender);
-    _setRoleAdmin(issuer, issuer);
   }
 
   /*
@@ -124,7 +330,7 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
   function ownerOf(uint256 tokenId) public view virtual returns(address) {
     (address owner, uint256 ownerTokenId, bool isNft) = rmrkOwnerOf(tokenId);
     if (isNft) {
-      owner = IRMRKCore(owner).ownerOf(ownerTokenId);
+      owner = IRMRKCore_vuln(owner).ownerOf(ownerTokenId);
     }
     require(owner != address(0), "RMRKCore: owner query for nonexistent token");
     return owner;
@@ -256,35 +462,40 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
 
   /**
    * @dev Function designed to be used by other instances of RMRK-Core contracts to update children.
-   * param1 childAddress is the address of the child contract as an IRMRKCore instance
+   * param1 childAddress is the address of the child contract as an IRMRKCore_vuln instance
    * param2 parentTokenId is the tokenId of the parent token on (this).
    * param3 childTokenId is the tokenId of the child instance
    */
 
-  //update for reentrancy
-  function setChild(IRMRKCore childAddress, uint parentTokenId, uint childTokenId) public virtual {
-   (address parent, , ) = childAddress.rmrkOwnerOf(childTokenId);
+  function setChild(IRMRKCore_vuln childAddress, uint parentTokenId, uint childTokenId) public virtual {
+   (address parent, uint256 tokenId, ) = childAddress.rmrkOwnerOf(childTokenId);
    require(parent == address(this), "Parent-child mismatch");
-   Child memory child = Child({
-       contractAddress: address(childAddress),
-       tokenId: childTokenId,
-       slotEquipped: 0,
-       partId: 0
-     });
-   _addChildToPending(child, parentTokenId);
+   if (_isApprovedOrOwner(tx.origin, parentTokenId) || childAddress.ownerOf(childTokenId) == ownerOf(parentTokenId)) {
+     Child memory child = Child({
+         contractAddress: address(childAddress),
+         tokenId: childTokenId,
+         slotEquipped: 0,
+         partId: 0
+       });
+     _addChildToChildren(child, parentTokenId);
+   } else {
+     Child memory child = Child({
+         contractAddress: address(childAddress),
+         tokenId: childTokenId,
+         slotEquipped: 0,
+         partId: 0
+       });
+     _addChildToPending(child, parentTokenId);
+   }
   }
 
 
   /**
-  @dev Adds an instance of Child to the pending children array for _tokenId. This is hardcoded to be 128 by default.
+  @dev Adds an instance of Child to the pending children array for _tokenId.
   */
 
   function _addChildToPending(Child memory _child, uint256 _tokenId) internal {
-    if(_pendingChildren[_tokenId].length < 128) {
-      _pendingChildren[_tokenId].push(_child);
-    } else {
-      revert("RMRKCore: Max pending children reached");
-    }
+    _pendingChildren[_tokenId].push(_child);
   }
 
   /**
@@ -329,7 +540,7 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
       "RMRKCore: Mint to non-RMRKCore implementer"
     );
 
-    IRMRKCore destContract = IRMRKCore(to);
+    IRMRKCore_vuln destContract = IRMRKCore_vuln(to);
 
     _beforeTokenTransfer(address(0), to, tokenId);
 
@@ -378,7 +589,6 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
   * Emits a {Transfer} event.
   */
 
-  //update for reentrancy
   function _burn(uint256 tokenId) internal virtual {
     address owner = ownerOf(tokenId);
     require(_isApprovedOrOwner(_msgSender(), tokenId), "RMRKCore: burn caller is not owner nor approved");
@@ -393,7 +603,7 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
 
     uint length = children.length; //gas savings
     for (uint i; i<length; i = u_inc(i)){
-      IRMRKCore(children[i].contractAddress)._burnChildren(
+      IRMRKCore_vuln(children[i].contractAddress)._burnChildren(
         children[i].tokenId,
         owner
       );
@@ -409,7 +619,6 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
   //Checks that caller is current RMRKOnwerOf contract
   //Updates rootOwner balance
   //recursively calls _burnChildren on all children
-  //update for reentrancy
   function _burnChildren(uint256 tokenId, address oldOwner) public virtual {
     (address _RMRKOwner, , ) = rmrkOwnerOf(tokenId);
     require(_RMRKOwner == _msgSender(), "Caller is not RMRKOwner contract");
@@ -422,7 +631,7 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
       address childContractAddress = children[i].contractAddress;
       uint256 childTokenId = children[i].tokenId;
 
-      IRMRKCore(childContractAddress)._burnChildren(
+      IRMRKCore_vuln(childContractAddress)._burnChildren(
         childTokenId,
         oldOwner
       );
@@ -494,7 +703,8 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
     if (data.length == 0) {
       _balances[to] += 1;
     } else {
-      IRMRKCore destContract = IRMRKCore(to);
+      require(_checkRMRKCoreImplementer(address(0), to, tokenId, data), "not RMRKCore");
+      IRMRKCore_vuln destContract = IRMRKCore_vuln(to);
       address rootOwner = destContract.ownerOf(destinationId);
       _balances[rootOwner] += 1;
       destContract.setChild(this, destinationId, tokenId);
@@ -578,169 +788,6 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
   }
 
   ////////////////////////////////////////
-  //              RESOURCES
-  ////////////////////////////////////////
-
-  function addResourceEntry(
-      bytes8 _id,
-      string memory _src,
-      string memory _thumb,
-      string memory _metadataURI
-  ) public onlyRole(issuer) {
-    resourceStorage.addResourceEntry(
-      _id,
-      _src,
-      _thumb,
-      _metadataURI
-      );
-  }
-
-  function addResourceToToken(
-      uint256 _tokenId,
-      address _resourceAddress,
-      bytes8 _resourceId,
-      bytes16 _overwrites
-  ) public onlyRole(issuer) {
-
-      bytes16 localResourceId = hashResource16(_resourceAddress, _resourceId);
-
-      //Dunno if this'll even work
-      require(
-        _resources[localResourceId].resourceAddress == address(0),
-        "RMRKCore: Resource already exists on token"
-      );
-      //This error code will never be triggered because of the interior call of
-      //resourceStorage.getResource. Left in for posterity.
-
-      //Abstract this out to IRMRKResourceStorage
-      require(
-        resourceStorage.getResource(_resourceId).id != bytes8(0),
-        "RMRKCore: Resource not found in storage"
-      );
-
-      //Construct Resource object
-      Resource memory resource_ = Resource({
-        resourceAddress: _resourceAddress,
-        resourceId: _resourceId
-      });
-
-      _resources[localResourceId] = resource_;
-
-      _pendingResources[_tokenId].push(localResourceId);
-
-      if (_overwrites != bytes16(0)) {
-        _resourceOverwrites[_tokenId][localResourceId] = _overwrites;
-      }
-
-      emit ResourceAdded(_tokenId, _resourceId);
-  }
-
-  function acceptResource(uint256 _tokenId, uint256 index) public {
-
-      require(
-        _isApprovedOrOwner(_msgSender(), _tokenId),
-          "RMRK: Attempting to accept a resource in non-owned NFT"
-      );
-
-      bytes16 _localResourceId = _pendingResources[_tokenId][index];
-
-      require(
-          _resources[_localResourceId].resourceAddress != address(0),
-          "RMRK: resource does not exist"
-      );
-
-      _removeItemByIndex(index, _pendingResources[_tokenId]);
-      //This feels weird, test this
-      bytes16 overwrite = _resourceOverwrites[_tokenId][_localResourceId];
-      if (overwrite != bytes16(0)) {
-        _removeItemByValue(overwrite, _activeResources[_tokenId]);
-      }
-      _activeResources[_tokenId].push(_localResourceId);
-      emit ResourceAccepted(_tokenId, _localResourceId);
-  }
-
-  function setPriority(uint256 _tokenId, bytes16[] memory _ids) public {
-      uint256 length = _ids.length;
-      require(
-        length == _activeResources[_tokenId].length,
-          "RMRK: Bad priority list length"
-      );
-      require(
-        _isApprovedOrOwner(_msgSender(), _tokenId),
-          "RMRK: Attempting to set priority in non-owned NFT"
-      );
-      for (uint256 i = 0; i < length; i = u_inc(i)) {
-          require(
-            (_resources[_ids[i]].resourceId !=bytes16(0)),
-              "RMRK: Trying to reprioritize a non-existant resource"
-          );
-      }
-      _activeResources[_tokenId] = _ids;
-      emit ResourcePrioritySet(_tokenId);
-  }
-
-  function getActiveResources(uint256 tokenId) public virtual view returns(bytes16[] memory) {
-    return _activeResources[tokenId];
-  }
-
-  function getPendingResources(uint256 tokenId) public virtual view returns(bytes16[] memory) {
-    return _pendingResources[tokenId];
-  }
-
-  function getRenderableResource(uint256 tokenId) public virtual view returns (Resource memory resource) {
-    bytes16 resourceId = getActiveResources(tokenId)[0];
-    return _resources[resourceId];
-  }
-
-  function getResourceObject(address _storage, bytes8 _id) public virtual view returns (IRMRKResourceCore.Resource memory resource) {
-    IRMRKResourceCore resourceStorage = IRMRKResourceCore(_storage);
-    IRMRKResourceCore.Resource memory resource = resourceStorage.getResource(_id);
-    return resource;
-  }
-
-  function getResObjectByIndex(uint256 _tokenId, uint256 _index) public virtual view returns(IRMRKResourceCore.Resource memory resource) {
-    bytes16 localResourceId = getActiveResources(_tokenId)[_index];
-    Resource memory _resource = _resources[localResourceId];
-    (address _storage, bytes8 _id) = (_resource.resourceAddress, _resource.resourceId);
-    return getResourceObject(_storage, _id);
-  }
-
-  function getResourceOverwrites(uint256 tokenId, bytes16 resId) public view returns(bytes16) {
-    return _resourceOverwrites[tokenId][resId];
-  }
-
-  function hashResource16(address addr, bytes8 id) public pure returns (bytes16) {
-    return bytes16(keccak256(abi.encodePacked(addr, id)));
-  }
-
-  ////////////////////////////////////////
-  //              ROYALTIES
-  ////////////////////////////////////////
-
-  /**
-  * @dev Returns contract royalty data.
-  * Returns a numerator and denominator for percentage calculations, as well as a desitnation address.
-  */
-  function getRoyaltyData() public virtual view returns(address royaltyAddress, uint256 numerator, uint256 denominator) {
-    RoyaltyData memory data = _royalties;
-    return(data.royaltyAddress, uint256(data.numerator), uint256(data.denominator));
-  }
-
-  /**
-  * @dev Setter for contract royalty data, percentage stored as a numerator and denominator.
-  * Recommended values are in Parts Per Million, E.G:
-  * A numerator of 1*10**5 and a denominator of 1*10**6 is equal to 10 percent, or 100,000 parts per 1,000,000.
-  */
-
-  function setRoyaltyData(address _royaltyAddress, uint32 _numerator, uint32 _denominator) internal virtual onlyRole(issuer) {
-    _royalties = RoyaltyData ({
-       royaltyAddress: _royaltyAddress,
-       numerator: _numerator,
-       denominator: _denominator
-     });
-  }
-
-  ////////////////////////////////////////
   //           SELF-AWARENESS
   ////////////////////////////////////////
   // I'm afraid I can't do that, Dave.
@@ -752,8 +799,8 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
       bytes memory _data
   ) private returns (bool) {
       if (to.isContract()) {
-          try IRMRKCore(to).isRMRKCore(_msgSender(), from, tokenId, _data) returns (bytes4 retval) {
-              return retval == IRMRKCore.isRMRKCore.selector;
+          try IRMRKCore_vuln(to).isRMRKCore(_msgSender(), from, tokenId, _data) returns (bytes4 retval) {
+              return retval == IRMRKCore_vuln.isRMRKCore.selector;
           } catch (bytes memory reason) {
               if (reason.length == 0) {
                   revert("RMRKCore: transfer to non RMRKCore implementer");
@@ -775,7 +822,7 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
       uint256,
       bytes memory
   ) public virtual returns (bytes4) {
-      return IRMRKCore.isRMRKCore.selector;
+      return IRMRKCore_vuln.isRMRKCore.selector;
   }
 
   ////////////////////////////////////////
