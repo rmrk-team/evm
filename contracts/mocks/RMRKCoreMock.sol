@@ -24,7 +24,7 @@ contract RMRKCoreMock is RMRKCore {
   }
 
   function doMintNest(address to, uint256 tokenId, uint256 destId, bytes calldata data) external {
-    _mint(to, tokenId, destId, "data");
+    _mint(to, tokenId, destId, data);
   }
 
   function burn(uint256 tokenId) public {

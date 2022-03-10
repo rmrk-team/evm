@@ -118,7 +118,7 @@ describe('init', async () => {
           1,
           resourceStorage.address,
           resArr[0].id,
-          ethers.utils.hexZeroPad('0x0', 8),
+          ethers.utils.hexZeroPad("0x0", 16),
         );
 
       // Get pending resources
@@ -131,7 +131,12 @@ describe('init', async () => {
       await expect(
         rmrkNft
           .connect(owner)
-          .addResourceEntry(resArr[0].id, resArr[0].src, resArr[0].thumb, resArr[0].metadataURI),
+          .addResourceEntry(
+            resArr[0].id,
+            resArr[0].src,
+            resArr[0].thumb,
+            resArr[0].metadataURI
+          ),
       ).to.be.revertedWith('RMRK: resource already exists');
 
       await expect(
@@ -163,7 +168,7 @@ describe('init', async () => {
           1,
           resourceStorage.address,
           resArr[0].id,
-          ethers.utils.hexZeroPad('0x0', 8),
+          ethers.utils.hexZeroPad('0x0', 16),
         );
 
       await rmrkNft.connect(addrs[0]).acceptResource(1, 0);
@@ -214,7 +219,7 @@ describe('init', async () => {
           1,
           resourceStorage.address,
           resArr[0].id,
-          ethers.utils.hexZeroPad('0x0', 8),
+          ethers.utils.hexZeroPad('0x0', 16),
         );
 
       await rmrkNft
@@ -223,7 +228,7 @@ describe('init', async () => {
           1,
           resourceStorage.address,
           resArr[1].id,
-          ethers.utils.hexZeroPad('0x0', 8),
+          ethers.utils.hexZeroPad('0x0', 16),
         );
 
       // Get pending resources
@@ -266,7 +271,7 @@ describe('init', async () => {
             1,
             resourceStorage.address,
             resArr[1].id,
-            ethers.utils.hexZeroPad('0x0', 8),
+            ethers.utils.hexZeroPad('0x0', 16),
           ),
       ).to.be.revertedWith('RMRKCore: Resource already exists on token');
 
@@ -277,7 +282,7 @@ describe('init', async () => {
             1,
             resourceStorage.address,
             ethers.utils.hexZeroPad('0xa1a2a3', 8),
-            ethers.utils.hexZeroPad('0x0', 8),
+            ethers.utils.hexZeroPad('0x0', 16),
           ),
       ).to.be.revertedWith('RMRKResource: No resource at index');
     });

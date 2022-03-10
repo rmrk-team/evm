@@ -46,7 +46,7 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
 
   string private _symbol;
 
-  string private _tokenURI;
+  string private _fallbackURI;
 
   RoyaltyData private _royalties;
 
@@ -165,6 +165,22 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
     return _symbol;
   }
 
+  function tokenURI(uint256 tokenId) public view virtual returns (string memory) {
+    if (_activeResources[tokenId].length > 0)  {
+      Resource memory activeRes = _resources[_activeResources[tokenId][0]];
+      address resAddr = activeRes.resourceAddress;
+      bytes8 resId = activeRes.resourceId;
+
+      IRMRKResourceCore.Resource memory _activeRes = IRMRKResourceCore(resAddr).getResource(resId);
+      string memory URI = _activeRes.src;
+      return URI;
+    }
+
+    else {
+      return _fallbackURI;
+    }
+  }
+
   ////////////////////////////////////////
   //          CHILD MANAGEMENT
   ////////////////////////////////////////
@@ -195,12 +211,12 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
   //CHECK: preload mappings into memory for gas savings
   function acceptChildFromPending(uint256 index, uint256 _tokenId) public {
     require(
-      _pendingChildren[_tokenId].length < index,
+      _pendingChildren[_tokenId].length > index,
       "RMRKcore: Pending child index out of range"
     );
     require(
       ownerOf(_tokenId) == _msgSender(),
-      "RMRKcore: Bad owner"
+      "RMRKCore: Bad owner"
     );
 
     Child memory child_ = _pendingChildren[_tokenId][index];
@@ -224,12 +240,12 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
 
   function deleteChildFromPending(uint256 index, uint256 _tokenId) public {
     require(
-      _pendingChildren[_tokenId].length < index,
+      _pendingChildren[_tokenId].length > index,
       "RMRKcore: Pending child index out of range"
     );
     require(
       ownerOf(_tokenId) == _msgSender(),
-      "RMRKcore: Bad owner"
+      "RMRKCore: Bad owner"
     );
 
     _removeItemByIndex(index, _pendingChildren[_tokenId]);
@@ -247,7 +263,7 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
     );
     require(
       ownerOf(_tokenId) == _msgSender(),
-      "RMRKcore: Bad owner"
+      "RMRKCore: Bad owner"
     );
 
     _removeItemByIndex(index, _children[_tokenId]);
@@ -406,7 +422,7 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
   }
 
   //how could devs allow something like this, smh
-  //Checks that caller is current RMRKOnwerOf contract
+  //Checks that caller is current RMRKOwnerOf contract
   //Updates rootOwner balance
   //recursively calls _burnChildren on all children
   //update for reentrancy
@@ -428,6 +444,7 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
       );
     }
     delete _RMRKOwners[tokenId];
+    //Also delete pending arrays for gas refund?
     //This can emit a lot of events.
     emit Transfer(oldOwner, address(0), tokenId);
     }

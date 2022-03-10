@@ -99,7 +99,7 @@ contract RMRKResourceCore is AccessControl {
    * @dev Resource name getter
    */
 
-  function getResourceName () public view returns (string memory) {
+  function getResourceName() public view returns (string memory) {
     return _resourceName;
   }
 
@@ -107,7 +107,7 @@ contract RMRKResourceCore is AccessControl {
    * @dev Resource name setter
    */
 
-  function setResourceName (string memory resourceName) internal {
+  function setResourceName(string memory resourceName) internal {
     _resourceName = resourceName;
   }
 
