@@ -4,8 +4,8 @@
 
 pragma solidity ^0.8.9;
 
-import "./IRMRKCore.sol";
-import "./IRMRKResourceCore.sol";
+import "./interfaces/IRMRKCore.sol";
+import "./interfaces/IRMRKResourceCore.sol";
 import "./utils/Address.sol";
 import "./utils/Context.sol";
 import "./utils/Strings.sol";
