@@ -4,13 +4,13 @@
 
 pragma solidity ^0.8.9;
 
+import "./RMRKResourceCore.sol";
+import "./access/RMRKIssuable.sol";
 import "./interfaces/IRMRKCore.sol";
 import "./interfaces/IRMRKResourceCore.sol";
 import "./utils/Address.sol";
 import "./utils/Context.sol";
 import "./utils/Strings.sol";
-import "./access/RMRKIssuable.sol";
-import "./RMRKResourceCore.sol";
 
 import "hardhat/console.sol";
 
