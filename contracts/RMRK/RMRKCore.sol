@@ -9,12 +9,12 @@ import "./interfaces/IRMRKResourceCore.sol";
 import "./utils/Address.sol";
 import "./utils/Context.sol";
 import "./utils/Strings.sol";
-import "./access/AccessControl.sol";
+import "./access/RMRKIssuable.sol";
 import "./RMRKResourceCore.sol";
 
 import "hardhat/console.sol";
 
-contract RMRKCore is Context, IRMRKCore, AccessControl {
+contract RMRKCore is Context, IRMRKCore, RMRKIssuable {
   using Address for address;
   using Strings for uint256;
 
@@ -72,9 +72,6 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
   mapping(uint256 => bytes16[]) private _pendingResources;
 
   // AccessControl roles and nest flag constants
-
-  bytes32 private constant issuer = keccak256("ISSUER");
-
   RMRKResourceCore public resourceStorage;
 
   //Resource events
@@ -90,9 +87,6 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
     resourceStorage = new RMRKResourceCore(resourceName);
     _name = name_;
     _symbol = symbol_;
-
-    _grantRole(issuer, msg.sender);
-    _setRoleAdmin(issuer, issuer);
   }
 
   /*
@@ -603,7 +597,7 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
       string memory _src,
       string memory _thumb,
       string memory _metadataURI
-  ) public onlyRole(issuer) {
+  ) public onlyIssuer {
     resourceStorage.addResourceEntry(
       _id,
       _src,
@@ -617,7 +611,7 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
       address _resourceAddress,
       bytes8 _resourceId,
       bytes16 _overwrites
-  ) public onlyRole(issuer) {
+  ) public onlyIssuer {
 
       bytes16 localResourceId = hashResource16(_resourceAddress, _resourceId);
 
@@ -749,7 +743,7 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
   * A numerator of 1*10**5 and a denominator of 1*10**6 is equal to 10 percent, or 100,000 parts per 1,000,000.
   */
 
-  function setRoyaltyData(address _royaltyAddress, uint32 _numerator, uint32 _denominator) internal virtual onlyRole(issuer) {
+  function setRoyaltyData(address _royaltyAddress, uint32 _numerator, uint32 _denominator) internal virtual onlyIssuer {
     _royalties = RoyaltyData ({
        royaltyAddress: _royaltyAddress,
        numerator: _numerator,
@@ -839,6 +833,4 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
         return i + 1;
     }
   }
-
-
 }
