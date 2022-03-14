@@ -32,7 +32,7 @@ contract RMRKCore is Context, IRMRKCore, RMRKIssuable {
   }
 
   struct Resource {
-    address resourceAddress;
+    IRMRKResourceCore resourceAddress;
     bytes8 resourceId;
   }
 
@@ -91,7 +91,6 @@ contract RMRKCore is Context, IRMRKCore, RMRKIssuable {
 
   /*
   TODOS:
-  abstract "transfer caller is not owner nor approved" to modifier
   Isolate _transfer() branches in own functions
   Update functions that take address and use as interface to take interface instead
   double check (this) in setChild() call functions appropriately
@@ -162,7 +161,7 @@ contract RMRKCore is Context, IRMRKCore, RMRKIssuable {
   function tokenURI(uint256 tokenId) public view virtual returns (string memory) {
     if (_activeResources[tokenId].length > 0)  {
       Resource memory activeRes = _resources[_activeResources[tokenId][0]];
-      address resAddr = activeRes.resourceAddress;
+      IRMRKResourceCore resAddr = activeRes.resourceAddress;
       bytes8 resId = activeRes.resourceId;
 
       IRMRKResourceCore.Resource memory _activeRes = IRMRKResourceCore(resAddr).getResource(resId);
@@ -524,6 +523,8 @@ contract RMRKCore is Context, IRMRKCore, RMRKIssuable {
     _afterTokenTransfer(from, to, tokenId);
   }
 
+
+
   function _beforeTokenTransfer(
     address from,
     address to,
@@ -608,7 +609,7 @@ contract RMRKCore is Context, IRMRKCore, RMRKIssuable {
 
   function addResourceToToken(
       uint256 _tokenId,
-      address _resourceAddress,
+      IRMRKResourceCore _resourceAddress,
       bytes8 _resourceId,
       bytes16 _overwrites
   ) public onlyIssuer {
@@ -617,7 +618,7 @@ contract RMRKCore is Context, IRMRKCore, RMRKIssuable {
 
       //Dunno if this'll even work
       require(
-        _resources[localResourceId].resourceAddress == address(0),
+        address(_resources[localResourceId].resourceAddress) == address(0),
         "RMRKCore: Resource already exists on token"
       );
       //This error code will never be triggered because of the interior call of
@@ -656,7 +657,7 @@ contract RMRKCore is Context, IRMRKCore, RMRKIssuable {
       bytes16 _localResourceId = _pendingResources[_tokenId][index];
 
       require(
-          _resources[_localResourceId].resourceAddress != address(0),
+          address(_resources[_localResourceId].resourceAddress) != address(0),
           "RMRK: resource does not exist"
       );
 
@@ -703,16 +704,14 @@ contract RMRKCore is Context, IRMRKCore, RMRKIssuable {
     return _resources[resourceId];
   }
 
-  function getResourceObject(address _storage, bytes8 _id) public virtual view returns (IRMRKResourceCore.Resource memory resource) {
-    IRMRKResourceCore resourceStorage = IRMRKResourceCore(_storage);
-    IRMRKResourceCore.Resource memory resource = resourceStorage.getResource(_id);
-    return resource;
+  function getResourceObject(IRMRKResourceCore _storage, bytes8 _id) public virtual view returns (IRMRKResourceCore.Resource memory resource) {    
+    return _storage.getResource(_id);
   }
 
   function getResObjectByIndex(uint256 _tokenId, uint256 _index) public virtual view returns(IRMRKResourceCore.Resource memory resource) {
     bytes16 localResourceId = getActiveResources(_tokenId)[_index];
     Resource memory _resource = _resources[localResourceId];
-    (address _storage, bytes8 _id) = (_resource.resourceAddress, _resource.resourceId);
+    (IRMRKResourceCore _storage, bytes8 _id) = (_resource.resourceAddress, _resource.resourceId);
     return getResourceObject(_storage, _id);
   }
 
@@ -720,7 +719,7 @@ contract RMRKCore is Context, IRMRKCore, RMRKIssuable {
     return _resourceOverwrites[tokenId][resId];
   }
 
-  function hashResource16(address addr, bytes8 id) public pure returns (bytes16) {
+  function hashResource16(IRMRKResourceCore addr, bytes8 id) public pure returns (bytes16) {
     return bytes16(keccak256(abi.encodePacked(addr, id)));
   }
 
