@@ -4,17 +4,17 @@
 
 pragma solidity ^0.8.9;
 
-import "./IRMRKCore.sol";
-import "./IRMRKResourceCore.sol";
+import "./RMRKResourceCore.sol";
+import "./access/RMRKIssuable.sol";
+import "./interfaces/IRMRKCore.sol";
+import "./interfaces/IRMRKResourceCore.sol";
 import "./utils/Address.sol";
 import "./utils/Context.sol";
 import "./utils/Strings.sol";
-import "./access/AccessControl.sol";
-import "./RMRKResourceCore.sol";
 
 import "hardhat/console.sol";
 
-contract RMRKCore is Context, IRMRKCore, AccessControl {
+contract RMRKCore is Context, IRMRKCore, RMRKIssuable {
   using Address for address;
   using Strings for uint256;
 
@@ -32,7 +32,7 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
   }
 
   struct Resource {
-    address resourceAddress;
+    IRMRKResourceCore resourceAddress;
     bytes8 resourceId;
   }
 
@@ -72,9 +72,6 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
   mapping(uint256 => bytes16[]) private _pendingResources;
 
   // AccessControl roles and nest flag constants
-
-  bytes32 private constant issuer = keccak256("ISSUER");
-
   RMRKResourceCore public resourceStorage;
 
   //Resource events
@@ -90,14 +87,10 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
     resourceStorage = new RMRKResourceCore(resourceName);
     _name = name_;
     _symbol = symbol_;
-
-    _grantRole(issuer, msg.sender);
-    _setRoleAdmin(issuer, issuer);
   }
 
   /*
   TODOS:
-  abstract "transfer caller is not owner nor approved" to modifier
   Isolate _transfer() branches in own functions
   Update functions that take address and use as interface to take interface instead
   double check (this) in setChild() call functions appropriately
@@ -168,7 +161,7 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
   function tokenURI(uint256 tokenId) public view virtual returns (string memory) {
     if (_activeResources[tokenId].length > 0)  {
       Resource memory activeRes = _resources[_activeResources[tokenId][0]];
-      address resAddr = activeRes.resourceAddress;
+      IRMRKResourceCore resAddr = activeRes.resourceAddress;
       bytes8 resId = activeRes.resourceId;
 
       IRMRKResourceCore.Resource memory _activeRes = IRMRKResourceCore(resAddr).getResource(resId);
@@ -530,6 +523,8 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
     _afterTokenTransfer(from, to, tokenId);
   }
 
+
+
   function _beforeTokenTransfer(
     address from,
     address to,
@@ -603,7 +598,7 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
       string memory _src,
       string memory _thumb,
       string memory _metadataURI
-  ) public onlyRole(issuer) {
+  ) public onlyIssuer {
     resourceStorage.addResourceEntry(
       _id,
       _src,
@@ -614,16 +609,16 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
 
   function addResourceToToken(
       uint256 _tokenId,
-      address _resourceAddress,
+      IRMRKResourceCore _resourceAddress,
       bytes8 _resourceId,
       bytes16 _overwrites
-  ) public onlyRole(issuer) {
+  ) public onlyIssuer {
 
       bytes16 localResourceId = hashResource16(_resourceAddress, _resourceId);
 
       //Dunno if this'll even work
       require(
-        _resources[localResourceId].resourceAddress == address(0),
+        address(_resources[localResourceId].resourceAddress) == address(0),
         "RMRKCore: Resource already exists on token"
       );
       //This error code will never be triggered because of the interior call of
@@ -662,7 +657,7 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
       bytes16 _localResourceId = _pendingResources[_tokenId][index];
 
       require(
-          _resources[_localResourceId].resourceAddress != address(0),
+          address(_resources[_localResourceId].resourceAddress) != address(0),
           "RMRK: resource does not exist"
       );
 
@@ -709,16 +704,14 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
     return _resources[resourceId];
   }
 
-  function getResourceObject(address _storage, bytes8 _id) public virtual view returns (IRMRKResourceCore.Resource memory resource) {
-    IRMRKResourceCore resourceStorage = IRMRKResourceCore(_storage);
-    IRMRKResourceCore.Resource memory resource = resourceStorage.getResource(_id);
-    return resource;
+  function getResourceObject(IRMRKResourceCore _storage, bytes8 _id) public virtual view returns (IRMRKResourceCore.Resource memory resource) {    
+    return _storage.getResource(_id);
   }
 
   function getResObjectByIndex(uint256 _tokenId, uint256 _index) public virtual view returns(IRMRKResourceCore.Resource memory resource) {
     bytes16 localResourceId = getActiveResources(_tokenId)[_index];
     Resource memory _resource = _resources[localResourceId];
-    (address _storage, bytes8 _id) = (_resource.resourceAddress, _resource.resourceId);
+    (IRMRKResourceCore _storage, bytes8 _id) = (_resource.resourceAddress, _resource.resourceId);
     return getResourceObject(_storage, _id);
   }
 
@@ -726,7 +719,7 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
     return _resourceOverwrites[tokenId][resId];
   }
 
-  function hashResource16(address addr, bytes8 id) public pure returns (bytes16) {
+  function hashResource16(IRMRKResourceCore addr, bytes8 id) public pure returns (bytes16) {
     return bytes16(keccak256(abi.encodePacked(addr, id)));
   }
 
@@ -749,7 +742,7 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
   * A numerator of 1*10**5 and a denominator of 1*10**6 is equal to 10 percent, or 100,000 parts per 1,000,000.
   */
 
-  function setRoyaltyData(address _royaltyAddress, uint32 _numerator, uint32 _denominator) internal virtual onlyRole(issuer) {
+  function setRoyaltyData(address _royaltyAddress, uint32 _numerator, uint32 _denominator) internal virtual onlyIssuer {
     _royalties = RoyaltyData ({
        royaltyAddress: _royaltyAddress,
        numerator: _numerator,
@@ -839,6 +832,4 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
         return i + 1;
     }
   }
-
-
 }
