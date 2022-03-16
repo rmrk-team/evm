@@ -16,7 +16,7 @@ describe('init', async () => {
   const resourceName = 'TestResource';
 
   /*
-  Mints 10 NFTs of NFT to to addrs[0] and addrs[1] on init.
+  Mints 10 NFTs of NFT to addrs[0] and addrs[1] on init.
   */
 
   // let baseParts = {
@@ -38,7 +38,7 @@ describe('init', async () => {
       metadataURI: '',
     },
     {
-      tokenId: 1,
+      tokenId: 2,
       id: ethers.utils.hexZeroPad('0x2', 8),
       src: 'ipfs://ipfs/QmQBhz44R6K6DeKJCCycgAn9RxPo6tn8Tg7vsEX3wewupP/99.png',
       thumb: 'ipfs://ipfs/QmZFWSK9cyfSTgdDVWJucn1eNLtmkBaFEqM8CmfNrhkaZU/99_thumb.png',
@@ -112,20 +112,21 @@ describe('init', async () => {
 
       expect(await resourceStorage.getResource(resArr[0].id)).to.eql(targetResultArr);
 
+      const tokenId = 1;
       await rmrkNft
         .connect(owner)
         .addResourceToToken(
-          1,
+          tokenId,
           resourceStorage.address,
           resArr[0].id,
           ethers.utils.hexZeroPad("0x0", 16),
         );
 
       // Get pending resources
-      expect(await rmrkNft.getPendingResources(1)).to.eql([resId16]);
+      expect(await rmrkNft.getPendingResources(tokenId)).to.eql([resId16]);
 
       // Get renderable resources - should return none
-      expect(await rmrkNft.getActiveResources(1)).to.eql([]);
+      expect(await rmrkNft.getActiveResources(tokenId)).to.eql([]);
 
       // Check expected reverts
       await expect(
@@ -162,25 +163,26 @@ describe('init', async () => {
         .connect(owner)
         .addResourceEntry(resArr[0].id, resArr[0].src, resArr[0].thumb, resArr[0].metadataURI);
 
+      const tokenId = 1;
       await rmrkNft
         .connect(owner)
         .addResourceToToken(
-          1,
+          tokenId,
           resourceStorage.address,
           resArr[0].id,
           ethers.utils.hexZeroPad('0x0', 16),
         );
 
-      await rmrkNft.connect(addrs[0]).acceptResource(1, 0);
+      await rmrkNft.connect(addrs[0]).acceptResource(tokenId, 0);
 
       // Get pending resources - should return none
-      expect(await rmrkNft.getPendingResources(1)).to.eql([]);
+      expect(await rmrkNft.getPendingResources(tokenId)).to.eql([]);
 
       // Get active resources
-      expect(await rmrkNft.getActiveResources(1)).to.eql([resId16]);
+      expect(await rmrkNft.getActiveResources(tokenId)).to.eql([resId16]);
 
       // Check getRenderableResource getter
-      expect(await rmrkNft.getRenderableResource(1)).to.eql([
+      expect(await rmrkNft.getRenderableResource(tokenId)).to.eql([
         resourceStorage.address,
         resArr[0].id,
       ]);
@@ -213,10 +215,11 @@ describe('init', async () => {
 
       // Check existing priority order
 
+      const tokenId = 1;
       await rmrkNft
         .connect(owner)
         .addResourceToToken(
-          1,
+          tokenId,
           resourceStorage.address,
           resArr[0].id,
           ethers.utils.hexZeroPad('0x0', 16),
@@ -225,40 +228,40 @@ describe('init', async () => {
       await rmrkNft
         .connect(owner)
         .addResourceToToken(
-          1,
+          tokenId,
           resourceStorage.address,
           resArr[1].id,
           ethers.utils.hexZeroPad('0x0', 16),
         );
 
       // Get pending resources
-      expect(await rmrkNft.getPendingResources(1)).to.eql([resId16_1, resId16_2]);
+      expect(await rmrkNft.getPendingResources(tokenId)).to.eql([resId16_1, resId16_2]);
 
-      await rmrkNft.connect(addrs[0]).acceptResource(1, 0);
-      await rmrkNft.connect(addrs[0]).acceptResource(1, 0);
+      await rmrkNft.connect(addrs[0]).acceptResource(tokenId, 0);
+      await rmrkNft.connect(addrs[0]).acceptResource(tokenId, 0);
 
-      expect(await rmrkNft.getPendingResources(1)).to.eql([]);
-      expect(await rmrkNft.getActiveResources(1)).to.eql([resId16_1, resId16_2]);
+      expect(await rmrkNft.getPendingResources(tokenId)).to.eql([]);
+      expect(await rmrkNft.getActiveResources(tokenId)).to.eql([resId16_1, resId16_2]);
 
-      expect(await rmrkNft.getResObjectByIndex(1, 0)).to.eql(targetResArrs[0]);
+      expect(await rmrkNft.getResObjectByIndex(tokenId, 0)).to.eql(targetResArrs[0]);
 
       // Reorder priorities and return correct renderable resource
-      await rmrkNft.connect(addrs[0]).setPriority(1, [resId16_2, resId16_1]);
+      await rmrkNft.connect(addrs[0]).setPriority(tokenId, [resId16_2, resId16_1]);
 
-      expect(await rmrkNft.getActiveResources(1)).to.eql([resId16_2, resId16_1]);
+      expect(await rmrkNft.getActiveResources(tokenId)).to.eql([resId16_2, resId16_1]);
 
       await expect(
-        rmrkNft.connect(addrs[1]).setPriority(1, [resId16_2, resId16_1]),
+        rmrkNft.connect(addrs[1]).setPriority(tokenId, [resId16_2, resId16_1]),
       ).to.be.revertedWith('RMRK: Attempting to set priority in non-owned NFT');
 
-      await expect(rmrkNft.connect(addrs[0]).setPriority(1, [resId16_2])).to.be.revertedWith(
+      await expect(rmrkNft.connect(addrs[0]).setPriority(tokenId, [resId16_2])).to.be.revertedWith(
         'RMRK: Bad priority list length',
       );
 
       await expect(
         rmrkNft
           .connect(addrs[0])
-          .setPriority(1, [
+          .setPriority(tokenId, [
             ethers.utils.hexZeroPad('0xaaaaa', 16),
             ethers.utils.hexZeroPad('0xbbbb', 16),
           ]),
@@ -268,7 +271,7 @@ describe('init', async () => {
         rmrkNft
           .connect(owner)
           .addResourceToToken(
-            1,
+            tokenId,
             resourceStorage.address,
             resArr[1].id,
             ethers.utils.hexZeroPad('0x0', 16),
@@ -279,7 +282,7 @@ describe('init', async () => {
         rmrkNft
           .connect(owner)
           .addResourceToToken(
-            1,
+            tokenId,
             resourceStorage.address,
             ethers.utils.hexZeroPad('0xa1a2a3', 8),
             ethers.utils.hexZeroPad('0x0', 16),
