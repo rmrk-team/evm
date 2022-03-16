@@ -122,11 +122,24 @@ describe('init', async () => {
           ethers.utils.hexZeroPad("0x0", 16),
         );
 
+      // add resource to other token
+      const otherTokenId = 2;
+        await rmrkNft
+        .connect(owner)
+        .addResourceToToken(
+          otherTokenId,
+          resourceStorage.address,
+          resArr[0].id,
+          ethers.utils.hexZeroPad("0x0", 16),
+        );
+
       // Get pending resources
       expect(await rmrkNft.getPendingResources(tokenId)).to.eql([resId16]);
+      expect(await rmrkNft.getPendingResources(otherTokenId)).to.eql([resId16]);
 
       // Get renderable resources - should return none
       expect(await rmrkNft.getActiveResources(tokenId)).to.eql([]);
+      expect(await rmrkNft.getActiveResources(otherTokenId)).to.eql([]);
 
       // Check expected reverts
       await expect(
@@ -288,6 +301,64 @@ describe('init', async () => {
             ethers.utils.hexZeroPad('0x0', 16),
           ),
       ).to.be.revertedWith('RMRKResource: No resource at index');
+    });
+
+    it('Overwrites resource', async function () {
+      const targetResArrs = [
+        [resArr[0].id, resArr[0].src, resArr[0].thumb, resArr[0].metadataURI],
+        [resArr[1].id, resArr[1].src, resArr[1].thumb, resArr[1].metadataURI],
+      ];
+
+      const resId32_1 = ethers.utils.solidityKeccak256(
+        ['address', 'bytes8'],
+        [resourceStorage.address, resArr[0].id],
+      );
+      const resId16_1 = ethers.utils.hexDataSlice(resId32_1, 0, 16);
+
+      const resId32_2 = ethers.utils.solidityKeccak256(
+        ['address', 'bytes8'],
+        [resourceStorage.address, resArr[1].id],
+      );
+      const resId16_2 = ethers.utils.hexDataSlice(resId32_2, 0, 16);
+
+      const tokenId = 1;
+      await rmrkNft
+        .connect(owner)
+        .addResourceEntry(resArr[0].id, resArr[0].src, resArr[0].thumb, resArr[0].metadataURI);
+      await rmrkNft
+        .connect(owner)
+        .addResourceEntry(resArr[1].id, resArr[1].src, resArr[1].thumb, resArr[1].metadataURI);
+
+      await rmrkNft
+        .connect(owner)
+        .addResourceToToken(
+          tokenId,
+          resourceStorage.address,
+          resArr[0].id,
+          ethers.utils.hexZeroPad('0x0', 16),
+        );
+
+      await rmrkNft.connect(addrs[0]).acceptResource(tokenId, 0);
+
+      await rmrkNft
+        .connect(owner)
+        .addResourceToToken(
+          tokenId,
+          resourceStorage.address,
+          resArr[1].id,
+          resId16_1, // overwrite
+        );
+
+      // Get pending resources
+      expect(await rmrkNft.getPendingResources(tokenId)).to.eql([resId16_2]);
+
+      await rmrkNft.connect(addrs[0]).acceptResource(tokenId, 0);
+
+      expect(await rmrkNft.getPendingResources(tokenId)).to.eql([]);
+      expect(await rmrkNft.getActiveResources(tokenId)).to.eql([resId16_2]);
+
+      expect(await rmrkNft.getResObjectByIndex(tokenId, 0)).to.eql(targetResArrs[1]);
+
     });
   });
 });

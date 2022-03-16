@@ -667,9 +667,10 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
       );
 
       _removeItemByIndex(index, _pendingResources[_tokenId]);
-      //This feels weird, test this
+
       bytes16 overwrite = _resourceOverwrites[_tokenId][_localResourceId];
       if (overwrite != bytes16(0)) {
+        // We could check here that the resource to overwrite actually exists but it is probably harmless.
         _removeItemByValue(overwrite, _activeResources[_tokenId]);
       }
       _activeResources[_tokenId].push(_localResourceId);
