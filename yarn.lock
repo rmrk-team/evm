@@ -8355,7 +8355,7 @@ prettier-linter-helpers@^1.0.0:
   dependencies:
     fast-diff "^1.1.2"
 
-prettier-plugin-solidity@^1.0.0-beta.13:
+prettier-plugin-solidity@^1.0.0-beta.19:
   version "1.0.0-beta.19"
   resolved "https://registry.yarnpkg.com/prettier-plugin-solidity/-/prettier-plugin-solidity-1.0.0-beta.19.tgz#7c3607fc4028f5e6a425259ff03e45eedf733df3"
   integrity sha512-xxRQ5ZiiZyUoMFLE9h7HnUDXI/daf1tnmL1msEdcKmyh7ZGQ4YklkYLC71bfBpYU2WruTb5/SFLUaEb3RApg5g==
@@ -8367,12 +8367,17 @@ prettier-plugin-solidity@^1.0.0-beta.13:
     solidity-comments-extractor "^0.0.7"
     string-width "^4.2.3"
 
+prettier@2.6.0:
+  version "2.6.0"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.6.0.tgz#12f8f504c4d8ddb76475f441337542fa799207d4"
+  integrity sha512-m2FgJibYrBGGgQXNzfd0PuDGShJgRavjUoRCw1mZERIWVSXF0iLzLm+aOqTAbLnC3n6JzUhAA8uZnFVghHJ86A==
+
 prettier@^1.14.3:
   version "1.19.1"
   resolved "https://registry.yarnpkg.com/prettier/-/prettier-1.19.1.tgz#f7d7f5ff8a9cd872a7be4ca142095956a60797cb"
   integrity sha512-s7PoyDv/II1ObgQunCbB9PdLmUcBZcnWOcxDh7O0N/UwDEsHyqkW+Qh28jW+mVuCdx7gLB0BotYI1Y6uI9iyew==
 
-prettier@^2.1.2, prettier@^2.3.2:
+prettier@^2.1.2:
   version "2.5.1"
   resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.5.1.tgz#fff75fa9d519c54cf0fce328c1017d94546bc56a"
   integrity sha512-vBZcPRUR5MZJwoyi3ZoyQlc1rXeEck8KgeC9AwwOn+exuxLxq5toTRDTSaVrXHxelDMHy9zlicw8u66yxoSUFg==

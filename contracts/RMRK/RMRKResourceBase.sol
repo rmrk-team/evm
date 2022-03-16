@@ -6,8 +6,5 @@ import "./RMRKResourceCore.sol";
 import "./interfaces/IRMRKResourceBase.sol";
 
 contract RMRKResourceBase is RMRKResourceCore {
-
-  constructor()RMRKResourceCore("dummyResource") {
-  }
-
+    constructor() RMRKResourceCore("dummyResource") {}
 }

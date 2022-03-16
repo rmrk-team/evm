@@ -1,17 +1,17 @@
-name: Tests CI
+name: Auto format code with Prettier
 
 on:
   push:
   pull_request:
 
 jobs:
-  test:
+  prettier:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Run unit tests
+      - name: Run prettier
         uses: actions/setup-node@v1
         with:
           node-version: "16"
       - run: yarn install
-      - run: yarn test
+      - run: yarn prettier

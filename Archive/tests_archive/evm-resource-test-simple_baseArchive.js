@@ -1,124 +1,107 @@
-const { expect } = require("chai");
-const { ethers } = require("hardhat");
+const { expect } = require('chai');
+const { ethers } = require('hardhat');
 const { expectRevert } = require('@openzeppelin/test-helpers');
 
-describe("init", async function () {
-
+describe('init', async function () {
   let acct0, acct1, acct2, acct3, acct4;
   let sendVal, pending;
   let i, j;
   let bytes8 = 0xaaaaaaaa;
   let resourceStorage;
 
-  const name = "RmrkTest";
-  const symbol = "RMRKTST";
-  const resourceName = "TestResource";
-  const nestFlag = "NEST";
+  const name = 'RmrkTest';
+  const symbol = 'RMRKTST';
+  const resourceName = 'TestResource';
+  const nestFlag = 'NEST';
 
   /*
   Mints 10 NFTs of NFT to to addrs[0] and addrs[1] on init.
   */
 
   let baseParts = {
-    "baseAddress": ethers.utils.hexZeroPad("0x1111", 20),
-    "partIds": [
-      ethers.utils.hexZeroPad("0x1111", 8),
-      ethers.utils.hexZeroPad("0x2222", 8),
-      ethers.utils.hexZeroPad("0x3333", 8),
-      ethers.utils.hexZeroPad("0x4444", 8),
-    ]
-  }
+    baseAddress: ethers.utils.hexZeroPad('0x1111', 20),
+    partIds: [
+      ethers.utils.hexZeroPad('0x1111', 8),
+      ethers.utils.hexZeroPad('0x2222', 8),
+      ethers.utils.hexZeroPad('0x3333', 8),
+      ethers.utils.hexZeroPad('0x4444', 8),
+    ],
+  };
 
   let resArr = [
     {
       tokenId: 1,
-      id: ethers.utils.hexZeroPad("0x1", 8),
+      id: ethers.utils.hexZeroPad('0x1', 8),
       slot: 0,
-      baseAddress: ethers.utils.hexZeroPad("0x1111", 20),
+      baseAddress: ethers.utils.hexZeroPad('0x1111', 20),
       basePartIds: [
-        ethers.utils.hexZeroPad("0x1111", 8),
-        ethers.utils.hexZeroPad("0x2222", 8),
-        ethers.utils.hexZeroPad("0x3333", 8),
-        ethers.utils.hexZeroPad("0x4444", 8),
+        ethers.utils.hexZeroPad('0x1111', 8),
+        ethers.utils.hexZeroPad('0x2222', 8),
+        ethers.utils.hexZeroPad('0x3333', 8),
+        ethers.utils.hexZeroPad('0x4444', 8),
       ],
-      src: "",
+      src: '',
       thumb: 'ipfs://ipfs/QmR3rK1P4n24PPqvfjGYNXWixPJpyBKTV6rYzAS2TYHLpT',
-      metadataURI: ""
+      metadataURI: '',
     },
     {
       tokenId: 1,
-      id: ethers.utils.hexZeroPad("0x2", 8),
+      id: ethers.utils.hexZeroPad('0x2', 8),
       slot: 0,
-      baseAddress: ethers.utils.hexZeroPad("0x0", 20),
+      baseAddress: ethers.utils.hexZeroPad('0x0', 20),
       basePartIds: [],
       src: 'ipfs://ipfs/QmQBhz44R6K6DeKJCCycgAn9RxPo6tn8Tg7vsEX3wewupP/99.png',
       thumb: 'ipfs://ipfs/QmZFWSK9cyfSTgdDVWJucn1eNLtmkBaFEqM8CmfNrhkaZU/99_thumb.png',
-      metadataURI: ""
-    }
-  ]
+      metadataURI: '',
+    },
+  ];
 
   beforeEach(async function () {
     [owner, ...addrs] = await ethers.getSigners();
 
-    const RMRK = await ethers.getContractFactory("RMRKCoreMock");
+    const RMRK = await ethers.getContractFactory('RMRKCoreMock');
     rmrkNft = await RMRK.deploy(name, symbol, resourceName);
     await rmrkNft.deployed();
 
-
     let i = 1;
-    while (i<=10) {
+    while (i <= 10) {
       await rmrkNft.doMint(addrs[0].address, i);
       i++;
     }
     i = 11;
-    while (i<=20) {
+    while (i <= 20) {
       await rmrkNft.doMint(addrs[1].address, i);
       i++;
     }
 
     //Initialize resource storage contract that was deployed as a component of RMRKCore
-    const RMRKResourceStorage = await ethers.getContractFactory("RMRKResource");
+    const RMRKResourceStorage = await ethers.getContractFactory('RMRKResource');
     const RMRKResourceAddress = await rmrkNft.resourceStorage();
     resourceStorage = await RMRKResourceStorage.attach(RMRKResourceAddress);
   });
 
-  describe("Init", async function() {
-
-    it("Name", async function() {
+  describe('Init', async function () {
+    it('Name', async function () {
       expect(await rmrkNft.name()).to.equal(name);
     });
 
-    it("Symbol", async function() {
+    it('Symbol', async function () {
       expect(await rmrkNft.symbol()).to.equal(symbol);
     });
 
-    it("Resource Storage Name", async function() {
+    it('Resource Storage Name', async function () {
       expect(await resourceStorage.getResourceName()).to.equal(resourceName);
     });
 
-    it("Contract2 Owner Test", async function() {
+    it('Contract2 Owner Test', async function () {
       expect(await rmrkNft.ownerOf(10)).to.equal(addrs[0].address);
       expect(await rmrkNft.ownerOf(20)).to.equal(addrs[1].address);
     });
-
   });
 
-  describe("Add resource", async function() {
-    it("Adds resource", async function() {
-
-      let targetResultArr =
-      [
-        resArr[0]['id'],
-        resArr[0]['slot'],
-        resArr[0]['baseAddress'],
-        resArr[0]['basePartIds'],
-        resArr[0]['src'],
-        resArr[0]['thumb'],
-        resArr[0]['metadataURI']
-      ]
-
-      //add resource
-      await rmrkNft.connect(owner).addResourceEntry(
+  describe('Add resource', async function () {
+    it('Adds resource', async function () {
+      let targetResultArr = [
         resArr[0]['id'],
         resArr[0]['slot'],
         resArr[0]['baseAddress'],
@@ -126,7 +109,20 @@ describe("init", async function () {
         resArr[0]['src'],
         resArr[0]['thumb'],
         resArr[0]['metadataURI'],
-      );
+      ];
+
+      //add resource
+      await rmrkNft
+        .connect(owner)
+        .addResourceEntry(
+          resArr[0]['id'],
+          resArr[0]['slot'],
+          resArr[0]['baseAddress'],
+          resArr[0]['basePartIds'],
+          resArr[0]['src'],
+          resArr[0]['thumb'],
+          resArr[0]['metadataURI'],
+        );
 
       // expect(await resourceStorage.getResource(resArr[0]['id'])).to.eql(targetResultArr);
       //
@@ -144,8 +140,9 @@ describe("init", async function () {
       //     ]);
       // expect(await rmrkNft.getPriorities(1)).to.eql([resArr[0]['id']]);
 
-      await
-        rmrkNft.connect(owner).addResourceEntry(
+      await rmrkNft
+        .connect(owner)
+        .addResourceEntry(
           resArr[0]['id'],
           resArr[0]['slot'],
           resArr[0]['baseAddress'],
@@ -156,19 +153,19 @@ describe("init", async function () {
         );
 
       await expect(
-        rmrkNft.connect(owner).addResourceEntry(
-          ethers.utils.hexZeroPad("0x0", 8),
-          resArr[0]['slot'],
-          resArr[0]['baseAddress'],
-          resArr[0]['basePartIds'],
-          resArr[0]['src'],
-          resArr[0]['thumb'],
-          resArr[0]['metadataURI'],
-        )).to.be.revertedWith(
-          "RMRK: Write to zero"
-        );
-
-      });
+        rmrkNft
+          .connect(owner)
+          .addResourceEntry(
+            ethers.utils.hexZeroPad('0x0', 8),
+            resArr[0]['slot'],
+            resArr[0]['baseAddress'],
+            resArr[0]['basePartIds'],
+            resArr[0]['src'],
+            resArr[0]['thumb'],
+            resArr[0]['metadataURI'],
+          ),
+      ).to.be.revertedWith('RMRK: Write to zero');
+    });
 
     //   it("Add multiple resources and reorder priorities", async function() {
     //
@@ -336,7 +333,5 @@ describe("init", async function () {
     //     );
     //
     //   });
-    });
-
-
+  });
 });
