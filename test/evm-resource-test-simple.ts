@@ -118,7 +118,7 @@ describe('init', async () => {
           1,
           resourceStorage.address,
           resArr[0].id,
-          ethers.utils.hexZeroPad("0x0", 16),
+          ethers.utils.hexZeroPad('0x0', 16),
         );
 
       // Get pending resources
@@ -131,12 +131,7 @@ describe('init', async () => {
       await expect(
         rmrkNft
           .connect(owner)
-          .addResourceEntry(
-            resArr[0].id,
-            resArr[0].src,
-            resArr[0].thumb,
-            resArr[0].metadataURI
-          ),
+          .addResourceEntry(resArr[0].id, resArr[0].src, resArr[0].thumb, resArr[0].metadataURI),
       ).to.be.revertedWith('RMRK: resource already exists');
 
       await expect(

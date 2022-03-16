@@ -21,7 +21,10 @@ import "../utils/Context.sol";
 abstract contract IssuerControl is Context {
     address private _issuer;
 
-    event IssuerTransferred(address indexed previousIssuer, address indexed newIssuer);
+    event IssuerTransferred(
+        address indexed previousIssuer,
+        address indexed newIssuer
+    );
 
     /**
      * @dev Initializes the contract setting the deployer as the initial owner.
@@ -61,7 +64,10 @@ abstract contract IssuerControl is Context {
      * Can only be called by the current owner.
      */
     function transferIssuer(address newIssuer) public virtual onlyIssuer {
-        require(newIssuer != address(0), "Issuer: new issuer is the zero address");
+        require(
+            newIssuer != address(0),
+            "Issuer: new issuer is the zero address"
+        );
         _transferIssuer(newIssuer);
     }
 
