@@ -826,10 +826,12 @@ contract RMRKCore is Context, IRMRKCore, RMRKIssuable {
     }
   }
 
-  //Gas saving iterator, consider conversion to assemby
-  function u_inc(uint i) private pure returns (uint) {
+  // Gas saving iterator
+  function u_inc(uint i) private pure returns (uint r) {
     unchecked {
-        return i + 1;
+      assembly {
+        r := add(i, 1)
+      }
     }
   }
 }
