@@ -80,6 +80,7 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
   //Resource events
   event ResourceAdded(uint256 indexed tokenId, bytes32 indexed uuid);
   event ResourceAccepted(uint256 indexed tokenId, bytes32 indexed uuid);
+  event ResourceRejected(uint256 indexed tokenId, bytes32 indexed uuid);
   event ResourcePrioritySet(uint256 indexed tokenId);
 
   //Nesting events
@@ -675,6 +676,31 @@ contract RMRKCore is Context, IRMRKCore, AccessControl {
       }
       _activeResources[_tokenId].push(_localResourceId);
       emit ResourceAccepted(_tokenId, _localResourceId);
+  }
+
+  function rejectResource(uint256 _tokenId, uint256 index) public {
+      require(
+        _isApprovedOrOwner(_msgSender(), _tokenId),
+          "RMRK: Attempting to reject a resource in non-owned NFT"
+      );
+
+      require(
+        _pendingResources[_tokenId].length > index,
+        "RMRKcore: Pending child index out of range"
+      );
+
+      bytes16 _localResourceId = _pendingResources[_tokenId][index];
+      _removeItemByValue(_localResourceId, _pendingResources[_tokenId]);
+
+      emit ResourceRejected(_tokenId, _localResourceId);
+  }
+
+  function rejectAllResources(uint256 _tokenId) public {
+    require(
+      _isApprovedOrOwner(_msgSender(), _tokenId),
+        "RMRK: Attempting to reject a resource in non-owned NFT"
+    );
+    delete(_pendingResources[_tokenId]);
   }
 
   function setPriority(uint256 _tokenId, bytes16[] memory _ids) public {

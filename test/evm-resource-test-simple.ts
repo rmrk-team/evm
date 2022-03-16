@@ -201,6 +201,73 @@ describe('init', async () => {
       ]);
     });
 
+    it('Rejects resource', async () => {
+      await rmrkNft
+        .connect(owner)
+        .addResourceEntry(resArr[0].id, resArr[0].src, resArr[0].thumb, resArr[0].metadataURI);
+
+      const tokenId = 1;
+      await rmrkNft
+        .connect(owner)
+        .addResourceToToken(
+          tokenId,
+          resourceStorage.address,
+          resArr[0].id,
+          ethers.utils.hexZeroPad('0x0', 16),
+        );
+
+      await rmrkNft.connect(addrs[0]).rejectResource(tokenId, 0);
+
+      // Get pending resources - should return none
+      expect(await rmrkNft.getPendingResources(tokenId)).to.eql([]);
+
+      // Get active resources
+      expect(await rmrkNft.getActiveResources(tokenId)).to.eql([]);
+
+      // Cannot reject resources for non existing index
+      await expect(
+        rmrkNft.connect(addrs[0]).rejectResource(tokenId, 0),
+      ).to.be.revertedWith('RMRKcore: Pending child index out of range');
+    });
+
+    it('Reject all resources', async () => {
+      await rmrkNft
+        .connect(owner)
+        .addResourceEntry(resArr[0].id, resArr[0].src, resArr[0].thumb, resArr[0].metadataURI);
+      await rmrkNft
+        .connect(owner)
+        .addResourceEntry(resArr[1].id, resArr[1].src, resArr[1].thumb, resArr[1].metadataURI);
+
+      const tokenId = 1;
+      await rmrkNft
+        .connect(owner)
+        .addResourceToToken(
+          tokenId,
+          resourceStorage.address,
+          resArr[0].id,
+          ethers.utils.hexZeroPad('0x0', 16),
+        );
+      await rmrkNft
+        .connect(owner)
+        .addResourceToToken(
+          tokenId,
+          resourceStorage.address,
+          resArr[1].id,
+          ethers.utils.hexZeroPad('0x0', 16),
+        );
+
+      await rmrkNft.connect(addrs[0]).rejectAllResources(tokenId);
+
+      // Get pending resources - should return none
+      expect(await rmrkNft.getPendingResources(tokenId)).to.eql([]);
+
+      // Get active resources - should return none
+      expect(await rmrkNft.getActiveResources(tokenId)).to.eql([]);
+
+      // It is harmless if resources are already empty:
+      await rmrkNft.connect(addrs[0]).rejectAllResources(tokenId);
+    });
+
     it('Add multiple resources and reorder priorities', async function () {
       const targetResArrs = [
         [resArr[0].id, resArr[0].src, resArr[0].thumb, resArr[0].metadataURI],
