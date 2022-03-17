@@ -177,7 +177,7 @@ describe('init', async () => {
 
       // addrs[1] attempts to force addrs[0] to accept the child
       await expect(ownerChunky.connect(addrs[1]).acceptChildFromPending(0, 10)).to.be.revertedWith(
-        'RMRKCore: Bad owner',
+        'RMRKCore: Not approved or owner',
       );
       // addrs[0] accepts the child at index 0 into the child array
       await ownerChunky.connect(addrs[0]).acceptChildFromPending(0, 10);
@@ -206,10 +206,10 @@ describe('init', async () => {
       ]);
 
       //user addrs[1] attempts to delete addrs[0]'s pending children
-      await expect(ownerChunky.connect(addrs[0]).deleteChildFromPending(0, 11)).to.be.revertedWith(
-        'RMRKCore: Bad owner',
+      await expect(ownerChunky.connect(addrs[0]).rejectChild(0, 11)).to.be.revertedWith(
+        'RMRKCore: Not approved or owner',
       );
-      await ownerChunky.connect(addrs[1]).deleteChildFromPending(0, 11);
+      await ownerChunky.connect(addrs[1]).rejectChild(0, 11);
       pendingChildren = await ownerChunky.pendingChildrenOf(destId);
       expect(pendingChildren).to.eql([]);
     });
@@ -227,10 +227,10 @@ describe('init', async () => {
       ]);
 
       //user addrs[1] attempts to delete addrs[0]'s pending children
-      await expect(ownerChunky.connect(addrs[0]).deleteAllPending(11)).to.be.revertedWith(
-        'RMRKCore: Bad owner',
+      await expect(ownerChunky.connect(addrs[0]).rejectAllChildren(11)).to.be.revertedWith(
+        'RMRKCore: Not approved or owner',
       );
-      await ownerChunky.connect(addrs[1]).deleteAllPending(11);
+      await ownerChunky.connect(addrs[1]).rejectAllChildren(11);
       pendingChildren = await ownerChunky.pendingChildrenOf(destId);
       expect(pendingChildren).to.eql([]);
     });

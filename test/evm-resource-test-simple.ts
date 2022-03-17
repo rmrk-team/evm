@@ -327,7 +327,7 @@ describe('init', async () => {
 
       await expect(
         rmrkNft.connect(addrs[1]).setPriority(tokenId, [resId16_2, resId16_1]),
-      ).to.be.revertedWith('RMRK: Attempting to set priority in non-owned NFT');
+      ).to.be.revertedWith('RMRKCore: Not approved or owner');
 
       await expect(rmrkNft.connect(addrs[0]).setPriority(tokenId, [resId16_2])).to.be.revertedWith(
         'RMRK: Bad priority list length',

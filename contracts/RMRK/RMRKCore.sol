@@ -4,92 +4,41 @@
 
 pragma solidity ^0.8.9;
 
-import "./RMRKResourceCore.sol";
-import "./access/RMRKIssuable.sol";
 import "./interfaces/IRMRKCore.sol";
-import "./interfaces/IRMRKResourceCore.sol";
+import "./access/RMRKIssuable.sol";
+import "./RMRKMultiResource.sol";
+import "./RMRKNesting.sol";
+import "./RMRKRoyalties.sol";
 import "./utils/Address.sol";
 import "./utils/Context.sol";
 import "./utils/Strings.sol";
 
 import "hardhat/console.sol";
 
-contract RMRKCore is Context, IRMRKCore, RMRKIssuable {
+contract RMRKCore is Context, IRMRKCore, RMRKMultiResource, RMRKNesting, RMRKRoyalties, RMRKIssuable {
   using Address for address;
   using Strings for uint256;
-
-  struct Child {
-    uint256 tokenId;
-    address contractAddress;
-    uint16 slotEquipped;
-    bytes8 partId;
-  }
-
-  struct RMRKOwner {
-    uint256 tokenId;
-    address ownerAddress;
-    bool isNft;
-  }
-
-  struct Resource {
-    IRMRKResourceCore resourceAddress;
-    bytes8 resourceId;
-  }
-
-  struct RoyaltyData {
-    address royaltyAddress;
-    uint32 numerator;
-    uint32 denominator;
-  }
 
   string private _name;
 
   string private _symbol;
 
-  string private _fallbackURI;
-
-  RoyaltyData private _royalties;
-
-  mapping(address => uint256) private _balances;
-
   mapping(uint256 => address) private _tokenApprovals;
 
-  mapping(uint256 => RMRKOwner) private _RMRKOwners;
-
-  mapping(uint256 => Child[]) private _children;
-
-  mapping(uint256 => Child[]) private _pendingChildren;
-
-  //mapping resourceContract to resource entry
-  mapping(bytes16 => Resource) private _resources;
-
-  mapping(uint256 => mapping(bytes16 => bytes16)) private _resourceOverwrites;
-
-  //mapping of tokenId to all resources by priority
-  mapping(uint256 => bytes16[]) private _activeResources;
-
-  //mapping of tokenId to all resources by priority
-  mapping(uint256 => bytes16[]) private _pendingResources;
-
-  // AccessControl roles and nest flag constants
-  RMRKResourceCore public resourceStorage;
-
-  //Resource events
-  event ResourceAdded(uint256 indexed tokenId, bytes32 indexed uuid);
-  event ResourceAccepted(uint256 indexed tokenId, bytes32 indexed uuid);
-  event ResourceRejected(uint256 indexed tokenId, bytes32 indexed uuid);
-  event ResourcePrioritySet(uint256 indexed tokenId);
-
-  //Nesting events
-  event childRemoved(uint index, uint tokenId);
-  event pendingChildRemoved(uint index, uint tokenId);
-
-  constructor(string memory name_, string memory symbol_, string memory resourceName) {
-    resourceStorage = new RMRKResourceCore(resourceName);
+  constructor(string memory name_, string memory symbol_, string memory resourceName)
+  RMRKMultiResource(resourceName)
+  {
     _name = name_;
     _symbol = symbol_;
   }
 
+  //Anything gated by this modifier should probably also clear approvals on end of execution
+  modifier onlyApprovedOrOwner(uint256 tokenId) {
+    require(_isApprovedOrOwner(_msgSender(), tokenId),
+      "RMRKCore: Not approved or owner"
+    );
+    _;
+  }
   /*
   TODOS:
   Isolate _transfer() branches in own functions
@@ -108,41 +57,6 @@ contract RMRKCore is Context, IRMRKCore, RMRKIssuable {
   Create minimal contract that relies on on-chain libraries for gas savings
   */
 
-  ////////////////////////////////////////
-  //             PROVENANCE
-  ////////////////////////////////////////
-
-  /**
-  @dev Returns the root owner of a RMRKCore NFT.
-  */
-  function ownerOf(uint256 tokenId) public view virtual returns(address) {
-    (address owner, uint256 ownerTokenId, bool isNft) = rmrkOwnerOf(tokenId);
-    if (isNft) {
-      owner = IRMRKCore(owner).ownerOf(ownerTokenId);
-    }
-    require(owner != address(0), "RMRKCore: owner query for nonexistent token");
-    return owner;
-  }
-
-  /**
-  @dev Returns the immediate provenance data of the current RMRK NFT. In the event the NFT is owned
-  * by a wallet, tokenId will be zero and isNft will be false. Otherwise, the returned data is the
-  * contract address and tokenID of the owner NFT, as well as its isNft flag.
-  */
-  function rmrkOwnerOf(uint256 tokenId) public view virtual returns (address, uint256, bool) {
-    RMRKOwner memory owner = _RMRKOwners[tokenId];
-    return (owner.ownerAddress, owner.tokenId, owner.isNft);
-  }
-
-  /**
-  @dev Returns balance of tokens owner by a given rootOwner.
-  */
-
-  function balanceOf(address owner) public view virtual returns (uint256) {
-    require(owner != address(0), "RMRKCore: balance query for the zero address");
-    return _balances[owner];
-  }
-
   /**
   @dev Returns name of NFT collection.
   */
@@ -157,152 +71,6 @@ contract RMRKCore is Context, IRMRKCore, RMRKIssuable {
 
   function symbol() public view virtual returns (string memory) {
     return _symbol;
-  }
-
-  function tokenURI(uint256 tokenId) public view virtual returns (string memory) {
-    if (_activeResources[tokenId].length > 0)  {
-      Resource memory activeRes = _resources[_activeResources[tokenId][0]];
-      IRMRKResourceCore resAddr = activeRes.resourceAddress;
-      bytes8 resId = activeRes.resourceId;
-
-      IRMRKResourceCore.Resource memory _activeRes = IRMRKResourceCore(resAddr).getResource(resId);
-      string memory URI = _activeRes.src;
-      return URI;
-    }
-
-    else {
-      return _fallbackURI;
-    }
-  }
-
-  ////////////////////////////////////////
-  //          CHILD MANAGEMENT
-  ////////////////////////////////////////
-
-  /**
-  @dev Returns all confirmed children
-  */
-
-  function childrenOf (uint256 parentTokenId) public view returns (Child[] memory) {
-    Child[] memory children = _children[parentTokenId];
-    return children;
-  }
-
-  /**
-  @dev Returns all pending children
-  */
-
-  function pendingChildrenOf (uint256 parentTokenId) public view returns (Child[] memory) {
-    Child[] memory pendingChildren = _pendingChildren[parentTokenId];
-    return pendingChildren;
-  }
-
-  /**
-  @dev Sends an instance of Child from the pending children array at index to children array for _tokenId.
-  * Updates _emptyIndexes of tokenId to preserve ordering.
-  */
-
-  //CHECK: preload mappings into memory for gas savings
-  function acceptChildFromPending(uint256 index, uint256 _tokenId) public {
-    require(
-      _pendingChildren[_tokenId].length > index,
-      "RMRKcore: Pending child index out of range"
-    );
-    require(
-      ownerOf(_tokenId) == _msgSender(),
-      "RMRKCore: Bad owner"
-    );
-
-    Child memory child_ = _pendingChildren[_tokenId][index];
-
-    _removeItemByIndex(index, _pendingChildren[_tokenId]);
-    _addChildToChildren(child_, _tokenId);
-  }
-
-  /**
-  @dev Deletes all pending children.
-  */
-
-  function deleteAllPending(uint256 _tokenId) public {
-    require(_msgSender() == ownerOf(_tokenId), "RMRKCore: Bad owner");
-    delete(_pendingChildren[_tokenId]);
-  }
-
-  /**
-  @dev Deletes a single child from the pending array by index.
-  */
-
-  function deleteChildFromPending(uint256 index, uint256 _tokenId) public {
-    require(
-      _pendingChildren[_tokenId].length > index,
-      "RMRKcore: Pending child index out of range"
-    );
-    require(
-      ownerOf(_tokenId) == _msgSender(),
-      "RMRKCore: Bad owner"
-    );
-
-    _removeItemByIndex(index, _pendingChildren[_tokenId]);
-    emit pendingChildRemoved(index, _tokenId);
-  }
-
-  /**
-  @dev Deletes a single child from the child array by index.
-  */
-
-  function deleteChildFromChildren(uint256 index, uint256 _tokenId) public {
-    require(
-      _pendingChildren[_tokenId].length < index,
-      "RMRKcore: Pending child index out of range"
-    );
-    require(
-      ownerOf(_tokenId) == _msgSender(),
-      "RMRKCore: Bad owner"
-    );
-
-    _removeItemByIndex(index, _children[_tokenId]);
-    emit childRemoved(index, _tokenId);
-  }
-
-  /**
-   * @dev Function designed to be used by other instances of RMRK-Core contracts to update children.
-   * param1 childAddress is the address of the child contract as an IRMRKCore instance
-   * param2 parentTokenId is the tokenId of the parent token on (this).
-   * param3 childTokenId is the tokenId of the child instance
-   */
-
-  //update for reentrancy
-  function setChild(IRMRKCore childAddress, uint parentTokenId, uint childTokenId) public virtual {
-   (address parent, , ) = childAddress.rmrkOwnerOf(childTokenId);
-   require(parent == address(this), "Parent-child mismatch");
-   Child memory child = Child({
-       contractAddress: address(childAddress),
-       tokenId: childTokenId,
-       slotEquipped: 0,
-       partId: 0
-     });
-   _addChildToPending(child, parentTokenId);
-  }
-
-
-  /**
-  @dev Adds an instance of Child to the pending children array for _tokenId. This is hardcoded to be 128 by default.
-  */
-
-  function _addChildToPending(Child memory _child, uint256 _tokenId) internal {
-    if(_pendingChildren[_tokenId].length < 128) {
-      _pendingChildren[_tokenId].push(_child);
-    } else {
-      revert("RMRKCore: Max pending children reached");
-    }
-  }
-
-  /**
-  @dev Adds an instance of Child to the children array for _tokenId.
-  */
-
-  function _addChildToChildren(Child memory _child, uint256 _tokenId) internal {
-    _children[_tokenId].push(_child);
   }
 
   ////////////////////////////////////////
@@ -339,7 +107,7 @@ contract RMRKCore is Context, IRMRKCore, RMRKIssuable {
       "RMRKCore: Mint to non-RMRKCore implementer"
     );
 
-    IRMRKCore destContract = IRMRKCore(to);
+    IRMRKNesting destContract = IRMRKNesting(to);
 
     _beforeTokenTransfer(address(0), to, tokenId);
 
@@ -352,11 +120,11 @@ contract RMRKCore is Context, IRMRKCore, RMRKIssuable {
       isNft: true
     });
 
-    destContract.setChild(this, destinationId, tokenId);
+    destContract.setChild(address(this), destinationId, tokenId);
 
-    emit Transfer(address(0), to, tokenId);
+    /* emit Transfer(address(0), to, tokenId);
 
-    _afterTokenTransfer(address(0), to, tokenId);
+    _afterTokenTransfer(address(0), to, tokenId); */
   }
 
   function _mintToRootOwner(address to, uint256 tokenId) internal virtual {
@@ -403,7 +171,7 @@ contract RMRKCore is Context, IRMRKCore, RMRKIssuable {
 
     uint length = children.length; //gas savings
     for (uint i; i<length; i = u_inc(i)){
-      IRMRKCore(children[i].contractAddress)._burnChildren(
+      IRMRKNesting(children[i].contractAddress)._burnChildren(
         children[i].tokenId,
         owner
       );
@@ -414,34 +182,6 @@ contract RMRKCore is Context, IRMRKCore, RMRKIssuable {
 
     _afterTokenTransfer(owner, address(0), tokenId);
   }
-
-  //how could devs allow something like this, smh
-  //Checks that caller is current RMRKOwnerOf contract
-  //Updates rootOwner balance
-  //recursively calls _burnChildren on all children
-  //update for reentrancy
-  function _burnChildren(uint256 tokenId, address oldOwner) public virtual {
-    (address _RMRKOwner, , ) = rmrkOwnerOf(tokenId);
-    require(_RMRKOwner == _msgSender(), "Caller is not RMRKOwner contract");
-    _balances[oldOwner] -= 1;
-
-    Child[] memory children = childrenOf(tokenId);
-
-    uint256 length = children.length; //gas savings
-    for (uint i; i<length; i = u_inc(i)){
-      address childContractAddress = children[i].contractAddress;
-      uint256 childTokenId = children[i].tokenId;
-
-      IRMRKCore(childContractAddress)._burnChildren(
-        childTokenId,
-        oldOwner
-      );
-    }
-    delete _RMRKOwners[tokenId];
-    //Also delete pending arrays for gas refund?
-    //This can emit a lot of events.
-    emit Transfer(oldOwner, address(0), tokenId);
-    }
 
   ////////////////////////////////////////
   //             TRANSFERS
@@ -466,9 +206,8 @@ contract RMRKCore is Context, IRMRKCore, RMRKIssuable {
     uint256 tokenId,
     uint256 destinationId,
     bytes memory data
-  ) public virtual {
+  ) public virtual onlyApprovedOrOwner(tokenId) {
     //solhint-disable-next-line max-line-length
-    require(_isApprovedOrOwner(_msgSender(), tokenId), "RMRKCore: transfer caller is not owner nor approved");
     _transfer(from, to, tokenId, destinationId, data);
   }
 
@@ -505,10 +244,10 @@ contract RMRKCore is Context, IRMRKCore, RMRKIssuable {
     if (data.length == 0) {
       _balances[to] += 1;
     } else {
-      IRMRKCore destContract = IRMRKCore(to);
+      IRMRKNesting destContract = IRMRKNesting(to);
       address rootOwner = destContract.ownerOf(destinationId);
       _balances[rootOwner] += 1;
-      destContract.setChild(this, destinationId, tokenId);
+      destContract.setChild(address(this), destinationId, tokenId);
       isNft = true;
     }
     _RMRKOwners[tokenId] = RMRKOwner({
@@ -594,13 +333,14 @@ contract RMRKCore is Context, IRMRKCore, RMRKIssuable {
   //              RESOURCES
   ////////////////////////////////////////
 
-  function addResourceEntry(
+  //TODO: Permissioning
+  function addResourceEntry (
       bytes8 _id,
       string memory _src,
       string memory _thumb,
       string memory _metadataURI
-  ) public onlyIssuer {
-    resourceStorage.addResourceEntry(
+  ) external onlyIssuer {
+    _addResourceEntry(
       _id,
       _src,
       _thumb,
@@ -613,168 +353,56 @@ contract RMRKCore is Context, IRMRKCore, RMRKIssuable {
       IRMRKResourceCore _resourceAddress,
       bytes8 _resourceId,
       bytes16 _overwrites
-  ) public onlyIssuer {
-
-      bytes16 localResourceId = hashResource16(_resourceAddress, _resourceId);
-
-      //Dunno if this'll even work
-      require(
-        address(_resources[localResourceId].resourceAddress) == address(0),
-        "RMRKCore: Resource already exists on token"
+  ) external onlyIssuer {
+    _addResourceToToken(
+      _tokenId,
+      _resourceAddress,
+      _resourceId,
+      _overwrites
       );
-      //This error code will never be triggered because of the interior call of
-      //resourceStorage.getResource. Left in for posterity.
-
-      //Abstract this out to IRMRKResourceStorage
-      require(
-        resourceStorage.getResource(_resourceId).id != bytes8(0),
-        "RMRKCore: Resource not found in storage"
-      );
-
-      //Construct Resource object
-      Resource memory resource_ = Resource({
-        resourceAddress: _resourceAddress,
-        resourceId: _resourceId
-      });
-
-      _resources[localResourceId] = resource_;
-
-      _pendingResources[_tokenId].push(localResourceId);
-
-      if (_overwrites != bytes16(0)) {
-        _resourceOverwrites[_tokenId][localResourceId] = _overwrites;
-      }
-
-      emit ResourceAdded(_tokenId, _resourceId);
   }
 
-  function acceptResource(uint256 _tokenId, uint256 index) public {
-
-      require(
-        _isApprovedOrOwner(_msgSender(), _tokenId),
-          "RMRK: Attempting to accept a resource in non-owned NFT"
-      );
-
-      bytes16 _localResourceId = _pendingResources[_tokenId][index];
-
-      require(
-          address(_resources[_localResourceId].resourceAddress) != address(0),
-          "RMRK: resource does not exist"
-      );
-
-      _removeItemByIndex(index, _pendingResources[_tokenId]);
-
-      bytes16 overwrite = _resourceOverwrites[_tokenId][_localResourceId];
-      if (overwrite != bytes16(0)) {
-        // We could check here that the resource to overwrite actually exists but it is probably harmless.
-        _removeItemByValue(overwrite, _activeResources[_tokenId]);
-      }
-      _activeResources[_tokenId].push(_localResourceId);
-      emit ResourceAccepted(_tokenId, _localResourceId);
+  function acceptResource(uint256 _tokenId, uint256 index) external onlyApprovedOrOwner(_tokenId) {
+    _acceptResource(_tokenId, index);
   }
 
-  function rejectResource(uint256 _tokenId, uint256 index) public {
-      require(
-        _isApprovedOrOwner(_msgSender(), _tokenId),
-          "RMRK: Attempting to reject a resource in non-owned NFT"
-      );
-
-      require(
-        _pendingResources[_tokenId].length > index,
-        "RMRKcore: Pending child index out of range"
-      );
-
-      bytes16 _localResourceId = _pendingResources[_tokenId][index];
-      _removeItemByValue(_localResourceId, _pendingResources[_tokenId]);
-
-      emit ResourceRejected(_tokenId, _localResourceId);
+  function rejectResource(uint256 _tokenId, uint256 index) external onlyApprovedOrOwner(_tokenId) {
+    _rejectResource(_tokenId, index);
   }
 
-  function rejectAllResources(uint256 _tokenId) public {
-    require(
-      _isApprovedOrOwner(_msgSender(), _tokenId),
-        "RMRK: Attempting to reject a resource in non-owned NFT"
-    );
-    delete(_pendingResources[_tokenId]);
+  function rejectAllResources(uint256 _tokenId) external onlyApprovedOrOwner(_tokenId) {
+    _rejectAllResources(_tokenId);
   }
 
-  function setPriority(uint256 _tokenId, bytes16[] memory _ids) public {
-      uint256 length = _ids.length;
-      require(
-        length == _activeResources[_tokenId].length,
-          "RMRK: Bad priority list length"
-      );
-      require(
-        _isApprovedOrOwner(_msgSender(), _tokenId),
-          "RMRK: Attempting to set priority in non-owned NFT"
-      );
-      for (uint256 i = 0; i < length; i = u_inc(i)) {
-          require(
-            (_resources[_ids[i]].resourceId !=bytes16(0)),
-              "RMRK: Trying to reprioritize a non-existant resource"
-          );
-      }
-      _activeResources[_tokenId] = _ids;
-      emit ResourcePrioritySet(_tokenId);
-  }
-
-  function getActiveResources(uint256 tokenId) public virtual view returns(bytes16[] memory) {
-    return _activeResources[tokenId];
-  }
-
-  function getPendingResources(uint256 tokenId) public virtual view returns(bytes16[] memory) {
-    return _pendingResources[tokenId];
-  }
-
-  function getRenderableResource(uint256 tokenId) public virtual view returns (Resource memory resource) {
-    bytes16 resourceId = getActiveResources(tokenId)[0];
-    return _resources[resourceId];
-  }
-
-  function getResourceObject(IRMRKResourceCore _storage, bytes8 _id) public virtual view returns (IRMRKResourceCore.Resource memory resource) {    
-    return _storage.getResource(_id);
-  }
-
-  function getResObjectByIndex(uint256 _tokenId, uint256 _index) public virtual view returns(IRMRKResourceCore.Resource memory resource) {
-    bytes16 localResourceId = getActiveResources(_tokenId)[_index];
-    Resource memory _resource = _resources[localResourceId];
-    (IRMRKResourceCore _storage, bytes8 _id) = (_resource.resourceAddress, _resource.resourceId);
-    return getResourceObject(_storage, _id);
-  }
-
-  function getResourceOverwrites(uint256 tokenId, bytes16 resId) public view returns(bytes16) {
-    return _resourceOverwrites[tokenId][resId];
-  }
-
-  function hashResource16(IRMRKResourceCore addr, bytes8 id) public pure returns (bytes16) {
-    return bytes16(keccak256(abi.encodePacked(addr, id)));
+  function setPriority(uint256 _tokenId, bytes16[] memory _ids) external onlyApprovedOrOwner(_tokenId) {
+    _setPriority(_tokenId, _ids);
   }
 
   ////////////////////////////////////////
-  //              ROYALTIES
+  //          CHILD MANAGEMENT
   ////////////////////////////////////////
 
-  /**
-  * @dev Returns contract royalty data.
-  * Returns a numerator and denominator for percentage calculations, as well as a desitnation address.
-  */
-  function getRoyaltyData() public virtual view returns(address royaltyAddress, uint256 numerator, uint256 denominator) {
-    RoyaltyData memory data = _royalties;
-    return(data.royaltyAddress, uint256(data.numerator), uint256(data.denominator));
+  //TODO: Permissioning
+
+  //Ensure this is also callable within the context of this contract
+  function setChild(address childTokenAddress, uint parentTokenId, uint childTokenId) public {
+    _setChild(childTokenAddress, parentTokenId, childTokenId);
   }
 
-  /**
-  * @dev Setter for contract royalty data, percentage stored as a numerator and denominator.
-  * Recommended values are in Parts Per Million, E.G:
-  * A numerator of 1*10**5 and a denominator of 1*10**6 is equal to 10 percent, or 100,000 parts per 1,000,000.
-  */
+  function acceptChildFromPending(uint256 index, uint256 _tokenId) external onlyApprovedOrOwner(_tokenId) {
+    _acceptChildFromPending(index, _tokenId);
+  }
 
-  function setRoyaltyData(address _royaltyAddress, uint32 _numerator, uint32 _denominator) internal virtual onlyIssuer {
-    _royalties = RoyaltyData ({
-       royaltyAddress: _royaltyAddress,
-       numerator: _numerator,
-       denominator: _denominator
-     });
+  function rejectAllChildren(uint256 _tokenId) external onlyApprovedOrOwner(_tokenId) {
+    _rejectAllChildren(_tokenId);
+  }
+
+  function rejectChild(uint256 index, uint256 _tokenId) external onlyApprovedOrOwner(_tokenId) {
+    _rejectChild(index, _tokenId);
+  }
+
+  function deleteChildFromChildren(uint256 index, uint256 _tokenId) external onlyApprovedOrOwner(_tokenId) {
+    _deleteChildFromChildren(index, _tokenId);
   }
 
   ////////////////////////////////////////
