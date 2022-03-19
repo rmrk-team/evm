@@ -26,6 +26,13 @@ contract RMRKMultiResource {
   //mapping of tokenId to all resources by priority
   mapping(uint256 => bytes16[]) private _activeResources;
 
+  //Double mapping of tokenId to active resources
+  mapping(uint256 => mapping(bytes16 => bool)) private _tokenResources;
+
+  //Double mapping of tokenId to active resources -- experimental bytes17 using abi.encodePacked of ID and boolean
+  //Save on a keccak256 call of double mapping
+  mapping(uint256 => bytes17) private _tokenResourcesExperimental;
+
   //mapping of tokenId to all resources by priority
   mapping(uint256 => bytes16[]) private _pendingResources;
 
@@ -71,9 +78,8 @@ contract RMRKMultiResource {
 
       bytes16 localResourceId = hashResource16(_resourceAddress, _resourceId);
 
-      //Dunno if this'll even work
       require(
-        address(_resources[localResourceId].resourceAddress) == address(0),
+        _tokenResources[_tokenId][localResourceId] == false,
         "RMRKCore: Resource already exists on token"
       );
       //This error code will never be triggered because of the interior call of
@@ -91,7 +97,11 @@ contract RMRKMultiResource {
         resourceId: _resourceId
       });
 
-      _resources[localResourceId] = resource_;
+      //gas saving if check for repeated resource usage
+      if (address(_resources[localResourceId].resourceAddress) == address(0)){
+          _resources[localResourceId] = resource_;
+      }
+      _tokenResources[_tokenId][localResourceId] == true;
 
       _pendingResources[_tokenId].push(localResourceId);
 
@@ -135,6 +145,14 @@ contract RMRKMultiResource {
   function _rejectAllResources(uint256 _tokenId) internal virtual {
     delete(_pendingResources[_tokenId]);
   }
+
+  /* function setFirstPriorities(uint256 _tokenId, uint256 calldata _indexes[], bytes16[] storage _activeResources) internal virtual {
+    while index
+  }
+
+  function setFirstPriority(uint256 _tokenId, uint256 _index, bytes16[] storage _activeResources) internal virtual {
+    while index
+  } */
 
   function _setPriority(uint256 _tokenId, bytes16[] memory _ids) internal virtual {
       uint256 length = _ids.length;
