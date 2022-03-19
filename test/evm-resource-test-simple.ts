@@ -375,7 +375,7 @@ describe('init', async () => {
             ethers.utils.hexZeroPad('0xaaaaa', 16),
             ethers.utils.hexZeroPad('0xbbbb', 16),
           ]),
-      ).to.be.revertedWith('RMRK: Trying to reprioritize a non-existant resource');
+      ).to.be.revertedWith('RMRKCore: Token does not have resource');
     });
 
     it('Can overwrite resource', async function () {
