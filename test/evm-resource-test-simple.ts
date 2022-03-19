@@ -340,7 +340,7 @@ describe('init', async () => {
             ethers.utils.hexZeroPad('0xaaaaa', 16),
             ethers.utils.hexZeroPad('0xbbbb', 16),
           ]),
-      ).to.be.revertedWith('RMRK: Trying to reprioritize a non-existant resource');
+      ).to.be.revertedWith('RMRKCore: Token does not have resource');
 
       await expect(
         rmrkNft
@@ -352,7 +352,7 @@ describe('init', async () => {
             ethers.utils.hexZeroPad('0x0', 16),
           ),
       ).to.be.revertedWith('RMRKCore: Resource already exists on token');
-
+      
       await expect(
         rmrkNft
           .connect(owner)

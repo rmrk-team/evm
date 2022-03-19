@@ -101,7 +101,7 @@ contract RMRKMultiResource {
       if (address(_resources[localResourceId].resourceAddress) == address(0)){
           _resources[localResourceId] = resource_;
       }
-      _tokenResources[_tokenId][localResourceId] == true;
+      _tokenResources[_tokenId][localResourceId] = true;
 
       _pendingResources[_tokenId].push(localResourceId);
 
@@ -138,6 +138,7 @@ contract RMRKMultiResource {
 
       bytes16 _localResourceId = _pendingResources[_tokenId][index];
       _pendingResources[_tokenId].removeItemByValue(_localResourceId);
+      _tokenResources[_tokenId][_localResourceId] = false;
 
       emit ResourceRejected(_tokenId, _localResourceId);
   }
@@ -154,17 +155,26 @@ contract RMRKMultiResource {
     while index
   } */
 
+  /*
+  This function must be gas tested. Tests involve:
+    1. Algorithm design (Can we sum and hash the elements of the array to ensure integrity instead? Is this robust?)
+    and/or:
+    2. Checking relative cost of elements of _activeResources vs checking the resourceExists double mapping
+    3. Finding a robust way to ensure that elements of the array are not repeated
+  */
+
   function _setPriority(uint256 _tokenId, bytes16[] memory _ids) internal virtual {
       uint256 length = _ids.length;
       require(
         length == _activeResources[_tokenId].length,
           "RMRK: Bad priority list length"
       );
+      bytes16[] memory checkArr = new bytes16[](length);
       for (uint256 i = 0; i < length; i = i.u_inc()) {
-          require(
-            (_resources[_ids[i]].resourceId !=bytes16(0)),
-              "RMRK: Trying to reprioritize a non-existant resource"
-          );
+          require(_activeResources[_tokenId].contains(_ids[i]),
+          "RMRKCore: Token does not have resource");
+          require(!checkArr.contains(_ids[i]),
+          "RMRKCore: Resource double submission");
       }
       _activeResources[_tokenId] = _ids;
       emit ResourcePrioritySet(_tokenId);
