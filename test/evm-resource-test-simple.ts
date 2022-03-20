@@ -352,7 +352,7 @@ describe('init', async () => {
             ethers.utils.hexZeroPad('0x0', 16),
           ),
       ).to.be.revertedWith('RMRKCore: Resource already exists on token');
-      
+
       await expect(
         rmrkNft
           .connect(owner)
