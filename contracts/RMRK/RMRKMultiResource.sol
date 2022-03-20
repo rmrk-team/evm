@@ -42,10 +42,14 @@ contract RMRKMultiResource {
   string private _fallbackURI;
 
   //Resource events
-  event ResourceAdded(uint256 indexed tokenId, bytes32 indexed uuid);
-  event ResourceAccepted(uint256 indexed tokenId, bytes32 indexed uuid);
-  event ResourceRejected(uint256 indexed tokenId, bytes32 indexed uuid);
+  event ResourceStorageSet(bytes8 id);
+  event ResourceAddedToToken(uint256 indexed tokenId, bytes16 localResourceId);
+  event ResourceAccepted(uint256 indexed tokenId, bytes16 localResourceId);
+  //Emits bytes16(0) as localResourceId in the event all resources are deleted
+  event ResourceRejected(uint256 indexed tokenId, bytes16 localResourceId);
   event ResourcePrioritySet(uint256 indexed tokenId);
+  event ResourceOverwriteProposed(uint256 indexed tokenId, bytes16 localResourceId, bytes16 overwrites);
+  event ResourceOverwritten(uint256 indexed tokenId, bytes16 overwritten);
 
   constructor(string memory resourceName) {
     resourceStorage = new RMRKResourceCore(resourceName);
@@ -67,6 +71,7 @@ contract RMRKMultiResource {
       _thumb,
       _metadataURI
       );
+    emit ResourceStorageSet(_id);
   }
 
   function _addResourceToToken(
@@ -107,9 +112,10 @@ contract RMRKMultiResource {
 
       if (_overwrites != bytes16(0)) {
         _resourceOverwrites[_tokenId][localResourceId] = _overwrites;
+        emit ResourceOverwriteProposed(_tokenId, localResourceId, _overwrites);
       }
 
-      emit ResourceAdded(_tokenId, _resourceId);
+      emit ResourceAddedToToken(_tokenId, localResourceId);
   }
 
   function _acceptResource(uint256 _tokenId, uint256 index) internal virtual {
@@ -125,6 +131,7 @@ contract RMRKMultiResource {
       if (overwrite != bytes16(0)) {
         // We could check here that the resource to overwrite actually exists but it is probably harmless.
         _activeResources[_tokenId].removeItemByValue(overwrite);
+        emit ResourceOverwritten(_tokenId, overwrite);
       }
       _activeResources[_tokenId].push(_localResourceId);
       emit ResourceAccepted(_tokenId, _localResourceId);
@@ -145,15 +152,8 @@ contract RMRKMultiResource {
 
   function _rejectAllResources(uint256 _tokenId) internal virtual {
     delete(_pendingResources[_tokenId]);
+    emit ResourceRejected(_tokenId, bytes16(0));
   }
-
-  /* function setFirstPriorities(uint256 _tokenId, uint256 calldata _indexes[], bytes16[] storage _activeResources) internal virtual {
-    while index
-  }
-
-  function setFirstPriority(uint256 _tokenId, uint256 _index, bytes16[] storage _activeResources) internal virtual {
-    while index
-  } */
 
   /*
   This function must be gas tested. Tests involve:

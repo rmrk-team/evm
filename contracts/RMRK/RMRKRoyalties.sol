@@ -15,6 +15,8 @@ contract RMRKRoyalties is IRMRKRoyalties {
 
   RoyaltyData private _royalties;
 
+  event RoyaltyDataSet(address royaltyAddress, uint256 numerator, uint256 denominator);
+
   ////////////////////////////////////////
   //              ROYALTIES
   ////////////////////////////////////////
@@ -40,5 +42,6 @@ contract RMRKRoyalties is IRMRKRoyalties {
        numerator: _numerator,
        denominator: _denominator
      });
+   emit RoyaltyDataSet(_royaltyAddress, _numerator, _denominator);
   }
 }

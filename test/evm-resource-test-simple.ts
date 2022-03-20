@@ -161,7 +161,7 @@ describe('init', async () => {
           resArr[resourceIndex].id,
           ethers.utils.hexZeroPad("0x0", 16),
         );
-        
+
 
       await rmrkNft
         .connect(owner)
@@ -181,7 +181,7 @@ describe('init', async () => {
       expect(await rmrkNft.getActiveResources(otherTokenId)).to.eql([]);
 
     });
-    
+
     it('cannot add the same resource twice', async function () {
 
       const resourceIndex = 0;
@@ -195,7 +195,7 @@ describe('init', async () => {
       ).to.be.revertedWith('RMRK: resource already exists');
 
     });
-    
+
     it('cannot add resource with id 0', async function () {
       const resourceIndex = 0;
       await _addResource(resourceIndex);
@@ -538,7 +538,7 @@ describe('init', async () => {
       // The 0 is for the index, not for the resourceId:
       await rmrkNft.connect(addrs[0]).acceptResource(tokenId, 0);
     }
-    
+
     return resId16;
   }
 

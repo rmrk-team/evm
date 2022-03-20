@@ -34,8 +34,13 @@ contract RMRKNesting is Context {
   mapping(uint256 => Child[]) internal _pendingChildren;
 
   //Nesting events
-  event childRemoved(uint index, uint tokenId);
-  event pendingChildRemoved(uint index, uint tokenId);
+  event ChildProposed(uint parentTokenId);
+  event ChildAccepted(uint tokenId);
+  event PendingChildRemoved(uint tokenId, uint index);
+  event AllPendingChildrenRemoved(uint tokenId);
+  event ChildRemoved(uint tokenId, uint index);
+  //Gas check this, can emit lots of events. Possibly offset by gas savings from deleted arrays.
+  event ChildBurned(uint tokenId);
 
   ////////////////////////////////////////
   //             PROVENANCE
@@ -95,6 +100,7 @@ contract RMRKNesting is Context {
        partId: 0
      });
     _addChildToPending(child, parentTokenId);
+    emit ChildProposed(parentTokenId);
   }
 
   /**
@@ -113,6 +119,7 @@ contract RMRKNesting is Context {
 
     removeItemByIndex_C(_pendingChildren[_tokenId], index);
     _addChildToChildren(child_, _tokenId);
+    emit ChildAccepted(_tokenId);
   }
 
   /**
@@ -121,6 +128,7 @@ contract RMRKNesting is Context {
 
   function _rejectAllChildren(uint256 _tokenId) internal {
     delete(_pendingChildren[_tokenId]);
+    emit AllPendingChildrenRemoved(_tokenId);
   }
 
   /**
@@ -133,7 +141,7 @@ contract RMRKNesting is Context {
       "RMRKcore: Pending child index out of range"
     );
     removeItemByIndex_C(_pendingChildren[_tokenId], index);
-    emit pendingChildRemoved(index, _tokenId);
+    emit PendingChildRemoved(_tokenId, index);
   }
 
   /**
@@ -147,7 +155,7 @@ contract RMRKNesting is Context {
     );
 
     removeItemByIndex_C(_children[_tokenId], index);
-    emit childRemoved(index, _tokenId);
+    emit ChildRemoved(_tokenId, index);
   }
 
 
@@ -193,7 +201,9 @@ contract RMRKNesting is Context {
         oldOwner
       );
     }
+    emit ChildBurned(tokenId);
     delete _RMRKOwners[tokenId];
+
     //Also delete pending arrays for gas refund?
     //This can emit a lot of events.
   }
