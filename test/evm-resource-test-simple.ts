@@ -165,6 +165,35 @@ describe('init', async () => {
       ).to.be.reverted;
     });
 
+    it('cannot add too many pending resources', async () => {
+      const tokenId = 1;
+      const overwrites = ethers.utils.hexZeroPad("0x0", 16);
+      let resourceId: string;
+
+      // First 127 should be fine.
+      for (let i = 1; i <= 128; i++) {
+        resourceId = ethers.utils.hexZeroPad(ethers.utils.hexValue(i), 8);
+        await rmrkNft
+        .connect(owner)
+        .addResourceEntry( resourceId, resArr[0].src, resArr[0].thumb, resArr[0].metadataURI);
+
+        await rmrkNft
+          .connect(owner)
+          .addResourceToToken(tokenId, resourceStorage.address, resourceId, overwrites);
+      }
+
+      resourceId = ethers.utils.hexZeroPad(ethers.utils.hexValue(129), 8);
+      await rmrkNft
+      .connect(owner)
+      .addResourceEntry(resourceId, resArr[0].src, resArr[0].thumb, resArr[0].metadataURI);
+
+      await expect(
+        rmrkNft
+        .connect(owner)
+        .addResourceToToken(tokenId, resourceStorage.address, resourceId, overwrites),
+        ).to.be.revertedWith('RMRKCore: Max pending resources reached');
+    });
+
     it('can add same resource to 2 different tokens', async function () {
       const tokenId = 1;
       const otherTokenId = 2;

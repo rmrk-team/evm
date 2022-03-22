@@ -96,6 +96,11 @@ contract RMRKMultiResource {
         "RMRKCore: Resource not found in storage"
       );
 
+      require(
+        _pendingResources[_tokenId].length < 128,
+        "RMRKCore: Max pending resources reached"
+      );
+
       //Construct Resource object
       Resource memory resource_ = Resource({
         resourceAddress: _resourceAddress,
