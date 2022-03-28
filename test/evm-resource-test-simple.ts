@@ -5,7 +5,7 @@ import { RMRKResourceCore } from '../typechain';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 
 
-describe('init', async () => {
+describe('Resources', async () => {
   let resourceStorage: RMRKResourceCore;
 
   let owner: SignerWithAddress;
