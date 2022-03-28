@@ -184,16 +184,13 @@ describe('Nesting', async () => {
 
       // mint petMonkey token 1 into ownerChunky token 10
       await petMonkey.connect(addrs[0]).doMintNest(ownerChunky.address, childId, parentId, mintNestData);
-      // confirm petMonkey
-      // await ownerChunky.connect(addrs[0]).acceptChildFromPending(0, parentId);
-
       // mint petMonkey token 21 into petMonkey token 1
       await petMonkey.connect(addrs[0]).doMintNest(petMonkey.address, granchildId, childId, mintNestData);
 
-      const childrenOfChunky10 = await ownerChunky.pendingChildrenOf(parentId);
+      const pendingChildrenOfChunky10 = await ownerChunky.pendingChildrenOf(parentId);
       const pendingChildrenOfMonkey1 = await petMonkey.pendingChildrenOf(childId);
 
-      expect(childrenOfChunky10).to.eql([
+      expect(pendingChildrenOfChunky10).to.eql([
         [ethers.BigNumber.from(childId), petMonkey.address, 0, ethers.utils.hexZeroPad('0x0', 8)],
       ]);
       expect(pendingChildrenOfMonkey1).to.eql([
@@ -210,6 +207,7 @@ describe('Nesting', async () => {
       // root owner of pet 21 should be owner address of chunky 10
       expect(await petMonkey.ownerOf(granchildId)).to.eql(addrs[0].address);
     });
+
   });
 
   describe('Accept child', async function () {
@@ -298,79 +296,94 @@ describe('Nesting', async () => {
   });
 
   describe('Burning', async function () {
-    it('Burn NFT', async function () {
-      let children1, children2;
-
+    it('can burn token', async function () {
       await petMonkey.connect(addrs[1]).doMint(addrs[1].address, 1);
-      await expect(petMonkey.connect(addrs[0]).burn(1)).to.be.revertedWith(
-        'RMRKCore: transfer caller is not owner nor approved',
-      );
       await petMonkey.connect(addrs[1]).burn(1);
       await expect(petMonkey.ownerOf(1)).to.be.revertedWith(
         'RMRKCore: owner query for nonexistent token',
       );
     });
 
-    it('Burn nested NFT', async function () {
-      let destId, children1, children2;
-
-      destId = 10;
-      // mint petMonkey token 1 into ownerChunky token 10
-      await petMonkey.connect(addrs[1]).doMintNest(ownerChunky.address, 1, destId, mintNestData);
-      await ownerChunky.connect(addrs[0]).acceptChildFromPending(0, destId);
-      await expect(petMonkey.connect(addrs[1]).burn(1)).to.be.revertedWith(
+    it('cannot burn not owned token', async function () {
+      await petMonkey.connect(addrs[1]).doMint(addrs[1].address, 1);
+      await expect(petMonkey.connect(addrs[0]).burn(1)).to.be.revertedWith(
         'RMRKCore: transfer caller is not owner nor approved',
       );
-      await petMonkey.connect(addrs[0]).burn(1);
+    });
 
-      await expect(petMonkey.ownerOf(1)).to.be.revertedWith(
+    it('can burn nested token', async function () {
+      const childId = 1;
+      const parentId = 10;
+      // mint petMonkey token 1 into ownerChunky token 10
+      await petMonkey.connect(addrs[1]).doMintNest(ownerChunky.address, childId, parentId, mintNestData);
+      await ownerChunky.connect(addrs[0]).acceptChildFromPending(0, parentId);
+      await petMonkey.connect(addrs[0]).burn(childId);
+
+      // FIXME: Behavior is not existing for non existing token
+      // no owner for token
+      await expect(petMonkey.ownerOf(childId)).to.be.revertedWith(
         'RMRKCore: owner query for nonexistent token',
       );
-      expect(await petMonkey.rmrkOwnerOf(1)).to.eql([
+      // rmrk owner is empty:
+      expect(await petMonkey.rmrkOwnerOf(childId)).to.eql([
         ethers.utils.hexZeroPad('0x0', 20),
         ethers.BigNumber.from(0),
         false,
       ]);
     });
 
-    it('Recursively burn nested NFT', async function () {
-      let destId, children1, children2;
-
-      destId = 10;
+    it('cannot burn not owned nested token', async function () {
+      const childId = 1;
+      const parentId = 10;
       // mint petMonkey token 1 into ownerChunky token 10
-      await petMonkey.connect(addrs[0]).doMintNest(ownerChunky.address, 1, destId, mintNestData);
-      await ownerChunky.connect(addrs[0]).acceptChildFromPending(0, destId);
-      // mint ownerChunky token 21 into petMonkey token 1
-      // ownership chain is now addrs[0] > ownerChunky[1] > petMonkey[1] > ownerChunky[21]
-      await ownerChunky.connect(addrs[0]).doMintNest(petMonkey.address, 21, 1, mintNestData);
-      await petMonkey.connect(addrs[0]).acceptChildFromPending(0, 1);
+      await petMonkey.connect(addrs[1]).doMintNest(ownerChunky.address, childId, parentId, mintNestData);
+      await ownerChunky.connect(addrs[0]).acceptChildFromPending(0, parentId);
 
-      children1 = await ownerChunky.childrenOf(10);
-      children2 = await petMonkey.childrenOf(1);
+      await expect(petMonkey.connect(addrs[1]).burn(childId)).to.be.revertedWith(
+        'RMRKCore: transfer caller is not owner nor approved',
+      );
+    });
+
+    it('can recursively burn nested token', async function () {
+      const childId = 1;
+      const parentId = 10;
+      const granchildId = 21;
+
+      // mint petMonkey token 1 into ownerChunky token 10
+      await petMonkey.connect(addrs[0]).doMintNest(ownerChunky.address, childId, parentId, mintNestData);
+      await ownerChunky.connect(addrs[0]).acceptChildFromPending(0, parentId);
+      // mint ownerChunky token 21 into petMonkey token 1
+      await ownerChunky.connect(addrs[0]).doMintNest(petMonkey.address, granchildId, childId, mintNestData);
+      await petMonkey.connect(addrs[0]).acceptChildFromPending(0, childId);
+
+      // ownership chain is now addrs[0] > ownerChunky[1] > petMonkey[1] > ownerChunky[21]
+
+      const children1 = await ownerChunky.childrenOf(parentId);
+      const children2 = await petMonkey.childrenOf(childId);
 
       expect(children1).to.eql([
-        [ethers.BigNumber.from(1), petMonkey.address, 0, ethers.utils.hexZeroPad('0x0', 8)],
+        [ethers.BigNumber.from(childId), petMonkey.address, 0, ethers.utils.hexZeroPad('0x0', 8)],
       ]);
 
       expect(children2).to.eql([
-        [ethers.BigNumber.from(21), ownerChunky.address, 0, ethers.utils.hexZeroPad('0x0', 8)],
+        [ethers.BigNumber.from(granchildId), ownerChunky.address, 0, ethers.utils.hexZeroPad('0x0', 8)],
       ]);
 
-      expect(await ownerChunky.rmrkOwnerOf(21)).to.eql([
+      expect(await ownerChunky.rmrkOwnerOf(granchildId)).to.eql([
         petMonkey.address,
-        ethers.BigNumber.from(1),
+        ethers.BigNumber.from(childId),
         true,
       ]);
 
-      await petMonkey.connect(addrs[0]).burn(1);
-      await expect(petMonkey.ownerOf(1)).to.be.revertedWith(
-        'RMRKCore: owner query for nonexistent token',
-      );
-      await expect(petMonkey.rmrkOwnerOf(1)).to.be.empty;
-      await expect(ownerChunky.ownerOf(21)).to.be.revertedWith(
-        'RMRKCore: owner query for nonexistent token',
-      );
-      await expect(ownerChunky.rmrkOwnerOf(21)).to.be.empty;
+      await petMonkey.connect(addrs[0]).burn(childId);
+
+      await expect(petMonkey.ownerOf(childId)).
+        to.be.revertedWith('RMRKCore: owner query for nonexistent token');
+      await expect(petMonkey.rmrkOwnerOf(childId)).to.be.empty;
+
+      await expect(ownerChunky.ownerOf(granchildId))
+        .to.be.revertedWith('RMRKCore: owner query for nonexistent token');
+      await expect(ownerChunky.rmrkOwnerOf(granchildId)).to.be.empty;
     });
   });
 });
