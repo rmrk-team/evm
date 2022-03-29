@@ -26,6 +26,9 @@ contract RMRKMultiResource {
   //mapping of tokenId to all resources by priority
   mapping(uint256 => bytes16[]) private _activeResources;
 
+  //mapping of tokenId to an array of resource priorities
+  mapping(uint256 => uint16[]) private _activeResourcePriorities;
+
   //Double mapping of tokenId to active resources
   mapping(uint256 => mapping(bytes16 => bool)) private _tokenResources;
 
@@ -168,7 +171,7 @@ contract RMRKMultiResource {
     3. Finding a robust way to ensure that elements of the array are not repeated
   */
 
-  function _setPriority(uint256 _tokenId, bytes16[] memory _ids) internal virtual {
+  /* function _setPriority(uint256 _tokenId, bytes16[] memory _ids) internal virtual {
       uint256 length = _ids.length;
       require(
         length == _activeResources[_tokenId].length,
@@ -183,6 +186,15 @@ contract RMRKMultiResource {
       }
       _activeResources[_tokenId] = _ids;
       emit ResourcePrioritySet(_tokenId);
+  } */
+
+  function _setPriority(uint256 _tokenId, uint16[] memory _priorities) internal virtual {
+    uint256 length = _priorities.length;
+    require(
+      length == _activeResources[_tokenId].length,
+        "RMRK: Bad priority list length"
+    );
+    _activeResourcePriorities[_tokenId] = _priorities;
   }
 
   function getActiveResources(uint256 tokenId) public virtual view returns(bytes16[] memory) {

@@ -374,7 +374,7 @@ contract RMRKCore is Context, IRMRKCore, RMRKMultiResource, RMRKNesting, RMRKRoy
     _rejectAllResources(_tokenId);
   }
 
-  function setPriority(uint256 _tokenId, bytes16[] memory _ids) external onlyApprovedOrOwner(_tokenId) {
+  function setPriority(uint256 _tokenId, uint16[] memory _ids) external onlyApprovedOrOwner(_tokenId) {
     _setPriority(_tokenId, _ids);
   }
 
