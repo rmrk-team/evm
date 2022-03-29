@@ -74,6 +74,7 @@ contract RMRKNesting is Context {
   */
   function rmrkOwnerOf(uint256 tokenId) public view virtual returns (address, uint256, bool) {
     RMRKOwner memory owner = _RMRKOwners[tokenId];
+    require(owner.ownerAddress != address(0), "RMRKCore: owner query for nonexistent token");
     return (owner.ownerAddress, owner.tokenId, owner.isNft);
   }
 

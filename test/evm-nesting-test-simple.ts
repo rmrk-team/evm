@@ -431,17 +431,13 @@ describe('Nesting', async () => {
       await ownerChunky.connect(addrs[0]).acceptChildFromPending(0, parentId);
       await petMonkey.connect(addrs[0]).burn(childId);
 
-      // FIXME: Behavior is not consitent for non existing token on ownerOf vs rmrkOwnerOf
       // no owner for token
       await expect(petMonkey.ownerOf(childId)).to.be.revertedWith(
         'RMRKCore: owner query for nonexistent token',
       );
-      // rmrk owner is empty:
-      expect(await petMonkey.rmrkOwnerOf(childId)).to.eql([
-        ethers.utils.hexZeroPad('0x0', 20),
-        ethers.BigNumber.from(0),
-        false,
-      ]);
+      await expect(petMonkey.rmrkOwnerOf(childId)).to.be.revertedWith(
+        'RMRKCore: owner query for nonexistent token',
+      );
     });
 
     it('cannot burn not owned nested token', async function () {
@@ -490,11 +486,13 @@ describe('Nesting', async () => {
 
       await expect(petMonkey.ownerOf(childId)).
         to.be.revertedWith('RMRKCore: owner query for nonexistent token');
-      await expect(petMonkey.rmrkOwnerOf(childId)).to.be.empty;
+      await expect(petMonkey.rmrkOwnerOf(childId)).
+        to.be.revertedWith('RMRKCore: owner query for nonexistent token');
 
       await expect(ownerChunky.ownerOf(granchildId))
         .to.be.revertedWith('RMRKCore: owner query for nonexistent token');
-      await expect(ownerChunky.rmrkOwnerOf(granchildId)).to.be.empty;
+      await expect(ownerChunky.rmrkOwnerOf(granchildId))
+        .to.be.revertedWith('RMRKCore: owner query for nonexistent token');
     });
   });
 });
