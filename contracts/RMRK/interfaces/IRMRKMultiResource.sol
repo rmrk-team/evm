@@ -6,10 +6,10 @@ pragma solidity ^0.8.0;
 
 interface IRMRKMultiResource {
   function addResourceEntry(
-    bytes8 _id,
-    string memory _src,
-    string memory _thumb,
-    string memory _metadataURI
+      bytes8 _id,
+      string memory _src,
+      string memory _thumb,
+      string memory _metadataURI
   ) external;
 
   function addResourceToToken(

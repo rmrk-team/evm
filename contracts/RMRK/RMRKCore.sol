@@ -444,6 +444,19 @@ contract RMRKCore is Context, IRMRKCore, RMRKMultiResource, RMRKNesting, RMRKRoy
   }
 
   ////////////////////////////////////////
+  //              ROYALTIES
+  ////////////////////////////////////////
+
+  function setRoyaltyData(address _royaltyAddress, uint32 _numerator, uint32 _denominator) external onlyIssuer {
+      _setRoyaltyData(_royaltyAddress, _numerator, _denominator);
+  }
+
+  function getRoyaltyData() external view returns(address royaltyAddress, uint256 numerator, uint256 denominator) {
+      (royaltyAddress, numerator, denominator) = _getRoyaltyData();
+  }
+
+
+  ////////////////////////////////////////
   //              HELPERS
   ////////////////////////////////////////
 
