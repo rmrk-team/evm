@@ -141,6 +141,8 @@ contract RMRKMultiResource {
         emit ResourceOverwritten(_tokenId, overwrite);
       }
       _activeResources[_tokenId].push(_localResourceId);
+      //Push max value of uint16 to array, e.g., lowest priority by default
+      _activeResourcePriorities[_tokenId].push(~uint16(0));
       emit ResourceAccepted(_tokenId, _localResourceId);
   }
 
@@ -158,89 +160,72 @@ contract RMRKMultiResource {
   }
 
   function _rejectAllResources(uint256 _tokenId) internal virtual {
-    delete(_pendingResources[_tokenId]);
-    emit ResourceRejected(_tokenId, bytes16(0));
+      delete(_pendingResources[_tokenId]);
+      emit ResourceRejected(_tokenId, bytes16(0));
   }
 
   /*
-  This function must be gas tested. Tests involve:
-    1. Algorithm design (Can we sum and hash the elements of the array to ensure integrity instead? Is this robust?)
-    and/or:
-    2. Checking relative cost of elements of _activeResources vs checking the resourceExists double mapping
-    3. Finding a robust way to ensure that elements of the array are not repeated
+    Edits a priority array that maps 1-1 to active resources
   */
 
-  /* function _setPriority(uint256 _tokenId, bytes16[] memory _ids) internal virtual {
-      uint256 length = _ids.length;
+  function _setPriority(uint256 _tokenId, uint16[] memory _priorities) internal virtual {
+      uint256 length = _priorities.length;
       require(
         length == _activeResources[_tokenId].length,
           "RMRK: Bad priority list length"
       );
-      bytes16[] memory checkArr = new bytes16[](length);
-      for (uint256 i = 0; i < length; i = i.u_inc()) {
-          require(_activeResources[_tokenId].contains(_ids[i]),
-          "RMRKCore: Token does not have resource");
-          require(!checkArr.contains(_ids[i]),
-          "RMRKCore: Resource double submission");
-      }
-      _activeResources[_tokenId] = _ids;
-      emit ResourcePrioritySet(_tokenId);
-  } */
-
-  function _setPriority(uint256 _tokenId, uint16[] memory _priorities) internal virtual {
-    uint256 length = _priorities.length;
-    require(
-      length == _activeResources[_tokenId].length,
-        "RMRK: Bad priority list length"
-    );
-    _activeResourcePriorities[_tokenId] = _priorities;
+      _activeResourcePriorities[_tokenId] = _priorities;
   }
 
   function getActiveResources(uint256 tokenId) public virtual view returns(bytes16[] memory) {
-    return _activeResources[tokenId];
+      return _activeResources[tokenId];
   }
 
   function getPendingResources(uint256 tokenId) public virtual view returns(bytes16[] memory) {
-    return _pendingResources[tokenId];
+      return _pendingResources[tokenId];
   }
 
+  function getActiveResourcePriorities(uint256 tokenId) public virtual returns(uint16[] memory) {
+      return _activeResourcePriorities[tokenId];
+  }
+
+  //Deprecate
   function getRenderableResource(uint256 tokenId) public virtual view returns (Resource memory resource) {
-    bytes16 resourceId = getActiveResources(tokenId)[0];
-    return _resources[resourceId];
+      bytes16 resourceId = getActiveResources(tokenId)[0];
+      return _resources[resourceId];
   }
 
   function getResourceObject(IRMRKResourceCore _storage, bytes8 _id) public virtual view returns (IRMRKResourceCore.Resource memory resource) {
-    return _storage.getResource(_id);
+      return _storage.getResource(_id);
   }
 
   function getResObjectByIndex(uint256 _tokenId, uint256 _index) public virtual view returns(IRMRKResourceCore.Resource memory resource) {
-    bytes16 localResourceId = getActiveResources(_tokenId)[_index];
-    Resource memory _resource = _resources[localResourceId];
-    (IRMRKResourceCore _storage, bytes8 _id) = (_resource.resourceAddress, _resource.resourceId);
-    return getResourceObject(_storage, _id);
+      bytes16 localResourceId = getActiveResources(_tokenId)[_index];
+      Resource memory _resource = _resources[localResourceId];
+      (IRMRKResourceCore _storage, bytes8 _id) = (_resource.resourceAddress, _resource.resourceId);
+      return getResourceObject(_storage, _id);
   }
 
   function getResourceOverwrites(uint256 _tokenId, bytes16 _resId) public view returns(bytes16) {
-    return _resourceOverwrites[_tokenId][_resId];
+      return _resourceOverwrites[_tokenId][_resId];
   }
 
   function hashResource16(IRMRKResourceCore _address, bytes8 _id) public pure returns (bytes16) {
-    return bytes16(keccak256(abi.encodePacked(_address, _id)));
+      return bytes16(keccak256(abi.encodePacked(_address, _id)));
   }
 
   function tokenURI(uint256 tokenId) public view virtual returns (string memory) {
-    if (_activeResources[tokenId].length > 0)  {
-      Resource memory activeRes = _resources[_activeResources[tokenId][0]];
-      IRMRKResourceCore resAddr = activeRes.resourceAddress;
-      bytes8 resId = activeRes.resourceId;
+      if (_activeResources[tokenId].length > 0)  {
+          Resource memory activeRes = _resources[_activeResources[tokenId][0]];
+          IRMRKResourceCore resAddr = activeRes.resourceAddress;
+          bytes8 resId = activeRes.resourceId;
 
-      IRMRKResourceCore.Resource memory _activeRes = IRMRKResourceCore(resAddr).getResource(resId);
-      string memory URI = _activeRes.src;
-      return URI;
-    }
-
-    else {
-      return _fallbackURI;
+          IRMRKResourceCore.Resource memory _activeRes = IRMRKResourceCore(resAddr).getResource(resId);
+          string memory URI = _activeRes.src;
+          return URI;
+      }
+      else {
+          return _fallbackURI;
     }
   }
 }
