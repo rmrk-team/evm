@@ -107,7 +107,7 @@ contract RMRKCore is Context, IRMRKCore, RMRKMultiResource, RMRKNesting, RMRKRoy
       "RMRKCore: Mint to non-RMRKCore implementer"
     );
 
-    IRMRKNesting destContract = IRMRKNesting(to);
+    IRMRKNestingInternal destContract = IRMRKNestingInternal(to);
 
     _beforeTokenTransfer(address(0), to, tokenId);
 
@@ -171,7 +171,7 @@ contract RMRKCore is Context, IRMRKCore, RMRKMultiResource, RMRKNesting, RMRKRoy
 
     uint length = children.length; //gas savings
     for (uint i; i<length; i = u_inc(i)){
-      IRMRKNesting(children[i].contractAddress)._burnChildren(
+      IRMRKNestingInternal(children[i].contractAddress)._burnChildren(
         children[i].tokenId,
         owner
       );
@@ -244,7 +244,7 @@ contract RMRKCore is Context, IRMRKCore, RMRKMultiResource, RMRKNesting, RMRKRoy
     if (data.length == 0) {
       _balances[to] += 1;
     } else {
-      IRMRKNesting destContract = IRMRKNesting(to);
+      IRMRKNestingInternal destContract = IRMRKNestingInternal(to);
       address rootOwner = destContract.ownerOf(destinationId);
       _balances[rootOwner] += 1;
       destContract.setChild(address(this), destinationId, tokenId);

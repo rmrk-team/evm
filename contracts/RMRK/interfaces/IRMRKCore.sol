@@ -6,7 +6,7 @@ import "./IRMRKMultiResource.sol";
 import "./IRMRKNesting.sol";
 import "./IRMRKRoyalties.sol";
 
-interface IRMRKCore is IRMRKMultiResource, IRMRKRoyalties {
+interface IRMRKCore is IRMRKMultiResource, IRMRKNesting, IRMRKRoyalties {
 
   event Transfer(
     address indexed from,

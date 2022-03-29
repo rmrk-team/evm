@@ -4,7 +4,7 @@
 
 pragma solidity ^0.8.9;
 
-import "./interfaces/IRMRKNesting.sol";
+import "./interfaces/IRMRKNestingInternal.sol";
 import "./library/RMRKLib.sol";
 import "./utils/Context.sol";
 
@@ -61,7 +61,7 @@ contract RMRKNesting is Context {
   function ownerOf(uint256 tokenId) public view virtual returns(address) {
     (address owner, uint256 ownerTokenId, bool isNft) = rmrkOwnerOf(tokenId);
     if (isNft) {
-      owner = IRMRKNesting(owner).ownerOf(ownerTokenId);
+      owner = IRMRKNestingInternal(owner).ownerOf(ownerTokenId);
     }
     require(owner != address(0), "RMRKCore: owner query for nonexistent token");
     return owner;
@@ -90,7 +90,7 @@ contract RMRKNesting is Context {
 
   //update for reentrancy
   function _setChild(address childTokenAddress, uint parentTokenId, uint childTokenId) internal virtual {
-    IRMRKNesting childTokenContract = IRMRKNesting(childTokenAddress);
+    IRMRKNestingInternal childTokenContract = IRMRKNestingInternal(childTokenAddress);
     (address parent, , ) = childTokenContract.rmrkOwnerOf(childTokenId);
     require(parent == address(this), "Parent-child mismatch");
     Child memory child = Child({
@@ -196,7 +196,7 @@ contract RMRKNesting is Context {
       address childContractAddress = children[i].contractAddress;
       uint256 childTokenId = children[i].tokenId;
 
-      IRMRKNesting(childContractAddress)._burnChildren(
+      IRMRKNestingInternal(childContractAddress)._burnChildren(
         childTokenId,
         oldOwner
       );

@@ -3,21 +3,12 @@
 pragma solidity ^0.8.9;
 
 interface IRMRKNesting {
-    function ownerOf(uint256 tokenId)
-        external view returns (address owner);
 
-    function rmrkOwnerOf(uint256 tokenId)
-       external view returns (
-           address,
-           uint256,
-           bool
-       );
+  function acceptChildFromPending(uint256 index, uint256 _tokenId) external;
 
-    function _burnChildren(uint256 tokenId, address oldOwner) external;
+  function rejectAllChildren(uint256 _tokenId) external;
 
-    function setChild(
-        address childTokenAddress,
-        uint256 tokenId,
-        uint256 childTokenId
-    ) external;
+  function rejectChild(uint256 index, uint256 _tokenId) external;
+
+  function deleteChildFromChildren(uint256 index, uint256 _tokenId) external;
 }
