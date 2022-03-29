@@ -366,72 +366,6 @@ describe('Resources', async () => {
 
     });
 
-    it('can reorder priorities', async function () {
-      const tokenId = 1;
-      // Will also accept:
-      const resId16_1 = await _addResourceAndAddToToken(0, tokenId, true);
-      const resId16_2 = await _addResourceAndAddToToken(1, tokenId, true);
-
-      // Reorder priorities and return correct renderable resource
-      await expect(rmrkNft
-        .connect(addrs[0])
-        .setPriority(tokenId, [resId16_2, resId16_1]))
-        .to.emit(rmrkNft, 'ResourcePrioritySet').withArgs(tokenId);
-
-      expect(await rmrkNft.getActiveResources(tokenId)).to.eql([resId16_2, resId16_1]);
-    });
-
-    it('reverts if not owner/approved tries to reorder priorities', async function () {
-      const tokenId = 1;
-      // Will also accept:
-      const resId16_1 = await _addResourceAndAddToToken(0, tokenId, true);
-      const resId16_2 = await _addResourceAndAddToToken(1, tokenId, true);
-
-      await expect(
-        rmrkNft.connect(addrs[1]).setPriority(tokenId, [resId16_2, resId16_1]),
-      ).to.be.revertedWith('RMRKCore: Not approved or owner');
-    });
-
-    it('allows approved address (not owner) to reorder priorities', async function () {
-      const tokenId = 1;
-      const approvedAddress = addrs[1];
-      // Will also accept:
-      const resId16_1 = await _addResourceAndAddToToken(0, tokenId, true);
-      const resId16_2 = await _addResourceAndAddToToken(1, tokenId, true);
-
-      await rmrkNft.connect(addrs[0]).approve(approvedAddress.address, tokenId);
-      await rmrkNft.connect(addrs[1]).setPriority(tokenId, [resId16_2, resId16_1])
-
-      expect(await rmrkNft.getActiveResources(tokenId)).to.eql([resId16_2, resId16_1]);
-    })
-
-    it('reverts if the new order has does not have the same length', async function () {
-      const tokenId = 1;
-      // Will also accept:
-      await _addResourceAndAddToToken(0, tokenId, true);
-      const resId16_2 = await _addResourceAndAddToToken(1, tokenId, true);
-
-      await expect(rmrkNft.connect(addrs[0]).setPriority(tokenId, [resId16_2])).to.be.revertedWith(
-        'RMRK: Bad priority list length',
-      );
-    });
-
-    it('reverts if trying to reprioritize non-existant resources', async function () {
-      const tokenId = 1;
-      // Will also accept:
-      await _addResourceAndAddToToken(0, tokenId, true);
-      await _addResourceAndAddToToken(1, tokenId, true);
-
-      await expect(
-        rmrkNft
-          .connect(addrs[0])
-          .setPriority(tokenId, [
-            ethers.utils.hexZeroPad('0xaaaaa', 16),
-            ethers.utils.hexZeroPad('0xbbbb', 16),
-          ]),
-      ).to.be.revertedWith('RMRKCore: Token does not have resource');
-    });
-
     it('can overwrite resource', async function () {
       const targetResArrs = [
         [resArr[0].id, resArr[0].src, resArr[0].thumb, resArr[0].metadataURI],
@@ -467,7 +401,61 @@ describe('Resources', async () => {
       expect(await rmrkNft.getActiveResources(tokenId)).to.eql([resId16_2]);
 
       expect(await rmrkNft.getResObjectByIndex(tokenId, 0)).to.eql(targetResArrs[1]);
+    });
+  });
 
+  describe('Set Priorities', async function () {
+
+    it('can reorder priorities', async function () {
+      const tokenId = 1;
+      // Will also accept:
+      await _addResourceAndAddToToken(0, tokenId, true);
+      await _addResourceAndAddToToken(1, tokenId, true);
+
+      // Reorder priorities and return correct renderable resource
+      await expect(rmrkNft
+        .connect(addrs[0])
+        .setPriority(tokenId, [1, 0]))
+        .to.emit(rmrkNft, 'ResourcePrioritySet').withArgs(tokenId);
+
+        const resourcePriorities = await rmrkNft.getActiveResourcePriorities(tokenId);
+        await expect(resourcePriorities).to.eql([1, 0]);
+    });
+
+    it('reverts if not owner/approved tries to reorder priorities', async function () {
+      const tokenId = 1;
+      // Will also accept:
+      await _addResourceAndAddToToken(0, tokenId, true);
+      await _addResourceAndAddToToken(1, tokenId, true);
+
+      await expect(
+        rmrkNft.connect(addrs[1]).setPriority(tokenId, [1, 0]),
+      ).to.be.revertedWith('RMRKCore: Not approved or owner');
+    });
+
+    it('allows approved address (not owner) to reorder priorities', async function () {
+      const tokenId = 1;
+      const approvedAddress = addrs[1];
+      // Will also accept:
+      await _addResourceAndAddToToken(0, tokenId, true);
+      await _addResourceAndAddToToken(1, tokenId, true);
+
+      await rmrkNft.connect(addrs[0]).approve(approvedAddress.address, tokenId);
+      await rmrkNft.connect(approvedAddress).setPriority(tokenId, [1, 0])
+
+      const resourcePriorities = await rmrkNft.getActiveResourcePriorities(tokenId);
+      await expect(resourcePriorities).to.eql([1, 0]);
+    });
+
+    it('reverts if the new order has does not have the same length', async function () {
+      const tokenId = 1;
+      // Will also accept:
+      await _addResourceAndAddToToken(0, tokenId, true);
+      await _addResourceAndAddToToken(1, tokenId, true);
+
+      await expect(rmrkNft.connect(addrs[0]).setPriority(tokenId, [0])).to.be.revertedWith(
+        'RMRK: Bad priority list length',
+      );
     });
   });
 

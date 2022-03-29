@@ -174,6 +174,8 @@ contract RMRKMultiResource {
           "RMRK: Bad priority list length"
       );
       _activeResourcePriorities[_tokenId] = _priorities;
+
+      emit ResourcePrioritySet(_tokenId);
   }
 
   function getActiveResources(uint256 tokenId) public virtual view returns(bytes16[] memory) {
@@ -184,7 +186,7 @@ contract RMRKMultiResource {
       return _pendingResources[tokenId];
   }
 
-  function getActiveResourcePriorities(uint256 tokenId) public virtual returns(uint16[] memory) {
+  function getActiveResourcePriorities(uint256 tokenId) public virtual view returns(uint16[] memory) {
       return _activeResourcePriorities[tokenId];
   }
 
