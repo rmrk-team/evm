@@ -2,7 +2,6 @@
 
 pragma solidity ^0.8.9;
 
-import "./interfaces/IRMRKMultiResource.sol";
 import "./interfaces/IRMRKResourceCore.sol";
 import "./RMRKResourceCore.sol";
 import "./library/RMRKLib.sol";

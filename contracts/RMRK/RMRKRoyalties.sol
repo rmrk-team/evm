@@ -2,8 +2,6 @@
 
 pragma solidity ^0.8.9;
 
-import "./interfaces/IRMRKRoyalties.sol";
-
 contract RMRKRoyalties {
 
   struct RoyaltyData {
