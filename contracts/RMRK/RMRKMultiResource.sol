@@ -52,7 +52,6 @@ contract RMRKMultiResource {
   event ResourcePrioritySet(uint256 indexed tokenId);
   event ResourceOverwriteProposed(uint256 indexed tokenId, bytes16 localResourceId, bytes16 overwrites);
   event ResourceOverwritten(uint256 indexed tokenId, bytes16 overwritten);
-
   constructor(string memory resourceName) {
     resourceStorage = new RMRKResourceCore(resourceName);
   }
@@ -141,8 +140,8 @@ contract RMRKMultiResource {
         emit ResourceOverwritten(_tokenId, overwrite);
       }
       _activeResources[_tokenId].push(_localResourceId);
-      //Push max value of uint16 to array, e.g., lowest priority by default
-      _activeResourcePriorities[_tokenId].push(~uint16(0));
+      //Push 0 value of uint16 to array, e.g., uninitialized
+      _activeResourcePriorities[_tokenId].push(uint16(0));
       emit ResourceAccepted(_tokenId, _localResourceId);
   }
 
