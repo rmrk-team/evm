@@ -390,6 +390,49 @@ describe('Nesting', async () => {
     });
   });
 
+  describe('Remove child', async function () {
+    it('can remove one child', async function () {
+      const parentId = 11;
+      await petMonkey.connect(addrs[0]).doMintNest(ownerChunky.address, 1, parentId, mintNestData);
+      await ownerChunky.connect(addrs[1]).acceptChild(parentId, 0);
+
+      await ownerChunky.connect(addrs[1]).removeChild(parentId, 0);
+      const children = await ownerChunky.childrenOf(parentId);
+      expect(children).to.eql([]);
+    });
+
+    it('cannot remove not owned child', async function () {
+      const parentId = 11;
+      await petMonkey.connect(addrs[0]).doMintNest(ownerChunky.address, 1, parentId, mintNestData);
+      await ownerChunky.connect(addrs[1]).acceptChild(parentId, 0);
+
+      // addrs[1] attempts to remove addrs[0]'s children
+      await expect(
+        ownerChunky.connect(addrs[0]).removeChild(parentId, 0)
+      ).to.be.revertedWith('RMRKCore: Not approved or owner');
+    });
+
+    it('can remove child from approved address (not owner)', async function () {
+      const parentId = 11;
+      const approvedAddress = addrs[2];
+
+      await ownerChunky.connect(addrs[1]).approve(approvedAddress.address, parentId);
+      await petMonkey.connect(addrs[0]).doMintNest(ownerChunky.address, 1, parentId, mintNestData);
+      await ownerChunky.connect(addrs[1]).acceptChild(parentId, 0);
+
+      await ownerChunky.connect(approvedAddress).removeChild(parentId, 0);
+      const children = await ownerChunky.childrenOf(parentId);
+      expect(children).to.eql([]);
+    });
+
+    it('cannot remove children for non existing index', async () => {
+      const parentId = 11;
+      await expect(
+        ownerChunky.connect(addrs[1]).removeChild(parentId, 0),
+      ).to.be.revertedWith('RMRKcore: Child index out of range');
+    });
+  });
+
   describe('Burning', async function () {
     it('can burn token', async function () {
       const tokenId = 1;

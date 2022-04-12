@@ -151,8 +151,8 @@ contract RMRKNesting is Context {
 
   function _removeChild(uint256 _tokenId, uint256 index) internal {
     require(
-      _pendingChildren[_tokenId].length < index,
-      "RMRKcore: Pending child index out of range"
+      _children[_tokenId].length > index,
+      "RMRKcore: Child index out of range"
     );
 
     removeItemByIndex_C(_children[_tokenId], index);
