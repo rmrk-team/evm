@@ -4,11 +4,11 @@ pragma solidity ^0.8.9;
 
 interface IRMRKNesting {
 
-  function acceptChildFromPending(uint256 index, uint256 _tokenId) external;
+  function acceptChild(uint256 _tokenId, uint256 index) external;
 
   function rejectAllChildren(uint256 _tokenId) external;
 
-  function rejectChild(uint256 index, uint256 _tokenId) external;
+  function rejectChild(uint256 _tokenId, uint256 index) external;
 
-  function deleteChildFromChildren(uint256 index, uint256 _tokenId) external;
+  function removeChild(uint256 _tokenId, uint256 index) external;
 }

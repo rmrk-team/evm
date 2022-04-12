@@ -90,7 +90,7 @@ contract RMRKNesting is Context {
    */
 
   //update for reentrancy
-  function _setChild(address childTokenAddress, uint parentTokenId, uint childTokenId) internal virtual {
+  function _addChild(uint parentTokenId, uint childTokenId, address childTokenAddress) internal virtual {
     IRMRKNestingInternal childTokenContract = IRMRKNestingInternal(childTokenAddress);
     (address parent, , ) = childTokenContract.rmrkOwnerOf(childTokenId);
     require(parent == address(this), "Parent-child mismatch");
@@ -100,7 +100,7 @@ contract RMRKNesting is Context {
        slotEquipped: 0,
        partId: 0
      });
-    _addChildToPending(child, parentTokenId);
+    _addChildToPending(parentTokenId, child);
     emit ChildProposed(parentTokenId);
   }
 
@@ -110,7 +110,7 @@ contract RMRKNesting is Context {
   */
 
   //CHECK: preload mappings into memory for gas savings
-  function _acceptChildFromPending(uint256 index, uint256 _tokenId) internal {
+  function _acceptChild(uint256 _tokenId, uint256 index) internal {
     require(
       _pendingChildren[_tokenId].length > index,
       "RMRKcore: Pending child index out of range"
@@ -119,7 +119,7 @@ contract RMRKNesting is Context {
     Child memory child_ = _pendingChildren[_tokenId][index];
 
     removeItemByIndex_C(_pendingChildren[_tokenId], index);
-    _addChildToChildren(child_, _tokenId);
+    _addChildToChildren(_tokenId, child_);
     emit ChildAccepted(_tokenId);
   }
 
@@ -136,7 +136,7 @@ contract RMRKNesting is Context {
   @dev Deletes a single child from the pending array by index.
   */
 
-  function _rejectChild(uint256 index, uint256 _tokenId) internal {
+  function _rejectChild(uint256 _tokenId, uint256 index) internal {
     require(
       _pendingChildren[_tokenId].length > index,
       "RMRKcore: Pending child index out of range"
@@ -149,7 +149,7 @@ contract RMRKNesting is Context {
   @dev Deletes a single child from the child array by index.
   */
 
-  function _deleteChildFromChildren(uint256 index, uint256 _tokenId) internal {
+  function _removeChild(uint256 _tokenId, uint256 index) internal {
     require(
       _pendingChildren[_tokenId].length < index,
       "RMRKcore: Pending child index out of range"
@@ -164,7 +164,7 @@ contract RMRKNesting is Context {
   @dev Adds an instance of Child to the pending children array for _tokenId. This is hardcoded to be 128 by default.
   */
 
-  function _addChildToPending(Child memory _child, uint256 _tokenId) internal {
+  function _addChildToPending(uint256 _tokenId, Child memory _child) internal {
     if(_pendingChildren[_tokenId].length < 128) {
       _pendingChildren[_tokenId].push(_child);
     } else {
@@ -176,7 +176,7 @@ contract RMRKNesting is Context {
   @dev Adds an instance of Child to the children array for _tokenId.
   */
 
-  function _addChildToChildren(Child memory _child, uint256 _tokenId) internal {
+  function _addChildToChildren(uint256 _tokenId, Child memory _child) internal {
     _children[_tokenId].push(_child);
   }
 

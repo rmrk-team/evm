@@ -43,15 +43,15 @@ contract RMRKCore is Context, IRMRKCore, RMRKMultiResource, RMRKNesting, RMRKRoy
   TODOS:
   Isolate _transfer() branches in own functions
   Update functions that take address and use as interface to take interface instead
-  double check (this) in setChild() call functions appropriately
+  double check (this) in addChild() call functions appropriately
 
   VULNERABILITY CHECK NOTES:
   External calls:
   ownerOf() during _transfer
-  setChild() during _transfer()
+  addChild() during _transfer()
 
   Vulnerabilities to test:
-  Greif during _transfer via setChild reentry?
+  Greif during _transfer via addChild reentry?
 
   EVENTUALLY:
   Create minimal contract that relies on on-chain libraries for gas savings
@@ -120,7 +120,7 @@ contract RMRKCore is Context, IRMRKCore, RMRKMultiResource, RMRKNesting, RMRKRoy
       isNft: true
     });
 
-    destContract.setChild(address(this), destinationId, tokenId);
+    destContract.addChild(destinationId, tokenId, address(this));
 
     /* emit Transfer(address(0), to, tokenId);
 
@@ -247,7 +247,7 @@ contract RMRKCore is Context, IRMRKCore, RMRKMultiResource, RMRKNesting, RMRKRoy
       IRMRKNestingInternal destContract = IRMRKNestingInternal(to);
       address rootOwner = destContract.ownerOf(destinationId);
       _balances[rootOwner] += 1;
-      destContract.setChild(address(this), destinationId, tokenId);
+      destContract.addChild(destinationId, tokenId, address(this));
       isNft = true;
     }
     _RMRKOwners[tokenId] = RMRKOwner({
@@ -348,13 +348,13 @@ contract RMRKCore is Context, IRMRKCore, RMRKMultiResource, RMRKNesting, RMRKRoy
       );
   }
 
-  function addResourceToToken(
+  function addResource(
       uint256 _tokenId,
       IRMRKResourceCore _resourceAddress,
       bytes8 _resourceId,
       bytes16 _overwrites
   ) external onlyIssuer {
-    _addResourceToToken(
+    _addResource(
       _tokenId,
       _resourceAddress,
       _resourceId,
@@ -385,24 +385,24 @@ contract RMRKCore is Context, IRMRKCore, RMRKMultiResource, RMRKNesting, RMRKRoy
   //TODO: Permissioning
 
   //Ensure this is also callable within the context of this contract
-  function setChild(address childTokenAddress, uint parentTokenId, uint childTokenId) public {
-    _setChild(childTokenAddress, parentTokenId, childTokenId);
+  function addChild(uint _parentTokenId, uint _childTokenId, address childTokenAddress) public {
+    _addChild(_parentTokenId, _childTokenId, childTokenAddress);
   }
 
-  function acceptChildFromPending(uint256 index, uint256 _tokenId) external onlyApprovedOrOwner(_tokenId) {
-    _acceptChildFromPending(index, _tokenId);
+  function acceptChild(uint256 _tokenId, uint256 index) external onlyApprovedOrOwner(_tokenId) {
+    _acceptChild(_tokenId, index);
+  }
+
+  function rejectChild(uint256 _tokenId, uint256 index) external onlyApprovedOrOwner(_tokenId) {
+    _rejectChild(_tokenId, index);
   }
 
   function rejectAllChildren(uint256 _tokenId) external onlyApprovedOrOwner(_tokenId) {
     _rejectAllChildren(_tokenId);
   }
 
-  function rejectChild(uint256 index, uint256 _tokenId) external onlyApprovedOrOwner(_tokenId) {
-    _rejectChild(index, _tokenId);
-  }
-
-  function deleteChildFromChildren(uint256 index, uint256 _tokenId) external onlyApprovedOrOwner(_tokenId) {
-    _deleteChildFromChildren(index, _tokenId);
+  function removeChild(uint256 _tokenId, uint256 index) external onlyApprovedOrOwner(_tokenId) {
+    _removeChild(_tokenId, index);
   }
 
   ////////////////////////////////////////

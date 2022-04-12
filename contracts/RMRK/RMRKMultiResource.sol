@@ -75,7 +75,7 @@ contract RMRKMultiResource {
     emit ResourceStorageSet(_id);
   }
 
-  function _addResourceToToken(
+  function _addResource(
       uint256 _tokenId,
       IRMRKResourceCore _resourceAddress,
       bytes8 _resourceId,

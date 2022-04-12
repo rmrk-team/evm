@@ -132,7 +132,7 @@ describe('Resources', async () => {
       const resId16 = await _addResource(resourceIndex);
       await expect(rmrkNft
         .connect(owner)
-        .addResourceToToken(
+        .addResource(
           tokenId,
           resourceStorage.address,
           resArr[0].id,
@@ -156,7 +156,7 @@ describe('Resources', async () => {
       await expect(
         rmrkNft
           .connect(addrs[1])
-          .addResourceToToken(
+          .addResource(
             tokenId,
             resourceStorage.address,
             resArr[resourceIndex].id,
@@ -179,7 +179,7 @@ describe('Resources', async () => {
 
         await rmrkNft
           .connect(owner)
-          .addResourceToToken(tokenId, resourceStorage.address, resourceId, overwrites);
+          .addResource(tokenId, resourceStorage.address, resourceId, overwrites);
       }
 
       resourceId = ethers.utils.hexZeroPad(ethers.utils.hexValue(129), 8);
@@ -190,7 +190,7 @@ describe('Resources', async () => {
       await expect(
         rmrkNft
         .connect(owner)
-        .addResourceToToken(tokenId, resourceStorage.address, resourceId, overwrites),
+        .addResource(tokenId, resourceStorage.address, resourceId, overwrites),
         ).to.be.revertedWith('RMRKCore: Max pending resources reached');
     });
 
@@ -203,7 +203,7 @@ describe('Resources', async () => {
 
       await rmrkNft
         .connect(owner)
-        .addResourceToToken(
+        .addResource(
           tokenId,
           resourceStorage.address,
           resArr[resourceIndex].id,
@@ -213,7 +213,7 @@ describe('Resources', async () => {
 
       await rmrkNft
         .connect(owner)
-        .addResourceToToken(
+        .addResource(
           otherTokenId,
           resourceStorage.address,
           resArr[resourceIndex].id,
@@ -268,7 +268,7 @@ describe('Resources', async () => {
       await expect(
         rmrkNft
           .connect(owner)
-          .addResourceToToken(
+          .addResource(
             tokenId,
             resourceStorage.address,
             resArr[resourceIndex].id,
@@ -283,7 +283,7 @@ describe('Resources', async () => {
       await expect(
         rmrkNft
           .connect(owner)
-          .addResourceToToken(
+          .addResource(
             tokenId,
             resourceStorage.address,
             ethers.utils.hexZeroPad('0xa1a2a3', 8),
@@ -381,7 +381,7 @@ describe('Resources', async () => {
 
       await expect (rmrkNft
         .connect(owner)
-        .addResourceToToken(
+        .addResource(
           tokenId,
           resourceStorage.address,
           resArr[replacingResourceIndex].id,
@@ -572,7 +572,7 @@ describe('Resources', async () => {
 
     await rmrkNft
         .connect(owner)
-        .addResourceToToken(
+        .addResource(
           tokenId,
           resourceStorage.address,
           resArr[resourceIndex].id,

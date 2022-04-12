@@ -12,7 +12,7 @@ interface IRMRKMultiResource {
       string memory _metadataURI
   ) external;
 
-  function addResourceToToken(
+  function addResource(
       uint256 _tokenId,
       IRMRKResourceCore _resourceAddress,
       bytes8 _resourceId,

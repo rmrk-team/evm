@@ -15,9 +15,9 @@ interface IRMRKNestingInternal {
 
     function _burnChildren(uint256 tokenId, address oldOwner) external;
 
-    function setChild(
-        address childTokenAddress,
-        uint256 tokenId,
-        uint256 childTokenId
+    function addChild(
+        uint256 parentTokenId,
+        uint256 childTokenId,
+        address childTokenAddress
     ) external;
 }

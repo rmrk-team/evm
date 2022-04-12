@@ -1,7 +1,6 @@
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
 import { Contract } from 'ethers';
-import { RMRKResourceCore } from '../typechain';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 
 //TODO: Transfer - transfer now does double duty as removeChild
@@ -262,7 +261,7 @@ describe('Nesting', async () => {
       await petMonkey.connect(addrs[0]).doMintNest(ownerChunky.address, childId, parentId, mintNestData);
 
       // owner accepts the child at index 0 into the child array
-      await ownerChunky.connect(addrs[1]).acceptChildFromPending(0, parentId);
+      await ownerChunky.connect(addrs[1]).acceptChild(parentId, 0);
 
       const pendingChildren = await ownerChunky.pendingChildrenOf(parentId);
       expect(pendingChildren).to.eql([]);
@@ -284,7 +283,7 @@ describe('Nesting', async () => {
       await expect(
         ownerChunky
         .connect(addrs[0])
-        .acceptChildFromPending(0, parentId)
+        .acceptChild(parentId, 0)
       ).to.be.revertedWith('RMRKCore: Not approved or owner');
     });
 
@@ -298,7 +297,7 @@ describe('Nesting', async () => {
       // Another address can mint
       await petMonkey.connect(addrs[0]).doMintNest(ownerChunky.address, childId, parentId, mintNestData);
 
-      await ownerChunky.connect(approvedAddress).acceptChildFromPending(0, parentId);
+      await ownerChunky.connect(approvedAddress).acceptChild(parentId, 0);
 
       const pendingChildren = await ownerChunky.pendingChildrenOf(parentId);
       expect(pendingChildren).to.eql([]);
@@ -316,7 +315,7 @@ describe('Nesting', async () => {
       const parentId = 11;
       await petMonkey.connect(addrs[0]).doMintNest(ownerChunky.address, 1, parentId, mintNestData);
 
-      await ownerChunky.connect(addrs[1]).rejectChild(0, parentId);
+      await ownerChunky.connect(addrs[1]).rejectChild(parentId, 0);
       const pendingChildren = await ownerChunky.pendingChildrenOf(parentId);
       expect(pendingChildren).to.eql([]);
     });
@@ -327,7 +326,7 @@ describe('Nesting', async () => {
 
       // addrs[1] attempts to reject addrs[0]'s pending children
       await expect(
-        ownerChunky.connect(addrs[0]).rejectChild(0, parentId)
+        ownerChunky.connect(addrs[0]).rejectChild(parentId, 0)
       ).to.be.revertedWith('RMRKCore: Not approved or owner');
     });
 
@@ -338,7 +337,7 @@ describe('Nesting', async () => {
       await ownerChunky.connect(addrs[1]).approve(approvedAddress.address, parentId);
       await petMonkey.connect(addrs[0]).doMintNest(ownerChunky.address, 1, parentId, mintNestData);
 
-      await ownerChunky.connect(approvedAddress).rejectChild(0, parentId);
+      await ownerChunky.connect(approvedAddress).rejectChild(parentId, 0);
       const pendingChildren = await ownerChunky.pendingChildrenOf(parentId);
       expect(pendingChildren).to.eql([]);
     });
@@ -386,7 +385,7 @@ describe('Nesting', async () => {
     it('cannot reject children for non existing index', async () => {
       const parentId = 11;
       await expect(
-        ownerChunky.connect(addrs[1]).rejectChild(0, parentId),
+        ownerChunky.connect(addrs[1]).rejectChild(parentId, 0),
       ).to.be.revertedWith('RMRKcore: Pending child index out of range');
     });
   });
@@ -428,7 +427,7 @@ describe('Nesting', async () => {
       const parentId = 10;
       // mint petMonkey token 1 into ownerChunky token 10
       await petMonkey.connect(addrs[1]).doMintNest(ownerChunky.address, childId, parentId, mintNestData);
-      await ownerChunky.connect(addrs[0]).acceptChildFromPending(0, parentId);
+      await ownerChunky.connect(addrs[0]).acceptChild(parentId, 0);
       await petMonkey.connect(addrs[0]).burn(childId);
 
       // no owner for token
@@ -445,7 +444,7 @@ describe('Nesting', async () => {
       const parentId = 10;
       // mint petMonkey token 1 into ownerChunky token 10
       await petMonkey.connect(addrs[1]).doMintNest(ownerChunky.address, childId, parentId, mintNestData);
-      await ownerChunky.connect(addrs[0]).acceptChildFromPending(0, parentId);
+      await ownerChunky.connect(addrs[0]).acceptChild(parentId, 0);
 
       await expect(petMonkey.connect(addrs[1]).burn(childId)).to.be.revertedWith(
         'RMRKCore: transfer caller is not owner nor approved',
@@ -459,10 +458,10 @@ describe('Nesting', async () => {
 
       // mint petMonkey token 1 into ownerChunky token 10
       await petMonkey.connect(addrs[0]).doMintNest(ownerChunky.address, childId, parentId, mintNestData);
-      await ownerChunky.connect(addrs[0]).acceptChildFromPending(0, parentId);
+      await ownerChunky.connect(addrs[0]).acceptChild(parentId, 0);
       // mint ownerChunky token 21 into petMonkey token 1
       await ownerChunky.connect(addrs[0]).doMintNest(petMonkey.address, granchildId, childId, mintNestData);
-      await petMonkey.connect(addrs[0]).acceptChildFromPending(0, childId);
+      await petMonkey.connect(addrs[0]).acceptChild(childId, 0);
 
       // ownership chain is now addrs[0] > ownerChunky[10] > petMonkey[1] > ownerChunky[21]
       const children1 = await ownerChunky.childrenOf(parentId);
