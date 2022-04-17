@@ -20,4 +20,26 @@ interface IRMRKNestingInternal {
         uint256 childTokenId,
         address childTokenAddress
     ) external;
+
+    function addChildAccepted(
+        uint256 parentTokenId,
+        uint256 childTokenId,
+        address childTokenAddress
+    ) external;
+
+    function acceptChild(
+        uint256 parentTokenId,
+        uint256 childTokenId,
+        address childTokenAddress
+    ) external;
+
+    function rejectChild(
+        uint256 parentTokenId,
+        uint256 index
+    ) external;
+
+    function removeChild(
+        uint256 parentTokenId,
+        uint256 index
+    ) external;
 }

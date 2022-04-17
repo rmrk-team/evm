@@ -39,6 +39,14 @@ contract RMRKCore is Context, IRMRKCore, RMRKMultiResource, RMRKNesting, RMRKRoy
     );
     _;
   }
+
+  //Anything gated by this modifier should probably also clear approvals on end of execution
+  modifier onlyApprovedOrOwnerOrChild(uint256 tokenId, uint256 index, ChildStatus status) {
+    require(_isApprovedOrOwner(_msgSender(), tokenId) || _isChild(_msgSender(), tokenId, index, status),
+      "RMRKCore: Not approved or owner"
+    );
+    _;
+  }
   /*
   TODOS:
   Isolate _transfer() branches in own functions
@@ -208,7 +216,20 @@ contract RMRKCore is Context, IRMRKCore, RMRKMultiResource, RMRKNesting, RMRKRoy
     bytes memory data
   ) public virtual onlyApprovedOrOwner(tokenId) {
     //solhint-disable-next-line max-line-length
-    _transfer(from, to, tokenId, destinationId, data);
+    _transfer(from, to, tokenId, destinationId, false, ChildStatus.Unknown, 0, data);
+  }
+
+  function transferFromRmrk(
+    address from,
+    address to,
+    uint256 tokenId,
+    uint256 toTokenId,
+    bool destinationIsNft,  // We could tell this from the 'to'
+    ChildStatus childStatus,
+    uint256 childIndex,
+    bytes memory data
+  ) public virtual onlyApprovedOrOwner(tokenId){
+    _transfer(from, to, tokenId, toTokenId, destinationIsNft, childStatus, childIndex, data);
   }
 
   /**
@@ -222,7 +243,6 @@ contract RMRKCore is Context, IRMRKCore, RMRKMultiResource, RMRKNesting, RMRKRoy
   *
   * Emits a {Transfer} event.
   */
-
   //Convert string to bytes in calldata for gas saving
   //Double check to make sure nested transfers update balanceOf correctly. Maybe add condition if rootOwner does not change for gas savings.
   //All children of transferred NFT should also have owner updated.
@@ -230,7 +250,10 @@ contract RMRKCore is Context, IRMRKCore, RMRKMultiResource, RMRKNesting, RMRKRoy
     address from,
     address to,
     uint256 tokenId,
-    uint256 destinationId,
+    uint256 toTokenId,
+    bool destinationIsNft,  // We could tell this from the 'to'
+    ChildStatus childStatus,
+    uint256 childIndex,
     bytes memory data
   ) internal virtual {
     require(ownerOf(tokenId) == from, "RMRKCore: transfer from incorrect owner");
@@ -238,22 +261,43 @@ contract RMRKCore is Context, IRMRKCore, RMRKMultiResource, RMRKNesting, RMRKRoy
 
     _beforeTokenTransfer(from, to, tokenId);
 
+    // FIXME: balances are not tested and probably broken
     _balances[from] -= 1;
-    bool isNft = false;
 
-    if (data.length == 0) {
+    // If the current owner is an NFT, we need to remove the child from it
+    RMRKOwner memory rmrkOwner = _RMRKOwners[tokenId];
+    if (rmrkOwner.isNft && rmrkOwner.ownerAddress != address(0)) {
+      IRMRKNestingInternal parentContract = IRMRKNestingInternal(rmrkOwner.ownerAddress);
+
+      if (childStatus == ChildStatus.Pending){
+        parentContract.rejectChild(rmrkOwner.tokenId, childIndex);
+      }
+      else if (childStatus == ChildStatus.Accepted){
+        parentContract.removeChild(rmrkOwner.tokenId, childIndex);
+      }
+      // FIXME: Else is pending, must look for it iterating over accepted and pending children
+    }
+
+    if(!destinationIsNft) {
       _balances[to] += 1;
     } else {
+      // If destination is an NFT, we need to add the child to it
       IRMRKNestingInternal destContract = IRMRKNestingInternal(to);
-      address rootOwner = destContract.ownerOf(destinationId);
-      _balances[rootOwner] += 1;
-      destContract.addChild(destinationId, tokenId, address(this));
-      isNft = true;
+      address nextOwner = destContract.ownerOf(toTokenId);
+      _balances[nextOwner] += 1;
+
+      if (from == nextOwner && childStatus == ChildStatus.Accepted) {
+        destContract.addChildAccepted(toTokenId, tokenId, address(this));
+      }
+      else {
+        destContract.addChild(toTokenId, tokenId, address(this));
+      }
     }
+
     _RMRKOwners[tokenId] = RMRKOwner({
       ownerAddress: to,
-      tokenId: destinationId,
-      isNft: isNft
+      tokenId: toTokenId,
+      isNft: destinationIsNft
     });
     // Clear approvals from the previous owner
     _approve(address(0), tokenId);
@@ -262,8 +306,6 @@ contract RMRKCore is Context, IRMRKCore, RMRKMultiResource, RMRKNesting, RMRKRoy
 
     _afterTokenTransfer(from, to, tokenId);
   }
-
-
 
   function _beforeTokenTransfer(
     address from,
@@ -389,11 +431,15 @@ contract RMRKCore is Context, IRMRKCore, RMRKMultiResource, RMRKNesting, RMRKRoy
     _addChild(_parentTokenId, _childTokenId, childTokenAddress);
   }
 
+  function addChildAccepted(uint _parentTokenId, uint _childTokenId, address childTokenAddress) public {
+    _addChildAccepted(_parentTokenId, _childTokenId, childTokenAddress);
+  }
+
   function acceptChild(uint256 _tokenId, uint256 index) external onlyApprovedOrOwner(_tokenId) {
     _acceptChild(_tokenId, index);
   }
 
-  function rejectChild(uint256 _tokenId, uint256 index) external onlyApprovedOrOwner(_tokenId) {
+  function rejectChild(uint256 _tokenId, uint256 index) external onlyApprovedOrOwnerOrChild(_tokenId, index, ChildStatus.Pending) {
     _rejectChild(_tokenId, index);
   }
 
@@ -401,7 +447,7 @@ contract RMRKCore is Context, IRMRKCore, RMRKMultiResource, RMRKNesting, RMRKRoy
     _rejectAllChildren(_tokenId);
   }
 
-  function removeChild(uint256 _tokenId, uint256 index) external onlyApprovedOrOwner(_tokenId) {
+  function removeChild(uint256 _tokenId, uint256 index) external onlyApprovedOrOwnerOrChild(_tokenId, index, ChildStatus.Accepted) {
     _removeChild(_tokenId, index);
   }
 

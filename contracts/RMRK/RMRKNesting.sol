@@ -7,6 +7,8 @@ pragma solidity ^0.8.9;
 import "./interfaces/IRMRKNestingInternal.sol";
 import "./library/RMRKLib.sol";
 import "./utils/Context.sol";
+import "hardhat/console.sol";
+
 
 contract RMRKNesting is Context {
 
@@ -23,6 +25,12 @@ contract RMRKNesting is Context {
     uint256 tokenId;
     address ownerAddress;
     bool isNft;
+  }
+
+  enum ChildStatus {
+      Unknown,
+      Pending,
+      Accepted
   }
 
   mapping(uint256 => RMRKOwner) internal _RMRKOwners;
@@ -78,6 +86,19 @@ contract RMRKNesting is Context {
     return (owner.ownerAddress, owner.tokenId, owner.isNft);
   }
 
+  function _isChild(address sender, uint256 tokenId, uint256 childIndex, ChildStatus status) internal view returns (bool) {
+    // What about also checking for tx origin to equal sender or approved?
+    if (status == ChildStatus.Pending) {
+      Child memory pendingChild = _pendingChildren[tokenId][childIndex];
+      return pendingChild.contractAddress == sender;
+    }
+    else if (status == ChildStatus.Accepted) {
+      Child memory child = _children[tokenId][childIndex];
+      return child.contractAddress == sender;
+    }
+    revert("RMRKCore: Unexpected child status");
+  }
+
   ////////////////////////////////////////
   //          CHILD MANAGEMENT
   ////////////////////////////////////////
@@ -119,8 +140,24 @@ contract RMRKNesting is Context {
     Child memory child_ = _pendingChildren[_tokenId][index];
 
     removeItemByIndex_C(_pendingChildren[_tokenId], index);
+
     _addChildToChildren(_tokenId, child_);
     emit ChildAccepted(_tokenId);
+  }
+
+  function _addChildAccepted(uint parentTokenId, uint childTokenId, address childTokenAddress) internal virtual {
+    IRMRKNestingInternal childTokenContract = IRMRKNestingInternal(childTokenAddress);
+    (address parent, , ) = childTokenContract.rmrkOwnerOf(childTokenId);
+    require(parent == address(this), "Parent-child mismatch");
+    Child memory child = Child({
+       contractAddress: childTokenAddress,
+       tokenId: childTokenId,
+       slotEquipped: 0,
+       partId: 0
+     });
+    _addChildToChildren(parentTokenId, child);
+    // FIXME: Should it also emmit ChildProposed?
+    emit ChildAccepted(parentTokenId);
   }
 
   /**

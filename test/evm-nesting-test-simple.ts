@@ -23,6 +23,10 @@ describe('Nesting', async () => {
   const emptyData = ethers.utils.hexZeroPad('0x', 0);
   const partId = ethers.utils.hexZeroPad('0x0', 8);
 
+  const CHILD_STATUS_PENDING = 1;
+  const CHILD_STATUS_ACCEPTED = 2;
+
+
   beforeEach(async function () {
     const [signersOwner, ...signersAddr] = await ethers.getSigners();
     owner = signersOwner;
@@ -601,6 +605,32 @@ describe('Nesting', async () => {
         [ethers.BigNumber.from(childId), petMonkey.address, 0, partId],
       ]);
     });
+
+    it('can transfer pending child to token with different owner, child is pending', async function () {
+      const {childId, parentId, firstOwner} = await mintTofirstOwner();
+      const newParentId = 5; // owned by addrs[0]
+
+      await petMonkey.connect(firstOwner).transferFromRmrk(
+        firstOwner.address, ownerChunky.address, childId, newParentId, true, CHILD_STATUS_PENDING, 0, emptyData);
+
+
+      const expected_pending = [ethers.BigNumber.from(childId), petMonkey.address, 0, partId];
+      check_accepted_and_pending_children(ownerChunky, parentId, [], []);
+      check_accepted_and_pending_children(ownerChunky, newParentId, [], expected_pending);
+    });
+
+    it('can transfer pending child to token with different owner, child is accepted', async function () {
+      const {childId, parentId, firstOwner} = await mintTofirstOwner(true);
+      const newParentId = 5; // owned by addrs[0]
+
+      await petMonkey.connect(firstOwner).transferFromRmrk(
+        firstOwner.address, ownerChunky.address, childId, newParentId, true, CHILD_STATUS_ACCEPTED, 0, emptyData);
+
+      const expected_accepted = [ethers.BigNumber.from(childId), petMonkey.address, 0, partId];
+      check_accepted_and_pending_children(ownerChunky, parentId, [], []);
+      check_accepted_and_pending_children(ownerChunky, newParentId, expected_accepted, []);
+    });
+
   });
 
   async function mintTofirstOwner(accept: boolean=false): Promise<{childId: number, parentId: number,  firstOwner: any}> {
@@ -610,10 +640,19 @@ describe('Nesting', async () => {
 
     await petMonkey.connect(firstOwner).doMintNest(ownerChunky.address, childId, parentId, mintNestData);
     if (accept){
-      await ownerChunky.connect(firstOwner).acceptChildFromPending(0, parentId);
+      await ownerChunky.connect(firstOwner).acceptChild(parentId, 0);
     }
 
     return {childId, parentId, firstOwner};
   }
+
+  async function check_accepted_and_pending_children(contract: any, tokenId: number, expected_accepted: any, expected_pending: any) {
+    const accepted = await contract.childrenOf(tokenId);
+    expect(accepted).to.eql(expected_accepted);
+
+    const pending = await contract.childrenOf(tokenId);
+    expect(pending).to.eql(expected_pending);
+  }
+
 
 });
