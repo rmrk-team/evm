@@ -29,8 +29,7 @@ interface IRMRKNestingInternal {
 
     function acceptChild(
         uint256 parentTokenId,
-        uint256 childTokenId,
-        address childTokenAddress
+        uint256 childTokenId
     ) external;
 
     function rejectChild(
@@ -41,5 +40,10 @@ interface IRMRKNestingInternal {
     function removeChild(
         uint256 parentTokenId,
         uint256 index
+    ) external;
+
+    function removeOrRejectChild(
+        uint256 parentTokenId,
+        uint256 childTokenId
     ) external;
 }

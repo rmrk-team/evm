@@ -196,6 +196,37 @@ contract RMRKNesting is Context {
     emit ChildRemoved(_tokenId, index);
   }
 
+  /**
+  @dev Deletes a single child from the pending or child array by matching the child id and the caller address.
+    Should only called from the child contract and it is very gas inefficient.
+  */
+
+  function _removeOrRejectChild(uint256 _tokenId, uint256 _childId) internal {
+    // Check in accepted
+    uint256 length = _children[_tokenId].length;
+    if (length > 0) {
+      for (uint i = 0; i < length; i = i.u_inc()) {
+        Child memory child = _children[_tokenId][i];
+        if (child.tokenId == _childId && child.contractAddress == msg.sender) {
+          _removeChild(_tokenId, i);
+          return;
+        }
+      }
+    }
+    // Check in pending
+    length = _pendingChildren[_tokenId].length;
+    if (length > 0) {
+      for (uint i = 0; i < length; i = i.u_inc()) {
+        Child memory child = _pendingChildren[_tokenId][i];
+        if (child.tokenId == _childId && child.contractAddress == msg.sender) {
+          _rejectChild(_tokenId, i);
+          return;
+        }
+      }
+    }
+    revert("RMRKCore: Child not found in pending nor accepted");
+  }
+
 
   /**
   @dev Adds an instance of Child to the pending children array for _tokenId. This is hardcoded to be 128 by default.

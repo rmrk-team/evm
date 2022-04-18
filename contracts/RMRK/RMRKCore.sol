@@ -275,7 +275,12 @@ contract RMRKCore is Context, IRMRKCore, RMRKMultiResource, RMRKNesting, RMRKRoy
       else if (childStatus == ChildStatus.Accepted){
         parentContract.removeChild(rmrkOwner.tokenId, childIndex);
       }
-      // FIXME: Else is pending, must look for it iterating over accepted and pending children
+      else if (childStatus == ChildStatus.Unknown){
+        parentContract.removeOrRejectChild(rmrkOwner.tokenId, tokenId);
+      }
+      else {
+        revert("RMRKCore: Invalid child status");
+      }
     }
 
     _RMRKOwners[tokenId] = RMRKOwner({
@@ -450,6 +455,10 @@ contract RMRKCore is Context, IRMRKCore, RMRKMultiResource, RMRKNesting, RMRKRoy
 
   function removeChild(uint256 _tokenId, uint256 index) external onlyApprovedOrOwnerOrChild(_tokenId, index, ChildStatus.Accepted) {
     _removeChild(_tokenId, index);
+  }
+
+  function removeOrRejectChild(uint256 _tokenId, uint256 _childId) external {
+    _removeOrRejectChild(_tokenId, _childId);
   }
 
   ////////////////////////////////////////

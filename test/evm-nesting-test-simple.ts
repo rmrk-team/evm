@@ -23,6 +23,7 @@ describe('Nesting', async () => {
   const emptyData = ethers.utils.hexZeroPad('0x', 0);
   const partId = ethers.utils.hexZeroPad('0x0', 8);
 
+  const CHILD_STATUS_UNKNOWN = 0;
   const CHILD_STATUS_PENDING = 1;
   const CHILD_STATUS_ACCEPTED = 2;
 
@@ -665,6 +666,30 @@ describe('Nesting', async () => {
       check_accepted_and_pending_children(ownerChunky, parentId, expected_accepted, []);
       expected_accepted = [ethers.BigNumber.from(parentId), ownerChunky.address, 0, partId];
       check_accepted_and_pending_children(ownerChunky, newParentId, expected_accepted, []);
+    });
+
+    it('can transfer accepted child to token with same owner not setting the status, child is in accepted', async function () {
+      const newParentId = 12; // owner is firstOwner
+      const {childId, parentId, firstOwner} = await mintTofirstOwner(true);
+
+      await petMonkey.connect(firstOwner).transferFromRmrk(
+        firstOwner.address, ownerChunky.address, childId, newParentId, true, CHILD_STATUS_UNKNOWN, 0, emptyData);
+
+      const expected_accepted = [ethers.BigNumber.from(childId), petMonkey.address, 0, partId];
+      check_accepted_and_pending_children(ownerChunky, parentId, [], []);
+      check_accepted_and_pending_children(ownerChunky, newParentId, expected_accepted, []);
+    });
+
+    it('can transfer pending child to token with same owner not setting the status, child is in pending', async function () {
+      const newParentId = 12; // owner is firstOwner
+      const {childId, parentId, firstOwner} = await mintTofirstOwner();
+
+      await petMonkey.connect(firstOwner).transferFromRmrk(
+        firstOwner.address, ownerChunky.address, childId, newParentId, true, CHILD_STATUS_UNKNOWN, 0, emptyData);
+
+      const expected_pending = [ethers.BigNumber.from(childId), petMonkey.address, 0, partId];
+      check_accepted_and_pending_children(ownerChunky, parentId, [], []);
+      check_accepted_and_pending_children(ownerChunky, newParentId, [], expected_pending);
     });
 
   });
