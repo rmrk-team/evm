@@ -278,6 +278,16 @@ contract RMRKCore is Context, IRMRKCore, RMRKMultiResource, RMRKNesting, RMRKRoy
       // FIXME: Else is pending, must look for it iterating over accepted and pending children
     }
 
+    _RMRKOwners[tokenId] = RMRKOwner({
+      ownerAddress: to,
+      tokenId: toTokenId,
+      isNft: destinationIsNft
+    });
+    // Clear approvals from the previous owner
+    _approve(address(0), tokenId);
+
+    emit Transfer(from, to, tokenId);
+
     if(!destinationIsNft) {
       _balances[to] += 1;
     } else {
@@ -293,16 +303,6 @@ contract RMRKCore is Context, IRMRKCore, RMRKMultiResource, RMRKNesting, RMRKRoy
         destContract.addChild(toTokenId, tokenId, address(this));
       }
     }
-
-    _RMRKOwners[tokenId] = RMRKOwner({
-      ownerAddress: to,
-      tokenId: toTokenId,
-      isNft: destinationIsNft
-    });
-    // Clear approvals from the previous owner
-    _approve(address(0), tokenId);
-
-    emit Transfer(from, to, tokenId);
 
     _afterTokenTransfer(from, to, tokenId);
   }
@@ -431,6 +431,7 @@ contract RMRKCore is Context, IRMRKCore, RMRKMultiResource, RMRKNesting, RMRKRoy
     _addChild(_parentTokenId, _childTokenId, childTokenAddress);
   }
 
+  // FIXME: this requires a modifier to restrict access, onlyApprovedOrOwnerOrChild cannot be used since there's no child yet
   function addChildAccepted(uint _parentTokenId, uint _childTokenId, address childTokenAddress) public {
     _addChildAccepted(_parentTokenId, _childTokenId, childTokenAddress);
   }
