@@ -263,9 +263,15 @@ contract RMRKCore is Context, IRMRKCore, RMRKMultiResource, RMRKNesting, RMRKRoy
 
     // FIXME: balances are not tested and probably broken
     _balances[from] -= 1;
+    RMRKOwner memory rmrkOwner = _RMRKOwners[tokenId];
+
+    _RMRKOwners[tokenId] = RMRKOwner({
+      ownerAddress: to,
+      tokenId: toTokenId,
+      isNft: destinationIsNft
+    });
 
     // If the current owner is an NFT, we need to remove the child from it
-    RMRKOwner memory rmrkOwner = _RMRKOwners[tokenId];
     if (rmrkOwner.isNft && rmrkOwner.ownerAddress != address(0)) {
       IRMRKNestingInternal parentContract = IRMRKNestingInternal(rmrkOwner.ownerAddress);
 
@@ -282,16 +288,8 @@ contract RMRKCore is Context, IRMRKCore, RMRKMultiResource, RMRKNesting, RMRKRoy
         revert("RMRKCore: Invalid child status");
       }
     }
-
-    _RMRKOwners[tokenId] = RMRKOwner({
-      ownerAddress: to,
-      tokenId: toTokenId,
-      isNft: destinationIsNft
-    });
     // Clear approvals from the previous owner
     _approve(address(0), tokenId);
-
-    emit Transfer(from, to, tokenId);
 
     if(!destinationIsNft) {
       _balances[to] += 1;
@@ -309,6 +307,7 @@ contract RMRKCore is Context, IRMRKCore, RMRKMultiResource, RMRKNesting, RMRKRoy
       }
     }
 
+    emit Transfer(from, to, tokenId);
     _afterTokenTransfer(from, to, tokenId);
   }
 
