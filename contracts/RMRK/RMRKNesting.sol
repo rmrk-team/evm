@@ -21,6 +21,13 @@ contract RMRKNesting is Context {
     bytes8 partId;
   }
 
+  struct ChildTransferApproval {
+    uint256 tokenId;
+    uint256 index;
+    address contractAddress;
+    ChildStatus status;
+  }
+
   struct RMRKOwner {
     uint256 tokenId;
     address ownerAddress;
@@ -41,9 +48,12 @@ contract RMRKNesting is Context {
 
   mapping(uint256 => Child[]) internal _pendingChildren;
 
+  mapping(uint256 => ChildTransferApproval[]) internal _approvedTransfers;
+
   //Nesting events
   event ChildProposed(uint parentTokenId);
   event ChildAccepted(uint tokenId);
+  event ChildTransferApproved(uint tokenId);  // FIXME: untested
   event PendingChildRemoved(uint tokenId, uint index);
   event AllPendingChildrenRemoved(uint tokenId);
   event ChildRemoved(uint tokenId, uint index);
@@ -86,17 +96,29 @@ contract RMRKNesting is Context {
     return (owner.ownerAddress, owner.tokenId, owner.isNft);
   }
 
-  function _isChild(address sender, uint256 tokenId, uint256 childIndex, ChildStatus status) internal view returns (bool) {
-    // What about also checking for tx origin to equal sender or approved?
-    if (status == ChildStatus.Pending) {
-      Child memory pendingChild = _pendingChildren[tokenId][childIndex];
-      return pendingChild.contractAddress == sender;
+  /**
+    @dev Returns whether the child is approved for transfer by checking status + index + sender or childId + sender.
+  */
+  function _approvedForTransfer(uint256 tokenId, ChildStatus status, uint256 index, uint256 childId, address sender) internal view returns (bool) {
+    uint256 length = _approvedTransfers[tokenId].length;
+    if (length > 0) {
+      if (status == ChildStatus.Unknown) {
+        for (uint256 i = 0; i < length; i++) {
+          ChildTransferApproval memory childApproval = _approvedTransfers[tokenId][i];
+          if (childApproval.tokenId == childId && childApproval.contractAddress == sender) {
+            return true;
+          }
+        }
+      } else {
+        for (uint256 i = 0; i < length; i++) {
+          ChildTransferApproval memory childApproval = _approvedTransfers[tokenId][i];
+          if (childApproval.status == status && childApproval.index == index && childApproval.contractAddress == sender) {
+            return true;
+          }
+        }
+      }
     }
-    else if (status == ChildStatus.Accepted) {
-      Child memory child = _children[tokenId][childIndex];
-      return child.contractAddress == sender;
-    }
-    revert("RMRKCore: Unexpected child status");
+    return false;
   }
 
   ////////////////////////////////////////
@@ -136,6 +158,7 @@ contract RMRKNesting is Context {
       _pendingChildren[_tokenId].length > index,
       "RMRKcore: Pending child index out of range"
     );
+    // FIXME: if it approved for transfer it should either update/remove the approvedTransfers or stop this accept.
 
     Child memory child_ = _pendingChildren[_tokenId][index];
 
@@ -167,6 +190,24 @@ contract RMRKNesting is Context {
   function _rejectAllChildren(uint256 _tokenId) internal {
     delete(_pendingChildren[_tokenId]);
     emit AllPendingChildrenRemoved(_tokenId);
+  }
+
+  /**
+  @dev Approves the future transfer of a child, which implies removing it from the children
+  */
+
+  function _approveTransfer(uint256 _tokenId, uint256 childIndex, ChildStatus status) internal {
+    if (status == ChildStatus.Accepted){
+      Child memory child = _children[_tokenId][childIndex];
+      _addChildToApprovedTransfers(_tokenId, child, ChildStatus.Accepted, childIndex);
+    }
+    else if (status == ChildStatus.Pending){
+      Child memory child = _pendingChildren[_tokenId][childIndex];
+      _addChildToApprovedTransfers(_tokenId, child, ChildStatus.Pending, childIndex);
+    }
+    else {
+      revert("RMRKCore: Invalid child status");
+    }
   }
 
   /**
@@ -202,14 +243,31 @@ contract RMRKNesting is Context {
   */
 
   function _removeOrRejectChild(uint256 _tokenId, uint256 _childId) internal {
+    (ChildStatus status, uint256 index) = _find_status_and_index(_tokenId, _childId, msg.sender);
+    if (status == ChildStatus.Pending){
+      _rejectChild(_tokenId, index);
+      return;
+    }
+    else if (status == ChildStatus.Accepted){
+      _removeChild(_tokenId, index);
+      return;
+    }
+    revert("RMRKCore: Invalid child status");
+  }
+
+
+  /**
+  @dev Identifies status and index or the given childId and address.
+  */
+
+  function _find_status_and_index(uint256 _tokenId, uint256 _childId, address childContractAddress) internal view returns (ChildStatus, uint256) {
     // Check in accepted
     uint256 length = _children[_tokenId].length;
     if (length > 0) {
       for (uint i = 0; i < length; i = i.u_inc()) {
         Child memory child = _children[_tokenId][i];
-        if (child.tokenId == _childId && child.contractAddress == msg.sender) {
-          _removeChild(_tokenId, i);
-          return;
+        if (child.tokenId == _childId && child.contractAddress == childContractAddress) {
+          return (ChildStatus.Accepted, i);
         }
       }
     }
@@ -218,13 +276,32 @@ contract RMRKNesting is Context {
     if (length > 0) {
       for (uint i = 0; i < length; i = i.u_inc()) {
         Child memory child = _pendingChildren[_tokenId][i];
-        if (child.tokenId == _childId && child.contractAddress == msg.sender) {
-          _rejectChild(_tokenId, i);
-          return;
+        if (child.tokenId == _childId && child.contractAddress == childContractAddress) {
+          return (ChildStatus.Pending, i);
         }
       }
     }
     revert("RMRKCore: Child not found in pending nor accepted");
+  }
+
+
+  /**
+  @dev Adds an instance of Child to the approved transfers children array for _tokenId. This is hardcoded to be 128 by default.
+  */
+
+  function _addChildToApprovedTransfers(uint256 _tokenId, Child memory _child, ChildStatus _status, uint256 _index) internal {
+    if(_approvedTransfers[_tokenId].length < 128) {
+      ChildTransferApproval memory childApproval = ChildTransferApproval({
+        tokenId: _child.tokenId,
+        index: _index,
+        contractAddress: _child.contractAddress,
+        status: _status
+      });
+      _approvedTransfers[_tokenId].push(childApproval);
+    } else {
+      revert("RMRKCore: Max approved transfer reached");
+    }
+    emit ChildTransferApproved(_tokenId);
   }
 
 

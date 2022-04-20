@@ -611,6 +611,7 @@ describe('Nesting', async () => {
       const newParentId = 12; // owner is firstOwner
       const {childId, parentId, firstOwner} = await mintTofirstOwner(true);
 
+      await ownerChunky.connect(firstOwner).approveTransfer(parentId, 0, CHILD_STATUS_ACCEPTED);
       await petMonkey.connect(firstOwner).transferFromRmrk(
         firstOwner.address, ownerChunky.address, childId, newParentId, true, CHILD_STATUS_ACCEPTED, 0, emptyData);
 
@@ -623,6 +624,7 @@ describe('Nesting', async () => {
       const {childId, parentId, firstOwner} = await mintTofirstOwner(true);
       const newParentId = 5; // owned by addrs[0]
 
+      await ownerChunky.connect(firstOwner).approveTransfer(parentId, 0, CHILD_STATUS_ACCEPTED);
       await petMonkey.connect(firstOwner).transferFromRmrk(
         firstOwner.address, ownerChunky.address, childId, newParentId, true, CHILD_STATUS_ACCEPTED, 0, emptyData);
 
@@ -635,6 +637,7 @@ describe('Nesting', async () => {
       const newParentId = 12; // owner is firstOwner
       const {childId, parentId, firstOwner} = await mintTofirstOwner();
 
+      await ownerChunky.connect(firstOwner).approveTransfer(parentId, 0, CHILD_STATUS_PENDING);
       await petMonkey.connect(firstOwner).transferFromRmrk(
         firstOwner.address, ownerChunky.address, childId, newParentId, true, CHILD_STATUS_PENDING, 0, emptyData);
 
@@ -647,6 +650,7 @@ describe('Nesting', async () => {
       const {childId, parentId, firstOwner} = await mintTofirstOwner();
       const newParentId = 5; // owned by addrs[0]
 
+      await ownerChunky.connect(firstOwner).approveTransfer(parentId, 0, CHILD_STATUS_PENDING);
       await petMonkey.connect(firstOwner).transferFromRmrk(
         firstOwner.address, ownerChunky.address, childId, newParentId, true, CHILD_STATUS_PENDING, 0, emptyData);
 
@@ -659,6 +663,7 @@ describe('Nesting', async () => {
       const newParentId = 12; // owner is firstOwner
       const {childId, parentId, firstOwner} = await mintTofirstOwner(true);
 
+      await ownerChunky.connect(firstOwner).approveTransfer(parentId, 0, CHILD_STATUS_ACCEPTED);
       await ownerChunky.connect(firstOwner).transferFromRmrk(
         firstOwner.address, ownerChunky.address, parentId, newParentId, true, CHILD_STATUS_ACCEPTED, 0, emptyData);
 
@@ -672,6 +677,8 @@ describe('Nesting', async () => {
       const newParentId = 12; // owner is firstOwner
       const {childId, parentId, firstOwner} = await mintTofirstOwner(true);
 
+      // Does not make much sense to know the status on approval but not on transfer. But we test it anyway.
+      await ownerChunky.connect(firstOwner).approveTransfer(parentId, 0, CHILD_STATUS_ACCEPTED);
       await petMonkey.connect(firstOwner).transferFromRmrk(
         firstOwner.address, ownerChunky.address, childId, newParentId, true, CHILD_STATUS_UNKNOWN, 0, emptyData);
 
@@ -684,6 +691,8 @@ describe('Nesting', async () => {
       const newParentId = 12; // owner is firstOwner
       const {childId, parentId, firstOwner} = await mintTofirstOwner();
 
+      // Does not make much sense to know the status on approval but not on transfer. But we test it anyway.
+      await ownerChunky.connect(firstOwner).approveTransfer(parentId, 0, CHILD_STATUS_PENDING);
       await petMonkey.connect(firstOwner).transferFromRmrk(
         firstOwner.address, ownerChunky.address, childId, newParentId, true, CHILD_STATUS_UNKNOWN, 0, emptyData);
 

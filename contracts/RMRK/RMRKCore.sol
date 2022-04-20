@@ -41,8 +41,8 @@ contract RMRKCore is Context, IRMRKCore, RMRKMultiResource, RMRKNesting, RMRKRoy
   }
 
   //Anything gated by this modifier should probably also clear approvals on end of execution
-  modifier onlyApprovedOrOwnerOrChild(uint256 tokenId, uint256 index, ChildStatus status) {
-    require(_isApprovedOrOwner(_msgSender(), tokenId) || _isChild(_msgSender(), tokenId, index, status),
+  modifier onlyApprovedOrOwnerOrTransferable(uint256 tokenId, ChildStatus status, uint256 index, uint256 childId) {
+    require(_isApprovedOrOwner(_msgSender(), tokenId) || _approvedForTransfer(tokenId, status, index, childId, _msgSender()),
       "RMRKCore: Not approved or owner"
     );
     _;
@@ -444,7 +444,11 @@ contract RMRKCore is Context, IRMRKCore, RMRKMultiResource, RMRKNesting, RMRKRoy
     _acceptChild(_tokenId, index);
   }
 
-  function rejectChild(uint256 _tokenId, uint256 index) external onlyApprovedOrOwnerOrChild(_tokenId, index, ChildStatus.Pending) {
+  function approveTransfer(uint256 _tokenId, uint256 childIndex, ChildStatus status) external onlyApprovedOrOwner(_tokenId) {
+    _approveTransfer(_tokenId, childIndex, status);
+  }
+
+  function rejectChild(uint256 _tokenId, uint256 index) external onlyApprovedOrOwnerOrTransferable(_tokenId, ChildStatus.Pending, index, 0) {
     _rejectChild(_tokenId, index);
   }
 
@@ -452,11 +456,11 @@ contract RMRKCore is Context, IRMRKCore, RMRKMultiResource, RMRKNesting, RMRKRoy
     _rejectAllChildren(_tokenId);
   }
 
-  function removeChild(uint256 _tokenId, uint256 index) external onlyApprovedOrOwnerOrChild(_tokenId, index, ChildStatus.Accepted) {
+  function removeChild(uint256 _tokenId, uint256 index) external onlyApprovedOrOwnerOrTransferable(_tokenId, ChildStatus.Accepted, index, 0) {
     _removeChild(_tokenId, index);
   }
 
-  function removeOrRejectChild(uint256 _tokenId, uint256 _childId) external {
+  function removeOrRejectChild(uint256 _tokenId, uint256 _childId) external onlyApprovedOrOwnerOrTransferable(_tokenId, ChildStatus.Unknown, 0, _childId) {
     _removeOrRejectChild(_tokenId, _childId);
   }
 

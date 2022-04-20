@@ -32,6 +32,12 @@ interface IRMRKNestingInternal {
         uint256 childTokenId
     ) external;
 
+    function approveTransfer(
+        uint256 _tokenId,
+        uint256 childIndex,
+        uint8 status
+    ) external;
+
     function rejectChild(
         uint256 parentTokenId,
         uint256 index
