@@ -20,7 +20,7 @@ interface IRMRKCore is IRMRKMultiResource, IRMRKNesting, IRMRKRoyalties {
       uint256 indexed tokenId
   );
 
-  function isRMRKCore(
+  function rmrkCoreCheck(
       address,
       address,
       uint256,

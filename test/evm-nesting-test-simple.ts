@@ -613,7 +613,7 @@ describe('Nesting', async () => {
 
       await ownerChunky.connect(firstOwner).approveTransfer(parentId, 0, CHILD_STATUS_ACCEPTED);
       await petMonkey.connect(firstOwner).transferFromRmrk(
-        firstOwner.address, ownerChunky.address, childId, newParentId, true, CHILD_STATUS_ACCEPTED, 0, emptyData);
+        firstOwner.address, ownerChunky.address, childId, newParentId, CHILD_STATUS_ACCEPTED, 0, emptyData);
 
       const expected_accepted = [ethers.BigNumber.from(childId), petMonkey.address, 0, partId];
       check_accepted_and_pending_children(ownerChunky, parentId, [], []);
@@ -626,7 +626,7 @@ describe('Nesting', async () => {
 
       await ownerChunky.connect(firstOwner).approveTransfer(parentId, 0, CHILD_STATUS_ACCEPTED);
       await petMonkey.connect(firstOwner).transferFromRmrk(
-        firstOwner.address, ownerChunky.address, childId, newParentId, true, CHILD_STATUS_ACCEPTED, 0, emptyData);
+        firstOwner.address, ownerChunky.address, childId, newParentId, CHILD_STATUS_ACCEPTED, 0, emptyData);
 
       const expected_pending = [ethers.BigNumber.from(childId), petMonkey.address, 0, partId];
       check_accepted_and_pending_children(ownerChunky, parentId, [], []);
@@ -639,7 +639,7 @@ describe('Nesting', async () => {
 
       await ownerChunky.connect(firstOwner).approveTransfer(parentId, 0, CHILD_STATUS_PENDING);
       await petMonkey.connect(firstOwner).transferFromRmrk(
-        firstOwner.address, ownerChunky.address, childId, newParentId, true, CHILD_STATUS_PENDING, 0, emptyData);
+        firstOwner.address, ownerChunky.address, childId, newParentId, CHILD_STATUS_PENDING, 0, emptyData);
 
       const expected_pending = [ethers.BigNumber.from(childId), petMonkey.address, 0, partId];
       check_accepted_and_pending_children(ownerChunky, parentId, [], []);
@@ -652,7 +652,7 @@ describe('Nesting', async () => {
 
       await ownerChunky.connect(firstOwner).approveTransfer(parentId, 0, CHILD_STATUS_PENDING);
       await petMonkey.connect(firstOwner).transferFromRmrk(
-        firstOwner.address, ownerChunky.address, childId, newParentId, true, CHILD_STATUS_PENDING, 0, emptyData);
+        firstOwner.address, ownerChunky.address, childId, newParentId, CHILD_STATUS_PENDING, 0, emptyData);
 
       const expected_pending = [ethers.BigNumber.from(childId), petMonkey.address, 0, partId];
       check_accepted_and_pending_children(ownerChunky, parentId, [], []);
@@ -665,7 +665,7 @@ describe('Nesting', async () => {
 
       await ownerChunky.connect(firstOwner).approveTransfer(parentId, 0, CHILD_STATUS_ACCEPTED);
       await ownerChunky.connect(firstOwner).transferFromRmrk(
-        firstOwner.address, ownerChunky.address, parentId, newParentId, true, CHILD_STATUS_ACCEPTED, 0, emptyData);
+        firstOwner.address, ownerChunky.address, parentId, newParentId, CHILD_STATUS_ACCEPTED, 0, emptyData);
 
       let expected_accepted = [ethers.BigNumber.from(childId), petMonkey.address, 0, partId];
       check_accepted_and_pending_children(ownerChunky, parentId, expected_accepted, []);
@@ -680,7 +680,7 @@ describe('Nesting', async () => {
       // Does not make much sense to know the status on approval but not on transfer. But we test it anyway.
       await ownerChunky.connect(firstOwner).approveTransfer(parentId, 0, CHILD_STATUS_ACCEPTED);
       await petMonkey.connect(firstOwner).transferFromRmrk(
-        firstOwner.address, ownerChunky.address, childId, newParentId, true, CHILD_STATUS_UNKNOWN, 0, emptyData);
+        firstOwner.address, ownerChunky.address, childId, newParentId, CHILD_STATUS_UNKNOWN, 0, emptyData);
 
       const expected_accepted = [ethers.BigNumber.from(childId), petMonkey.address, 0, partId];
       check_accepted_and_pending_children(ownerChunky, parentId, [], []);
@@ -694,7 +694,7 @@ describe('Nesting', async () => {
       // Does not make much sense to know the status on approval but not on transfer. But we test it anyway.
       await ownerChunky.connect(firstOwner).approveTransfer(parentId, 0, CHILD_STATUS_PENDING);
       await petMonkey.connect(firstOwner).transferFromRmrk(
-        firstOwner.address, ownerChunky.address, childId, newParentId, true, CHILD_STATUS_UNKNOWN, 0, emptyData);
+        firstOwner.address, ownerChunky.address, childId, newParentId, CHILD_STATUS_UNKNOWN, 0, emptyData);
 
       const expected_pending = [ethers.BigNumber.from(childId), petMonkey.address, 0, partId];
       check_accepted_and_pending_children(ownerChunky, parentId, [], []);

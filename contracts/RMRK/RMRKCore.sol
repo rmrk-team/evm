@@ -216,7 +216,7 @@ contract RMRKCore is Context, IRMRKCore, RMRKMultiResource, RMRKNesting, RMRKRoy
     bytes memory data
   ) public virtual onlyApprovedOrOwner(tokenId) {
     //solhint-disable-next-line max-line-length
-    _transfer(from, to, tokenId, destinationId, false, ChildStatus.Unknown, 0, data);
+    _transfer(from, to, tokenId, destinationId, ChildStatus.Unknown, 0, data);
   }
 
   function transferFromRmrk(
@@ -224,12 +224,11 @@ contract RMRKCore is Context, IRMRKCore, RMRKMultiResource, RMRKNesting, RMRKRoy
     address to,
     uint256 tokenId,
     uint256 toTokenId,
-    bool destinationIsNft,  // We could tell this from the 'to'
     ChildStatus childStatus,
     uint256 childIndex,
     bytes memory data
   ) public virtual onlyApprovedOrOwner(tokenId){
-    _transfer(from, to, tokenId, toTokenId, destinationIsNft, childStatus, childIndex, data);
+    _transfer(from, to, tokenId, toTokenId, childStatus, childIndex, data);
   }
 
   /**
@@ -251,7 +250,6 @@ contract RMRKCore is Context, IRMRKCore, RMRKMultiResource, RMRKNesting, RMRKRoy
     address to,
     uint256 tokenId,
     uint256 toTokenId,
-    bool destinationIsNft,  // We could tell this from the 'to'
     ChildStatus childStatus,
     uint256 childIndex,
     bytes memory data
@@ -264,6 +262,7 @@ contract RMRKCore is Context, IRMRKCore, RMRKMultiResource, RMRKNesting, RMRKRoy
     // FIXME: balances are not tested and probably broken
     _balances[from] -= 1;
     RMRKOwner memory rmrkOwner = _RMRKOwners[tokenId];
+    bool destinationIsNft = isRMRKCore(from, to, tokenId, data);
 
     _RMRKOwners[tokenId] = RMRKOwner({
       ownerAddress: to,
@@ -476,8 +475,8 @@ contract RMRKCore is Context, IRMRKCore, RMRKMultiResource, RMRKNesting, RMRKRoy
       bytes memory _data
   ) private returns (bool) {
       if (to.isContract()) {
-          try IRMRKCore(to).isRMRKCore(_msgSender(), from, tokenId, _data) returns (bytes4 retval) {
-              return retval == IRMRKCore.isRMRKCore.selector;
+          try IRMRKCore(to).rmrkCoreCheck(_msgSender(), from, tokenId, _data) returns (bytes4 retval) {
+              return retval == IRMRKCore.rmrkCoreCheck.selector;
           } catch (bytes memory reason) {
               if (reason.length == 0) {
                   revert("RMRKCore: transfer to non RMRKCore implementer");
@@ -493,13 +492,31 @@ contract RMRKCore is Context, IRMRKCore, RMRKMultiResource, RMRKNesting, RMRKRoy
   }
 
   //This is not 100% secure -- a bytes4 function signature is replicable via brute force attacks.
-  function isRMRKCore(
+  function rmrkCoreCheck(
       address,
       address,
       uint256,
       bytes memory
   ) public virtual returns (bytes4) {
-      return IRMRKCore.isRMRKCore.selector;
+      return IRMRKCore.rmrkCoreCheck.selector;
+  }
+
+  function isRMRKCore(
+      address from,
+      address to,
+      uint256 tokenId,
+      bytes memory _data
+  ) internal virtual returns (bool) {
+    if (to.isContract()) {
+      try IRMRKCore(to).rmrkCoreCheck(_msgSender(), from, tokenId, _data) returns (bytes4 retval) {
+        return retval == IRMRKCore.rmrkCoreCheck.selector;
+      } catch {
+        return false;
+      }
+    }
+    else {
+      return false;
+    }
   }
 
   ////////////////////////////////////////
