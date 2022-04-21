@@ -98,7 +98,7 @@ contract RMRKCore is Context, IRMRKCore, RMRKMultiResource, RMRKNesting, RMRKRoy
   }
 
   function _mint(address to, uint256 tokenId, uint256 destinationId, bytes memory data) internal virtual {
-
+    // FIXME: We could use the isRMRKCore function here to decide instead
     if (data.length > 0) {
       _mintToNft(to, tokenId, destinationId, data);
     }
