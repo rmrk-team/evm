@@ -274,6 +274,7 @@ contract RMRKCore is Context, IRMRKCore, RMRKMultiResource, RMRKNesting, RMRKRoy
     if (rmrkOwner.isNft && rmrkOwner.ownerAddress != address(0)) {
       IRMRKNestingInternal parentContract = IRMRKNestingInternal(rmrkOwner.ownerAddress);
 
+      // FIXME: Must remove transfer approvals
       if (childStatus == ChildStatus.Pending){
         parentContract.rejectChild(rmrkOwner.tokenId, childIndex);
       }
