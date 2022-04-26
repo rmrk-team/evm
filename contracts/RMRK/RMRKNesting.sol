@@ -103,14 +103,14 @@ contract RMRKNesting is Context {
     uint256 length = _approvedTransfers[tokenId].length;
     if (length > 0) {
       if (status == ChildStatus.Unknown) {
-        for (uint256 i = 0; i < length; i++) {
+        for (uint256 i = 0; i < length; i.u_inc()) {
           ChildTransferApproval memory childApproval = _approvedTransfers[tokenId][i];
           if (childApproval.tokenId == childId && childApproval.contractAddress == sender) {
             return true;
           }
         }
       } else {
-        for (uint256 i = 0; i < length; i++) {
+        for (uint256 i = 0; i < length; i.u_inc()) {
           ChildTransferApproval memory childApproval = _approvedTransfers[tokenId][i];
           if (childApproval.status == status && childApproval.index == index && childApproval.contractAddress == sender) {
             return true;
