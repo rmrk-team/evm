@@ -36,7 +36,6 @@
     "eslint-plugin-promise": "^5.1.0",
     "ethereum-waffle": "^3.4.0",
     "ethers": "^5.0.0",
-    "hardhat-contract-sizer": "^2.5.1",
     "hardhat-gas-reporter": "^1.0.4",
     "prettier": "2.6.0",
     "prettier-plugin-solidity": "^1.0.0-beta.19",
