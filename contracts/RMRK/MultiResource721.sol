@@ -3,6 +3,7 @@
 pragma solidity ^0.8.9;
 
 import "./interfaces/IERC721.sol";
+import "./interfaces/IERC721Receiver.sol";
 import "./interfaces/IMultiResource.sol";
 import "./library/MultiResourceLib.sol";
 import "./utils/Address.sol";
@@ -197,7 +198,7 @@ contract MultiResourceToken is Context, IMultiResource, IERC721 {
     ) internal virtual {
         _transfer(from, to, tokenId);
         require(
-            _checkOnMultiResourceReceived(from, to, tokenId, data),
+            _checkOnERC721Received(from, to, tokenId, data),
             "MultiResource: transfer to non MultiResource Receiver implementer"
         );
     }
@@ -237,7 +238,7 @@ contract MultiResourceToken is Context, IMultiResource, IERC721 {
     ) internal virtual {
         _mint(to, tokenId);
         require(
-            _checkOnMultiResourceReceived(address(0), to, tokenId, data),
+            _checkOnERC721Received(address(0), to, tokenId, data),
             "MultiResource: transfer to non MultiResource Receiver implementer"
         );
     }
@@ -321,20 +322,20 @@ contract MultiResourceToken is Context, IMultiResource, IERC721 {
     }
 
 
-    function _checkOnMultiResourceReceived(
+    function _checkOnERC721Received(
         address from,
         address to,
         uint256 tokenId,
         bytes memory data
     ) private returns (bool) {
         if (to.isContract()) {
-            try IMultiResourceReceiver(to).onMultiResourceReceived(
+            try IERC721Receiver(to).onMultiResourceReceived(
                 _msgSender(),
                 from,
                 tokenId,
                 data
             ) returns (bytes4 retval) {
-                return retval == IMultiResourceReceiver.onMultiResourceReceived.selector;
+                return retval == IERC721Receiver.onERC721Received.selector;
             } catch (bytes memory reason) {
                 if (reason.length == 0) {
                     revert("MultiResource: transfer to non MultiResource Receiver implementer");

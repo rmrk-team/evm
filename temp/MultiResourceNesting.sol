@@ -2,14 +2,14 @@
 
 pragma solidity ^0.8.9;
 
-import "./interfaces/IERC721.sol";
+import "./interfaces/IRMRKNesting.sol";
 import "./interfaces/IMultiResource.sol";
 import "./library/MultiResourceLib.sol";
 import "./utils/Address.sol";
 import "./utils/Strings.sol";
 import "./utils/Context.sol";
 
-contract MultiResourceToken is Context, IMultiResource, IERC721 {
+contract NestingMultiResourceToken is Context, IMultiResource, IRMRKNesting {
 
     using MultiResourceLib for uint256;
     using MultiResourceLib for bytes8[];
