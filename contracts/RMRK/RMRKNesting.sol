@@ -587,7 +587,7 @@ function _baseURI() internal view virtual returns (string memory) {
   }
 
   //TODO Gotta ask steven about this one
-  function unnestToken(uint256 tokenId, uint256 parentId, address newOwner) public virtual onlyApprovedOrOwnerunnestToken(uint256 tokenId, uint256 parentId, address newOwner) internal {
+  function unnestToken(uint256 tokenId, uint256 parentId, address newOwner) public virtual onlyApprovedOrOwner(tokenId) {
     // A malicious contract which is parent to this token, could unnest any children and transfer to new owner
     RMRKOwner memory owner = _RMRKOwners[tokenId];
     require(
