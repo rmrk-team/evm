@@ -39,20 +39,20 @@ const config: HardhatUserConfig = {
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
     moonbaseAlpha: {
-      url: "https://rpc.testnet.moonbeam.network",
+      url: 'https://rpc.testnet.moonbeam.network',
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
     moonriver: {
-      url: "https://rpc.api.moonriver.moonbeam.network",
+      url: 'https://rpc.api.moonriver.moonbeam.network',
       chainId: 1285, // (hex: 0x505),
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
   },
   gasReporter: {
     enabled: process.env.REPORT_GAS !== undefined,
-    currency: "USD",
-    coinmarketcap: process.env.COIN_MARKET_CAP_KEY || "",
-    gasPrice: 50
+    currency: 'USD',
+    coinmarketcap: process.env.COIN_MARKET_CAP_KEY || '',
+    gasPrice: 50,
   },
   etherscan: {
     apiKey: process.env.ETHERSCAN_API_KEY,
