@@ -7,11 +7,11 @@ interface IRMRKNestingInternal {
         external view returns (address owner);
 
     function rmrkOwnerOf(uint256 tokenId)
-       external view returns (
-           address,
-           uint256,
-           bool
-       );
+        external view returns (
+            address,
+            uint256,
+            bool
+        );
 
     function _burnChildren(uint256 tokenId, address oldOwner) external;
 
@@ -21,21 +21,9 @@ interface IRMRKNestingInternal {
         address childTokenAddress
     ) external;
 
-    function addChildAccepted(
-        uint256 parentTokenId,
-        uint256 childTokenId,
-        address childTokenAddress
-    ) external;
-
     function acceptChild(
         uint256 parentTokenId,
         uint256 childTokenId
-    ) external;
-
-    function approveTransfer(
-        uint256 _tokenId,
-        uint256 childIndex,
-        uint8 status
     ) external;
 
     function rejectChild(
@@ -48,8 +36,14 @@ interface IRMRKNestingInternal {
         uint256 index
     ) external;
 
-    function removeOrRejectChild(
-        uint256 parentTokenId,
-        uint256 childTokenId
+    function unnestChild(
+        uint256 tokenId,
+        uint256 index
+    ) external;
+
+    function unnestToken(
+        uint256 tokenId,
+        uint256 parentId,
+        address parentAddress
     ) external;
 }

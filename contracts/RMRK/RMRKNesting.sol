@@ -21,23 +21,10 @@ contract RMRKNesting is Context {
     bytes8 partId;
   }
 
-  struct ChildTransferApproval {
-    uint256 tokenId;
-    uint256 index;
-    address contractAddress;
-    ChildStatus status;
-  }
-
   struct RMRKOwner {
     uint256 tokenId;
     address ownerAddress;
     bool isNft;
-  }
-
-  enum ChildStatus {
-      Unknown,
-      Pending,
-      Accepted
   }
 
   mapping(uint256 => RMRKOwner) internal _RMRKOwners;
@@ -48,8 +35,6 @@ contract RMRKNesting is Context {
 
   mapping(uint256 => Child[]) internal _pendingChildren;
 
-  mapping(uint256 => ChildTransferApproval[]) internal _approvedTransfers;
-
   //Nesting events
   event ChildProposed(uint parentTokenId);
   event ChildAccepted(uint tokenId);
@@ -57,6 +42,7 @@ contract RMRKNesting is Context {
   event PendingChildRemoved(uint tokenId, uint index);
   event AllPendingChildrenRemoved(uint tokenId);
   event ChildRemoved(uint tokenId, uint index);
+  event ChildUnnested(uint parentTokenId, uint childTokenId);
   //Gas check this, can emit lots of events. Possibly offset by gas savings from deleted arrays.
   event ChildBurned(uint tokenId);
 
@@ -96,31 +82,6 @@ contract RMRKNesting is Context {
     return (owner.ownerAddress, owner.tokenId, owner.isNft);
   }
 
-  /**
-    @dev Returns whether the child is approved for transfer by checking status + index + sender or childId + sender.
-  */
-  function _approvedForTransfer(uint256 tokenId, ChildStatus status, uint256 index, uint256 childId, address sender) internal view returns (bool) {
-    uint256 length = _approvedTransfers[tokenId].length;
-    if (length > 0) {
-      if (status == ChildStatus.Unknown) {
-        for (uint256 i = 0; i < length; i.u_inc()) {
-          ChildTransferApproval memory childApproval = _approvedTransfers[tokenId][i];
-          if (childApproval.tokenId == childId && childApproval.contractAddress == sender) {
-            return true;
-          }
-        }
-      } else {
-        for (uint256 i = 0; i < length; i.u_inc()) {
-          ChildTransferApproval memory childApproval = _approvedTransfers[tokenId][i];
-          if (childApproval.status == status && childApproval.index == index && childApproval.contractAddress == sender) {
-            return true;
-          }
-        }
-      }
-    }
-    return false;
-  }
-
   ////////////////////////////////////////
   //          CHILD MANAGEMENT
   ////////////////////////////////////////
@@ -138,11 +99,11 @@ contract RMRKNesting is Context {
     (address parent, , ) = childTokenContract.rmrkOwnerOf(childTokenId);
     require(parent == address(this), "Parent-child mismatch");
     Child memory child = Child({
-       contractAddress: childTokenAddress,
-       tokenId: childTokenId,
-       slotEquipped: 0,
-       partId: 0
-     });
+      contractAddress: childTokenAddress,
+      tokenId: childTokenId,
+      slotEquipped: 0,
+      partId: 0
+    });
     _addChildToPending(parentTokenId, child);
     emit ChildProposed(parentTokenId);
   }
@@ -168,21 +129,6 @@ contract RMRKNesting is Context {
     emit ChildAccepted(_tokenId);
   }
 
-  function _addChildAccepted(uint parentTokenId, uint childTokenId, address childTokenAddress) internal virtual {
-    IRMRKNestingInternal childTokenContract = IRMRKNestingInternal(childTokenAddress);
-    (address parent, , ) = childTokenContract.rmrkOwnerOf(childTokenId);
-    require(parent == address(this), "Parent-child mismatch");
-    Child memory child = Child({
-       contractAddress: childTokenAddress,
-       tokenId: childTokenId,
-       slotEquipped: 0,
-       partId: 0
-     });
-    _addChildToChildren(parentTokenId, child);
-    // FIXME: Should it also emmit ChildProposed?
-    emit ChildAccepted(parentTokenId);
-  }
-
   /**
   @dev Deletes all pending children.
   */
@@ -190,24 +136,6 @@ contract RMRKNesting is Context {
   function _rejectAllChildren(uint256 _tokenId) internal {
     delete(_pendingChildren[_tokenId]);
     emit AllPendingChildrenRemoved(_tokenId);
-  }
-
-  /**
-  @dev Approves the future transfer of a child, which implies removing it from the children
-  */
-
-  function _approveTransfer(uint256 _tokenId, uint256 childIndex, ChildStatus status) internal {
-    if (status == ChildStatus.Accepted){
-      Child memory child = _children[_tokenId][childIndex];
-      _addChildToApprovedTransfers(_tokenId, child, ChildStatus.Accepted, childIndex);
-    }
-    else if (status == ChildStatus.Pending){
-      Child memory child = _pendingChildren[_tokenId][childIndex];
-      _addChildToApprovedTransfers(_tokenId, child, ChildStatus.Pending, childIndex);
-    }
-    else {
-      revert("RMRKCore: Invalid child status");
-    }
   }
 
   /**
@@ -237,71 +165,41 @@ contract RMRKNesting is Context {
     emit ChildRemoved(_tokenId, index);
   }
 
-  /**
-  @dev Deletes a single child from the pending or child array by matching the child id and the caller address.
-    Should only called from the child contract and it is very gas inefficient.
-  */
-
-  function _removeOrRejectChild(uint256 _tokenId, uint256 _childId) internal {
-    (ChildStatus status, uint256 index) = _find_status_and_index(_tokenId, _childId, msg.sender);
-    if (status == ChildStatus.Pending){
-      _rejectChild(_tokenId, index);
-      return;
-    }
-    else if (status == ChildStatus.Accepted){
-      _removeChild(_tokenId, index);
-      return;
-    }
-    revert("RMRKCore: Invalid child status");
+  function _unnestChild(uint256 tokenId, uint256 index) internal {
+    require(
+      _children[tokenId].length > index,
+      "RMRKcore: Child index out of range"
+    );
+    Child memory child = _children[tokenId][index];
+    removeItemByIndex_C(_children[tokenId], index);
+    IRMRKNestingInternal(child.contractAddress).unnestToken(child.tokenId, tokenId, _RMRKOwners[tokenId].ownerAddress);
+    emit ChildUnnested(tokenId, child.tokenId);
   }
 
+  function _unnestToken(uint256 tokenId, uint256 parentId, address newOwner) internal {
+    RMRKOwner memory owner = _RMRKOwners[tokenId];
+    require(
+      owner.ownerAddress != address(0),
+      "RMRKCore: unnest for nonexistent token"
+    );
+    require(
+      owner.isNft,
+      "RMRKCore: unnest for non-NFT parent"
+    );
+    require(
+      owner.tokenId == parentId,
+      "RMRKCore: unnest from wrong parent"
+    );
+    require(
+      owner.ownerAddress == msg.sender,
+      "RMRKCore: unnest from wrong owner"
+    );
+    _RMRKOwners[tokenId] = RMRKOwner({
+      ownerAddress: newOwner,
+      tokenId: 0,
+      isNft: false
+    });
 
-  /**
-  @dev Identifies status and index or the given childId and address.
-  */
-
-  function _find_status_and_index(uint256 _tokenId, uint256 _childId, address childContractAddress) internal view returns (ChildStatus, uint256) {
-    // Check in accepted
-    uint256 length = _children[_tokenId].length;
-    if (length > 0) {
-      for (uint i = 0; i < length; i = i.u_inc()) {
-        Child memory child = _children[_tokenId][i];
-        if (child.tokenId == _childId && child.contractAddress == childContractAddress) {
-          return (ChildStatus.Accepted, i);
-        }
-      }
-    }
-    // Check in pending
-    length = _pendingChildren[_tokenId].length;
-    if (length > 0) {
-      for (uint i = 0; i < length; i = i.u_inc()) {
-        Child memory child = _pendingChildren[_tokenId][i];
-        if (child.tokenId == _childId && child.contractAddress == childContractAddress) {
-          return (ChildStatus.Pending, i);
-        }
-      }
-    }
-    revert("RMRKCore: Child not found in pending nor accepted");
-  }
-
-
-  /**
-  @dev Adds an instance of Child to the approved transfers children array for _tokenId. This is hardcoded to be 128 by default.
-  */
-
-  function _addChildToApprovedTransfers(uint256 _tokenId, Child memory _child, ChildStatus _status, uint256 _index) internal {
-    if(_approvedTransfers[_tokenId].length < 128) {
-      ChildTransferApproval memory childApproval = ChildTransferApproval({
-        tokenId: _child.tokenId,
-        index: _index,
-        contractAddress: _child.contractAddress,
-        status: _status
-      });
-      _approvedTransfers[_tokenId].push(childApproval);
-    } else {
-      revert("RMRKCore: Max approved transfer reached");
-    }
-    emit ChildTransferApproved(_tokenId);
   }
 
 

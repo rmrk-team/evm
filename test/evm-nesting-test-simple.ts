@@ -23,10 +23,6 @@ describe('Nesting', async () => {
   const emptyData = ethers.utils.hexZeroPad('0x', 0);
   const partId = ethers.utils.hexZeroPad('0x0', 8);
 
-  const CHILD_STATUS_UNKNOWN = 0;
-  const CHILD_STATUS_PENDING = 1;
-  const CHILD_STATUS_ACCEPTED = 2;
-
 
   beforeEach(async function () {
     const [signersOwner, ...signersAddr] = await ethers.getSigners();
@@ -574,11 +570,11 @@ describe('Nesting', async () => {
       await petMonkey.connect(firstOwner).doMint(firstOwner.address, tokenId);
       await petMonkey.connect(firstOwner).approve(approved.address, tokenId);
 
-      await petMonkey.connect(firstOwner).transferFrom(firstOwner.address, newOwner.address, tokenId, 0, emptyData);
+      await petMonkey.connect(approved).transferFrom(firstOwner.address, newOwner.address, tokenId, 0, emptyData);
       expect(await petMonkey.ownerOf(tokenId)).to.eql(newOwner.address);
     });
 
-    it('can transfer parent token to address and owners are ok', async function () {
+    it('can transfer not nested token to address and owners are ok', async function () {
       const newOwner = addrs[2];
       const {childId, parentId, firstOwner} = await mintTofirstOwner();
       await ownerChunky.connect(firstOwner).transferFrom(firstOwner.address, newOwner.address, parentId, 0, emptyData);
@@ -592,10 +588,9 @@ describe('Nesting', async () => {
       expect(await petMonkey.ownerOf(childId)).to.eql(newOwner.address);
       expect(await petMonkey.rmrkOwnerOf(childId)).to.eql(
         [ ownerChunky.address, ethers.BigNumber.from(parentId), true]);
-
     });
 
-    it('can transfer parent token to address and children are ok', async function () {
+    it('can transfer not nested token to address and children are ok', async function () {
       const newOwner = addrs[2];
       const {childId, parentId, firstOwner} = await mintTofirstOwner();
       await ownerChunky.connect(firstOwner).transferFrom(firstOwner.address, newOwner.address, parentId, 0, emptyData);
@@ -607,98 +602,28 @@ describe('Nesting', async () => {
       ]);
     });
 
-    it('can transfer accepted child to token with same owner, child is in accepted', async function () {
+    it('cannot transfer nested child', async function () {
       const newParentId = 12; // owner is firstOwner
       const {childId, parentId, firstOwner} = await mintTofirstOwner(true);
 
-      await ownerChunky.connect(firstOwner).approveTransfer(parentId, 0, CHILD_STATUS_ACCEPTED);
-      await petMonkey.connect(firstOwner).transferFromRmrk(
-        firstOwner.address, ownerChunky.address, childId, newParentId, CHILD_STATUS_ACCEPTED, 0, emptyData);
-
-      const expected_accepted = [ethers.BigNumber.from(childId), petMonkey.address, 0, partId];
-      check_accepted_and_pending_children(ownerChunky, parentId, [], []);
-      check_accepted_and_pending_children(ownerChunky, newParentId, expected_accepted, []);
-    });
-
-    it('can transfer accepted child to token with different owner, child is in pending', async function () {
-      const {childId, parentId, firstOwner} = await mintTofirstOwner(true);
-      const newParentId = 5; // owned by addrs[0]
-
-      await ownerChunky.connect(firstOwner).approveTransfer(parentId, 0, CHILD_STATUS_ACCEPTED);
-      await petMonkey.connect(firstOwner).transferFromRmrk(
-        firstOwner.address, ownerChunky.address, childId, newParentId, CHILD_STATUS_ACCEPTED, 0, emptyData);
-
-      const expected_pending = [ethers.BigNumber.from(childId), petMonkey.address, 0, partId];
-      check_accepted_and_pending_children(ownerChunky, parentId, [], []);
-      check_accepted_and_pending_children(ownerChunky, newParentId, [], expected_pending);
-    });
-
-    it('can transfer pending child to token with same owner, child is in pending', async function () {
-      const newParentId = 12; // owner is firstOwner
-      const {childId, parentId, firstOwner} = await mintTofirstOwner();
-
-      await ownerChunky.connect(firstOwner).approveTransfer(parentId, 0, CHILD_STATUS_PENDING);
-      await petMonkey.connect(firstOwner).transferFromRmrk(
-        firstOwner.address, ownerChunky.address, childId, newParentId, CHILD_STATUS_PENDING, 0, emptyData);
-
-      const expected_pending = [ethers.BigNumber.from(childId), petMonkey.address, 0, partId];
-      check_accepted_and_pending_children(ownerChunky, parentId, [], []);
-      check_accepted_and_pending_children(ownerChunky, newParentId, [], expected_pending);
-    });
-
-    it('can transfer pending child to token with different owner, child is pending', async function () {
-      const {childId, parentId, firstOwner} = await mintTofirstOwner();
-      const newParentId = 5; // owned by addrs[0]
-
-      await ownerChunky.connect(firstOwner).approveTransfer(parentId, 0, CHILD_STATUS_PENDING);
-      await petMonkey.connect(firstOwner).transferFromRmrk(
-        firstOwner.address, ownerChunky.address, childId, newParentId, CHILD_STATUS_PENDING, 0, emptyData);
-
-      const expected_pending = [ethers.BigNumber.from(childId), petMonkey.address, 0, partId];
-      check_accepted_and_pending_children(ownerChunky, parentId, [], []);
-      check_accepted_and_pending_children(ownerChunky, newParentId, [], expected_pending);
+      await expect(
+        petMonkey.connect(firstOwner).transferFrom(
+          firstOwner.address, ownerChunky.address, childId, newParentId, emptyData
+        )
+      ).to.be.revertedWith("RMRKCore: Must unnest first");
     });
 
     it('can transfer parent token to token with same owner, family tree is ok', async function () {
       const newParentId = 12; // owner is firstOwner
       const {childId, parentId, firstOwner} = await mintTofirstOwner(true);
 
-      await ownerChunky.connect(firstOwner).approveTransfer(parentId, 0, CHILD_STATUS_ACCEPTED);
-      await ownerChunky.connect(firstOwner).transferFromRmrk(
-        firstOwner.address, ownerChunky.address, parentId, newParentId, CHILD_STATUS_ACCEPTED, 0, emptyData);
+      await ownerChunky.connect(firstOwner).transferFrom(
+        firstOwner.address, ownerChunky.address, parentId, newParentId, emptyData);
 
       let expected_accepted = [ethers.BigNumber.from(childId), petMonkey.address, 0, partId];
       check_accepted_and_pending_children(ownerChunky, parentId, expected_accepted, []);
       expected_accepted = [ethers.BigNumber.from(parentId), ownerChunky.address, 0, partId];
       check_accepted_and_pending_children(ownerChunky, newParentId, expected_accepted, []);
-    });
-
-    it('can transfer accepted child to token with same owner not setting the status, child is in accepted', async function () {
-      const newParentId = 12; // owner is firstOwner
-      const {childId, parentId, firstOwner} = await mintTofirstOwner(true);
-
-      // Does not make much sense to know the status on approval but not on transfer. But we test it anyway.
-      await ownerChunky.connect(firstOwner).approveTransfer(parentId, 0, CHILD_STATUS_ACCEPTED);
-      await petMonkey.connect(firstOwner).transferFromRmrk(
-        firstOwner.address, ownerChunky.address, childId, newParentId, CHILD_STATUS_UNKNOWN, 0, emptyData);
-
-      const expected_accepted = [ethers.BigNumber.from(childId), petMonkey.address, 0, partId];
-      check_accepted_and_pending_children(ownerChunky, parentId, [], []);
-      check_accepted_and_pending_children(ownerChunky, newParentId, expected_accepted, []);
-    });
-
-    it('can transfer pending child to token with same owner not setting the status, child is in pending', async function () {
-      const newParentId = 12; // owner is firstOwner
-      const {childId, parentId, firstOwner} = await mintTofirstOwner();
-
-      // Does not make much sense to know the status on approval but not on transfer. But we test it anyway.
-      await ownerChunky.connect(firstOwner).approveTransfer(parentId, 0, CHILD_STATUS_PENDING);
-      await petMonkey.connect(firstOwner).transferFromRmrk(
-        firstOwner.address, ownerChunky.address, childId, newParentId, CHILD_STATUS_UNKNOWN, 0, emptyData);
-
-      const expected_pending = [ethers.BigNumber.from(childId), petMonkey.address, 0, partId];
-      check_accepted_and_pending_children(ownerChunky, parentId, [], []);
-      check_accepted_and_pending_children(ownerChunky, newParentId, [], expected_pending);
     });
 
   });
