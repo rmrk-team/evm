@@ -8,12 +8,16 @@ import "./interfaces/IRMRKNesting.sol";
 import "./interfaces/IRMRKNestingReceiver.sol";
 import "./interfaces/IERC721Receiver.sol";
 import "./library/RMRKLib.sol";
+import "./utils/Address.sol";
+import "./utils/Strings.sol";
 import "./utils/Context.sol";
 import "hardhat/console.sol";
 
 contract RMRKNesting is Context, IRMRKNesting {
 
   using RMRKLib for uint256;
+  using Address for address;
+  using Strings for uint256;
 
   struct RMRKOwner {
     uint256 tokenId;
@@ -111,6 +115,31 @@ contract RMRKNesting is Context, IRMRKNesting {
     require(owner.ownerAddress != address(0), "RMRKCore: owner query for nonexistent token");
     return (owner.ownerAddress, owner.tokenId, owner.isNft);
   }
+
+  function tokenURI(uint256 tokenId) public view virtual returns (string memory) {
+    //TODO: Discuss removing this check
+    _requireMinted(tokenId);
+
+    string memory baseURI = _baseURI();
+    return bytes(baseURI).length > 0 ? string(abi.encodePacked(baseURI, tokenId.toString())) : "";
+}
+
+/**
+ * @dev Reverts if the `tokenId` has not been minted yet.
+ */
+function _requireMinted(uint256 tokenId) internal view virtual {
+    require(_exists(tokenId), "ERC721: invalid token ID");
+}
+
+
+/**
+ * @dev Base URI for computing {tokenURI}. If set, the resulting URI for each
+ * token will be the concatenation of the `baseURI` and the `tokenId`. Empty
+ * by default, can be overridden in child contracts.
+ */
+function _baseURI() internal view virtual returns (string memory) {
+    return "";
+}
 
   ////////////////////////////////////////
   //              MINTING
@@ -257,12 +286,12 @@ contract RMRKNesting is Context, IRMRKNesting {
       uint256 tokenId,
       uint256 destinationId,
       bytes memory data
-  ) public virtual override {
+  ) public virtual {
       require(
           _isApprovedOrOwner(_msgSender(), tokenId),
           "MultiResource: transfer caller is not owner nor approved"
       );
-      _safeTransfer(from, to, tokenId, data);
+      _safeTransfer(from, to, tokenId, destinationId, data);
   }
 
   function _safeTransfer(
@@ -466,9 +495,9 @@ contract RMRKNesting is Context, IRMRKNesting {
 
   /**
    * @dev Function designed to be used by other instances of RMRK-Core contracts to update children.
-   * param1 childAddress is the address of the child contract as an IRMRKCore instance
-   * param2 parentTokenId is the tokenId of the parent token on (this).
-   * param3 childTokenId is the tokenId of the child instance
+   * param1 parentTokenId is the tokenId of the parent token on (this).
+   * param2 childTokenId is the tokenId of the child instance
+   * param3 childAddress is the address of the child contract as an IRMRKCore instance
    */
 
   //update for reentrancy
@@ -476,7 +505,7 @@ contract RMRKNesting is Context, IRMRKNesting {
     uint256 parentTokenId,
     uint256 childTokenId,
     address childTokenAddress
-  ) public virtual onlyApprovedOrOwner {
+  ) public virtual onlyApprovedOrOwner(parentTokenId) {
     IRMRKNesting childTokenContract = IRMRKNesting(childTokenAddress);
     (address parent, , ) = childTokenContract.rmrkOwnerOf(childTokenId);
     require(parent == address(this), "Parent-child mismatch");
@@ -496,7 +525,7 @@ contract RMRKNesting is Context, IRMRKNesting {
   */
 
   //CHECK: preload mappings into memory for gas savings
-  function acceptChild(uint256 _tokenId, uint256 index) public virtual onlyApprovedOrOwner {
+  function acceptChild(uint256 _tokenId, uint256 index) public virtual onlyApprovedOrOwner(_tokenId) {
     require(
       _pendingChildren[_tokenId].length > index,
       "RMRKcore: Pending child index out of range"
@@ -514,7 +543,7 @@ contract RMRKNesting is Context, IRMRKNesting {
   /**
   @dev Deletes all pending children.
   */
-  function rejectAllChildren(uint256 _tokenId) public virtual onlyApprovedOrOwner {
+  function rejectAllChildren(uint256 _tokenId) public virtual onlyApprovedOrOwner(_tokenId) {
     delete(_pendingChildren[_tokenId]);
     emit AllPendingChildrenRemoved(_tokenId);
   }
@@ -523,7 +552,7 @@ contract RMRKNesting is Context, IRMRKNesting {
   @dev Deletes a single child from the pending array by index.
   */
 
-  function rejectChild(uint256 _tokenId, uint256 index) public virtual onlyApprovedOrOwner {
+  function rejectChild(uint256 _tokenId, uint256 index) public virtual onlyApprovedOrOwner(_tokenId) {
     require(
       _pendingChildren[_tokenId].length > index,
       "RMRKcore: Pending child index out of range"
@@ -536,7 +565,7 @@ contract RMRKNesting is Context, IRMRKNesting {
   @dev Deletes a single child from the child array by index.
   */
 
-  function removeChild(uint256 _tokenId, uint256 index) public virtual onlyApprovedOrOwner {
+  function removeChild(uint256 _tokenId, uint256 index) public virtual onlyApprovedOrOwner(_tokenId) {
     require(
       _children[_tokenId].length > index,
       "RMRKcore: Child index out of range"
@@ -546,7 +575,7 @@ contract RMRKNesting is Context, IRMRKNesting {
     emit ChildRemoved(_tokenId, index);
   }
 
-  function unnestChild(uint256 tokenId, uint256 index) public virtual onlyApprovedOrOwner {
+  function unnestChild(uint256 tokenId, uint256 index) public virtual onlyApprovedOrOwner(tokenId) {
     require(
       _children[tokenId].length > index,
       "RMRKcore: Child index out of range"
@@ -558,7 +587,7 @@ contract RMRKNesting is Context, IRMRKNesting {
   }
 
   //TODO Gotta ask steven about this one
-  function _unnestToken(uint256 tokenId, uint256 parentId, address newOwner) public virtual onlyApprovedOrOwner {
+  function unnestToken(uint256 tokenId, uint256 parentId, address newOwner) public virtual onlyApprovedOrOwner( tokenId) {
     RMRKOwner memory owner = _RMRKOwners[tokenId];
     require(
       owner.ownerAddress != address(0),
@@ -665,10 +694,10 @@ contract RMRKNesting is Context, IRMRKNesting {
   ) private returns (bool) {
       if (to.isContract()) {
           try IRMRKNestingReceiver(to).onRMRKNestingReceived(_msgSender(), from, tokenId, _data) returns (bytes4 retval) {
-              return retval == IRMRKNesting.onRMRKNestingReceived.selector;
+              return retval == IRMRKNestingReceiver.onRMRKNestingReceived.selector;
           } catch (bytes memory reason) {
               if (reason.length == 0) {
-                  revert("RMRKCore: transfer to non RMRKCore implementer");
+                  revert("RMRKNesting: transfer to non RMRKNesting implementer");
               } else {
                   assembly {
                       revert(add(32, reason), mload(reason))
@@ -687,7 +716,7 @@ contract RMRKNesting is Context, IRMRKNesting {
       bytes memory data
   ) private returns (bool) {
       if (to.isContract()) {
-          try IERC721Receiver(to).onMultiResourceReceived(
+          try IERC721Receiver(to).onERC721Received(
               _msgSender(),
               from,
               tokenId,
@@ -696,7 +725,7 @@ contract RMRKNesting is Context, IRMRKNesting {
               return retval == IERC721Receiver.onERC721Received.selector;
           } catch (bytes memory reason) {
               if (reason.length == 0) {
-                  revert("MultiResource: transfer to non MultiResource Receiver implementer");
+                  revert("ERC721: transfer to non ERC721 Receiver implementer");
               } else {
                   assembly {
                       revert(add(32, reason), mload(reason))
@@ -706,6 +735,11 @@ contract RMRKNesting is Context, IRMRKNesting {
       } else {
           return true;
       }
+  }
+
+  //Make also return true for ERC721?
+  function supportsInterface(bytes4 interfaceId) public pure returns (bool) {
+      return interfaceId == type(IRMRKNesting).interfaceId;
   }
 
   //HELPERS

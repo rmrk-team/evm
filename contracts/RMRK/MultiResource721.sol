@@ -329,7 +329,7 @@ contract MultiResourceToken is Context, IMultiResource, IERC721 {
         bytes memory data
     ) private returns (bool) {
         if (to.isContract()) {
-            try IERC721Receiver(to).onMultiResourceReceived(
+            try IERC721Receiver(to).onERC721Received(
                 _msgSender(),
                 from,
                 tokenId,
