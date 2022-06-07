@@ -1,15 +1,15 @@
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
-import { Contract } from 'ethers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { RMRKCoreMock } from './typechain'
 
 // TODO: Transfer - transfer now does double duty as removeChild
 
 describe('Nesting', async () => {
   let owner: SignerWithAddress;
   let addrs: SignerWithAddress[];
-  let ownerChunky: Contract;
-  let petMonkey: Contract;
+  let ownerChunky: RMRKCoreMock;
+  let petMonkey: RMRKCoreMock;
 
   const name = 'ownerChunky';
   const symbol = 'CHNKY';
@@ -767,7 +767,7 @@ describe('Nesting', async () => {
   }
 
   async function checkAcceptedAndPendingChildren(
-    contract: any,
+    contract: RMRKCoreMock,
     tokenId: number,
     expectedAccepted: any,
     expectedPending: any,
