@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { RMRKCoreMock } from './typechain'
+import { RMRKCoreMock } from '../typechain'
 
 // TODO: Transfer - transfer now does double duty as removeChild
 
