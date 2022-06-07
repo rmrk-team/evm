@@ -36,6 +36,7 @@ contract RMRKNesting is Context {
   mapping(uint256 => Child[]) internal _pendingChildren;
 
   //Nesting events
+  //MIGRATE THESE TO INTERFACE AFTER WORKING
   event ChildProposed(uint parentTokenId);
   event ChildAccepted(uint tokenId);
   event ChildTransferApproved(uint tokenId);  // FIXME: untested

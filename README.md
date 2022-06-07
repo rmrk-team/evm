@@ -2,11 +2,17 @@
 
 A set of Solidity contracts for RMRK.app.
 
-## Core
+Please note that any implementations which are not marked `//////EXAMPLE//////` will not include any externally accessible functions which may modify the state of a user-owned token without that user's express authorization. Implementers are advised to inherit from these contracts and create a top-level wrapper that defines the logic of these functions as per the needs of their own deployment.
 
-Multi resource and nesting ability.
+## Multiresource
 
-Use Core2.sol, Core.sol was an attempt at making it ERC721 BC but I ran into difficulties and decided to build from the ground up instead and add BC later.
+# Interface
+
+This interface defines the standard for RMRK multi-resource tokens. While this repository will not enforce inheritance from another interface that defines a spec for token provenance or transfer, please note that most practical implementations will do so, the implementation provided in this repository included.
+
+# Implementation
+
+Provided are two examples of a RMRK multiresource token -- one which inherits from ERC721, and one which inherits from RMRK nesting, which may be considered a ERC721 compatible replacement.
 
 ## Settings
 

@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.0;
 
-import "./IRMRKMultiResource.sol";
+import "./IMultiResource.sol";
 import "./IRMRKNesting.sol";
 import "./IRMRKRoyalties.sol";
 

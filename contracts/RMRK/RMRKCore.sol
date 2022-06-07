@@ -39,7 +39,7 @@ contract RMRKCore is Context, IRMRKCore, RMRKMultiResource, RMRKNesting, RMRKRoy
     );
     _;
   }
-  
+
   /*
   TODOS:
   Isolate _transfer() branches in own functions
