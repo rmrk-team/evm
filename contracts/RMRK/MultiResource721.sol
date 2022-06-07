@@ -10,7 +10,7 @@ import "./utils/Address.sol";
 import "./utils/Strings.sol";
 import "./utils/Context.sol";
 
-contract MultiResourceToken is Context, IMultiResource, IERC721 {
+contract MultiResource721 is Context, IMultiResource, IERC721 {
 
     using MultiResourceLib for uint256;
     using MultiResourceLib for bytes8[];
