@@ -177,6 +177,7 @@ contract RMRKNesting is Context {
   }
 
   function _unnestToken(uint256 tokenId, uint256 parentId, address newOwner) internal {
+    // A malicious contract which is parent to this token, could unnest any children and transfer to new owner
     RMRKOwner memory owner = _RMRKOwners[tokenId];
     require(
       owner.ownerAddress != address(0),
@@ -229,6 +230,7 @@ contract RMRKNesting is Context {
   //recursively calls _burnChildren on all children
   //update for reentrancy
   function _burnChildren(uint256 tokenId, address oldOwner) public virtual {
+    // A malicious contract which is parent to this token, could burn any children
     (address _RMRKOwner, , ) = rmrkOwnerOf(tokenId);
     require(_RMRKOwner == _msgSender(), "Caller is not RMRKOwner contract");
     _balances[oldOwner] -= 1;
