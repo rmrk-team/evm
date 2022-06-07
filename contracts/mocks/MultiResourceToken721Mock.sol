@@ -2,14 +2,14 @@
 
 pragma solidity ^0.8.9;
 
-import "../RMRK/MultiResource721.sol";
+import "../RMRK/MultiResourceToken721.sol";
 
-contract MultiResource721Mock is MultiResource721 {
+contract MultiResourceToken721Mock is MultiResourceToken721 {
 
     address private _issuer;
 
     constructor(string memory name, string memory symbol)
-        MultiResource721(name, symbol)
+        MultiResourceToken721(name, symbol)
     {
         _setIssuer(_msgSender());
     }
