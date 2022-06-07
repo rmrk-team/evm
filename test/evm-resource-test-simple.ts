@@ -4,7 +4,6 @@ import { Contract } from 'ethers';
 import { RMRKResourceCore } from '../typechain';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 
-
 describe('Resources', async () => {
   let resourceStorage: RMRKResourceCore;
 
@@ -102,16 +101,32 @@ describe('Resources', async () => {
       const resId16 = ethers.utils.hexDataSlice(resId32, 0, 16);
 
       // Check on and offchain kekkac256 method
-      const testKec = await rmrkNft.hashResource16(resourceStorage.address, resArr[resourceIndex].id);
+      const testKec = await rmrkNft.hashResource16(
+        resourceStorage.address,
+        resArr[resourceIndex].id,
+      );
       expect(testKec).to.equal(resId16);
 
-      const targetResultArr = [resArr[resourceIndex].id, resArr[resourceIndex].src, resArr[resourceIndex].thumb, resArr[resourceIndex].metadataURI];
+      const targetResultArr = [
+        resArr[resourceIndex].id,
+        resArr[resourceIndex].src,
+        resArr[resourceIndex].thumb,
+        resArr[resourceIndex].metadataURI,
+      ];
 
       // add resource
-      await expect(rmrkNft
-        .connect(owner)
-        .addResourceEntry(resArr[resourceIndex].id, resArr[resourceIndex].src, resArr[resourceIndex].thumb, resArr[resourceIndex].metadataURI))
-        .to.emit(rmrkNft, 'ResourceStorageSet').withArgs(resArr[resourceIndex].id);
+      await expect(
+        rmrkNft
+          .connect(owner)
+          .addResourceEntry(
+            resArr[resourceIndex].id,
+            resArr[resourceIndex].src,
+            resArr[resourceIndex].thumb,
+            resArr[resourceIndex].metadataURI,
+          ),
+      )
+        .to.emit(rmrkNft, 'ResourceStorageSet')
+        .withArgs(resArr[resourceIndex].id);
 
       expect(await resourceStorage.getResource(resArr[resourceIndex].id)).to.eql(targetResultArr);
     });
@@ -121,7 +136,12 @@ describe('Resources', async () => {
       await expect(
         rmrkNft
           .connect(addrs[1])
-          .addResourceEntry(resArr[resourceIndex].id, resArr[resourceIndex].src, resArr[resourceIndex].thumb, resArr[resourceIndex].metadataURI),
+          .addResourceEntry(
+            resArr[resourceIndex].id,
+            resArr[resourceIndex].src,
+            resArr[resourceIndex].thumb,
+            resArr[resourceIndex].metadataURI,
+          ),
       ).to.be.reverted;
     });
 
@@ -130,22 +150,24 @@ describe('Resources', async () => {
       const resourceIndex = 0;
 
       const resId16 = await _addResource(resourceIndex);
-      await expect(rmrkNft
-        .connect(owner)
-        .addResource(
-          tokenId,
-          resourceStorage.address,
-          resArr[0].id,
-          ethers.utils.hexZeroPad("0x0", 16),
-        ))
-        .to.emit(rmrkNft, 'ResourceAddedToToken').withArgs(tokenId, resId16);
+      await expect(
+        rmrkNft
+          .connect(owner)
+          .addResource(
+            tokenId,
+            resourceStorage.address,
+            resArr[0].id,
+            ethers.utils.hexZeroPad('0x0', 16),
+          ),
+      )
+        .to.emit(rmrkNft, 'ResourceAddedToToken')
+        .withArgs(tokenId, resId16);
 
       // Get pending resources
       expect(await rmrkNft.getPendingResources(tokenId)).to.eql([resId16]);
 
       // Get renderable resources - should return none
       expect(await rmrkNft.getActiveResources(tokenId)).to.eql([]);
-
     });
 
     it('reverts if not issuer tries to add resource to token', async function () {
@@ -161,21 +183,21 @@ describe('Resources', async () => {
             resourceStorage.address,
             resArr[resourceIndex].id,
             ethers.utils.hexZeroPad('0x0', 16),
-          )
+          ),
       ).to.be.reverted;
     });
 
     it('cannot add too many pending resources', async () => {
       const tokenId = 1;
-      const overwrites = ethers.utils.hexZeroPad("0x0", 16);
+      const overwrites = ethers.utils.hexZeroPad('0x0', 16);
       let resourceId: string;
 
       // First 127 should be fine.
       for (let i = 1; i <= 128; i++) {
         resourceId = ethers.utils.hexZeroPad(ethers.utils.hexValue(i), 8);
         await rmrkNft
-        .connect(owner)
-        .addResourceEntry( resourceId, resArr[0].src, resArr[0].thumb, resArr[0].metadataURI);
+          .connect(owner)
+          .addResourceEntry(resourceId, resArr[0].src, resArr[0].thumb, resArr[0].metadataURI);
 
         await rmrkNft
           .connect(owner)
@@ -184,14 +206,14 @@ describe('Resources', async () => {
 
       resourceId = ethers.utils.hexZeroPad(ethers.utils.hexValue(129), 8);
       await rmrkNft
-      .connect(owner)
-      .addResourceEntry(resourceId, resArr[0].src, resArr[0].thumb, resArr[0].metadataURI);
+        .connect(owner)
+        .addResourceEntry(resourceId, resArr[0].src, resArr[0].thumb, resArr[0].metadataURI);
 
       await expect(
         rmrkNft
-        .connect(owner)
-        .addResource(tokenId, resourceStorage.address, resourceId, overwrites),
-        ).to.be.revertedWith('RMRKCore: Max pending resources reached');
+          .connect(owner)
+          .addResource(tokenId, resourceStorage.address, resourceId, overwrites),
+      ).to.be.revertedWith('RMRKCore: Max pending resources reached');
     });
 
     it('can add same resource to 2 different tokens', async function () {
@@ -207,9 +229,8 @@ describe('Resources', async () => {
           tokenId,
           resourceStorage.address,
           resArr[resourceIndex].id,
-          ethers.utils.hexZeroPad("0x0", 16),
+          ethers.utils.hexZeroPad('0x0', 16),
         );
-
 
       await rmrkNft
         .connect(owner)
@@ -217,7 +238,7 @@ describe('Resources', async () => {
           otherTokenId,
           resourceStorage.address,
           resArr[resourceIndex].id,
-          ethers.utils.hexZeroPad("0x0", 16),
+          ethers.utils.hexZeroPad('0x0', 16),
         );
 
       // Get pending resources
@@ -227,11 +248,9 @@ describe('Resources', async () => {
       // Get renderable resources - should return none
       expect(await rmrkNft.getActiveResources(tokenId)).to.eql([]);
       expect(await rmrkNft.getActiveResources(otherTokenId)).to.eql([]);
-
     });
 
     it('cannot add the same resource twice', async function () {
-
       const resourceIndex = 0;
       await _addResource(resourceIndex);
 
@@ -239,9 +258,13 @@ describe('Resources', async () => {
       await expect(
         rmrkNft
           .connect(owner)
-          .addResourceEntry(resArr[resourceIndex].id, resArr[resourceIndex].src, resArr[resourceIndex].thumb, resArr[resourceIndex].metadataURI),
+          .addResourceEntry(
+            resArr[resourceIndex].id,
+            resArr[resourceIndex].src,
+            resArr[resourceIndex].thumb,
+            resArr[resourceIndex].metadataURI,
+          ),
       ).to.be.revertedWith('RMRK: resource already exists');
-
     });
 
     it('cannot add resource with id 0', async function () {
@@ -260,7 +283,6 @@ describe('Resources', async () => {
     });
 
     it('cannot add the same resource to the same token twice', async function () {
-
       const tokenId = 1;
       const resourceIndex = 0;
       await _addResourceAndAddToToken(resourceIndex, tokenId);
@@ -278,7 +300,6 @@ describe('Resources', async () => {
     });
 
     it('cannot add resource with not added resource id to a token', async function () {
-
       const tokenId = 1;
       await expect(
         rmrkNft
@@ -295,15 +316,13 @@ describe('Resources', async () => {
 
   describe('Accept resource', async function () {
     it('can accept resource', async () => {
-
       const tokenId = 1;
       const resourceIndex = 0;
-      const resId16 =  await _addResourceAndAddToToken(resourceIndex, tokenId);
+      const resId16 = await _addResourceAndAddToToken(resourceIndex, tokenId);
 
-      await expect(rmrkNft
-        .connect(addrs[0]).
-        acceptResource(tokenId, 0))
-        .to.emit(rmrkNft, 'ResourceAccepted').withArgs(tokenId, resId16);
+      await expect(rmrkNft.connect(addrs[0]).acceptResource(tokenId, 0))
+        .to.emit(rmrkNft, 'ResourceAccepted')
+        .withArgs(tokenId, resId16);
 
       // Get pending resources - should return none
       expect(await rmrkNft.getPendingResources(tokenId)).to.eql([]);
@@ -323,24 +342,23 @@ describe('Resources', async () => {
       const resourceIndex = 0;
       await _addResourceAndAddToToken(resourceIndex, tokenId);
 
-      await expect(
-        rmrkNft.connect(addrs[1]).acceptResource(tokenId, 0)
-      ).to.be.revertedWith('RMRKCore: Not approved or owner');
-
-    })
+      await expect(rmrkNft.connect(addrs[1]).acceptResource(tokenId, 0)).to.be.revertedWith(
+        'RMRKCore: Not approved or owner',
+      );
+    });
 
     it('allows approved address (not owner) to accept resource', async function () {
       const tokenId = 1;
       const resourceIndex = 0;
       const approvedAddress = addrs[1];
-      const resId16 =  await _addResourceAndAddToToken(resourceIndex, tokenId);
+      const resId16 = await _addResourceAndAddToToken(resourceIndex, tokenId);
 
       await rmrkNft.connect(addrs[0]).approve(approvedAddress.address, tokenId);
       await rmrkNft.connect(approvedAddress).acceptResource(tokenId, 0);
 
       expect(await rmrkNft.getPendingResources(tokenId)).to.eql([]);
       expect(await rmrkNft.getActiveResources(tokenId)).to.eql([resId16]);
-    })
+    });
 
     it('can accept multiple resources', async function () {
       const targetResArrs = [
@@ -349,21 +367,20 @@ describe('Resources', async () => {
       ];
 
       const tokenId = 1;
-      const resId16_1 = await _addResourceAndAddToToken(0, tokenId);
-      const resId16_2 = await _addResourceAndAddToToken(1, tokenId);
+      const resId16A = await _addResourceAndAddToToken(0, tokenId);
+      const resId16B = await _addResourceAndAddToToken(1, tokenId);
 
       // Get pending resources
-      expect(await rmrkNft.getPendingResources(tokenId)).to.eql([resId16_1, resId16_2]);
+      expect(await rmrkNft.getPendingResources(tokenId)).to.eql([resId16A, resId16B]);
 
       await rmrkNft.connect(addrs[0]).acceptResource(tokenId, 0);
       await rmrkNft.connect(addrs[0]).acceptResource(tokenId, 0);
 
       expect(await rmrkNft.getPendingResources(tokenId)).to.eql([]);
-      expect(await rmrkNft.getActiveResources(tokenId)).to.eql([resId16_1, resId16_2]);
+      expect(await rmrkNft.getActiveResources(tokenId)).to.eql([resId16A, resId16B]);
 
       expect(await rmrkNft.getResObjectByIndex(tokenId, 0)).to.eql(targetResArrs[0]);
       expect(await rmrkNft.getResObjectByIndex(tokenId, 1)).to.eql(targetResArrs[1]);
-
     });
 
     it('can overwrite resource', async function () {
@@ -376,36 +393,35 @@ describe('Resources', async () => {
       const originalResourceIndex = 0;
       const replacingResourceIndex = 1;
       // Will also accept:
-      const resId16_1 = await _addResourceAndAddToToken(originalResourceIndex, tokenId, true);
-      const resId16_2 = await _addResource(replacingResourceIndex);
+      const resId16A = await _addResourceAndAddToToken(originalResourceIndex, tokenId, true);
+      const resId16B = await _addResource(replacingResourceIndex);
 
-      await expect (rmrkNft
-        .connect(owner)
-        .addResource(
+      await expect(
+        rmrkNft.connect(owner).addResource(
           tokenId,
           resourceStorage.address,
           resArr[replacingResourceIndex].id,
-          resId16_1, // overwrite
-        ))
-        .to.emit(rmrkNft, 'ResourceOverwriteProposed').withArgs(tokenId, resId16_2, resId16_1);
+          resId16A, // overwrite
+        ),
+      )
+        .to.emit(rmrkNft, 'ResourceOverwriteProposed')
+        .withArgs(tokenId, resId16B, resId16A);
 
       // Get pending resources
-      expect(await rmrkNft.getPendingResources(tokenId)).to.eql([resId16_2]);
+      expect(await rmrkNft.getPendingResources(tokenId)).to.eql([resId16B]);
 
-      await expect(
-        rmrkNft
-        .connect(addrs[0]).acceptResource(tokenId, 0))
-        .to.emit(rmrkNft, 'ResourceOverwritten').withArgs(tokenId, resId16_1);
+      await expect(rmrkNft.connect(addrs[0]).acceptResource(tokenId, 0))
+        .to.emit(rmrkNft, 'ResourceOverwritten')
+        .withArgs(tokenId, resId16A);
 
       expect(await rmrkNft.getPendingResources(tokenId)).to.eql([]);
-      expect(await rmrkNft.getActiveResources(tokenId)).to.eql([resId16_2]);
+      expect(await rmrkNft.getActiveResources(tokenId)).to.eql([resId16B]);
 
       expect(await rmrkNft.getResObjectByIndex(tokenId, 0)).to.eql(targetResArrs[1]);
     });
   });
 
   describe('Set Priorities', async function () {
-
     it('can reorder priorities', async function () {
       const tokenId = 1;
       // Will also accept:
@@ -413,13 +429,12 @@ describe('Resources', async () => {
       await _addResourceAndAddToToken(1, tokenId, true);
 
       // Reorder priorities and return correct renderable resource
-      await expect(rmrkNft
-        .connect(addrs[0])
-        .setPriority(tokenId, [1, 0]))
-        .to.emit(rmrkNft, 'ResourcePrioritySet').withArgs(tokenId);
+      await expect(rmrkNft.connect(addrs[0]).setPriority(tokenId, [1, 0]))
+        .to.emit(rmrkNft, 'ResourcePrioritySet')
+        .withArgs(tokenId);
 
-        const resourcePriorities = await rmrkNft.getActiveResourcePriorities(tokenId);
-        await expect(resourcePriorities).to.eql([1, 0]);
+      const resourcePriorities = await rmrkNft.getActiveResourcePriorities(tokenId);
+      await expect(resourcePriorities).to.eql([1, 0]);
     });
 
     it('reverts if not owner/approved tries to reorder priorities', async function () {
@@ -428,9 +443,9 @@ describe('Resources', async () => {
       await _addResourceAndAddToToken(0, tokenId, true);
       await _addResourceAndAddToToken(1, tokenId, true);
 
-      await expect(
-        rmrkNft.connect(addrs[1]).setPriority(tokenId, [1, 0]),
-      ).to.be.revertedWith('RMRKCore: Not approved or owner');
+      await expect(rmrkNft.connect(addrs[1]).setPriority(tokenId, [1, 0])).to.be.revertedWith(
+        'RMRKCore: Not approved or owner',
+      );
     });
 
     it('allows approved address (not owner) to reorder priorities', async function () {
@@ -441,7 +456,7 @@ describe('Resources', async () => {
       await _addResourceAndAddToToken(1, tokenId, true);
 
       await rmrkNft.connect(addrs[0]).approve(approvedAddress.address, tokenId);
-      await rmrkNft.connect(approvedAddress).setPriority(tokenId, [1, 0])
+      await rmrkNft.connect(approvedAddress).setPriority(tokenId, [1, 0]);
 
       const resourcePriorities = await rmrkNft.getActiveResourcePriorities(tokenId);
       await expect(resourcePriorities).to.eql([1, 0]);
@@ -465,10 +480,9 @@ describe('Resources', async () => {
       const resourceIndex = 0;
       const resId16 = await _addResourceAndAddToToken(resourceIndex, tokenId);
 
-      await expect(rmrkNft.
-        connect(addrs[0]).
-        rejectResource(tokenId, 0))
-        .to.emit(rmrkNft, 'ResourceRejected').withArgs(tokenId, resId16);
+      await expect(rmrkNft.connect(addrs[0]).rejectResource(tokenId, 0))
+        .to.emit(rmrkNft, 'ResourceRejected')
+        .withArgs(tokenId, resId16);
 
       // Get pending resources - should return none
       expect(await rmrkNft.getPendingResources(tokenId)).to.eql([]);
@@ -479,9 +493,9 @@ describe('Resources', async () => {
 
     it('cannot reject resources for non existing index', async () => {
       // Cannot reject resources for non existing index
-      await expect(
-        rmrkNft.connect(addrs[0]).rejectResource(1, 0),
-      ).to.be.revertedWith('RMRKcore: Pending child index out of range');
+      await expect(rmrkNft.connect(addrs[0]).rejectResource(1, 0)).to.be.revertedWith(
+        'RMRKcore: Pending child index out of range',
+      );
     });
 
     it('reverts if not owner/approved tries to reject resource', async function () {
@@ -522,10 +536,9 @@ describe('Resources', async () => {
       expect(await rmrkNft.getActiveResources(tokenId)).to.eql([]);
 
       // It is harmless if resources are already empty:
-      await expect(rmrkNft
-        .connect(addrs[0])
-        .rejectAllResources(tokenId))
-        .to.emit(rmrkNft, 'ResourceRejected').withArgs(tokenId, resourceIdZero);
+      await expect(rmrkNft.connect(addrs[0]).rejectAllResources(tokenId))
+        .to.emit(rmrkNft, 'ResourceRejected')
+        .withArgs(tokenId, resourceIdZero);
     });
 
     it('reverts if not owner/approved tries to reject all resources', async function () {
@@ -533,9 +546,9 @@ describe('Resources', async () => {
       await _addResourceAndAddToToken(0, tokenId);
       await _addResourceAndAddToToken(1, tokenId);
 
-      await expect(
-        rmrkNft.connect(addrs[1]).rejectAllResources(tokenId),
-      ).to.be.revertedWith('RMRKCore: Not approved or owner');
+      await expect(rmrkNft.connect(addrs[1]).rejectAllResources(tokenId)).to.be.revertedWith(
+        'RMRKCore: Not approved or owner',
+      );
     });
 
     it('allows approved address (not owner) to reject all resources', async function () {
@@ -562,29 +575,37 @@ describe('Resources', async () => {
     // add resource
     await rmrkNft
       .connect(owner)
-      .addResourceEntry(resArr[resourceIndex].id, resArr[resourceIndex].src, resArr[resourceIndex].thumb, resArr[resourceIndex].metadataURI);
+      .addResourceEntry(
+        resArr[resourceIndex].id,
+        resArr[resourceIndex].src,
+        resArr[resourceIndex].thumb,
+        resArr[resourceIndex].metadataURI,
+      );
 
     return resId16;
   }
 
-  async function _addResourceAndAddToToken(resourceIndex: number, tokenId: number, accept: boolean=false): Promise<string> {
+  async function _addResourceAndAddToToken(
+    resourceIndex: number,
+    tokenId: number,
+    accept = false,
+  ): Promise<string> {
     const resId16 = await _addResource(resourceIndex);
 
     await rmrkNft
-        .connect(owner)
-        .addResource(
-          tokenId,
-          resourceStorage.address,
-          resArr[resourceIndex].id,
-          ethers.utils.hexZeroPad('0x0', 16),
-        );
+      .connect(owner)
+      .addResource(
+        tokenId,
+        resourceStorage.address,
+        resArr[resourceIndex].id,
+        ethers.utils.hexZeroPad('0x0', 16),
+      );
 
-    if (accept){
+    if (accept) {
       // The 0 is for the index, not for the resourceId:
       await rmrkNft.connect(addrs[0]).acceptResource(tokenId, 0);
     }
 
     return resId16;
   }
-
 });

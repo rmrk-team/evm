@@ -3,11 +3,11 @@ import { ethers } from 'hardhat';
 import { Contract } from 'ethers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 
-//TODO: Transfer - transfer now does double duty as removeChild
+// TODO: Transfer - transfer now does double duty as removeChild
 
 describe('Nesting', async () => {
   let owner: SignerWithAddress;
-  let addrs: any[];
+  let addrs: SignerWithAddress[];
   let ownerChunky: Contract;
   let petMonkey: Contract;
 
@@ -23,7 +23,6 @@ describe('Nesting', async () => {
   const emptyData = ethers.utils.hexZeroPad('0x', 0);
   const partId = ethers.utils.hexZeroPad('0x0', 8);
 
-
   beforeEach(async function () {
     const [signersOwner, ...signersAddr] = await ethers.getSigners();
     owner = signersOwner;
@@ -37,7 +36,7 @@ describe('Nesting', async () => {
     petMonkey = await MONKY.deploy(name2, symbol2, resourceName2);
     await petMonkey.deployed();
 
-    //Mint 20 ownerChunkys. These tests will simulate minting of petMonkeys to ownerChunkys.
+    // Mint 20 ownerChunkys. These tests will simulate minting of petMonkeys to ownerChunkys.
     let i = 1;
     while (i <= 10) {
       await ownerChunky.doMint(addrs[0].address, i);
@@ -82,14 +81,14 @@ describe('Nesting', async () => {
 
     it('cannot mint already minted token', async function () {
       await petMonkey.connect(owner).doMint(owner.address, 1);
-      await expect(
-        petMonkey.connect(owner).doMint(owner.address, 1)
-      ).to.be.revertedWith('RMRKCore: token already minted');
+      await expect(petMonkey.connect(owner).doMint(owner.address, 1)).to.be.revertedWith(
+        'RMRKCore: token already minted',
+      );
     });
 
     it('cannot mint to zero address', async function () {
       await expect(
-        petMonkey.connect(owner).doMint('0x0000000000000000000000000000000000000000', 1)
+        petMonkey.connect(owner).doMint('0x0000000000000000000000000000000000000000', 1),
       ).to.be.revertedWith('RMRKCore: mint to the zero address');
     });
 
@@ -113,11 +112,15 @@ describe('Nesting', async () => {
       const childId = 1;
       const parentId = 11; // owner is addrs[1]
 
-      //Mint petMonkey 1 into ownerChunky 11
-      await petMonkey.connect(addrs[0]).doMintNest(ownerChunky.address, childId, parentId, mintNestData);
+      // Mint petMonkey 1 into ownerChunky 11
+      await petMonkey
+        .connect(addrs[0])
+        .doMintNest(ownerChunky.address, childId, parentId, mintNestData);
 
       await expect(
-        petMonkey.connect(addrs[0]).doMintNest(ownerChunky.address, childId, parentId, mintNestData)
+        petMonkey
+          .connect(addrs[0])
+          .doMintNest(ownerChunky.address, childId, parentId, mintNestData),
       ).to.be.revertedWith('RMRKCore: token already minted');
     });
 
@@ -126,17 +129,23 @@ describe('Nesting', async () => {
       const childId = 1;
       const parentId = 12; // owner is addrs[1]
 
-      //Mint petMonkey 1 into ownerChunky 11
-      await petMonkey.connect(addrs[0]).doMintNest(ownerChunky.address, childId, parentId, mintNestData);
+      // Mint petMonkey 1 into ownerChunky 11
+      await petMonkey
+        .connect(addrs[0])
+        .doMintNest(ownerChunky.address, childId, parentId, mintNestData);
 
       await expect(
-        petMonkey.connect(addrs[0]).doMintNest(ownerChunky.address, childId, parentId, mintNestData)
+        petMonkey
+          .connect(addrs[0])
+          .doMintNest(ownerChunky.address, childId, parentId, mintNestData),
       ).to.be.revertedWith('RMRKCore: token already minted');
     });
 
     it('cannot nest mint to zero address', async function () {
       await expect(
-        petMonkey.connect(owner).doMintNest('0x0000000000000000000000000000000000000000', 1, 10, mintNestData)
+        petMonkey
+          .connect(owner)
+          .doMintNest('0x0000000000000000000000000000000000000000', 1, 10, mintNestData),
       ).to.be.revertedWith('RMRKCore: mint to the zero address');
     });
 
@@ -144,19 +153,23 @@ describe('Nesting', async () => {
       const childId = 1;
       const parentId = 11; // owner is addrs[1]
 
-      //Mint petMonkey 1 into ownerChunky 11
-      await petMonkey.connect(addrs[0]).doMintNest(ownerChunky.address, childId, parentId, mintNestData);
+      // Mint petMonkey 1 into ownerChunky 11
+      await petMonkey
+        .connect(addrs[0])
+        .doMintNest(ownerChunky.address, childId, parentId, mintNestData);
 
       // owner is the same adress
       expect(await ownerChunky.ownerOf(parentId)).to.equal(addrs[1].address);
       expect(await petMonkey.ownerOf(childId)).to.equal(addrs[1].address);
     });
 
-    it('can mint to contract and RMRK owners are ok', async function () {      
+    it('can mint to contract and RMRK owners are ok', async function () {
       const childId = 1;
       const parentId = 11;
 
-      await petMonkey.connect(addrs[0]).doMintNest(ownerChunky.address, childId, parentId, mintNestData);
+      await petMonkey
+        .connect(addrs[0])
+        .doMintNest(ownerChunky.address, childId, parentId, mintNestData);
 
       // RMRK owner is an address for the parent
       expect(await ownerChunky.rmrkOwnerOf(parentId)).to.eql([
@@ -176,7 +189,9 @@ describe('Nesting', async () => {
       const childId = 1;
       const parentId = 11;
 
-      await petMonkey.connect(addrs[0]).doMintNest(ownerChunky.address, childId, parentId, mintNestData);
+      await petMonkey
+        .connect(addrs[0])
+        .doMintNest(ownerChunky.address, childId, parentId, mintNestData);
 
       const children = await ownerChunky.childrenOf(parentId);
       expect(children).to.eql([]);
@@ -185,26 +200,29 @@ describe('Nesting', async () => {
       expect(pendingChildren).to.eql([
         [ethers.BigNumber.from(childId), petMonkey.address, 0, partId],
       ]);
-
     });
 
     it('can mint multiple children', async function () {
-      const childId_1 = 1;
-      const childId_2 = 2;
+      const childId1 = 1;
+      const childId2 = 2;
       const parentId = 10;
 
       // Owner address mints a child
-      await petMonkey.connect(addrs[0]).doMintNest(ownerChunky.address, childId_1, parentId, mintNestData);
-      expect(await petMonkey.ownerOf(childId_1)).to.equal(addrs[0].address);
+      await petMonkey
+        .connect(addrs[0])
+        .doMintNest(ownerChunky.address, childId1, parentId, mintNestData);
+      expect(await petMonkey.ownerOf(childId1)).to.equal(addrs[0].address);
 
       // Another address mints a second child
-      await petMonkey.connect(addrs[1]).doMintNest(ownerChunky.address, childId_2, parentId, mintNestData);
-      expect(await petMonkey.ownerOf(childId_2)).to.equal(addrs[0].address);
+      await petMonkey
+        .connect(addrs[1])
+        .doMintNest(ownerChunky.address, childId2, parentId, mintNestData);
+      expect(await petMonkey.ownerOf(childId2)).to.equal(addrs[0].address);
 
       const pendingChildren = await ownerChunky.pendingChildrenOf(parentId);
       expect(pendingChildren).to.eql([
-        [ethers.BigNumber.from(childId_1), petMonkey.address, 0, partId],
-        [ethers.BigNumber.from(childId_2), petMonkey.address, 0, partId],
+        [ethers.BigNumber.from(childId1), petMonkey.address, 0, partId],
+        [ethers.BigNumber.from(childId2), petMonkey.address, 0, partId],
       ]);
     });
 
@@ -214,9 +232,13 @@ describe('Nesting', async () => {
       const granchildId = 21;
 
       // mint petMonkey token 1 into ownerChunky token 10
-      await petMonkey.connect(addrs[0]).doMintNest(ownerChunky.address, childId, parentId, mintNestData);
+      await petMonkey
+        .connect(addrs[0])
+        .doMintNest(ownerChunky.address, childId, parentId, mintNestData);
       // mint petMonkey token 21 into petMonkey token 1
-      await petMonkey.connect(addrs[0]).doMintNest(petMonkey.address, granchildId, childId, mintNestData);
+      await petMonkey
+        .connect(addrs[0])
+        .doMintNest(petMonkey.address, granchildId, childId, mintNestData);
 
       const pendingChildrenOfChunky10 = await ownerChunky.pendingChildrenOf(parentId);
       const pendingChildrenOfMonkey1 = await petMonkey.pendingChildrenOf(childId);
@@ -248,20 +270,20 @@ describe('Nesting', async () => {
       }
 
       await expect(
-        petMonkey.connect(addrs[0]).doMintNest(ownerChunky.address, 129, tokenId, mintNestData)
-        ).to.be.revertedWith('RMRKCore: Max pending children reached');
+        petMonkey.connect(addrs[0]).doMintNest(ownerChunky.address, 129, tokenId, mintNestData),
+      ).to.be.revertedWith('RMRKCore: Max pending children reached');
     });
-
   });
 
   describe('Accept child', async function () {
-
     it('can accept child', async function () {
       const childId = 1;
       const parentId = 11;
 
       // Another address can mint
-      await petMonkey.connect(addrs[0]).doMintNest(ownerChunky.address, childId, parentId, mintNestData);
+      await petMonkey
+        .connect(addrs[0])
+        .doMintNest(ownerChunky.address, childId, parentId, mintNestData);
 
       // owner accepts the child at index 0 into the child array
       await ownerChunky.connect(addrs[1]).acceptChild(parentId, 0);
@@ -270,9 +292,7 @@ describe('Nesting', async () => {
       expect(pendingChildren).to.eql([]);
 
       const children = await ownerChunky.childrenOf(parentId);
-      expect(children).to.eql([
-        [ethers.BigNumber.from(childId), petMonkey.address, 0, partId],
-      ]);
+      expect(children).to.eql([[ethers.BigNumber.from(childId), petMonkey.address, 0, partId]]);
     });
 
     it('cannot accept not owned child', async function () {
@@ -280,14 +300,14 @@ describe('Nesting', async () => {
       const parentId = 11;
 
       // Another address can mint
-      await petMonkey.connect(addrs[0]).doMintNest(ownerChunky.address, childId, parentId, mintNestData);
+      await petMonkey
+        .connect(addrs[0])
+        .doMintNest(ownerChunky.address, childId, parentId, mintNestData);
 
       // Another address cannot accept
-      await expect(
-        ownerChunky
-        .connect(addrs[0])
-        .acceptChild(parentId, 0)
-      ).to.be.revertedWith('RMRKCore: Not approved or owner');
+      await expect(ownerChunky.connect(addrs[0]).acceptChild(parentId, 0)).to.be.revertedWith(
+        'RMRKCore: Not approved or owner',
+      );
     });
 
     it('can accept child from approved address (not owner)', async function () {
@@ -298,7 +318,9 @@ describe('Nesting', async () => {
       await ownerChunky.connect(addrs[1]).approve(approvedAddress.address, parentId);
 
       // Another address can mint
-      await petMonkey.connect(addrs[0]).doMintNest(ownerChunky.address, childId, parentId, mintNestData);
+      await petMonkey
+        .connect(addrs[0])
+        .doMintNest(ownerChunky.address, childId, parentId, mintNestData);
 
       await ownerChunky.connect(approvedAddress).acceptChild(parentId, 0);
 
@@ -306,11 +328,8 @@ describe('Nesting', async () => {
       expect(pendingChildren).to.eql([]);
 
       const children = await ownerChunky.childrenOf(parentId);
-      expect(children).to.eql([
-        [ethers.BigNumber.from(childId), petMonkey.address, 0, partId],
-      ]);
+      expect(children).to.eql([[ethers.BigNumber.from(childId), petMonkey.address, 0, partId]]);
     });
-
   });
 
   describe('Reject child', async function () {
@@ -328,9 +347,9 @@ describe('Nesting', async () => {
       await petMonkey.connect(addrs[0]).doMintNest(ownerChunky.address, 1, parentId, mintNestData);
 
       // addrs[1] attempts to reject addrs[0]'s pending children
-      await expect(
-        ownerChunky.connect(addrs[0]).rejectChild(parentId, 0)
-      ).to.be.revertedWith('RMRKCore: Not approved or owner');
+      await expect(ownerChunky.connect(addrs[0]).rejectChild(parentId, 0)).to.be.revertedWith(
+        'RMRKCore: Not approved or owner',
+      );
     });
 
     it('can reject child from approved address (not owner)', async function () {
@@ -387,9 +406,9 @@ describe('Nesting', async () => {
 
     it('cannot reject children for non existing index', async () => {
       const parentId = 11;
-      await expect(
-        ownerChunky.connect(addrs[1]).rejectChild(parentId, 0),
-      ).to.be.revertedWith('RMRKcore: Pending child index out of range');
+      await expect(ownerChunky.connect(addrs[1]).rejectChild(parentId, 0)).to.be.revertedWith(
+        'RMRKcore: Pending child index out of range',
+      );
     });
   });
 
@@ -410,9 +429,9 @@ describe('Nesting', async () => {
       await ownerChunky.connect(addrs[1]).acceptChild(parentId, 0);
 
       // addrs[1] attempts to remove addrs[0]'s children
-      await expect(
-        ownerChunky.connect(addrs[0]).removeChild(parentId, 0)
-      ).to.be.revertedWith('RMRKCore: Not approved or owner');
+      await expect(ownerChunky.connect(addrs[0]).removeChild(parentId, 0)).to.be.revertedWith(
+        'RMRKCore: Not approved or owner',
+      );
     });
 
     it('can remove child from approved address (not owner)', async function () {
@@ -430,9 +449,9 @@ describe('Nesting', async () => {
 
     it('cannot remove children for non existing index', async () => {
       const parentId = 11;
-      await expect(
-        ownerChunky.connect(addrs[1]).removeChild(parentId, 0),
-      ).to.be.revertedWith('RMRKcore: Child index out of range');
+      await expect(ownerChunky.connect(addrs[1]).removeChild(parentId, 0)).to.be.revertedWith(
+        'RMRKcore: Child index out of range',
+      );
     });
   });
 
@@ -472,7 +491,9 @@ describe('Nesting', async () => {
       const childId = 1;
       const parentId = 10;
       // mint petMonkey token 1 into ownerChunky token 10
-      await petMonkey.connect(addrs[1]).doMintNest(ownerChunky.address, childId, parentId, mintNestData);
+      await petMonkey
+        .connect(addrs[1])
+        .doMintNest(ownerChunky.address, childId, parentId, mintNestData);
       await ownerChunky.connect(addrs[0]).acceptChild(parentId, 0);
       await petMonkey.connect(addrs[0]).burn(childId);
 
@@ -489,7 +510,9 @@ describe('Nesting', async () => {
       const childId = 1;
       const parentId = 10;
       // mint petMonkey token 1 into ownerChunky token 10
-      await petMonkey.connect(addrs[1]).doMintNest(ownerChunky.address, childId, parentId, mintNestData);
+      await petMonkey
+        .connect(addrs[1])
+        .doMintNest(ownerChunky.address, childId, parentId, mintNestData);
       await ownerChunky.connect(addrs[0]).acceptChild(parentId, 0);
 
       await expect(petMonkey.connect(addrs[1]).burn(childId)).to.be.revertedWith(
@@ -503,19 +526,21 @@ describe('Nesting', async () => {
       const granchildId = 21;
 
       // mint petMonkey token 1 into ownerChunky token 10
-      await petMonkey.connect(addrs[0]).doMintNest(ownerChunky.address, childId, parentId, mintNestData);
+      await petMonkey
+        .connect(addrs[0])
+        .doMintNest(ownerChunky.address, childId, parentId, mintNestData);
       await ownerChunky.connect(addrs[0]).acceptChild(parentId, 0);
       // mint ownerChunky token 21 into petMonkey token 1
-      await ownerChunky.connect(addrs[0]).doMintNest(petMonkey.address, granchildId, childId, mintNestData);
+      await ownerChunky
+        .connect(addrs[0])
+        .doMintNest(petMonkey.address, granchildId, childId, mintNestData);
       await petMonkey.connect(addrs[0]).acceptChild(childId, 0);
 
       // ownership chain is now addrs[0] > ownerChunky[10] > petMonkey[1] > ownerChunky[21]
       const children1 = await ownerChunky.childrenOf(parentId);
       const children2 = await petMonkey.childrenOf(childId);
 
-      expect(children1).to.eql([
-        [ethers.BigNumber.from(childId), petMonkey.address, 0, partId],
-      ]);
+      expect(children1).to.eql([[ethers.BigNumber.from(childId), petMonkey.address, 0, partId]]);
 
       expect(children2).to.eql([
         [ethers.BigNumber.from(granchildId), ownerChunky.address, 0, partId],
@@ -529,15 +554,101 @@ describe('Nesting', async () => {
 
       await petMonkey.connect(addrs[0]).burn(childId);
 
-      await expect(petMonkey.ownerOf(childId)).
-        to.be.revertedWith('RMRKCore: owner query for nonexistent token');
-      await expect(petMonkey.rmrkOwnerOf(childId)).
-        to.be.revertedWith('RMRKCore: owner query for nonexistent token');
+      await expect(petMonkey.ownerOf(childId)).to.be.revertedWith(
+        'RMRKCore: owner query for nonexistent token',
+      );
+      await expect(petMonkey.rmrkOwnerOf(childId)).to.be.revertedWith(
+        'RMRKCore: owner query for nonexistent token',
+      );
 
-      await expect(ownerChunky.ownerOf(granchildId))
-        .to.be.revertedWith('RMRKCore: owner query for nonexistent token');
-      await expect(ownerChunky.rmrkOwnerOf(granchildId))
-        .to.be.revertedWith('RMRKCore: owner query for nonexistent token');
+      await expect(ownerChunky.ownerOf(granchildId)).to.be.revertedWith(
+        'RMRKCore: owner query for nonexistent token',
+      );
+      await expect(ownerChunky.rmrkOwnerOf(granchildId)).to.be.revertedWith(
+        'RMRKCore: owner query for nonexistent token',
+      );
+    });
+  });
+
+  describe('Unnesting', async function () {
+    it('can unnest child and new owner is root owner', async function () {
+      const { childId, parentId, firstOwner } = await mintTofirstOwner(true);
+      await expect(ownerChunky.connect(firstOwner).unnestChild(parentId, 0))
+        .to.emit(ownerChunky, 'ChildUnnested')
+        .withArgs(parentId, childId);
+
+      // New owner of child
+      expect(await petMonkey.ownerOf(childId)).to.eql(firstOwner.address);
+      expect(await petMonkey.rmrkOwnerOf(childId)).to.eql([
+        firstOwner.address,
+        ethers.BigNumber.from(0),
+        false,
+      ]);
+    });
+
+    it('can unnest child with grandchild and childen are ok', async function () {
+      const parentId = 10;
+      const childId = 1;
+      const grandchildId = 21;
+      const owner = addrs[0];
+
+      // mint petMonkey token 1 into ownerChunky token 10
+      await petMonkey
+        .connect(owner)
+        .doMintNest(ownerChunky.address, childId, parentId, mintNestData);
+      await ownerChunky.connect(owner).acceptChild(parentId, 0);
+      // mint petMonkey token 21 into petMonkey token 1
+      await petMonkey
+        .connect(owner)
+        .doMintNest(petMonkey.address, grandchildId, childId, mintNestData);
+      await petMonkey.connect(owner).acceptChild(childId, 0);
+
+      // Unnest child from parent.
+      await ownerChunky.connect(owner).unnestChild(parentId, 0);
+
+      // New owner of child
+      expect(await petMonkey.ownerOf(childId)).to.eql(owner.address);
+      expect(await petMonkey.rmrkOwnerOf(childId)).to.eql([
+        owner.address,
+        ethers.BigNumber.from(0),
+        false,
+      ]);
+
+      // Grandchild is still owned by petMonkey childId
+      expect(await petMonkey.ownerOf(grandchildId)).to.eql(owner.address);
+      expect(await petMonkey.rmrkOwnerOf(grandchildId)).to.eql([
+        petMonkey.address,
+        ethers.BigNumber.from(childId),
+        true,
+      ]);
+    });
+
+    it('cannot unnest from not owned child', async function () {
+      const { parentId } = await mintTofirstOwner(true);
+      await expect(ownerChunky.connect(addrs[3]).unnestChild(parentId, 0)).to.be.revertedWith(
+        'RMRKCore: Not approved or owner',
+      );
+    });
+
+    it('cannot unnest not existing child', async function () {
+      const { parentId, firstOwner } = await mintTofirstOwner(true);
+      await expect(ownerChunky.connect(firstOwner).unnestChild(parentId, 1)).to.be.revertedWith(
+        'RMRKcore: Child index out of range',
+      );
+    });
+
+    it('cannot unnest token directly even if root owner', async function () {
+      const { childId, parentId, firstOwner } = await mintTofirstOwner(true);
+      await expect(
+        petMonkey.connect(firstOwner).unnestToken(childId, parentId, firstOwner.address),
+      ).to.be.revertedWith('RMRKCore: unnest from wrong owner');
+    });
+
+    it('cannot unnest token not owned by an NFT', async function () {
+      const { parentId, firstOwner } = await mintTofirstOwner(true);
+      await expect(
+        ownerChunky.connect(firstOwner).unnestToken(parentId, 0, firstOwner.address),
+      ).to.be.revertedWith('RMRKCore: unnest for non-NFT parent');
     });
   });
 
@@ -556,9 +667,9 @@ describe('Nesting', async () => {
       const newOwner = addrs[2];
 
       await petMonkey.connect(addrs[1]).doMint(addrs[1].address, tokenId);
-      await expect(petMonkey.connect(addrs[0]).transfer(newOwner.address, tokenId)).to.be.revertedWith(
-        'RMRKCore: Not approved or owner',
-      );
+      await expect(
+        petMonkey.connect(addrs[0]).transfer(newOwner.address, tokenId),
+      ).to.be.revertedWith('RMRKCore: Not approved or owner');
     });
 
     it('can transfer token from approved address (not owner)', async function () {
@@ -570,84 +681,101 @@ describe('Nesting', async () => {
       await petMonkey.connect(firstOwner).doMint(firstOwner.address, tokenId);
       await petMonkey.connect(firstOwner).approve(approved.address, tokenId);
 
-      await petMonkey.connect(approved).transferFrom(firstOwner.address, newOwner.address, tokenId, 0, emptyData);
+      await petMonkey
+        .connect(approved)
+        .transferFrom(firstOwner.address, newOwner.address, tokenId, 0, emptyData);
       expect(await petMonkey.ownerOf(tokenId)).to.eql(newOwner.address);
     });
 
     it('can transfer not nested token to address and owners are ok', async function () {
       const newOwner = addrs[2];
-      const {childId, parentId, firstOwner} = await mintTofirstOwner();
-      await ownerChunky.connect(firstOwner).transferFrom(firstOwner.address, newOwner.address, parentId, 0, emptyData);
+      const { childId, parentId, firstOwner } = await mintTofirstOwner();
+      await ownerChunky
+        .connect(firstOwner)
+        .transferFrom(firstOwner.address, newOwner.address, parentId, 0, emptyData);
 
       // New owner of parent
       expect(await ownerChunky.ownerOf(parentId)).to.eql(newOwner.address);
-      expect(await ownerChunky.rmrkOwnerOf(parentId)).to.eql(
-        [ newOwner.address, ethers.BigNumber.from(0), false]);
+      expect(await ownerChunky.rmrkOwnerOf(parentId)).to.eql([
+        newOwner.address,
+        ethers.BigNumber.from(0),
+        false,
+      ]);
 
       // New owner of child
       expect(await petMonkey.ownerOf(childId)).to.eql(newOwner.address);
-      expect(await petMonkey.rmrkOwnerOf(childId)).to.eql(
-        [ ownerChunky.address, ethers.BigNumber.from(parentId), true]);
+      expect(await petMonkey.rmrkOwnerOf(childId)).to.eql([
+        ownerChunky.address,
+        ethers.BigNumber.from(parentId),
+        true,
+      ]);
     });
 
     it('can transfer not nested token to address and children are ok', async function () {
       const newOwner = addrs[2];
-      const {childId, parentId, firstOwner} = await mintTofirstOwner();
-      await ownerChunky.connect(firstOwner).transferFrom(firstOwner.address, newOwner.address, parentId, 0, emptyData);
+      const { childId, parentId, firstOwner } = await mintTofirstOwner();
+      await ownerChunky
+        .connect(firstOwner)
+        .transferFrom(firstOwner.address, newOwner.address, parentId, 0, emptyData);
 
       // Parent still has its children
       const children = await ownerChunky.pendingChildrenOf(parentId);
-      expect(children).to.eql([
-        [ethers.BigNumber.from(childId), petMonkey.address, 0, partId],
-      ]);
+      expect(children).to.eql([[ethers.BigNumber.from(childId), petMonkey.address, 0, partId]]);
     });
 
     it('cannot transfer nested child', async function () {
       const newParentId = 12; // owner is firstOwner
-      const {childId, parentId, firstOwner} = await mintTofirstOwner(true);
+      const { childId, firstOwner } = await mintTofirstOwner(true);
 
       await expect(
-        petMonkey.connect(firstOwner).transferFrom(
-          firstOwner.address, ownerChunky.address, childId, newParentId, emptyData
-        )
-      ).to.be.revertedWith("RMRKCore: Must unnest first");
+        petMonkey
+          .connect(firstOwner)
+          .transferFrom(firstOwner.address, ownerChunky.address, childId, newParentId, emptyData),
+      ).to.be.revertedWith('RMRKCore: Must unnest first');
     });
 
     it('can transfer parent token to token with same owner, family tree is ok', async function () {
       const newParentId = 12; // owner is firstOwner
-      const {childId, parentId, firstOwner} = await mintTofirstOwner(true);
+      const { childId, parentId, firstOwner } = await mintTofirstOwner(true);
 
-      await ownerChunky.connect(firstOwner).transferFrom(
-        firstOwner.address, ownerChunky.address, parentId, newParentId, emptyData);
+      await ownerChunky
+        .connect(firstOwner)
+        .transferFrom(firstOwner.address, ownerChunky.address, parentId, newParentId, emptyData);
 
-      let expected_accepted = [ethers.BigNumber.from(childId), petMonkey.address, 0, partId];
-      check_accepted_and_pending_children(ownerChunky, parentId, expected_accepted, []);
-      expected_accepted = [ethers.BigNumber.from(parentId), ownerChunky.address, 0, partId];
-      check_accepted_and_pending_children(ownerChunky, newParentId, expected_accepted, []);
+      let expectedAccepted = [ethers.BigNumber.from(childId), petMonkey.address, 0, partId];
+      checkAcceptedAndPendingChildren(ownerChunky, parentId, expectedAccepted, []);
+      expectedAccepted = [ethers.BigNumber.from(parentId), ownerChunky.address, 0, partId];
+      checkAcceptedAndPendingChildren(ownerChunky, newParentId, expectedAccepted, []);
     });
-
   });
 
-  async function mintTofirstOwner(accept: boolean=false): Promise<{childId: number, parentId: number,  firstOwner: any}> {
+  async function mintTofirstOwner(
+    accept = false,
+  ): Promise<{ childId: number; parentId: number; firstOwner: any }> {
     const childId = 1;
     const parentId = 11;
     const firstOwner = addrs[1];
 
-    await petMonkey.connect(firstOwner).doMintNest(ownerChunky.address, childId, parentId, mintNestData);
-    if (accept){
+    await petMonkey
+      .connect(firstOwner)
+      .doMintNest(ownerChunky.address, childId, parentId, mintNestData);
+    if (accept) {
       await ownerChunky.connect(firstOwner).acceptChild(parentId, 0);
     }
 
-    return {childId, parentId, firstOwner};
+    return { childId, parentId, firstOwner };
   }
 
-  async function check_accepted_and_pending_children(contract: any, tokenId: number, expected_accepted: any, expected_pending: any) {
+  async function checkAcceptedAndPendingChildren(
+    contract: any,
+    tokenId: number,
+    expectedAccepted: any,
+    expectedPending: any,
+  ) {
     const accepted = await contract.childrenOf(tokenId);
-    expect(accepted).to.eql(expected_accepted);
+    expect(accepted).to.eql(expectedAccepted);
 
     const pending = await contract.childrenOf(tokenId);
-    expect(pending).to.eql(expected_pending);
+    expect(pending).to.eql(expectedPending);
   }
-
-
 });
