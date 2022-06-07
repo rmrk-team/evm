@@ -7,7 +7,7 @@ contract RMRKRoyalties {
   struct RoyaltyData {
     address royaltyAddress;
     uint32 numerator;
-    uint32 denominator;q
+    uint32 denominator;
   }
 
   RoyaltyData private _royalties;
