@@ -523,59 +523,59 @@ contract RMRKNesting is Context, IRMRKNesting {
     }
 
     /**
-    @dev Sends an instance of Child from the pending children array at index to children array for _tokenId.
+    @dev Sends an instance of Child from the pending children array at index to children array for tokenId.
     * Updates _emptyIndexes of tokenId to preserve ordering.
     */
 
     //CHECK: preload mappings into memory for gas savings
-    function acceptChild(uint256 _tokenId, uint256 index) public virtual onlyApprovedOrOwner(_tokenId) {
+    function acceptChild(uint256 tokenId, uint256 index) public virtual onlyApprovedOrOwner(tokenId) {
         require(
-            _pendingChildren[_tokenId].length > index,
+            _pendingChildren[tokenId].length > index,
             "RMRKcore: Pending child index out of range"
         );
         // FIXME: if it approved for transfer it should either update/remove the approvedTransfers or stop this accept.
 
-        Child memory child_ = _pendingChildren[_tokenId][index];
+        Child memory child_ = _pendingChildren[tokenId][index];
 
-        removeItemByIndex_C(_pendingChildren[_tokenId], index);
+        removeItemByIndex_C(_pendingChildren[tokenId], index);
 
-        _addChildToChildren(_tokenId, child_);
-        emit ChildAccepted(_tokenId);
+        _addChildToChildren(tokenId, child_);
+        emit ChildAccepted(tokenId);
     }
 
     /**
     @dev Deletes all pending children.
     */
-    function rejectAllChildren(uint256 _tokenId) public virtual onlyApprovedOrOwner(_tokenId) {
-        delete(_pendingChildren[_tokenId]);
-        emit AllPendingChildrenRemoved(_tokenId);
+    function rejectAllChildren(uint256 tokenId) public virtual onlyApprovedOrOwner(tokenId) {
+        delete(_pendingChildren[tokenId]);
+        emit AllPendingChildrenRemoved(tokenId);
     }
 
     /**
     @dev Deletes a single child from the pending array by index.
     */
 
-    function rejectChild(uint256 _tokenId, uint256 index) public virtual onlyApprovedOrOwner(_tokenId) {
+    function rejectChild(uint256 tokenId, uint256 index) public virtual onlyApprovedOrOwner(tokenId) {
         require(
-            _pendingChildren[_tokenId].length > index,
+            _pendingChildren[tokenId].length > index,
             "RMRKcore: Pending child index out of range"
         );
-        removeItemByIndex_C(_pendingChildren[_tokenId], index);
-        emit PendingChildRemoved(_tokenId, index);
+        removeItemByIndex_C(_pendingChildren[tokenId], index);
+        emit PendingChildRemoved(tokenId, index);
     }
 
     /**
     @dev Deletes a single child from the child array by index.
     */
 
-    function removeChild(uint256 _tokenId, uint256 index) public virtual onlyApprovedOrOwner(_tokenId) {
+    function removeChild(uint256 tokenId, uint256 index) public virtual onlyApprovedOrOwner(tokenId) {
         require(
-            _children[_tokenId].length > index,
+            _children[tokenId].length > index,
             "RMRKcore: Child index out of range"
         );
 
-        removeItemByIndex_C(_children[_tokenId], index);
-        emit ChildRemoved(_tokenId, index);
+        removeItemByIndex_C(_children[tokenId], index);
+        emit ChildRemoved(tokenId, index);
     }
 
     function unnestChild(uint256 tokenId, uint256 index) public virtual onlyApprovedOrOwner(tokenId) {
@@ -618,23 +618,23 @@ contract RMRKNesting is Context, IRMRKNesting {
 
 
     /**
-    @dev Adds an instance of Child to the pending children array for _tokenId. This is hardcoded to be 128 by default.
+    @dev Adds an instance of Child to the pending children array for tokenId. This is hardcoded to be 128 by default.
     */
 
-    function _addChildToPending(uint256 _tokenId, Child memory _child) internal {
-        if(_pendingChildren[_tokenId].length < 128) {
-            _pendingChildren[_tokenId].push(_child);
+    function _addChildToPending(uint256 tokenId, Child memory child) internal {
+        if(_pendingChildren[tokenId].length < 128) {
+            _pendingChildren[tokenId].push(child);
         } else {
             revert("RMRKCore: Max pending children reached");
         }
     }
 
     /**
-    @dev Adds an instance of Child to the children array for _tokenId.
+    @dev Adds an instance of Child to the children array for tokenId.
     */
 
-    function _addChildToChildren(uint256 _tokenId, Child memory _child) internal {
-        _children[_tokenId].push(_child);
+    function _addChildToChildren(uint256 tokenId, Child memory child) internal {
+        _children[tokenId].push(child);
     }
 
     /**
@@ -664,10 +664,10 @@ contract RMRKNesting is Context, IRMRKNesting {
         address from,
         address to,
         uint256 tokenId,
-        bytes memory _data
+        bytes memory data
     ) private returns (bool) {
         if (to.isContract()) {
-            try IRMRKNestingReceiver(to).onRMRKNestingReceived(_msgSender(), from, tokenId, _data) returns (bytes4 retval) {
+            try IRMRKNestingReceiver(to).onRMRKNestingReceived(_msgSender(), from, tokenId, data) returns (bytes4 retval) {
                 return retval == IRMRKNestingReceiver.onRMRKNestingReceived.selector;
             } catch (bytes memory reason) {
                 if (reason.length == 0) {
