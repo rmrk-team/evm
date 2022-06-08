@@ -56,10 +56,6 @@ abstract contract MultiResourceTokenAbstract is Context, IMultiResource {
             index < _pendingResources[tokenId].length,
             "MultiResource: index out of bounds"
         );
-        // require(
-        //     _msgSender() == ownerOf(tokenId),
-        //     "MultiResource: not owner"
-        // );
         bytes8 resourceId = _pendingResources[tokenId][index];
         _pendingResources[tokenId].removeItemByIndex(0);
 
@@ -85,11 +81,6 @@ abstract contract MultiResourceTokenAbstract is Context, IMultiResource {
             _pendingResources[tokenId].length > index,
             "MultiResource: Pending child index out of range"
         );
-        // require(
-        //     _msgSender() == ownerOf(tokenId),
-        //     "MultiResource: not owner"
-        // );
-
         bytes8 resourceId = _pendingResources[tokenId][index];
         _pendingResources[tokenId].removeItemByValue(resourceId);
         _tokenResources[tokenId][resourceId] = false;
@@ -98,10 +89,6 @@ abstract contract MultiResourceTokenAbstract is Context, IMultiResource {
     }
 
     function _rejectAllResources(uint256 tokenId) internal {
-        // require(
-        //     _msgSender() == ownerOf(tokenId),
-        //     "MultiResource: not owner"
-        // );
         delete(_pendingResources[tokenId]);
         emit ResourceRejected(tokenId, bytes8(0));
     }
@@ -115,10 +102,6 @@ abstract contract MultiResourceTokenAbstract is Context, IMultiResource {
             length == _activeResources[tokenId].length,
             "MultiResource: Bad priority list length"
         );
-        // require(
-        //     _msgSender() == ownerOf(tokenId),
-        //     "MultiResource: not owner"
-        // );
         _activeResourcePriorities[tokenId] = priorities;
 
         emit ResourcePrioritySet(tokenId);
@@ -278,12 +261,6 @@ abstract contract MultiResourceTokenAbstract is Context, IMultiResource {
         bytes8 resourceId,
         bytes8 overwrites
     ) internal {
-
-        // require(
-        //     _owners[tokenId] != address(0),
-        //     "ERC721: owner query for nonexistent token"
-        // );
-
         require(
             _tokenResources[tokenId][resourceId] == false,
             "MultiResource: Resource already exists on token"
