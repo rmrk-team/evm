@@ -165,6 +165,7 @@ contract MultiResourceToken721 is MultiResourceTokenAbstract, IERC721 {
             _isApprovedOrOwner(_msgSender(), tokenId),
             "MultiResource: transfer caller is not owner nor approved"
         );
+        // FIXME: clean approvals and test
 
         _transfer(from, to, tokenId);
     }
@@ -189,6 +190,7 @@ contract MultiResourceToken721 is MultiResourceTokenAbstract, IERC721 {
             _isApprovedOrOwner(_msgSender(), tokenId),
             "MultiResource: transfer caller is not owner nor approved"
         );
+        // FIXME: clean approvals and test
         _safeTransfer(from, to, tokenId, data);
     }
 
@@ -376,6 +378,7 @@ contract MultiResourceToken721 is MultiResourceTokenAbstract, IERC721 {
             _isApprovedOrOwner(_msgSender(), tokenId),
             "MultiResource: not owner"
         );
+        // FIXME: clean approvals and test
         _acceptResource(tokenId, index);
     }
 
@@ -384,6 +387,7 @@ contract MultiResourceToken721 is MultiResourceTokenAbstract, IERC721 {
             _isApprovedOrOwner(_msgSender(), tokenId),
             "MultiResource: not owner"
         );
+        // FIXME: clean approvals and test
         _rejectResource(tokenId, index);
     }
 
@@ -392,6 +396,7 @@ contract MultiResourceToken721 is MultiResourceTokenAbstract, IERC721 {
             _isApprovedOrOwner(_msgSender(), tokenId),
             "MultiResource: not owner"
         );
+        // FIXME: clean approvals and test
         _rejectAllResources(tokenId);
     }
 
@@ -403,6 +408,7 @@ contract MultiResourceToken721 is MultiResourceTokenAbstract, IERC721 {
             _isApprovedOrOwner(_msgSender(), tokenId),
             "MultiResource: not owner"
         );
+        // FIXME: clean approvals and test
         _setPriority(tokenId, priorities);
     }
 
