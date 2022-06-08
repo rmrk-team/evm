@@ -17,8 +17,6 @@ interface IRMRKNesting is IERC721 {
         bool
     );
 
-    function _burnChildren(uint256 tokenId, address oldOwner) external;
-
     function burnFromParent(uint256 tokenId) external;
 
     function addChild(
@@ -49,7 +47,6 @@ interface IRMRKNesting is IERC721 {
 
     function unnestToken(
         uint256 tokenId,
-        uint256 parentId,
-        address parentAddress
+        uint256 parentId
     ) external;
 }

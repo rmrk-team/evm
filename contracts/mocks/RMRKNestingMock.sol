@@ -30,12 +30,10 @@ contract RMRKNestingMock is RMRKNesting, IRMRKNestingReceiver {
 
     //update for reentrancy
     function burn(uint256 tokenId) public {
-        console.log("Called external burn");
         require(
             _isApprovedOrOwner(_msgSender(), tokenId),
             "RMRKCore: transfer caller is not owner nor approved"
         );
-        console.log("Will cal internal _burn");
         _burn(tokenId);
     }
 
