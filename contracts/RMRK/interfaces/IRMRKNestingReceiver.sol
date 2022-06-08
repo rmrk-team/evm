@@ -7,11 +7,11 @@ pragma solidity ^0.8.0;
  */
 interface IRMRKNestingReceiver {
 
-  function onRMRKNestingReceived(
-      address,
-      address,
-      uint256,
-      bytes calldata
-  ) external returns (bytes4);
+    function onRMRKNestingReceived(
+        address,
+        address,
+        uint256,
+        bytes calldata
+    ) external returns (bytes4);
 
 }

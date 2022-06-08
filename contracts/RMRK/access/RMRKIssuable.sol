@@ -6,15 +6,15 @@ import "./AccessControl.sol";
 
 contract RMRKIssuable is AccessControl {
 
-  bytes32 private constant ISSUER_ROLE = keccak256("ISSUER");
-  
-  constructor() {
-    _grantRole(ISSUER_ROLE, msg.sender);
-    _setRoleAdmin(ISSUER_ROLE, ISSUER_ROLE);
-  }
+    bytes32 private constant ISSUER_ROLE = keccak256("ISSUER");
+    
+    constructor() {
+        _grantRole(ISSUER_ROLE, msg.sender);
+        _setRoleAdmin(ISSUER_ROLE, ISSUER_ROLE);
+    }
 
-  modifier onlyIssuer() {
-    _checkRole(ISSUER_ROLE, _msgSender());
-    _;
-  }
+    modifier onlyIssuer() {
+        _checkRole(ISSUER_ROLE, _msgSender());
+        _;
+    }
 }
