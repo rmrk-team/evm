@@ -19,6 +19,8 @@ interface IRMRKNesting is IERC721 {
 
     function _burnChildren(uint256 tokenId, address oldOwner) external;
 
+    function burnFromParent(uint256 tokenId) external;
+
     function addChild(
         uint256 parentTokenId,
         uint256 childTokenId,
