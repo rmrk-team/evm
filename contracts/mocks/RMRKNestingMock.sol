@@ -2,16 +2,16 @@
 
 pragma solidity ^0.8.9;
 
-import "../RMRK/RMRKCore.sol";
+import "../RMRK/RMRKNesting.sol";
+import "../RMRK/interfaces/IRMRKNestingReceiver.sol";
 
 //Minimal public implementation of RMRKCore for testing.
 
-contract RMRKCoreMock is RMRKCore {
+contract RMRKNestingMock is RMRKNesting, IRMRKNestingReceiver {
     constructor(
         string memory name_,
-        string memory symbol_,
-        string memory resourceName
-    ) RMRKCore(name_, symbol_, resourceName) {}
+        string memory symbol_
+    ) RMRKNesting(name_, symbol_) {}
 
     //The preferred method here is to overload the function, but hardhat tests prevent this.
     function doMint(address to, uint256 tokenId) external {
@@ -33,5 +33,14 @@ contract RMRKCoreMock is RMRKCore {
             "RMRKCore: transfer caller is not owner nor approved"
         );
         _burn(tokenId);
+    }
+
+    function onRMRKNestingReceived(
+        address from,
+        address to,
+        uint256 tokenId,
+        bytes calldata
+    ) external returns (bytes4) {
+        return IRMRKNestingReceiver.onRMRKNestingReceived.selector;
     }
 }
