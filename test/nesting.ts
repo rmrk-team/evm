@@ -632,21 +632,21 @@ describe('Nesting', async () => {
 
     it('cannot unnest token directly even if root owner', async function () {
       const { childId, parentId, firstOwner } = await mintTofirstOwner(true);
-      await expect(
-        petMonkey.connect(firstOwner).unnestToken(childId, parentId, firstOwner.address),
-      ).to.be.revertedWith('RMRKCore: unnest from wrong owner');
+      await expect(petMonkey.connect(firstOwner).unnestToken(childId, parentId)).to.be.revertedWith(
+        'RMRKCore: unnest from wrong owner',
+      );
     });
 
     it('cannot unnest token not owned by an NFT', async function () {
       const { parentId, firstOwner } = await mintTofirstOwner(true);
-      await expect(
-        ownerChunky.connect(firstOwner).unnestToken(parentId, 0, firstOwner.address),
-      ).to.be.revertedWith('RMRKCore: unnest for non-NFT parent');
+      await expect(ownerChunky.connect(firstOwner).unnestToken(parentId, 0)).to.be.revertedWith(
+        'RMRKCore: unnest for non-NFT parent',
+      );
     });
   });
 
   describe('Transfer', async function () {
-    it.skip('can transfer token', async function () {
+    it('can transfer token', async function () {
       const tokenId = 1;
       const newOwner = addrs[2];
 
@@ -665,7 +665,7 @@ describe('Nesting', async () => {
       ).to.be.revertedWith('RMRKCore: Not approved or owner');
     });
 
-    it.skip('can transfer token from approved address (not owner)', async function () {
+    it('can transfer token from approved address (not owner)', async function () {
       const tokenId = 1;
       const firstOwner = addrs[1];
       const approved = addrs[2];
@@ -686,7 +686,7 @@ describe('Nesting', async () => {
       expect(await petMonkey.ownerOf(tokenId)).to.eql(newOwner.address);
     });
 
-    it.skip('can transfer not nested token to address and owners are ok', async function () {
+    it('can transfer not nested token to address and owners are ok', async function () {
       const newOwner = addrs[2];
       const { childId, parentId, firstOwner } = await mintTofirstOwner();
       await ownerChunky
@@ -716,7 +716,7 @@ describe('Nesting', async () => {
       ]);
     });
 
-    it.skip('can transfer not nested token to address and children are ok', async function () {
+    it('can transfer not nested token to address and children are ok', async function () {
       const newOwner = addrs[2];
       const { childId, parentId, firstOwner } = await mintTofirstOwner();
       await ownerChunky
@@ -734,7 +734,7 @@ describe('Nesting', async () => {
       expect(children).to.eql([[ethers.BigNumber.from(childId), petMonkey.address, 0, partId]]);
     });
 
-    it.skip('cannot transfer nested child', async function () {
+    it('cannot transfer nested child', async function () {
       const newParentId = 12; // owner is firstOwner
       const { childId, firstOwner } = await mintTofirstOwner(true);
 
@@ -751,6 +751,7 @@ describe('Nesting', async () => {
       ).to.be.revertedWith('RMRKCore: Must unnest first');
     });
 
+    // broken
     it.skip('can transfer parent token to token with same owner, family tree is ok', async function () {
       const newParentId = 12; // owner is firstOwner
       const { childId, parentId, firstOwner } = await mintTofirstOwner(true);
@@ -766,9 +767,9 @@ describe('Nesting', async () => {
         );
 
       let expectedAccepted = [ethers.BigNumber.from(childId), petMonkey.address, 0, partId];
-      checkAcceptedAndPendingChildren(ownerChunky, parentId, expectedAccepted, []);
+      checkAcceptedAndPendingChildren(ownerChunky, parentId, [expectedAccepted], []);
       expectedAccepted = [ethers.BigNumber.from(parentId), ownerChunky.address, 0, partId];
-      checkAcceptedAndPendingChildren(ownerChunky, newParentId, expectedAccepted, []);
+      checkAcceptedAndPendingChildren(ownerChunky, newParentId, [expectedAccepted], []);
     });
   });
 
@@ -792,8 +793,8 @@ describe('Nesting', async () => {
   async function checkAcceptedAndPendingChildren(
     contract: RMRKNestingMock,
     tokenId: number,
-    expectedAccepted: any,
-    expectedPending: any,
+    expectedAccepted: any[],
+    expectedPending: any[],
   ) {
     const accepted = await contract.childrenOf(tokenId);
     expect(accepted).to.eql(expectedAccepted);
