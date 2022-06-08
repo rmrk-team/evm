@@ -129,8 +129,8 @@ contract MultiResourceToken721 is MultiResourceTokenAbstract, IERC721 {
 
 
     function getApproved(
-        uint256 tokenId)
-     public view virtual override returns (address) {
+        uint256 tokenId
+    ) public view virtual override returns (address) {
         require(
             _exists(tokenId),
             "MultiResource: approved query for nonexistent token"
@@ -373,7 +373,7 @@ contract MultiResourceToken721 is MultiResourceTokenAbstract, IERC721 {
 
     function acceptResource(uint256 tokenId, uint256 index) external virtual {
         require(
-            _msgSender() == ownerOf(tokenId),
+            _isApprovedOrOwner(_msgSender(), tokenId),
             "MultiResource: not owner"
         );
         _acceptResource(tokenId, index);
@@ -381,7 +381,7 @@ contract MultiResourceToken721 is MultiResourceTokenAbstract, IERC721 {
 
     function rejectResource(uint256 tokenId, uint256 index) external virtual {
         require(
-            _msgSender() == ownerOf(tokenId),
+            _isApprovedOrOwner(_msgSender(), tokenId),
             "MultiResource: not owner"
         );
         _rejectResource(tokenId, index);
@@ -389,7 +389,7 @@ contract MultiResourceToken721 is MultiResourceTokenAbstract, IERC721 {
 
     function rejectAllResources(uint256 tokenId) external virtual {
         require(
-            _msgSender() == ownerOf(tokenId),
+            _isApprovedOrOwner(_msgSender(), tokenId),
             "MultiResource: not owner"
         );
         _rejectAllResources(tokenId);
@@ -400,7 +400,7 @@ contract MultiResourceToken721 is MultiResourceTokenAbstract, IERC721 {
         uint16[] memory priorities
     ) external virtual {
         require(
-            _msgSender() == ownerOf(tokenId),
+            _isApprovedOrOwner(_msgSender(), tokenId),
             "MultiResource: not owner"
         );
         _setPriority(tokenId, priorities);

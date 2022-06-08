@@ -57,7 +57,7 @@ abstract contract MultiResourceTokenAbstract is Context, IMultiResource {
             "MultiResource: index out of bounds"
         );
         bytes8 resourceId = _pendingResources[tokenId][index];
-        _pendingResources[tokenId].removeItemByIndex(0);
+        _pendingResources[tokenId].removeItemByIndex(index);
 
         bytes8 overwrite = _resourceOverwrites[tokenId][resourceId];
         if (overwrite != bytes8(0)) {
