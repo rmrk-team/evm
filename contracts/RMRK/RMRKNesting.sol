@@ -88,6 +88,14 @@ contract RMRKNesting is Context, IRMRKNesting {
     @dev Returns balance of tokens owner by a given rootOwner.
     */
 
+    function name() public view returns (string memory) {
+        return _name;
+    }
+
+    function symbol() public view returns (string memory) {
+        return _symbol;
+    }
+
     function balanceOf(address owner) public view virtual returns (uint256) {
         require(owner != address(0), "RMRKCore: balance query for the zero address");
         return _balances[owner];

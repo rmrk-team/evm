@@ -48,15 +48,15 @@ describe('Nesting', async () => {
   });
 
   describe('Init', async function () {
-    // it.skip('Name', async function () {
-    //   expect(await ownerChunky.name()).to.equal(name);
-    //   expect(await petMonkey.name()).to.equal(name2);
-    // });
+    it('Name', async function () {
+      expect(await ownerChunky.name()).to.equal(name);
+      expect(await petMonkey.name()).to.equal(name2);
+    });
 
-    // it.skip('Symbol', async function () {
-    //   expect(await ownerChunky.symbol()).to.equal(symbol);
-    //   expect(await petMonkey.symbol()).to.equal(symbol2);
-    // });
+    it('Symbol', async function () {
+      expect(await ownerChunky.symbol()).to.equal(symbol);
+      expect(await petMonkey.symbol()).to.equal(symbol2);
+    });
 
     it('ownerChunky Ownership Test', async function () {
       expect(await ownerChunky.ownerOf(10)).to.equal(addrs[0].address);
@@ -751,9 +751,10 @@ describe('Nesting', async () => {
       ).to.be.revertedWith('RMRKCore: Must unnest first');
     });
 
-    // broken
-    it.skip('can transfer parent token to token with same owner, family tree is ok', async function () {
-      const newParentId = 12; // owner is firstOwner
+    it('can transfer parent token to token with same owner, family tree is ok', async function () {
+      const newGrandparentId = 12; // owner is firstOwner
+
+      // Ownership: firstOwner > parent > child
       const { childId, parentId, firstOwner } = await mintTofirstOwner(true);
 
       await ownerChunky
@@ -762,14 +763,16 @@ describe('Nesting', async () => {
           firstOwner.address,
           ownerChunky.address,
           parentId,
-          newParentId,
+          newGrandparentId,
           emptyData,
         );
 
-      let expectedAccepted = [ethers.BigNumber.from(childId), petMonkey.address, 0, partId];
-      checkAcceptedAndPendingChildren(ownerChunky, parentId, [expectedAccepted], []);
-      expectedAccepted = [ethers.BigNumber.from(parentId), ownerChunky.address, 0, partId];
-      checkAcceptedAndPendingChildren(ownerChunky, newParentId, [expectedAccepted], []);
+      // Parent is still owner of child
+      let expected = [ethers.BigNumber.from(childId), petMonkey.address, 0, partId];
+      checkAcceptedAndPendingChildren(ownerChunky, parentId, [expected], []);
+      // Ownership: firstOwner > newGrandparent > parent > child
+      expected = [ethers.BigNumber.from(parentId), ownerChunky.address, 0, partId];
+      checkAcceptedAndPendingChildren(ownerChunky, newGrandparentId, [], [expected]);
     });
   });
 
@@ -799,7 +802,7 @@ describe('Nesting', async () => {
     const accepted = await contract.childrenOf(tokenId);
     expect(accepted).to.eql(expectedAccepted);
 
-    const pending = await contract.childrenOf(tokenId);
+    const pending = await contract.pendingChildrenOf(tokenId);
     expect(pending).to.eql(expectedPending);
   }
 });
