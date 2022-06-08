@@ -47,6 +47,10 @@ contract MultiResourceToken721Mock is MultiResourceToken721 {
         bytes8 resourceId,
         bytes8 overwrites
     ) external onlyIssuer {
+        require(
+            ownerOf(tokenId) != address(0),
+            "ERC721: owner query for nonexistent token"
+        );
         _addResourceToToken(tokenId, resourceId, overwrites);
     }
 

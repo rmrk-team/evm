@@ -419,10 +419,8 @@ describe('MultiResource', async () => {
     it('cannot set different number of priorities', async function () {
       const tokenId = 1;
       await addResourcesToToken(tokenId);
-      await expect(token.connect(addrs[1]).setPriority(tokenId, [1])).to.be.revertedWith(
-        'Bad priority list length',
-      );
-      await expect(token.connect(addrs[1]).setPriority(tokenId, [2, 1, 3])).to.be.revertedWith(
+      await expect(token.setPriority(tokenId, [1])).to.be.revertedWith('Bad priority list length');
+      await expect(token.setPriority(tokenId, [2, 1, 3])).to.be.revertedWith(
         'Bad priority list length',
       );
     });
