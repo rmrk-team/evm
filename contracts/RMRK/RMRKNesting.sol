@@ -112,6 +112,8 @@ contract RMRKNesting is Context, IRMRKNesting {
   */
   function rmrkOwnerOf(uint256 tokenId) public view virtual returns (address, uint256, bool) {
     RMRKOwner memory owner = _RMRKOwners[tokenId];
+    // console.log("tokenId: %s", tokenId);
+    // console.log("owner: %s", owner.ownerAddress);
     require(owner.ownerAddress != address(0), "RMRKCore: owner query for nonexistent token");
     return (owner.ownerAddress, owner.tokenId, owner.isNft);
   }
@@ -225,10 +227,12 @@ function _baseURI() internal view virtual returns (string memory) {
   */
 
   //update for reentrancy
-  function _burn(uint256 tokenId) internal virtual {
+  function _burnOld(uint256 tokenId) internal virtual {
+    console.log("_burn: Will try to burn: %s", tokenId);
     address owner = ownerOf(tokenId);
     require(_isApprovedOrOwner(_msgSender(), tokenId), "RMRKCore: burn caller is not owner nor approved");
     _beforeTokenTransfer(owner, address(0), tokenId);
+    console.log("_burn: Checked ownership for: %s", tokenId);
 
     // Clear approvals
     _approve(address(0), tokenId);
@@ -236,16 +240,21 @@ function _baseURI() internal view virtual returns (string memory) {
     _balances[owner] -= 1;
 
     Child[] memory children = childrenOf(tokenId);
+    console.log("_burn: Loaded children for: %s", tokenId);
 
     uint length = children.length; //gas savings
+    console.log("_burn: Total children: %s", length);
     //Check to see if i.u_inc() assembly method or { unchecked ++1 } saves more gas
     for (uint i; i<length; i.u_inc()){
+      console.log("i: %s", i);
+      console.log("_burn: Will call burn children for: %s", children[i].tokenId);
       IRMRKNesting(children[i].contractAddress)._burnChildren(
         children[i].tokenId,
         owner
       );
     }
 
+    console.log("_burn: Removing token from owners: %s", tokenId);
     delete _RMRKOwners[tokenId];
     emit Transfer(owner, address(0), tokenId);
 
@@ -641,16 +650,22 @@ function _baseURI() internal view virtual returns (string memory) {
   //recursively calls _burnChildren on all children
   //update for reentrancy
   function _burnChildren(uint256 tokenId, address oldOwner) public virtual {
+    console.log("_burnChildren: Burning children for tokenId: %s", tokenId);
     (address _RMRKOwner, , ) = rmrkOwnerOf(tokenId);
     require(_RMRKOwner == _msgSender(), "Caller is not RMRKOwner contract");
     _balances[oldOwner] -= 1;
+    console.log("_burnChildren: Checked ownership for tokenId: %s", tokenId);
 
     Child[] memory children = childrenOf(tokenId);
+    console.log("_burnChildren: Loaded children for tokenId: %s", tokenId);
 
     uint256 length = children.length; //gas savings
+    console.log("_burnChildren: Total children: %s", length);
     for (uint i; i<length; i = i.u_inc()){
       address childContractAddress = children[i].contractAddress;
       uint256 childTokenId = children[i].tokenId;
+
+      console.log("_burnChildren: Calling _burnChildren on childContractAddress: %s", childContractAddress);
 
       IRMRKNesting(childContractAddress)._burnChildren(
         childTokenId,
@@ -662,6 +677,46 @@ function _baseURI() internal view virtual returns (string memory) {
 
     //Also delete pending arrays for gas refund?
     //This can emit a lot of events.
+  }
+
+  function _burn(uint256 tokenId) internal virtual {
+    console.log("_burn: Will burn: %s", tokenId);
+    address owner = ownerOf(tokenId);
+    _burnForOwner(tokenId, owner);
+  }
+
+  //update for reentrancy
+  function burnFromParent(uint256 tokenId) external {
+    console.log("burnFromParent: Will burn: %s", tokenId);
+    (address _RMRKOwner, , ) = rmrkOwnerOf(tokenId);
+    require(_RMRKOwner == _msgSender(), "Caller is not RMRKOwner contract");
+    address owner = ownerOf(tokenId);
+    _burnForOwner(tokenId, owner);
+  }
+
+  function _burnForOwner(uint256 tokenId, address rootOwner) private {
+    console.log("_burnForOwner: Will burn: %s", tokenId);
+    _beforeTokenTransfer(rootOwner, address(0), tokenId);
+    _approve(address(0), tokenId);
+    _balances[rootOwner] -= 1;
+
+    Child[] memory children = childrenOf(tokenId);
+
+    uint256 length = children.length; //gas savings
+    console.log("_burnForOwner: Loaded children (%s)", length);
+    for (uint i; i<length; i = i.u_inc()){
+      address childContractAddress = children[i].contractAddress;
+      uint256 childTokenId = children[i].tokenId;
+      console.log("_burnForOwner: Will burn child: %s", childTokenId);
+      IRMRKNesting(childContractAddress).burnFromParent(childTokenId);
+    }
+    delete _RMRKOwners[tokenId];
+    delete _pendingChildren[tokenId];
+    delete _children[tokenId];
+    delete _tokenApprovals[tokenId];
+
+    _afterTokenTransfer(rootOwner, address(0), tokenId);
+    emit Transfer(rootOwner, address(0), tokenId);
   }
 
   /**

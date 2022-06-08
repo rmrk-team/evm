@@ -517,7 +517,7 @@ describe('Nesting', async () => {
     });
 
     // FIXME: Broken
-    it.skip('can recursively burn nested token', async function () {
+    it('can recursively burn nested token', async function () {
       const childId = 1;
       const parentId = 10;
       const granchildId = 21;

@@ -4,6 +4,7 @@ pragma solidity ^0.8.9;
 
 import "../RMRK/RMRKNesting.sol";
 import "../RMRK/interfaces/IRMRKNestingReceiver.sol";
+import "hardhat/console.sol";
 
 //Minimal public implementation of RMRKCore for testing.
 
@@ -27,20 +28,23 @@ contract RMRKNestingMock is RMRKNesting, IRMRKNestingReceiver {
         _mint(to, tokenId, destId, data);
     }
 
+    //update for reentrancy
     function burn(uint256 tokenId) public {
+        console.log("Called external burn");
         require(
             _isApprovedOrOwner(_msgSender(), tokenId),
             "RMRKCore: transfer caller is not owner nor approved"
         );
+        console.log("Will cal internal _burn");
         _burn(tokenId);
     }
 
     function onRMRKNestingReceived(
-        address from,
-        address to,
-        uint256 tokenId,
+        address,
+        address,
+        uint256,
         bytes calldata
-    ) external returns (bytes4) {
+    ) external pure returns (bytes4) {
         return IRMRKNestingReceiver.onRMRKNestingReceived.selector;
     }
 }
