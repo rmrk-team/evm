@@ -505,7 +505,7 @@ function _baseURI() internal view virtual returns (string memory) {
     uint256 parentTokenId,
     uint256 childTokenId,
     address childTokenAddress
-  ) public virtual onlyApprovedOrOwner(parentTokenId) {
+  ) public virtual {
     IRMRKNesting childTokenContract = IRMRKNesting(childTokenAddress);
     (address parent, , ) = childTokenContract.rmrkOwnerOf(childTokenId);
     require(parent == address(this), "Parent-child mismatch");
@@ -587,7 +587,7 @@ function _baseURI() internal view virtual returns (string memory) {
   }
 
   //TODO Gotta ask steven about this one
-  function unnestToken(uint256 tokenId, uint256 parentId, address newOwner) public virtual onlyApprovedOrOwner(tokenId) {
+  function unnestToken(uint256 tokenId, uint256 parentId, address newOwner) public virtual {
     // A malicious contract which is parent to this token, could unnest any children and transfer to new owner
     RMRKOwner memory owner = _RMRKOwners[tokenId];
     require(
