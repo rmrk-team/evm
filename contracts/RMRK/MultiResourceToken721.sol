@@ -38,36 +38,6 @@ contract MultiResourceToken721 is MultiResourceTokenAbstract, IERC721 {
     // Mapping from owner to operator approvals
     mapping(address => mapping(address => bool)) private _operatorApprovals;
 
-    //mapping of bytes8 Ids to resource object
-    mapping(bytes8 => Resource) private _resources;
-
-    //mapping tokenId to current resource to replacing resource
-    mapping(uint256 => mapping(bytes8 => bytes8)) private _resourceOverwrites;
-
-    //mapping of tokenId to all resources
-    mapping(uint256 => bytes8[]) private _activeResources;
-
-    //mapping of tokenId to an array of resource priorities
-    mapping(uint256 => uint16[]) private _activeResourcePriorities;
-
-    //Double mapping of tokenId to active resources
-    mapping(uint256 => mapping(bytes8 => bool)) private _tokenResources;
-
-    //mapping of tokenId to all resources by priority
-    mapping(uint256 => bytes8[]) private _pendingResources;
-
-    //Mapping of bytes8 resource ID to tokenEnumeratedResource for tokenURI
-    mapping(bytes8 => bool) private _tokenEnumeratedResource;
-
-    //Mapping of bytes16 custom field to bytes data
-    mapping(bytes8 => mapping (bytes16 => bytes)) private _customResourceData;
-
-    //List of all resources
-    bytes8[] private _allResources;
-
-    //fallback URI
-    string private _fallbackURI;
-
     constructor(string memory name_, string memory symbol_) {
         _name = name_;
         _symbol = symbol_;
