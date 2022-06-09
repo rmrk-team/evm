@@ -7,6 +7,13 @@ import "./IRMRKNestingReceiver.sol";
 
 interface IRMRKNesting is IERC721 {
 
+    event ChildProposed(uint parentTokenId);
+    event ChildAccepted(uint tokenId);
+    event PendingChildRemoved(uint tokenId, uint index);
+    event AllPendingChildrenRemoved(uint tokenId);
+    event ChildRemoved(uint tokenId, uint index);
+    event ChildUnnested(uint parentTokenId, uint childTokenId);
+
     function ownerOf(uint256 tokenId)
     external view returns (address owner);
 

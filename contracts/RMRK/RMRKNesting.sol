@@ -56,17 +56,6 @@ contract RMRKNesting is Context, IRMRKNesting {
     // Mapping of tokenId to array of pending children structs
     mapping(uint256 => Child[]) internal _pendingChildren;
 
-    //Nesting events
-    //MIGRATE THESE TO INTERFACE AFTER WORKING
-    event ChildProposed(uint parentTokenId);
-    event ChildAccepted(uint tokenId);
-    event ChildTransferApproved(uint tokenId);  // FIXME: untested
-    event PendingChildRemoved(uint tokenId, uint index);
-    event AllPendingChildrenRemoved(uint tokenId);
-    event ChildRemoved(uint tokenId, uint index);
-    event ChildUnnested(uint parentTokenId, uint childTokenId);
-    //Gas check this, can emit lots of events. Possibly offset by gas savings from deleted arrays.
-    event ChildBurned(uint tokenId);
 
     modifier onlyApprovedOrOwner(uint256 tokenId) {
         require(_isApprovedOrOwner(_msgSender(), tokenId),
