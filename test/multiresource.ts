@@ -443,7 +443,10 @@ describe('MultiResource', async () => {
       await token.addResourceToToken(tokenId, resId, emptyOverwrite);
       await token.addResourceToToken(tokenId, resId2, emptyOverwrite);
 
-      await expect(token.connect(approvedAddress).rejectAllResources(tokenId)).to.emit(token, 'ResourceRejected');
+      await expect(token.connect(approvedAddress).rejectAllResources(tokenId)).to.emit(
+        token,
+        'ResourceRejected',
+      );
 
       const pending = await token.getFullPendingResources(tokenId);
       expect(pending).to.be.eql([]);
