@@ -14,12 +14,11 @@ contract RMRKNestingMock is RMRKNesting, IRMRKNestingReceiver {
         string memory symbol_
     ) RMRKNesting(name_, symbol_) {}
 
-    //The preferred method here is to overload the function, but hardhat tests prevent this.
-    function doMint(address to, uint256 tokenId) external {
+    function mint(address to, uint256 tokenId) external {
         _mint(to, tokenId);
     }
 
-    function doMintNest(
+    function mint(
         address to,
         uint256 tokenId,
         uint256 destId,
