@@ -63,4 +63,25 @@ library RMRKLib {
     return isIn;
   }
 
+  /* //Implement these if useful/time
+  //Returns first zero found in array -- more efficient for a lot of things
+  //Untested, could be busted, gotta test
+  function getZero(uint256[] memory array_) public view returns(uint256) {
+
+    assembly {
+        let val := add(array_, 0x20)
+        let len := mload(array_)
+        for
+            { let i := 0x0 }
+            lt(i, len)
+            {  }
+        {
+            if iszero(mload(val)) {
+              return(i)
+            }
+        }
+    }
+
+  } */
+
 }

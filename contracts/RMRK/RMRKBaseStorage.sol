@@ -3,8 +3,10 @@
 pragma solidity ^0.8.9;
 
 import "./access/AccessControl.sol";
+import "./utils/Address.sol";
 
-contract RMRKBaseCore is AccessControl {
+contract RMRKBaseStorage is AccessControl {
+  using Address for address;
     /*
   REVIEW NOTES:
 
@@ -29,18 +31,22 @@ contract RMRKBaseCore is AccessControl {
 
     //bytes8 is sort of arbitrary here--resource IDs in RMRK substrate are bytes8 for reference
     mapping(bytes8 => Base) private bases;
+    mapping(bytes8 => mapping(address => bool)) private isEquippable;
 
     bytes8[] private baseIds;
 
     bytes32 public constant issuer = keccak256("ISSUER");
+
+    //TODO: Make private
+    string public name;
 
     enum ItemType {
         Slot,
         Fixed
     }
 
-    event AddedEquippablesToEntry(bytes8 baseId, bytes8[] equippableIds);
-    event AddedEquippableToAll(bytes8 equippableId);
+    event AddedEquippablesToEntry(bytes8 baseId, address[] equippableAddresses);
+    event AddedEquippableToAll(address equippableAddress);
 
     //Inquire about using an index instead of hashed ID to prevent any chance of collision
     struct IntakeStruct {
@@ -61,20 +67,20 @@ contract RMRKBaseCore is AccessControl {
         ItemType itemType; //1 byte
         uint8 z; //1 byte
         bool exists; //1 byte
-        bytes8[] equippableIds; //n bytes 32+
+        address[] equippable; //n bytes 32+
         string src; //n bytes 32+
         string fallbackSrc; //n bytes 32+
     }
 
     /**
-  @dev Base items are only settable during contract deployment (with one exception, see addEquippableIds).
+  @dev Base items are only settable during contract deployment (with one exception, see addequippableAddresses).
   * This may need to be changed for contracts which would reach the block gas limit.
   */
 
-    constructor(IntakeStruct[] memory intakeStruct) {
+    constructor(string memory _name) {
         _grantRole(issuer, msg.sender);
         _setRoleAdmin(issuer, issuer);
-        addBaseEntryList(intakeStruct);
+        name = _name;
     }
 
     /**
@@ -100,18 +106,23 @@ contract RMRKBaseCore is AccessControl {
     }
 
     /**
-  @dev Public function which adds a number of equippableIds to a single base entry. Only accessible by the contract
+  @dev Public function which adds a number of equippableAddresses to a single base entry. Only accessible by the contract
   * deployer or transferred Issuer, designated by the modifier onlyIssuer as per the inherited contract issuerControl.
   */
 
-    function addEquippableIds(
-        bytes8 _baseEntryid,
-        bytes8[] memory _equippableIds
+    function addEquippableAddresses(
+        bytes8 _baseId,
+        address[] memory _equippableAddresses
     ) public onlyRole(issuer) {
-        require(_equippableIds.length > 0, "RMRK: Zero-length ids passed.");
-        require(bases[_baseEntryid].exists, "RMRK: Base entry does not exist.");
-        bases[_baseEntryid].equippableIds = _equippableIds;
-        emit AddedEquippablesToEntry(_baseEntryid, _equippableIds);
+        require(_equippableAddresses.length > 0, "RMRK: Zero-length ids passed.");
+        require(bases[_baseId].exists, "RMRK: Base entry does not exist.");
+        for (uint256 i = 0; i < _equippableAddresses.length;) {
+            if (bases[_baseId].itemType == ItemType.Slot) {
+                isEquippable[_baseId][_equippableAddresses[i]] = true;
+            }
+            unchecked {++i;}
+        }
+        emit AddedEquippablesToEntry(_baseId, _equippableAddresses);
     }
 
     /**
@@ -120,17 +131,18 @@ contract RMRKBaseCore is AccessControl {
   * deployer or transferred Issuer, designated by the modifier onlyIssuer as per the inherited contract issuerControl.
   */
 
-    function addEquippableIdToAll(bytes8 _equippableId)
+    function addEquippableIdToAll(address _equippableAddress)
         public
         onlyRole(issuer)
     {
-        for (uint256 i = 0; i < baseIds.length; i++) {
+        for (uint256 i = 0; i < baseIds.length;) {
             bytes8 baseId_ = baseIds[i];
             if (bases[baseId_].itemType == ItemType.Slot) {
-                bases[baseId_].equippableIds.push(_equippableId);
+                isEquippable[baseId_][_equippableAddress] = true;
             }
+            unchecked {++i;}
         }
-        emit AddedEquippableToAll(_equippableId);
+        emit AddedEquippableToAll(_equippableAddress);
     }
 
     /**
@@ -138,6 +150,9 @@ contract RMRKBaseCore is AccessControl {
   */
 
     function getBaseEntry(bytes8 _id) external view returns (Base memory) {
+        if(msg.sender.isContract()) {
+          require(isEquippable[_id][msg.sender], "RMRK Equippable: read not whitelisted");
+        }
         return (bases[_id]);
     }
 
@@ -150,9 +165,14 @@ contract RMRKBaseCore is AccessControl {
         view
         returns (Base[] memory)
     {
+        bool isContract;
         Base[] memory baseEntries;
-        for (uint256 i = 0; i < _ids.length; i++) {
+        for (uint256 i = 0; i < _ids.length;) {
+            if(isContract) {
+              require(isEquippable[_ids[i]][msg.sender], "RMRK Equippable: read not whitelisted");
+            }
             baseEntries[i] = bases[_ids[i]];
+            unchecked {++i;}
         }
         return baseEntries;
     }
