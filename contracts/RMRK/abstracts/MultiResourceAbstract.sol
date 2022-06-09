@@ -2,13 +2,13 @@
 
 pragma solidity ^0.8.9;
 
-import "./interfaces/IMultiResource.sol";
-import "./library/MultiResourceLib.sol";
-import "./utils/Address.sol";
-import "./utils/Strings.sol";
-import "./utils/Context.sol";
+import "../interfaces/IMultiResource.sol";
+import "../library/MultiResourceLib.sol";
+import "../utils/Address.sol";
+import "../utils/Strings.sol";
+import "../utils/Context.sol";
 
-abstract contract MultiResourceTokenAbstract is Context, IMultiResource {
+abstract contract MultiResourceAbstract is Context, IMultiResource {
 
     using MultiResourceLib for uint256;
     using MultiResourceLib for bytes8[];

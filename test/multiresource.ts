@@ -13,8 +13,6 @@ describe('MultiResource', async () => {
   const name = 'RmrkTest';
   const symbol = 'RMRKTST';
 
-  const srcDefault = 'src';
-  const thumbDefault = 'thumb';
   const metaURIDefault = 'metaURI';
   const customDefault: string[] = [];
 
@@ -42,9 +40,7 @@ describe('MultiResource', async () => {
     it('can add resource', async function () {
       const id = ethers.utils.hexZeroPad('0x1111', 8);
 
-      await expect(
-        token.addResourceEntry(id, srcDefault, thumbDefault, metaURIDefault, customDefault),
-      )
+      await expect(token.addResourceEntry(id, metaURIDefault, customDefault))
         .to.emit(token, 'ResourceSet')
         .withArgs(id);
     });
@@ -57,9 +53,7 @@ describe('MultiResource', async () => {
     it('cannot add resource entry if not issuer', async function () {
       const id = ethers.utils.hexZeroPad('0x1111', 8);
       await expect(
-        token
-          .connect(addrs[1])
-          .addResourceEntry(id, srcDefault, thumbDefault, metaURIDefault, customDefault),
+        token.connect(addrs[1]).addResourceEntry(id, metaURIDefault, customDefault),
       ).to.be.revertedWith('RMRK: Only issuer');
     });
 
@@ -81,38 +75,36 @@ describe('MultiResource', async () => {
     it('cannot overwrite resource', async function () {
       const id = ethers.utils.hexZeroPad('0x1111', 8);
 
-      await token.addResourceEntry(id, 'src', thumbDefault, metaURIDefault, customDefault);
-      await expect(
-        token.addResourceEntry(id, 'newSrc', thumbDefault, metaURIDefault, customDefault),
-      ).to.be.revertedWith('RMRK: resource already exists');
+      await token.addResourceEntry(id, metaURIDefault, customDefault);
+      await expect(token.addResourceEntry(id, 'newMetaUri', customDefault)).to.be.revertedWith(
+        'RMRK: resource already exists',
+      );
     });
 
     it('cannot add resource with id 0', async function () {
       const id = ethers.utils.hexZeroPad('0x0', 8);
 
-      await expect(
-        token.addResourceEntry(id, srcDefault, thumbDefault, metaURIDefault, customDefault),
-      ).to.be.revertedWith('RMRK: Write to zero');
+      await expect(token.addResourceEntry(id, metaURIDefault, customDefault)).to.be.revertedWith(
+        'RMRK: Write to zero',
+      );
     });
 
     it('cannot add same resource twice', async function () {
       const id = ethers.utils.hexZeroPad('0x1111', 8);
 
-      await expect(
-        token.addResourceEntry(id, srcDefault, thumbDefault, metaURIDefault, customDefault),
-      )
+      await expect(token.addResourceEntry(id, metaURIDefault, customDefault))
         .to.emit(token, 'ResourceSet')
         .withArgs(id);
 
-      await expect(
-        token.addResourceEntry(id, srcDefault, thumbDefault, metaURIDefault, customDefault),
-      ).to.be.revertedWith('RMRK: resource already exists');
+      await expect(token.addResourceEntry(id, metaURIDefault, customDefault)).to.be.revertedWith(
+        'RMRK: resource already exists',
+      );
     });
 
     it('can add and remove custom data for resource', async function () {
       const resId = ethers.utils.hexZeroPad('0x0001', 8);
       const customDataTypeKey = ethers.utils.hexZeroPad('0x0003', 16);
-      await token.addResourceEntry(resId, srcDefault, thumbDefault, metaURIDefault, customDefault);
+      await token.addResourceEntry(resId, metaURIDefault, customDefault);
 
       await expect(token.addCustomDataToResource(resId, customDataTypeKey))
         .to.emit(token, 'ResourceCustomDataAdded')
@@ -147,14 +139,12 @@ describe('MultiResource', async () => {
 
       const pending = await token.getFullPendingResources(tokenId);
       expect(pending).to.be.eql([
-        [resId, srcDefault, thumbDefault, metaURIDefault, customDefault],
-        [resId2, srcDefault, thumbDefault, metaURIDefault, customDefault],
+        [resId, metaURIDefault, customDefault],
+        [resId2, metaURIDefault, customDefault],
       ]);
 
       expect(await token.getPendingResObjectByIndex(tokenId, 0)).to.eql([
         resId,
-        srcDefault,
-        thumbDefault,
         metaURIDefault,
         customDefault,
       ]);
@@ -242,12 +232,10 @@ describe('MultiResource', async () => {
       expect(pending).to.be.eql([]);
 
       const accepted = await token.getFullResources(tokenId);
-      expect(accepted).to.eql([[resId, srcDefault, thumbDefault, metaURIDefault, customDefault]]);
+      expect(accepted).to.eql([[resId, metaURIDefault, customDefault]]);
 
       expect(await token.getResObjectByIndex(tokenId, 0)).to.eql([
         resId,
-        srcDefault,
-        thumbDefault,
         metaURIDefault,
         customDefault,
       ]);
@@ -274,8 +262,8 @@ describe('MultiResource', async () => {
 
       const accepted = await token.getFullResources(tokenId);
       expect(accepted).to.eql([
-        [resId2, srcDefault, thumbDefault, metaURIDefault, customDefault],
-        [resId, srcDefault, thumbDefault, metaURIDefault, customDefault],
+        [resId2, metaURIDefault, customDefault],
+        [resId, metaURIDefault, customDefault],
       ]);
     });
 
@@ -355,7 +343,7 @@ describe('MultiResource', async () => {
       await expect(token.acceptResource(tokenId, 0)).to.emit(token, 'ResourceOverwritten');
 
       expect(await token.getFullResources(tokenId)).to.be.eql([
-        [resId2, srcDefault, thumbDefault, metaURIDefault, customDefault],
+        [resId2, metaURIDefault, customDefault],
       ]);
       // Overwrite should be gone
       expect(await token.getResourceOverwrites(tokenId, pendingResources[0])).to.eql(
@@ -373,7 +361,7 @@ describe('MultiResource', async () => {
       await token.acceptResource(tokenId, 0);
 
       expect(await token.getFullResources(tokenId)).to.be.eql([
-        [resId, srcDefault, thumbDefault, metaURIDefault, customDefault],
+        [resId, metaURIDefault, customDefault],
       ]);
     });
   });
@@ -580,8 +568,8 @@ describe('MultiResource', async () => {
       const resId2 = ethers.utils.hexZeroPad('0x0002', 8);
 
       await token.mint(owner.address, tokenId);
-      await token.addResourceEntry(resId, 'srcA', 'thumbA', 'UriA', customDefault);
-      await token.addResourceEntry(resId2, 'srcB', 'thumbB', 'UriB', customDefault);
+      await token.addResourceEntry(resId, 'UriA', customDefault);
+      await token.addResourceEntry(resId2, 'UriB', customDefault);
       await token.addResourceToToken(tokenId, resId, emptyOverwrite);
       await token.addResourceToToken(tokenId, resId2, emptyOverwrite);
       await token.acceptResource(tokenId, 0);
@@ -607,15 +595,12 @@ describe('MultiResource', async () => {
       const customDataAreaValue = ethers.utils.hexZeroPad('0x00FF', 16);
 
       await token.mint(owner.address, tokenId);
-      await token.addResourceEntry(resId, 'srcA', 'thumbA', 'UriA', [
+      await token.addResourceEntry(resId, 'UriA', [
         customDataWidthKey,
         customDataHeightKey,
         customDataTypeKey,
       ]);
-      await token.addResourceEntry(resId2, 'srcB', 'thumbB', 'UriB', [
-        customDataTypeKey,
-        customDataAreaKey,
-      ]);
+      await token.addResourceEntry(resId2, 'UriB', [customDataTypeKey, customDataAreaKey]);
       await expect(token.setCustomResourceData(resId, customDataWidthKey, customDataWidthValue))
         .to.emit(token, 'ResourceCustomDataSet')
         .withArgs(resId, customDataWidthKey);
@@ -649,8 +634,8 @@ describe('MultiResource', async () => {
     const customDataOtherKey = ethers.utils.hexZeroPad('0x0002', 16);
 
     await token.mint(owner.address, tokenId);
-    await token.addResourceEntry(resId, 'srcA', 'thumbA', 'UriA', [customDataTypeKey]);
-    await token.addResourceEntry(resId2, 'srcB', 'thumbB', 'UriB', [customDataTypeKey]);
+    await token.addResourceEntry(resId, 'srcA', [customDataTypeKey]);
+    await token.addResourceEntry(resId2, 'srcB', [customDataTypeKey]);
     await token.setCustomResourceData(resId, customDataTypeKey, customDataTypeValueA);
     await token.setCustomResourceData(resId2, customDataTypeKey, customDataTypeValueB);
 
@@ -673,7 +658,7 @@ describe('MultiResource', async () => {
 
   async function addResources(ids: string[]): Promise<void> {
     ids.forEach(async (resId) => {
-      await token.addResourceEntry(resId, srcDefault, thumbDefault, metaURIDefault, customDefault);
+      await token.addResourceEntry(resId, metaURIDefault, customDefault);
     });
   }
 

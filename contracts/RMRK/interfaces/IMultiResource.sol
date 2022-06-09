@@ -6,8 +6,6 @@ interface IMultiResource {
 
     struct Resource {
         bytes8 id; //8 bytes
-        string src; //32+
-        string thumb; //32+
         string metadataURI; //32+
         bytes16[] custom;
     }
