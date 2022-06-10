@@ -61,6 +61,15 @@ contract RMRKNesting is Context, IRMRKNesting {
   //             PROVENANCE
   ////////////////////////////////////////
 
+  function name() public view virtual returns (string memory) {
+      return _name;
+  }
+
+
+  function symbol() public view virtual returns (string memory) {
+      return _symbol;
+  }
+
   /**
   @dev Returns balance of tokens owner by a given rootOwner.
   */

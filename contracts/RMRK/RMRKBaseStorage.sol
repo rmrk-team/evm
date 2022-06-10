@@ -41,6 +41,7 @@ contract RMRKBaseStorage is AccessControl {
     string public name;
 
     enum ItemType {
+        None,
         Slot,
         Fixed
     }
@@ -66,8 +67,6 @@ contract RMRKBaseStorage is AccessControl {
     struct Base {
         ItemType itemType; //1 byte
         uint8 z; //1 byte
-        bool exists; //1 byte
-        address[] equippable; //n bytes 32+
         string src; //n bytes 32+
         string fallbackSrc; //n bytes 32+
     }
@@ -87,9 +86,9 @@ contract RMRKBaseStorage is AccessControl {
   @dev Private function for handling an array of base item inputs. Takes an array of type IntakeStruct.
   */
 
-    function addBaseEntryList(IntakeStruct[] memory intakeStruct) private {
+    function _addBaseEntryList(IntakeStruct[] memory intakeStruct) internal {
         for (uint256 i = 0; i < intakeStruct.length; i++) {
-            addBaseEntry(intakeStruct[i]);
+            _addBaseEntry(intakeStruct[i]);
         }
     }
 
@@ -98,51 +97,10 @@ contract RMRKBaseStorage is AccessControl {
   * a bytes8 identifier and a base struct object.
   */
 
-    function addBaseEntry(IntakeStruct memory intakeStruct) private {
-        require(!bases[intakeStruct.id].exists, "Base already exists");
-        intakeStruct.base.exists = true; //enforce exists, can swap to require if need be.
+    function _addBaseEntry(IntakeStruct memory intakeStruct) internal {
+        require(bases[intakeStruct.id].itemType == ItemType.None, "Base already exists");
         bases[intakeStruct.id] = intakeStruct.base;
         baseIds.push(intakeStruct.id);
-    }
-
-    /**
-  @dev Public function which adds a number of equippableAddresses to a single base entry. Only accessible by the contract
-  * deployer or transferred Issuer, designated by the modifier onlyIssuer as per the inherited contract issuerControl.
-  */
-
-    function addEquippableAddresses(
-        bytes8 _baseId,
-        address[] memory _equippableAddresses
-    ) public onlyRole(issuer) {
-        require(_equippableAddresses.length > 0, "RMRK: Zero-length ids passed.");
-        require(bases[_baseId].exists, "RMRK: Base entry does not exist.");
-        for (uint256 i = 0; i < _equippableAddresses.length;) {
-            if (bases[_baseId].itemType == ItemType.Slot) {
-                isEquippable[_baseId][_equippableAddresses[i]] = true;
-            }
-            unchecked {++i;}
-        }
-        emit AddedEquippablesToEntry(_baseId, _equippableAddresses);
-    }
-
-    /**
-  @dev Public function which adds a single equippableId to every base item.
-  * Handle this function with care, this function can be extremely gas-expensive. Only accessible by the contract
-  * deployer or transferred Issuer, designated by the modifier onlyIssuer as per the inherited contract issuerControl.
-  */
-
-    function addEquippableIdToAll(address _equippableAddress)
-        public
-        onlyRole(issuer)
-    {
-        for (uint256 i = 0; i < baseIds.length;) {
-            bytes8 baseId_ = baseIds[i];
-            if (bases[baseId_].itemType == ItemType.Slot) {
-                isEquippable[baseId_][_equippableAddress] = true;
-            }
-            unchecked {++i;}
-        }
-        emit AddedEquippableToAll(_equippableAddress);
     }
 
     /**
@@ -150,9 +108,6 @@ contract RMRKBaseStorage is AccessControl {
   */
 
     function getBaseEntry(bytes8 _id) external view returns (Base memory) {
-        if(msg.sender.isContract()) {
-          require(isEquippable[_id][msg.sender], "RMRK Equippable: read not whitelisted");
-        }
         return (bases[_id]);
     }
 
@@ -167,13 +122,6 @@ contract RMRKBaseStorage is AccessControl {
     {
         bool isContract;
         Base[] memory baseEntries;
-        for (uint256 i = 0; i < _ids.length;) {
-            if(isContract) {
-              require(isEquippable[_ids[i]][msg.sender], "RMRK Equippable: read not whitelisted");
-            }
-            baseEntries[i] = bases[_ids[i]];
-            unchecked {++i;}
-        }
         return baseEntries;
     }
 }

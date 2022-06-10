@@ -8,12 +8,13 @@ import "./RMRKNesting.sol";
 import "./interfaces/IRMRKEquippableResource.sol";
 import "./interfaces/IRMRKResourceBase.sol";
 import "./library/RMRKLib.sol";
+import "./library/MultiResourceLib.sol";
 import "./utils/Address.sol";
 import "./utils/Strings.sol";
 import "./utils/Context.sol";
 import "hardhat/console.sol";
 
-contract RMRKEquippable is Context, IRMRKEquippableResource, RMRKNesting {
+contract RMRKEquippable is Context, RMRKNesting, IRMRKEquippableResource {
 
     constructor(string memory _name, string memory _symbol)
     RMRKNesting(_name, _symbol)
@@ -21,33 +22,54 @@ contract RMRKEquippable is Context, IRMRKEquippableResource, RMRKNesting {
 
     }
 
-    //Gate to owner of tokenId
-    function equip(uint256 tokenId, bytes8 targetResourceId, uint256 slotPartIndex, uint256 childIndex, uint256 childResourceIndex) public {
+    using MultiResourceLib for bytes8[];
+    using MultiResourceLib for bytes16[];
+    using Strings for uint256;
 
+    //TODO: private setter/getters
+    //TODO: Check to see is moving the array into Resource struct is cheaper
+    mapping(bytes8 => bytes8[16]) public fixedPartIds;
+    mapping(bytes8 => bytes8[16]) public slotPartIds;
+    mapping(bytes8 => Equipment[16]) public equipped;
+
+    //Gate to owner of tokenId
+    function equip(
+        uint256 tokenId,
+        bytes8 targetResourceId,
+        uint256 slotPartIndex,
+        uint256 childIndex,
+        uint256 childResourceIndex
+    ) public {
         Resource storage targetResource = _resources[targetResourceId];
         Child memory child = childrenOf(tokenId)[childIndex];
         //TODO check to see if scoping like so costs or saves gas. Probably saves if pointer is re-used after de-scope like assembly?
-        {
-          Resource memory childResource = IRMRKEquippableResource(child.contractAddress).getResObjectByIndex(childIndex, childResourceIndex);
-          require(targetResource.slotPartDefinitions[slotPartIndex] == childResource.slotId, "RMRKEquippable: SlotID mismatch");
-        }
-        targetResource.equippedChildren[slotPartIndex] = Equipped({
+        Resource memory childResource = IRMRKEquippableResource(child.contractAddress).getResObjectByIndex(childIndex, childResourceIndex);
+        require(slotPartIds[targetResourceId][slotPartIndex] == childResource.slotId, "RMRKEquippable: SlotID mismatch");
+
+        equipped[targetResourceId][slotPartIndex] = Equipment({
           tokenId: child.tokenId,
-          contractAddress: child.contractAddress
+          contractAddress: child.contractAddress,
+          childResourceId: childResource.id
           });
 
     }
 
     //Gate to owner of tokenId
-    function unequip(uint256 tokenId, bytes8 targetResourceId, uint256 slotPartIndex) public {
-
+    function unequip(
+        uint256 tokenId,
+        bytes8 targetResourceId,
+        uint256 slotPartIndex
+    ) public {
         Resource storage targetResource = _resources[targetResourceId];
-        delete targetResource.equippedChildren[slotPartIndex];
-
+        delete equipped[targetResourceId][slotPartIndex];
     }
 
-    /* //Gate for equippable array in here by check of slotPartDefinition to slotPartId
-    function composeEquippables(uint256 tokenId, bytes8 targetResourceId) public view returns (bytes8[] memory basePartIds) {
+    function getEquipped(bytes8 targetResourceId) public view returns (Equipment[16] memory childrenEquipped) {
+        childrenEquipped = equipped[targetResourceId];
+    }
+
+    //Gate for equippable array in here by check of slotPartDefinition to slotPartId
+    /* function composeEquippables(uint256 tokenId, bytes8 targetResourceId) public view returns (bytes8[] memory basePartIds) {
         Resource storage targetResource = _resources[targetResourceId];
 
         //get fixed
@@ -55,11 +77,14 @@ contract RMRKEquippable is Context, IRMRKEquippableResource, RMRKNesting {
         uint256 basePartIdsLen = 0;
         for (uint i; i<fixedLen;) {
             basePartIds.push(targetResource.fixedParts[i]);
+            unchecked {++basePartIdsLen;}
             unchecked {++i;}
         }
 
-        uint256 slotLen = targetResource.slotPartDefinitions.length;
-        for (uint i; i<slotLen;) {
+        Equipped[10] memory equippedChildren = getEquippedChildren(targetResourceId);
+        uint256 equippedLen = equippedChildren.length;
+
+        for (uint i; i<equippedLen;) {
              Resource memory childRes = IRMRKEquippableResource(
                 targetResource.equippedChildren[i].contractAddress
                 ).getResource(
@@ -70,8 +95,18 @@ contract RMRKEquippable is Context, IRMRKEquippableResource, RMRKNesting {
 
     }
 
+    function _returnTreeFixedSlots(uint256 equippedLen) internal view returns(bytes8[] memory basePartIds) {
+        bytes8[] memory internalBaseParts = _returnTreeFixedSlots();
+        uint256 len = internalBaseParts.length;
+        for(uint i; i<len;) {
+            basePartIds
+            unchecked{++i;}
+        }
+
+    } */
+
     //Rewrite in assembly if time
-    function returnMinPos(uint256[] memory array) public view returns(uint256 pos) {
+    /* function returnMinPos(uint256[] memory array) public view returns(uint256 pos) {
 
       assembly {
 
@@ -220,7 +255,7 @@ contract RMRKEquippable is Context, IRMRKEquippableResource, RMRKNesting {
 
     function tokenURI(
         uint256 tokenId
-    ) public view virtual override(RMRKNesting) returns (string memory) {
+    ) public view virtual override(RMRKNesting, IRMRKEquippableResource) returns (string memory) {
         return _tokenURIAtIndex(tokenId, 0);
     }
 
@@ -281,9 +316,11 @@ contract RMRKEquippable is Context, IRMRKEquippableResource, RMRKNesting {
 
     function _addResourceEntry(
         bytes8 id,
-        string memory src,
-        string memory thumb,
         string memory metadataURI,
+        bytes8[16] memory fixedParts,
+        bytes8[16] memory slotParts,
+        address baseAddress,
+        bytes8 slotId,
         bytes16[] memory custom
     ) internal {
         require(id != bytes8(0), "RMRK: Write to zero");
@@ -293,12 +330,15 @@ contract RMRKEquippable is Context, IRMRKEquippableResource, RMRKNesting {
         );
         Resource memory resource = Resource({
             id: id,
-            src: src,
-            thumb: thumb,
             metadataURI: metadataURI,
+            baseAddress: baseAddress,
+            slotId: slotId,
             custom: custom
         });
         _resources[id] = resource;
+        fixedPartIds[id] = fixedParts;
+        slotPartIds[id] = slotParts;
+
         _allResources.push(id);
 
         emit ResourceSet(id);
@@ -432,6 +472,41 @@ contract RMRKEquippable is Context, IRMRKEquippableResource, RMRKNesting {
         bytes8 resourceId
     ) public view virtual returns(bool) {
         return _tokenEnumeratedResource[resourceId];
+    }
+
+    function acceptResource(uint256 tokenId, uint256 index) external virtual {
+        require(
+            _msgSender() == ownerOf(tokenId),
+            "MultiResource: not owner"
+        );
+        _acceptResource(tokenId, index);
+    }
+
+    function rejectResource(uint256 tokenId, uint256 index) external virtual {
+        require(
+            _msgSender() == ownerOf(tokenId),
+            "MultiResource: not owner"
+        );
+        _rejectResource(tokenId, index);
+    }
+
+    function rejectAllResources(uint256 tokenId) external virtual {
+        require(
+            _msgSender() == ownerOf(tokenId),
+            "MultiResource: not owner"
+        );
+        _rejectAllResources(tokenId);
+    }
+
+    function setPriority(
+        uint256 tokenId,
+        uint16[] memory priorities
+    ) external virtual {
+        require(
+            _msgSender() == ownerOf(tokenId),
+            "MultiResource: not owner"
+        );
+        _setPriority(tokenId, priorities);
     }
 
 }

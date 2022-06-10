@@ -7,19 +7,16 @@ interface IRMRKEquippableResource {
     struct Resource {
       bytes8 id; //8 bytes
       string metadataURI; //32+
-      //For a top-level
-      bytes8[] fixedParts;
-      //This is checked against resources of equipped children
-      bytes8[10] slotPartDefinitions;
-      Equipped[10] equippedChildren;
       //describes this equippable status
       address baseAddress;
       bytes8 slotId;
+      bytes16[] custom;
     }
 
-    struct Equipped {
+    struct Equipment {
       uint256 tokenId;
       address contractAddress;
+      bytes8 childResourceId;
     }
 
     event ResourceSet(bytes8 resourceId);
