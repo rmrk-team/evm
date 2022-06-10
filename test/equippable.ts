@@ -34,7 +34,7 @@ describe('MultiResource', async () => {
     owner = signersOwner;
     addrs = signersAddr;
 
-    const Base = await ethers.getContractFactory('RMRKBaseStorage');
+    const Base = await ethers.getContractFactory('RMRKBaseStorageMock');
     base = await Base.deploy(baseName);
     await base.deployed();
 
@@ -49,12 +49,12 @@ describe('MultiResource', async () => {
     // Mint 20 ownerChunkys.
     let i = 1;
     while (i <= 10) {
-      await ownerChunky.doMint(addrs[0].address, i);
+      await token1.doMint(addrs[0].address, i);
       i++;
     }
     i = 11;
     while (i <= 20) {
-      await ownerChunky.doMint(addrs[1].address, i);
+      await token1.doMint(addrs[1].address, i);
       i++;
     }
 
