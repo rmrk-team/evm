@@ -1,10 +1,10 @@
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
-import { MultiResourceToken721Mock } from '../typechain';
+import { RMRKMultiResourceMock } from '../typechain';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 
 describe('MultiResource', async () => {
-  let token: MultiResourceToken721Mock;
+  let token: RMRKMultiResourceMock;
 
   let owner: SignerWithAddress;
   let addrs: any[];
@@ -21,7 +21,7 @@ describe('MultiResource', async () => {
     owner = signersOwner;
     addrs = signersAddr;
 
-    const Token = await ethers.getContractFactory('MultiResourceToken721Mock');
+    const Token = await ethers.getContractFactory('RMRKMultiResourceMock');
     token = await Token.deploy(name, symbol);
     await token.deployed();
   });

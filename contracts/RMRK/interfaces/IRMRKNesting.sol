@@ -2,10 +2,9 @@
 
 pragma solidity ^0.8.9;
 
-import "./IERC721.sol";
 import "./IRMRKNestingReceiver.sol";
 
-interface IRMRKNesting is IERC721 {
+interface IRMRKNesting {
 
     event ChildProposed(uint parentTokenId);
     event ChildAccepted(uint tokenId);

@@ -255,7 +255,7 @@ contract RMRKEquippable is Context, RMRKNesting, IRMRKEquippableResource {
 
     function tokenURI(
         uint256 tokenId
-    ) public view virtual override(RMRKNesting, IRMRKEquippableResource) returns (string memory) {
+    ) public view virtual override(NestingAbstract, IRMRKEquippableResource) returns (string memory) {
         return _tokenURIAtIndex(tokenId, 0);
     }
 

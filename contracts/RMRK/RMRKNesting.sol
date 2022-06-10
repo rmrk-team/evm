@@ -4,6 +4,8 @@
 
 pragma solidity ^0.8.9;
 
+import "./abstracts/ERC721Abstract.sol";
+import "./abstracts/NestingAbstract.sol";
 import "./interfaces/IRMRKNesting.sol";
 import "./interfaces/IRMRKNestingReceiver.sol";
 import "./interfaces/IERC721Receiver.sol";
@@ -13,134 +15,21 @@ import "./utils/Strings.sol";
 import "./utils/Context.sol";
 import "hardhat/console.sol";
 
-contract RMRKNesting is Context, IRMRKNesting {
+contract RMRKNesting is ERC721Abstract, NestingAbstract {
 
     using RMRKLib for uint256;
     using Address for address;
-    using Strings for uint256;
 
-    struct RMRKOwner {
-        uint256 tokenId;
-        address ownerAddress;
-        bool isNft;
+    constructor(string memory name_, string memory symbol_) ERC721Abstract(name_, symbol_) {}
+
+    function ownerOf(uint256 tokenId) public view override(ERC721Abstract, NestingAbstract) virtual returns(address) {
+        return super.ownerOf(tokenId);
     }
 
-    struct Child {
-        uint256 tokenId;
-        address contractAddress;
-        uint16 slotEquipped;
-        bytes8 partId;
+    function _exists(uint256 tokenId) internal view override(ERC721Abstract, NestingAbstract) virtual returns (bool) {
+        return super._exists(tokenId);
     }
 
-    // Token name
-    string private _name;
-
-    // Token symbol
-    string private _symbol;
-
-    // Mapping from token ID to RMRKOwner struct
-    mapping(uint256 => RMRKOwner) internal _RMRKOwners;
-
-    // Mapping owner address to token count
-    mapping(address => uint256) private _balances;
-
-    // Mapping from token ID to approved address
-    mapping(uint256 => address) private _tokenApprovals;
-
-    // Mapping from owner to operator approvals
-    mapping(address => mapping(address => bool)) private _operatorApprovals;
-
-    // Mapping of tokenId to array of active children structs
-    mapping(uint256 => Child[]) internal _children;
-
-    // Mapping of tokenId to array of pending children structs
-    mapping(uint256 => Child[]) internal _pendingChildren;
-
-
-    modifier onlyApprovedOrOwner(uint256 tokenId) {
-        require(_isApprovedOrOwner(_msgSender(), tokenId),
-            "RMRKCore: Not approved or owner"
-        );
-        _;
-    }
-
-    constructor(string memory name_, string memory symbol_) {
-        _name = name_;
-        _symbol = symbol_;
-    }
-
-    ////////////////////////////////////////
-    //             PROVENANCE
-    ////////////////////////////////////////
-
-    /**
-    @dev Returns balance of tokens owner by a given rootOwner.
-    */
-
-    function name() public view returns (string memory) {
-        return _name;
-    }
-
-    function symbol() public view returns (string memory) {
-        return _symbol;
-    }
-
-    function balanceOf(address owner) public view virtual returns (uint256) {
-        require(owner != address(0), "RMRKCore: balance query for the zero address");
-        return _balances[owner];
-    }
-
-    /**
-    @dev Returns the root owner of a RMRKCore NFT.
-    */
-    function ownerOf(uint256 tokenId) public view virtual returns(address) {
-        (address owner, uint256 ownerTokenId, bool isNft) = rmrkOwnerOf(tokenId);
-        if (isNft) {
-            owner = IRMRKNesting(owner).ownerOf(ownerTokenId);
-        }
-        require(owner != address(0), "RMRKCore: owner query for nonexistent token");
-        return owner;
-    }
-
-    /**
-    @dev Returns the immediate provenance data of the current RMRK NFT. In the event the NFT is owned
-    * by a wallet, tokenId will be zero and isNft will be false. Otherwise, the returned data is the
-    * contract address and tokenID of the owner NFT, as well as its isNft flag.
-    */
-    function rmrkOwnerOf(uint256 tokenId) public view virtual returns (address, uint256, bool) {
-        RMRKOwner memory owner = _RMRKOwners[tokenId];
-        require(owner.ownerAddress != address(0), "RMRKCore: owner query for nonexistent token");
-        return (owner.ownerAddress, owner.tokenId, owner.isNft);
-    }
-
-    function tokenURI(uint256 tokenId) public view virtual returns (string memory) {
-        //TODO: Discuss removing this check
-        _requireMinted(tokenId);
-
-        string memory baseURI = _baseURI();
-        return bytes(baseURI).length > 0 ? string(abi.encodePacked(baseURI, tokenId.toString())) : "";
-    }
-
-    /**
-    * @dev Reverts if the `tokenId` has not been minted yet.
-    */
-    function _requireMinted(uint256 tokenId) internal view virtual {
-        require(_exists(tokenId), "ERC721: invalid token ID");
-    }
-
-
-    /**
-    * @dev Base URI for computing {tokenURI}. If set, the resulting URI for each
-    * token will be the concatenation of the `baseURI` and the `tokenId`. Empty
-    * by default, can be overridden in child contracts.
-    */
-    function _baseURI() internal view virtual returns (string memory) {
-        return "";
-    }
-
-    ////////////////////////////////////////
-    //              MINTING
-    ////////////////////////////////////////
 
     /**
     @dev Mints an NFT.
@@ -150,7 +39,7 @@ contract RMRKNesting is Context, IRMRKNesting {
     * package to the function.
     */
 
-    function _mint(address to, uint256 tokenId) internal virtual {
+    function _mint(address to, uint256 tokenId) internal override virtual {
         _mint(to, tokenId, 0, "");
     }
 
@@ -222,7 +111,7 @@ contract RMRKNesting is Context, IRMRKNesting {
     */
 
     //update for reentrancy
-    function _burn(uint256 tokenId) internal virtual {
+    function _burn(uint256 tokenId) internal override virtual {
         address owner = ownerOf(tokenId);
         _burnForOwner(tokenId, owner);
     }
@@ -257,64 +146,6 @@ contract RMRKNesting is Context, IRMRKNesting {
         emit Transfer(rootOwner, address(0), tokenId);
     }
 
-    ////////////////////////////////////////
-    //             TRANSFERS
-    ////////////////////////////////////////
-
-    //TODO: Safe Transfers
-
-    function safeTransferFrom(
-        address from,
-        address to,
-        uint256 tokenId
-    ) public virtual override {
-        safeTransferFrom(from, to, tokenId, 0, "");
-    }
-
-
-    function safeTransferFrom(
-        address from,
-        address to,
-        uint256 tokenId,
-        bytes memory data
-    ) public virtual override {
-        require(
-            _isApprovedOrOwner(_msgSender(), tokenId),
-            "MultiResource: transfer caller is not owner nor approved"
-        );
-        _safeTransfer(from, to, tokenId, 0, data);
-    }
-
-    function safeTransferFrom(
-        address from,
-        address to,
-        uint256 tokenId,
-        uint256 destinationId,
-        bytes memory data
-    ) public virtual {
-        require(
-            _isApprovedOrOwner(_msgSender(), tokenId),
-            "MultiResource: transfer caller is not owner nor approved"
-        );
-        _safeTransfer(from, to, tokenId, destinationId, data);
-    }
-
-    function _safeTransfer(
-        address from,
-        address to,
-        uint256 tokenId,
-        uint256 destinationId,
-        bytes memory data
-    ) internal virtual {
-        _transfer(from, to, tokenId, destinationId, data);
-        require(
-            _checkRMRKNestingImplementer(from, to, tokenId, data) ||
-            _checkOnERC721Received(from, to, tokenId, data)
-            ,
-            "MultiResource: transfer to non MultiResource Receiver implementer"
-        );
-    }
-
     /**
     * @dev See {IERC721-transferFrom}.
     */
@@ -332,7 +163,7 @@ contract RMRKNesting is Context, IRMRKNesting {
         address from,
         address to,
         uint256 tokenId
-    ) public virtual onlyApprovedOrOwner(tokenId) {
+    ) public override virtual onlyApprovedOrOwner(tokenId) {
         _transfer(from, to, tokenId, 0, "");
     }
 
@@ -344,6 +175,50 @@ contract RMRKNesting is Context, IRMRKNesting {
         bytes memory data
     ) public virtual onlyApprovedOrOwner(tokenId) {
         _transfer(from, to, tokenId, destinationId, data);
+    }
+
+    function safeTransferFrom(
+        address from,
+        address to,
+        uint256 tokenId
+    ) public virtual override {
+        safeTransferFrom(from, to, tokenId, 0, "");
+    }
+
+
+    function safeTransferFrom(
+        address from,
+        address to,
+        uint256 tokenId,
+        bytes memory data
+    ) public virtual override onlyApprovedOrOwner(tokenId) {
+        _safeTransfer(from, to, tokenId, 0, data);
+    }
+
+    function safeTransferFrom(
+        address from,
+        address to,
+        uint256 tokenId,
+        uint256 destinationId,
+        bytes memory data
+    ) public virtual onlyApprovedOrOwner(tokenId) {
+        _safeTransfer(from, to, tokenId, destinationId, data);
+    }
+
+    function _safeTransfer(
+        address from,
+        address to,
+        uint256 tokenId,
+        uint256 destinationId,
+        bytes memory data
+    ) internal virtual {
+        _transfer(from, to, tokenId, destinationId, data);
+        require(
+            _checkRMRKNestingImplementer(from, to, tokenId, data) ||
+            _checkOnERC721Received(from, to, tokenId, data)
+            ,
+            "MultiResource: transfer to non MultiResource Receiver implementer"
+        );
     }
 
     /**
@@ -401,262 +276,12 @@ contract RMRKNesting is Context, IRMRKNesting {
         _afterTokenTransfer(from, to, tokenId);
     }
 
-    function _beforeTokenTransfer(
-        address from,
-        address to,
-        uint256 tokenId
-    ) internal virtual {}
-
-    /**
-    * @dev Hook that is called after any transfer of tokens. This includes
-    * minting and burning.    address owner = this.ownerOf(tokenId);
-      return (spender == owner || getApproved(tokenId) == spender);
-    *
-    * Calling conditions:
-    *
-    * - when `from` and `to` are both non-zero.
-    * - `from` and `to` are never both zero.
-    *
-    * To learn more about hooks, head to xref:ROOT:extending-contracts.adoc#using-hooks[Using Hooks].
-    */
-    function _afterTokenTransfer(
-        address from,
-        address to,
-        uint256 tokenId
-    ) internal virtual {}
-
-    ////////////////////////////////////////
-    //      APPROVALS / PRE-CHECKING
-    ////////////////////////////////////////
-
-    function _exists(uint256 tokenId) internal view virtual returns (bool) {
-        return _RMRKOwners[tokenId].ownerAddress != address(0);
-    }
-
-    function approve(address to, uint256 tokenId) public virtual {
-        address owner = this.ownerOf(tokenId);
-        require(to != owner, "RMRKCore: approval to current owner");
-
-        require(
-            _msgSender() == owner,
-            "RMRKCore: approve caller is not owner"
-        );
-
-        _approve(to, tokenId);
-    }
-
-    function _approve(address to, uint256 tokenId) internal virtual {
-        _tokenApprovals[tokenId] = to;
-        emit Approval(ownerOf(tokenId), to, tokenId);
-    }
-
-    function _setApprovalForAll(
-        address owner,
-        address operator,
-        bool approved
-    ) internal virtual {
-        require(owner != operator, "MultiResource: approve to caller");
-        _operatorApprovals[owner][operator] = approved;
-        emit ApprovalForAll(owner, operator, approved);
-    }
-
-    function isApprovedOrOwner(address spender, uint256 tokenId) external view virtual returns (bool) {
-        return _isApprovedOrOwner(spender, tokenId);
-    }
-
-    function _isApprovedOrOwner(address spender, uint256 tokenId) internal view virtual returns (bool) {
-        address owner = this.ownerOf(tokenId);
-        return (spender == owner || getApproved(tokenId) == spender);
-    }
-
-    function getApproved(uint256 tokenId) public view virtual returns (address) {
-        require(_exists(tokenId), "RMRKCore: approved query for nonexistent token");
-        return _tokenApprovals[tokenId];
-    }
-
-    function setApprovalForAll(
-        address operator,
-        bool approved
-    ) public virtual override {
-        _setApprovalForAll(_msgSender(), operator, approved);
-    }
-
-    function isApprovedForAll(
-        address owner,
-        address operator
-    ) public view virtual override returns (bool) {
-        return _operatorApprovals[owner][operator];
-    }
-
-
-    ////////////////////////////////////////
-    //          CHILD MANAGEMENT
-    ////////////////////////////////////////
-
-    /**
-     * @dev Function designed to be used by other instances of RMRK-Core contracts to update children.
-     * param1 parentTokenId is the tokenId of the parent token on (this).
-     * param2 childTokenId is the tokenId of the child instance
-     * param3 childAddress is the address of the child contract as an IRMRKCore instance
-     */
-
-    //update for reentrancy
-    function addChild(
-        uint256 parentTokenId,
-        uint256 childTokenId,
-        address childTokenAddress
-    ) public virtual {
-        IRMRKNesting childTokenContract = IRMRKNesting(childTokenAddress);
-        (address parent, , ) = childTokenContract.rmrkOwnerOf(childTokenId);
-        require(parent == address(this), "Parent-child mismatch");
-        Child memory child = Child({
-            contractAddress: childTokenAddress,
-            tokenId: childTokenId,
-            slotEquipped: 0,
-            partId: 0
-        });
-        _addChildToPending(parentTokenId, child);
-        emit ChildProposed(parentTokenId);
-    }
-
-    /**
-    @dev Sends an instance of Child from the pending children array at index to children array for tokenId.
-    * Updates _emptyIndexes of tokenId to preserve ordering.
-    */
-
-    //CHECK: preload mappings into memory for gas savings
-    function acceptChild(uint256 tokenId, uint256 index) public virtual onlyApprovedOrOwner(tokenId) {
-        require(
-            _pendingChildren[tokenId].length > index,
-            "RMRKcore: Pending child index out of range"
-        );
-        // FIXME: if it approved for transfer it should either update/remove the approvedTransfers or stop this accept.
-
-        Child memory child_ = _pendingChildren[tokenId][index];
-
-        removeItemByIndex_C(_pendingChildren[tokenId], index);
-
-        _addChildToChildren(tokenId, child_);
-        emit ChildAccepted(tokenId);
-    }
-
-    /**
-    @dev Deletes all pending children.
-    */
-    function rejectAllChildren(uint256 tokenId) public virtual onlyApprovedOrOwner(tokenId) {
-        delete(_pendingChildren[tokenId]);
-        emit AllPendingChildrenRemoved(tokenId);
-    }
-
-    /**
-    @dev Deletes a single child from the pending array by index.
-    */
-
-    function rejectChild(uint256 tokenId, uint256 index) public virtual onlyApprovedOrOwner(tokenId) {
-        require(
-            _pendingChildren[tokenId].length > index,
-            "RMRKcore: Pending child index out of range"
-        );
-        removeItemByIndex_C(_pendingChildren[tokenId], index);
-        emit PendingChildRemoved(tokenId, index);
-    }
-
-    /**
-    @dev Deletes a single child from the child array by index.
-    */
-
-    function removeChild(uint256 tokenId, uint256 index) public virtual onlyApprovedOrOwner(tokenId) {
-        require(
-            _children[tokenId].length > index,
-            "RMRKcore: Child index out of range"
-        );
-
-        removeItemByIndex_C(_children[tokenId], index);
-        emit ChildRemoved(tokenId, index);
-    }
-
-    function unnestChild(uint256 tokenId, uint256 index) public virtual onlyApprovedOrOwner(tokenId) {
-        require(
-            _children[tokenId].length > index,
-            "RMRKcore: Child index out of range"
-        );
-        Child memory child = _children[tokenId][index];
-        removeItemByIndex_C(_children[tokenId], index);
-        IRMRKNesting(child.contractAddress).unnestToken(child.tokenId, tokenId);
-        emit ChildUnnested(tokenId, child.tokenId);
-    }
-
-    function unnestToken(uint256 tokenId, uint256 parentId) public virtual {
-      // A malicious contract which is parent to this token, could unnest any children
-        RMRKOwner memory owner = _RMRKOwners[tokenId];
-        require(
-            owner.ownerAddress != address(0),
-            "RMRKCore: unnest for nonexistent token"
-        );
-        require(
-            owner.isNft,
-            "RMRKCore: unnest for non-NFT parent"
-        );
-        require(
-            owner.tokenId == parentId,
-            "RMRKCore: unnest from wrong parent"
-        );
-        require(
-            owner.ownerAddress == msg.sender,
-            "RMRKCore: unnest from wrong owner"
-        );
-        address rootOwner =  IRMRKNesting(owner.ownerAddress).ownerOf(owner.tokenId);
-        _RMRKOwners[tokenId] = RMRKOwner({
-            ownerAddress: rootOwner,
-            tokenId: 0,
-            isNft: false
-        });
-    }
-
-
-    /**
-    @dev Adds an instance of Child to the pending children array for tokenId. This is hardcoded to be 128 by default.
-    */
-
-    function _addChildToPending(uint256 tokenId, Child memory child) internal {
-        if(_pendingChildren[tokenId].length < 128) {
-            _pendingChildren[tokenId].push(child);
-        } else {
-            revert("RMRKCore: Max pending children reached");
-        }
-    }
-
-    /**
-    @dev Adds an instance of Child to the children array for tokenId.
-    */
-
-    function _addChildToChildren(uint256 tokenId, Child memory child) internal {
-        _children[tokenId].push(child);
-    }
-
-    /**
-    @dev Returns all confirmed children
-    */
-
-    function childrenOf(uint256 parentTokenId) public view returns (Child[] memory) {
-        Child[] memory children = _children[parentTokenId];
-        return children;
-    }
-
-    /**
-    @dev Returns all pending children
-    */
-
-    function pendingChildrenOf(uint256 parentTokenId) public view returns (Child[] memory) {
-        Child[] memory pendingChildren = _pendingChildren[parentTokenId];
-        return pendingChildren;
-    }
-
     ////////////////////////////////////////
     //           SELF-AWARENESS
     ////////////////////////////////////////
     // I'm afraid I can't do that, Dave.
 
+    
     function _checkRMRKNestingImplementer(
         address from,
         address to,
@@ -680,54 +305,32 @@ contract RMRKNesting is Context, IRMRKNesting {
         }
     }
 
-    function _checkOnERC721Received(
-        address from,
-        address to,
-        uint256 tokenId,
-        bytes memory data
-    ) private returns (bool) {
-        if (to.isContract()) {
-            try IERC721Receiver(to).onERC721Received(
-                _msgSender(),
-                from,
-                tokenId,
-                data
-            ) returns (bytes4 retval) {
-                return retval == IERC721Receiver.onERC721Received.selector;
-            } catch (bytes memory reason) {
-                if (reason.length == 0) {
-                    revert("ERC721: transfer to non ERC721 Receiver implementer");
-                } else {
-                    assembly {
-                        revert(add(32, reason), mload(reason))
-                    }
-                }
-            }
-        } else {
-            return true;
-        }
-    }
-
     //Make also return true for ERC721?
-    function supportsInterface(bytes4 interfaceId) public pure returns (bool) {
+    function supportsInterface(bytes4 interfaceId) public override(ERC721Abstract) pure returns (bool) {
         return interfaceId == type(IRMRKNesting).interfaceId;
     }
 
-    //HELPERS
 
-    // For child storage array
-    function removeItemByIndex_C(Child[] storage array, uint256 index) internal {
-        //Check to see if this is already gated by require in all calls
-        require(index < array.length);
-        array[index] = array[array.length-1];
-        array.pop();
+    function acceptChild(uint256 tokenId, uint256 index) public virtual onlyApprovedOrOwner(tokenId) {
+        _acceptChild(tokenId, index);
     }
 
-    function removeItemByIndexMulti_C(Child[] storage array, uint256[] memory indexes) internal {
-        uint256 length = indexes.length; //gas savings
-        for (uint i; i<length; i = i.u_inc()) {
-            removeItemByIndex_C(array, indexes[i]);
-        }
+    function rejectAllChildren(uint256 tokenId) public virtual onlyApprovedOrOwner(tokenId) {
+        _rejectAllChildren(tokenId);
     }
+
+    function rejectChild(uint256 tokenId, uint256 index) public virtual onlyApprovedOrOwner(tokenId) {
+        _rejectChild(tokenId, index);
+    }
+
+    function removeChild(uint256 tokenId, uint256 index) public virtual onlyApprovedOrOwner(tokenId) {
+        _removeChild(tokenId, index);
+    }
+
+    function unnestChild(uint256 tokenId, uint256 index) public virtual onlyApprovedOrOwner(tokenId) {
+        _unnestChild(tokenId, index);
+    }
+
+
 
 }

@@ -9,10 +9,10 @@ import "./library/MultiResourceLib.sol";
 import "./utils/Address.sol";
 import "./utils/Strings.sol";
 import "./utils/Context.sol";
-import "./MultiResourceTokenAbstract.sol";
+import "./abstracts/MultiResourceAbstract.sol";
 
 
-contract MultiResourceToken721 is MultiResourceTokenAbstract, IERC721 {
+contract RMRKMultiResource is MultiResourceAbstract, IERC721 {
 
     using MultiResourceLib for uint256;
     using MultiResourceLib for bytes8[];
