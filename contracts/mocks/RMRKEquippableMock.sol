@@ -1,10 +1,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
-pragma solidity ^0.8.9;
+pragma solidity ^0.8.14;
 
 import "../RMRK/RMRKEquippable.sol";
 
 //Minimal public implementation of RMRKCore for testing.
+
+error RMRKOnlyIssuer();
+error RMRKCoreTransferCallerNotOwnerOrApproved();
+error ERC721OwnerQueryForNonexistentToken();
 
 contract RMRKEquippableMock is RMRKEquippable {
 
@@ -16,7 +20,7 @@ contract RMRKEquippableMock is RMRKEquippable {
     ) RMRKEquippable(name_, symbol_) {}
 
     modifier onlyIssuer() {
-        require(_msgSender() == _issuer, "RMRK: Only issuer");
+        if(_msgSender() != _issuer) revert RMRKOnlyIssuer();
         _;
     }
 
@@ -35,10 +39,7 @@ contract RMRKEquippableMock is RMRKEquippable {
     }
 
     function burn(uint256 tokenId) public {
-        require(
-            _isApprovedOrOwner(_msgSender(), tokenId),
-            "RMRKCore: transfer caller is not owner nor approved"
-        );
+        if(!_isApprovedOrOwner(_msgSender(), tokenId)) revert RMRKCoreTransferCallerNotOwnerOrApproved();
         _burn(tokenId);
     }
 
@@ -56,10 +57,7 @@ contract RMRKEquippableMock is RMRKEquippable {
         bytes8 resourceId,
         bytes8 overwrites
     ) external onlyIssuer {
-        require(
-            ownerOf(tokenId) != address(0),
-            "ERC721: owner query for nonexistent token"
-        );
+        if(ownerOf(tokenId) == address(0)) revert ERC721OwnerQueryForNonexistentToken();
         _addResourceToToken(tokenId, resourceId, overwrites);
     }
 

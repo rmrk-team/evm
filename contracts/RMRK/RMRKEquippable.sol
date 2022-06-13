@@ -14,6 +14,20 @@ import "./utils/Strings.sol";
 import "./utils/Context.sol";
 import "hardhat/console.sol";
 
+error RMRKResourceAlreadyExists();
+error RMRKNoResourceMatchingId();
+error RMRKWriteToZero();
+
+error RMRKEquippableSlotIDMismatch();
+error RMRKEquippableEquipNotAllowedByBase();
+
+error MultiResourceAlreadyExists();
+error MultiResourceNotOwner();
+error MultiResourceIndexOutOfBounds();
+error MultiResourceResourceNotFoundInStorage();
+error MultiResourceMaxPendingResourcesReached();
+error MultiResourceBadPriorityListLength();
+
 contract RMRKEquippable is Context, RMRKNesting, IRMRKEquippableResource {
 
     constructor(string memory _name, string memory _symbol)
@@ -44,8 +58,9 @@ contract RMRKEquippable is Context, RMRKNesting, IRMRKEquippableResource {
         Child memory child = childrenOf(tokenId)[childIndex];
         //TODO check to see if scoping like so costs or saves gas. Probably saves if pointer is re-used after de-scope like assembly?
         Resource memory childResource = IRMRKEquippableResource(child.contractAddress).getResObjectByIndex(childIndex, childResourceIndex);
-        require(validateEquip(childResource.baseAddress, childResource.slotId), "RMRKEquippable: Equip not allowed by base");
-        require(slotPartIds[targetResourceId][slotPartIndex] == childResource.slotId, "RMRKEquippable: SlotID mismatch");
+
+        if(validateEquip(childResource.baseAddress, childResource.slotId) == false) revert RMRKEquippableEquipNotAllowedByBase();
+        if(slotPartIds[targetResourceId][slotPartIndex] != childResource.slotId) revert RMRKEquippableSlotIDMismatch();
 
         equipped[targetResourceId][slotPartIndex] = Equipment({
           tokenId: child.tokenId,
@@ -169,10 +184,7 @@ contract RMRKEquippable is Context, RMRKNesting, IRMRKEquippableResource {
     }
 
     function _acceptResource(uint256 tokenId, uint256 index) internal {
-        require(
-            index < _pendingResources[tokenId].length,
-            "MultiResource: index out of bounds"
-        );
+        if(index >= _pendingResources[tokenId].length) revert MultiResourceNotOwner();
         bytes8 resourceId = _pendingResources[tokenId][index];
         _pendingResources[tokenId].removeItemByIndex(0);
 
@@ -190,14 +202,8 @@ contract RMRKEquippable is Context, RMRKNesting, IRMRKEquippableResource {
     }
 
     function _rejectResource(uint256 tokenId, uint256 index) internal {
-        require(
-            index < _pendingResources[tokenId].length,
-            "MultiResource: index out of bounds"
-        );
-        require(
-            _pendingResources[tokenId].length > index,
-            "MultiResource: Pending child index out of range"
-        );
+        if(index >= _pendingResources[tokenId].length) revert MultiResourceIndexOutOfBounds();
+        if(_pendingResources[tokenId].length <= index) revert MultiResourceNotOwner();
         bytes8 resourceId = _pendingResources[tokenId][index];
         _pendingResources[tokenId].removeItemByValue(resourceId);
         _tokenResources[tokenId][resourceId] = false;
@@ -215,10 +221,7 @@ contract RMRKEquippable is Context, RMRKNesting, IRMRKEquippableResource {
         uint16[] memory priorities
     ) internal {
         uint256 length = priorities.length;
-        require(
-            length == _activeResources[tokenId].length,
-            "MultiResource: Bad priority list length"
-        );
+        if(length != _activeResources[tokenId].length) revert MultiResourceBadPriorityListLength();
         _activeResourcePriorities[tokenId] = priorities;
 
         emit ResourcePrioritySet(tokenId);
@@ -254,10 +257,7 @@ contract RMRKEquippable is Context, RMRKNesting, IRMRKEquippableResource {
     ) public view virtual returns (Resource memory)
     {
         Resource memory resource = _resources[resourceId];
-        require(
-            resource.id != bytes8(0),
-            "RMRK: No resource matching Id"
-        );
+        if(resource.id == bytes8(0)) revert RMRKNoResourceMatchingId();
         return resource;
     }
 
@@ -331,11 +331,9 @@ contract RMRKEquippable is Context, RMRKNesting, IRMRKEquippableResource {
         bytes8 slotId,
         bytes16[] memory custom
     ) internal {
-        require(id != bytes8(0), "RMRK: Write to zero");
-        require(
-            _resources[id].id == bytes8(0),
-            "RMRK: resource already exists"
-        );
+        if(id == bytes8(0)) revert RMRKWriteToZero();
+        if(_resources[id].id != bytes8(0)) revert RMRKResourceAlreadyExists();
+
         Resource memory resource = Resource({
             id: id,
             metadataURI: metadataURI,
@@ -383,20 +381,11 @@ contract RMRKEquippable is Context, RMRKNesting, IRMRKEquippableResource {
         bytes8 resourceId,
         bytes8 overwrites
     ) internal {
-        require(
-            _tokenResources[tokenId][resourceId] == false,
-            "MultiResource: Resource already exists on token"
-        );
+        if(_tokenResources[tokenId][resourceId] != false) revert MultiResourceAlreadyExists();
 
-        require(
-            getResource(resourceId).id != bytes8(0),
-            "MultiResource: Resource not found in storage"
-        );
+        if( getResource(resourceId).id == bytes8(0)) revert MultiResourceResourceNotFoundInStorage();
 
-        require(
-            _pendingResources[tokenId].length < 128,
-            "MultiResource: Max pending resources reached"
-        );
+        if(_pendingResources[tokenId].length >= 128) revert MultiResourceMaxPendingResourcesReached();
 
         _tokenResources[tokenId][resourceId] = true;
 
@@ -483,26 +472,17 @@ contract RMRKEquippable is Context, RMRKNesting, IRMRKEquippableResource {
     }
 
     function acceptResource(uint256 tokenId, uint256 index) external virtual {
-        require(
-            _msgSender() == ownerOf(tokenId),
-            "MultiResource: not owner"
-        );
+        if(_msgSender() != ownerOf(tokenId)) revert MultiResourceNotOwner();
         _acceptResource(tokenId, index);
     }
 
     function rejectResource(uint256 tokenId, uint256 index) external virtual {
-        require(
-            _msgSender() == ownerOf(tokenId),
-            "MultiResource: not owner"
-        );
+        if(_msgSender() != ownerOf(tokenId)) revert MultiResourceNotOwner();
         _rejectResource(tokenId, index);
     }
 
     function rejectAllResources(uint256 tokenId) external virtual {
-        require(
-            _msgSender() == ownerOf(tokenId),
-            "MultiResource: not owner"
-        );
+        if(_msgSender() != ownerOf(tokenId)) revert MultiResourceNotOwner();
         _rejectAllResources(tokenId);
     }
 
@@ -510,10 +490,7 @@ contract RMRKEquippable is Context, RMRKNesting, IRMRKEquippableResource {
         uint256 tokenId,
         uint16[] memory priorities
     ) external virtual {
-        require(
-            _msgSender() == ownerOf(tokenId),
-            "MultiResource: not owner"
-        );
+        if(_msgSender() != ownerOf(tokenId)) revert MultiResourceNotOwner();
         _setPriority(tokenId, priorities);
     }
 
