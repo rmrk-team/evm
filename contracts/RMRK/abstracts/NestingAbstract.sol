@@ -9,6 +9,9 @@ import "../utils/Address.sol";
 import "../utils/Strings.sol";
 import "../utils/Context.sol";
 
+error RMRKCoreOwnerQueryForNonexistentToken();
+error RMRKCoreChildIndexOutOfRange();
+
 abstract contract NestingAbstract is Context, IRMRKNesting {
 
     using RMRKLib for uint256;
@@ -45,7 +48,7 @@ abstract contract NestingAbstract is Context, IRMRKNesting {
         if (isNft) {
             owner = IRMRKNesting(owner).ownerOf(ownerTokenId);
         }
-        require(owner != address(0), "RMRKCore: owner query for nonexistent token");
+        if(owner == address(0)) revert RMRKCoreOwnerQueryForNonexistentToken();
         return owner;
     }
 
@@ -56,7 +59,8 @@ abstract contract NestingAbstract is Context, IRMRKNesting {
     */
     function rmrkOwnerOf(uint256 tokenId) public view virtual returns (address, uint256, bool) {
         RMRKOwner memory owner = _RMRKOwners[tokenId];
-        require(owner.ownerAddress != address(0), "RMRKCore: owner query for nonexistent token");
+        if(owner.ownerAddress == address(0)) revert RMRKCoreOwnerQueryForNonexistentToken();
+
         return (owner.ownerAddress, owner.tokenId, owner.isNft);
     }
 
@@ -167,20 +171,14 @@ abstract contract NestingAbstract is Context, IRMRKNesting {
     */
 
     function _removeChild(uint256 tokenId, uint256 index) public virtual {
-        require(
-            _children[tokenId].length > index,
-            "RMRKcore: Child index out of range"
-        );
+        if(_children[tokenId].length <= index) revert RMRKCoreChildIndexOutOfRange();
 
         removeItemByIndex_C(_children[tokenId], index);
         emit ChildRemoved(tokenId, index);
     }
 
     function _unnestChild(uint256 tokenId, uint256 index) public virtual {
-        require(
-            _children[tokenId].length > index,
-            "RMRKcore: Child index out of range"
-        );
+        if(_children[tokenId].length <= index) revert RMRKCoreChildIndexOutOfRange();
         Child memory child = _children[tokenId][index];
         removeItemByIndex_C(_children[tokenId], index);
         IRMRKNesting(child.contractAddress).unnestToken(child.tokenId, tokenId);
@@ -214,11 +212,9 @@ abstract contract NestingAbstract is Context, IRMRKNesting {
         });
     }
 
-
     /**
     @dev Adds an instance of Child to the pending children array for tokenId. This is hardcoded to be 128 by default.
     */
-
     function _addChildToPending(uint256 tokenId, Child memory child) internal {
         if(_pendingChildren[tokenId].length < 128) {
             _pendingChildren[tokenId].push(child);

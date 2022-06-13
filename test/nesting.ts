@@ -103,7 +103,7 @@ describe('Nesting', async () => {
     it('cannot nest mint to a non-existent token', async function () {
       await expect(
         petMonkey['mint(address,uint256,uint256,bytes)'](ownerChunky.address, 1, 0, mintNestData),
-      ).to.be.revertedWith('RMRKCore: owner query for nonexistent token');
+      ).to.be.revertedWith('RMRKCoreOwnerQueryForNonexistentToken()');
     });
 
     it('cannot nest mint already minted token', async function () {
@@ -549,7 +549,7 @@ describe('Nesting', async () => {
     it('cannot remove children for non existing index', async () => {
       const parentId = 11;
       await expect(ownerChunky.connect(addrs[1]).removeChild(parentId, 0)).to.be.revertedWith(
-        'RMRKcore: Child index out of range',
+        'RMRKCoreChildIndexOutOfRange()',
       );
     });
   });
@@ -561,7 +561,7 @@ describe('Nesting', async () => {
       await petMonkey.connect(addrs[1])['mint(address,uint256)'](addrs[1].address, tokenId);
       await petMonkey.connect(addrs[1]).burn(tokenId);
       await expect(petMonkey.ownerOf(tokenId)).to.be.revertedWith(
-        'RMRKCore: owner query for nonexistent token',
+        'RMRKCoreOwnerQueryForNonexistentToken()',
       );
     });
 
@@ -582,7 +582,7 @@ describe('Nesting', async () => {
 
       await petMonkey.connect(approvedAddress).burn(tokenId);
       await expect(petMonkey.ownerOf(tokenId)).to.be.revertedWith(
-        'RMRKCore: owner query for nonexistent token',
+        'RMRKCoreOwnerQueryForNonexistentToken()',
       );
     });
 
@@ -603,10 +603,10 @@ describe('Nesting', async () => {
 
       // no owner for token
       await expect(petMonkey.ownerOf(childId)).to.be.revertedWith(
-        'RMRKCore: owner query for nonexistent token',
+        'RMRKCoreOwnerQueryForNonexistentToken()',
       );
       await expect(petMonkey.rmrkOwnerOf(childId)).to.be.revertedWith(
-        'RMRKCore: owner query for nonexistent token',
+        'RMRKCoreOwnerQueryForNonexistentToken()',
       );
     });
 
@@ -675,17 +675,17 @@ describe('Nesting', async () => {
       await petMonkey.connect(addrs[0]).burn(childId);
 
       await expect(petMonkey.ownerOf(childId)).to.be.revertedWith(
-        'RMRKCore: owner query for nonexistent token',
+        'RMRKCoreOwnerQueryForNonexistentToken()',
       );
       await expect(petMonkey.rmrkOwnerOf(childId)).to.be.revertedWith(
-        'RMRKCore: owner query for nonexistent token',
+        'RMRKCoreOwnerQueryForNonexistentToken()',
       );
 
       await expect(ownerChunky.ownerOf(granchildId)).to.be.revertedWith(
-        'RMRKCore: owner query for nonexistent token',
+        'RMRKCoreOwnerQueryForNonexistentToken()',
       );
       await expect(ownerChunky.rmrkOwnerOf(granchildId)).to.be.revertedWith(
-        'RMRKCore: owner query for nonexistent token',
+        'RMRKCoreOwnerQueryForNonexistentToken()',
       );
     });
   });
@@ -759,7 +759,7 @@ describe('Nesting', async () => {
     it('cannot unnest not existing child', async function () {
       const { parentId, firstOwner } = await mintTofirstOwner(true);
       await expect(ownerChunky.connect(firstOwner).unnestChild(parentId, 1)).to.be.revertedWith(
-        'RMRKcore: Child index out of range',
+        'RMRKCoreChildIndexOutOfRange()',
       );
     });
 
