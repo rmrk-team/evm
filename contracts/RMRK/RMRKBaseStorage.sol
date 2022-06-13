@@ -29,6 +29,7 @@ contract RMRKBaseStorage is AccessControl {
 
     */
 
+
     //bytes8 is sort of arbitrary here--resource IDs in RMRK substrate are bytes8 for reference
     mapping(bytes8 => Base) private bases;
     mapping(bytes8 => mapping(address => bool)) private isEquippable;
@@ -55,7 +56,7 @@ contract RMRKBaseStorage is AccessControl {
         Base base;
     }
 
-    //Consider merkel tree for equippables array if stuff gets crazy
+    //Consider merkel tree for equippables validation?
 
     /**
     @dev Base struct for a standard RMRK base item. Requires a minimum of 3 storage slots per base item,
@@ -104,11 +105,61 @@ contract RMRKBaseStorage is AccessControl {
     }
 
     /**
-  @dev Getter for a single base item entry.
-  */
+    @dev Getter for a single base item entry.
+    */
 
     function getBaseEntry(bytes8 _id) external view returns (Base memory) {
         return (bases[_id]);
+    }
+
+    /**
+    @dev Public function which adds a number of equippableAddresses to a single base entry. Only accessible by the contract
+    * deployer or transferred Issuer, designated by the modifier onlyIssuer as per the inherited contract issuerControl.
+    */
+
+    function addEquippableAddresses(
+        bytes8 _baseEntryid,
+        address[] memory _equippableAddresses
+    ) public onlyRole(issuer) {
+        require(_equippableAddresses.length > 0, "RMRK: Zero-length ids passed.");
+        require(bases[_baseEntryid].itemType != ItemType.None, "RMRK: Base entry does not exist.");
+        uint256 len = _equippableAddresses.length;
+        for (uint i; i<len;) {
+          isEquippable[_baseEntryid][_equippableAddresses[i]] = true;
+          unchecked {++i;}
+        }
+        emit AddedEquippablesToEntry(_baseEntryid, _equippableAddresses);
+    }
+
+    /**
+    @dev Public function which adds a single equippableId to every base item.
+    * Handle this function with care, this function can be extremely gas-expensive. Only accessible by the contract
+    * deployer or transferred Issuer, designated by the modifier onlyIssuer as per the inherited contract issuerControl.
+    */
+
+    function addEquippableIdToAll(address _equippableAddress) public onlyRole(issuer) {
+        uint256 len = baseIds.length;
+        for (uint256 i = 0; i < len;) {
+            bytes8 baseId_ = baseIds[i];
+            if (bases[baseId_].itemType == ItemType.Slot) {
+                isEquippable[baseId_][_equippableAddress] = true;
+                unchecked {++i;}
+            }
+        }
+        emit AddedEquippableToAll(_equippableAddress);
+    }
+
+    function checkIsEquippable(bytes8 baseId, address targetAddress) public view returns (bool isEquippable_) {
+        isEquippable_ = isEquippable[baseId][targetAddress];
+    }
+
+    function checkIsEquippableMulti(bytes8[] calldata baseId, address[] calldata targetAddress) public view returns (bool[] memory isEquippable_) {
+        uint256 len = baseId.length;
+        require(len == targetAddress.length, "Mismatched input array length");
+        for (uint i; i<len;) {
+          isEquippable_[i] = isEquippable[baseId[i]][targetAddress[i]];
+          unchecked {++i;}
+        }
     }
 
     /**
@@ -120,7 +171,6 @@ contract RMRKBaseStorage is AccessControl {
         view
         returns (Base[] memory)
     {
-        bool isContract;
         Base[] memory baseEntries;
         return baseEntries;
     }

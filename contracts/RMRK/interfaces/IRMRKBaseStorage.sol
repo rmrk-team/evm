@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.9;
 
-interface IRMRKResourceBase {
+interface IRMRKBaseStorage {
 
   enum ItemType {
       Slot,
@@ -17,5 +17,7 @@ interface IRMRKResourceBase {
       string src; //n bytes 32+
       string fallbackSrc; //n bytes 32+
   }
+
+  function checkIsEquippable(bytes8 baseId, address targetAddress) external view returns (bool);
 
 }

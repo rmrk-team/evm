@@ -6,7 +6,7 @@ pragma solidity ^0.8.9;
 
 import "./RMRKNesting.sol";
 import "./interfaces/IRMRKEquippableResource.sol";
-import "./interfaces/IRMRKResourceBase.sol";
+import "./interfaces/IRMRKBaseStorage.sol";
 import "./library/RMRKLib.sol";
 import "./library/MultiResourceLib.sol";
 import "./utils/Address.sol";
@@ -44,6 +44,7 @@ contract RMRKEquippable is Context, RMRKNesting, IRMRKEquippableResource {
         Child memory child = childrenOf(tokenId)[childIndex];
         //TODO check to see if scoping like so costs or saves gas. Probably saves if pointer is re-used after de-scope like assembly?
         Resource memory childResource = IRMRKEquippableResource(child.contractAddress).getResObjectByIndex(childIndex, childResourceIndex);
+        require(validateEquip(childResource.baseAddress, childResource.slotId), "RMRKEquippable: Equip not allowed by base");
         require(slotPartIds[targetResourceId][slotPartIndex] == childResource.slotId, "RMRKEquippable: SlotID mismatch");
 
         equipped[targetResourceId][slotPartIndex] = Equipment({
@@ -62,6 +63,13 @@ contract RMRKEquippable is Context, RMRKNesting, IRMRKEquippableResource {
     ) public {
         Resource storage targetResource = _resources[targetResourceId];
         delete equipped[targetResourceId][slotPartIndex];
+    }
+
+    // THIS CALL IS EASILY BYPASSED BY ANY GIVEN IMPLEMENTER. For obvious reasons, this function is
+    // included to encourage good-faith adherence to a standard, but in no way should be considered
+    // a secure feature from the perspective of a Base deployer.
+    function validateEquip(address baseContract, bytes8 baseId) private view returns (bool isEquippable) {
+        isEquippable = IRMRKBaseStorage(baseContract).checkIsEquippable(baseId, address(this));
     }
 
     function getEquipped(bytes8 targetResourceId) public view returns (Equipment[16] memory childrenEquipped) {
