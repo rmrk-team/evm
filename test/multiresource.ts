@@ -292,7 +292,7 @@ describe('MultiResource', async () => {
       await token.acceptResource(tokenId, 0);
 
       await expect(token.acceptResource(tokenId, 0)).to.be.revertedWith(
-        'MultiResource: index out of bounds',
+        'MultiResourceIndexOutOfBounds()',
       );
     });
 
@@ -313,7 +313,7 @@ describe('MultiResource', async () => {
 
       await token.mint(owner.address, tokenId);
       await expect(token.acceptResource(tokenId, 0)).to.be.revertedWith(
-        'MultiResource: index out of bounds',
+        'MultiResourceIndexOutOfBounds()',
       );
     });
   });
@@ -452,7 +452,7 @@ describe('MultiResource', async () => {
       await token.rejectResource(tokenId, 0);
 
       await expect(token.rejectResource(tokenId, 0)).to.be.revertedWith(
-        'MultiResource: index out of bounds',
+        'MultiResourceIndexOutOfBounds()',
       );
     });
 
@@ -477,7 +477,7 @@ describe('MultiResource', async () => {
 
       await token.mint(owner.address, tokenId);
       await expect(token.rejectResource(tokenId, 0)).to.be.revertedWith(
-        'MultiResource: index out of bounds',
+        'MultiResourceIndexOutOfBounds()',
       );
     });
   });
@@ -519,9 +519,11 @@ describe('MultiResource', async () => {
     it('cannot set different number of priorities', async function () {
       const tokenId = 1;
       await addResourcesToToken(tokenId);
-      await expect(token.setPriority(tokenId, [1])).to.be.revertedWith('Bad priority list length');
+      await expect(token.setPriority(tokenId, [1])).to.be.revertedWith(
+        'MultiResourceBadPriorityListLength()',
+      );
       await expect(token.setPriority(tokenId, [2, 1, 3])).to.be.revertedWith(
-        'Bad priority list length',
+        'MultiResourceBadPriorityListLength()',
       );
     });
 

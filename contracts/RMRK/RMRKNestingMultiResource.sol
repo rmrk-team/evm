@@ -62,7 +62,7 @@ contract RMRKNestingMultiResource is MultiResourceAbstract, RMRKNesting {
 
     function tokenURI(
         uint256 tokenId
-    ) public view override(MultiResourceAbstract, NestingAbstract) returns (string memory) {
+    ) public view override(NestingAbstract, IRMRKMultiResourceBase, MultiResourceAbstractBase) returns (string memory) {
         return _tokenURIAtIndex(tokenId, 0);
     }
 
