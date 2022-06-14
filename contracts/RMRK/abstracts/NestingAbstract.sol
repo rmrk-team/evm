@@ -258,11 +258,4 @@ abstract contract NestingAbstract is Context, IRMRKNesting {
         array[index] = array[array.length-1];
         array.pop();
     }
-
-    function removeItemByIndexMulti_C(Child[] storage array, uint256[] memory indexes) internal {
-        uint256 length = indexes.length; //gas savings
-        for (uint i; i<length; i = i.u_inc()) {
-            removeItemByIndex_C(array, indexes[i]);
-        }
-    }
 }
