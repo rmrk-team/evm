@@ -1,8 +1,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
-pragma solidity ^0.8.9;
+pragma solidity ^0.8.14;
 
 import "../RMRK/RMRKMultiResource.sol";
+
+error RMRKOnlyIssuer();
+error ERC721OwnerQueryForNonexistentToken();
 
 contract RMRKMultiResourceMock is RMRKMultiResource {
 
@@ -15,7 +18,7 @@ contract RMRKMultiResourceMock is RMRKMultiResource {
     }
 
     modifier onlyIssuer() {
-        require(_msgSender() == _issuer, "RMRK: Only issuer");
+        if(_msgSender() != _issuer) revert RMRKOnlyIssuer();
         _;
     }
 
@@ -47,10 +50,7 @@ contract RMRKMultiResourceMock is RMRKMultiResource {
         bytes8 resourceId,
         bytes8 overwrites
     ) external onlyIssuer {
-        require(
-            ownerOf(tokenId) != address(0),
-            "ERC721: owner query for nonexistent token"
-        );
+        if(ownerOf(tokenId) == address(0)) revert ERC721OwnerQueryForNonexistentToken();
         _addResourceToToken(tokenId, resourceId, overwrites);
     }
 

@@ -54,7 +54,7 @@ describe('MultiResource', async () => {
       const id = ethers.utils.hexZeroPad('0x1111', 8);
       await expect(
         token.connect(addrs[1]).addResourceEntry(id, metaURIDefault, customDefault),
-      ).to.be.revertedWith('RMRK: Only issuer');
+      ).to.be.revertedWith('RMRKOnlyIssuer()');
     });
 
     it('can set and get issuer', async function () {
@@ -68,7 +68,7 @@ describe('MultiResource', async () => {
     it('cannot set issuer if not issuer', async function () {
       const newIssuer = addrs[1];
       await expect(token.connect(newIssuer).setIssuer(newIssuer.address)).to.be.revertedWith(
-        'RMRK: Only issuer',
+        'RMRKOnlyIssuer()',
       );
     });
 

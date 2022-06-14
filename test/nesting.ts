@@ -331,7 +331,7 @@ describe('Nesting', async () => {
         petMonkey
           .connect(addrs[0])
           ['mint(address,uint256,uint256,bytes)'](ownerChunky.address, 129, tokenId, mintNestData),
-      ).to.be.revertedWith('RMRKCore: Max pending children reached');
+      ).to.be.revertedWith('RMRKCoreMaxPendingChildrenReached()');
     });
   });
 
@@ -500,7 +500,7 @@ describe('Nesting', async () => {
     it('cannot reject children for non existing index', async () => {
       const parentId = 11;
       await expect(ownerChunky.connect(addrs[1]).rejectChild(parentId, 0)).to.be.revertedWith(
-        'RMRKcore: Pending child index out of range',
+        'RMRKCorePendingChildIndexOutOfRange()',
       );
     });
   });
@@ -569,7 +569,7 @@ describe('Nesting', async () => {
       const tokenId = 1;
       await petMonkey.connect(addrs[1])['mint(address,uint256)'](addrs[1].address, tokenId);
       await expect(petMonkey.connect(addrs[0]).burn(tokenId)).to.be.revertedWith(
-        'RMRKCore: transfer caller is not owner nor approved',
+        'RMRKCoreTransferCallerNotOwnerOrApproved()',
       );
     });
 
@@ -625,7 +625,7 @@ describe('Nesting', async () => {
       await ownerChunky.connect(addrs[0]).acceptChild(parentId, 0);
 
       await expect(petMonkey.connect(addrs[1]).burn(childId)).to.be.revertedWith(
-        'RMRKCore: transfer caller is not owner nor approved',
+        'RMRKCoreTransferCallerNotOwnerOrApproved()',
       );
     });
 
@@ -766,14 +766,14 @@ describe('Nesting', async () => {
     it('cannot unnest token directly even if root owner', async function () {
       const { childId, parentId, firstOwner } = await mintTofirstOwner(true);
       await expect(petMonkey.connect(firstOwner).unnestToken(childId, parentId)).to.be.revertedWith(
-        'RMRKCore: unnest from wrong owner',
+        'RMRKCoreUnnestFromWrongOwner()',
       );
     });
 
     it('cannot unnest token not owned by an NFT', async function () {
       const { parentId, firstOwner } = await mintTofirstOwner(true);
       await expect(ownerChunky.connect(firstOwner).unnestToken(parentId, 0)).to.be.revertedWith(
-        'RMRKCore: unnest for non-NFT parent',
+        'RMRKCoreUnnestForNonNftParent()',
       );
     });
   });
