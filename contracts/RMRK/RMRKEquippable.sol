@@ -13,7 +13,7 @@ import "./library/MultiResourceLib.sol";
 import "./utils/Address.sol";
 import "./utils/Strings.sol";
 import "./utils/Context.sol";
-import "hardhat/console.sol";
+// import "hardhat/console.sol";
 
 error RMRKEquippableBasePartNotEquippable();
 error RMRKEquippableEquipNotAllowedByBase();

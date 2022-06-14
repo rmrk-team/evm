@@ -1,12 +1,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
-pragma solidity ^0.8.9;
+pragma solidity ^0.8.14;
 
 import "../RMRK/RMRKNesting.sol";
 import "../RMRK/interfaces/IRMRKNestingReceiver.sol";
-import "hardhat/console.sol";
+// import "hardhat/console.sol";
 
 //Minimal public implementation of RMRKCore for testing.
+
+error RMRKCoreTransferCallerNotOwnerOrApproved();
 
 contract RMRKNestingMock is RMRKNesting, IRMRKNestingReceiver {
     constructor(
@@ -29,10 +31,7 @@ contract RMRKNestingMock is RMRKNesting, IRMRKNestingReceiver {
 
     //update for reentrancy
     function burn(uint256 tokenId) public {
-        require(
-            _isApprovedOrOwner(_msgSender(), tokenId),
-            "RMRKCore: transfer caller is not owner nor approved"
-        );
+        if(!_isApprovedOrOwner(_msgSender(), tokenId)) revert RMRKCoreTransferCallerNotOwnerOrApproved();
         _burn(tokenId);
     }
 
