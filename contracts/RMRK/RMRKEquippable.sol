@@ -59,7 +59,7 @@ contract RMRKEquippable is Context, RMRKNesting, IRMRKEquippableResource {
         //TODO check to see if scoping like so costs or saves gas. Probably saves if pointer is re-used after de-scope like assembly?
         Resource memory childResource = IRMRKEquippableResource(child.contractAddress).getResObjectByIndex(childIndex, childResourceIndex);
 
-        if(validateEquip(childResource.baseAddress, childResource.slotId) == false) revert RMRKEquippableEquipNotAllowedByBase();
+        if(!validateEquip(childResource.baseAddress, childResource.slotId)) revert RMRKEquippableEquipNotAllowedByBase();
         if(slotPartIds[targetResourceId][slotPartIndex] != childResource.slotId) revert RMRKEquippableSlotIDMismatch();
 
         equipped[targetResourceId][slotPartIndex] = Equipment({
@@ -381,7 +381,7 @@ contract RMRKEquippable is Context, RMRKNesting, IRMRKEquippableResource {
         bytes8 resourceId,
         bytes8 overwrites
     ) internal {
-        if(_tokenResources[tokenId][resourceId] != false) revert MultiResourceAlreadyExists();
+        if(_tokenResources[tokenId][resourceId]) revert MultiResourceAlreadyExists();
 
         if( getResource(resourceId).id == bytes8(0)) revert MultiResourceResourceNotFoundInStorage();
 

@@ -258,7 +258,7 @@ abstract contract MultiResourceAbstract is Context, IMultiResource {
         bytes8 overwrites
     ) internal {
         require(
-            _tokenResources[tokenId][resourceId] == false,
+            !_tokenResources[tokenId][resourceId],
             "MultiResource: Resource already exists on token"
         );
 
