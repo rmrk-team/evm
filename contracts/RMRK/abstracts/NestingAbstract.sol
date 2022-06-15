@@ -18,6 +18,11 @@ error RMRKCoreUnnestForNonNftParent();
 error RMRKCoreUnnestFromWrongParent();
 error RMRKCoreUnnestFromWrongOwner();
 error RMRKParentChildMismatch();
+error RMRKCoreMintToTheZeroAddress();
+error RMRKCoreMustUnnestFirst();
+error RMRKCoreTokenAlreadyMinted();
+error RMRKCoreIsNotContract();
+error RMRKCoreMintToNonRMRKCoreImplementer();
 error ERC721InvalidTokenID();
 
 abstract contract NestingAbstract is Context, IRMRKNesting {

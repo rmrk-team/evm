@@ -54,12 +54,11 @@ contract RMRKNesting is ERC721Abstract, NestingAbstract {
     }
 
     function _mintToNft(address to, uint256 tokenId, uint256 destinationId, bytes memory data) internal virtual {
-        require(to != address(0), "RMRKCore: mint to the zero address");
-        require(!_exists(tokenId), "RMRKCore: token already minted");
-        require(to.isContract(), "RMRKCore: Is not contract");
-        require(_checkRMRKNestingImplementer(_msgSender(), to, tokenId, ""),
-            "RMRKCore: Mint to non-RMRKCore implementer"
-        );
+        if(to == address(0)) revert RMRKCoreMintToTheZeroAddress();
+        if(_exists(tokenId)) revert RMRKCoreTokenAlreadyMinted();
+        if(!to.isContract()) revert RMRKCoreIsNotContract();
+        if(!_checkRMRKNestingImplementer(_msgSender(), to, tokenId, ""))
+            revert RMRKCoreMintToNonRMRKCoreImplementer();
 
         IRMRKNesting destContract = IRMRKNesting(to);
 
@@ -82,8 +81,8 @@ contract RMRKNesting is ERC721Abstract, NestingAbstract {
     }
 
     function _mintToRootOwner(address to, uint256 tokenId) internal virtual {
-        require(to != address(0), "RMRKCore: mint to the zero address");
-        require(!_exists(tokenId), "RMRKCore: token already minted");
+        if(to == address(0)) revert RMRKCoreMintToTheZeroAddress();
+        if(_exists(tokenId)) revert RMRKCoreTokenAlreadyMinted();
 
         _beforeTokenTransfer(address(0), to, tokenId);
 
@@ -243,14 +242,14 @@ contract RMRKNesting is ERC721Abstract, NestingAbstract {
         bytes memory data
     ) internal virtual {
         require(ownerOf(tokenId) == from, "RMRKCore: transfer from incorrect owner");
-        require(to != address(0), "RMRKCore: transfer to the zero address");
+        if(to == address(0)) revert RMRKCoreMintToTheZeroAddress();
 
         _beforeTokenTransfer(from, to, tokenId);
 
         // FIXME: balances are not tested and probably broken
         _balances[from] -= 1;
         RMRKOwner memory rmrkOwner = _RMRKOwners[tokenId];
-        require(!rmrkOwner.isNft, "RMRKCore: Must unnest first");
+        if(rmrkOwner.isNft) revert RMRKCoreMustUnnestFirst();
         bool destinationIsNft = _checkRMRKNestingImplementer(from, to, tokenId, data);
 
         _RMRKOwners[tokenId] = RMRKOwner({
