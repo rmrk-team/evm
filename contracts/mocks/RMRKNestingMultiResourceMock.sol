@@ -9,7 +9,6 @@ import "../RMRK/RMRKNestingMultiResource.sol";
 
 error RMRKOnlyIssuer();
 error RMRKCoreTransferCallerNotOwnerOrApproved();
-error ERC721OwnerQueryForNonexistentToken();
 
 contract RMRKNestingMultiResourceMock is RMRKNestingMultiResource {
 

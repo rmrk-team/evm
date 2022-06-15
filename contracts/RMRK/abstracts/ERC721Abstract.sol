@@ -11,6 +11,8 @@ import "../utils/Strings.sol";
 import "../utils/Context.sol";
 // import "hardhat/console.sol";
 
+error ERC721OwnerQueryForNonexistentToken();
+
 contract ERC721Abstract is Context, IERC721 {
 
     using Address for address;
@@ -71,10 +73,8 @@ contract ERC721Abstract is Context, IERC721 {
         uint256 tokenId
     ) public view virtual override returns (address) {
         address owner = _owners[tokenId];
-        require(
-            owner != address(0),
-            "RMRKCoreOwnerQueryForNonexistentToken()"
-        );
+        if(owner == address(0) )
+            revert ERC721OwnerQueryForNonexistentToken();
         return owner;
     }
 
@@ -190,10 +190,9 @@ contract ERC721Abstract is Context, IERC721 {
         address spender,
         uint256 tokenId
     ) internal view virtual returns (bool) {
-        require(
-            _exists(tokenId),
-            "RMRKCoreOwnerQueryForNonexistentToken()"
-        );
+        if(!_exists(tokenId))
+            revert ERC721OwnerQueryForNonexistentToken();
+
         address owner = ownerOf(tokenId);
         return (
             spender == owner

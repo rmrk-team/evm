@@ -8,7 +8,6 @@ import "../RMRK/RMRKEquippable.sol";
 
 error RMRKOnlyIssuer();
 error RMRKCoreTransferCallerNotOwnerOrApproved();
-error ERC721OwnerQueryForNonexistentToken();
 
 contract RMRKEquippableMock is RMRKEquippable {
 
