@@ -70,7 +70,7 @@ contract RMRKMultiResource is MultiResourceAbstract, IERC721 {
         address owner = _owners[tokenId];
         require(
             owner != address(0),
-            "ERC721: owner query for nonexistent token"
+            "RMRKCoreOwnerQueryForNonexistentToken()"
         );
         return owner;
     }
@@ -189,7 +189,7 @@ contract RMRKMultiResource is MultiResourceAbstract, IERC721 {
     ) internal view virtual returns (bool) {
         require(
             _exists(tokenId),
-            "MultiResource: operator query for nonexistent token"
+            "RMRKCoreOwnerQueryForNonexistentToken()"
         );
         address owner = ownerOf(tokenId);
         return (
@@ -346,7 +346,7 @@ contract RMRKMultiResource is MultiResourceAbstract, IERC721 {
     function acceptResource(uint256 tokenId, uint256 index) external virtual {
         require(
             _isApprovedOrOwner(_msgSender(), tokenId),
-            "MultiResource: not owner"
+            "MultiResourceNotOwner()"
         );
         // FIXME: clean approvals and test
         _acceptResource(tokenId, index);
@@ -355,7 +355,7 @@ contract RMRKMultiResource is MultiResourceAbstract, IERC721 {
     function rejectResource(uint256 tokenId, uint256 index) external virtual {
         require(
             _isApprovedOrOwner(_msgSender(), tokenId),
-            "MultiResource: not owner"
+            "MultiResourceNotOwner()"
         );
         // FIXME: clean approvals and test
         _rejectResource(tokenId, index);
@@ -364,7 +364,7 @@ contract RMRKMultiResource is MultiResourceAbstract, IERC721 {
     function rejectAllResources(uint256 tokenId) external virtual {
         require(
             _isApprovedOrOwner(_msgSender(), tokenId),
-            "MultiResource: not owner"
+            "MultiResourceNotOwner()"
         );
         // FIXME: clean approvals and test
         _rejectAllResources(tokenId);
@@ -376,7 +376,7 @@ contract RMRKMultiResource is MultiResourceAbstract, IERC721 {
     ) external virtual {
         require(
             _isApprovedOrOwner(_msgSender(), tokenId),
-            "MultiResource: not owner"
+            "MultiResourceNotOwner()"
         );
         // FIXME: clean approvals and test
         _setPriority(tokenId, priorities);

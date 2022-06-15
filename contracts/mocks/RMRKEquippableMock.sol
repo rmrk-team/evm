@@ -17,25 +17,38 @@ contract RMRKEquippableMock is RMRKEquippable {
     constructor(
         string memory name_,
         string memory symbol_
-    ) RMRKEquippable(name_, symbol_) {}
+    ) RMRKEquippable(name_, symbol_)
+    {
+        _setIssuer(_msgSender());
+    }
 
     modifier onlyIssuer() {
         if(_msgSender() != _issuer) revert RMRKOnlyIssuer();
         _;
     }
 
-    //The preferred method here is to overload the function, but hardhat tests prevent this.
-    function doMint(address to, uint256 tokenId) external {
-        _mint(to, tokenId);
+    function setFallbackURI(string memory fallbackURI) external onlyIssuer {
+        _setFallbackURI(fallbackURI);
     }
 
-    function doMintNest(
-        address to,
-        uint256 tokenId,
-        uint256 destId,
-        bytes calldata data
-    ) external {
-        _mint(to, tokenId, destId, data);
+    function setTokenEnumeratedResource(
+        bytes8 resourceId,
+        bool state
+    ) external onlyIssuer {
+        _setTokenEnumeratedResource(resourceId, state);
+    }
+
+    function setIssuer(address issuer) external onlyIssuer {
+        _setIssuer(issuer);
+    }
+
+    function getIssuer() external view returns (address) {
+        return _issuer;
+    }
+
+    //The preferred method here is to overload the function, but hardhat tests prevent this.
+    function mint(address to, uint256 tokenId) external {
+        _mint(to, tokenId);
     }
 
     function burn(uint256 tokenId) public {

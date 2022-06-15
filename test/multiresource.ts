@@ -166,7 +166,7 @@ describe('MultiResource', async () => {
 
       await addResources([resId]);
       await expect(token.addResourceToToken(tokenId, resId, emptyOverwrite)).to.be.revertedWith(
-        'ERC721: owner query for nonexistent token',
+        'RMRKCoreOwnerQueryForNonexistentToken()',
       );
     });
 
@@ -178,7 +178,7 @@ describe('MultiResource', async () => {
       await addResources([resId]);
       await token.addResourceToToken(tokenId, resId, emptyOverwrite);
       await expect(token.addResourceToToken(tokenId, resId, emptyOverwrite)).to.be.revertedWith(
-        'MultiResource: Resource already exists on token',
+        'MultiResourceAlreadyExists()',
       );
     });
 
@@ -196,7 +196,7 @@ describe('MultiResource', async () => {
       const resId = ethers.utils.hexZeroPad(ethers.utils.hexValue(129), 8);
       await addResources([resId]);
       await expect(token.addResourceToToken(tokenId, resId, emptyOverwrite)).to.be.revertedWith(
-        'MultiResource: Max pending resources reached',
+        'MultiResourceMaxPendingResourcesReached()',
       );
     });
 
@@ -304,7 +304,7 @@ describe('MultiResource', async () => {
       await addResources([resId]);
       await token.addResourceToToken(tokenId, resId, emptyOverwrite);
       await expect(token.connect(addrs[1]).acceptResource(tokenId, 0)).to.be.revertedWith(
-        'MultiResource: not owner',
+        'MultiResourceNotOwner()',
       );
     });
 
@@ -465,10 +465,10 @@ describe('MultiResource', async () => {
       await token.addResourceToToken(tokenId, resId, emptyOverwrite);
 
       await expect(token.connect(addrs[1]).rejectResource(tokenId, 0)).to.be.revertedWith(
-        'MultiResource: not owner',
+        'MultiResourceNotOwner()',
       );
       await expect(token.connect(addrs[1]).rejectAllResources(tokenId)).to.be.revertedWith(
-        'MultiResource: not owner',
+        'MultiResourceNotOwner()',
       );
     });
 
@@ -512,7 +512,7 @@ describe('MultiResource', async () => {
       const tokenId = 1;
       await addResourcesToToken(tokenId);
       await expect(token.connect(addrs[1]).setPriority(tokenId, [2, 1])).to.be.revertedWith(
-        'MultiResource: not owner',
+        'MultiResourceNotOwner()',
       );
     });
 
@@ -530,7 +530,7 @@ describe('MultiResource', async () => {
     it('cannot set priorities for non existing token', async function () {
       const tokenId = 1;
       await expect(token.connect(addrs[1]).setPriority(tokenId, [])).to.be.revertedWith(
-        'MultiResource: operator query for nonexistent token',
+        'RMRKCoreOwnerQueryForNonexistentToken()',
       );
     });
   });

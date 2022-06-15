@@ -73,7 +73,7 @@ contract ERC721Abstract is Context, IERC721 {
         address owner = _owners[tokenId];
         require(
             owner != address(0),
-            "ERC721: owner query for nonexistent token"
+            "RMRKCoreOwnerQueryForNonexistentToken()"
         );
         return owner;
     }
@@ -192,7 +192,7 @@ contract ERC721Abstract is Context, IERC721 {
     ) internal view virtual returns (bool) {
         require(
             _exists(tokenId),
-            "MultiResource: operator query for nonexistent token"
+            "RMRKCoreOwnerQueryForNonexistentToken()"
         );
         address owner = ownerOf(tokenId);
         return (

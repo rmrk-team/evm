@@ -99,7 +99,7 @@ abstract contract MultiResourceAbstract is Context, IMultiResource, MultiResourc
     ) internal {
         require(
             !_tokenResources[tokenId][resourceId],
-            "MultiResource: Resource already exists on token"
+            "MultiResourceAlreadyExists()"
         );
 
         require(
@@ -109,7 +109,7 @@ abstract contract MultiResourceAbstract is Context, IMultiResource, MultiResourc
 
         require(
             _pendingResources[tokenId].length < 128,
-            "MultiResource: Max pending resources reached"
+            "MultiResourceMaxPendingResourcesReached()"
         );
 
         _tokenResources[tokenId][resourceId] = true;
