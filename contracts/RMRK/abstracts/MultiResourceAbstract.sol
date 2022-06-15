@@ -97,20 +97,16 @@ abstract contract MultiResourceAbstract is Context, IMultiResource, MultiResourc
         bytes8 resourceId,
         bytes8 overwrites
     ) internal {
-        require(
-            !_tokenResources[tokenId][resourceId],
-            "MultiResourceAlreadyExists()"
-        );
+        if(_tokenResources[tokenId][resourceId])
+            revert MultiResourceAlreadyExists();
 
         require(
             getResource(resourceId).id != bytes8(0),
             "MultiResource: Resource not found in storage"
         );
 
-        require(
-            _pendingResources[tokenId].length < 128,
-            "MultiResourceMaxPendingResourcesReached()"
-        );
+        if(_pendingResources[tokenId].length >= 128)
+            revert MultiResourceMaxPendingResourcesReached();
 
         _tokenResources[tokenId][resourceId] = true;
 
