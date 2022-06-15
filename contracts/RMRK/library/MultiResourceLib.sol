@@ -15,7 +15,7 @@ library MultiResourceLib {
         }
     }
 
-    //For reasource storage array
+    //For resource storage array
     function removeItemByIndex(bytes8[] storage array, uint256 index) internal {
         //Check to see if this is already gated by require in all calls
         require(index < array.length);
@@ -23,7 +23,7 @@ library MultiResourceLib {
         array.pop();
     }
 
-    //For reasource storage array
+    //For resource storage array
     function removeItemByIndex(bytes16[] storage array, uint256 index) internal {
         //Check to see if this is already gated by require in all calls
         require(index < array.length);

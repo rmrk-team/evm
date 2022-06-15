@@ -6,14 +6,15 @@ import "./IRMRKMultiResourceBase.sol";
 
 interface IRMRKEquippableResource is IRMRKMultiResourceBase {
 
-    //Possibly move this to the constructor of the contract, if only for being able to set arr len on construct
+    //Reorder this during optimization for packing
     struct Resource {
-        bytes8 id; //8 bytes
-        string metadataURI; //32+
+        bytes8 id; // ID of this resource
+        bytes8 equippableRefId; // ID of mapping for applicable equippables
+        string metadataURI;
         //describes this equippable status
-        address baseAddress;
-        bytes8 slotId;
-        bytes16[] custom;
+        address baseAddress; // Base contract reference
+        bytes8 slotId; // Which slotId this resource is equippable in
+        bytes16[] custom; //Custom data
     }
 
     struct Equipment {

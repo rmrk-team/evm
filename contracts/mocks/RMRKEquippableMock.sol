@@ -63,14 +63,13 @@ contract RMRKEquippableMock is RMRKEquippable {
 
     function addResourceEntry(
         bytes8 id,
+        bytes8 equippableRefId,
         string calldata metadataURI,
-        bytes8[16] calldata fixedParts,
-        bytes8[16] calldata slotParts,
         address baseAddress,
         bytes8 slotId,
         bytes16[] calldata custom
     ) external onlyIssuer {
-        _addResourceEntry(id, metadataURI, fixedParts, slotParts, baseAddress, slotId, custom);
+        _addResourceEntry(id, equippableRefId, metadataURI, baseAddress, slotId, custom);
     }
 
     function setCustomResourceData(
