@@ -622,40 +622,40 @@ describe('MultiResource', async () => {
         await token.tokenURIForCustomValue(tokenId, customDataTypeKey, customDataTypeValueB),
       ).to.eql('UriB');
     });
-  });
 
-  it('gets fall back if matching value is not find on custom data', async function () {
-    const tokenId = 1;
-    const resId = ethers.utils.hexZeroPad('0x0001', 8);
-    const resId2 = ethers.utils.hexZeroPad('0x0002', 8);
-    // We define a custom data for 'type'.
-    const customDataTypeKey = ethers.utils.hexZeroPad('0x0001', 16);
-    const customDataTypeValueA = ethers.utils.hexZeroPad('0xAAAA', 16);
-    const customDataTypeValueB = ethers.utils.hexZeroPad('0xBBBB', 16);
-    const customDataTypeValueC = ethers.utils.hexZeroPad('0xCCCC', 16);
-    const customDataOtherKey = ethers.utils.hexZeroPad('0x0002', 16);
+    it('gets fall back if matching value is not find on custom data', async function () {
+      const tokenId = 1;
+      const resId = ethers.utils.hexZeroPad('0x0001', 8);
+      const resId2 = ethers.utils.hexZeroPad('0x0002', 8);
+      // We define a custom data for 'type'.
+      const customDataTypeKey = ethers.utils.hexZeroPad('0x0001', 16);
+      const customDataTypeValueA = ethers.utils.hexZeroPad('0xAAAA', 16);
+      const customDataTypeValueB = ethers.utils.hexZeroPad('0xBBBB', 16);
+      const customDataTypeValueC = ethers.utils.hexZeroPad('0xCCCC', 16);
+      const customDataOtherKey = ethers.utils.hexZeroPad('0x0002', 16);
 
-    await token.mint(owner.address, tokenId);
-    await token.addResourceEntry(resId, 'srcA', [customDataTypeKey]);
-    await token.addResourceEntry(resId2, 'srcB', [customDataTypeKey]);
-    await token.setCustomResourceData(resId, customDataTypeKey, customDataTypeValueA);
-    await token.setCustomResourceData(resId2, customDataTypeKey, customDataTypeValueB);
+      await token.mint(owner.address, tokenId);
+      await token.addResourceEntry(resId, 'srcA', [customDataTypeKey]);
+      await token.addResourceEntry(resId2, 'srcB', [customDataTypeKey]);
+      await token.setCustomResourceData(resId, customDataTypeKey, customDataTypeValueA);
+      await token.setCustomResourceData(resId2, customDataTypeKey, customDataTypeValueB);
 
-    await token.addResourceToToken(tokenId, resId, emptyOverwrite);
-    await token.addResourceToToken(tokenId, resId2, emptyOverwrite);
-    await token.acceptResource(tokenId, 0);
-    await token.acceptResource(tokenId, 0);
+      await token.addResourceToToken(tokenId, resId, emptyOverwrite);
+      await token.addResourceToToken(tokenId, resId2, emptyOverwrite);
+      await token.acceptResource(tokenId, 0);
+      await token.acceptResource(tokenId, 0);
 
-    await token.setFallbackURI('fallback404');
+      await token.setFallbackURI('fallback404');
 
-    // No resource has this custom value for type:
-    expect(
-      await token.tokenURIForCustomValue(tokenId, customDataTypeKey, customDataTypeValueC),
-    ).to.eql('fallback404');
-    // No resource has this custom key:
-    expect(
-      await token.tokenURIForCustomValue(tokenId, customDataOtherKey, customDataTypeValueA),
-    ).to.eql('fallback404');
+      // No resource has this custom value for type:
+      expect(
+        await token.tokenURIForCustomValue(tokenId, customDataTypeKey, customDataTypeValueC),
+      ).to.eql('fallback404');
+      // No resource has this custom key:
+      expect(
+        await token.tokenURIForCustomValue(tokenId, customDataOtherKey, customDataTypeValueA),
+      ).to.eql('fallback404');
+    });
   });
 
   async function addResources(ids: string[]): Promise<void> {
