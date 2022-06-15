@@ -80,20 +80,20 @@ describe('Nesting', async () => {
     it('cannot mint already minted token', async function () {
       await petMonkey['mint(address,uint256)'](owner.address, 1);
       await expect(petMonkey['mint(address,uint256)'](owner.address, 1)).to.be.revertedWith(
-        'RMRKCore: token already minted',
+        'RMRKCoreTokenAlreadyMinted()',
       );
     });
 
     it('cannot mint to zero address', async function () {
       await expect(
         petMonkey['mint(address,uint256)']('0x0000000000000000000000000000000000000000', 1),
-      ).to.be.revertedWith('RMRKCore: mint to the zero address');
+      ).to.be.revertedWith('RMRKCoreMintToTheZeroAddress()');
     });
 
     it('cannot nest mint to a non-contract destination', async function () {
       await expect(
         petMonkey['mint(address,uint256,uint256,bytes)'](owner.address, 1, 0, mintNestData),
-      ).to.be.revertedWith('Is not contract');
+      ).to.be.revertedWith('RMRKCoreIsNotContract()');
     });
 
     it.skip('cannot nest mint to non rmrk core implementer', async function () {
@@ -129,7 +129,7 @@ describe('Nesting', async () => {
             parentId,
             mintNestData,
           ),
-      ).to.be.revertedWith('RMRKCore: token already minted');
+      ).to.be.revertedWith('RMRKCoreTokenAlreadyMinted()');
     });
 
     it('cannot nest mint already minted token to a different parent', async function () {
@@ -156,7 +156,7 @@ describe('Nesting', async () => {
             parentId,
             mintNestData,
           ),
-      ).to.be.revertedWith('RMRKCore: token already minted');
+      ).to.be.revertedWith('RMRKCoreTokenAlreadyMinted()');
     });
 
     it('cannot nest mint to zero address', async function () {
@@ -167,7 +167,7 @@ describe('Nesting', async () => {
           10,
           mintNestData,
         ),
-      ).to.be.revertedWith('RMRKCore: mint to the zero address');
+      ).to.be.revertedWith('RMRKCoreMintToTheZeroAddress()');
     });
 
     it('can mint to contract and owners are ok', async function () {
@@ -881,7 +881,7 @@ describe('Nesting', async () => {
             newParentId,
             emptyData,
           ),
-      ).to.be.revertedWith('RMRKCore: Must unnest first');
+      ).to.be.revertedWith('RMRKCoreMustUnnestFirst()');
     });
 
     it('can transfer parent token to token with same owner, family tree is ok', async function () {
