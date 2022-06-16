@@ -344,28 +344,25 @@ contract RMRKMultiResource is MultiResourceAbstract, IERC721 {
 
 
     function acceptResource(uint256 tokenId, uint256 index) external virtual {
-        require(
-            _isApprovedOrOwner(_msgSender(), tokenId),
-            "MultiResourceNotOwner()"
-        );
+        if(!_isApprovedOrOwner(_msgSender(), tokenId))
+                revert MultiResourceNotOwner();
+
         // FIXME: clean approvals and test
         _acceptResource(tokenId, index);
     }
 
     function rejectResource(uint256 tokenId, uint256 index) external virtual {
-        require(
-            _isApprovedOrOwner(_msgSender(), tokenId),
-            "MultiResourceNotOwner()"
-        );
+        if(!_isApprovedOrOwner(_msgSender(), tokenId))
+                revert MultiResourceNotOwner();
+
         // FIXME: clean approvals and test
         _rejectResource(tokenId, index);
     }
 
     function rejectAllResources(uint256 tokenId) external virtual {
-        require(
-            _isApprovedOrOwner(_msgSender(), tokenId),
-            "MultiResourceNotOwner()"
-        );
+        if(!_isApprovedOrOwner(_msgSender(), tokenId))
+                revert MultiResourceNotOwner();
+
         // FIXME: clean approvals and test
         _rejectAllResources(tokenId);
     }
@@ -374,10 +371,9 @@ contract RMRKMultiResource is MultiResourceAbstract, IERC721 {
         uint256 tokenId,
         uint16[] memory priorities
     ) external virtual {
-        require(
-            _isApprovedOrOwner(_msgSender(), tokenId),
-            "MultiResourceNotOwner()"
-        );
+        if(!_isApprovedOrOwner(_msgSender(), tokenId))
+                revert MultiResourceNotOwner();
+
         // FIXME: clean approvals and test
         _setPriority(tokenId, priorities);
     }
