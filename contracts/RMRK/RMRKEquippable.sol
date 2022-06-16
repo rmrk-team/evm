@@ -56,7 +56,7 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippableResource, MultiResourceAb
 
         Resource memory childResource = IRMRKEquippableResource(child.contractAddress).getResObjectByIndex(childIndex, childResourceIndex);
 
-        if(!isValidBasePartId[targetResource.equippableRefId][childResource.slotId])
+        if(!isValidBasePartId[childResource.equippableRefId][targetResource.slotId])
             revert RMRKEquippableBasePartNotEquippable();
 
         if(!validateEquip(childResource.baseAddress, childResource.slotId))
@@ -90,8 +90,27 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippableResource, MultiResourceAb
         uint256 childResourceIndex
     ) public {
 
+    }
+
+    //TODO: gate to admin
+    //TODO: Migrate to custom error
+    function setEquippableRefIds(bytes8 equippableRefId, bytes8[] memory partId, bool[] memory state) public {
+        uint256 len = partId.length;
+        require(len == state.length, "Bad length");
+        for(uint i; i<len;) {
+          _setEquippableRefId(equippableRefId, partId[i], state[i]);
+          unchecked {++i;}
+        }
+    }
+
+    //TODO: gate to admin
+    function setEquippableRefId(bytes8 equippableRefId, bytes8 partId, bool state) public {
+        _setEquippableRefId(equippableRefId, partId, state);
+    }
 
 
+    function _setEquippableRefId(bytes8 equippableRefId, bytes8 partId, bool state) internal {
+        isValidBasePartId[equippableRefId][partId] = state;
     }
 
     // THIS CALL IS EASILY BYPASSED BY ANY GIVEN IMPLEMENTER. For obvious reasons, this function is
@@ -245,24 +264,13 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippableResource, MultiResourceAb
     // TODO make take a resource struct and additional params for mappings
 
     function _addResourceEntry(
-        bytes8 id,
-        bytes8 equippableRefId,
-        string memory metadataURI,
-        address baseAddress,
-        bytes8 slotId,
-        bytes16[] memory custom
+        Resource memory resource,
+        bytes8[] memory fixedPartIds,
+        bytes8[] memory slotPartIds
     ) internal {
+        bytes8 id = resource.id;
         if(id == bytes8(0)) revert RMRKWriteToZero();
         if(_resources[id].id != bytes8(0)) revert RMRKResourceAlreadyExists();
-
-        Resource memory resource = Resource({
-            id: id,
-            metadataURI: metadataURI,
-            equippableRefId: equippableRefId,
-            baseAddress: baseAddress,
-            slotId: slotId,
-            custom: custom
-        });
 
         _resources[id] = resource;
 
