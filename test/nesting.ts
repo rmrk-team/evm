@@ -629,7 +629,6 @@ describe('Nesting', async () => {
       );
     });
 
-    // FIXME: Broken
     it('can recursively burn nested token', async function () {
       const childId = 1;
       const parentId = 10;
