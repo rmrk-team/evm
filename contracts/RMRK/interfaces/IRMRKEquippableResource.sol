@@ -46,4 +46,8 @@ interface IRMRKEquippableResource is IRMRKMultiResourceBase {
     function getFullPendingResources(
         uint256 tokenId
     ) external view returns (Resource[] memory);
+
+    function getCallerEquippableSlot(
+        bytes8 resourceRefId
+    ) external view returns (bytes8);
 }

@@ -40,8 +40,8 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippableResource, MultiResourceAb
     //mapping of resourceId to slot to equipped children
     mapping(bytes8 => mapping(bytes8 => Equipment)) private equipped;
 
-    //Mapping of equippableRefId to slotId to bool for is valid slot ID
-    mapping(bytes8 => mapping(bytes8 => bool)) private isValidBasePartId;
+    //Mapping of equippableRefId to parent contract address bytes8 slotId for equipping validation
+    mapping(bytes8 => mapping(address => bytes8)) private validParentSlot;
 
     //TODO: Gate to owner of tokenId
     function equip(
@@ -56,10 +56,10 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippableResource, MultiResourceAb
 
         Resource memory childResource = IRMRKEquippableResource(child.contractAddress).getResObjectByIndex(childIndex, childResourceIndex);
 
-        if(!isValidBasePartId[childResource.equippableRefId][targetResource.slotId])
+        if(!validateChildEquip(child.contractAddress, targetResourceId))
             revert RMRKEquippableBasePartNotEquippable();
 
-        if(!validateEquip(childResource.baseAddress, childResource.slotId))
+        if(!validateBaseEquip(childResource.baseAddress, childResource.slotId))
             revert RMRKEquippableEquipNotAllowedByBase();
 
         Equipment memory newEquip = Equipment({
@@ -94,30 +94,42 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippableResource, MultiResourceAb
 
     //TODO: gate to admin
     //TODO: Migrate to custom error
-    function setEquippableRefIds(bytes8 equippableRefId, bytes8[] memory partId, bool[] memory state) public {
+    function setEquippableRefIds(bytes8 equippableRefId, address[] memory equippableAddress, bytes8[] memory partId) public {
         uint256 len = partId.length;
-        require(len == state.length, "Bad length");
+        require(len == equippableAddress.length, "Bad length");
         for(uint i; i<len;) {
-          _setEquippableRefId(equippableRefId, partId[i], state[i]);
+          _setEquippableRefId(equippableRefId, equippableAddress[i], partId[i]);
           unchecked {++i;}
         }
     }
 
     //TODO: gate to admin
-    function setEquippableRefId(bytes8 equippableRefId, bytes8 partId, bool state) public {
-        _setEquippableRefId(equippableRefId, partId, state);
+    function setEquippableRefId(bytes8 equippableRefId, address equippableAddress, bytes8 partId) public {
+        _setEquippableRefId(equippableRefId, equippableAddress, partId);
     }
 
 
-    function _setEquippableRefId(bytes8 equippableRefId, bytes8 partId, bool state) internal {
-        isValidBasePartId[equippableRefId][partId] = state;
+
+    function _setEquippableRefId(bytes8 equippableRefId, address equippableAddress, bytes8 partId) internal {
+        validParentSlot[equippableRefId][equippableAddress] = partId;
     }
 
     // THIS CALL IS EASILY BYPASSED BY ANY GIVEN IMPLEMENTER. For obvious reasons, this function is
     // included to encourage good-faith adherence to a standard, but in no way should be considered
     // a secure feature from the perspective of a Base deployer.
-    function validateEquip(address baseContract, bytes8 baseId) private view returns (bool isEquippable) {
-        isEquippable = IRMRKBaseStorage(baseContract).checkIsEquippable(baseId, address(this));
+    function validateBaseEquip(address baseContract, bytes8 partId) private view returns (bool isEquippable) {
+        isEquippable = IRMRKBaseStorage(baseContract).checkIsEquippable(partId, address(this));
+    }
+
+    //Return 0 means not equippable
+    function validateChildEquip(address childContract, bytes8 childResourceId) public view returns (bool isEquippable) {
+        isEquippable = IRMRKEquippableResource(childContract).getCallerEquippableSlot(childResourceId) > bytes8(0);
+    }
+
+    //Return 0 means not equippable
+    function getCallerEquippableSlot(bytes8 resourceId) public view returns (bytes8 equippableSlot) {
+        bytes8 resourceRefId = _resources[resourceId].equippableRefId;
+        equippableSlot = validParentSlot[resourceRefId][msg.sender];
     }
 
     function getEquipped(bytes8 targetResourceId) public view returns (bytes8[] memory slotsEquipped, Equipment[] memory childrenEquipped) {
