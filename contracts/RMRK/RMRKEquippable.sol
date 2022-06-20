@@ -281,8 +281,10 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippableResource, MultiResourceAb
         bytes8[] memory slotPartIds
     ) internal {
         bytes8 id = resource.id;
-        if(id == bytes8(0)) revert RMRKWriteToZero();
-        if(_resources[id].id != bytes8(0)) revert RMRKResourceAlreadyExists();
+        if(id == bytes8(0))
+            revert RMRKWriteToZero();
+        if(_resources[id].id != bytes8(0))
+            revert RMRKResourceAlreadyExists();
 
         _resources[id] = resource;
 
