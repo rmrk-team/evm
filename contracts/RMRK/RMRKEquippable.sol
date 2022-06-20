@@ -239,7 +239,8 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippableResource, MultiResourceAb
     ) public view virtual returns (Resource memory)
     {
         Resource memory resource = _resources[resourceId];
-        if(resource.id == uint32(0)) revert RMRKNoResourceMatchingId();
+        if(resource.id == uint32(0))
+            revert RMRKNoResourceMatchingId();
         return resource;
     }
 
@@ -281,8 +282,10 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippableResource, MultiResourceAb
         uint32[] memory slotPartIds
     ) internal {
         uint32 id = resource.id;
-        if(id == uint32(0)) revert RMRKWriteToZero();
-        if(_resources[id].id != uint32(0)) revert RMRKResourceAlreadyExists();
+        if(id == bytes8(0))
+            revert RMRKWriteToZero();
+        if(_resources[id].id != uint32(0))
+            revert RMRKResourceAlreadyExists();
 
         _resources[id] = resource;
 

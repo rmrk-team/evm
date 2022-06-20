@@ -23,7 +23,10 @@ error RMRKCoreMustUnnestFirst();
 error RMRKCoreTokenAlreadyMinted();
 error RMRKCoreIsNotContract();
 error RMRKCoreMintToNonRMRKCoreImplementer();
+error RMRKCoreTransferFromIncorrectOwner();
+error RMRKNestingTransferToNonRMRKNestingImplementer();
 error ERC721InvalidTokenID();
+error CallerIsNotRMRKOwnerContract();
 
 abstract contract NestingAbstract is Context, IRMRKNesting {
 
@@ -61,7 +64,8 @@ abstract contract NestingAbstract is Context, IRMRKNesting {
         if (isNft) {
             owner = IRMRKNesting(owner).ownerOf(ownerTokenId);
         }
-        if(owner == address(0)) revert RMRKCoreOwnerQueryForNonexistentToken();
+        if(owner == address(0))
+            revert RMRKCoreOwnerQueryForNonexistentToken();
         return owner;
     }
 

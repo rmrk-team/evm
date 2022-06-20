@@ -12,6 +12,17 @@ import "../utils/Context.sol";
 // import "hardhat/console.sol";
 
 error ERC721OwnerQueryForNonexistentToken();
+error ERC721AddressZeroIsNotaValidOwner();
+error MultiResourceTransferToNonMultiResourceReceiverImplementer();
+error MultiResourceTransferCallerIsNotOwnerNorApproved();
+error MultiResourceApproveToCaller();
+error MultiResourceApprovalToCurrentOwner();
+error MultiResourceApproveCallerIsNotOwnerNorApprovedForAll();
+error RMRKCoreNotApprovedOrOwner();
+error MultiResourceMintToTheZeroAddress();
+error MultiResourceTokenAlreadyMinted();
+error MultiResourceTransferFromIncorrectOwner();
+error MultiResourceApprovedQueryForNonexistentToken();
 
 contract ERC721Abstract is Context, IERC721 {
 
@@ -42,9 +53,8 @@ contract ERC721Abstract is Context, IERC721 {
     }
 
     modifier onlyApprovedOrOwner(uint256 tokenId) {
-        require(_isApprovedOrOwner(_msgSender(), tokenId),
-            "RMRKCore: Not approved or owner"
-        );
+        if(!_isApprovedOrOwner(_msgSender(), tokenId))
+            revert RMRKCoreNotApprovedOrOwner();
         _;
     }
 
@@ -61,10 +71,8 @@ contract ERC721Abstract is Context, IERC721 {
     function balanceOf(
         address owner
     ) public view virtual override returns (uint256) {
-        require(
-            owner != address(0),
-            "ERC721: address zero is not a valid owner"
-        );
+        if(owner == address(0))
+            revert ERC721AddressZeroIsNotaValidOwner();
         return _balances[owner];
     }
 
@@ -91,11 +99,10 @@ contract ERC721Abstract is Context, IERC721 {
 
     function approve(address to, uint256 tokenId) public virtual {
         address owner = ownerOf(tokenId);
-        require(to != owner, "MultiResource: approval to current owner");
-        require(
-            _msgSender() == owner || isApprovedForAll(owner, _msgSender()),
-            "MultiResource: approve caller is not owner nor approved for all"
-        );
+        if(to == owner)
+            revert MultiResourceApprovalToCurrentOwner();
+        if(_msgSender() != owner && !isApprovedForAll(owner, _msgSender()))
+            revert MultiResourceApproveCallerIsNotOwnerNorApprovedForAll();
 
         _approve(to, tokenId);
     }
@@ -104,11 +111,8 @@ contract ERC721Abstract is Context, IERC721 {
     function getApproved(
         uint256 tokenId
     ) public view virtual override returns (address) {
-        require(
-            _exists(tokenId),
-            "MultiResource: approved query for nonexistent token"
-        );
-
+        if(!_exists(tokenId))
+            revert MultiResourceApprovedQueryForNonexistentToken();
         return _tokenApprovals[tokenId];
     }
 
@@ -133,11 +137,8 @@ contract ERC721Abstract is Context, IERC721 {
         address to,
         uint256 tokenId
     ) public virtual override {
-        //solhint-disable-next-line max-line-length
-        require(
-            _isApprovedOrOwner(_msgSender(), tokenId),
-            "MultiResource: transfer caller is not owner nor approved"
-        );
+        if(!_isApprovedOrOwner(_msgSender(), tokenId))
+            revert MultiResourceTransferCallerIsNotOwnerNorApproved();
         // FIXME: clean approvals and test
 
         _transfer(from, to, tokenId);
@@ -159,10 +160,8 @@ contract ERC721Abstract is Context, IERC721 {
         uint256 tokenId,
         bytes memory data
     ) public virtual override {
-        require(
-            _isApprovedOrOwner(_msgSender(), tokenId),
-            "MultiResource: transfer caller is not owner nor approved"
-        );
+        if(!_isApprovedOrOwner(_msgSender(), tokenId))
+            revert MultiResourceTransferCallerIsNotOwnerNorApproved();
         // FIXME: clean approvals and test
         _safeTransfer(from, to, tokenId, data);
     }
@@ -174,10 +173,8 @@ contract ERC721Abstract is Context, IERC721 {
         bytes memory data
     ) internal virtual {
         _transfer(from, to, tokenId);
-        require(
-            _checkOnERC721Received(from, to, tokenId, data),
-            "MultiResource: transfer to non MultiResource Receiver implementer"
-        );
+        if(!_checkOnERC721Received(from, to, tokenId, data))
+            revert MultiResourceTransferToNonMultiResourceReceiverImplementer();
     }
 
 
@@ -213,17 +210,16 @@ contract ERC721Abstract is Context, IERC721 {
         bytes memory data
     ) internal virtual {
         _mint(to, tokenId);
-        require(
-            _checkOnERC721Received(address(0), to, tokenId, data),
-            "MultiResource: transfer to non MultiResource Receiver implementer"
-        );
+        if(!_checkOnERC721Received(address(0), to, tokenId, data))
+            revert MultiResourceTransferToNonMultiResourceReceiverImplementer();
     }
 
 
     function _mint(address to, uint256 tokenId) internal virtual {
-        require(to != address(0), "MultiResource: mint to the zero address");
-        require(!_exists(tokenId), "MultiResource: token already minted");
-
+        if(to == address(0))
+            revert MultiResourceMintToTheZeroAddress();
+        if(_exists(tokenId))
+            revert MultiResourceTokenAlreadyMinted();
         _beforeTokenTransfer(address(0), to, tokenId);
 
         _balances[to] += 1;
@@ -257,14 +253,10 @@ contract ERC721Abstract is Context, IERC721 {
         address to,
         uint256 tokenId
     ) internal virtual {
-        require(
-            ownerOf(tokenId) == from,
-            "MultiResource: transfer from incorrect owner"
-        );
-        require(
-            to != address(0),
-            "MultiResource: transfer to the zero address"
-        );
+        if(ownerOf(tokenId) != from)
+            revert MultiResourceTransferFromIncorrectOwner();
+        if(to == address(0))
+            revert MultiResourceMintToTheZeroAddress();
 
         _beforeTokenTransfer(from, to, tokenId);
 
@@ -292,7 +284,8 @@ contract ERC721Abstract is Context, IERC721 {
         address operator,
         bool approved
     ) internal virtual {
-        require(owner != operator, "MultiResource: approve to caller");
+        if(owner == operator)
+            revert MultiResourceApproveToCaller();
         _operatorApprovals[owner][operator] = approved;
         emit ApprovalForAll(owner, operator, approved);
     }
@@ -314,7 +307,7 @@ contract ERC721Abstract is Context, IERC721 {
                 return retval == IERC721Receiver.onERC721Received.selector;
             } catch (bytes memory reason) {
                 if (reason.length == 0) {
-                    revert("MultiResource: transfer to non MultiResource Receiver implementer");
+                    revert MultiResourceTransferToNonMultiResourceReceiverImplementer();
                 } else {
                     assembly {
                         revert(add(32, reason), mload(reason))

@@ -22,10 +22,8 @@ abstract contract MultiResourceAbstract is Context, IMultiResource, MultiResourc
     ) public view virtual returns (Resource memory)
     {
         Resource memory resource = _resources[resourceId];
-        require(
-            resource.id != uint32(0),
-            "RMRK: No resource matching Id"
-        );
+        if(resource.id == uint32(0))
+            revert RMRKNoResourceMatchingId();
         return resource;
     }
 
@@ -59,11 +57,11 @@ abstract contract MultiResourceAbstract is Context, IMultiResource, MultiResourc
         string memory metadataURI,
         uint64[] memory custom
     ) internal {
-        require(id != uint32(0), "RMRK: Write to zero");
-        require(
-            _resources[id].id == uint32(0),
-            "RMRK: resource already exists"
-        );
+        if(id == uint32(0))
+            revert RMRKWriteToZero();
+        if(_resources[id].id != uint32(0))
+            revert RMRKResourceAlreadyExists();
+
         Resource memory resource = Resource({
             id: id,
             metadataURI: metadataURI,
@@ -100,10 +98,8 @@ abstract contract MultiResourceAbstract is Context, IMultiResource, MultiResourc
         if(_tokenResources[tokenId][resourceId])
             revert MultiResourceAlreadyExists();
 
-        require(
-            getResource(resourceId).id != uint32(0),
-            "MultiResource: Resource not found in storage"
-        );
+        if(getResource(resourceId).id == uint32(0))
+            revert MultiResourceResourceNotFoundInStorage();
 
         if(_pendingResources[tokenId].length >= 128)
             revert MultiResourceMaxPendingResourcesReached();

@@ -54,9 +54,12 @@ contract RMRKNesting is ERC721Abstract, NestingAbstract {
     }
 
     function _mintToNft(address to, uint256 tokenId, uint256 destinationId, bytes memory data) internal virtual {
-        if(to == address(0)) revert RMRKCoreMintToTheZeroAddress();
-        if(_exists(tokenId)) revert RMRKCoreTokenAlreadyMinted();
-        if(!to.isContract()) revert RMRKCoreIsNotContract();
+        if(to == address(0))
+            revert RMRKCoreMintToTheZeroAddress();
+        if(_exists(tokenId))
+            revert RMRKCoreTokenAlreadyMinted();
+        if(!to.isContract())
+            revert RMRKCoreIsNotContract();
         if(!_checkRMRKNestingImplementer(_msgSender(), to, tokenId, ""))
             revert RMRKCoreMintToNonRMRKCoreImplementer();
 
@@ -118,7 +121,8 @@ contract RMRKNesting is ERC721Abstract, NestingAbstract {
     //update for reentrancy
     function burnFromParent(uint256 tokenId) external {
         (address _RMRKOwner, , ) = rmrkOwnerOf(tokenId);
-        require(_RMRKOwner == _msgSender(), "Caller is not RMRKOwner contract");
+        if(_RMRKOwner != _msgSender())
+            revert CallerIsNotRMRKOwnerContract();
         address owner = ownerOf(tokenId);
         _burnForOwner(tokenId, owner);
     }
@@ -212,12 +216,9 @@ contract RMRKNesting is ERC721Abstract, NestingAbstract {
         bytes memory data
     ) internal virtual {
         _transfer(from, to, tokenId, destinationId, data);
-        require(
-            _checkRMRKNestingImplementer(from, to, tokenId, data) ||
-            _checkOnERC721Received(from, to, tokenId, data)
-            ,
-            "MultiResource: transfer to non MultiResource Receiver implementer"
-        );
+        if(_checkRMRKNestingImplementer(from, to, tokenId, data) ||
+            _checkOnERC721Received(from, to, tokenId, data))
+            revert MultiResourceTransferToNonMultiResourceReceiverImplementer();
     }
 
     /**
@@ -241,7 +242,8 @@ contract RMRKNesting is ERC721Abstract, NestingAbstract {
         uint256 toTokenId,
         bytes memory data
     ) internal virtual {
-        require(ownerOf(tokenId) == from, "RMRKCore: transfer from incorrect owner");
+        if(ownerOf(tokenId) != from)
+            revert RMRKCoreTransferFromIncorrectOwner();
         if(to == address(0)) revert RMRKCoreMintToTheZeroAddress();
 
         _beforeTokenTransfer(from, to, tokenId);
@@ -292,7 +294,7 @@ contract RMRKNesting is ERC721Abstract, NestingAbstract {
                 return retval == IRMRKNestingReceiver.onRMRKNestingReceived.selector;
             } catch (bytes memory reason) {
                 if (reason.length == 0) {
-                    revert("RMRKNesting: transfer to non RMRKNesting implementer");
+                    revert RMRKNestingTransferToNonRMRKNestingImplementer();
                 } else {
                     assembly {
                         revert(add(32, reason), mload(reason))
