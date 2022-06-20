@@ -4,9 +4,9 @@ pragma solidity ^0.8.9;
 
 import "../interfaces/IRMRKMultiResourceBase.sol";
 import "../library/MultiResourceLib.sol";
-import "../utils/Address.sol";
-import "../utils/Strings.sol";
-import "../utils/Context.sol";
+import "@openzeppelin/contracts/utils/Address.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
+import "@openzeppelin/contracts/utils/Context.sol";
 
 error MultiResourceNotOwner();
 error MultiResourceIndexOutOfBounds();

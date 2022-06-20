@@ -8,8 +8,8 @@ import "./RMRKNesting.sol";
 import "./abstracts/MultiResourceAbstract.sol";
 import "./abstracts/NestingAbstract.sol";
 import "./library/RMRKLib.sol";
-import "./utils/Address.sol";
-import "./utils/Strings.sol";
+import "@openzeppelin/contracts/utils/Address.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
 // import "hardhat/console.sol";
 
 contract RMRKNestingMultiResource is MultiResourceAbstract, RMRKNesting {
