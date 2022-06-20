@@ -60,12 +60,16 @@ describe('MultiResource', async () => {
 
       await expect(
         chunky.addResourceEntry(
-          id,
-          equippableRefIdDefault,
-          metaURIDefault,
-          baseAddressDefault,
-          slotIdDefault,
-          customDefault,
+          {
+            id: id,
+            equippableRefId: equippableRefIdDefault,
+            metadataURI: metaURIDefault,
+            baseAddress: baseAddressDefault,
+            slotId: slotIdDefault,
+            custom: customDefault,
+          },
+          [],
+          [],
         ),
       )
         .to.emit(chunky, 'ResourceSet')
@@ -80,16 +84,18 @@ describe('MultiResource', async () => {
     it('cannot add resource entry if not issuer', async function () {
       const id = 11;
       await expect(
-        chunky
-          .connect(addrs[1])
-          .addResourceEntry(
-            id,
-            equippableRefIdDefault,
-            metaURIDefault,
-            baseAddressDefault,
-            slotIdDefault,
-            customDefault,
-          ),
+        chunky.connect(addrs[1]).addResourceEntry(
+          {
+            id: id,
+            equippableRefId: equippableRefIdDefault,
+            metadataURI: metaURIDefault,
+            baseAddress: baseAddressDefault,
+            slotId: slotIdDefault,
+            custom: customDefault,
+          },
+          [],
+          [],
+        ),
       ).to.be.revertedWith('RMRKOnlyIssuer()');
     });
 
@@ -112,36 +118,48 @@ describe('MultiResource', async () => {
       const id = 11;
 
       await chunky.addResourceEntry(
-        id,
-        equippableRefIdDefault,
-        metaURIDefault,
-        baseAddressDefault,
-        slotIdDefault,
-        customDefault,
+        {
+          id: id,
+          equippableRefId: equippableRefIdDefault,
+          metadataURI: metaURIDefault,
+          baseAddress: baseAddressDefault,
+          slotId: slotIdDefault,
+          custom: customDefault,
+        },
+        [],
+        [],
       );
       await expect(
         chunky.addResourceEntry(
-          id,
-          equippableRefIdDefault,
-          'newMetaUri',
-          baseAddressDefault,
-          slotIdDefault,
-          customDefault,
+          {
+            id: id,
+            equippableRefId: equippableRefIdDefault,
+            metadataURI: metaURIDefault,
+            baseAddress: baseAddressDefault,
+            slotId: slotIdDefault,
+            custom: customDefault,
+          },
+          [],
+          [],
         ),
       ).to.be.revertedWith('RMRKResourceAlreadyExists()');
     });
 
     it('cannot add resource with id 0', async function () {
-      const id = 0
+      const id = 0;
 
       await expect(
         chunky.addResourceEntry(
-          id,
-          equippableRefIdDefault,
-          metaURIDefault,
-          baseAddressDefault,
-          slotIdDefault,
-          customDefault,
+          {
+            id: id,
+            equippableRefId: equippableRefIdDefault,
+            metadataURI: metaURIDefault,
+            baseAddress: baseAddressDefault,
+            slotId: slotIdDefault,
+            custom: customDefault,
+          },
+          [],
+          [],
         ),
       ).to.be.revertedWith('RMRKWriteToZero()');
     });
@@ -151,12 +169,16 @@ describe('MultiResource', async () => {
 
       await expect(
         chunky.addResourceEntry(
-          id,
-          equippableRefIdDefault,
-          metaURIDefault,
-          baseAddressDefault,
-          slotIdDefault,
-          customDefault,
+          {
+            id: id,
+            equippableRefId: equippableRefIdDefault,
+            metadataURI: metaURIDefault,
+            baseAddress: baseAddressDefault,
+            slotId: slotIdDefault,
+            custom: customDefault,
+          },
+          [],
+          [],
         ),
       )
         .to.emit(chunky, 'ResourceSet')
@@ -164,12 +186,16 @@ describe('MultiResource', async () => {
 
       await expect(
         chunky.addResourceEntry(
-          id,
-          equippableRefIdDefault,
-          metaURIDefault,
-          baseAddressDefault,
-          slotIdDefault,
-          customDefault,
+          {
+            id: id,
+            equippableRefId: equippableRefIdDefault,
+            metadataURI: metaURIDefault,
+            baseAddress: baseAddressDefault,
+            slotId: slotIdDefault,
+            custom: customDefault,
+          },
+          [],
+          [],
         ),
       ).to.be.revertedWith('RMRKResourceAlreadyExists()');
     });
@@ -178,12 +204,16 @@ describe('MultiResource', async () => {
       const resId = 1;
       const customDataTypeKey = 3;
       await chunky.addResourceEntry(
-        resId,
-        equippableRefIdDefault,
-        metaURIDefault,
-        baseAddressDefault,
-        slotIdDefault,
-        customDefault,
+        {
+          id: resId,
+          equippableRefId: equippableRefIdDefault,
+          metadataURI: metaURIDefault,
+          baseAddress: baseAddressDefault,
+          slotId: slotIdDefault,
+          custom: customDefault,
+        },
+        [],
+        [],
       );
 
       await expect(chunky.addCustomDataToResource(resId, customDataTypeKey))
@@ -220,12 +250,16 @@ describe('MultiResource', async () => {
       const pending = await chunky.getFullPendingResources(tokenId);
       expect(pending).to.be.eql([
         [
-          resId,
-          equippableRefIdDefault,
-          metaURIDefault,
-          baseAddressDefault,
-          slotIdDefault,
-          customDefault,
+          {
+            id: resId,
+            equippableRefId: equippableRefIdDefault,
+            metadataURI: metaURIDefault,
+            baseAddress: baseAddressDefault,
+            slotId: slotIdDefault,
+            custom: customDefault,
+          },
+          [],
+          [],
         ],
         [
           resId2,
@@ -709,20 +743,28 @@ describe('MultiResource', async () => {
 
       await chunky.mint(owner.address, tokenId);
       await chunky.addResourceEntry(
-        resId,
-        equippableRefIdDefault,
-        'UriA',
-        baseAddressDefault,
-        slotIdDefault,
-        customDefault,
+        {
+          id: resId,
+          equippableRefId: equippableRefIdDefault,
+          metadataURI: 'UriA',
+          baseAddress: baseAddressDefault,
+          slotId: slotIdDefault,
+          custom: customDefault,
+        },
+        [],
+        [],
       );
       await chunky.addResourceEntry(
-        resId2,
-        equippableRefIdDefault,
-        'UriB',
-        baseAddressDefault,
-        slotIdDefault,
-        customDefault,
+        {
+          id: resId2,
+          equippableRefId: equippableRefIdDefault,
+          metadataURI: 'UriB',
+          baseAddress: baseAddressDefault,
+          slotId: slotIdDefault,
+          custom: customDefault,
+        },
+        [],
+        [],
       );
       await chunky.addResourceToToken(tokenId, resId, 0);
       await chunky.addResourceToToken(tokenId, resId2, 0);
@@ -750,20 +792,28 @@ describe('MultiResource', async () => {
 
       await chunky.mint(owner.address, tokenId);
       await chunky.addResourceEntry(
-        resId,
-        equippableRefIdDefault,
-        'UriA',
-        baseAddressDefault,
-        slotIdDefault,
-        [customDataWidthKey, customDataHeightKey, customDataTypeKey],
+        {
+          id: resId,
+          equippableRefId: equippableRefIdDefault,
+          metadataURI: 'UriA',
+          baseAddress: baseAddressDefault,
+          slotId: slotIdDefault,
+          custom: [customDataWidthKey, customDataHeightKey, customDataTypeKey],
+        },
+        [],
+        [],
       );
       await chunky.addResourceEntry(
-        resId2,
-        equippableRefIdDefault,
-        'UriB',
-        baseAddressDefault,
-        slotIdDefault,
-        [customDataTypeKey, customDataAreaKey],
+        {
+          id: resId2,
+          equippableRefId: equippableRefIdDefault,
+          metadataURI: 'UriB',
+          baseAddress: baseAddressDefault,
+          slotId: slotIdDefault,
+          custom: [customDataTypeKey, customDataAreaKey],
+        },
+        [],
+        [],
       );
       await expect(chunky.setCustomResourceData(resId, customDataWidthKey, customDataWidthValue))
         .to.emit(chunky, 'ResourceCustomDataSet')
@@ -799,20 +849,28 @@ describe('MultiResource', async () => {
       await chunky.mint(owner.address, tokenId);
 
       await chunky.addResourceEntry(
-        resId,
-        equippableRefIdDefault,
-        'srcA',
-        baseAddressDefault,
-        slotIdDefault,
-        [customDataTypeKey],
+        {
+          id: resId,
+          equippableRefId: equippableRefIdDefault,
+          metadataURI: 'srcA',
+          baseAddress: baseAddressDefault,
+          slotId: slotIdDefault,
+          custom: [customDataTypeKey],
+        },
+        [],
+        [],
       );
       await chunky.addResourceEntry(
-        resId2,
-        equippableRefIdDefault,
-        'srcB',
-        baseAddressDefault,
-        slotIdDefault,
-        [customDataTypeKey],
+        {
+          id: resId,
+          equippableRefId: equippableRefIdDefault,
+          metadataURI: 'srcB',
+          baseAddress: baseAddressDefault,
+          slotId: slotIdDefault,
+          custom: [customDataTypeKey],
+        },
+        [],
+        [],
       );
       await chunky.setCustomResourceData(resId, customDataTypeKey, customDataTypeValueA);
       await chunky.setCustomResourceData(resId2, customDataTypeKey, customDataTypeValueB);
@@ -838,12 +896,16 @@ describe('MultiResource', async () => {
   async function addResources(ids: number[]): Promise<void> {
     ids.forEach(async (resId) => {
       await chunky.addResourceEntry(
-        resId,
-        equippableRefIdDefault,
-        metaURIDefault,
-        baseAddressDefault,
-        slotIdDefault,
-        customDefault,
+        {
+          id: resId,
+          equippableRefId: equippableRefIdDefault,
+          metadataURI: metaURIDefault,
+          baseAddress: baseAddressDefault,
+          slotId: slotIdDefault,
+          custom: customDefault,
+        },
+        [],
+        [],
       );
     });
   }
