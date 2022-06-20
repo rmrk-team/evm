@@ -18,7 +18,7 @@ contract RMRKBaseStorage is AccessControl, IRMRKBaseStorage {
     of each asset. Future implementations may want to include a mapping of common prefixes / suffixes and
     getters that recompose these assets on the fly.
 
-    IntakeStruct currently requires the user to pass an id of type bytes8 as an identifier. Other options
+    IntakeStruct currently requires the user to pass an id of type uint32 as an identifier. Other options
     include computing the id on-chain as a hash of attributes of the struct, or a simple incrementer. Passing
     an ID or an incrementer will likely be the cheapest in terms of gas cost.
 
@@ -31,24 +31,24 @@ contract RMRKBaseStorage is AccessControl, IRMRKBaseStorage {
     */
 
 
-    //bytes8 is sort of arbitrary here--resource IDs in RMRK substrate are bytes8 for reference
-    mapping(bytes8 => Base) private bases;
-    mapping(bytes8 => mapping(address => bool)) private isEquippable;
+    //uint32 is sort of arbitrary here--resource IDs in RMRK substrate are uint32 for reference
+    mapping(uint32 => Base) private bases;
+    mapping(uint32 => mapping(address => bool)) private isEquippable;
 
-    bytes8[] private baseIds;
+    uint32[] private baseIds;
 
     bytes32 public constant issuer = keccak256("ISSUER");
 
     //TODO: Make private
     string public name;
 
-    event AddedEquippablesToEntry(bytes8 baseId, address[] equippableAddresses);
+    event AddedEquippablesToEntry(uint32 baseId, address[] equippableAddresses);
     event AddedEquippableToAll(address equippableAddress);
 
     //Inquire about using an index instead of hashed ID to prevent any chance of collision
     //Consider moving to interface
     struct IntakeStruct {
-        bytes8 id;
+        uint32 id;
         Base base;
     }
 
@@ -77,7 +77,7 @@ contract RMRKBaseStorage is AccessControl, IRMRKBaseStorage {
 
     /**
     @dev Private function which writes base item entries to storage. intakeStruct takes the form of a struct containing
-    * a bytes8 identifier and a base struct object.
+    * a uint32 identifier and a base struct object.
     */
 
     function _addBaseEntry(IntakeStruct memory intakeStruct) internal {
@@ -90,7 +90,7 @@ contract RMRKBaseStorage is AccessControl, IRMRKBaseStorage {
     @dev Getter for a single base item entry.
     */
 
-    function getBaseEntry(bytes8 _id) external view returns (Base memory) {
+    function getBaseEntry(uint32 _id) external view returns (Base memory) {
         return (bases[_id]);
     }
 
@@ -100,7 +100,7 @@ contract RMRKBaseStorage is AccessControl, IRMRKBaseStorage {
     */
 
     function addEquippableAddresses(
-        bytes8 _baseEntryid,
+        uint32 _baseEntryid,
         address[] memory _equippableAddresses
     ) public onlyRole(issuer) {
         require(_equippableAddresses.length > 0, "RMRK: Zero-length ids passed.");
@@ -122,7 +122,7 @@ contract RMRKBaseStorage is AccessControl, IRMRKBaseStorage {
     function addEquippableIdToAll(address _equippableAddress) public onlyRole(issuer) {
         uint256 len = baseIds.length;
         for (uint256 i = 0; i < len;) {
-            bytes8 baseId_ = baseIds[i];
+            uint32 baseId_ = baseIds[i];
             if (bases[baseId_].itemType == ItemType.Slot) {
                 isEquippable[baseId_][_equippableAddress] = true;
                 unchecked {++i;}
@@ -131,11 +131,11 @@ contract RMRKBaseStorage is AccessControl, IRMRKBaseStorage {
         emit AddedEquippableToAll(_equippableAddress);
     }
 
-    function checkIsEquippable(bytes8 baseId, address targetAddress) public view returns (bool isEquippable_) {
+    function checkIsEquippable(uint32 baseId, address targetAddress) public view returns (bool isEquippable_) {
         isEquippable_ = isEquippable[baseId][targetAddress];
     }
 
-    function checkIsEquippableMulti(bytes8[] calldata baseId, address[] calldata targetAddress) public view returns (bool[] memory isEquippable_) {
+    function checkIsEquippableMulti(uint32[] calldata baseId, address[] calldata targetAddress) public view returns (bool[] memory isEquippable_) {
         uint256 len = baseId.length;
         require(len == targetAddress.length, "Mismatched input array length");
         for (uint i; i<len;) {
@@ -148,7 +148,7 @@ contract RMRKBaseStorage is AccessControl, IRMRKBaseStorage {
     @dev Getter for multiple base item entries.
     */
 
-    function getBaseEntries(bytes8[] calldata _ids)
+    function getBaseEntries(uint32[] calldata _ids)
         external
         view
         returns (Base[] memory)

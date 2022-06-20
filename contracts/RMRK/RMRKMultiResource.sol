@@ -15,8 +15,8 @@ import "./abstracts/MultiResourceAbstract.sol";
 contract RMRKMultiResource is MultiResourceAbstract, IERC721 {
 
     using MultiResourceLib for uint256;
-    using MultiResourceLib for bytes8[];
-    using MultiResourceLib for bytes16[];
+    using MultiResourceLib for uint32[];
+    using MultiResourceLib for uint64[];
     using Address for address;
     using Strings for uint256;
 

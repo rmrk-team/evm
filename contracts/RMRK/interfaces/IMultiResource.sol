@@ -7,14 +7,14 @@ import "./IRMRKMultiResourceBase.sol";
 interface IMultiResource is IRMRKMultiResourceBase {
 
     struct Resource {
-        bytes8 id; //8 bytes
+        uint32 id; //8 bytes
         string metadataURI; //32+
-        bytes16[] custom;
+        uint64[] custom;
     }
 
     //Abstractions
 
-    function getResource(bytes8 resourceId) external view returns (Resource memory);
+    function getResource(uint32 resourceId) external view returns (Resource memory);
 
     function getResObjectByIndex(
         uint256 tokenId,

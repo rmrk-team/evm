@@ -8,26 +8,26 @@ interface IRMRKEquippableResource is IRMRKMultiResourceBase {
 
     //Reorder this during optimization for packing
     struct Resource {
-        bytes8 id; // ID of this resource
-        bytes8 equippableRefId; // ID of mapping for applicable equippables
+        uint32 id; // ID of this resource
+        uint32 equippableRefId; // ID of mapping for applicable equippables
         string metadataURI;
         //describes this equippable status
         address baseAddress; // Base contract reference
-        bytes8 slotId; // Which slotId this resource is equippable in
-        bytes16[] custom; //Custom data
+        uint32 slotId; // Which slotId this resource is equippable in
+        uint64[] custom; //Custom data
     }
 
     struct Equipment {
         uint256 tokenId;
         address contractAddress;
-        bytes8 childResourceId;
+        uint32 childResourceId;
     }
 
     //Equipping
 
     //Abstractions
 
-    function getResource(bytes8 resourceId) external view returns (Resource memory);
+    function getResource(uint32 resourceId) external view returns (Resource memory);
 
     function getResObjectByIndex(
         uint256 tokenId,
@@ -48,6 +48,6 @@ interface IRMRKEquippableResource is IRMRKMultiResourceBase {
     ) external view returns (Resource[] memory);
 
     function getCallerEquippableSlot(
-        bytes8 resourceRefId
-    ) external view returns (bytes8);
+        uint32 resourceRefId
+    ) external view returns (uint32);
 }
