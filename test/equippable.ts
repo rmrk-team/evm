@@ -250,16 +250,12 @@ describe('MultiResource', async () => {
       const pending = await chunky.getFullPendingResources(tokenId);
       expect(pending).to.be.eql([
         [
-          {
-            id: resId,
-            equippableRefId: equippableRefIdDefault,
-            metadataURI: metaURIDefault,
-            baseAddress: baseAddressDefault,
-            slotId: slotIdDefault,
-            custom: customDefault,
-          },
-          [],
-          [],
+          resId,
+          equippableRefIdDefault,
+          metaURIDefault,
+          baseAddressDefault,
+          slotIdDefault,
+          customDefault,
         ],
         [
           resId2,

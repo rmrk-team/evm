@@ -282,7 +282,7 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippableResource, MultiResourceAb
         uint32[] memory slotPartIds
     ) internal {
         uint32 id = resource.id;
-        if(id == bytes8(0))
+        if(id == uint32(0))
             revert RMRKWriteToZero();
         if(_resources[id].id != uint32(0))
             revert RMRKResourceAlreadyExists();
