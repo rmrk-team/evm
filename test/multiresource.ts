@@ -47,7 +47,7 @@ describe('MultiResource', async () => {
 
     it('cannot get non existing resource', async function () {
       const id = ethers.utils.hexZeroPad('0x1111', 8);
-      await expect(token.getResource(id)).to.be.revertedWith('RMRK: No resource matching Id');
+      await expect(token.getResource(id)).to.be.revertedWith('RMRKNoResourceMatchingId()');
     });
 
     it('cannot add resource entry if not issuer', async function () {
@@ -77,7 +77,7 @@ describe('MultiResource', async () => {
 
       await token.addResourceEntry(id, metaURIDefault, customDefault);
       await expect(token.addResourceEntry(id, 'newMetaUri', customDefault)).to.be.revertedWith(
-        'RMRK: resource already exists',
+        'RMRKResourceAlreadyExists()',
       );
     });
 
@@ -85,7 +85,7 @@ describe('MultiResource', async () => {
       const id = ethers.utils.hexZeroPad('0x0', 8);
 
       await expect(token.addResourceEntry(id, metaURIDefault, customDefault)).to.be.revertedWith(
-        'RMRK: Write to zero',
+        'RMRKWriteToZero()',
       );
     });
 
@@ -97,7 +97,7 @@ describe('MultiResource', async () => {
         .withArgs(id);
 
       await expect(token.addResourceEntry(id, metaURIDefault, customDefault)).to.be.revertedWith(
-        'RMRK: resource already exists',
+        'RMRKResourceAlreadyExists()',
       );
     });
 
@@ -156,7 +156,7 @@ describe('MultiResource', async () => {
 
       await token.mint(owner.address, tokenId);
       await expect(token.addResourceToToken(tokenId, resId, emptyOverwrite)).to.be.revertedWith(
-        'RMRK: No resource matching Id',
+        'RMRKNoResourceMatchingId()',
       );
     });
 

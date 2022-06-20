@@ -239,7 +239,8 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippableResource, MultiResourceAb
     ) public view virtual returns (Resource memory)
     {
         Resource memory resource = _resources[resourceId];
-        if(resource.id == bytes8(0)) revert RMRKNoResourceMatchingId();
+        if(resource.id == bytes8(0))
+            revert RMRKNoResourceMatchingId();
         return resource;
     }
 

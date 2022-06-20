@@ -101,7 +101,7 @@ contract ERC721Abstract is Context, IERC721 {
         address owner = ownerOf(tokenId);
         if(to == owner)
             revert MultiResourceApprovalToCurrentOwner();
-        if(_msgSender() != owner || !isApprovedForAll(owner, _msgSender()))
+        if(_msgSender() != owner && !isApprovedForAll(owner, _msgSender()))
             revert MultiResourceApproveCallerIsNotOwnerNorApprovedForAll();
 
         _approve(to, tokenId);

@@ -376,7 +376,7 @@ describe('Nesting', async () => {
 
       // Another address cannot accept
       await expect(ownerChunky.connect(addrs[0]).acceptChild(parentId, 0)).to.be.revertedWith(
-        'RMRKCore: Not approved or owner',
+        'RMRKCoreNotApprovedOrOwner()',
       );
     });
 
@@ -427,7 +427,7 @@ describe('Nesting', async () => {
 
       // addrs[1] attempts to reject addrs[0]'s pending children
       await expect(ownerChunky.connect(addrs[0]).rejectChild(parentId, 0)).to.be.revertedWith(
-        'RMRKCore: Not approved or owner',
+        'RMRKCoreNotApprovedOrOwner()',
       );
     });
 
@@ -476,7 +476,7 @@ describe('Nesting', async () => {
 
       // addrs[1] attempts to reject addrs[0]'s pending children
       await expect(ownerChunky.connect(addrs[0]).rejectAllChildren(parentId)).to.be.revertedWith(
-        'RMRKCore: Not approved or owner',
+        'RMRKCoreNotApprovedOrOwner()',
       );
     });
 
@@ -527,7 +527,7 @@ describe('Nesting', async () => {
 
       // addrs[1] attempts to remove addrs[0]'s children
       await expect(ownerChunky.connect(addrs[0]).removeChild(parentId, 0)).to.be.revertedWith(
-        'RMRKCore: Not approved or owner',
+        'RMRKCoreNotApprovedOrOwner()',
       );
     });
 
@@ -751,7 +751,7 @@ describe('Nesting', async () => {
     it('cannot unnest from not owned child', async function () {
       const { parentId } = await mintTofirstOwner(true);
       await expect(ownerChunky.connect(addrs[3]).unnestChild(parentId, 0)).to.be.revertedWith(
-        'RMRKCore: Not approved or owner',
+        'RMRKCoreNotApprovedOrOwner()',
       );
     });
 
@@ -794,7 +794,7 @@ describe('Nesting', async () => {
       await petMonkey.connect(addrs[1])['mint(address,uint256)'](addrs[1].address, tokenId);
       await expect(
         petMonkey.connect(addrs[0]).transfer(newOwner.address, tokenId),
-      ).to.be.revertedWith('RMRKCore: Not approved or owner');
+      ).to.be.revertedWith('RMRKCoreNotApprovedOrOwner()');
     });
 
     it('can transfer token from approved address (not owner)', async function () {
