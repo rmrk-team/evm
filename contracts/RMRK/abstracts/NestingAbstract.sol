@@ -44,7 +44,7 @@ abstract contract NestingAbstract is Context, IRMRKNesting {
         uint256 tokenId;
         address contractAddress;
         uint16 slotEquipped;
-        bytes8 partId;
+        uint32 partId;
     }
 
     // Mapping from token ID to RMRKOwner struct

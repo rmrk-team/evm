@@ -11,7 +11,6 @@ describe('MultiResource', async () => {
   let owner: SignerWithAddress;
   let addrs: any[];
 
-  const emptyOverwrite = ethers.utils.hexZeroPad('0x0', 8);
   const baseName = 'RmrkBaseStorageTest';
 
   const name = 'ownerChunky';
@@ -20,10 +19,10 @@ describe('MultiResource', async () => {
   const name2 = 'petMonkey';
   const symbol2 = 'MONKE';
 
-  const equippableRefIdDefault = ethers.utils.hexZeroPad('0x0001', 8);
+  const equippableRefIdDefault = 1;
   const metaURIDefault = 'metaURI';
   const baseAddressDefault = ethers.constants.AddressZero;
-  const slotIdDefault = ethers.utils.hexZeroPad('0x0001', 8);
+  const slotIdDefault = 1;
   const customDefault: string[] = [];
 
   beforeEach(async () => {
@@ -57,16 +56,20 @@ describe('MultiResource', async () => {
 
   describe('Resource storage', async function () {
     it('can add resource', async function () {
-      const id = ethers.utils.hexZeroPad('0x1111', 8);
+      const id = 11;
 
       await expect(
         chunky.addResourceEntry(
-          id,
-          equippableRefIdDefault,
-          metaURIDefault,
-          baseAddressDefault,
-          slotIdDefault,
-          customDefault,
+          {
+            id: id,
+            equippableRefId: equippableRefIdDefault,
+            metadataURI: metaURIDefault,
+            baseAddress: baseAddressDefault,
+            slotId: slotIdDefault,
+            custom: customDefault,
+          },
+          [],
+          [],
         ),
       )
         .to.emit(chunky, 'ResourceSet')
@@ -74,23 +77,25 @@ describe('MultiResource', async () => {
     });
 
     it('cannot get non existing resource', async function () {
-      const id = ethers.utils.hexZeroPad('0x1111', 8);
+      const id = 11;
       await expect(chunky.getResource(id)).to.be.revertedWith('RMRKNoResourceMatchingId()');
     });
 
     it('cannot add resource entry if not issuer', async function () {
-      const id = ethers.utils.hexZeroPad('0x1111', 8);
+      const id = 11;
       await expect(
-        chunky
-          .connect(addrs[1])
-          .addResourceEntry(
-            id,
-            equippableRefIdDefault,
-            metaURIDefault,
-            baseAddressDefault,
-            slotIdDefault,
-            customDefault,
-          ),
+        chunky.connect(addrs[1]).addResourceEntry(
+          {
+            id: id,
+            equippableRefId: equippableRefIdDefault,
+            metadataURI: metaURIDefault,
+            baseAddress: baseAddressDefault,
+            slotId: slotIdDefault,
+            custom: customDefault,
+          },
+          [],
+          [],
+        ),
       ).to.be.revertedWith('RMRKOnlyIssuer()');
     });
 
@@ -110,54 +115,70 @@ describe('MultiResource', async () => {
     });
 
     it('cannot overwrite resource', async function () {
-      const id = ethers.utils.hexZeroPad('0x1111', 8);
+      const id = 11;
 
       await chunky.addResourceEntry(
-        id,
-        equippableRefIdDefault,
-        metaURIDefault,
-        baseAddressDefault,
-        slotIdDefault,
-        customDefault,
+        {
+          id: id,
+          equippableRefId: equippableRefIdDefault,
+          metadataURI: metaURIDefault,
+          baseAddress: baseAddressDefault,
+          slotId: slotIdDefault,
+          custom: customDefault,
+        },
+        [],
+        [],
       );
       await expect(
         chunky.addResourceEntry(
-          id,
-          equippableRefIdDefault,
-          'newMetaUri',
-          baseAddressDefault,
-          slotIdDefault,
-          customDefault,
+          {
+            id: id,
+            equippableRefId: equippableRefIdDefault,
+            metadataURI: metaURIDefault,
+            baseAddress: baseAddressDefault,
+            slotId: slotIdDefault,
+            custom: customDefault,
+          },
+          [],
+          [],
         ),
       ).to.be.revertedWith('RMRKResourceAlreadyExists()');
     });
 
     it('cannot add resource with id 0', async function () {
-      const id = ethers.utils.hexZeroPad('0x0', 8);
+      const id = 0;
 
       await expect(
         chunky.addResourceEntry(
-          id,
-          equippableRefIdDefault,
-          metaURIDefault,
-          baseAddressDefault,
-          slotIdDefault,
-          customDefault,
+          {
+            id: id,
+            equippableRefId: equippableRefIdDefault,
+            metadataURI: metaURIDefault,
+            baseAddress: baseAddressDefault,
+            slotId: slotIdDefault,
+            custom: customDefault,
+          },
+          [],
+          [],
         ),
       ).to.be.revertedWith('RMRKWriteToZero()');
     });
 
     it('cannot add same resource twice', async function () {
-      const id = ethers.utils.hexZeroPad('0x1111', 8);
+      const id = 11;
 
       await expect(
         chunky.addResourceEntry(
-          id,
-          equippableRefIdDefault,
-          metaURIDefault,
-          baseAddressDefault,
-          slotIdDefault,
-          customDefault,
+          {
+            id: id,
+            equippableRefId: equippableRefIdDefault,
+            metadataURI: metaURIDefault,
+            baseAddress: baseAddressDefault,
+            slotId: slotIdDefault,
+            custom: customDefault,
+          },
+          [],
+          [],
         ),
       )
         .to.emit(chunky, 'ResourceSet')
@@ -165,33 +186,41 @@ describe('MultiResource', async () => {
 
       await expect(
         chunky.addResourceEntry(
-          id,
-          equippableRefIdDefault,
-          metaURIDefault,
-          baseAddressDefault,
-          slotIdDefault,
-          customDefault,
+          {
+            id: id,
+            equippableRefId: equippableRefIdDefault,
+            metadataURI: metaURIDefault,
+            baseAddress: baseAddressDefault,
+            slotId: slotIdDefault,
+            custom: customDefault,
+          },
+          [],
+          [],
         ),
       ).to.be.revertedWith('RMRKResourceAlreadyExists()');
     });
 
     it('can add and remove custom data for resource', async function () {
-      const resId = ethers.utils.hexZeroPad('0x0001', 8);
-      const customDataTypeKey = ethers.utils.hexZeroPad('0x0003', 16);
+      const resId = 1;
+      const customDataTypeKey = 3;
       await chunky.addResourceEntry(
-        resId,
-        equippableRefIdDefault,
-        metaURIDefault,
-        baseAddressDefault,
-        slotIdDefault,
-        customDefault,
+        {
+          id: resId,
+          equippableRefId: equippableRefIdDefault,
+          metadataURI: metaURIDefault,
+          baseAddress: baseAddressDefault,
+          slotId: slotIdDefault,
+          custom: customDefault,
+        },
+        [],
+        [],
       );
 
       await expect(chunky.addCustomDataToResource(resId, customDataTypeKey))
         .to.emit(chunky, 'ResourceCustomDataAdded')
         .withArgs(resId, customDataTypeKey);
       let resource = await chunky.getResource(resId);
-      expect(resource.custom).to.eql([customDataTypeKey]);
+      expect(resource.custom).to.eql([ethers.BigNumber.from(customDataTypeKey)]);
 
       await expect(chunky.removeCustomDataFromResource(resId, 0))
         .to.emit(chunky, 'ResourceCustomDataRemoved')
@@ -203,17 +232,17 @@ describe('MultiResource', async () => {
 
   describe('Adding resources', async function () {
     it('can add resource to token', async function () {
-      const resId = ethers.utils.hexZeroPad('0x0001', 8);
-      const resId2 = ethers.utils.hexZeroPad('0x0002', 8);
+      const resId = 1;
+      const resId2 = 2;
       const tokenId = 1;
 
       await chunky.mint(owner.address, tokenId);
       await addResources([resId, resId2]);
-      await expect(chunky.addResourceToToken(tokenId, resId, emptyOverwrite)).to.emit(
+      await expect(chunky.addResourceToToken(tokenId, resId, 0)).to.emit(
         chunky,
         'ResourceAddedToToken',
       );
-      await expect(chunky.addResourceToToken(tokenId, resId2, emptyOverwrite)).to.emit(
+      await expect(chunky.addResourceToToken(tokenId, resId2, 0)).to.emit(
         chunky,
         'ResourceAddedToToken',
       );
@@ -221,12 +250,16 @@ describe('MultiResource', async () => {
       const pending = await chunky.getFullPendingResources(tokenId);
       expect(pending).to.be.eql([
         [
-          resId,
-          equippableRefIdDefault,
-          metaURIDefault,
-          baseAddressDefault,
-          slotIdDefault,
-          customDefault,
+          {
+            id: resId,
+            equippableRefId: equippableRefIdDefault,
+            metadataURI: metaURIDefault,
+            baseAddress: baseAddressDefault,
+            slotId: slotIdDefault,
+            custom: customDefault,
+          },
+          [],
+          [],
         ],
         [
           resId2,
@@ -249,33 +282,33 @@ describe('MultiResource', async () => {
     });
 
     it('cannot add non existing resource to token', async function () {
-      const resId = ethers.utils.hexZeroPad('0x0001', 8);
+      const resId = 1;
       const tokenId = 1;
 
       await chunky.mint(owner.address, tokenId);
-      await expect(chunky.addResourceToToken(tokenId, resId, emptyOverwrite)).to.be.revertedWith(
+      await expect(chunky.addResourceToToken(tokenId, resId, 0)).to.be.revertedWith(
         'RMRKNoResourceMatchingId()',
       );
     });
 
     it('cannot add resource to non existing token', async function () {
-      const resId = ethers.utils.hexZeroPad('0x0001', 8);
+      const resId = 1;
       const tokenId = 1;
 
       await addResources([resId]);
-      await expect(chunky.addResourceToToken(tokenId, resId, emptyOverwrite)).to.be.revertedWith(
+      await expect(chunky.addResourceToToken(tokenId, resId, 0)).to.be.revertedWith(
         'RMRKCoreOwnerQueryForNonexistentToken()',
       );
     });
 
     it('cannot add resource twice to the same token', async function () {
-      const resId = ethers.utils.hexZeroPad('0x0001', 8);
+      const resId = 1;
       const tokenId = 1;
 
       await chunky.mint(owner.address, tokenId);
       await addResources([resId]);
-      await chunky.addResourceToToken(tokenId, resId, emptyOverwrite);
-      await expect(chunky.addResourceToToken(tokenId, resId, emptyOverwrite)).to.be.revertedWith(
+      await chunky.addResourceToToken(tokenId, resId, 0);
+      await expect(chunky.addResourceToToken(tokenId, resId, 0)).to.be.revertedWith(
         'MultiResourceAlreadyExists()',
       );
     });
@@ -285,29 +318,28 @@ describe('MultiResource', async () => {
 
       await chunky.mint(owner.address, tokenId);
       for (let i = 1; i <= 128; i++) {
-        const resId = ethers.utils.hexZeroPad(ethers.utils.hexValue(i), 8);
-        await addResources([resId]);
-        await chunky.addResourceToToken(tokenId, resId, emptyOverwrite);
+        await addResources([i]);
+        await chunky.addResourceToToken(tokenId, i, 0);
       }
 
       // Now it's full, next should fail
-      const resId = ethers.utils.hexZeroPad(ethers.utils.hexValue(129), 8);
+      const resId = 129;
       await addResources([resId]);
-      await expect(chunky.addResourceToToken(tokenId, resId, emptyOverwrite)).to.be.revertedWith(
+      await expect(chunky.addResourceToToken(tokenId, resId, 0)).to.be.revertedWith(
         'MultiResourceMaxPendingResourcesReached()',
       );
     });
 
     it('can add same resource to 2 different tokens', async function () {
-      const resId = ethers.utils.hexZeroPad('0x0001', 8);
+      const resId = 1;
       const tokenId1 = 1;
       const tokenId2 = 2;
 
       await chunky.mint(owner.address, tokenId1);
       await chunky.mint(owner.address, tokenId2);
       await addResources([resId]);
-      await chunky.addResourceToToken(tokenId1, resId, emptyOverwrite);
-      await chunky.addResourceToToken(tokenId2, resId, emptyOverwrite);
+      await chunky.addResourceToToken(tokenId1, resId, 0);
+      await chunky.addResourceToToken(tokenId2, resId, 0);
 
       expect(await chunky.getPendingResources(tokenId1)).to.be.eql([resId]);
       expect(await chunky.getPendingResources(tokenId2)).to.be.eql([resId]);
@@ -316,12 +348,12 @@ describe('MultiResource', async () => {
 
   describe('Accepting resources', async function () {
     it('can accept resource', async function () {
-      const resId = ethers.utils.hexZeroPad('0x0001', 8);
+      const resId = 1;
       const tokenId = 1;
 
       await chunky.mint(owner.address, tokenId);
       await addResources([resId]);
-      await chunky.addResourceToToken(tokenId, resId, emptyOverwrite);
+      await chunky.addResourceToToken(tokenId, resId, 0);
       await expect(chunky.acceptResource(tokenId, 0))
         .to.emit(chunky, 'ResourceAccepted')
         .withArgs(tokenId, resId);
@@ -352,14 +384,14 @@ describe('MultiResource', async () => {
     });
 
     it('can accept multiple resources', async function () {
-      const resId = ethers.utils.hexZeroPad('0x0001', 8);
-      const resId2 = ethers.utils.hexZeroPad('0x0002', 8);
+      const resId = 1;
+      const resId2 = 2;
       const tokenId = 1;
 
       await chunky.mint(owner.address, tokenId);
       await addResources([resId, resId2]);
-      await chunky.addResourceToToken(tokenId, resId, emptyOverwrite);
-      await chunky.addResourceToToken(tokenId, resId2, emptyOverwrite);
+      await chunky.addResourceToToken(tokenId, resId, 0);
+      await chunky.addResourceToToken(tokenId, resId2, 0);
       await expect(chunky.acceptResource(tokenId, 1)) // Accepting resId2
         .to.emit(chunky, 'ResourceAccepted')
         .withArgs(tokenId, resId2);
@@ -393,14 +425,14 @@ describe('MultiResource', async () => {
 
     // approved not implemented yet
     it.skip('can accept resource if approved', async function () {
-      const resId = ethers.utils.hexZeroPad('0x0001', 8);
+      const resId = 1;
       const tokenId = 1;
       const approvedAddress = addrs[1];
       await chunky.mint(owner.address, tokenId);
       await chunky.approve(approvedAddress.address, tokenId);
       await addResources([resId]);
 
-      await chunky.addResourceToToken(tokenId, resId, emptyOverwrite);
+      await chunky.addResourceToToken(tokenId, resId, 0);
       await chunky.connect(approvedAddress).acceptResource(tokenId, 0);
 
       const pending = await chunky.getFullPendingResources(tokenId);
@@ -408,12 +440,12 @@ describe('MultiResource', async () => {
     });
 
     it('cannot accept resource twice', async function () {
-      const resId = ethers.utils.hexZeroPad('0x0001', 8);
+      const resId = 1;
       const tokenId = 1;
 
       await chunky.mint(owner.address, tokenId);
       await addResources([resId]);
-      await chunky.addResourceToToken(tokenId, resId, emptyOverwrite);
+      await chunky.addResourceToToken(tokenId, resId, 0);
       await chunky.acceptResource(tokenId, 0);
 
       await expect(chunky.acceptResource(tokenId, 0)).to.be.revertedWith(
@@ -422,12 +454,12 @@ describe('MultiResource', async () => {
     });
 
     it('cannot accept resource if not owner', async function () {
-      const resId = ethers.utils.hexZeroPad('0x0001', 8);
+      const resId = 1;
       const tokenId = 1;
 
       await chunky.mint(owner.address, tokenId);
       await addResources([resId]);
-      await chunky.addResourceToToken(tokenId, resId, emptyOverwrite);
+      await chunky.addResourceToToken(tokenId, resId, 0);
       await expect(chunky.connect(addrs[1]).acceptResource(tokenId, 0)).to.be.revertedWith(
         'MultiResourceNotOwner()',
       );
@@ -445,13 +477,13 @@ describe('MultiResource', async () => {
 
   describe('Overwriting resources', async function () {
     it('can add resource to token overwritting an existing one', async function () {
-      const resId = ethers.utils.hexZeroPad('0x0001', 8);
-      const resId2 = ethers.utils.hexZeroPad('0x0002', 8);
+      const resId = 1;
+      const resId2 = 2;
       const tokenId = 1;
 
       await chunky.mint(owner.address, tokenId);
       await addResources([resId, resId2]);
-      await chunky.addResourceToToken(tokenId, resId, emptyOverwrite);
+      await chunky.addResourceToToken(tokenId, resId, 0);
       await chunky.acceptResource(tokenId, 0);
 
       // Add new resource to overwrite the first, and accept
@@ -478,13 +510,11 @@ describe('MultiResource', async () => {
         ],
       ]);
       // Overwrite should be gone
-      expect(await chunky.getResourceOverwrites(tokenId, pendingResources[0])).to.eql(
-        ethers.utils.hexZeroPad('0x0000', 8),
-      );
+      expect(await chunky.getResourceOverwrites(tokenId, pendingResources[0])).to.eql(0);
     });
 
     it('can overwrite non existing resource to token, it could have been deleted', async function () {
-      const resId = ethers.utils.hexZeroPad('0x0001', 8);
+      const resId = 1;
       const tokenId = 1;
 
       await chunky.mint(owner.address, tokenId);
@@ -507,12 +537,12 @@ describe('MultiResource', async () => {
 
   describe('Rejecting resources', async function () {
     it('can reject resource', async function () {
-      const resId = ethers.utils.hexZeroPad('0x0001', 8);
+      const resId = 1;
       const tokenId = 1;
 
       await chunky.mint(owner.address, tokenId);
       await addResources([resId]);
-      await chunky.addResourceToToken(tokenId, resId, emptyOverwrite);
+      await chunky.addResourceToToken(tokenId, resId, 0);
 
       await expect(chunky.rejectResource(tokenId, 0)).to.emit(chunky, 'ResourceRejected');
 
@@ -524,14 +554,14 @@ describe('MultiResource', async () => {
 
     // FIXME: approve not implemented yet
     it.skip('can reject resource if approved', async function () {
-      const resId = ethers.utils.hexZeroPad('0x0001', 8);
+      const resId = 1;
       const approvedAddress = addrs[1];
       const tokenId = 1;
 
       await chunky.mint(owner.address, tokenId);
       await chunky.approve(approvedAddress.address, tokenId);
       await addResources([resId]);
-      await chunky.addResourceToToken(tokenId, resId, emptyOverwrite);
+      await chunky.addResourceToToken(tokenId, resId, 0);
 
       await expect(chunky.rejectResource(tokenId, 0)).to.emit(chunky, 'ResourceRejected');
 
@@ -542,14 +572,14 @@ describe('MultiResource', async () => {
     });
 
     it('can reject all resources', async function () {
-      const resId = ethers.utils.hexZeroPad('0x0001', 8);
-      const resId2 = ethers.utils.hexZeroPad('0x0002', 8);
+      const resId = 1;
+      const resId2 = 2;
       const tokenId = 1;
 
       await chunky.mint(owner.address, tokenId);
       await addResources([resId, resId2]);
-      await chunky.addResourceToToken(tokenId, resId, emptyOverwrite);
-      await chunky.addResourceToToken(tokenId, resId2, emptyOverwrite);
+      await chunky.addResourceToToken(tokenId, resId, 0);
+      await chunky.addResourceToToken(tokenId, resId2, 0);
 
       await expect(chunky.rejectAllResources(tokenId)).to.emit(chunky, 'ResourceRejected');
 
@@ -561,16 +591,16 @@ describe('MultiResource', async () => {
 
     // FIXME: approve not implemented yet
     it.skip('can reject all resources if approved', async function () {
-      const resId = ethers.utils.hexZeroPad('0x0001', 8);
-      const resId2 = ethers.utils.hexZeroPad('0x0002', 8);
+      const resId = 1;
+      const resId2 = 2;
       const tokenId = 1;
       const approvedAddress = addrs[1];
 
       await chunky.mint(owner.address, tokenId);
       await chunky.approve(approvedAddress.address, tokenId);
       await addResources([resId, resId2]);
-      await chunky.addResourceToToken(tokenId, resId, emptyOverwrite);
-      await chunky.addResourceToToken(tokenId, resId2, emptyOverwrite);
+      await chunky.addResourceToToken(tokenId, resId, 0);
+      await chunky.addResourceToToken(tokenId, resId2, 0);
 
       await expect(chunky.connect(approvedAddress).rejectAllResources(tokenId)).to.emit(
         chunky,
@@ -584,12 +614,12 @@ describe('MultiResource', async () => {
     });
 
     it('cannot reject resource twice', async function () {
-      const resId = ethers.utils.hexZeroPad('0x0001', 8);
+      const resId = 1;
       const tokenId = 1;
 
       await chunky.mint(owner.address, tokenId);
       await addResources([resId]);
-      await chunky.addResourceToToken(tokenId, resId, emptyOverwrite);
+      await chunky.addResourceToToken(tokenId, resId, 0);
       await chunky.rejectResource(tokenId, 0);
 
       await expect(chunky.rejectResource(tokenId, 0)).to.be.revertedWith(
@@ -598,12 +628,12 @@ describe('MultiResource', async () => {
     });
 
     it('cannot reject resource nor reject all if not owner', async function () {
-      const resId = ethers.utils.hexZeroPad('0x0001', 8);
+      const resId = 1;
       const tokenId = 1;
 
       await chunky.mint(owner.address, tokenId);
       await addResources([resId]);
-      await chunky.addResourceToToken(tokenId, resId, emptyOverwrite);
+      await chunky.addResourceToToken(tokenId, resId, 0);
 
       await expect(chunky.connect(addrs[1]).rejectResource(tokenId, 0)).to.be.revertedWith(
         'MultiResourceNotOwner()',
@@ -699,7 +729,7 @@ describe('MultiResource', async () => {
 
     it('can get token URI when resource is enumerated', async function () {
       const tokenId = 1;
-      const resId = ethers.utils.hexZeroPad('0x0001', 8);
+      const resId = 1;
       await addResourcesToToken(tokenId);
       await chunky.setTokenEnumeratedResource(resId, true);
       expect(await chunky.isTokenEnumeratedResource(resId)).to.eql(true);
@@ -708,28 +738,36 @@ describe('MultiResource', async () => {
 
     it('can get token URI at specific index', async function () {
       const tokenId = 1;
-      const resId = ethers.utils.hexZeroPad('0x0001', 8);
-      const resId2 = ethers.utils.hexZeroPad('0x0002', 8);
+      const resId = 1;
+      const resId2 = 2;
 
       await chunky.mint(owner.address, tokenId);
       await chunky.addResourceEntry(
-        resId,
-        equippableRefIdDefault,
-        'UriA',
-        baseAddressDefault,
-        slotIdDefault,
-        customDefault,
+        {
+          id: resId,
+          equippableRefId: equippableRefIdDefault,
+          metadataURI: 'UriA',
+          baseAddress: baseAddressDefault,
+          slotId: slotIdDefault,
+          custom: customDefault,
+        },
+        [],
+        [],
       );
       await chunky.addResourceEntry(
-        resId2,
-        equippableRefIdDefault,
-        'UriB',
-        baseAddressDefault,
-        slotIdDefault,
-        customDefault,
+        {
+          id: resId2,
+          equippableRefId: equippableRefIdDefault,
+          metadataURI: 'UriB',
+          baseAddress: baseAddressDefault,
+          slotId: slotIdDefault,
+          custom: customDefault,
+        },
+        [],
+        [],
       );
-      await chunky.addResourceToToken(tokenId, resId, emptyOverwrite);
-      await chunky.addResourceToToken(tokenId, resId2, emptyOverwrite);
+      await chunky.addResourceToToken(tokenId, resId, 0);
+      await chunky.addResourceToToken(tokenId, resId2, 0);
       await chunky.acceptResource(tokenId, 0);
       await chunky.acceptResource(tokenId, 0);
 
@@ -738,36 +776,44 @@ describe('MultiResource', async () => {
 
     it('can get token URI by specific custom value', async function () {
       const tokenId = 1;
-      const resId = ethers.utils.hexZeroPad('0x0001', 8);
-      const resId2 = ethers.utils.hexZeroPad('0x0002', 8);
+      const resId = 1;
+      const resId2 = 2;
       // We define some custom types and values which mean something to the issuer.
       // Resource 1 has Width, Height and Type. Resource 2 has Area and Type.
-      const customDataWidthKey = ethers.utils.hexZeroPad('0x0001', 16);
+      const customDataWidthKey = 1;
       const customDataWidthValue = ethers.utils.hexZeroPad('0x1111', 16);
-      const customDataHeightKey = ethers.utils.hexZeroPad('0x0002', 16);
+      const customDataHeightKey = 2;
       const customDataHeightValue = ethers.utils.hexZeroPad('0x1111', 16);
-      const customDataTypeKey = ethers.utils.hexZeroPad('0x0003', 16);
+      const customDataTypeKey = 3;
       const customDataTypeValueA = ethers.utils.hexZeroPad('0xAAAA', 16);
       const customDataTypeValueB = ethers.utils.hexZeroPad('0xBBBB', 16);
-      const customDataAreaKey = ethers.utils.hexZeroPad('0x0004', 16);
+      const customDataAreaKey = 4;
       const customDataAreaValue = ethers.utils.hexZeroPad('0x00FF', 16);
 
       await chunky.mint(owner.address, tokenId);
       await chunky.addResourceEntry(
-        resId,
-        equippableRefIdDefault,
-        'UriA',
-        baseAddressDefault,
-        slotIdDefault,
-        [customDataWidthKey, customDataHeightKey, customDataTypeKey],
+        {
+          id: resId,
+          equippableRefId: equippableRefIdDefault,
+          metadataURI: 'UriA',
+          baseAddress: baseAddressDefault,
+          slotId: slotIdDefault,
+          custom: [customDataWidthKey, customDataHeightKey, customDataTypeKey],
+        },
+        [],
+        [],
       );
       await chunky.addResourceEntry(
-        resId2,
-        equippableRefIdDefault,
-        'UriB',
-        baseAddressDefault,
-        slotIdDefault,
-        [customDataTypeKey, customDataAreaKey],
+        {
+          id: resId2,
+          equippableRefId: equippableRefIdDefault,
+          metadataURI: 'UriB',
+          baseAddress: baseAddressDefault,
+          slotId: slotIdDefault,
+          custom: [customDataTypeKey, customDataAreaKey],
+        },
+        [],
+        [],
       );
       await expect(chunky.setCustomResourceData(resId, customDataWidthKey, customDataWidthValue))
         .to.emit(chunky, 'ResourceCustomDataSet')
@@ -777,8 +823,8 @@ describe('MultiResource', async () => {
       await chunky.setCustomResourceData(resId2, customDataAreaKey, customDataAreaValue);
       await chunky.setCustomResourceData(resId2, customDataTypeKey, customDataTypeValueB);
 
-      await chunky.addResourceToToken(tokenId, resId, emptyOverwrite);
-      await chunky.addResourceToToken(tokenId, resId2, emptyOverwrite);
+      await chunky.addResourceToToken(tokenId, resId, 0);
+      await chunky.addResourceToToken(tokenId, resId2, 0);
       await chunky.acceptResource(tokenId, 0);
       await chunky.acceptResource(tokenId, 0);
 
@@ -791,38 +837,46 @@ describe('MultiResource', async () => {
 
     it('gets fall back if matching value is not find on custom data', async function () {
       const tokenId = 1;
-      const resId = ethers.utils.hexZeroPad('0x0001', 8);
-      const resId2 = ethers.utils.hexZeroPad('0x0002', 8);
+      const resId = 1;
+      const resId2 = 2;
       // We define a custom data for 'type'.
-      const customDataTypeKey = ethers.utils.hexZeroPad('0x0001', 16);
+      const customDataTypeKey = 1;
       const customDataTypeValueA = ethers.utils.hexZeroPad('0xAAAA', 16);
       const customDataTypeValueB = ethers.utils.hexZeroPad('0xBBBB', 16);
       const customDataTypeValueC = ethers.utils.hexZeroPad('0xCCCC', 16);
-      const customDataOtherKey = ethers.utils.hexZeroPad('0x0002', 16);
+      const customDataOtherKey = 2;
 
       await chunky.mint(owner.address, tokenId);
 
       await chunky.addResourceEntry(
-        resId,
-        equippableRefIdDefault,
-        'srcA',
-        baseAddressDefault,
-        slotIdDefault,
-        [customDataTypeKey],
+        {
+          id: resId,
+          equippableRefId: equippableRefIdDefault,
+          metadataURI: 'srcA',
+          baseAddress: baseAddressDefault,
+          slotId: slotIdDefault,
+          custom: [customDataTypeKey],
+        },
+        [],
+        [],
       );
       await chunky.addResourceEntry(
-        resId2,
-        equippableRefIdDefault,
-        'srcB',
-        baseAddressDefault,
-        slotIdDefault,
-        [customDataTypeKey],
+        {
+          id: resId,
+          equippableRefId: equippableRefIdDefault,
+          metadataURI: 'srcB',
+          baseAddress: baseAddressDefault,
+          slotId: slotIdDefault,
+          custom: [customDataTypeKey],
+        },
+        [],
+        [],
       );
       await chunky.setCustomResourceData(resId, customDataTypeKey, customDataTypeValueA);
       await chunky.setCustomResourceData(resId2, customDataTypeKey, customDataTypeValueB);
 
-      await chunky.addResourceToToken(tokenId, resId, emptyOverwrite);
-      await chunky.addResourceToToken(tokenId, resId2, emptyOverwrite);
+      await chunky.addResourceToToken(tokenId, resId, 0);
+      await chunky.addResourceToToken(tokenId, resId2, 0);
       await chunky.acceptResource(tokenId, 0);
       await chunky.acceptResource(tokenId, 0);
 
@@ -839,26 +893,30 @@ describe('MultiResource', async () => {
     });
   });
 
-  async function addResources(ids: string[]): Promise<void> {
+  async function addResources(ids: number[]): Promise<void> {
     ids.forEach(async (resId) => {
       await chunky.addResourceEntry(
-        resId,
-        equippableRefIdDefault,
-        metaURIDefault,
-        baseAddressDefault,
-        slotIdDefault,
-        customDefault,
+        {
+          id: resId,
+          equippableRefId: equippableRefIdDefault,
+          metadataURI: metaURIDefault,
+          baseAddress: baseAddressDefault,
+          slotId: slotIdDefault,
+          custom: customDefault,
+        },
+        [],
+        [],
       );
     });
   }
 
   async function addResourcesToToken(tokenId: number): Promise<void> {
-    const resId = ethers.utils.hexZeroPad('0x0001', 8);
-    const resId2 = ethers.utils.hexZeroPad('0x0002', 8);
+    const resId = 1;
+    const resId2 = 2;
     await chunky.mint(owner.address, tokenId);
     await addResources([resId, resId2]);
-    await chunky.addResourceToToken(tokenId, resId, emptyOverwrite);
-    await chunky.addResourceToToken(tokenId, resId2, emptyOverwrite);
+    await chunky.addResourceToToken(tokenId, resId, 0);
+    await chunky.addResourceToToken(tokenId, resId2, 0);
     await chunky.acceptResource(tokenId, 0);
     await chunky.acceptResource(tokenId, 0);
   }

@@ -9,7 +9,6 @@ describe('MultiResource', async () => {
   let owner: SignerWithAddress;
   let addrs: any[];
 
-  const emptyOverwrite = ethers.utils.hexZeroPad('0x0', 8);
   const name = 'RmrkTest';
   const symbol = 'RMRKTST';
 
@@ -38,7 +37,7 @@ describe('MultiResource', async () => {
 
   describe('Resource storage', async function () {
     it('can add resource', async function () {
-      const id = ethers.utils.hexZeroPad('0x1111', 8);
+      const id = 11;
 
       await expect(token.addResourceEntry(id, metaURIDefault, customDefault))
         .to.emit(token, 'ResourceSet')
@@ -46,12 +45,12 @@ describe('MultiResource', async () => {
     });
 
     it('cannot get non existing resource', async function () {
-      const id = ethers.utils.hexZeroPad('0x1111', 8);
+      const id = 11;
       await expect(token.getResource(id)).to.be.revertedWith('RMRKNoResourceMatchingId()');
     });
 
     it('cannot add resource entry if not issuer', async function () {
-      const id = ethers.utils.hexZeroPad('0x1111', 8);
+      const id = 11;
       await expect(
         token.connect(addrs[1]).addResourceEntry(id, metaURIDefault, customDefault),
       ).to.be.revertedWith('RMRKOnlyIssuer()');
@@ -73,7 +72,7 @@ describe('MultiResource', async () => {
     });
 
     it('cannot overwrite resource', async function () {
-      const id = ethers.utils.hexZeroPad('0x1111', 8);
+      const id = 11;
 
       await token.addResourceEntry(id, metaURIDefault, customDefault);
       await expect(token.addResourceEntry(id, 'newMetaUri', customDefault)).to.be.revertedWith(
@@ -82,7 +81,7 @@ describe('MultiResource', async () => {
     });
 
     it('cannot add resource with id 0', async function () {
-      const id = ethers.utils.hexZeroPad('0x0', 8);
+      const id = 0
 
       await expect(token.addResourceEntry(id, metaURIDefault, customDefault)).to.be.revertedWith(
         'RMRKWriteToZero()',
@@ -90,7 +89,7 @@ describe('MultiResource', async () => {
     });
 
     it('cannot add same resource twice', async function () {
-      const id = ethers.utils.hexZeroPad('0x1111', 8);
+      const id = 11;
 
       await expect(token.addResourceEntry(id, metaURIDefault, customDefault))
         .to.emit(token, 'ResourceSet')
@@ -102,15 +101,15 @@ describe('MultiResource', async () => {
     });
 
     it('can add and remove custom data for resource', async function () {
-      const resId = ethers.utils.hexZeroPad('0x0001', 8);
-      const customDataTypeKey = ethers.utils.hexZeroPad('0x0003', 16);
+      const resId = 1;
+      const customDataTypeKey = 3;
       await token.addResourceEntry(resId, metaURIDefault, customDefault);
 
       await expect(token.addCustomDataToResource(resId, customDataTypeKey))
         .to.emit(token, 'ResourceCustomDataAdded')
         .withArgs(resId, customDataTypeKey);
       let resource = await token.getResource(resId);
-      expect(resource.custom).to.eql([customDataTypeKey]);
+      expect(resource.custom).to.eql([ethers.BigNumber.from(customDataTypeKey)]);
 
       await expect(token.removeCustomDataFromResource(resId, 0))
         .to.emit(token, 'ResourceCustomDataRemoved')
@@ -122,17 +121,17 @@ describe('MultiResource', async () => {
 
   describe('Adding resources', async function () {
     it('can add resource to token', async function () {
-      const resId = ethers.utils.hexZeroPad('0x0001', 8);
-      const resId2 = ethers.utils.hexZeroPad('0x0002', 8);
+      const resId = 1;
+      const resId2 = 2;
       const tokenId = 1;
 
       await token.mint(owner.address, tokenId);
       await addResources([resId, resId2]);
-      await expect(token.addResourceToToken(tokenId, resId, emptyOverwrite)).to.emit(
+      await expect(token.addResourceToToken(tokenId, resId, 0)).to.emit(
         token,
         'ResourceAddedToToken',
       );
-      await expect(token.addResourceToToken(tokenId, resId2, emptyOverwrite)).to.emit(
+      await expect(token.addResourceToToken(tokenId, resId2, 0)).to.emit(
         token,
         'ResourceAddedToToken',
       );
@@ -151,33 +150,33 @@ describe('MultiResource', async () => {
     });
 
     it('cannot add non existing resource to token', async function () {
-      const resId = ethers.utils.hexZeroPad('0x0001', 8);
+      const resId = 1;
       const tokenId = 1;
 
       await token.mint(owner.address, tokenId);
-      await expect(token.addResourceToToken(tokenId, resId, emptyOverwrite)).to.be.revertedWith(
+      await expect(token.addResourceToToken(tokenId, resId, 0)).to.be.revertedWith(
         'RMRKNoResourceMatchingId()',
       );
     });
 
     it('cannot add resource to non existing token', async function () {
-      const resId = ethers.utils.hexZeroPad('0x0001', 8);
+      const resId = 1;
       const tokenId = 1;
 
       await addResources([resId]);
-      await expect(token.addResourceToToken(tokenId, resId, emptyOverwrite)).to.be.revertedWith(
+      await expect(token.addResourceToToken(tokenId, resId, 0)).to.be.revertedWith(
         'RMRKCoreOwnerQueryForNonexistentToken()',
       );
     });
 
     it('cannot add resource twice to the same token', async function () {
-      const resId = ethers.utils.hexZeroPad('0x0001', 8);
+      const resId = 1;
       const tokenId = 1;
 
       await token.mint(owner.address, tokenId);
       await addResources([resId]);
-      await token.addResourceToToken(tokenId, resId, emptyOverwrite);
-      await expect(token.addResourceToToken(tokenId, resId, emptyOverwrite)).to.be.revertedWith(
+      await token.addResourceToToken(tokenId, resId, 0);
+      await expect(token.addResourceToToken(tokenId, resId, 0)).to.be.revertedWith(
         'MultiResourceAlreadyExists()',
       );
     });
@@ -187,29 +186,28 @@ describe('MultiResource', async () => {
 
       await token.mint(owner.address, tokenId);
       for (let i = 1; i <= 128; i++) {
-        const resId = ethers.utils.hexZeroPad(ethers.utils.hexValue(i), 8);
-        await addResources([resId]);
-        await token.addResourceToToken(tokenId, resId, emptyOverwrite);
+        await addResources([i]);
+        await token.addResourceToToken(tokenId, i, 0);
       }
 
       // Now it's full, next should fail
-      const resId = ethers.utils.hexZeroPad(ethers.utils.hexValue(129), 8);
+      const resId = 129;
       await addResources([resId]);
-      await expect(token.addResourceToToken(tokenId, resId, emptyOverwrite)).to.be.revertedWith(
+      await expect(token.addResourceToToken(tokenId, resId, 0)).to.be.revertedWith(
         'MultiResourceMaxPendingResourcesReached()',
       );
     });
 
     it('can add same resource to 2 different tokens', async function () {
-      const resId = ethers.utils.hexZeroPad('0x0001', 8);
+      const resId = 1;
       const tokenId1 = 1;
       const tokenId2 = 2;
 
       await token.mint(owner.address, tokenId1);
       await token.mint(owner.address, tokenId2);
       await addResources([resId]);
-      await token.addResourceToToken(tokenId1, resId, emptyOverwrite);
-      await token.addResourceToToken(tokenId2, resId, emptyOverwrite);
+      await token.addResourceToToken(tokenId1, resId, 0);
+      await token.addResourceToToken(tokenId2, resId, 0);
 
       expect(await token.getPendingResources(tokenId1)).to.be.eql([resId]);
       expect(await token.getPendingResources(tokenId2)).to.be.eql([resId]);
@@ -218,12 +216,12 @@ describe('MultiResource', async () => {
 
   describe('Accepting resources', async function () {
     it('can accept resource', async function () {
-      const resId = ethers.utils.hexZeroPad('0x0001', 8);
+      const resId = 1;
       const tokenId = 1;
 
       await token.mint(owner.address, tokenId);
       await addResources([resId]);
-      await token.addResourceToToken(tokenId, resId, emptyOverwrite);
+      await token.addResourceToToken(tokenId, resId, 0);
       await expect(token.acceptResource(tokenId, 0))
         .to.emit(token, 'ResourceAccepted')
         .withArgs(tokenId, resId);
@@ -242,14 +240,14 @@ describe('MultiResource', async () => {
     });
 
     it('can accept multiple resources', async function () {
-      const resId = ethers.utils.hexZeroPad('0x0001', 8);
-      const resId2 = ethers.utils.hexZeroPad('0x0002', 8);
+      const resId = 1;
+      const resId2 = 2;
       const tokenId = 1;
 
       await token.mint(owner.address, tokenId);
       await addResources([resId, resId2]);
-      await token.addResourceToToken(tokenId, resId, emptyOverwrite);
-      await token.addResourceToToken(tokenId, resId2, emptyOverwrite);
+      await token.addResourceToToken(tokenId, resId, 0);
+      await token.addResourceToToken(tokenId, resId2, 0);
       await expect(token.acceptResource(tokenId, 1)) // Accepting resId2
         .to.emit(token, 'ResourceAccepted')
         .withArgs(tokenId, resId2);
@@ -268,14 +266,14 @@ describe('MultiResource', async () => {
     });
 
     it('can accept resource if approved', async function () {
-      const resId = ethers.utils.hexZeroPad('0x0001', 8);
+      const resId = 1;
       const tokenId = 1;
       const approvedAddress = addrs[1];
       await token.mint(owner.address, tokenId);
       await token.approve(approvedAddress.address, tokenId);
       await addResources([resId]);
 
-      await token.addResourceToToken(tokenId, resId, emptyOverwrite);
+      await token.addResourceToToken(tokenId, resId, 0);
       await token.connect(approvedAddress).acceptResource(tokenId, 0);
 
       const pending = await token.getFullPendingResources(tokenId);
@@ -283,12 +281,12 @@ describe('MultiResource', async () => {
     });
 
     it('cannot accept resource twice', async function () {
-      const resId = ethers.utils.hexZeroPad('0x0001', 8);
+      const resId = 1;
       const tokenId = 1;
 
       await token.mint(owner.address, tokenId);
       await addResources([resId]);
-      await token.addResourceToToken(tokenId, resId, emptyOverwrite);
+      await token.addResourceToToken(tokenId, resId, 0);
       await token.acceptResource(tokenId, 0);
 
       await expect(token.acceptResource(tokenId, 0)).to.be.revertedWith(
@@ -297,12 +295,12 @@ describe('MultiResource', async () => {
     });
 
     it('cannot accept resource if not owner', async function () {
-      const resId = ethers.utils.hexZeroPad('0x0001', 8);
+      const resId = 1;
       const tokenId = 1;
 
       await token.mint(owner.address, tokenId);
       await addResources([resId]);
-      await token.addResourceToToken(tokenId, resId, emptyOverwrite);
+      await token.addResourceToToken(tokenId, resId, 0);
       await expect(token.connect(addrs[1]).acceptResource(tokenId, 0)).to.be.revertedWith(
         'MultiResourceNotOwner()',
       );
@@ -320,13 +318,13 @@ describe('MultiResource', async () => {
 
   describe('Overwriting resources', async function () {
     it('can add resource to token overwritting an existing one', async function () {
-      const resId = ethers.utils.hexZeroPad('0x0001', 8);
-      const resId2 = ethers.utils.hexZeroPad('0x0002', 8);
+      const resId = 1;
+      const resId2 = 2;
       const tokenId = 1;
 
       await token.mint(owner.address, tokenId);
       await addResources([resId, resId2]);
-      await token.addResourceToToken(tokenId, resId, emptyOverwrite);
+      await token.addResourceToToken(tokenId, resId, 0);
       await token.acceptResource(tokenId, 0);
 
       // Add new resource to overwrite the first, and accept
@@ -346,18 +344,16 @@ describe('MultiResource', async () => {
         [resId2, metaURIDefault, customDefault],
       ]);
       // Overwrite should be gone
-      expect(await token.getResourceOverwrites(tokenId, pendingResources[0])).to.eql(
-        ethers.utils.hexZeroPad('0x0000', 8),
-      );
+      expect(await token.getResourceOverwrites(tokenId, pendingResources[0])).to.eql(0);
     });
 
     it('can overwrite non existing resource to token, it could have been deleted', async function () {
-      const resId = ethers.utils.hexZeroPad('0x0001', 8);
+      const resId = 1;
       const tokenId = 1;
 
       await token.mint(owner.address, tokenId);
       await addResources([resId]);
-      await token.addResourceToToken(tokenId, resId, ethers.utils.hexZeroPad('0x1', 8));
+      await token.addResourceToToken(tokenId, resId, 1);
       await token.acceptResource(tokenId, 0);
 
       expect(await token.getFullResources(tokenId)).to.be.eql([
@@ -368,12 +364,12 @@ describe('MultiResource', async () => {
 
   describe('Rejecting resources', async function () {
     it('can reject resource', async function () {
-      const resId = ethers.utils.hexZeroPad('0x0001', 8);
+      const resId = 1;
       const tokenId = 1;
 
       await token.mint(owner.address, tokenId);
       await addResources([resId]);
-      await token.addResourceToToken(tokenId, resId, emptyOverwrite);
+      await token.addResourceToToken(tokenId, resId, 0);
 
       await expect(token.rejectResource(tokenId, 0)).to.emit(token, 'ResourceRejected');
 
@@ -384,14 +380,14 @@ describe('MultiResource', async () => {
     });
 
     it('can reject resource if approved', async function () {
-      const resId = ethers.utils.hexZeroPad('0x0001', 8);
+      const resId = 1;
       const approvedAddress = addrs[1];
       const tokenId = 1;
 
       await token.mint(owner.address, tokenId);
       await token.approve(approvedAddress.address, tokenId);
       await addResources([resId]);
-      await token.addResourceToToken(tokenId, resId, emptyOverwrite);
+      await token.addResourceToToken(tokenId, resId, 0);
 
       await expect(token.rejectResource(tokenId, 0)).to.emit(token, 'ResourceRejected');
 
@@ -402,14 +398,14 @@ describe('MultiResource', async () => {
     });
 
     it('can reject all resources', async function () {
-      const resId = ethers.utils.hexZeroPad('0x0001', 8);
-      const resId2 = ethers.utils.hexZeroPad('0x0002', 8);
+      const resId = 1;
+      const resId2 = 2;
       const tokenId = 1;
 
       await token.mint(owner.address, tokenId);
       await addResources([resId, resId2]);
-      await token.addResourceToToken(tokenId, resId, emptyOverwrite);
-      await token.addResourceToToken(tokenId, resId2, emptyOverwrite);
+      await token.addResourceToToken(tokenId, resId, 0);
+      await token.addResourceToToken(tokenId, resId2, 0);
 
       await expect(token.rejectAllResources(tokenId)).to.emit(token, 'ResourceRejected');
 
@@ -420,16 +416,16 @@ describe('MultiResource', async () => {
     });
 
     it('can reject all resources if approved', async function () {
-      const resId = ethers.utils.hexZeroPad('0x0001', 8);
-      const resId2 = ethers.utils.hexZeroPad('0x0002', 8);
+      const resId = 1;
+      const resId2 = 2;
       const tokenId = 1;
       const approvedAddress = addrs[1];
 
       await token.mint(owner.address, tokenId);
       await token.approve(approvedAddress.address, tokenId);
       await addResources([resId, resId2]);
-      await token.addResourceToToken(tokenId, resId, emptyOverwrite);
-      await token.addResourceToToken(tokenId, resId2, emptyOverwrite);
+      await token.addResourceToToken(tokenId, resId, 0);
+      await token.addResourceToToken(tokenId, resId2, 0);
 
       await expect(token.connect(approvedAddress).rejectAllResources(tokenId)).to.emit(
         token,
@@ -443,12 +439,12 @@ describe('MultiResource', async () => {
     });
 
     it('cannot reject resource twice', async function () {
-      const resId = ethers.utils.hexZeroPad('0x0001', 8);
+      const resId = 1;
       const tokenId = 1;
 
       await token.mint(owner.address, tokenId);
       await addResources([resId]);
-      await token.addResourceToToken(tokenId, resId, emptyOverwrite);
+      await token.addResourceToToken(tokenId, resId, 0);
       await token.rejectResource(tokenId, 0);
 
       await expect(token.rejectResource(tokenId, 0)).to.be.revertedWith(
@@ -457,12 +453,12 @@ describe('MultiResource', async () => {
     });
 
     it('cannot reject resource nor reject all if not owner', async function () {
-      const resId = ethers.utils.hexZeroPad('0x0001', 8);
+      const resId = 1;
       const tokenId = 1;
 
       await token.mint(owner.address, tokenId);
       await addResources([resId]);
-      await token.addResourceToToken(tokenId, resId, emptyOverwrite);
+      await token.addResourceToToken(tokenId, resId, 0);
 
       await expect(token.connect(addrs[1]).rejectResource(tokenId, 0)).to.be.revertedWith(
         'MultiResourceNotOwner()',
@@ -557,7 +553,7 @@ describe('MultiResource', async () => {
 
     it('can get token URI when resource is enumerated', async function () {
       const tokenId = 1;
-      const resId = ethers.utils.hexZeroPad('0x0001', 8);
+      const resId = 1;
       await addResourcesToToken(tokenId);
       await token.setTokenEnumeratedResource(resId, true);
       expect(await token.isTokenEnumeratedResource(resId)).to.eql(true);
@@ -566,14 +562,14 @@ describe('MultiResource', async () => {
 
     it('can get token URI at specific index', async function () {
       const tokenId = 1;
-      const resId = ethers.utils.hexZeroPad('0x0001', 8);
-      const resId2 = ethers.utils.hexZeroPad('0x0002', 8);
+      const resId = 1;
+      const resId2 = 2;
 
       await token.mint(owner.address, tokenId);
       await token.addResourceEntry(resId, 'UriA', customDefault);
       await token.addResourceEntry(resId2, 'UriB', customDefault);
-      await token.addResourceToToken(tokenId, resId, emptyOverwrite);
-      await token.addResourceToToken(tokenId, resId2, emptyOverwrite);
+      await token.addResourceToToken(tokenId, resId, 0);
+      await token.addResourceToToken(tokenId, resId2, 0);
       await token.acceptResource(tokenId, 0);
       await token.acceptResource(tokenId, 0);
 
@@ -582,18 +578,18 @@ describe('MultiResource', async () => {
 
     it('can get token URI by specific custom value', async function () {
       const tokenId = 1;
-      const resId = ethers.utils.hexZeroPad('0x0001', 8);
-      const resId2 = ethers.utils.hexZeroPad('0x0002', 8);
+      const resId = 1;
+      const resId2 = 2;
       // We define some custom types and values which mean something to the issuer.
       // Resource 1 has Width, Height and Type. Resource 2 has Area and Type.
-      const customDataWidthKey = ethers.utils.hexZeroPad('0x0001', 16);
+      const customDataWidthKey = 1;
       const customDataWidthValue = ethers.utils.hexZeroPad('0x1111', 16);
-      const customDataHeightKey = ethers.utils.hexZeroPad('0x0002', 16);
+      const customDataHeightKey = 2;
       const customDataHeightValue = ethers.utils.hexZeroPad('0x1111', 16);
-      const customDataTypeKey = ethers.utils.hexZeroPad('0x0003', 16);
+      const customDataTypeKey = 3;
       const customDataTypeValueA = ethers.utils.hexZeroPad('0xAAAA', 16);
       const customDataTypeValueB = ethers.utils.hexZeroPad('0xBBBB', 16);
-      const customDataAreaKey = ethers.utils.hexZeroPad('0x0004', 16);
+      const customDataAreaKey = 4;
       const customDataAreaValue = ethers.utils.hexZeroPad('0x00FF', 16);
 
       await token.mint(owner.address, tokenId);
@@ -611,8 +607,8 @@ describe('MultiResource', async () => {
       await token.setCustomResourceData(resId2, customDataAreaKey, customDataAreaValue);
       await token.setCustomResourceData(resId2, customDataTypeKey, customDataTypeValueB);
 
-      await token.addResourceToToken(tokenId, resId, emptyOverwrite);
-      await token.addResourceToToken(tokenId, resId2, emptyOverwrite);
+      await token.addResourceToToken(tokenId, resId, 0);
+      await token.addResourceToToken(tokenId, resId2, 0);
       await token.acceptResource(tokenId, 0);
       await token.acceptResource(tokenId, 0);
 
@@ -625,14 +621,14 @@ describe('MultiResource', async () => {
 
     it('gets fall back if matching value is not find on custom data', async function () {
       const tokenId = 1;
-      const resId = ethers.utils.hexZeroPad('0x0001', 8);
-      const resId2 = ethers.utils.hexZeroPad('0x0002', 8);
+      const resId = 1;
+      const resId2 = 2;
       // We define a custom data for 'type'.
-      const customDataTypeKey = ethers.utils.hexZeroPad('0x0001', 16);
+      const customDataTypeKey = 1;
       const customDataTypeValueA = ethers.utils.hexZeroPad('0xAAAA', 16);
       const customDataTypeValueB = ethers.utils.hexZeroPad('0xBBBB', 16);
       const customDataTypeValueC = ethers.utils.hexZeroPad('0xCCCC', 16);
-      const customDataOtherKey = ethers.utils.hexZeroPad('0x0002', 16);
+      const customDataOtherKey = 2;
 
       await token.mint(owner.address, tokenId);
       await token.addResourceEntry(resId, 'srcA', [customDataTypeKey]);
@@ -640,8 +636,8 @@ describe('MultiResource', async () => {
       await token.setCustomResourceData(resId, customDataTypeKey, customDataTypeValueA);
       await token.setCustomResourceData(resId2, customDataTypeKey, customDataTypeValueB);
 
-      await token.addResourceToToken(tokenId, resId, emptyOverwrite);
-      await token.addResourceToToken(tokenId, resId2, emptyOverwrite);
+      await token.addResourceToToken(tokenId, resId, 0);
+      await token.addResourceToToken(tokenId, resId2, 0);
       await token.acceptResource(tokenId, 0);
       await token.acceptResource(tokenId, 0);
 
@@ -658,19 +654,19 @@ describe('MultiResource', async () => {
     });
   });
 
-  async function addResources(ids: string[]): Promise<void> {
+  async function addResources(ids: number[]): Promise<void> {
     ids.forEach(async (resId) => {
       await token.addResourceEntry(resId, metaURIDefault, customDefault);
     });
   }
 
   async function addResourcesToToken(tokenId: number): Promise<void> {
-    const resId = ethers.utils.hexZeroPad('0x0001', 8);
-    const resId2 = ethers.utils.hexZeroPad('0x0002', 8);
+    const resId = 1;
+    const resId2 = 2;
     await token.mint(owner.address, tokenId);
     await addResources([resId, resId2]);
-    await token.addResourceToToken(tokenId, resId, emptyOverwrite);
-    await token.addResourceToToken(tokenId, resId2, emptyOverwrite);
+    await token.addResourceToToken(tokenId, resId, 0);
+    await token.addResourceToToken(tokenId, resId2, 0);
     await token.acceptResource(tokenId, 0);
     await token.acceptResource(tokenId, 0);
   }

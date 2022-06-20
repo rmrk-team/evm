@@ -3,34 +3,34 @@
 pragma solidity ^0.8.0;
 
 interface IRMRKMultiResourceBase {
-    event ResourceSet(bytes8 resourceId);
+    event ResourceSet(uint32 resourceId);
 
-    event ResourceAddedToToken(uint256 indexed tokenId, bytes8 resourceId);
+    event ResourceAddedToToken(uint256 indexed tokenId, uint32 resourceId);
 
-    event ResourceAccepted(uint256 indexed tokenId, bytes8 resourceId);
+    event ResourceAccepted(uint256 indexed tokenId, uint32 resourceId);
 
-    event ResourceRejected(uint256 indexed tokenId, bytes8 resourceId);
+    event ResourceRejected(uint256 indexed tokenId, uint32 resourceId);
 
     event ResourcePrioritySet(uint256 indexed tokenId);
 
     event ResourceOverwriteProposed(
         uint256 indexed tokenId,
-        bytes8 resourceId,
-        bytes8 overwrites
+        uint32 resourceId,
+        uint32 overwrites
     );
 
-    event ResourceOverwritten(uint256 indexed tokenId, bytes8 overwritten);
+    event ResourceOverwritten(uint256 indexed tokenId, uint32 overwritten);
 
-    event ResourceCustomDataSet(bytes8 resourceId, bytes16 customResourceId);
+    event ResourceCustomDataSet(uint32 resourceId, uint64 customResourceId);
 
     event ResourceCustomDataAdded(
-        bytes8 resourceId,
-        bytes16 customResourceId
+        uint32 resourceId,
+        uint64 customResourceId
     );
 
     event ResourceCustomDataRemoved(
-        bytes8 resourceId,
-        bytes16 customResourceId
+        uint32 resourceId,
+        uint64 customResourceId
     );
 
     function acceptResource(uint256 tokenId, uint256 index) external;
@@ -43,11 +43,11 @@ interface IRMRKMultiResourceBase {
 
     function getActiveResources(
         uint256 tokenId
-    ) external view returns(bytes8[] memory);
+    ) external view returns(uint32[] memory);
 
     function getPendingResources(
         uint256 tokenId
-    ) external view returns(bytes8[] memory);
+    ) external view returns(uint32[] memory);
 
     function getActiveResourcePriorities(
         uint256 tokenId
@@ -55,12 +55,12 @@ interface IRMRKMultiResourceBase {
 
     function getResourceOverwrites(
         uint256 tokenId,
-        bytes8 resourceId
-    ) external view returns(bytes8);
+        uint32 resourceId
+    ) external view returns(uint32);
 
     function getCustomResourceData(
-        bytes8 resourceId,
-        bytes16 customResourceId
+        uint32 resourceId,
+        uint64 customResourceId
     ) external view returns (bytes memory);
 
     function tokenURI(

@@ -19,7 +19,7 @@ describe('Nesting', async () => {
 
   const mintNestData = ethers.utils.hexZeroPad('0xabcd', 8);
   const emptyData = ethers.utils.hexZeroPad('0x', 0);
-  const partId = ethers.utils.hexZeroPad('0x0', 8);
+  const partId = 0
 
   beforeEach(async function () {
     const [signersOwner, ...signersAddr] = await ethers.getSigners();
