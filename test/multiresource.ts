@@ -81,7 +81,7 @@ describe('MultiResource', async () => {
     });
 
     it('cannot add resource with id 0', async function () {
-      const id = 0
+      const id = 0;
 
       await expect(token.addResourceEntry(id, metaURIDefault, customDefault)).to.be.revertedWith(
         'RMRKWriteToZero()',

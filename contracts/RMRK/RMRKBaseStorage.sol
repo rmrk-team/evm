@@ -2,9 +2,14 @@
 
 pragma solidity ^0.8.9;
 
-import "./access/AccessControl.sol";
 import "./interfaces/IRMRKBaseStorage.sol";
+import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
+
+error BaseAlreadyExists();
+error RMRKZeroLengthIdsPassed();
+error RMRKBaseEntryDoesNotExist();
+error MismatchedInputArrayLength();
 
 contract RMRKBaseStorage is AccessControl, IRMRKBaseStorage {
   using Address for address;
@@ -24,7 +29,7 @@ contract RMRKBaseStorage is AccessControl, IRMRKBaseStorage {
 
     In its current implementation, all base asset entries MUST be passed via an array during contract construction.
     This is the only way to ensure contract immutability after deployment, though due to the gas costs of RMRK
-    base assets it is hightly recommended that developers are offered a commit > freeze pattern, by which developers
+    base assets it is highly recommended that developers are offered a commit > freeze pattern, by which developers
     are allowed multiple commits until a 'freeze' function is called, after which the base contract is no
     longer mutable.
 
@@ -81,7 +86,8 @@ contract RMRKBaseStorage is AccessControl, IRMRKBaseStorage {
     */
 
     function _addBaseEntry(IntakeStruct memory intakeStruct) internal {
-        require(bases[intakeStruct.id].itemType == ItemType.None, "Base already exists");
+        if(bases[intakeStruct.id].itemType != ItemType.None)
+            revert BaseAlreadyExists();
         bases[intakeStruct.id] = intakeStruct.base;
         baseIds.push(intakeStruct.id);
     }
@@ -100,17 +106,19 @@ contract RMRKBaseStorage is AccessControl, IRMRKBaseStorage {
     */
 
     function addEquippableAddresses(
-        uint32 _baseEntryid,
+        uint32 _baseEntryId,
         address[] memory _equippableAddresses
     ) public onlyRole(issuer) {
-        require(_equippableAddresses.length > 0, "RMRK: Zero-length ids passed.");
-        require(bases[_baseEntryid].itemType != ItemType.None, "RMRK: Base entry does not exist.");
+        if(_equippableAddresses.length <= 0)
+            revert RMRKZeroLengthIdsPassed();
+        if(bases[_baseEntryId].itemType == ItemType.None)
+            revert RMRKBaseEntryDoesNotExist();
         uint256 len = _equippableAddresses.length;
         for (uint i; i<len;) {
-          isEquippable[_baseEntryid][_equippableAddresses[i]] = true;
+          isEquippable[_baseEntryId][_equippableAddresses[i]] = true;
           unchecked {++i;}
         }
-        emit AddedEquippablesToEntry(_baseEntryid, _equippableAddresses);
+        emit AddedEquippablesToEntry(_baseEntryId, _equippableAddresses);
     }
 
     /**
@@ -137,7 +145,8 @@ contract RMRKBaseStorage is AccessControl, IRMRKBaseStorage {
 
     function checkIsEquippableMulti(uint32[] calldata baseId, address[] calldata targetAddress) public view returns (bool[] memory isEquippable_) {
         uint256 len = baseId.length;
-        require(len == targetAddress.length, "Mismatched input array length");
+        if(len != targetAddress.length)
+            revert MismatchedInputArrayLength();
         for (uint i; i<len;) {
           isEquippable_[i] = isEquippable[baseId[i]][targetAddress[i]];
           unchecked {++i;}
