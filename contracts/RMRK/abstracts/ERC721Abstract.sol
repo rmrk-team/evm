@@ -6,9 +6,9 @@ pragma solidity ^0.8.9;
 
 import "../interfaces/IERC721.sol";
 import "../interfaces/IERC721Receiver.sol";
-import "../utils/Address.sol";
-import "../utils/Strings.sol";
-import "../utils/Context.sol";
+import "@openzeppelin/contracts/utils/Address.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
+import "@openzeppelin/contracts/utils/Context.sol";
 // import "hardhat/console.sol";
 
 error ERC721OwnerQueryForNonexistentToken();

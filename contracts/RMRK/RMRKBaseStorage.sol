@@ -4,7 +4,7 @@ pragma solidity ^0.8.9;
 
 import "./access/AccessControl.sol";
 import "./interfaces/IRMRKBaseStorage.sol";
-import "./utils/Address.sol";
+import "@openzeppelin/contracts/utils/Address.sol";
 
 contract RMRKBaseStorage is AccessControl, IRMRKBaseStorage {
   using Address for address;

@@ -9,7 +9,7 @@
     "prettier": "prettier --write ."
   },
   "dependencies": {
-    "@openzeppelin/contracts": "^4.4.0",
+    "@openzeppelin/contracts": "^4.6.0",
     "hardhat": "^2.6.5",
     "solc": "^0.8.9"
   },

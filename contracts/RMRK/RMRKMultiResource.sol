@@ -6,9 +6,9 @@ import "./interfaces/IERC721.sol";
 import "./interfaces/IERC721Receiver.sol";
 import "./interfaces/IMultiResource.sol";
 import "./library/MultiResourceLib.sol";
-import "./utils/Address.sol";
-import "./utils/Strings.sol";
-import "./utils/Context.sol";
+import "@openzeppelin/contracts/utils/Address.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
+import "@openzeppelin/contracts/utils/Context.sol";
 import "./abstracts/MultiResourceAbstract.sol";
 
 error RMRKCoreOwnerQueryForNonexistentToken();

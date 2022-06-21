@@ -10,9 +10,9 @@ import "./interfaces/IRMRKEquippableResource.sol";
 import "./interfaces/IRMRKBaseStorage.sol";
 import "./library/RMRKLib.sol";
 import "./library/MultiResourceLib.sol";
-import "./utils/Address.sol";
-import "./utils/Strings.sol";
-import "./utils/Context.sol";
+import "@openzeppelin/contracts/utils/Address.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
+import "@openzeppelin/contracts/utils/Context.sol";
 // import "hardhat/console.sol";
 
 error RMRKEquippableBasePartNotEquippable();
