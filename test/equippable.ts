@@ -551,6 +551,23 @@ describe('MultiResource', async () => {
       expect(accepted).to.be.eql([]);
     });
 
+    it('can reject resource and overwrites are cleared', async function () {
+      const resId = BigNumber.from(1);
+      const resId2 = BigNumber.from(2);
+      const tokenId = 1;
+
+      await chunky.mint(owner.address, tokenId);
+      await addResources([resId, resId2]);
+      await chunky.addResourceToToken(tokenId, resId, 0);
+      await chunky.acceptResource(tokenId, 0);
+
+      // Will try to overwrite but we reject it
+      await chunky.addResourceToToken(tokenId, resId2, resId);
+      await chunky.rejectResource(tokenId, 0);
+
+      expect(await chunky.getResourceOverwrites(tokenId, resId2)).to.eql(BigNumber.from(0));
+    });
+
     // FIXME: approve not implemented yet
     it.skip('can reject resource if approved', async function () {
       const resId = BigNumber.from(1);
@@ -586,6 +603,42 @@ describe('MultiResource', async () => {
       expect(pending).to.be.eql([]);
       const accepted = await chunky.getFullResources(tokenId);
       expect(accepted).to.be.eql([]);
+    });
+
+    it('can reject all resources and overwrites are cleared', async function () {
+      const resId = BigNumber.from(1);
+      const resId2 = BigNumber.from(2);
+      const tokenId = 1;
+
+      await chunky.mint(owner.address, tokenId);
+      await addResources([resId, resId2]);
+      await chunky.addResourceToToken(tokenId, resId, 0);
+      await chunky.acceptResource(tokenId, 0);
+
+      // Will try to overwrite but we reject all
+      await chunky.addResourceToToken(tokenId, resId2, resId);
+      await chunky.rejectAllResources(tokenId);
+
+      expect(await chunky.getResourceOverwrites(tokenId, resId2)).to.eql(BigNumber.from(0));
+    });
+
+    it('can reject all pending resources at max capacity', async function () {
+      const tokenId = 1;
+      const resArr = [];
+
+      for (let i = 1; i < 128; i++) {
+        resArr.push(BigNumber.from(i));
+      }
+
+      await chunky.mint(owner.address, tokenId);
+      await addResources(resArr);
+
+      for (let i = 1; i < 128; i++) {
+        await chunky.addResourceToToken(tokenId, i, 1);
+      }
+      await chunky.rejectAllResources(tokenId);
+
+      expect(await chunky.getResourceOverwrites(1, 2)).to.eql(BigNumber.from(0));
     });
 
     // FIXME: approve not implemented yet

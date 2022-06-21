@@ -382,6 +382,23 @@ describe('MultiResource', async () => {
       expect(accepted).to.be.eql([]);
     });
 
+    it('can reject resource and overwrites are cleared', async function () {
+      const resId = BigNumber.from(1);
+      const resId2 = BigNumber.from(2);
+      const tokenId = 1;
+
+      await token.mint(owner.address, tokenId);
+      await addResources([resId, resId2]);
+      await token.addResourceToToken(tokenId, resId, 0);
+      await token.acceptResource(tokenId, 0);
+
+      // Will try to overwrite but we reject it
+      await token.addResourceToToken(tokenId, resId2, resId);
+      await token.rejectResource(tokenId, 0);
+
+      expect(await token.getResourceOverwrites(tokenId, resId2)).to.eql(BigNumber.from(0));
+    });
+
     it('can reject resource if approved', async function () {
       const resId = BigNumber.from(1);
       const approvedAddress = addrs[1];
@@ -416,6 +433,42 @@ describe('MultiResource', async () => {
       expect(pending).to.be.eql([]);
       const accepted = await token.getFullResources(tokenId);
       expect(accepted).to.be.eql([]);
+    });
+
+    it('can reject all resources and overwrites are cleared', async function () {
+      const resId = BigNumber.from(1);
+      const resId2 = BigNumber.from(2);
+      const tokenId = 1;
+
+      await token.mint(owner.address, tokenId);
+      await addResources([resId, resId2]);
+      await token.addResourceToToken(tokenId, resId, 0);
+      await token.acceptResource(tokenId, 0);
+
+      // Will try to overwrite but we reject all
+      await token.addResourceToToken(tokenId, resId2, resId);
+      await token.rejectAllResources(tokenId);
+
+      expect(await token.getResourceOverwrites(tokenId, resId2)).to.eql(BigNumber.from(0));
+    });
+
+    it('can reject all pending resources at max capacity', async function () {
+      const tokenId = 1;
+      const resArr = [];
+
+      for (let i = 1; i < 128; i++) {
+        resArr.push(BigNumber.from(i));
+      }
+
+      await token.mint(owner.address, tokenId);
+      await addResources(resArr);
+
+      for (let i = 1; i < 128; i++) {
+        await token.addResourceToToken(tokenId, i, 1);
+      }
+      await token.rejectAllResources(tokenId);
+
+      expect(await token.getResourceOverwrites(1, 2)).to.eql(BigNumber.from(0));
     });
 
     it('can reject all resources if approved', async function () {

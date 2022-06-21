@@ -23,7 +23,7 @@ abstract contract MultiResourceAbstractBase is Context, IRMRKMultiResourceBase {
 
     using RMRKLib for uint64[];
 
-    //mapping tokenId to current resource to replacing resource
+    //mapping of tokenId to new resource, to resource to be replaced
     mapping(uint256 => mapping(uint64 => uint64)) internal _resourceOverwrites;
 
     //mapping of tokenId to all resources
@@ -78,11 +78,19 @@ abstract contract MultiResourceAbstractBase is Context, IRMRKMultiResourceBase {
         uint64 resourceId = _pendingResources[tokenId][index];
         _pendingResources[tokenId].removeItemByValue(resourceId);
         _tokenResources[tokenId][resourceId] = false;
+        delete(_resourceOverwrites[tokenId][resourceId]);
 
         emit ResourceRejected(tokenId, resourceId);
     }
 
     function _rejectAllResources(uint256 tokenId) internal {
+        uint256 len = _pendingResources[tokenId].length;
+        for (uint i; i<len;) {
+            uint64 resourceId = _pendingResources[tokenId][i];
+            delete _resourceOverwrites[tokenId][resourceId];
+            unchecked {++i;}
+        }
+
         delete(_pendingResources[tokenId]);
         emit ResourceRejected(tokenId, uint64(0));
     }
