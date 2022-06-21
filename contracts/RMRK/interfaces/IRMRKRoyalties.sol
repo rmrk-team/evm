@@ -15,8 +15,8 @@ function getRoyaltyData()
 
 function setRoyaltyData(
     address _royaltyAddress,
-    uint32 _numerator,
-    uint32 _denominator
+    uint64 _numerator,
+    uint64 _denominator
 ) external;
 
 }

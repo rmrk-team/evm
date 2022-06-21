@@ -2,6 +2,7 @@ import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { RMRKBaseStorageMock, RMRKEquippableMock } from '../typechain';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { BigNumber } from 'ethers';
 
 describe('MultiResource', async () => {
   let base: RMRKBaseStorageMock;
@@ -56,7 +57,7 @@ describe('MultiResource', async () => {
 
   describe('Resource storage', async function () {
     it('can add resource', async function () {
-      const id = 11;
+      const id = BigNumber.from(1);
 
       await expect(
         chunky.addResourceEntry(
@@ -77,12 +78,12 @@ describe('MultiResource', async () => {
     });
 
     it('cannot get non existing resource', async function () {
-      const id = 11;
+      const id = BigNumber.from(1);
       await expect(chunky.getResource(id)).to.be.revertedWith('RMRKNoResourceMatchingId()');
     });
 
     it('cannot add resource entry if not issuer', async function () {
-      const id = 11;
+      const id = BigNumber.from(1);
       await expect(
         chunky.connect(addrs[1]).addResourceEntry(
           {
@@ -115,7 +116,7 @@ describe('MultiResource', async () => {
     });
 
     it('cannot overwrite resource', async function () {
-      const id = 11;
+      const id = BigNumber.from(1);
 
       await chunky.addResourceEntry(
         {
@@ -165,7 +166,7 @@ describe('MultiResource', async () => {
     });
 
     it('cannot add same resource twice', async function () {
-      const id = 11;
+      const id = BigNumber.from(1);
 
       await expect(
         chunky.addResourceEntry(
@@ -201,7 +202,7 @@ describe('MultiResource', async () => {
     });
 
     it('can add and remove custom data for resource', async function () {
-      const resId = 1;
+      const resId = BigNumber.from(1);
       const customDataTypeKey = 3;
       await chunky.addResourceEntry(
         {
@@ -220,7 +221,7 @@ describe('MultiResource', async () => {
         .to.emit(chunky, 'ResourceCustomDataAdded')
         .withArgs(resId, customDataTypeKey);
       let resource = await chunky.getResource(resId);
-      expect(resource.custom).to.eql([ethers.BigNumber.from(customDataTypeKey)]);
+      expect(resource.custom).to.eql([BigNumber.from(customDataTypeKey)]);
 
       await expect(chunky.removeCustomDataFromResource(resId, 0))
         .to.emit(chunky, 'ResourceCustomDataRemoved')
@@ -232,8 +233,8 @@ describe('MultiResource', async () => {
 
   describe('Adding resources', async function () {
     it('can add resource to token', async function () {
-      const resId = 1;
-      const resId2 = 2;
+      const resId = BigNumber.from(1);
+      const resId2 = BigNumber.from(2);
       const tokenId = 1;
 
       await chunky.mint(owner.address, tokenId);
@@ -278,7 +279,7 @@ describe('MultiResource', async () => {
     });
 
     it('cannot add non existing resource to token', async function () {
-      const resId = 1;
+      const resId = BigNumber.from(1);
       const tokenId = 1;
 
       await chunky.mint(owner.address, tokenId);
@@ -288,7 +289,7 @@ describe('MultiResource', async () => {
     });
 
     it('cannot add resource to non existing token', async function () {
-      const resId = 1;
+      const resId = BigNumber.from(1);
       const tokenId = 1;
 
       await addResources([resId]);
@@ -298,7 +299,7 @@ describe('MultiResource', async () => {
     });
 
     it('cannot add resource twice to the same token', async function () {
-      const resId = 1;
+      const resId = BigNumber.from(1);
       const tokenId = 1;
 
       await chunky.mint(owner.address, tokenId);
@@ -314,12 +315,12 @@ describe('MultiResource', async () => {
 
       await chunky.mint(owner.address, tokenId);
       for (let i = 1; i <= 128; i++) {
-        await addResources([i]);
+        await addResources([BigNumber.from(i)]);
         await chunky.addResourceToToken(tokenId, i, 0);
       }
 
       // Now it's full, next should fail
-      const resId = 129;
+      const resId = BigNumber.from(129);
       await addResources([resId]);
       await expect(chunky.addResourceToToken(tokenId, resId, 0)).to.be.revertedWith(
         'MultiResourceMaxPendingResourcesReached()',
@@ -327,7 +328,7 @@ describe('MultiResource', async () => {
     });
 
     it('can add same resource to 2 different tokens', async function () {
-      const resId = 1;
+      const resId = BigNumber.from(1);
       const tokenId1 = 1;
       const tokenId2 = 2;
 
@@ -344,7 +345,7 @@ describe('MultiResource', async () => {
 
   describe('Accepting resources', async function () {
     it('can accept resource', async function () {
-      const resId = 1;
+      const resId = BigNumber.from(1);
       const tokenId = 1;
 
       await chunky.mint(owner.address, tokenId);
@@ -380,8 +381,8 @@ describe('MultiResource', async () => {
     });
 
     it('can accept multiple resources', async function () {
-      const resId = 1;
-      const resId2 = 2;
+      const resId = BigNumber.from(1);
+      const resId2 = BigNumber.from(2);
       const tokenId = 1;
 
       await chunky.mint(owner.address, tokenId);
@@ -421,7 +422,7 @@ describe('MultiResource', async () => {
 
     // approved not implemented yet
     it.skip('can accept resource if approved', async function () {
-      const resId = 1;
+      const resId = BigNumber.from(1);
       const tokenId = 1;
       const approvedAddress = addrs[1];
       await chunky.mint(owner.address, tokenId);
@@ -436,7 +437,7 @@ describe('MultiResource', async () => {
     });
 
     it('cannot accept resource twice', async function () {
-      const resId = 1;
+      const resId = BigNumber.from(1);
       const tokenId = 1;
 
       await chunky.mint(owner.address, tokenId);
@@ -450,7 +451,7 @@ describe('MultiResource', async () => {
     });
 
     it('cannot accept resource if not owner', async function () {
-      const resId = 1;
+      const resId = BigNumber.from(1);
       const tokenId = 1;
 
       await chunky.mint(owner.address, tokenId);
@@ -473,8 +474,8 @@ describe('MultiResource', async () => {
 
   describe('Overwriting resources', async function () {
     it('can add resource to token overwritting an existing one', async function () {
-      const resId = 1;
-      const resId2 = 2;
+      const resId = BigNumber.from(1);
+      const resId2 = BigNumber.from(2);
       const tokenId = 1;
 
       await chunky.mint(owner.address, tokenId);
@@ -510,7 +511,7 @@ describe('MultiResource', async () => {
     });
 
     it('can overwrite non existing resource to token, it could have been deleted', async function () {
-      const resId = 1;
+      const resId = BigNumber.from(1);
       const tokenId = 1;
 
       await chunky.mint(owner.address, tokenId);
@@ -533,7 +534,7 @@ describe('MultiResource', async () => {
 
   describe('Rejecting resources', async function () {
     it('can reject resource', async function () {
-      const resId = 1;
+      const resId = BigNumber.from(1);
       const tokenId = 1;
 
       await chunky.mint(owner.address, tokenId);
@@ -550,7 +551,7 @@ describe('MultiResource', async () => {
 
     // FIXME: approve not implemented yet
     it.skip('can reject resource if approved', async function () {
-      const resId = 1;
+      const resId = BigNumber.from(1);
       const approvedAddress = addrs[1];
       const tokenId = 1;
 
@@ -568,8 +569,8 @@ describe('MultiResource', async () => {
     });
 
     it('can reject all resources', async function () {
-      const resId = 1;
-      const resId2 = 2;
+      const resId = BigNumber.from(1);
+      const resId2 = BigNumber.from(2);
       const tokenId = 1;
 
       await chunky.mint(owner.address, tokenId);
@@ -587,8 +588,8 @@ describe('MultiResource', async () => {
 
     // FIXME: approve not implemented yet
     it.skip('can reject all resources if approved', async function () {
-      const resId = 1;
-      const resId2 = 2;
+      const resId = BigNumber.from(1);
+      const resId2 = BigNumber.from(2);
       const tokenId = 1;
       const approvedAddress = addrs[1];
 
@@ -610,7 +611,7 @@ describe('MultiResource', async () => {
     });
 
     it('cannot reject resource twice', async function () {
-      const resId = 1;
+      const resId = BigNumber.from(1);
       const tokenId = 1;
 
       await chunky.mint(owner.address, tokenId);
@@ -624,7 +625,7 @@ describe('MultiResource', async () => {
     });
 
     it('cannot reject resource nor reject all if not owner', async function () {
-      const resId = 1;
+      const resId = BigNumber.from(1);
       const tokenId = 1;
 
       await chunky.mint(owner.address, tokenId);
@@ -725,7 +726,7 @@ describe('MultiResource', async () => {
 
     it('can get token URI when resource is enumerated', async function () {
       const tokenId = 1;
-      const resId = 1;
+      const resId = BigNumber.from(1);
       await addResourcesToToken(tokenId);
       await chunky.setTokenEnumeratedResource(resId, true);
       expect(await chunky.isTokenEnumeratedResource(resId)).to.eql(true);
@@ -734,8 +735,8 @@ describe('MultiResource', async () => {
 
     it('can get token URI at specific index', async function () {
       const tokenId = 1;
-      const resId = 1;
-      const resId2 = 2;
+      const resId = BigNumber.from(1);
+      const resId2 = BigNumber.from(2);
 
       await chunky.mint(owner.address, tokenId);
       await chunky.addResourceEntry(
@@ -772,8 +773,8 @@ describe('MultiResource', async () => {
 
     it('can get token URI by specific custom value', async function () {
       const tokenId = 1;
-      const resId = 1;
-      const resId2 = 2;
+      const resId = BigNumber.from(1);
+      const resId2 = BigNumber.from(2);
       // We define some custom types and values which mean something to the issuer.
       // Resource 1 has Width, Height and Type. Resource 2 has Area and Type.
       const customDataWidthKey = 1;
@@ -833,8 +834,8 @@ describe('MultiResource', async () => {
 
     it('gets fall back if matching value is not find on custom data', async function () {
       const tokenId = 1;
-      const resId = 1;
-      const resId2 = 2;
+      const resId = BigNumber.from(1);
+      const resId2 = BigNumber.from(2);
       // We define a custom data for 'type'.
       const customDataTypeKey = 1;
       const customDataTypeValueA = ethers.utils.hexZeroPad('0xAAAA', 16);
@@ -889,7 +890,7 @@ describe('MultiResource', async () => {
     });
   });
 
-  async function addResources(ids: number[]): Promise<void> {
+  async function addResources(ids: BigNumber[]): Promise<void> {
     ids.forEach(async (resId) => {
       await chunky.addResourceEntry(
         {
@@ -907,8 +908,8 @@ describe('MultiResource', async () => {
   }
 
   async function addResourcesToToken(tokenId: number): Promise<void> {
-    const resId = 1;
-    const resId2 = 2;
+    const resId = BigNumber.from(1);
+    const resId2 = BigNumber.from(2);
     await chunky.mint(owner.address, tokenId);
     await addResources([resId, resId2]);
     await chunky.addResourceToToken(tokenId, resId, 0);

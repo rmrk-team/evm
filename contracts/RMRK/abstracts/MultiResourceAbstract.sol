@@ -13,16 +13,16 @@ abstract contract MultiResourceAbstract is Context, IRMRKMultiResource, MultiRes
 
     using Strings for uint256;
 
-    //mapping of uint32 Ids to resource object
-    mapping(uint32 => Resource) private _resources;
-    using RMRKLib for uint64[];
+    //mapping of uint64 Ids to resource object
+    mapping(uint64 => Resource) private _resources;
+    using RMRKLib for uint128[];
 
     function getResource(
-        uint32 resourceId
+        uint64 resourceId
     ) public view virtual returns (Resource memory)
     {
         Resource memory resource = _resources[resourceId];
-        if(resource.id == uint32(0))
+        if(resource.id == uint64(0))
             revert RMRKNoResourceMatchingId();
         return resource;
     }
@@ -32,7 +32,7 @@ abstract contract MultiResourceAbstract is Context, IRMRKMultiResource, MultiRes
         uint256 index
     ) internal override view returns (string memory) {
         if (_activeResources[tokenId].length > index)  {
-            uint32 activeResId = _activeResources[tokenId][index];
+            uint64 activeResId = _activeResources[tokenId][index];
             string memory URI;
             Resource memory _activeRes = getResource(activeResId);
             if (!_tokenEnumeratedResource[activeResId]) {
@@ -53,13 +53,13 @@ abstract contract MultiResourceAbstract is Context, IRMRKMultiResource, MultiRes
     // To be implemented with custom guards
 
     function _addResourceEntry(
-        uint32 id,
+        uint64 id,
         string memory metadataURI,
-        uint64[] memory custom
+        uint128[] memory custom
     ) internal {
-        if(id == uint32(0))
+        if(id == uint64(0))
             revert RMRKWriteToZero();
-        if(_resources[id].id != uint32(0))
+        if(_resources[id].id != uint64(0))
             revert RMRKResourceAlreadyExists();
 
         Resource memory resource = Resource({
@@ -74,31 +74,31 @@ abstract contract MultiResourceAbstract is Context, IRMRKMultiResource, MultiRes
     }
 
     function _addCustomDataToResource(
-        uint32 resourceId,
-        uint64 customResourceId
+        uint64 resourceId,
+        uint128 customResourceId
     ) internal {
         _resources[resourceId].custom.push(customResourceId);
         emit ResourceCustomDataAdded(resourceId, customResourceId);
     }
 
     function _removeCustomDataFromResource(
-        uint32 resourceId,
+        uint64 resourceId,
         uint256 index
     ) internal {
-        uint64 customResourceId = _resources[resourceId].custom[index];
+        uint128 customResourceId = _resources[resourceId].custom[index];
         _resources[resourceId].custom.removeItemByIndex(index);
         emit ResourceCustomDataRemoved(resourceId, customResourceId);
     }
 
     function _addResourceToToken(
         uint256 tokenId,
-        uint32 resourceId,
-        uint32 overwrites
+        uint64 resourceId,
+        uint64 overwrites
     ) internal {
         if(_tokenResources[tokenId][resourceId])
             revert MultiResourceAlreadyExists();
 
-        if(getResource(resourceId).id == uint32(0))
+        if(getResource(resourceId).id == uint64(0))
             revert MultiResourceResourceNotFoundInStorage();
 
         if(_pendingResources[tokenId].length >= 128)
@@ -108,7 +108,7 @@ abstract contract MultiResourceAbstract is Context, IRMRKMultiResource, MultiRes
 
         _pendingResources[tokenId].push(resourceId);
 
-        if (overwrites != uint32(0)) {
+        if (overwrites != uint64(0)) {
             _resourceOverwrites[tokenId][resourceId] = overwrites;
             emit ResourceOverwriteProposed(tokenId, resourceId, overwrites);
         }
@@ -122,7 +122,7 @@ abstract contract MultiResourceAbstract is Context, IRMRKMultiResource, MultiRes
         uint256 tokenId,
         uint256 index
     ) public view virtual returns(Resource memory) {
-        uint32 resourceId = getActiveResources(tokenId)[index];
+        uint64 resourceId = getActiveResources(tokenId)[index];
         return getResource(resourceId);
     }
 
@@ -130,14 +130,14 @@ abstract contract MultiResourceAbstract is Context, IRMRKMultiResource, MultiRes
         uint256 tokenId,
         uint256 index
     ) public view virtual returns(Resource memory) {
-        uint32 resourceId = getPendingResources(tokenId)[index];
+        uint64 resourceId = getPendingResources(tokenId)[index];
         return getResource(resourceId);
     }
 
     function getFullResources(
         uint256 tokenId
     ) public view virtual returns (Resource[] memory) {
-        uint32[] memory activeResources = _activeResources[tokenId];
+        uint64[] memory activeResources = _activeResources[tokenId];
         uint256 len = activeResources.length;
         Resource[] memory resources = new Resource[](len);
         for (uint i; i<len;) {
@@ -150,7 +150,7 @@ abstract contract MultiResourceAbstract is Context, IRMRKMultiResource, MultiRes
     function getFullPendingResources(
         uint256 tokenId
     ) public view virtual returns (Resource[] memory) {
-        uint32[] memory pendingResources = _pendingResources[tokenId];
+        uint64[] memory pendingResources = _pendingResources[tokenId];
         uint256 len = pendingResources.length;
         Resource[] memory resources = new Resource[](len);
         for (uint i; i<len;) {

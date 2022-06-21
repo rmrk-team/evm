@@ -31,7 +31,7 @@ contract RMRKEquippableMock is RMRKEquippable {
     }
 
     function setTokenEnumeratedResource(
-        uint32 resourceId,
+        uint64 resourceId,
         bool state
     ) external onlyIssuer {
         _setTokenEnumeratedResource(resourceId, state);
@@ -66,8 +66,8 @@ contract RMRKEquippableMock is RMRKEquippable {
 
     function addResourceToToken(
         uint256 tokenId,
-        uint32 resourceId,
-        uint32 overwrites
+        uint64 resourceId,
+        uint64 overwrites
     ) external onlyIssuer {
         if(ownerOf(tokenId) == address(0)) revert ERC721OwnerQueryForNonexistentToken();
         _addResourceToToken(tokenId, resourceId, overwrites);
@@ -75,29 +75,29 @@ contract RMRKEquippableMock is RMRKEquippable {
 
     function addResourceEntry(
         Resource calldata resource,
-        uint32[] calldata fixedPartIds,
-        uint32[] calldata slotPartIds
+        uint64[] calldata fixedPartIds,
+        uint64[] calldata slotPartIds
     ) external onlyIssuer {
         _addResourceEntry(resource, fixedPartIds, slotPartIds);
     }
 
     function setCustomResourceData(
-        uint32 resourceId,
-        uint64 customResourceId,
+        uint64 resourceId,
+        uint128 customResourceId,
         bytes memory data
     ) external onlyIssuer {
         _setCustomResourceData(resourceId, customResourceId, data);
     }
 
     function addCustomDataToResource(
-        uint32 resourceId,
-        uint64 customResourceId
+        uint64 resourceId,
+        uint128 customResourceId
     ) external onlyIssuer {
         _addCustomDataToResource(resourceId, customResourceId);
     }
 
     function removeCustomDataFromResource(
-        uint32 resourceId,
+        uint64 resourceId,
         uint256 index
     ) external onlyIssuer {
         _removeCustomDataFromResource(resourceId, index);

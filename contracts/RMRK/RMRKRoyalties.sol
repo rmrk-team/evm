@@ -6,8 +6,8 @@ contract RMRKRoyalties {
 
     struct RoyaltyData {
         address royaltyAddress;
-        uint32 numerator;
-        uint32 denominator;
+        uint64 numerator;
+        uint64 denominator;
     }
 
     RoyaltyData private _royalties;
@@ -33,7 +33,7 @@ contract RMRKRoyalties {
     * A numerator of 1*10**5 and a denominator of 1*10**6 is equal to 10 percent, or 100,000 parts per 1,000,000.
     */
 
-    function _setRoyaltyData(address _royaltyAddress, uint32 _numerator, uint32 _denominator) internal virtual {
+    function _setRoyaltyData(address _royaltyAddress, uint64 _numerator, uint64 _denominator) internal virtual {
         _royalties = RoyaltyData ({
         royaltyAddress: _royaltyAddress,
         numerator: _numerator,
