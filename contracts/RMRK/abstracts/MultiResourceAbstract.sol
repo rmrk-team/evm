@@ -3,19 +3,19 @@
 pragma solidity ^0.8.9;
 
 import "./MultiResourceAbstractBase.sol";
-import "../interfaces/IMultiResource.sol";
-import "../library/MultiResourceLib.sol";
+import "../interfaces/IRMRKMultiResource.sol";
+import "../library/RMRKLib.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
 
-abstract contract MultiResourceAbstract is Context, IMultiResource, MultiResourceAbstractBase {
+abstract contract MultiResourceAbstract is Context, IRMRKMultiResource, MultiResourceAbstractBase {
 
     using Strings for uint256;
 
     //mapping of uint32 Ids to resource object
     mapping(uint32 => Resource) private _resources;
-    using MultiResourceLib for uint64[];
+    using RMRKLib for uint64[];
 
     function getResource(
         uint32 resourceId

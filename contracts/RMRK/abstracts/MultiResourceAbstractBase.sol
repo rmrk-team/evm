@@ -3,7 +3,7 @@
 pragma solidity ^0.8.9;
 
 import "../interfaces/IRMRKMultiResourceBase.sol";
-import "../library/MultiResourceLib.sol";
+import "../library/RMRKLib.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
@@ -21,7 +21,7 @@ error RMRKWriteToZero();
 
 abstract contract MultiResourceAbstractBase is Context, IRMRKMultiResourceBase {
 
-    using MultiResourceLib for uint32[];
+    using RMRKLib for uint32[];
 
     //mapping tokenId to current resource to replacing resource
     mapping(uint256 => mapping(uint32 => uint32)) internal _resourceOverwrites;

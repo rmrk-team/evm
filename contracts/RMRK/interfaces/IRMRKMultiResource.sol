@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 
 import "./IRMRKMultiResourceBase.sol";
 
-interface IMultiResource is IRMRKMultiResourceBase {
+interface IRMRKMultiResource is IRMRKMultiResourceBase {
 
     struct Resource {
         uint32 id; //8 bytes

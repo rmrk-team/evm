@@ -9,7 +9,6 @@ import "./RMRKNesting.sol";
 import "./interfaces/IRMRKEquippableResource.sol";
 import "./interfaces/IRMRKBaseStorage.sol";
 import "./library/RMRKLib.sol";
-import "./library/MultiResourceLib.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
@@ -26,8 +25,8 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippableResource, MultiResourceAb
 
     }
 
-    using MultiResourceLib for uint32[];
-    using MultiResourceLib for uint64[];
+    using RMRKLib for uint32[];
+    using RMRKLib for uint64[];
     using Strings for uint256;
 
     //TODO: private setter/getters
@@ -40,6 +39,7 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippableResource, MultiResourceAb
     //mapping of resourceId to slot to equipped children
     mapping(uint32 => mapping(uint32 => Equipment)) private equipped;
 
+    // FIXME: name equippableRefId to equippableParentRefId
     //Mapping of equippableRefId to parent contract address uint32 slotId for equipping validation
     mapping(uint32 => mapping(address => uint32)) private validParentSlot;
 

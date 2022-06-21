@@ -3,7 +3,6 @@
 pragma solidity ^0.8.9;
 
 import "../interfaces/IRMRKNesting.sol";
-import "../library/MultiResourceLib.sol";
 import "../library/RMRKLib.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";

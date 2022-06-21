@@ -4,8 +4,8 @@ pragma solidity ^0.8.9;
 
 import "./interfaces/IERC721.sol";
 import "./interfaces/IERC721Receiver.sol";
-import "./interfaces/IMultiResource.sol";
-import "./library/MultiResourceLib.sol";
+import "./interfaces/IRMRKMultiResource.sol";
+import "./library/RMRKLib.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
@@ -25,9 +25,9 @@ error ERC721AddressZeroIsNotaValidOwner();
 
 contract RMRKMultiResource is MultiResourceAbstract, IERC721 {
 
-    using MultiResourceLib for uint256;
-    using MultiResourceLib for uint32[];
-    using MultiResourceLib for uint64[];
+    using RMRKLib for uint256;
+    using RMRKLib for uint32[];
+    using RMRKLib for uint64[];
     using Address for address;
     using Strings for uint256;
 
@@ -60,7 +60,7 @@ contract RMRKMultiResource is MultiResourceAbstract, IERC721 {
 
 
     function supportsInterface(bytes4 interfaceId) public pure returns (bool) {
-        return interfaceId == type(IMultiResource).interfaceId;
+        return interfaceId == type(IRMRKMultiResource).interfaceId;
     }
 
 

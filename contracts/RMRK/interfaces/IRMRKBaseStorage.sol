@@ -20,7 +20,7 @@ interface IRMRKBaseStorage {
   struct Base {
       ItemType itemType; //1 byte
       uint8 z; //1 byte
-      address[] equippable; //n bytes 32+
+      address[] equippable; //n bytes 32+ // Can use receive this slot or can be equipped
       string src; //n bytes 32+
       string fallbackSrc; //n bytes 32+
   }
