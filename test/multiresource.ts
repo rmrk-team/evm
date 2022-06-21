@@ -658,9 +658,9 @@ describe('MultiResource', async () => {
   });
 
   async function addResources(ids: BigNumber[]): Promise<void> {
-    ids.forEach(async (resId) => {
-      await token.addResourceEntry(resId, metaURIDefault, customDefault);
-    });
+    for (let i = 0; i < ids.length; i++) {
+      await token.addResourceEntry(ids[i], metaURIDefault, customDefault);
+    }
   }
 
   async function addResourcesToToken(tokenId: number): Promise<void> {

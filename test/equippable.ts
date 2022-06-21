@@ -20,10 +20,10 @@ describe('MultiResource', async () => {
   const name2 = 'petMonkey';
   const symbol2 = 'MONKE';
 
-  const equippableRefIdDefault = 1;
+  const equippableRefIdDefault = BigNumber.from(1);
   const metaURIDefault = 'metaURI';
   const baseAddressDefault = ethers.constants.AddressZero;
-  const slotIdDefault = 1;
+  const slotIdDefault = BigNumber.from(1);
   const customDefault: string[] = [];
 
   beforeEach(async () => {
@@ -507,7 +507,9 @@ describe('MultiResource', async () => {
         ],
       ]);
       // Overwrite should be gone
-      expect(await chunky.getResourceOverwrites(tokenId, pendingResources[0])).to.eql(0);
+      expect(await chunky.getResourceOverwrites(tokenId, pendingResources[0])).to.eql(
+        BigNumber.from(0),
+      );
     });
 
     it('can overwrite non existing resource to token, it could have been deleted', async function () {
@@ -859,7 +861,7 @@ describe('MultiResource', async () => {
       );
       await chunky.addResourceEntry(
         {
-          id: resId,
+          id: resId2,
           equippableRefId: equippableRefIdDefault,
           metadataURI: 'srcB',
           baseAddress: baseAddressDefault,
@@ -891,10 +893,10 @@ describe('MultiResource', async () => {
   });
 
   async function addResources(ids: BigNumber[]): Promise<void> {
-    ids.forEach(async (resId) => {
+    for (let i = 0; i < ids.length; i++) {
       await chunky.addResourceEntry(
         {
-          id: resId,
+          id: ids[i],
           equippableRefId: equippableRefIdDefault,
           metadataURI: metaURIDefault,
           baseAddress: baseAddressDefault,
@@ -904,7 +906,7 @@ describe('MultiResource', async () => {
         [],
         [],
       );
-    });
+    }
   }
 
   async function addResourcesToToken(tokenId: number): Promise<void> {
