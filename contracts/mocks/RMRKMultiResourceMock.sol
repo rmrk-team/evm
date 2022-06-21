@@ -27,7 +27,7 @@ contract RMRKMultiResourceMock is RMRKMultiResource {
     }
 
     function setTokenEnumeratedResource(
-        uint32 resourceId,
+        uint64 resourceId,
         bool state
     ) external onlyIssuer {
         _setTokenEnumeratedResource(resourceId, state);
@@ -47,38 +47,38 @@ contract RMRKMultiResourceMock is RMRKMultiResource {
 
     function addResourceToToken(
         uint256 tokenId,
-        uint32 resourceId,
-        uint32 overwrites
+        uint64 resourceId,
+        uint64 overwrites
     ) external onlyIssuer {
         if(ownerOf(tokenId) == address(0)) revert ERC721OwnerQueryForNonexistentToken();
         _addResourceToToken(tokenId, resourceId, overwrites);
     }
 
     function addResourceEntry(
-        uint32 id,
+        uint64 id,
         string memory metadataURI,
-        uint64[] memory custom
+        uint128[] memory custom
     ) external onlyIssuer {
         _addResourceEntry(id, metadataURI, custom);
     }
 
     function setCustomResourceData(
-        uint32 resourceId,
-        uint64 customResourceId,
+        uint64 resourceId,
+        uint128 customResourceId,
         bytes memory data
     ) external onlyIssuer {
         _setCustomResourceData(resourceId, customResourceId, data);
     }
 
     function addCustomDataToResource(
-        uint32 resourceId,
-        uint64 customResourceId
+        uint64 resourceId,
+        uint128 customResourceId
     ) external onlyIssuer {
         _addCustomDataToResource(resourceId, customResourceId);
     }
 
     function removeCustomDataFromResource(
-        uint32 resourceId,
+        uint64 resourceId,
         uint256 index
     ) external onlyIssuer {
         _removeCustomDataFromResource(resourceId, index);

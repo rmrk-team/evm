@@ -26,8 +26,8 @@ error ERC721AddressZeroIsNotaValidOwner();
 contract RMRKMultiResource is MultiResourceAbstract, IERC721 {
 
     using RMRKLib for uint256;
-    using RMRKLib for uint32[];
     using RMRKLib for uint64[];
+    using RMRKLib for uint128[];
     using Address for address;
     using Strings for uint256;
 

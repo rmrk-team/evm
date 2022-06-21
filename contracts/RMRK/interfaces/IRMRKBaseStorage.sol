@@ -25,6 +25,6 @@ interface IRMRKBaseStorage {
       string fallbackSrc; //n bytes 32+
   }
 
-  function checkIsEquippable(uint32 baseId, address targetAddress) external view returns (bool);
+  function checkIsEquippable(uint64 baseId, address targetAddress) external view returns (bool);
 
 }

@@ -2,6 +2,7 @@ import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { RMRKMultiResourceMock } from '../typechain';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { BigNumber } from 'ethers';
 
 describe('MultiResource', async () => {
   let token: RMRKMultiResourceMock;
@@ -37,7 +38,7 @@ describe('MultiResource', async () => {
 
   describe('Resource storage', async function () {
     it('can add resource', async function () {
-      const id = 11;
+      const id = BigNumber.from(1);
 
       await expect(token.addResourceEntry(id, metaURIDefault, customDefault))
         .to.emit(token, 'ResourceSet')
@@ -45,12 +46,12 @@ describe('MultiResource', async () => {
     });
 
     it('cannot get non existing resource', async function () {
-      const id = 11;
+      const id = BigNumber.from(1);
       await expect(token.getResource(id)).to.be.revertedWith('RMRKNoResourceMatchingId()');
     });
 
     it('cannot add resource entry if not issuer', async function () {
-      const id = 11;
+      const id = BigNumber.from(1);
       await expect(
         token.connect(addrs[1]).addResourceEntry(id, metaURIDefault, customDefault),
       ).to.be.revertedWith('RMRKOnlyIssuer()');
@@ -72,7 +73,7 @@ describe('MultiResource', async () => {
     });
 
     it('cannot overwrite resource', async function () {
-      const id = 11;
+      const id = BigNumber.from(1);
 
       await token.addResourceEntry(id, metaURIDefault, customDefault);
       await expect(token.addResourceEntry(id, 'newMetaUri', customDefault)).to.be.revertedWith(
@@ -81,7 +82,7 @@ describe('MultiResource', async () => {
     });
 
     it('cannot add resource with id 0', async function () {
-      const id = 0
+      const id = 0;
 
       await expect(token.addResourceEntry(id, metaURIDefault, customDefault)).to.be.revertedWith(
         'RMRKWriteToZero()',
@@ -89,7 +90,7 @@ describe('MultiResource', async () => {
     });
 
     it('cannot add same resource twice', async function () {
-      const id = 11;
+      const id = BigNumber.from(1);
 
       await expect(token.addResourceEntry(id, metaURIDefault, customDefault))
         .to.emit(token, 'ResourceSet')
@@ -101,7 +102,7 @@ describe('MultiResource', async () => {
     });
 
     it('can add and remove custom data for resource', async function () {
-      const resId = 1;
+      const resId = BigNumber.from(1);
       const customDataTypeKey = 3;
       await token.addResourceEntry(resId, metaURIDefault, customDefault);
 
@@ -109,7 +110,7 @@ describe('MultiResource', async () => {
         .to.emit(token, 'ResourceCustomDataAdded')
         .withArgs(resId, customDataTypeKey);
       let resource = await token.getResource(resId);
-      expect(resource.custom).to.eql([ethers.BigNumber.from(customDataTypeKey)]);
+      expect(resource.custom).to.eql([BigNumber.from(customDataTypeKey)]);
 
       await expect(token.removeCustomDataFromResource(resId, 0))
         .to.emit(token, 'ResourceCustomDataRemoved')
@@ -121,8 +122,8 @@ describe('MultiResource', async () => {
 
   describe('Adding resources', async function () {
     it('can add resource to token', async function () {
-      const resId = 1;
-      const resId2 = 2;
+      const resId = BigNumber.from(1);
+      const resId2 = BigNumber.from(2);
       const tokenId = 1;
 
       await token.mint(owner.address, tokenId);
@@ -150,7 +151,7 @@ describe('MultiResource', async () => {
     });
 
     it('cannot add non existing resource to token', async function () {
-      const resId = 1;
+      const resId = BigNumber.from(1);
       const tokenId = 1;
 
       await token.mint(owner.address, tokenId);
@@ -160,7 +161,7 @@ describe('MultiResource', async () => {
     });
 
     it('cannot add resource to non existing token', async function () {
-      const resId = 1;
+      const resId = BigNumber.from(1);
       const tokenId = 1;
 
       await addResources([resId]);
@@ -170,7 +171,7 @@ describe('MultiResource', async () => {
     });
 
     it('cannot add resource twice to the same token', async function () {
-      const resId = 1;
+      const resId = BigNumber.from(1);
       const tokenId = 1;
 
       await token.mint(owner.address, tokenId);
@@ -186,12 +187,12 @@ describe('MultiResource', async () => {
 
       await token.mint(owner.address, tokenId);
       for (let i = 1; i <= 128; i++) {
-        await addResources([i]);
+        await addResources([BigNumber.from(i)]);
         await token.addResourceToToken(tokenId, i, 0);
       }
 
       // Now it's full, next should fail
-      const resId = 129;
+      const resId = BigNumber.from(129);
       await addResources([resId]);
       await expect(token.addResourceToToken(tokenId, resId, 0)).to.be.revertedWith(
         'MultiResourceMaxPendingResourcesReached()',
@@ -199,7 +200,7 @@ describe('MultiResource', async () => {
     });
 
     it('can add same resource to 2 different tokens', async function () {
-      const resId = 1;
+      const resId = BigNumber.from(1);
       const tokenId1 = 1;
       const tokenId2 = 2;
 
@@ -216,7 +217,7 @@ describe('MultiResource', async () => {
 
   describe('Accepting resources', async function () {
     it('can accept resource', async function () {
-      const resId = 1;
+      const resId = BigNumber.from(1);
       const tokenId = 1;
 
       await token.mint(owner.address, tokenId);
@@ -240,8 +241,8 @@ describe('MultiResource', async () => {
     });
 
     it('can accept multiple resources', async function () {
-      const resId = 1;
-      const resId2 = 2;
+      const resId = BigNumber.from(1);
+      const resId2 = BigNumber.from(2);
       const tokenId = 1;
 
       await token.mint(owner.address, tokenId);
@@ -266,7 +267,7 @@ describe('MultiResource', async () => {
     });
 
     it('can accept resource if approved', async function () {
-      const resId = 1;
+      const resId = BigNumber.from(1);
       const tokenId = 1;
       const approvedAddress = addrs[1];
       await token.mint(owner.address, tokenId);
@@ -281,7 +282,7 @@ describe('MultiResource', async () => {
     });
 
     it('cannot accept resource twice', async function () {
-      const resId = 1;
+      const resId = BigNumber.from(1);
       const tokenId = 1;
 
       await token.mint(owner.address, tokenId);
@@ -295,7 +296,7 @@ describe('MultiResource', async () => {
     });
 
     it('cannot accept resource if not owner', async function () {
-      const resId = 1;
+      const resId = BigNumber.from(1);
       const tokenId = 1;
 
       await token.mint(owner.address, tokenId);
@@ -318,8 +319,8 @@ describe('MultiResource', async () => {
 
   describe('Overwriting resources', async function () {
     it('can add resource to token overwritting an existing one', async function () {
-      const resId = 1;
-      const resId2 = 2;
+      const resId = BigNumber.from(1);
+      const resId2 = BigNumber.from(2);
       const tokenId = 1;
 
       await token.mint(owner.address, tokenId);
@@ -344,11 +345,13 @@ describe('MultiResource', async () => {
         [resId2, metaURIDefault, customDefault],
       ]);
       // Overwrite should be gone
-      expect(await token.getResourceOverwrites(tokenId, pendingResources[0])).to.eql(0);
+      expect(await token.getResourceOverwrites(tokenId, pendingResources[0])).to.eql(
+        BigNumber.from(0),
+      );
     });
 
     it('can overwrite non existing resource to token, it could have been deleted', async function () {
-      const resId = 1;
+      const resId = BigNumber.from(1);
       const tokenId = 1;
 
       await token.mint(owner.address, tokenId);
@@ -364,7 +367,7 @@ describe('MultiResource', async () => {
 
   describe('Rejecting resources', async function () {
     it('can reject resource', async function () {
-      const resId = 1;
+      const resId = BigNumber.from(1);
       const tokenId = 1;
 
       await token.mint(owner.address, tokenId);
@@ -380,7 +383,7 @@ describe('MultiResource', async () => {
     });
 
     it('can reject resource if approved', async function () {
-      const resId = 1;
+      const resId = BigNumber.from(1);
       const approvedAddress = addrs[1];
       const tokenId = 1;
 
@@ -398,8 +401,8 @@ describe('MultiResource', async () => {
     });
 
     it('can reject all resources', async function () {
-      const resId = 1;
-      const resId2 = 2;
+      const resId = BigNumber.from(1);
+      const resId2 = BigNumber.from(2);
       const tokenId = 1;
 
       await token.mint(owner.address, tokenId);
@@ -416,8 +419,8 @@ describe('MultiResource', async () => {
     });
 
     it('can reject all resources if approved', async function () {
-      const resId = 1;
-      const resId2 = 2;
+      const resId = BigNumber.from(1);
+      const resId2 = BigNumber.from(2);
       const tokenId = 1;
       const approvedAddress = addrs[1];
 
@@ -439,7 +442,7 @@ describe('MultiResource', async () => {
     });
 
     it('cannot reject resource twice', async function () {
-      const resId = 1;
+      const resId = BigNumber.from(1);
       const tokenId = 1;
 
       await token.mint(owner.address, tokenId);
@@ -453,7 +456,7 @@ describe('MultiResource', async () => {
     });
 
     it('cannot reject resource nor reject all if not owner', async function () {
-      const resId = 1;
+      const resId = BigNumber.from(1);
       const tokenId = 1;
 
       await token.mint(owner.address, tokenId);
@@ -553,7 +556,7 @@ describe('MultiResource', async () => {
 
     it('can get token URI when resource is enumerated', async function () {
       const tokenId = 1;
-      const resId = 1;
+      const resId = BigNumber.from(1);
       await addResourcesToToken(tokenId);
       await token.setTokenEnumeratedResource(resId, true);
       expect(await token.isTokenEnumeratedResource(resId)).to.eql(true);
@@ -562,8 +565,8 @@ describe('MultiResource', async () => {
 
     it('can get token URI at specific index', async function () {
       const tokenId = 1;
-      const resId = 1;
-      const resId2 = 2;
+      const resId = BigNumber.from(1);
+      const resId2 = BigNumber.from(2);
 
       await token.mint(owner.address, tokenId);
       await token.addResourceEntry(resId, 'UriA', customDefault);
@@ -578,8 +581,8 @@ describe('MultiResource', async () => {
 
     it('can get token URI by specific custom value', async function () {
       const tokenId = 1;
-      const resId = 1;
-      const resId2 = 2;
+      const resId = BigNumber.from(1);
+      const resId2 = BigNumber.from(2);
       // We define some custom types and values which mean something to the issuer.
       // Resource 1 has Width, Height and Type. Resource 2 has Area and Type.
       const customDataWidthKey = 1;
@@ -621,8 +624,8 @@ describe('MultiResource', async () => {
 
     it('gets fall back if matching value is not find on custom data', async function () {
       const tokenId = 1;
-      const resId = 1;
-      const resId2 = 2;
+      const resId = BigNumber.from(1);
+      const resId2 = BigNumber.from(2);
       // We define a custom data for 'type'.
       const customDataTypeKey = 1;
       const customDataTypeValueA = ethers.utils.hexZeroPad('0xAAAA', 16);
@@ -654,15 +657,15 @@ describe('MultiResource', async () => {
     });
   });
 
-  async function addResources(ids: number[]): Promise<void> {
+  async function addResources(ids: BigNumber[]): Promise<void> {
     ids.forEach(async (resId) => {
       await token.addResourceEntry(resId, metaURIDefault, customDefault);
     });
   }
 
   async function addResourcesToToken(tokenId: number): Promise<void> {
-    const resId = 1;
-    const resId2 = 2;
+    const resId = BigNumber.from(1);
+    const resId2 = BigNumber.from(2);
     await token.mint(owner.address, tokenId);
     await addResources([resId, resId2]);
     await token.addResourceToToken(tokenId, resId, 0);
