@@ -14,6 +14,7 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
 // import "hardhat/console.sol";
 
+error BadLength();
 error RMRKEquippableBasePartNotEquippable();
 error RMRKEquippableEquipNotAllowedByBase();
 
@@ -93,10 +94,10 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippableResource, MultiResourceAb
     }
 
     //TODO: gate to admin
-    //TODO: Migrate to custom error
     function setEquippableRefIds(uint64 equippableRefId, address[] memory equippableAddress, uint64[] memory partId) public {
         uint256 len = partId.length;
-        require(len == equippableAddress.length, "Bad length");
+        if(len != equippableAddress.length)
+            revert BadLength();
         for(uint i; i<len;) {
           _setEquippableRefId(equippableRefId, equippableAddress[i], partId[i]);
           unchecked {++i;}

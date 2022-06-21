@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.9;
 
-import "./AccessControl.sol";
+import "@openzeppelin/contracts/access/AccessControl.sol";
 
 contract RMRKIssuable is AccessControl {
 
