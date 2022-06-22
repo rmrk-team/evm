@@ -128,7 +128,7 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippableResource, MultiResourceAb
     //Return 0 means not equippable
     function getCallerEquippableSlot(uint64 resourceId) public view returns (uint64 equippableSlot) {
         uint64 resourceRefId = _resources[resourceId].equippableRefId;
-        equippableSlot = validParentSlot[resourceRefId][msg.sender];
+        equippableSlot = validParentSlot[resourceRefId][_msgSender()];
     }
 
     function getEquipped(uint64 targetResourceId) public view returns (uint64[] memory slotsEquipped, Equipment[] memory childrenEquipped) {

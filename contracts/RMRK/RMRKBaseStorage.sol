@@ -3,7 +3,6 @@
 pragma solidity ^0.8.15;
 
 import "./interfaces/IRMRKBaseStorage.sol";
-import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 
 error RMRKBaseAlreadyExists();
@@ -11,7 +10,7 @@ error RMRKBaseEntryDoesNotExist();
 error RMRKMismatchedInputArrayLength();
 error RMRKZeroLengthIdsPassed();
 
-contract RMRKBaseStorage is AccessControl, IRMRKBaseStorage {
+contract RMRKBaseStorage is IRMRKBaseStorage {
   using Address for address;
     /*
     REVIEW NOTES:
@@ -42,10 +41,8 @@ contract RMRKBaseStorage is AccessControl, IRMRKBaseStorage {
 
     uint64[] private baseIds;
 
-    bytes32 public constant issuer = keccak256("ISSUER");
-
     //TODO: Make private
-    string public name;
+    string private _name;
 
     event AddedEquippablesToEntry(uint64 baseId, address[] equippableAddresses);
     event AddedEquippableToAll(address equippableAddress);
@@ -64,10 +61,8 @@ contract RMRKBaseStorage is AccessControl, IRMRKBaseStorage {
     * This may need to be changed for contracts which would reach the block gas limit.
     */
 
-    constructor(string memory _name) {
-        _grantRole(issuer, msg.sender);
-        _setRoleAdmin(issuer, issuer);
-        name = _name;
+    constructor(string memory name_) {
+        _name = name_;
     }
 
     /**
@@ -107,18 +102,19 @@ contract RMRKBaseStorage is AccessControl, IRMRKBaseStorage {
     * deployer or transferred Issuer, designated by the modifier onlyIssuer as per the inherited contract issuerControl.
     */
 
+    // FIXME: Must be internal and add onlyIssuer gate on mock
     function addEquippableAddresses(
         uint64 _baseEntryId,
         address[] memory _equippableAddresses
-    ) public onlyRole(issuer) {
+    ) public {
         if(_equippableAddresses.length <= 0)
             revert RMRKZeroLengthIdsPassed();
         if(bases[_baseEntryId].itemType == ItemType.None)
             revert RMRKBaseEntryDoesNotExist();
         uint256 len = _equippableAddresses.length;
         for (uint i; i<len;) {
-          isEquippable[_baseEntryId][_equippableAddresses[i]] = true;
-          unchecked {++i;}
+            isEquippable[_baseEntryId][_equippableAddresses[i]] = true;
+            unchecked {++i;}
         }
         emit AddedEquippablesToEntry(_baseEntryId, _equippableAddresses);
     }
@@ -129,7 +125,8 @@ contract RMRKBaseStorage is AccessControl, IRMRKBaseStorage {
     * deployer or transferred Issuer, designated by the modifier onlyIssuer as per the inherited contract issuerControl.
     */
 
-    function addEquippableIdToAll(address _equippableAddress) public onlyRole(issuer) {
+    // FIXME: Must be internal and add onlyIssuer gate on mock
+    function addEquippableIdToAll(address _equippableAddress) public {
         uint256 len = baseIds.length;
         for (uint256 i = 0; i < len;) {
             uint64 baseId_ = baseIds[i];
@@ -150,8 +147,8 @@ contract RMRKBaseStorage is AccessControl, IRMRKBaseStorage {
         if(len != targetAddress.length)
             revert RMRKMismatchedInputArrayLength();
         for (uint i; i<len;) {
-          isEquippable_[i] = isEquippable[baseId[i]][targetAddress[i]];
-          unchecked {++i;}
+            isEquippable_[i] = isEquippable[baseId[i]][targetAddress[i]];
+            unchecked {++i;}
         }
     }
 

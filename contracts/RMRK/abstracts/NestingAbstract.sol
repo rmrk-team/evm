@@ -211,7 +211,7 @@ abstract contract NestingAbstract is Context, IRMRKNesting {
             revert RMRKUnnestForNonNftParent();
         if(owner.tokenId != parentId)
             revert RMRKUnnestFromWrongParent();
-        if(owner.ownerAddress != msg.sender)
+        if(owner.ownerAddress != _msgSender())
             revert RMRKUnnestFromWrongOwner();
 
         address rootOwner =  IRMRKNesting(owner.ownerAddress).ownerOf(owner.tokenId);
