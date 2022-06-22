@@ -2,24 +2,15 @@
 
 pragma solidity ^0.8.14;
 
+import "../RMRK/access/RMRKIssuable.sol";
 import "../RMRK/RMRKMultiResource.sol";
 
-error RMRKOnlyIssuer();
-
-contract RMRKMultiResourceMock is RMRKMultiResource {
+contract RMRKMultiResourceMock is RMRKIssuable, RMRKMultiResource {
 
     address private _issuer;
 
     constructor(string memory name, string memory symbol)
-        RMRKMultiResource(name, symbol)
-    {
-        _setIssuer(_msgSender());
-    }
-
-    modifier onlyIssuer() {
-        if(_msgSender() != _issuer) revert RMRKOnlyIssuer();
-        _;
-    }
+        RMRKMultiResource(name, symbol) {}
 
     function setFallbackURI(string memory fallbackURI) external onlyIssuer {
         _setFallbackURI(fallbackURI);
@@ -30,14 +21,6 @@ contract RMRKMultiResourceMock is RMRKMultiResource {
         bool state
     ) external onlyIssuer {
         _setTokenEnumeratedResource(resourceId, state);
-    }
-
-    function setIssuer(address issuer) external onlyIssuer {
-        _setIssuer(issuer);
-    }
-
-    function getIssuer() external view returns (address) {
-        return _issuer;
     }
 
     function mint(address to, uint256 tokenId) external onlyIssuer {
@@ -81,10 +64,6 @@ contract RMRKMultiResourceMock is RMRKMultiResource {
         uint256 index
     ) external onlyIssuer {
         _removeCustomDataFromResource(resourceId, index);
-    }
-
-    function _setIssuer(address issuer) private {
-        _issuer = issuer;
     }
 
 }

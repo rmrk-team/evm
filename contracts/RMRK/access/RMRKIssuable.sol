@@ -2,19 +2,32 @@
 
 pragma solidity ^0.8.9;
 
-import "@openzeppelin/contracts/access/AccessControl.sol";
+import "@openzeppelin/contracts/utils/Context.sol";
 
-contract RMRKIssuable is AccessControl {
+error RMRKOnlyIssuer();
 
-    bytes32 private constant ISSUER_ROLE = keccak256("ISSUER");
+contract RMRKIssuable is Context {
+
+    address private _issuer;
     
     constructor() {
-        _grantRole(ISSUER_ROLE, msg.sender);
-        _setRoleAdmin(ISSUER_ROLE, ISSUER_ROLE);
+        _setIssuer(_msgSender());
     }
 
     modifier onlyIssuer() {
-        _checkRole(ISSUER_ROLE, _msgSender());
+        if(_msgSender() != _issuer) revert RMRKOnlyIssuer();
         _;
+    }
+
+    function setIssuer(address issuer) external onlyIssuer {
+        _setIssuer(issuer);
+    }
+
+    function getIssuer() external view returns (address) {
+        return _issuer;
+    }
+
+    function _setIssuer(address issuer) private {
+        _issuer = issuer;
     }
 }

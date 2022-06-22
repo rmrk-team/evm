@@ -25,10 +25,10 @@ contract RMRKMultiResource is ERC721Abstract, MultiResourceAbstract {
     ////////////////////////////////////////
 
 
-    function supportsInterface(bytes4 interfaceId) public override pure returns (bool) {
+    function supportsInterface(bytes4 interfaceId) public override virtual view returns (bool) {
         return (
             interfaceId == type(IRMRKMultiResource).interfaceId ||
-            interfaceId == type(IERC721).interfaceId
+            super.supportsInterface(interfaceId)
         );
     }
 

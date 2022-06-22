@@ -285,10 +285,10 @@ contract RMRKNesting is ERC721Abstract, NestingAbstract {
         }
     }
 
-    function supportsInterface(bytes4 interfaceId) public override(ERC721Abstract) pure returns (bool) {
+    function supportsInterface(bytes4 interfaceId) public override(ERC721Abstract) virtual view returns (bool) {
         return (
             interfaceId == type(IRMRKNesting).interfaceId ||
-            interfaceId == type(IERC721).interfaceId
+            super.supportsInterface(interfaceId)
         );
     }
 

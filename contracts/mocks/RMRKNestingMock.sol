@@ -2,13 +2,14 @@
 
 pragma solidity ^0.8.14;
 
-import "../RMRK/RMRKNesting.sol";
+import "../RMRK/access/RMRKIssuable.sol";
 import "../RMRK/interfaces/IRMRKNestingReceiver.sol";
+import "../RMRK/RMRKNesting.sol";
 // import "hardhat/console.sol";
 
 //Minimal public implementation of RMRK for testing.
 
-contract RMRKNestingMock is RMRKNesting, IRMRKNestingReceiver {
+contract RMRKNestingMock is  RMRKIssuable, IRMRKNestingReceiver, RMRKNesting {
     constructor(
         string memory name_,
         string memory symbol_

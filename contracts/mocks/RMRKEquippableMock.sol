@@ -2,28 +2,20 @@
 
 pragma solidity ^0.8.14;
 
+import "../RMRK/access/RMRKIssuable.sol";
 import "../RMRK/RMRKEquippable.sol";
 
 //Minimal public implementation of RMRK for testing.
 
-error RMRKOnlyIssuer();
 
-contract RMRKEquippableMock is RMRKEquippable {
+contract RMRKEquippableMock is RMRKIssuable, RMRKEquippable {
 
     address private _issuer;
 
     constructor(
         string memory name_,
         string memory symbol_
-    ) RMRKEquippable(name_, symbol_)
-    {
-        _setIssuer(_msgSender());
-    }
-
-    modifier onlyIssuer() {
-        if(_msgSender() != _issuer) revert RMRKOnlyIssuer();
-        _;
-    }
+    ) RMRKEquippable(name_, symbol_) {}
 
     function setFallbackURI(string memory fallbackURI) external onlyIssuer {
         _setFallbackURI(fallbackURI);
@@ -34,14 +26,6 @@ contract RMRKEquippableMock is RMRKEquippable {
         bool state
     ) external onlyIssuer {
         _setTokenEnumeratedResource(resourceId, state);
-    }
-
-    function setIssuer(address issuer) external onlyIssuer {
-        _setIssuer(issuer);
-    }
-
-    function getIssuer() external view returns (address) {
-        return _issuer;
     }
 
     //The preferred method here is to overload the function, but hardhat tests prevent this.
@@ -59,7 +43,7 @@ contract RMRKEquippableMock is RMRKEquippable {
         address to,
         uint256 tokenId,
         bytes calldata
-    ) external returns (bytes4) {
+    ) external pure returns (bytes4) {
         return IRMRKNestingReceiver.onRMRKNestingReceived.selector;
     }
 
@@ -100,9 +84,5 @@ contract RMRKEquippableMock is RMRKEquippable {
         uint256 index
     ) external onlyIssuer {
         _removeCustomDataFromResource(resourceId, index);
-    }
-
-    function _setIssuer(address issuer) private {
-        _issuer = issuer;
     }
 }

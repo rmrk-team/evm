@@ -62,8 +62,11 @@ contract ERC721Abstract is Context, IERC721 {
     ////////////////////////////////////////
 
 
-    function supportsInterface(bytes4 interfaceId) public virtual pure returns (bool) {
-        return interfaceId == type(IERC721).interfaceId;
+    function supportsInterface(bytes4 interfaceId) public virtual view returns (bool) {
+        return (
+            interfaceId == type(IERC721).interfaceId ||
+            interfaceId == type(IERC165).interfaceId
+        );
     }
 
 

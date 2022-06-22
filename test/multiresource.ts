@@ -36,6 +36,24 @@ describe('MultiResource', async () => {
     });
   });
 
+  describe('Interface support', async function () {
+    it('can support IERC165', async function () {
+      expect(await token.supportsInterface('0x01ffc9a7')).to.equal(true);
+    });
+
+    it('can support IERC721', async function () {
+      expect(await token.supportsInterface('0x80ac58cd')).to.equal(true);
+    });
+
+    it('can support IMultiResource', async function () {
+      expect(await token.supportsInterface('0xe0418d4c')).to.equal(true);
+    });
+
+    it('cannot support other interfaceId', async function () {
+      expect(await token.supportsInterface('0xffffffff')).to.equal(false);
+    });
+  });
+
   describe('Resource storage', async function () {
     it('can add resource', async function () {
       const id = BigNumber.from(1);
@@ -52,24 +70,13 @@ describe('MultiResource', async () => {
 
     it('cannot add resource entry if not issuer', async function () {
       const id = BigNumber.from(1);
-      await expect(
-        token.connect(addrs[1]).addResourceEntry(id, metaURIDefault, customDefault),
-      ).to.be.revertedWith('RMRKOnlyIssuer()');
-    });
-
-    it('can set and get issuer', async function () {
-      const newIssuerAddr = addrs[1].address;
-      expect(await token.getIssuer()).to.equal(owner.address);
-
-      await token.setIssuer(newIssuerAddr);
-      expect(await token.getIssuer()).to.equal(newIssuerAddr);
+      await expect(token.connect(addrs[1]).addResourceEntry(id, metaURIDefault, customDefault)).to
+        .be.reverted;
     });
 
     it('cannot set issuer if not issuer', async function () {
       const newIssuer = addrs[1];
-      await expect(token.connect(newIssuer).setIssuer(newIssuer.address)).to.be.revertedWith(
-        'RMRKOnlyIssuer()',
-      );
+      await expect(token.connect(newIssuer).setIssuer(newIssuer.address)).to.be.reverted;
     });
 
     it('cannot overwrite resource', async function () {

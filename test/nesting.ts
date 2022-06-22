@@ -67,6 +67,24 @@ describe('Nesting', async () => {
     });
   });
 
+  describe('Interface support', async function () {
+    it('can support IERC165', async function () {
+      expect(await ownerChunky.supportsInterface('0x01ffc9a7')).to.equal(true);
+    });
+
+    it('can support IERC721', async function () {
+      expect(await ownerChunky.supportsInterface('0x80ac58cd')).to.equal(true);
+    });
+
+    it('can support INesting', async function () {
+      expect(await ownerChunky.supportsInterface('0xebb57b26')).to.equal(true);
+    });
+
+    it('cannot support other interfaceId', async function () {
+      expect(await ownerChunky.supportsInterface('0xffffffff')).to.equal(false);
+    });
+  });
+
   describe('Minting', async function () {
     it('can mint with no destination', async function () {
       await petMonkey['mint(address,uint256)'](owner.address, 1);
