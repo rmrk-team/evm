@@ -2,7 +2,7 @@
 
 //Generally all interactions should propagate downstream
 
-pragma solidity ^0.8.9;
+pragma solidity ^0.8.15;
 
 import "./abstracts/MultiResourceAbstractBase.sol";
 import "./RMRKNesting.sol";
@@ -37,7 +37,7 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippableResource, MultiResourceAb
     mapping(uint64 => uint64[]) public fixedPartIds;
     mapping(uint64 => uint64[]) public slotPartIds;
 
-    //mapping of resourceId to slot to equipped children
+    //mapping of resourceId to slotId to equipped children
     mapping(uint64 => mapping(uint64 => Equipment)) private equipped;
 
     // FIXME: name equippableRefId to equippableParentRefId
@@ -148,77 +148,59 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippableResource, MultiResourceAb
     }
 
     //Gate for equippable array in here by check of slotPartDefinition to slotPartId
-    function composeEquippables(uint256 tokenId, uint64 targetResourceId) public view returns (uint64[] memory basePartIds) {
+    function composeEquippables(
+        uint256 tokenId,
+        uint64 targetResourceId
+    ) public view returns (uint64[] memory basePartIds, address[] memory baseAddresses) {
         //get Resource of target token
-        /* Resource storage targetResource = _resources[targetResourceId];
-
-        //get fixed part length -- always 16 by default
+        Resource storage targetResource = _resources[targetResourceId];
         //Check gas efficiency of scoping like this
+        address baseAddress = targetResource.baseAddress;
         //fixed IDs
         {
-          uint256 len = fixedPartIds[targetResourceId].length;
-          uint256 basePartIdsLen = basePartIds.length;
-          for (uint i; i<fixedLen;) {
-              uint64 partId = fixedPartIds[targetResourceId][i];
-              if (partId != uint64(0)) {
-                  basePartIds[basePartIdsLen] = partId;
-                  unchecked {++basePartIdsLen;}
-              }
-              unchecked {++i;}
-          }
+            uint64[] memory fixedPartIds_ = fixedPartIds[targetResourceId];
+            uint256 len = fixedPartIds_.length;
+            uint256 basePartIdsLen = basePartIds.length;
+            unchecked {
+                for (uint i; i<len;) {
+                    uint64 partId = fixedPartIds_[i];
+                    basePartIds[basePartIdsLen] = partId;
+                    baseAddresses[basePartIdsLen] = baseAddress;
+                    ++basePartIdsLen;
+                    ++i;
+                }
+            }
         }
-        //Slot IDs
+        //Slot IDs + recurse
         {
-          uint256 len = slotPartIds[targetResourceId].length;
-          uint256 basePartIdsLen = basePartIds.length;
-          for (uint i; i<slotLen;) {
-              uint64 partId = fixedPartIds[targetResourceId][i];
-              if (partId != uint64(0)) {
-                  basePartIds[basePartIdsLen] = partId;
-                  unchecked {++basePartIdsLen;}
-              }
-              unchecked {++i;}
-          }
-        } */
-        /* //Recurse
-        Equipment[16] memory equippedChildren = getEquipped(targetResourceId);
-        uint256 equippedLen = equippedChildren.length;
+            uint64[] memory slotPartIds_ = slotPartIds[targetResourceId];
+            uint256 len = slotPartIds_.length;
+            uint256 basePartIdsLen = basePartIds.length;
+            unchecked {
+                for (uint i; i<len;) {
+                    uint64 partId = slotPartIds_[i];
+                    basePartIds[basePartIdsLen] = partId;
+                    baseAddresses[basePartIdsLen] = baseAddress;
+                    ++basePartIdsLen;
+                    ++i;
 
-        //Get tokenID and resourceID of equipped child
-        for (uint i; i<equippedLen;) {
-            // Check gas of caching the equippedChildren iterator
-            Equipment memory equipped = equippedChildren[i];
-            uint256 childId = equipped.childId;
-            uint64 childResourceId = equipped.childResourceId;
-            Resource memory childRes = IRMRKEquippableResource(
-                targetResource.equippedChildren[i].contractAddress
-                ).getResource(
-                    targetResource.slotPartDefinitions[i]
+                    uint256 equippedTokenId = equipped[targetResourceId][partId].tokenId;
+                    uint64 equippedResourceId = equipped[targetResourceId][partId].childResourceId;
+                    //Recuse while we're in this block, slotpartIds are initialized
+                    (uint64[] memory equippedBasePartIds, address[] memory equippedBaseAddresses) = composeEquippables(
+                        equippedTokenId, equippedResourceId
                     );
-
-            unchecked {++i;}
-        } */
-
-    }
-
-    /* function _returnTreeFixedSlots(uint256 equippedLen) internal view returns(uint64[] memory basePartIds) {
-        uint64[] memory internalBaseParts = _returnTreeFixedSlots();
-        uint256 len = internalBaseParts.length;
-        for(uint i; i<len;) {
-            basePartIds
-            unchecked{++i;}
+                    uint256 recLen = equippedBasePartIds.length;
+                    for (uint i; i<recLen;) {
+                        basePartIds[basePartIdsLen] = partId;
+                        baseAddresses[basePartIdsLen] = baseAddress;
+                        ++basePartIdsLen;
+                        ++i;
+                    }
+                }
+            }
         }
-
-    } */
-
-    //Rewrite in assembly if time
-    /* function returnMinPos(uint256[] memory array) public view returns(uint256 pos) {
-
-      assembly {
-
-      }
-
-    } */
+    }
 
     function returnMinPos(uint256[] memory array) public pure returns(uint256 pos) {
       uint256 min = array[0];
