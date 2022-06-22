@@ -11,17 +11,17 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
 // import "hardhat/console.sol";
 
-error ERC721OwnerQueryForNonexistentToken();
 error ERC721AddressZeroIsNotaValidOwner();
-error MultiResourceTransferToNonMultiResourceReceiverImplementer();
-error MultiResourceApproveToCaller();
-error MultiResourceApprovalToCurrentOwner();
-error MultiResourceApproveCallerIsNotOwnerNorApprovedForAll();
-error RMRKCoreNotApprovedOrOwner();
-error MultiResourceMintToTheZeroAddress();
-error MultiResourceTokenAlreadyMinted();
-error MultiResourceTransferFromIncorrectOwner();
-error MultiResourceApprovedQueryForNonexistentToken();
+error ERC721ApprovalToCurrentOwner();
+error ERC721ApproveCallerIsNotOwnerNorApprovedForAll();
+error ERC721ApprovedQueryForNonexistentToken();
+error ERC721ApproveToCaller();
+error ERC721MintToTheZeroAddress();
+error ERC721NotApprovedOrOwner();
+error ERC721OwnerQueryForNonexistentToken();
+error ERC721TokenAlreadyMinted();
+error ERC721TransferFromIncorrectOwner();
+error ERC721TransferToNonReceiverImplementer();
 
 contract ERC721Abstract is Context, IERC721 {
 
@@ -53,7 +53,7 @@ contract ERC721Abstract is Context, IERC721 {
 
     modifier onlyApprovedOrOwner(uint256 tokenId) {
         if(!_isApprovedOrOwner(_msgSender(), tokenId))
-            revert RMRKCoreNotApprovedOrOwner();
+            revert ERC721NotApprovedOrOwner();
         _;
     }
 
@@ -99,9 +99,9 @@ contract ERC721Abstract is Context, IERC721 {
     function approve(address to, uint256 tokenId) public virtual {
         address owner = ownerOf(tokenId);
         if(to == owner)
-            revert MultiResourceApprovalToCurrentOwner();
+            revert ERC721ApprovalToCurrentOwner();
         if(_msgSender() != owner && !isApprovedForAll(owner, _msgSender()))
-            revert MultiResourceApproveCallerIsNotOwnerNorApprovedForAll();
+            revert ERC721ApproveCallerIsNotOwnerNorApprovedForAll();
 
         _approve(to, tokenId);
     }
@@ -111,7 +111,7 @@ contract ERC721Abstract is Context, IERC721 {
         uint256 tokenId
     ) public view virtual override returns (address) {
         if(!_exists(tokenId))
-            revert MultiResourceApprovedQueryForNonexistentToken();
+            revert ERC721ApprovedQueryForNonexistentToken();
         return _tokenApprovals[tokenId];
     }
 
@@ -147,7 +147,7 @@ contract ERC721Abstract is Context, IERC721 {
         uint256 tokenId
     ) public virtual override {
         if(!_isApprovedOrOwner(_msgSender(), tokenId))
-            revert RMRKCoreNotApprovedOrOwner();
+            revert ERC721NotApprovedOrOwner();
         // FIXME: clean approvals and test
 
         _transfer(from, to, tokenId);
@@ -170,7 +170,7 @@ contract ERC721Abstract is Context, IERC721 {
         bytes memory data
     ) public virtual override {
         if(!_isApprovedOrOwner(_msgSender(), tokenId))
-            revert RMRKCoreNotApprovedOrOwner();
+            revert ERC721NotApprovedOrOwner();
         // FIXME: clean approvals and test
         _safeTransfer(from, to, tokenId, data);
     }
@@ -183,7 +183,7 @@ contract ERC721Abstract is Context, IERC721 {
     ) internal virtual {
         _transfer(from, to, tokenId);
         if(!_checkOnERC721Received(from, to, tokenId, data))
-            revert MultiResourceTransferToNonMultiResourceReceiverImplementer();
+            revert ERC721TransferToNonReceiverImplementer();
     }
 
 
@@ -220,15 +220,15 @@ contract ERC721Abstract is Context, IERC721 {
     ) internal virtual {
         _mint(to, tokenId);
         if(!_checkOnERC721Received(address(0), to, tokenId, data))
-            revert MultiResourceTransferToNonMultiResourceReceiverImplementer();
+            revert ERC721TransferToNonReceiverImplementer();
     }
 
 
     function _mint(address to, uint256 tokenId) internal virtual {
         if(to == address(0))
-            revert MultiResourceMintToTheZeroAddress();
+            revert ERC721MintToTheZeroAddress();
         if(_exists(tokenId))
-            revert MultiResourceTokenAlreadyMinted();
+            revert ERC721TokenAlreadyMinted();
         _beforeTokenTransfer(address(0), to, tokenId);
 
         _balances[to] += 1;
@@ -263,9 +263,9 @@ contract ERC721Abstract is Context, IERC721 {
         uint256 tokenId
     ) internal virtual {
         if(ownerOf(tokenId) != from)
-            revert MultiResourceTransferFromIncorrectOwner();
+            revert ERC721TransferFromIncorrectOwner();
         if(to == address(0))
-            revert MultiResourceMintToTheZeroAddress();
+            revert ERC721MintToTheZeroAddress();
 
         _beforeTokenTransfer(from, to, tokenId);
 
@@ -294,7 +294,7 @@ contract ERC721Abstract is Context, IERC721 {
         bool approved
     ) internal virtual {
         if(owner == operator)
-            revert MultiResourceApproveToCaller();
+            revert ERC721ApproveToCaller();
         _operatorApprovals[owner][operator] = approved;
         emit ApprovalForAll(owner, operator, approved);
     }
@@ -316,7 +316,7 @@ contract ERC721Abstract is Context, IERC721 {
                 return retval == IERC721Receiver.onERC721Received.selector;
             } catch (bytes memory reason) {
                 if (reason.length == 0) {
-                    revert MultiResourceTransferToNonMultiResourceReceiverImplementer();
+                    revert ERC721TransferToNonReceiverImplementer();
                 } else {
                     assembly {
                         revert(add(32, reason), mload(reason))

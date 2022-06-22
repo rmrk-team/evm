@@ -96,13 +96,13 @@ abstract contract MultiResourceAbstract is Context, IRMRKMultiResource, MultiRes
         uint64 overwrites
     ) internal {
         if(_tokenResources[tokenId][resourceId])
-            revert MultiResourceAlreadyExists();
+            revert RMRKResourceAlreadyExists();
 
         if(getResource(resourceId).id == uint64(0))
-            revert MultiResourceResourceNotFoundInStorage();
+            revert RMRKResourceNotFoundInStorage();
 
         if(_pendingResources[tokenId].length >= 128)
-            revert MultiResourceMaxPendingResourcesReached();
+            revert RMRKMaxPendingResourcesReached();
 
         _tokenResources[tokenId][resourceId] = true;
 

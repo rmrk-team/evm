@@ -6,10 +6,10 @@ import "./interfaces/IRMRKBaseStorage.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 
-error BaseAlreadyExists();
-error RMRKZeroLengthIdsPassed();
+error RMRKBaseAlreadyExists();
 error RMRKBaseEntryDoesNotExist();
-error MismatchedInputArrayLength();
+error RMRKMismatchedInputArrayLength();
+error RMRKZeroLengthIdsPassed();
 
 contract RMRKBaseStorage is AccessControl, IRMRKBaseStorage {
   using Address for address;
@@ -87,7 +87,7 @@ contract RMRKBaseStorage is AccessControl, IRMRKBaseStorage {
 
     function _addBaseEntry(IntakeStruct memory intakeStruct) internal {
         if(bases[intakeStruct.id].itemType != ItemType.None)
-            revert BaseAlreadyExists();
+            revert RMRKBaseAlreadyExists();
         bases[intakeStruct.id] = intakeStruct.base;
         baseIds.push(intakeStruct.id);
     }
@@ -146,7 +146,7 @@ contract RMRKBaseStorage is AccessControl, IRMRKBaseStorage {
     function checkIsEquippableMulti(uint64[] calldata baseId, address[] calldata targetAddress) public view returns (bool[] memory isEquippable_) {
         uint256 len = baseId.length;
         if(len != targetAddress.length)
-            revert MismatchedInputArrayLength();
+            revert RMRKMismatchedInputArrayLength();
         for (uint i; i<len;) {
           isEquippable_[i] = isEquippable[baseId[i]][targetAddress[i]];
           unchecked {++i;}

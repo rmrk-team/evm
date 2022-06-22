@@ -44,7 +44,7 @@ contract RMRKNesting is ERC721Abstract, NestingAbstract {
     }
 
     function _mint(address to, uint256 tokenId, uint256 destinationId, bytes memory data) internal virtual {
-        // FIXME: We could use the isRMRKCore function here to decide instead
+        // FIXME: We could use the isRMRK function here to decide instead
         if (data.length > 0) {
             _mintToNft(to, tokenId, destinationId, data);
         }
@@ -55,13 +55,13 @@ contract RMRKNesting is ERC721Abstract, NestingAbstract {
 
     function _mintToNft(address to, uint256 tokenId, uint256 destinationId, bytes memory data) internal virtual {
         if(to == address(0))
-            revert RMRKCoreMintToTheZeroAddress();
+            revert ERC721MintToTheZeroAddress();
         if(_exists(tokenId))
-            revert RMRKCoreTokenAlreadyMinted();
+            revert ERC721TokenAlreadyMinted();
         if(!to.isContract())
-            revert RMRKCoreIsNotContract();
+            revert RMRKIsNotContract();
         if(!_checkRMRKNestingImplementer(_msgSender(), to, tokenId, ""))
-            revert RMRKCoreMintToNonRMRKCoreImplementer();
+            revert RMRKMintToNonRMRKImplementer();
 
         IRMRKNesting destContract = IRMRKNesting(to);
 
@@ -84,8 +84,8 @@ contract RMRKNesting is ERC721Abstract, NestingAbstract {
     }
 
     function _mintToRootOwner(address to, uint256 tokenId) internal virtual {
-        if(to == address(0)) revert RMRKCoreMintToTheZeroAddress();
-        if(_exists(tokenId)) revert RMRKCoreTokenAlreadyMinted();
+        if(to == address(0)) revert ERC721MintToTheZeroAddress();
+        if(_exists(tokenId)) revert ERC721TokenAlreadyMinted();
 
         _beforeTokenTransfer(address(0), to, tokenId);
 
@@ -122,7 +122,7 @@ contract RMRKNesting is ERC721Abstract, NestingAbstract {
     function burnFromParent(uint256 tokenId) external {
         (address _RMRKOwner, , ) = rmrkOwnerOf(tokenId);
         if(_RMRKOwner != _msgSender())
-            revert CallerIsNotRMRKOwnerContract();
+            revert RMRKCallerIsNotOwnerContract();
         address owner = ownerOf(tokenId);
         _burnForOwner(tokenId, owner);
     }
@@ -189,7 +189,7 @@ contract RMRKNesting is ERC721Abstract, NestingAbstract {
         _transfer(from, to, tokenId, destinationId, data);
         if(_checkRMRKNestingImplementer(from, to, tokenId, data) ||
             _checkOnERC721Received(from, to, tokenId, data))
-            revert MultiResourceTransferToNonMultiResourceReceiverImplementer();
+            revert ERC721TransferToNonReceiverImplementer();
     }
 
     function _transfer(
@@ -222,15 +222,15 @@ contract RMRKNesting is ERC721Abstract, NestingAbstract {
         bytes memory data
     ) internal virtual {
         if(ownerOf(tokenId) != from)
-            revert RMRKCoreTransferFromIncorrectOwner();
-        if(to == address(0)) revert RMRKCoreMintToTheZeroAddress();
+            revert ERC721TransferFromIncorrectOwner();
+        if(to == address(0)) revert ERC721MintToTheZeroAddress();
 
         _beforeTokenTransfer(from, to, tokenId);
 
         // FIXME: balances are not tested and probably broken
         _balances[from] -= 1;
         RMRKOwner memory rmrkOwner = _RMRKOwners[tokenId];
-        if(rmrkOwner.isNft) revert RMRKCoreMustUnnestFirst();
+        if(rmrkOwner.isNft) revert RMRKMustUnnestFirst();
         bool destinationIsNft = _checkRMRKNestingImplementer(from, to, tokenId, data);
 
         _RMRKOwners[tokenId] = RMRKOwner({

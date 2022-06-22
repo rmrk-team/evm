@@ -6,9 +6,7 @@ import "../RMRK/RMRKNesting.sol";
 import "../RMRK/interfaces/IRMRKNestingReceiver.sol";
 // import "hardhat/console.sol";
 
-//Minimal public implementation of RMRKCore for testing.
-
-error RMRKCoreTransferCallerNotOwnerOrApproved();
+//Minimal public implementation of RMRK for testing.
 
 contract RMRKNestingMock is RMRKNesting, IRMRKNestingReceiver {
     constructor(
@@ -31,7 +29,7 @@ contract RMRKNestingMock is RMRKNesting, IRMRKNestingReceiver {
 
     //update for reentrancy
     function burn(uint256 tokenId) public {
-        if(!_isApprovedOrOwner(_msgSender(), tokenId)) revert RMRKCoreTransferCallerNotOwnerOrApproved();
+        if(!_isApprovedOrOwner(_msgSender(), tokenId)) revert ERC721NotApprovedOrOwner();
         _burn(tokenId);
     }
 

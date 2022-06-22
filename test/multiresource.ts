@@ -178,7 +178,7 @@ describe('MultiResource', async () => {
       await addResources([resId]);
       await token.addResourceToToken(tokenId, resId, 0);
       await expect(token.addResourceToToken(tokenId, resId, 0)).to.be.revertedWith(
-        'MultiResourceAlreadyExists()',
+        'RMRKResourceAlreadyExists()',
       );
     });
 
@@ -195,7 +195,7 @@ describe('MultiResource', async () => {
       const resId = BigNumber.from(129);
       await addResources([resId]);
       await expect(token.addResourceToToken(tokenId, resId, 0)).to.be.revertedWith(
-        'MultiResourceMaxPendingResourcesReached()',
+        'RMRKMaxPendingResourcesReached()',
       );
     });
 
@@ -290,9 +290,7 @@ describe('MultiResource', async () => {
       await token.addResourceToToken(tokenId, resId, 0);
       await token.acceptResource(tokenId, 0);
 
-      await expect(token.acceptResource(tokenId, 0)).to.be.revertedWith(
-        'MultiResourceIndexOutOfBounds()',
-      );
+      await expect(token.acceptResource(tokenId, 0)).to.be.revertedWith('RMRKIndexOutOfRange()');
     });
 
     it('cannot accept resource if not owner', async function () {
@@ -303,7 +301,7 @@ describe('MultiResource', async () => {
       await addResources([resId]);
       await token.addResourceToToken(tokenId, resId, 0);
       await expect(token.connect(addrs[1]).acceptResource(tokenId, 0)).to.be.revertedWith(
-        'MultiResourceNotOwner()',
+        'ERC721NotApprovedOrOwner()',
       );
     });
 
@@ -311,9 +309,7 @@ describe('MultiResource', async () => {
       const tokenId = 1;
 
       await token.mint(owner.address, tokenId);
-      await expect(token.acceptResource(tokenId, 0)).to.be.revertedWith(
-        'MultiResourceIndexOutOfBounds()',
-      );
+      await expect(token.acceptResource(tokenId, 0)).to.be.revertedWith('RMRKIndexOutOfRange()');
     });
   });
 
@@ -503,9 +499,7 @@ describe('MultiResource', async () => {
       await token.addResourceToToken(tokenId, resId, 0);
       await token.rejectResource(tokenId, 0);
 
-      await expect(token.rejectResource(tokenId, 0)).to.be.revertedWith(
-        'MultiResourceIndexOutOfBounds()',
-      );
+      await expect(token.rejectResource(tokenId, 0)).to.be.revertedWith('RMRKIndexOutOfRange()');
     });
 
     it('cannot reject resource nor reject all if not owner', async function () {
@@ -517,10 +511,10 @@ describe('MultiResource', async () => {
       await token.addResourceToToken(tokenId, resId, 0);
 
       await expect(token.connect(addrs[1]).rejectResource(tokenId, 0)).to.be.revertedWith(
-        'MultiResourceNotOwner()',
+        'ERC721NotApprovedOrOwner()',
       );
       await expect(token.connect(addrs[1]).rejectAllResources(tokenId)).to.be.revertedWith(
-        'MultiResourceNotOwner()',
+        'ERC721NotApprovedOrOwner()',
       );
     });
 
@@ -528,9 +522,7 @@ describe('MultiResource', async () => {
       const tokenId = 1;
 
       await token.mint(owner.address, tokenId);
-      await expect(token.rejectResource(tokenId, 0)).to.be.revertedWith(
-        'MultiResourceIndexOutOfBounds()',
-      );
+      await expect(token.rejectResource(tokenId, 0)).to.be.revertedWith('RMRKIndexOutOfRange()');
     });
   });
 
@@ -564,7 +556,7 @@ describe('MultiResource', async () => {
       const tokenId = 1;
       await addResourcesToToken(tokenId);
       await expect(token.connect(addrs[1]).setPriority(tokenId, [2, 1])).to.be.revertedWith(
-        'MultiResourceNotOwner()',
+        'ERC721NotApprovedOrOwner()',
       );
     });
 
@@ -572,10 +564,10 @@ describe('MultiResource', async () => {
       const tokenId = 1;
       await addResourcesToToken(tokenId);
       await expect(token.setPriority(tokenId, [1])).to.be.revertedWith(
-        'MultiResourceBadPriorityListLength()',
+        'RMRKBadPriorityListLength()',
       );
       await expect(token.setPriority(tokenId, [2, 1, 3])).to.be.revertedWith(
-        'MultiResourceBadPriorityListLength()',
+        'RMRKBadPriorityListLength()',
       );
     });
 

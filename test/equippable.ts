@@ -294,7 +294,7 @@ describe('MultiResource', async () => {
 
       await addResources([resId]);
       await expect(chunky.addResourceToToken(tokenId, resId, 0)).to.be.revertedWith(
-        'RMRKCoreOwnerQueryForNonexistentToken()',
+        'RMRKOwnerQueryForNonexistentToken()',
       );
     });
 
@@ -306,7 +306,7 @@ describe('MultiResource', async () => {
       await addResources([resId]);
       await chunky.addResourceToToken(tokenId, resId, 0);
       await expect(chunky.addResourceToToken(tokenId, resId, 0)).to.be.revertedWith(
-        'MultiResourceAlreadyExists()',
+        'RMRKResourceAlreadyExists()',
       );
     });
 
@@ -323,7 +323,7 @@ describe('MultiResource', async () => {
       const resId = BigNumber.from(129);
       await addResources([resId]);
       await expect(chunky.addResourceToToken(tokenId, resId, 0)).to.be.revertedWith(
-        'MultiResourceMaxPendingResourcesReached()',
+        'RMRKMaxPendingResourcesReached()',
       );
     });
 
@@ -445,9 +445,7 @@ describe('MultiResource', async () => {
       await chunky.addResourceToToken(tokenId, resId, 0);
       await chunky.acceptResource(tokenId, 0);
 
-      await expect(chunky.acceptResource(tokenId, 0)).to.be.revertedWith(
-        'MultiResourceIndexOutOfBounds()',
-      );
+      await expect(chunky.acceptResource(tokenId, 0)).to.be.revertedWith('RMRKIndexOutOfRange()');
     });
 
     it('cannot accept resource if not owner', async function () {
@@ -458,7 +456,7 @@ describe('MultiResource', async () => {
       await addResources([resId]);
       await chunky.addResourceToToken(tokenId, resId, 0);
       await expect(chunky.connect(addrs[1]).acceptResource(tokenId, 0)).to.be.revertedWith(
-        'MultiResourceNotOwner()',
+        'ERC721NotApprovedOrOwner()',
       );
     });
 
@@ -466,9 +464,7 @@ describe('MultiResource', async () => {
       const tokenId = 1;
 
       await chunky.mint(owner.address, tokenId);
-      await expect(chunky.acceptResource(tokenId, 0)).to.be.revertedWith(
-        'MultiResourceIndexOutOfBounds()',
-      );
+      await expect(chunky.acceptResource(tokenId, 0)).to.be.revertedWith('RMRKIndexOutOfRange()');
     });
   });
 
@@ -674,9 +670,7 @@ describe('MultiResource', async () => {
       await chunky.addResourceToToken(tokenId, resId, 0);
       await chunky.rejectResource(tokenId, 0);
 
-      await expect(chunky.rejectResource(tokenId, 0)).to.be.revertedWith(
-        'MultiResourceIndexOutOfBounds()',
-      );
+      await expect(chunky.rejectResource(tokenId, 0)).to.be.revertedWith('RMRKIndexOutOfRange()');
     });
 
     it('cannot reject resource nor reject all if not owner', async function () {
@@ -688,10 +682,10 @@ describe('MultiResource', async () => {
       await chunky.addResourceToToken(tokenId, resId, 0);
 
       await expect(chunky.connect(addrs[1]).rejectResource(tokenId, 0)).to.be.revertedWith(
-        'MultiResourceNotOwner()',
+        'ERC721NotApprovedOrOwner()',
       );
       await expect(chunky.connect(addrs[1]).rejectAllResources(tokenId)).to.be.revertedWith(
-        'MultiResourceNotOwner()',
+        'ERC721NotApprovedOrOwner()',
       );
     });
 
@@ -699,9 +693,7 @@ describe('MultiResource', async () => {
       const tokenId = 1;
 
       await chunky.mint(owner.address, tokenId);
-      await expect(chunky.rejectResource(tokenId, 0)).to.be.revertedWith(
-        'MultiResourceIndexOutOfBounds()',
-      );
+      await expect(chunky.rejectResource(tokenId, 0)).to.be.revertedWith('RMRKIndexOutOfRange()');
     });
   });
 
@@ -736,7 +728,7 @@ describe('MultiResource', async () => {
       const tokenId = 1;
       await addResourcesToToken(tokenId);
       await expect(chunky.connect(addrs[1]).setPriority(tokenId, [2, 1])).to.be.revertedWith(
-        'MultiResourceNotOwner()',
+        'ERC721NotApprovedOrOwner()',
       );
     });
 
@@ -744,17 +736,17 @@ describe('MultiResource', async () => {
       const tokenId = 1;
       await addResourcesToToken(tokenId);
       await expect(chunky.setPriority(tokenId, [1])).to.be.revertedWith(
-        'MultiResourceBadPriorityListLength()',
+        'RMRKBadPriorityListLength()',
       );
       await expect(chunky.setPriority(tokenId, [2, 1, 3])).to.be.revertedWith(
-        'MultiResourceBadPriorityListLength()',
+        'RMRKBadPriorityListLength()',
       );
     });
 
     it('cannot set priorities for non existing token', async function () {
       const tokenId = 1;
       await expect(chunky.connect(addrs[1]).setPriority(tokenId, [])).to.be.revertedWith(
-        'RMRKCoreOwnerQueryForNonexistentToken()',
+        'RMRKOwnerQueryForNonexistentToken()',
       );
     });
   });

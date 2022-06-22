@@ -8,14 +8,12 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
 
-error MultiResourceNotOwner();
-error MultiResourceIndexOutOfBounds();
-error MultiResourceBadPriorityListLength();
-error MultiResourceAlreadyExists();
-error MultiResourceResourceNotFoundInStorage();
-error MultiResourceMaxPendingResourcesReached();
-error RMRKResourceAlreadyExists();
+error RMRKBadPriorityListLength();
+error RMRKIndexOutOfRange();
+error RMRKMaxPendingResourcesReached();
 error RMRKNoResourceMatchingId();
+error RMRKResourceAlreadyExists();
+error RMRKResourceNotFoundInStorage();
 error RMRKWriteToZero();
 
 
@@ -55,7 +53,7 @@ abstract contract MultiResourceAbstractBase is Context, IRMRKMultiResourceBase {
     }
 
     function _acceptResource(uint256 tokenId, uint256 index) internal {
-        if(index >= _pendingResources[tokenId].length) revert MultiResourceIndexOutOfBounds();
+        if(index >= _pendingResources[tokenId].length) revert RMRKIndexOutOfRange();
         uint64 resourceId = _pendingResources[tokenId][index];
         _pendingResources[tokenId].removeItemByIndex(index);
 
@@ -73,8 +71,8 @@ abstract contract MultiResourceAbstractBase is Context, IRMRKMultiResourceBase {
     }
 
     function _rejectResource(uint256 tokenId, uint256 index) internal {
-        if(index >= _pendingResources[tokenId].length) revert MultiResourceIndexOutOfBounds();
-        if(_pendingResources[tokenId].length <= index) revert MultiResourceIndexOutOfBounds();
+        if(index >= _pendingResources[tokenId].length) revert RMRKIndexOutOfRange();
+        if(_pendingResources[tokenId].length <= index) revert RMRKIndexOutOfRange();
         uint64 resourceId = _pendingResources[tokenId][index];
         _pendingResources[tokenId].removeItemByValue(resourceId);
         _tokenResources[tokenId][resourceId] = false;
@@ -100,7 +98,7 @@ abstract contract MultiResourceAbstractBase is Context, IRMRKMultiResourceBase {
         uint16[] memory priorities
     ) internal {
         uint256 length = priorities.length;
-        if(length != _activeResources[tokenId].length) revert MultiResourceBadPriorityListLength();
+        if(length != _activeResources[tokenId].length) revert RMRKBadPriorityListLength();
         _activeResourcePriorities[tokenId] = priorities;
 
         emit ResourcePrioritySet(tokenId);

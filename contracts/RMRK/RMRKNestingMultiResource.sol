@@ -22,28 +22,28 @@ contract RMRKNestingMultiResource is MultiResourceAbstract, RMRKNesting {
 
     function acceptResource(uint256 tokenId, uint256 index) external virtual {
         if (!_isApprovedOrOwner(_msgSender(), tokenId))
-            revert MultiResourceNotOwner();
+            revert ERC721NotApprovedOrOwner();
         // FIXME: clean approvals and test
         _acceptResource(tokenId, index);
     }
 
     function rejectResource(uint256 tokenId, uint256 index) external virtual {
         if (!_isApprovedOrOwner(_msgSender(), tokenId))
-            revert MultiResourceNotOwner();
+            revert ERC721NotApprovedOrOwner();
         // FIXME: clean approvals and test
         _rejectResource(tokenId, index);
     }
 
     function rejectAllResources(uint256 tokenId) external virtual {
         if (!_isApprovedOrOwner(_msgSender(), tokenId))
-            revert MultiResourceNotOwner();
+            revert ERC721NotApprovedOrOwner();
         // FIXME: clean approvals and test
         _rejectAllResources(tokenId);
     }
 
     function setPriority(uint256 tokenId, uint16[] memory priorities) external virtual {
         if (!_isApprovedOrOwner(_msgSender(), tokenId))
-            revert MultiResourceNotOwner();
+            revert ERC721NotApprovedOrOwner();
         // FIXME: clean approvals and test
         _setPriority(tokenId, priorities);
     }

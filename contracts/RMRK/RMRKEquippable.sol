@@ -14,7 +14,7 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
 // import "hardhat/console.sol";
 
-error BadLength();
+error RMRKBadLength();
 error RMRKEquippableBasePartNotEquippable();
 error RMRKEquippableEquipNotAllowedByBase();
 
@@ -97,7 +97,7 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippableResource, MultiResourceAb
     function setEquippableRefIds(uint64 equippableRefId, address[] memory equippableAddress, uint64[] memory partId) public {
         uint256 len = partId.length;
         if(len != equippableAddress.length)
-            revert BadLength();
+            revert RMRKBadLength();
         for(uint i; i<len;) {
           _setEquippableRefId(equippableRefId, equippableAddress[i], partId[i]);
           unchecked {++i;}
@@ -325,11 +325,11 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippableResource, MultiResourceAb
         uint64 resourceId,
         uint64 overwrites
     ) internal {
-        if(_tokenResources[tokenId][resourceId]) revert MultiResourceAlreadyExists();
+        if(_tokenResources[tokenId][resourceId]) revert RMRKResourceAlreadyExists();
 
-        if( getResource(resourceId).id == uint64(0)) revert MultiResourceResourceNotFoundInStorage();
+        if( getResource(resourceId).id == uint64(0)) revert RMRKResourceNotFoundInStorage();
 
-        if(_pendingResources[tokenId].length >= 128) revert MultiResourceMaxPendingResourcesReached();
+        if(_pendingResources[tokenId].length >= 128) revert RMRKMaxPendingResourcesReached();
 
         _tokenResources[tokenId][resourceId] = true;
 
@@ -388,17 +388,17 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippableResource, MultiResourceAb
     }
 
     function acceptResource(uint256 tokenId, uint256 index) external virtual {
-        if(_msgSender() != ownerOf(tokenId)) revert MultiResourceNotOwner();
+        if(_msgSender() != ownerOf(tokenId)) revert ERC721NotApprovedOrOwner();
         _acceptResource(tokenId, index);
     }
 
     function rejectResource(uint256 tokenId, uint256 index) external virtual {
-        if(_msgSender() != ownerOf(tokenId)) revert MultiResourceNotOwner();
+        if(_msgSender() != ownerOf(tokenId)) revert ERC721NotApprovedOrOwner();
         _rejectResource(tokenId, index);
     }
 
     function rejectAllResources(uint256 tokenId) external virtual {
-        if(_msgSender() != ownerOf(tokenId)) revert MultiResourceNotOwner();
+        if(_msgSender() != ownerOf(tokenId)) revert ERC721NotApprovedOrOwner();
         _rejectAllResources(tokenId);
     }
 
@@ -406,7 +406,7 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippableResource, MultiResourceAb
         uint256 tokenId,
         uint16[] memory priorities
     ) external virtual {
-        if(_msgSender() != ownerOf(tokenId)) revert MultiResourceNotOwner();
+        if(_msgSender() != ownerOf(tokenId)) revert ERC721NotApprovedOrOwner();
         _setPriority(tokenId, priorities);
     }
 

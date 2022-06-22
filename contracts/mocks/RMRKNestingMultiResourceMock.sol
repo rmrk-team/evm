@@ -5,10 +5,9 @@ pragma solidity ^0.8.14;
 import "../RMRK/RMRKNestingMultiResource.sol";
 // import "hardhat/console.sol";
 
-//Minimal public implementation of RMRKCore for testing.
+//Minimal public implementation of RMRK for testing.
 
 error RMRKOnlyIssuer();
-error RMRKCoreTransferCallerNotOwnerOrApproved();
 
 contract RMRKNestingMultiResourceMock is RMRKNestingMultiResource {
 
@@ -36,7 +35,7 @@ contract RMRKNestingMultiResourceMock is RMRKNestingMultiResource {
     //update for reentrancy
     function burn(uint256 tokenId) public {
         if(!_isApprovedOrOwner(_msgSender(), tokenId))
-            revert RMRKCoreTransferCallerNotOwnerOrApproved();
+            revert ERC721NotApprovedOrOwner();
         _burn(tokenId);
     }
 

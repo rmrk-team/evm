@@ -8,24 +8,21 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
 
-error RMRKCoreOwnerQueryForNonexistentToken();
-error RMRKCoreChildIndexOutOfRange();
-error RMRKCorePendingChildIndexOutOfRange();
-error RMRKCoreMaxPendingChildrenReached();
-error RMRKCoreUnnestForNonexistentToken();
-error RMRKCoreUnnestForNonNftParent();
-error RMRKCoreUnnestFromWrongParent();
-error RMRKCoreUnnestFromWrongOwner();
-error RMRKParentChildMismatch();
-error RMRKCoreMintToTheZeroAddress();
-error RMRKCoreMustUnnestFirst();
-error RMRKCoreTokenAlreadyMinted();
-error RMRKCoreIsNotContract();
-error RMRKCoreMintToNonRMRKCoreImplementer();
-error RMRKCoreTransferFromIncorrectOwner();
+error RMRKCallerIsNotOwnerContract();
+error RMRKChildIndexOutOfRange();
+error RMRKInvalidTokenID();
+error RMRKIsNotContract();
+error RMRKMaxPendingChildrenReached();
+error RMRKMintToNonRMRKImplementer();
+error RMRKMustUnnestFirst();
 error RMRKNestingTransferToNonRMRKNestingImplementer();
-error ERC721InvalidTokenID();
-error CallerIsNotRMRKOwnerContract();
+error RMRKOwnerQueryForNonexistentToken();
+error RMRKParentChildMismatch();
+error RMRKPendingChildIndexOutOfRange();
+error RMRKUnnestForNonexistentToken();
+error RMRKUnnestForNonNftParent();
+error RMRKUnnestFromWrongOwner();
+error RMRKUnnestFromWrongParent();
 
 abstract contract NestingAbstract is Context, IRMRKNesting {
 
@@ -56,7 +53,7 @@ abstract contract NestingAbstract is Context, IRMRKNesting {
     mapping(uint256 => Child[]) internal _pendingChildren;
 
     /**
-    @dev Returns the root owner of a RMRKCore NFT.
+    @dev Returns the root owner of a RMRK NFT.
     */
     function ownerOf(uint256 tokenId) public view virtual returns(address) {
         (address owner, uint256 ownerTokenId, bool isNft) = rmrkOwnerOf(tokenId);
@@ -64,7 +61,7 @@ abstract contract NestingAbstract is Context, IRMRKNesting {
             owner = IRMRKNesting(owner).ownerOf(ownerTokenId);
         }
         if(owner == address(0))
-            revert RMRKCoreOwnerQueryForNonexistentToken();
+            revert RMRKOwnerQueryForNonexistentToken();
         return owner;
     }
 
@@ -75,7 +72,7 @@ abstract contract NestingAbstract is Context, IRMRKNesting {
     */
     function rmrkOwnerOf(uint256 tokenId) public view virtual returns (address, uint256, bool) {
         RMRKOwner memory owner = _RMRKOwners[tokenId];
-        if(owner.ownerAddress == address(0)) revert RMRKCoreOwnerQueryForNonexistentToken();
+        if(owner.ownerAddress == address(0)) revert RMRKOwnerQueryForNonexistentToken();
 
         return (owner.ownerAddress, owner.tokenId, owner.isNft);
     }
@@ -93,7 +90,7 @@ abstract contract NestingAbstract is Context, IRMRKNesting {
     */
     function _requireMinted(uint256 tokenId) internal view virtual {
         if(!_exists(tokenId))
-            revert ERC721InvalidTokenID();
+            revert RMRKInvalidTokenID();
     }
 
     function _exists(uint256 tokenId) internal view virtual returns (bool) {
@@ -119,7 +116,7 @@ abstract contract NestingAbstract is Context, IRMRKNesting {
      * @dev Function designed to be used by other instances of RMRK-Core contracts to update children.
      * param1 parentTokenId is the tokenId of the parent token on (this).
      * param2 childTokenId is the tokenId of the child instance
-     * param3 childAddress is the address of the child contract as an IRMRKCore instance
+     * param3 childAddress is the address of the child contract as an IRMRK instance
      */
 
     //update for reentrancy
@@ -151,7 +148,7 @@ abstract contract NestingAbstract is Context, IRMRKNesting {
     //CHECK: preload mappings into memory for gas savings
     function _acceptChild(uint256 tokenId, uint256 index) public virtual {
         if(_pendingChildren[tokenId].length <= index)
-            revert RMRKCorePendingChildIndexOutOfRange();
+            revert RMRKPendingChildIndexOutOfRange();
 
         // FIXME: if it approved for transfer it should either update/remove the approvedTransfers or stop this accept.
 
@@ -177,7 +174,7 @@ abstract contract NestingAbstract is Context, IRMRKNesting {
 
     function _rejectChild(uint256 tokenId, uint256 index) public virtual {
         if(_pendingChildren[tokenId].length <= index)
-            revert RMRKCorePendingChildIndexOutOfRange();
+            revert RMRKPendingChildIndexOutOfRange();
 
         removeItemByIndex_C(_pendingChildren[tokenId], index);
         emit PendingChildRemoved(tokenId, index);
@@ -189,7 +186,7 @@ abstract contract NestingAbstract is Context, IRMRKNesting {
 
     function _removeChild(uint256 tokenId, uint256 index) public virtual {
         if(_children[tokenId].length <= index)
-            revert RMRKCoreChildIndexOutOfRange();
+            revert RMRKChildIndexOutOfRange();
 
         removeItemByIndex_C(_children[tokenId], index);
         emit ChildRemoved(tokenId, index);
@@ -197,7 +194,7 @@ abstract contract NestingAbstract is Context, IRMRKNesting {
 
     function _unnestChild(uint256 tokenId, uint256 index) public virtual {
         if(_children[tokenId].length <= index)
-            revert RMRKCoreChildIndexOutOfRange();
+            revert RMRKChildIndexOutOfRange();
         Child memory child = _children[tokenId][index];
         removeItemByIndex_C(_children[tokenId], index);
         IRMRKNesting(child.contractAddress).unnestToken(child.tokenId, tokenId);
@@ -209,13 +206,13 @@ abstract contract NestingAbstract is Context, IRMRKNesting {
         RMRKOwner memory owner = _RMRKOwners[tokenId];
 
         if(owner.ownerAddress == address(0))
-            revert RMRKCoreUnnestForNonexistentToken();
+            revert RMRKUnnestForNonexistentToken();
         if(!owner.isNft)
-            revert RMRKCoreUnnestForNonNftParent();
+            revert RMRKUnnestForNonNftParent();
         if(owner.tokenId != parentId)
-            revert RMRKCoreUnnestFromWrongParent();
+            revert RMRKUnnestFromWrongParent();
         if(owner.ownerAddress != msg.sender)
-            revert RMRKCoreUnnestFromWrongOwner();
+            revert RMRKUnnestFromWrongOwner();
 
         address rootOwner =  IRMRKNesting(owner.ownerAddress).ownerOf(owner.tokenId);
         _RMRKOwners[tokenId] = RMRKOwner({
@@ -232,7 +229,7 @@ abstract contract NestingAbstract is Context, IRMRKNesting {
         if(_pendingChildren[tokenId].length < 128) {
             _pendingChildren[tokenId].push(child);
         } else {
-            revert RMRKCoreMaxPendingChildrenReached();
+            revert RMRKMaxPendingChildrenReached();
         }
     }
 
