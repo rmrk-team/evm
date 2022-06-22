@@ -5,7 +5,6 @@ pragma solidity ^0.8.14;
 import "../RMRK/RMRKMultiResource.sol";
 
 error RMRKOnlyIssuer();
-error ERC721OwnerQueryForNonexistentToken();
 
 contract RMRKMultiResourceMock is RMRKMultiResource {
 
