@@ -65,6 +65,10 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
         _name = name_;
     }
 
+    function name() external view returns(string memory) {
+        return _name;
+    }
+
     /**
     @dev Private function for handling an array of base item inputs. Takes an array of type IntakeStruct.
     */
