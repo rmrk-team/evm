@@ -32,8 +32,8 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippableResource, MultiResourceAb
     //TODO: Check to see is moving the array into Resource struct is cheaper
 
     //Mapping of resourceId to all base parts (slot and fixed) applicable to this resource. Check cost of adding these to resource struct.
-    mapping(uint64 => uint64[]) public fixedPartIds;
-    mapping(uint64 => uint64[]) public slotPartIds;
+    mapping(uint64 => uint64[]) private fixedPartIds;
+    mapping(uint64 => uint64[]) private slotPartIds;
 
     //mapping of resourceId to slotId to equipped children
     mapping(uint64 => mapping(uint64 => Equipment)) private equipped;

@@ -75,7 +75,8 @@ contract RMRKBaseStorage is AccessControl, IRMRKBaseStorage {
     */
 
     function _addBaseEntryList(IntakeStruct[] memory intakeStruct) internal {
-        for (uint256 i = 0; i < intakeStruct.length;) {
+        uint len = intakeStruct.length;
+        for (uint256 i = 0; i < len;) {
             _addBaseEntry(intakeStruct[i]);
             unchecked {++i;}
         }
