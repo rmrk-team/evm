@@ -27,10 +27,11 @@ library RMRKLib {
     // indexOf, indexOfFromEnd, and contains adapted from Cryptofin-Solidity arrayUtils
     function indexOf(uint128[] memory A, uint128 a) internal pure returns (uint256, bool) {
         uint256 length = A.length;
-        for (uint256 i = 0; i < length; i++) {
+        for (uint256 i = 0; i < length;) {
             if (A[i] == a) {
                 return (i, true);
             }
+            unchecked {++i;}
         }
         return (0, false);
     }
