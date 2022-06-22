@@ -2,9 +2,10 @@
 
 pragma solidity ^0.8.9;
 
+import "../RMRK/access/RMRKIssuable.sol";
 import "../RMRK/RMRKBaseStorage.sol";
 
-contract RMRKBaseStorageMock is RMRKBaseStorage {
+contract RMRKBaseStorageMock is RMRKIssuable, RMRKBaseStorage {
   constructor(string memory _baseName)
   RMRKBaseStorage(_baseName)
   {}

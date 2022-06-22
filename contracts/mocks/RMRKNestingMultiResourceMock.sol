@@ -2,22 +2,16 @@
 
 pragma solidity ^0.8.14;
 
+import "../RMRK/access/RMRKIssuable.sol";
 import "../RMRK/RMRKNestingMultiResource.sol";
 // import "hardhat/console.sol";
 
 //Minimal public implementation of RMRK for testing.
+contract RMRKNestingMultiResourceMock is RMRKIssuable, RMRKNestingMultiResource {
 
-error RMRKOnlyIssuer();
-
-contract RMRKNestingMultiResourceMock is RMRKNestingMultiResource {
-
-    address private _issuer;
 
     constructor(string memory name, string memory symbol)
-        RMRKNestingMultiResource(name, symbol)
-    {
-        _setIssuer(_msgSender());
-    }
+        RMRKNestingMultiResource(name, symbol) {}
 
     function mint(address to, uint256 tokenId) external {
         _mint(to, tokenId);
@@ -48,11 +42,6 @@ contract RMRKNestingMultiResourceMock is RMRKNestingMultiResource {
         return IRMRKNestingReceiver.onRMRKNestingReceived.selector;
     }
 
-    modifier onlyIssuer() {
-        if(_msgSender() != _issuer) revert RMRKOnlyIssuer();
-        _;
-    }
-
     function setFallbackURI(string memory fallbackURI) external onlyIssuer {
         _setFallbackURI(fallbackURI);
     }
@@ -62,14 +51,6 @@ contract RMRKNestingMultiResourceMock is RMRKNestingMultiResource {
         bool state
     ) external onlyIssuer {
         _setTokenEnumeratedResource(resourceId, state);
-    }
-
-    function setIssuer(address issuer) external onlyIssuer {
-        _setIssuer(issuer);
-    }
-
-    function getIssuer() external view returns (address) {
-        return _issuer;
     }
 
     function addResourceToToken(
@@ -110,9 +91,5 @@ contract RMRKNestingMultiResourceMock is RMRKNestingMultiResource {
         uint256 index
     ) external onlyIssuer {
         _removeCustomDataFromResource(resourceId, index);
-    }
-
-    function _setIssuer(address issuer) private {
-        _issuer = issuer;
     }
 }
