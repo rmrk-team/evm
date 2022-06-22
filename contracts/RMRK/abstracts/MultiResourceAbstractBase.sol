@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
-pragma solidity ^0.8.9;
+pragma solidity ^0.8.15;
 
 import "../interfaces/IRMRKMultiResourceBase.sol";
 import "../library/RMRKLib.sol";

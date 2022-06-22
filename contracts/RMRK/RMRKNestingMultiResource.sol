@@ -2,7 +2,7 @@
 
 //Generally all interactions should propagate downstream
 
-pragma solidity ^0.8.9;
+pragma solidity ^0.8.15;
 
 import "./RMRKNesting.sol";
 import "./abstracts/MultiResourceAbstract.sol";

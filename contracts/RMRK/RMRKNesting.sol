@@ -2,7 +2,7 @@
 
 //Generally all interactions should propagate downstream
 
-pragma solidity ^0.8.9;
+pragma solidity ^0.8.15;
 
 import "./abstracts/ERC721Abstract.sol";
 import "./abstracts/NestingAbstract.sol";
