@@ -7,11 +7,12 @@ library RMRKLib {
     function removeItemByValue(uint128[] storage array, uint128 value) internal {
         uint128[] memory memArr = array; //Copy array to memory, check for gas savings here
         uint256 length = memArr.length; //gas savings
-        for (uint i; i<length; i = u_inc(i)) {
+        for (uint i; i<length;) {
             if (memArr[i] == value) {
                 removeItemByIndex(array, i);
                 break;
             }
+            unchecked {++i;}
         }
     }
 
@@ -57,11 +58,12 @@ library RMRKLib {
     function removeItemByValue(uint64[] storage array, uint64 value) internal {
         uint64[] memory memArr = array; //Copy array to memory, check for gas savings here
         uint256 length = memArr.length; //gas savings
-        for (uint i; i<length; i = u_inc(i)) {
+        for (uint i; i<length;) {
             if (memArr[i] == value) {
                 removeItemByIndex(array, i);
                 break;
             }
+            unchecked {++i;}
         }
     }
 
@@ -76,10 +78,11 @@ library RMRKLib {
     // indexOf, indexOfFromEnd, and contains adapted from Cryptofin-Solidity arrayUtils
     function indexOf(uint64[] memory A, uint64 a) internal pure returns (uint256, bool) {
         uint256 length = A.length;
-        for (uint256 i = 0; i < length; u_inc(i)) {
+        for (uint256 i = 0; i < length;) {
             if (A[i] == a) {
                 return (i, true);
             }
+            unchecked {++i;}
         }
         return (0, false);
     }
@@ -102,15 +105,6 @@ library RMRKLib {
     function containsFromEnd(uint64[] memory A, uint64 a) internal pure returns (bool) {
         (, bool isIn) = indexOfFromEnd(A, a);
         return isIn;
-    }
-
-    // Gas saving iterator
-    function u_inc(uint i) internal pure returns (uint r) {
-        unchecked {
-            assembly {
-                r := add(i, 1)
-            }
-        }
     }
 
 }

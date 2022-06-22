@@ -135,10 +135,11 @@ contract RMRKNesting is ERC721Abstract, NestingAbstract {
         Child[] memory children = childrenOf(tokenId);
 
         uint256 length = children.length; //gas savings
-        for (uint i; i<length; i = i.u_inc()){
+        for (uint i; i<length;){
             address childContractAddress = children[i].contractAddress;
             uint256 childTokenId = children[i].tokenId;
             IRMRKNesting(childContractAddress).burnFromParent(childTokenId);
+            unchecked {++i;}
         }
         delete _RMRKOwners[tokenId];
         delete _pendingChildren[tokenId];
