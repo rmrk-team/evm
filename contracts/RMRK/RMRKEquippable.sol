@@ -200,17 +200,17 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippableResource, MultiResourceAb
         }
     }
 
-    function returnMinPos(uint256[] memory array) public pure returns(uint256 pos) {
-      uint256 min = array[0];
-      uint256 len = array.length;
-      for(uint256 i=1; i<len;) {
-        if(min > array[i]) {
-          min = array[i];
-          pos = i;
-        }
-        unchecked {++i;}
-      }
-    }
+    // function returnMinPos(uint256[] memory array) public pure returns(uint256 pos) {
+    //     uint256 min = array[0];
+    //     uint256 len = array.length;
+    //     for(uint256 i=1; i<len;) {
+    //         if(min > array[i]) {
+    //         min = array[i];
+    //         pos = i;
+    //         }
+    //         unchecked {++i;}
+    //     }
+    // }
 
     //mapping of uint64 Ids to resource object
     mapping(uint64 => Resource) private _resources;
@@ -293,12 +293,12 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippableResource, MultiResourceAb
     }
 
     //For equipped storage array
-    function removeEquipmentByIndex(Equipment[] storage array, uint256 index) internal {
-        //Check to see if this is already gated by require in all calls
-        require(index < array.length);
-        array[index] = array[array.length-1];
-        array.pop();
-    }
+    // function removeEquipmentByIndex(Equipment[] storage array, uint256 index) internal {
+    //     //Check to see if this is already gated by require in all calls
+    //     require(index < array.length);
+    //     array[index] = array[array.length-1];
+    //     array.pop();
+    // }
 
     function _addResourceToToken(
         uint256 tokenId,
