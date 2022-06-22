@@ -149,26 +149,6 @@ contract RMRKNesting is ERC721Abstract, NestingAbstract {
         emit Transfer(rootOwner, address(0), tokenId);
     }
 
-    /**
-    * @dev See {IERC721-transferFrom}.
-    */
-    function transfer(
-        address to,
-        uint256 tokenId
-    ) public virtual {
-        transferFrom(msg.sender, to, tokenId, 0, "");
-    }
-
-    /**
-    * @dev
-    */
-    function transferFrom(
-        address from,
-        address to,
-        uint256 tokenId
-    ) public override virtual onlyApprovedOrOwner(tokenId) {
-        _transfer(from, to, tokenId, 0, "");
-    }
 
     function transferFrom(
         address from,
@@ -179,15 +159,6 @@ contract RMRKNesting is ERC721Abstract, NestingAbstract {
     ) public virtual onlyApprovedOrOwner(tokenId) {
         _transfer(from, to, tokenId, destinationId, data);
     }
-
-    function safeTransferFrom(
-        address from,
-        address to,
-        uint256 tokenId
-    ) public virtual override {
-        safeTransferFrom(from, to, tokenId, 0, "");
-    }
-
 
     function safeTransferFrom(
         address from,
@@ -219,6 +190,14 @@ contract RMRKNesting is ERC721Abstract, NestingAbstract {
         if(_checkRMRKNestingImplementer(from, to, tokenId, data) ||
             _checkOnERC721Received(from, to, tokenId, data))
             revert MultiResourceTransferToNonMultiResourceReceiverImplementer();
+    }
+
+    function _transfer(
+        address from,
+        address to,
+        uint256 tokenId
+    ) internal override(ERC721Abstract) virtual {
+        _transfer(from, to, tokenId, 0, "");
     }
 
     /**
@@ -306,11 +285,12 @@ contract RMRKNesting is ERC721Abstract, NestingAbstract {
         }
     }
 
-    //Make also return true for ERC721?
     function supportsInterface(bytes4 interfaceId) public override(ERC721Abstract) pure returns (bool) {
-        return interfaceId == type(IRMRKNesting).interfaceId;
+        return (
+            interfaceId == type(IRMRKNesting).interfaceId ||
+            interfaceId == type(IERC721).interfaceId
+        );
     }
-
 
     function acceptChild(uint256 tokenId, uint256 index) public virtual onlyApprovedOrOwner(tokenId) {
         _acceptChild(tokenId, index);

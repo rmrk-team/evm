@@ -14,7 +14,6 @@ import "@openzeppelin/contracts/utils/Context.sol";
 error ERC721OwnerQueryForNonexistentToken();
 error ERC721AddressZeroIsNotaValidOwner();
 error MultiResourceTransferToNonMultiResourceReceiverImplementer();
-error MultiResourceTransferCallerIsNotOwnerNorApproved();
 error MultiResourceApproveToCaller();
 error MultiResourceApprovalToCurrentOwner();
 error MultiResourceApproveCallerIsNotOwnerNorApprovedForAll();
@@ -131,6 +130,16 @@ contract ERC721Abstract is Context, IERC721 {
         return _operatorApprovals[owner][operator];
     }
 
+    /**
+    * @dev See {IERC721-transferFrom}.
+    */
+    function transfer(
+        address to,
+        uint256 tokenId
+    ) public virtual {
+        transferFrom(_msgSender(), to, tokenId);
+    }
+
 
     function transferFrom(
         address from,
@@ -138,7 +147,7 @@ contract ERC721Abstract is Context, IERC721 {
         uint256 tokenId
     ) public virtual override {
         if(!_isApprovedOrOwner(_msgSender(), tokenId))
-            revert MultiResourceTransferCallerIsNotOwnerNorApproved();
+            revert RMRKCoreNotApprovedOrOwner();
         // FIXME: clean approvals and test
 
         _transfer(from, to, tokenId);
@@ -161,7 +170,7 @@ contract ERC721Abstract is Context, IERC721 {
         bytes memory data
     ) public virtual override {
         if(!_isApprovedOrOwner(_msgSender(), tokenId))
-            revert MultiResourceTransferCallerIsNotOwnerNorApproved();
+            revert RMRKCoreNotApprovedOrOwner();
         // FIXME: clean approvals and test
         _safeTransfer(from, to, tokenId, data);
     }
