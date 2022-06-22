@@ -330,7 +330,7 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippableResource, MultiResourceAb
     function getResObjectByIndex(
         uint256 tokenId,
         uint256 index
-    ) public view virtual returns(Resource memory) {
+    ) external view virtual returns(Resource memory) {
         uint64 resourceId = getActiveResources(tokenId)[index];
         return getResource(resourceId);
     }
@@ -338,32 +338,32 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippableResource, MultiResourceAb
     function getPendingResObjectByIndex(
         uint256 tokenId,
         uint256 index
-    ) public view virtual returns(Resource memory) {
+    ) external view virtual returns(Resource memory) {
         uint64 resourceId = getPendingResources(tokenId)[index];
         return getResource(resourceId);
     }
 
     function getFullResources(
         uint256 tokenId
-    ) public view virtual returns (Resource[] memory) {
-        uint64[] memory activeResources = _activeResources[tokenId];
-        uint256 len = activeResources.length;
-        Resource[] memory resources = new Resource[](len);
-        for (uint i; i<len;) {
-            resources[i] = getResource(activeResources[i]);
-            unchecked {++i;}
-        }
-        return resources;
+    ) external view virtual returns (Resource[] memory) {
+        uint64[] memory resourceIds = _activeResources[tokenId];
+        return _getResourcesById(resourceIds);
     }
 
     function getFullPendingResources(
         uint256 tokenId
-    ) public view virtual returns (Resource[] memory) {
-        uint64[] memory pendingResources = _pendingResources[tokenId];
-        uint256 len = pendingResources.length;
+    ) external view virtual returns (Resource[] memory) {
+        uint64[] memory resourceIds = _pendingResources[tokenId];
+        return _getResourcesById(resourceIds);
+    }
+
+    function _getResourcesById(
+        uint64[] memory resourceIds
+    ) internal view virtual returns (Resource[] memory) {
+        uint256 len = resourceIds.length;
         Resource[] memory resources = new Resource[](len);
         for (uint i; i<len;) {
-            resources[i] = getResource(pendingResources[i]);
+            resources[i] = getResource(resourceIds[i]);
             unchecked {++i;}
         }
         return resources;
