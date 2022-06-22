@@ -5,8 +5,8 @@ pragma solidity ^0.8.15;
 import "../interfaces/IRMRKNesting.sol";
 import "../library/RMRKLib.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
-import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
 
 error RMRKCallerIsNotOwnerContract();
 error RMRKChildIndexOutOfRange();

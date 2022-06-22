@@ -122,20 +122,20 @@ describe('MultiResource', async () => {
       ).to.be.revertedWith('RMRKOnlyIssuer()');
     });
 
-    it('can set and get issuer', async function () {
-      const newIssuerAddr = addrs[1].address;
-      expect(await chunky.getIssuer()).to.equal(owner.address);
+    // it('can set and get issuer', async function () {
+    //   const newIssuerAddr = addrs[1].address;
+    //   expect(await chunky.getIssuer()).to.equal(owner.address);
 
-      await chunky.setIssuer(newIssuerAddr);
-      expect(await chunky.getIssuer()).to.equal(newIssuerAddr);
-    });
+    //   await chunky.setIssuer(newIssuerAddr);
+    //   expect(await chunky.getIssuer()).to.equal(newIssuerAddr);
+    // });
 
-    it('cannot set issuer if not issuer', async function () {
-      const newIssuer = addrs[1];
-      await expect(chunky.connect(newIssuer).setIssuer(newIssuer.address)).to.be.revertedWith(
-        'RMRKOnlyIssuer()',
-      );
-    });
+    // it('cannot set issuer if not issuer', async function () {
+    //   const newIssuer = addrs[1];
+    //   await expect(chunky.connect(newIssuer).setIssuer(newIssuer.address)).to.be.revertedWith(
+    //     'RMRKOnlyIssuer()',
+    //   );
+    // });
 
     it('cannot overwrite resource', async function () {
       const id = BigNumber.from(1);
@@ -290,14 +290,14 @@ describe('MultiResource', async () => {
         ],
       ]);
 
-      expect(await chunky.getPendingResObjectByIndex(tokenId, 0)).to.eql([
-        resId,
-        equippableRefIdDefault,
-        metaURIDefault,
-        baseAddressDefault,
-        slotIdDefault,
-        customDefault,
-      ]);
+      // expect(await chunky.getPendingResObjectByIndex(tokenId, 0)).to.eql([
+      //   resId,
+      //   equippableRefIdDefault,
+      //   metaURIDefault,
+      //   baseAddressDefault,
+      //   slotIdDefault,
+      //   customDefault,
+      // ]);
     });
 
     it('cannot add non existing resource to token', async function () {

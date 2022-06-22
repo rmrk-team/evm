@@ -74,10 +74,10 @@ describe('MultiResource', async () => {
         .be.reverted;
     });
 
-    it('cannot set issuer if not issuer', async function () {
-      const newIssuer = addrs[1];
-      await expect(token.connect(newIssuer).setIssuer(newIssuer.address)).to.be.reverted;
-    });
+    // it('cannot set issuer if not issuer', async function () {
+    //   const newIssuer = addrs[1];
+    //   await expect(token.connect(newIssuer).setIssuer(newIssuer.address)).to.be.reverted;
+    // });
 
     it('cannot overwrite resource', async function () {
       const id = BigNumber.from(1);
@@ -150,11 +150,11 @@ describe('MultiResource', async () => {
         [resId2, metaURIDefault, customDefault],
       ]);
 
-      expect(await token.getPendingResObjectByIndex(tokenId, 0)).to.eql([
-        resId,
-        metaURIDefault,
-        customDefault,
-      ]);
+      // expect(await token.getPendingResObjectByIndex(tokenId, 0)).to.eql([
+      //   resId,
+      //   metaURIDefault,
+      //   customDefault,
+      // ]);
     });
 
     it('cannot add non existing resource to token', async function () {

@@ -2,14 +2,12 @@
 
 pragma solidity ^0.8.15;
 
-import "./MultiResourceAbstractBase.sol";
 import "../interfaces/IRMRKMultiResource.sol";
 import "../library/RMRKLib.sol";
-import "@openzeppelin/contracts/utils/Address.sol";
+import "./MultiResourceAbstractBase.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
-import "@openzeppelin/contracts/utils/Context.sol";
 
-abstract contract MultiResourceAbstract is Context, IRMRKMultiResource, MultiResourceAbstractBase {
+abstract contract MultiResourceAbstract is IRMRKMultiResource, MultiResourceAbstractBase {
 
     using Strings for uint256;
 
@@ -126,13 +124,14 @@ abstract contract MultiResourceAbstract is Context, IRMRKMultiResource, MultiRes
         return getResource(resourceId);
     }
 
-    function getPendingResObjectByIndex(
-        uint256 tokenId,
-        uint256 index
-    ) external view virtual returns(Resource memory) {
-        uint64 resourceId = getPendingResources(tokenId)[index];
-        return getResource(resourceId);
-    }
+    // FIXME: Re enable functionality when enough space
+    // function getPendingResObjectByIndex(
+    //     uint256 tokenId,
+    //     uint256 index
+    // ) external view virtual returns(Resource memory) {
+    //     uint64 resourceId = getPendingResources(tokenId)[index];
+    //     return getResource(resourceId);
+    // }
 
     function getFullResources(
         uint256 tokenId

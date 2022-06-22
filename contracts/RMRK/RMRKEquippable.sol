@@ -5,13 +5,11 @@
 pragma solidity ^0.8.15;
 
 import "./abstracts/MultiResourceAbstractBase.sol";
-import "./RMRKNesting.sol";
-import "./interfaces/IRMRKEquippableResource.sol";
 import "./interfaces/IRMRKBaseStorage.sol";
+import "./interfaces/IRMRKEquippableResource.sol";
 import "./library/RMRKLib.sol";
-import "@openzeppelin/contracts/utils/Address.sol";
+import "./RMRKNesting.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
-import "@openzeppelin/contracts/utils/Context.sol";
 // import "hardhat/console.sol";
 
 error RMRKBadLength();
@@ -52,7 +50,7 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippableResource, MultiResourceAb
         uint256 childIndex,
         uint256 childResourceIndex
     ) public {
-        Resource storage targetResource = _resources[targetResourceId];
+        // Resource storage targetResource = _resources[targetResourceId];
         Child memory child = childrenOf(tokenId)[childIndex];
 
         Resource memory childResource = IRMRKEquippableResource(child.contractAddress).getResObjectByIndex(childIndex, childResourceIndex);
@@ -335,13 +333,14 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippableResource, MultiResourceAb
         return getResource(resourceId);
     }
 
-    function getPendingResObjectByIndex(
-        uint256 tokenId,
-        uint256 index
-    ) external view virtual returns(Resource memory) {
-        uint64 resourceId = getPendingResources(tokenId)[index];
-        return getResource(resourceId);
-    }
+    // FIXME: Re enable functionality when enough space
+    // function getPendingResObjectByIndex(
+    //     uint256 tokenId,
+    //     uint256 index
+    // ) external view virtual returns(Resource memory) {
+    //     uint64 resourceId = getPendingResources(tokenId)[index];
+    //     return getResource(resourceId);
+    // }
 
     function getFullResources(
         uint256 tokenId

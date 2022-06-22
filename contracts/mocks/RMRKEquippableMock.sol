@@ -39,9 +39,9 @@ contract RMRKEquippableMock is RMRKIssuable, RMRKEquippable {
     }
 
     function onRMRKNestingReceived(
-        address from,
-        address to,
-        uint256 tokenId,
+        address,
+        address,
+        uint256,
         bytes calldata
     ) external pure returns (bytes4) {
         return IRMRKNestingReceiver.onRMRKNestingReceived.selector;

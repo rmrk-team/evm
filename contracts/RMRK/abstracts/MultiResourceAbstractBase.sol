@@ -4,8 +4,6 @@ pragma solidity ^0.8.15;
 
 import "../interfaces/IRMRKMultiResourceBase.sol";
 import "../library/RMRKLib.sol";
-import "@openzeppelin/contracts/utils/Address.sol";
-import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
 
 error RMRKBadPriorityListLength();
@@ -72,9 +70,8 @@ abstract contract MultiResourceAbstractBase is Context, IRMRKMultiResourceBase {
 
     function _rejectResource(uint256 tokenId, uint256 index) internal {
         if(index >= _pendingResources[tokenId].length) revert RMRKIndexOutOfRange();
-        if(_pendingResources[tokenId].length <= index) revert RMRKIndexOutOfRange();
         uint64 resourceId = _pendingResources[tokenId][index];
-        _pendingResources[tokenId].removeItemByValue(resourceId);
+        _pendingResources[tokenId].removeItemByIndex(index);
         _tokenResources[tokenId][resourceId] = false;
         delete(_resourceOverwrites[tokenId][resourceId]);
 
