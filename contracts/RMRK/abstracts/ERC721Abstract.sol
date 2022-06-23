@@ -17,6 +17,7 @@ error ERC721ApproveCallerIsNotOwnerNorApprovedForAll();
 error ERC721ApprovedQueryForNonexistentToken();
 error ERC721ApproveToCaller();
 error ERC721MintToTheZeroAddress();
+error ERC721TransferToTheZeroAddress();
 error ERC721NotApprovedOrOwner();
 error ERC721OwnerQueryForNonexistentToken();
 error ERC721TokenAlreadyMinted();
@@ -272,7 +273,7 @@ contract ERC721Abstract is Context, IERC721 {
         if(ownerOf(tokenId) != from)
             revert ERC721TransferFromIncorrectOwner();
         if(to == address(0))
-            revert ERC721MintToTheZeroAddress();
+            revert ERC721TransferToTheZeroAddress();
 
         _beforeTokenTransfer(from, to, tokenId);
 

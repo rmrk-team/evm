@@ -57,11 +57,6 @@ interface IRMRKNesting {
         uint256 index
     ) external;
 
-    function unnestToken(
-        uint256 tokenId,
-        uint256 parentId
-    ) external;
-
     function childrenOf(
         uint256 parentTokenId
     ) external view returns (Child[] memory);

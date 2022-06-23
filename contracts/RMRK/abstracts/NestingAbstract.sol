@@ -23,6 +23,7 @@ error RMRKUnnestForNonexistentToken();
 error RMRKUnnestForNonNftParent();
 error RMRKUnnestFromWrongOwner();
 error RMRKUnnestFromWrongParent();
+error RMRKUnnestFromWrongChild();
 
 abstract contract NestingAbstract is Context, IRMRKNesting {
 
@@ -183,16 +184,17 @@ abstract contract NestingAbstract is Context, IRMRKNesting {
         emit ChildRemoved(tokenId, index);
     }
 
-    function _unnestChild(uint256 tokenId, uint256 index) public virtual {
-        if(_children[tokenId].length <= index)
-            revert RMRKChildIndexOutOfRange();
+    function _unnestChild(uint256 tokenId, uint256 index) internal virtual {
         Child memory child = _children[tokenId][index];
-        removeItemByIndex_C(_children[tokenId], index);
-        IRMRKNesting(child.contractAddress).unnestToken(child.tokenId, tokenId);
-        emit ChildUnnested(tokenId, child.tokenId);
+
+        if(child.contractAddress != _msgSender())
+            revert RMRKUnnestFromWrongChild();
+
+        _removeChild(tokenId, index);
     }
 
-    function unnestToken(uint256 tokenId, uint256 parentId) public virtual {
+    //Child-scoped interaction, gate to onlyApprovedOrOwner
+    function unnestFromParent(uint256 tokenId, uint256 indexOnParent) public virtual {
       // A malicious contract which is parent to this token, could unnest any children
         RMRKOwner memory owner = _RMRKOwners[tokenId];
 
@@ -200,10 +202,6 @@ abstract contract NestingAbstract is Context, IRMRKNesting {
             revert RMRKUnnestForNonexistentToken();
         if(!owner.isNft)
             revert RMRKUnnestForNonNftParent();
-        if(owner.tokenId != parentId)
-            revert RMRKUnnestFromWrongParent();
-        if(owner.ownerAddress != _msgSender())
-            revert RMRKUnnestFromWrongOwner();
 
         address rootOwner =  IRMRKNesting(owner.ownerAddress).ownerOf(owner.tokenId);
         _RMRKOwners[tokenId] = RMRKOwner({
@@ -211,6 +209,7 @@ abstract contract NestingAbstract is Context, IRMRKNesting {
             tokenId: 0,
             isNft: false
         });
+        IRMRKNesting(owner.ownerAddress).unnestChild(owner.tokenId, indexOnParent);
     }
 
     /**

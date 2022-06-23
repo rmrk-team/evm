@@ -224,7 +224,7 @@ contract RMRKNesting is ERC721Abstract, NestingAbstract {
     ) internal virtual {
         if(ownerOf(tokenId) != from)
             revert ERC721TransferFromIncorrectOwner();
-        if(to == address(0)) revert ERC721MintToTheZeroAddress();
+        if(to == address(0)) revert ERC721TransferToTheZeroAddress();
 
         _beforeTokenTransfer(from, to, tokenId);
 
@@ -262,7 +262,7 @@ contract RMRKNesting is ERC721Abstract, NestingAbstract {
     ////////////////////////////////////////
     // I'm afraid I can't do that, Dave.
 
-    
+
     function _checkRMRKNestingImplementer(
         address from,
         address to,
