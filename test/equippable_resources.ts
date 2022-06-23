@@ -1,26 +1,18 @@
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
-import { RMRKBaseStorageMock, RMRKEquippableMock, RMRKNestingMock } from '../typechain';
+import { RMRKEquippableMock, RMRKNestingMock } from '../typechain';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { BigNumber } from 'ethers';
 
 describe('MultiResource', async () => {
-  let base: RMRKBaseStorageMock;
   let chunky: RMRKNestingMock;
   let chunkyEquip: RMRKEquippableMock;
-  let monkey: RMRKNestingMock;
-  let monkeyEquip: RMRKEquippableMock;
 
   let owner: SignerWithAddress;
   let addrs: any[];
 
-  const baseName = 'RmrkBaseStorageTest';
-
   const name = 'ownerChunky';
   const symbol = 'CHNKY';
-
-  const name2 = 'petMonkey';
-  const symbol2 = 'MONKE';
 
   const equippableRefIdDefault = BigNumber.from(1);
   const metaURIDefault = 'metaURI';
@@ -33,10 +25,6 @@ describe('MultiResource', async () => {
     owner = signersOwner;
     addrs = signersAddr;
 
-    const Base = await ethers.getContractFactory('RMRKBaseStorageMock');
-    base = await Base.deploy(baseName);
-    await base.deployed();
-
     const CHNKY = await ethers.getContractFactory('RMRKNestingMock');
     chunky = await CHNKY.deploy(name, symbol);
     await chunky.deployed();
@@ -45,25 +33,12 @@ describe('MultiResource', async () => {
     chunkyEquip = await ChnkEqup.deploy();
     chunkyEquip.setNestingAddress(chunky.address);
     await chunkyEquip.deployed();
-
-    const MONKE = await ethers.getContractFactory('RMRKNestingMock');
-    monkey = await MONKE.deploy(name2, symbol2);
-    await monkey.deployed();
-
-    const MhnkEqup = await ethers.getContractFactory('RMRKEquippableMock');
-    monkeyEquip = await MhnkEqup.deploy();
-    monkeyEquip.setNestingAddress(monkey.address);
-    await monkeyEquip.deployed();
   });
 
   describe('Init', async function () {
     it('it can get names and symbols', async function () {
-      expect(await base.name()).to.equal(baseName);
       expect(await chunky.name()).to.equal(name);
-      expect(await monkey.name()).to.equal(name2);
-
       expect(await chunky.symbol()).to.equal(symbol);
-      expect(await monkey.symbol()).to.equal(symbol2);
     });
   });
 
