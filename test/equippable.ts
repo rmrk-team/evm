@@ -314,8 +314,7 @@ describe('MultiResource', async () => {
       );
     });
 
-    // FIXME: broken
-    it.skip('cannot add resource to non existing token', async function () {
+    it('cannot add resource to non existing token', async function () {
       const resId = BigNumber.from(1);
       const tokenId = 1;
 

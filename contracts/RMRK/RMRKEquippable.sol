@@ -13,10 +13,11 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 // import "hardhat/console.sol";
 
+error ERC721NotApprovedOrOwner();
 error RMRKBadLength();
 error RMRKEquippableBasePartNotEquippable();
 error RMRKEquippableEquipNotAllowedByBase();
-error ERC721NotApprovedOrOwner();
+error RMRKOwnerQueryForNonexistentToken();
 
 contract RMRKEquippable is IRMRKEquippableResource, MultiResourceAbstractBase {
 
@@ -39,6 +40,19 @@ contract RMRKEquippable is IRMRKEquippableResource, MultiResourceAbstractBase {
     // FIXME: name equippableRefId to equippableParentRefId
     //Mapping of equippableRefId to parent contract address uint64 slotId for equipping validation
     mapping(uint64 => mapping(address => uint64)) private validParentSlot;
+
+    function _ownerOf(uint tokenId) internal view returns(address) {
+        return IRMRKNesting(_nestingAddress).ownerOf(tokenId);
+    }
+
+    function _onlyOwner(uint tokenId) internal view {
+        if(_msgSender() != _ownerOf(tokenId)) revert ERC721NotApprovedOrOwner();
+    }
+
+    modifier onlyOwner(uint256 tokenId) {
+        _onlyOwner(tokenId);
+        _;
+    }
 
     function _setNestingAddress(address nestingAddress) internal {
         _nestingAddress = nestingAddress;
@@ -313,6 +327,8 @@ contract RMRKEquippable is IRMRKEquippableResource, MultiResourceAbstractBase {
         uint64 resourceId,
         uint64 overwrites
     ) internal {
+        if(_ownerOf(tokenId) == address(0)) revert RMRKOwnerQueryForNonexistentToken();
+
         if(_tokenResources[tokenId][resourceId]) revert RMRKResourceAlreadyExists();
 
         if( getResource(resourceId).id == uint64(0)) revert RMRKResourceNotFoundInStorage();
@@ -375,26 +391,22 @@ contract RMRKEquippable is IRMRKEquippableResource, MultiResourceAbstractBase {
         return resources;
     }
 
-    function acceptResource(uint256 tokenId, uint256 index) external virtual {
-        if(_msgSender() != IRMRKNesting(_nestingAddress).ownerOf(tokenId)) revert ERC721NotApprovedOrOwner();
+    function acceptResource(uint256 tokenId, uint256 index) external virtual onlyOwner(tokenId) {
         _acceptResource(tokenId, index);
     }
 
-    function rejectResource(uint256 tokenId, uint256 index) external virtual {
-        if(_msgSender() != IRMRKNesting(_nestingAddress).ownerOf(tokenId)) revert ERC721NotApprovedOrOwner();
+    function rejectResource(uint256 tokenId, uint256 index) external virtual onlyOwner(tokenId) {
         _rejectResource(tokenId, index);
     }
 
-    function rejectAllResources(uint256 tokenId) external virtual {
-        if(_msgSender() != IRMRKNesting(_nestingAddress).ownerOf(tokenId)) revert ERC721NotApprovedOrOwner();
+    function rejectAllResources(uint256 tokenId) external virtual onlyOwner(tokenId) {
         _rejectAllResources(tokenId);
     }
 
     function setPriority(
         uint256 tokenId,
         uint16[] memory priorities
-    ) external virtual {
-        if(_msgSender() != IRMRKNesting(_nestingAddress).ownerOf(tokenId)) revert ERC721NotApprovedOrOwner();
+    ) external virtual onlyOwner(tokenId) {
         _setPriority(tokenId, priorities);
     }
 

@@ -5,9 +5,8 @@ pragma solidity ^0.8.15;
 import "../RMRK/access/RMRKIssuable.sol";
 import "../RMRK/RMRKEquippable.sol";
 
-//Minimal public implementation of RMRK for testing.
 
-
+//Minimal public implementation of RMRKEquippable for testing.
 contract RMRKEquippableMock is RMRKIssuable, RMRKEquippable {
 
     function setFallbackURI(string memory fallbackURI) external onlyIssuer {
@@ -30,7 +29,6 @@ contract RMRKEquippableMock is RMRKIssuable, RMRKEquippable {
         uint64 resourceId,
         uint64 overwrites
     ) external onlyIssuer {
-        // if(ownerOf(tokenId) == address(0)) revert ERC721OwnerQueryForNonexistentToken();
         _addResourceToToken(tokenId, resourceId, overwrites);
     }
 
