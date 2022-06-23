@@ -11,7 +11,7 @@ import "./interfaces/IRMRKNesting.sol";
 import "./library/RMRKLib.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
-import "hardhat/console.sol";
+// import "hardhat/console.sol";
 
 error RMRKBadLength();
 error RMRKEquippableBasePartNotEquippable();
@@ -45,7 +45,6 @@ contract RMRKEquippable is IRMRKEquippableResource, MultiResourceAbstractBase {
     }
 
     function supportsInterface(bytes4 interfaceId) public virtual view returns (bool) {
-        console.logBytes4(type(IRMRKEquippableResource).interfaceId);
         return (
             interfaceId == type(IRMRKEquippableResource).interfaceId ||
             interfaceId == type(IERC165).interfaceId
