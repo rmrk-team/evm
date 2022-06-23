@@ -7,14 +7,13 @@ import "../RMRK/RMRKBaseStorage.sol";
 
 contract RMRKBaseStorageMock is RMRKIssuable, RMRKBaseStorage {
   constructor(string memory _baseName)
-  RMRKBaseStorage(_baseName)
-  {}
+  RMRKBaseStorage(_baseName) {}
 
-  function addBaseEntry(IntakeStruct memory intakeStruct) public {
+  function addBaseEntry(IntakeStruct memory intakeStruct) external onlyIssuer {
     _addBaseEntry(intakeStruct);
   }
 
-  function addBaseEntryList(IntakeStruct[] memory intakeStructs) public {
+  function addBaseEntryList(IntakeStruct[] memory intakeStructs) external onlyIssuer {
     _addBaseEntryList(intakeStructs);
   }
 }

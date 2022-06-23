@@ -38,26 +38,25 @@ contract RMRKMultiResource is ERC721Abstract, MultiResourceAbstract {
     ////////////////////////////////////////
 
 
-    function acceptResource(uint256 tokenId, uint256 index) external virtual {
-        if(!_isApprovedOrOwner(_msgSender(), tokenId))
-                revert ERC721NotApprovedOrOwner();
-
+    function acceptResource(
+        uint256 tokenId,
+        uint256 index
+    ) external virtual onlyApprovedOrOwner(tokenId) {
         // FIXME: clean approvals and test
         _acceptResource(tokenId, index);
     }
 
-    function rejectResource(uint256 tokenId, uint256 index) external virtual {
-        if(!_isApprovedOrOwner(_msgSender(), tokenId))
-                revert ERC721NotApprovedOrOwner();
-
+    function rejectResource(
+        uint256 tokenId,
+        uint256 index
+    ) external virtual onlyApprovedOrOwner(tokenId) {
         // FIXME: clean approvals and test
         _rejectResource(tokenId, index);
     }
 
-    function rejectAllResources(uint256 tokenId) external virtual {
-        if(!_isApprovedOrOwner(_msgSender(), tokenId))
-                revert ERC721NotApprovedOrOwner();
-
+    function rejectAllResources(
+        uint256 tokenId
+    ) external virtual onlyApprovedOrOwner(tokenId) {
         // FIXME: clean approvals and test
         _rejectAllResources(tokenId);
     }
@@ -65,10 +64,7 @@ contract RMRKMultiResource is ERC721Abstract, MultiResourceAbstract {
     function setPriority(
         uint256 tokenId,
         uint16[] memory priorities
-    ) external virtual {
-        if(!_isApprovedOrOwner(_msgSender(), tokenId))
-                revert ERC721NotApprovedOrOwner();
-
+    ) external virtual onlyApprovedOrOwner(tokenId) {
         // FIXME: clean approvals and test
         _setPriority(tokenId, priorities);
     }

@@ -6,14 +6,13 @@ import "../RMRK/access/RMRKIssuable.sol";
 import "../RMRK/RMRKNestingMultiResource.sol";
 // import "hardhat/console.sol";
 
-//Minimal public implementation of RMRK for testing.
+//Minimal public implementation of RMRKNestingMultiResource for testing.
 contract RMRKNestingMultiResourceMock is RMRKIssuable, RMRKNestingMultiResource {
-
 
     constructor(string memory name, string memory symbol)
         RMRKNestingMultiResource(name, symbol) {}
 
-    function mint(address to, uint256 tokenId) external {
+    function mint(address to, uint256 tokenId) external onlyIssuer {
         _mint(to, tokenId);
     }
 
@@ -22,14 +21,12 @@ contract RMRKNestingMultiResourceMock is RMRKIssuable, RMRKNestingMultiResource 
         uint256 tokenId,
         uint256 destId,
         bytes calldata data
-    ) external {
+    ) external onlyIssuer {
         _mint(to, tokenId, destId, data);
     }
 
     //update for reentrancy
-    function burn(uint256 tokenId) public {
-        if(!_isApprovedOrOwner(_msgSender(), tokenId))
-            revert ERC721NotApprovedOrOwner();
+    function burn(uint256 tokenId) public onlyApprovedOrOwner(tokenId) {
         _burn(tokenId);
     }
 
