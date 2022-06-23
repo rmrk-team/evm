@@ -211,11 +211,11 @@ contract RMRKEquippable is IRMRKEquippableResource, MultiResourceAbstractBase {
                         equippedTokenId, equippedResourceId
                     );
                     uint256 recLen = equippedBasePartIds.length;
-                    for (uint i; i<recLen;) {
+                    for (uint j; j<recLen;) {
                         basePartIds[basePartIdsLen] = partId;
                         baseAddresses[basePartIdsLen] = baseAddress;
                         ++basePartIdsLen;
-                        ++i;
+                        ++j;
                     }
                 }
             }
