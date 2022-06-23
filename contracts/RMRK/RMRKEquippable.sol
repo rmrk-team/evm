@@ -96,7 +96,6 @@ contract RMRKEquippable is IRMRKEquippableResource, MultiResourceAbstractBase {
 
     //TODO: Gate to owner of tokenId
     function unequip(
-        uint256 tokenId,
         uint64 targetResourceId,
         uint64 slotPartId
     ) public {
@@ -169,7 +168,6 @@ contract RMRKEquippable is IRMRKEquippableResource, MultiResourceAbstractBase {
 
     //Gate for equippable array in here by check of slotPartDefinition to slotPartId
     function composeEquippables(
-        uint256 tokenId,
         uint64 targetResourceId
     ) public view returns (uint64[] memory basePartIds, address[] memory baseAddresses) {
         //get Resource of target token
@@ -204,16 +202,15 @@ contract RMRKEquippable is IRMRKEquippableResource, MultiResourceAbstractBase {
                     ++basePartIdsLen;
                     ++i;
 
-                    uint256 equippedTokenId = equipped[targetResourceId][partId].tokenId;
                     uint64 equippedResourceId = equipped[targetResourceId][partId].childResourceId;
                     //Recuse while we're in this block, slotpartIds are initialized
                     (uint64[] memory equippedBasePartIds, address[] memory equippedBaseAddresses) = composeEquippables(
-                        equippedTokenId, equippedResourceId
+                        equippedResourceId
                     );
                     uint256 recLen = equippedBasePartIds.length;
                     for (uint j; j<recLen;) {
-                        basePartIds[basePartIdsLen] = partId;
-                        baseAddresses[basePartIdsLen] = baseAddress;
+                        basePartIds[basePartIdsLen] = equippedBasePartIds[j];
+                        baseAddresses[basePartIdsLen] = equippedBaseAddresses[j];
                         ++basePartIdsLen;
                         ++j;
                     }
@@ -281,8 +278,8 @@ contract RMRKEquippable is IRMRKEquippableResource, MultiResourceAbstractBase {
 
     function _addResourceEntry(
         Resource memory resource,
-        uint64[] memory fixedPartIds,
-        uint64[] memory slotPartIds
+        uint64[] memory fixedPartIds_,
+        uint64[] memory slotPartIds_
     ) internal {
         uint64 id = resource.id;
         if(id == uint64(0))
@@ -291,6 +288,9 @@ contract RMRKEquippable is IRMRKEquippableResource, MultiResourceAbstractBase {
             revert RMRKResourceAlreadyExists();
 
         _resources[id] = resource;
+
+        fixedPartIds[id] = fixedPartIds_;
+        slotPartIds[id] = slotPartIds_;
 
         _allResources.push(id);
 
