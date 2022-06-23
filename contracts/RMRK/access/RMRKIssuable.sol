@@ -23,14 +23,13 @@ contract RMRKIssuable is Context {
         _;
     }
 
-    // FIXME: Re enable functionality when enough space
-    // function setIssuer(address issuer) external onlyIssuer {
-    //     _setIssuer(issuer);
-    // }
+    function setIssuer(address issuer) external onlyIssuer {
+        _setIssuer(issuer);
+    }
 
-    // function getIssuer() external view returns (address) {
-    //     return _issuer;
-    // }
+    function getIssuer() external view returns (address) {
+        return _issuer;
+    }
 
     function _setIssuer(address issuer) private {
         _issuer = issuer;
