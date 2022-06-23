@@ -150,11 +150,11 @@ describe('MultiResource', async () => {
         [resId2, metaURIDefault, customDefault],
       ]);
 
-      // expect(await token.getPendingResObjectByIndex(tokenId, 0)).to.eql([
-      //   resId,
-      //   metaURIDefault,
-      //   customDefault,
-      // ]);
+      expect(await token.getPendingResObjectByIndex(tokenId, 0)).to.eql([
+        resId,
+        metaURIDefault,
+        customDefault,
+      ]);
     });
 
     it('cannot add non existing resource to token', async function () {

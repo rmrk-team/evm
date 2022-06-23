@@ -7,22 +7,20 @@ pragma solidity ^0.8.15;
 import "./abstracts/MultiResourceAbstractBase.sol";
 import "./interfaces/IRMRKBaseStorage.sol";
 import "./interfaces/IRMRKEquippableResource.sol";
+import "./interfaces/IRMRKNesting.sol";
 import "./library/RMRKLib.sol";
-import "./RMRKNesting.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
-// import "hardhat/console.sol";
+import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+import "hardhat/console.sol";
 
 error RMRKBadLength();
 error RMRKEquippableBasePartNotEquippable();
 error RMRKEquippableEquipNotAllowedByBase();
+error ERC721NotApprovedOrOwner();
 
-contract RMRKEquippable is RMRKNesting, IRMRKEquippableResource, MultiResourceAbstractBase {
+contract RMRKEquippable is IRMRKEquippableResource, MultiResourceAbstractBase {
 
-    constructor(string memory _name, string memory _symbol)
-    RMRKNesting(_name, _symbol)
-    {
-
-    }
+    address private _nestingAddress;
 
     using RMRKLib for uint64[];
     using RMRKLib for uint128[];
@@ -42,6 +40,18 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippableResource, MultiResourceAb
     //Mapping of equippableRefId to parent contract address uint64 slotId for equipping validation
     mapping(uint64 => mapping(address => uint64)) private validParentSlot;
 
+    function _setNestingAddress(address nestingAddress) internal {
+        _nestingAddress = nestingAddress;
+    }
+
+    function supportsInterface(bytes4 interfaceId) public virtual view returns (bool) {
+        console.logBytes4(type(IRMRKEquippableResource).interfaceId);
+        return (
+            interfaceId == type(IRMRKEquippableResource).interfaceId ||
+            interfaceId == type(IERC165).interfaceId
+        );
+    }
+
     //TODO: Gate to owner of tokenId
     function equip(
         uint256 tokenId,
@@ -51,7 +61,7 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippableResource, MultiResourceAb
         uint256 childResourceIndex
     ) public {
         // Resource storage targetResource = _resources[targetResourceId];
-        Child memory child = childrenOf(tokenId)[childIndex];
+        IRMRKNesting.Child memory child = IRMRKNesting(_nestingAddress).childOf(tokenId, childIndex);
 
         Resource memory childResource = IRMRKEquippableResource(child.contractAddress).getResObjectByIndex(childIndex, childResourceIndex);
 
@@ -97,8 +107,8 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippableResource, MultiResourceAb
         if(len != equippableAddress.length)
             revert RMRKBadLength();
         for(uint i; i<len;) {
-          _setEquippableRefId(equippableRefId, equippableAddress[i], partId[i]);
-          unchecked {++i;}
+            _setEquippableRefId(equippableRefId, equippableAddress[i], partId[i]);
+            unchecked {++i;}
         }
     }
 
@@ -106,7 +116,6 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippableResource, MultiResourceAb
     function setEquippableRefId(uint64 equippableRefId, address equippableAddress, uint64 partId) public {
         _setEquippableRefId(equippableRefId, equippableAddress, partId);
     }
-
 
 
     function _setEquippableRefId(uint64 equippableRefId, address equippableAddress, uint64 partId) internal {
@@ -135,13 +144,13 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippableResource, MultiResourceAb
         uint64[] memory slotPartIds_ = slotPartIds[targetResourceId];
         uint256 len = slotPartIds_.length;
         for (uint i; i<len;) {
-          Equipment memory childEquipped = equipped[targetResourceId][slotPartIds_[i]];
-          if (childEquipped.tokenId != uint256(0)) {
-              uint256 childrenEquippedLen = childrenEquipped.length;
-              childrenEquipped[childrenEquippedLen] = childEquipped;
-              slotsEquipped[childrenEquippedLen] = slotPartIds_[i];
-          }
-          unchecked {++i;}
+            Equipment memory childEquipped = equipped[targetResourceId][slotPartIds_[i]];
+            if (childEquipped.tokenId != uint256(0)) {
+                uint256 childrenEquippedLen = childrenEquipped.length;
+                childrenEquipped[childrenEquippedLen] = childEquipped;
+                slotsEquipped[childrenEquippedLen] = slotPartIds_[i];
+            }
+            unchecked {++i;}
         }
     }
 
@@ -227,7 +236,7 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippableResource, MultiResourceAb
 
     function tokenURI(
         uint256 tokenId
-    ) public view override(NestingAbstract, IRMRKMultiResourceBase, MultiResourceAbstractBase) virtual returns (string memory) {
+    ) public view override(IRMRKMultiResourceBase, MultiResourceAbstractBase) virtual returns (string memory) {
         return _tokenURIAtIndex(tokenId, 0);
     }
 
@@ -333,14 +342,13 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippableResource, MultiResourceAb
         return getResource(resourceId);
     }
 
-    // FIXME: Re enable functionality when enough space
-    // function getPendingResObjectByIndex(
-    //     uint256 tokenId,
-    //     uint256 index
-    // ) external view virtual returns(Resource memory) {
-    //     uint64 resourceId = getPendingResources(tokenId)[index];
-    //     return getResource(resourceId);
-    // }
+    function getPendingResObjectByIndex(
+        uint256 tokenId,
+        uint256 index
+    ) external view virtual returns(Resource memory) {
+        uint64 resourceId = getPendingResources(tokenId)[index];
+        return getResource(resourceId);
+    }
 
     function getFullResources(
         uint256 tokenId
@@ -369,17 +377,17 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippableResource, MultiResourceAb
     }
 
     function acceptResource(uint256 tokenId, uint256 index) external virtual {
-        if(_msgSender() != ownerOf(tokenId)) revert ERC721NotApprovedOrOwner();
+        if(_msgSender() != IRMRKNesting(_nestingAddress).ownerOf(tokenId)) revert ERC721NotApprovedOrOwner();
         _acceptResource(tokenId, index);
     }
 
     function rejectResource(uint256 tokenId, uint256 index) external virtual {
-        if(_msgSender() != ownerOf(tokenId)) revert ERC721NotApprovedOrOwner();
+        if(_msgSender() != IRMRKNesting(_nestingAddress).ownerOf(tokenId)) revert ERC721NotApprovedOrOwner();
         _rejectResource(tokenId, index);
     }
 
     function rejectAllResources(uint256 tokenId) external virtual {
-        if(_msgSender() != ownerOf(tokenId)) revert ERC721NotApprovedOrOwner();
+        if(_msgSender() != IRMRKNesting(_nestingAddress).ownerOf(tokenId)) revert ERC721NotApprovedOrOwner();
         _rejectAllResources(tokenId);
     }
 
@@ -387,7 +395,7 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippableResource, MultiResourceAb
         uint256 tokenId,
         uint16[] memory priorities
     ) external virtual {
-        if(_msgSender() != ownerOf(tokenId)) revert ERC721NotApprovedOrOwner();
+        if(_msgSender() != IRMRKNesting(_nestingAddress).ownerOf(tokenId)) revert ERC721NotApprovedOrOwner();
         _setPriority(tokenId, priorities);
     }
 

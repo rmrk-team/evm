@@ -124,14 +124,13 @@ abstract contract MultiResourceAbstract is IRMRKMultiResource, MultiResourceAbst
         return getResource(resourceId);
     }
 
-    // FIXME: Re enable functionality when enough space
-    // function getPendingResObjectByIndex(
-    //     uint256 tokenId,
-    //     uint256 index
-    // ) external view virtual returns(Resource memory) {
-    //     uint64 resourceId = getPendingResources(tokenId)[index];
-    //     return getResource(resourceId);
-    // }
+    function getPendingResObjectByIndex(
+        uint256 tokenId,
+        uint256 index
+    ) external view virtual returns(Resource memory) {
+        uint64 resourceId = getPendingResources(tokenId)[index];
+        return getResource(resourceId);
+    }
 
     function getFullResources(
         uint256 tokenId

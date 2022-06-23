@@ -10,15 +10,12 @@ import "../RMRK/RMRKEquippable.sol";
 
 contract RMRKEquippableMock is RMRKIssuable, RMRKEquippable {
 
-    address private _issuer;
-
-    constructor(
-        string memory name_,
-        string memory symbol_
-    ) RMRKEquippable(name_, symbol_) {}
-
     function setFallbackURI(string memory fallbackURI) external onlyIssuer {
         _setFallbackURI(fallbackURI);
+    }
+
+    function setNestingAddress(address nestingAddress) external onlyIssuer {
+        _setNestingAddress(nestingAddress);
     }
 
     function setTokenEnumeratedResource(
@@ -28,31 +25,12 @@ contract RMRKEquippableMock is RMRKIssuable, RMRKEquippable {
         _setTokenEnumeratedResource(resourceId, state);
     }
 
-    //The preferred method here is to overload the function, but hardhat tests prevent this.
-    function mint(address to, uint256 tokenId) external {
-        _mint(to, tokenId);
-    }
-
-    function burn(uint256 tokenId) public {
-        if(!_isApprovedOrOwner(_msgSender(), tokenId)) revert ERC721NotApprovedOrOwner();
-        _burn(tokenId);
-    }
-
-    function onRMRKNestingReceived(
-        address,
-        address,
-        uint256,
-        bytes calldata
-    ) external pure returns (bytes4) {
-        return IRMRKNestingReceiver.onRMRKNestingReceived.selector;
-    }
-
     function addResourceToToken(
         uint256 tokenId,
         uint64 resourceId,
         uint64 overwrites
     ) external onlyIssuer {
-        if(ownerOf(tokenId) == address(0)) revert ERC721OwnerQueryForNonexistentToken();
+        // if(ownerOf(tokenId) == address(0)) revert ERC721OwnerQueryForNonexistentToken();
         _addResourceToToken(tokenId, resourceId, overwrites);
     }
 

@@ -13,6 +13,12 @@ interface IRMRKNesting {
     event ChildRemoved(uint tokenId, uint index);
     event ChildUnnested(uint parentTokenId, uint childTokenId);
 
+
+    struct Child {
+        uint256 tokenId;
+        address contractAddress;
+    }
+
     function ownerOf(uint256 tokenId)
     external view returns (address owner);
 
@@ -55,4 +61,22 @@ interface IRMRKNesting {
         uint256 tokenId,
         uint256 parentId
     ) external;
+
+    function childrenOf(
+        uint256 parentTokenId
+    ) external view returns (Child[] memory);
+
+    function pendingChildrenOf(
+        uint256 parentTokenId
+    ) external view returns (Child[] memory);
+
+    function childOf(
+        uint256 parentTokenId,
+        uint256 index
+    ) external view returns (Child memory);
+
+    function pendingChildOf(
+        uint256 parentTokenId,
+        uint256 index
+    ) external view returns (Child memory);
 }
