@@ -51,9 +51,13 @@ contract ERC721Abstract is Context, IERC721 {
         _symbol = symbol_;
     }
 
-    modifier onlyApprovedOrOwner(uint256 tokenId) {
+    function _onlyApprovedOrOwner(uint256 tokenId) private view {
         if(!_isApprovedOrOwner(_msgSender(), tokenId))
             revert ERC721NotApprovedOrOwner();
+    }
+
+    modifier onlyApprovedOrOwner(uint256 tokenId) {
+        _onlyApprovedOrOwner(tokenId);
         _;
     }
 

@@ -36,13 +36,6 @@ abstract contract NestingAbstract is Context, IRMRKNesting {
         bool isNft;
     }
 
-    struct Child {
-        uint256 tokenId;
-        address contractAddress;
-        uint16 slotEquipped;
-        uint64 partId;
-    }
-
     // Mapping from token ID to RMRKOwner struct
     mapping(uint256 => RMRKOwner) internal _RMRKOwners;
 
@@ -132,9 +125,7 @@ abstract contract NestingAbstract is Context, IRMRKNesting {
 
         Child memory child = Child({
             contractAddress: childTokenAddress,
-            tokenId: childTokenId,
-            slotEquipped: 0,
-            partId: 0
+            tokenId: childTokenId
         });
         _addChildToPending(parentTokenId, child);
         emit ChildProposed(parentTokenId);
@@ -257,6 +248,24 @@ abstract contract NestingAbstract is Context, IRMRKNesting {
     function pendingChildrenOf(uint256 parentTokenId) public view returns (Child[] memory) {
         Child[] memory pendingChildren = _pendingChildren[parentTokenId];
         return pendingChildren;
+    }
+
+    function childOf(
+        uint256 parentTokenId,
+        uint256 index
+    ) external view returns (Child memory) {
+        // FIXME: Check index
+        Child memory child = _pendingChildren[parentTokenId][index];
+        return child;
+    }
+
+    function pendingChildOf(
+        uint256 parentTokenId,
+        uint256 index
+    ) external view returns (Child memory) {
+        // FIXME: Check index
+        Child memory child = _pendingChildren[parentTokenId][index];
+        return child;
     }
 
     //HELPERS

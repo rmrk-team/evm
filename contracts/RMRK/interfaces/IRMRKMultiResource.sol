@@ -21,11 +21,10 @@ interface IRMRKMultiResource is IRMRKMultiResourceBase {
         uint256 index
     ) external view returns(Resource memory);
 
-    // FIXME: Re enable functionality when enough space
-    // function getPendingResObjectByIndex(
-    //     uint256 tokenId,
-    //     uint256 index
-    // ) external view returns(Resource memory);
+    function getPendingResObjectByIndex(
+        uint256 tokenId,
+        uint256 index
+    ) external view returns(Resource memory);
 
     function getFullResources(
         uint256 tokenId

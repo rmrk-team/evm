@@ -20,7 +20,6 @@ describe('Nesting', async () => {
 
   const mintNestData = ethers.utils.hexZeroPad('0xabcd', 8);
   const emptyData = ethers.utils.hexZeroPad('0x', 0);
-  const partId = BigNumber.from(0);
 
   beforeEach(async function () {
     const [signersOwner, ...signersAddr] = await ethers.getSigners();
@@ -77,7 +76,7 @@ describe('Nesting', async () => {
     });
 
     it('can support INesting', async function () {
-      expect(await ownerChunky.supportsInterface('0xebb57b26')).to.equal(true);
+      expect(await ownerChunky.supportsInterface('0x47ea672d')).to.equal(true);
     });
 
     it('cannot support other interfaceId', async function () {
@@ -248,7 +247,7 @@ describe('Nesting', async () => {
       expect(children).to.eql([]);
 
       const pendingChildren = await ownerChunky.pendingChildrenOf(parentId);
-      expect(pendingChildren).to.eql([[BigNumber.from(childId), petMonkey.address, 0, partId]]);
+      expect(pendingChildren).to.eql([[BigNumber.from(childId), petMonkey.address]]);
     });
 
     it('can mint multiple children', async function () {
@@ -280,8 +279,8 @@ describe('Nesting', async () => {
 
       const pendingChildren = await ownerChunky.pendingChildrenOf(parentId);
       expect(pendingChildren).to.eql([
-        [BigNumber.from(childId1), petMonkey.address, 0, partId],
-        [BigNumber.from(childId2), petMonkey.address, 0, partId],
+        [BigNumber.from(childId1), petMonkey.address],
+        [BigNumber.from(childId2), petMonkey.address],
       ]);
     });
 
@@ -313,10 +312,10 @@ describe('Nesting', async () => {
       const pendingChildrenOfMonkey1 = await petMonkey.pendingChildrenOf(childId);
 
       expect(pendingChildrenOfChunky10).to.eql([
-        [BigNumber.from(childId), petMonkey.address, 0, partId],
+        [BigNumber.from(childId), petMonkey.address],
       ]);
       expect(pendingChildrenOfMonkey1).to.eql([
-        [BigNumber.from(granchildId), petMonkey.address, 0, partId],
+        [BigNumber.from(granchildId), petMonkey.address],
       ]);
 
       // RMRK owner of pet 21 is pet 1
@@ -370,7 +369,7 @@ describe('Nesting', async () => {
       expect(pendingChildren).to.eql([]);
 
       const children = await ownerChunky.childrenOf(parentId);
-      expect(children).to.eql([[BigNumber.from(childId), petMonkey.address, 0, partId]]);
+      expect(children).to.eql([[BigNumber.from(childId), petMonkey.address]]);
     });
 
     it('cannot accept not owned child', async function () {
@@ -416,7 +415,7 @@ describe('Nesting', async () => {
       expect(pendingChildren).to.eql([]);
 
       const children = await ownerChunky.childrenOf(parentId);
-      expect(children).to.eql([[BigNumber.from(childId), petMonkey.address, 0, partId]]);
+      expect(children).to.eql([[BigNumber.from(childId), petMonkey.address]]);
     });
   });
 
@@ -469,8 +468,8 @@ describe('Nesting', async () => {
 
       let pendingChildren = await ownerChunky.pendingChildrenOf(parentId);
       expect(pendingChildren).to.eql([
-        [BigNumber.from(1), petMonkey.address, 0, partId],
-        [BigNumber.from(2), petMonkey.address, 0, partId],
+        [BigNumber.from(1), petMonkey.address],
+        [BigNumber.from(2), petMonkey.address],
       ]);
 
       await ownerChunky.connect(addrs[1]).rejectAllChildren(parentId);
@@ -672,9 +671,9 @@ describe('Nesting', async () => {
       const children1 = await ownerChunky.childrenOf(parentId);
       const children2 = await petMonkey.childrenOf(childId);
 
-      expect(children1).to.eql([[BigNumber.from(childId), petMonkey.address, 0, partId]]);
+      expect(children1).to.eql([[BigNumber.from(childId), petMonkey.address]]);
 
-      expect(children2).to.eql([[BigNumber.from(granchildId), ownerChunky.address, 0, partId]]);
+      expect(children2).to.eql([[BigNumber.from(granchildId), ownerChunky.address]]);
 
       expect(await ownerChunky.rmrkOwnerOf(granchildId)).to.eql([
         petMonkey.address,
@@ -874,7 +873,7 @@ describe('Nesting', async () => {
 
       // Parent still has its children
       const children = await ownerChunky.pendingChildrenOf(parentId);
-      expect(children).to.eql([[BigNumber.from(childId), petMonkey.address, 0, partId]]);
+      expect(children).to.eql([[BigNumber.from(childId), petMonkey.address]]);
     });
 
     it('cannot transfer nested child', async function () {
@@ -911,10 +910,10 @@ describe('Nesting', async () => {
         );
 
       // Parent is still owner of child
-      let expected = [BigNumber.from(childId), petMonkey.address, 0, partId];
+      let expected = [BigNumber.from(childId), petMonkey.address];
       checkAcceptedAndPendingChildren(ownerChunky, parentId, [expected], []);
       // Ownership: firstOwner > newGrandparent > parent > child
-      expected = [BigNumber.from(parentId), ownerChunky.address, 0, partId];
+      expected = [BigNumber.from(parentId), ownerChunky.address];
       checkAcceptedAndPendingChildren(ownerChunky, newGrandparentId, [], [expected]);
     });
   });

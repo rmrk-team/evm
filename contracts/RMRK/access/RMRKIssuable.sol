@@ -14,8 +14,12 @@ contract RMRKIssuable is Context {
         _setIssuer(_msgSender());
     }
 
-    modifier onlyIssuer() {
+    function _onlyIssuer() private view {
         if(_msgSender() != _issuer) revert RMRKOnlyIssuer();
+    }
+
+    modifier onlyIssuer() {
+        _onlyIssuer();
         _;
     }
 
