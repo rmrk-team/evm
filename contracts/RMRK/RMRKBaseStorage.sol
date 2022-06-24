@@ -145,14 +145,16 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
         isEquippable_ = isEquippable[baseId][targetAddress];
     }
 
-    function checkIsEquippableMulti(uint64[] calldata baseId, address[] calldata targetAddress) public view returns (bool[] memory isEquippable_) {
+    function checkIsEquippableMulti(uint64[] calldata baseId, address[] calldata targetAddress) public view returns (bool[] memory) {
         uint256 len = baseId.length;
+        bool[] memory isEquippable_ = new bool[](len);
         if(len != targetAddress.length)
             revert RMRKMismatchedInputArrayLength();
         for (uint256 i = 0; i < len;) {
             isEquippable_[i] = isEquippable[baseId[i]][targetAddress[i]];
             unchecked {++i;}
         }
+        return isEquippable_;
     }
 
     /**
