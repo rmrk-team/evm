@@ -4,6 +4,7 @@ pragma solidity ^0.8.15;
 
 import "./interfaces/IRMRKBaseStorage.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
+//import "hardhat/console.sol";
 
 error RMRKBaseAlreadyExists();
 error RMRKBaseEntryDoesNotExist();
@@ -106,11 +107,10 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
     * deployer or transferred Issuer, designated by the modifier onlyIssuer as per the inherited contract issuerControl.
     */
 
-    // FIXME: Must be internal and add onlyIssuer gate on mock
-    function addEquippableAddresses(
+    function _addEquippableAddresses(
         uint64 _baseEntryId,
         address[] memory _equippableAddresses
-    ) public {
+    ) internal {
         if(_equippableAddresses.length <= 0)
             revert RMRKZeroLengthIdsPassed();
         if(bases[_baseEntryId].itemType == ItemType.None)
@@ -129,8 +129,7 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
     * deployer or transferred Issuer, designated by the modifier onlyIssuer as per the inherited contract issuerControl.
     */
 
-    // FIXME: Must be internal and add onlyIssuer gate on mock
-    function addEquippableIdToAll(address _equippableAddress) public {
+    function _addEquippableIdToAll(address _equippableAddress) internal {
         uint256 len = baseIds.length;
         for (uint256 i = 0; i < len;) {
             uint64 baseId_ = baseIds[i];
@@ -150,7 +149,7 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
         uint256 len = baseId.length;
         if(len != targetAddress.length)
             revert RMRKMismatchedInputArrayLength();
-        for (uint i; i<len;) {
+        for (uint256 i = 0; i < len;) {
             isEquippable_[i] = isEquippable[baseId[i]][targetAddress[i]];
             unchecked {++i;}
         }
@@ -162,7 +161,7 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
 
     function getBaseEntries(uint64[] calldata _ids)
         external
-        view
+        pure
         returns (Base[] memory)
     {
         Base[] memory baseEntries;
