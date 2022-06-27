@@ -53,6 +53,12 @@ describe('Equipping', async () => {
   const weaponGems = [21, 22, 23, 24, 25, 26, 27, 28, 29, 30];
   const backgrounds = [31, 32, 33, 34, 35, 36, 37, 38, 39, 40];
 
+  const weaponResourcesFull = [1, 2, 3, 4]; // Must match the total of uniqueResources
+  const weaponResourcesEquip = [5, 6, 7, 8]; // Must match the total of uniqueResources
+  const weaponGemResourceFull = 1;
+  const weaponGemResourceEquip = 2;
+  const backgroundResourceId = 1;
+
   enum ItemType {
     None, 
     Slot,
@@ -78,9 +84,28 @@ describe('Equipping', async () => {
     await addResourcesToBackground();
   });
 
-  describe('Init', async function () {
-    it('it can get names and symbols', async function () {
-      //
+  describe('Validations', async function () {
+    it('can validate equips', async function () {
+      // Weapons into soldiers, only equip resources
+      expect(
+        await soldierEquip.validateChildEquip(weaponEquip.address, weaponResourcesFull[0]),
+      ).to.eql(false);
+      expect(
+        await soldierEquip.validateChildEquip(weaponEquip.address, weaponResourcesEquip[0]),
+      ).to.eql(true);
+
+      // Weapon gems into weapons, only equip resource
+      expect(
+        await weaponEquip.validateChildEquip(weaponGemEquip.address, weaponGemResourceFull),
+      ).to.eql(false);
+      expect(
+        await weaponEquip.validateChildEquip(weaponGemEquip.address, weaponGemResourceEquip),
+      ).to.eql(true);
+
+      // Background into soldiers
+      expect(
+        await soldierEquip.validateChildEquip(backgroundEquip.address, backgroundResourceId),
+      ).to.eql(true);
     });
   });
 
@@ -133,21 +158,21 @@ describe('Equipping', async () => {
     const baseForWeapon = {
       itemType: ItemType.Slot,
       z: 2,
-      equippableInto: [soldier.address],
+      equippableInto: [soldierEquip.address],
       src: '',
       fallbackSrc: '',
     };
     const baseForWeaponGem = {
       itemType: ItemType.Slot,
       z: 3,
-      equippableInto: [weapon.address],
+      equippableInto: [weaponEquip.address],
       src: '',
       fallbackSrc: '',
     };
     const baseForBackground = {
       itemType: ItemType.Slot,
       z: 0,
-      equippableInto: [soldier.address],
+      equippableInto: [soldierEquip.address],
       src: '',
       fallbackSrc: '',
     };
@@ -162,7 +187,7 @@ describe('Equipping', async () => {
     // FIXME: Why this if it is set when adding base entry?
     base.addEquippableAddresses(partIdForWeapon, [soldierEquip.address]);
     base.addEquippableAddresses(partIdForBackground, [soldierEquip.address]);
-    base.addEquippableAddresses(partIdForWeaponGem, [weapon.address]);
+    base.addEquippableAddresses(partIdForWeaponGem, [weaponEquip.address]);
   }
 
   async function mintSoldiers(): Promise<void> {
@@ -171,6 +196,7 @@ describe('Equipping', async () => {
       await soldier['mint(address,uint256)'](addrs[i % 3].address, soldiers[i]);
     }
   }
+
   async function mintWeapons(): Promise<void> {
     // Mint one weapon to soldier
     for (let i = 0; i < soldiers.length; i++) {
@@ -183,6 +209,7 @@ describe('Equipping', async () => {
       await soldier.connect(addrs[i % 3]).acceptChild(soldiers[i], 0);
     }
   }
+
   async function mintWeaponGems(): Promise<void> {
     // Mint one weapon gem for each weapon on each soldier
     for (let i = 0; i < soldiers.length; i++) {
@@ -195,6 +222,7 @@ describe('Equipping', async () => {
       await weapon.connect(addrs[i % 3]).acceptChild(weapons[i], 0);
     }
   }
+
   async function mintBackgrounds(): Promise<void> {
     // Mint one background to soldier
     for (let i = 0; i < soldiers.length; i++) {
@@ -231,15 +259,13 @@ describe('Equipping', async () => {
 
   async function addResourcesToWeapon(): Promise<void> {
     const equippableRefId = 1; // Resources to equip will both use this
-    const resourcesFull = [1, 2, 3, 4]; // Must match the total of uniqueResources
-    const resourcesEquip = [5, 6, 7, 8]; // Must match the total of uniqueResources
 
-    for (let i = 0; i < resourcesFull.length; i++) {
+    for (let i = 0; i < weaponResourcesFull.length; i++) {
       await weaponEquip.addResourceEntry(
         {
-          id: resourcesFull[i],
+          id: weaponResourcesFull[i],
           equippableRefId: 0, // Not meant to equip
-          metadataURI: `ipfs:weapon/full/${resourcesFull[i]}`,
+          metadataURI: `ipfs:weapon/full/${weaponResourcesFull[i]}`,
           baseAddress: ethers.constants.AddressZero, // Not meant to equip
           slotId: 0, // Not meant to equip
           custom: [],
@@ -248,12 +274,12 @@ describe('Equipping', async () => {
         [],
       );
     }
-    for (let i = 0; i < resourcesEquip.length; i++) {
+    for (let i = 0; i < weaponResourcesEquip.length; i++) {
       await weaponEquip.addResourceEntry(
         {
-          id: resourcesEquip[i],
+          id: weaponResourcesEquip[i],
           equippableRefId: equippableRefId,
-          metadataURI: `ipfs:weapon/equip/${resourcesEquip[i]}`,
+          metadataURI: `ipfs:weapon/equip/${weaponResourcesEquip[i]}`,
           baseAddress: base.address,
           slotId: partIdForWeapon,
           custom: [],
@@ -263,22 +289,23 @@ describe('Equipping', async () => {
       );
     }
 
+    // Can be equipped into soldiers
+    await weaponEquip.setEquippableRefId(equippableRefId, soldierEquip.address, partIdForWeapon);
+
     // Add 2 resources to each weapon, one full, one for equip
     // There are 10 weapon tokens for 4 unique resources so we use %
     for (let i = 0; i < weapons.length; i++) {
-      await weaponEquip.addResourceToToken(weapons[i], resourcesFull[i % uniqueWeapons], 0);
-      await weaponEquip.addResourceToToken(weapons[i], resourcesEquip[i % uniqueWeapons], 0);
+      await weaponEquip.addResourceToToken(weapons[i], weaponResourcesFull[i % uniqueWeapons], 0);
+      await weaponEquip.addResourceToToken(weapons[i], weaponResourcesEquip[i % uniqueWeapons], 0);
       await weaponEquip.connect(addrs[i % 3]).acceptResource(weapons[i], 0);
     }
   }
 
   async function addResourcesToWeaponGem(): Promise<void> {
-    const equippableRefId = 1; // Resources to equip will both use this
-    const resFull = 1;
-    const resEquip = 2;
+    const equippableRefId = 1; // Resources to equip will use this
     await weaponGemEquip.addResourceEntry(
       {
-        id: resFull,
+        id: weaponGemResourceFull,
         equippableRefId: 0, // Not meant to equip
         metadataURI: 'ipfs:weagponGem/full/',
         baseAddress: ethers.constants.AddressZero, // Not meant to equip
@@ -290,7 +317,7 @@ describe('Equipping', async () => {
     );
     await weaponGemEquip.addResourceEntry(
       {
-        id: resEquip,
+        id: weaponGemResourceEquip,
         equippableRefId: equippableRefId,
         metadataURI: 'ipfs:weagponGem/equip/',
         baseAddress: base.address,
@@ -300,22 +327,29 @@ describe('Equipping', async () => {
       [],
       [],
     );
-    await weaponGemEquip.setTokenEnumeratedResource(resFull, true);
-    await weaponGemEquip.setTokenEnumeratedResource(resEquip, true);
+    // Can be equipped into weapons
+    await weaponGemEquip.setEquippableRefId(
+      equippableRefId,
+      weaponEquip.address,
+      partIdForWeaponGem,
+    );
+
+    await weaponGemEquip.setTokenEnumeratedResource(weaponGemResourceFull, true);
+    await weaponGemEquip.setTokenEnumeratedResource(weaponGemResourceEquip, true);
     for (let i = 0; i < soldiers.length; i++) {
-      await weaponGemEquip.addResourceToToken(weaponGems[i], resFull, 0);
-      await weaponGemEquip.addResourceToToken(weaponGems[i], resEquip, 0);
+      await weaponGemEquip.addResourceToToken(weaponGems[i], weaponGemResourceFull, 0);
+      await weaponGemEquip.addResourceToToken(weaponGems[i], weaponGemResourceEquip, 0);
       await weaponGemEquip.connect(addrs[i % 3]).acceptResource(weaponGems[i], 0);
       await weaponGemEquip.connect(addrs[i % 3]).acceptResource(weaponGems[i], 0);
     }
   }
 
   async function addResourcesToBackground(): Promise<void> {
-    const resId = 1;
+    const equippableRefId = 1; // Resources to equip will use this
     await backgroundEquip.addResourceEntry(
       {
-        id: resId,
-        equippableRefId: 0,
+        id: backgroundResourceId,
+        equippableRefId: equippableRefId,
         metadataURI: 'ipfs:background/',
         baseAddress: base.address,
         slotId: partIdForBackground,
@@ -324,9 +358,16 @@ describe('Equipping', async () => {
       [],
       [],
     );
-    await backgroundEquip.setTokenEnumeratedResource(resId, true);
+    // Can be equipped into soldiers
+    await backgroundEquip.setEquippableRefId(
+      equippableRefId,
+      soldierEquip.address,
+      partIdForBackground,
+    );
+
+    await backgroundEquip.setTokenEnumeratedResource(backgroundResourceId, true);
     for (let i = 0; i < soldiers.length; i++) {
-      await backgroundEquip.addResourceToToken(backgrounds[i], resId, 0);
+      await backgroundEquip.addResourceToToken(backgrounds[i], backgroundResourceId, 0);
       await backgroundEquip.connect(addrs[i % 3]).acceptResource(backgrounds[i], 0);
     }
   }

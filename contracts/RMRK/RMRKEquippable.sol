@@ -76,9 +76,14 @@ contract RMRKEquippable is IRMRKEquippableResource, MultiResourceAbstractBase {
         // Resource storage targetResource = _resources[targetResourceId];
         IRMRKNesting.Child memory child = IRMRKNesting(_nestingAddress).childOf(tokenId, childIndex);
 
-        Resource memory childResource = IRMRKEquippableResource(child.contractAddress).getResObjectByIndex(childIndex, childResourceIndex);
+        // FIXME: probably need to ask for the child equip contract instead
+        address childEquipable  = child.contractAddress;
+        // Idea:
+        // address childEquipable = IRMRKNesting(child.contractAddress).getEquippablesAddress();
 
-        if(!validateChildEquip(child.contractAddress, targetResourceId))
+        Resource memory childResource = IRMRKEquippableResource(childEquipable).getResObjectByIndex(child.tokenId, childResourceIndex);
+
+        if(!validateChildEquip(childEquipable, targetResourceId))
             revert RMRKEquippableBasePartNotEquippable();
 
         if(!validateBaseEquip(childResource.baseAddress, childResource.slotId))
@@ -86,7 +91,7 @@ contract RMRKEquippable is IRMRKEquippableResource, MultiResourceAbstractBase {
 
         Equipment memory newEquip = Equipment({
             tokenId: child.tokenId,
-            contractAddress: child.contractAddress,
+            contractAddress: childEquipable,
             childResourceId: childResource.id
         });
 
