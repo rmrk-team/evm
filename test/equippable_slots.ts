@@ -24,7 +24,8 @@ describe('Equipping', async () => {
   let owner: SignerWithAddress;
   let addrs: any[];
 
-  const baseName = 'SnakeSoldierBase';
+  const baseSymbol = 'SSB';
+  const baseType = 'mixed';
 
   const soldierName = 'SnakeSoldier';
   const soldierSymbol = 'SS';
@@ -115,7 +116,7 @@ describe('Equipping', async () => {
     const Equip = await ethers.getContractFactory('RMRKEquippableMock');
 
     // Base
-    base = await Base.deploy(baseName);
+    base = await Base.deploy(baseSymbol, baseType);
     await base.deployed();
 
     // Soldier token
@@ -148,40 +149,40 @@ describe('Equipping', async () => {
   }
 
   async function setupBase(): Promise<void> {
-    const baseForBody = {
+    const partForBody = {
       itemType: ItemType.Fixed,
       z: 1,
-      equippableInto: [],
+      equippable: [],
       src: '',
       fallbackSrc: '',
     };
-    const baseForWeapon = {
+    const partForWeapon = {
       itemType: ItemType.Slot,
       z: 2,
-      equippableInto: [soldierEquip.address],
+      equippable: [weaponEquip.address],
       src: '',
       fallbackSrc: '',
     };
-    const baseForWeaponGem = {
+    const partForWeaponGem = {
       itemType: ItemType.Slot,
       z: 3,
-      equippableInto: [weaponEquip.address],
+      equippable: [weaponGemEquip.address],
       src: '',
       fallbackSrc: '',
     };
-    const baseForBackground = {
+    const partForBackground = {
       itemType: ItemType.Slot,
       z: 0,
-      equippableInto: [soldierEquip.address],
+      equippable: [backgroundEquip.address],
       src: '',
       fallbackSrc: '',
     };
 
-    await base.addBaseEntryList([
-      { id: partIdForBody, base: baseForBody },
-      { id: partIdForWeapon, base: baseForWeapon },
-      { id: partIdForWeaponGem, base: baseForWeaponGem },
-      { id: partIdForBackground, base: baseForBackground },
+    await base.addPartList([
+      { partId: partIdForBody, part: partForBody },
+      { partId: partIdForWeapon, part: partForWeapon },
+      { partId: partIdForWeaponGem, part: partForWeaponGem },
+      { partId: partIdForBackground, part: partForBackground },
     ]);
 
     // FIXME: Why this if it is set when adding base entry?

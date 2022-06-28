@@ -17,14 +17,14 @@ interface IRMRKBaseStorage {
   * and 35,000,000 gas per 250 resources--the maximum block size of ETH mainnet is 30M at peak usage.
   */
 
-  struct Base {
+  struct Part {
       ItemType itemType; //1 byte
       uint8 z; //1 byte
-      address[] equippableInto; //n bytes 32+ // Tokens that can use receive this slot.
+      address[] equippable; //n Collections that can be equipped into this slot
       string src; //n bytes 32+
       string fallbackSrc; //n bytes 32+
   }
 
-  function checkIsEquippable(uint64 baseId, address targetAddress) external view returns (bool);
+  function checkIsEquippable(uint64 partId, address targetAddress) external view returns (bool);
 
 }
