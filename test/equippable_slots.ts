@@ -86,27 +86,82 @@ describe('Equipping', async () => {
   });
 
   describe('Validations', async function () {
-    it('can validate equips', async function () {
-      // Weapons into soldiers, only equip resources
+    it('can validate equips of weapons into soldiers', async function () {
+      // This resource is not equippable
       expect(
-        await soldierEquip.validateChildEquip(weaponEquip.address, weaponResourcesFull[0]),
+        await soldierEquip.validateChildEquip(
+          weaponEquip.address,
+          weaponResourcesFull[0],
+          partIdForWeapon,
+        ),
       ).to.eql(false);
+
+      // This resource is equippable into weapon part
       expect(
-        await soldierEquip.validateChildEquip(weaponEquip.address, weaponResourcesEquip[0]),
+        await soldierEquip.validateChildEquip(
+          weaponEquip.address,
+          weaponResourcesEquip[0],
+          partIdForWeapon,
+        ),
       ).to.eql(true);
 
-      // Weapon gems into weapons, only equip resource
+      // This resource is NOT equippable into weapon gem part
       expect(
-        await weaponEquip.validateChildEquip(weaponGemEquip.address, weaponGemResourceFull),
+        await soldierEquip.validateChildEquip(
+          weaponEquip.address,
+          weaponResourcesEquip[0],
+          partIdForWeaponGem,
+        ),
       ).to.eql(false);
+    });
+
+    it('can validate equips of weapon gems into weapons', async function () {
+      // This resource is not equippable
       expect(
-        await weaponEquip.validateChildEquip(weaponGemEquip.address, weaponGemResourceEquip),
+        await weaponEquip.validateChildEquip(
+          weaponGemEquip.address,
+          weaponGemResourceFull,
+          partIdForWeaponGem,
+        ),
+      ).to.eql(false);
+
+      // This resource is equippable into weapon gem slot
+      expect(
+        await weaponEquip.validateChildEquip(
+          weaponGemEquip.address,
+          weaponGemResourceEquip,
+          partIdForWeaponGem,
+        ),
       ).to.eql(true);
 
-      // Background into soldiers
+      // This resource is NOT equippable into background slot
       expect(
-        await soldierEquip.validateChildEquip(backgroundEquip.address, backgroundResourceId),
+        await weaponEquip.validateChildEquip(
+          weaponGemEquip.address,
+          weaponGemResourceEquip,
+          partIdForBackground,
+        ),
+      ).to.eql(false);
+    });
+
+    it('can validate equips of backgrounds into soldiers', async function () {
+      // This resource is equippable into background slot
+      expect(
+        await soldierEquip.validateChildEquip(
+          backgroundEquip.address,
+          backgroundResourceId,
+          partIdForBackground,
+        ),
       ).to.eql(true);
+
+      // This resource is NOT equippable into weapon slot
+      expect(
+        await soldierEquip.validateChildEquip(
+          backgroundEquip.address,
+          backgroundResourceId,
+          partIdForWeapon,
+        ),
+      ).to.eql(false);
     });
   });
 
@@ -184,11 +239,6 @@ describe('Equipping', async () => {
       { partId: partIdForWeaponGem, part: partForWeaponGem },
       { partId: partIdForBackground, part: partForBackground },
     ]);
-
-    // FIXME: Why this if it is set when adding base entry?
-    base.addEquippableAddresses(partIdForWeapon, [soldierEquip.address]);
-    base.addEquippableAddresses(partIdForBackground, [soldierEquip.address]);
-    base.addEquippableAddresses(partIdForWeaponGem, [weaponEquip.address]);
   }
 
   async function mintSoldiers(): Promise<void> {
@@ -291,7 +341,7 @@ describe('Equipping', async () => {
     }
 
     // Can be equipped into soldiers
-    await weaponEquip.setEquippableRefId(equippableRefId, soldierEquip.address, partIdForWeapon);
+    await weaponEquip.setValidParentRefId(equippableRefId, soldierEquip.address, partIdForWeapon);
 
     // Add 2 resources to each weapon, one full, one for equip
     // There are 10 weapon tokens for 4 unique resources so we use %
@@ -329,7 +379,7 @@ describe('Equipping', async () => {
       [],
     );
     // Can be equipped into weapons
-    await weaponGemEquip.setEquippableRefId(
+    await weaponGemEquip.setValidParentRefId(
       equippableRefId,
       weaponEquip.address,
       partIdForWeaponGem,
@@ -360,7 +410,7 @@ describe('Equipping', async () => {
       [],
     );
     // Can be equipped into soldiers
-    await backgroundEquip.setEquippableRefId(
+    await backgroundEquip.setValidParentRefId(
       equippableRefId,
       soldierEquip.address,
       partIdForBackground,
