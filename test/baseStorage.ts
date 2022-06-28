@@ -2,7 +2,6 @@ import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { RMRKBaseStorageMock } from '../typechain';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { test } from 'mocha';
 
 describe('MultiResource', async () => {
   let testBase: RMRKBaseStorageMock;
@@ -16,7 +15,7 @@ describe('MultiResource', async () => {
   const srcDefault = 'src';
   const fallbackSrcDefault = 'fallback';
 
-  const noType = 1;
+  // const noType = 0;
   const slotType = 1;
   const fixedType = 2;
 
@@ -182,6 +181,10 @@ describe('MultiResource', async () => {
     });
 
     it.skip('resets equippable to all if addresses are added', async function () {
+      //
+    });
+
+    it.skip('can get multiple parts', async function () {
       //
     });
   });

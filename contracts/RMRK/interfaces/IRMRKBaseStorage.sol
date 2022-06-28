@@ -27,4 +27,8 @@ interface IRMRKBaseStorage {
 
   function checkIsEquippable(uint64 partId, address targetAddress) external view returns (bool);
 
+  function getPart(uint64 partId) external view returns (Part memory);
+
+  function getParts(uint64[] calldata partIds) external view returns (Part[] memory);
+
 }

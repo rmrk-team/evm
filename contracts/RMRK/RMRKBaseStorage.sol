@@ -103,14 +103,6 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
     }
 
     /**
-    @dev Getter for a single base part.
-    */
-
-    function getPart(uint64 partId) external view returns (Part memory) {
-        return (_parts[partId]);
-    }
-
-    /**
     @dev Public function which adds a number of equippableAddresses to a single base entry. Only accessible by the contract
     * deployer or transferred Issuer, designated by the modifier onlyIssuer as per the inherited contract issuerControl.
     */
@@ -180,10 +172,18 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
     }
 
     /**
+    @dev Getter for a single base part.
+    */
+
+    function getPart(uint64 partId) external view returns (Part memory) {
+        return (_parts[partId]);
+    }
+
+    /**
     @dev Getter for multiple base item entries.
     */
 
-    function getBaseParts(uint64[] calldata partIds)
+    function getParts(uint64[] calldata partIds)
         external
         view
         returns (Part[] memory)
