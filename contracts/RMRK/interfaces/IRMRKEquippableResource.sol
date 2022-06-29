@@ -18,9 +18,10 @@ interface IRMRKEquippableResource is IRMRKMultiResourceBase {
     }
 
     struct Equipment {
-        uint256 tokenId;
-        address contractAddress;
+        uint64 resourceId;
         uint64 childResourceId;
+        uint childTokenId;
+        address childAddress;
     }
 
     //Equipping

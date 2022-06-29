@@ -8,6 +8,7 @@ import "./abstracts/MultiResourceAbstractBase.sol";
 import "./interfaces/IRMRKBaseStorage.sol";
 import "./interfaces/IRMRKEquippableResource.sol";
 import "./interfaces/IRMRKNesting.sol";
+import "./interfaces/IRMRKNestingWithEquippable.sol";
 import "./library/RMRKLib.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
@@ -27,9 +28,6 @@ contract RMRKEquippable is IRMRKEquippableResource, MultiResourceAbstractBase {
     using RMRKLib for uint128[];
     using Strings for uint256;
 
-    //TODO: private setter/getters
-    //TODO: Check to see is moving the array into Resource struct is cheaper
-
     //mapping of uint64 Ids to resource object
     mapping(uint64 => Resource) private _resources;
 
@@ -37,9 +35,8 @@ contract RMRKEquippable is IRMRKEquippableResource, MultiResourceAbstractBase {
     mapping(uint64 => uint64[]) private _fixedPartIds;
     mapping(uint64 => uint64[]) private _slotPartIds;
 
-    // FIXME: This should include token
-    //mapping of resourceId to slotId to equipped children
-    mapping(uint64 => mapping(uint64 => Equipment)) private _equipped;
+    //mapping of token to base address to slot part Id to equipped information.
+    mapping(uint => mapping(address => mapping(uint64 => Equipment))) private _equipped;
 
     //Mapping of refId to parent contract address and valid slotId
     mapping(uint64 => mapping(address => uint64)) private _validParentSlots;
@@ -61,6 +58,10 @@ contract RMRKEquippable is IRMRKEquippableResource, MultiResourceAbstractBase {
         _nestingAddress = nestingAddress;
     }
 
+    function getNestingAddress() external view returns(address) {
+        return _nestingAddress;
+    }
+
     function supportsInterface(bytes4 interfaceId) public virtual view returns (bool) {
         return (
             interfaceId == type(IRMRKEquippableResource).interfaceId ||
@@ -68,70 +69,96 @@ contract RMRKEquippable is IRMRKEquippableResource, MultiResourceAbstractBase {
         );
     }
 
-    //TODO: Gate to owner of tokenId
     function equip(
         uint256 tokenId,
-        uint64 targetResourceId,
+        uint64 resourceId,
         uint64 slotPartId,
         uint256 childIndex,
-        uint256 childResourceIndex
+        uint64 childResourceId
     ) external onlyOwner(tokenId) {
-        Resource storage targetResource = _resources[targetResourceId];
+        _equip(tokenId, resourceId, slotPartId, childIndex, childResourceId);
+    }
+
+    function _equip(
+        uint256 tokenId,
+        uint64 resourceId,
+        uint64 slotPartId,
+        uint256 childIndex,
+        uint64 childResourceId
+    ) private {
+        Resource storage resource = _resources[resourceId];
         IRMRKNesting.Child memory child = IRMRKNesting(_nestingAddress).childOf(tokenId, childIndex);
 
-        // FIXME: probably need to ask for the child equip contract instead
-        address childEquipable  = child.contractAddress;
-        // Idea:
-        // address childEquipable = IRMRKNesting(child.contractAddress).getEquippablesAddress();
-
-        Resource memory childResource = IRMRKEquippableResource(childEquipable).getResObjectByIndex(child.tokenId, childResourceIndex);
-        // FIXME: should we make sure childResource.baseAddress == targetResource.baseAddress
+        address childEquipable = IRMRKNestingWithEquippable(child.contractAddress).getEquippablesAddress();
 
         // Check from child persective
-        if(!validateChildEquip(childEquipable, targetResourceId, slotPartId))
+        if(!validateChildEquip(childEquipable, childResourceId, slotPartId))
             revert RMRKEquippableBasePartNotEquippable();
 
-        if(!_validateBaseEquip(targetResource.baseAddress, childEquipable, slotPartId))
+        // Check from base perspective
+        if(!_validateBaseEquip(resource.baseAddress, childEquipable, slotPartId))
             revert RMRKEquippableEquipNotAllowedByBase();
 
         Equipment memory newEquip = Equipment({
-            tokenId: child.tokenId,
-            contractAddress: childEquipable,
-            childResourceId: childResource.id
+            resourceId: resourceId,
+            childResourceId: childResourceId,
+            childTokenId: child.tokenId,
+            childAddress: childEquipable
         });
 
-        // FIXME this is missing token id
-        _equipped[targetResourceId][slotPartId] = newEquip;
+        _equipped[tokenId][resource.baseAddress][slotPartId] = newEquip;
+        // FIXME: child must now be marked as equipped
     }
 
     function unequip(
         uint256 tokenId,
-        uint64 targetResourceId,
+        uint64 resourceId,
         uint64 slotPartId
     ) external onlyOwner(tokenId) {
-        // FIXME this is missing token id
-        delete _equipped[targetResourceId][slotPartId];
+        _unequip(tokenId, resourceId, slotPartId);
+    }
+
+    function _unequip(
+        uint256 tokenId,
+        uint64 resourceId,
+        uint64 slotPartId
+    ) private {
+        address targetBaseAddress = _resources[resourceId].baseAddress;
+        delete _equipped[tokenId][targetBaseAddress][slotPartId];
     }
 
     function replaceEquipment(
         uint256 tokenId,
-        uint64 targetResourceId,
-        uint256 slotPartIndex,
+        uint64 oldResourceId,
+        uint64 newResourceId,
+        uint64 slotPartId,
         uint256 childIndex,
-        uint256 childResourceIndex
+        uint64 childResourceId
     ) external onlyOwner(tokenId) {
-        // TODO: Implement
+        _unequip(tokenId, oldResourceId, slotPartId);
+        _equip(tokenId, newResourceId, slotPartId, childIndex, childResourceId);
     }
 
-    function getEquipped(uint64 targetResourceId) public view returns (uint64[] memory slotsEquipped, Equipment[] memory childrenEquipped) {
-        uint64[] memory slotPartIds = _slotPartIds[targetResourceId];
+    function getEquipped(
+        uint64 tokenId,
+        uint64 resourceId
+    ) public view returns (
+        uint64[] memory slotsEquipped,
+        Equipment[] memory childrenEquipped
+    ) {
+        address targetBaseAddress = _resources[resourceId].baseAddress;
+        uint64[] memory slotPartIds = _slotPartIds[resourceId];
+
+        // FIXME: There could be empty slots and children at the end, since a part might be equipped to another resource or simply not equipped
+        slotsEquipped = new uint64[](slotPartIds.length);
+        childrenEquipped = new Equipment[](slotPartIds.length);
+
         uint256 len = slotPartIds.length;
         for (uint i; i<len;) {
-            Equipment memory childEquipped = _equipped[targetResourceId][slotPartIds[i]];
-            if (childEquipped.tokenId != uint256(0)) {
-                uint256 childrenEquippedLen = childrenEquipped.length;
-                childrenEquipped[childrenEquippedLen] = childEquipped;
-                slotsEquipped[childrenEquippedLen] = slotPartIds[i];
+            slotsEquipped[i] = slotPartIds[i];
+            Equipment memory equipment = _equipped[tokenId][targetBaseAddress][slotPartIds[i]];
+            if (equipment.resourceId == resourceId) {
+                childrenEquipped[i] = equipment;
             }
             unchecked {++i;}
         }
@@ -139,55 +166,56 @@ contract RMRKEquippable is IRMRKEquippableResource, MultiResourceAbstractBase {
 
     //Gate for equippable array in here by check of slotPartDefinition to slotPartId
     function composeEquippables(
-        uint64 targetResourceId
+        uint tokenId,
+        uint64 resourceId
     ) public view returns (uint64[] memory basePartIds, address[] memory baseAddresses) {
         //get Resource of target token
-        Resource storage targetResource = _resources[targetResourceId];
-        //Check gas efficiency of scoping like this
-        address baseAddress = targetResource.baseAddress;
-        //fixed IDs
-        {
-            uint64[] memory fixedPartIds = _fixedPartIds[targetResourceId];
-            uint256 len = fixedPartIds.length;
-            uint256 basePartIdsLen = basePartIds.length;
-            unchecked {
-                for (uint i; i<len;) {
-                    uint64 partId = fixedPartIds[i];
-                    basePartIds[basePartIdsLen] = partId;
-                    baseAddresses[basePartIdsLen] = baseAddress;
-                    ++basePartIdsLen;
-                    ++i;
-                }
-            }
-        }
-        //Slot IDs + recurse
-        {
-            uint64[] memory slotPartIds = _slotPartIds[targetResourceId];
-            uint256 len = slotPartIds.length;
-            uint256 basePartIdsLen = basePartIds.length;
-            unchecked {
-                for (uint i; i<len;) {
-                    uint64 partId = slotPartIds[i];
-                    basePartIds[basePartIdsLen] = partId;
-                    baseAddresses[basePartIdsLen] = baseAddress;
-                    ++basePartIdsLen;
-                    ++i;
+        // Resource storage resource = _resources[resourceId];
+        // //Check gas efficiency of scoping like this
+        // address baseAddress = resource.baseAddress;
+        // //fixed IDs
+        // {
+        //     uint64[] memory fixedPartIds = _fixedPartIds[resourceId];
+        //     uint256 len = fixedPartIds.length;
+        //     uint256 basePartIdsLen = basePartIds.length;
+        //     unchecked {
+        //         for (uint i; i<len;) {
+        //             uint64 partId = fixedPartIds[i];
+        //             basePartIds[basePartIdsLen] = partId;
+        //             baseAddresses[basePartIdsLen] = baseAddress;
+        //             ++basePartIdsLen;
+        //             ++i;
+        //         }
+        //     }
+        // }
+        // //Slot IDs + recurse
+        // {
+        //     uint64[] memory slotPartIds = _slotPartIds[resourceId];
+        //     uint256 len = slotPartIds.length;
+        //     uint256 basePartIdsLen = basePartIds.length;
+        //     unchecked {
+        //         for (uint i; i<len;) {
+        //             uint64 partId = slotPartIds[i];
+        //             basePartIds[basePartIdsLen] = partId;
+        //             baseAddresses[basePartIdsLen] = baseAddress;
+        //             ++basePartIdsLen;
+        //             ++i;
 
-                    uint64 equippedResourceId = _equipped[targetResourceId][partId].childResourceId;
-                    //Recuse while we're in this block, slotpartIds are initialized
-                    (uint64[] memory equippedBasePartIds, address[] memory equippedBaseAddresses) = composeEquippables(
-                        equippedResourceId
-                    );
-                    uint256 recLen = equippedBasePartIds.length;
-                    for (uint j; j<recLen;) {
-                        basePartIds[basePartIdsLen] = equippedBasePartIds[j];
-                        baseAddresses[basePartIdsLen] = equippedBaseAddresses[j];
-                        ++basePartIdsLen;
-                        ++j;
-                    }
-                }
-            }
-        }
+        //             uint64 equippedResourceId = _equipped[resourceId][partId].childResourceId;
+        //             //Recuse while we're in this block, slotpartIds are initialized
+        //             (uint64[] memory equippedBasePartIds, address[] memory equippedBaseAddresses) = composeEquippables(
+        //                 equippedResourceId
+        //             );
+        //             uint256 recLen = equippedBasePartIds.length;
+        //             for (uint j; j<recLen;) {
+        //                 basePartIds[basePartIdsLen] = equippedBasePartIds[j];
+        //                 baseAddresses[basePartIdsLen] = equippedBaseAddresses[j];
+        //                 ++basePartIdsLen;
+        //                 ++j;
+        //             }
+        //         }
+        //     }
+        // }
     }
 
     // --------------------- VALIDATION ---------------------
@@ -204,6 +232,7 @@ contract RMRKEquippable is IRMRKEquippableResource, MultiResourceAbstractBase {
 
     //Checks if the resource for the child is intented to be equipped into the part slot
     function validateChildEquip(address childContract, uint64 childResourceId, uint64 slotPartId) public view returns (bool isEquippable) {
+        // FIXME: Must also check the child is not already equipped
         isEquippable = IRMRKEquippableResource(childContract).getCallerEquippableSlot(childResourceId) == slotPartId;
     }
 

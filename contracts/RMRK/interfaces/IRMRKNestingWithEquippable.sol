@@ -7,13 +7,8 @@ pragma solidity ^0.8.0;
  * @dev Interface for any contract that wants to support safeTransfers
  * from ERC721 asset contracts.
  */
-interface IRMRKNestingReceiver {
+interface IRMRKNestingWithEquippable {
 
-    function onRMRKNestingReceived(
-        address,
-        address,
-        uint256,
-        bytes calldata
-    ) external returns (bytes4);
+    function getEquippablesAddress() external view returns (address);
 
 }

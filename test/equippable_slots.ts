@@ -2,6 +2,7 @@ import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { RMRKBaseStorageMock, RMRKEquippableMock, RMRKNestingMock } from '../typechain';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { BigNumber } from 'ethers';
 
 // The general idea is having these tokens: Soldier, Weapon, WeaponGem and Background.
 // Weapon and Background can be equipped into Soldier. WeaponGem can be equipped into Weapon
@@ -54,6 +55,7 @@ describe('Equipping', async () => {
   const weaponGems = [21, 22, 23, 24, 25, 26, 27, 28, 29, 30];
   const backgrounds = [31, 32, 33, 34, 35, 36, 37, 38, 39, 40];
 
+  const soldierResId = 1;
   const weaponResourcesFull = [1, 2, 3, 4]; // Must match the total of uniqueResources
   const weaponResourcesEquip = [5, 6, 7, 8]; // Must match the total of uniqueResources
   const weaponGemResourceFull = 1;
@@ -165,6 +167,57 @@ describe('Equipping', async () => {
     });
   });
 
+  describe('Equip', async function () {
+    it('can equip weapon', async function () {
+      // Weapon is child on index 0, background on index 1
+      const childIndex = 0;
+      const weaponResId = weaponResourcesEquip[0]; // This resource is assigned to weapon first weapon
+      await soldierEquip
+        .connect(addrs[0])
+        .equip(soldiers[0], soldierResId, partIdForWeapon, childIndex, weaponResId);
+      // All part slots are included on the response:
+      const expectedSlots = [bn(partIdForWeapon), bn(partIdForBackground)];
+      // If a slot has nothing equipped, it returns an empty equip:
+      const expectedEquips = [
+        [bn(soldierResId), bn(weaponResId), bn(weapons[0]), weaponEquip.address],
+        [bn(0), bn(0), bn(0), ethers.constants.AddressZero],
+      ];
+      expect(await soldierEquip.getEquipped(soldiers[0], soldierResId)).to.eql([
+        expectedSlots,
+        expectedEquips,
+      ]);
+    });
+
+    it('can equip weapon and background', async function () {
+      // Weapon is child on index 0, background on index 1
+      const weaponChildIndex = 0;
+      const backgroundChildIndex = 1;
+      const weaponResId = weaponResourcesEquip[0]; // This resource is assigned to weapon first weapon
+      await soldierEquip
+        .connect(addrs[0])
+        .equip(soldiers[0], soldierResId, partIdForWeapon, weaponChildIndex, weaponResId);
+      await soldierEquip
+        .connect(addrs[0])
+        .equip(
+          soldiers[0],
+          soldierResId,
+          partIdForBackground,
+          backgroundChildIndex,
+          backgroundResourceId,
+        );
+
+      const expectedSlots = [bn(partIdForWeapon), bn(partIdForBackground)];
+      const expectedEquips = [
+        [bn(soldierResId), bn(weaponResId), bn(weapons[0]), weaponEquip.address],
+        [bn(soldierResId), bn(backgroundResourceId), bn(backgrounds[0]), backgroundEquip.address],
+      ];
+      expect(await soldierEquip.getEquipped(soldiers[0], soldierResId)).to.eql([
+        expectedSlots,
+        expectedEquips,
+      ]);
+    });
+  });
+
   async function deployContracts(): Promise<void> {
     const Base = await ethers.getContractFactory('RMRKBaseStorageMock');
     const Nesting = await ethers.getContractFactory('RMRKNestingMock');
@@ -179,28 +232,36 @@ describe('Equipping', async () => {
     await soldier.deployed();
     soldierEquip = await Equip.deploy();
     await soldierEquip.deployed();
-    soldierEquip.setNestingAddress(soldier.address);
 
+    // Link nesting and equippable:
+    soldierEquip.setNestingAddress(soldier.address);
+    soldier.setEquippableAddress(soldierEquip.address);
     // Weapon
     weapon = await Nesting.deploy(weaponName, weaponSymbol);
     await weapon.deployed();
     weaponEquip = await Equip.deploy();
-    weaponEquip.setNestingAddress(weapon.address);
     await weaponEquip.deployed();
+    // Link nesting and equippable:
+    weaponEquip.setNestingAddress(weapon.address);
+    weapon.setEquippableAddress(weaponEquip.address);
 
     // Weapon Gem
     weaponGem = await Nesting.deploy(weaponGemName, weaponGemSymbol);
     await weaponGem.deployed();
     weaponGemEquip = await Equip.deploy();
-    weaponGemEquip.setNestingAddress(weaponGem.address);
     await weaponGemEquip.deployed();
+    // Link nesting and equippable:
+    weaponGemEquip.setNestingAddress(weaponGem.address);
+    weaponGem.setEquippableAddress(weaponGemEquip.address);
 
     // Background
     background = await Nesting.deploy(backgroundName, backgroundSymbol);
     await background.deployed();
     backgroundEquip = await Equip.deploy();
-    backgroundEquip.setNestingAddress(background.address);
     await backgroundEquip.deployed();
+    // Link nesting and equippable:
+    backgroundEquip.setNestingAddress(background.address);
+    background.setEquippableAddress(backgroundEquip.address);
   }
 
   async function setupBase(): Promise<void> {
@@ -288,22 +349,21 @@ describe('Equipping', async () => {
   }
 
   async function addResourcesToSoldier(): Promise<void> {
-    const resId = 1;
     await soldierEquip.addResourceEntry(
       {
-        id: resId,
+        id: soldierResId,
         equippableRefId: 0,
         metadataURI: 'ipfs:soldier/',
         baseAddress: base.address,
         slotId: partIdForBody,
         custom: [],
       },
-      [], // FIXME: Should part id for body be here?
-      [partIdForWeapon, partIdForWeapon], // Can receive these
+      [partIdForBody], // Fixed parts
+      [partIdForWeapon, partIdForBackground], // Can receive these
     );
-    await soldierEquip.setTokenEnumeratedResource(resId, true);
+    await soldierEquip.setTokenEnumeratedResource(soldierResId, true);
     for (let i = 0; i < soldiers.length; i++) {
-      await soldierEquip.addResourceToToken(soldiers[i], resId, 0);
+      await soldierEquip.addResourceToToken(soldiers[i], soldierResId, 0);
       await soldierEquip.connect(addrs[i % 3]).acceptResource(soldiers[i], 0);
     }
   }
@@ -336,7 +396,7 @@ describe('Equipping', async () => {
           custom: [],
         },
         [],
-        [],
+        [partIdForWeaponGem],
       );
     }
 
@@ -421,5 +481,9 @@ describe('Equipping', async () => {
       await backgroundEquip.addResourceToToken(backgrounds[i], backgroundResourceId, 0);
       await backgroundEquip.connect(addrs[i % 3]).acceptResource(backgrounds[i], 0);
     }
+  }
+
+  function bn(x: number): BigNumber {
+    return BigNumber.from(x);
   }
 });

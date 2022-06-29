@@ -253,8 +253,8 @@ abstract contract NestingAbstract is Context, IRMRKNesting {
         uint256 parentTokenId,
         uint256 index
     ) external view returns (Child memory) {
-        // FIXME: Check index
-        Child memory child = _pendingChildren[parentTokenId][index];
+        // FIXME: Add test, this was broken (looking into pending)
+        Child memory child = _children[parentTokenId][index];
         return child;
     }
 
