@@ -2,6 +2,7 @@ import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { RMRKBaseStorageMock, RMRKEquippableMock, RMRKNestingMock } from '../typechain';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { BigNumber } from 'ethers';
 
 // The general idea is having these tokens: Soldier, Weapon, WeaponGem and Background.
 // Weapon and Background can be equipped into Soldier. WeaponGem can be equipped into Weapon
@@ -24,7 +25,8 @@ describe('Equipping', async () => {
   let owner: SignerWithAddress;
   let addrs: any[];
 
-  const baseName = 'SnakeSoldierBase';
+  const baseSymbol = 'SSB';
+  const baseType = 'mixed';
 
   const soldierName = 'SnakeSoldier';
   const soldierSymbol = 'SS';
@@ -53,11 +55,12 @@ describe('Equipping', async () => {
   const weaponGems = [21, 22, 23, 24, 25, 26, 27, 28, 29, 30];
   const backgrounds = [31, 32, 33, 34, 35, 36, 37, 38, 39, 40];
 
+  const soldierResId = 100;
   const weaponResourcesFull = [1, 2, 3, 4]; // Must match the total of uniqueResources
   const weaponResourcesEquip = [5, 6, 7, 8]; // Must match the total of uniqueResources
-  const weaponGemResourceFull = 1;
-  const weaponGemResourceEquip = 2;
-  const backgroundResourceId = 1;
+  const weaponGemResourceFull = 101;
+  const weaponGemResourceEquip = 102;
+  const backgroundResourceId = 200;
 
   enum ItemType {
     None, 
@@ -85,27 +88,231 @@ describe('Equipping', async () => {
   });
 
   describe('Validations', async function () {
-    it('can validate equips', async function () {
-      // Weapons into soldiers, only equip resources
+    it('can validate equips of weapons into soldiers', async function () {
+      // This resource is not equippable
       expect(
-        await soldierEquip.validateChildEquip(weaponEquip.address, weaponResourcesFull[0]),
+        await soldierEquip.validateChildEquip(
+          weaponEquip.address,
+          weaponResourcesFull[0],
+          partIdForWeapon,
+        ),
       ).to.eql(false);
+
+      // This resource is equippable into weapon part
       expect(
-        await soldierEquip.validateChildEquip(weaponEquip.address, weaponResourcesEquip[0]),
+        await soldierEquip.validateChildEquip(
+          weaponEquip.address,
+          weaponResourcesEquip[0],
+          partIdForWeapon,
+        ),
       ).to.eql(true);
 
-      // Weapon gems into weapons, only equip resource
+      // This resource is NOT equippable into weapon gem part
       expect(
-        await weaponEquip.validateChildEquip(weaponGemEquip.address, weaponGemResourceFull),
+        await soldierEquip.validateChildEquip(
+          weaponEquip.address,
+          weaponResourcesEquip[0],
+          partIdForWeaponGem,
+        ),
       ).to.eql(false);
+    });
+
+    it('can validate equips of weapon gems into weapons', async function () {
+      // This resource is not equippable
       expect(
-        await weaponEquip.validateChildEquip(weaponGemEquip.address, weaponGemResourceEquip),
+        await weaponEquip.validateChildEquip(
+          weaponGemEquip.address,
+          weaponGemResourceFull,
+          partIdForWeaponGem,
+        ),
+      ).to.eql(false);
+
+      // This resource is equippable into weapon gem slot
+      expect(
+        await weaponEquip.validateChildEquip(
+          weaponGemEquip.address,
+          weaponGemResourceEquip,
+          partIdForWeaponGem,
+        ),
       ).to.eql(true);
 
-      // Background into soldiers
+      // This resource is NOT equippable into background slot
       expect(
-        await soldierEquip.validateChildEquip(backgroundEquip.address, backgroundResourceId),
+        await weaponEquip.validateChildEquip(
+          weaponGemEquip.address,
+          weaponGemResourceEquip,
+          partIdForBackground,
+        ),
+      ).to.eql(false);
+    });
+
+    it('can validate equips of backgrounds into soldiers', async function () {
+      // This resource is equippable into background slot
+      expect(
+        await soldierEquip.validateChildEquip(
+          backgroundEquip.address,
+          backgroundResourceId,
+          partIdForBackground,
+        ),
       ).to.eql(true);
+
+      // This resource is NOT equippable into weapon slot
+      expect(
+        await soldierEquip.validateChildEquip(
+          backgroundEquip.address,
+          backgroundResourceId,
+          partIdForWeapon,
+        ),
+      ).to.eql(false);
+    });
+  });
+
+  describe.only('Equip', async function () {
+    it('can equip weapon', async function () {
+      // Weapon is child on index 0, background on index 1
+      const childIndex = 0;
+      const weaponResId = weaponResourcesEquip[0]; // This resource is assigned to weapon first weapon
+      await soldierEquip
+        .connect(addrs[0])
+        .equip(soldiers[0], soldierResId, partIdForWeapon, childIndex, weaponResId);
+      // All part slots are included on the response:
+      const expectedSlots = [bn(partIdForWeapon), bn(partIdForBackground)];
+      // If a slot has nothing equipped, it returns an empty equip:
+      const expectedEquips = [
+        [bn(soldierResId), bn(weaponResId), bn(weapons[0]), weaponEquip.address],
+        [bn(0), bn(0), bn(0), ethers.constants.AddressZero],
+      ];
+      expect(await soldierEquip.getEquipped(soldiers[0], soldierResId)).to.eql([
+        expectedSlots,
+        expectedEquips,
+      ]);
+
+      // Child is marked as equpped:
+      expect(await weaponEquip.isEquipped(weapons[0])).to.eql(true);
+    });
+
+    it('can equip weapon and background', async function () {
+      // Weapon is child on index 0, background on index 1
+      const weaponChildIndex = 0;
+      const backgroundChildIndex = 1;
+      const weaponResId = weaponResourcesEquip[0]; // This resource is assigned to weapon first weapon
+      await soldierEquip
+        .connect(addrs[0])
+        .equip(soldiers[0], soldierResId, partIdForWeapon, weaponChildIndex, weaponResId);
+      await soldierEquip
+        .connect(addrs[0])
+        .equip(
+          soldiers[0],
+          soldierResId,
+          partIdForBackground,
+          backgroundChildIndex,
+          backgroundResourceId,
+        );
+
+      const expectedSlots = [bn(partIdForWeapon), bn(partIdForBackground)];
+      const expectedEquips = [
+        [bn(soldierResId), bn(weaponResId), bn(weapons[0]), weaponEquip.address],
+        [bn(soldierResId), bn(backgroundResourceId), bn(backgrounds[0]), backgroundEquip.address],
+      ];
+      expect(await soldierEquip.getEquipped(soldiers[0], soldierResId)).to.eql([
+        expectedSlots,
+        expectedEquips,
+      ]);
+
+      // Children are marked as equpped:
+      expect(await weaponEquip.isEquipped(weapons[0])).to.eql(true);
+      expect(await backgroundEquip.isEquipped(backgrounds[0])).to.eql(true);
+    });
+
+    it('cannot equip non existing child in slot (weapon in background)', async function () {
+      // Weapon is child on index 0, background on index 1
+      const badChildIndex = 3;
+      const weaponResId = weaponResourcesEquip[0]; // This resource is assigned to weapon first weapon
+      await expect(
+        soldierEquip
+          .connect(addrs[0])
+          .equip(soldiers[0], soldierResId, partIdForWeapon, badChildIndex, weaponResId),
+      ).to.be.reverted; // Bad index
+    });
+
+    it('cannot equip wrong child in slot (weapon in background)', async function () {
+      // Weapon is child on index 0, background on index 1
+      const backgroundChildIndex = 1;
+      const weaponResId = weaponResourcesEquip[0]; // This resource is assigned to weapon first weapon
+      await expect(
+        soldierEquip
+          .connect(addrs[0])
+          .equip(soldiers[0], soldierResId, partIdForWeapon, backgroundChildIndex, weaponResId),
+      ).to.be.revertedWith('RMRKEquippableBasePartNotEquippable()');
+    });
+
+    it('cannot equip child in wrong slot (weapon in background)', async function () {
+      // Weapon is child on index 0, background on index 1
+      const childIndex = 0;
+      const weaponResId = weaponResourcesEquip[0]; // This resource is assigned to weapon first weapon
+      await expect(
+        soldierEquip
+          .connect(addrs[0])
+          .equip(soldiers[0], soldierResId, partIdForBackground, childIndex, weaponResId),
+      ).to.be.revertedWith('RMRKEquippableBasePartNotEquippable()');
+    });
+
+    it('cannot equip child with wrong resource (weapon in background)', async function () {
+      // Weapon is child on index 0, background on index 1
+      const childIndex = 0;
+      await expect(
+        soldierEquip
+          .connect(addrs[0])
+          .equip(soldiers[0], soldierResId, partIdForWeapon, childIndex, backgroundResourceId),
+      ).to.be.revertedWith('RMRKEquippableBasePartNotEquippable()');
+    });
+
+    it('cannot equip if not owner', async function () {
+      //
+    });
+
+    it('cannot equip 2 children into the same slot', async function () {
+      //
+    });
+
+    it('cannot equip if not intented on base', async function () {
+      //
+    });
+
+    it('cannot equip on not slot part on base', async function () {
+      //
+    });
+
+    it('cannot mark equipped from wrong parent', async function () {
+      //
+    });
+  });
+
+  describe('Unequip', async function () {
+    it('can unequipp', async function () {
+      //
+    });
+
+    it('cannot unequipp if not equipped', async function () {
+      //
+    });
+
+    it('cannot unequipp if not owner', async function () {
+      //
+    });
+  });
+
+  describe.only('Replace equip', async function () {
+    it('can replace equip', async function () {
+      //
+    });
+
+    it('cannot replace equip if not equipped', async function () {
+      //
+    });
+
+    it('cannot replace equip if not owner', async function () {
+      //
     });
   });
 
@@ -115,7 +322,7 @@ describe('Equipping', async () => {
     const Equip = await ethers.getContractFactory('RMRKEquippableMock');
 
     // Base
-    base = await Base.deploy(baseName);
+    base = await Base.deploy(baseSymbol, baseType);
     await base.deployed();
 
     // Soldier token
@@ -123,71 +330,74 @@ describe('Equipping', async () => {
     await soldier.deployed();
     soldierEquip = await Equip.deploy();
     await soldierEquip.deployed();
-    soldierEquip.setNestingAddress(soldier.address);
 
+    // Link nesting and equippable:
+    soldierEquip.setNestingAddress(soldier.address);
+    soldier.setEquippableAddress(soldierEquip.address);
     // Weapon
     weapon = await Nesting.deploy(weaponName, weaponSymbol);
     await weapon.deployed();
     weaponEquip = await Equip.deploy();
-    weaponEquip.setNestingAddress(weapon.address);
     await weaponEquip.deployed();
+    // Link nesting and equippable:
+    weaponEquip.setNestingAddress(weapon.address);
+    weapon.setEquippableAddress(weaponEquip.address);
 
     // Weapon Gem
     weaponGem = await Nesting.deploy(weaponGemName, weaponGemSymbol);
     await weaponGem.deployed();
     weaponGemEquip = await Equip.deploy();
-    weaponGemEquip.setNestingAddress(weaponGem.address);
     await weaponGemEquip.deployed();
+    // Link nesting and equippable:
+    weaponGemEquip.setNestingAddress(weaponGem.address);
+    weaponGem.setEquippableAddress(weaponGemEquip.address);
 
     // Background
     background = await Nesting.deploy(backgroundName, backgroundSymbol);
     await background.deployed();
     backgroundEquip = await Equip.deploy();
-    backgroundEquip.setNestingAddress(background.address);
     await backgroundEquip.deployed();
+    // Link nesting and equippable:
+    backgroundEquip.setNestingAddress(background.address);
+    background.setEquippableAddress(backgroundEquip.address);
   }
 
   async function setupBase(): Promise<void> {
-    const baseForBody = {
+    const partForBody = {
       itemType: ItemType.Fixed,
       z: 1,
-      equippableInto: [],
+      equippable: [],
       src: '',
       fallbackSrc: '',
     };
-    const baseForWeapon = {
+    const partForWeapon = {
       itemType: ItemType.Slot,
       z: 2,
-      equippableInto: [soldierEquip.address],
+      equippable: [weaponEquip.address],
       src: '',
       fallbackSrc: '',
     };
-    const baseForWeaponGem = {
+    const partForWeaponGem = {
       itemType: ItemType.Slot,
       z: 3,
-      equippableInto: [weaponEquip.address],
+      equippable: [weaponGemEquip.address],
       src: '',
       fallbackSrc: '',
     };
-    const baseForBackground = {
+    const partForBackground = {
       itemType: ItemType.Slot,
       z: 0,
-      equippableInto: [soldierEquip.address],
+      equippable: [backgroundEquip.address],
       src: '',
       fallbackSrc: '',
     };
 
-    await base.addBaseEntryList([
-      { id: partIdForBody, base: baseForBody },
-      { id: partIdForWeapon, base: baseForWeapon },
-      { id: partIdForWeaponGem, base: baseForWeaponGem },
-      { id: partIdForBackground, base: baseForBackground },
+    await base.addPartList([
+      { partId: partIdForBody, part: partForBody },
+      { partId: partIdForWeapon, part: partForWeapon },
+      { partId: partIdForWeaponGem, part: partForWeaponGem },
+      { partId: partIdForBackground, part: partForBackground },
     ]);
-
-    // FIXME: Why this if it is set when adding base entry?
-    base.addEquippableAddresses(partIdForWeapon, [soldierEquip.address]);
-    base.addEquippableAddresses(partIdForBackground, [soldierEquip.address]);
-    base.addEquippableAddresses(partIdForWeaponGem, [weaponEquip.address]);
   }
 
   async function mintSoldiers(): Promise<void> {
@@ -237,22 +447,21 @@ describe('Equipping', async () => {
   }
 
   async function addResourcesToSoldier(): Promise<void> {
-    const resId = 1;
     await soldierEquip.addResourceEntry(
       {
-        id: resId,
+        id: soldierResId,
         equippableRefId: 0,
         metadataURI: 'ipfs:soldier/',
         baseAddress: base.address,
         slotId: partIdForBody,
         custom: [],
       },
-      [], // FIXME: Should part id for body be here?
-      [partIdForWeapon, partIdForWeapon], // Can receive these
+      [partIdForBody], // Fixed parts
+      [partIdForWeapon, partIdForBackground], // Can receive these
     );
-    await soldierEquip.setTokenEnumeratedResource(resId, true);
+    await soldierEquip.setTokenEnumeratedResource(soldierResId, true);
     for (let i = 0; i < soldiers.length; i++) {
-      await soldierEquip.addResourceToToken(soldiers[i], resId, 0);
+      await soldierEquip.addResourceToToken(soldiers[i], soldierResId, 0);
       await soldierEquip.connect(addrs[i % 3]).acceptResource(soldiers[i], 0);
     }
   }
@@ -285,12 +494,12 @@ describe('Equipping', async () => {
           custom: [],
         },
         [],
-        [],
+        [partIdForWeaponGem],
       );
     }
 
     // Can be equipped into soldiers
-    await weaponEquip.setEquippableRefId(equippableRefId, soldierEquip.address, partIdForWeapon);
+    await weaponEquip.setValidParentRefId(equippableRefId, soldierEquip.address, partIdForWeapon);
 
     // Add 2 resources to each weapon, one full, one for equip
     // There are 10 weapon tokens for 4 unique resources so we use %
@@ -328,7 +537,7 @@ describe('Equipping', async () => {
       [],
     );
     // Can be equipped into weapons
-    await weaponGemEquip.setEquippableRefId(
+    await weaponGemEquip.setValidParentRefId(
       equippableRefId,
       weaponEquip.address,
       partIdForWeaponGem,
@@ -359,7 +568,7 @@ describe('Equipping', async () => {
       [],
     );
     // Can be equipped into soldiers
-    await backgroundEquip.setEquippableRefId(
+    await backgroundEquip.setValidParentRefId(
       equippableRefId,
       soldierEquip.address,
       partIdForBackground,
@@ -370,5 +579,9 @@ describe('Equipping', async () => {
       await backgroundEquip.addResourceToToken(backgrounds[i], backgroundResourceId, 0);
       await backgroundEquip.connect(addrs[i % 3]).acceptResource(backgrounds[i], 0);
     }
+  }
+
+  function bn(x: number): BigNumber {
+    return BigNumber.from(x);
   }
 });

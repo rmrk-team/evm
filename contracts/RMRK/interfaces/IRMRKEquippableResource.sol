@@ -18,12 +18,17 @@ interface IRMRKEquippableResource is IRMRKMultiResourceBase {
     }
 
     struct Equipment {
-        uint256 tokenId;
-        address contractAddress;
+        uint64 resourceId;
         uint64 childResourceId;
+        uint childTokenId;
+        address childAddress;
     }
 
     //Equipping
+
+    function markEquipped(uint tokenId, uint64 resourceId, bool equipped) external;
+
+    function isEquipped(uint tokenId) external view returns(bool);
 
     //Abstractions
 

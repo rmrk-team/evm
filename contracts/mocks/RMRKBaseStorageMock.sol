@@ -6,26 +6,33 @@ import "../RMRK/access/RMRKIssuable.sol";
 import "../RMRK/RMRKBaseStorage.sol";
 
 contract RMRKBaseStorageMock is RMRKIssuable, RMRKBaseStorage {
-    constructor(string memory _baseName)
-    RMRKBaseStorage(_baseName) {}
+    constructor(string memory symbol_, string memory type__)
+    RMRKBaseStorage(symbol_, type__) {}
 
-    function addBaseEntry(IntakeStruct memory intakeStruct) external onlyIssuer {
-        _addBaseEntry(intakeStruct);
+    function addPart(IntakeStruct memory intakeStruct) external onlyIssuer {
+        _addPart(intakeStruct);
     }
 
-    function addBaseEntryList(IntakeStruct[] memory intakeStructs) external onlyIssuer {
-        _addBaseEntryList(intakeStructs);
+    function addPartList(IntakeStruct[] memory intakeStructs) external onlyIssuer {
+        _addPartList(intakeStructs);
     }
 
     function addEquippableAddresses(
-        uint64 _baseEntryId,
-        address[] memory _equippableAddresses
+        uint64 partId,
+        address[] memory equippableAddresses
     ) external onlyIssuer {
-        _addEquippableAddresses(_baseEntryId, _equippableAddresses);
+        _addEquippableAddresses(partId, equippableAddresses);
     }
 
-    function addEquippableIdToAll(address _equippableAddress) external onlyIssuer {
-        _addEquippableIdToAll(_equippableAddress);
+    function setEquippableAddresses(
+        uint64 partId,
+        address[] memory equippableAddresses
+    ) external onlyIssuer {
+        _setEquippableAddresses(partId, equippableAddresses);
+    }
+
+    function setEquippableToAll(uint64 partId) external onlyIssuer {
+        _setEquippableToAll(partId);
     }
 
 }

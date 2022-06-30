@@ -6,13 +6,13 @@ import "./interfaces/IRMRKBaseStorage.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 //import "hardhat/console.sol";
 
-error RMRKBaseAlreadyExists();
-error RMRKBaseEntryDoesNotExist();
-error RMRKMismatchedInputArrayLength();
+error RMRKPartAlreadyExists();
+error RMRKPartDoesNotExist();
+error RMRKPartIsNotSlot();
 error RMRKZeroLengthIdsPassed();
 
 contract RMRKBaseStorage is IRMRKBaseStorage {
-  using Address for address;
+    using Address for address;
     /*
     REVIEW NOTES:
 
@@ -27,6 +27,7 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
     include computing the id on-chain as a hash of attributes of the struct, or a simple incrementer. Passing
     an ID or an incrementer will likely be the cheapest in terms of gas cost.
 
+    FIXME: This is not true at the moment:
     In its current implementation, all base asset entries MUST be passed via an array during contract construction.
     This is the only way to ensure contract immutability after deployment, though due to the gas costs of RMRK
     base assets it is highly recommended that developers are offered a commit > freeze pattern, by which developers
@@ -37,69 +38,68 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
 
 
     //uint64 is sort of arbitrary here--resource IDs in RMRK substrate are uint64 for reference
-    mapping(uint64 => Base) private bases;
-    mapping(uint64 => mapping(address => bool)) private isEquippable;
+    mapping(uint64 => Part) private _parts;
+    mapping(uint64 => bool) private _isEquippableToAll;
 
-    uint64[] private baseIds;
+    uint64[] private _partIds;
 
-    //TODO: Make private
-    string private _name;
+    string private _symbol;
+    string private _type;
 
-    event AddedEquippablesToEntry(uint64 baseId, address[] equippableAddresses);
-    event AddedEquippableToAll(address equippableAddress);
+    event AddedEquippables(uint64 partId, address[] equippableAddresses);
+    event SetEquippables(uint64 partId, address[] equippableAddresses);
+    event SetEquippableToAll(uint64 partId);
 
     //Inquire about using an index instead of hashed ID to prevent any chance of collision
     //Consider moving to interface
     struct IntakeStruct {
-        uint64 id;
-        Base base;
+        uint64 partId;
+        Part part;
     }
 
     //Consider merkel tree for equippables validation?
 
     /**
-    @dev Base items are only settable during contract deployment (with one exception, see addEquippableIds).
+    FIXME: This is not true at the moment:
+    @dev Part items are only settable during contract deployment (with one exception, see addEquippableIds).
     * This may need to be changed for contracts which would reach the block gas limit.
     */
 
-    constructor(string memory name_) {
-        _name = name_;
+    constructor(string memory symbol_, string memory type__) {
+        _symbol = symbol_;
+        _type = type__;
     }
 
-    function name() external view returns(string memory) {
-        return _name;
+    function symbol() external view returns(string memory) {
+        return _symbol;
+    }
+
+    function type_() external view returns(string memory) {
+        return _type;
     }
 
     /**
     @dev Private function for handling an array of base item inputs. Takes an array of type IntakeStruct.
     */
 
-    function _addBaseEntryList(IntakeStruct[] memory intakeStruct) internal {
-        uint len = intakeStruct.length;
+    function _addPartList(IntakeStruct[] memory partIntake) internal {
+        uint len = partIntake.length;
         for (uint256 i = 0; i < len;) {
-            _addBaseEntry(intakeStruct[i]);
+            _addPart(partIntake[i]);
             unchecked {++i;}
         }
     }
 
     /**
-    @dev Private function which writes base item entries to storage. intakeStruct takes the form of a struct containing
+    @dev Private function which writes base item entries to storage. partIntake takes the form of a struct containing
     * a uint64 identifier and a base struct object.
     */
 
-    function _addBaseEntry(IntakeStruct memory intakeStruct) internal {
-        if(bases[intakeStruct.id].itemType != ItemType.None)
-            revert RMRKBaseAlreadyExists();
-        bases[intakeStruct.id] = intakeStruct.base;
-        baseIds.push(intakeStruct.id);
-    }
-
-    /**
-    @dev Getter for a single base item entry.
-    */
-
-    function getBaseEntry(uint64 _id) external view returns (Base memory) {
-        return (bases[_id]);
+    function _addPart(IntakeStruct memory partIntake) internal {
+        if(_parts[partIntake.partId].itemType != ItemType.None)
+            revert RMRKPartAlreadyExists();
+        _parts[partIntake.partId] = partIntake.part;
+        _partIds.push(partIntake.partId);
     }
 
     /**
@@ -108,19 +108,35 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
     */
 
     function _addEquippableAddresses(
-        uint64 _baseEntryId,
-        address[] memory _equippableAddresses
+        uint64 partId,
+        address[] memory equippableAddresses
     ) internal {
-        if(_equippableAddresses.length <= 0)
+        if(equippableAddresses.length <= 0)
             revert RMRKZeroLengthIdsPassed();
-        if(bases[_baseEntryId].itemType == ItemType.None)
-            revert RMRKBaseEntryDoesNotExist();
-        uint256 len = _equippableAddresses.length;
+        if(_parts[partId].itemType == ItemType.None)
+            revert RMRKPartDoesNotExist();
+        uint256 len = equippableAddresses.length;
         for (uint i; i<len;) {
-            isEquippable[_baseEntryId][_equippableAddresses[i]] = true;
+            _parts[partId].equippable.push(equippableAddresses[i]);
             unchecked {++i;}
         }
-        emit AddedEquippablesToEntry(_baseEntryId, _equippableAddresses);
+        _isEquippableToAll[partId] = false;
+
+        emit AddedEquippables(partId, equippableAddresses);
+    }
+
+    function _setEquippableAddresses(
+        uint64 partId,
+        address[] memory equippableAddresses
+    ) internal {
+        if(equippableAddresses.length <= 0)
+            revert RMRKZeroLengthIdsPassed();
+        if(_parts[partId].itemType == ItemType.None)
+            revert RMRKPartDoesNotExist();
+        _parts[partId].equippable = equippableAddresses;
+        _isEquippableToAll[partId] = false;
+
+        emit SetEquippables(partId, equippableAddresses);
     }
 
     /**
@@ -129,44 +145,58 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
     * deployer or transferred Issuer, designated by the modifier onlyIssuer as per the inherited contract issuerControl.
     */
 
-    function _addEquippableIdToAll(address _equippableAddress) internal {
-        uint256 len = baseIds.length;
-        for (uint256 i = 0; i < len;) {
-            uint64 baseId_ = baseIds[i];
-            if (bases[baseId_].itemType == ItemType.Slot) {
-                isEquippable[baseId_][_equippableAddress] = true;
+    function _setEquippableToAll(uint64 partId) internal {
+        if(_parts[partId].itemType == ItemType.None)
+            revert RMRKPartDoesNotExist();
+
+        _isEquippableToAll[partId] = true;
+        emit SetEquippableToAll(partId);
+    }
+
+    function checkIsEquippable(uint64 partId, address targetAddress) public view returns (bool isEquippable) {
+        // If this is equippable to all, we're good
+        isEquippable = _isEquippableToAll[partId];
+
+        // Otherwise, must check against each of the equippable for the part
+        if (!isEquippable && _parts[partId].itemType == ItemType.Slot) {
+            address[] memory equippable = _parts[partId].equippable;
+            uint256 len = equippable.length;
+            for (uint256 i = 0; i < len;) {
+                if (targetAddress == equippable[i]) {
+                    isEquippable = true;
+                    break;
+                }
                 unchecked {++i;}
             }
         }
-        emit AddedEquippableToAll(_equippableAddress);
     }
 
-    function checkIsEquippable(uint64 baseId, address targetAddress) public view returns (bool isEquippable_) {
-        isEquippable_ = isEquippable[baseId][targetAddress];
-    }
+    /**
+    @dev Getter for a single base part.
+    */
 
-    function checkIsEquippableMulti(uint64[] calldata baseId, address[] calldata targetAddress) public view returns (bool[] memory) {
-        uint256 len = baseId.length;
-        bool[] memory isEquippable_ = new bool[](len);
-        if(len != targetAddress.length)
-            revert RMRKMismatchedInputArrayLength();
-        for (uint256 i = 0; i < len;) {
-            isEquippable_[i] = isEquippable[baseId[i]][targetAddress[i]];
-            unchecked {++i;}
-        }
-        return isEquippable_;
+    function getPart(uint64 partId) external view returns (Part memory) {
+        return (_parts[partId]);
     }
 
     /**
     @dev Getter for multiple base item entries.
     */
 
-    function getBaseEntries(uint64[] calldata _ids)
+    function getParts(uint64[] calldata partIds)
         external
-        pure
-        returns (Base[] memory)
+        view
+        returns (Part[] memory)
     {
-        Base[] memory baseEntries;
-        return baseEntries;
+        uint256 numParts = partIds.length;
+        Part[] memory parts = new Part[](numParts);
+
+        for(uint i; i<numParts;) {
+            uint64 partId = partIds[i];
+            parts[i] = _parts[partId];
+            unchecked { ++i; }
+        }
+
+        return parts;
     }
 }
