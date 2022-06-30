@@ -15,9 +15,12 @@ import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 // import "hardhat/console.sol";
 
 error ERC721NotApprovedOrOwner();
+error RMRKAlreadyEquipped();
 error RMRKBadLength();
+error RMRKCallerCannotChangeEquipStatus();
 error RMRKEquippableBasePartNotEquippable();
 error RMRKEquippableEquipNotAllowedByBase();
+error RMRKNotEquipped();
 error RMRKOwnerQueryForNonexistentToken();
 
 contract RMRKEquippable is IRMRKEquippableResource, MultiResourceAbstractBase {
@@ -35,8 +38,12 @@ contract RMRKEquippable is IRMRKEquippableResource, MultiResourceAbstractBase {
     mapping(uint64 => uint64[]) private _fixedPartIds;
     mapping(uint64 => uint64[]) private _slotPartIds;
 
-    //mapping of token to base address to slot part Id to equipped information.
-    mapping(uint => mapping(address => mapping(uint64 => Equipment))) private _equipped;
+    //mapping of token id to base address to slot part Id to equipped information.
+    mapping(uint => mapping(address => mapping(uint64 => Equipment))) private _equipments;
+
+    //mapping of token id to whether it is equipped into the parent
+    mapping(uint => bool) private _isEquipped;
+
 
     //Mapping of refId to parent contract address and valid slotId
     mapping(uint64 => mapping(address => uint64)) private _validParentSlots;
@@ -106,8 +113,8 @@ contract RMRKEquippable is IRMRKEquippableResource, MultiResourceAbstractBase {
             childAddress: childEquipable
         });
 
-        _equipped[tokenId][resource.baseAddress][slotPartId] = newEquip;
-        // FIXME: child must now be marked as equipped
+        _equipments[tokenId][resource.baseAddress][slotPartId] = newEquip;
+        IRMRKEquippableResource(childEquipable).markEquipped(child.tokenId, childResourceId, true);
     }
 
     function unequip(
@@ -124,7 +131,11 @@ contract RMRKEquippable is IRMRKEquippableResource, MultiResourceAbstractBase {
         uint64 slotPartId
     ) private {
         address targetBaseAddress = _resources[resourceId].baseAddress;
-        delete _equipped[tokenId][targetBaseAddress][slotPartId];
+        Equipment memory equipment = _equipments[tokenId][targetBaseAddress][slotPartId];
+        delete _equipments[tokenId][targetBaseAddress][slotPartId];
+
+        address childEquipable = IRMRKNestingWithEquippable(equipment.childAddress).getEquippablesAddress();
+        IRMRKEquippableResource(childEquipable).markEquipped(equipment.childTokenId, equipment.childResourceId, false);
     }
 
     function replaceEquipment(
@@ -137,6 +148,20 @@ contract RMRKEquippable is IRMRKEquippableResource, MultiResourceAbstractBase {
     ) external onlyOwner(tokenId) {
         _unequip(tokenId, oldResourceId, slotPartId);
         _equip(tokenId, newResourceId, slotPartId, childIndex, childResourceId);
+    }
+
+    function markEquipped(uint tokenId, uint64 resourceId, bool equipped) external {
+        if (getCallerEquippableSlot(resourceId) == uint64(0))
+            revert RMRKCallerCannotChangeEquipStatus();
+        if (_isEquipped[tokenId] && equipped)
+            revert RMRKAlreadyEquipped();
+        if(!_isEquipped[tokenId] && !equipped)
+            revert RMRKNotEquipped();
+        _isEquipped[tokenId] = equipped;
+    }
+
+    function isEquipped(uint tokenId) external view returns(bool) {
+        return _isEquipped[tokenId];
     }
 
     function getEquipped(
@@ -156,7 +181,7 @@ contract RMRKEquippable is IRMRKEquippableResource, MultiResourceAbstractBase {
         uint256 len = slotPartIds.length;
         for (uint i; i<len;) {
             slotsEquipped[i] = slotPartIds[i];
-            Equipment memory equipment = _equipped[tokenId][targetBaseAddress][slotPartIds[i]];
+            Equipment memory equipment = _equipments[tokenId][targetBaseAddress][slotPartIds[i]];
             if (equipment.resourceId == resourceId) {
                 childrenEquipped[i] = equipment;
             }
@@ -201,7 +226,7 @@ contract RMRKEquippable is IRMRKEquippableResource, MultiResourceAbstractBase {
         //             ++basePartIdsLen;
         //             ++i;
 
-        //             uint64 equippedResourceId = _equipped[resourceId][partId].childResourceId;
+        //             uint64 equippedResourceId = _equipments[resourceId][partId].childResourceId;
         //             //Recuse while we're in this block, slotpartIds are initialized
         //             (uint64[] memory equippedBasePartIds, address[] memory equippedBaseAddresses) = composeEquippables(
         //                 equippedResourceId

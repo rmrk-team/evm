@@ -55,12 +55,12 @@ describe('Equipping', async () => {
   const weaponGems = [21, 22, 23, 24, 25, 26, 27, 28, 29, 30];
   const backgrounds = [31, 32, 33, 34, 35, 36, 37, 38, 39, 40];
 
-  const soldierResId = 1;
+  const soldierResId = 100;
   const weaponResourcesFull = [1, 2, 3, 4]; // Must match the total of uniqueResources
   const weaponResourcesEquip = [5, 6, 7, 8]; // Must match the total of uniqueResources
-  const weaponGemResourceFull = 1;
-  const weaponGemResourceEquip = 2;
-  const backgroundResourceId = 1;
+  const weaponGemResourceFull = 101;
+  const weaponGemResourceEquip = 102;
+  const backgroundResourceId = 200;
 
   enum ItemType {
     None, 
@@ -167,7 +167,7 @@ describe('Equipping', async () => {
     });
   });
 
-  describe('Equip', async function () {
+  describe.only('Equip', async function () {
     it('can equip weapon', async function () {
       // Weapon is child on index 0, background on index 1
       const childIndex = 0;
@@ -186,6 +186,9 @@ describe('Equipping', async () => {
         expectedSlots,
         expectedEquips,
       ]);
+
+      // Child is marked as equpped:
+      expect(await weaponEquip.isEquipped(weapons[0])).to.eql(true);
     });
 
     it('can equip weapon and background', async function () {
@@ -215,6 +218,101 @@ describe('Equipping', async () => {
         expectedSlots,
         expectedEquips,
       ]);
+
+      // Children are marked as equpped:
+      expect(await weaponEquip.isEquipped(weapons[0])).to.eql(true);
+      expect(await backgroundEquip.isEquipped(backgrounds[0])).to.eql(true);
+    });
+
+    it('cannot equip non existing child in slot (weapon in background)', async function () {
+      // Weapon is child on index 0, background on index 1
+      const badChildIndex = 3;
+      const weaponResId = weaponResourcesEquip[0]; // This resource is assigned to weapon first weapon
+      await expect(
+        soldierEquip
+          .connect(addrs[0])
+          .equip(soldiers[0], soldierResId, partIdForWeapon, badChildIndex, weaponResId),
+      ).to.be.reverted; // Bad index
+    });
+
+    it('cannot equip wrong child in slot (weapon in background)', async function () {
+      // Weapon is child on index 0, background on index 1
+      const backgroundChildIndex = 1;
+      const weaponResId = weaponResourcesEquip[0]; // This resource is assigned to weapon first weapon
+      await expect(
+        soldierEquip
+          .connect(addrs[0])
+          .equip(soldiers[0], soldierResId, partIdForWeapon, backgroundChildIndex, weaponResId),
+      ).to.be.revertedWith('RMRKEquippableBasePartNotEquippable()');
+    });
+
+    it('cannot equip child in wrong slot (weapon in background)', async function () {
+      // Weapon is child on index 0, background on index 1
+      const childIndex = 0;
+      const weaponResId = weaponResourcesEquip[0]; // This resource is assigned to weapon first weapon
+      await expect(
+        soldierEquip
+          .connect(addrs[0])
+          .equip(soldiers[0], soldierResId, partIdForBackground, childIndex, weaponResId),
+      ).to.be.revertedWith('RMRKEquippableBasePartNotEquippable()');
+    });
+
+    it('cannot equip child with wrong resource (weapon in background)', async function () {
+      // Weapon is child on index 0, background on index 1
+      const childIndex = 0;
+      await expect(
+        soldierEquip
+          .connect(addrs[0])
+          .equip(soldiers[0], soldierResId, partIdForWeapon, childIndex, backgroundResourceId),
+      ).to.be.revertedWith('RMRKEquippableBasePartNotEquippable()');
+    });
+
+    it('cannot equip if not owner', async function () {
+      //
+    });
+
+    it('cannot equip 2 children into the same slot', async function () {
+      //
+    });
+
+    it('cannot equip if not intented on base', async function () {
+      //
+    });
+
+    it('cannot equip on not slot part on base', async function () {
+      //
+    });
+
+    it('cannot mark equipped from wrong parent', async function () {
+      //
+    });
+  });
+
+  describe('Unequip', async function () {
+    it('can unequipp', async function () {
+      //
+    });
+
+    it('cannot unequipp if not equipped', async function () {
+      //
+    });
+
+    it('cannot unequipp if not owner', async function () {
+      //
+    });
+  });
+
+  describe.only('Replace equip', async function () {
+    it('can replace equip', async function () {
+      //
+    });
+
+    it('cannot replace equip if not equipped', async function () {
+      //
+    });
+
+    it('cannot replace equip if not owner', async function () {
+      //
     });
   });
 

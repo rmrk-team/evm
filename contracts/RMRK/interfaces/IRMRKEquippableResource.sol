@@ -26,6 +26,10 @@ interface IRMRKEquippableResource is IRMRKMultiResourceBase {
 
     //Equipping
 
+    function markEquipped(uint tokenId, uint64 resourceId, bool equipped) external;
+
+    function isEquipped(uint tokenId) external view returns(bool);
+
     //Abstractions
 
     function getResource(uint64 resourceId) external view returns (Resource memory);
