@@ -140,7 +140,7 @@ abstract contract NestingAbstract is Context, IRMRKNesting {
     */
 
     //CHECK: preload mappings into memory for gas savings
-    function _acceptChild(uint256 tokenId, uint256 index) public virtual {
+    function _acceptChild(uint256 tokenId, uint256 index) internal virtual {
         if(_pendingChildren[tokenId].length <= index)
             revert RMRKPendingChildIndexOutOfRange();
 
@@ -157,7 +157,7 @@ abstract contract NestingAbstract is Context, IRMRKNesting {
     /**
     @dev Deletes all pending children.
     */
-    function _rejectAllChildren(uint256 tokenId) public virtual {
+    function _rejectAllChildren(uint256 tokenId) internal virtual {
         delete(_pendingChildren[tokenId]);
         emit AllPendingChildrenRemoved(tokenId);
     }
@@ -166,7 +166,7 @@ abstract contract NestingAbstract is Context, IRMRKNesting {
     @dev Deletes a single child from the pending array by index.
     */
 
-    function _rejectChild(uint256 tokenId, uint256 index) public virtual {
+    function _rejectChild(uint256 tokenId, uint256 index) internal virtual {
         if(_pendingChildren[tokenId].length <= index)
             revert RMRKPendingChildIndexOutOfRange();
 
@@ -178,7 +178,7 @@ abstract contract NestingAbstract is Context, IRMRKNesting {
     @dev Deletes a single child from the child array by index.
     */
 
-    function _removeChild(uint256 tokenId, uint256 index) public virtual {
+    function _removeChild(uint256 tokenId, uint256 index) internal virtual {
         if(_children[tokenId].length <= index)
             revert RMRKChildIndexOutOfRange();
 
