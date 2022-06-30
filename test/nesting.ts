@@ -718,7 +718,7 @@ describe('Nesting', async () => {
     });
   });
 
-  describe.only('Unnesting', async function () {
+  describe('Unnesting', async function () {
     it('can unnest child and new owner is root owner', async function () {
       const { childId, parentId, firstOwner } = await mintTofirstOwner(true);
       await expect(petMonkey.connect(firstOwner).unnestFromParent(childId, 0))

@@ -63,7 +63,7 @@ describe('Equipping', async () => {
   const backgroundResourceId = 200;
 
   enum ItemType {
-    None, 
+    None,
     Slot,
     Fixed,
   }
@@ -167,7 +167,7 @@ describe('Equipping', async () => {
     });
   });
 
-  describe.only('Equip', async function () {
+  describe('Equip', async function () {
     it('can equip weapon', async function () {
       // Weapon is child on index 0, background on index 1
       const childIndex = 0;
@@ -302,7 +302,7 @@ describe('Equipping', async () => {
     });
   });
 
-  describe.only('Replace equip', async function () {
+  describe('Replace equip', async function () {
     it('can replace equip', async function () {
       //
     });
