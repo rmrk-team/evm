@@ -247,7 +247,6 @@ describe('Equipping', async () => {
     });
 
     it('cannot equip child in wrong slot (weapon in background)', async function () {
-      // Weapon is child on index 0, background on index 1
       const childIndex = 0;
       const weaponResId = weaponResourcesEquip[0]; // This resource is assigned to weapon first weapon
       await expect(
@@ -258,7 +257,6 @@ describe('Equipping', async () => {
     });
 
     it('cannot equip child with wrong resource (weapon in background)', async function () {
-      // Weapon is child on index 0, background on index 1
       const childIndex = 0;
       await expect(
         soldierEquip
@@ -268,50 +266,149 @@ describe('Equipping', async () => {
     });
 
     it('cannot equip if not owner', async function () {
-      //
+      // Weapon is child on index 0, background on index 1
+      const childIndex = 0;
+      const weaponResId = weaponResourcesEquip[0]; // This resource is assigned to weapon first weapon
+      await expect(
+        soldierEquip
+          .connect(addrs[1]) // Owner is addrs[0]
+          .equip(soldiers[0], soldierResId, partIdForWeapon, childIndex, weaponResId),
+      ).to.be.revertedWith('ERC721NotApprovedOrOwner()');
     });
 
     it('cannot equip 2 children into the same slot', async function () {
-      //
+      // Weapon is child on index 0, background on index 1
+      const childIndex = 0;
+      const weaponResId = weaponResourcesEquip[0]; // This resource is assigned to weapon first weapon
+      await soldierEquip
+        .connect(addrs[0])
+        .equip(soldiers[0], soldierResId, partIdForWeapon, childIndex, weaponResId);
+
+      const newWeaponId = 999;
+      const weaponResourceIndex = 3;
+      await mintWeaponToSoldier(addrs[0], soldiers[0], newWeaponId, weaponResourceIndex);
+
+      const newWeaponChildIndex = 2;
+      const newWeaponResId = weaponResourcesEquip[weaponResourceIndex];
+      await expect(
+        soldierEquip
+          .connect(addrs[0])
+          .equip(soldiers[0], soldierResId, partIdForWeapon, newWeaponChildIndex, newWeaponResId),
+      ).to.be.revertedWith('RMRKSlotAlreadyUsed()');
     });
 
     it('cannot equip if not intented on base', async function () {
-      //
+      // Weapon is child on index 0, background on index 1
+      const childIndex = 0;
+      const weaponResId = weaponResourcesEquip[0]; // This resource is assigned to weapon first weapon
+
+      // Remove equipable addresses for part.
+      await base.resetEquippableAddresses(partIdForWeapon);
+      await expect(
+        soldierEquip
+          .connect(addrs[0]) // Owner is addrs[0]
+          .equip(soldiers[0], soldierResId, partIdForWeapon, childIndex, weaponResId),
+      ).to.be.revertedWith('RMRKEquippableEquipNotAllowedByBase()');
+    });
+
+    it('cannot child into 2 different slots', async function () {
+      // Weapon is child on index 0, background on index 1.
+      const childIndex = 0;
+
+      // We add a new partId which receives weapons
+      const partIdForWeaponAlt = 5;
+      const partForWeaponAlt = {
+        itemType: ItemType.Slot,
+        z: 2,
+        equippable: [weaponEquip.address],
+        src: '',
+        fallbackSrc: '',
+      };
+      await base.addPart({ partId: partIdForWeaponAlt, part: partForWeaponAlt });
+
+      // Ad a new resource to first weapon, which can go into new slot
+      const weaponResId = weaponResourcesEquip[0]; // This resource is assigned to weapon first weapon
+      const newWeaponResId = 99;
+      const newEquippableRefId = 2; // New resources to equip will use this
+      await addNewEquipableResourceToWeapon(newWeaponResId, newEquippableRefId, partIdForWeaponAlt);
+
+      // If all went good, we can the weapon's new resource into the new slot
+      await soldierEquip
+        .connect(addrs[0])
+        .equip(soldiers[0], soldierResId, partIdForWeaponAlt, childIndex, newWeaponResId);
+
+      // Trying to equip the same child again into another slot must fail
+      await expect(
+        soldierEquip
+          .connect(addrs[0]) // Owner is addrs[0]
+          .equip(soldiers[0], soldierResId, partIdForWeapon, childIndex, weaponResId),
+      ).to.be.revertedWith('RMRKAlreadyEquipped()');
     });
 
     it('cannot equip on not slot part on base', async function () {
-      //
+      // Weapon is child on index 0, background on index 1.
+      const childIndex = 0;
+
+      // We add a new partId which receives weapons
+      const partIdForWeaponAlt = 5;
+      // FIXME: It should not be possible to add a fixed part with equippable addresses
+      const partForWeaponAlt = {
+        itemType: ItemType.Fixed, // This is what we're testing
+        z: 2,
+        equippable: [weaponEquip.address],
+        src: '',
+        fallbackSrc: '',
+      };
+      await base.addPart({ partId: partIdForWeaponAlt, part: partForWeaponAlt });
+
+      // Ad a new resource to first weapon, which can go into new slot
+      const newWeaponResId = 99;
+      const newEquippableRefId = 2; // New resources to equip will use this
+      await addNewEquipableResourceToWeapon(newWeaponResId, newEquippableRefId, partIdForWeaponAlt);
+
+      await expect(
+        soldierEquip
+          .connect(addrs[0]) // Owner is addrs[0]
+          .equip(soldiers[0], soldierResId, partIdForWeaponAlt, childIndex, newWeaponResId),
+      ).to.be.revertedWith('RMRKEquippableEquipNotAllowedByBase()');
     });
 
     it('cannot mark equipped from wrong parent', async function () {
-      //
+      // Even if the caller is the owner, only the current parent contract can mark it as equipped
+      await expect(
+        weaponEquip.connect(addrs[0]).markEquipped(weapons[0], weaponResourcesEquip[0], true),
+      ).to.be.revertedWith('RMRKCallerCannotChangeEquipStatus()');
+      // Just in case, we also test setting it unequipped
+      await expect(
+        weaponEquip.connect(addrs[0]).markEquipped(weapons[0], weaponResourcesEquip[0], false),
+      ).to.be.revertedWith('RMRKCallerCannotChangeEquipStatus()');
     });
   });
 
   describe('Unequip', async function () {
-    it('can unequipp', async function () {
+    it.skip('can unequipp', async function () {
       //
     });
 
-    it('cannot unequipp if not equipped', async function () {
+    it.skip('cannot unequipp if not equipped', async function () {
       //
     });
 
-    it('cannot unequipp if not owner', async function () {
+    it.skip('cannot unequipp if not owner', async function () {
       //
     });
   });
 
   describe('Replace equip', async function () {
-    it('can replace equip', async function () {
+    it.skip('can replace equip', async function () {
       //
     });
 
-    it('cannot replace equip if not equipped', async function () {
+    it.skip('cannot replace equip if not equipped', async function () {
       //
     });
 
-    it('cannot replace equip if not owner', async function () {
+    it.skip('cannot replace equip if not owner', async function () {
       //
     });
   });
@@ -579,6 +676,55 @@ describe('Equipping', async () => {
       await backgroundEquip.addResourceToToken(backgrounds[i], backgroundResourceId, 0);
       await backgroundEquip.connect(addrs[i % 3]).acceptResource(backgrounds[i], 0);
     }
+  }
+
+  async function mintWeaponToSoldier(
+    soldierOwner: SignerWithAddress,
+    soldierId: number,
+    newWeaponId: number,
+    resourceIndex: number,
+  ): Promise<void> {
+    // Mint another weapon to the soldier and accept it
+    await weapon['mint(address,uint256,uint256,bytes)'](
+      soldier.address,
+      newWeaponId, // New weapon id
+      soldierId,
+      ethers.utils.hexZeroPad('0x1', 1),
+    );
+    await soldier.connect(soldierOwner).acceptChild(soldierId, 0);
+
+    // Add resources to weapon
+    await weaponEquip.addResourceToToken(newWeaponId, weaponResourcesFull[resourceIndex], 0);
+    await weaponEquip.addResourceToToken(newWeaponId, weaponResourcesEquip[resourceIndex], 0);
+    await weaponEquip.connect(soldierOwner).acceptResource(newWeaponId, 0);
+  }
+
+  async function addNewEquipableResourceToWeapon(
+    newWeaponResId: number,
+    newEquippableRefId: number,
+    partIdForWeaponAlt: number,
+  ): Promise<void> {
+    await weaponEquip.addResourceEntry(
+      {
+        id: newWeaponResId,
+        equippableRefId: newEquippableRefId,
+        metadataURI: `ipfs:weapon/equipAlt/${newWeaponResId}`,
+        baseAddress: base.address,
+        slotId: partIdForWeaponAlt,
+        custom: [],
+      },
+      [],
+      [partIdForWeaponGem],
+    );
+    // Make it equippable into soldier using new slot
+    await weaponEquip.setValidParentRefId(
+      newEquippableRefId,
+      soldierEquip.address,
+      partIdForWeaponAlt,
+    );
+    // Add the resource to the weapon and accept it
+    await weaponEquip.addResourceToToken(weapons[0], newWeaponResId, 0);
+    await weaponEquip.connect(addrs[0]).acceptResource(weapons[0], 0);
   }
 
   function bn(x: number): BigNumber {
