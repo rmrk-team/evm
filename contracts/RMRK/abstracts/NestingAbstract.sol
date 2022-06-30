@@ -8,6 +8,8 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
+import "hardhat/console.sol";
+
 error RMRKCallerIsNotOwnerContract();
 error RMRKChildIndexOutOfRange();
 error RMRKInvalidTokenID();
@@ -187,14 +189,16 @@ abstract contract NestingAbstract is Context, IRMRKNesting {
     function _unnestChild(uint256 tokenId, uint256 index) internal virtual {
         Child memory child = _children[tokenId][index];
 
-        if(child.contractAddress != _msgSender())
-            revert RMRKUnnestFromWrongChild();
+        //TODO clean this up, check edge cases -- may never be entered
+        if(_children[tokenId].length <= index)
+            revert RMRKChildIndexOutOfRange();
 
-        _removeChild(tokenId, index);
+        removeItemByIndex_C(_children[tokenId], index);
+        emit ChildUnnested(tokenId, index);
     }
 
-    //Child-scoped interaction, gate to onlyApprovedOrOwner
-    function unnestFromParent(uint256 tokenId, uint256 indexOnParent) public virtual {
+    //Child-scoped interaction
+    function _unnestFromParent(uint256 tokenId, uint256 indexOnParent) internal virtual {
       // A malicious contract which is parent to this token, could unnest any children
         RMRKOwner memory owner = _RMRKOwners[tokenId];
 

@@ -309,8 +309,15 @@ contract RMRKNesting is ERC721Abstract, NestingAbstract {
         _removeChild(tokenId, index);
     }
 
-    function unnestChild(uint256 tokenId, uint256 index) public virtual onlyApprovedOrOwner(tokenId) {
+    //Must be called from the child contract
+    function unnestChild(uint256 tokenId, uint256 index) public virtual {
+        Child memory child = _children[tokenId][index];
+        if (child.contractAddress != _msgSender()) revert RMRKUnnestFromWrongChild();
         _unnestChild(tokenId, index);
+    }
+
+    function unnestFromParent(uint256 tokenId, uint256 indexOnParent) public virtual onlyApprovedOrOwner(tokenId) {
+        _unnestFromParent(tokenId, indexOnParent);
     }
 
 

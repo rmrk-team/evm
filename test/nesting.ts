@@ -718,12 +718,12 @@ describe('Nesting', async () => {
     });
   });
 
-  describe('Unnesting', async function () {
+  describe.only('Unnesting', async function () {
     it('can unnest child and new owner is root owner', async function () {
       const { childId, parentId, firstOwner } = await mintTofirstOwner(true);
-      await expect(ownerChunky.connect(firstOwner).unnestChild(parentId, 0))
+      await expect(petMonkey.connect(firstOwner).unnestFromParent(childId, 0))
         .to.emit(ownerChunky, 'ChildUnnested')
-        .withArgs(parentId, childId);
+        .withArgs(parentId, 0 );
 
       // New owner of child
       expect(await petMonkey.ownerOf(childId)).to.eql(firstOwner.address);
@@ -758,7 +758,7 @@ describe('Nesting', async () => {
       await petMonkey.connect(addrs[0]).acceptChild(childId, 0);
 
       // Unnest child from parent.
-      await ownerChunky.connect(addrs[0]).unnestChild(parentId, 0);
+      await petMonkey.connect(addrs[0]).unnestFromParent(childId, 0);
 
       // New owner of child
       expect(await petMonkey.ownerOf(childId)).to.eql(owner.address);
@@ -777,33 +777,30 @@ describe('Nesting', async () => {
       ]);
     });
 
-    it('cannot unnest from not owned child', async function () {
-      const { parentId } = await mintTofirstOwner(true);
-      await expect(ownerChunky.connect(addrs[3]).unnestChild(parentId, 0)).to.be.revertedWith(
+    it('cannot unnest if not child root owner', async function () {
+      const { childId, parentId, firstOwner } = await mintTofirstOwner(true);
+      await expect(petMonkey.connect(addrs[2]).unnestFromParent(1, 0)).to.be.revertedWith(
         'ERC721NotApprovedOrOwner()',
       );
     });
 
     it('cannot unnest not existing child', async function () {
-      const { parentId, firstOwner } = await mintTofirstOwner(true);
-      await expect(ownerChunky.connect(firstOwner).unnestChild(parentId, 1)).to.be.revertedWith(
-        'RMRKChildIndexOutOfRange()',
-      );
-    });
-
-    it('cannot unnest token directly even if root owner', async function () {
       const { childId, parentId, firstOwner } = await mintTofirstOwner(true);
-      await expect(petMonkey.connect(firstOwner).unnestToken(childId, parentId)).to.be.revertedWith(
-        'RMRKUnnestFromWrongOwner()',
+      await expect(petMonkey.connect(firstOwner).unnestFromParent(childId+1, 0)).to.be.revertedWith(
+        'ERC721OwnerQueryForNonexistentToken()',
       );
     });
 
     it('cannot unnest token not owned by an NFT', async function () {
-      const { parentId, firstOwner } = await mintTofirstOwner(true);
-      await expect(ownerChunky.connect(firstOwner).unnestToken(parentId, 0)).to.be.revertedWith(
+      const parentId = 10;
+      const childId = 1;
+
+      await petMonkey['mint(address,uint256)'](addrs[1].address, childId);
+      await expect(petMonkey.connect(addrs[1]).unnestFromParent(childId, 0)).to.be.revertedWith(
         'RMRKUnnestForNonNftParent()',
       );
     });
+
   });
 
   describe('Transfer', async function () {

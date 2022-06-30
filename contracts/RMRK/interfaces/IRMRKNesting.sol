@@ -11,7 +11,7 @@ interface IRMRKNesting {
     event PendingChildRemoved(uint tokenId, uint index);
     event AllPendingChildrenRemoved(uint tokenId);
     event ChildRemoved(uint tokenId, uint index);
-    event ChildUnnested(uint parentTokenId, uint childTokenId);
+    event ChildUnnested(uint tokenId, uint index);
 
 
     struct Child {
