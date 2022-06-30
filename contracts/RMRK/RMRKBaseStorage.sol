@@ -139,6 +139,15 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
         emit SetEquippables(partId, equippableAddresses);
     }
 
+    function _resetEquippableAddresses( uint64 partId ) internal {
+        if(_parts[partId].itemType == ItemType.None)
+            revert RMRKPartDoesNotExist();
+        delete _parts[partId].equippable;
+        _isEquippableToAll[partId] = false;
+
+        emit SetEquippables(partId, new address[](0));
+    }
+
     /**
     @dev Public function which adds a single equippableId to every base item.
     * Handle this function with care, this function can be extremely gas-expensive. Only accessible by the contract

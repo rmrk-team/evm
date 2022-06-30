@@ -22,6 +22,7 @@ error RMRKEquippableBasePartNotEquippable();
 error RMRKEquippableEquipNotAllowedByBase();
 error RMRKNotEquipped();
 error RMRKOwnerQueryForNonexistentToken();
+error RMRKSlotAlreadyUsed();
 
 contract RMRKEquippable is IRMRKEquippableResource, MultiResourceAbstractBase {
 
@@ -113,6 +114,8 @@ contract RMRKEquippable is IRMRKEquippableResource, MultiResourceAbstractBase {
             childAddress: childEquipable
         });
 
+        if (_equipments[tokenId][resource.baseAddress][slotPartId].childAddress != address(0))
+            revert RMRKSlotAlreadyUsed();
         _equipments[tokenId][resource.baseAddress][slotPartId] = newEquip;
         IRMRKEquippableResource(childEquipable).markEquipped(child.tokenId, childResourceId, true);
     }

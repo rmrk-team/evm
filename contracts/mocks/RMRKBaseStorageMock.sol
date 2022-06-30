@@ -35,4 +35,8 @@ contract RMRKBaseStorageMock is RMRKIssuable, RMRKBaseStorage {
         _setEquippableToAll(partId);
     }
 
+    function resetEquippableAddresses(uint64 partId) external onlyIssuer {
+        _resetEquippableAddresses(partId);
+    }
+
 }
