@@ -70,6 +70,19 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
         _type = type__;
     }
 
+    function _onlySlot(uint64 partId) internal view {
+        ItemType itemType = _parts[partId].itemType;
+        if(itemType == ItemType.None)
+            revert RMRKPartDoesNotExist();
+        if(itemType == ItemType.Fixed)
+            revert RMRKPartIsNotSlot();
+    }
+
+    modifier onlySlot(uint64 partId) {
+        _onlySlot(partId);
+        _;
+    }
+
     function symbol() external view returns(string memory) {
         return _symbol;
     }
@@ -110,11 +123,10 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
     function _addEquippableAddresses(
         uint64 partId,
         address[] memory equippableAddresses
-    ) internal {
+    ) internal onlySlot(partId) {
         if(equippableAddresses.length <= 0)
             revert RMRKZeroLengthIdsPassed();
-        if(_parts[partId].itemType == ItemType.None)
-            revert RMRKPartDoesNotExist();
+
         uint256 len = equippableAddresses.length;
         for (uint i; i<len;) {
             _parts[partId].equippable.push(equippableAddresses[i]);
@@ -128,20 +140,16 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
     function _setEquippableAddresses(
         uint64 partId,
         address[] memory equippableAddresses
-    ) internal {
+    ) internal onlySlot(partId) {
         if(equippableAddresses.length <= 0)
             revert RMRKZeroLengthIdsPassed();
-        if(_parts[partId].itemType == ItemType.None)
-            revert RMRKPartDoesNotExist();
         _parts[partId].equippable = equippableAddresses;
         _isEquippableToAll[partId] = false;
 
         emit SetEquippables(partId, equippableAddresses);
     }
 
-    function _resetEquippableAddresses( uint64 partId ) internal {
-        if(_parts[partId].itemType == ItemType.None)
-            revert RMRKPartDoesNotExist();
+    function _resetEquippableAddresses(uint64 partId) internal onlySlot(partId) {
         delete _parts[partId].equippable;
         _isEquippableToAll[partId] = false;
 
@@ -154,12 +162,16 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
     * deployer or transferred Issuer, designated by the modifier onlyIssuer as per the inherited contract issuerControl.
     */
 
-    function _setEquippableToAll(uint64 partId) internal {
+    function _setEquippableToAll(uint64 partId) internal onlySlot(partId) {
         if(_parts[partId].itemType == ItemType.None)
             revert RMRKPartDoesNotExist();
 
         _isEquippableToAll[partId] = true;
         emit SetEquippableToAll(partId);
+    }
+
+    function checkIsEquippableToAll(uint64 partId) external view returns (bool) {
+        return _isEquippableToAll[partId];
     }
 
     function checkIsEquippable(uint64 partId, address targetAddress) public view returns (bool isEquippable) {
