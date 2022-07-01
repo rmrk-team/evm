@@ -4,7 +4,7 @@ import { RMRKEquippableMock, RMRKNestingMock } from '../typechain';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { BigNumber } from 'ethers';
 
-describe('MultiResource', async () => {
+describe('MultiResourceEquippable', async () => {
   let chunky: RMRKNestingMock;
   let chunkyEquip: RMRKEquippableMock;
 
@@ -47,7 +47,7 @@ describe('MultiResource', async () => {
       expect(await chunky.supportsInterface('0x01ffc9a7')).to.equal(true);
     });
     it('can support IEquippable', async function () {
-      expect(await chunkyEquip.supportsInterface('0xfd482fce')).to.equal(true);
+      expect(await chunkyEquip.supportsInterface('0x023c2114')).to.equal(true);
     });
     it('cannot support other interfaceId', async function () {
       expect(await chunkyEquip.supportsInterface('0xffffffff')).to.equal(false);

@@ -6,7 +6,7 @@ pragma solidity ^0.8.15;
 
 import "./abstracts/MultiResourceAbstractBase.sol";
 import "./interfaces/IRMRKBaseStorage.sol";
-import "./interfaces/IRMRKEquippableResource.sol";
+import "./interfaces/IRMRKMultiResourceEquippable.sol";
 import "./interfaces/IRMRKNesting.sol";
 import "./interfaces/IRMRKNestingWithEquippable.sol";
 import "./library/RMRKLib.sol";
@@ -24,7 +24,7 @@ error RMRKNotEquipped();
 error RMRKOwnerQueryForNonexistentToken();
 error RMRKSlotAlreadyUsed();
 
-contract RMRKEquippable is IRMRKEquippableResource, MultiResourceAbstractBase {
+contract RMRKEquippable is IRMRKMultiResourceEquippable, MultiResourceAbstractBase {
 
     address private _nestingAddress;
 
@@ -72,7 +72,7 @@ contract RMRKEquippable is IRMRKEquippableResource, MultiResourceAbstractBase {
 
     function supportsInterface(bytes4 interfaceId) public virtual view returns (bool) {
         return (
-            interfaceId == type(IRMRKEquippableResource).interfaceId ||
+            interfaceId == type(IRMRKMultiResourceEquippable).interfaceId ||
             interfaceId == type(IERC165).interfaceId
         );
     }
@@ -117,7 +117,7 @@ contract RMRKEquippable is IRMRKEquippableResource, MultiResourceAbstractBase {
         });
 
         _equipments[tokenId][resource.baseAddress][slotPartId] = newEquip;
-        IRMRKEquippableResource(childEquipable).markEquipped(child.tokenId, childResourceId, true);
+        IRMRKMultiResourceEquippable(childEquipable).markEquipped(child.tokenId, childResourceId, true);
     }
 
     function unequip(
@@ -139,7 +139,7 @@ contract RMRKEquippable is IRMRKEquippableResource, MultiResourceAbstractBase {
             revert RMRKNotEquipped();
         delete _equipments[tokenId][targetBaseAddress][slotPartId];
 
-        IRMRKEquippableResource(equipment.childAddress).markEquipped(equipment.childTokenId, equipment.childResourceId, false);
+        IRMRKMultiResourceEquippable(equipment.childAddress).markEquipped(equipment.childTokenId, equipment.childResourceId, false);
     }
 
     function replaceEquipment(
@@ -261,7 +261,7 @@ contract RMRKEquippable is IRMRKEquippableResource, MultiResourceAbstractBase {
     //Checks if the resource for the child is intented to be equipped into the part slot
     function validateChildEquip(address childContract, uint64 childResourceId, uint64 slotPartId) public view returns (bool isEquippable) {
         // FIXME: Must also check the child is not already equipped
-        isEquippable = IRMRKEquippableResource(childContract).getCallerEquippableSlot(childResourceId) == slotPartId;
+        isEquippable = IRMRKMultiResourceEquippable(childContract).getCallerEquippableSlot(childResourceId) == slotPartId;
     }
 
     //Return 0 means not equippable

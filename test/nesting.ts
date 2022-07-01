@@ -93,7 +93,7 @@ describe('Nesting', async () => {
     });
 
     it('can support INesting', async function () {
-      expect(await ownerChunky.supportsInterface('0x47ea672d')).to.equal(true);
+      expect(await ownerChunky.supportsInterface('0xdd0adc0b')).to.equal(true);
     });
 
     it('cannot support other interfaceId', async function () {

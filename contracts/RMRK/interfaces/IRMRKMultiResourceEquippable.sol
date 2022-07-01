@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 
 import "./IRMRKMultiResourceBase.sol";
 
-interface IRMRKEquippableResource is IRMRKMultiResourceBase {
+interface IRMRKMultiResourceEquippable is IRMRKMultiResourceBase {
 
     //Reorder this during optimization for packing
     struct Resource {
