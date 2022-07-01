@@ -69,19 +69,4 @@ contract RMRKEquippableMock is RMRKIssuable, RMRKEquippable {
     ) external onlyIssuer {
         _setValidParentRefId(refId, parentAddress, partId);
     }
-
-    function setValidParentsRefIds(
-        uint64 refId,
-        address[] memory parentAddresses,
-        uint64[] memory partIds
-    ) external onlyIssuer {
-        uint256 len = partIds.length;
-        if(len != parentAddresses.length)
-            revert RMRKBadLength();
-
-        for(uint i; i<len;) {
-            _setValidParentRefId(refId, parentAddresses[i], partIds[i]);
-            unchecked {++i;}
-        }
-    }
 }
