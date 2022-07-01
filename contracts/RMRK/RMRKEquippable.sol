@@ -4,9 +4,9 @@
 
 pragma solidity ^0.8.15;
 
-import "./abstracts/MultiResourceAbstractBase.sol";
+import "./abstracts/MultiResourceAbstract.sol";
 import "./interfaces/IRMRKBaseStorage.sol";
-import "./interfaces/IRMRKMultiResourceEquippable.sol";
+import "./interfaces/IRMRKEquippable.sol";
 import "./interfaces/IRMRKNesting.sol";
 import "./interfaces/IRMRKNestingWithEquippable.sol";
 import "./library/RMRKLib.sol";
@@ -24,16 +24,25 @@ error RMRKNotEquipped();
 error RMRKOwnerQueryForNonexistentToken();
 error RMRKSlotAlreadyUsed();
 
-contract RMRKEquippable is IRMRKMultiResourceEquippable, MultiResourceAbstractBase {
-
-    address private _nestingAddress;
+contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
 
     using RMRKLib for uint64[];
     using RMRKLib for uint128[];
     using Strings for uint256;
 
+    struct ExtendedResource { // Used for input/output only
+        uint64 id; // ID of this resource
+        uint64 equippableRefId;
+        address baseAddress;
+        string metadataURI;
+        uint128[] custom; //Custom data
+    }
+
+    address private _nestingAddress;
+
     //mapping of uint64 Ids to resource object
-    mapping(uint64 => Resource) private _resources;
+    mapping(uint64 => address) private _baseAddresses;
+    mapping(uint64 => uint64) private _equippableRefIds;
 
     //Mapping of resourceId to all base parts (slot and fixed) applicable to this resource. Check cost of adding these to resource struct.
     mapping(uint64 => uint64[]) private _fixedPartIds;
@@ -72,7 +81,7 @@ contract RMRKEquippable is IRMRKMultiResourceEquippable, MultiResourceAbstractBa
 
     function supportsInterface(bytes4 interfaceId) public virtual view returns (bool) {
         return (
-            interfaceId == type(IRMRKMultiResourceEquippable).interfaceId ||
+            interfaceId == type(IRMRKEquippable).interfaceId ||
             interfaceId == type(IERC165).interfaceId
         );
     }
@@ -95,7 +104,7 @@ contract RMRKEquippable is IRMRKMultiResourceEquippable, MultiResourceAbstractBa
         uint64 childResourceId
     ) private {
         Resource storage resource = _resources[resourceId];
-        if (_equipments[tokenId][resource.baseAddress][slotPartId].childAddress != address(0))
+        if (_equipments[tokenId][_baseAddresses[resourceId]][slotPartId].childAddress != address(0))
             revert RMRKSlotAlreadyUsed();
 
         IRMRKNesting.Child memory child = IRMRKNesting(_nestingAddress).childOf(tokenId, childIndex);
@@ -106,7 +115,7 @@ contract RMRKEquippable is IRMRKMultiResourceEquippable, MultiResourceAbstractBa
             revert RMRKEquippableBasePartNotEquippable();
 
         // Check from base perspective
-        if(!_validateBaseEquip(resource.baseAddress, childEquipable, slotPartId))
+        if(!_validateBaseEquip(_baseAddresses[resourceId], childEquipable, slotPartId))
             revert RMRKEquippableEquipNotAllowedByBase();
 
         Equipment memory newEquip = Equipment({
@@ -116,8 +125,8 @@ contract RMRKEquippable is IRMRKMultiResourceEquippable, MultiResourceAbstractBa
             childAddress: childEquipable
         });
 
-        _equipments[tokenId][resource.baseAddress][slotPartId] = newEquip;
-        IRMRKMultiResourceEquippable(childEquipable).markEquipped(child.tokenId, childResourceId, true);
+        _equipments[tokenId][_baseAddresses[resourceId]][slotPartId] = newEquip;
+        IRMRKEquippable(childEquipable).markEquipped(child.tokenId, childResourceId, true);
     }
 
     function unequip(
@@ -133,13 +142,13 @@ contract RMRKEquippable is IRMRKMultiResourceEquippable, MultiResourceAbstractBa
         uint64 resourceId,
         uint64 slotPartId
     ) private {
-        address targetBaseAddress = _resources[resourceId].baseAddress;
+        address targetBaseAddress = _baseAddresses[resourceId];
         Equipment memory equipment = _equipments[tokenId][targetBaseAddress][slotPartId];
         if (equipment.childAddress == address(0))
             revert RMRKNotEquipped();
         delete _equipments[tokenId][targetBaseAddress][slotPartId];
 
-        IRMRKMultiResourceEquippable(equipment.childAddress).markEquipped(equipment.childTokenId, equipment.childResourceId, false);
+        IRMRKEquippable(equipment.childAddress).markEquipped(equipment.childTokenId, equipment.childResourceId, false);
     }
 
     function replaceEquipment(
@@ -174,7 +183,7 @@ contract RMRKEquippable is IRMRKMultiResourceEquippable, MultiResourceAbstractBa
         uint64[] memory slotsEquipped,
         Equipment[] memory childrenEquipped
     ) {
-        address targetBaseAddress = _resources[resourceId].baseAddress;
+        address targetBaseAddress = _baseAddresses[resourceId];
         uint64[] memory slotPartIds = _slotPartIds[resourceId];
 
         // FIXME: There could be empty slots and children at the end, since a part might be equipped to another resource or simply not equipped
@@ -261,177 +270,39 @@ contract RMRKEquippable is IRMRKMultiResourceEquippable, MultiResourceAbstractBa
     //Checks if the resource for the child is intented to be equipped into the part slot
     function validateChildEquip(address childContract, uint64 childResourceId, uint64 slotPartId) public view returns (bool isEquippable) {
         // FIXME: Must also check the child is not already equipped
-        isEquippable = IRMRKMultiResourceEquippable(childContract).getCallerEquippableSlot(childResourceId) == slotPartId;
+        isEquippable = IRMRKEquippable(childContract).getCallerEquippableSlot(childResourceId) == slotPartId;
     }
 
     //Return 0 means not equippable
     function getCallerEquippableSlot(uint64 resourceId) public view returns (uint64 equippableSlot) {
-        uint64 refId = _resources[resourceId].equippableRefId;
+        uint64 refId = _equippableRefIds[resourceId];
         equippableSlot = _validParentSlots[refId][_msgSender()];
     }
 
-    // --------------------- RESOURCES ---------------------
+    ////////////////////////////////////////
+    //                RESOURCES
+    ////////////////////////////////////////
 
-    function getResource(
-        uint64 resourceId
-    ) public view virtual returns (Resource memory)
-    {
-        Resource memory resource = _resources[resourceId];
-        if(resource.id == uint64(0))
-            revert RMRKNoResourceMatchingId();
-        return resource;
-    }
-
-    function tokenURI(
-        uint256 tokenId
-    ) public view override(
-        IRMRKMultiResourceBase,
-        MultiResourceAbstractBase
-    ) virtual returns (string memory) {
-        return _tokenURIAtIndex(tokenId, 0);
-    }
-
-    function _tokenURIAtIndex(
+    function acceptResource(
         uint256 tokenId,
         uint256 index
-    ) internal override view returns (string memory) {
-        if (_activeResources[tokenId].length > index)  {
-            uint64 activeResId = _activeResources[tokenId][index];
-            string memory URI;
-            Resource memory _activeRes = getResource(activeResId);
-            if (!_tokenEnumeratedResource[activeResId]) {
-                URI = _activeRes.metadataURI;
-            }
-            else {
-                string memory baseURI = _activeRes.metadataURI;
-                URI = bytes(baseURI).length > 0 ?
-                    string(abi.encodePacked(baseURI, tokenId.toString())) : "";
-            }
-            return URI;
-        }
-        else {
-            return _fallbackURI;
-        }
-    }
-
-    // To be implemented with custom guards
-    // TODO make take a resource struct and additional params for mappings
-    function _addResourceEntry(
-        Resource memory resource,
-        uint64[] memory fixedPartIds,
-        uint64[] memory slotPartIds
-    ) internal {
-        uint64 id = resource.id;
-        if(id == uint64(0))
-            revert RMRKWriteToZero();
-        if(_resources[id].id != uint64(0))
-            revert RMRKResourceAlreadyExists();
-
-        _resources[id] = resource;
-
-        _fixedPartIds[id] = fixedPartIds;
-        _slotPartIds[id] = slotPartIds;
-
-        _allResources.push(id);
-
-        emit ResourceSet(id);
-    }
-
-    function _addCustomDataToResource(
-        uint64 resourceId,
-        uint128 customResourceId
-    ) internal {
-        _resources[resourceId].custom.push(customResourceId);
-        emit ResourceCustomDataAdded(resourceId, customResourceId);
-    }
-
-    function _removeCustomDataFromResource(
-        uint64 resourceId,
-        uint256 index
-    ) internal {
-        uint128 customResourceId = _resources[resourceId].custom[index];
-        _resources[resourceId].custom.removeItemByIndex(index);
-        emit ResourceCustomDataRemoved(resourceId, customResourceId);
-    }
-
-    function _addResourceToToken(
-        uint256 tokenId,
-        uint64 resourceId,
-        uint64 overwrites
-    ) internal {
-        if(_ownerOf(tokenId) == address(0)) revert RMRKOwnerQueryForNonexistentToken();
-
-        if(_tokenResources[tokenId][resourceId]) revert RMRKResourceAlreadyExists();
-
-        if( getResource(resourceId).id == uint64(0)) revert RMRKResourceNotFoundInStorage();
-
-        if(_pendingResources[tokenId].length >= 128) revert RMRKMaxPendingResourcesReached();
-
-        _tokenResources[tokenId][resourceId] = true;
-
-        _pendingResources[tokenId].push(resourceId);
-
-        if (overwrites != uint64(0)) {
-            _resourceOverwrites[tokenId][resourceId] = overwrites;
-            emit ResourceOverwriteProposed(tokenId, resourceId, overwrites);
-        }
-
-        emit ResourceAddedToToken(tokenId, resourceId);
-    }
-
-    // Utilities
-
-    function getResObjectByIndex(
-        uint256 tokenId,
-        uint256 index
-    ) external view virtual returns(Resource memory) {
-        uint64 resourceId = getActiveResources(tokenId)[index];
-        return getResource(resourceId);
-    }
-
-    function getPendingResObjectByIndex(
-        uint256 tokenId,
-        uint256 index
-    ) external view virtual returns(Resource memory) {
-        uint64 resourceId = getPendingResources(tokenId)[index];
-        return getResource(resourceId);
-    }
-
-    function getFullResources(
-        uint256 tokenId
-    ) external view virtual returns (Resource[] memory) {
-        uint64[] memory resourceIds = _activeResources[tokenId];
-        return _getResourcesById(resourceIds);
-    }
-
-    function getFullPendingResources(
-        uint256 tokenId
-    ) external view virtual returns (Resource[] memory) {
-        uint64[] memory resourceIds = _pendingResources[tokenId];
-        return _getResourcesById(resourceIds);
-    }
-
-    function _getResourcesById(
-        uint64[] memory resourceIds
-    ) internal view virtual returns (Resource[] memory) {
-        uint256 len = resourceIds.length;
-        Resource[] memory resources = new Resource[](len);
-        for (uint i; i<len;) {
-            resources[i] = getResource(resourceIds[i]);
-            unchecked {++i;}
-        }
-        return resources;
-    }
-
-    function acceptResource(uint256 tokenId, uint256 index) external virtual onlyOwner(tokenId) {
+    ) external virtual onlyOwner(tokenId) {
+        // FIXME: clean approvals and test
         _acceptResource(tokenId, index);
     }
 
-    function rejectResource(uint256 tokenId, uint256 index) external virtual onlyOwner(tokenId) {
+    function rejectResource(
+        uint256 tokenId,
+        uint256 index
+    ) external virtual onlyOwner(tokenId) {
+        // FIXME: clean approvals and test
         _rejectResource(tokenId, index);
     }
 
-    function rejectAllResources(uint256 tokenId) external virtual onlyOwner(tokenId) {
+    function rejectAllResources(
+        uint256 tokenId
+    ) external virtual onlyOwner(tokenId) {
+        // FIXME: clean approvals and test
         _rejectAllResources(tokenId);
     }
 
@@ -439,7 +310,91 @@ contract RMRKEquippable is IRMRKMultiResourceEquippable, MultiResourceAbstractBa
         uint256 tokenId,
         uint16[] memory priorities
     ) external virtual onlyOwner(tokenId) {
+        // FIXME: clean approvals and test
         _setPriority(tokenId, priorities);
     }
 
+    ////////////////////////////////////////
+    //       MANAGING EXTENDED RESOURCES
+    ////////////////////////////////////////
+
+    function _addResourceEntry(
+        ExtendedResource memory resource,
+        uint64[] memory fixedPartIds,
+        uint64[] memory slotPartIds
+    ) internal {
+        _addResourceEntry(resource.id, resource.metadataURI, resource.custom);
+
+        _baseAddresses[resource.id] = resource.baseAddress;
+        _equippableRefIds[resource.id] = resource.equippableRefId;
+        _fixedPartIds[resource.id] = fixedPartIds;
+        _slotPartIds[resource.id] = slotPartIds;
+    }
+
+    function getExtendedResource(
+        uint64 resourceId
+    ) public view virtual returns (ExtendedResource memory)
+    {
+        Resource memory resource = _resources[resourceId];
+        if(resource.id == uint64(0))
+            revert RMRKNoResourceMatchingId();
+        
+        return ExtendedResource({
+            id: resource.id,
+            equippableRefId: _equippableRefIds[resource.id],
+            baseAddress: _baseAddresses[resource.id],
+            metadataURI: resource.metadataURI,
+            custom: resource.custom
+        });
+    }
+
+    function getExtendedResObjectByIndex(
+        uint256 tokenId,
+        uint256 index
+    ) external view virtual returns(ExtendedResource memory) {
+        uint64 resourceId = getActiveResources(tokenId)[index];
+        return getExtendedResource(resourceId);
+    }
+
+    function getPendingExtendedResObjectByIndex(
+        uint256 tokenId,
+        uint256 index
+    ) external view virtual returns(ExtendedResource memory) {
+        uint64 resourceId = getPendingResources(tokenId)[index];
+        return getExtendedResource(resourceId);
+    }
+
+    function getFullExtendedResources(
+        uint256 tokenId
+    ) external view virtual returns (ExtendedResource[] memory) {
+        uint64[] memory resourceIds = _activeResources[tokenId];
+        return _getExtendedResourcesById(resourceIds);
+    }
+
+    function getFullPendingExtendedResources(
+        uint256 tokenId
+    ) external view virtual returns (ExtendedResource[] memory) {
+        uint64[] memory resourceIds = _pendingResources[tokenId];
+        return _getExtendedResourcesById(resourceIds);
+    }
+
+    function _getExtendedResourcesById(
+        uint64[] memory resourceIds
+    ) internal view virtual returns (ExtendedResource[] memory) {
+        uint256 len = resourceIds.length;
+        ExtendedResource[] memory extendedResources = new ExtendedResource[](len);
+        for (uint i; i<len;) {
+            Resource memory resource = getResource(resourceIds[i]);
+            extendedResources[i] = ExtendedResource({
+                id: resource.id,
+                equippableRefId: _equippableRefIds[resource.id],
+                baseAddress: _baseAddresses[resource.id],
+                metadataURI: resource.metadataURI,
+                custom: resource.custom
+            });
+            unchecked {++i;}
+        }
+
+        return extendedResources;
+    }
 }

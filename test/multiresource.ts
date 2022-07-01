@@ -46,7 +46,7 @@ describe('MultiResource', async () => {
     });
 
     it('can support IMultiResource', async function () {
-      expect(await token.supportsInterface('0xe0418d4c')).to.equal(true);
+      expect(await token.supportsInterface('0xb925bcaf')).to.equal(true);
     });
 
     it('cannot support other interfaceId', async function () {

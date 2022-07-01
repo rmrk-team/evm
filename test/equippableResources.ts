@@ -4,7 +4,7 @@ import { RMRKEquippableMock, RMRKNestingMock } from '../typechain';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { BigNumber } from 'ethers';
 
-describe('MultiResourceEquippable', async () => {
+describe('Equippable', async () => {
   let chunky: RMRKNestingMock;
   let chunkyEquip: RMRKEquippableMock;
 
@@ -17,7 +17,6 @@ describe('MultiResourceEquippable', async () => {
   const equippableRefIdDefault = BigNumber.from(1);
   const metaURIDefault = 'metaURI';
   const baseAddressDefault = ethers.constants.AddressZero;
-  const slotIdDefault = BigNumber.from(1);
   const customDefault: string[] = [];
 
   beforeEach(async () => {
@@ -47,7 +46,7 @@ describe('MultiResourceEquippable', async () => {
       expect(await chunky.supportsInterface('0x01ffc9a7')).to.equal(true);
     });
     it('can support IEquippable', async function () {
-      expect(await chunkyEquip.supportsInterface('0x023c2114')).to.equal(true);
+      expect(await chunkyEquip.supportsInterface('0xe27dac58')).to.equal(true);
     });
     it('cannot support other interfaceId', async function () {
       expect(await chunkyEquip.supportsInterface('0xffffffff')).to.equal(false);
@@ -82,7 +81,6 @@ describe('MultiResourceEquippable', async () => {
             equippableRefId: equippableRefIdDefault,
             metadataURI: metaURIDefault,
             baseAddress: baseAddressDefault,
-            slotId: slotIdDefault,
             custom: customDefault,
           },
           [],
@@ -95,7 +93,7 @@ describe('MultiResourceEquippable', async () => {
 
     it('cannot get non existing resource', async function () {
       const id = BigNumber.from(1);
-      await expect(chunkyEquip.getResource(id)).to.be.revertedWith('RMRKNoResourceMatchingId()');
+      await expect(chunkyEquip.getExtendedResource(id)).to.be.revertedWith('RMRKNoResourceMatchingId()');
     });
 
     it('cannot add resource entry if not issuer', async function () {
@@ -107,7 +105,6 @@ describe('MultiResourceEquippable', async () => {
             equippableRefId: equippableRefIdDefault,
             metadataURI: metaURIDefault,
             baseAddress: baseAddressDefault,
-            slotId: slotIdDefault,
             custom: customDefault,
           },
           [],
@@ -125,7 +122,6 @@ describe('MultiResourceEquippable', async () => {
           equippableRefId: equippableRefIdDefault,
           metadataURI: metaURIDefault,
           baseAddress: baseAddressDefault,
-          slotId: slotIdDefault,
           custom: customDefault,
         },
         [],
@@ -138,7 +134,6 @@ describe('MultiResourceEquippable', async () => {
             equippableRefId: equippableRefIdDefault,
             metadataURI: metaURIDefault,
             baseAddress: baseAddressDefault,
-            slotId: slotIdDefault,
             custom: customDefault,
           },
           [],
@@ -157,7 +152,6 @@ describe('MultiResourceEquippable', async () => {
             equippableRefId: equippableRefIdDefault,
             metadataURI: metaURIDefault,
             baseAddress: baseAddressDefault,
-            slotId: slotIdDefault,
             custom: customDefault,
           },
           [],
@@ -176,7 +170,6 @@ describe('MultiResourceEquippable', async () => {
             equippableRefId: equippableRefIdDefault,
             metadataURI: metaURIDefault,
             baseAddress: baseAddressDefault,
-            slotId: slotIdDefault,
             custom: customDefault,
           },
           [],
@@ -193,7 +186,6 @@ describe('MultiResourceEquippable', async () => {
             equippableRefId: equippableRefIdDefault,
             metadataURI: metaURIDefault,
             baseAddress: baseAddressDefault,
-            slotId: slotIdDefault,
             custom: customDefault,
           },
           [],
@@ -211,7 +203,6 @@ describe('MultiResourceEquippable', async () => {
           equippableRefId: equippableRefIdDefault,
           metadataURI: metaURIDefault,
           baseAddress: baseAddressDefault,
-          slotId: slotIdDefault,
           custom: customDefault,
         },
         [],
@@ -221,13 +212,13 @@ describe('MultiResourceEquippable', async () => {
       await expect(chunkyEquip.addCustomDataToResource(resId, customDataTypeKey))
         .to.emit(chunkyEquip, 'ResourceCustomDataAdded')
         .withArgs(resId, customDataTypeKey);
-      let resource = await chunkyEquip.getResource(resId);
+      let resource = await chunkyEquip.getExtendedResource(resId);
       expect(resource.custom).to.eql([BigNumber.from(customDataTypeKey)]);
 
       await expect(chunkyEquip.removeCustomDataFromResource(resId, 0))
         .to.emit(chunkyEquip, 'ResourceCustomDataRemoved')
         .withArgs(resId, customDataTypeKey);
-      resource = await chunkyEquip.getResource(resId);
+      resource = await chunkyEquip.getExtendedResource(resId);
       expect(resource.custom).to.eql([]);
     });
   });
@@ -249,32 +240,17 @@ describe('MultiResourceEquippable', async () => {
         'ResourceAddedToToken',
       );
 
-      const pending = await chunkyEquip.getFullPendingResources(tokenId);
+      const pending = await chunkyEquip.getFullPendingExtendedResources(tokenId);
       expect(pending).to.be.eql([
-        [
-          resId,
-          equippableRefIdDefault,
-          metaURIDefault,
-          baseAddressDefault,
-          slotIdDefault,
-          customDefault,
-        ],
-        [
-          resId2,
-          equippableRefIdDefault,
-          metaURIDefault,
-          baseAddressDefault,
-          slotIdDefault,
-          customDefault,
-        ],
+        [resId, equippableRefIdDefault, baseAddressDefault, metaURIDefault, customDefault],
+        [resId2, equippableRefIdDefault, baseAddressDefault, metaURIDefault, customDefault],
       ]);
 
-      expect(await chunkyEquip.getPendingResObjectByIndex(tokenId, 0)).to.eql([
+      expect(await chunkyEquip.getPendingExtendedResObjectByIndex(tokenId, 0)).to.eql([
         resId,
         equippableRefIdDefault,
-        metaURIDefault,
         baseAddressDefault,
-        slotIdDefault,
+        metaURIDefault,
         customDefault,
       ]);
     });
@@ -356,27 +332,19 @@ describe('MultiResourceEquippable', async () => {
         .to.emit(chunkyEquip, 'ResourceAccepted')
         .withArgs(tokenId, resId);
 
-      const pending = await chunkyEquip.getFullPendingResources(tokenId);
+      const pending = await chunkyEquip.getFullPendingExtendedResources(tokenId);
       expect(pending).to.be.eql([]);
 
-      const accepted = await chunkyEquip.getFullResources(tokenId);
+      const accepted = await chunkyEquip.getFullExtendedResources(tokenId);
       expect(accepted).to.eql([
-        [
-          resId,
-          equippableRefIdDefault,
-          metaURIDefault,
-          baseAddressDefault,
-          slotIdDefault,
-          customDefault,
-        ],
+        [resId, equippableRefIdDefault, baseAddressDefault, metaURIDefault, customDefault],
       ]);
 
-      expect(await chunkyEquip.getResObjectByIndex(tokenId, 0)).to.eql([
+      expect(await chunkyEquip.getExtendedResObjectByIndex(tokenId, 0)).to.eql([
         resId,
         equippableRefIdDefault,
-        metaURIDefault,
         baseAddressDefault,
-        slotIdDefault,
+        metaURIDefault,
         customDefault,
       ]);
     });
@@ -397,27 +365,13 @@ describe('MultiResourceEquippable', async () => {
         .to.emit(chunkyEquip, 'ResourceAccepted')
         .withArgs(tokenId, resId);
 
-      const pending = await chunkyEquip.getFullPendingResources(tokenId);
+      const pending = await chunkyEquip.getFullPendingExtendedResources(tokenId);
       expect(pending).to.be.eql([]);
 
-      const accepted = await chunkyEquip.getFullResources(tokenId);
+      const accepted = await chunkyEquip.getFullExtendedResources(tokenId);
       expect(accepted).to.eql([
-        [
-          resId2,
-          equippableRefIdDefault,
-          metaURIDefault,
-          baseAddressDefault,
-          slotIdDefault,
-          customDefault,
-        ],
-        [
-          resId,
-          equippableRefIdDefault,
-          metaURIDefault,
-          baseAddressDefault,
-          slotIdDefault,
-          customDefault,
-        ],
+        [resId2, equippableRefIdDefault, baseAddressDefault, metaURIDefault, customDefault],
+        [resId, equippableRefIdDefault, baseAddressDefault, metaURIDefault, customDefault],
       ]);
     });
 
@@ -433,7 +387,7 @@ describe('MultiResourceEquippable', async () => {
       await chunkyEquip.addResourceToToken(tokenId, resId, 0);
       await chunkyEquip.connect(approvedAddress).acceptResource(tokenId, 0);
 
-      const pending = await chunkyEquip.getFullPendingResources(tokenId);
+      const pending = await chunkyEquip.getFullPendingExtendedResources(tokenId);
       expect(pending).to.be.eql([]);
     });
 
@@ -500,15 +454,8 @@ describe('MultiResourceEquippable', async () => {
         'ResourceOverwritten',
       );
 
-      expect(await chunkyEquip.getFullResources(tokenId)).to.be.eql([
-        [
-          resId2,
-          equippableRefIdDefault,
-          metaURIDefault,
-          baseAddressDefault,
-          slotIdDefault,
-          customDefault,
-        ],
+      expect(await chunkyEquip.getFullExtendedResources(tokenId)).to.be.eql([
+        [resId2, equippableRefIdDefault, baseAddressDefault, metaURIDefault, customDefault],
       ]);
       // Overwrite should be gone
       expect(await chunkyEquip.getResourceOverwrites(tokenId, pendingResources[0])).to.eql(
@@ -525,15 +472,8 @@ describe('MultiResourceEquippable', async () => {
       await chunkyEquip.addResourceToToken(tokenId, resId, ethers.utils.hexZeroPad('0x1', 8));
       await chunkyEquip.acceptResource(tokenId, 0);
 
-      expect(await chunkyEquip.getFullResources(tokenId)).to.be.eql([
-        [
-          resId,
-          equippableRefIdDefault,
-          metaURIDefault,
-          baseAddressDefault,
-          slotIdDefault,
-          customDefault,
-        ],
+      expect(await chunkyEquip.getFullExtendedResources(tokenId)).to.be.eql([
+        [resId, equippableRefIdDefault, baseAddressDefault, metaURIDefault, customDefault],
       ]);
     });
   });
@@ -549,9 +489,9 @@ describe('MultiResourceEquippable', async () => {
 
       await expect(chunkyEquip.rejectResource(tokenId, 0)).to.emit(chunkyEquip, 'ResourceRejected');
 
-      const pending = await chunkyEquip.getFullPendingResources(tokenId);
+      const pending = await chunkyEquip.getFullPendingExtendedResources(tokenId);
       expect(pending).to.be.eql([]);
-      const accepted = await chunkyEquip.getFullResources(tokenId);
+      const accepted = await chunkyEquip.getFullExtendedResources(tokenId);
       expect(accepted).to.be.eql([]);
     });
 
@@ -585,9 +525,9 @@ describe('MultiResourceEquippable', async () => {
 
       await expect(chunkyEquip.rejectResource(tokenId, 0)).to.emit(chunkyEquip, 'ResourceRejected');
 
-      const pending = await chunkyEquip.getFullPendingResources(tokenId);
+      const pending = await chunkyEquip.getFullPendingExtendedResources(tokenId);
       expect(pending).to.be.eql([]);
-      const accepted = await chunkyEquip.getFullResources(tokenId);
+      const accepted = await chunkyEquip.getFullExtendedResources(tokenId);
       expect(accepted).to.be.eql([]);
     });
 
@@ -606,9 +546,9 @@ describe('MultiResourceEquippable', async () => {
         'ResourceRejected',
       );
 
-      const pending = await chunkyEquip.getFullPendingResources(tokenId);
+      const pending = await chunkyEquip.getFullPendingExtendedResources(tokenId);
       expect(pending).to.be.eql([]);
-      const accepted = await chunkyEquip.getFullResources(tokenId);
+      const accepted = await chunkyEquip.getFullExtendedResources(tokenId);
       expect(accepted).to.be.eql([]);
     });
 
@@ -666,9 +606,9 @@ describe('MultiResourceEquippable', async () => {
         'ResourceRejected',
       );
 
-      const pending = await chunkyEquip.getFullPendingResources(tokenId);
+      const pending = await chunkyEquip.getFullPendingExtendedResources(tokenId);
       expect(pending).to.be.eql([]);
-      const accepted = await chunkyEquip.getFullResources(tokenId);
+      const accepted = await chunkyEquip.getFullExtendedResources(tokenId);
       expect(accepted).to.be.eql([]);
     });
 
@@ -807,7 +747,6 @@ describe('MultiResourceEquippable', async () => {
           equippableRefId: equippableRefIdDefault,
           metadataURI: 'UriA',
           baseAddress: baseAddressDefault,
-          slotId: slotIdDefault,
           custom: customDefault,
         },
         [],
@@ -819,7 +758,6 @@ describe('MultiResourceEquippable', async () => {
           equippableRefId: equippableRefIdDefault,
           metadataURI: 'UriB',
           baseAddress: baseAddressDefault,
-          slotId: slotIdDefault,
           custom: customDefault,
         },
         [],
@@ -856,7 +794,6 @@ describe('MultiResourceEquippable', async () => {
           equippableRefId: equippableRefIdDefault,
           metadataURI: 'UriA',
           baseAddress: baseAddressDefault,
-          slotId: slotIdDefault,
           custom: [customDataWidthKey, customDataHeightKey, customDataTypeKey],
         },
         [],
@@ -868,7 +805,6 @@ describe('MultiResourceEquippable', async () => {
           equippableRefId: equippableRefIdDefault,
           metadataURI: 'UriB',
           baseAddress: baseAddressDefault,
-          slotId: slotIdDefault,
           custom: [customDataTypeKey, customDataAreaKey],
         },
         [],
@@ -915,7 +851,6 @@ describe('MultiResourceEquippable', async () => {
           equippableRefId: equippableRefIdDefault,
           metadataURI: 'srcA',
           baseAddress: baseAddressDefault,
-          slotId: slotIdDefault,
           custom: [customDataTypeKey],
         },
         [],
@@ -927,7 +862,6 @@ describe('MultiResourceEquippable', async () => {
           equippableRefId: equippableRefIdDefault,
           metadataURI: 'srcB',
           baseAddress: baseAddressDefault,
-          slotId: slotIdDefault,
           custom: [customDataTypeKey],
         },
         [],
@@ -962,7 +896,6 @@ describe('MultiResourceEquippable', async () => {
           equippableRefId: equippableRefIdDefault,
           metadataURI: metaURIDefault,
           baseAddress: baseAddressDefault,
-          slotId: slotIdDefault,
           custom: customDefault,
         },
         [],

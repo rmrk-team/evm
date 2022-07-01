@@ -29,11 +29,12 @@ contract RMRKEquippableMock is RMRKIssuable, RMRKEquippable {
         uint64 resourceId,
         uint64 overwrites
     ) external onlyIssuer {
+        _ownerOf(tokenId); // FIXME: This reverts if token not exists, should it be more explicit?
         _addResourceToToken(tokenId, resourceId, overwrites);
     }
 
     function addResourceEntry(
-        Resource calldata resource,
+        ExtendedResource calldata resource,
         uint64[] calldata fixedPartIds,
         uint64[] calldata slotPartIds
     ) external onlyIssuer {

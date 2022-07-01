@@ -653,7 +653,6 @@ describe('Equipping', async () => {
         equippableRefId: 0,
         metadataURI: 'ipfs:soldier/',
         baseAddress: base.address,
-        slotId: partIdForBody,
         custom: [],
       },
       [partIdForBody], // Fixed parts
@@ -676,7 +675,6 @@ describe('Equipping', async () => {
           equippableRefId: 0, // Not meant to equip
           metadataURI: `ipfs:weapon/full/${weaponResourcesFull[i]}`,
           baseAddress: ethers.constants.AddressZero, // Not meant to equip
-          slotId: 0, // Not meant to equip
           custom: [],
         },
         [],
@@ -690,7 +688,6 @@ describe('Equipping', async () => {
           equippableRefId: equippableRefId,
           metadataURI: `ipfs:weapon/equip/${weaponResourcesEquip[i]}`,
           baseAddress: base.address,
-          slotId: partIdForWeapon,
           custom: [],
         },
         [],
@@ -718,7 +715,6 @@ describe('Equipping', async () => {
         equippableRefId: 0, // Not meant to equip
         metadataURI: 'ipfs:weagponGem/full/',
         baseAddress: ethers.constants.AddressZero, // Not meant to equip
-        slotId: 0, // Not meant to equip
         custom: [],
       },
       [],
@@ -730,7 +726,6 @@ describe('Equipping', async () => {
         equippableRefId: equippableRefId,
         metadataURI: 'ipfs:weagponGem/equip/',
         baseAddress: base.address,
-        slotId: partIdForWeaponGem,
         custom: [],
       },
       [],
@@ -761,7 +756,6 @@ describe('Equipping', async () => {
         equippableRefId: equippableRefId,
         metadataURI: 'ipfs:background/',
         baseAddress: base.address,
-        slotId: partIdForBackground,
         custom: [],
       },
       [],
@@ -813,7 +807,6 @@ describe('Equipping', async () => {
         equippableRefId: newEquippableRefId,
         metadataURI: `ipfs:weapon/equipAlt/${newWeaponResId}`,
         baseAddress: base.address,
-        slotId: partIdForWeaponAlt,
         custom: [],
       },
       [],
