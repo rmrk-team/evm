@@ -95,8 +95,10 @@ contract RMRKEquippable is IRMRKEquippableResource, MultiResourceAbstractBase {
         uint64 childResourceId
     ) private {
         Resource storage resource = _resources[resourceId];
-        IRMRKNesting.Child memory child = IRMRKNesting(_nestingAddress).childOf(tokenId, childIndex);
+        if (_equipments[tokenId][resource.baseAddress][slotPartId].childAddress != address(0))
+            revert RMRKSlotAlreadyUsed();
 
+        IRMRKNesting.Child memory child = IRMRKNesting(_nestingAddress).childOf(tokenId, childIndex);
         address childEquipable = IRMRKNestingWithEquippable(child.contractAddress).getEquippablesAddress();
 
         // Check from child persective
@@ -114,8 +116,6 @@ contract RMRKEquippable is IRMRKEquippableResource, MultiResourceAbstractBase {
             childAddress: childEquipable
         });
 
-        if (_equipments[tokenId][resource.baseAddress][slotPartId].childAddress != address(0))
-            revert RMRKSlotAlreadyUsed();
         _equipments[tokenId][resource.baseAddress][slotPartId] = newEquip;
         IRMRKEquippableResource(childEquipable).markEquipped(child.tokenId, childResourceId, true);
     }
@@ -135,22 +135,22 @@ contract RMRKEquippable is IRMRKEquippableResource, MultiResourceAbstractBase {
     ) private {
         address targetBaseAddress = _resources[resourceId].baseAddress;
         Equipment memory equipment = _equipments[tokenId][targetBaseAddress][slotPartId];
+        if (equipment.childAddress == address(0))
+            revert RMRKNotEquipped();
         delete _equipments[tokenId][targetBaseAddress][slotPartId];
 
-        address childEquipable = IRMRKNestingWithEquippable(equipment.childAddress).getEquippablesAddress();
-        IRMRKEquippableResource(childEquipable).markEquipped(equipment.childTokenId, equipment.childResourceId, false);
+        IRMRKEquippableResource(equipment.childAddress).markEquipped(equipment.childTokenId, equipment.childResourceId, false);
     }
 
     function replaceEquipment(
         uint256 tokenId,
-        uint64 oldResourceId,
-        uint64 newResourceId,
+        uint64 resourceId,
         uint64 slotPartId,
         uint256 childIndex,
         uint64 childResourceId
     ) external onlyOwner(tokenId) {
-        _unequip(tokenId, oldResourceId, slotPartId);
-        _equip(tokenId, newResourceId, slotPartId, childIndex, childResourceId);
+        _unequip(tokenId, resourceId, slotPartId);
+        _equip(tokenId, resourceId, slotPartId, childIndex, childResourceId);
     }
 
     function markEquipped(uint tokenId, uint64 resourceId, bool equipped) external {

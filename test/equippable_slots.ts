@@ -187,7 +187,7 @@ describe('Equipping', async () => {
         expectedEquips,
       ]);
 
-      // Child is marked as equpped:
+      // Child is marked as equipped:
       expect(await weaponEquip.isEquipped(weapons[0])).to.eql(true);
     });
 
@@ -219,7 +219,7 @@ describe('Equipping', async () => {
         expectedEquips,
       ]);
 
-      // Children are marked as equpped:
+      // Children are marked as equipped:
       expect(await weaponEquip.isEquipped(weapons[0])).to.eql(true);
       expect(await backgroundEquip.isEquipped(backgrounds[0])).to.eql(true);
     });
@@ -378,7 +378,7 @@ describe('Equipping', async () => {
       await expect(
         weaponEquip.connect(addrs[0]).markEquipped(weapons[0], weaponResourcesEquip[0], true),
       ).to.be.revertedWith('RMRKCallerCannotChangeEquipStatus()');
-      // Just in case, we also test setting it unequipped
+      // Just in case, we also test setting it unequiped
       await expect(
         weaponEquip.connect(addrs[0]).markEquipped(weapons[0], weaponResourcesEquip[0], false),
       ).to.be.revertedWith('RMRKCallerCannotChangeEquipStatus()');
@@ -386,30 +386,126 @@ describe('Equipping', async () => {
   });
 
   describe('Unequip', async function () {
-    it.skip('can unequipp', async function () {
-      //
+    it('can unequip', async function () {
+      // Weapon is child on index 0, background on index 1
+      const childIndex = 0;
+      const weaponResId = weaponResourcesEquip[0]; // This resource is assigned to weapon first weapon
+      await soldierEquip
+        .connect(addrs[0])
+        .equip(soldiers[0], soldierResId, partIdForWeapon, childIndex, weaponResId);
+
+      await soldierEquip.connect(addrs[0]).unequip(soldiers[0], soldierResId, partIdForWeapon);
+
+      const expectedSlots = [bn(partIdForWeapon), bn(partIdForBackground)];
+      // If a slot has nothing equipped, it returns an empty equip:
+      const expectedEquips = [
+        [bn(0), bn(0), bn(0), ethers.constants.AddressZero],
+        [bn(0), bn(0), bn(0), ethers.constants.AddressZero],
+      ];
+      expect(await soldierEquip.getEquipped(soldiers[0], soldierResId)).to.eql([
+        expectedSlots,
+        expectedEquips,
+      ]);
+
+      // Child is marked as not equipped:
+      expect(await weaponEquip.isEquipped(weapons[0])).to.eql(false);
     });
 
-    it.skip('cannot unequipp if not equipped', async function () {
-      //
+    it('cannot unequip if not equipped', async function () {
+      await expect(
+        soldierEquip.connect(addrs[0]).unequip(soldiers[0], soldierResId, partIdForWeapon),
+      ).to.be.revertedWith('RMRKNotEquipped()');
     });
 
-    it.skip('cannot unequipp if not owner', async function () {
-      //
+    it('cannot unequip if not owner', async function () {
+      // Weapon is child on index 0, background on index 1
+      const childIndex = 0;
+      const weaponResId = weaponResourcesEquip[0]; // This resource is assigned to weapon first weapon
+      await soldierEquip
+        .connect(addrs[0])
+        .equip(soldiers[0], soldierResId, partIdForWeapon, childIndex, weaponResId);
+
+      await expect(
+        soldierEquip.connect(addrs[1]).unequip(soldiers[0], soldierResId, partIdForWeapon),
+      ).to.be.revertedWith('ERC721NotApprovedOrOwner()');
     });
   });
 
   describe('Replace equip', async function () {
-    it.skip('can replace equip', async function () {
-      //
+    it('can replace equip', async function () {
+      // Weapon is child on index 0, background on index 1
+      const childIndex = 0;
+      const weaponResId = weaponResourcesEquip[0]; // This resource is assigned to weapon first weapon
+      await soldierEquip
+        .connect(addrs[0])
+        .equip(soldiers[0], soldierResId, partIdForWeapon, childIndex, weaponResId);
+
+      const newWeaponId = 999;
+      const weaponResourceIndex = 3;
+      await mintWeaponToSoldier(addrs[0], soldiers[0], newWeaponId, weaponResourceIndex);
+
+      const newWeaponChildIndex = 2;
+      const newWeaponResId = weaponResourcesEquip[weaponResourceIndex];
+      await soldierEquip
+        .connect(addrs[0])
+        .replaceEquipment(
+          soldiers[0],
+          soldierResId,
+          partIdForWeapon,
+          newWeaponChildIndex,
+          newWeaponResId,
+        );
+
+      const expectedSlots = [bn(partIdForWeapon), bn(partIdForBackground)];
+      // If a slot has nothing equipped, it returns an empty equip:
+      const expectedEquips = [
+        [bn(soldierResId), bn(newWeaponResId), bn(newWeaponId), weaponEquip.address],
+        [bn(0), bn(0), bn(0), ethers.constants.AddressZero],
+      ];
+      expect(await soldierEquip.getEquipped(soldiers[0], soldierResId)).to.eql([
+        expectedSlots,
+        expectedEquips,
+      ]);
+
+      // Child is marked as equipped:
+      expect(await weaponEquip.isEquipped(weapons[0])).to.eql(false);
+      expect(await weaponEquip.isEquipped(newWeaponId)).to.eql(true);
     });
 
-    it.skip('cannot replace equip if not equipped', async function () {
-      //
+    it('cannot replace equip if not equipped', async function () {
+      const childIndex = 0;
+      const weaponResId = weaponResourcesEquip[0]; // This resource is assigned to weapon first weapon
+      await expect(
+        soldierEquip
+          .connect(addrs[0])
+          .replaceEquipment(soldiers[0], soldierResId, partIdForWeapon, childIndex, weaponResId),
+      ).to.be.revertedWith('RMRKNotEquipped()');
     });
 
-    it.skip('cannot replace equip if not owner', async function () {
-      //
+    it('cannot replace equip if not owner', async function () {
+      const childIndex = 0;
+      const weaponResId = weaponResourcesEquip[0]; // This resource is assigned to weapon first weapon
+      await soldierEquip
+        .connect(addrs[0])
+        .equip(soldiers[0], soldierResId, partIdForWeapon, childIndex, weaponResId);
+
+      const newWeaponId = 999;
+      const weaponResourceIndex = 3;
+      await mintWeaponToSoldier(addrs[0], soldiers[0], newWeaponId, weaponResourceIndex);
+
+      const newWeaponChildIndex = 2;
+      const newWeaponResId = weaponResourcesEquip[weaponResourceIndex];
+      await expect(
+        soldierEquip
+          .connect(addrs[1])
+          .replaceEquipment(
+            soldiers[0],
+            soldierResId,
+            partIdForWeapon,
+            newWeaponChildIndex,
+            newWeaponResId,
+          ),
+      ).to.be.revertedWith('ERC721NotApprovedOrOwner()');
     });
   });
 
