@@ -24,7 +24,7 @@ library RMRKLib {
         array.pop();
     }
 
-    // indexOf, indexOfFromEnd, and contains adapted from Cryptofin-Solidity arrayUtils
+    // indexOf adapted from Cryptofin-Solidity arrayUtils
     function indexOf(uint128[] memory A, uint128 a) internal pure returns (uint256, bool) {
         uint256 length = A.length;
         for (uint256 i = 0; i < length;) {
@@ -34,26 +34,6 @@ library RMRKLib {
             unchecked {++i;}
         }
         return (0, false);
-    }
-
-    function indexOfFromEnd(uint128[] memory A, uint128 a) internal pure returns (uint256, bool) {
-        uint256 length = A.length;
-        for (uint256 i = length; i > 0; i--) {
-            if (A[i - 1] == a) {
-                return (i, true);
-            }
-        }
-        return (0, false);
-    }
-
-    function contains(uint128[] memory A, uint128 a) internal pure returns (bool) {
-        (, bool isIn) = indexOf(A, a);
-        return isIn;
-    }
-
-    function containsFromEnd(uint128[] memory A, uint128 a) internal pure returns (bool) {
-        (, bool isIn) = indexOfFromEnd(A, a);
-        return isIn;
     }
 
     function removeItemByValue(uint64[] storage array, uint64 value) internal {
@@ -76,7 +56,7 @@ library RMRKLib {
         array.pop();
     }
 
-    // indexOf, indexOfFromEnd, and contains adapted from Cryptofin-Solidity arrayUtils
+    // indexOf adapted from Cryptofin-Solidity arrayUtils
     function indexOf(uint64[] memory A, uint64 a) internal pure returns (uint256, bool) {
         uint256 length = A.length;
         for (uint256 i = 0; i < length;) {
@@ -87,25 +67,4 @@ library RMRKLib {
         }
         return (0, false);
     }
-
-    function indexOfFromEnd(uint64[] memory A, uint64 a) internal pure returns (uint256, bool) {
-        uint256 length = A.length;
-        for (uint256 i = length; i > 0; i--) {
-            if (A[i - 1] == a) {
-                return (i, true);
-            }
-        }
-        return (0, false);
-    }
-
-    function contains(uint64[] memory A, uint64 a) internal pure returns (bool) {
-        (, bool isIn) = indexOf(A, a);
-        return isIn;
-    }
-
-    function containsFromEnd(uint64[] memory A, uint64 a) internal pure returns (bool) {
-        (, bool isIn) = indexOfFromEnd(A, a);
-        return isIn;
-    }
-
 }
