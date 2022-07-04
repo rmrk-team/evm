@@ -516,6 +516,62 @@ describe('Equipping', async () => {
     });
   });
 
+  describe('Compose', async function () {
+    it('can get composables for soldier', async function () {
+      const childIndex = 0;
+      const weaponResId = weaponResourcesEquip[0]; // This resource is assigned to weapon first weapon
+      await soldierEquip
+        .connect(addrs[0])
+        .equip(soldiers[0], soldierResId, partIdForWeapon, childIndex, weaponResId);
+
+      const expectedResource = [
+        bn(soldierResId), // id
+        bn(0), // equippableRefId
+        base.address, // baseAddress
+        'ipfs:soldier/', // metadataURI
+        [],
+      ];
+      const expectedFixedParts = [
+        [
+          bn(partIdForBody), // partId
+          1, // z
+          'genericBody.png', // src
+          'genericBodyAlt.png', // fallbackSrc
+        ],
+      ];
+      const expectedSlotParts = [
+        [
+          bn(partIdForWeapon), // partId
+          bn(weaponResourcesEquip[0]), // childResourceId
+          2, // z
+          bn(weapons[0]), // childTokenId
+          weaponEquip.address, // childAddress
+          '', // src
+          '', // fallbackSrc
+        ],
+        [
+          // Nothing on equipped on background slot:
+          bn(partIdForBackground), // partId
+          bn(0), // childResourceId
+          0, // z
+          bn(0), // childTokenId
+          ethers.constants.AddressZero, // childAddress
+          '', // src
+          'noBackground.png', // fallbackSrc
+        ],
+      ];
+      const allResources = await soldierEquip.composeEquippables(soldiers[0], soldierResId);
+      expect(allResources).to.eql([expectedResource, expectedFixedParts, expectedSlotParts]);
+    });
+
+    it('cannot get composables for soldier with not associated resource', async function () {
+      const wrongResId = weaponResourcesEquip[1];
+      await expect(weaponEquip.composeEquippables(weapons[0], wrongResId)).to.be.revertedWith(
+        'RMRKTokenDoesNotHaveActiveResource()',
+      );
+    });
+  });
+
   async function deployContracts(): Promise<void> {
     const Base = await ethers.getContractFactory('RMRKBaseStorageMock');
     const Nesting = await ethers.getContractFactory('RMRKNestingMock');
@@ -567,8 +623,8 @@ describe('Equipping', async () => {
       itemType: ItemType.Fixed,
       z: 1,
       equippable: [],
-      src: '',
-      fallbackSrc: '',
+      src: 'genericBody.png',
+      fallbackSrc: 'genericBodyAlt.png',
     };
     const partForWeapon = {
       itemType: ItemType.Slot,
@@ -582,14 +638,14 @@ describe('Equipping', async () => {
       z: 3,
       equippable: [weaponGemEquip.address],
       src: '',
-      fallbackSrc: '',
+      fallbackSrc: 'noGem.png',
     };
     const partForBackground = {
       itemType: ItemType.Slot,
       z: 0,
       equippable: [backgroundEquip.address],
       src: '',
-      fallbackSrc: '',
+      fallbackSrc: 'noBackground.png',
     };
 
     await base.addPartList([

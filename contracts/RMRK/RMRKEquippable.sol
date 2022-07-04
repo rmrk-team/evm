@@ -23,6 +23,7 @@ error RMRKEquippableEquipNotAllowedByBase();
 error RMRKNotEquipped();
 error RMRKOwnerQueryForNonexistentToken();
 error RMRKSlotAlreadyUsed();
+error RMRKTokenDoesNotHaveActiveResource();
 
 contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
 
@@ -30,12 +31,36 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
     using RMRKLib for uint128[];
     using Strings for uint256;
 
+    struct Equipment {
+        uint64 resourceId;
+        uint64 childResourceId;
+        uint childTokenId;
+        address childAddress;
+    }
+
     struct ExtendedResource { // Used for input/output only
         uint64 id; // ID of this resource
         uint64 equippableRefId;
         address baseAddress;
         string metadataURI;
         uint128[] custom; //Custom data
+    }
+
+    struct FixedPart {
+        uint64 partId;
+        uint8 z; //1 byte
+        string src; //n bytes 32+
+        string fallbackSrc; //n bytes 32+
+    }
+
+    struct SlotPart {
+        uint64 partId;
+        uint64 childResourceId;
+        uint8 z; //1 byte
+        uint childTokenId;
+        address childAddress;
+        string src; //n bytes 32+
+        string fallbackSrc; //n bytes 32+
     }
 
     address private _nestingAddress;
@@ -103,7 +128,6 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
         uint256 childIndex,
         uint64 childResourceId
     ) private {
-        Resource storage resource = _resources[resourceId];
         if (_equipments[tokenId][_baseAddresses[resourceId]][slotPartId].childAddress != address(0))
             revert RMRKSlotAlreadyUsed();
 
@@ -180,19 +204,19 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
         uint64 tokenId,
         uint64 resourceId
     ) public view returns (
-        uint64[] memory slotsEquipped,
+        uint64[] memory slotParts,
         Equipment[] memory childrenEquipped
     ) {
         address targetBaseAddress = _baseAddresses[resourceId];
         uint64[] memory slotPartIds = _slotPartIds[resourceId];
 
-        // FIXME: There could be empty slots and children at the end, since a part might be equipped to another resource or simply not equipped
-        slotsEquipped = new uint64[](slotPartIds.length);
+        // FIXME: Some children equipped might be empty. Should clarify this or implement in a different way
+        slotParts = new uint64[](slotPartIds.length);
         childrenEquipped = new Equipment[](slotPartIds.length);
 
         uint256 len = slotPartIds.length;
         for (uint i; i<len;) {
-            slotsEquipped[i] = slotPartIds[i];
+            slotParts[i] = slotPartIds[i];
             Equipment memory equipment = _equipments[tokenId][targetBaseAddress][slotPartIds[i]];
             if (equipment.resourceId == resourceId) {
                 childrenEquipped[i] = equipment;
@@ -205,54 +229,66 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
     function composeEquippables(
         uint tokenId,
         uint64 resourceId
-    ) public view returns (uint64[] memory basePartIds, address[] memory baseAddresses) {
-        //get Resource of target token
-        // Resource storage resource = _resources[resourceId];
-        // //Check gas efficiency of scoping like this
-        // address baseAddress = resource.baseAddress;
-        // //fixed IDs
-        // {
-        //     uint64[] memory fixedPartIds = _fixedPartIds[resourceId];
-        //     uint256 len = fixedPartIds.length;
-        //     uint256 basePartIdsLen = basePartIds.length;
-        //     unchecked {
-        //         for (uint i; i<len;) {
-        //             uint64 partId = fixedPartIds[i];
-        //             basePartIds[basePartIdsLen] = partId;
-        //             baseAddresses[basePartIdsLen] = baseAddress;
-        //             ++basePartIdsLen;
-        //             ++i;
-        //         }
-        //     }
-        // }
-        // //Slot IDs + recurse
-        // {
-        //     uint64[] memory slotPartIds = _slotPartIds[resourceId];
-        //     uint256 len = slotPartIds.length;
-        //     uint256 basePartIdsLen = basePartIds.length;
-        //     unchecked {
-        //         for (uint i; i<len;) {
-        //             uint64 partId = slotPartIds[i];
-        //             basePartIds[basePartIdsLen] = partId;
-        //             baseAddresses[basePartIdsLen] = baseAddress;
-        //             ++basePartIdsLen;
-        //             ++i;
+    ) public view returns (
+        ExtendedResource memory resource,
+        FixedPart[] memory fixedParts,
+        SlotPart[] memory slotParts
+    ) {
+        resource = getExtendedResource(resourceId);
 
-        //             uint64 equippedResourceId = _equipments[resourceId][partId].childResourceId;
-        //             //Recuse while we're in this block, slotpartIds are initialized
-        //             (uint64[] memory equippedBasePartIds, address[] memory equippedBaseAddresses) = composeEquippables(
-        //                 equippedResourceId
-        //             );
-        //             uint256 recLen = equippedBasePartIds.length;
-        //             for (uint j; j<recLen;) {
-        //                 basePartIds[basePartIdsLen] = equippedBasePartIds[j];
-        //                 baseAddresses[basePartIdsLen] = equippedBaseAddresses[j];
-        //                 ++basePartIdsLen;
-        //                 ++j;
-        //             }
-        //         }
-        //     }
-        // }
+        // We make sure token has that resource. Alternative is to receive index but makes equipping more complex.
+        (, bool found) = _activeResources[tokenId].indexOf(resourceId);
+        if (!found)
+            revert RMRKTokenDoesNotHaveActiveResource();
+
+        address targetBaseAddress = _baseAddresses[resourceId];
+
+        // Fixed parts:
+        uint64[] memory fixedPartIds = _fixedPartIds[resourceId];
+        fixedParts = new FixedPart[](fixedPartIds.length);
+        IRMRKBaseStorage.Part[] memory baseFixedParts = IRMRKBaseStorage(targetBaseAddress).getParts(fixedPartIds);
+        uint256 len = fixedPartIds.length;
+        for (uint i; i<len;) {
+            fixedParts[i] = FixedPart({
+                partId: fixedPartIds[i],
+                z: baseFixedParts[i].z,
+                src: baseFixedParts[i].src,
+                fallbackSrc: baseFixedParts[i].fallbackSrc
+            });
+            unchecked {++i;}
+        }
+
+        // Slot parts:
+        uint64[] memory slotPartIds = _slotPartIds[resourceId];
+        slotParts = new SlotPart[](slotPartIds.length);
+        IRMRKBaseStorage.Part[] memory baseSlotParts = IRMRKBaseStorage(targetBaseAddress).getParts(slotPartIds);
+        len = slotPartIds.length;
+        for (uint i; i<len;) {
+            Equipment memory equipment = _equipments[tokenId][targetBaseAddress][slotPartIds[i]];
+            if (equipment.resourceId == resourceId) {
+                slotParts[i] = SlotPart({
+                    partId: slotPartIds[i],
+                    childResourceId: equipment.childResourceId,
+                    z: baseSlotParts[i].z,
+                    childTokenId: equipment.childTokenId,
+                    childAddress: equipment.childAddress,
+                    src: baseSlotParts[i].src,
+                    fallbackSrc: baseSlotParts[i].fallbackSrc
+                });
+            }
+            else {
+                slotParts[i] = SlotPart({
+                    partId: slotPartIds[i],
+                    childResourceId: uint64(0),
+                    z: baseSlotParts[i].z,
+                    childTokenId: uint(0),
+                    childAddress: address(0),
+                    src: baseSlotParts[i].src,
+                    fallbackSrc: baseSlotParts[i].fallbackSrc
+                });
+            }
+            unchecked {++i;}
+        }
     }
 
     // --------------------- VALIDATION ---------------------
