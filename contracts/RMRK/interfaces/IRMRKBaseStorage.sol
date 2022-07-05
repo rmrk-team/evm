@@ -21,8 +21,7 @@ interface IRMRKBaseStorage {
       ItemType itemType; //1 byte
       uint8 z; //1 byte
       address[] equippable; //n Collections that can be equipped into this slot
-      string src; //n bytes 32+
-      string fallbackSrc; //n bytes 32+
+      string metadataURI; //n bytes 32+
   }
 
   function checkIsEquippable(uint64 partId, address targetAddress) external view returns (bool);

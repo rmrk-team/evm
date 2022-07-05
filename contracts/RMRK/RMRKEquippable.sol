@@ -49,8 +49,7 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
     struct FixedPart {
         uint64 partId;
         uint8 z; //1 byte
-        string src; //n bytes 32+
-        string fallbackSrc; //n bytes 32+
+        string metadataURI; //n bytes 32+
     }
 
     struct SlotPart {
@@ -59,8 +58,7 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
         uint8 z; //1 byte
         uint childTokenId;
         address childAddress;
-        string src; //n bytes 32+
-        string fallbackSrc; //n bytes 32+
+        string metadataURI; //n bytes 32+
     }
 
     address private _nestingAddress;
@@ -252,8 +250,7 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
             fixedParts[i] = FixedPart({
                 partId: fixedPartIds[i],
                 z: baseFixedParts[i].z,
-                src: baseFixedParts[i].src,
-                fallbackSrc: baseFixedParts[i].fallbackSrc
+                metadataURI: baseFixedParts[i].metadataURI
             });
             unchecked {++i;}
         }
@@ -272,8 +269,7 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
                     z: baseSlotParts[i].z,
                     childTokenId: equipment.childTokenId,
                     childAddress: equipment.childAddress,
-                    src: baseSlotParts[i].src,
-                    fallbackSrc: baseSlotParts[i].fallbackSrc
+                    metadataURI: baseSlotParts[i].metadataURI
                 });
             }
             else {
@@ -283,8 +279,7 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
                     z: baseSlotParts[i].z,
                     childTokenId: uint(0),
                     childAddress: address(0),
-                    src: baseSlotParts[i].src,
-                    fallbackSrc: baseSlotParts[i].fallbackSrc
+                    metadataURI: baseSlotParts[i].metadataURI
                 });
             }
             unchecked {++i;}

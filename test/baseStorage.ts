@@ -13,8 +13,7 @@ describe('MultiResource', async () => {
   const baseSymbol = 'BSE';
   const baseType = 'mixed';
 
-  const srcDefault = 'src';
-  const fallbackSrcDefault = 'fallback';
+  const metadataUriDefault = 'src';
 
   // const noType = 0;
   const slotType = 1;
@@ -24,8 +23,7 @@ describe('MultiResource', async () => {
     itemType: slotType,
     z: 0,
     equippable: [],
-    src: srcDefault,
-    fallbackSrc: fallbackSrcDefault,
+    metadataURI: metadataUriDefault,
   };
 
   beforeEach(async () => {
@@ -55,18 +53,17 @@ describe('MultiResource', async () => {
         itemType: fixedType,
         z: 0,
         equippable: [],
-        src: srcDefault,
-        fallbackSrc: fallbackSrcDefault,
+        metadataURI: metadataUriDefault,
       };
 
       await testBase.addPart({ partId: partId, part: partData });
-      expect(await testBase.getPart(partId)).to.eql([2, 0, [], srcDefault, fallbackSrcDefault]);
+      expect(await testBase.getPart(partId)).to.eql([2, 0, [], metadataUriDefault]);
     });
 
     it('can add slot part', async function () {
       const partId = 2;
       await testBase.addPart({ partId: partId, part: sampleSlotPartData });
-      expect(await testBase.getPart(partId)).to.eql([1, 0, [], srcDefault, fallbackSrcDefault]);
+      expect(await testBase.getPart(partId)).to.eql([1, 0, [], metadataUriDefault]);
     });
 
     it('can add parts list', async function () {
@@ -76,23 +73,21 @@ describe('MultiResource', async () => {
         itemType: slotType,
         z: 0,
         equippable: [],
-        src: 'src1',
-        fallbackSrc: 'fallback1',
+        metadataURI: 'src1',
       };
       const partData2 = {
         itemType: fixedType,
         z: 1,
         equippable: [],
-        src: 'src2',
-        fallbackSrc: 'fallback2',
+        metadataURI: 'src2',
       };
       await testBase.addPartList([
         { partId: partId, part: partData1 },
         { partId: partId2, part: partData2 },
       ]);
       expect(await testBase.getParts([partId, partId2])).to.eql([
-        [slotType, 0, [], 'src1', 'fallback1'],
-        [fixedType, 1, [], 'src2', 'fallback2'],
+        [slotType, 0, [], 'src1'],
+        [fixedType, 1, [], 'src2'],
       ]);
     });
 
@@ -116,8 +111,7 @@ describe('MultiResource', async () => {
         itemType: slotType,
         z: 0,
         equippable: [addrs[1].address, addrs[2].address],
-        src: srcDefault,
-        fallbackSrc: fallbackSrcDefault,
+        metadataURI: metadataUriDefault,
       };
       await testBase.addPart({ partId: partId, part: partData });
       expect(await testBase.checkIsEquippable(partId, addrs[2].address)).to.eql(true);
@@ -175,8 +169,7 @@ describe('MultiResource', async () => {
         itemType: fixedType, // This is what we're testing
         z: 0,
         equippable: [],
-        src: srcDefault,
-        fallbackSrc: fallbackSrcDefault,
+        metadataURI: metadataUriDefault,
       };
       await testBase.addPart({ partId: fixedPartId, part: partData });
       await expect(

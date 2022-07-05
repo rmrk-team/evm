@@ -328,8 +328,7 @@ describe('Equipping', async () => {
         itemType: ItemType.Slot,
         z: 2,
         equippable: [weaponEquip.address],
-        src: '',
-        fallbackSrc: '',
+        metadataURI: '',
       };
       await base.addPart({ partId: partIdForWeaponAlt, part: partForWeaponAlt });
 
@@ -363,8 +362,7 @@ describe('Equipping', async () => {
         itemType: ItemType.Fixed, // This is what we're testing
         z: 2,
         equippable: [weaponEquip.address],
-        src: '',
-        fallbackSrc: '',
+        metadataURI: '',
       };
       await base.addPart({ partId: partIdForWeaponAlt, part: partForWeaponAlt });
 
@@ -535,8 +533,7 @@ describe('Equipping', async () => {
         [
           bn(partIdForBody), // partId
           1, // z
-          'genericBody.png', // src
-          'genericBodyAlt.png', // fallbackSrc
+          'genericBody.png', // metadataURI
         ],
       ];
       const expectedSlotParts = [
@@ -546,8 +543,7 @@ describe('Equipping', async () => {
           2, // z
           bn(weapons[0]), // childTokenId
           weaponEquip.address, // childAddress
-          '', // src
-          '', // fallbackSrc
+          '', // metadataURI
         ],
         [
           // Nothing on equipped on background slot:
@@ -556,8 +552,7 @@ describe('Equipping', async () => {
           0, // z
           bn(0), // childTokenId
           ethers.constants.AddressZero, // childAddress
-          '', // src
-          'noBackground.png', // fallbackSrc
+          'noBackground.png', // metadataURI
         ],
       ];
       const allResources = await soldierEquip.composeEquippables(soldiers[0], soldierResId);
@@ -623,29 +618,25 @@ describe('Equipping', async () => {
       itemType: ItemType.Fixed,
       z: 1,
       equippable: [],
-      src: 'genericBody.png',
-      fallbackSrc: 'genericBodyAlt.png',
+      metadataURI: 'genericBody.png',
     };
     const partForWeapon = {
       itemType: ItemType.Slot,
       z: 2,
       equippable: [weaponEquip.address],
-      src: '',
-      fallbackSrc: '',
+      metadataURI: '',
     };
     const partForWeaponGem = {
       itemType: ItemType.Slot,
       z: 3,
       equippable: [weaponGemEquip.address],
-      src: '',
-      fallbackSrc: 'noGem.png',
+      metadataURI: 'noGem.png',
     };
     const partForBackground = {
       itemType: ItemType.Slot,
       z: 0,
       equippable: [backgroundEquip.address],
-      src: '',
-      fallbackSrc: 'noBackground.png',
+      metadataURI: 'noBackground.png',
     };
 
     await base.addPartList([
