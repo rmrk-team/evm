@@ -2,15 +2,15 @@
 
 pragma solidity ^0.8.15;
 
-import "./abstracts/ERC721Abstract.sol";
 import "./abstracts/MultiResourceAbstract.sol";
 import "./interfaces/IRMRKMultiResource.sol";
 import "./library/RMRKLib.sol";
+import "./standard/ERC721.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
 
-contract RMRKMultiResource is ERC721Abstract, MultiResourceAbstract {
+contract RMRKMultiResource is ERC721, MultiResourceAbstract {
 
     using RMRKLib for uint256;
     using RMRKLib for uint64[];
@@ -18,7 +18,7 @@ contract RMRKMultiResource is ERC721Abstract, MultiResourceAbstract {
     using Address for address;
     using Strings for uint256;
 
-    constructor(string memory name_, string memory symbol_) ERC721Abstract(name_, symbol_) {}
+    constructor(string memory name_, string memory symbol_) ERC721(name_, symbol_) {}
 
     ////////////////////////////////////////
     //        ERC-721 COMPLIANCE
@@ -30,6 +30,12 @@ contract RMRKMultiResource is ERC721Abstract, MultiResourceAbstract {
             interfaceId == type(IRMRKMultiResource).interfaceId ||
             super.supportsInterface(interfaceId)
         );
+    }
+
+
+
+    function tokenURI(uint256 tokenId) public view virtual override(ERC721, MultiResourceAbstract) returns (string memory) {
+        return MultiResourceAbstract.tokenURI(tokenId);
     }
 
 

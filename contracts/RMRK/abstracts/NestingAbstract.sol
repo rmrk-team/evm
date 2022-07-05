@@ -73,37 +73,6 @@ abstract contract NestingAbstract is Context, IRMRKNesting {
         return (owner.ownerAddress, owner.tokenId, owner.isNft);
     }
 
-    function tokenURI(uint256 tokenId) public view virtual returns (string memory) {
-        //TODO: Discuss removing this check
-        _requireMinted(tokenId);
-
-        string memory baseURI = _baseURI();
-        return bytes(baseURI).length > 0 ? string(abi.encodePacked(baseURI, tokenId.toString())) : "";
-    }
-
-    /**
-    * @dev Reverts if the `tokenId` has not been minted yet.
-    */
-    function _requireMinted(uint256 tokenId) internal view virtual {
-        if(!_exists(tokenId))
-            revert RMRKInvalidTokenID();
-    }
-
-    function _exists(uint256 tokenId) internal view virtual returns (bool) {
-        return _RMRKOwners[tokenId].ownerAddress != address(0);
-    }
-
-
-    /**
-    * @dev Base URI for computing {tokenURI}. If set, the resulting URI for each
-    * token will be the concatenation of the `baseURI` and the `tokenId`. Empty
-    * by default, can be overridden in child contracts.
-    */
-    function _baseURI() internal view virtual returns (string memory) {
-        return "";
-    }
-
-
     ////////////////////////////////////////
     //          CHILD MANAGEMENT
     ////////////////////////////////////////

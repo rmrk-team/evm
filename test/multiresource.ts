@@ -185,7 +185,7 @@ describe('MultiResource', async () => {
 
       await addResources([resId]);
       await expect(token.addResourceToToken(tokenId, resId, 0)).to.be.revertedWith(
-        'ERC721OwnerQueryForNonexistentToken()',
+        'ERC721InvalidTokenId()',
       );
     });
 
@@ -593,7 +593,7 @@ describe('MultiResource', async () => {
     it('cannot set priorities for non existing token', async function () {
       const tokenId = 1;
       await expect(token.connect(addrs[1]).setPriority(tokenId, [])).to.be.revertedWith(
-        'ERC721OwnerQueryForNonexistentToken()',
+        'ERC721InvalidTokenId()',
       );
     });
   });

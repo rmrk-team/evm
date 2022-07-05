@@ -32,7 +32,7 @@ contract RMRKMultiResourceMock is RMRKIssuable, RMRKMultiResource {
         uint64 resourceId,
         uint64 overwrites
     ) external onlyIssuer {
-        if(ownerOf(tokenId) == address(0)) revert ERC721OwnerQueryForNonexistentToken();
+        if(ownerOf(tokenId) == address(0)) revert ERC721InvalidTokenId();
         _addResourceToToken(tokenId, resourceId, overwrites);
     }
 

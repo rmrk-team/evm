@@ -4,40 +4,27 @@
 
 pragma solidity ^0.8.15;
 
-import "./abstracts/ERC721Abstract.sol";
 import "./abstracts/NestingAbstract.sol";
 import "./interfaces/IRMRKNesting.sol";
 import "./interfaces/IRMRKNestingReceiver.sol";
 import "./library/RMRKLib.sol";
+import "./standard/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
-// import "hardhat/console.sol";
+import "hardhat/console.sol";
 
-contract RMRKNesting is ERC721Abstract, NestingAbstract {
+contract RMRKNesting is ERC721, NestingAbstract {
 
     using RMRKLib for uint256;
     using Address for address;
 
-    constructor(string memory name_, string memory symbol_) ERC721Abstract(name_, symbol_) {}
+    constructor(string memory name_, string memory symbol_) ERC721(name_, symbol_) {}
 
-    function ownerOf(uint256 tokenId) public view override(ERC721Abstract, NestingAbstract) virtual returns(address) {
-        return super.ownerOf(tokenId);
+    function ownerOf(uint tokenId) public override(ERC721, NestingAbstract) virtual view returns (address) {
+        return NestingAbstract.ownerOf(tokenId);
     }
-
-    function _exists(uint256 tokenId) internal view override(ERC721Abstract, NestingAbstract) virtual returns (bool) {
-        return super._exists(tokenId);
-    }
-
-
-    /**
-    @dev Mints an NFT.
-    * Can mint to a root owner or another NFT.
-    * Overloaded function _mint() can be used either to minto into a root owner or another NFT.
-    * If isNft contains any non-empty data, _mintToNft will be called and pass the extra data
-    * package to the function.
-    */
 
     function _mint(address to, uint256 tokenId) internal override virtual {
         _mint(to, tokenId, 0, "");
@@ -99,6 +86,17 @@ contract RMRKNesting is ERC721Abstract, NestingAbstract {
         emit Transfer(address(0), to, tokenId);
 
         _afterTokenTransfer(address(0), to, tokenId);
+    }
+
+    function _exists(uint256 tokenId) internal view virtual override returns (bool) {
+        return _RMRKOwners[tokenId].ownerAddress != address(0);
+    }
+
+    function transfer(
+        address to,
+        uint256 tokenId
+    ) public virtual {
+        transferFrom(_msgSender(), to, tokenId);
     }
 
     /**
@@ -197,7 +195,7 @@ contract RMRKNesting is ERC721Abstract, NestingAbstract {
         address from,
         address to,
         uint256 tokenId
-    ) internal override(ERC721Abstract) virtual {
+    ) internal override(ERC721) virtual {
         _transfer(from, to, tokenId, 0, "");
     }
 
@@ -286,7 +284,7 @@ contract RMRKNesting is ERC721Abstract, NestingAbstract {
         }
     }
 
-    function supportsInterface(bytes4 interfaceId) public override(ERC721Abstract) virtual view returns (bool) {
+    function supportsInterface(bytes4 interfaceId) public override(ERC721) virtual view returns (bool) {
         return (
             interfaceId == type(IRMRKNesting).interfaceId ||
             super.supportsInterface(interfaceId)

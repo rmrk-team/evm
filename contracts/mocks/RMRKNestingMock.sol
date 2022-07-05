@@ -6,7 +6,7 @@ import "../RMRK/access/RMRKIssuable.sol";
 import "../RMRK/interfaces/IRMRKNestingReceiver.sol";
 import "../RMRK/interfaces/IRMRKNestingWithEquippable.sol";
 import "../RMRK/RMRKNesting.sol";
-// import "hardhat/console.sol";
+import "hardhat/console.sol";
 
 //Minimal public implementation of IRMRKNesting for testing.
 contract RMRKNestingMock is  RMRKIssuable, IRMRKNestingWithEquippable, IRMRKNestingReceiver, RMRKNesting {
