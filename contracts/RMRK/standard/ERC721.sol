@@ -27,7 +27,9 @@ error ERC721TransferToTheZeroAddress();
 /**
  * @dev Implementation of https://eips.ethereum.org/EIPS/eip-721[ERC721] Non-Fungible Token Standard, 
     based on https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC721/ERC721.sol
-    with some modifications for RMRK standards.
+    with some modifications for RMRK standards, including:
+    Use of custom errors, having _balances and _tokenApprovals internal instead of private,
+    call to ownerOf not fixed to ERC721.
  */
 contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
     using Address for address;
@@ -76,6 +78,7 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
     function supportsInterface(bytes4 interfaceId) public view virtual override(ERC165, IERC165) returns (bool) {
         return
             interfaceId == type(IERC721).interfaceId ||
+            interfaceId == type(IERC721Metadata).interfaceId ||
             super.supportsInterface(interfaceId);
     }
 
