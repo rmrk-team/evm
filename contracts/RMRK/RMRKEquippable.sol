@@ -17,9 +17,11 @@ import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 error ERC721NotApprovedOrOwner();
 error RMRKAlreadyEquipped();
 error RMRKBadLength();
+error RMRKBaseRequiredForParts();
 error RMRKCallerCannotChangeEquipStatus();
 error RMRKEquippableBasePartNotEquippable();
 error RMRKEquippableEquipNotAllowedByBase();
+error RMRKNotComposableResource();
 error RMRKNotEquipped();
 error RMRKOwnerQueryForNonexistentToken();
 error RMRKSlotAlreadyUsed();
@@ -240,49 +242,57 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
             revert RMRKTokenDoesNotHaveActiveResource();
 
         address targetBaseAddress = _baseAddresses[resourceId];
+        if (targetBaseAddress == address(0))
+            revert RMRKNotComposableResource();
 
         // Fixed parts:
         uint64[] memory fixedPartIds = _fixedPartIds[resourceId];
         fixedParts = new FixedPart[](fixedPartIds.length);
-        IRMRKBaseStorage.Part[] memory baseFixedParts = IRMRKBaseStorage(targetBaseAddress).getParts(fixedPartIds);
+
         uint256 len = fixedPartIds.length;
-        for (uint i; i<len;) {
-            fixedParts[i] = FixedPart({
-                partId: fixedPartIds[i],
-                z: baseFixedParts[i].z,
-                metadataURI: baseFixedParts[i].metadataURI
-            });
-            unchecked {++i;}
+        if (len > 0) {
+            IRMRKBaseStorage.Part[] memory baseFixedParts = IRMRKBaseStorage(targetBaseAddress).getParts(fixedPartIds);
+            for (uint i; i<len;) {
+                fixedParts[i] = FixedPart({
+                    partId: fixedPartIds[i],
+                    z: baseFixedParts[i].z,
+                    metadataURI: baseFixedParts[i].metadataURI
+                });
+                unchecked {++i;}
+            }
         }
 
         // Slot parts:
         uint64[] memory slotPartIds = _slotPartIds[resourceId];
         slotParts = new SlotPart[](slotPartIds.length);
-        IRMRKBaseStorage.Part[] memory baseSlotParts = IRMRKBaseStorage(targetBaseAddress).getParts(slotPartIds);
         len = slotPartIds.length;
-        for (uint i; i<len;) {
-            Equipment memory equipment = _equipments[tokenId][targetBaseAddress][slotPartIds[i]];
-            if (equipment.resourceId == resourceId) {
-                slotParts[i] = SlotPart({
-                    partId: slotPartIds[i],
-                    childResourceId: equipment.childResourceId,
-                    z: baseSlotParts[i].z,
-                    childTokenId: equipment.childTokenId,
-                    childAddress: equipment.childAddress,
-                    metadataURI: baseSlotParts[i].metadataURI
-                });
+
+        if (len > 0) {
+            IRMRKBaseStorage.Part[] memory baseSlotParts = IRMRKBaseStorage(targetBaseAddress).getParts(slotPartIds);
+            for (uint i; i<len;) {
+                Equipment memory equipment = _equipments[tokenId][targetBaseAddress][slotPartIds[i]];
+                if (equipment.resourceId == resourceId) {
+                    slotParts[i] = SlotPart({
+                        partId: slotPartIds[i],
+                        childResourceId: equipment.childResourceId,
+                        z: baseSlotParts[i].z,
+                        childTokenId: equipment.childTokenId,
+                        childAddress: equipment.childAddress,
+                        metadataURI: baseSlotParts[i].metadataURI
+                    });
+                }
+                else {
+                    slotParts[i] = SlotPart({
+                        partId: slotPartIds[i],
+                        childResourceId: uint64(0),
+                        z: baseSlotParts[i].z,
+                        childTokenId: uint(0),
+                        childAddress: address(0),
+                        metadataURI: baseSlotParts[i].metadataURI
+                    });
+                }
+                unchecked {++i;}
             }
-            else {
-                slotParts[i] = SlotPart({
-                    partId: slotPartIds[i],
-                    childResourceId: uint64(0),
-                    z: baseSlotParts[i].z,
-                    childTokenId: uint(0),
-                    childAddress: address(0),
-                    metadataURI: baseSlotParts[i].metadataURI
-                });
-            }
-            unchecked {++i;}
         }
     }
 
@@ -354,6 +364,9 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
         uint64[] memory fixedPartIds,
         uint64[] memory slotPartIds
     ) internal {
+        if (resource.baseAddress == address(0) && (fixedPartIds.length > 0 || slotPartIds.length > 0))
+            revert RMRKBaseRequiredForParts();
+
         _addResourceEntry(resource.id, resource.metadataURI, resource.custom);
 
         _baseAddresses[resource.id] = resource.baseAddress;
