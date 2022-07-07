@@ -11,7 +11,7 @@ import "hardhat/console.sol";
 //Minimal public implementation of IRMRKNesting for testing.
 contract RMRKNestingMock is  RMRKIssuable, IRMRKNestingWithEquippable, IRMRKNestingReceiver, RMRKNesting {
 
-    address _equippableAdress;
+    address _equippableAddress;
 
     constructor(
         string memory name_,
@@ -46,10 +46,10 @@ contract RMRKNestingMock is  RMRKIssuable, IRMRKNestingWithEquippable, IRMRKNest
     }
 
     function setEquippableAddress(address equippable) external onlyIssuer {
-        _equippableAdress = equippable;
+        _equippableAddress = equippable;
     }
 
     function getEquippablesAddress() external view returns (address) {
-        return _equippableAdress;
+        return _equippableAddress;
     }
 }

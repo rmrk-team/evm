@@ -12,7 +12,7 @@ import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
-import "hardhat/console.sol";
+// import "hardhat/console.sol";
 
 error RMRKCallerIsNotOwnerContract();
 error RMRKChildIndexOutOfRange();
@@ -384,7 +384,7 @@ contract RMRKNesting is ERC721, IRMRKNesting {
     }
 
     //Child-scoped interaction
-    function _unnestFromParent(uint256 tokenId, uint256 indexOnParent) internal virtual {
+    function _unnestSelf(uint256 tokenId, uint256 indexOnParent) internal virtual {
       // A malicious contract which is parent to this token, could unnest any children
         RMRKOwner memory owner = _RMRKOwners[tokenId];
 
@@ -475,8 +475,8 @@ contract RMRKNesting is ERC721, IRMRKNesting {
         _unnestChild(tokenId, index);
     }
 
-    function unnestFromParent(uint256 tokenId, uint256 indexOnParent) public virtual onlyApprovedOrOwner(tokenId) {
-        _unnestFromParent(tokenId, indexOnParent);
+    function unnestSelf(uint256 tokenId, uint256 indexOnParent) public virtual onlyApprovedOrOwner(tokenId) {
+        _unnestSelf(tokenId, indexOnParent);
     }
 
 
