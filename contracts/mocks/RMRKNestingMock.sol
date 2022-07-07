@@ -6,10 +6,11 @@ import "../RMRK/access/RMRKIssuable.sol";
 import "../RMRK/interfaces/IRMRKNestingReceiver.sol";
 import "../RMRK/interfaces/IRMRKNestingWithEquippable.sol";
 import "../RMRK/RMRKNesting.sol";
-import "hardhat/console.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
+// import "hardhat/console.sol";
 
 //Minimal public implementation of IRMRKNesting for testing.
-contract RMRKNestingMock is  RMRKIssuable, IRMRKNestingWithEquippable, IRMRKNestingReceiver, RMRKNesting {
+contract RMRKNestingMock is  RMRKIssuable, IRMRKNestingWithEquippable, IRMRKNestingReceiver, IERC721Receiver, RMRKNesting {
 
     address _equippableAddress;
 
@@ -44,6 +45,16 @@ contract RMRKNestingMock is  RMRKIssuable, IRMRKNestingWithEquippable, IRMRKNest
     ) external pure returns (bytes4) {
         return IRMRKNestingReceiver.onRMRKNestingReceived.selector;
     }
+
+    function onERC721Received(
+        address,
+        address,
+        uint256,
+        bytes calldata
+    ) external pure returns (bytes4) {
+        return IERC721Receiver.onERC721Received.selector;
+    }
+
 
     function setEquippableAddress(address equippable) external onlyIssuer {
         _equippableAddress = equippable;

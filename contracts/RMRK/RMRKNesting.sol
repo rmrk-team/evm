@@ -249,8 +249,8 @@ contract RMRKNesting is ERC721, IRMRKNesting {
         bytes memory data
     ) internal virtual {
         _transfer(from, to, tokenId, destinationId, data);
-        if(_checkRMRKNestingImplementer(from, to, tokenId, data) ||
-            _checkOnERC721Received(from, to, tokenId, data))
+        if(!_checkRMRKNestingImplementer(from, to, tokenId, data) ||
+            !_checkOnERC721Received(from, to, tokenId, data))
             revert ERC721TransferToNonReceiverImplementer();
     }
 

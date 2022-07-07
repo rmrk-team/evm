@@ -785,9 +785,9 @@ describe('Nesting', async () => {
 
     it('cannot unnest not existing child', async function () {
       const { childId, parentId, firstOwner } = await mintTofirstOwner(true);
-      await expect(
-        petMonkey.connect(firstOwner).unnestSelf(childId + 1, 0),
-      ).to.be.revertedWith('RMRKOwnerQueryForNonexistentToken()');
+      await expect(petMonkey.connect(firstOwner).unnestSelf(childId + 1, 0)).to.be.revertedWith(
+        'RMRKOwnerQueryForNonexistentToken()',
+      );
     });
 
     it('cannot unnest token not owned by an NFT', async function () {
@@ -916,6 +916,30 @@ describe('Nesting', async () => {
       await ownerChunky
         .connect(firstOwner)
         ['transferFrom(address,address,uint256,uint256,bytes)'](
+          firstOwner.address,
+          ownerChunky.address,
+          parentId,
+          newGrandparentId,
+          emptyData,
+        );
+
+      // Parent is still owner of child
+      let expected = [BigNumber.from(childId), petMonkey.address];
+      checkAcceptedAndPendingChildren(ownerChunky, parentId, [expected], []);
+      // Ownership: firstOwner > newGrandparent > parent > child
+      expected = [BigNumber.from(parentId), ownerChunky.address];
+      checkAcceptedAndPendingChildren(ownerChunky, newGrandparentId, [], [expected]);
+    });
+
+    it('can safe transfer parent token to token with same owner, family tree is ok', async function () {
+      const newGrandparentId = 12; // owner is firstOwner
+
+      // Ownership: firstOwner > parent > child
+      const { childId, parentId, firstOwner } = await mintTofirstOwner(true);
+
+      await ownerChunky
+        .connect(firstOwner)
+        ['safeTransferFrom(address,address,uint256,uint256,bytes)'](
           firstOwner.address,
           ownerChunky.address,
           parentId,
