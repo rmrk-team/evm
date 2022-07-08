@@ -249,8 +249,8 @@ contract RMRKNesting is ERC721, IRMRKNesting {
         bytes memory data
     ) internal virtual {
         _transfer(from, to, tokenId, destinationId, data);
-        if(_checkRMRKNestingImplementer(from, to, tokenId, data) ||
-            _checkOnERC721Received(from, to, tokenId, data))
+        if(!_checkRMRKNestingImplementer(from, to, tokenId, data) ||
+            !_checkOnERC721Received(from, to, tokenId, data))
             revert ERC721TransferToNonReceiverImplementer();
     }
 
@@ -384,7 +384,7 @@ contract RMRKNesting is ERC721, IRMRKNesting {
     }
 
     //Child-scoped interaction
-    function _unnestFromParent(uint256 tokenId, uint256 indexOnParent) internal virtual {
+    function _unnestSelf(uint256 tokenId, uint256 indexOnParent) internal virtual {
       // A malicious contract which is parent to this token, could unnest any children
         RMRKOwner memory owner = _RMRKOwners[tokenId];
 
@@ -475,8 +475,8 @@ contract RMRKNesting is ERC721, IRMRKNesting {
         _unnestChild(tokenId, index);
     }
 
-    function unnestFromParent(uint256 tokenId, uint256 indexOnParent) public virtual onlyApprovedOrOwner(tokenId) {
-        _unnestFromParent(tokenId, indexOnParent);
+    function unnestSelf(uint256 tokenId, uint256 indexOnParent) public virtual onlyApprovedOrOwner(tokenId) {
+        _unnestSelf(tokenId, indexOnParent);
     }
 
 

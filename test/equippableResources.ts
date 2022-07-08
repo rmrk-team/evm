@@ -113,6 +113,36 @@ describe('Equippable', async () => {
       ).to.be.revertedWith('RMRKOnlyIssuer()');
     });
 
+    it('cannot add resource entry with parts and no base', async function () {
+      const id = BigNumber.from(1);
+      await expect(
+        chunkyEquip.addResourceEntry(
+          {
+            id: id,
+            equippableRefId: equippableRefIdDefault,
+            metadataURI: metaURIDefault,
+            baseAddress: baseAddressDefault,
+            custom: customDefault,
+          },
+          [1],
+          [],
+        ),
+      ).to.be.revertedWith('RMRKBaseRequiredForParts()');
+      await expect(
+        chunkyEquip.addResourceEntry(
+          {
+            id: id,
+            equippableRefId: equippableRefIdDefault,
+            metadataURI: metaURIDefault,
+            baseAddress: baseAddressDefault,
+            custom: customDefault,
+          },
+          [],
+          [1],
+        ),
+      ).to.be.revertedWith('RMRKBaseRequiredForParts()');
+    });
+
     it('cannot overwrite resource', async function () {
       const id = BigNumber.from(1);
 

@@ -751,6 +751,8 @@ describe('Equipping', async () => {
       await weaponEquip.addResourceToToken(weapons[i], weaponResourcesFull[i % uniqueWeapons], 0);
       await weaponEquip.addResourceToToken(weapons[i], weaponResourcesEquip[i % uniqueWeapons], 0);
       await weaponEquip.connect(addrs[i % 3]).acceptResource(weapons[i], 0);
+      // FIXME: Tests past without this accept:
+      await weaponEquip.connect(addrs[i % 3]).acceptResource(weapons[i], 0);
     }
   }
 
