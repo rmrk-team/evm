@@ -784,14 +784,13 @@ describe('Nesting', async () => {
     });
 
     it('cannot unnest not existing child', async function () {
-      const { childId, parentId, firstOwner } = await mintTofirstOwner(true);
+      const { childId, firstOwner } = await mintTofirstOwner(true);
       await expect(petMonkey.connect(firstOwner).unnestSelf(childId + 1, 0)).to.be.revertedWith(
         'RMRKOwnerQueryForNonexistentToken()',
       );
     });
 
     it('cannot unnest token not owned by an NFT', async function () {
-      const parentId = 10;
       const childId = 1;
 
       await petMonkey['mint(address,uint256)'](addrs[1].address, childId);

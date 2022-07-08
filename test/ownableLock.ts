@@ -2,9 +2,6 @@ import { expect } from 'chai';
 import { ethers } from 'hardhat';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { OwnableLockMock } from '../typechain';
-import { BigNumber } from 'ethers';
-
-// TODO: Transfer - transfer now does double duty as removeChild
 
 describe('Nesting', async () => {
   let ownableLock: OwnableLockMock;
@@ -31,19 +28,21 @@ describe('Nesting', async () => {
       expect(await ownableLock.getLock()).to.equal(false);
       await ownableLock.connect(owner).setLock();
       expect(await ownableLock.getLock()).to.equal(true);
-      //Test second call of setLock
+      // Test second call of setLock
       await ownableLock.connect(owner).setLock();
       expect(await ownableLock.getLock()).to.equal(true);
     });
 
     it('Reverts if setLock caller is not owner', async function () {
-      await expect(ownableLock.connect(addrs[0]).setLock()).to.be.revertedWith("Ownable: caller is not the owner");
+      await expect(ownableLock.connect(addrs[0]).setLock()).to.be.revertedWith(
+        'Ownable: caller is not the owner',
+      );
     });
 
     it('Modifier', async function () {
       expect(await ownableLock.testLock()).to.equal(true);
       await ownableLock.connect(owner).setLock();
-      await expect(ownableLock.connect(owner).testLock()).to.be.revertedWith("RMRKLocked()");
+      await expect(ownableLock.connect(owner).testLock()).to.be.revertedWith('RMRKLocked()');
     });
   });
 });

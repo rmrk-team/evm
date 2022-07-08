@@ -93,7 +93,9 @@ describe('Equippable', async () => {
 
     it('cannot get non existing resource', async function () {
       const id = BigNumber.from(1);
-      await expect(chunkyEquip.getExtendedResource(id)).to.be.revertedWith('RMRKNoResourceMatchingId()');
+      await expect(chunkyEquip.getExtendedResource(id)).to.be.revertedWith(
+        'RMRKNoResourceMatchingId()',
+      );
     });
 
     it('cannot add resource entry if not issuer', async function () {
