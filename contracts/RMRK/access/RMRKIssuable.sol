@@ -9,7 +9,7 @@ error RMRKOnlyIssuer();
 contract RMRKIssuable is Context {
 
     address private _issuer;
-    
+
     constructor() {
         _setIssuer(_msgSender());
     }

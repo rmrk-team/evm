@@ -4,7 +4,7 @@ pragma solidity ^0.8.15;
 
 import "./interfaces/IRMRKBaseStorage.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
-//import "hardhat/console.sol";
+import "hardhat/console.sol";
 
 error RMRKPartAlreadyExists();
 error RMRKPartDoesNotExist();
@@ -70,6 +70,11 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
         _type = type__;
     }
 
+    modifier onlySlot(uint64 partId) {
+        _onlySlot(partId);
+        _;
+    }
+
     function _onlySlot(uint64 partId) internal view {
         ItemType itemType = _parts[partId].itemType;
         if(itemType == ItemType.None)
@@ -78,16 +83,11 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
             revert RMRKPartIsNotSlot();
     }
 
-    modifier onlySlot(uint64 partId) {
-        _onlySlot(partId);
-        _;
-    }
-
-    function symbol() external view returns(string memory) {
+    function symbol() external view returns (string memory) {
         return _symbol;
     }
 
-    function type_() external view returns(string memory) {
+    function type_() external view returns (string memory) {
         return _type;
     }
 
@@ -174,7 +174,7 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
         return _isEquippableToAll[partId];
     }
 
-    function checkIsEquippable(uint64 partId, address targetAddress) public view returns (bool isEquippable) {
+    function checkIsEquippable(uint64 partId, address targetAddress) external view returns (bool isEquippable) {
         // If this is equippable to all, we're good
         isEquippable = _isEquippableToAll[partId];
 

@@ -2,30 +2,25 @@
 
 pragma solidity ^0.8.15;
 
-import "../RMRK/access/RMRKIssuable.sol";
 import "../RMRK/RMRKEquippable.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
-/* import "hardhat/console.sol"; */
 
 //Minimal public implementation of RMRKEquippable for testing.
-contract RMRKEquippableMock is RMRKIssuable, RMRKEquippable {
+contract RMRKEquippableImpl is Ownable, RMRKEquippable {
 
-    constructor()
-    RMRKEquippable(address(this))
+    constructor(address nestingAddress)
+    RMRKEquippable(nestingAddress)
     {}
 
-    function setFallbackURI(string memory fallbackURI) external onlyIssuer {
+    function setFallbackURI(string memory fallbackURI) external onlyOwner {
         _setFallbackURI(fallbackURI);
-    }
-
-    function setNestingAddress(address nestingAddress) external onlyIssuer {
-        _setNestingAddress(nestingAddress);
     }
 
     function setTokenEnumeratedResource(
         uint64 resourceId,
         bool state
-    ) external onlyIssuer {
+    ) external onlyOwner {
         _setTokenEnumeratedResource(resourceId, state);
     }
 
@@ -33,7 +28,7 @@ contract RMRKEquippableMock is RMRKIssuable, RMRKEquippable {
         uint256 tokenId,
         uint64 resourceId,
         uint64 overwrites
-    ) external onlyIssuer {
+    ) external onlyOwner {
         _ownerOf(tokenId); // FIXME: This reverts if token not exists, should it be more explicit?
         _addResourceToToken(tokenId, resourceId, overwrites);
     }
@@ -42,7 +37,7 @@ contract RMRKEquippableMock is RMRKIssuable, RMRKEquippable {
         ExtendedResource calldata resource,
         uint64[] calldata fixedPartIds,
         uint64[] calldata slotPartIds
-    ) external onlyIssuer {
+    ) external onlyOwner {
         _addResourceEntry(resource, fixedPartIds, slotPartIds);
     }
 
@@ -50,21 +45,21 @@ contract RMRKEquippableMock is RMRKIssuable, RMRKEquippable {
         uint64 resourceId,
         uint128 customResourceId,
         bytes memory data
-    ) external onlyIssuer {
+    ) external onlyOwner {
         _setCustomResourceData(resourceId, customResourceId, data);
     }
 
     function addCustomDataToResource(
         uint64 resourceId,
         uint128 customResourceId
-    ) external onlyIssuer {
+    ) external onlyOwner {
         _addCustomDataToResource(resourceId, customResourceId);
     }
 
     function removeCustomDataFromResource(
         uint64 resourceId,
         uint256 index
-    ) external onlyIssuer {
+    ) external onlyOwner {
         _removeCustomDataFromResource(resourceId, index);
     }
 
@@ -72,7 +67,7 @@ contract RMRKEquippableMock is RMRKIssuable, RMRKEquippable {
         uint64 refId,
         address parentAddress,
         uint64 partId
-    ) external onlyIssuer {
+    ) external onlyOwner {
         _setValidParentRefId(refId, parentAddress, partId);
     }
 }

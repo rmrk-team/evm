@@ -12,7 +12,7 @@ import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
-import "hardhat/console.sol";
+/* import "hardhat/console.sol"; */
 
 error RMRKCallerIsNotOwnerContract();
 error RMRKChildIndexOutOfRange();
@@ -152,7 +152,7 @@ contract RMRKNesting is ERC721, IRMRKNesting {
     ////////////////////////////////////////
     //              BURNING
     ////////////////////////////////////////
-/**
+    /**
     * @dev Destroys `tokenId`.
     * The approval is cleared when the token is burned.
     *

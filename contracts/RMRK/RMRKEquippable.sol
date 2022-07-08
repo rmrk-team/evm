@@ -2,6 +2,10 @@
 
 //Generally all interactions should propagate downstream
 
+/*
+* RMRK Equippables accessory contract, responsible for state storage and management of equippable items.
+*/
+
 pragma solidity ^0.8.15;
 
 import "./abstracts/MultiResourceAbstract.sol";
@@ -61,6 +65,10 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
         string metadataURI; //n bytes 32+
     }
 
+    constructor(address nestingAddress) {
+        _setNestingAddress(nestingAddress);
+    }
+
     address private _nestingAddress;
 
     //mapping of uint64 Ids to resource object
@@ -85,12 +93,12 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
         return IRMRKNesting(_nestingAddress).ownerOf(tokenId);
     }
 
-    function _onlyOwner(uint tokenId) internal view {
+    function _onlyTokenOwner(uint tokenId) internal view {
         if(_msgSender() != _ownerOf(tokenId)) revert ERC721NotApprovedOrOwner();
     }
 
-    modifier onlyOwner(uint256 tokenId) {
-        _onlyOwner(tokenId);
+    modifier onlyTokenOwner(uint256 tokenId) {
+        _onlyTokenOwner(tokenId);
         _;
     }
 
@@ -115,7 +123,7 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
         uint64 slotPartId,
         uint256 childIndex,
         uint64 childResourceId
-    ) external onlyOwner(tokenId) {
+    ) external onlyTokenOwner(tokenId) {
         _equip(tokenId, resourceId, slotPartId, childIndex, childResourceId);
     }
 
@@ -155,7 +163,7 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
         uint256 tokenId,
         uint64 resourceId,
         uint64 slotPartId
-    ) external onlyOwner(tokenId) {
+    ) external onlyTokenOwner(tokenId) {
         _unequip(tokenId, resourceId, slotPartId);
     }
 
@@ -179,7 +187,7 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
         uint64 slotPartId,
         uint256 childIndex,
         uint64 childResourceId
-    ) external onlyOwner(tokenId) {
+    ) external onlyTokenOwner(tokenId) {
         _unequip(tokenId, resourceId, slotPartId);
         _equip(tokenId, resourceId, slotPartId, childIndex, childResourceId);
     }
@@ -317,7 +325,7 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
     function acceptResource(
         uint256 tokenId,
         uint256 index
-    ) external virtual onlyOwner(tokenId) {
+    ) external virtual onlyTokenOwner(tokenId) {
         // FIXME: clean approvals and test
         _acceptResource(tokenId, index);
     }
@@ -325,14 +333,14 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
     function rejectResource(
         uint256 tokenId,
         uint256 index
-    ) external virtual onlyOwner(tokenId) {
+    ) external virtual onlyTokenOwner(tokenId) {
         // FIXME: clean approvals and test
         _rejectResource(tokenId, index);
     }
 
     function rejectAllResources(
         uint256 tokenId
-    ) external virtual onlyOwner(tokenId) {
+    ) external virtual onlyTokenOwner(tokenId) {
         // FIXME: clean approvals and test
         _rejectAllResources(tokenId);
     }
@@ -340,7 +348,7 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
     function setPriority(
         uint256 tokenId,
         uint16[] memory priorities
-    ) external virtual onlyOwner(tokenId) {
+    ) external virtual onlyTokenOwner(tokenId) {
         // FIXME: clean approvals and test
         _setPriority(tokenId, priorities);
     }
@@ -369,7 +377,7 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
         Resource memory resource = _resources[resourceId];
         if(resource.id == uint64(0))
             revert RMRKNoResourceMatchingId();
-        
+
         return ExtendedResource({
             id: resource.id,
             equippableRefId: _equippableRefIds[resource.id],
