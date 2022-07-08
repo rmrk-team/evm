@@ -63,6 +63,10 @@ describe('Nesting', async () => {
       expect(await ownerChunky.ownerOf(20)).to.equal(addrs[1].address);
       expect(await ownerChunky.balanceOf(addrs[0].address)).to.equal(10);
       expect(await ownerChunky.balanceOf(addrs[1].address)).to.equal(10);
+
+      await expect(ownerChunky.ownerOf(100)).to.be.revertedWith(
+        'RMRKOwnerQueryForNonexistentToken()',
+      );
     });
   });
 
@@ -251,6 +255,10 @@ describe('Nesting', async () => {
 
       const pendingChildren = await ownerChunky.pendingChildrenOf(parentId);
       expect(pendingChildren).to.eql([[BigNumber.from(childId), petMonkey.address]]);
+      expect(await ownerChunky.pendingChildOf(parentId, 0)).to.eql([
+        BigNumber.from(childId),
+        petMonkey.address,
+      ]);
     });
 
     it('can mint multiple children', async function () {
@@ -344,6 +352,17 @@ describe('Nesting', async () => {
     });
   });
 
+  describe('Adding child', async function () {
+    it('cannot add child to existing NFT with different owner', async function () {
+      const parentId = 11;
+      const childId = 1;
+      await petMonkey['mint(address,uint256)'](addrs[0].address, childId);
+      await expect(ownerChunky.addChild(parentId, childId, petMonkey.address)).to.be.revertedWith(
+        'RMRKParentChildMismatch()',
+      );
+    });
+  });
+
   describe('Accept child', async function () {
     it('can accept child', async function () {
       const childId = 1;
@@ -365,6 +384,10 @@ describe('Nesting', async () => {
 
       const children = await ownerChunky.childrenOf(parentId);
       expect(children).to.eql([[BigNumber.from(childId), petMonkey.address]]);
+      expect(await ownerChunky.childOf(parentId, 0)).to.eql([
+        BigNumber.from(childId),
+        petMonkey.address,
+      ]);
     });
 
     it('cannot accept not owned child', async function () {
@@ -407,6 +430,13 @@ describe('Nesting', async () => {
 
       const children = await ownerChunky.childrenOf(parentId);
       expect(children).to.eql([[BigNumber.from(childId), petMonkey.address]]);
+    });
+
+    it('cannot accept children for non existing index', async () => {
+      const parentId = 11;
+      await expect(ownerChunky.connect(addrs[1]).acceptChild(parentId, 0)).to.be.revertedWith(
+        'RMRKPendingChildIndexOutOfRange()',
+      );
     });
   });
 
@@ -612,6 +642,21 @@ describe('Nesting', async () => {
       );
     });
 
+    it('cannot burn from parent if not parent', async function () {
+      const childId = 1;
+      const parentId = 10;
+      // mint petMonkey token 1 into ownerChunky token 10
+      await petMonkey['mint(address,uint256,uint256,bytes)'](
+        ownerChunky.address,
+        childId,
+        parentId,
+        mintNestData,
+      );
+      await expect(petMonkey.burnFromParent(childId)).to.be.revertedWith(
+        'RMRKCallerIsNotOwnerContract()',
+      );
+    });
+
     it('can burn token from approved address (not owner)', async function () {
       const tokenId = 1;
       const approvedAddress = addrs[2];
@@ -734,6 +779,13 @@ describe('Nesting', async () => {
       ]);
     });
 
+    it('cannot unnest from parent directly', async function () {
+      const { parentId, firstOwner } = await mintTofirstOwner(true);
+      await expect(ownerChunky.connect(firstOwner).unnestChild(parentId, 0)).to.be.revertedWith(
+        'RMRKUnnestFromWrongChild()',
+      );
+    });
+
     it('can unnest child with grandchild and childen are ok', async function () {
       const parentId = 10;
       const childId = 1;
@@ -818,6 +870,13 @@ describe('Nesting', async () => {
       await expect(
         petMonkey.connect(addrs[0]).transfer(newOwner.address, tokenId),
       ).to.be.revertedWith('ERC721NotApprovedOrOwner()');
+    });
+
+    it('cannot transfer to address zero', async function () {
+      const tokenId = 1;
+      await expect(
+        ownerChunky.connect(addrs[0]).transfer(ethers.constants.AddressZero, tokenId),
+      ).to.be.revertedWith('ERC721TransferToTheZeroAddress()');
     });
 
     it('can transfer token from approved address (not owner)', async function () {
