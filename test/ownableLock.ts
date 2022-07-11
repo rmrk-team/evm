@@ -42,7 +42,10 @@ describe('Nesting', async () => {
     it('Modifier', async function () {
       expect(await ownableLock.testLock()).to.equal(true);
       await ownableLock.connect(owner).setLock();
-      await expect(ownableLock.connect(owner).testLock()).to.be.revertedWith('RMRKLocked()');
+      await expect(ownableLock.connect(owner).testLock()).to.be.revertedWithCustomError(
+        ownableLock,
+        'RMRKLocked',
+      );
     });
   });
 });

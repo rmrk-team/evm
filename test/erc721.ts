@@ -61,8 +61,9 @@ describe('ERC721', async () => {
         });
 
         it('reverts when queried for non existent token id', async function () {
-          await expect(token.tokenURI(nonExistentTokenId)).to.be.revertedWith(
-            'ERC721InvalidTokenId()',
+          await expect(token.tokenURI(nonExistentTokenId)).to.be.revertedWithCustomError(
+            token,
+            'ERC721InvalidTokenId',
           );
         });
 
@@ -112,8 +113,9 @@ describe('ERC721', async () => {
 
       context('when querying the zero address', function () {
         it('throws', async function () {
-          await expect(token.balanceOf(ethers.constants.AddressZero)).to.be.revertedWith(
-            'ERC721AddressZeroIsNotaValidOwner()',
+          await expect(token.balanceOf(ethers.constants.AddressZero)).to.be.revertedWithCustomError(
+            token,
+            'ERC721AddressZeroIsNotaValidOwner',
           );
         });
       });
@@ -132,7 +134,10 @@ describe('ERC721', async () => {
         const tokenId = nonExistentTokenId;
 
         it('reverts', async function () {
-          await expect(token.ownerOf(tokenId)).to.be.revertedWith('ERC721InvalidTokenId()');
+          await expect(token.ownerOf(tokenId)).to.be.revertedWithCustomError(
+            token,
+            'ERC721InvalidTokenId',
+          );
         });
       });
     });
@@ -232,7 +237,7 @@ describe('ERC721', async () => {
           it('reverts', async function () {
             await expect(
               transferFunction(others[0].address, others[0].address, tokenId, owner),
-            ).to.be.revertedWith('ERC721TransferFromIncorrectOwner()');
+            ).to.be.revertedWithCustomError(token, 'ERC721TransferFromIncorrectOwner');
           });
         });
 
@@ -240,7 +245,7 @@ describe('ERC721', async () => {
           it('reverts', async function () {
             await expect(
               transferFunction(owner.address, others[0].address, tokenId, others[0]),
-            ).to.be.revertedWith('ERC721NotApprovedOrOwner()');
+            ).to.be.revertedWithCustomError(token, 'ERC721NotApprovedOrOwner');
           });
         });
 
@@ -248,7 +253,7 @@ describe('ERC721', async () => {
           it('reverts', async function () {
             await expect(
               transferFunction(owner.address, others[0].address, nonExistentTokenId, owner),
-            ).to.be.revertedWith('ERC721InvalidTokenId()');
+            ).to.be.revertedWithCustomError(token, 'ERC721InvalidTokenId');
           });
         });
 
@@ -256,7 +261,7 @@ describe('ERC721', async () => {
           it('reverts', async function () {
             await expect(
               transferFunction(owner.address, ethers.constants.AddressZero, tokenId, owner),
-            ).to.be.revertedWith('ERC721TransferToTheZeroAddress()');
+            ).to.be.revertedWithCustomError(token, 'ERC721TransferToTheZeroAddress');
           });
         });
       };
@@ -329,7 +334,7 @@ describe('ERC721', async () => {
               it('reverts', async function () {
                 await expect(
                   transferFun(owner.address, receiver.address, nonExistentTokenId, owner),
-                ).to.be.revertedWith('ERC721InvalidTokenId()');
+                ).to.be.revertedWithCustomError(token, 'ERC721InvalidTokenId');
               });
             });
           });
@@ -357,7 +362,7 @@ describe('ERC721', async () => {
                 invalidReceiver.address,
                 tokenId,
               ),
-            ).to.be.revertedWith('ERC721TransferToNonReceiverImplementer()');
+            ).to.be.revertedWithCustomError(token, 'ERC721TransferToNonReceiverImplementer');
           });
         });
 
@@ -480,7 +485,7 @@ describe('ERC721', async () => {
 
           await expect(
             token['safeMint(address,uint256)'](invalidReceiver.address, tokenId),
-          ).to.be.revertedWith('ERC721TransferToNonReceiverImplementer()');
+          ).to.be.revertedWithCustomError(token, 'ERC721TransferToNonReceiverImplementer');
         });
       });
 
@@ -615,8 +620,9 @@ describe('ERC721', async () => {
 
         context('when the address that receives the approval is the owner', function () {
           it('reverts', async function () {
-            await expect(token.approve(owner.address, tokenId)).to.be.revertedWith(
-              'ERC721ApprovalToCurrentOwner()',
+            await expect(token.approve(owner.address, tokenId)).to.be.revertedWithCustomError(
+              token,
+              'ERC721ApprovalToCurrentOwner',
             );
           });
         });
@@ -625,7 +631,10 @@ describe('ERC721', async () => {
           it('reverts', async function () {
             await expect(
               token.connect(others[0]).approve(approved.address, tokenId),
-            ).to.be.revertedWith('ERC721ApproveCallerIsNotOwnerNorApprovedForAll()');
+            ).to.be.revertedWithCustomError(
+              token,
+              'ERC721ApproveCallerIsNotOwnerNorApprovedForAll',
+            );
           });
         });
 
@@ -634,7 +643,10 @@ describe('ERC721', async () => {
             await token.approve(approved.address, tokenId);
             await expect(
               token.connect(approved).approve(anotherApproved.address, tokenId),
-            ).to.be.revertedWith('ERC721ApproveCallerIsNotOwnerNorApprovedForAll()');
+            ).to.be.revertedWithCustomError(
+              token,
+              'ERC721ApproveCallerIsNotOwnerNorApprovedForAll',
+            );
           });
         });
 
@@ -654,7 +666,7 @@ describe('ERC721', async () => {
           it('reverts', async function () {
             await expect(
               token.connect(operator).approve(approved.address, nonExistentTokenId),
-            ).to.be.revertedWith('ERC721InvalidTokenId()');
+            ).to.be.revertedWithCustomError(token, 'ERC721InvalidTokenId');
           });
         });
       });
@@ -671,7 +683,9 @@ describe('ERC721', async () => {
             it('emits an approval event', async function () {
               const receipt = await token.setApprovalForAll(operator.address, true);
 
-              expect(receipt).to.emit(token, 'ApprovalForAll').withArgs(owner.address, operator.address, true);
+              expect(receipt)
+                .to.emit(token, 'ApprovalForAll')
+                .withArgs(owner.address, operator.address, true);
             });
           });
 
@@ -724,9 +738,9 @@ describe('ERC721', async () => {
 
         context('when the operator is the owner', function () {
           it('reverts', async function () {
-            await expect(token.setApprovalForAll(owner.address, true)).to.be.revertedWith(
-              'ERC721ApproveToCaller()',
-            );
+            await expect(
+              token.setApprovalForAll(owner.address, true),
+            ).to.be.revertedWithCustomError(token, 'ERC721ApproveToCaller');
           });
         });
       });
@@ -734,8 +748,9 @@ describe('ERC721', async () => {
       describe('getApproved', async function () {
         context('when token is not minted', async function () {
           it('reverts', async function () {
-            await expect(token.getApproved(nonExistentTokenId)).to.be.revertedWith(
-              'ERC721InvalidTokenId()',
+            await expect(token.getApproved(nonExistentTokenId)).to.be.revertedWithCustomError(
+              token,
+              'ERC721InvalidTokenId',
             );
           });
         });
@@ -769,9 +784,9 @@ describe('ERC721', async () => {
     });
 
     it('reverts with a null destination address', async function () {
-      await expect(token.mint(ethers.constants.AddressZero, firstTokenId)).to.be.revertedWith(
-        'ERC721MintToTheZeroAddress()',
-      );
+      await expect(
+        token.mint(ethers.constants.AddressZero, firstTokenId),
+      ).to.be.revertedWithCustomError(token, 'ERC721MintToTheZeroAddress');
     });
 
     context('with minted token', async function () {
@@ -791,8 +806,9 @@ describe('ERC721', async () => {
       });
 
       it('reverts when adding a token id that already exists', async function () {
-        await expect(token.mint(owner.address, firstTokenId)).to.be.revertedWith(
-          'ERC721TokenAlreadyMinted()',
+        await expect(token.mint(owner.address, firstTokenId)).to.be.revertedWithCustomError(
+          token,
+          'ERC721TokenAlreadyMinted',
         );
       });
     });
@@ -808,7 +824,10 @@ describe('ERC721', async () => {
     });
 
     it('reverts when burning a non-existent token id', async function () {
-      await expect(token.burn(nonExistentTokenId)).to.be.revertedWith('ERC721InvalidTokenId()');
+      await expect(token.burn(nonExistentTokenId)).to.be.revertedWithCustomError(
+        token,
+        'ERC721InvalidTokenId',
+      );
     });
 
     context('with minted tokens', function () {
@@ -836,11 +855,17 @@ describe('ERC721', async () => {
 
         it('deletes the token', async function () {
           expect(await token.balanceOf(owner.address)).to.eql(BigNumber.from(1));
-          await expect(token.ownerOf(firstTokenId)).to.be.revertedWith('ERC721InvalidTokenId()');
+          await expect(token.ownerOf(firstTokenId)).to.be.revertedWithCustomError(
+            token,
+            'ERC721InvalidTokenId',
+          );
         });
 
         it('reverts when burning a token id that has been deleted', async function () {
-          await expect(token.burn(firstTokenId)).to.be.revertedWith('ERC721InvalidTokenId()');
+          await expect(token.burn(firstTokenId)).to.be.revertedWithCustomError(
+            token,
+            'ERC721InvalidTokenId',
+          );
         });
       });
     });

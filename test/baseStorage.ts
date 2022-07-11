@@ -96,7 +96,7 @@ describe('MultiResource', async () => {
       await testBase.addPart({ partId: partId, part: sampleSlotPartData });
       await expect(
         testBase.addPart({ partId: partId, part: sampleSlotPartData }),
-      ).to.be.revertedWith('RMRKPartAlreadyExists()');
+      ).to.be.revertedWithCustomError(testBase, 'RMRKPartAlreadyExists');
     });
 
     it('is not equippable if address was not added', async function () {
@@ -142,11 +142,13 @@ describe('MultiResource', async () => {
     it('cannot add nor set equippable addresses for non existing part', async function () {
       const partId = 1;
       await testBase.addPart({ partId: partId, part: sampleSlotPartData });
-      await expect(testBase.addEquippableAddresses(partId, [])).to.be.revertedWith(
-        'RMRKZeroLengthIdsPassed()',
+      await expect(testBase.addEquippableAddresses(partId, [])).to.be.revertedWithCustomError(
+        testBase,
+        'RMRKZeroLengthIdsPassed',
       );
-      await expect(testBase.setEquippableAddresses(partId, [])).to.be.revertedWith(
-        'RMRKZeroLengthIdsPassed()',
+      await expect(testBase.setEquippableAddresses(partId, [])).to.be.revertedWithCustomError(
+        testBase,
+        'RMRKZeroLengthIdsPassed',
       );
     });
 
@@ -154,12 +156,13 @@ describe('MultiResource', async () => {
       const NonExistingPartId = 1;
       await expect(
         testBase.addEquippableAddresses(NonExistingPartId, [addrs[1].address]),
-      ).to.be.revertedWith('RMRKPartDoesNotExist()');
+      ).to.be.revertedWithCustomError(testBase, 'RMRKPartDoesNotExist');
       await expect(
         testBase.setEquippableAddresses(NonExistingPartId, [addrs[1].address]),
-      ).to.be.revertedWith('RMRKPartDoesNotExist()');
-      await expect(testBase.setEquippableToAll(NonExistingPartId)).to.be.revertedWith(
-        'RMRKPartDoesNotExist()',
+      ).to.be.revertedWithCustomError(testBase, 'RMRKPartDoesNotExist');
+      await expect(testBase.setEquippableToAll(NonExistingPartId)).to.be.revertedWithCustomError(
+        testBase,
+        'RMRKPartDoesNotExist',
       );
     });
 
@@ -174,12 +177,13 @@ describe('MultiResource', async () => {
       await testBase.addPart({ partId: fixedPartId, part: partData });
       await expect(
         testBase.addEquippableAddresses(fixedPartId, [addrs[1].address]),
-      ).to.be.revertedWith('RMRKPartIsNotSlot()');
+      ).to.be.revertedWithCustomError(testBase, 'RMRKPartIsNotSlot');
       await expect(
         testBase.setEquippableAddresses(fixedPartId, [addrs[1].address]),
-      ).to.be.revertedWith('RMRKPartIsNotSlot()');
-      await expect(testBase.setEquippableToAll(fixedPartId)).to.be.revertedWith(
-        'RMRKPartIsNotSlot()',
+      ).to.be.revertedWithCustomError(testBase, 'RMRKPartIsNotSlot');
+      await expect(testBase.setEquippableToAll(fixedPartId)).to.be.revertedWithCustomError(
+        testBase,
+        'RMRKPartIsNotSlot',
       );
     });
 

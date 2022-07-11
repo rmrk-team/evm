@@ -64,9 +64,9 @@ describe('Equippable', async () => {
 
     it('cannot set issuer if not issuer', async function () {
       const newIssuer = addrs[1];
-      await expect(chunky.connect(newIssuer).setIssuer(newIssuer.address)).to.be.revertedWith(
-        'RMRKOnlyIssuer()',
-      );
+      await expect(
+        chunky.connect(newIssuer).setIssuer(newIssuer.address),
+      ).to.be.revertedWithCustomError(chunky, 'RMRKOnlyIssuer');
     });
   });
 
@@ -93,8 +93,9 @@ describe('Equippable', async () => {
 
     it('cannot get non existing resource', async function () {
       const id = BigNumber.from(1);
-      await expect(chunkyEquip.getExtendedResource(id)).to.be.revertedWith(
-        'RMRKNoResourceMatchingId()',
+      await expect(chunkyEquip.getExtendedResource(id)).to.be.revertedWithCustomError(
+        chunkyEquip,
+        'RMRKNoResourceMatchingId',
       );
     });
 
@@ -112,7 +113,7 @@ describe('Equippable', async () => {
           [],
           [],
         ),
-      ).to.be.revertedWith('RMRKOnlyIssuer()');
+      ).to.be.revertedWithCustomError(chunkyEquip, 'RMRKOnlyIssuer');
     });
 
     it('cannot add resource entry with parts and no base', async function () {
@@ -129,7 +130,7 @@ describe('Equippable', async () => {
           [1],
           [],
         ),
-      ).to.be.revertedWith('RMRKBaseRequiredForParts()');
+      ).to.be.revertedWithCustomError(chunkyEquip, 'RMRKBaseRequiredForParts');
       await expect(
         chunkyEquip.addResourceEntry(
           {
@@ -142,7 +143,7 @@ describe('Equippable', async () => {
           [],
           [1],
         ),
-      ).to.be.revertedWith('RMRKBaseRequiredForParts()');
+      ).to.be.revertedWithCustomError(chunkyEquip, 'RMRKBaseRequiredForParts');
     });
 
     it('cannot overwrite resource', async function () {
@@ -171,7 +172,7 @@ describe('Equippable', async () => {
           [],
           [],
         ),
-      ).to.be.revertedWith('RMRKResourceAlreadyExists()');
+      ).to.be.revertedWithCustomError(chunkyEquip, 'RMRKResourceAlreadyExists');
     });
 
     it('cannot add resource with id 0', async function () {
@@ -189,7 +190,7 @@ describe('Equippable', async () => {
           [],
           [],
         ),
-      ).to.be.revertedWith('RMRKWriteToZero()');
+      ).to.be.revertedWithCustomError(chunkyEquip, 'RMRKWriteToZero');
     });
 
     it('cannot add same resource twice', async function () {
@@ -223,7 +224,7 @@ describe('Equippable', async () => {
           [],
           [],
         ),
-      ).to.be.revertedWith('RMRKResourceAlreadyExists()');
+      ).to.be.revertedWithCustomError(chunkyEquip, 'RMRKResourceAlreadyExists');
     });
 
     it('can add and remove custom data for resource', async function () {
@@ -292,8 +293,9 @@ describe('Equippable', async () => {
       const tokenId = 1;
 
       await chunky['mint(address,uint256)'](owner.address, tokenId);
-      await expect(chunkyEquip.addResourceToToken(tokenId, resId, 0)).to.be.revertedWith(
-        'RMRKNoResourceMatchingId()',
+      await expect(chunkyEquip.addResourceToToken(tokenId, resId, 0)).to.be.revertedWithCustomError(
+        chunkyEquip,
+        'RMRKNoResourceMatchingId',
       );
     });
 
@@ -302,8 +304,9 @@ describe('Equippable', async () => {
       const tokenId = 1;
 
       await addResources([resId]);
-      await expect(chunkyEquip.addResourceToToken(tokenId, resId, 0)).to.be.revertedWith(
-        'RMRKOwnerQueryForNonexistentToken()',
+      await expect(chunkyEquip.addResourceToToken(tokenId, resId, 0)).to.be.revertedWithCustomError(
+        chunky,
+        'RMRKOwnerQueryForNonexistentToken',
       );
     });
 
@@ -314,8 +317,9 @@ describe('Equippable', async () => {
       await chunky['mint(address,uint256)'](owner.address, tokenId);
       await addResources([resId]);
       await chunkyEquip.addResourceToToken(tokenId, resId, 0);
-      await expect(chunkyEquip.addResourceToToken(tokenId, resId, 0)).to.be.revertedWith(
-        'RMRKResourceAlreadyExists()',
+      await expect(chunkyEquip.addResourceToToken(tokenId, resId, 0)).to.be.revertedWithCustomError(
+        chunkyEquip,
+        'RMRKResourceAlreadyExists',
       );
     });
 
@@ -331,8 +335,9 @@ describe('Equippable', async () => {
       // Now it's full, next should fail
       const resId = BigNumber.from(129);
       await addResources([resId]);
-      await expect(chunkyEquip.addResourceToToken(tokenId, resId, 0)).to.be.revertedWith(
-        'RMRKMaxPendingResourcesReached()',
+      await expect(chunkyEquip.addResourceToToken(tokenId, resId, 0)).to.be.revertedWithCustomError(
+        chunkyEquip,
+        'RMRKMaxPendingResourcesReached',
       );
     });
 
@@ -432,8 +437,9 @@ describe('Equippable', async () => {
       await chunkyEquip.addResourceToToken(tokenId, resId, 0);
       await chunkyEquip.acceptResource(tokenId, 0);
 
-      await expect(chunkyEquip.acceptResource(tokenId, 0)).to.be.revertedWith(
-        'RMRKIndexOutOfRange()',
+      await expect(chunkyEquip.acceptResource(tokenId, 0)).to.be.revertedWithCustomError(
+        chunkyEquip,
+        'RMRKIndexOutOfRange',
       );
     });
 
@@ -444,17 +450,18 @@ describe('Equippable', async () => {
       await chunky['mint(address,uint256)'](owner.address, tokenId);
       await addResources([resId]);
       await chunkyEquip.addResourceToToken(tokenId, resId, 0);
-      await expect(chunkyEquip.connect(addrs[1]).acceptResource(tokenId, 0)).to.be.revertedWith(
-        'ERC721NotApprovedOrOwner()',
-      );
+      await expect(
+        chunkyEquip.connect(addrs[1]).acceptResource(tokenId, 0),
+      ).to.be.revertedWithCustomError(chunkyEquip, 'ERC721NotApprovedOrOwner');
     });
 
     it('cannot accept non existing resource', async function () {
       const tokenId = 1;
 
       await chunky['mint(address,uint256)'](owner.address, tokenId);
-      await expect(chunkyEquip.acceptResource(tokenId, 0)).to.be.revertedWith(
-        'RMRKIndexOutOfRange()',
+      await expect(chunkyEquip.acceptResource(tokenId, 0)).to.be.revertedWithCustomError(
+        chunkyEquip,
+        'RMRKIndexOutOfRange',
       );
     });
   });
@@ -653,8 +660,9 @@ describe('Equippable', async () => {
       await chunkyEquip.addResourceToToken(tokenId, resId, 0);
       await chunkyEquip.rejectResource(tokenId, 0);
 
-      await expect(chunkyEquip.rejectResource(tokenId, 0)).to.be.revertedWith(
-        'RMRKIndexOutOfRange()',
+      await expect(chunkyEquip.rejectResource(tokenId, 0)).to.be.revertedWithCustomError(
+        chunkyEquip,
+        'RMRKIndexOutOfRange',
       );
     });
 
@@ -666,20 +674,21 @@ describe('Equippable', async () => {
       await addResources([resId]);
       await chunkyEquip.addResourceToToken(tokenId, resId, 0);
 
-      await expect(chunkyEquip.connect(addrs[1]).rejectResource(tokenId, 0)).to.be.revertedWith(
-        'ERC721NotApprovedOrOwner()',
-      );
-      await expect(chunkyEquip.connect(addrs[1]).rejectAllResources(tokenId)).to.be.revertedWith(
-        'ERC721NotApprovedOrOwner()',
-      );
+      await expect(
+        chunkyEquip.connect(addrs[1]).rejectResource(tokenId, 0),
+      ).to.be.revertedWithCustomError(chunkyEquip, 'ERC721NotApprovedOrOwner');
+      await expect(
+        chunkyEquip.connect(addrs[1]).rejectAllResources(tokenId),
+      ).to.be.revertedWithCustomError(chunkyEquip, 'ERC721NotApprovedOrOwner');
     });
 
     it('cannot reject non existing resource', async function () {
       const tokenId = 1;
 
       await chunky['mint(address,uint256)'](owner.address, tokenId);
-      await expect(chunkyEquip.rejectResource(tokenId, 0)).to.be.revertedWith(
-        'RMRKIndexOutOfRange()',
+      await expect(chunkyEquip.rejectResource(tokenId, 0)).to.be.revertedWithCustomError(
+        chunkyEquip,
+        'RMRKIndexOutOfRange',
       );
     });
   });
@@ -714,27 +723,29 @@ describe('Equippable', async () => {
     it('cannot set priorities for non owned token', async function () {
       const tokenId = 1;
       await addResourcesToToken(tokenId);
-      await expect(chunkyEquip.connect(addrs[1]).setPriority(tokenId, [2, 1])).to.be.revertedWith(
-        'ERC721NotApprovedOrOwner()',
-      );
+      await expect(
+        chunkyEquip.connect(addrs[1]).setPriority(tokenId, [2, 1]),
+      ).to.be.revertedWithCustomError(chunkyEquip, 'ERC721NotApprovedOrOwner');
     });
 
     it('cannot set different number of priorities', async function () {
       const tokenId = 1;
       await addResourcesToToken(tokenId);
-      await expect(chunkyEquip.setPriority(tokenId, [1])).to.be.revertedWith(
-        'RMRKBadPriorityListLength()',
+      await expect(chunkyEquip.setPriority(tokenId, [1])).to.be.revertedWithCustomError(
+        chunkyEquip,
+        'RMRKBadPriorityListLength',
       );
-      await expect(chunkyEquip.setPriority(tokenId, [2, 1, 3])).to.be.revertedWith(
-        'RMRKBadPriorityListLength()',
+      await expect(chunkyEquip.setPriority(tokenId, [2, 1, 3])).to.be.revertedWithCustomError(
+        chunkyEquip,
+        'RMRKBadPriorityListLength',
       );
     });
 
     it('cannot set priorities for non existing token', async function () {
       const tokenId = 1;
-      await expect(chunkyEquip.connect(addrs[1]).setPriority(tokenId, [])).to.be.revertedWith(
-        'RMRKOwnerQueryForNonexistentToken()',
-      );
+      await expect(
+        chunkyEquip.connect(addrs[1]).setPriority(tokenId, []),
+      ).to.be.revertedWithCustomError(chunky, 'RMRKOwnerQueryForNonexistentToken');
     });
   });
 

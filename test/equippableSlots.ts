@@ -250,7 +250,7 @@ describe('Equipping', async () => {
         soldierEquip
           .connect(addrs[0])
           .equip(soldiers[0], soldierResId, partIdForWeapon, backgroundChildIndex, weaponResId),
-      ).to.be.revertedWith('RMRKEquippableBasePartNotEquippable()');
+      ).to.be.revertedWithCustomError(soldierEquip, 'RMRKEquippableBasePartNotEquippable');
     });
 
     it('cannot equip child in wrong slot (weapon in background)', async function () {
@@ -260,7 +260,7 @@ describe('Equipping', async () => {
         soldierEquip
           .connect(addrs[0])
           .equip(soldiers[0], soldierResId, partIdForBackground, childIndex, weaponResId),
-      ).to.be.revertedWith('RMRKEquippableBasePartNotEquippable()');
+      ).to.be.revertedWithCustomError(soldierEquip, 'RMRKEquippableBasePartNotEquippable');
     });
 
     it('cannot equip child with wrong resource (weapon in background)', async function () {
@@ -269,7 +269,7 @@ describe('Equipping', async () => {
         soldierEquip
           .connect(addrs[0])
           .equip(soldiers[0], soldierResId, partIdForWeapon, childIndex, backgroundResourceId),
-      ).to.be.revertedWith('RMRKEquippableBasePartNotEquippable()');
+      ).to.be.revertedWithCustomError(soldierEquip, 'RMRKEquippableBasePartNotEquippable');
     });
 
     it('cannot equip if not owner', async function () {
@@ -280,7 +280,7 @@ describe('Equipping', async () => {
         soldierEquip
           .connect(addrs[1]) // Owner is addrs[0]
           .equip(soldiers[0], soldierResId, partIdForWeapon, childIndex, weaponResId),
-      ).to.be.revertedWith('ERC721NotApprovedOrOwner()');
+      ).to.be.revertedWithCustomError(soldierEquip, 'ERC721NotApprovedOrOwner');
     });
 
     it('cannot equip 2 children into the same slot', async function () {
@@ -301,7 +301,7 @@ describe('Equipping', async () => {
         soldierEquip
           .connect(addrs[0])
           .equip(soldiers[0], soldierResId, partIdForWeapon, newWeaponChildIndex, newWeaponResId),
-      ).to.be.revertedWith('RMRKSlotAlreadyUsed()');
+      ).to.be.revertedWithCustomError(soldierEquip, 'RMRKSlotAlreadyUsed');
     });
 
     it('cannot equip if not intented on base', async function () {
@@ -315,7 +315,7 @@ describe('Equipping', async () => {
         soldierEquip
           .connect(addrs[0]) // Owner is addrs[0]
           .equip(soldiers[0], soldierResId, partIdForWeapon, childIndex, weaponResId),
-      ).to.be.revertedWith('RMRKEquippableEquipNotAllowedByBase()');
+      ).to.be.revertedWithCustomError(soldierEquip, 'RMRKEquippableEquipNotAllowedByBase');
     });
 
     it('cannot child into 2 different slots', async function () {
@@ -348,7 +348,7 @@ describe('Equipping', async () => {
         soldierEquip
           .connect(addrs[0]) // Owner is addrs[0]
           .equip(soldiers[0], soldierResId, partIdForWeapon, childIndex, weaponResId),
-      ).to.be.revertedWith('RMRKAlreadyEquipped()');
+      ).to.be.revertedWithCustomError(soldierEquip, 'RMRKAlreadyEquipped');
     });
 
     it('cannot equip on not slot part on base', async function () {
@@ -375,18 +375,18 @@ describe('Equipping', async () => {
         soldierEquip
           .connect(addrs[0]) // Owner is addrs[0]
           .equip(soldiers[0], soldierResId, partIdForWeaponAlt, childIndex, newWeaponResId),
-      ).to.be.revertedWith('RMRKEquippableEquipNotAllowedByBase()');
+      ).to.be.revertedWithCustomError(soldierEquip, 'RMRKEquippableEquipNotAllowedByBase');
     });
 
     it('cannot mark equipped from wrong parent', async function () {
       // Even if the caller is the owner, only the current parent contract can mark it as equipped
       await expect(
         weaponEquip.connect(addrs[0]).markEquipped(weapons[0], weaponResourcesEquip[0], true),
-      ).to.be.revertedWith('RMRKCallerCannotChangeEquipStatus()');
+      ).to.be.revertedWithCustomError(weaponEquip, 'RMRKCallerCannotChangeEquipStatus');
       // Just in case, we also test setting it unequiped
       await expect(
         weaponEquip.connect(addrs[0]).markEquipped(weapons[0], weaponResourcesEquip[0], false),
-      ).to.be.revertedWith('RMRKCallerCannotChangeEquipStatus()');
+      ).to.be.revertedWithCustomError(weaponEquip, 'RMRKCallerCannotChangeEquipStatus');
     });
   });
 
@@ -419,7 +419,7 @@ describe('Equipping', async () => {
     it('cannot unequip if not equipped', async function () {
       await expect(
         soldierEquip.connect(addrs[0]).unequip(soldiers[0], soldierResId, partIdForWeapon),
-      ).to.be.revertedWith('RMRKNotEquipped()');
+      ).to.be.revertedWithCustomError(soldierEquip, 'RMRKNotEquipped');
     });
 
     it('cannot unequip if not owner', async function () {
@@ -432,7 +432,7 @@ describe('Equipping', async () => {
 
       await expect(
         soldierEquip.connect(addrs[1]).unequip(soldiers[0], soldierResId, partIdForWeapon),
-      ).to.be.revertedWith('ERC721NotApprovedOrOwner()');
+      ).to.be.revertedWithCustomError(soldierEquip, 'ERC721NotApprovedOrOwner');
     });
   });
 
@@ -484,7 +484,7 @@ describe('Equipping', async () => {
         soldierEquip
           .connect(addrs[0])
           .replaceEquipment(soldiers[0], soldierResId, partIdForWeapon, childIndex, weaponResId),
-      ).to.be.revertedWith('RMRKNotEquipped()');
+      ).to.be.revertedWithCustomError(soldierEquip, 'RMRKNotEquipped');
     });
 
     it('cannot replace equip if not owner', async function () {
@@ -510,7 +510,7 @@ describe('Equipping', async () => {
             newWeaponChildIndex,
             newWeaponResId,
           ),
-      ).to.be.revertedWith('ERC721NotApprovedOrOwner()');
+      ).to.be.revertedWithCustomError(soldierEquip, 'ERC721NotApprovedOrOwner');
     });
   });
 
@@ -561,9 +561,9 @@ describe('Equipping', async () => {
 
     it('cannot get composables for soldier with not associated resource', async function () {
       const wrongResId = weaponResourcesEquip[1];
-      await expect(weaponEquip.composeEquippables(weapons[0], wrongResId)).to.be.revertedWith(
-        'RMRKTokenDoesNotHaveActiveResource()',
-      );
+      await expect(
+        weaponEquip.composeEquippables(weapons[0], wrongResId),
+      ).to.be.revertedWithCustomError(weaponEquip, 'RMRKTokenDoesNotHaveActiveResource');
     });
   });
 
