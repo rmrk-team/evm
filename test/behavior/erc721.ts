@@ -55,8 +55,9 @@ async function shouldBehaveLikeERC721() {
         });
 
         it('reverts when queried for non existent token id', async function () {
-          await expect(this.token.tokenURI(nonExistentTokenId)).to.be.revertedWith(
-            'ERC721InvalidTokenId()',
+          await expect(this.token.tokenURI(nonExistentTokenId)).to.be.revertedWithCustomError(
+            this.token,
+            'ERC721InvalidTokenId',
           );
         });
 
@@ -106,9 +107,9 @@ async function shouldBehaveLikeERC721() {
 
       context('when querying the zero address', function () {
         it('throws', async function () {
-          await expect(this.token.balanceOf(ethers.constants.AddressZero)).to.be.revertedWith(
-            'ERC721AddressZeroIsNotaValidOwner()',
-          );
+          await expect(
+            this.token.balanceOf(ethers.constants.AddressZero),
+          ).to.be.revertedWithCustomError(this.token, 'ERC721AddressZeroIsNotaValidOwner');
         });
       });
     });
@@ -126,7 +127,10 @@ async function shouldBehaveLikeERC721() {
         const tokenId = nonExistentTokenId;
 
         it('reverts', async function () {
-          await expect(this.token.ownerOf(tokenId)).to.be.revertedWith('ERC721InvalidTokenId()');
+          await expect(this.token.ownerOf(tokenId)).to.be.revertedWithCustomError(
+            this.token,
+            'ERC721InvalidTokenId',
+          );
         });
       });
     });
@@ -256,7 +260,7 @@ async function shouldBehaveLikeERC721() {
           it('reverts', async function () {
             await expect(
               transferFunction(this.token, others[0].address, others[0].address, tokenId, owner),
-            ).to.be.revertedWith('ERC721TransferFromIncorrectOwner()');
+            ).to.be.revertedWithCustomError(this.token, 'ERC721TransferFromIncorrectOwner');
           });
         });
 
@@ -264,7 +268,7 @@ async function shouldBehaveLikeERC721() {
           it('reverts', async function () {
             await expect(
               transferFunction(this.token, owner.address, others[0].address, tokenId, others[0]),
-            ).to.be.revertedWith('ERC721NotApprovedOrOwner()');
+            ).to.be.revertedWithCustomError(this.token, 'ERC721NotApprovedOrOwner');
           });
         });
 
@@ -278,7 +282,7 @@ async function shouldBehaveLikeERC721() {
                 nonExistentTokenId,
                 owner,
               ),
-            ).to.be.revertedWith('ERC721InvalidTokenId()');
+            ).to.be.revertedWithCustomError(this.token, 'ERC721InvalidTokenId');
           });
         });
 
@@ -292,7 +296,7 @@ async function shouldBehaveLikeERC721() {
                 tokenId,
                 owner,
               ),
-            ).to.be.revertedWith('ERC721TransferToTheZeroAddress()');
+            ).to.be.revertedWithCustomError(this.token, 'ERC721TransferToTheZeroAddress');
           });
         });
       };
@@ -386,7 +390,7 @@ async function shouldBehaveLikeERC721() {
                     nonExistentTokenId,
                     owner,
                   ),
-                ).to.be.revertedWith('ERC721InvalidTokenId()');
+                ).to.be.revertedWithCustomError(this.token, 'ERC721InvalidTokenId');
               });
             });
           });
@@ -414,7 +418,7 @@ async function shouldBehaveLikeERC721() {
                 invalidReceiver.address,
                 tokenId,
               ),
-            ).to.be.revertedWith('ERC721TransferToNonReceiverImplementer()');
+            ).to.be.revertedWithCustomError(this.token, 'ERC721TransferToNonReceiverImplementer');
           });
         });
 
@@ -537,7 +541,7 @@ async function shouldBehaveLikeERC721() {
 
           await expect(
             this.token['safeMint(address,uint256)'](invalidReceiver.address, tokenId),
-          ).to.be.revertedWith('ERC721TransferToNonReceiverImplementer()');
+          ).to.be.revertedWithCustomError(this.token, 'ERC721TransferToNonReceiverImplementer');
         });
       });
 
@@ -680,8 +684,9 @@ async function shouldBehaveLikeERC721() {
 
         context('when the address that receives the approval is the owner', function () {
           it('reverts', async function () {
-            await expect(this.token.approve(owner.address, tokenId)).to.be.revertedWith(
-              'ERC721ApprovalToCurrentOwner()',
+            await expect(this.token.approve(owner.address, tokenId)).to.be.revertedWithCustomError(
+              this.token,
+              'ERC721ApprovalToCurrentOwner',
             );
           });
         });
@@ -690,7 +695,10 @@ async function shouldBehaveLikeERC721() {
           it('reverts', async function () {
             await expect(
               this.token.connect(others[0]).approve(approved.address, tokenId),
-            ).to.be.revertedWith('ERC721ApproveCallerIsNotOwnerNorApprovedForAll()');
+            ).to.be.revertedWithCustomError(
+              this.token,
+              'ERC721ApproveCallerIsNotOwnerNorApprovedForAll',
+            );
           });
         });
 
@@ -699,7 +707,10 @@ async function shouldBehaveLikeERC721() {
             await this.token.approve(approved.address, tokenId);
             await expect(
               this.token.connect(approved).approve(anotherApproved.address, tokenId),
-            ).to.be.revertedWith('ERC721ApproveCallerIsNotOwnerNorApprovedForAll()');
+            ).to.be.revertedWithCustomError(
+              this.token,
+              'ERC721ApproveCallerIsNotOwnerNorApprovedForAll',
+            );
           });
         });
 
@@ -719,7 +730,7 @@ async function shouldBehaveLikeERC721() {
           it('reverts', async function () {
             await expect(
               this.token.connect(operator).approve(approved.address, nonExistentTokenId),
-            ).to.be.revertedWith('ERC721InvalidTokenId()');
+            ).to.be.revertedWithCustomError(this.token, 'ERC721InvalidTokenId');
           });
         });
       });
@@ -799,9 +810,9 @@ async function shouldBehaveLikeERC721() {
 
         context('when the operator is the owner', function () {
           it('reverts', async function () {
-            await expect(this.token.setApprovalForAll(owner.address, true)).to.be.revertedWith(
-              'ERC721ApproveToCaller()',
-            );
+            await expect(
+              this.token.setApprovalForAll(owner.address, true),
+            ).to.be.revertedWithCustomError(this.token, 'ERC721ApproveToCaller');
           });
         });
       });
@@ -809,8 +820,9 @@ async function shouldBehaveLikeERC721() {
       describe('getApproved', async function () {
         context('when token is not minted', async function () {
           it('reverts', async function () {
-            await expect(this.token.getApproved(nonExistentTokenId)).to.be.revertedWith(
-              'ERC721InvalidTokenId()',
+            await expect(this.token.getApproved(nonExistentTokenId)).to.be.revertedWithCustomError(
+              this.token,
+              'ERC721InvalidTokenId',
             );
           });
         });
@@ -842,9 +854,9 @@ async function shouldBehaveLikeERC721() {
     });
 
     it('reverts with a null destination address', async function () {
-      await expect(this.token.mint(ethers.constants.AddressZero, firstTokenId)).to.be.revertedWith(
-        'ERC721MintToTheZeroAddress()',
-      );
+      await expect(
+        this.token.mint(ethers.constants.AddressZero, firstTokenId),
+      ).to.be.revertedWithCustomError(this.token, 'ERC721MintToTheZeroAddress');
     });
 
     context('with minted token', async function () {
@@ -864,8 +876,9 @@ async function shouldBehaveLikeERC721() {
       });
 
       it('reverts when adding a token id that already exists', async function () {
-        await expect(this.token.mint(owner.address, firstTokenId)).to.be.revertedWith(
-          'ERC721TokenAlreadyMinted()',
+        await expect(this.token.mint(owner.address, firstTokenId)).to.be.revertedWithCustomError(
+          this.token,
+          'ERC721TokenAlreadyMinted',
         );
       });
     });
@@ -877,8 +890,9 @@ async function shouldBehaveLikeERC721() {
     });
 
     it('reverts when burning a non-existent token id', async function () {
-      await expect(this.token.burn(nonExistentTokenId)).to.be.revertedWith(
-        'ERC721InvalidTokenId()',
+      await expect(this.token.burn(nonExistentTokenId)).to.be.revertedWithCustomError(
+        this.token,
+        'ERC721InvalidTokenId',
       );
     });
 
@@ -907,13 +921,17 @@ async function shouldBehaveLikeERC721() {
 
         it('deletes the token', async function () {
           expect(await this.token.balanceOf(owner.address)).to.eql(BigNumber.from(1));
-          await expect(this.token.ownerOf(firstTokenId)).to.be.revertedWith(
-            'ERC721InvalidTokenId()',
+          await expect(this.token.ownerOf(firstTokenId)).to.be.revertedWithCustomError(
+            this.token,
+            'ERC721InvalidTokenId',
           );
         });
 
         it('reverts when burning a token id that has been deleted', async function () {
-          await expect(this.token.burn(firstTokenId)).to.be.revertedWith('ERC721InvalidTokenId()');
+          await expect(this.token.burn(firstTokenId)).to.be.revertedWithCustomError(
+            this.token,
+            'ERC721InvalidTokenId',
+          );
         });
       });
     });
