@@ -65,9 +65,9 @@ describe('MultiResource', async () => {
 
     it('cannot set issuer if not issuer', async function () {
       const newIssuer = addrs[1];
-      await expect(token.connect(newIssuer).setIssuer(newIssuer.address)).to.be.revertedWith(
-        'RMRKOnlyIssuer()',
-      );
+      await expect(
+        token.connect(newIssuer).setIssuer(newIssuer.address),
+      ).to.be.revertedWithCustomError(token, 'RMRKOnlyIssuer');
     });
   });
 
@@ -82,7 +82,10 @@ describe('MultiResource', async () => {
 
     it('cannot get non existing resource', async function () {
       const id = BigNumber.from(1);
-      await expect(token.getResource(id)).to.be.revertedWith('RMRKNoResourceMatchingId()');
+      await expect(token.getResource(id)).to.be.revertedWithCustomError(
+        token,
+        'RMRKNoResourceMatchingId',
+      );
     });
 
     it('cannot add resource entry if not issuer', async function () {
@@ -95,17 +98,17 @@ describe('MultiResource', async () => {
       const id = BigNumber.from(1);
 
       await token.addResourceEntry(id, metaURIDefault, customDefault);
-      await expect(token.addResourceEntry(id, 'newMetaUri', customDefault)).to.be.revertedWith(
-        'RMRKResourceAlreadyExists()',
-      );
+      await expect(
+        token.addResourceEntry(id, 'newMetaUri', customDefault),
+      ).to.be.revertedWithCustomError(token, 'RMRKResourceAlreadyExists');
     });
 
     it('cannot add resource with id 0', async function () {
       const id = 0;
 
-      await expect(token.addResourceEntry(id, metaURIDefault, customDefault)).to.be.revertedWith(
-        'RMRKWriteToZero()',
-      );
+      await expect(
+        token.addResourceEntry(id, metaURIDefault, customDefault),
+      ).to.be.revertedWithCustomError(token, 'RMRKWriteToZero');
     });
 
     it('cannot add same resource twice', async function () {
@@ -115,9 +118,9 @@ describe('MultiResource', async () => {
         .to.emit(token, 'ResourceSet')
         .withArgs(id);
 
-      await expect(token.addResourceEntry(id, metaURIDefault, customDefault)).to.be.revertedWith(
-        'RMRKResourceAlreadyExists()',
-      );
+      await expect(
+        token.addResourceEntry(id, metaURIDefault, customDefault),
+      ).to.be.revertedWithCustomError(token, 'RMRKResourceAlreadyExists');
     });
 
     it('can add and remove custom data for resource', async function () {
@@ -174,8 +177,9 @@ describe('MultiResource', async () => {
       const tokenId = 1;
 
       await token.mint(owner.address, tokenId);
-      await expect(token.addResourceToToken(tokenId, resId, 0)).to.be.revertedWith(
-        'RMRKNoResourceMatchingId()',
+      await expect(token.addResourceToToken(tokenId, resId, 0)).to.be.revertedWithCustomError(
+        token,
+        'RMRKNoResourceMatchingId',
       );
     });
 
@@ -184,8 +188,9 @@ describe('MultiResource', async () => {
       const tokenId = 1;
 
       await addResources([resId]);
-      await expect(token.addResourceToToken(tokenId, resId, 0)).to.be.revertedWith(
-        'ERC721InvalidTokenId()',
+      await expect(token.addResourceToToken(tokenId, resId, 0)).to.be.revertedWithCustomError(
+        token,
+        'ERC721InvalidTokenId',
       );
     });
 
@@ -196,8 +201,9 @@ describe('MultiResource', async () => {
       await token.mint(owner.address, tokenId);
       await addResources([resId]);
       await token.addResourceToToken(tokenId, resId, 0);
-      await expect(token.addResourceToToken(tokenId, resId, 0)).to.be.revertedWith(
-        'RMRKResourceAlreadyExists()',
+      await expect(token.addResourceToToken(tokenId, resId, 0)).to.be.revertedWithCustomError(
+        token,
+        'RMRKResourceAlreadyExists',
       );
     });
 
@@ -213,8 +219,9 @@ describe('MultiResource', async () => {
       // Now it's full, next should fail
       const resId = BigNumber.from(129);
       await addResources([resId]);
-      await expect(token.addResourceToToken(tokenId, resId, 0)).to.be.revertedWith(
-        'RMRKMaxPendingResourcesReached()',
+      await expect(token.addResourceToToken(tokenId, resId, 0)).to.be.revertedWithCustomError(
+        token,
+        'RMRKMaxPendingResourcesReached',
       );
     });
 
@@ -309,7 +316,10 @@ describe('MultiResource', async () => {
       await token.addResourceToToken(tokenId, resId, 0);
       await token.acceptResource(tokenId, 0);
 
-      await expect(token.acceptResource(tokenId, 0)).to.be.revertedWith('RMRKIndexOutOfRange()');
+      await expect(token.acceptResource(tokenId, 0)).to.be.revertedWithCustomError(
+        token,
+        'RMRKIndexOutOfRange',
+      );
     });
 
     it('cannot accept resource if not owner', async function () {
@@ -319,16 +329,19 @@ describe('MultiResource', async () => {
       await token.mint(owner.address, tokenId);
       await addResources([resId]);
       await token.addResourceToToken(tokenId, resId, 0);
-      await expect(token.connect(addrs[1]).acceptResource(tokenId, 0)).to.be.revertedWith(
-        'ERC721NotApprovedOrOwner()',
-      );
+      await expect(
+        token.connect(addrs[1]).acceptResource(tokenId, 0),
+      ).to.be.revertedWithCustomError(token, 'ERC721NotApprovedOrOwner');
     });
 
     it('cannot accept non existing resource', async function () {
       const tokenId = 1;
 
       await token.mint(owner.address, tokenId);
-      await expect(token.acceptResource(tokenId, 0)).to.be.revertedWith('RMRKIndexOutOfRange()');
+      await expect(token.acceptResource(tokenId, 0)).to.be.revertedWithCustomError(
+        token,
+        'RMRKIndexOutOfRange',
+      );
     });
   });
 
@@ -518,7 +531,10 @@ describe('MultiResource', async () => {
       await token.addResourceToToken(tokenId, resId, 0);
       await token.rejectResource(tokenId, 0);
 
-      await expect(token.rejectResource(tokenId, 0)).to.be.revertedWith('RMRKIndexOutOfRange()');
+      await expect(token.rejectResource(tokenId, 0)).to.be.revertedWithCustomError(
+        token,
+        'RMRKIndexOutOfRange',
+      );
     });
 
     it('cannot reject resource nor reject all if not owner', async function () {
@@ -529,19 +545,22 @@ describe('MultiResource', async () => {
       await addResources([resId]);
       await token.addResourceToToken(tokenId, resId, 0);
 
-      await expect(token.connect(addrs[1]).rejectResource(tokenId, 0)).to.be.revertedWith(
-        'ERC721NotApprovedOrOwner()',
-      );
-      await expect(token.connect(addrs[1]).rejectAllResources(tokenId)).to.be.revertedWith(
-        'ERC721NotApprovedOrOwner()',
-      );
+      await expect(
+        token.connect(addrs[1]).rejectResource(tokenId, 0),
+      ).to.be.revertedWithCustomError(token, 'ERC721NotApprovedOrOwner');
+      await expect(
+        token.connect(addrs[1]).rejectAllResources(tokenId),
+      ).to.be.revertedWithCustomError(token, 'ERC721NotApprovedOrOwner');
     });
 
     it('cannot reject non existing resource', async function () {
       const tokenId = 1;
 
       await token.mint(owner.address, tokenId);
-      await expect(token.rejectResource(tokenId, 0)).to.be.revertedWith('RMRKIndexOutOfRange()');
+      await expect(token.rejectResource(tokenId, 0)).to.be.revertedWithCustomError(
+        token,
+        'RMRKIndexOutOfRange',
+      );
     });
   });
 
@@ -574,26 +593,29 @@ describe('MultiResource', async () => {
     it('cannot set priorities for non owned token', async function () {
       const tokenId = 1;
       await addResourcesToToken(tokenId);
-      await expect(token.connect(addrs[1]).setPriority(tokenId, [2, 1])).to.be.revertedWith(
-        'ERC721NotApprovedOrOwner()',
-      );
+      await expect(
+        token.connect(addrs[1]).setPriority(tokenId, [2, 1]),
+      ).to.be.revertedWithCustomError(token, 'ERC721NotApprovedOrOwner');
     });
 
     it('cannot set different number of priorities', async function () {
       const tokenId = 1;
       await addResourcesToToken(tokenId);
-      await expect(token.setPriority(tokenId, [1])).to.be.revertedWith(
-        'RMRKBadPriorityListLength()',
+      await expect(token.setPriority(tokenId, [1])).to.be.revertedWithCustomError(
+        token,
+        'RMRKBadPriorityListLength',
       );
-      await expect(token.setPriority(tokenId, [2, 1, 3])).to.be.revertedWith(
-        'RMRKBadPriorityListLength()',
+      await expect(token.setPriority(tokenId, [2, 1, 3])).to.be.revertedWithCustomError(
+        token,
+        'RMRKBadPriorityListLength',
       );
     });
 
     it('cannot set priorities for non existing token', async function () {
       const tokenId = 1;
-      await expect(token.connect(addrs[1]).setPriority(tokenId, [])).to.be.revertedWith(
-        'ERC721InvalidTokenId()',
+      await expect(token.connect(addrs[1]).setPriority(tokenId, [])).to.be.revertedWithCustomError(
+        token,
+        'ERC721InvalidTokenId',
       );
     });
   });

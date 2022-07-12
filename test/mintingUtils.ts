@@ -28,8 +28,9 @@ describe('Nesting', async () => {
     it('Test saleIsOpen', async function () {
       expect(await mintingUtils.testSaleIsOpen()).to.equal(true);
       await mintingUtils.connect(owner).setupTestSaleIsOpen();
-      await expect(mintingUtils.connect(owner).testSaleIsOpen()).to.be.revertedWith(
-        'RMRKMintOverMax()',
+      await expect(mintingUtils.connect(owner).testSaleIsOpen()).to.be.revertedWithCustomError(
+        mintingUtils,
+        'RMRKMintOverMax',
       );
     });
   });

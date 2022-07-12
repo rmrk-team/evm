@@ -197,8 +197,9 @@ describe('Equipping', async () => {
 
     it('cannot get composables for neon with not associated resource', async function () {
       const wrongResId = maskResourcesEquip[1];
-      await expect(maskEquip.composeEquippables(masks[0], wrongResId)).to.be.revertedWith(
-        'RMRKTokenDoesNotHaveActiveResource()',
+      await expect(maskEquip.composeEquippables(masks[0], wrongResId)).to.be.revertedWithCustomError(
+        maskEquip,
+        'RMRKTokenDoesNotHaveActiveResource',
       );
     });
 
@@ -217,8 +218,9 @@ describe('Equipping', async () => {
       );
       await maskEquip.addResourceToToken(masks[0], noBaseResourceId, 0);
       await maskEquip.connect(addrs[0]).acceptResource(masks[0], 0);
-      await expect(maskEquip.composeEquippables(masks[0], noBaseResourceId)).to.be.revertedWith(
-        'RMRKNotComposableResource()',
+      await expect(maskEquip.composeEquippables(masks[0], noBaseResourceId)).to.be.revertedWithCustomError(
+        maskEquip,
+        'RMRKNotComposableResource',
       );
     });
   });

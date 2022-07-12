@@ -64,8 +64,9 @@ describe('Nesting', async () => {
       expect(await ownerChunky.balanceOf(addrs[0].address)).to.equal(10);
       expect(await ownerChunky.balanceOf(addrs[1].address)).to.equal(10);
 
-      await expect(ownerChunky.ownerOf(100)).to.be.revertedWith(
-        'RMRKOwnerQueryForNonexistentToken()',
+      await expect(ownerChunky.ownerOf(100)).to.be.revertedWithCustomError(
+        ownerChunky,
+        'RMRKOwnerQueryForNonexistentToken',
       );
     });
   });
@@ -81,9 +82,9 @@ describe('Nesting', async () => {
 
     it('cannot set issuer if not issuer', async function () {
       const newIssuer = addrs[1];
-      await expect(ownerChunky.connect(newIssuer).setIssuer(newIssuer.address)).to.be.revertedWith(
-        'RMRKOnlyIssuer()',
-      );
+      await expect(
+        ownerChunky.connect(newIssuer).setIssuer(newIssuer.address),
+      ).to.be.revertedWithCustomError(ownerChunky, 'RMRKOnlyIssuer');
     });
   });
 
@@ -114,21 +115,21 @@ describe('Nesting', async () => {
 
     it('cannot mint already minted token', async function () {
       await petMonkey['mint(address,uint256)'](owner.address, 1);
-      await expect(petMonkey['mint(address,uint256)'](owner.address, 1)).to.be.revertedWith(
-        'ERC721TokenAlreadyMinted()',
-      );
+      await expect(
+        petMonkey['mint(address,uint256)'](owner.address, 1),
+      ).to.be.revertedWithCustomError(petMonkey, 'ERC721TokenAlreadyMinted');
     });
 
     it('cannot mint to zero address', async function () {
       await expect(
         petMonkey['mint(address,uint256)']('0x0000000000000000000000000000000000000000', 1),
-      ).to.be.revertedWith('ERC721MintToTheZeroAddress()');
+      ).to.be.revertedWithCustomError(petMonkey, 'ERC721MintToTheZeroAddress');
     });
 
     it('cannot nest mint to a non-contract destination', async function () {
       await expect(
         petMonkey['mint(address,uint256,uint256,bytes)'](owner.address, 1, 0, mintNestData),
-      ).to.be.revertedWith('RMRKIsNotContract()');
+      ).to.be.revertedWithCustomError(petMonkey, 'RMRKIsNotContract');
     });
 
     it.skip('cannot nest mint to non rmrk core implementer', async function () {
@@ -138,7 +139,7 @@ describe('Nesting', async () => {
     it('cannot nest mint to a non-existent token', async function () {
       await expect(
         petMonkey['mint(address,uint256,uint256,bytes)'](ownerChunky.address, 1, 0, mintNestData),
-      ).to.be.revertedWith('RMRKOwnerQueryForNonexistentToken()');
+      ).to.be.revertedWithCustomError(petMonkey, 'RMRKOwnerQueryForNonexistentToken');
     });
 
     it('cannot nest mint already minted token', async function () {
@@ -160,7 +161,7 @@ describe('Nesting', async () => {
           parentId,
           mintNestData,
         ),
-      ).to.be.revertedWith('ERC721TokenAlreadyMinted()');
+      ).to.be.revertedWithCustomError(petMonkey, 'ERC721TokenAlreadyMinted');
     });
 
     it('cannot nest mint already minted token to a different parent', async function () {
@@ -183,7 +184,7 @@ describe('Nesting', async () => {
           parentId,
           mintNestData,
         ),
-      ).to.be.revertedWith('ERC721TokenAlreadyMinted()');
+      ).to.be.revertedWithCustomError(petMonkey, 'ERC721TokenAlreadyMinted');
     });
 
     it('cannot nest mint to zero address', async function () {
@@ -194,7 +195,7 @@ describe('Nesting', async () => {
           10,
           mintNestData,
         ),
-      ).to.be.revertedWith('ERC721MintToTheZeroAddress()');
+      ).to.be.revertedWithCustomError(petMonkey, 'ERC721MintToTheZeroAddress');
     });
 
     it('can mint to contract and owners are ok', async function () {
@@ -348,7 +349,7 @@ describe('Nesting', async () => {
           tokenId,
           mintNestData,
         ),
-      ).to.be.revertedWith('RMRKMaxPendingChildrenReached()');
+      ).to.be.revertedWithCustomError(petMonkey, 'RMRKMaxPendingChildrenReached');
     });
   });
 
@@ -357,9 +358,9 @@ describe('Nesting', async () => {
       const parentId = 11;
       const childId = 1;
       await petMonkey['mint(address,uint256)'](addrs[0].address, childId);
-      await expect(ownerChunky.addChild(parentId, childId, petMonkey.address)).to.be.revertedWith(
-        'RMRKParentChildMismatch()',
-      );
+      await expect(
+        ownerChunky.addChild(parentId, childId, petMonkey.address),
+      ).to.be.revertedWithCustomError(ownerChunky, 'RMRKParentChildMismatch');
     });
   });
 
@@ -403,9 +404,9 @@ describe('Nesting', async () => {
       );
 
       // Another address cannot accept
-      await expect(ownerChunky.connect(addrs[0]).acceptChild(parentId, 0)).to.be.revertedWith(
-        'ERC721NotApprovedOrOwner()',
-      );
+      await expect(
+        ownerChunky.connect(addrs[0]).acceptChild(parentId, 0),
+      ).to.be.revertedWithCustomError(ownerChunky, 'ERC721NotApprovedOrOwner');
     });
 
     it('can accept child from approved address (not owner)', async function () {
@@ -434,9 +435,9 @@ describe('Nesting', async () => {
 
     it('cannot accept children for non existing index', async () => {
       const parentId = 11;
-      await expect(ownerChunky.connect(addrs[1]).acceptChild(parentId, 0)).to.be.revertedWith(
-        'RMRKPendingChildIndexOutOfRange()',
-      );
+      await expect(
+        ownerChunky.connect(addrs[1]).acceptChild(parentId, 0),
+      ).to.be.revertedWithCustomError(ownerChunky, 'RMRKPendingChildIndexOutOfRange');
     });
   });
 
@@ -465,9 +466,9 @@ describe('Nesting', async () => {
       );
 
       // addrs[1] attempts to reject addrs[0]'s pending children
-      await expect(ownerChunky.connect(addrs[0]).rejectChild(parentId, 0)).to.be.revertedWith(
-        'ERC721NotApprovedOrOwner()',
-      );
+      await expect(
+        ownerChunky.connect(addrs[0]).rejectChild(parentId, 0),
+      ).to.be.revertedWithCustomError(ownerChunky, 'ERC721NotApprovedOrOwner');
     });
 
     it('can reject child from approved address (not owner)', async function () {
@@ -529,9 +530,9 @@ describe('Nesting', async () => {
       );
 
       // addrs[1] attempts to reject addrs[0]'s pending children
-      await expect(ownerChunky.connect(addrs[0]).rejectAllChildren(parentId)).to.be.revertedWith(
-        'ERC721NotApprovedOrOwner()',
-      );
+      await expect(
+        ownerChunky.connect(addrs[0]).rejectAllChildren(parentId),
+      ).to.be.revertedWithCustomError(ownerChunky, 'ERC721NotApprovedOrOwner');
     });
 
     it('can reject all pending children from approved address (not owner)', async function () {
@@ -559,9 +560,9 @@ describe('Nesting', async () => {
 
     it('cannot reject children for non existing index', async () => {
       const parentId = 11;
-      await expect(ownerChunky.connect(addrs[1]).rejectChild(parentId, 0)).to.be.revertedWith(
-        'RMRKPendingChildIndexOutOfRange()',
-      );
+      await expect(
+        ownerChunky.connect(addrs[1]).rejectChild(parentId, 0),
+      ).to.be.revertedWithCustomError(ownerChunky, 'RMRKPendingChildIndexOutOfRange');
     });
   });
 
@@ -592,9 +593,9 @@ describe('Nesting', async () => {
       await ownerChunky.connect(addrs[1]).acceptChild(parentId, 0);
 
       // addrs[1] attempts to remove addrs[0]'s children
-      await expect(ownerChunky.connect(addrs[0]).removeChild(parentId, 0)).to.be.revertedWith(
-        'ERC721NotApprovedOrOwner()',
-      );
+      await expect(
+        ownerChunky.connect(addrs[0]).removeChild(parentId, 0),
+      ).to.be.revertedWithCustomError(ownerChunky, 'ERC721NotApprovedOrOwner');
     });
 
     it('can remove child from approved address (not owner)', async function () {
@@ -617,9 +618,9 @@ describe('Nesting', async () => {
 
     it('cannot remove children for non existing index', async () => {
       const parentId = 11;
-      await expect(ownerChunky.connect(addrs[1]).removeChild(parentId, 0)).to.be.revertedWith(
-        'RMRKChildIndexOutOfRange()',
-      );
+      await expect(
+        ownerChunky.connect(addrs[1]).removeChild(parentId, 0),
+      ).to.be.revertedWithCustomError(ownerChunky, 'RMRKChildIndexOutOfRange');
     });
   });
 
@@ -629,16 +630,18 @@ describe('Nesting', async () => {
 
       await petMonkey['mint(address,uint256)'](addrs[1].address, tokenId);
       await petMonkey.connect(addrs[1]).burn(tokenId);
-      await expect(petMonkey.ownerOf(tokenId)).to.be.revertedWith(
-        'RMRKOwnerQueryForNonexistentToken()',
+      await expect(petMonkey.ownerOf(tokenId)).to.be.revertedWithCustomError(
+        petMonkey,
+        'RMRKOwnerQueryForNonexistentToken',
       );
     });
 
     it('cannot burn not owned token', async function () {
       const tokenId = 1;
       await petMonkey['mint(address,uint256)'](addrs[1].address, tokenId);
-      await expect(petMonkey.connect(addrs[0]).burn(tokenId)).to.be.revertedWith(
-        'ERC721NotApprovedOrOwner()',
+      await expect(petMonkey.connect(addrs[0]).burn(tokenId)).to.be.revertedWithCustomError(
+        petMonkey,
+        'ERC721NotApprovedOrOwner',
       );
     });
 
@@ -652,8 +655,9 @@ describe('Nesting', async () => {
         parentId,
         mintNestData,
       );
-      await expect(petMonkey.burnFromParent(childId)).to.be.revertedWith(
-        'RMRKCallerIsNotOwnerContract()',
+      await expect(petMonkey.burnFromParent(childId)).to.be.revertedWithCustomError(
+        petMonkey,
+        'RMRKCallerIsNotOwnerContract',
       );
     });
 
@@ -665,8 +669,9 @@ describe('Nesting', async () => {
       await petMonkey.connect(addrs[1]).approve(approvedAddress.address, tokenId);
 
       await petMonkey.connect(approvedAddress).burn(tokenId);
-      await expect(petMonkey.ownerOf(tokenId)).to.be.revertedWith(
-        'RMRKOwnerQueryForNonexistentToken()',
+      await expect(petMonkey.ownerOf(tokenId)).to.be.revertedWithCustomError(
+        petMonkey,
+        'RMRKOwnerQueryForNonexistentToken',
       );
     });
 
@@ -684,11 +689,13 @@ describe('Nesting', async () => {
       await petMonkey.connect(addrs[0]).burn(childId);
 
       // no owner for token
-      await expect(petMonkey.ownerOf(childId)).to.be.revertedWith(
-        'RMRKOwnerQueryForNonexistentToken()',
+      await expect(petMonkey.ownerOf(childId)).to.be.revertedWithCustomError(
+        petMonkey,
+        'RMRKOwnerQueryForNonexistentToken',
       );
-      await expect(petMonkey.rmrkOwnerOf(childId)).to.be.revertedWith(
-        'RMRKOwnerQueryForNonexistentToken()',
+      await expect(petMonkey.rmrkOwnerOf(childId)).to.be.revertedWithCustomError(
+        petMonkey,
+        'RMRKOwnerQueryForNonexistentToken',
       );
     });
 
@@ -704,8 +711,9 @@ describe('Nesting', async () => {
       );
       await ownerChunky.connect(addrs[0]).acceptChild(parentId, 0);
 
-      await expect(petMonkey.connect(addrs[1]).burn(childId)).to.be.revertedWith(
-        'ERC721NotApprovedOrOwner()',
+      await expect(petMonkey.connect(addrs[1]).burn(childId)).to.be.revertedWithCustomError(
+        petMonkey,
+        'ERC721NotApprovedOrOwner',
       );
     });
 
@@ -747,18 +755,22 @@ describe('Nesting', async () => {
 
       await petMonkey.connect(addrs[0]).burn(childId);
 
-      await expect(petMonkey.ownerOf(childId)).to.be.revertedWith(
-        'RMRKOwnerQueryForNonexistentToken()',
+      await expect(petMonkey.ownerOf(childId)).to.be.revertedWithCustomError(
+        petMonkey,
+        'RMRKOwnerQueryForNonexistentToken',
       );
-      await expect(petMonkey.rmrkOwnerOf(childId)).to.be.revertedWith(
-        'RMRKOwnerQueryForNonexistentToken()',
+      await expect(petMonkey.rmrkOwnerOf(childId)).to.be.revertedWithCustomError(
+        petMonkey,
+        'RMRKOwnerQueryForNonexistentToken',
       );
 
-      await expect(ownerChunky.ownerOf(granchildId)).to.be.revertedWith(
-        'RMRKOwnerQueryForNonexistentToken()',
+      await expect(ownerChunky.ownerOf(granchildId)).to.be.revertedWithCustomError(
+        ownerChunky,
+        'RMRKOwnerQueryForNonexistentToken',
       );
-      await expect(ownerChunky.rmrkOwnerOf(granchildId)).to.be.revertedWith(
-        'RMRKOwnerQueryForNonexistentToken()',
+      await expect(ownerChunky.rmrkOwnerOf(granchildId)).to.be.revertedWithCustomError(
+        ownerChunky,
+        'RMRKOwnerQueryForNonexistentToken',
       );
     });
   });
@@ -781,9 +793,9 @@ describe('Nesting', async () => {
 
     it('cannot unnest from parent directly', async function () {
       const { parentId, firstOwner } = await mintTofirstOwner(true);
-      await expect(ownerChunky.connect(firstOwner).unnestChild(parentId, 0)).to.be.revertedWith(
-        'RMRKUnnestFromWrongChild()',
-      );
+      await expect(
+        ownerChunky.connect(firstOwner).unnestChild(parentId, 0),
+      ).to.be.revertedWithCustomError(ownerChunky, 'RMRKUnnestFromWrongChild');
     });
 
     it('can unnest child with grandchild and childen are ok', async function () {
@@ -830,25 +842,26 @@ describe('Nesting', async () => {
     });
 
     it('cannot unnest if not child root owner', async function () {
-      await expect(petMonkey.connect(addrs[2]).unnestSelf(1, 0)).to.be.revertedWith(
-        'RMRKOwnerQueryForNonexistentToken()',
+      await expect(petMonkey.connect(addrs[2]).unnestSelf(1, 0)).to.be.revertedWithCustomError(
+        petMonkey,
+        'RMRKOwnerQueryForNonexistentToken',
       );
     });
 
     it('cannot unnest not existing child', async function () {
       const { childId, firstOwner } = await mintTofirstOwner(true);
-      await expect(petMonkey.connect(firstOwner).unnestSelf(childId + 1, 0)).to.be.revertedWith(
-        'RMRKOwnerQueryForNonexistentToken()',
-      );
+      await expect(
+        petMonkey.connect(firstOwner).unnestSelf(childId + 1, 0),
+      ).to.be.revertedWithCustomError(petMonkey, 'RMRKOwnerQueryForNonexistentToken');
     });
 
     it('cannot unnest token not owned by an NFT', async function () {
       const childId = 1;
 
       await petMonkey['mint(address,uint256)'](addrs[1].address, childId);
-      await expect(petMonkey.connect(addrs[1]).unnestSelf(childId, 0)).to.be.revertedWith(
-        'RMRKUnnestForNonNftParent()',
-      );
+      await expect(
+        petMonkey.connect(addrs[1]).unnestSelf(childId, 0),
+      ).to.be.revertedWithCustomError(petMonkey, 'RMRKUnnestForNonNftParent');
     });
   });
 
@@ -869,14 +882,14 @@ describe('Nesting', async () => {
       await petMonkey['mint(address,uint256)'](addrs[1].address, tokenId);
       await expect(
         petMonkey.connect(addrs[0]).transfer(newOwner.address, tokenId),
-      ).to.be.revertedWith('ERC721NotApprovedOrOwner()');
+      ).to.be.revertedWithCustomError(petMonkey, 'ERC721NotApprovedOrOwner');
     });
 
     it('cannot transfer to address zero', async function () {
       const tokenId = 1;
       await expect(
         ownerChunky.connect(addrs[0]).transfer(ethers.constants.AddressZero, tokenId),
-      ).to.be.revertedWith('ERC721TransferToTheZeroAddress()');
+      ).to.be.revertedWithCustomError(ownerChunky, 'ERC721TransferToTheZeroAddress');
     });
 
     it('can transfer token from approved address (not owner)', async function () {
@@ -962,7 +975,7 @@ describe('Nesting', async () => {
             newParentId,
             emptyData,
           ),
-      ).to.be.revertedWith('RMRKMustUnnestFirst()');
+      ).to.be.revertedWithCustomError(petMonkey, 'RMRKMustUnnestFirst');
     });
 
     it('can transfer parent token to token with same owner, family tree is ok', async function () {
