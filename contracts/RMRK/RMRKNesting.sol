@@ -21,7 +21,6 @@ error RMRKMaxPendingChildrenReached();
 error RMRKMintToNonRMRKImplementer();
 error RMRKMustUnnestFirst();
 error RMRKNestingTransferToNonRMRKNestingImplementer();
-error RMRKOwnerQueryForNonexistentToken();
 error RMRKParentChildMismatch();
 error RMRKPendingChildIndexOutOfRange();
 error RMRKUnnestForNonexistentToken();
@@ -63,7 +62,7 @@ contract RMRKNesting is ERC721, IRMRKNesting {
             owner = IRMRKNesting(owner).ownerOf(ownerTokenId);
         }
         if(owner == address(0))
-            revert RMRKOwnerQueryForNonexistentToken();
+            revert ERC721InvalidTokenId();
         return owner;
     }
 
@@ -74,7 +73,7 @@ contract RMRKNesting is ERC721, IRMRKNesting {
     */
     function rmrkOwnerOf(uint256 tokenId) public view virtual returns (address, uint256, bool) {
         RMRKOwner memory owner = _RMRKOwners[tokenId];
-        if(owner.ownerAddress == address(0)) revert RMRKOwnerQueryForNonexistentToken();
+        if(owner.ownerAddress == address(0)) revert ERC721InvalidTokenId();
 
         return (owner.ownerAddress, owner.tokenId, owner.isNft);
     }
@@ -210,6 +209,14 @@ contract RMRKNesting is ERC721, IRMRKNesting {
         uint256 tokenId
     ) public virtual {
         transferFrom(_msgSender(), to, tokenId);
+    }
+
+    function transferFrom(
+        address from,
+        address to,
+        uint256 tokenId
+    ) public virtual override onlyApprovedOrOwner(tokenId) {
+        _transfer(from, to, tokenId, 0, "");
     }
 
     function transferFrom(

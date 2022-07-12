@@ -27,7 +27,6 @@ error RMRKEquippableBasePartNotEquippable();
 error RMRKEquippableEquipNotAllowedByBase();
 error RMRKNotComposableResource();
 error RMRKNotEquipped();
-error RMRKOwnerQueryForNonexistentToken();
 error RMRKSlotAlreadyUsed();
 error RMRKTokenDoesNotHaveActiveResource();
 

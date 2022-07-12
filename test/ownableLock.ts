@@ -1,10 +1,10 @@
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { OwnableLockMock } from '../typechain';
+import { Contract } from 'ethers';
 
-describe('Nesting', async () => {
-  let ownableLock: OwnableLockMock;
+describe('Ownable Lock', async () => {
+  let ownableLock: Contract;
 
   let owner: SignerWithAddress;
   let addrs: SignerWithAddress[];

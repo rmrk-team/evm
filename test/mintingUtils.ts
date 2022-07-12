@@ -1,10 +1,10 @@
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { MintingUtilsMock } from '../typechain';
+import { Contract } from 'ethers';
 
 describe('Nesting', async () => {
-  let mintingUtils: MintingUtilsMock;
+  let mintingUtils: Contract;
 
   let owner: SignerWithAddress;
   let addrs: SignerWithAddress[];
