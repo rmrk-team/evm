@@ -2,7 +2,6 @@ import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { BigNumber, Contract } from 'ethers';
-import { IRMRKMultiResource } from '../../typechain';
 
 async function shouldBehaveLikeMultiResource(name: string, symbol: string) {
   let owner: SignerWithAddress;
@@ -122,7 +121,7 @@ async function shouldBehaveLikeMultiResource(name: string, symbol: string) {
       const resId2 = BigNumber.from(2);
       const tokenId = 1;
 
-      await this.token.mint(owner.address, tokenId);
+      await this.token['mint(address,uint256)'](owner.address, tokenId);
       await addResources(this.token, [resId, resId2]);
       await expect(this.token.addResourceToToken(tokenId, resId, 0)).to.emit(
         this.token,
@@ -150,7 +149,7 @@ async function shouldBehaveLikeMultiResource(name: string, symbol: string) {
       const resId = BigNumber.from(1);
       const tokenId = 1;
 
-      await this.token.mint(owner.address, tokenId);
+      await this.token['mint(address,uint256)'](owner.address, tokenId);
       await expect(this.token.addResourceToToken(tokenId, resId, 0)).to.be.revertedWithCustomError(
         this.token,
         'RMRKNoResourceMatchingId',
@@ -172,7 +171,7 @@ async function shouldBehaveLikeMultiResource(name: string, symbol: string) {
       const resId = BigNumber.from(1);
       const tokenId = 1;
 
-      await this.token.mint(owner.address, tokenId);
+      await this.token['mint(address,uint256)'](owner.address, tokenId);
       await addResources(this.token, [resId]);
       await this.token.addResourceToToken(tokenId, resId, 0);
       await expect(this.token.addResourceToToken(tokenId, resId, 0)).to.be.revertedWithCustomError(
@@ -184,7 +183,7 @@ async function shouldBehaveLikeMultiResource(name: string, symbol: string) {
     it('cannot add too many resources to the same token', async function () {
       const tokenId = 1;
 
-      await this.token.mint(owner.address, tokenId);
+      await this.token['mint(address,uint256)'](owner.address, tokenId);
       for (let i = 1; i <= 128; i++) {
         await addResources(this.token, [BigNumber.from(i)]);
         await this.token.addResourceToToken(tokenId, i, 0);
@@ -204,8 +203,8 @@ async function shouldBehaveLikeMultiResource(name: string, symbol: string) {
       const tokenId1 = 1;
       const tokenId2 = 2;
 
-      await this.token.mint(owner.address, tokenId1);
-      await this.token.mint(owner.address, tokenId2);
+      await this.token['mint(address,uint256)'](owner.address, tokenId1);
+      await this.token['mint(address,uint256)'](owner.address, tokenId2);
       await addResources(this.token, [resId]);
       await this.token.addResourceToToken(tokenId1, resId, 0);
       await this.token.addResourceToToken(tokenId2, resId, 0);
@@ -220,7 +219,7 @@ async function shouldBehaveLikeMultiResource(name: string, symbol: string) {
       const resId = BigNumber.from(1);
       const tokenId = 1;
 
-      await this.token.mint(owner.address, tokenId);
+      await this.token['mint(address,uint256)'](owner.address, tokenId);
       await addResources(this.token, [resId]);
       await this.token.addResourceToToken(tokenId, resId, 0);
       await expect(this.token.acceptResource(tokenId, 0))
@@ -245,7 +244,7 @@ async function shouldBehaveLikeMultiResource(name: string, symbol: string) {
       const resId2 = BigNumber.from(2);
       const tokenId = 1;
 
-      await this.token.mint(owner.address, tokenId);
+      await this.token['mint(address,uint256)'](owner.address, tokenId);
       await addResources(this.token, [resId, resId2]);
       await this.token.addResourceToToken(tokenId, resId, 0);
       await this.token.addResourceToToken(tokenId, resId2, 0);
@@ -270,7 +269,7 @@ async function shouldBehaveLikeMultiResource(name: string, symbol: string) {
       const resId = BigNumber.from(1);
       const tokenId = 1;
       const approvedAddress = addrs[1];
-      await this.token.mint(owner.address, tokenId);
+      await this.token['mint(address,uint256)'](owner.address, tokenId);
       await this.token.approve(approvedAddress.address, tokenId);
       await addResources(this.token, [resId]);
 
@@ -285,7 +284,7 @@ async function shouldBehaveLikeMultiResource(name: string, symbol: string) {
       const resId = BigNumber.from(1);
       const tokenId = 1;
 
-      await this.token.mint(owner.address, tokenId);
+      await this.token['mint(address,uint256)'](owner.address, tokenId);
       await addResources(this.token, [resId]);
       await this.token.addResourceToToken(tokenId, resId, 0);
       await this.token.acceptResource(tokenId, 0);
@@ -300,7 +299,7 @@ async function shouldBehaveLikeMultiResource(name: string, symbol: string) {
       const resId = BigNumber.from(1);
       const tokenId = 1;
 
-      await this.token.mint(owner.address, tokenId);
+      await this.token['mint(address,uint256)'](owner.address, tokenId);
       await addResources(this.token, [resId]);
       await this.token.addResourceToToken(tokenId, resId, 0);
       await expect(
@@ -311,7 +310,7 @@ async function shouldBehaveLikeMultiResource(name: string, symbol: string) {
     it('cannot accept non existing resource', async function () {
       const tokenId = 1;
 
-      await this.token.mint(owner.address, tokenId);
+      await this.token['mint(address,uint256)'](owner.address, tokenId);
       await expect(this.token.acceptResource(tokenId, 0)).to.be.revertedWithCustomError(
         this.token,
         'RMRKIndexOutOfRange',
@@ -325,7 +324,7 @@ async function shouldBehaveLikeMultiResource(name: string, symbol: string) {
       const resId2 = BigNumber.from(2);
       const tokenId = 1;
 
-      await this.token.mint(owner.address, tokenId);
+      await this.token['mint(address,uint256)'](owner.address, tokenId);
       await addResources(this.token, [resId, resId2]);
       await this.token.addResourceToToken(tokenId, resId, 0);
       await this.token.acceptResource(tokenId, 0);
@@ -359,7 +358,7 @@ async function shouldBehaveLikeMultiResource(name: string, symbol: string) {
       const resId = BigNumber.from(1);
       const tokenId = 1;
 
-      await this.token.mint(owner.address, tokenId);
+      await this.token['mint(address,uint256)'](owner.address, tokenId);
       await addResources(this.token, [resId]);
       await this.token.addResourceToToken(tokenId, resId, 1);
       await this.token.acceptResource(tokenId, 0);
@@ -375,7 +374,7 @@ async function shouldBehaveLikeMultiResource(name: string, symbol: string) {
       const resId = BigNumber.from(1);
       const tokenId = 1;
 
-      await this.token.mint(owner.address, tokenId);
+      await this.token['mint(address,uint256)'](owner.address, tokenId);
       await addResources(this.token, [resId]);
       await this.token.addResourceToToken(tokenId, resId, 0);
 
@@ -392,7 +391,7 @@ async function shouldBehaveLikeMultiResource(name: string, symbol: string) {
       const resId2 = BigNumber.from(2);
       const tokenId = 1;
 
-      await this.token.mint(owner.address, tokenId);
+      await this.token['mint(address,uint256)'](owner.address, tokenId);
       await addResources(this.token, [resId, resId2]);
       await this.token.addResourceToToken(tokenId, resId, 0);
       await this.token.acceptResource(tokenId, 0);
@@ -409,7 +408,7 @@ async function shouldBehaveLikeMultiResource(name: string, symbol: string) {
       const approvedAddress = addrs[1];
       const tokenId = 1;
 
-      await this.token.mint(owner.address, tokenId);
+      await this.token['mint(address,uint256)'](owner.address, tokenId);
       await this.token.approve(approvedAddress.address, tokenId);
       await addResources(this.token, [resId]);
       await this.token.addResourceToToken(tokenId, resId, 0);
@@ -427,7 +426,7 @@ async function shouldBehaveLikeMultiResource(name: string, symbol: string) {
       const resId2 = BigNumber.from(2);
       const tokenId = 1;
 
-      await this.token.mint(owner.address, tokenId);
+      await this.token['mint(address,uint256)'](owner.address, tokenId);
       await addResources(this.token, [resId, resId2]);
       await this.token.addResourceToToken(tokenId, resId, 0);
       await this.token.addResourceToToken(tokenId, resId2, 0);
@@ -445,7 +444,7 @@ async function shouldBehaveLikeMultiResource(name: string, symbol: string) {
       const resId2 = BigNumber.from(2);
       const tokenId = 1;
 
-      await this.token.mint(owner.address, tokenId);
+      await this.token['mint(address,uint256)'](owner.address, tokenId);
       await addResources(this.token, [resId, resId2]);
       await this.token.addResourceToToken(tokenId, resId, 0);
       await this.token.acceptResource(tokenId, 0);
@@ -465,7 +464,7 @@ async function shouldBehaveLikeMultiResource(name: string, symbol: string) {
         resArr.push(BigNumber.from(i));
       }
 
-      await this.token.mint(owner.address, tokenId);
+      await this.token['mint(address,uint256)'](owner.address, tokenId);
       await addResources(this.token, resArr);
 
       for (let i = 1; i < 128; i++) {
@@ -482,7 +481,7 @@ async function shouldBehaveLikeMultiResource(name: string, symbol: string) {
       const tokenId = 1;
       const approvedAddress = addrs[1];
 
-      await this.token.mint(owner.address, tokenId);
+      await this.token['mint(address,uint256)'](owner.address, tokenId);
       await this.token.approve(approvedAddress.address, tokenId);
       await addResources(this.token, [resId, resId2]);
       await this.token.addResourceToToken(tokenId, resId, 0);
@@ -503,7 +502,7 @@ async function shouldBehaveLikeMultiResource(name: string, symbol: string) {
       const resId = BigNumber.from(1);
       const tokenId = 1;
 
-      await this.token.mint(owner.address, tokenId);
+      await this.token['mint(address,uint256)'](owner.address, tokenId);
       await addResources(this.token, [resId]);
       await this.token.addResourceToToken(tokenId, resId, 0);
       await this.token.rejectResource(tokenId, 0);
@@ -518,7 +517,7 @@ async function shouldBehaveLikeMultiResource(name: string, symbol: string) {
       const resId = BigNumber.from(1);
       const tokenId = 1;
 
-      await this.token.mint(owner.address, tokenId);
+      await this.token['mint(address,uint256)'](owner.address, tokenId);
       await addResources(this.token, [resId]);
       await this.token.addResourceToToken(tokenId, resId, 0);
 
@@ -533,7 +532,7 @@ async function shouldBehaveLikeMultiResource(name: string, symbol: string) {
     it('cannot reject non existing resource', async function () {
       const tokenId = 1;
 
-      await this.token.mint(owner.address, tokenId);
+      await this.token['mint(address,uint256)'](owner.address, tokenId);
       await expect(this.token.rejectResource(tokenId, 0)).to.be.revertedWithCustomError(
         this.token,
         'RMRKIndexOutOfRange',
@@ -605,7 +604,7 @@ async function shouldBehaveLikeMultiResource(name: string, symbol: string) {
     it('gets fallback URI if no active resources on token', async function () {
       const tokenId = 1;
       const fallBackUri = 'fallback404';
-      await this.token.mint(owner.address, tokenId);
+      await this.token['mint(address,uint256)'](owner.address, tokenId);
       await this.token.setFallbackURI(fallBackUri);
       expect(await this.token.tokenURI(tokenId)).to.eql(fallBackUri);
     });
@@ -630,7 +629,7 @@ async function shouldBehaveLikeMultiResource(name: string, symbol: string) {
       const resId = BigNumber.from(1);
       const resId2 = BigNumber.from(2);
 
-      await this.token.mint(owner.address, tokenId);
+      await this.token['mint(address,uint256)'](owner.address, tokenId);
       await this.token.addResourceEntry(resId, 'UriA', customDefault);
       await this.token.addResourceEntry(resId2, 'UriB', customDefault);
       await this.token.addResourceToToken(tokenId, resId, 0);
@@ -657,7 +656,7 @@ async function shouldBehaveLikeMultiResource(name: string, symbol: string) {
       const customDataAreaKey = 4;
       const customDataAreaValue = ethers.utils.hexZeroPad('0x00FF', 16);
 
-      await this.token.mint(owner.address, tokenId);
+      await this.token['mint(address,uint256)'](owner.address, tokenId);
       await this.token.addResourceEntry(resId, 'UriA', [
         customDataWidthKey,
         customDataHeightKey,
@@ -697,7 +696,7 @@ async function shouldBehaveLikeMultiResource(name: string, symbol: string) {
       const customDataTypeValueC = ethers.utils.hexZeroPad('0xCCCC', 16);
       const customDataOtherKey = 2;
 
-      await this.token.mint(owner.address, tokenId);
+      await this.token['mint(address,uint256)'](owner.address, tokenId);
       await this.token.addResourceEntry(resId, 'srcA', [customDataTypeKey]);
       await this.token.addResourceEntry(resId2, 'srcB', [customDataTypeKey]);
       await this.token.setCustomResourceData(resId, customDataTypeKey, customDataTypeValueA);
@@ -730,7 +729,7 @@ async function shouldBehaveLikeMultiResource(name: string, symbol: string) {
   async function addResourcesToToken(token: Contract, tokenId: number): Promise<void> {
     const resId = BigNumber.from(1);
     const resId2 = BigNumber.from(2);
-    await token.mint(owner.address, tokenId);
+    await token['mint(address,uint256)'](owner.address, tokenId);
     await addResources(token, [resId, resId2]);
     await token.addResourceToToken(tokenId, resId, 0);
     await token.addResourceToToken(tokenId, resId2, 0);

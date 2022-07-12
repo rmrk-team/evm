@@ -1,12 +1,11 @@
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
-import { RMRKEquippableMock, RMRKNestingMock } from '../typechain';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { BigNumber } from 'ethers';
+import { BigNumber, Contract } from 'ethers';
 
 describe('Equippable', async () => {
-  let chunky: RMRKNestingMock;
-  let chunkyEquip: RMRKEquippableMock;
+  let chunky: Contract;
+  let chunkyEquip: Contract;
 
   let owner: SignerWithAddress;
   let addrs: any[];
@@ -306,7 +305,7 @@ describe('Equippable', async () => {
       await addResources([resId]);
       await expect(chunkyEquip.addResourceToToken(tokenId, resId, 0)).to.be.revertedWithCustomError(
         chunky,
-        'RMRKOwnerQueryForNonexistentToken',
+        'ERC721InvalidTokenId',
       );
     });
 
@@ -745,7 +744,7 @@ describe('Equippable', async () => {
       const tokenId = 1;
       await expect(
         chunkyEquip.connect(addrs[1]).setPriority(tokenId, []),
-      ).to.be.revertedWithCustomError(chunky, 'RMRKOwnerQueryForNonexistentToken');
+      ).to.be.revertedWithCustomError(chunky, 'ERC721InvalidTokenId');
     });
   });
 

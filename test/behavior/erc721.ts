@@ -1,8 +1,8 @@
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { ERC721Mock, ERC721ReceiverMock } from '../../typechain';
-import { BigNumber, ContractTransaction } from 'ethers';
+import { ERC721Mock, ERC721ReceiverMock } from '../../typechain-types/contracts/mocks';
+import { BigNumber, Contract, ContractTransaction } from 'ethers';
 
 // Based on https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/test/token/ERC721/ERC721.behavior.js
 
@@ -11,11 +11,11 @@ async function shouldBehaveLikeERC721() {
   let approved: SignerWithAddress;
   let anotherApproved: SignerWithAddress;
   let operator: SignerWithAddress;
-  let toWhom: SignerWithAddress | ERC721ReceiverMock;
+  let toWhom: SignerWithAddress | Contract;
   let others: SignerWithAddress[];
   // let token: ERC721Mock;
   let receipt: ContractTransaction;
-  let receiver: ERC721ReceiverMock;
+  let receiver: Contract;
 
   const firstTokenId = BigNumber.from(5042);
   const secondTokenId = BigNumber.from(79217);

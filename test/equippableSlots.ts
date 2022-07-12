@@ -1,8 +1,7 @@
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
-import { RMRKBaseStorageMock, RMRKEquippableMock, RMRKNestingMock } from '../typechain';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { BigNumber } from 'ethers';
+import { BigNumber, Contract } from 'ethers';
 
 // The general idea is having these tokens: Soldier, Weapon, WeaponGem and Background.
 // Weapon and Background can be equipped into Soldier. WeaponGem can be equipped into Weapon
@@ -12,15 +11,15 @@ import { BigNumber } from 'ethers';
 // Background will have a single resource for each, it can be use as full view and to equip
 // Weapon Gems will have 2 enumerated resources, one for full view, one for equipping.
 describe('Equipping', async () => {
-  let base: RMRKBaseStorageMock;
-  let soldier: RMRKNestingMock;
-  let soldierEquip: RMRKEquippableMock;
-  let weapon: RMRKNestingMock;
-  let weaponEquip: RMRKEquippableMock;
-  let weaponGem: RMRKNestingMock;
-  let weaponGemEquip: RMRKEquippableMock;
-  let background: RMRKNestingMock;
-  let backgroundEquip: RMRKEquippableMock;
+  let base: Contract;
+  let soldier: Contract;
+  let soldierEquip: Contract;
+  let weapon: Contract;
+  let weaponEquip: Contract;
+  let weaponGem: Contract;
+  let weaponGemEquip: Contract;
+  let background: Contract;
+  let backgroundEquip: Contract;
 
   let owner: SignerWithAddress;
   let addrs: any[];

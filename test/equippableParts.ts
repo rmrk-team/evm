@@ -1,6 +1,6 @@
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
-import { RMRKBaseStorageMock, RMRKEquippableMock, RMRKNestingMock } from '../typechain';
+import { Contract } from 'ethers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { BigNumber } from 'ethers';
 
@@ -10,11 +10,11 @@ import { BigNumber } from 'ethers';
 // Neon will use a resource per token, which uses fixed parts to compose the body
 // Mask will have 2 resources per weapon, one for full view, one for equipping. Both are composed using fixed parts
 describe('Equipping', async () => {
-  let base: RMRKBaseStorageMock;
-  let neon: RMRKNestingMock;
-  let neonEquip: RMRKEquippableMock;
-  let mask: RMRKNestingMock;
-  let maskEquip: RMRKEquippableMock;
+  let base: Contract;
+  let neon: Contract;
+  let neonEquip: Contract;
+  let mask: Contract;
+  let maskEquip: Contract;
 
   let owner: SignerWithAddress;
   let addrs: any[];

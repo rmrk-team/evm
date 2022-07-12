@@ -59,7 +59,7 @@ async function shouldBehaveLikeNesting(
 
       await expect(ownerChunky.ownerOf(100)).to.be.revertedWithCustomError(
         ownerChunky,
-        'RMRKOwnerQueryForNonexistentToken',
+        'ERC721InvalidTokenId',
       );
     });
   });
@@ -132,7 +132,7 @@ async function shouldBehaveLikeNesting(
     it('cannot nest mint to a non-existent token', async function () {
       await expect(
         petMonkey['mint(address,uint256,uint256,bytes)'](ownerChunky.address, 1, 0, mintNestData),
-      ).to.be.revertedWithCustomError(petMonkey, 'RMRKOwnerQueryForNonexistentToken');
+      ).to.be.revertedWithCustomError(petMonkey, 'ERC721InvalidTokenId');
     });
 
     it('cannot nest mint already minted token', async function () {
@@ -625,7 +625,7 @@ async function shouldBehaveLikeNesting(
       await petMonkey.connect(addrs[1]).burn(tokenId);
       await expect(petMonkey.ownerOf(tokenId)).to.be.revertedWithCustomError(
         petMonkey,
-        'RMRKOwnerQueryForNonexistentToken',
+        'ERC721InvalidTokenId',
       );
     });
 
@@ -664,7 +664,7 @@ async function shouldBehaveLikeNesting(
       await petMonkey.connect(approvedAddress).burn(tokenId);
       await expect(petMonkey.ownerOf(tokenId)).to.be.revertedWithCustomError(
         petMonkey,
-        'RMRKOwnerQueryForNonexistentToken',
+        'ERC721InvalidTokenId',
       );
     });
 
@@ -684,11 +684,11 @@ async function shouldBehaveLikeNesting(
       // no owner for token
       await expect(petMonkey.ownerOf(childId)).to.be.revertedWithCustomError(
         petMonkey,
-        'RMRKOwnerQueryForNonexistentToken',
+        'ERC721InvalidTokenId',
       );
       await expect(petMonkey.rmrkOwnerOf(childId)).to.be.revertedWithCustomError(
         petMonkey,
-        'RMRKOwnerQueryForNonexistentToken',
+        'ERC721InvalidTokenId',
       );
     });
 
@@ -750,20 +750,20 @@ async function shouldBehaveLikeNesting(
 
       await expect(petMonkey.ownerOf(childId)).to.be.revertedWithCustomError(
         petMonkey,
-        'RMRKOwnerQueryForNonexistentToken',
+        'ERC721InvalidTokenId',
       );
       await expect(petMonkey.rmrkOwnerOf(childId)).to.be.revertedWithCustomError(
         petMonkey,
-        'RMRKOwnerQueryForNonexistentToken',
+        'ERC721InvalidTokenId',
       );
 
       await expect(ownerChunky.ownerOf(granchildId)).to.be.revertedWithCustomError(
         ownerChunky,
-        'RMRKOwnerQueryForNonexistentToken',
+        'ERC721InvalidTokenId',
       );
       await expect(ownerChunky.rmrkOwnerOf(granchildId)).to.be.revertedWithCustomError(
         ownerChunky,
-        'RMRKOwnerQueryForNonexistentToken',
+        'ERC721InvalidTokenId',
       );
     });
   });
@@ -837,7 +837,7 @@ async function shouldBehaveLikeNesting(
     it('cannot unnest if not child root owner', async function () {
       await expect(petMonkey.connect(addrs[2]).unnestSelf(1, 0)).to.be.revertedWithCustomError(
         petMonkey,
-        'RMRKOwnerQueryForNonexistentToken',
+        'ERC721InvalidTokenId',
       );
     });
 
@@ -845,7 +845,7 @@ async function shouldBehaveLikeNesting(
       const { childId, firstOwner } = await mintTofirstOwner(true);
       await expect(
         petMonkey.connect(firstOwner).unnestSelf(childId + 1, 0),
-      ).to.be.revertedWithCustomError(petMonkey, 'RMRKOwnerQueryForNonexistentToken');
+      ).to.be.revertedWithCustomError(petMonkey, 'ERC721InvalidTokenId');
     });
 
     it('cannot unnest token not owned by an NFT', async function () {

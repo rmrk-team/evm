@@ -1,11 +1,11 @@
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
-import { RMRKMultiResourceMock } from '../typechain';
+import { Contract } from 'ethers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import shouldBehaveLikeMultiResource from './behavior/multiresource';
 
 describe('MultiResource', async () => {
-  let token: RMRKMultiResourceMock;
+  let token: Contract;
 
   let owner: SignerWithAddress;
   let addrs: any[];
