@@ -6,7 +6,6 @@ import { BigNumber, Contract } from 'ethers';
 // TODO: Transfer - transfer now does double duty as removeChild
 
 async function shouldBehaveLikeNesting(
-  contractName: string,
   name: string,
   symbol: string,
   name2: string,
@@ -20,18 +19,13 @@ async function shouldBehaveLikeNesting(
   const mintNestData = ethers.utils.hexZeroPad('0xabcd', 8);
   const emptyData = ethers.utils.hexZeroPad('0x', 0);
 
-  before(async function () {
+  beforeEach(async function () {
     const [signersOwner, ...signersAddr] = await ethers.getSigners();
     owner = signersOwner;
     addrs = signersAddr;
-  });
 
-  beforeEach(async () => {
-    const Token = await ethers.getContractFactory(contractName);
-    ownerChunky = await Token.deploy(name, symbol);
-    await ownerChunky.deployed();
-    petMonkey = await Token.deploy(name2, symbol2);
-    await petMonkey.deployed();
+    ownerChunky = this.parentToken;
+    petMonkey = this.childToken;
 
     // Mint 20 ownerChunkys. These tests will simulate minting of petMonkeys to ownerChunkys.
     let i = 1;
