@@ -214,6 +214,14 @@ contract RMRKNesting is ERC721, IRMRKNesting {
     function transferFrom(
         address from,
         address to,
+        uint256 tokenId
+    ) public virtual override onlyApprovedOrOwner(tokenId) {
+        _transfer(from, to, tokenId, 0, "");
+    }
+
+    function transferFrom(
+        address from,
+        address to,
         uint256 tokenId,
         uint256 destinationId,
         bytes memory data

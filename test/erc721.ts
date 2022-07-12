@@ -9,11 +9,11 @@ describe('ERC721', function () {
 
   beforeEach(async function () {
     const Erc721 = await ethers.getContractFactory('ERC721Mock');
-    this.token = await Erc721.deploy(name, symbol);
-    await this.token.deployed();
-    this.name = name;
-    this.symbol = symbol;
+    const token = await Erc721.deploy(name, symbol);
+    await token.deployed();
+    this.token = token;
+    this.ERC721Receiver = await ethers.getContractFactory('ERC721ReceiverMock');
   });
 
-  shouldBehaveLikeERC721();
+  shouldBehaveLikeERC721(name, symbol);
 });

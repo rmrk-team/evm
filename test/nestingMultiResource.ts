@@ -48,7 +48,7 @@ describe('MultiResource', function () {
   shouldBehaveLikeMultiResource(name, symbol);
 });
 
-describe('Nesting', function () {
+describe('Issuer', function () {
   let owner: SignerWithAddress;
   let addrs: SignerWithAddress[];
   let ownerChunky: Contract;

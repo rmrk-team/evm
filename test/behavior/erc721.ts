@@ -1,19 +1,18 @@
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { ERC721Mock, ERC721ReceiverMock } from '../../typechain-types/contracts/mocks';
+import { ERC721ReceiverMock } from '../../typechain-types/contracts/mocks';
 import { BigNumber, Contract, ContractTransaction } from 'ethers';
 
 // Based on https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/test/token/ERC721/ERC721.behavior.js
 
-async function shouldBehaveLikeERC721() {
+async function shouldBehaveLikeERC721(name: string, symbol: string) {
   let owner: SignerWithAddress;
   let approved: SignerWithAddress;
   let anotherApproved: SignerWithAddress;
   let operator: SignerWithAddress;
   let toWhom: SignerWithAddress | Contract;
   let others: SignerWithAddress[];
-  // let token: ERC721Mock;
   let receipt: ContractTransaction;
   let receiver: Contract;
 
@@ -35,18 +34,18 @@ async function shouldBehaveLikeERC721() {
     beforeEach(async function () {
       [owner, approved, anotherApproved, operator, ...others] = await ethers.getSigners();
 
-      await this.token.mint(owner.address, firstTokenId);
-      await this.token.mint(owner.address, secondTokenId);
+      await this.token['mint(address,uint256)'](owner.address, firstTokenId);
+      await this.token['mint(address,uint256)'](owner.address, secondTokenId);
       toWhom = others[0]; // default to other for toWhom in context-dependent tests
     });
 
     describe('metadata', function () {
       it('has a name', async function () {
-        expect(await this.token.name()).to.be.equal(this.name);
+        expect(await this.token.name()).to.be.equal(name);
       });
 
       it('has a symbol', async function () {
-        expect(await this.token.symbol()).to.be.equal(this.symbol);
+        expect(await this.token.symbol()).to.be.equal(symbol);
       });
 
       describe('token URI', function () {
@@ -303,19 +302,19 @@ async function shouldBehaveLikeERC721() {
 
       describe('via transferFrom', function () {
         shouldTransferTokensByUsers(function (
-          token: ERC721Mock,
+          token: Contract,
           from: string,
           to: string,
           tokenId: BigNumber,
           user: SignerWithAddress,
         ) {
-          return token.connect(user).transferFrom(from, to, tokenId);
+          return token.connect(user)['transferFrom(address,address,uint256)'](from, to, tokenId);
         });
       });
 
       describe('via safeTransferFrom', function () {
         const safeTransferFromWithData = function (
-          token: ERC721Mock,
+          token: Contract,
           from: string,
           to: string,
           tokenId: BigNumber,
@@ -327,7 +326,7 @@ async function shouldBehaveLikeERC721() {
         };
 
         const safeTransferFromWithoutData = function (
-          token: ERC721Mock,
+          token: Contract,
           from: string,
           to: string,
           tokenId: BigNumber,
@@ -345,8 +344,7 @@ async function shouldBehaveLikeERC721() {
 
           describe('to a valid receiver contract', function () {
             beforeEach(async function () {
-              const ERC721Receiver = await ethers.getContractFactory('ERC721ReceiverMock');
-              receiver = await ERC721Receiver.deploy(RECEIVER_MAGIC_VALUE, Error.None);
+              receiver = await this.ERC721Receiver.deploy(RECEIVER_MAGIC_VALUE, Error.None);
               await receiver.deployed();
               toWhom = receiver;
             });
@@ -458,7 +456,7 @@ async function shouldBehaveLikeERC721() {
                   revertingReceiver.address,
                   tokenId,
                 ),
-            ).to.be.revertedWith('ERC721: transfer to non ERC721Receiver implementer');
+            ).to.be.revertedWithCustomError(this.token, 'ERC721TransferToNonReceiverImplementer');
           });
         });
 
@@ -491,7 +489,7 @@ async function shouldBehaveLikeERC721() {
                 nonReceiver.address,
                 tokenId,
               ),
-            ).to.be.revertedWith('ERC721: transfer to non ERC721Receiver implementer');
+            ).to.be.revertedWithCustomError(this.token, 'ERC721TransferToNonReceiverImplementer');
           });
         });
       });
@@ -573,7 +571,7 @@ async function shouldBehaveLikeERC721() {
             this.token
               .connect(owner)
               ['safeMint(address,uint256)'](revertingReceiver.address, tokenId),
-          ).to.be.revertedWith('ERC721: transfer to non ERC721Receiver implementer');
+          ).to.be.revertedWithCustomError(this.token, 'ERC721TransferToNonReceiverImplementer');
         });
       });
 
@@ -595,7 +593,7 @@ async function shouldBehaveLikeERC721() {
           const nonReceiver = this.token;
           await expect(
             this.token['safeMint(address,uint256)'](nonReceiver.address, tokenId),
-          ).to.be.revertedWith('ERC721: transfer to non ERC721Receiver implementer');
+          ).to.be.revertedWithCustomError(this.token, 'ERC721TransferToNonReceiverImplementer');
         });
       });
 
@@ -855,13 +853,13 @@ async function shouldBehaveLikeERC721() {
 
     it('reverts with a null destination address', async function () {
       await expect(
-        this.token.mint(ethers.constants.AddressZero, firstTokenId),
+        this.token['mint(address,uint256)'](ethers.constants.AddressZero, firstTokenId),
       ).to.be.revertedWithCustomError(this.token, 'ERC721MintToTheZeroAddress');
     });
 
     context('with minted token', async function () {
       beforeEach(async function () {
-        receipt = await this.token.mint(owner.address, firstTokenId);
+        receipt = await this.token['mint(address,uint256)'](owner.address, firstTokenId);
       });
 
       it('emits a Transfer event', function () {
@@ -876,7 +874,7 @@ async function shouldBehaveLikeERC721() {
       });
 
       it('reverts when adding a token id that already exists', async function () {
-        await expect(this.token.mint(owner.address, firstTokenId)).to.be.revertedWithCustomError(
+        await expect(this.token['mint(address,uint256)'](owner.address, firstTokenId)).to.be.revertedWithCustomError(
           this.token,
           'ERC721TokenAlreadyMinted',
         );
@@ -898,8 +896,8 @@ async function shouldBehaveLikeERC721() {
 
     context('with minted tokens', function () {
       beforeEach(async function () {
-        await this.token.mint(owner.address, firstTokenId);
-        await this.token.mint(owner.address, secondTokenId);
+        await this.token['mint(address,uint256)'](owner.address, firstTokenId);
+        await this.token['mint(address,uint256)'](owner.address, secondTokenId);
       });
 
       context('with burnt token', function () {
