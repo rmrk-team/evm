@@ -24,16 +24,6 @@ describe('MultiResource', async () => {
     this.token = token;
   });
 
-  describe('Init', async function () {
-    it('Name', async function () {
-      expect(await token.name()).to.equal(name);
-    });
-
-    it('Symbol', async function () {
-      expect(await token.symbol()).to.equal(symbol);
-    });
-  });
-
   describe('Issuer', async function () {
     it('can set and get issuer', async function () {
       const newIssuerAddr = addrs[1].address;
@@ -51,5 +41,5 @@ describe('MultiResource', async () => {
     });
   });
 
-  shouldBehaveLikeMultiResource();
+  shouldBehaveLikeMultiResource(name, symbol);
 });

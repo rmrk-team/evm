@@ -4,17 +4,27 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { BigNumber, Contract } from 'ethers';
 import { IRMRKMultiResource } from '../../typechain';
 
-async function shouldBehaveLikeMultiResource() {
+async function shouldBehaveLikeMultiResource(name: string, symbol: string) {
   let owner: SignerWithAddress;
   let addrs: any[];
 
   const metaURIDefault = 'metaURI';
   const customDefault: string[] = [];
 
-  beforeEach(async () => {
+  before(async () => {
     const [signersOwner, ...signersAddr] = await ethers.getSigners();
     owner = signersOwner;
     addrs = signersAddr;
+  });
+
+  describe('Init', async function () {
+    it('Name', async function () {
+      expect(await this.token.name()).to.equal(name);
+    });
+
+    it('Symbol', async function () {
+      expect(await this.token.symbol()).to.equal(symbol);
+    });
   });
 
   describe('Interface support', async function () {
