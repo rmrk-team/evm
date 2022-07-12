@@ -3,7 +3,10 @@ import { expect } from 'chai';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { BigNumber, Contract } from 'ethers';
 
-describe('Equippable', async () => {
+async function shouldBehaveLikeEquippableResources(
+  equippableContractName: string,
+  nestingContractName: string,
+) {
   let chunky: Contract;
   let chunkyEquip: Contract;
 
@@ -23,11 +26,11 @@ describe('Equippable', async () => {
     owner = signersOwner;
     addrs = signersAddr;
 
-    const CHNKY = await ethers.getContractFactory('RMRKNestingMock');
+    const CHNKY = await ethers.getContractFactory(nestingContractName);
     chunky = await CHNKY.deploy(name, symbol);
     await chunky.deployed();
 
-    const ChnkEqup = await ethers.getContractFactory('RMRKEquippableMock');
+    const ChnkEqup = await ethers.getContractFactory(equippableContractName);
     chunkyEquip = await ChnkEqup.deploy();
     chunkyEquip.setNestingAddress(chunky.address);
     await chunkyEquip.deployed();
@@ -956,4 +959,6 @@ describe('Equippable', async () => {
     await chunkyEquip.acceptResource(tokenId, 0);
     await chunkyEquip.acceptResource(tokenId, 0);
   }
-});
+}
+
+export default shouldBehaveLikeEquippableResources;

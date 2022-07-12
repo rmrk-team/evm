@@ -10,7 +10,11 @@ import { BigNumber, Contract } from 'ethers';
 // Weapon will have 2 resources per weapon, one for full view, one for equipping
 // Background will have a single resource for each, it can be use as full view and to equip
 // Weapon Gems will have 2 enumerated resources, one for full view, one for equipping.
-describe('Equipping', async () => {
+async function shouldBehaveLikeEquippableWithSlots(
+  equippableContractName: string,
+  nestingContractName: string,
+  baseContractName: string,
+) {
   let base: Contract;
   let soldier: Contract;
   let soldierEquip: Contract;
@@ -21,7 +25,6 @@ describe('Equipping', async () => {
   let background: Contract;
   let backgroundEquip: Contract;
 
-  let owner: SignerWithAddress;
   let addrs: any[];
 
   const baseSymbol = 'SSB';
@@ -68,8 +71,7 @@ describe('Equipping', async () => {
   }
 
   beforeEach(async () => {
-    const [signersOwner, ...signersAddr] = await ethers.getSigners();
-    owner = signersOwner;
+    const [, ...signersAddr] = await ethers.getSigners();
     addrs = signersAddr;
 
     await deployContracts();
@@ -567,9 +569,9 @@ describe('Equipping', async () => {
   });
 
   async function deployContracts(): Promise<void> {
-    const Base = await ethers.getContractFactory('RMRKBaseStorageMock');
-    const Nesting = await ethers.getContractFactory('RMRKNestingMock');
-    const Equip = await ethers.getContractFactory('RMRKEquippableMock');
+    const Base = await ethers.getContractFactory(baseContractName);
+    const Nesting = await ethers.getContractFactory(nestingContractName);
+    const Equip = await ethers.getContractFactory(equippableContractName);
 
     // Base
     base = await Base.deploy(baseSymbol, baseType);
@@ -874,4 +876,6 @@ describe('Equipping', async () => {
   function bn(x: number): BigNumber {
     return BigNumber.from(x);
   }
-});
+};
+
+export default shouldBehaveLikeEquippableWithSlots;

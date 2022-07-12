@@ -1,23 +1,25 @@
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
-import { Contract } from 'ethers';
+import { BigNumber, Contract } from 'ethers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { BigNumber } from 'ethers';
 
 // The general idea is having these tokens: Neon and Mask
 // Masks can be equipped into Neons.
 // All use a single base.
 // Neon will use a resource per token, which uses fixed parts to compose the body
 // Mask will have 2 resources per weapon, one for full view, one for equipping. Both are composed using fixed parts
-describe('Equipping', async () => {
+async function shouldBehaveLikeEquippableWithParts(
+  equippableContractName: string,
+  nestingContractName: string,
+  baseContractName: string,
+) {
   let base: Contract;
   let neon: Contract;
   let neonEquip: Contract;
   let mask: Contract;
   let maskEquip: Contract;
 
-  let owner: SignerWithAddress;
-  let addrs: any[];
+  let addrs: SignerWithAddress[];
 
   const baseSymbol = 'NCB';
   const baseType = 'mixed';
@@ -72,8 +74,7 @@ describe('Equipping', async () => {
   }
 
   beforeEach(async () => {
-    const [signersOwner, ...signersAddr] = await ethers.getSigners();
-    owner = signersOwner;
+    const [, ...signersAddr] = await ethers.getSigners();
     addrs = signersAddr;
 
     await deployContracts();
@@ -197,10 +198,9 @@ describe('Equipping', async () => {
 
     it('cannot get composables for neon with not associated resource', async function () {
       const wrongResId = maskResourcesEquip[1];
-      await expect(maskEquip.composeEquippables(masks[0], wrongResId)).to.be.revertedWithCustomError(
-        maskEquip,
-        'RMRKTokenDoesNotHaveActiveResource',
-      );
+      await expect(
+        maskEquip.composeEquippables(masks[0], wrongResId),
+      ).to.be.revertedWithCustomError(maskEquip, 'RMRKTokenDoesNotHaveActiveResource');
     });
 
     it('cannot get composables for mask for resource with no base', async function () {
@@ -218,17 +218,16 @@ describe('Equipping', async () => {
       );
       await maskEquip.addResourceToToken(masks[0], noBaseResourceId, 0);
       await maskEquip.connect(addrs[0]).acceptResource(masks[0], 0);
-      await expect(maskEquip.composeEquippables(masks[0], noBaseResourceId)).to.be.revertedWithCustomError(
-        maskEquip,
-        'RMRKNotComposableResource',
-      );
+      await expect(
+        maskEquip.composeEquippables(masks[0], noBaseResourceId),
+      ).to.be.revertedWithCustomError(maskEquip, 'RMRKNotComposableResource');
     });
   });
 
   async function deployContracts(): Promise<void> {
-    const Base = await ethers.getContractFactory('RMRKBaseStorageMock');
-    const Nesting = await ethers.getContractFactory('RMRKNestingMock');
-    const Equip = await ethers.getContractFactory('RMRKEquippableMock');
+    const Base = await ethers.getContractFactory(baseContractName);
+    const Nesting = await ethers.getContractFactory(nestingContractName);
+    const Equip = await ethers.getContractFactory(equippableContractName);
 
     // Base
     base = await Base.deploy(baseSymbol, baseType);
@@ -632,4 +631,6 @@ describe('Equipping', async () => {
   function bn(x: number): BigNumber {
     return BigNumber.from(x);
   }
-});
+}
+
+export default shouldBehaveLikeEquippableWithParts;
