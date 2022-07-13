@@ -8,7 +8,7 @@ import { BigNumber, Contract } from 'ethers';
 // All use a single base.
 // Soldier will use a single enumerated fixed resource for simplicity
 // Weapon will have 2 resources per weapon, one for full view, one for equipping
-// Background will have a single resource for each, it can be use as full view and to equip
+// Background will have a single resource for each, it can be used as full view and to equip
 // Weapon Gems will have 2 enumerated resources, one for full view, one for equipping.
 async function shouldBehaveLikeEquippableWithSlots(
   equippableContractName: string,
