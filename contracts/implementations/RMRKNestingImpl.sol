@@ -38,15 +38,14 @@ contract RMRKNestingImpl is OwnableLock, RMRKMintingUtils, IRMRKNestingWithEquip
         if (numToMint + _totalSupply > _maxSupply) revert RMRKMintOverMax();
 
         uint256 mintPriceRequired = numToMint * _pricePerMint;
-        if (mintPriceRequired < msg.value) revert RMRKMintUnderpriced();
+        if (mintPriceRequired != msg.value) 
+            revert RMRKMintUnderpriced();
 
         uint256 nextToken = _totalSupply+1;
         _totalSupply += numToMint;
+        uint256 totalSupplyOffset = _totalSupply+1;
 
-        /*
-        FIXME: Double check this, i inits to non-zero to avoid doubling up on the increment
-        */
-        for(uint i = nextToken; i < _totalSupply;) {
+        for(uint i = nextToken; i < totalSupplyOffset;) {
             _safeMint(to, i);
             unchecked {++i;}
         }

@@ -32,7 +32,7 @@ contract RMRKMultiResourceImpl is OwnableLock, RMRKMintingUtils, RMRKMultiResour
         if (numToMint + _totalSupply > _maxSupply) revert RMRKMintOverMax();
 
         uint256 mintPriceRequired = numToMint * _pricePerMint;
-        if (mintPriceRequired < msg.value) 
+        if (mintPriceRequired != msg.value) 
             revert RMRKMintUnderpriced();
 
         uint256 nextToken = _totalSupply+1;
