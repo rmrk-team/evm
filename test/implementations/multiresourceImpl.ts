@@ -53,8 +53,14 @@ describe.only('MultiResource', async () => {
       expect(await this.token.totalSupply()).to.equal(1);
       expect(await this.token.balanceOf(owner.address)).to.equal(1);
 
-      await expect(this.token.connect(owner).mint(owner.address, 1, {value: ONE_ETH.div(2)})).to.be.revertedWithCustomError;
-      await expect(this.token.connect(owner).mint(owner.address, 1, {value: 0})).to.be.revertedWithCustomError;
+      await expect(this.token.connect(owner).mint(owner.address, 1, {value: ONE_ETH.div(2)})).to.be.revertedWithCustomError(
+        this.token,
+        "RMRKMintUnderpriced"
+      );
+      await expect(this.token.connect(owner).mint(owner.address, 1, {value: 0})).to.be.revertedWithCustomError(
+        this.token,
+        "RMRKMintUnderpriced"
+      );
     })
 
     it('Can mint multiple tokens through sale logic', async function () {
@@ -63,8 +69,14 @@ describe.only('MultiResource', async () => {
       expect(await this.token.ownerOf(1)).to.equal(owner.address);
       expect(await this.token.totalSupply()).to.equal(10);
       expect(await this.token.balanceOf(owner.address)).to.equal(10);
-      await expect(this.token.connect(owner).mint(owner.address, 1, {value: ONE_ETH.div(2)})).to.be.revertedWithCustomError;
-      await expect(this.token.connect(owner).mint(owner.address, 1, {value: 0})).to.be.revertedWithCustomError;
+      await expect(this.token.connect(owner).mint(owner.address, 1, {value: ONE_ETH.div(2)})).to.be.revertedWithCustomError(
+        this.token,
+        "RMRKMintUnderpriced"
+      );
+      await expect(this.token.connect(owner).mint(owner.address, 1, {value: 0})).to.be.revertedWithCustomError(
+        this.token,
+        "RMRKMintUnderpriced"
+      );
     })
     
   });
