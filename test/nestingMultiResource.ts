@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { ethers } from 'hardhat';
 import { Contract } from 'ethers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import shouldBehaveLikeNesting from './behavior/nesting'
+import shouldBehaveLikeNesting from './behavior/nesting';
 import shouldBehaveLikeMultiResource from './behavior/multiresource';
 
 // TODO: Transfer - transfer now does double duty as removeChild
