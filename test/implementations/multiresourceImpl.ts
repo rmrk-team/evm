@@ -5,7 +5,7 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 
 import shouldBehaveLikeOwnableLock from '../behavior/ownableLock';
 
-describe.only('MultiResource', async () => {
+describe('MultiResource', async () => {
   let token: Contract;
 
   let owner: SignerWithAddress;
