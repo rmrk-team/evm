@@ -415,12 +415,12 @@ async function shouldBehaveLikeEquippableResources(
     });
 
     // approved not implemented yet
-    it.skip('can accept resource if approved', async function () {
+    it('can accept resource if approved', async function () {
       const resId = BigNumber.from(1);
       const tokenId = 1;
       const approvedAddress = addrs[1];
       await chunky['mint(address,uint256)'](owner.address, tokenId);
-      await chunky.approve(approvedAddress.address, tokenId);
+      await chunkyEquip.approveForResources(approvedAddress.address, tokenId);
       await addResources([resId]);
 
       await chunkyEquip.addResourceToToken(tokenId, resId, 0);
@@ -553,14 +553,13 @@ async function shouldBehaveLikeEquippableResources(
       expect(await chunkyEquip.getResourceOverwrites(tokenId, resId2)).to.eql(BigNumber.from(0));
     });
 
-    // FIXME: approve not implemented yet
-    it.skip('can reject resource if approved', async function () {
+    it('can reject resource if approved', async function () {
       const resId = BigNumber.from(1);
       const approvedAddress = addrs[1];
       const tokenId = 1;
 
       await chunky['mint(address,uint256)'](owner.address, tokenId);
-      await chunky.approve(approvedAddress.address, tokenId);
+      await chunkyEquip.approveForResources(approvedAddress.address, tokenId);
       await addResources([resId]);
       await chunkyEquip.addResourceToToken(tokenId, resId, 0);
 
@@ -629,15 +628,14 @@ async function shouldBehaveLikeEquippableResources(
       expect(await chunkyEquip.getResourceOverwrites(1, 2)).to.eql(BigNumber.from(0));
     });
 
-    // FIXME: approve not implemented yet
-    it.skip('can reject all resources if approved', async function () {
+    it('can reject all resources if approved', async function () {
       const resId = BigNumber.from(1);
       const resId2 = BigNumber.from(2);
       const tokenId = 1;
       const approvedAddress = addrs[1];
 
       await chunky['mint(address,uint256)'](owner.address, tokenId);
-      await chunky.approve(approvedAddress.address, tokenId);
+      await chunkyEquip.approveForResources(approvedAddress.address, tokenId);
       await addResources([resId, resId2]);
       await chunkyEquip.addResourceToToken(tokenId, resId, 0);
       await chunkyEquip.addResourceToToken(tokenId, resId2, 0);
@@ -707,13 +705,12 @@ async function shouldBehaveLikeEquippableResources(
       expect(await chunkyEquip.getActiveResourcePriorities(tokenId)).to.be.eql([2, 1]);
     });
 
-    // FIXME: approve not implemented yet
-    it.skip('can set and get priorities if approved', async function () {
+    it('can set and get priorities if approved', async function () {
       const tokenId = 1;
       const approvedAddress = addrs[1];
 
       await addResourcesToToken(tokenId);
-      await chunky.approve(approvedAddress.address, tokenId);
+      await chunkyEquip.approveForResources(approvedAddress.address, tokenId);
 
       expect(await chunkyEquip.getActiveResourcePriorities(tokenId)).to.be.eql([0, 0]);
       await expect(chunkyEquip.connect(approvedAddress).setPriority(tokenId, [2, 1]))
