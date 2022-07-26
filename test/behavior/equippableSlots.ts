@@ -515,7 +515,7 @@ async function shouldBehaveLikeEquippableWithSlots(
     });
   });
 
-  describe.only('Transfer equipped', async function () {
+  describe('Transfer equipped', async function () {
       /*
       This test fails for now -- implementing channel from child to childEquippable,
       after which the revert may not even be necessary. Revert must also be implemented
