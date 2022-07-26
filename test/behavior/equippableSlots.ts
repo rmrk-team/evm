@@ -515,12 +515,15 @@ async function shouldBehaveLikeEquippableWithSlots(
     });
   });
 
-  describe('Transfer equipped', async function () {
+  describe.only('Transfer equipped', async function () {
       /*
       This test fails for now -- implementing channel from child to childEquippable,
       after which the revert may not even be necessary. Revert must also be implemented
       from top-level via nestingImpl override of unnestSelf() since it must be triggered
       by the unnest call. Error does not yet exist, first securing markEquipped() channel.
+
+      It says the target contract doesn't have a custom error 'RMRKNotNesting', meaning
+      that while it's defined, it's not implemented yet.
       */
     it('Unnest fails if self is equipped', async function() {
       // Weapon is child on index 0
