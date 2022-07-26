@@ -36,7 +36,7 @@ async function shouldBehaveLikeMultiResource(name: string, symbol: string) {
     });
 
     it('can support IMultiResource', async function () {
-      expect(await this.token.supportsInterface('0xb925bcaf')).to.equal(true);
+      expect(await this.token.supportsInterface('0x4d6339c8')).to.equal(true);
     });
 
     it('cannot support other interfaceId', async function () {
@@ -270,7 +270,7 @@ async function shouldBehaveLikeMultiResource(name: string, symbol: string) {
       const tokenId = 1;
       const approvedAddress = addrs[1];
       await this.token['mint(address,uint256)'](owner.address, tokenId);
-      await this.token.approve(approvedAddress.address, tokenId);
+      await this.token.approveForResources(approvedAddress.address, tokenId);
       await addResources(this.token, [resId]);
 
       await this.token.addResourceToToken(tokenId, resId, 0);
@@ -295,7 +295,21 @@ async function shouldBehaveLikeMultiResource(name: string, symbol: string) {
       );
     });
 
-    it('cannot accept resource if not owner', async function () {
+    it('cannot accept resource if not owner or approved', async function () {
+      const resId = BigNumber.from(1);
+      const tokenId = 1;
+      const approvedAddress = addrs[1];
+      await this.token['mint(address,uint256)'](owner.address, tokenId);
+      await this.token.approve(approvedAddress.address, tokenId);
+      await addResources(this.token, [resId]);
+
+      await this.token.addResourceToToken(tokenId, resId, 0);
+      await expect(
+        this.token.connect(addrs[1]).acceptResource(tokenId, 0),
+      ).to.be.revertedWithCustomError(this.token, 'RMRKNotApprovedForResourcesOrOwner');
+    });
+
+    it('cannot accept resource if not approved for resource', async function () {
       const resId = BigNumber.from(1);
       const tokenId = 1;
 
@@ -304,7 +318,7 @@ async function shouldBehaveLikeMultiResource(name: string, symbol: string) {
       await this.token.addResourceToToken(tokenId, resId, 0);
       await expect(
         this.token.connect(addrs[1]).acceptResource(tokenId, 0),
-      ).to.be.revertedWithCustomError(this.token, 'ERC721NotApprovedOrOwner');
+      ).to.be.revertedWithCustomError(this.token, 'RMRKNotApprovedForResourcesOrOwner');
     });
 
     it('cannot accept non existing resource', async function () {
@@ -409,7 +423,7 @@ async function shouldBehaveLikeMultiResource(name: string, symbol: string) {
       const tokenId = 1;
 
       await this.token['mint(address,uint256)'](owner.address, tokenId);
-      await this.token.approve(approvedAddress.address, tokenId);
+      await this.token.approveForResources(approvedAddress.address, tokenId);
       await addResources(this.token, [resId]);
       await this.token.addResourceToToken(tokenId, resId, 0);
 
@@ -482,7 +496,7 @@ async function shouldBehaveLikeMultiResource(name: string, symbol: string) {
       const approvedAddress = addrs[1];
 
       await this.token['mint(address,uint256)'](owner.address, tokenId);
-      await this.token.approve(approvedAddress.address, tokenId);
+      await this.token.approveForResources(approvedAddress.address, tokenId);
       await addResources(this.token, [resId, resId2]);
       await this.token.addResourceToToken(tokenId, resId, 0);
       await this.token.addResourceToToken(tokenId, resId2, 0);
@@ -523,10 +537,10 @@ async function shouldBehaveLikeMultiResource(name: string, symbol: string) {
 
       await expect(
         this.token.connect(addrs[1]).rejectResource(tokenId, 0),
-      ).to.be.revertedWithCustomError(this.token, 'ERC721NotApprovedOrOwner');
+      ).to.be.revertedWithCustomError(this.token, 'RMRKNotApprovedForResourcesOrOwner');
       await expect(
         this.token.connect(addrs[1]).rejectAllResources(tokenId),
-      ).to.be.revertedWithCustomError(this.token, 'ERC721NotApprovedOrOwner');
+      ).to.be.revertedWithCustomError(this.token, 'RMRKNotApprovedForResourcesOrOwner');
     });
 
     it('cannot reject non existing resource', async function () {
@@ -557,7 +571,7 @@ async function shouldBehaveLikeMultiResource(name: string, symbol: string) {
       const approvedAddress = addrs[1];
 
       await addResourcesToToken(this.token, tokenId);
-      await this.token.approve(approvedAddress.address, tokenId);
+      await this.token.approveForResources(approvedAddress.address, tokenId);
 
       expect(await this.token.getActiveResourcePriorities(tokenId)).to.be.eql([0, 0]);
       await expect(this.token.connect(approvedAddress).setPriority(tokenId, [2, 1]))
@@ -571,7 +585,7 @@ async function shouldBehaveLikeMultiResource(name: string, symbol: string) {
       await addResourcesToToken(this.token, tokenId);
       await expect(
         this.token.connect(addrs[1]).setPriority(tokenId, [2, 1]),
-      ).to.be.revertedWithCustomError(this.token, 'ERC721NotApprovedOrOwner');
+      ).to.be.revertedWithCustomError(this.token, 'RMRKNotApprovedForResourcesOrOwner');
     });
 
     it('cannot set different number of priorities', async function () {

@@ -454,7 +454,7 @@ async function shouldBehaveLikeEquippableResources(
       await chunkyEquip.addResourceToToken(tokenId, resId, 0);
       await expect(
         chunkyEquip.connect(addrs[1]).acceptResource(tokenId, 0),
-      ).to.be.revertedWithCustomError(chunkyEquip, 'ERC721NotApprovedOrOwner');
+      ).to.be.revertedWithCustomError(chunkyEquip, 'RMRKNotApprovedForResourcesOrOwner');
     });
 
     it('cannot accept non existing resource', async function () {
@@ -678,10 +678,10 @@ async function shouldBehaveLikeEquippableResources(
 
       await expect(
         chunkyEquip.connect(addrs[1]).rejectResource(tokenId, 0),
-      ).to.be.revertedWithCustomError(chunkyEquip, 'ERC721NotApprovedOrOwner');
+      ).to.be.revertedWithCustomError(chunkyEquip, 'RMRKNotApprovedForResourcesOrOwner');
       await expect(
         chunkyEquip.connect(addrs[1]).rejectAllResources(tokenId),
-      ).to.be.revertedWithCustomError(chunkyEquip, 'ERC721NotApprovedOrOwner');
+      ).to.be.revertedWithCustomError(chunkyEquip, 'RMRKNotApprovedForResourcesOrOwner');
     });
 
     it('cannot reject non existing resource', async function () {
@@ -727,7 +727,7 @@ async function shouldBehaveLikeEquippableResources(
       await addResourcesToToken(tokenId);
       await expect(
         chunkyEquip.connect(addrs[1]).setPriority(tokenId, [2, 1]),
-      ).to.be.revertedWithCustomError(chunkyEquip, 'ERC721NotApprovedOrOwner');
+      ).to.be.revertedWithCustomError(chunkyEquip, 'RMRKNotApprovedForResourcesOrOwner');
     });
 
     it('cannot set different number of priorities', async function () {

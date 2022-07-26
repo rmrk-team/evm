@@ -103,6 +103,21 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
         _;
     }
 
+    function _isApprovedForResourcesOrOwner(address user, uint256 tokenId) internal view virtual returns (bool) {
+        address owner = _ownerOf(tokenId);
+        return (user == owner || isApprovedForAllForResources(owner, user) || getApprovedForResources(tokenId) == user);
+    }
+
+    function _onlyApprovedForResourcesOrOwner(uint256 tokenId) private view {
+        if(!_isApprovedForResourcesOrOwner(_msgSender(), tokenId))
+            revert RMRKNotApprovedForResourcesOrOwner();
+    }
+
+    modifier onlyApprovedForResourcesOrOwner(uint256 tokenId) {
+        _onlyApprovedForResourcesOrOwner(tokenId);
+        _;
+    }
+
     function _setNestingAddress(address nestingAddress) internal {
         _nestingAddress = nestingAddress;
     }
@@ -334,31 +349,27 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
     function acceptResource(
         uint256 tokenId,
         uint256 index
-    ) external virtual onlyTokenOwner(tokenId) {
-        // FIXME: clean approvals and test
+    ) external virtual onlyApprovedForResourcesOrOwner(tokenId) {
         _acceptResource(tokenId, index);
     }
 
     function rejectResource(
         uint256 tokenId,
         uint256 index
-    ) external virtual onlyTokenOwner(tokenId) {
-        // FIXME: clean approvals and test
+    ) external virtual onlyApprovedForResourcesOrOwner(tokenId) {
         _rejectResource(tokenId, index);
     }
 
     function rejectAllResources(
         uint256 tokenId
-    ) external virtual onlyTokenOwner(tokenId) {
-        // FIXME: clean approvals and test
+    ) external virtual onlyApprovedForResourcesOrOwner(tokenId) {
         _rejectAllResources(tokenId);
     }
 
     function setPriority(
         uint256 tokenId,
         uint16[] memory priorities
-    ) external virtual onlyTokenOwner(tokenId) {
-        // FIXME: clean approvals and test
+    ) external virtual onlyApprovedForResourcesOrOwner(tokenId) {
         _setPriority(tokenId, priorities);
     }
 
@@ -447,5 +458,24 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
         }
 
         return extendedResources;
+    }
+
+    // Approvals
+
+    function approveForResources(address to, uint256 tokenId) external virtual {
+        address owner = _ownerOf(tokenId);
+        if(to == owner)
+            revert RMRKApprovalForResourcesToCurrentOwner();
+
+        if(_msgSender() != owner && !isApprovedForAllForResources(owner, _msgSender()))
+            revert RMRKApproveForResourcesCallerIsNotOwnerNorApprovedForAll();
+        _approveForResources(owner, to, tokenId);
+    }
+
+    function setApprovalForAllForResources(address operator, bool approved) external virtual {
+        address owner = _msgSender();
+        if(owner == operator)
+            revert RMRKApproveForResourcesToCaller();
+        _setApprovalForAllForResources(owner, operator, approved);
     }
 }
