@@ -29,6 +29,7 @@ error RMRKNotComposableResource();
 error RMRKNotEquipped();
 error RMRKSlotAlreadyUsed();
 error RMRKTokenDoesNotHaveActiveResource();
+error RMRKNotNesting();
 
 contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
 
@@ -98,8 +99,17 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
         if(_msgSender() != _ownerOf(tokenId)) revert ERC721NotApprovedOrOwner();
     }
 
+    function _onlyNesting() internal view {
+        if(_msgSender() != _nestingAddress) revert RMRKNotNesting();
+    }
+
     modifier onlyTokenOwner(uint256 tokenId) {
         _onlyTokenOwner(tokenId);
+        _;
+    }
+
+    modifier onlyNesting() {
+        _onlyNesting();
         _;
     }
 

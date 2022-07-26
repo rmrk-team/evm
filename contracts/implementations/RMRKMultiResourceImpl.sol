@@ -76,9 +76,8 @@ contract RMRKMultiResourceImpl is OwnableLock, RMRKMintingUtils, RMRKMultiResour
         string memory metadataURI,
         uint128[] memory custom
     ) external onlyOwner {
-        uint64 nextId = uint64(_totalResources);
         unchecked {_totalResources += 1;}
-        _addResourceEntry(nextId, metadataURI, custom);
+        _addResourceEntry(uint64(_totalResources), metadataURI, custom);
     }
 
     function setCustomResourceData(

@@ -515,6 +515,27 @@ async function shouldBehaveLikeEquippableWithSlots(
     });
   });
 
+  describe('Transfer equipped', async function () {
+      /*
+      This test fails for now -- implementing channel from child to childEquippable,
+      after which the revert may not even be necessary. Revert must also be implemented
+      from top-level via nestingImpl override of unnestSelf() since it must be triggered
+      by the unnest call. Error does not yet exist, first securing markEquipped() channel.
+      */
+    it('Unnest fails if self is equipped', async function() {
+      // Weapon is child on index 0
+      const childIndex = 0;
+      const weaponResId = weaponResourcesEquip[0]; // This resource is assigned to weapon first weapon
+      await soldierEquip
+        .connect(addrs[0])
+        .equip(soldiers[0], soldierResId, partIdForWeapon, childIndex, weaponResId);
+
+      await expect(
+        weapon.connect(addrs[0]).unnestSelf(11, 0),
+      ).to.be.revertedWithCustomError(weaponEquip, 'RMRKNotNesting');
+    });
+  });
+
   describe('Compose', async function () {
     it('can get composables for soldier', async function () {
       const childIndex = 0;
