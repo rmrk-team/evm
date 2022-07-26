@@ -94,12 +94,13 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
         return IRMRKNesting(_nestingAddress).ownerOf(tokenId);
     }
 
-    function _onlyTokenOwner(uint tokenId) internal view {
+    function _onlyOwnerOrApproved(uint tokenId) internal view {
+        // FIXME: This should call also checked for approvals, maybe we need to add a method to check it to IRMRKNestingWithEquippable
         if(_msgSender() != _ownerOf(tokenId)) revert ERC721NotApprovedOrOwner();
     }
 
-    modifier onlyTokenOwner(uint256 tokenId) {
-        _onlyTokenOwner(tokenId);
+    modifier onlyOwnerOrApproved(uint256 tokenId) {
+        _onlyOwnerOrApproved(tokenId);
         _;
     }
 
@@ -139,7 +140,7 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
         uint64 slotPartId,
         uint256 childIndex,
         uint64 childResourceId
-    ) external onlyTokenOwner(tokenId) {
+    ) external onlyOwnerOrApproved(tokenId) {
         _equip(tokenId, resourceId, slotPartId, childIndex, childResourceId);
     }
 
@@ -179,7 +180,7 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
         uint256 tokenId,
         uint64 resourceId,
         uint64 slotPartId
-    ) external onlyTokenOwner(tokenId) {
+    ) external onlyOwnerOrApproved(tokenId) {
         _unequip(tokenId, resourceId, slotPartId);
     }
 
@@ -203,7 +204,7 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
         uint64 slotPartId,
         uint256 childIndex,
         uint64 childResourceId
-    ) external onlyTokenOwner(tokenId) {
+    ) external onlyOwnerOrApproved(tokenId) {
         _unequip(tokenId, resourceId, slotPartId);
         _equip(tokenId, resourceId, slotPartId, childIndex, childResourceId);
     }
