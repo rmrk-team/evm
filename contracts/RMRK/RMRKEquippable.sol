@@ -95,8 +95,8 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
     }
 
     function _onlyOwnerOrApproved(uint tokenId) internal view {
-        // FIXME: This should call also checked for approvals, maybe we need to add a method to check it to IRMRKNestingWithEquippable
-        if(_msgSender() != _ownerOf(tokenId)) revert ERC721NotApprovedOrOwner();
+        if (!IRMRKNestingWithEquippable(_nestingAddress).isApprovedOrOwner(_msgSender(), tokenId))
+            revert ERC721NotApprovedOrOwner();
     }
 
     modifier onlyOwnerOrApproved(uint256 tokenId) {

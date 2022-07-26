@@ -11,4 +11,5 @@ interface IRMRKNestingWithEquippable {
 
     function getEquippablesAddress() external view returns (address);
 
+    function isApprovedOrOwner(address spender, uint256 tokenId) external view returns (bool);
 }

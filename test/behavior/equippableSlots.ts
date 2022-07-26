@@ -199,6 +199,31 @@ async function shouldBehaveLikeEquippableWithSlots(
       expect(await weaponEquip.isEquipped(weapons[0])).to.eql(true);
     });
 
+    it('can equip weapon if approved', async function () {
+      // Weapon is child on index 0, background on index 1
+      const approved = addrs[1];
+      const childIndex = 0;
+      const weaponResId = weaponResourcesEquip[0]; // This resource is assigned to weapon first weapon
+      await soldier.connect(addrs[0]).approve(approved.address, soldiers[0]);
+      await soldierEquip
+        .connect(approved)
+        .equip(soldiers[0], soldierResId, partIdForWeapon, childIndex, weaponResId);
+      // All part slots are included on the response:
+      const expectedSlots = [bn(partIdForWeapon), bn(partIdForBackground)];
+      // If a slot has nothing equipped, it returns an empty equip:
+      const expectedEquips = [
+        [bn(soldierResId), bn(weaponResId), bn(weapons[0]), weaponEquip.address],
+        [bn(0), bn(0), bn(0), ethers.constants.AddressZero],
+      ];
+      expect(await soldierEquip.getEquipped(soldiers[0], soldierResId)).to.eql([
+        expectedSlots,
+        expectedEquips,
+      ]);
+
+      // Child is marked as equipped:
+      expect(await weaponEquip.isEquipped(weapons[0])).to.eql(true);
+    });
+
     it('can equip weapon and background', async function () {
       // Weapon is child on index 0, background on index 1
       const weaponChildIndex = 0;
