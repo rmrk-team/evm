@@ -22,7 +22,7 @@ async function main() {
     name: 'RMRK MR',
     symbol: 'RMRK',
     maxSupply: 100000, // supply
-    pricePerMint: 1, // in WEI
+    pricePerMint: 0, // in WEI
   };
 
   const rmrkMultiResource = await RMRKMultiResourceImpl.deploy(

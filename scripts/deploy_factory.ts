@@ -3,7 +3,8 @@
 //
 // When running the script with `npx hardhat run <script>` you'll find the Hardhat
 // Runtime Environment's members available in the global scope.
-import { ethers } from 'hardhat';
+import { ethers, run } from 'hardhat';
+import { Signer } from 'ethers';
 
 async function main() {
   // Hardhat always runs the compile task when running scripts with its command
@@ -12,14 +13,21 @@ async function main() {
   // If this script is run directly using `node` you may want to call compile
   // manually to make sure everything is compiled
   // await hre.run('compile');
+  const accounts: Signer[] = await ethers.getSigners();
+  console.log('Deployer address: ' + (await accounts[0].getAddress()));
 
   // We get the contract to deploy
-  const Greeter = await ethers.getContractFactory('Greeter');
-  const greeter = await Greeter.deploy('Hello, Hardhat!');
+  const RMRKFactory = await ethers.getContractFactory('RMRKFactory');
+  const rmrkFactory = await RMRKFactory.deploy();
+  await rmrkFactory.deployed();
 
-  await greeter.deployed();
+  console.log('RMRK Factory deployed to:', rmrkFactory.address);
 
-  console.log('Greeter deployed to:', greeter.address);
+  console.log('Etherscan contract verification starting now.');
+  await run('verify:verify', {
+    address: rmrkFactory.address,
+    constructorArguments: [],
+  });
 }
 
 // We recommend this pattern to be able to use async/await everywhere
