@@ -280,6 +280,21 @@ async function shouldBehaveLikeMultiResource(name: string, symbol: string) {
       expect(pending).to.be.eql([]);
     });
 
+    it('can accept resource if approved for all', async function () {
+      const resId = BigNumber.from(1);
+      const tokenId = 1;
+      const approvedAddress = addrs[1];
+      await this.token['mint(address,uint256)'](owner.address, tokenId);
+      await this.token.setApprovalForAllForResources(approvedAddress.address, true);
+      await addResources(this.token, [resId]);
+
+      await this.token.addResourceToToken(tokenId, resId, 0);
+      await this.token.connect(approvedAddress).acceptResource(tokenId, 0);
+
+      const pending = await this.token.getFullPendingResources(tokenId);
+      expect(pending).to.be.eql([]);
+    });
+
     it('cannot accept resource twice', async function () {
       const resId = BigNumber.from(1);
       const tokenId = 1;
@@ -435,6 +450,24 @@ async function shouldBehaveLikeMultiResource(name: string, symbol: string) {
       expect(accepted).to.be.eql([]);
     });
 
+    it('can reject resource if approved for all', async function () {
+      const resId = BigNumber.from(1);
+      const approvedAddress = addrs[1];
+      const tokenId = 1;
+
+      await this.token['mint(address,uint256)'](owner.address, tokenId);
+      await this.token.setApprovalForAllForResources(approvedAddress.address, true);
+      await addResources(this.token, [resId]);
+      await this.token.addResourceToToken(tokenId, resId, 0);
+
+      await expect(this.token.rejectResource(tokenId, 0)).to.emit(this.token, 'ResourceRejected');
+
+      const pending = await this.token.getFullPendingResources(tokenId);
+      expect(pending).to.be.eql([]);
+      const accepted = await this.token.getFullResources(tokenId);
+      expect(accepted).to.be.eql([]);
+    });
+
     it('can reject all resources', async function () {
       const resId = BigNumber.from(1);
       const resId2 = BigNumber.from(2);
@@ -512,6 +545,29 @@ async function shouldBehaveLikeMultiResource(name: string, symbol: string) {
       expect(accepted).to.be.eql([]);
     });
 
+    it('can reject all resources if approved for all', async function () {
+      const resId = BigNumber.from(1);
+      const resId2 = BigNumber.from(2);
+      const tokenId = 1;
+      const approvedAddress = addrs[1];
+
+      await this.token['mint(address,uint256)'](owner.address, tokenId);
+      await this.token.setApprovalForAllForResources(approvedAddress.address, true);
+      await addResources(this.token, [resId, resId2]);
+      await this.token.addResourceToToken(tokenId, resId, 0);
+      await this.token.addResourceToToken(tokenId, resId2, 0);
+
+      await expect(this.token.connect(approvedAddress).rejectAllResources(tokenId)).to.emit(
+        this.token,
+        'ResourceRejected',
+      );
+
+      const pending = await this.token.getFullPendingResources(tokenId);
+      expect(pending).to.be.eql([]);
+      const accepted = await this.token.getFullResources(tokenId);
+      expect(accepted).to.be.eql([]);
+    });
+
     it('cannot reject resource twice', async function () {
       const resId = BigNumber.from(1);
       const tokenId = 1;
@@ -572,6 +628,20 @@ async function shouldBehaveLikeMultiResource(name: string, symbol: string) {
 
       await addResourcesToToken(this.token, tokenId);
       await this.token.approveForResources(approvedAddress.address, tokenId);
+
+      expect(await this.token.getActiveResourcePriorities(tokenId)).to.be.eql([0, 0]);
+      await expect(this.token.connect(approvedAddress).setPriority(tokenId, [2, 1]))
+        .to.emit(this.token, 'ResourcePrioritySet')
+        .withArgs(tokenId);
+      expect(await this.token.getActiveResourcePriorities(tokenId)).to.be.eql([2, 1]);
+    });
+
+    it('can set and get priorities if approved for all', async function () {
+      const tokenId = 1;
+      const approvedAddress = addrs[1];
+
+      await addResourcesToToken(this.token, tokenId);
+      await this.token.setApprovalForAllForResources(approvedAddress.address, true);
 
       expect(await this.token.getActiveResourcePriorities(tokenId)).to.be.eql([0, 0]);
       await expect(this.token.connect(approvedAddress).setPriority(tokenId, [2, 1]))
