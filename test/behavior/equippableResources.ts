@@ -952,6 +952,29 @@ async function shouldBehaveLikeEquippableResources(
         ethers.constants.AddressZero,
       );
     });
+
+    it('cleans token and resources approvals on burn', async function () {
+      const tokenId = 1;
+      const tokenOwner = addrs[1];
+      const approved = addrs[3];
+      await chunky['mint(address,uint256)'](tokenOwner.address, tokenId);
+      await chunky.connect(tokenOwner).approve(approved.address, tokenId);
+      await chunkyEquip.connect(tokenOwner).approveForResources(approved.address, tokenId);
+
+      expect(await chunky.getApproved(tokenId)).to.eql(approved.address);
+      expect(await chunkyEquip.getApprovedForResources(tokenId)).to.eql(approved.address);
+
+      await chunky.connect(tokenOwner).burn(tokenId);
+
+      await expect(chunky.getApproved(tokenId)).to.be.revertedWithCustomError(
+        chunky,
+        'ERC721InvalidTokenId',
+      );
+      // FIXME: This should be consistent (i.e. revert)
+      expect(await chunkyEquip.getApprovedForResources(tokenId)).to.eql(
+        ethers.constants.AddressZero,
+      );
+    });
   });
 
   async function addResources(ids: BigNumber[]): Promise<void> {
