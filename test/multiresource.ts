@@ -14,7 +14,7 @@ describe('MultiResource', async () => {
   const name = 'RmrkTest';
   const symbol = 'RMRKTST';
 
-  async function deployRmrkMultiResourceMock() {
+  async function deployRmrkMultiResourceMockFixture() {
     const [signersOwner, ...signersAddr] = await ethers.getSigners();
     const Token = await ethers.getContractFactory('RMRKMultiResourceMock');
     token = await Token.deploy(name, symbol);
@@ -23,7 +23,9 @@ describe('MultiResource', async () => {
   }
 
   beforeEach(async function () {
-    const { token, signersOwner, signersAddr } = await loadFixture(deployRmrkMultiResourceMock);
+    const { token, signersOwner, signersAddr } = await loadFixture(
+      deployRmrkMultiResourceMockFixture,
+    );
     owner = signersOwner;
     addrs = signersAddr;
     this.token = token;
