@@ -28,7 +28,7 @@ describe('MultiResource', async () => {
     addrs = signersAddr;
   });
 
-  describe.only('Deployment', async function () {
+  describe('Deployment', async function () {
     beforeEach(async function () {
       const { token } = await loadFixture(deployMultiResourceFixture);
       this.token = token;

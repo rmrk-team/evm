@@ -2,6 +2,7 @@ import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { BigNumber, Contract } from 'ethers';
+import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 
 async function shouldBehaveLikeEquippableResources(
   equippableContractName: string,
@@ -21,19 +22,26 @@ async function shouldBehaveLikeEquippableResources(
   const baseAddressDefault = ethers.constants.AddressZero;
   const customDefault: string[] = [];
 
+  async function deployTokensFixture() {
+    const CHNKY = await ethers.getContractFactory(nestingContractName);
+    const chunkyContract = await CHNKY.deploy(name, symbol);
+    await chunkyContract.deployed();
+
+    const ChnkEqup = await ethers.getContractFactory(equippableContractName);
+    const chunkyEquipContract = await ChnkEqup.deploy();
+    chunkyEquipContract.setNestingAddress(chunkyContract.address);
+    await chunkyEquipContract.deployed();
+
+    return { chunkyContract, chunkyEquipContract };
+  }
+
   beforeEach(async () => {
     const [signersOwner, ...signersAddr] = await ethers.getSigners();
     owner = signersOwner;
     addrs = signersAddr;
-
-    const CHNKY = await ethers.getContractFactory(nestingContractName);
-    chunky = await CHNKY.deploy(name, symbol);
-    await chunky.deployed();
-
-    const ChnkEqup = await ethers.getContractFactory(equippableContractName);
-    chunkyEquip = await ChnkEqup.deploy();
-    chunkyEquip.setNestingAddress(chunky.address);
-    await chunkyEquip.deployed();
+    const { chunkyContract, chunkyEquipContract } = await loadFixture(deployTokensFixture);
+    chunky = chunkyContract;
+    chunkyEquip = chunkyEquipContract;
   });
 
   describe('Init', async function () {
