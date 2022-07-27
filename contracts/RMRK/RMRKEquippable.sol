@@ -29,6 +29,7 @@ error RMRKNotComposableResource();
 error RMRKNotEquipped();
 error RMRKSlotAlreadyUsed();
 error RMRKTokenDoesNotHaveActiveResource();
+error RMRKNotNesting();
 
 contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
 
@@ -116,6 +117,13 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
 
     modifier onlyApprovedForResourcesOrOwner(uint256 tokenId) {
         _onlyApprovedForResourcesOrOwner(tokenId);
+
+    function _onlyNesting() internal view {
+        if(_msgSender() != _nestingAddress) revert RMRKNotNesting();
+    }
+
+    modifier onlyNesting() {
+        _onlyNesting();
         _;
     }
 

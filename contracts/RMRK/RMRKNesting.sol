@@ -27,7 +27,6 @@ error RMRKUnnestForNonexistentToken();
 error RMRKUnnestForNonNftParent();
 error RMRKUnnestFromWrongChild();
 
-
 contract RMRKNesting is ERC721, IRMRKNesting {
 
     using RMRKLib for uint256;

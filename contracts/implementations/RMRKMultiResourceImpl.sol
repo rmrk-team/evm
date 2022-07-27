@@ -13,6 +13,13 @@ error RMRKMintZero();
 
 contract RMRKMultiResourceImpl is OwnableLock, RMRKMintingUtils, RMRKMultiResource {
 
+    /*
+    Top-level structures
+    */
+
+    // Manage resources via increment
+    uint256 private _totalResources;
+
     constructor(
         string memory name,
         string memory symbol,
@@ -66,11 +73,11 @@ contract RMRKMultiResourceImpl is OwnableLock, RMRKMintingUtils, RMRKMultiResour
     }
 
     function addResourceEntry(
-        uint64 id,
         string memory metadataURI,
         uint128[] memory custom
     ) external onlyOwner {
-        _addResourceEntry(id, metadataURI, custom);
+        unchecked {_totalResources += 1;}
+        _addResourceEntry(uint64(_totalResources), metadataURI, custom);
     }
 
     function setCustomResourceData(
@@ -93,6 +100,10 @@ contract RMRKMultiResourceImpl is OwnableLock, RMRKMintingUtils, RMRKMultiResour
         uint256 index
     ) external onlyOwner {
         _removeCustomDataFromResource(resourceId, index);
+    }
+
+    function totalResources() external view returns(uint256) {
+        return _totalResources;
     }
 
 }
