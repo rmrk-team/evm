@@ -117,6 +117,8 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
 
     modifier onlyApprovedForResourcesOrOwner(uint256 tokenId) {
         _onlyApprovedForResourcesOrOwner(tokenId);
+        _;
+    }
 
     function _onlyNesting() internal view {
         if(_msgSender() != _nestingAddress) revert RMRKNotNesting();
