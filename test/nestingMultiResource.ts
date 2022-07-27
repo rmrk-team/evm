@@ -4,6 +4,7 @@ import { Contract } from 'ethers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import shouldBehaveLikeNesting from './behavior/nesting';
 import shouldBehaveLikeMultiResource from './behavior/multiresource';
+import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 
 // TODO: Transfer - transfer now does double duty as removeChild
 
@@ -17,15 +18,21 @@ describe('Nesting', function () {
   const name2 = 'petMonkey';
   const symbol2 = 'MONKE';
 
-  beforeEach(async function () {
+  async function deployTokensFixture() {
     const CHNKY = await ethers.getContractFactory('RMRKNestingMultiResourceMock');
     ownerChunky = await CHNKY.deploy(name, symbol);
     await ownerChunky.deployed();
-    this.parentToken = ownerChunky;
 
     const MONKY = await ethers.getContractFactory('RMRKNestingMultiResourceMock');
     petMonkey = await MONKY.deploy(name2, symbol2);
     await petMonkey.deployed();
+
+    return { ownerChunky, petMonkey };
+  }
+
+  beforeEach(async function () {
+    const { ownerChunky, petMonkey } = await loadFixture(deployTokensFixture);
+    this.parentToken = ownerChunky;
     this.childToken = petMonkey;
   });
 
@@ -38,11 +45,16 @@ describe('MultiResource', function () {
   const name = 'RmrkTest';
   const symbol = 'RMRKTST';
 
-  beforeEach(async function () {
+  async function deployTokensFixture() {
     const Token = await ethers.getContractFactory('RMRKNestingMultiResourceMock');
-    token = await Token.deploy(name, symbol);
-    await token.deployed();
-    this.token = token;
+    const testToken = await Token.deploy(name, symbol);
+    await testToken.deployed();
+    return { testToken };
+  }
+
+  beforeEach(async function () {
+    const { testToken } = await loadFixture(deployTokensFixture);
+    this.token = testToken;
   });
 
   shouldBehaveLikeMultiResource(name, symbol);
@@ -56,14 +68,19 @@ describe('Issuer', function () {
   const name = 'ownerChunky';
   const symbol = 'CHNKY';
 
+  async function deployTokensFixture() {
+    const CHNKY = await ethers.getContractFactory('RMRKNestingMultiResourceMock');
+    ownerChunky = await CHNKY.deploy(name, symbol);
+    await ownerChunky.deployed();
+    return { ownerChunky };
+  }
+
   beforeEach(async function () {
     const [signersOwner, ...signersAddr] = await ethers.getSigners();
     owner = signersOwner;
     addrs = signersAddr;
 
-    const CHNKY = await ethers.getContractFactory('RMRKNestingMultiResourceMock');
-    ownerChunky = await CHNKY.deploy(name, symbol);
-    await ownerChunky.deployed();
+    const { ownerChunky } = await loadFixture(deployTokensFixture);
     this.parentToken = ownerChunky;
   });
 

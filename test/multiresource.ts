@@ -5,7 +5,7 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import shouldBehaveLikeMultiResource from './behavior/multiresource';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 
-describe.only('MultiResource', async () => {
+describe('MultiResource', async () => {
   let token: Contract;
 
   let owner: SignerWithAddress;
