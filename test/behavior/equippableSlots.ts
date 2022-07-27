@@ -525,7 +525,7 @@ async function shouldBehaveLikeEquippableWithSlots(
       It says the target contract doesn't have a custom error 'RMRKNotNesting', meaning
       that while it's defined, it's not implemented yet.
       */
-    it('Unnest fails if self is equipped', async function() {
+    it('Unnest fails if self is equipped', async function () {
       // Weapon is child on index 0
       const childIndex = 0;
       const weaponResId = weaponResourcesEquip[0]; // This resource is assigned to weapon first weapon
@@ -533,9 +533,10 @@ async function shouldBehaveLikeEquippableWithSlots(
         .connect(addrs[0])
         .equip(soldiers[0], soldierResId, partIdForWeapon, childIndex, weaponResId);
 
-      await expect(
-        weapon.connect(addrs[0]).unnestSelf(11, 0),
-      ).to.be.revertedWithCustomError(weaponEquip, 'RMRKNotNesting');
+      await expect(weapon.connect(addrs[0]).unnestSelf(11, 0)).to.be.revertedWithCustomError(
+        weaponEquip,
+        'RMRKNotNesting',
+      );
     });
   });
 
@@ -682,12 +683,7 @@ async function shouldBehaveLikeEquippableWithSlots(
   async function mintWeapons(): Promise<void> {
     // Mint one weapon to soldier
     for (let i = 0; i < soldiers.length; i++) {
-      await weapon['mint(address,uint256,uint256,bytes)'](
-        soldier.address,
-        weapons[i],
-        soldiers[i],
-        ethers.utils.hexZeroPad('0x1', 1),
-      );
+      await weapon['mint(address,uint256,uint256)'](soldier.address, weapons[i], soldiers[i]);
       await soldier.connect(addrs[i % 3]).acceptChild(soldiers[i], 0);
     }
   }
@@ -695,12 +691,7 @@ async function shouldBehaveLikeEquippableWithSlots(
   async function mintWeaponGems(): Promise<void> {
     // Mint one weapon gem for each weapon on each soldier
     for (let i = 0; i < soldiers.length; i++) {
-      await weaponGem['mint(address,uint256,uint256,bytes)'](
-        weapon.address,
-        weaponGems[i],
-        weapons[i],
-        ethers.utils.hexZeroPad('0x1', 1),
-      );
+      await weaponGem['mint(address,uint256,uint256)'](weapon.address, weaponGems[i], weapons[i]);
       await weapon.connect(addrs[i % 3]).acceptChild(weapons[i], 0);
     }
   }
@@ -708,11 +699,10 @@ async function shouldBehaveLikeEquippableWithSlots(
   async function mintBackgrounds(): Promise<void> {
     // Mint one background to soldier
     for (let i = 0; i < soldiers.length; i++) {
-      await background['mint(address,uint256,uint256,bytes)'](
+      await background['mint(address,uint256,uint256)'](
         soldier.address,
         backgrounds[i],
         soldiers[i],
-        ethers.utils.hexZeroPad('0x1', 1),
       );
       await soldier.connect(addrs[i % 3]).acceptChild(soldiers[i], 0);
     }
@@ -856,11 +846,10 @@ async function shouldBehaveLikeEquippableWithSlots(
     resourceIndex: number,
   ): Promise<void> {
     // Mint another weapon to the soldier and accept it
-    await weapon['mint(address,uint256,uint256,bytes)'](
+    await weapon['mint(address,uint256,uint256)'](
       soldier.address,
       newWeaponId, // New weapon id
       soldierId,
-      ethers.utils.hexZeroPad('0x1', 1),
     );
     await soldier.connect(soldierOwner).acceptChild(soldierId, 0);
 

@@ -443,12 +443,7 @@ async function shouldBehaveLikeEquippableWithParts(
   async function mintMasks(): Promise<void> {
     // Mint one weapon to neon
     for (let i = 0; i < neons.length; i++) {
-      await mask['mint(address,uint256,uint256,bytes)'](
-        neon.address,
-        masks[i],
-        neons[i],
-        ethers.utils.hexZeroPad('0x1', 1),
-      );
+      await mask['mint(address,uint256,uint256)'](neon.address, masks[i], neons[i]);
       await neon.connect(addrs[i % 3]).acceptChild(neons[i], 0);
     }
   }

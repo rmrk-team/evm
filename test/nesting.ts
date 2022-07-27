@@ -33,7 +33,7 @@ describe('Nesting', function () {
 });
 
 // FIXME: several tests are still failing, fixing isn't trivial
-describe.skip('ERC721', function () {
+describe('ERC721', function () {
   let token: Contract;
 
   const name = 'RmrkTest';
@@ -44,7 +44,11 @@ describe.skip('ERC721', function () {
     token = await Token.deploy(name, symbol);
     await token.deployed();
     this.token = token;
-    this.ERC721Receiver = await ethers.getContractFactory('RMRKNestingReceiverMock');
+    this.ERC721Receiver = await ethers.getContractFactory(
+      'ERC721ReceiverMockWithRMRKNestingReceiver',
+    );
+    this.RMRKNestingReceiver = await ethers.getContractFactory('RMRKNestingReceiverMock');
+    this.commonERC721 = await ethers.getContractFactory('ERC721Mock');
   });
 
   shouldBehaveLikeERC721(name, symbol);

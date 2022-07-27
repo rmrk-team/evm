@@ -19,10 +19,9 @@ contract RMRKNestingMultiResourceMock is RMRKIssuable, RMRKNestingMultiResource 
     function mint(
         address to,
         uint256 tokenId,
-        uint256 destId,
-        bytes calldata data
+        uint256 destId
     ) external onlyIssuer {
-        _mint(to, tokenId, destId, data);
+        _mint(to, tokenId, destId);
     }
 
     //update for reentrancy

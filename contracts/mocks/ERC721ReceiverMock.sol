@@ -12,8 +12,8 @@ contract ERC721ReceiverMock is IERC721Receiver {
         Panic
     }
 
-    bytes4 private immutable _retval;
-    Error private immutable _error;
+    bytes4 internal immutable _retval;
+    Error internal immutable _error;
 
     event Received(address operator, address from, uint256 tokenId, bytes data);
 

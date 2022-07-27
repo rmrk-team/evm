@@ -3,9 +3,8 @@
 pragma solidity ^0.8.0;
 
 import "../RMRK/interfaces/IRMRKNestingReceiver.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 
-contract RMRKNestingReceiverMock is IRMRKNestingReceiver, IERC721Receiver {
+contract RMRKNestingReceiverMock is IRMRKNestingReceiver {
     enum Error {
         None,
         RevertWithMessage,
@@ -13,8 +12,8 @@ contract RMRKNestingReceiverMock is IRMRKNestingReceiver, IERC721Receiver {
         Panic
     }
 
-    bytes4 private immutable _retval;
-    Error private immutable _error;
+    bytes4 internal immutable _retval;
+    Error internal immutable _error;
 
     event Received(address operator, address from, uint256 tokenId, bytes data);
 
@@ -24,20 +23,11 @@ contract RMRKNestingReceiverMock is IRMRKNestingReceiver, IERC721Receiver {
     }
 
     function onRMRKNestingReceived(
-        address,
-        address,
-        uint256,
-        bytes calldata
-    ) external pure returns (bytes4) {
-        return IRMRKNestingReceiver.onRMRKNestingReceived.selector;
-    }
-
-    function onERC721Received(
         address operator,
         address from,
         uint256 tokenId,
         bytes memory data
-    ) public returns (bytes4) {
+    ) public override returns (bytes4) {
         if (_error == Error.RevertWithMessage) {
             revert("ERC721ReceiverMock: reverting");
         } else if (_error == Error.RevertWithoutMessage) {

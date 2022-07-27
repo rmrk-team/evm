@@ -30,6 +30,18 @@ contract RMRKNestingMock is  RMRKIssuable, IRMRKNestingReceiver, IRMRKNestingWit
         _safeMint(to, tokenId, _data);
     }
 
+    function safeMintNesting(address to, uint256 tokenId) public {
+        _safeMintNesting(to, tokenId);
+    }
+
+    function safeMintNesting(
+        address to,
+        uint256 tokenId,
+        bytes memory _data
+    ) public {
+        _safeMintNesting(to, tokenId, _data);
+    }
+
     function mint(address to, uint256 tokenId) external onlyIssuer {
         _mint(to, tokenId);
     }
@@ -37,10 +49,9 @@ contract RMRKNestingMock is  RMRKIssuable, IRMRKNestingReceiver, IRMRKNestingWit
     function mint(
         address to,
         uint256 tokenId,
-        uint256 destId,
-        bytes calldata data
+        uint256 destId
     ) external onlyIssuer {
-        _mint(to, tokenId, destId, data);
+        _mint(to, tokenId, destId);
     }
 
     //update for reentrancy
