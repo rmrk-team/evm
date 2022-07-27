@@ -3,8 +3,9 @@ import { expect } from 'chai';
 import { Contract } from 'ethers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import shouldBehaveLikeMultiResource from './behavior/multiresource';
+import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 
-describe('MultiResource', async () => {
+describe.only('MultiResource', async () => {
   let token: Contract;
 
   let owner: SignerWithAddress;
@@ -13,14 +14,18 @@ describe('MultiResource', async () => {
   const name = 'RmrkTest';
   const symbol = 'RMRKTST';
 
-  beforeEach(async function () {
+  async function deployRmrkMultiResourceMock() {
     const [signersOwner, ...signersAddr] = await ethers.getSigners();
-    owner = signersOwner;
-    addrs = signersAddr;
-
     const Token = await ethers.getContractFactory('RMRKMultiResourceMock');
     token = await Token.deploy(name, symbol);
     await token.deployed();
+    return { token, signersOwner, signersAddr };
+  }
+
+  beforeEach(async function () {
+    const { token, signersOwner, signersAddr } = await loadFixture(deployRmrkMultiResourceMock);
+    owner = signersOwner;
+    addrs = signersAddr;
     this.token = token;
   });
 
