@@ -69,4 +69,8 @@ contract RMRKNestingImpl is OwnableLock, RMRKMintingUtils, IRMRKNestingWithEquip
         return _equippableAddress;
     }
 
+    function isApprovedOrOwner(address spender, uint256 tokenId) external view returns (bool) {
+        return _isApprovedOrOwner(spender, tokenId);
+    }
+
 }

@@ -415,12 +415,12 @@ async function shouldBehaveLikeEquippableResources(
     });
 
     // approved not implemented yet
-    it.skip('can accept resource if approved', async function () {
+    it('can accept resource if approved', async function () {
       const resId = BigNumber.from(1);
       const tokenId = 1;
       const approvedAddress = addrs[1];
       await chunky['mint(address,uint256)'](owner.address, tokenId);
-      await chunky.approve(approvedAddress.address, tokenId);
+      await chunkyEquip.approveForResources(approvedAddress.address, tokenId);
       await addResources([resId]);
 
       await chunkyEquip.addResourceToToken(tokenId, resId, 0);
@@ -454,7 +454,7 @@ async function shouldBehaveLikeEquippableResources(
       await chunkyEquip.addResourceToToken(tokenId, resId, 0);
       await expect(
         chunkyEquip.connect(addrs[1]).acceptResource(tokenId, 0),
-      ).to.be.revertedWithCustomError(chunkyEquip, 'ERC721NotApprovedOrOwner');
+      ).to.be.revertedWithCustomError(chunkyEquip, 'RMRKNotApprovedForResourcesOrOwner');
     });
 
     it('cannot accept non existing resource', async function () {
@@ -553,14 +553,13 @@ async function shouldBehaveLikeEquippableResources(
       expect(await chunkyEquip.getResourceOverwrites(tokenId, resId2)).to.eql(BigNumber.from(0));
     });
 
-    // FIXME: approve not implemented yet
-    it.skip('can reject resource if approved', async function () {
+    it('can reject resource if approved', async function () {
       const resId = BigNumber.from(1);
       const approvedAddress = addrs[1];
       const tokenId = 1;
 
       await chunky['mint(address,uint256)'](owner.address, tokenId);
-      await chunky.approve(approvedAddress.address, tokenId);
+      await chunkyEquip.approveForResources(approvedAddress.address, tokenId);
       await addResources([resId]);
       await chunkyEquip.addResourceToToken(tokenId, resId, 0);
 
@@ -629,15 +628,14 @@ async function shouldBehaveLikeEquippableResources(
       expect(await chunkyEquip.getResourceOverwrites(1, 2)).to.eql(BigNumber.from(0));
     });
 
-    // FIXME: approve not implemented yet
-    it.skip('can reject all resources if approved', async function () {
+    it('can reject all resources if approved', async function () {
       const resId = BigNumber.from(1);
       const resId2 = BigNumber.from(2);
       const tokenId = 1;
       const approvedAddress = addrs[1];
 
       await chunky['mint(address,uint256)'](owner.address, tokenId);
-      await chunky.approve(approvedAddress.address, tokenId);
+      await chunkyEquip.approveForResources(approvedAddress.address, tokenId);
       await addResources([resId, resId2]);
       await chunkyEquip.addResourceToToken(tokenId, resId, 0);
       await chunkyEquip.addResourceToToken(tokenId, resId2, 0);
@@ -678,10 +676,10 @@ async function shouldBehaveLikeEquippableResources(
 
       await expect(
         chunkyEquip.connect(addrs[1]).rejectResource(tokenId, 0),
-      ).to.be.revertedWithCustomError(chunkyEquip, 'ERC721NotApprovedOrOwner');
+      ).to.be.revertedWithCustomError(chunkyEquip, 'RMRKNotApprovedForResourcesOrOwner');
       await expect(
         chunkyEquip.connect(addrs[1]).rejectAllResources(tokenId),
-      ).to.be.revertedWithCustomError(chunkyEquip, 'ERC721NotApprovedOrOwner');
+      ).to.be.revertedWithCustomError(chunkyEquip, 'RMRKNotApprovedForResourcesOrOwner');
     });
 
     it('cannot reject non existing resource', async function () {
@@ -707,13 +705,12 @@ async function shouldBehaveLikeEquippableResources(
       expect(await chunkyEquip.getActiveResourcePriorities(tokenId)).to.be.eql([2, 1]);
     });
 
-    // FIXME: approve not implemented yet
-    it.skip('can set and get priorities if approved', async function () {
+    it('can set and get priorities if approved', async function () {
       const tokenId = 1;
       const approvedAddress = addrs[1];
 
       await addResourcesToToken(tokenId);
-      await chunky.approve(approvedAddress.address, tokenId);
+      await chunkyEquip.approveForResources(approvedAddress.address, tokenId);
 
       expect(await chunkyEquip.getActiveResourcePriorities(tokenId)).to.be.eql([0, 0]);
       await expect(chunkyEquip.connect(approvedAddress).setPriority(tokenId, [2, 1]))
@@ -727,7 +724,7 @@ async function shouldBehaveLikeEquippableResources(
       await addResourcesToToken(tokenId);
       await expect(
         chunkyEquip.connect(addrs[1]).setPriority(tokenId, [2, 1]),
-      ).to.be.revertedWithCustomError(chunkyEquip, 'ERC721NotApprovedOrOwner');
+      ).to.be.revertedWithCustomError(chunkyEquip, 'RMRKNotApprovedForResourcesOrOwner');
     });
 
     it('cannot set different number of priorities', async function () {
