@@ -82,4 +82,8 @@ contract RMRKNestingMultiResource is MultiResourceAbstract, RMRKNesting {
             revert RMRKApproveForResourcesToCaller();
         _setApprovalForAllForResources(owner, operator, approved);
     }
+
+    function _cleanApprovals(address owner, uint256 tokenId) internal override virtual {
+        _approveForResources(owner, address(0), tokenId);
+    }
 }

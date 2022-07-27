@@ -179,6 +179,7 @@ contract RMRKNesting is ERC721, IRMRKNesting {
     function _burnForOwner(uint256 tokenId, address rootOwner) private {
         _beforeTokenTransfer(rootOwner, address(0), tokenId);
         _approve(address(0), tokenId);
+        _cleanApprovals(address(0), tokenId);
         _balances[rootOwner] -= 1;
 
         Child[] memory children = childrenOf(tokenId);
@@ -309,6 +310,7 @@ contract RMRKNesting is ERC721, IRMRKNesting {
 
         // Clear approvals from the previous owner
         _approve(address(0), tokenId);
+        _cleanApprovals(to, tokenId);
 
         if(!destinationIsNft) {
             _balances[to] += 1;
@@ -323,6 +325,8 @@ contract RMRKNesting is ERC721, IRMRKNesting {
         emit Transfer(from, to, tokenId);
         _afterTokenTransfer(from, to, tokenId);
     }
+
+    function _cleanApprovals(address owner, uint256 tokenId) internal virtual {}
 
     ////////////////////////////////////////
     //      CHILD MANAGEMENT INTERNAL
