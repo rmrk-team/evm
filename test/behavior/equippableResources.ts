@@ -970,9 +970,9 @@ async function shouldBehaveLikeEquippableResources(
         chunky,
         'ERC721InvalidTokenId',
       );
-      // FIXME: This should be consistent (i.e. revert)
-      expect(await chunkyEquip.getApprovedForResources(tokenId)).to.eql(
-        ethers.constants.AddressZero,
+      await expect(chunkyEquip.getApprovedForResources(tokenId)).to.be.revertedWithCustomError(
+        chunky,
+        'ERC721InvalidTokenId',
       );
     });
   });

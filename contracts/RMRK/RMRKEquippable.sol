@@ -492,4 +492,8 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
             revert RMRKApproveForResourcesToCaller();
         _setApprovalForAllForResources(owner, operator, approved);
     }
+
+    function _exists(uint256 tokenId) internal override view virtual returns (bool) {
+        return _ownerOf(tokenId) != address(0);
+    }
 }
