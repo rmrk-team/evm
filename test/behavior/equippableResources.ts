@@ -32,7 +32,8 @@ async function shouldBehaveLikeEquippableResources(
     const chunkyEquipContract = await ChnkEqup.deploy();
     await chunkyEquipContract.deployed();
 
-    chunkyEquipContract.setNestingAddress(chunkyContract.address);
+    await chunkyContract.setEquippableAddress(chunkyEquipContract.address);
+    await chunkyEquipContract.setNestingAddress(chunkyContract.address);
 
     return { chunkyContract, chunkyEquipContract };
   }
@@ -65,23 +66,6 @@ async function shouldBehaveLikeEquippableResources(
     });
   });
 
-  describe('Issuer', async function () {
-    it('can set and get issuer', async function () {
-      const newIssuerAddr = addrs[1].address;
-      expect(await chunky.getIssuer()).to.equal(owner.address);
-
-      await chunky.setIssuer(newIssuerAddr);
-      expect(await chunky.getIssuer()).to.equal(newIssuerAddr);
-    });
-
-    it('cannot set issuer if not issuer', async function () {
-      const newIssuer = addrs[1];
-      await expect(
-        chunky.connect(newIssuer).setIssuer(newIssuer.address),
-      ).to.be.revertedWithCustomError(chunky, 'RMRKOnlyIssuer');
-    });
-  });
-
   describe('Resource storage', async function () {
     it('can add resource', async function () {
       const id = BigNumber.from(1);
@@ -109,23 +93,6 @@ async function shouldBehaveLikeEquippableResources(
         chunkyEquip,
         'RMRKNoResourceMatchingId',
       );
-    });
-
-    it('cannot add resource entry if not issuer', async function () {
-      const id = BigNumber.from(1);
-      await expect(
-        chunkyEquip.connect(addrs[1]).addResourceEntry(
-          {
-            id: id,
-            equippableRefId: equippableRefIdDefault,
-            metadataURI: metaURIDefault,
-            baseAddress: baseAddressDefault,
-            custom: customDefault,
-          },
-          [],
-          [],
-        ),
-      ).to.be.revertedWithCustomError(chunkyEquip, 'RMRKOnlyIssuer');
     });
 
     it('cannot add resource entry with parts and no base', async function () {
@@ -937,6 +904,51 @@ async function shouldBehaveLikeEquippableResources(
       expect(
         await chunkyEquip.tokenURIForCustomValue(tokenId, customDataOtherKey, customDataTypeValueA),
       ).to.eql('fallback404');
+    });
+  });
+
+  describe('Approval Cleaning', async function () {
+    it('cleans token and resources approvals on transfer', async function () {
+      const tokenId = 1;
+      const tokenOwner = addrs[1];
+      const newOwner = addrs[2];
+      const approved = addrs[3];
+      await chunky['mint(address,uint256)'](tokenOwner.address, tokenId);
+      await chunky.connect(tokenOwner).approve(approved.address, tokenId);
+      await chunkyEquip.connect(tokenOwner).approveForResources(approved.address, tokenId);
+
+      expect(await chunky.getApproved(tokenId)).to.eql(approved.address);
+      expect(await chunkyEquip.getApprovedForResources(tokenId)).to.eql(approved.address);
+
+      await chunky.connect(tokenOwner).transfer(newOwner.address, tokenId);
+
+      expect(await chunky.getApproved(tokenId)).to.eql(ethers.constants.AddressZero);
+      expect(await chunkyEquip.getApprovedForResources(tokenId)).to.eql(
+        ethers.constants.AddressZero,
+      );
+    });
+
+    it('cleans token and resources approvals on burn', async function () {
+      const tokenId = 1;
+      const tokenOwner = addrs[1];
+      const approved = addrs[3];
+      await chunky['mint(address,uint256)'](tokenOwner.address, tokenId);
+      await chunky.connect(tokenOwner).approve(approved.address, tokenId);
+      await chunkyEquip.connect(tokenOwner).approveForResources(approved.address, tokenId);
+
+      expect(await chunky.getApproved(tokenId)).to.eql(approved.address);
+      expect(await chunkyEquip.getApprovedForResources(tokenId)).to.eql(approved.address);
+
+      await chunky.connect(tokenOwner).burn(tokenId);
+
+      await expect(chunky.getApproved(tokenId)).to.be.revertedWithCustomError(
+        chunky,
+        'ERC721InvalidTokenId',
+      );
+      await expect(chunkyEquip.getApprovedForResources(tokenId)).to.be.revertedWithCustomError(
+        chunky,
+        'ERC721InvalidTokenId',
+      );
     });
   });
 

@@ -9,6 +9,7 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 
 error RMRKBadPriorityListLength();
 error RMRKIndexOutOfRange();
+error RMRKInvalidTokenId();
 error RMRKMaxPendingResourcesReached();
 error RMRKNoResourceMatchingId();
 error RMRKResourceAlreadyExists();
@@ -301,7 +302,7 @@ abstract contract MultiResourceAbstract is Context, IRMRKMultiResource {
     // Approvals
 
     function getApprovedForResources(uint256 tokenId) public virtual view returns (address) {
-        // TODO: Do we want to add require minted here?
+        _requireMinted(tokenId);
         return _tokenApprovalsForResources[tokenId];
     }
 
@@ -385,5 +386,15 @@ abstract contract MultiResourceAbstract is Context, IRMRKMultiResource {
         }
         return resources;
     }
+
+        /**
+     * @dev Reverts if the `tokenId` has not been minted yet.
+     */
+    function _requireMinted(uint256 tokenId) internal view virtual {
+        if(!_exists(tokenId))
+            revert RMRKInvalidTokenId();
+    }
+
+    function _exists(uint256 tokenId) internal view virtual returns (bool);
 
 }

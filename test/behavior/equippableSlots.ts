@@ -542,9 +542,9 @@ async function shouldBehaveLikeEquippableWithSlots() {
     from top-level via nestingImpl override of unnestSelf() since it must be triggered
     by the unnest call. Error does not yet exist, first securing markEquipped() channel.
 
-    It says the target contract doesn't have a custom error 'RMRKNotNesting', meaning
-    that while it's defined, it's not implemented yet.
-    */
+      It says the target contract doesn't have a custom error 'RMRKNotNesting', meaning
+      that while it's defined, it's not implemented yet.
+      */
     it('Unnest fails if self is equipped', async function () {
       // Weapon is child on index 0
       const childIndex = 0;

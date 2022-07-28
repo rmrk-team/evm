@@ -3,16 +3,16 @@
 pragma solidity ^0.8.15;
 
 import "../RMRK/interfaces/IRMRKNestingReceiver.sol";
-import "../RMRK/RMRKNesting.sol";
+import "../RMRK/RMRKNestingWithEquippable.sol";
 // import "hardhat/console.sol";
 
 //Minimal public implementation of IRMRKNesting for testing.
-contract RMRKNestingMock is  IRMRKNestingReceiver, RMRKNesting {
+contract RMRKNestingWithEquippableMock is  IRMRKNestingReceiver, RMRKNestingWithEquippable {
 
     constructor(
         string memory name_,
         string memory symbol_
-    ) RMRKNesting(name_, symbol_) {}
+    ) RMRKNestingWithEquippable(name_, symbol_) {}
 
     function safeMint(address to, uint256 tokenId) public {
         _safeMint(to, tokenId);
@@ -24,18 +24,6 @@ contract RMRKNestingMock is  IRMRKNestingReceiver, RMRKNesting {
         bytes memory _data
     ) public {
         _safeMint(to, tokenId, _data);
-    }
-
-    function safeMintNesting(address to, uint256 tokenId) public {
-        _safeMintNesting(to, tokenId);
-    }
-
-    function safeMintNesting(
-        address to,
-        uint256 tokenId,
-        bytes memory _data
-    ) public {
-        _safeMintNesting(to, tokenId, _data);
     }
 
     function mint(address to, uint256 tokenId) external {
@@ -62,6 +50,10 @@ contract RMRKNestingMock is  IRMRKNestingReceiver, RMRKNesting {
         bytes calldata
     ) external pure returns (bytes4) {
         return IRMRKNestingReceiver.onRMRKNestingReceived.selector;
+    }
+
+    function setEquippableAddress(address equippable) external {
+        _setEquippableAddress(equippable);
     }
 
 }
