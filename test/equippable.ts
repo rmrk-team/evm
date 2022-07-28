@@ -10,12 +10,8 @@ describe('Equippable with Parts', async () => {
   );
 });
 
-describe('Equippable with Slots', async () => {
-  shouldBehaveLikeEquippableWithSlots(
-    'RMRKEquippableMock',
-    'RMRKNestingMock',
-    'RMRKBaseStorageMock',
-  );
+describe.only('Equippable with Slots', async () => {
+  shouldBehaveLikeEquippableWithSlots();
 });
 
 describe('Equippable Resources', async () => {
