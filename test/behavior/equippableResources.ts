@@ -32,8 +32,10 @@ async function shouldBehaveLikeEquippableResources(
 
     const ChnkEqup = await ethers.getContractFactory(equippableContractName);
     chunkyEquip = await ChnkEqup.deploy();
-    chunkyEquip.setNestingAddress(chunky.address);
     await chunkyEquip.deployed();
+
+    await chunky.setEquippableAddress(chunkyEquip.address);
+    await chunkyEquip.setNestingAddress(chunky.address);
   });
 
   describe('Init', async function () {
@@ -927,6 +929,51 @@ async function shouldBehaveLikeEquippableResources(
       expect(
         await chunkyEquip.tokenURIForCustomValue(tokenId, customDataOtherKey, customDataTypeValueA),
       ).to.eql('fallback404');
+    });
+  });
+
+  describe('Approval Cleaning', async function () {
+    it('cleans token and resources approvals on transfer', async function () {
+      const tokenId = 1;
+      const tokenOwner = addrs[1];
+      const newOwner = addrs[2];
+      const approved = addrs[3];
+      await chunky['mint(address,uint256)'](tokenOwner.address, tokenId);
+      await chunky.connect(tokenOwner).approve(approved.address, tokenId);
+      await chunkyEquip.connect(tokenOwner).approveForResources(approved.address, tokenId);
+
+      expect(await chunky.getApproved(tokenId)).to.eql(approved.address);
+      expect(await chunkyEquip.getApprovedForResources(tokenId)).to.eql(approved.address);
+
+      await chunky.connect(tokenOwner).transfer(newOwner.address, tokenId);
+
+      expect(await chunky.getApproved(tokenId)).to.eql(ethers.constants.AddressZero);
+      expect(await chunkyEquip.getApprovedForResources(tokenId)).to.eql(
+        ethers.constants.AddressZero,
+      );
+    });
+
+    it('cleans token and resources approvals on burn', async function () {
+      const tokenId = 1;
+      const tokenOwner = addrs[1];
+      const approved = addrs[3];
+      await chunky['mint(address,uint256)'](tokenOwner.address, tokenId);
+      await chunky.connect(tokenOwner).approve(approved.address, tokenId);
+      await chunkyEquip.connect(tokenOwner).approveForResources(approved.address, tokenId);
+
+      expect(await chunky.getApproved(tokenId)).to.eql(approved.address);
+      expect(await chunkyEquip.getApprovedForResources(tokenId)).to.eql(approved.address);
+
+      await chunky.connect(tokenOwner).burn(tokenId);
+
+      await expect(chunky.getApproved(tokenId)).to.be.revertedWithCustomError(
+        chunky,
+        'ERC721InvalidTokenId',
+      );
+      await expect(chunkyEquip.getApprovedForResources(tokenId)).to.be.revertedWithCustomError(
+        chunky,
+        'ERC721InvalidTokenId',
+      );
     });
   });
 

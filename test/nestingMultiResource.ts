@@ -48,6 +48,67 @@ describe('MultiResource', function () {
   shouldBehaveLikeMultiResource(name, symbol);
 });
 
+describe('Nesting MR', function () {
+  let addrs: SignerWithAddress[];
+  let chunky: Contract;
+
+  const name = 'ownerChunky';
+  const symbol = 'CHNKY';
+
+  beforeEach(async function () {
+    const [, ...signersAddr] = await ethers.getSigners();
+    addrs = signersAddr;
+
+    const CHNKY = await ethers.getContractFactory('RMRKNestingMultiResourceMock');
+    chunky = await CHNKY.deploy(name, symbol);
+    await chunky.deployed();
+    this.parentToken = chunky;
+  });
+
+  describe('Approval Cleaning', async function () {
+    it('cleans token and resources approvals on transfer', async function () {
+      const tokenId = 1;
+      const tokenOwner = addrs[1];
+      const newOwner = addrs[2];
+      const approved = addrs[3];
+      await chunky['mint(address,uint256)'](tokenOwner.address, tokenId);
+      await chunky.connect(tokenOwner).approve(approved.address, tokenId);
+      await chunky.connect(tokenOwner).approveForResources(approved.address, tokenId);
+
+      expect(await chunky.getApproved(tokenId)).to.eql(approved.address);
+      expect(await chunky.getApprovedForResources(tokenId)).to.eql(approved.address);
+
+      await chunky.connect(tokenOwner).transfer(newOwner.address, tokenId);
+
+      expect(await chunky.getApproved(tokenId)).to.eql(ethers.constants.AddressZero);
+      expect(await chunky.getApprovedForResources(tokenId)).to.eql(ethers.constants.AddressZero);
+    });
+
+    it('cleans token and resources approvals on burn', async function () {
+      const tokenId = 1;
+      const tokenOwner = addrs[1];
+      const approved = addrs[3];
+      await chunky['mint(address,uint256)'](tokenOwner.address, tokenId);
+      await chunky.connect(tokenOwner).approve(approved.address, tokenId);
+      await chunky.connect(tokenOwner).approveForResources(approved.address, tokenId);
+
+      expect(await chunky.getApproved(tokenId)).to.eql(approved.address);
+      expect(await chunky.getApprovedForResources(tokenId)).to.eql(approved.address);
+
+      await chunky.connect(tokenOwner).burn(tokenId);
+
+      await expect(chunky.getApproved(tokenId)).to.be.revertedWithCustomError(
+        chunky,
+        'ERC721InvalidTokenId',
+      );
+      await expect(chunky.getApprovedForResources(tokenId)).to.be.revertedWithCustomError(
+        chunky,
+        'ERC721InvalidTokenId',
+      );
+    });
+  });
+});
+
 describe('Issuer', function () {
   let owner: SignerWithAddress;
   let addrs: SignerWithAddress[];
