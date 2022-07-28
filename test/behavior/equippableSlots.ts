@@ -722,11 +722,10 @@ async function shouldBehaveLikeEquippableWithSlots() {
     resourceIndex: number,
   ): Promise<void> {
     // Mint another weapon to the soldier and accept it
-    await weapon['mint(address,uint256,uint256,bytes)'](
+    await weapon['mint(address,uint256,uint256)'](
       soldier.address,
       newWeaponId, // New weapon id
       soldierId,
-      ethers.utils.hexZeroPad('0x1', 1),
     );
     await soldier.connect(soldierOwner).acceptChild(soldierId, 0);
 

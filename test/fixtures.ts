@@ -61,7 +61,7 @@ export async function equippableSlotsContractsFixture() {
   addrs = signersAddr;
 
   const Base = await ethers.getContractFactory('RMRKBaseStorageMock');
-  const Nesting = await ethers.getContractFactory('RMRKNestingMock');
+  const Nesting = await ethers.getContractFactory('RMRKNestingWithEquippableMock');
   const Equip = await ethers.getContractFactory('RMRKEquippableMock');
 
   // Base
@@ -172,11 +172,10 @@ async function mintSoldiers(): Promise<void> {
 async function mintWeapons(): Promise<void> {
   // Mint one weapon to soldier
   for (let i = 0; i < soldiers.length; i++) {
-    await weaponContract['mint(address,uint256,uint256,bytes)'](
+    await weaponContract['mint(address,uint256,uint256)'](
       soldierContract.address,
       weapons[i],
       soldiers[i],
-      ethers.utils.hexZeroPad('0x1', 1),
     );
     await soldierContract.connect(addrs[i % 3]).acceptChild(soldiers[i], 0);
   }
@@ -185,11 +184,10 @@ async function mintWeapons(): Promise<void> {
 async function mintWeaponGems(): Promise<void> {
   // Mint one weapon gem for each weapon on each soldier
   for (let i = 0; i < soldiers.length; i++) {
-    await weaponGemContract['mint(address,uint256,uint256,bytes)'](
+    await weaponGemContract['mint(address,uint256,uint256)'](
       weaponContract.address,
       weaponGems[i],
       weapons[i],
-      ethers.utils.hexZeroPad('0x1', 1),
     );
     await weaponContract.connect(addrs[i % 3]).acceptChild(weapons[i], 0);
   }
@@ -198,11 +196,10 @@ async function mintWeaponGems(): Promise<void> {
 async function mintBackgrounds(): Promise<void> {
   // Mint one background to soldier
   for (let i = 0; i < soldiers.length; i++) {
-    await backgroundContract['mint(address,uint256,uint256,bytes)'](
+    await backgroundContract['mint(address,uint256,uint256)'](
       soldierContract.address,
       backgrounds[i],
       soldiers[i],
-      ethers.utils.hexZeroPad('0x1', 1),
     );
     await soldierContract.connect(addrs[i % 3]).acceptChild(soldiers[i], 0);
   }
