@@ -63,6 +63,9 @@ enum ItemType {
 }
 
 export async function equippablePartsContractsFixture() {
+  const [, ...signersAddr] = await ethers.getSigners();
+  addrs = signersAddr;
+
   const Base = await ethers.getContractFactory('RMRKBaseStorageMock');
   const Nesting = await ethers.getContractFactory('RMRKNestingWithEquippableMock');
   const Equip = await ethers.getContractFactory('RMRKEquippableMock');
