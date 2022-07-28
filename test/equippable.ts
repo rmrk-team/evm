@@ -3,11 +3,7 @@ import shouldBehaveLikeEquippableResources from './behavior/equippableResources'
 import shouldBehaveLikeEquippableWithSlots from './behavior/equippableSlots';
 
 describe('Equippable with Parts', async () => {
-  shouldBehaveLikeEquippableWithParts(
-    'RMRKEquippableMock',
-    'RMRKNestingWithEquippableMock',
-    'RMRKBaseStorageMock',
-  );
+  shouldBehaveLikeEquippableWithParts();
 });
 
 describe('Equippable Resources', async () => {
