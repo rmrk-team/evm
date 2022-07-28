@@ -2,17 +2,16 @@
 
 pragma solidity ^0.8.15;
 
-import "../RMRK/access/RMRKIssuable.sol";
 import "../RMRK/RMRKNestingMultiResource.sol";
 // import "hardhat/console.sol";
 
 //Minimal public implementation of RMRKNestingMultiResource for testing.
-contract RMRKNestingMultiResourceMock is RMRKIssuable, RMRKNestingMultiResource {
+contract RMRKNestingMultiResourceMock is RMRKNestingMultiResource {
 
     constructor(string memory name, string memory symbol)
         RMRKNestingMultiResource(name, symbol) {}
 
-    function mint(address to, uint256 tokenId) external onlyIssuer {
+    function mint(address to, uint256 tokenId) external {
         _mint(to, tokenId);
     }
 
@@ -20,7 +19,7 @@ contract RMRKNestingMultiResourceMock is RMRKIssuable, RMRKNestingMultiResource 
         address to,
         uint256 tokenId,
         uint256 destId
-    ) external onlyIssuer {
+    ) external {
         _mint(to, tokenId, destId);
     }
 
@@ -47,14 +46,14 @@ contract RMRKNestingMultiResourceMock is RMRKIssuable, RMRKNestingMultiResource 
         return IERC721Receiver.onERC721Received.selector;
     }
 
-    function setFallbackURI(string memory fallbackURI) external onlyIssuer {
+    function setFallbackURI(string memory fallbackURI) external {
         _setFallbackURI(fallbackURI);
     }
 
     function setTokenEnumeratedResource(
         uint64 resourceId,
         bool state
-    ) external onlyIssuer {
+    ) external {
         _setTokenEnumeratedResource(resourceId, state);
     }
 
@@ -62,7 +61,7 @@ contract RMRKNestingMultiResourceMock is RMRKIssuable, RMRKNestingMultiResource 
         uint256 tokenId,
         uint64 resourceId,
         uint64 overwrites
-    ) external onlyIssuer {
+    ) external {
         if(ownerOf(tokenId) == address(0))
             revert ERC721InvalidTokenId();
         _addResourceToToken(tokenId, resourceId, overwrites);
@@ -72,7 +71,7 @@ contract RMRKNestingMultiResourceMock is RMRKIssuable, RMRKNestingMultiResource 
         uint64 id,
         string memory metadataURI,
         uint128[] memory custom
-    ) external onlyIssuer {
+    ) external {
         _addResourceEntry(id, metadataURI, custom);
     }
 
@@ -80,21 +79,21 @@ contract RMRKNestingMultiResourceMock is RMRKIssuable, RMRKNestingMultiResource 
         uint64 resourceId,
         uint128 customResourceId,
         bytes memory data
-    ) external onlyIssuer {
+    ) external {
         _setCustomResourceData(resourceId, customResourceId, data);
     }
 
     function addCustomDataToResource(
         uint64 resourceId,
         uint128 customResourceId
-    ) external onlyIssuer {
+    ) external {
         _addCustomDataToResource(resourceId, customResourceId);
     }
 
     function removeCustomDataFromResource(
         uint64 resourceId,
         uint256 index
-    ) external onlyIssuer {
+    ) external {
         _removeCustomDataFromResource(resourceId, index);
     }
 }

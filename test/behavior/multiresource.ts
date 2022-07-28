@@ -130,12 +130,6 @@ async function shouldBehaveLikeMultiResource(name: string, symbol: string) {
       );
     });
 
-    it('cannot add resource entry if not issuer', async function () {
-      const id = BigNumber.from(1);
-      await expect(this.token.connect(addrs[1]).addResourceEntry(id, metaURIDefault, customDefault))
-        .to.be.reverted;
-    });
-
     it('cannot overwrite resource', async function () {
       const id = BigNumber.from(1);
 

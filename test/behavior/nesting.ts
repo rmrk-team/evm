@@ -64,23 +64,6 @@ async function shouldBehaveLikeNesting(
     });
   });
 
-  describe('Issuer', async function () {
-    it('can set and get issuer', async function () {
-      const newIssuerAddr = addrs[1].address;
-      expect(await ownerChunky.getIssuer()).to.equal(owner.address);
-
-      await ownerChunky.setIssuer(newIssuerAddr);
-      expect(await ownerChunky.getIssuer()).to.equal(newIssuerAddr);
-    });
-
-    it('cannot set issuer if not issuer', async function () {
-      const newIssuer = addrs[1];
-      await expect(
-        ownerChunky.connect(newIssuer).setIssuer(newIssuer.address),
-      ).to.be.revertedWithCustomError(ownerChunky, 'RMRKOnlyIssuer');
-    });
-  });
-
   describe('Interface support', async function () {
     it('can support IERC165', async function () {
       expect(await ownerChunky.supportsInterface('0x01ffc9a7')).to.equal(true);

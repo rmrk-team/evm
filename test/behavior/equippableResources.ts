@@ -57,23 +57,6 @@ async function shouldBehaveLikeEquippableResources(
     });
   });
 
-  describe('Issuer', async function () {
-    it('can set and get issuer', async function () {
-      const newIssuerAddr = addrs[1].address;
-      expect(await chunky.getIssuer()).to.equal(owner.address);
-
-      await chunky.setIssuer(newIssuerAddr);
-      expect(await chunky.getIssuer()).to.equal(newIssuerAddr);
-    });
-
-    it('cannot set issuer if not issuer', async function () {
-      const newIssuer = addrs[1];
-      await expect(
-        chunky.connect(newIssuer).setIssuer(newIssuer.address),
-      ).to.be.revertedWithCustomError(chunky, 'RMRKOnlyIssuer');
-    });
-  });
-
   describe('Resource storage', async function () {
     it('can add resource', async function () {
       const id = BigNumber.from(1);
@@ -101,23 +84,6 @@ async function shouldBehaveLikeEquippableResources(
         chunkyEquip,
         'RMRKNoResourceMatchingId',
       );
-    });
-
-    it('cannot add resource entry if not issuer', async function () {
-      const id = BigNumber.from(1);
-      await expect(
-        chunkyEquip.connect(addrs[1]).addResourceEntry(
-          {
-            id: id,
-            equippableRefId: equippableRefIdDefault,
-            metadataURI: metaURIDefault,
-            baseAddress: baseAddressDefault,
-            custom: customDefault,
-          },
-          [],
-          [],
-        ),
-      ).to.be.revertedWithCustomError(chunkyEquip, 'RMRKOnlyIssuer');
     });
 
     it('cannot add resource entry with parts and no base', async function () {

@@ -2,13 +2,12 @@
 
 pragma solidity ^0.8.15;
 
-import "../RMRK/access/RMRKIssuable.sol";
 import "../RMRK/interfaces/IRMRKNestingReceiver.sol";
 import "../RMRK/RMRKNesting.sol";
 // import "hardhat/console.sol";
 
 //Minimal public implementation of IRMRKNesting for testing.
-contract RMRKNestingMock is  RMRKIssuable, IRMRKNestingReceiver, RMRKNesting {
+contract RMRKNestingMock is  IRMRKNestingReceiver, RMRKNesting {
 
     constructor(
         string memory name_,
@@ -39,7 +38,7 @@ contract RMRKNestingMock is  RMRKIssuable, IRMRKNestingReceiver, RMRKNesting {
         _safeMintNesting(to, tokenId, _data);
     }
 
-    function mint(address to, uint256 tokenId) external onlyIssuer {
+    function mint(address to, uint256 tokenId) external {
         _mint(to, tokenId);
     }
 
@@ -47,7 +46,7 @@ contract RMRKNestingMock is  RMRKIssuable, IRMRKNestingReceiver, RMRKNesting {
         address to,
         uint256 tokenId,
         uint256 destId
-    ) external onlyIssuer {
+    ) external {
         _mint(to, tokenId, destId);
     }
 
