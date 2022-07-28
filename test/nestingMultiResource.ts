@@ -101,8 +101,10 @@ describe('Nesting MR', function () {
         chunky,
         'ERC721InvalidTokenId',
       );
-      // FIXME: This should be consistent (i.e. revert)
-      expect(await chunky.getApprovedForResources(tokenId)).to.eql(ethers.constants.AddressZero);
+      await expect(chunky.getApprovedForResources(tokenId)).to.be.revertedWithCustomError(
+        chunky,
+        'ERC721InvalidTokenId',
+      );
     });
   });
 });
