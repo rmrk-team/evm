@@ -75,4 +75,8 @@ contract RMRKNestingMock is  RMRKIssuable, IRMRKNestingReceiver, IRMRKNestingWit
     function getEquippablesAddress() external view returns (address) {
         return _equippableAddress;
     }
+
+    function isApprovedOrOwner(address spender, uint256 tokenId) external view returns (bool) {
+        return _isApprovedOrOwner(spender, tokenId);
+    }
 }

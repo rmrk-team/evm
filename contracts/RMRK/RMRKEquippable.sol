@@ -95,17 +95,33 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
         return IRMRKNesting(_nestingAddress).ownerOf(tokenId);
     }
 
-    function _onlyTokenOwner(uint tokenId) internal view {
-        if(_msgSender() != _ownerOf(tokenId)) revert ERC721NotApprovedOrOwner();
+    function _onlyOwnerOrApproved(uint tokenId) internal view {
+        if (!IRMRKNestingWithEquippable(_nestingAddress).isApprovedOrOwner(_msgSender(), tokenId))
+            revert ERC721NotApprovedOrOwner();
+    }
+
+    modifier onlyOwnerOrApproved(uint256 tokenId) {
+        _onlyOwnerOrApproved(tokenId);
+        _;
+    }
+
+    function _isApprovedForResourcesOrOwner(address user, uint256 tokenId) internal view virtual returns (bool) {
+        address owner = _ownerOf(tokenId);
+        return (user == owner || isApprovedForAllForResources(owner, user) || getApprovedForResources(tokenId) == user);
+    }
+
+    function _onlyApprovedForResourcesOrOwner(uint256 tokenId) private view {
+        if(!_isApprovedForResourcesOrOwner(_msgSender(), tokenId))
+            revert RMRKNotApprovedForResourcesOrOwner();
+    }
+
+    modifier onlyApprovedForResourcesOrOwner(uint256 tokenId) {
+        _onlyApprovedForResourcesOrOwner(tokenId);
+        _;
     }
 
     function _onlyNesting() internal view {
         if(_msgSender() != _nestingAddress) revert RMRKNotNesting();
-    }
-
-    modifier onlyTokenOwner(uint256 tokenId) {
-        _onlyTokenOwner(tokenId);
-        _;
     }
 
     modifier onlyNesting() {
@@ -134,7 +150,7 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
         uint64 slotPartId,
         uint256 childIndex,
         uint64 childResourceId
-    ) external onlyTokenOwner(tokenId) {
+    ) external onlyOwnerOrApproved(tokenId) {
         _equip(tokenId, resourceId, slotPartId, childIndex, childResourceId);
     }
 
@@ -174,7 +190,7 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
         uint256 tokenId,
         uint64 resourceId,
         uint64 slotPartId
-    ) external onlyTokenOwner(tokenId) {
+    ) external onlyOwnerOrApproved(tokenId) {
         _unequip(tokenId, resourceId, slotPartId);
     }
 
@@ -198,7 +214,7 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
         uint64 slotPartId,
         uint256 childIndex,
         uint64 childResourceId
-    ) external onlyTokenOwner(tokenId) {
+    ) external onlyOwnerOrApproved(tokenId) {
         _unequip(tokenId, resourceId, slotPartId);
         _equip(tokenId, resourceId, slotPartId, childIndex, childResourceId);
     }
@@ -344,31 +360,27 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
     function acceptResource(
         uint256 tokenId,
         uint256 index
-    ) external virtual onlyTokenOwner(tokenId) {
-        // FIXME: clean approvals and test
+    ) external virtual onlyApprovedForResourcesOrOwner(tokenId) {
         _acceptResource(tokenId, index);
     }
 
     function rejectResource(
         uint256 tokenId,
         uint256 index
-    ) external virtual onlyTokenOwner(tokenId) {
-        // FIXME: clean approvals and test
+    ) external virtual onlyApprovedForResourcesOrOwner(tokenId) {
         _rejectResource(tokenId, index);
     }
 
     function rejectAllResources(
         uint256 tokenId
-    ) external virtual onlyTokenOwner(tokenId) {
-        // FIXME: clean approvals and test
+    ) external virtual onlyApprovedForResourcesOrOwner(tokenId) {
         _rejectAllResources(tokenId);
     }
 
     function setPriority(
         uint256 tokenId,
         uint16[] memory priorities
-    ) external virtual onlyTokenOwner(tokenId) {
-        // FIXME: clean approvals and test
+    ) external virtual onlyApprovedForResourcesOrOwner(tokenId) {
         _setPriority(tokenId, priorities);
     }
 
@@ -457,5 +469,24 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
         }
 
         return extendedResources;
+    }
+
+    // Approvals
+
+    function approveForResources(address to, uint256 tokenId) external virtual {
+        address owner = _ownerOf(tokenId);
+        if(to == owner)
+            revert RMRKApprovalForResourcesToCurrentOwner();
+
+        if(_msgSender() != owner && !isApprovedForAllForResources(owner, _msgSender()))
+            revert RMRKApproveForResourcesCallerIsNotOwnerNorApprovedForAll();
+        _approveForResources(owner, to, tokenId);
+    }
+
+    function setApprovalForAllForResources(address operator, bool approved) external virtual {
+        address owner = _msgSender();
+        if(owner == operator)
+            revert RMRKApproveForResourcesToCaller();
+        _setApprovalForAllForResources(owner, operator, approved);
     }
 }

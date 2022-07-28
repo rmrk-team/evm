@@ -14,6 +14,10 @@ error RMRKNoResourceMatchingId();
 error RMRKResourceAlreadyExists();
 error RMRKResourceNotFoundInStorage();
 error RMRKWriteToZero();
+error RMRKNotApprovedForResourcesOrOwner();
+error RMRKApprovalForResourcesToCurrentOwner();
+error RMRKApproveForResourcesCallerIsNotOwnerNorApprovedForAll();
+error RMRKApproveForResourcesToCaller();
 
 
 abstract contract MultiResourceAbstract is Context, IRMRKMultiResource {
@@ -51,6 +55,12 @@ abstract contract MultiResourceAbstract is Context, IRMRKMultiResource {
 
     //fallback URI
     string internal _fallbackURI;
+
+    // Mapping from token ID to approved address for resources
+    mapping(uint256 => address) internal _tokenApprovalsForResources;
+
+    // Mapping from owner to operator approvals for resources
+    mapping(address => mapping(address => bool)) internal _operatorApprovalsForResources;
 
     function getResource(
         uint64 resourceId
@@ -286,6 +296,33 @@ abstract contract MultiResourceAbstract is Context, IRMRKMultiResource {
         bool state
     ) internal {
         _tokenEnumeratedResource[resourceId] = state;
+    }
+
+    // Approvals
+
+    function getApprovedForResources(uint256 tokenId) public virtual view returns (address) {
+        // TODO: Do we want to add require minted here?
+        return _tokenApprovalsForResources[tokenId];
+    }
+
+    function isApprovedForAllForResources(address owner, address operator) public virtual view returns (bool) {
+        return _operatorApprovalsForResources[owner][operator];
+    }
+
+    // Cannot be fully implemented since ownership is not defined at this level
+    function _approveForResources(address owner, address to, uint256 tokenId) internal virtual {
+        _tokenApprovalsForResources[tokenId] = to;
+        emit ApprovalForResources(owner, to, tokenId);
+    }
+
+    // Cannot be fully implemented since ownership is not defined at this level
+    function _setApprovalForAllForResources(
+        address owner,
+        address operator,
+        bool approved
+    ) internal virtual {
+        _operatorApprovalsForResources[owner][operator] = approved;
+        emit ApprovalForAllForResources(owner, operator, approved);
     }
 
     // Utilities

@@ -293,24 +293,25 @@ async function shouldBehaveLikeNesting(
 
   describe('Accept child', async function () {
     it('can accept child', async function () {
-      const childId = 1;
+      const accepter = addrs[1]; // owner of parent token
       const parentId = 11;
+      await checkAcceptChildFromAddress(accepter, parentId);
+    });
 
-      // Another address can mint
-      await petMonkey['mint(address,uint256,uint256)'](ownerChunky.address, childId, parentId);
+    it('can accept child if approved', async function () {
+      const tokenOwner = addrs[1];
+      const approved = addrs[2];
+      const parentId = 11;
+      await ownerChunky.connect(tokenOwner).approve(approved.address, parentId);
+      await checkAcceptChildFromAddress(approved, parentId);
+    });
 
-      // owner accepts the child at index 0 into the child array
-      await ownerChunky.connect(addrs[1]).acceptChild(parentId, 0);
-
-      const pendingChildren = await ownerChunky.pendingChildrenOf(parentId);
-      expect(pendingChildren).to.eql([]);
-
-      const children = await ownerChunky.childrenOf(parentId);
-      expect(children).to.eql([[BigNumber.from(childId), petMonkey.address]]);
-      expect(await ownerChunky.childOf(parentId, 0)).to.eql([
-        BigNumber.from(childId),
-        petMonkey.address,
-      ]);
+    it('can accept child if approved for all', async function () {
+      const tokenOwner = addrs[1];
+      const approved = addrs[2];
+      const parentId = 11;
+      await ownerChunky.connect(tokenOwner).setApprovalForAll(approved.address, true);
+      await checkAcceptChildFromAddress(approved, parentId);
     });
 
     it('cannot accept not owned child', async function () {
@@ -326,25 +327,6 @@ async function shouldBehaveLikeNesting(
       ).to.be.revertedWithCustomError(ownerChunky, 'ERC721NotApprovedOrOwner');
     });
 
-    it('can accept child from approved address (not owner)', async function () {
-      const childId = 1;
-      const parentId = 11;
-      const approvedAddress = addrs[2];
-
-      await ownerChunky.connect(addrs[1]).approve(approvedAddress.address, parentId);
-
-      // Another address can mint
-      await petMonkey['mint(address,uint256,uint256)'](ownerChunky.address, childId, parentId);
-
-      await ownerChunky.connect(approvedAddress).acceptChild(parentId, 0);
-
-      const pendingChildren = await ownerChunky.pendingChildrenOf(parentId);
-      expect(pendingChildren).to.eql([]);
-
-      const children = await ownerChunky.childrenOf(parentId);
-      expect(children).to.eql([[BigNumber.from(childId), petMonkey.address]]);
-    });
-
     it('cannot accept children for non existing index', async () => {
       const parentId = 11;
       await expect(
@@ -355,12 +337,25 @@ async function shouldBehaveLikeNesting(
 
   describe('Reject child', async function () {
     it('can reject one pending child', async function () {
+      const rejecter = addrs[1]; // owner of parent token
       const parentId = 11;
-      await petMonkey['mint(address,uint256,uint256)'](ownerChunky.address, 1, parentId);
+      await checkRejectChildFromAddress(rejecter, parentId);
+    });
 
-      await ownerChunky.connect(addrs[1]).rejectChild(parentId, 0);
-      const pendingChildren = await ownerChunky.pendingChildrenOf(parentId);
-      expect(pendingChildren).to.eql([]);
+    it('can reject child if approved', async function () {
+      const tokenOwner = addrs[1];
+      const rejecter = addrs[2];
+      const parentId = 11;
+      await ownerChunky.connect(tokenOwner).approve(rejecter.address, parentId);
+      await checkRejectChildFromAddress(rejecter, parentId);
+    });
+
+    it('can reject child if approved for all', async function () {
+      const tokenOwner = addrs[1];
+      const rejecter = addrs[2];
+      const parentId = 11;
+      await ownerChunky.connect(tokenOwner).setApprovalForAll(rejecter.address, true);
+      await checkRejectChildFromAddress(rejecter, parentId);
     });
 
     it('cannot reject not owned pending child', async function () {
@@ -373,32 +368,26 @@ async function shouldBehaveLikeNesting(
       ).to.be.revertedWithCustomError(ownerChunky, 'ERC721NotApprovedOrOwner');
     });
 
-    it('can reject child from approved address (not owner)', async function () {
+    it('can reject all pending children', async function () {
+      const rejecter = addrs[1]; // owner of parent token
       const parentId = 11;
-      const approvedAddress = addrs[2];
-
-      await ownerChunky.connect(addrs[1]).approve(approvedAddress.address, parentId);
-      await petMonkey['mint(address,uint256,uint256)'](ownerChunky.address, 1, parentId);
-
-      await ownerChunky.connect(approvedAddress).rejectChild(parentId, 0);
-      const pendingChildren = await ownerChunky.pendingChildrenOf(parentId);
-      expect(pendingChildren).to.eql([]);
+      await checkRejectAllPendingChildrenFromAddress(rejecter, parentId);
     });
 
-    it('can reject all pending children', async function () {
+    it('can reject all pending children if approved', async function () {
+      const tokenOwner = addrs[1];
+      const rejecter = addrs[2];
       const parentId = 11;
-      await petMonkey['mint(address,uint256,uint256)'](ownerChunky.address, 1, parentId);
-      await petMonkey['mint(address,uint256,uint256)'](ownerChunky.address, 2, parentId);
+      await ownerChunky.connect(tokenOwner).approve(rejecter.address, parentId);
+      await checkRejectAllPendingChildrenFromAddress(rejecter, parentId);
+    });
 
-      let pendingChildren = await ownerChunky.pendingChildrenOf(parentId);
-      expect(pendingChildren).to.eql([
-        [BigNumber.from(1), petMonkey.address],
-        [BigNumber.from(2), petMonkey.address],
-      ]);
-
-      await ownerChunky.connect(addrs[1]).rejectAllChildren(parentId);
-      pendingChildren = await ownerChunky.pendingChildrenOf(parentId);
-      expect(pendingChildren).to.eql([]);
+    it('can reject all pending children if approved for all', async function () {
+      const tokenOwner = addrs[1];
+      const rejecter = addrs[2];
+      const parentId = 11;
+      await ownerChunky.connect(tokenOwner).setApprovalForAll(rejecter.address, true);
+      await checkRejectAllPendingChildrenFromAddress(rejecter, parentId);
     });
 
     it('cannot reject all pending children for not owned pending child', async function () {
@@ -435,13 +424,25 @@ async function shouldBehaveLikeNesting(
 
   describe('Remove child', async function () {
     it('can remove one child', async function () {
+      const remover = addrs[1]; // owner of parent token
       const parentId = 11;
-      await petMonkey['mint(address,uint256,uint256)'](ownerChunky.address, 1, parentId);
-      await ownerChunky.connect(addrs[1]).acceptChild(parentId, 0);
+      await checkRemoveChildFromAddress(remover, parentId);
+    });
 
-      await ownerChunky.connect(addrs[1]).removeChild(parentId, 0);
-      const children = await ownerChunky.childrenOf(parentId);
-      expect(children).to.eql([]);
+    it('can remove one child if approved', async function () {
+      const tokenOwner = addrs[1];
+      const remover = addrs[2];
+      const parentId = 11;
+      await ownerChunky.connect(tokenOwner).approve(remover.address, parentId);
+      await checkRemoveChildFromAddress(remover, parentId);
+    });
+
+    it('can remove one child if approved for all', async function () {
+      const tokenOwner = addrs[1];
+      const remover = addrs[2];
+      const parentId = 11;
+      await ownerChunky.connect(tokenOwner).setApprovalForAll(remover.address, true);
+      await checkRemoveChildFromAddress(remover, parentId);
     });
 
     it('cannot remove not owned child', async function () {
@@ -453,19 +454,6 @@ async function shouldBehaveLikeNesting(
       await expect(
         ownerChunky.connect(addrs[0]).removeChild(parentId, 0),
       ).to.be.revertedWithCustomError(ownerChunky, 'ERC721NotApprovedOrOwner');
-    });
-
-    it('can remove child from approved address (not owner)', async function () {
-      const parentId = 11;
-      const approvedAddress = addrs[2];
-
-      await ownerChunky.connect(addrs[1]).approve(approvedAddress.address, parentId);
-      await petMonkey['mint(address,uint256,uint256)'](ownerChunky.address, 1, parentId);
-      await ownerChunky.connect(addrs[1]).acceptChild(parentId, 0);
-
-      await ownerChunky.connect(approvedAddress).removeChild(parentId, 0);
-      const children = await ownerChunky.childrenOf(parentId);
-      expect(children).to.eql([]);
     });
 
     it('cannot remove children for non existing index', async () => {
@@ -605,17 +593,23 @@ async function shouldBehaveLikeNesting(
   describe('Unnesting', async function () {
     it('can unnest child and new owner is root owner', async function () {
       const { childId, parentId, firstOwner } = await mintTofirstOwner(true);
-      await expect(petMonkey.connect(firstOwner).unnestSelf(childId, 0))
-        .to.emit(ownerChunky, 'ChildUnnested')
-        .withArgs(parentId, 0);
+      await checkUnnestFromAddress(childId, parentId, firstOwner, firstOwner);
+    });
 
-      // New owner of child
-      expect(await petMonkey.ownerOf(childId)).to.eql(firstOwner.address);
-      expect(await petMonkey.rmrkOwnerOf(childId)).to.eql([
-        firstOwner.address,
-        BigNumber.from(0),
-        false,
-      ]);
+    it('can unnest child if approved', async function () {
+      const { childId, parentId, firstOwner } = await mintTofirstOwner(true);
+      const unnester = addrs[2];
+      // Since unnest is child scoped, approval must be on the child contract to child id
+      await petMonkey.connect(firstOwner).approve(unnester.address, childId);
+      await checkUnnestFromAddress(childId, parentId, firstOwner, unnester);
+    });
+
+    it('can unnest child if approved for all', async function () {
+      const { childId, parentId, firstOwner } = await mintTofirstOwner(true);
+      const unnester = addrs[2];
+      // Since unnest is child scoped, approval must be on the child contract to child id
+      await petMonkey.connect(firstOwner).setApprovalForAll(unnester.address, true);
+      await checkUnnestFromAddress(childId, parentId, firstOwner, unnester);
     });
 
     it('cannot unnest from parent directly', async function () {
@@ -849,6 +843,87 @@ async function shouldBehaveLikeNesting(
 
     const pending = await contract.pendingChildrenOf(tokenId);
     expect(pending).to.eql(expectedPending);
+  }
+
+  async function checkAcceptChildFromAddress(
+    accepter: SignerWithAddress,
+    parentId: number,
+  ): Promise<void> {
+    const childId = 1;
+
+    await petMonkey['mint(address,uint256,uint256)'](ownerChunky.address, childId, parentId);
+
+    // owner accepts the child at index 0 into the child array
+    await ownerChunky.connect(accepter).acceptChild(parentId, 0);
+
+    const pendingChildren = await ownerChunky.pendingChildrenOf(parentId);
+    expect(pendingChildren).to.eql([]);
+
+    const children = await ownerChunky.childrenOf(parentId);
+    expect(children).to.eql([[BigNumber.from(childId), petMonkey.address]]);
+    expect(await ownerChunky.childOf(parentId, 0)).to.eql([
+      BigNumber.from(childId),
+      petMonkey.address,
+    ]);
+  }
+
+  async function checkRejectChildFromAddress(
+    rejecter: SignerWithAddress,
+    parentId: number,
+  ): Promise<void> {
+    await petMonkey['mint(address,uint256,uint256)'](ownerChunky.address, 1, parentId);
+    await ownerChunky.connect(rejecter).rejectChild(parentId, 0);
+    const pendingChildren = await ownerChunky.pendingChildrenOf(parentId);
+    expect(pendingChildren).to.eql([]);
+  }
+
+  async function checkRejectAllPendingChildrenFromAddress(
+    rejecter: SignerWithAddress,
+    parentId: number,
+  ): Promise<void> {
+    await petMonkey['mint(address,uint256,uint256)'](ownerChunky.address, 1, parentId);
+    await petMonkey['mint(address,uint256,uint256)'](ownerChunky.address, 2, parentId);
+
+    let pendingChildren = await ownerChunky.pendingChildrenOf(parentId);
+    expect(pendingChildren).to.eql([
+      [BigNumber.from(1), petMonkey.address],
+      [BigNumber.from(2), petMonkey.address],
+    ]);
+
+    await ownerChunky.connect(rejecter).rejectAllChildren(parentId);
+    pendingChildren = await ownerChunky.pendingChildrenOf(parentId);
+    expect(pendingChildren).to.eql([]);
+  }
+
+  async function checkRemoveChildFromAddress(
+    remover: SignerWithAddress,
+    parentId: number,
+  ): Promise<void> {
+    await petMonkey['mint(address,uint256,uint256)'](ownerChunky.address, 1, parentId);
+    await ownerChunky.connect(addrs[1]).acceptChild(parentId, 0);
+
+    await ownerChunky.connect(remover).removeChild(parentId, 0);
+    const children = await ownerChunky.childrenOf(parentId);
+    expect(children).to.eql([]);
+  }
+
+  async function checkUnnestFromAddress(
+    childId: number,
+    parentId: number,
+    firstOwner: SignerWithAddress,
+    unnester: SignerWithAddress,
+  ): Promise<void> {
+    await expect(petMonkey.connect(unnester).unnestSelf(childId, 0))
+      .to.emit(ownerChunky, 'ChildUnnested')
+      .withArgs(parentId, 0);
+
+    // New owner of child
+    expect(await petMonkey.ownerOf(childId)).to.eql(firstOwner.address);
+    expect(await petMonkey.rmrkOwnerOf(childId)).to.eql([
+      firstOwner.address,
+      BigNumber.from(0),
+      false,
+    ]);
   }
 }
 
