@@ -12,7 +12,7 @@ import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
-/* import "hardhat/console.sol"; */
+// import "hardhat/console.sol";
 
 error RMRKCallerIsNotOwnerContract();
 error RMRKChildIndexOutOfRange();
@@ -270,7 +270,7 @@ contract RMRKNesting is ERC721, IRMRKNesting {
 
         // Clear approvals from the previous owner
         _approve(address(0), tokenId);
-
+        _cleanApprovals(to, tokenId);
         _balances[to] += 1;
 
         emit Transfer(from, to, tokenId);
