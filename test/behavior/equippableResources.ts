@@ -24,13 +24,15 @@ async function shouldBehaveLikeEquippableResources(
 
   async function deployTokensFixture() {
     const CHNKY = await ethers.getContractFactory(nestingContractName);
+    const ChnkEqup = await ethers.getContractFactory(equippableContractName);
+
     const chunkyContract = await CHNKY.deploy(name, symbol);
     await chunkyContract.deployed();
 
-    const ChnkEqup = await ethers.getContractFactory(equippableContractName);
     const chunkyEquipContract = await ChnkEqup.deploy();
-    chunkyEquipContract.setNestingAddress(chunkyContract.address);
     await chunkyEquipContract.deployed();
+
+    chunkyEquipContract.setNestingAddress(chunkyContract.address);
 
     return { chunkyContract, chunkyEquipContract };
   }
