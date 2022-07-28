@@ -10,7 +10,7 @@ describe('Equippable with Parts', async () => {
   );
 });
 
-describe.only('Equippable with Slots', async () => {
+describe('Equippable with Slots', async () => {
   shouldBehaveLikeEquippableWithSlots();
 });
 
