@@ -16,10 +16,9 @@ contract RMRKNestingEquippable is RMRKNestingMultiResource {
 
     address private _equippableAddress;
 
-    constructor(address equippableAddress, string memory name, string memory symbol)
+    constructor(string memory name, string memory symbol)
     RMRKNestingMultiResource(name, symbol)
     {
-        _equippableAddress = equippableAddress;
     }
 
     //FIXME: Check to make sure this cannot be called from non_RMRK owner
@@ -55,6 +54,10 @@ contract RMRKNestingEquippable is RMRKNestingMultiResource {
         bool equipped
     ) external onlyEquippable {
         IRMRKRMRKNestingEquippable(childAddress).markEquipped(tokenId, resourceId, equipped);
+    }
+
+    function _setEquippableAddress(address equippableAddress) internal {
+        _equippableAddress = equippableAddress;
     }
 
 }

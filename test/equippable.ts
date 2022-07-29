@@ -5,7 +5,7 @@ import shouldBehaveLikeEquippableWithSlots from './behavior/equippableSlots';
 describe.only('Equippable with Parts', async () => {
   shouldBehaveLikeEquippableWithParts(
     'RMRKEquippableMock',
-    'RMRKNestingMock',
+    'RMRKNestingEquippableMock',
     'RMRKBaseStorageMock',
   );
 });
@@ -13,11 +13,11 @@ describe.only('Equippable with Parts', async () => {
 describe.only('Equippable with Slots', async () => {
   shouldBehaveLikeEquippableWithSlots(
     'RMRKEquippableMock',
-    'RMRKNestingMock',
+    'RMRKNestingEquippableMock',
     'RMRKBaseStorageMock',
   );
 });
 
 describe.only('Equippable Resources', async () => {
-  shouldBehaveLikeEquippableResources('RMRKEquippableMock', 'RMRKNestingMock');
+  shouldBehaveLikeEquippableResources('RMRKEquippableMock', 'RMRKNestingEquippableMock');
 });
