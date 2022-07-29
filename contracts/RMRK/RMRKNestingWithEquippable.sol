@@ -4,11 +4,18 @@
 
 pragma solidity ^0.8.15;
 
+import "../RMRK/interfaces/IRMRKEquippable.sol";
 import "../RMRK/interfaces/IRMRKNestingWithEquippable.sol";
-import "../RMRK/interfaces/IRMRKMultiResource.sol";
 import "../RMRK/RMRKNesting.sol";
-/* import "hardhat/console.sol"; */
+// import "hardhat/console.sol";
 
+error RMRKNotParent();
+error RMRKNotEquippable();
+error RMRKMustUnequipFirst();
+
+// interface IRMRKRMRKNestingEquippable {
+//     function markEquipped(uint tokenId, uint64 resourceId, bool equipped) external;
+// }
 
 contract RMRKNestingWithEquippable is IRMRKNestingWithEquippable, RMRKNesting {
 
@@ -18,6 +25,47 @@ contract RMRKNestingWithEquippable is IRMRKNestingWithEquippable, RMRKNesting {
         string memory name_,
         string memory symbol_
     ) RMRKNesting(name_, symbol_) {}
+
+    //FIXME: Check to make sure this cannot be called from non_RMRK owner
+    function _onlyParent(uint256 tokenId) private view {
+        (address owner,,bool isNFT) = rmrkOwnerOf(tokenId);
+        if(_msgSender() != owner || !isNFT)
+            revert RMRKNotParent();
+    }
+
+    modifier onlyParent(uint256 tokenId) {
+        _onlyParent(tokenId);
+        _;
+    }
+
+    function _onlyEquippable() private view {
+        if(_msgSender() != _equippableAddress)
+            revert RMRKNotParent();
+    }
+
+    modifier onlyEquippable() {
+        _onlyEquippable();
+        _;
+    }
+
+    function markSelfEquipped(uint tokenId, uint64 resourceId, bool equipped) external onlyParent(tokenId) {
+        IRMRKEquippable(_equippableAddress).markEquipped(tokenId, resourceId, equipped);
+    }
+
+    function markChildEquipped(
+        address childAddress, 
+        uint tokenId, 
+        uint64 resourceId, 
+        bool equipped
+    ) external onlyEquippable {
+        IRMRKNestingWithEquippable(childAddress).markSelfEquipped(tokenId, resourceId, equipped);
+    }
+
+    function _unnestSelf(uint256 tokenId, uint256 index) internal override {
+        if (IRMRKEquippable(_equippableAddress).isEquipped(tokenId))
+            revert RMRKMustUnequipFirst();
+        super._unnestChild(tokenId, index);
+    }
 
     function _setEquippableAddress(address equippable) internal virtual {
         _equippableAddress = equippable;
