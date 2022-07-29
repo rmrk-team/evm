@@ -2,7 +2,7 @@ import shouldBehaveLikeEquippableWithParts from './behavior/equippableParts';
 import shouldBehaveLikeEquippableResources from './behavior/equippableResources';
 import shouldBehaveLikeEquippableWithSlots from './behavior/equippableSlots';
 
-describe('Equippable with Parts', async () => {
+describe.only('Equippable with Parts', async () => {
   shouldBehaveLikeEquippableWithParts(
     'RMRKEquippableMock',
     'RMRKNestingMock',
@@ -10,7 +10,7 @@ describe('Equippable with Parts', async () => {
   );
 });
 
-describe('Equippable with Slots', async () => {
+describe.only('Equippable with Slots', async () => {
   shouldBehaveLikeEquippableWithSlots(
     'RMRKEquippableMock',
     'RMRKNestingMock',
@@ -18,6 +18,6 @@ describe('Equippable with Slots', async () => {
   );
 });
 
-describe('Equippable Resources', async () => {
+describe.only('Equippable Resources', async () => {
   shouldBehaveLikeEquippableResources('RMRKEquippableMock', 'RMRKNestingMock');
 });

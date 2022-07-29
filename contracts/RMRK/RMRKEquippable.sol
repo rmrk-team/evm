@@ -219,7 +219,7 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
         _equip(tokenId, resourceId, slotPartId, childIndex, childResourceId);
     }
 
-    function markEquipped(uint tokenId, uint64 resourceId, bool equipped) external {
+    function markEquipped(uint tokenId, uint64 resourceId, bool equipped) external onlyNesting() {
         if (getCallerEquippableSlot(resourceId) == uint64(0))
             revert RMRKCallerCannotChangeEquipStatus();
         if (_isEquipped[tokenId] && equipped)
