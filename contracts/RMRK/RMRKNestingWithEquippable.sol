@@ -13,10 +13,6 @@ error RMRKNotParent();
 error RMRKNotEquippable();
 error RMRKMustUnequipFirst();
 
-// interface IRMRKRMRKNestingEquippable {
-//     function markEquipped(uint tokenId, uint64 resourceId, bool equipped) external;
-// }
-
 contract RMRKNestingWithEquippable is IRMRKNestingWithEquippable, RMRKNesting {
 
     address private _equippableAddress;
