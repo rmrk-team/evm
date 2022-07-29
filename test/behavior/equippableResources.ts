@@ -59,7 +59,7 @@ async function shouldBehaveLikeEquippableResources(
       expect(await chunky.supportsInterface('0x01ffc9a7')).to.equal(true);
     });
     it('can support IEquippable', async function () {
-      expect(await chunkyEquip.supportsInterface('0xe27dac58')).to.equal(true);
+      expect(await chunkyEquip.supportsInterface('0x07459234')).to.equal(true);
     });
     it('cannot support other interfaceId', async function () {
       expect(await chunkyEquip.supportsInterface('0xffffffff')).to.equal(false);
