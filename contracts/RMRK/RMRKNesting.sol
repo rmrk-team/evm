@@ -104,21 +104,13 @@ contract RMRKNesting is ERC721, IRMRKNesting {
     }
 
     function _mint(address to, uint256 tokenId, uint256 destinationId) internal virtual {
-        if(to == address(0))
-            revert ERC721MintToTheZeroAddress();
-        if(_exists(tokenId))
-            revert ERC721TokenAlreadyMinted();
-        if(!to.isContract())
-            revert RMRKIsNotContract();
+        if(to == address(0)) revert ERC721MintToTheZeroAddress();
+        if(_exists(tokenId)) revert ERC721TokenAlreadyMinted();
+        if(!to.isContract()) revert RMRKIsNotContract();
         if(!IERC165(to).supportsInterface(type(IRMRKNesting).interfaceId))
             revert RMRKMintToNonRMRKImplementer();
 
-        IRMRKNesting destContract = IRMRKNesting(to);
-
         _beforeTokenTransfer(address(0), to, tokenId);
-
-        address rootOwner = destContract.ownerOf(destinationId);
-        _balances[rootOwner] += 1;
 
         _RMRKOwners[tokenId] = RMRKOwner({
             ownerAddress: to,
@@ -126,11 +118,7 @@ contract RMRKNesting is ERC721, IRMRKNesting {
             isNft: true
         });
 
-        destContract.addChild(destinationId, tokenId, address(this));
-
-        emit Transfer(address(0), to, tokenId);
-
-        _afterTokenTransfer(address(0), to, tokenId);
+        _sendToNFT(tokenId, destinationId, address(0), to);
     }
 
     function _safeMintNesting(address to, uint256 tokenId) internal virtual {
@@ -142,6 +130,16 @@ contract RMRKNesting is ERC721, IRMRKNesting {
         if (!_checkRMRKNestingImplementer(address(0), to, tokenId, data)) {
             revert RMRKMintToNonRMRKImplementer();
         }
+    }
+
+    function _sendToNFT(uint tokenId, uint destinationId, address from, address to) private {
+        IRMRKNesting destContract = IRMRKNesting(to);
+        address nextOwner = destContract.ownerOf(destinationId);
+        _balances[nextOwner] += 1;
+        destContract.addChild(destinationId, tokenId, address(this));
+
+        emit Transfer(from, to, tokenId);
+        _afterTokenTransfer(from, to, tokenId);
     }
 
     ////////////////////////////////////////
@@ -253,24 +251,13 @@ contract RMRKNesting is ERC721, IRMRKNesting {
         if(ownerOf(tokenId) != from)
             revert ERC721TransferFromIncorrectOwner();
         if(to == address(0)) revert ERC721TransferToTheZeroAddress();
+        if(_RMRKOwners[tokenId].isNft) revert RMRKMustUnnestFirst();
 
         _beforeTokenTransfer(from, to, tokenId);
 
         // FIXME: balances are not tested and probably broken
         _balances[from] -= 1;
-        
-        RMRKOwner memory rmrkOwner = _RMRKOwners[tokenId];
-        if(rmrkOwner.isNft) revert RMRKMustUnnestFirst();
-
-        _RMRKOwners[tokenId] = RMRKOwner({
-            ownerAddress: to,
-            tokenId: 0,
-            isNft: false
-        });
-
-        // Clear approvals from the previous owner
-        _approve(address(0), tokenId);
-        _cleanApprovals(to, tokenId);
+        _updateOwnerAndClearApprovals(tokenId, 0, to, false);
         _balances[to] += 1;
 
         emit Transfer(from, to, tokenId);
@@ -299,37 +286,32 @@ contract RMRKNesting is ERC721, IRMRKNesting {
     ) internal virtual {
         if(ownerOf(tokenId) != from)
             revert ERC721TransferFromIncorrectOwner();
-        if(to == address(0)) revert ERC721TransferToTheZeroAddress();
+        if(_RMRKOwners[tokenId].isNft) revert RMRKMustUnnestFirst();
+        // Destination contract checks:
+        if(to == address(0)) revert ERC721TransferToTheZeroAddress(); // FIXME: Is this redundant with next?
         if(!to.isContract()) revert RMRKIsNotContract();
         if(!IERC165(to).supportsInterface(type(IRMRKNesting).interfaceId)) revert RMRKNestingTransferToNonRMRKNestingImplementer();
 
         _beforeTokenTransfer(from, to, tokenId);
-
-        // FIXME: balances are not tested and probably broken
+        // FIXME: balances are not tested
         _balances[from] -= 1;
 
-        RMRKOwner memory rmrkOwner = _RMRKOwners[tokenId];
-        if(rmrkOwner.isNft) revert RMRKMustUnnestFirst();
+        _updateOwnerAndClearApprovals(tokenId, destinationId, to, true);
 
+        // Sending to NFT:
+        _sendToNFT(tokenId, destinationId, from, to);
+    }
+
+    function _updateOwnerAndClearApprovals(uint tokenId, uint destinationId, address to, bool isNft) internal {
         _RMRKOwners[tokenId] = RMRKOwner({
             ownerAddress: to,
             tokenId: destinationId,
-            isNft: true
+            isNft: isNft
         });
 
         // Clear approvals from the previous owner
         _approve(address(0), tokenId);
         _cleanApprovals(to, tokenId);
-
-        IRMRKNesting destContract = IRMRKNesting(to);
-        
-        address nextOwner = destContract.ownerOf(destinationId);
-        _balances[nextOwner] += 1;
-
-        destContract.addChild(destinationId, tokenId, address(this));
-
-        emit Transfer(from, to, tokenId);
-        _afterTokenTransfer(from, to, tokenId);
     }
 
     function _cleanApprovals(address owner, uint256 tokenId) internal virtual {}
@@ -553,7 +535,7 @@ contract RMRKNesting is ERC721, IRMRKNesting {
                 return retval == IRMRKNestingReceiver.onRMRKNestingReceived.selector;
             } catch (bytes memory reason) {
                 if (reason.length == 0) {
-                    revert RMRKNestingTransferToNonRMRKNestingImplementer();
+                    return false;
                 } else {
                     assembly {
                         revert(add(32, reason), mload(reason))

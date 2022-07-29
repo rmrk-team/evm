@@ -1004,7 +1004,7 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
             this.token['safeMintNesting(address,uint256)'](invalidReceiver.address, tokenId),
           ).to.be.revertedWithCustomError(
             this.token,
-            'RMRKNestingTransferToNonRMRKNestingImplementer',
+            'RMRKMintToNonRMRKImplementer',
           );
         });
       });
@@ -1035,10 +1035,7 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
             this.token
               .connect(owner)
               ['safeMintNesting(address,uint256)'](revertingReceiver.address, tokenId),
-          ).to.be.revertedWithCustomError(
-            this.token,
-            'RMRKNestingTransferToNonRMRKNestingImplementer',
-          );
+          ).to.be.revertedWithCustomError(this.token, 'RMRKMintToNonRMRKImplementer');
         });
       });
 
@@ -1065,10 +1062,7 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
           );
           await expect(
             this.token['safeMintNesting(address,uint256)'](nonReceiver.address, tokenId),
-          ).to.be.revertedWithCustomError(
-            this.token,
-            'RMRKNestingTransferToNonRMRKNestingImplementer',
-          );
+          ).to.be.revertedWithCustomError(this.token, 'RMRKMintToNonRMRKImplementer');
         });
       });
 
