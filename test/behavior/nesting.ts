@@ -64,23 +64,6 @@ async function shouldBehaveLikeNesting(
     });
   });
 
-  describe('Issuer', async function () {
-    it('can set and get issuer', async function () {
-      const newIssuerAddr = addrs[1].address;
-      expect(await ownerChunky.getIssuer()).to.equal(owner.address);
-
-      await ownerChunky.setIssuer(newIssuerAddr);
-      expect(await ownerChunky.getIssuer()).to.equal(newIssuerAddr);
-    });
-
-    it('cannot set issuer if not issuer', async function () {
-      const newIssuer = addrs[1];
-      await expect(
-        ownerChunky.connect(newIssuer).setIssuer(newIssuer.address),
-      ).to.be.revertedWithCustomError(ownerChunky, 'RMRKOnlyIssuer');
-    });
-  });
-
   describe('Interface support', async function () {
     it('can support IERC165', async function () {
       expect(await ownerChunky.supportsInterface('0x01ffc9a7')).to.equal(true);
@@ -121,7 +104,7 @@ async function shouldBehaveLikeNesting(
 
     it('cannot nest mint to a non-contract destination', async function () {
       await expect(
-        petMonkey['mint(address,uint256,uint256,bytes)'](owner.address, 1, 0, mintNestData),
+        petMonkey['mint(address,uint256,uint256)'](owner.address, 1, 0),
       ).to.be.revertedWithCustomError(petMonkey, 'RMRKIsNotContract');
     });
 
@@ -131,7 +114,7 @@ async function shouldBehaveLikeNesting(
 
     it('cannot nest mint to a non-existent token', async function () {
       await expect(
-        petMonkey['mint(address,uint256,uint256,bytes)'](ownerChunky.address, 1, 0, mintNestData),
+        petMonkey['mint(address,uint256,uint256)'](ownerChunky.address, 1, 0),
       ).to.be.revertedWithCustomError(petMonkey, 'ERC721InvalidTokenId');
     });
 
@@ -140,20 +123,10 @@ async function shouldBehaveLikeNesting(
       const parentId = 11; // owner is addrs[1]
 
       // Mint petMonkey 1 into ownerChunky 11
-      await petMonkey['mint(address,uint256,uint256,bytes)'](
-        ownerChunky.address,
-        childId,
-        parentId,
-        mintNestData,
-      );
+      await petMonkey['mint(address,uint256,uint256)'](ownerChunky.address, childId, parentId);
 
       await expect(
-        petMonkey['mint(address,uint256,uint256,bytes)'](
-          ownerChunky.address,
-          childId,
-          parentId,
-          mintNestData,
-        ),
+        petMonkey['mint(address,uint256,uint256)'](ownerChunky.address, childId, parentId),
       ).to.be.revertedWithCustomError(petMonkey, 'ERC721TokenAlreadyMinted');
     });
 
@@ -163,30 +136,19 @@ async function shouldBehaveLikeNesting(
       const parentId = 12; // owner is addrs[1]
 
       // Mint petMonkey 1 into ownerChunky 11
-      await petMonkey['mint(address,uint256,uint256,bytes)'](
-        ownerChunky.address,
-        childId,
-        parentId,
-        mintNestData,
-      );
+      await petMonkey['mint(address,uint256,uint256)'](ownerChunky.address, childId, parentId);
 
       await expect(
-        petMonkey['mint(address,uint256,uint256,bytes)'](
-          ownerChunky.address,
-          childId,
-          parentId,
-          mintNestData,
-        ),
+        petMonkey['mint(address,uint256,uint256)'](ownerChunky.address, childId, parentId),
       ).to.be.revertedWithCustomError(petMonkey, 'ERC721TokenAlreadyMinted');
     });
 
     it('cannot nest mint to zero address', async function () {
       await expect(
-        petMonkey['mint(address,uint256,uint256,bytes)'](
+        petMonkey['mint(address,uint256,uint256)'](
           '0x0000000000000000000000000000000000000000',
           1,
           10,
-          mintNestData,
         ),
       ).to.be.revertedWithCustomError(petMonkey, 'ERC721MintToTheZeroAddress');
     });
@@ -196,12 +158,7 @@ async function shouldBehaveLikeNesting(
       const parentId = 11; // owner is addrs[1]
 
       // Mint petMonkey 1 into ownerChunky 11
-      await petMonkey['mint(address,uint256,uint256,bytes)'](
-        ownerChunky.address,
-        childId,
-        parentId,
-        mintNestData,
-      );
+      await petMonkey['mint(address,uint256,uint256)'](ownerChunky.address, childId, parentId);
 
       // owner is the same adress
       expect(await ownerChunky.ownerOf(parentId)).to.equal(addrs[1].address);
@@ -212,12 +169,7 @@ async function shouldBehaveLikeNesting(
       const childId = 1;
       const parentId = 11;
 
-      await petMonkey['mint(address,uint256,uint256,bytes)'](
-        ownerChunky.address,
-        childId,
-        parentId,
-        mintNestData,
-      );
+      await petMonkey['mint(address,uint256,uint256)'](ownerChunky.address, childId, parentId);
 
       // RMRK owner is an address for the parent
       expect(await ownerChunky.rmrkOwnerOf(parentId)).to.eql([
@@ -237,12 +189,7 @@ async function shouldBehaveLikeNesting(
       const childId = 1;
       const parentId = 11;
 
-      await petMonkey['mint(address,uint256,uint256,bytes)'](
-        ownerChunky.address,
-        childId,
-        parentId,
-        mintNestData,
-      );
+      await petMonkey['mint(address,uint256,uint256)'](ownerChunky.address, childId, parentId);
 
       const children = await ownerChunky.childrenOf(parentId);
       expect(children).to.eql([]);
@@ -261,21 +208,11 @@ async function shouldBehaveLikeNesting(
       const parentId = 10;
 
       // Owner address mints a child
-      await petMonkey['mint(address,uint256,uint256,bytes)'](
-        ownerChunky.address,
-        childId1,
-        parentId,
-        mintNestData,
-      );
+      await petMonkey['mint(address,uint256,uint256)'](ownerChunky.address, childId1, parentId);
       expect(await petMonkey.ownerOf(childId1)).to.equal(addrs[0].address);
 
       // Mint a second child
-      await petMonkey['mint(address,uint256,uint256,bytes)'](
-        ownerChunky.address,
-        childId2,
-        parentId,
-        mintNestData,
-      );
+      await petMonkey['mint(address,uint256,uint256)'](ownerChunky.address, childId2, parentId);
       expect(await petMonkey.ownerOf(childId2)).to.equal(addrs[0].address);
 
       const pendingChildren = await ownerChunky.pendingChildrenOf(parentId);
@@ -291,19 +228,9 @@ async function shouldBehaveLikeNesting(
       const granchildId = 21;
 
       // mint petMonkey token 1 into ownerChunky token 10
-      await petMonkey['mint(address,uint256,uint256,bytes)'](
-        ownerChunky.address,
-        childId,
-        parentId,
-        mintNestData,
-      );
+      await petMonkey['mint(address,uint256,uint256)'](ownerChunky.address, childId, parentId);
       // mint petMonkey token 21 into petMonkey token 1
-      await petMonkey['mint(address,uint256,uint256,bytes)'](
-        petMonkey.address,
-        granchildId,
-        childId,
-        mintNestData,
-      );
+      await petMonkey['mint(address,uint256,uint256)'](petMonkey.address, granchildId, childId);
 
       const pendingChildrenOfChunky10 = await ownerChunky.pendingChildrenOf(parentId);
       const pendingChildrenOfMonkey1 = await petMonkey.pendingChildrenOf(childId);
@@ -327,21 +254,11 @@ async function shouldBehaveLikeNesting(
 
       // First 127 should be fine.
       for (let i = 1; i <= 128; i++) {
-        await petMonkey['mint(address,uint256,uint256,bytes)'](
-          ownerChunky.address,
-          i,
-          tokenId,
-          mintNestData,
-        );
+        await petMonkey['mint(address,uint256,uint256)'](ownerChunky.address, i, tokenId);
       }
 
       await expect(
-        petMonkey['mint(address,uint256,uint256,bytes)'](
-          ownerChunky.address,
-          129,
-          tokenId,
-          mintNestData,
-        ),
+        petMonkey['mint(address,uint256,uint256)'](ownerChunky.address, 129, tokenId),
       ).to.be.revertedWithCustomError(petMonkey, 'RMRKMaxPendingChildrenReached');
     });
   });
@@ -385,12 +302,7 @@ async function shouldBehaveLikeNesting(
       const parentId = 11;
 
       // Another address can mint
-      await petMonkey['mint(address,uint256,uint256,bytes)'](
-        ownerChunky.address,
-        childId,
-        parentId,
-        mintNestData,
-      );
+      await petMonkey['mint(address,uint256,uint256)'](ownerChunky.address, childId, parentId);
 
       // Another address cannot accept
       await expect(
@@ -431,12 +343,7 @@ async function shouldBehaveLikeNesting(
 
     it('cannot reject not owned pending child', async function () {
       const parentId = 11;
-      await petMonkey['mint(address,uint256,uint256,bytes)'](
-        ownerChunky.address,
-        1,
-        parentId,
-        mintNestData,
-      );
+      await petMonkey['mint(address,uint256,uint256)'](ownerChunky.address, 1, parentId);
 
       // addrs[1] attempts to reject addrs[0]'s pending children
       await expect(
@@ -468,18 +375,8 @@ async function shouldBehaveLikeNesting(
 
     it('cannot reject all pending children for not owned pending child', async function () {
       const parentId = 11;
-      await petMonkey['mint(address,uint256,uint256,bytes)'](
-        ownerChunky.address,
-        1,
-        parentId,
-        mintNestData,
-      );
-      await petMonkey['mint(address,uint256,uint256,bytes)'](
-        ownerChunky.address,
-        2,
-        parentId,
-        mintNestData,
-      );
+      await petMonkey['mint(address,uint256,uint256)'](ownerChunky.address, 1, parentId);
+      await petMonkey['mint(address,uint256,uint256)'](ownerChunky.address, 2, parentId);
 
       // addrs[1] attempts to reject addrs[0]'s pending children
       await expect(
@@ -492,18 +389,8 @@ async function shouldBehaveLikeNesting(
       const approvedAddress = addrs[2];
 
       await ownerChunky.connect(addrs[1]).approve(approvedAddress.address, parentId);
-      await petMonkey['mint(address,uint256,uint256,bytes)'](
-        ownerChunky.address,
-        1,
-        parentId,
-        mintNestData,
-      );
-      await petMonkey['mint(address,uint256,uint256,bytes)'](
-        ownerChunky.address,
-        2,
-        parentId,
-        mintNestData,
-      );
+      await petMonkey['mint(address,uint256,uint256)'](ownerChunky.address, 1, parentId);
+      await petMonkey['mint(address,uint256,uint256)'](ownerChunky.address, 2, parentId);
 
       await ownerChunky.connect(approvedAddress).rejectAllChildren(parentId);
       const pendingChildren = await ownerChunky.pendingChildrenOf(parentId);
@@ -543,12 +430,7 @@ async function shouldBehaveLikeNesting(
 
     it('cannot remove not owned child', async function () {
       const parentId = 11;
-      await petMonkey['mint(address,uint256,uint256,bytes)'](
-        ownerChunky.address,
-        1,
-        parentId,
-        mintNestData,
-      );
+      await petMonkey['mint(address,uint256,uint256)'](ownerChunky.address, 1, parentId);
       await ownerChunky.connect(addrs[1]).acceptChild(parentId, 0);
 
       // addrs[1] attempts to remove addrs[0]'s children
@@ -590,12 +472,7 @@ async function shouldBehaveLikeNesting(
       const childId = 1;
       const parentId = 10;
       // mint petMonkey token 1 into ownerChunky token 10
-      await petMonkey['mint(address,uint256,uint256,bytes)'](
-        ownerChunky.address,
-        childId,
-        parentId,
-        mintNestData,
-      );
+      await petMonkey['mint(address,uint256,uint256)'](ownerChunky.address, childId, parentId);
       await expect(petMonkey.burnFromParent(childId)).to.be.revertedWithCustomError(
         petMonkey,
         'RMRKCallerIsNotOwnerContract',
@@ -620,12 +497,7 @@ async function shouldBehaveLikeNesting(
       const childId = 1;
       const parentId = 10;
       // mint petMonkey token 1 into ownerChunky token 10
-      await petMonkey['mint(address,uint256,uint256,bytes)'](
-        ownerChunky.address,
-        childId,
-        parentId,
-        mintNestData,
-      );
+      await petMonkey['mint(address,uint256,uint256)'](ownerChunky.address, childId, parentId);
       await ownerChunky.connect(addrs[0]).acceptChild(parentId, 0);
       await petMonkey.connect(addrs[0]).burn(childId);
 
@@ -644,12 +516,7 @@ async function shouldBehaveLikeNesting(
       const childId = 1;
       const parentId = 10;
       // mint petMonkey token 1 into ownerChunky token 10
-      await petMonkey['mint(address,uint256,uint256,bytes)'](
-        ownerChunky.address,
-        childId,
-        parentId,
-        mintNestData,
-      );
+      await petMonkey['mint(address,uint256,uint256)'](ownerChunky.address, childId, parentId);
       await ownerChunky.connect(addrs[0]).acceptChild(parentId, 0);
 
       await expect(petMonkey.connect(addrs[1]).burn(childId)).to.be.revertedWithCustomError(
@@ -664,20 +531,10 @@ async function shouldBehaveLikeNesting(
       const granchildId = 21;
 
       // mint petMonkey token 1 into ownerChunky token 10
-      await petMonkey['mint(address,uint256,uint256,bytes)'](
-        ownerChunky.address,
-        childId,
-        parentId,
-        mintNestData,
-      );
+      await petMonkey['mint(address,uint256,uint256)'](ownerChunky.address, childId, parentId);
       await ownerChunky.connect(addrs[0]).acceptChild(parentId, 0);
       // mint ownerChunky token 21 into petMonkey token 1
-      await ownerChunky['mint(address,uint256,uint256,bytes)'](
-        petMonkey.address,
-        granchildId,
-        childId,
-        mintNestData,
-      );
+      await ownerChunky['mint(address,uint256,uint256)'](petMonkey.address, granchildId, childId);
       await petMonkey.connect(addrs[0]).acceptChild(childId, 0);
 
       // ownership chain is now addrs[0] > ownerChunky[10] > petMonkey[1] > ownerChunky[21]
@@ -752,20 +609,10 @@ async function shouldBehaveLikeNesting(
       const owner = addrs[0];
 
       // mint petMonkey token 1 into ownerChunky token 10
-      await petMonkey['mint(address,uint256,uint256,bytes)'](
-        ownerChunky.address,
-        childId,
-        parentId,
-        mintNestData,
-      );
+      await petMonkey['mint(address,uint256,uint256)'](ownerChunky.address, childId, parentId);
       await ownerChunky.connect(addrs[0]).acceptChild(parentId, 0);
       // mint petMonkey token 21 into petMonkey token 1
-      await petMonkey['mint(address,uint256,uint256,bytes)'](
-        petMonkey.address,
-        grandchildId,
-        childId,
-        mintNestData,
-      );
+      await petMonkey['mint(address,uint256,uint256)'](petMonkey.address, grandchildId, childId);
       await petMonkey.connect(addrs[0]).acceptChild(childId, 0);
 
       // Unnest child from parent.
@@ -850,13 +697,7 @@ async function shouldBehaveLikeNesting(
 
       await petMonkey
         .connect(approved)
-        ['transferFrom(address,address,uint256,uint256,bytes)'](
-          firstOwner.address,
-          newOwner.address,
-          tokenId,
-          0,
-          emptyData,
-        );
+        ['transferFrom(address,address,uint256)'](firstOwner.address, newOwner.address, tokenId);
       expect(await petMonkey.ownerOf(tokenId)).to.eql(newOwner.address);
     });
 
@@ -865,13 +706,7 @@ async function shouldBehaveLikeNesting(
       const { childId, parentId, firstOwner } = await mintTofirstOwner();
       await ownerChunky
         .connect(firstOwner)
-        ['transferFrom(address,address,uint256,uint256,bytes)'](
-          firstOwner.address,
-          newOwner.address,
-          parentId,
-          0,
-          emptyData,
-        );
+        ['transferFrom(address,address,uint256)'](firstOwner.address, newOwner.address, parentId);
 
       // New owner of parent
       expect(await ownerChunky.ownerOf(parentId)).to.eql(newOwner.address);
@@ -895,13 +730,7 @@ async function shouldBehaveLikeNesting(
       const { childId, parentId, firstOwner } = await mintTofirstOwner();
       await ownerChunky
         .connect(firstOwner)
-        ['transferFrom(address,address,uint256,uint256,bytes)'](
-          firstOwner.address,
-          newOwner.address,
-          parentId,
-          0,
-          emptyData,
-        );
+        ['transferFrom(address,address,uint256)'](firstOwner.address, newOwner.address, parentId);
 
       // Parent still has its children
       const children = await ownerChunky.pendingChildrenOf(parentId);
@@ -915,12 +744,11 @@ async function shouldBehaveLikeNesting(
       await expect(
         petMonkey
           .connect(firstOwner)
-          ['transferFrom(address,address,uint256,uint256,bytes)'](
+          ['transferFrom(address,address,uint256,uint256)'](
             firstOwner.address,
             ownerChunky.address,
             childId,
             newParentId,
-            emptyData,
           ),
       ).to.be.revertedWithCustomError(petMonkey, 'RMRKMustUnnestFirst');
     });
@@ -933,12 +761,11 @@ async function shouldBehaveLikeNesting(
 
       await ownerChunky
         .connect(firstOwner)
-        ['transferFrom(address,address,uint256,uint256,bytes)'](
+        ['transferFrom(address,address,uint256,uint256)'](
           firstOwner.address,
           ownerChunky.address,
           parentId,
           newGrandparentId,
-          emptyData,
         );
 
       // Parent is still owner of child
@@ -957,12 +784,11 @@ async function shouldBehaveLikeNesting(
 
       await ownerChunky
         .connect(firstOwner)
-        ['safeTransferFrom(address,address,uint256,uint256,bytes)'](
+        ['transferFrom(address,address,uint256,uint256)'](
           firstOwner.address,
           ownerChunky.address,
           parentId,
           newGrandparentId,
-          emptyData,
         );
 
       // Parent is still owner of child
@@ -981,12 +807,7 @@ async function shouldBehaveLikeNesting(
     const parentId = 11; // First owner owns this
     const firstOwner = addrs[1];
 
-    await petMonkey['mint(address,uint256,uint256,bytes)'](
-      ownerChunky.address,
-      childId,
-      parentId,
-      mintNestData,
-    );
+    await petMonkey['mint(address,uint256,uint256)'](ownerChunky.address, childId, parentId);
     if (accept) {
       await ownerChunky.connect(firstOwner).acceptChild(parentId, 0);
     }
@@ -1013,12 +834,7 @@ async function shouldBehaveLikeNesting(
   ): Promise<void> {
     const childId = 1;
 
-    await petMonkey['mint(address,uint256,uint256,bytes)'](
-      ownerChunky.address,
-      childId,
-      parentId,
-      mintNestData,
-    );
+    await petMonkey['mint(address,uint256,uint256)'](ownerChunky.address, childId, parentId);
 
     // owner accepts the child at index 0 into the child array
     await ownerChunky.connect(accepter).acceptChild(parentId, 0);
@@ -1038,13 +854,7 @@ async function shouldBehaveLikeNesting(
     rejecter: SignerWithAddress,
     parentId: number,
   ): Promise<void> {
-    await petMonkey['mint(address,uint256,uint256,bytes)'](
-      ownerChunky.address,
-      1,
-      parentId,
-      mintNestData,
-    );
-
+    await petMonkey['mint(address,uint256,uint256)'](ownerChunky.address, 1, parentId);
     await ownerChunky.connect(rejecter).rejectChild(parentId, 0);
     const pendingChildren = await ownerChunky.pendingChildrenOf(parentId);
     expect(pendingChildren).to.eql([]);
@@ -1054,18 +864,8 @@ async function shouldBehaveLikeNesting(
     rejecter: SignerWithAddress,
     parentId: number,
   ): Promise<void> {
-    await petMonkey['mint(address,uint256,uint256,bytes)'](
-      ownerChunky.address,
-      1,
-      parentId,
-      mintNestData,
-    );
-    await petMonkey['mint(address,uint256,uint256,bytes)'](
-      ownerChunky.address,
-      2,
-      parentId,
-      mintNestData,
-    );
+    await petMonkey['mint(address,uint256,uint256)'](ownerChunky.address, 1, parentId);
+    await petMonkey['mint(address,uint256,uint256)'](ownerChunky.address, 2, parentId);
 
     let pendingChildren = await ownerChunky.pendingChildrenOf(parentId);
     expect(pendingChildren).to.eql([
@@ -1082,12 +882,7 @@ async function shouldBehaveLikeNesting(
     remover: SignerWithAddress,
     parentId: number,
   ): Promise<void> {
-    await petMonkey['mint(address,uint256,uint256,bytes)'](
-      ownerChunky.address,
-      1,
-      parentId,
-      mintNestData,
-    );
+    await petMonkey['mint(address,uint256,uint256)'](ownerChunky.address, 1, parentId);
     await ownerChunky.connect(addrs[1]).acceptChild(parentId, 0);
 
     await ownerChunky.connect(remover).removeChild(parentId, 0);

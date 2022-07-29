@@ -105,4 +105,14 @@ contract RMRKMultiResource is ERC721, MultiResourceAbstract {
         _setApprovalForAllForResources(owner, operator, approved);
     }
 
+    // Other
+
+    function _requireMinted(uint256 tokenId) internal view virtual override(ERC721, MultiResourceAbstract) {
+        ERC721._requireMinted(tokenId);
+    }
+
+    function _exists(uint256 tokenId) internal view virtual override(ERC721, MultiResourceAbstract) returns (bool) {
+        return ERC721._exists(tokenId);
+    }
+
 }

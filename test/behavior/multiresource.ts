@@ -44,6 +44,75 @@ async function shouldBehaveLikeMultiResource(name: string, symbol: string) {
     });
   });
 
+  describe('Approvals', async function () {
+    it('can approve address for resources', async function () {
+      const tokenId = 1;
+      const approvedAddress = addrs[1];
+      await this.token['mint(address,uint256)'](owner.address, tokenId);
+      await this.token.approveForResources(approvedAddress.address, tokenId);
+      expect(await this.token.getApprovedForResources(tokenId)).to.eql(approvedAddress.address);
+    });
+
+    it('can approve address for all for resources', async function () {
+      const tokenId = 1;
+      const approvedAddress = addrs[1].address;
+      await this.token['mint(address,uint256)'](owner.address, tokenId);
+
+      await this.token.setApprovalForAllForResources(approvedAddress, true);
+      expect(await this.token.isApprovedForAllForResources(owner.address, approvedAddress)).to.eql(
+        true,
+      );
+
+      await this.token.setApprovalForAllForResources(approvedAddress, false);
+      expect(await this.token.isApprovedForAllForResources(owner.address, approvedAddress)).to.eql(
+        false,
+      );
+    });
+
+    it('cannot approve owner for resources', async function () {
+      const tokenId = 1;
+      await this.token['mint(address,uint256)'](owner.address, tokenId);
+
+      await expect(
+        this.token.approveForResources(owner.address, tokenId),
+      ).to.be.revertedWithCustomError(this.token, 'RMRKApprovalForResourcesToCurrentOwner');
+    });
+
+    it('cannot approve owner for all resources', async function () {
+      const tokenId = 1;
+      await this.token['mint(address,uint256)'](owner.address, tokenId);
+
+      await expect(
+        this.token.setApprovalForAllForResources(owner.address, owner.address),
+      ).to.be.revertedWithCustomError(this.token, 'RMRKApproveForResourcesToCaller');
+    });
+
+    it('cannot approve owner if not owner', async function () {
+      const tokenId = 1;
+      const notOwner = addrs[2];
+      const approvedAddress = addrs[1].address;
+      await this.token['mint(address,uint256)'](owner.address, tokenId);
+
+      await expect(
+        this.token.connect(notOwner).approveForResources(approvedAddress, tokenId),
+      ).to.be.revertedWithCustomError(
+        this.token,
+        'RMRKApproveForResourcesCallerIsNotOwnerNorApprovedForAll',
+      );
+    });
+
+    it('can approve address for resources if approved for all resources', async function () {
+      const tokenId = 1;
+      const approvedForAll = addrs[1];
+      const otherApproved = addrs[2];
+      await this.token['mint(address,uint256)'](owner.address, tokenId);
+      await this.token.setApprovalForAllForResources(approvedForAll.address, true);
+
+      await this.token.connect(approvedForAll).approveForResources(otherApproved.address, tokenId);
+      expect(await this.token.getApprovedForResources(tokenId)).to.eql(otherApproved.address);
+    });
+  });
+
   describe('Resource storage', async function () {
     it('can add resource', async function () {
       const id = BigNumber.from(1);
@@ -59,12 +128,6 @@ async function shouldBehaveLikeMultiResource(name: string, symbol: string) {
         this.token,
         'RMRKNoResourceMatchingId',
       );
-    });
-
-    it('cannot add resource entry if not issuer', async function () {
-      const id = BigNumber.from(1);
-      await expect(this.token.connect(addrs[1]).addResourceEntry(id, metaURIDefault, customDefault))
-        .to.be.reverted;
     });
 
     it('cannot overwrite resource', async function () {

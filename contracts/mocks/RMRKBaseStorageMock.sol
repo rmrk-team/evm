@@ -2,10 +2,9 @@
 
 pragma solidity ^0.8.15;
 
-import "../RMRK/access/RMRKIssuable.sol";
 import "../RMRK/RMRKBaseStorage.sol";
 
-contract RMRKBaseStorageMock is RMRKIssuable, RMRKBaseStorage {
+contract RMRKBaseStorageMock is RMRKBaseStorage {
     constructor(string memory symbol_, string memory type__)
     RMRKBaseStorage(symbol_, type__) {}
 
@@ -20,14 +19,14 @@ contract RMRKBaseStorageMock is RMRKIssuable, RMRKBaseStorage {
     function addEquippableAddresses(
         uint64 partId,
         address[] memory equippableAddresses
-    ) external onlyIssuer {
+    ) external {
         _addEquippableAddresses(partId, equippableAddresses);
     }
 
     function setEquippableAddresses(
         uint64 partId,
         address[] memory equippableAddresses
-    ) external onlyIssuer {
+    ) external {
         _setEquippableAddresses(partId, equippableAddresses);
     }
 

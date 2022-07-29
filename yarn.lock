@@ -748,6 +748,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@nomicfoundation/hardhat-network-helpers@npm:^1.0.3":
+  version: 1.0.3
+  resolution: "@nomicfoundation/hardhat-network-helpers@npm:1.0.3"
+  dependencies:
+    ethereumjs-util: ^7.1.4
+  peerDependencies:
+    hardhat: ^2.0.0
+  checksum: d2538070c84b6982b0eed76dad96d5119ca074e2b046cfeebdb71f99ac44c47aa77ba44ea3773d5a1c27da4998837462372fb0a9e12c1668e1398c85ec8bca0a
+  languageName: node
+  linkType: hard
+
 "@nomiclabs/hardhat-ethers@npm:^2.1.0":
   version: 2.1.0
   resolution: "@nomiclabs/hardhat-ethers@npm:2.1.0"
@@ -6056,7 +6067,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"hardhat@npm:^2.10.0":
+"hardhat@npm:^2.10.1":
   version: 2.10.1
   resolution: "hardhat@npm:2.10.1"
   dependencies:
@@ -10250,6 +10261,7 @@ __metadata:
   resolution: "rmrksol@workspace:."
   dependencies:
     "@nomicfoundation/hardhat-chai-matchers": ^1.0.1
+    "@nomicfoundation/hardhat-network-helpers": ^1.0.3
     "@nomiclabs/hardhat-ethers": ^2.1.0
     "@nomiclabs/hardhat-etherscan": ^3.1.0
     "@openzeppelin/contracts": ^4.6.0
@@ -10271,7 +10283,7 @@ __metadata:
     eslint-plugin-prettier: ^4.2.1
     eslint-plugin-promise: ^6.0.0
     ethers: ^5.6.9
-    hardhat: ^2.10.0
+    hardhat: ^2.10.1
     hardhat-contract-sizer: ^2.6.1
     hardhat-gas-reporter: ^1.0.8
     prettier: 2.7.1

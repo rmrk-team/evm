@@ -2,6 +2,7 @@ import { expect } from 'chai';
 import { ethers } from 'hardhat';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { Contract } from 'ethers';
+import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 
 describe('Nesting', async () => {
   let mintingUtils: Contract;
@@ -9,14 +10,22 @@ describe('Nesting', async () => {
   let owner: SignerWithAddress;
   let addrs: SignerWithAddress[];
 
-  beforeEach(async function () {
+  async function deployMintingUtilsFixture() {
     const [signersOwner, ...signersAddr] = await ethers.getSigners();
+    const MINT = await ethers.getContractFactory('MintingUtilsMock');
+    const mintingUtilsContract = await MINT.deploy(10, 100);
+    await mintingUtilsContract.deployed();
+
+    return { mintingUtilsContract, signersOwner, signersAddr };
+  }
+
+  beforeEach(async function () {
+    const { mintingUtilsContract, signersOwner, signersAddr } = await loadFixture(
+      deployMintingUtilsFixture,
+    );
     owner = signersOwner;
     addrs = signersAddr;
-
-    const MINT = await ethers.getContractFactory('MintingUtilsMock');
-    mintingUtils = await MINT.deploy(10, 100);
-    await mintingUtils.deployed();
+    mintingUtils = mintingUtilsContract;
   });
 
   describe('Test', async function () {

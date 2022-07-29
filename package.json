@@ -10,11 +10,12 @@
     },
     "dependencies": {
         "@openzeppelin/contracts": "^4.6.0",
-        "hardhat": "^2.10.0",
+        "hardhat": "^2.10.1",
         "solc": "^0.8.9"
     },
     "devDependencies": {
         "@nomicfoundation/hardhat-chai-matchers": "^1.0.1",
+        "@nomicfoundation/hardhat-network-helpers": "^1.0.3",
         "@nomiclabs/hardhat-ethers": "^2.1.0",
         "@nomiclabs/hardhat-etherscan": "^3.1.0",
         "@openzeppelin/test-helpers": "^0.5.15",

@@ -478,7 +478,10 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
         if(to == owner)
             revert RMRKApprovalForResourcesToCurrentOwner();
 
-        if(_msgSender() != owner && !isApprovedForAllForResources(owner, _msgSender()))
+        // We want to bypass the check if the caller is the linked nesting contract and it's simply removing approvals
+        bool isNestingCallToRemoveApprovals = (_msgSender() == _nestingAddress &&  to == address(0));
+
+        if(!isNestingCallToRemoveApprovals && _msgSender() != owner && !isApprovedForAllForResources(owner, _msgSender()))
             revert RMRKApproveForResourcesCallerIsNotOwnerNorApprovedForAll();
         _approveForResources(owner, to, tokenId);
     }
@@ -488,5 +491,9 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
         if(owner == operator)
             revert RMRKApproveForResourcesToCaller();
         _setApprovalForAllForResources(owner, operator, approved);
+    }
+
+    function _exists(uint256 tokenId) internal override view virtual returns (bool) {
+        return _ownerOf(tokenId) != address(0);
     }
 }
