@@ -1,6 +1,6 @@
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
-import { BigNumberish, Contract } from 'ethers';
+import { Contract } from 'ethers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 
 describe('RMRKFactory', async () => {
@@ -17,8 +17,8 @@ describe('RMRKFactory', async () => {
 
   describe('Deployment', async function () {
     beforeEach(async function () {
-      const RMRKFactory = await ethers.getContractFactory('RMRKFactory');
-      rmrkFactory = await RMRKFactory.deploy();
+      const RMRKMultiResourceFactory = await ethers.getContractFactory('RMRKMultiResourceFactory');
+      rmrkFactory = await RMRKMultiResourceFactory.deploy();
     });
 
     it('Deploy a new RMRK MultiResource contract', async function () {
