@@ -382,16 +382,6 @@ async function shouldBehaveLikeEquippableWithSlots() {
       ).to.be.revertedWithCustomError(soldierEquip, 'RMRKEquippableEquipNotAllowedByBase');
     });
 
-    it('cannot mark equipped from wrong parent', async function () {
-      // Even if the caller is the owner, only the current parent contract can mark it as equipped
-      await expect(
-        weaponEquip.connect(addrs[0]).markEquipped(weapons[0], weaponResourcesEquip[0], true),
-      ).to.be.revertedWithCustomError(weaponEquip, 'RMRKCallerCannotChangeEquipStatus');
-      // Just in case, we also test setting it unequiped
-      await expect(
-        weaponEquip.connect(addrs[0]).markEquipped(weapons[0], weaponResourcesEquip[0], false),
-      ).to.be.revertedWithCustomError(weaponEquip, 'RMRKCallerCannotChangeEquipStatus');
-    });
   });
 
   describe('Unequip', async function () {
@@ -400,6 +390,7 @@ async function shouldBehaveLikeEquippableWithSlots() {
       const soldierOwner = addrs[0];
       const childIndex = 0;
       const weaponResId = weaponResourcesEquip[0]; // This resource is assigned to weapon first weapon
+
       await soldierEquip
         .connect(soldierOwner)
         .equip(soldiers[0], soldierResId, partIdForWeapon, childIndex, weaponResId);
@@ -536,15 +527,19 @@ async function shouldBehaveLikeEquippableWithSlots() {
   });
 
   describe('Transfer equipped', async function () {
-    /*
-    This test fails for now -- implementing channel from child to childEquippable,
-    after which the revert may not even be necessary. Revert must also be implemented
-    from top-level via nestingImpl override of unnestSelf() since it must be triggered
-    by the unnest call. Error does not yet exist, first securing markEquipped() channel.
+    it('Can unequip and unnest', async function () {
+      // Weapon is child on index 0, background on index 1
+      const soldierOwner = addrs[0];
+      const childIndex = 0;
+      const weaponResId = weaponResourcesEquip[0]; // This resource is assigned to weapon first weapon
 
-      It says the target contract doesn't have a custom error 'RMRKNotNesting', meaning
-      that while it's defined, it's not implemented yet.
-      */
+      await soldierEquip
+        .connect(soldierOwner)
+        .equip(soldiers[0], soldierResId, partIdForWeapon, childIndex, weaponResId);
+
+      await unequipWeaponAndCheckFromAddress(soldierOwner);
+      await weapon.connect(soldierOwner).unnestSelf(11, 0);
+    });
     it('Unnest fails if self is equipped', async function () {
       // Weapon is child on index 0
       const childIndex = 0;
@@ -554,8 +549,8 @@ async function shouldBehaveLikeEquippableWithSlots() {
         .equip(soldiers[0], soldierResId, partIdForWeapon, childIndex, weaponResId);
 
       await expect(weapon.connect(addrs[0]).unnestSelf(11, 0)).to.be.revertedWithCustomError(
-        weaponEquip,
-        'RMRKNotNesting',
+        weapon,
+        'RMRKMustUnequipFirst',
       );
     });
   });

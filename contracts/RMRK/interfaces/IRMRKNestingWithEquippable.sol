@@ -12,4 +12,8 @@ interface IRMRKNestingWithEquippable {
     function getEquippablesAddress() external view returns (address);
 
     function isApprovedOrOwner(address spender, uint256 tokenId) external view returns (bool);
+
+    function markSelfEquipped(uint tokenId, uint64 resourceId, bool equipped) external;
+
+    function markChildEquipped(address childAddress, uint tokenId, uint64 resourceId, bool equipped) external;
 }

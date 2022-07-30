@@ -41,7 +41,7 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
         uint64 resourceId;
         uint64 childResourceId;
         uint childTokenId;
-        address childAddress;
+        address childEquippableAddress;
     }
 
     struct ExtendedResource { // Used for input/output only
@@ -161,29 +161,29 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
         uint256 childIndex,
         uint64 childResourceId
     ) private {
-        if (_equipments[tokenId][_baseAddresses[resourceId]][slotPartId].childAddress != address(0))
+        if (_equipments[tokenId][_baseAddresses[resourceId]][slotPartId].childEquippableAddress != address(0))
             revert RMRKSlotAlreadyUsed();
 
         IRMRKNesting.Child memory child = IRMRKNesting(_nestingAddress).childOf(tokenId, childIndex);
-        address childEquipable = IRMRKNestingWithEquippable(child.contractAddress).getEquippablesAddress();
+        address childEquippable = IRMRKNestingWithEquippable(child.contractAddress).getEquippablesAddress();
 
         // Check from child persective
-        if(!validateChildEquip(childEquipable, childResourceId, slotPartId))
+        if(!validateChildEquip(childEquippable, childResourceId, slotPartId))
             revert RMRKEquippableBasePartNotEquippable();
 
         // Check from base perspective
-        if(!_validateBaseEquip(_baseAddresses[resourceId], childEquipable, slotPartId))
+        if(!_validateBaseEquip(_baseAddresses[resourceId], childEquippable, slotPartId))
             revert RMRKEquippableEquipNotAllowedByBase();
 
         Equipment memory newEquip = Equipment({
             resourceId: resourceId,
             childResourceId: childResourceId,
             childTokenId: child.tokenId,
-            childAddress: childEquipable
+            childEquippableAddress: childEquippable
         });
 
         _equipments[tokenId][_baseAddresses[resourceId]][slotPartId] = newEquip;
-        IRMRKEquippable(childEquipable).markEquipped(child.tokenId, childResourceId, true);
+        IRMRKNestingWithEquippable(_nestingAddress).markChildEquipped(child.contractAddress, child.tokenId, childResourceId, true);
     }
 
     function unequip(
@@ -201,11 +201,11 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
     ) private {
         address targetBaseAddress = _baseAddresses[resourceId];
         Equipment memory equipment = _equipments[tokenId][targetBaseAddress][slotPartId];
-        if (equipment.childAddress == address(0))
+        if (equipment.childEquippableAddress == address(0))
             revert RMRKNotEquipped();
         delete _equipments[tokenId][targetBaseAddress][slotPartId];
-
-        IRMRKEquippable(equipment.childAddress).markEquipped(equipment.childTokenId, equipment.childResourceId, false);
+        address childNestingAddress = IRMRKEquippable(equipment.childEquippableAddress).getNestingAddress();
+        IRMRKNestingWithEquippable(_nestingAddress).markChildEquipped(childNestingAddress, equipment.childTokenId, equipment.childResourceId, false);
     }
 
     function replaceEquipment(
@@ -219,9 +219,10 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
         _equip(tokenId, resourceId, slotPartId, childIndex, childResourceId);
     }
 
-    function markEquipped(uint tokenId, uint64 resourceId, bool equipped) external {
-        if (getCallerEquippableSlot(resourceId) == uint64(0))
-            revert RMRKCallerCannotChangeEquipStatus();
+    function markEquipped(uint tokenId, uint64 resourceId, bool equipped) external onlyNesting() {
+        //FIXME: ask to explain the flow of this check
+        // if (getCallerEquippableSlot(resourceId) == uint64(0))
+        //     revert RMRKCallerCannotChangeEquipStatus();
         if (_isEquipped[tokenId] && equipped)
             revert RMRKAlreadyEquipped();
         if(!_isEquipped[tokenId] && !equipped)
@@ -310,7 +311,7 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
                         childResourceId: equipment.childResourceId,
                         z: baseSlotParts[i].z,
                         childTokenId: equipment.childTokenId,
-                        childAddress: equipment.childAddress,
+                        childAddress: equipment.childEquippableAddress,
                         metadataURI: baseSlotParts[i].metadataURI
                     });
                 }

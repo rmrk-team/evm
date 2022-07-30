@@ -6,13 +6,13 @@ import "../RMRK/access/OwnableLock.sol";
 import "../RMRK/utils/RMRKMintingUtils.sol";
 import "../RMRK/interfaces/IRMRKNestingReceiver.sol";
 import "../RMRK/interfaces/IRMRKNestingWithEquippable.sol";
-import "../RMRK/RMRKNesting.sol";
+import "../RMRK/RMRKNestingWithEquippable.sol";
 
 error RMRKMintUnderpriced();
 error RMRKMintZero();
 
 //Minimal public implementation of IRMRKNesting for testing.
-contract RMRKNestingImpl is OwnableLock, RMRKMintingUtils, IRMRKNestingWithEquippable, IRMRKNestingReceiver, RMRKNesting {
+contract RMRKNestingImpl is OwnableLock, RMRKMintingUtils, IRMRKNestingReceiver, RMRKNestingWithEquippable {
 
     address _equippableAddress;
 
@@ -23,7 +23,7 @@ contract RMRKNestingImpl is OwnableLock, RMRKMintingUtils, IRMRKNestingWithEquip
         uint256 pricePerMint_,
         address equippableAddress_
     )
-    RMRKNesting(name_, symbol_)
+    RMRKNestingWithEquippable(name_, symbol_)
     RMRKMintingUtils(maxSupply_, pricePerMint_)
     {
         // Can't add an equippable deployment here due to contract size, for factory
@@ -63,14 +63,6 @@ contract RMRKNestingImpl is OwnableLock, RMRKMintingUtils, IRMRKNestingWithEquip
         bytes calldata
     ) external pure returns (bytes4) {
         return IRMRKNestingReceiver.onRMRKNestingReceived.selector;
-    }
-
-    function getEquippablesAddress() external view returns (address) {
-        return _equippableAddress;
-    }
-
-    function isApprovedOrOwner(address spender, uint256 tokenId) external view returns (bool) {
-        return _isApprovedOrOwner(spender, tokenId);
     }
 
 }
