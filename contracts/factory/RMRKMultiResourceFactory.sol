@@ -4,7 +4,7 @@ pragma solidity ^0.8.15;
 
 import "../implementations/RMRKMultiResourceImpl.sol";
 
-contract RMRKFactory {
+contract RMRKMultiResourceFactory {
 
     address[] public multiResourceNftCollections;
 
