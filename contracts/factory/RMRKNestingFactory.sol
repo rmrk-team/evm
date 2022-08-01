@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.15;
 
-import "../implementations/RMRKNestingImpl.sol";
+import "../implementations/RMRKNestingMultiResourceImpl.sol";
 
 contract RMRKNestingFactory {
 
@@ -14,10 +14,9 @@ contract RMRKNestingFactory {
         string memory name,
         string memory symbol,
         uint256 maxSupply,
-        uint256 pricePerMint, //in WEI
-        address equippableAddress
+        uint256 pricePerMint //in WEI
     ) public {
-        RMRKNestingImpl nestingContract = new RMRKNestingImpl(name, symbol, maxSupply, pricePerMint, equippableAddress);
+        RMRKNestingMultiResourceImpl nestingContract = new RMRKNestingMultiResourceImpl(name, symbol, maxSupply, pricePerMint);
         nestingCollections.push(address(nestingContract));
         emit NewRMRKNestingContract(address(nestingContract), msg.sender);
     }
