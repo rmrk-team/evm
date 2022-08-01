@@ -328,7 +328,7 @@ contract RMRKNesting is ERC721, IRMRKNesting {
     */
 
     // TODO low prio: preload mappings into memory for gas savings
-    function _acceptChild(uint256 tokenId, uint256 index) internal virtual {
+    function acceptChild(uint256 tokenId, uint256 index) public virtual onlyApprovedOrOwner(tokenId) {
         if(_pendingChildren[tokenId].length <= index)
             revert RMRKPendingChildIndexOutOfRange();
 
@@ -343,7 +343,7 @@ contract RMRKNesting is ERC721, IRMRKNesting {
     /**
     @dev Deletes all pending children.
     */
-    function _rejectAllChildren(uint256 tokenId) internal virtual {
+    function rejectAllChildren(uint256 tokenId) public virtual onlyApprovedOrOwner(tokenId) {
         delete(_pendingChildren[tokenId]);
         emit AllPendingChildrenRemoved(tokenId);
     }
@@ -352,7 +352,7 @@ contract RMRKNesting is ERC721, IRMRKNesting {
     @dev Deletes a single child from the pending array by index.
     */
 
-    function _rejectChild(uint256 tokenId, uint256 index) internal virtual {
+    function rejectChild(uint256 tokenId, uint256 index) public virtual onlyApprovedOrOwner(tokenId) {
         if(_pendingChildren[tokenId].length <= index)
             revert RMRKPendingChildIndexOutOfRange();
 
@@ -364,7 +364,7 @@ contract RMRKNesting is ERC721, IRMRKNesting {
     @dev Deletes a single child from the child array by index.
     */
 
-    function _removeChild(uint256 tokenId, uint256 index) internal virtual {
+    function removeChild(uint256 tokenId, uint256 index) public virtual onlyApprovedOrOwner(tokenId) {
         if(_children[tokenId].length <= index)
             revert RMRKChildIndexOutOfRange();
 
@@ -373,10 +373,6 @@ contract RMRKNesting is ERC721, IRMRKNesting {
     }
 
     function _unnestChild(uint256 tokenId, uint256 index) internal virtual {
-        //FIXME: Move this check up
-        if(_children[tokenId].length <= index)
-            revert RMRKChildIndexOutOfRange();
-
         removeItemByIndex_C(_children[tokenId], index);
         emit ChildUnnested(tokenId, index);
     }
@@ -449,25 +445,11 @@ contract RMRKNesting is ERC721, IRMRKNesting {
         emit ChildProposed(parentTokenId);
     }
 
-    // FIXME Steven: Is it worth to have both public and internal versions? Check gas and contract size
-    function acceptChild(uint256 tokenId, uint256 index) public virtual onlyApprovedOrOwner(tokenId) {
-        _acceptChild(tokenId, index);
-    }
-
-    function rejectAllChildren(uint256 tokenId) public virtual onlyApprovedOrOwner(tokenId) {
-        _rejectAllChildren(tokenId);
-    }
-
-    function rejectChild(uint256 tokenId, uint256 index) public virtual onlyApprovedOrOwner(tokenId) {
-        _rejectChild(tokenId, index);
-    }
-
-    function removeChild(uint256 tokenId, uint256 index) public virtual onlyApprovedOrOwner(tokenId) {
-        _removeChild(tokenId, index);
-    }
-
     //Must be called from the child contract
     function unnestChild(uint256 tokenId, uint256 index) public virtual {
+        if(_children[tokenId].length <= index)
+            revert RMRKChildIndexOutOfRange();
+
         Child memory child = _children[tokenId][index];
         if (child.contractAddress != _msgSender()) revert RMRKUnnestFromWrongChild();
         _unnestChild(tokenId, index);
@@ -504,8 +486,8 @@ contract RMRKNesting is ERC721, IRMRKNesting {
         uint256 parentTokenId,
         uint256 index
     ) external view returns (Child memory) {
-        // FIXME Steven: Add test, this was broken (looking into pending)
-        // FIXME Steven: Check index
+        if(_children[parentTokenId].length <= index)
+            revert RMRKChildIndexOutOfRange();
         Child memory child = _children[parentTokenId][index];
         return child;
     }
@@ -514,7 +496,8 @@ contract RMRKNesting is ERC721, IRMRKNesting {
         uint256 parentTokenId,
         uint256 index
     ) external view returns (Child memory) {
-        // FIXME Steven: Check index
+        if(_pendingChildren[parentTokenId].length <= index)
+            revert RMRKPendingChildIndexOutOfRange();
         Child memory child = _pendingChildren[parentTokenId][index];
         return child;
     }

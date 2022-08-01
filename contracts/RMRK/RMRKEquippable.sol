@@ -344,7 +344,8 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
 
     //Checks if the resource for the child is intented to be equipped into the part slot
     function validateChildEquip(address childContract, uint64 childResourceId, uint64 slotPartId) public view returns (bool isEquippable) {
-        // FIXME Steven: Must also check the child is not already equipped.
+        // We could also check here for the child not to be equipped into something
+        // But it will be done when we try to mark it as equipped.
         isEquippable = IRMRKEquippable(childContract).getCallerEquippableSlot(childResourceId) == slotPartId;
     }
 

@@ -314,7 +314,7 @@ async function shouldBehaveLikeEquippableWithSlots() {
       ).to.be.revertedWithCustomError(soldierEquip, 'RMRKEquippableEquipNotAllowedByBase');
     });
 
-    it('cannot child into 2 different slots', async function () {
+    it('cannot equip child into 2 different slots', async function () {
       // Weapon is child on index 0, background on index 1.
       const childIndex = 0;
 

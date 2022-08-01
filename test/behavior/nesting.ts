@@ -197,6 +197,22 @@ async function shouldBehaveLikeNesting(
       ]);
     });
 
+    it('cannot get child out of index', async function () {
+      const tokenId = 1;
+      await expect(ownerChunky.childOf(tokenId, 0)).to.be.revertedWithCustomError(
+        ownerChunky,
+        'RMRKChildIndexOutOfRange',
+      );
+    });
+
+    it('cannot get pending child out of index', async function () {
+      const tokenId = 1;
+      await expect(ownerChunky.pendingChildOf(tokenId, 0)).to.be.revertedWithCustomError(
+        ownerChunky,
+        'RMRKPendingChildIndexOutOfRange',
+      );
+    });
+
     it('can mint multiple children', async function () {
       const childId1 = 1;
       const childId2 = 2;
