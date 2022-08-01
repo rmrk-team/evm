@@ -23,7 +23,7 @@ error RMRKAlreadyEquipped();
 error RMRKBadLength();
 error RMRKBaseRequiredForParts();
 error RMRKCallerCannotChangeEquipStatus();
-error RMRKEquippableBasePartNotEquippable();
+error RMRKTokenCannotBeEquippedWithResourceIntoSlot();
 error RMRKEquippableEquipNotAllowedByBase();
 error RMRKNotComposableResource();
 error RMRKNotEquipped();
@@ -167,9 +167,15 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
         IRMRKNesting.Child memory child = IRMRKNesting(_nestingAddress).childOf(tokenId, childIndex);
         address childEquippable = IRMRKNestingWithEquippable(child.contractAddress).getEquippablesAddress();
 
-        // Check from child persective
-        if(!validateChildEquip(childEquippable, childResourceId, slotPartId))
-            revert RMRKEquippableBasePartNotEquippable();
+        // Check from child perspective intention to be used in part
+        if (!isChildEquipValid(
+                childEquippable,
+                child.tokenId,
+                childResourceId,
+                slotPartId
+            )
+        )
+            revert RMRKTokenCannotBeEquippedWithResourceIntoSlot();
 
         // Check from base perspective
         if(!_validateBaseEquip(_baseAddresses[resourceId], childEquippable, slotPartId))
@@ -342,17 +348,32 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
         isEquippable = IRMRKBaseStorage(baseContract).checkIsEquippable(partId, childContract);
     }
 
-    //Checks if the resource for the child is intented to be equipped into the part slot
-    function validateChildEquip(address childContract, uint64 childResourceId, uint64 slotPartId) public view returns (bool isEquippable) {
-        // We could also check here for the child not to be equipped into something
-        // But it will be done when we try to mark it as equipped.
-        isEquippable = IRMRKEquippable(childContract).getCallerEquippableSlot(childResourceId) == slotPartId;
+    function isChildEquipValid(
+        address childAddress,
+        uint childTokenId,
+        uint64 childResourceId,
+        uint64 slotId
+    ) public view returns (bool) {
+        return IRMRKEquippable(childAddress).canTokenBeEquippedWithResourceIntoSlot(
+            childTokenId,
+            childResourceId,
+            slotId
+        );
     }
 
-    //Return 0 means not equippable
-    function getCallerEquippableSlot(uint64 resourceId) public view returns (uint64 equippableSlot) {
+    // Not intented to check if it is already equipped, only if can be.
+    function canTokenBeEquippedWithResourceIntoSlot(
+        uint tokenId,
+        uint64 resourceId,
+        uint64 slotId
+    ) external view returns (bool) {
         uint64 refId = _equippableRefIds[resourceId];
-        equippableSlot = _validParentSlots[refId][_msgSender()];
+        uint64 equippableSlot = _validParentSlots[refId][_msgSender()];
+        if (equippableSlot == slotId) {
+            (, bool found) = _activeResources[tokenId].indexOf(resourceId);
+            return found;
+        }
+        return false;
     }
 
     ////////////////////////////////////////

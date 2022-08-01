@@ -1,5 +1,6 @@
 import { ethers } from 'hardhat';
 import { Contract } from 'ethers';
+import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 
 const baseSymbol = 'SSB';
 const baseType = 'mixed';
@@ -44,7 +45,7 @@ enum ItemType {
   Fixed,
 }
 
-let addrs: any[];
+let addrs: SignerWithAddress[];
 
 let baseContract: Contract;
 let soldierContract: Contract;
@@ -275,7 +276,6 @@ async function addResourcesToWeapon(): Promise<void> {
       0,
     );
     await weaponEquipContract.connect(addrs[i % 3]).acceptResource(weapons[i], 0);
-    // FIXME Steven: Tests past without this accept:
     await weaponEquipContract.connect(addrs[i % 3]).acceptResource(weapons[i], 0);
   }
 }

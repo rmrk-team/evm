@@ -12,5 +12,12 @@ interface IRMRKEquippable is IRMRKMultiResource {
 
     function isEquipped(uint tokenId) external view returns(bool);
 
-    function getCallerEquippableSlot(uint64 resourceId) external view returns (uint64 equippableSlot);
+    function isChildEquipValid(
+        address childAddress,
+        uint childTokenId,
+        uint64 childResourceId,
+        uint64 slotId
+    ) external view returns (bool);
+
+    function canTokenBeEquippedWithResourceIntoSlot(uint tokenId, uint64 resourceId, uint64 slotId) external view returns (bool);
 }

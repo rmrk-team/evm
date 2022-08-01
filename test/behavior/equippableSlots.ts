@@ -89,8 +89,9 @@ async function shouldBehaveLikeEquippableWithSlots() {
     it('can validate equips of weapons into soldiers', async function () {
       // This resource is not equippable
       expect(
-        await soldierEquip.validateChildEquip(
+        await soldierEquip.isChildEquipValid(
           weaponEquip.address,
+          weapons[0],
           weaponResourcesFull[0],
           partIdForWeapon,
         ),
@@ -98,8 +99,9 @@ async function shouldBehaveLikeEquippableWithSlots() {
 
       // This resource is equippable into weapon part
       expect(
-        await soldierEquip.validateChildEquip(
+        await soldierEquip.isChildEquipValid(
           weaponEquip.address,
+          weapons[0],
           weaponResourcesEquip[0],
           partIdForWeapon,
         ),
@@ -107,8 +109,9 @@ async function shouldBehaveLikeEquippableWithSlots() {
 
       // This resource is NOT equippable into weapon gem part
       expect(
-        await soldierEquip.validateChildEquip(
+        await soldierEquip.isChildEquipValid(
           weaponEquip.address,
+          weapons[0],
           weaponResourcesEquip[0],
           partIdForWeaponGem,
         ),
@@ -118,8 +121,9 @@ async function shouldBehaveLikeEquippableWithSlots() {
     it('can validate equips of weapon gems into weapons', async function () {
       // This resource is not equippable
       expect(
-        await weaponEquip.validateChildEquip(
+        await weaponEquip.isChildEquipValid(
           weaponGemEquip.address,
+          weaponGems[0],
           weaponGemResourceFull,
           partIdForWeaponGem,
         ),
@@ -127,8 +131,9 @@ async function shouldBehaveLikeEquippableWithSlots() {
 
       // This resource is equippable into weapon gem slot
       expect(
-        await weaponEquip.validateChildEquip(
+        await weaponEquip.isChildEquipValid(
           weaponGemEquip.address,
+          weaponGems[0],
           weaponGemResourceEquip,
           partIdForWeaponGem,
         ),
@@ -136,8 +141,9 @@ async function shouldBehaveLikeEquippableWithSlots() {
 
       // This resource is NOT equippable into background slot
       expect(
-        await weaponEquip.validateChildEquip(
+        await weaponEquip.isChildEquipValid(
           weaponGemEquip.address,
+          weaponGems[0],
           weaponGemResourceEquip,
           partIdForBackground,
         ),
@@ -147,8 +153,9 @@ async function shouldBehaveLikeEquippableWithSlots() {
     it('can validate equips of backgrounds into soldiers', async function () {
       // This resource is equippable into background slot
       expect(
-        await soldierEquip.validateChildEquip(
+        await soldierEquip.isChildEquipValid(
           backgroundEquip.address,
+          backgrounds[0],
           backgroundResourceId,
           partIdForBackground,
         ),
@@ -156,8 +163,9 @@ async function shouldBehaveLikeEquippableWithSlots() {
 
       // This resource is NOT equippable into weapon slot
       expect(
-        await soldierEquip.validateChildEquip(
+        await soldierEquip.isChildEquipValid(
           backgroundEquip.address,
+          backgrounds[0],
           backgroundResourceId,
           partIdForWeapon,
         ),
@@ -246,7 +254,7 @@ async function shouldBehaveLikeEquippableWithSlots() {
         soldierEquip
           .connect(addrs[0])
           .equip(soldiers[0], soldierResId, partIdForWeapon, backgroundChildIndex, weaponResId),
-      ).to.be.revertedWithCustomError(soldierEquip, 'RMRKEquippableBasePartNotEquippable');
+      ).to.be.revertedWithCustomError(soldierEquip, 'RMRKTokenCannotBeEquippedWithResourceIntoSlot');
     });
 
     it('cannot equip child in wrong slot (weapon in background)', async function () {
@@ -256,7 +264,7 @@ async function shouldBehaveLikeEquippableWithSlots() {
         soldierEquip
           .connect(addrs[0])
           .equip(soldiers[0], soldierResId, partIdForBackground, childIndex, weaponResId),
-      ).to.be.revertedWithCustomError(soldierEquip, 'RMRKEquippableBasePartNotEquippable');
+      ).to.be.revertedWithCustomError(soldierEquip, 'RMRKTokenCannotBeEquippedWithResourceIntoSlot');
     });
 
     it('cannot equip child with wrong resource (weapon in background)', async function () {
@@ -265,7 +273,7 @@ async function shouldBehaveLikeEquippableWithSlots() {
         soldierEquip
           .connect(addrs[0])
           .equip(soldiers[0], soldierResId, partIdForWeapon, childIndex, backgroundResourceId),
-      ).to.be.revertedWithCustomError(soldierEquip, 'RMRKEquippableBasePartNotEquippable');
+      ).to.be.revertedWithCustomError(soldierEquip, 'RMRKTokenCannotBeEquippedWithResourceIntoSlot');
     });
 
     it('cannot equip if not owner', async function () {
@@ -381,7 +389,6 @@ async function shouldBehaveLikeEquippableWithSlots() {
           .equip(soldiers[0], soldierResId, partIdForWeaponAlt, childIndex, newWeaponResId),
       ).to.be.revertedWithCustomError(soldierEquip, 'RMRKEquippableEquipNotAllowedByBase');
     });
-
   });
 
   describe('Unequip', async function () {
@@ -727,6 +734,7 @@ async function shouldBehaveLikeEquippableWithSlots() {
     // Add resources to weapon
     await weaponEquip.addResourceToToken(newWeaponId, weaponResourcesFull[resourceIndex], 0);
     await weaponEquip.addResourceToToken(newWeaponId, weaponResourcesEquip[resourceIndex], 0);
+    await weaponEquip.connect(soldierOwner).acceptResource(newWeaponId, 0);
     await weaponEquip.connect(soldierOwner).acceptResource(newWeaponId, 0);
   }
 
