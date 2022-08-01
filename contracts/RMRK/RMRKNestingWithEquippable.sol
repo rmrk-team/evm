@@ -44,17 +44,26 @@ contract RMRKNestingWithEquippable is IRMRKNestingWithEquippable, RMRKNesting {
         _;
     }
 
-    function markSelfEquipped(uint tokenId, uint64 resourceId, bool equipped) external onlyParent(tokenId) {
-        IRMRKEquippable(_equippableAddress).markEquipped(tokenId, resourceId, equipped);
+    function markSelfEquipped(
+        uint tokenId,
+        address equippingParent,
+        uint64 resourceId,
+        uint64 slotId,
+        bool equipped
+    ) external onlyParent(tokenId) {
+        IRMRKEquippable(_equippableAddress).markEquipped(
+            tokenId, equippingParent, resourceId, slotId, equipped);
     }
 
     function markChildEquipped(
         address childAddress, 
         uint tokenId, 
         uint64 resourceId, 
+        uint64 slotId,
         bool equipped
     ) external onlyEquippable {
-        IRMRKNestingWithEquippable(childAddress).markSelfEquipped(tokenId, resourceId, equipped);
+        IRMRKNestingWithEquippable(childAddress).markSelfEquipped(
+            tokenId, _equippableAddress, resourceId, slotId, equipped);
     }
 
     function _unnestSelf(uint256 tokenId, uint256 index) internal override {
