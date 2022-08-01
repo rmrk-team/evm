@@ -17,11 +17,11 @@ async function main() {
   console.log('Deployer address: ' + (await accounts[0].getAddress()));
 
   // We get the contract to deploy
-  const RMRKFactory = await ethers.getContractFactory('RMRKFactory');
-  const rmrkFactory = await RMRKFactory.deploy();
+  const RMRKMultiResourceFactory = await ethers.getContractFactory('RMRKMultiResourceFactory');
+  const rmrkFactory = await RMRKMultiResourceFactory.deploy();
   await rmrkFactory.deployed();
 
-  console.log('RMRK Factory deployed to:', rmrkFactory.address);
+  console.log('RMRK MR Factory deployed to:', rmrkFactory.address);
 
   console.log('Etherscan contract verification starting now.');
   await run('verify:verify', {
