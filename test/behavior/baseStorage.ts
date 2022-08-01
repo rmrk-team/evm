@@ -9,7 +9,7 @@ async function shouldBehaveLikeBase(contractName: string, symbol: string, type: 
   let addrs: SignerWithAddress[];
   const metadataUriDefault = 'src';
 
-  // const noType = 0;
+  const noType = 0;
   const slotType = 1;
   const fixedType = 2;
 
@@ -90,6 +90,32 @@ async function shouldBehaveLikeBase(contractName: string, symbol: string, type: 
       await expect(
         testBase.addPart({ partId: partId, part: sampleSlotPartData }),
       ).to.be.revertedWithCustomError(testBase, 'RMRKPartAlreadyExists');
+    });
+
+    it('cannot add part with item type None', async function () {
+      const partId = 1;
+      const badPartData = {
+        itemType: noType,
+        z: 0,
+        equippable: [],
+        metadataURI: metadataUriDefault,
+      };
+      await expect(
+        testBase.addPart({ partId: partId, part: badPartData }),
+      ).to.be.revertedWithCustomError(testBase, 'RMRKBadConfig');
+    });
+
+    it('cannot add fixed part with equippable addresses', async function () {
+      const partId = 1;
+      const badPartData = {
+        itemType: fixedType,
+        z: 0,
+        equippable: [addrs[3].address],
+        metadataURI: metadataUriDefault,
+      };
+      await expect(
+        testBase.addPart({ partId: partId, part: badPartData }),
+      ).to.be.revertedWithCustomError(testBase, 'RMRKBadConfig');
     });
 
     it('is not equippable if address was not added', async function () {

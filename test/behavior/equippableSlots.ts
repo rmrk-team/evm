@@ -358,37 +358,6 @@ async function shouldBehaveLikeEquippableWithSlots() {
           .equip(soldiers[0], soldierResId, partIdForWeapon, childIndex, weaponResId),
       ).to.be.revertedWithCustomError(soldierEquip, 'RMRKAlreadyEquipped');
     });
-
-    it('cannot equip on not slot part on base', async function () {
-      // Weapon is child on index 0, background on index 1.
-      const childIndex = 0;
-
-      // We add a new partId which receives weapons
-      const partIdForWeaponAlt = 5;
-      // FIXME Steven: It should not be possible to add a fixed part with equippable addresses
-      const partForWeaponAlt = {
-        itemType: ItemType.Fixed, // This is what we're testing
-        z: 2,
-        equippable: [weaponEquip.address],
-        metadataURI: '',
-      };
-      await base.addPart({ partId: partIdForWeaponAlt, part: partForWeaponAlt });
-
-      // Ad a new resource to first weapon, which can go into new slot
-      const newWeaponResId = 99;
-      const newEquippableRefId = 2; // New resources to equip will use this
-      await addNewEquippableResourceToWeapon(
-        newWeaponResId,
-        newEquippableRefId,
-        partIdForWeaponAlt,
-      );
-
-      await expect(
-        soldierEquip
-          .connect(addrs[0]) // Owner is addrs[0]
-          .equip(soldiers[0], soldierResId, partIdForWeaponAlt, childIndex, newWeaponResId),
-      ).to.be.revertedWithCustomError(soldierEquip, 'RMRKEquippableEquipNotAllowedByBase');
-    });
   });
 
   describe('Unequip', async function () {

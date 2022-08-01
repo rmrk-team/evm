@@ -10,6 +10,7 @@ error RMRKPartAlreadyExists();
 error RMRKPartDoesNotExist();
 error RMRKPartIsNotSlot();
 error RMRKZeroLengthIdsPassed();
+error RMRKBadConfig();
 
 contract RMRKBaseStorage is IRMRKBaseStorage {
     using Address for address;
@@ -110,6 +111,11 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
     function _addPart(IntakeStruct memory partIntake) internal {
         if(_parts[partIntake.partId].itemType != ItemType.None)
             revert RMRKPartAlreadyExists();
+        if(partIntake.part.itemType == ItemType.None)
+            revert RMRKBadConfig();
+        if(partIntake.part.itemType == ItemType.Fixed && partIntake.part.equippable.length > 0)
+            revert RMRKBadConfig();
+
         _parts[partIntake.partId] = partIntake.part;
         _partIds.push(partIntake.partId);
     }
