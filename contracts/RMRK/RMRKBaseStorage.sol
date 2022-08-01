@@ -27,7 +27,7 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
     include computing the id on-chain as a hash of attributes of the struct, or a simple incrementer. Passing
     an ID or an incrementer will likely be the cheapest in terms of gas cost.
 
-    FIXME: This is not true at the moment: We could add a lock (could be auto timed)
+    TODO: Clarify: This is not true at the moment: We could add a lock (could be auto timed)
     In its current implementation, all base asset entries MUST be passed via an array during contract construction.
     This is the only way to ensure contract immutability after deployment, though due to the gas costs of RMRK
     base assets it is highly recommended that developers are offered a commit > freeze pattern, by which developers
@@ -59,7 +59,7 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
     //Consider merkel tree for equippables validation?
 
     /**
-    FIXME: This is not true at the moment:
+    TODO: Clarify: This is not true at the moment: We could add a lock (could be auto timed)
     @dev Part items are only settable during contract deployment (with one exception, see addEquippableIds).
     * This may need to be changed for contracts which would reach the block gas limit.
     */
