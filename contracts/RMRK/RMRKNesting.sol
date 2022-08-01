@@ -106,8 +106,8 @@ contract RMRKNesting is ERC721, IRMRKNesting {
     function _mint(address to, uint256 tokenId, uint256 destinationId) internal virtual {
         if(to == address(0)) revert ERC721MintToTheZeroAddress();
         if(_exists(tokenId)) revert ERC721TokenAlreadyMinted();
-        // This is redundant with following line:
-        // if(!to.isContract()) revert RMRKIsNotContract();
+        // It seems redundant, but otherwise it would revert with no error
+        if(!to.isContract()) revert RMRKIsNotContract();
         if(!IERC165(to).supportsInterface(type(IRMRKNesting).interfaceId))
             revert RMRKMintToNonRMRKImplementer();
 
@@ -288,10 +288,10 @@ contract RMRKNesting is ERC721, IRMRKNesting {
         if(ownerOf(tokenId) != from)
             revert ERC721TransferFromIncorrectOwner();
         if(_RMRKOwners[tokenId].isNft) revert RMRKMustUnnestFirst();
+        if(to == address(0)) revert ERC721TransferToTheZeroAddress();
         // Destination contract checks:
-        // First 2 are redundant with following line:
-        // if(to == address(0)) revert ERC721TransferToTheZeroAddress();
-        // if(!to.isContract()) revert RMRKIsNotContract();
+        // It seems redundant, but otherwise it would revert with no error
+        if(!to.isContract()) revert RMRKIsNotContract();
         if(!IERC165(to).supportsInterface(type(IRMRKNesting).interfaceId))
             revert RMRKNestingTransferToNonRMRKNestingImplementer();
 
