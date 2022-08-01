@@ -357,7 +357,7 @@ async function shouldBehaveLikeEquippableWithSlots() {
 
       // We add a new partId which receives weapons
       const partIdForWeaponAlt = 5;
-      // FIXME: It should not be possible to add a fixed part with equippable addresses
+      // FIXME Steven: It should not be possible to add a fixed part with equippable addresses
       const partForWeaponAlt = {
         itemType: ItemType.Fixed, // This is what we're testing
         z: 2,

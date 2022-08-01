@@ -106,7 +106,8 @@ contract RMRKNesting is ERC721, IRMRKNesting {
     function _mint(address to, uint256 tokenId, uint256 destinationId) internal virtual {
         if(to == address(0)) revert ERC721MintToTheZeroAddress();
         if(_exists(tokenId)) revert ERC721TokenAlreadyMinted();
-        if(!to.isContract()) revert RMRKIsNotContract();
+        // This is redundant with following line:
+        // if(!to.isContract()) revert RMRKIsNotContract();
         if(!IERC165(to).supportsInterface(type(IRMRKNesting).interfaceId))
             revert RMRKMintToNonRMRKImplementer();
 
@@ -255,7 +256,7 @@ contract RMRKNesting is ERC721, IRMRKNesting {
 
         _beforeTokenTransfer(from, to, tokenId);
 
-        // FIXME: balances are not tested and probably broken
+        // FIXME Steven: balances are not tested
         _balances[from] -= 1;
         _updateOwnerAndClearApprovals(tokenId, 0, to, false);
         _balances[to] += 1;
@@ -288,12 +289,13 @@ contract RMRKNesting is ERC721, IRMRKNesting {
             revert ERC721TransferFromIncorrectOwner();
         if(_RMRKOwners[tokenId].isNft) revert RMRKMustUnnestFirst();
         // Destination contract checks:
-        if(to == address(0)) revert ERC721TransferToTheZeroAddress(); // FIXME: Is this redundant with next?
-        if(!to.isContract()) revert RMRKIsNotContract();
-        if(!IERC165(to).supportsInterface(type(IRMRKNesting).interfaceId)) revert RMRKNestingTransferToNonRMRKNestingImplementer();
+        // First 2 are redundant with following line:
+        // if(to == address(0)) revert ERC721TransferToTheZeroAddress();
+        // if(!to.isContract()) revert RMRKIsNotContract();
+        if(!IERC165(to).supportsInterface(type(IRMRKNesting).interfaceId))
+            revert RMRKNestingTransferToNonRMRKNestingImplementer();
 
         _beforeTokenTransfer(from, to, tokenId);
-        // FIXME: balances are not tested
         _balances[from] -= 1;
 
         _updateOwnerAndClearApprovals(tokenId, destinationId, to, true);
@@ -325,12 +327,10 @@ contract RMRKNesting is ERC721, IRMRKNesting {
     * Updates _emptyIndexes of tokenId to preserve ordering.
     */
 
-    //CHECK: preload mappings into memory for gas savings
+    // TODO low prio: preload mappings into memory for gas savings
     function _acceptChild(uint256 tokenId, uint256 index) internal virtual {
         if(_pendingChildren[tokenId].length <= index)
             revert RMRKPendingChildIndexOutOfRange();
-
-        // FIXME: if it approved for transfer it should either update/remove the approvedTransfers or stop this accept.
 
         Child memory child_ = _pendingChildren[tokenId][index];
 
@@ -373,7 +373,7 @@ contract RMRKNesting is ERC721, IRMRKNesting {
     }
 
     function _unnestChild(uint256 tokenId, uint256 index) internal virtual {
-        //TODO clean this up, check edge cases -- may never be entered
+        //FIXME: Move this check up
         if(_children[tokenId].length <= index)
             revert RMRKChildIndexOutOfRange();
 
@@ -449,7 +449,7 @@ contract RMRKNesting is ERC721, IRMRKNesting {
         emit ChildProposed(parentTokenId);
     }
 
-    // FIXME: Is it worth to have both public and internal versions?
+    // FIXME Steven: Is it worth to have both public and internal versions? Check gas and contract size
     function acceptChild(uint256 tokenId, uint256 index) public virtual onlyApprovedOrOwner(tokenId) {
         _acceptChild(tokenId, index);
     }
@@ -504,7 +504,8 @@ contract RMRKNesting is ERC721, IRMRKNesting {
         uint256 parentTokenId,
         uint256 index
     ) external view returns (Child memory) {
-        // FIXME: Add test, this was broken (looking into pending)
+        // FIXME Steven: Add test, this was broken (looking into pending)
+        // FIXME Steven: Check index
         Child memory child = _children[parentTokenId][index];
         return child;
     }
@@ -513,7 +514,7 @@ contract RMRKNesting is ERC721, IRMRKNesting {
         uint256 parentTokenId,
         uint256 index
     ) external view returns (Child memory) {
-        // FIXME: Check index
+        // FIXME Steven: Check index
         Child memory child = _pendingChildren[parentTokenId][index];
         return child;
     }

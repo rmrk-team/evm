@@ -17,10 +17,6 @@ interface IRMRKBaseStorage {
   * and 35,000,000 gas per 250 resources--the maximum block size of ETH mainnet is 30M at peak usage.
   */
 
-  /*
-  FIXME: Consider deconstructing part struct from the interface side and moving to returning typed params
-  */
-
   struct Part {
       ItemType itemType; //1 byte
       uint8 z; //1 byte

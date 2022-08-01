@@ -244,7 +244,7 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
         address targetBaseAddress = _baseAddresses[resourceId];
         uint64[] memory slotPartIds = _slotPartIds[resourceId];
 
-        // FIXME: Some children equipped might be empty. Should clarify this or implement in a different way
+        // TODO: Clarify on docs: Some children equipped might be empty.
         slotParts = new uint64[](slotPartIds.length);
         childrenEquipped = new Equipment[](slotPartIds.length);
 
@@ -344,7 +344,7 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
 
     //Checks if the resource for the child is intented to be equipped into the part slot
     function validateChildEquip(address childContract, uint64 childResourceId, uint64 slotPartId) public view returns (bool isEquippable) {
-        // FIXME: Must also check the child is not already equipped
+        // FIXME Steven: Must also check the child is not already equipped.
         isEquippable = IRMRKEquippable(childContract).getCallerEquippableSlot(childResourceId) == slotPartId;
     }
 

@@ -29,7 +29,8 @@ contract RMRKEquippableImpl is Ownable, RMRKEquippable {
         uint64 resourceId,
         uint64 overwrites
     ) external onlyOwner {
-        _ownerOf(tokenId); // FIXME: This reverts if token not exists, should it be more explicit?
+        // This reverts if token does not exist:
+        _ownerOf(tokenId);
         _addResourceToToken(tokenId, resourceId, overwrites);
     }
 

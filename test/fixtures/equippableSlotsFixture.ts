@@ -275,7 +275,7 @@ async function addResourcesToWeapon(): Promise<void> {
       0,
     );
     await weaponEquipContract.connect(addrs[i % 3]).acceptResource(weapons[i], 0);
-    // FIXME: Tests past without this accept:
+    // FIXME Steven: Tests past without this accept:
     await weaponEquipContract.connect(addrs[i % 3]).acceptResource(weapons[i], 0);
   }
 }

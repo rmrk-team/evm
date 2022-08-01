@@ -3,8 +3,6 @@ import { ethers } from 'hardhat';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { BigNumber, Contract } from 'ethers';
 
-// TODO: Transfer - transfer now does double duty as removeChild
-
 async function shouldBehaveLikeNesting(
   name: string,
   symbol: string,
@@ -15,9 +13,6 @@ async function shouldBehaveLikeNesting(
   let addrs: SignerWithAddress[];
   let ownerChunky: Contract;
   let petMonkey: Contract;
-
-  const mintNestData = ethers.utils.hexZeroPad('0xabcd', 8);
-  const emptyData = ethers.utils.hexZeroPad('0x', 0);
 
   beforeEach(async function () {
     const [signersOwner, ...signersAddr] = await ethers.getSigners();
@@ -109,7 +104,7 @@ async function shouldBehaveLikeNesting(
     });
 
     it.skip('cannot nest mint to non rmrk core implementer', async function () {
-      // FIXME: implement
+      // FIXME Steven: implement
     });
 
     it('cannot nest mint to a non-existent token', async function () {

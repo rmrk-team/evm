@@ -27,13 +27,12 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
     include computing the id on-chain as a hash of attributes of the struct, or a simple incrementer. Passing
     an ID or an incrementer will likely be the cheapest in terms of gas cost.
 
-    FIXME: This is not true at the moment:
+    FIXME: This is not true at the moment: We could add a lock (could be auto timed)
     In its current implementation, all base asset entries MUST be passed via an array during contract construction.
     This is the only way to ensure contract immutability after deployment, though due to the gas costs of RMRK
     base assets it is highly recommended that developers are offered a commit > freeze pattern, by which developers
     are allowed multiple commits until a 'freeze' function is called, after which the base contract is no
     longer mutable.
-
     */
 
 

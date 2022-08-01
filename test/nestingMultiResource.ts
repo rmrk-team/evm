@@ -6,8 +6,6 @@ import shouldBehaveLikeNesting from './behavior/nesting';
 import shouldBehaveLikeMultiResource from './behavior/multiresource';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 
-// TODO: Transfer - transfer now does double duty as removeChild
-
 describe('Nesting', function () {
   let ownerChunky: Contract;
   let petMonkey: Contract;

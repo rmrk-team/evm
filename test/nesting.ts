@@ -4,8 +4,6 @@ import shouldBehaveLikeNesting from "./behavior/nesting"
 import shouldBehaveLikeERC721 from "./behavior/erc721"
 import { loadFixture } from "@nomicfoundation/hardhat-network-helpers"
 
-// TODO: Transfer - transfer now does double duty as removeChild
-
 describe('Nesting', function () {
   const name = 'ownerChunky';
   const symbol = 'CHNKY';
@@ -34,7 +32,6 @@ describe('Nesting', function () {
   shouldBehaveLikeNesting(name, symbol, name2, symbol2);
 });
 
-// FIXME: several tests are still failing, fixing isn't trivial
 describe('ERC721', function () {
   let token: Contract;
 
