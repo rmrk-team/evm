@@ -189,7 +189,8 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
         });
 
         _equipments[tokenId][_baseAddresses[resourceId]][slotPartId] = newEquip;
-        IRMRKNestingWithEquippable(_nestingAddress).markChildEquipped(child.contractAddress, child.tokenId, childResourceId, true);
+        IRMRKNestingWithEquippable(_nestingAddress).markChildEquipped(
+            child.contractAddress, child.tokenId, childResourceId, slotPartId, true);
     }
 
     function unequip(
@@ -211,7 +212,13 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
             revert RMRKNotEquipped();
         delete _equipments[tokenId][targetBaseAddress][slotPartId];
         address childNestingAddress = IRMRKEquippable(equipment.childEquippableAddress).getNestingAddress();
-        IRMRKNestingWithEquippable(_nestingAddress).markChildEquipped(childNestingAddress, equipment.childTokenId, equipment.childResourceId, false);
+        IRMRKNestingWithEquippable(_nestingAddress).markChildEquipped(
+            childNestingAddress,
+            equipment.childTokenId,
+            equipment.childResourceId,
+            slotPartId,
+            false
+        );
     }
 
     function replaceEquipment(
@@ -225,10 +232,16 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
         _equip(tokenId, resourceId, slotPartId, childIndex, childResourceId);
     }
 
-    function markEquipped(uint tokenId, uint64 resourceId, bool equipped) external onlyNesting() {
-        //FIXME: ask to explain the flow of this check
-        // if (getCallerEquippableSlot(resourceId) == uint64(0))
-        //     revert RMRKCallerCannotChangeEquipStatus();
+    function markEquipped(
+        uint tokenId,
+        address equippingParent,
+        uint64 resourceId,
+        uint64 slotId,
+        bool equipped
+    ) external onlyNesting() {
+        if (!canTokenBeEquippedWithResourceIntoSlot(equippingParent, tokenId, resourceId, slotId))
+            revert RMRKTokenCannotBeEquippedWithResourceIntoSlot();
+
         if (_isEquipped[tokenId] && equipped)
             revert RMRKAlreadyEquipped();
         if(!_isEquipped[tokenId] && !equipped)
@@ -355,6 +368,7 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
         uint64 slotId
     ) public view returns (bool) {
         return IRMRKEquippable(childAddress).canTokenBeEquippedWithResourceIntoSlot(
+            address(this),
             childTokenId,
             childResourceId,
             slotId
@@ -363,12 +377,13 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
 
     // Not intented to check if it is already equipped, only if can be.
     function canTokenBeEquippedWithResourceIntoSlot(
+        address parent,
         uint tokenId,
         uint64 resourceId,
         uint64 slotId
-    ) external view returns (bool) {
+    ) public view returns (bool) {
         uint64 refId = _equippableRefIds[resourceId];
-        uint64 equippableSlot = _validParentSlots[refId][_msgSender()];
+        uint64 equippableSlot = _validParentSlots[refId][parent];
         if (equippableSlot == slotId) {
             (, bool found) = _activeResources[tokenId].indexOf(resourceId);
             return found;
