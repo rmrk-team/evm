@@ -22,8 +22,9 @@ contract RMRKNestingWithEquippable is IRMRKNestingWithEquippable, RMRKNesting {
         string memory symbol_
     ) RMRKNesting(name_, symbol_) {}
 
-    //FIXME: Check to make sure this cannot be called from non_RMRK owner
     function _onlyParent(uint256 tokenId) private view {
+        if(!IERC165(_msgSender()).supportsInterface(type(IRMRKNesting).interfaceId))
+            revert RMRKNotParent();
         (address owner,,bool isNFT) = rmrkOwnerOf(tokenId);
         if(_msgSender() != owner || !isNFT)
             revert RMRKNotParent();
