@@ -43,3 +43,35 @@ describe('Nesting', function () {
 
   shouldBehaveLikeNesting(name, symbol, name2, symbol2);
 });
+
+describe.only('ERC721 on NestingWithEquippable', function () {
+  let token: Contract;
+
+  const name = 'RmrkTest';
+  const symbol = 'RMRKTST';
+
+  async function nestingFixture() {
+    const Token = await ethers.getContractFactory('RMRKNestingWithEquippableMock');
+    const tokenContract = await Token.deploy(name, symbol);
+    await tokenContract.deployed();
+
+    const Equippable = await ethers.getContractFactory('RMRKEquippableMock');
+    const equippableContract = await Equippable.deploy(tokenContract.address);
+    await equippableContract.deployed();
+
+    await tokenContract.setEquippableAddress(equippableContract.address);
+    return tokenContract;
+  }
+
+  beforeEach(async function () {
+    token = await loadFixture(nestingFixture);
+    this.token = token;
+    this.ERC721Receiver = await ethers.getContractFactory(
+      'ERC721ReceiverMockWithRMRKNestingReceiver',
+    );
+    this.RMRKNestingReceiver = await ethers.getContractFactory('RMRKNestingReceiverMock');
+    this.commonERC721 = await ethers.getContractFactory('ERC721Mock');
+  });
+
+  shouldBehaveLikeERC721(name, symbol);
+});
