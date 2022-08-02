@@ -103,8 +103,18 @@ async function shouldBehaveLikeNesting(
       ).to.be.revertedWithCustomError(petMonkey, 'RMRKIsNotContract');
     });
 
-    it.skip('cannot nest mint to non rmrk core implementer', async function () {
-      // FIXME Steven: implement
+    it('cannot nest mint to non rmrk nesting receiver', async function () {
+      const ERC721 = await ethers.getContractFactory('ERC721Mock');
+      const nonReceiver = await ERC721.deploy(name, symbol);
+      await nonReceiver.deployed();
+
+      const parentId = 1;
+      const childId = 99;
+      await nonReceiver['mint(address,uint256)'](addrs[1].address, parentId);
+
+      await expect(
+        petMonkey['mint(address,uint256,uint256)'](nonReceiver.address, childId, parentId),
+      ).to.be.revertedWithCustomError(petMonkey, 'RMRKMintToNonRMRKImplementer');
     });
 
     it('cannot nest mint to a non-existent token', async function () {
