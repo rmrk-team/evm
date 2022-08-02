@@ -69,7 +69,7 @@ async function shouldBehaveLikeNesting(
     });
 
     it('can support INesting', async function () {
-      expect(await ownerChunky.supportsInterface('0xed432250')).to.equal(true);
+      expect(await ownerChunky.supportsInterface('0x71c8af03')).to.equal(true);
     });
 
     it('cannot support other interfaceId', async function () {
@@ -607,10 +607,28 @@ async function shouldBehaveLikeNesting(
     });
 
     it('cannot unnest from parent directly', async function () {
-      const { parentId, firstOwner } = await mintTofirstOwner(true);
+      const { childId, parentId, firstOwner } = await mintTofirstOwner(true);
       await expect(
-        ownerChunky.connect(firstOwner).unnestChild(parentId, 0),
+        ownerChunky.connect(firstOwner).unnestChild(parentId, childId, 0),
       ).to.be.revertedWithCustomError(ownerChunky, 'RMRKUnnestFromWrongChild');
+    });
+
+    it('cannot unnest if child id does not match with child on index', async function () {
+      const childId = 1;
+      const childId2 = 2;
+      const parentId = 11; // First owner owns this
+      const firstOwner = addrs[1];
+
+      // Mint and accept 2 children
+      await petMonkey['mint(address,uint256,uint256)'](ownerChunky.address, childId, parentId);
+      await petMonkey['mint(address,uint256,uint256)'](ownerChunky.address, childId2, parentId);
+      await ownerChunky.connect(firstOwner).acceptChild(parentId, 0);
+      await ownerChunky.connect(firstOwner).acceptChild(parentId, 0);
+
+      // Unnesting child 2 with index on parent of child 1
+      await expect(
+        ownerChunky.connect(firstOwner).unnestChild(parentId, childId2, 0),
+      ).to.be.revertedWithCustomError(ownerChunky, 'RMRKUnnestChildIdMismatch');
     });
 
     it('can unnest child with grandchild and childen are ok', async function () {

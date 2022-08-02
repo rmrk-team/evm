@@ -23,6 +23,7 @@ error RMRKMustUnnestFirst();
 error RMRKNestingTransferToNonRMRKNestingImplementer();
 error RMRKParentChildMismatch();
 error RMRKPendingChildIndexOutOfRange();
+error RMRKUnnestChildIdMismatch();
 error RMRKUnnestForNonexistentToken();
 error RMRKUnnestForNonNftParent();
 error RMRKUnnestFromWrongChild();
@@ -393,7 +394,7 @@ contract RMRKNesting is ERC721, IRMRKNesting {
             tokenId: 0,
             isNft: false
         });
-        IRMRKNesting(owner.ownerAddress).unnestChild(owner.tokenId, indexOnParent);
+        IRMRKNesting(owner.ownerAddress).unnestChild(owner.tokenId, tokenId, indexOnParent);
     }
 
     /**
@@ -446,12 +447,16 @@ contract RMRKNesting is ERC721, IRMRKNesting {
     }
 
     //Must be called from the child contract
-    function unnestChild(uint256 tokenId, uint256 index) public virtual {
+    function unnestChild(uint256 tokenId, uint256 childId, uint256 index) public virtual {
         if(_children[tokenId].length <= index)
             revert RMRKChildIndexOutOfRange();
 
         Child memory child = _children[tokenId][index];
-        if (child.contractAddress != _msgSender()) revert RMRKUnnestFromWrongChild();
+        // This check is to prevent user errors, sending a bad index.
+        if(child.tokenId != childId)
+            revert RMRKUnnestChildIdMismatch();
+        if (child.contractAddress != _msgSender())
+            revert RMRKUnnestFromWrongChild();
         _unnestChild(tokenId, index);
     }
 

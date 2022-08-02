@@ -54,6 +54,7 @@ interface IRMRKNesting {
 
     function unnestChild(
         uint256 tokenId,
+        uint256 childId,
         uint256 index
     ) external;
 
