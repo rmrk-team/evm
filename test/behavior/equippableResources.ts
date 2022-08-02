@@ -29,11 +29,10 @@ async function shouldBehaveLikeEquippableResources(
     const chunkyContract = await CHNKY.deploy(name, symbol);
     await chunkyContract.deployed();
 
-    const chunkyEquipContract = await ChnkEqup.deploy();
+    const chunkyEquipContract = await ChnkEqup.deploy(chunkyContract.address);
     await chunkyEquipContract.deployed();
 
     await chunkyContract.setEquippableAddress(chunkyEquipContract.address);
-    await chunkyEquipContract.setNestingAddress(chunkyContract.address);
 
     return { chunkyContract, chunkyEquipContract };
   }

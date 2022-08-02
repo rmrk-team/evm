@@ -76,7 +76,7 @@ export async function equippablePartsContractsFixture() {
   // Neon token
   neon = await Nesting.deploy(neonName, neonSymbol);
   await neon.deployed();
-  neonEquip = await Equip.deploy();
+  neonEquip = await Equip.deploy(neon.address);
   await neonEquip.deployed();
 
   // Link nesting and equippable:
@@ -85,7 +85,7 @@ export async function equippablePartsContractsFixture() {
   // Weapon
   mask = await Nesting.deploy(maskName, maskSymbol);
   await mask.deployed();
-  maskEquip = await Equip.deploy();
+  maskEquip = await Equip.deploy(mask.address);
   await maskEquip.deployed();
   // Link nesting and equippable:
   maskEquip.setNestingAddress(mask.address);

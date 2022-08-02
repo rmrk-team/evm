@@ -9,8 +9,8 @@ import "../RMRK/RMRKEquippable.sol";
 //Minimal public implementation of RMRKEquippable for testing.
 contract RMRKEquippableMock is RMRKEquippable {
 
-    constructor()
-    RMRKEquippable(address(this))
+    constructor(address nestingAddress)
+    RMRKEquippable(nestingAddress)
     {}
 
     function setFallbackURI(string memory fallbackURI) external {

@@ -72,7 +72,7 @@ export async function equippableSlotsContractsFixture() {
   // Soldier token
   soldierContract = await Nesting.deploy(soldierName, soldierSymbol);
   await soldierContract.deployed();
-  soldierEquipContract = await Equip.deploy();
+  soldierEquipContract = await Equip.deploy(soldierContract.address);
   await soldierEquipContract.deployed();
 
   // Link nesting and equippable:
@@ -81,7 +81,7 @@ export async function equippableSlotsContractsFixture() {
   // Weapon
   weaponContract = await Nesting.deploy(weaponName, weaponSymbol);
   await weaponContract.deployed();
-  weaponEquipContract = await Equip.deploy();
+  weaponEquipContract = await Equip.deploy(weaponContract.address);
   await weaponEquipContract.deployed();
   // Link nesting and equippable:
   weaponEquipContract.setNestingAddress(weaponContract.address);
@@ -90,7 +90,7 @@ export async function equippableSlotsContractsFixture() {
   // Weapon Gem
   weaponGemContract = await Nesting.deploy(weaponGemName, weaponGemSymbol);
   await weaponGemContract.deployed();
-  weaponGemEquipContract = await Equip.deploy();
+  weaponGemEquipContract = await Equip.deploy(weaponGemContract.address);
   await weaponGemEquipContract.deployed();
   // Link nesting and equippable:
   weaponGemEquipContract.setNestingAddress(weaponGemContract.address);
@@ -99,7 +99,7 @@ export async function equippableSlotsContractsFixture() {
   // Background
   backgroundContract = await Nesting.deploy(backgroundName, backgroundSymbol);
   await backgroundContract.deployed();
-  backgroundEquipContract = await Equip.deploy();
+  backgroundEquipContract = await Equip.deploy(backgroundContract.address);
   await backgroundEquipContract.deployed();
   // Link nesting and equippable:
   backgroundEquipContract.setNestingAddress(backgroundContract.address);

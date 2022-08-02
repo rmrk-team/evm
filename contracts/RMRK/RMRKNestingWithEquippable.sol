@@ -69,7 +69,7 @@ contract RMRKNestingWithEquippable is IRMRKNestingWithEquippable, RMRKNesting {
     function _unnestSelf(uint256 tokenId, uint256 index) internal override {
         if (IRMRKEquippable(_equippableAddress).isEquipped(tokenId))
             revert RMRKMustUnequipFirst();
-        super._unnestChild(tokenId, index);
+        super._unnestSelf(tokenId, index);
     }
 
     function _setEquippableAddress(address equippable) internal virtual {
