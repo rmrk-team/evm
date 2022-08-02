@@ -44,7 +44,7 @@ describe('Nesting', function () {
   shouldBehaveLikeNesting(name, symbol, name2, symbol2);
 });
 
-describe.only('ERC721 on NestingWithEquippable', function () {
+describe('ERC721 on NestingWithEquippable', function () {
   let token: Contract;
 
   const name = 'RmrkTest';

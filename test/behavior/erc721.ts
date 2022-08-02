@@ -951,11 +951,16 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
       const data = '0x42';
 
       before(function () {
-        if (!this.token['safeTransferNestingFrom(address,address,uint256,bytes)']) {
+        if (!this.token['safeMintNesting(address,uint256,bytes)']) {
           this.skip();
         }
       });
       describe('via safeMintNesting', function () {
+        before(function () {
+          if (!this.token['safeMintNesting(address,uint256,bytes)']) {
+            this.skip();
+          }
+        });
         // regular minting is tested in ERC721Mintable.test.js and others
         it('calls onERC721Received — with data', async function () {
           receiver = await this.RMRKNestingReceiver.deploy(
