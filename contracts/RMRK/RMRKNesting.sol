@@ -257,7 +257,6 @@ contract RMRKNesting is ERC721, IRMRKNesting {
 
         _beforeTokenTransfer(from, to, tokenId);
 
-        // FIXME Steven: balances are not tested
         _balances[from] -= 1;
         _updateOwnerAndClearApprovals(tokenId, 0, to, false);
         _balances[to] += 1;

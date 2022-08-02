@@ -158,6 +158,8 @@ async function shouldBehaveLikeNesting(
       // owner is the same adress
       expect(await ownerChunky.ownerOf(parentId)).to.equal(addrs[1].address);
       expect(await petMonkey.ownerOf(childId)).to.equal(addrs[1].address);
+
+      expect(await petMonkey.balanceOf(addrs[1].address)).to.equal(1);
     });
 
     it('can mint to contract and RMRK owners are ok', async function () {
@@ -226,6 +228,8 @@ async function shouldBehaveLikeNesting(
       await petMonkey['mint(address,uint256,uint256)'](ownerChunky.address, childId2, parentId);
       expect(await petMonkey.ownerOf(childId2)).to.equal(addrs[0].address);
 
+      expect(await petMonkey.balanceOf(addrs[0].address)).to.equal(2);
+
       const pendingChildren = await ownerChunky.pendingChildrenOf(parentId);
       expect(pendingChildren).to.eql([
         [BigNumber.from(childId1), petMonkey.address],
@@ -242,6 +246,9 @@ async function shouldBehaveLikeNesting(
       await petMonkey['mint(address,uint256,uint256)'](ownerChunky.address, childId, parentId);
       // mint petMonkey token 21 into petMonkey token 1
       await petMonkey['mint(address,uint256,uint256)'](petMonkey.address, granchildId, childId);
+
+      // Address 0 owns the top parent
+      expect(await petMonkey.balanceOf(addrs[0].address)).to.equal(2);
 
       const pendingChildrenOfChunky10 = await ownerChunky.pendingChildrenOf(parentId);
       const pendingChildrenOfMonkey1 = await petMonkey.pendingChildrenOf(childId);
@@ -463,7 +470,9 @@ async function shouldBehaveLikeNesting(
       const tokenId = 1;
 
       await petMonkey['mint(address,uint256)'](addrs[1].address, tokenId);
+      expect(await petMonkey.balanceOf(addrs[1].address)).to.equal(1);
       await petMonkey.connect(addrs[1]).burn(tokenId);
+      expect(await petMonkey.balanceOf(addrs[1].address)).to.equal(0);
       await expect(petMonkey.ownerOf(tokenId)).to.be.revertedWithCustomError(
         petMonkey,
         'ERC721InvalidTokenId',
@@ -549,6 +558,9 @@ async function shouldBehaveLikeNesting(
       await petMonkey.connect(addrs[0]).acceptChild(childId, 0);
 
       // ownership chain is now addrs[0] > ownerChunky[10] > petMonkey[1] > ownerChunky[21]
+
+      expect(await ownerChunky.balanceOf(addrs[0].address)).to.equal(11);
+      expect(await petMonkey.balanceOf(addrs[0].address)).to.equal(1);
       const children1 = await ownerChunky.childrenOf(parentId);
       const children2 = await petMonkey.childrenOf(childId);
 
@@ -563,6 +575,11 @@ async function shouldBehaveLikeNesting(
       ]);
 
       await petMonkey.connect(addrs[0]).burn(childId);
+
+      // Child pet was burnt
+      expect(await petMonkey.balanceOf(addrs[0].address)).to.equal(0);
+      // Gran child chunky was burnt
+      expect(await ownerChunky.balanceOf(addrs[0].address)).to.equal(10);
 
       await expect(petMonkey.ownerOf(childId)).to.be.revertedWithCustomError(
         petMonkey,
@@ -587,7 +604,10 @@ async function shouldBehaveLikeNesting(
   describe('Unnesting', async function () {
     it('can unnest child and new owner is root owner', async function () {
       const { childId, parentId, firstOwner } = await mintTofirstOwner(true);
+      expect(await petMonkey.balanceOf(firstOwner.address)).to.equal(1);
       await checkUnnestFromAddress(childId, parentId, firstOwner, firstOwner);
+      // Unnesting must not affect balances:
+      expect(await petMonkey.balanceOf(firstOwner.address)).to.equal(1);
     });
 
     it('can unnest child if approved', async function () {
@@ -695,6 +715,10 @@ async function shouldBehaveLikeNesting(
 
       await petMonkey['mint(address,uint256)'](addrs[1].address, tokenId);
       await petMonkey.connect(addrs[1]).transfer(newOwner.address, tokenId);
+
+      // Balances and ownership are updated
+      expect(await petMonkey.balanceOf(addrs[1].address)).to.equal(0);
+      expect(await petMonkey.balanceOf(newOwner.address)).to.equal(1);
       expect(await petMonkey.ownerOf(tokenId)).to.eql(newOwner.address);
     });
 
@@ -733,11 +757,17 @@ async function shouldBehaveLikeNesting(
     it('can transfer not nested token to address and owners are ok', async function () {
       const newOwner = addrs[2];
       const { childId, parentId, firstOwner } = await mintTofirstOwner();
+
+      // Owner starts with 10 tokens
+      expect(await ownerChunky.balanceOf(firstOwner.address)).to.equal(10);
       await ownerChunky
         .connect(firstOwner)
         ['transferFrom(address,address,uint256)'](firstOwner.address, newOwner.address, parentId);
 
-      // New owner of parent
+      // Balances and ownership are updated
+      expect(await ownerChunky.balanceOf(firstOwner.address)).to.equal(9);
+      expect(await ownerChunky.balanceOf(newOwner.address)).to.equal(1);
+
       expect(await ownerChunky.ownerOf(parentId)).to.eql(newOwner.address);
       expect(await ownerChunky.rmrkOwnerOf(parentId)).to.eql([
         newOwner.address,
@@ -788,6 +818,8 @@ async function shouldBehaveLikeNesting(
       // Ownership: firstOwner > parent > child
       const { childId, parentId, firstOwner } = await mintTofirstOwner(true);
 
+      // Owner starts with 10 tokens
+      expect(await ownerChunky.balanceOf(firstOwner.address)).to.equal(10);
       await ownerChunky
         .connect(firstOwner)
         ['transferFrom(address,address,uint256,uint256)'](
@@ -796,6 +828,9 @@ async function shouldBehaveLikeNesting(
           parentId,
           newGrandparentId,
         );
+
+      // Balances unchanged since root owner is the same
+      expect(await ownerChunky.balanceOf(firstOwner.address)).to.equal(10);
 
       // Parent is still owner of child
       let expected = [BigNumber.from(childId), petMonkey.address];
@@ -811,6 +846,8 @@ async function shouldBehaveLikeNesting(
       // Ownership: firstOwner > parent > child
       const { childId, parentId, firstOwner } = await mintTofirstOwner(true);
 
+      // Owner starts with 10 tokens
+      expect(await ownerChunky.balanceOf(firstOwner.address)).to.equal(10);
       await ownerChunky
         .connect(firstOwner)
         ['transferFrom(address,address,uint256,uint256)'](
@@ -820,6 +857,8 @@ async function shouldBehaveLikeNesting(
           newGrandparentId,
         );
 
+      // Balances unchanged since root owner is the same
+      expect(await ownerChunky.balanceOf(firstOwner.address)).to.equal(10);
       // Parent is still owner of child
       let expected = [BigNumber.from(childId), petMonkey.address];
       checkAcceptedAndPendingChildren(ownerChunky, parentId, [expected], []);
@@ -884,7 +923,10 @@ async function shouldBehaveLikeNesting(
     parentId: number,
   ): Promise<void> {
     await petMonkey['mint(address,uint256,uint256)'](ownerChunky.address, 1, parentId);
+    expect(await petMonkey.balanceOf(addrs[1].address)).to.equal(1);
     await ownerChunky.connect(rejecter).rejectChild(parentId, 0);
+    // It still exists on child contract.
+    expect(await petMonkey.balanceOf(addrs[1].address)).to.equal(1);
     const pendingChildren = await ownerChunky.pendingChildrenOf(parentId);
     expect(pendingChildren).to.eql([]);
   }
@@ -912,9 +954,12 @@ async function shouldBehaveLikeNesting(
     parentId: number,
   ): Promise<void> {
     await petMonkey['mint(address,uint256,uint256)'](ownerChunky.address, 1, parentId);
+    expect(await petMonkey.balanceOf(addrs[1].address)).to.equal(1);
     await ownerChunky.connect(addrs[1]).acceptChild(parentId, 0);
 
     await ownerChunky.connect(remover).removeChild(parentId, 0);
+    // It still exists on child contract.
+    expect(await petMonkey.balanceOf(addrs[1].address)).to.equal(1);
     const children = await ownerChunky.childrenOf(parentId);
     expect(children).to.eql([]);
   }
