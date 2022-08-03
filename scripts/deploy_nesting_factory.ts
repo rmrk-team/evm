@@ -22,7 +22,7 @@ async function main() {
   await rmrkFactory.deployed();
 
   const tx = await rmrkFactory.deployRMRKNesting('Test Collection', 'TEST', 10000, 0);
-  await tx.wait(6);
+  await tx.wait(10);
   const nestingCollection = await rmrkFactory.nestingCollections(0);
 
   console.log('RMRK Nesting Factory deployed to:', rmrkFactory.address);
