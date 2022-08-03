@@ -19,6 +19,7 @@ contract RMRKMultiResourceFactory {
     ) public {
         RMRKMultiResourceImpl multiResourceContract = new RMRKMultiResourceImpl(name, symbol, maxSupply, pricePerMint);
         multiResourceNftCollections.push(address(multiResourceContract));
+        multiResourceContract.transferOwnership(msg.sender);
         emit NewRMRKMultiResourceContract(address(multiResourceContract), msg.sender);
     }
 }

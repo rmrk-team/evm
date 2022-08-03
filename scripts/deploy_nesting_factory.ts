@@ -21,12 +21,23 @@ async function main() {
   const rmrkFactory = await RMRKNestingFactory.deploy();
   await rmrkFactory.deployed();
 
+  const tx = await rmrkFactory.deployRMRKNesting('Test Collection', 'TEST', 10000, 0);
+  await tx.wait(6);
+  const nestingCollection = await rmrkFactory.nestingCollections(0);
+
   console.log('RMRK Nesting Factory deployed to:', rmrkFactory.address);
+  console.log('RMRK Nesting Collection deployed to:', nestingCollection);
 
   console.log('Etherscan contract verification starting now.');
+
   await run('verify:verify', {
     address: rmrkFactory.address,
     constructorArguments: [],
+  });
+
+  await run('verify:verify', {
+    address: nestingCollection,
+    constructorArguments: ['Test Collection', 'TEST', 10000, 0],
   });
 }
 

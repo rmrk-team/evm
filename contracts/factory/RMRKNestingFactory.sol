@@ -18,6 +18,7 @@ contract RMRKNestingFactory {
     ) public {
         RMRKNestingMultiResourceImpl nestingContract = new RMRKNestingMultiResourceImpl(name, symbol, maxSupply, pricePerMint);
         nestingCollections.push(address(nestingContract));
+        nestingContract.transferOwnership(msg.sender);
         emit NewRMRKNestingContract(address(nestingContract), msg.sender);
     }
 }
