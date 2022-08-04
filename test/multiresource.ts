@@ -1,4 +1,4 @@
-import { Contract } from 'ethers';
+import { BigNumber, Contract } from 'ethers';
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
@@ -8,11 +8,14 @@ import {
   shouldHandleApprovalsForResources,
   shouldHandleAcceptsForResources,
   shouldHandleRejectsForResources,
+  shouldHandleSetPriorities,
 } from './behavior/multiresource';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 
 const name = 'RmrkTest';
 const symbol = 'RMRKTST';
+let nextTokenId = 1;
+let nextResourceId = 1;
 
 async function deployRmrkMultiResourceMockFixture() {
   const Token = await ethers.getContractFactory('RMRKMultiResourceMock');
@@ -21,8 +24,18 @@ async function deployRmrkMultiResourceMockFixture() {
   return { token };
 }
 
-async function mint(token: Contract, to: string, tokenId: number) {
+async function mint(token: Contract, to: string): Promise<number> {
+  const tokenId = nextTokenId;
+  nextTokenId++;
   await token['mint(address,uint256)'](to, tokenId);
+  return tokenId;
+}
+
+async function addResourceEntry(token: Contract, data?: string): Promise<BigNumber> {
+  const resourceId = BigNumber.from(nextResourceId);
+  nextResourceId++;
+  await token.addResourceEntry(resourceId, data !== undefined ? data : 'metaURI');
+  return resourceId;
 }
 
 describe('MultiResource behavior', async () => {
@@ -32,7 +45,7 @@ describe('MultiResource behavior', async () => {
   });
 
   shouldSupportInterfaces();
-  shouldBehaveLikeMultiResource(mint);
+  shouldBehaveLikeMultiResource(mint, addResourceEntry);
 });
 
 describe('Multiresource with minted token', async () => {
@@ -50,9 +63,9 @@ describe('Multiresource with minted token', async () => {
 
 describe('Multiresource with minted token and pending resources', async () => {
   const tokenId = 1;
-  const resId1 = ethers.BigNumber.from(1);
+  const resId1 = BigNumber.from(1);
   const resData1 = 'data1';
-  const resId2 = ethers.BigNumber.from(2);
+  const resId2 = BigNumber.from(2);
   const resData2 = 'data2';
 
   beforeEach(async function () {
@@ -71,6 +84,7 @@ describe('Multiresource with minted token and pending resources', async () => {
 
   shouldHandleAcceptsForResources(tokenId, resId1, resData1, resId2, resData2);
   shouldHandleRejectsForResources(tokenId, resId1, resData1, resId2, resData2);
+  shouldHandleSetPriorities(tokenId);
 });
 
 describe('Init', async function () {
@@ -86,6 +100,63 @@ describe('Init', async function () {
 
   it('Symbol', async function () {
     expect(await token.symbol()).to.equal(symbol);
+  });
+});
+
+describe('Resource storage', async function () {
+  let token: Contract;
+  const metaURIDefault = 'metaURI';
+
+  beforeEach(async function () {
+    ({ token } = await loadFixture(deployRmrkMultiResourceMockFixture));
+  });
+
+  it('can add resource', async function () {
+    const id = BigNumber.from(1);
+
+    await expect(token.addResourceEntry(id, metaURIDefault))
+      .to.emit(token, 'ResourceSet')
+      .withArgs(id);
+  });
+
+  it('cannot get non existing resource', async function () {
+    const id = BigNumber.from(1);
+    await expect(token.getResource(id)).to.be.revertedWithCustomError(
+      token,
+      'RMRKNoResourceMatchingId',
+    );
+  });
+
+  it('cannot add existing resource', async function () {
+    const id = BigNumber.from(1);
+
+    await token.addResourceEntry(id, metaURIDefault);
+    await expect(token.addResourceEntry(id, 'newMetaUri')).to.be.revertedWithCustomError(
+      token,
+      'RMRKResourceAlreadyExists',
+    );
+  });
+
+  it('cannot add resource with id 0', async function () {
+    const id = 0;
+
+    await expect(token.addResourceEntry(id, metaURIDefault)).to.be.revertedWithCustomError(
+      token,
+      'RMRKWriteToZero',
+    );
+  });
+
+  it('cannot add same resource twice', async function () {
+    const id = BigNumber.from(1);
+
+    await expect(token.addResourceEntry(id, metaURIDefault))
+      .to.emit(token, 'ResourceSet')
+      .withArgs(id);
+
+    await expect(token.addResourceEntry(id, metaURIDefault)).to.be.revertedWithCustomError(
+      token,
+      'RMRKResourceAlreadyExists',
+    );
   });
 });
 

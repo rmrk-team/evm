@@ -85,7 +85,7 @@ async function shouldHandleApprovalsForResources(tokenId: number) {
   });
 }
 
-// Assumes there's a minted token with tokenId, and that owner is first address after contract deployer
+// Assumes there's a minted token with tokenId with 2 pending resources, and that owner is first address after contract deployer
 async function shouldHandleAcceptsForResources(
   tokenId: number,
   resId1: BigNumber,
@@ -178,7 +178,7 @@ async function shouldHandleAcceptsForResources(
   });
 }
 
-// Assumes there's a minted token with tokenId, and that owner is first address after contract deployer
+// Assumes there's a minted token with tokenId with 2 pending resources, and that owner is first address after contract deployer
 async function shouldHandleRejectsForResources(
   tokenId: number,
   resId1: BigNumber,
@@ -201,6 +201,11 @@ async function shouldHandleRejectsForResources(
 
   describe('Rejecting resources', async function () {
     it('can reject resource', async function () {
+      expect(await this.token.getFullPendingResources(tokenId)).to.eql([
+        [resId1, resData1],
+        [resId2, resData2],
+      ]);
+
       await expect(this.token.connect(tokenOwner).rejectResource(tokenId, 0))
         .to.emit(this.token, 'ResourceRejected')
         .withArgs(tokenId, resId1);
@@ -301,78 +306,103 @@ async function shouldHandleRejectsForResources(
   });
 }
 
+// Assumes there's a minted token with tokenId with 2 pending resources, and that owner is first address after contract deployer
+async function shouldHandleSetPriorities(tokenId: number) {
+  let tokenOwner: SignerWithAddress;
+  let approved: SignerWithAddress;
+  let operator: SignerWithAddress;
+  let notApproved: SignerWithAddress;
+
+  before(async () => {
+    const [, ...signersAddr] = await ethers.getSigners();
+    tokenOwner = signersAddr[0];
+    approved = signersAddr[1];
+    operator = signersAddr[2];
+    notApproved = signersAddr[3];
+  });
+
+  describe('Priorities', async function () {
+    it('can set and get priorities', async function () {
+      await this.token.connect(tokenOwner).acceptResource(tokenId, 0);
+      await this.token.connect(tokenOwner).acceptResource(tokenId, 0);
+      expect(await this.token.getActiveResourcePriorities(tokenId)).to.be.eql([0, 0]);
+
+      await expect(this.token.connect(tokenOwner).setPriority(tokenId, [2, 1]))
+        .to.emit(this.token, 'ResourcePrioritySet')
+        .withArgs(tokenId);
+      expect(await this.token.getActiveResourcePriorities(tokenId)).to.be.eql([2, 1]);
+    });
+
+    it('can set and get priorities if approved', async function () {
+      await this.token.connect(tokenOwner).acceptResource(tokenId, 0);
+      await this.token.connect(tokenOwner).acceptResource(tokenId, 0);
+      await this.token.connect(tokenOwner).approveForResources(approved.address, tokenId);
+
+      await expect(this.token.connect(approved).setPriority(tokenId, [2, 1]))
+        .to.emit(this.token, 'ResourcePrioritySet')
+        .withArgs(tokenId);
+      expect(await this.token.getActiveResourcePriorities(tokenId)).to.be.eql([2, 1]);
+    });
+
+    it('can set and get priorities if approved for all', async function () {
+      await this.token.connect(tokenOwner).acceptResource(tokenId, 0);
+      await this.token.connect(tokenOwner).acceptResource(tokenId, 0);
+      await this.token.connect(tokenOwner).setApprovalForAllForResources(operator.address, true);
+
+      expect(await this.token.getActiveResourcePriorities(tokenId)).to.be.eql([0, 0]);
+      await expect(this.token.connect(operator).setPriority(tokenId, [2, 1]))
+        .to.emit(this.token, 'ResourcePrioritySet')
+        .withArgs(tokenId);
+      expect(await this.token.getActiveResourcePriorities(tokenId)).to.be.eql([2, 1]);
+    });
+
+    it('cannot set priorities for non owned token', async function () {
+      await this.token.connect(tokenOwner).acceptResource(tokenId, 0);
+      await this.token.connect(tokenOwner).acceptResource(tokenId, 0);
+
+      await expect(
+        this.token.connect(notApproved).setPriority(tokenId, [2, 1]),
+      ).to.be.revertedWithCustomError(this.token, 'RMRKNotApprovedForResourcesOrOwner');
+    });
+
+    it('cannot set different number of priorities', async function () {
+      await this.token.connect(tokenOwner).acceptResource(tokenId, 0);
+      await this.token.connect(tokenOwner).acceptResource(tokenId, 0);
+
+      await expect(
+        this.token.connect(tokenOwner).setPriority(tokenId, [1]),
+      ).to.be.revertedWithCustomError(this.token, 'RMRKBadPriorityListLength');
+      await expect(
+        this.token.connect(tokenOwner).setPriority(tokenId, [2, 1, 3]),
+      ).to.be.revertedWithCustomError(this.token, 'RMRKBadPriorityListLength');
+    });
+
+    it('cannot set priorities for non existing token', async function () {
+      const badTokenId = 99;
+      await expect(
+        this.token.connect(tokenOwner).setPriority(badTokenId, []),
+      ).to.be.revertedWithCustomError(this.token, 'ERC721InvalidTokenId');
+    });
+  });
+}
+
 async function shouldBehaveLikeMultiResource(
-  mintFunc: (token: Contract, to: string, tokenId: number) => Promise<void>,
+  mintFunc: (token: Contract, to: string) => Promise<number>,
+  addResourceEntryFunc: (token: Contract, data?: string) => Promise<BigNumber>,
 ) {
   let owner: SignerWithAddress;
-  let addrs: SignerWithAddress[];
-
   const metaURIDefault = 'metaURI';
 
   before(async () => {
-    const [signersOwner, ...signersAddr] = await ethers.getSigners();
-    owner = signersOwner;
-    addrs = signersAddr;
+    owner = (await ethers.getSigners())[0];
   });
 
-  describe('Resource storage', async function () {
-    it('can add resource', async function () {
-      const id = BigNumber.from(1);
-
-      await expect(this.token.addResourceEntry(id, metaURIDefault))
-        .to.emit(this.token, 'ResourceSet')
-        .withArgs(id);
-    });
-
-    it('cannot get non existing resource', async function () {
-      const id = BigNumber.from(1);
-      await expect(this.token.getResource(id)).to.be.revertedWithCustomError(
-        this.token,
-        'RMRKNoResourceMatchingId',
-      );
-    });
-
-    it('cannot add existing resource', async function () {
-      const id = BigNumber.from(1);
-
-      await this.token.addResourceEntry(id, metaURIDefault);
-      await expect(this.token.addResourceEntry(id, 'newMetaUri')).to.be.revertedWithCustomError(
-        this.token,
-        'RMRKResourceAlreadyExists',
-      );
-    });
-
-    it('cannot add resource with id 0', async function () {
-      const id = 0;
-
-      await expect(this.token.addResourceEntry(id, metaURIDefault)).to.be.revertedWithCustomError(
-        this.token,
-        'RMRKWriteToZero',
-      );
-    });
-
-    it('cannot add same resource twice', async function () {
-      const id = BigNumber.from(1);
-
-      await expect(this.token.addResourceEntry(id, metaURIDefault))
-        .to.emit(this.token, 'ResourceSet')
-        .withArgs(id);
-
-      await expect(this.token.addResourceEntry(id, metaURIDefault)).to.be.revertedWithCustomError(
-        this.token,
-        'RMRKResourceAlreadyExists',
-      );
-    });
-  });
-
-  describe('Adding resources', async function () {
+  describe('Adding resources to tokens', async function () {
     it('can add resource to token', async function () {
-      const resId = BigNumber.from(1);
-      const resId2 = BigNumber.from(2);
-      const tokenId = 1;
+      const resId = await addResourceEntryFunc(this.token, 'data1');
+      const resId2 = await addResourceEntryFunc(this.token, 'data2');
+      const tokenId = await mintFunc(this.token, owner.address);
 
-      await mintFunc(this.token, owner.address, tokenId);
-      await addResources(this.token, [resId, resId2]);
       await expect(this.token.addResourceToToken(tokenId, resId, 0)).to.emit(
         this.token,
         'ResourceAddedToToken',
@@ -384,21 +414,17 @@ async function shouldBehaveLikeMultiResource(
 
       const pending = await this.token.getFullPendingResources(tokenId);
       expect(pending).to.be.eql([
-        [resId, metaURIDefault],
-        [resId2, metaURIDefault],
+        [resId, 'data1'],
+        [resId2, 'data2'],
       ]);
 
-      expect(await this.token.getPendingResObjectByIndex(tokenId, 0)).to.eql([
-        resId,
-        metaURIDefault,
-      ]);
+      expect(await this.token.getPendingResObjectByIndex(tokenId, 0)).to.eql([resId, 'data1']);
     });
 
     it('cannot add non existing resource to token', async function () {
       const resId = BigNumber.from(1);
-      const tokenId = 1;
+      const tokenId = await mintFunc(this.token, owner.address);
 
-      await mintFunc(this.token, owner.address, tokenId);
       await expect(this.token.addResourceToToken(tokenId, resId, 0)).to.be.revertedWithCustomError(
         this.token,
         'RMRKNoResourceMatchingId',
@@ -406,10 +432,9 @@ async function shouldBehaveLikeMultiResource(
     });
 
     it('cannot add resource to non existing token', async function () {
-      const resId = BigNumber.from(1);
+      const resId = await addResourceEntryFunc(this.token);
       const tokenId = 1;
 
-      await addResources(this.token, [resId]);
       await expect(this.token.addResourceToToken(tokenId, resId, 0)).to.be.revertedWithCustomError(
         this.token,
         'ERC721InvalidTokenId',
@@ -417,11 +442,9 @@ async function shouldBehaveLikeMultiResource(
     });
 
     it('cannot add resource twice to the same token', async function () {
-      const resId = BigNumber.from(1);
-      const tokenId = 1;
+      const resId = await addResourceEntryFunc(this.token);
+      const tokenId = await mintFunc(this.token, owner.address);
 
-      await mintFunc(this.token, owner.address, tokenId);
-      await addResources(this.token, [resId]);
       await this.token.addResourceToToken(tokenId, resId, 0);
       await expect(this.token.addResourceToToken(tokenId, resId, 0)).to.be.revertedWithCustomError(
         this.token,
@@ -430,17 +453,15 @@ async function shouldBehaveLikeMultiResource(
     });
 
     it('cannot add too many resources to the same token', async function () {
-      const tokenId = 1;
+      const tokenId = await mintFunc(this.token, owner.address);
 
-      await mintFunc(this.token, owner.address, tokenId);
       for (let i = 1; i <= 128; i++) {
-        await addResources(this.token, [BigNumber.from(i)]);
-        await this.token.addResourceToToken(tokenId, i, 0);
+        const resId = await addResourceEntryFunc(this.token);
+        await this.token.addResourceToToken(tokenId, resId, 0);
       }
 
       // Now it's full, next should fail
-      const resId = BigNumber.from(129);
-      await addResources(this.token, [resId]);
+      const resId = await addResourceEntryFunc(this.token);
       await expect(this.token.addResourceToToken(tokenId, resId, 0)).to.be.revertedWithCustomError(
         this.token,
         'RMRKMaxPendingResourcesReached',
@@ -448,13 +469,10 @@ async function shouldBehaveLikeMultiResource(
     });
 
     it('can add same resource to 2 different tokens', async function () {
-      const resId = BigNumber.from(1);
-      const tokenId1 = 1;
-      const tokenId2 = 2;
+      const resId = await addResourceEntryFunc(this.token);
+      const tokenId1 = await mintFunc(this.token, owner.address);
+      const tokenId2 = await mintFunc(this.token, owner.address);
 
-      await mintFunc(this.token, owner.address, tokenId1);
-      await mintFunc(this.token, owner.address, tokenId2);
-      await addResources(this.token, [resId]);
       await this.token.addResourceToToken(tokenId1, resId, 0);
       await this.token.addResourceToToken(tokenId2, resId, 0);
 
@@ -465,12 +483,10 @@ async function shouldBehaveLikeMultiResource(
 
   describe('Overwriting resources', async function () {
     it('can add resource to token overwritting an existing one', async function () {
-      const resId = BigNumber.from(1);
-      const resId2 = BigNumber.from(2);
-      const tokenId = 1;
+      const resId = await addResourceEntryFunc(this.token);
+      const resId2 = await addResourceEntryFunc(this.token);
+      const tokenId = await mintFunc(this.token, owner.address);
 
-      await mintFunc(this.token, owner.address, tokenId);
-      await addResources(this.token, [resId, resId2]);
       await this.token.addResourceToToken(tokenId, resId, 0);
       await this.token.acceptResource(tokenId, 0);
 
@@ -498,84 +514,13 @@ async function shouldBehaveLikeMultiResource(
     });
 
     it('can overwrite non existing resource to token, it could have been deleted', async function () {
-      const resId = BigNumber.from(1);
-      const tokenId = 1;
+      const resId = await addResourceEntryFunc(this.token);
+      const tokenId = await mintFunc(this.token, owner.address);
 
-      await mintFunc(this.token, owner.address, tokenId);
-      await addResources(this.token, [resId]);
       await this.token.addResourceToToken(tokenId, resId, 1);
       await this.token.acceptResource(tokenId, 0);
 
       expect(await this.token.getFullResources(tokenId)).to.be.eql([[resId, metaURIDefault]]);
-    });
-  });
-
-  describe('Priorities', async function () {
-    it('can set and get priorities', async function () {
-      const tokenId = 1;
-      await addResourcesToToken(this.token, tokenId);
-
-      expect(await this.token.getActiveResourcePriorities(tokenId)).to.be.eql([0, 0]);
-      await expect(this.token.setPriority(tokenId, [2, 1]))
-        .to.emit(this.token, 'ResourcePrioritySet')
-        .withArgs(tokenId);
-      expect(await this.token.getActiveResourcePriorities(tokenId)).to.be.eql([2, 1]);
-    });
-
-    it('can set and get priorities if approved', async function () {
-      const tokenId = 1;
-      const approvedAddress = addrs[1];
-
-      await addResourcesToToken(this.token, tokenId);
-      await this.token.approveForResources(approvedAddress.address, tokenId);
-
-      expect(await this.token.getActiveResourcePriorities(tokenId)).to.be.eql([0, 0]);
-      await expect(this.token.connect(approvedAddress).setPriority(tokenId, [2, 1]))
-        .to.emit(this.token, 'ResourcePrioritySet')
-        .withArgs(tokenId);
-      expect(await this.token.getActiveResourcePriorities(tokenId)).to.be.eql([2, 1]);
-    });
-
-    it('can set and get priorities if approved for all', async function () {
-      const tokenId = 1;
-      const approvedAddress = addrs[1];
-
-      await addResourcesToToken(this.token, tokenId);
-      await this.token.setApprovalForAllForResources(approvedAddress.address, true);
-
-      expect(await this.token.getActiveResourcePriorities(tokenId)).to.be.eql([0, 0]);
-      await expect(this.token.connect(approvedAddress).setPriority(tokenId, [2, 1]))
-        .to.emit(this.token, 'ResourcePrioritySet')
-        .withArgs(tokenId);
-      expect(await this.token.getActiveResourcePriorities(tokenId)).to.be.eql([2, 1]);
-    });
-
-    it('cannot set priorities for non owned token', async function () {
-      const tokenId = 1;
-      await addResourcesToToken(this.token, tokenId);
-      await expect(
-        this.token.connect(addrs[1]).setPriority(tokenId, [2, 1]),
-      ).to.be.revertedWithCustomError(this.token, 'RMRKNotApprovedForResourcesOrOwner');
-    });
-
-    it('cannot set different number of priorities', async function () {
-      const tokenId = 1;
-      await addResourcesToToken(this.token, tokenId);
-      await expect(this.token.setPriority(tokenId, [1])).to.be.revertedWithCustomError(
-        this.token,
-        'RMRKBadPriorityListLength',
-      );
-      await expect(this.token.setPriority(tokenId, [2, 1, 3])).to.be.revertedWithCustomError(
-        this.token,
-        'RMRKBadPriorityListLength',
-      );
-    });
-
-    it('cannot set priorities for non existing token', async function () {
-      const tokenId = 1;
-      await expect(
-        this.token.connect(addrs[1]).setPriority(tokenId, []),
-      ).to.be.revertedWithCustomError(this.token, 'ERC721InvalidTokenId');
     });
   });
 
@@ -586,34 +531,44 @@ async function shouldBehaveLikeMultiResource(
     });
 
     it('gets fallback URI if no active resources on token', async function () {
-      const tokenId = 1;
       const fallBackUri = 'fallback404';
-      await mintFunc(this.token, owner.address, tokenId);
+      const tokenId = await mintFunc(this.token, owner.address);
+
       await this.token.setFallbackURI(fallBackUri);
       expect(await this.token.tokenURI(tokenId)).to.eql(fallBackUri);
     });
 
     it('can get token URI when resource is not enumerated', async function () {
-      const tokenId = 1;
-      await addResourcesToToken(this.token, tokenId);
+      const resId = await addResourceEntryFunc(this.token);
+      const resId2 = await addResourceEntryFunc(this.token);
+      const tokenId = await mintFunc(this.token, owner.address);
+
+      await this.token.addResourceToToken(tokenId, resId, 0);
+      await this.token.addResourceToToken(tokenId, resId2, 0);
+      await this.token.acceptResource(tokenId, 0);
+      await this.token.acceptResource(tokenId, 0);
       expect(await this.token.tokenURI(tokenId)).to.eql(metaURIDefault);
     });
 
     it('can get token URI when resource is enumerated', async function () {
-      const tokenId = 1;
-      const resId = BigNumber.from(1);
-      await addResourcesToToken(this.token, tokenId);
+      const resId = await addResourceEntryFunc(this.token);
+      const resId2 = await addResourceEntryFunc(this.token);
+      const tokenId = await mintFunc(this.token, owner.address);
+
+      await this.token.addResourceToToken(tokenId, resId, 0);
+      await this.token.addResourceToToken(tokenId, resId2, 0);
+      await this.token.acceptResource(tokenId, 0);
+      await this.token.acceptResource(tokenId, 0);
       await this.token.setTokenEnumeratedResource(resId, true);
       expect(await this.token.isTokenEnumeratedResource(resId)).to.eql(true);
       expect(await this.token.tokenURI(tokenId)).to.eql(`${metaURIDefault}${tokenId}`);
     });
 
     it('can get token URI at specific index', async function () {
-      const tokenId = 1;
       const resId = BigNumber.from(1);
       const resId2 = BigNumber.from(2);
+      const tokenId = await mintFunc(this.token, owner.address);
 
-      await mintFunc(this.token, owner.address, tokenId);
       await this.token.addResourceEntry(resId, 'UriA');
       await this.token.addResourceEntry(resId2, 'UriB');
       await this.token.addResourceToToken(tokenId, resId, 0);
@@ -624,23 +579,6 @@ async function shouldBehaveLikeMultiResource(
       expect(await this.token.tokenURIAtIndex(tokenId, 1)).to.eql('UriB');
     });
   });
-
-  async function addResources(token: Contract, ids: BigNumber[]): Promise<void> {
-    for (let i = 0; i < ids.length; i++) {
-      await token.addResourceEntry(ids[i], metaURIDefault);
-    }
-  }
-
-  async function addResourcesToToken(token: Contract, tokenId: number): Promise<void> {
-    const resId = BigNumber.from(1);
-    const resId2 = BigNumber.from(2);
-    await mintFunc(token, owner.address, tokenId);
-    await addResources(token, [resId, resId2]);
-    await token.addResourceToToken(tokenId, resId, 0);
-    await token.addResourceToToken(tokenId, resId2, 0);
-    await token.acceptResource(tokenId, 0);
-    await token.acceptResource(tokenId, 0);
-  }
 }
 
 export {
@@ -649,4 +587,5 @@ export {
   shouldHandleApprovalsForResources,
   shouldHandleAcceptsForResources,
   shouldHandleRejectsForResources,
+  shouldHandleSetPriorities,
 };
