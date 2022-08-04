@@ -24,6 +24,15 @@ contract RMRKMultiResourceMock is RMRKMultiResource {
         _mint(to, tokenId);
     }
 
+    function transfer(address to, uint256 tokenId) external {
+        _transfer(msg.sender, to, tokenId);
+    }
+
+    function burn(uint256 tokenId) external {
+        _burn(tokenId);
+    }
+
+
     function addResourceToToken(
         uint256 tokenId,
         uint64 resourceId,
