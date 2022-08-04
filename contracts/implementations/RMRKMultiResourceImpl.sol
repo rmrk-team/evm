@@ -6,7 +6,7 @@ import "../RMRK/access/OwnableLock.sol";
 import "../RMRK/utils/RMRKMintingUtils.sol";
 import "../RMRK/RMRKMultiResource.sol";
 
-import "hardhat/console.sol";
+//import "hardhat/console.sol";
 
 error RMRKMintUnderpriced();
 error RMRKMintZero();

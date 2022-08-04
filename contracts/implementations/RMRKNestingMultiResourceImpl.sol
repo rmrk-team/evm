@@ -14,6 +14,9 @@ error RMRKMintZero();
 //Minimal public implementation of IRMRKNesting for testing.
 contract RMRKNestingMultiResourceImpl is OwnableLock, RMRKMintingUtils, IRMRKNestingReceiver, RMRKNestingMultiResource {
 
+    // Manage resources via increment
+    uint256 private _totalResources;
+
     constructor(
         string memory name_,
         string memory symbol_,
@@ -84,11 +87,12 @@ contract RMRKNestingMultiResourceImpl is OwnableLock, RMRKMintingUtils, IRMRKNes
         _addResourceToToken(tokenId, resourceId, overwrites);
     }
 
-    function addResourceEntry(
-        uint64 id,
-        string memory metadataURI
-    ) external {
-        _addResourceEntry(id, metadataURI);
+    function addResourceEntry(string memory metadataURI) external onlyOwner {
+        unchecked {_totalResources += 1;}
+        _addResourceEntry(uint64(_totalResources), metadataURI);
     }
 
+    function totalResources() external view returns(uint256) {
+        return _totalResources;
+    }
 }
