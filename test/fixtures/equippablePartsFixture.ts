@@ -305,7 +305,6 @@ async function addResourcesToNeon(): Promise<void> {
       equippableRefId: 0,
       metadataURI: 'ipfs:neonRes/1',
       baseAddress: base.address,
-      custom: [],
     },
     [partIdForHead1, partIdForBody1, partIdForHair1], // Fixed parts
     [partIdForMask], // Can receive these
@@ -316,7 +315,6 @@ async function addResourcesToNeon(): Promise<void> {
       equippableRefId: 0,
       metadataURI: 'ipfs:neonRes/2',
       baseAddress: base.address,
-      custom: [],
     },
     [partIdForHead2, partIdForBody2, partIdForHair2], // Fixed parts
     [partIdForMask], // Can receive these
@@ -327,7 +325,6 @@ async function addResourcesToNeon(): Promise<void> {
       equippableRefId: 0,
       metadataURI: 'ipfs:neonRes/3',
       baseAddress: base.address,
-      custom: [],
     },
     [partIdForHead3, partIdForBody1, partIdForHair3], // Fixed parts
     [partIdForMask], // Can receive these
@@ -338,7 +335,6 @@ async function addResourcesToNeon(): Promise<void> {
       equippableRefId: 0,
       metadataURI: 'ipfs:neonRes/4',
       baseAddress: base.address,
-      custom: [],
     },
     [partIdForHead1, partIdForBody2, partIdForHair2], // Fixed parts
     [partIdForMask], // Can receive these
@@ -349,7 +345,6 @@ async function addResourcesToNeon(): Promise<void> {
       equippableRefId: 0,
       metadataURI: 'ipfs:neonRes/1',
       baseAddress: base.address,
-      custom: [],
     },
     [partIdForHead2, partIdForBody1, partIdForHair1], // Fixed parts
     [partIdForMask], // Can receive these
@@ -369,7 +364,6 @@ async function addResourcesToMask(): Promise<void> {
       equippableRefId: 0, // Not meant to equip
       metadataURI: `ipfs:weapon/full/${maskResourcesFull[0]}`,
       baseAddress: base.address, // Not meant to equip, but base needed for parts
-      custom: [],
     },
     [partIdForMaskBase1, partIdForHorns1, partIdForEars1],
     [],
@@ -380,7 +374,6 @@ async function addResourcesToMask(): Promise<void> {
       equippableRefId: 0, // Not meant to equip
       metadataURI: `ipfs:weapon/full/${maskResourcesFull[1]}`,
       baseAddress: base.address, // Not meant to equip, but base needed for parts
-      custom: [],
     },
     [partIdForMaskBase2, partIdForHorns2, partIdForEars2],
     [],
@@ -391,7 +384,6 @@ async function addResourcesToMask(): Promise<void> {
       equippableRefId: 0, // Not meant to equip
       metadataURI: `ipfs:weapon/full/${maskResourcesFull[2]}`,
       baseAddress: base.address, // Not meant to equip, but base needed for parts
-      custom: [],
     },
     [partIdForMaskBase3, partIdForHorns1, partIdForEars2],
     [],
@@ -402,7 +394,6 @@ async function addResourcesToMask(): Promise<void> {
       equippableRefId: 0, // Not meant to equip
       metadataURI: `ipfs:weapon/full/${maskResourcesFull[3]}`,
       baseAddress: base.address, // Not meant to equip, but base needed for parts
-      custom: [],
     },
     [partIdForMaskBase2, partIdForHorns2, partIdForEars1],
     [],
@@ -415,7 +406,6 @@ async function addResourcesToMask(): Promise<void> {
       equippableRefId: maskEquippableRefId,
       metadataURI: `ipfs:weapon/equip/${maskResourcesEquip[0]}`,
       baseAddress: base.address,
-      custom: [],
     },
     [partIdForMaskBase1, partIdForHorns1, partIdForEars1],
     [],
@@ -428,7 +418,6 @@ async function addResourcesToMask(): Promise<void> {
       equippableRefId: maskEquippableRefId,
       metadataURI: `ipfs:weapon/equip/${maskResourcesEquip[1]}`,
       baseAddress: base.address,
-      custom: [],
     },
     [partIdForMaskBase2, partIdForHorns2, partIdForEars2],
     [],
@@ -441,7 +430,6 @@ async function addResourcesToMask(): Promise<void> {
       equippableRefId: maskEquippableRefId,
       metadataURI: `ipfs:weapon/equip/${maskResourcesEquip[2]}`,
       baseAddress: base.address,
-      custom: [],
     },
     [partIdForMaskBase3, partIdForHorns1, partIdForEars2],
     [],
@@ -454,7 +442,6 @@ async function addResourcesToMask(): Promise<void> {
       equippableRefId: maskEquippableRefId,
       metadataURI: `ipfs:weapon/equip/${maskResourcesEquip[3]}`,
       baseAddress: base.address,
-      custom: [],
     },
     [partIdForMaskBase2, partIdForHorns2, partIdForEars1],
     [],

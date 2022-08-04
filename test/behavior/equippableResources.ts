@@ -12,7 +12,7 @@ async function shouldBehaveLikeEquippableResources(
   let chunkyEquip: Contract;
 
   let owner: SignerWithAddress;
-  let addrs: any[];
+  let addrs: SignerWithAddress[];
 
   const name = 'ownerChunky';
   const symbol = 'CHNKY';
@@ -20,7 +20,6 @@ async function shouldBehaveLikeEquippableResources(
   const equippableRefIdDefault = BigNumber.from(1);
   const metaURIDefault = 'metaURI';
   const baseAddressDefault = ethers.constants.AddressZero;
-  const customDefault: string[] = [];
 
   async function deployTokensFixture() {
     const CHNKY = await ethers.getContractFactory(nestingContractName);
@@ -76,7 +75,6 @@ async function shouldBehaveLikeEquippableResources(
             equippableRefId: equippableRefIdDefault,
             metadataURI: metaURIDefault,
             baseAddress: baseAddressDefault,
-            custom: customDefault,
           },
           [],
           [],
@@ -103,7 +101,6 @@ async function shouldBehaveLikeEquippableResources(
             equippableRefId: equippableRefIdDefault,
             metadataURI: metaURIDefault,
             baseAddress: baseAddressDefault,
-            custom: customDefault,
           },
           [1],
           [],
@@ -116,7 +113,6 @@ async function shouldBehaveLikeEquippableResources(
             equippableRefId: equippableRefIdDefault,
             metadataURI: metaURIDefault,
             baseAddress: baseAddressDefault,
-            custom: customDefault,
           },
           [],
           [1],
@@ -133,7 +129,6 @@ async function shouldBehaveLikeEquippableResources(
           equippableRefId: equippableRefIdDefault,
           metadataURI: metaURIDefault,
           baseAddress: baseAddressDefault,
-          custom: customDefault,
         },
         [],
         [],
@@ -145,7 +140,6 @@ async function shouldBehaveLikeEquippableResources(
             equippableRefId: equippableRefIdDefault,
             metadataURI: metaURIDefault,
             baseAddress: baseAddressDefault,
-            custom: customDefault,
           },
           [],
           [],
@@ -163,7 +157,6 @@ async function shouldBehaveLikeEquippableResources(
             equippableRefId: equippableRefIdDefault,
             metadataURI: metaURIDefault,
             baseAddress: baseAddressDefault,
-            custom: customDefault,
           },
           [],
           [],
@@ -181,7 +174,6 @@ async function shouldBehaveLikeEquippableResources(
             equippableRefId: equippableRefIdDefault,
             metadataURI: metaURIDefault,
             baseAddress: baseAddressDefault,
-            custom: customDefault,
           },
           [],
           [],
@@ -197,40 +189,11 @@ async function shouldBehaveLikeEquippableResources(
             equippableRefId: equippableRefIdDefault,
             metadataURI: metaURIDefault,
             baseAddress: baseAddressDefault,
-            custom: customDefault,
           },
           [],
           [],
         ),
       ).to.be.revertedWithCustomError(chunkyEquip, 'RMRKResourceAlreadyExists');
-    });
-
-    it('can add and remove custom data for resource', async function () {
-      const resId = BigNumber.from(1);
-      const customDataTypeKey = 3;
-      await chunkyEquip.addResourceEntry(
-        {
-          id: resId,
-          equippableRefId: equippableRefIdDefault,
-          metadataURI: metaURIDefault,
-          baseAddress: baseAddressDefault,
-          custom: customDefault,
-        },
-        [],
-        [],
-      );
-
-      await expect(chunkyEquip.addCustomDataToResource(resId, customDataTypeKey))
-        .to.emit(chunkyEquip, 'ResourceCustomDataAdded')
-        .withArgs(resId, customDataTypeKey);
-      let resource = await chunkyEquip.getExtendedResource(resId);
-      expect(resource.custom).to.eql([BigNumber.from(customDataTypeKey)]);
-
-      await expect(chunkyEquip.removeCustomDataFromResource(resId, 0))
-        .to.emit(chunkyEquip, 'ResourceCustomDataRemoved')
-        .withArgs(resId, customDataTypeKey);
-      resource = await chunkyEquip.getExtendedResource(resId);
-      expect(resource.custom).to.eql([]);
     });
   });
 
@@ -253,8 +216,8 @@ async function shouldBehaveLikeEquippableResources(
 
       const pending = await chunkyEquip.getFullPendingExtendedResources(tokenId);
       expect(pending).to.be.eql([
-        [resId, equippableRefIdDefault, baseAddressDefault, metaURIDefault, customDefault],
-        [resId2, equippableRefIdDefault, baseAddressDefault, metaURIDefault, customDefault],
+        [resId, equippableRefIdDefault, baseAddressDefault, metaURIDefault],
+        [resId2, equippableRefIdDefault, baseAddressDefault, metaURIDefault],
       ]);
 
       expect(await chunkyEquip.getPendingExtendedResObjectByIndex(tokenId, 0)).to.eql([
@@ -262,7 +225,6 @@ async function shouldBehaveLikeEquippableResources(
         equippableRefIdDefault,
         baseAddressDefault,
         metaURIDefault,
-        customDefault,
       ]);
     });
 
@@ -352,7 +314,7 @@ async function shouldBehaveLikeEquippableResources(
 
       const accepted = await chunkyEquip.getFullExtendedResources(tokenId);
       expect(accepted).to.eql([
-        [resId, equippableRefIdDefault, baseAddressDefault, metaURIDefault, customDefault],
+        [resId, equippableRefIdDefault, baseAddressDefault, metaURIDefault],
       ]);
 
       expect(await chunkyEquip.getExtendedResObjectByIndex(tokenId, 0)).to.eql([
@@ -360,7 +322,6 @@ async function shouldBehaveLikeEquippableResources(
         equippableRefIdDefault,
         baseAddressDefault,
         metaURIDefault,
-        customDefault,
       ]);
     });
 
@@ -385,8 +346,8 @@ async function shouldBehaveLikeEquippableResources(
 
       const accepted = await chunkyEquip.getFullExtendedResources(tokenId);
       expect(accepted).to.eql([
-        [resId2, equippableRefIdDefault, baseAddressDefault, metaURIDefault, customDefault],
-        [resId, equippableRefIdDefault, baseAddressDefault, metaURIDefault, customDefault],
+        [resId2, equippableRefIdDefault, baseAddressDefault, metaURIDefault],
+        [resId, equippableRefIdDefault, baseAddressDefault, metaURIDefault],
       ]);
     });
 
@@ -472,7 +433,7 @@ async function shouldBehaveLikeEquippableResources(
       );
 
       expect(await chunkyEquip.getFullExtendedResources(tokenId)).to.be.eql([
-        [resId2, equippableRefIdDefault, baseAddressDefault, metaURIDefault, customDefault],
+        [resId2, equippableRefIdDefault, baseAddressDefault, metaURIDefault],
       ]);
       // Overwrite should be gone
       expect(await chunkyEquip.getResourceOverwrites(tokenId, pendingResources[0])).to.eql(
@@ -490,7 +451,7 @@ async function shouldBehaveLikeEquippableResources(
       await chunkyEquip.acceptResource(tokenId, 0);
 
       expect(await chunkyEquip.getFullExtendedResources(tokenId)).to.be.eql([
-        [resId, equippableRefIdDefault, baseAddressDefault, metaURIDefault, customDefault],
+        [resId, equippableRefIdDefault, baseAddressDefault, metaURIDefault],
       ]);
     });
   });
@@ -765,7 +726,6 @@ async function shouldBehaveLikeEquippableResources(
           equippableRefId: equippableRefIdDefault,
           metadataURI: 'UriA',
           baseAddress: baseAddressDefault,
-          custom: customDefault,
         },
         [],
         [],
@@ -776,7 +736,6 @@ async function shouldBehaveLikeEquippableResources(
           equippableRefId: equippableRefIdDefault,
           metadataURI: 'UriB',
           baseAddress: baseAddressDefault,
-          custom: customDefault,
         },
         [],
         [],
@@ -787,122 +746,6 @@ async function shouldBehaveLikeEquippableResources(
       await chunkyEquip.acceptResource(tokenId, 0);
 
       expect(await chunkyEquip.tokenURIAtIndex(tokenId, 1)).to.eql('UriB');
-    });
-
-    it('can get token URI by specific custom value', async function () {
-      const tokenId = 1;
-      const resId = BigNumber.from(1);
-      const resId2 = BigNumber.from(2);
-      // We define some custom types and values which mean something to the issuer.
-      // Resource 1 has Width, Height and Type. Resource 2 has Area and Type.
-      const customDataWidthKey = 1;
-      const customDataWidthValue = ethers.utils.hexZeroPad('0x1111', 16);
-      const customDataHeightKey = 2;
-      const customDataHeightValue = ethers.utils.hexZeroPad('0x1111', 16);
-      const customDataTypeKey = 3;
-      const customDataTypeValueA = ethers.utils.hexZeroPad('0xAAAA', 16);
-      const customDataTypeValueB = ethers.utils.hexZeroPad('0xBBBB', 16);
-      const customDataAreaKey = 4;
-      const customDataAreaValue = ethers.utils.hexZeroPad('0x00FF', 16);
-
-      await chunky['mint(address,uint256)'](owner.address, tokenId);
-      await chunkyEquip.addResourceEntry(
-        {
-          id: resId,
-          equippableRefId: equippableRefIdDefault,
-          metadataURI: 'UriA',
-          baseAddress: baseAddressDefault,
-          custom: [customDataWidthKey, customDataHeightKey, customDataTypeKey],
-        },
-        [],
-        [],
-      );
-      await chunkyEquip.addResourceEntry(
-        {
-          id: resId2,
-          equippableRefId: equippableRefIdDefault,
-          metadataURI: 'UriB',
-          baseAddress: baseAddressDefault,
-          custom: [customDataTypeKey, customDataAreaKey],
-        },
-        [],
-        [],
-      );
-      await expect(
-        chunkyEquip.setCustomResourceData(resId, customDataWidthKey, customDataWidthValue),
-      )
-        .to.emit(chunkyEquip, 'ResourceCustomDataSet')
-        .withArgs(resId, customDataWidthKey);
-      await chunkyEquip.setCustomResourceData(resId, customDataHeightKey, customDataHeightValue);
-      await chunkyEquip.setCustomResourceData(resId, customDataTypeKey, customDataTypeValueA);
-      await chunkyEquip.setCustomResourceData(resId2, customDataAreaKey, customDataAreaValue);
-      await chunkyEquip.setCustomResourceData(resId2, customDataTypeKey, customDataTypeValueB);
-
-      await chunkyEquip.addResourceToToken(tokenId, resId, 0);
-      await chunkyEquip.addResourceToToken(tokenId, resId2, 0);
-      await chunkyEquip.acceptResource(tokenId, 0);
-      await chunkyEquip.acceptResource(tokenId, 0);
-
-      // Finally, user can get the right resource filtering by custom data.
-      // In this case, we filter by type being equal to 0xAAAA. (Whatever that means for the issuer)
-      expect(
-        await chunkyEquip.tokenURIForCustomValue(tokenId, customDataTypeKey, customDataTypeValueB),
-      ).to.eql('UriB');
-    });
-
-    it('gets fall back if matching value is not find on custom data', async function () {
-      const tokenId = 1;
-      const resId = BigNumber.from(1);
-      const resId2 = BigNumber.from(2);
-      // We define a custom data for 'type'.
-      const customDataTypeKey = 1;
-      const customDataTypeValueA = ethers.utils.hexZeroPad('0xAAAA', 16);
-      const customDataTypeValueB = ethers.utils.hexZeroPad('0xBBBB', 16);
-      const customDataTypeValueC = ethers.utils.hexZeroPad('0xCCCC', 16);
-      const customDataOtherKey = 2;
-
-      await chunky['mint(address,uint256)'](owner.address, tokenId);
-
-      await chunkyEquip.addResourceEntry(
-        {
-          id: resId,
-          equippableRefId: equippableRefIdDefault,
-          metadataURI: 'srcA',
-          baseAddress: baseAddressDefault,
-          custom: [customDataTypeKey],
-        },
-        [],
-        [],
-      );
-      await chunkyEquip.addResourceEntry(
-        {
-          id: resId2,
-          equippableRefId: equippableRefIdDefault,
-          metadataURI: 'srcB',
-          baseAddress: baseAddressDefault,
-          custom: [customDataTypeKey],
-        },
-        [],
-        [],
-      );
-      await chunkyEquip.setCustomResourceData(resId, customDataTypeKey, customDataTypeValueA);
-      await chunkyEquip.setCustomResourceData(resId2, customDataTypeKey, customDataTypeValueB);
-
-      await chunkyEquip.addResourceToToken(tokenId, resId, 0);
-      await chunkyEquip.addResourceToToken(tokenId, resId2, 0);
-      await chunkyEquip.acceptResource(tokenId, 0);
-      await chunkyEquip.acceptResource(tokenId, 0);
-
-      await chunkyEquip.setFallbackURI('fallback404');
-
-      // No resource has this custom value for type:
-      expect(
-        await chunkyEquip.tokenURIForCustomValue(tokenId, customDataTypeKey, customDataTypeValueC),
-      ).to.eql('fallback404');
-      // No resource has this custom key:
-      expect(
-        await chunkyEquip.tokenURIForCustomValue(tokenId, customDataOtherKey, customDataTypeValueA),
-      ).to.eql('fallback404');
     });
   });
 
@@ -959,7 +802,6 @@ async function shouldBehaveLikeEquippableResources(
           equippableRefId: equippableRefIdDefault,
           metadataURI: metaURIDefault,
           baseAddress: baseAddressDefault,
-          custom: customDefault,
         },
         [],
         [],

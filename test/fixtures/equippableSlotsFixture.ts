@@ -213,7 +213,6 @@ async function addResourcesToSoldier(): Promise<void> {
       equippableRefId: 0,
       metadataURI: 'ipfs:soldier/',
       baseAddress: baseContract.address,
-      custom: [],
     },
     [partIdForBody], // Fixed parts
     [partIdForWeapon, partIdForBackground], // Can receive these
@@ -235,7 +234,6 @@ async function addResourcesToWeapon(): Promise<void> {
         equippableRefId: 0, // Not meant to equip
         metadataURI: `ipfs:weapon/full/${weaponResourcesFull[i]}`,
         baseAddress: ethers.constants.AddressZero, // Not meant to equip
-        custom: [],
       },
       [],
       [],
@@ -248,7 +246,6 @@ async function addResourcesToWeapon(): Promise<void> {
         equippableRefId: equippableRefId,
         metadataURI: `ipfs:weapon/equip/${weaponResourcesEquip[i]}`,
         baseAddress: baseContract.address,
-        custom: [],
       },
       [],
       [partIdForWeaponGem],
@@ -288,7 +285,6 @@ async function addResourcesToWeaponGem(): Promise<void> {
       equippableRefId: 0, // Not meant to equip
       metadataURI: 'ipfs:weagponGem/full/',
       baseAddress: ethers.constants.AddressZero, // Not meant to equip
-      custom: [],
     },
     [],
     [],
@@ -299,7 +295,6 @@ async function addResourcesToWeaponGem(): Promise<void> {
       equippableRefId: equippableRefId,
       metadataURI: 'ipfs:weagponGem/equip/',
       baseAddress: baseContract.address,
-      custom: [],
     },
     [],
     [],
@@ -329,7 +324,6 @@ async function addResourcesToBackground(): Promise<void> {
       equippableRefId: equippableRefId,
       metadataURI: 'ipfs:background/',
       baseAddress: baseContract.address,
-      custom: [],
     },
     [],
     [],
