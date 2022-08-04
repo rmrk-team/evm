@@ -23,18 +23,6 @@ interface IRMRKMultiResource {
 
     event ResourceOverwritten(uint256 indexed tokenId, uint64 overwritten);
 
-    event ResourceCustomDataSet(uint64 resourceId, uint128 customResourceId);
-
-    event ResourceCustomDataAdded(
-        uint64 resourceId,
-        uint128 customResourceId
-    );
-
-    event ResourceCustomDataRemoved(
-        uint64 resourceId,
-        uint128 customResourceId
-    );
-
     event ApprovalForResources(address indexed owner, address indexed approved, uint256 indexed tokenId);
 
     event ApprovalForAllForResources(address indexed owner, address indexed operator, bool approved);
@@ -42,7 +30,6 @@ interface IRMRKMultiResource {
     struct Resource {
         uint64 id; //8 bytes
         string metadataURI; //32+
-        uint128[] custom;
     }
     
     function acceptResource(uint256 tokenId, uint256 index) external;
@@ -69,11 +56,6 @@ interface IRMRKMultiResource {
         uint256 tokenId,
         uint64 resourceId
     ) external view returns(uint64);
-
-    function getCustomResourceData(
-        uint64 resourceId,
-        uint128 customResourceId
-    ) external view returns (bytes memory);
 
     function tokenURI(
         uint256 tokenId

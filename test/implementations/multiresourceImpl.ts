@@ -74,16 +74,8 @@ describe('MultiResource', async () => {
       await this.token.connect(owner).addResourceEntry(defaultResource1, []);
       await this.token.connect(owner).addResourceEntry(defaultResource2, []);
 
-      expect(await this.token.getResource(1)).to.eql([
-        ethers.BigNumber.from(1),
-        defaultResource1,
-        [],
-      ]);
-      expect(await this.token.getResource(2)).to.eql([
-        ethers.BigNumber.from(2),
-        defaultResource2,
-        [],
-      ]);
+      expect(await this.token.getResource(1)).to.eql([ethers.BigNumber.from(1), defaultResource1]);
+      expect(await this.token.getResource(2)).to.eql([ethers.BigNumber.from(2), defaultResource2]);
     });
   });
 

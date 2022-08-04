@@ -49,7 +49,6 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
         uint64 equippableRefId;
         address baseAddress;
         string metadataURI;
-        uint128[] custom; //Custom data
     }
 
     struct FixedPart {
@@ -434,7 +433,7 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
         if (resource.baseAddress == address(0) && (fixedPartIds.length > 0 || slotPartIds.length > 0))
             revert RMRKBaseRequiredForParts();
 
-        _addResourceEntry(resource.id, resource.metadataURI, resource.custom);
+        _addResourceEntry(resource.id, resource.metadataURI);
 
         _baseAddresses[resource.id] = resource.baseAddress;
         _equippableRefIds[resource.id] = resource.equippableRefId;
@@ -454,8 +453,7 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
             id: resource.id,
             equippableRefId: _equippableRefIds[resource.id],
             baseAddress: _baseAddresses[resource.id],
-            metadataURI: resource.metadataURI,
-            custom: resource.custom
+            metadataURI: resource.metadataURI
         });
     }
 
@@ -500,8 +498,7 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
                 id: resource.id,
                 equippableRefId: _equippableRefIds[resource.id],
                 baseAddress: _baseAddresses[resource.id],
-                metadataURI: resource.metadataURI,
-                custom: resource.custom
+                metadataURI: resource.metadataURI
             });
             unchecked {++i;}
         }

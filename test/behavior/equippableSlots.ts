@@ -254,7 +254,10 @@ async function shouldBehaveLikeEquippableWithSlots() {
         soldierEquip
           .connect(addrs[0])
           .equip(soldiers[0], soldierResId, partIdForWeapon, backgroundChildIndex, weaponResId),
-      ).to.be.revertedWithCustomError(soldierEquip, 'RMRKTokenCannotBeEquippedWithResourceIntoSlot');
+      ).to.be.revertedWithCustomError(
+        soldierEquip,
+        'RMRKTokenCannotBeEquippedWithResourceIntoSlot',
+      );
     });
 
     it('cannot equip child in wrong slot (weapon in background)', async function () {
@@ -264,7 +267,10 @@ async function shouldBehaveLikeEquippableWithSlots() {
         soldierEquip
           .connect(addrs[0])
           .equip(soldiers[0], soldierResId, partIdForBackground, childIndex, weaponResId),
-      ).to.be.revertedWithCustomError(soldierEquip, 'RMRKTokenCannotBeEquippedWithResourceIntoSlot');
+      ).to.be.revertedWithCustomError(
+        soldierEquip,
+        'RMRKTokenCannotBeEquippedWithResourceIntoSlot',
+      );
     });
 
     it('cannot equip child with wrong resource (weapon in background)', async function () {
@@ -273,7 +279,10 @@ async function shouldBehaveLikeEquippableWithSlots() {
         soldierEquip
           .connect(addrs[0])
           .equip(soldiers[0], soldierResId, partIdForWeapon, childIndex, backgroundResourceId),
-      ).to.be.revertedWithCustomError(soldierEquip, 'RMRKTokenCannotBeEquippedWithResourceIntoSlot');
+      ).to.be.revertedWithCustomError(
+        soldierEquip,
+        'RMRKTokenCannotBeEquippedWithResourceIntoSlot',
+      );
     });
 
     it('cannot equip if not owner', async function () {
@@ -544,7 +553,6 @@ async function shouldBehaveLikeEquippableWithSlots() {
         bn(0), // equippableRefId
         base.address, // baseAddress
         'ipfs:soldier/', // metadataURI
-        [],
       ];
       const expectedFixedParts = [
         [
@@ -595,7 +603,6 @@ async function shouldBehaveLikeEquippableWithSlots() {
         equippableRefId: newEquippableRefId,
         metadataURI: `ipfs:weapon/equipAlt/${newWeaponResId}`,
         baseAddress: base.address,
-        custom: [],
       },
       [],
       [partIdForWeaponGem],

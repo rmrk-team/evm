@@ -95,7 +95,6 @@ async function shouldBehaveLikeEquippableWithParts() {
         bn(0), // equippableRefId
         baseContract.address, // baseAddress
         'ipfs:neonRes/1', // metadataURI
-        [],
       ];
       const expectedFixedParts = [
         [
@@ -134,7 +133,6 @@ async function shouldBehaveLikeEquippableWithParts() {
         bn(maskEquippableRefId), // equippableRefId
         baseContract.address, // baseAddress
         `ipfs:weapon/equip/${maskResourcesEquip[0]}`, // metadataURI
-        [],
       ];
       const expectedFixedParts = [
         [
@@ -175,7 +173,6 @@ async function shouldBehaveLikeEquippableWithParts() {
           equippableRefId: 0, // Not meant to equip
           metadataURI: `ipfs:weapon/full/customResource.png`,
           baseAddress: ethers.constants.AddressZero, // Not meant to equip
-          custom: [],
         },
         [],
         [],

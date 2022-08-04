@@ -8,7 +8,6 @@ async function shouldBehaveLikeMultiResource(name: string, symbol: string) {
   let addrs: any[];
 
   const metaURIDefault = 'metaURI';
-  const customDefault: string[] = [];
 
   before(async () => {
     const [signersOwner, ...signersAddr] = await ethers.getSigners();
@@ -36,7 +35,7 @@ async function shouldBehaveLikeMultiResource(name: string, symbol: string) {
     });
 
     it('can support IMultiResource', async function () {
-      expect(await this.token.supportsInterface('0x4d6339c8')).to.equal(true);
+      expect(await this.token.supportsInterface('0xbb5b3194')).to.equal(true);
     });
 
     it('cannot support other interfaceId', async function () {
@@ -117,7 +116,7 @@ async function shouldBehaveLikeMultiResource(name: string, symbol: string) {
     it('can add resource', async function () {
       const id = BigNumber.from(1);
 
-      await expect(this.token.addResourceEntry(id, metaURIDefault, customDefault))
+      await expect(this.token.addResourceEntry(id, metaURIDefault))
         .to.emit(this.token, 'ResourceSet')
         .withArgs(id);
     });
@@ -133,48 +132,33 @@ async function shouldBehaveLikeMultiResource(name: string, symbol: string) {
     it('cannot overwrite resource', async function () {
       const id = BigNumber.from(1);
 
-      await this.token.addResourceEntry(id, metaURIDefault, customDefault);
-      await expect(
-        this.token.addResourceEntry(id, 'newMetaUri', customDefault),
-      ).to.be.revertedWithCustomError(this.token, 'RMRKResourceAlreadyExists');
+      await this.token.addResourceEntry(id, metaURIDefault);
+      await expect(this.token.addResourceEntry(id, 'newMetaUri')).to.be.revertedWithCustomError(
+        this.token,
+        'RMRKResourceAlreadyExists',
+      );
     });
 
     it('cannot add resource with id 0', async function () {
       const id = 0;
 
-      await expect(
-        this.token.addResourceEntry(id, metaURIDefault, customDefault),
-      ).to.be.revertedWithCustomError(this.token, 'RMRKWriteToZero');
+      await expect(this.token.addResourceEntry(id, metaURIDefault)).to.be.revertedWithCustomError(
+        this.token,
+        'RMRKWriteToZero',
+      );
     });
 
     it('cannot add same resource twice', async function () {
       const id = BigNumber.from(1);
 
-      await expect(this.token.addResourceEntry(id, metaURIDefault, customDefault))
+      await expect(this.token.addResourceEntry(id, metaURIDefault))
         .to.emit(this.token, 'ResourceSet')
         .withArgs(id);
 
-      await expect(
-        this.token.addResourceEntry(id, metaURIDefault, customDefault),
-      ).to.be.revertedWithCustomError(this.token, 'RMRKResourceAlreadyExists');
-    });
-
-    it('can add and remove custom data for resource', async function () {
-      const resId = BigNumber.from(1);
-      const customDataTypeKey = 3;
-      await this.token.addResourceEntry(resId, metaURIDefault, customDefault);
-
-      await expect(this.token.addCustomDataToResource(resId, customDataTypeKey))
-        .to.emit(this.token, 'ResourceCustomDataAdded')
-        .withArgs(resId, customDataTypeKey);
-      let resource = await this.token.getResource(resId);
-      expect(resource.custom).to.eql([BigNumber.from(customDataTypeKey)]);
-
-      await expect(this.token.removeCustomDataFromResource(resId, 0))
-        .to.emit(this.token, 'ResourceCustomDataRemoved')
-        .withArgs(resId, customDataTypeKey);
-      resource = await this.token.getResource(resId);
-      expect(resource.custom).to.eql([]);
+      await expect(this.token.addResourceEntry(id, metaURIDefault)).to.be.revertedWithCustomError(
+        this.token,
+        'RMRKResourceAlreadyExists',
+      );
     });
   });
 
@@ -197,14 +181,13 @@ async function shouldBehaveLikeMultiResource(name: string, symbol: string) {
 
       const pending = await this.token.getFullPendingResources(tokenId);
       expect(pending).to.be.eql([
-        [resId, metaURIDefault, customDefault],
-        [resId2, metaURIDefault, customDefault],
+        [resId, metaURIDefault],
+        [resId2, metaURIDefault],
       ]);
 
       expect(await this.token.getPendingResObjectByIndex(tokenId, 0)).to.eql([
         resId,
         metaURIDefault,
-        customDefault,
       ]);
     });
 
@@ -293,13 +276,9 @@ async function shouldBehaveLikeMultiResource(name: string, symbol: string) {
       expect(pending).to.be.eql([]);
 
       const accepted = await this.token.getFullResources(tokenId);
-      expect(accepted).to.eql([[resId, metaURIDefault, customDefault]]);
+      expect(accepted).to.eql([[resId, metaURIDefault]]);
 
-      expect(await this.token.getResObjectByIndex(tokenId, 0)).to.eql([
-        resId,
-        metaURIDefault,
-        customDefault,
-      ]);
+      expect(await this.token.getResObjectByIndex(tokenId, 0)).to.eql([resId, metaURIDefault]);
     });
 
     it('can accept multiple resources', async function () {
@@ -323,8 +302,8 @@ async function shouldBehaveLikeMultiResource(name: string, symbol: string) {
 
       const accepted = await this.token.getFullResources(tokenId);
       expect(accepted).to.eql([
-        [resId2, metaURIDefault, customDefault],
-        [resId, metaURIDefault, customDefault],
+        [resId2, metaURIDefault],
+        [resId, metaURIDefault],
       ]);
     });
 
@@ -437,9 +416,7 @@ async function shouldBehaveLikeMultiResource(name: string, symbol: string) {
         'ResourceOverwritten',
       );
 
-      expect(await this.token.getFullResources(tokenId)).to.be.eql([
-        [resId2, metaURIDefault, customDefault],
-      ]);
+      expect(await this.token.getFullResources(tokenId)).to.be.eql([[resId2, metaURIDefault]]);
       // Overwrite should be gone
       expect(await this.token.getResourceOverwrites(tokenId, pendingResources[0])).to.eql(
         BigNumber.from(0),
@@ -455,9 +432,7 @@ async function shouldBehaveLikeMultiResource(name: string, symbol: string) {
       await this.token.addResourceToToken(tokenId, resId, 1);
       await this.token.acceptResource(tokenId, 0);
 
-      expect(await this.token.getFullResources(tokenId)).to.be.eql([
-        [resId, metaURIDefault, customDefault],
-      ]);
+      expect(await this.token.getFullResources(tokenId)).to.be.eql([[resId, metaURIDefault]]);
     });
   });
 
@@ -777,8 +752,8 @@ async function shouldBehaveLikeMultiResource(name: string, symbol: string) {
       const resId2 = BigNumber.from(2);
 
       await this.token['mint(address,uint256)'](owner.address, tokenId);
-      await this.token.addResourceEntry(resId, 'UriA', customDefault);
-      await this.token.addResourceEntry(resId2, 'UriB', customDefault);
+      await this.token.addResourceEntry(resId, 'UriA');
+      await this.token.addResourceEntry(resId2, 'UriB');
       await this.token.addResourceToToken(tokenId, resId, 0);
       await this.token.addResourceToToken(tokenId, resId2, 0);
       await this.token.acceptResource(tokenId, 0);
@@ -786,90 +761,11 @@ async function shouldBehaveLikeMultiResource(name: string, symbol: string) {
 
       expect(await this.token.tokenURIAtIndex(tokenId, 1)).to.eql('UriB');
     });
-
-    it('can get token URI by specific custom value', async function () {
-      const tokenId = 1;
-      const resId = BigNumber.from(1);
-      const resId2 = BigNumber.from(2);
-      // We define some custom types and values which mean something to the issuer.
-      // Resource 1 has Width, Height and Type. Resource 2 has Area and Type.
-      const customDataWidthKey = 1;
-      const customDataWidthValue = ethers.utils.hexZeroPad('0x1111', 16);
-      const customDataHeightKey = 2;
-      const customDataHeightValue = ethers.utils.hexZeroPad('0x1111', 16);
-      const customDataTypeKey = 3;
-      const customDataTypeValueA = ethers.utils.hexZeroPad('0xAAAA', 16);
-      const customDataTypeValueB = ethers.utils.hexZeroPad('0xBBBB', 16);
-      const customDataAreaKey = 4;
-      const customDataAreaValue = ethers.utils.hexZeroPad('0x00FF', 16);
-
-      await this.token['mint(address,uint256)'](owner.address, tokenId);
-      await this.token.addResourceEntry(resId, 'UriA', [
-        customDataWidthKey,
-        customDataHeightKey,
-        customDataTypeKey,
-      ]);
-      await this.token.addResourceEntry(resId2, 'UriB', [customDataTypeKey, customDataAreaKey]);
-      await expect(
-        this.token.setCustomResourceData(resId, customDataWidthKey, customDataWidthValue),
-      )
-        .to.emit(this.token, 'ResourceCustomDataSet')
-        .withArgs(resId, customDataWidthKey);
-      await this.token.setCustomResourceData(resId, customDataHeightKey, customDataHeightValue);
-      await this.token.setCustomResourceData(resId, customDataTypeKey, customDataTypeValueA);
-      await this.token.setCustomResourceData(resId2, customDataAreaKey, customDataAreaValue);
-      await this.token.setCustomResourceData(resId2, customDataTypeKey, customDataTypeValueB);
-
-      await this.token.addResourceToToken(tokenId, resId, 0);
-      await this.token.addResourceToToken(tokenId, resId2, 0);
-      await this.token.acceptResource(tokenId, 0);
-      await this.token.acceptResource(tokenId, 0);
-
-      // Finally, user can get the right resource filtering by custom data.
-      // In this case, we filter by type being equal to 0xAAAA. (Whatever that means for the issuer)
-      expect(
-        await this.token.tokenURIForCustomValue(tokenId, customDataTypeKey, customDataTypeValueB),
-      ).to.eql('UriB');
-    });
-
-    it('gets fall back if matching value is not find on custom data', async function () {
-      const tokenId = 1;
-      const resId = BigNumber.from(1);
-      const resId2 = BigNumber.from(2);
-      // We define a custom data for 'type'.
-      const customDataTypeKey = 1;
-      const customDataTypeValueA = ethers.utils.hexZeroPad('0xAAAA', 16);
-      const customDataTypeValueB = ethers.utils.hexZeroPad('0xBBBB', 16);
-      const customDataTypeValueC = ethers.utils.hexZeroPad('0xCCCC', 16);
-      const customDataOtherKey = 2;
-
-      await this.token['mint(address,uint256)'](owner.address, tokenId);
-      await this.token.addResourceEntry(resId, 'srcA', [customDataTypeKey]);
-      await this.token.addResourceEntry(resId2, 'srcB', [customDataTypeKey]);
-      await this.token.setCustomResourceData(resId, customDataTypeKey, customDataTypeValueA);
-      await this.token.setCustomResourceData(resId2, customDataTypeKey, customDataTypeValueB);
-
-      await this.token.addResourceToToken(tokenId, resId, 0);
-      await this.token.addResourceToToken(tokenId, resId2, 0);
-      await this.token.acceptResource(tokenId, 0);
-      await this.token.acceptResource(tokenId, 0);
-
-      await this.token.setFallbackURI('fallback404');
-
-      // No resource has this custom value for type:
-      expect(
-        await this.token.tokenURIForCustomValue(tokenId, customDataTypeKey, customDataTypeValueC),
-      ).to.eql('fallback404');
-      // No resource has this custom key:
-      expect(
-        await this.token.tokenURIForCustomValue(tokenId, customDataOtherKey, customDataTypeValueA),
-      ).to.eql('fallback404');
-    });
   });
 
   async function addResources(token: Contract, ids: BigNumber[]): Promise<void> {
     for (let i = 0; i < ids.length; i++) {
-      await token.addResourceEntry(ids[i], metaURIDefault, customDefault);
+      await token.addResourceEntry(ids[i], metaURIDefault);
     }
   }
 

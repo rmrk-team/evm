@@ -44,32 +44,8 @@ contract RMRKMultiResourceMock is RMRKMultiResource {
 
     function addResourceEntry(
         uint64 id,
-        string memory metadataURI,
-        uint128[] memory custom
+        string memory metadataURI
     ) external {
-        _addResourceEntry(id, metadataURI, custom);
+        _addResourceEntry(id, metadataURI);
     }
-
-    function setCustomResourceData(
-        uint64 resourceId,
-        uint128 customResourceId,
-        bytes memory data
-    ) external {
-        _setCustomResourceData(resourceId, customResourceId, data);
-    }
-
-    function addCustomDataToResource(
-        uint64 resourceId,
-        uint128 customResourceId
-    ) external {
-        _addCustomDataToResource(resourceId, customResourceId);
-    }
-
-    function removeCustomDataFromResource(
-        uint64 resourceId,
-        uint256 index
-    ) external {
-        _removeCustomDataFromResource(resourceId, index);
-    }
-
 }

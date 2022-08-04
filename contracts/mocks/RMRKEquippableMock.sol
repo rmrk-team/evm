@@ -46,28 +46,6 @@ contract RMRKEquippableMock is RMRKEquippable {
         _addResourceEntry(resource, fixedPartIds, slotPartIds);
     }
 
-    function setCustomResourceData(
-        uint64 resourceId,
-        uint128 customResourceId,
-        bytes memory data
-    ) external {
-        _setCustomResourceData(resourceId, customResourceId, data);
-    }
-
-    function addCustomDataToResource(
-        uint64 resourceId,
-        uint128 customResourceId
-    ) external {
-        _addCustomDataToResource(resourceId, customResourceId);
-    }
-
-    function removeCustomDataFromResource(
-        uint64 resourceId,
-        uint256 index
-    ) external {
-        _removeCustomDataFromResource(resourceId, index);
-    }
-
     function setValidParentRefId(
         uint64 refId,
         address parentAddress,

@@ -48,9 +48,6 @@ abstract contract MultiResourceAbstract is Context, IRMRKMultiResource {
     //Mapping of uint64 resource ID to tokenEnumeratedResource for tokenURI
     mapping(uint64 => bool) internal _tokenEnumeratedResource;
 
-    //Mapping of uint128 custom field to bytes data
-    mapping(uint64 => mapping (uint128 => bytes)) internal _customResourceData;
-
     //List of all resources
     uint64[] internal _allResources;
 
@@ -155,8 +152,7 @@ abstract contract MultiResourceAbstract is Context, IRMRKMultiResource {
 
     function _addResourceEntry(
         uint64 id,
-        string memory metadataURI,
-        uint128[] memory custom
+        string memory metadataURI
     ) internal {
         if(id == uint64(0))
             revert RMRKWriteToZero();
@@ -165,30 +161,12 @@ abstract contract MultiResourceAbstract is Context, IRMRKMultiResource {
 
         Resource memory resource = Resource({
             id: id,
-            metadataURI: metadataURI,
-            custom: custom
+            metadataURI: metadataURI
         });
         _resources[id] = resource;
         _allResources.push(id);
 
         emit ResourceSet(id);
-    }
-
-    function _addCustomDataToResource(
-        uint64 resourceId,
-        uint128 customResourceId
-    ) internal {
-        _resources[resourceId].custom.push(customResourceId);
-        emit ResourceCustomDataAdded(resourceId, customResourceId);
-    }
-
-    function _removeCustomDataFromResource(
-        uint64 resourceId,
-        uint256 index
-    ) internal {
-        uint128 customResourceId = _resources[resourceId].custom[index];
-        _resources[resourceId].custom.removeItemByIndex(index);
-        emit ResourceCustomDataRemoved(resourceId, customResourceId);
     }
 
     function _addResourceToToken(
@@ -256,38 +234,6 @@ abstract contract MultiResourceAbstract is Context, IRMRKMultiResource {
         return _tokenURIAtIndex(tokenId, index);
     }
 
-    function tokenURIForCustomValue(
-        uint256 tokenId,
-        uint128 customResourceId,
-        bytes memory customResourceValue
-    ) public view virtual returns (string memory) {
-        uint64[] memory activeResources = _activeResources[tokenId];
-        uint256 len = _activeResources[tokenId].length;
-        for (uint index; index<len;) {
-            bytes memory actualCustomResourceValue = getCustomResourceData(
-                activeResources[index],
-                customResourceId
-            );
-            if (
-                keccak256(actualCustomResourceValue) ==
-                keccak256(customResourceValue)
-            ) {
-                return _tokenURIAtIndex(tokenId, index);
-            }
-            unchecked {++index;}
-        }
-        return _fallbackURI;
-    }
-
-    function _setCustomResourceData(
-        uint64 resourceId,
-        uint128 customResourceId,
-        bytes memory data
-    ) internal {
-        _customResourceData[resourceId][customResourceId] = data;
-        emit ResourceCustomDataSet(resourceId, customResourceId);
-    }
-
     function _setFallbackURI(string memory fallbackURI) internal {
         _fallbackURI = fallbackURI;
     }
@@ -330,13 +276,6 @@ abstract contract MultiResourceAbstract is Context, IRMRKMultiResource {
 
     function getAllResources() public view virtual returns (uint64[] memory) {
         return _allResources;
-    }
-
-    function getCustomResourceData(
-        uint64 resourceId,
-        uint128 customResourceId
-    ) public view virtual returns (bytes memory) {
-        return _customResourceData[resourceId][customResourceId];
     }
 
     function isTokenEnumeratedResource(
