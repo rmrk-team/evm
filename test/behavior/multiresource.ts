@@ -9,10 +9,6 @@ async function shouldSupportInterfacesForResources() {
       expect(await this.token.supportsInterface('0x01ffc9a7')).to.equal(true);
     });
 
-    it('can support IERC721', async function () {
-      expect(await this.token.supportsInterface('0x80ac58cd')).to.equal(true);
-    });
-
     it('can support IMultiResource', async function () {
       expect(await this.token.supportsInterface('0xbb5b3194')).to.equal(true);
     });
@@ -440,9 +436,7 @@ async function shouldHandleSetPriorities(tokenId: number) {
 
     it('cannot set priorities for non existing token', async function () {
       const badTokenId = 99;
-      await expect(
-        this.token.connect(tokenOwner).setPriority(badTokenId, []),
-      ).to.be.revertedWithCustomError(this.token, 'ERC721InvalidTokenId');
+      await expect(this.token.connect(tokenOwner).setPriority(badTokenId, [])).to.be.reverted;
     });
   });
 }
