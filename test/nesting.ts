@@ -1,10 +1,34 @@
-import { ethers } from "hardhat"
-import { Contract } from "ethers"
-import shouldBehaveLikeNesting from "./behavior/nesting"
-import shouldBehaveLikeERC721 from "./behavior/erc721"
-import { loadFixture } from "@nomicfoundation/hardhat-network-helpers"
+import { expect } from 'chai';
+import { ethers } from 'hardhat';
+import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { BigNumber, Contract } from 'ethers';
+import shouldBehaveLikeNesting from './behavior/nesting';
+import shouldBehaveLikeERC721 from './behavior/erc721';
+import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
+
+let nextTokenId = 1;
+let nextChildTokenId = 100;
+
+async function mint(token: Contract, to: string): Promise<number> {
+  const tokenId = nextTokenId;
+  nextTokenId++;
+  await token['mint(address,uint256)'](to, tokenId);
+  return tokenId;
+}
+
+async function nestMint(token: Contract, to: string, parentId: number): Promise<number> {
+  const childTokenId = nextChildTokenId;
+  nextChildTokenId++;
+  await token['mint(address,uint256,uint256)'](to, childTokenId, parentId);
+  return childTokenId;
+}
 
 describe('Nesting', function () {
+  let parent: Contract;
+  let child: Contract;
+  let owner: SignerWithAddress;
+  let addrs: SignerWithAddress[];
+
   const name = 'ownerChunky';
   const symbol = 'CHNKY';
 
@@ -12,24 +36,57 @@ describe('Nesting', function () {
   const symbol2 = 'MONKE';
 
   async function nestingFixture() {
-    const CHNKY = await ethers.getContractFactory('RMRKNestingMockWithReceiver');
-    const ownerChunky = await CHNKY.deploy(name, symbol);
-    await ownerChunky.deployed();
+    const NestingFactory = await ethers.getContractFactory('RMRKNestingMockWithReceiver');
+    parent = await NestingFactory.deploy(name, symbol);
+    await parent.deployed();
 
-    const MONKY = await ethers.getContractFactory('RMRKNestingMockWithReceiver');
-    const petMonkey = await MONKY.deploy(name2, symbol2);
-    await petMonkey.deployed();
+    child = await NestingFactory.deploy(name2, symbol2);
+    await child.deployed();
 
-    return { ownerChunky, petMonkey };
+    return { parent, child };
   }
 
   beforeEach(async function () {
-    const { ownerChunky, petMonkey } = await loadFixture(nestingFixture);
-    this.parentToken = ownerChunky;
-    this.childToken = petMonkey;
+    const [signersOwner, ...signersAddr] = await ethers.getSigners();
+    owner = signersOwner;
+    addrs = signersAddr;
+
+    const { parent, child } = await loadFixture(nestingFixture);
+    this.parentToken = parent;
+    this.childToken = child;
   });
 
-  shouldBehaveLikeNesting(name, symbol, name2, symbol2);
+  shouldBehaveLikeNesting(mint, nestMint);
+
+  describe('Init', async function () {
+    it('Name', async function () {
+      expect(await parent.name()).to.equal(name);
+      expect(await child.name()).to.equal(name2);
+    });
+
+    it('Symbol', async function () {
+      expect(await parent.symbol()).to.equal(symbol);
+      expect(await child.symbol()).to.equal(symbol2);
+    });
+  });
+
+  describe('Minting', async function () {
+    it('cannot mint already minted token', async function () {
+      const tokenId = await mint(child, owner.address);
+      await expect(
+        child['mint(address,uint256)'](owner.address, tokenId),
+      ).to.be.revertedWithCustomError(child, 'ERC721TokenAlreadyMinted');
+    });
+
+    it('cannot nest mint already minted token', async function () {
+      const parentId = await mint(parent, owner.address);
+      const childId = await nestMint(child, parent.address, parentId);
+
+      await expect(
+        child['mint(address,uint256,uint256)'](parent.address, childId, parentId),
+      ).to.be.revertedWithCustomError(child, 'ERC721TokenAlreadyMinted');
+    });
+  });
 });
 
 describe('ERC721', function () {
