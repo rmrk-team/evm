@@ -139,6 +139,7 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
     function supportsInterface(bytes4 interfaceId) public virtual view returns (bool) {
         return (
             interfaceId == type(IRMRKEquippable).interfaceId ||
+            interfaceId == type(IRMRKMultiResource).interfaceId ||
             interfaceId == type(IERC165).interfaceId
         );
     }

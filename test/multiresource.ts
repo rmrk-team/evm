@@ -102,6 +102,10 @@ describe('MultiResourceMock Init', async function () {
   it('Symbol', async function () {
     expect(await token.symbol()).to.equal(symbol);
   });
+
+  it('can support IERC721', async function () {
+    expect(await token.supportsInterface('0x80ac58cd')).to.equal(true);
+  });
 });
 
 describe('MultiResourceMock Resource storage', async function () {
