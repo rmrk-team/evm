@@ -4,6 +4,7 @@ pragma solidity ^0.8.15;
 
 import "./interfaces/IRMRKBaseStorage.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
+import "@openzeppelin/contracts/utils/introspection/ERC165.sol";
 import "hardhat/console.sol";
 
 error RMRKPartAlreadyExists();
@@ -12,7 +13,7 @@ error RMRKPartIsNotSlot();
 error RMRKZeroLengthIdsPassed();
 error RMRKBadConfig();
 
-contract RMRKBaseStorage is IRMRKBaseStorage {
+contract RMRKBaseStorage is IRMRKBaseStorage, ERC165 {
     using Address for address;
     /*
     REVIEW NOTES:
@@ -89,6 +90,11 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
 
     function type_() external view returns (string memory) {
         return _type;
+    }
+
+    function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
+        return super.supportsInterface(interfaceId) ||
+            interfaceId == type(IRMRKBaseStorage).interfaceId;
     }
 
     /**

@@ -19,61 +19,37 @@ interface IRMRKEquippableAyuilosVer {
     }
 
     struct SlotEquipment {
-        uint256 tokenId;
         IRMRKNesting.Child child;
-        uint64 baseRelatedResourceId;
         uint64 childBaseRelatedResourceId;
     }
 
-    event Equip(uint256 tokenId);
-    event Unequip(uint256 tokenId);
-
-    event BaseRelatedResourceSet(uint64 id);
-    event BaseRelatedResourceIdsInvolvedInEquipmentSet(
+    event BaseRelatedResourceAdd(uint64 id);
+    event SlotEquipmentsSet(
         uint256 tokenId,
-        uint64[] baseRelatedResourceIds
-    );
-    event SlotEquipmentsAdd(
-        uint256 tokenId,
-        uint128[] slotEquipmentIds,
+        uint64 baseRelatedResourceId,
+        uint64[] slotPartIds,
         SlotEquipment[] slotEquipments
     );
-    event SlotEquipmentsRemove(uint256 tokenId, uint128[] slotEquipmentIds);
 
-    function equip(uint256 tokenId) external;
-
-    function unequip(uint256 tokenId) external;
-
-    function getEquipStatus(uint256 tokenId) external view returns (bool);
-
-    function batchGetEquipStatus(uint256[] calldata tokenIds)
+    function getBaseRelatedResource(uint64 baseRelatedResourceId)
         external
         view
-        returns (bool[] memory);
+        returns (BaseRelatedResource memory baseRelatedResource);
 
     function getAllBaseRelatedResourceIds()
         external
         view
-        returns (uint64[] memory);
+        returns (uint64[] memory allBaseRelatedResourceIds);
 
-    function getBaseRelatedResourceIdsInvolvedInEquipment(uint256 tokenId)
-        external
-        view
-        returns (uint64[] memory);
-
-    function getSlotEquipments(uint256 tokenId)
+    function getSlotEquipments(uint256 tokenId, uint64 baseRelatedResource)
         external
         view
         returns (SlotEquipment[] memory slotEquipments);
 
-    function setBaseRelatedResourceIdsInvolvedInEquipment(
+    function setSlotEquipments(
         uint256 tokenId,
-        uint64[] calldata baseRelatedResourceIds
-    ) external;
-
-    function addSlotEquipments(
-        uint256 tokenId,
-        uint128[] calldata slotEquipmentIds,
+        uint64 baseRelatedResourceId,
+        uint64[] calldata slotPartIds,
         SlotEquipment[] calldata slotEquipments
     ) external;
 }

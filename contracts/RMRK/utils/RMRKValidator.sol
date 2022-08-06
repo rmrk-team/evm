@@ -2,6 +2,7 @@
 pragma solidity ^0.8.15;
 
 import "../RMRKEquippableAyuilosVer.sol";
+import "../RMRKBaseStorage.sol";
 
 contract RMRKEquippableValidator {
     using Address for address;
@@ -42,45 +43,142 @@ contract RMRKEquippableValidator {
         (, result) = idArr.indexOf(id);
     }
 
-    function _validateContract(address targetContract) internal view {
-        if (!targetContract.isContract()) {
-            revert("RV: Not a valid contract");
-        }
+    function getValidChildrenOf(address targetContract, uint256 tokenId)
+        public
+        view
+        returns (IRMRKNesting.Child[] memory validChildren)
+    {
+        (bool isValid, string memory reason) = isAValidNestingContract(
+            targetContract
+        );
 
-        if (
-            !IERC165(targetContract).supportsInterface(
-                type(IRMRKEquippableAyuilosVer).interfaceId
-            )
-        ) {
-            revert("RV: Not Equippable");
+        if (isValid) {
+            IRMRKNesting.Child[] memory children = IRMRKNesting(targetContract)
+                .childrenOf(tokenId);
+            uint256 len = children.length;
+            uint256 j;
+
+            for (uint256 i; i < len; ++i) {
+                IRMRKNesting.Child memory child = children[i];
+                (bool childIsValid, ) = isAValidNestingContract(
+                    child.contractAddress
+                );
+
+                if (childIsValid) {
+                    (
+                        address ownerAddr,
+                        uint256 ownerTokenId,
+                        bool isNft
+                    ) = IRMRKNesting(child.contractAddress).rmrkOwnerOf(
+                            child.tokenId
+                        );
+
+                    if (
+                        ownerAddr == targetContract &&
+                        ownerTokenId == tokenId &&
+                        isNft
+                    ) {
+                        validChildren[j] = child;
+                        ++j;
+                    }
+                }
+            }
+        } else {
+            revert(reason);
         }
     }
 
+    function isAValidNestingContract(address targetContract)
+        public
+        view
+        returns (bool, string memory)
+    {
+        if (!targetContract.isContract()) {
+            return (false, "RV: Not a valid contract");
+        }
+
+        if (
+            !(
+                IERC165(targetContract).supportsInterface(
+                    type(IRMRKNesting).interfaceId
+                )
+            )
+        ) {
+            return (false, "RV: Not a Nesting");
+        }
+
+        return (true, "");
+    }
+
+    function isAValidBaseStorageContract(address targetContract)
+        public
+        view
+        returns (bool, string memory)
+    {
+        if (!targetContract.isContract()) {
+            return (false, "RV: Not a valid contract");
+        }
+
+        if (
+            !(
+                IERC165(targetContract).supportsInterface(
+                    type(IRMRKBaseStorage).interfaceId
+                )
+            )
+        ) {
+            return (false, "RV: Not a BaseStorage");
+        }
+
+        return (true, "");
+    }
+
+    function isAValidEquippableContract(address targetContract)
+        public
+        view
+        returns (bool, string memory)
+    {
+        if (!targetContract.isContract()) {
+            return (false, "RV: Not a valid contract");
+        }
+
+        if (
+            !(IERC165(targetContract).supportsInterface(
+                type(IRMRKEquippableAyuilosVer).interfaceId
+            ) &&
+                IERC165(targetContract).supportsInterface(
+                    type(IRMRKNesting).interfaceId
+                ) &&
+                IERC165(targetContract).supportsInterface(
+                    type(IRMRKMultiResource).interfaceId
+                ))
+        ) {
+            return (false, "RV: Not a Equippable");
+        }
+
+        return (true, "");
+    }
+
+    function _validateContract(address targetContract) internal view {
+        (bool result, string memory reason) = isAValidEquippableContract(
+            targetContract
+        );
+
+        if (!result) {
+            revert(reason);
+        }
+    }
+
+    // Make sure `targetContract` is valid Equippable contract
     modifier validContract(address targetContract) {
         _validateContract(targetContract);
         _;
     }
 
-    function getValidBaseRelatedResourceIdsInvolvedInEquipment(
+    function getValidSlotEquipments(
         address targetContract,
-        uint256 tokenId
+        uint256 tokenId,
+        uint64 baseRelatedResourceId
     )
-        public
-        view
-        validContract(targetContract)
-        returns (uint64[] memory validBaseRelatedResourceIds)
-    {
-        RMRKEquippableAyuilosVer tContract = RMRKEquippableAyuilosVer(
-            targetContract
-        );
-        uint64[] memory activeResIds = tContract.getActiveResources(tokenId);
-        uint64[] memory baseRelatedResIdsInvolvedInEquipment = tContract
-            .getBaseRelatedResourceIdsInvolvedInEquipment(tokenId);
-
-        return _pickUint64(activeResIds, baseRelatedResIdsInvolvedInEquipment);
-    }
-
-    function getValidSlotEquipments(address targetContract, uint256 tokenId)
         public
         view
         validContract(targetContract)
@@ -90,60 +188,137 @@ contract RMRKEquippableValidator {
             targetContract
         );
 
-        IRMRKEquippableAyuilosVer.SlotEquipment[]
-            memory slotEquipments = tContract.getSlotEquipments(tokenId);
-        uint64[]
-            memory validBRRIIIE = getValidBaseRelatedResourceIdsInvolvedInEquipment(
-                targetContract,
+        // To avoid "stack too deep" problem
+        {
+            uint64[] memory activeResourceIds = tContract.getActiveResources(
                 tokenId
             );
-        uint256 len = slotEquipments.length;
+
+            // `baseRelatedResourceId` has to be in `activeResourceIds`
+            if (!_existsInUint64Arr(baseRelatedResourceId, activeResourceIds)) {
+                return new IRMRKEquippableAyuilosVer.SlotEquipment[](0);
+            }
+        }
+
+        {
+            IRMRKEquippableAyuilosVer.BaseRelatedResource
+                memory baseRelatedResource = tContract.getBaseRelatedResource(
+                    baseRelatedResourceId
+                );
+
+            address baseStorageContract = baseRelatedResource.baseAddress;
+            (bool isBaseStorage, ) = isAValidBaseStorageContract(
+                baseStorageContract
+            );
+
+            // `baseRelatedResource` has to be a Base instance
+            if (!isBaseStorage) {
+                return new IRMRKEquippableAyuilosVer.SlotEquipment[](0);
+            }
+        }
+
+        IRMRKEquippableAyuilosVer.SlotEquipment[]
+            memory slotEquipments = tContract.getSlotEquipments(
+                tokenId,
+                baseRelatedResourceId
+            );
+
         IRMRKEquippableAyuilosVer.SlotEquipment[]
             memory _validSlotEquipments = new IRMRKEquippableAyuilosVer.SlotEquipment[](
-                len
+                slotEquipments.length
             );
+
         uint256 j;
 
-        for (uint256 i; i < len; ) {
+        for (uint256 i; i < slotEquipments.length; i++) {
             IRMRKEquippableAyuilosVer.SlotEquipment memory sE = slotEquipments[
                 i
             ];
 
-            if (!_existsInUint64Arr(sE.baseRelatedResourceId, validBRRIIIE)) {
-                unchecked {
-                    ++i;
-                }
-                continue;
-            }
-
-            uint64 childBaseRelatedReousourceId = sE.childBaseRelatedResourceId;
-
             IRMRKNesting.Child memory child = sE.child;
-            address childContract = child.contractAddress;
-            uint256 childTokenId = child.tokenId;
 
-            try
-                this.getValidBaseRelatedResourceIdsInvolvedInEquipment(
-                    childContract,
-                    childTokenId
-                )
-            returns (uint64[] memory childValidBRRIIIE) {
-                if (
-                    _existsInUint64Arr(
-                        childBaseRelatedReousourceId,
-                        childValidBRRIIIE
-                    )
-                ) {
-                    _validSlotEquipments[j] = sE;
-                    unchecked {
-                        ++j;
-                        ++i;
+            // The child token has to be a valid eqippable contract
+            (bool childContractIsValid, ) = isAValidEquippableContract(
+                child.contractAddress
+            );
+            if (childContractIsValid) {
+                {
+                    (
+                        address ownerAddr,
+                        uint256 ownerTokenId,
+                        bool isNft
+                    ) = IRMRKNesting(child.contractAddress).rmrkOwnerOf(
+                            child.tokenId
+                        );
+
+                    // The child token's owner has to be this token
+                    if (
+                        ownerAddr != targetContract ||
+                        ownerTokenId != tokenId ||
+                        !isNft
+                    ) {
+                        continue;
                     }
                 }
-            } catch {
-                unchecked {
-                    ++i;
+
+                {
+                    uint64 childBaseRelatedResourceId = sE
+                        .childBaseRelatedResourceId;
+
+                    uint64[] memory childActiveResourceIds = IRMRKMultiResource(
+                        child.contractAddress
+                    ).getActiveResources(child.tokenId);
+
+                    // The child token's `baseRelatedResourceId` has to be in child token's activeResourceIds
+                    if (
+                        !_existsInUint64Arr(
+                            childBaseRelatedResourceId,
+                            childActiveResourceIds
+                        )
+                    ) {
+                        continue;
+                    }
                 }
+
+                {
+                    uint64 childBaseRelatedResourceId = sE
+                        .childBaseRelatedResourceId;
+
+                    IRMRKEquippableAyuilosVer.BaseRelatedResource
+                        memory baseRelatedResource = tContract
+                            .getBaseRelatedResource(baseRelatedResourceId);
+
+                    IRMRKEquippableAyuilosVer.BaseRelatedResource
+                        memory childBaseRelatedResource = IRMRKEquippableAyuilosVer(
+                            child.contractAddress
+                        ).getBaseRelatedResource(childBaseRelatedResourceId);
+
+                    address baseStorageContract = baseRelatedResource
+                        .baseAddress;
+
+                    // 1. The child's `targetBaseAddress` has to be `baseRelatedResource.baseAddress`
+                    // 2. The child's `targetSlotId` has to be in `baseRelatedResource.partIds`,
+                    // 3. Finally, this child collection should be allowed to be equipped on the `targetSlotId` by `baseStorageContract`
+                    if (
+                        childBaseRelatedResource.targetBaseAddress !=
+                        baseStorageContract ||
+                        !_existsInUint64Arr(
+                            childBaseRelatedResource.targetSlotId,
+                            baseRelatedResource.partIds
+                        ) ||
+                        !IRMRKBaseStorage(baseStorageContract)
+                            .checkIsEquippable(
+                                childBaseRelatedResource.targetSlotId,
+                                child.contractAddress
+                            )
+                    ) {
+                        continue;
+                    }
+                }
+
+                // The validation is over, this is a valid slotEquipment.
+                _validSlotEquipments[j] = sE;
+                ++j;
             }
         }
 
