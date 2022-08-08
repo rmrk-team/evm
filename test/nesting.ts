@@ -67,6 +67,15 @@ describe('Nesting', function () {
         child['mint(address,uint256,uint256)'](parent.address, childId, parentId),
       ).to.be.revertedWithCustomError(child, 'ERC721TokenAlreadyMinted');
     });
+
+    it('cannot nest mint already minted token', async function () {
+      const parentId = await mintTokenId(parent, owner.address);
+      const childId = await nestMinttokenId(child, parent.address, parentId);
+
+      await expect(
+        child['mint(address,uint256,uint256)'](parent.address, childId, parentId),
+      ).to.be.revertedWithCustomError(child, 'ERC721TokenAlreadyMinted');
+    });
   });
 });
 
