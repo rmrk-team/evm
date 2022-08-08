@@ -1,5 +1,5 @@
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { Contract } from 'ethers';
+import { BigNumber, Contract } from 'ethers';
 
 let nextTokenId = 1;
 let nextChildTokenId = 100;
@@ -37,4 +37,13 @@ async function nestTransfer(
   await token.connect(caller)['nestTransfer(address,uint256,uint256)'](to, tokenId, parentId);
 }
 
-export { mintTokenId, nestMinttokenId, transfer, nestTransfer };
+async function addResourceToToken(
+  token: Contract,
+  tokenId: number,
+  resId: BigNumber,
+  overwrites: BigNumber | number,
+): Promise<void> {
+  await token.addResourceToToken(tokenId, resId, overwrites);
+}
+
+export { mintTokenId, nestMinttokenId, transfer, nestTransfer, addResourceToToken };
