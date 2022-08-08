@@ -45,6 +45,27 @@ contract RMRKNestingMultiResourceImpl is OwnableLock, RMRKMintingUtils, IRMRKNes
         }
     }
 
+    /*
+    Template minting logic
+    */
+    function mintNesting(address to, uint256 numToMint, uint256 destinationId) external payable saleIsOpen notLocked {
+        if (numToMint == uint256(0)) revert RMRKMintZero();
+        if (numToMint + _totalSupply > _maxSupply) revert RMRKMintOverMax();
+
+        uint256 mintPriceRequired = numToMint * _pricePerMint;
+        if (mintPriceRequired != msg.value)
+            revert RMRKMintUnderpriced();
+
+        uint256 nextToken = _totalSupply+1;
+        _totalSupply += numToMint;
+        uint256 totalSupplyOffset = _totalSupply+1;
+
+        for(uint i = nextToken; i < totalSupplyOffset;) {
+            _safeMintNesting(to, i, destinationId);
+            unchecked {++i;}
+        }
+    }
+
     //update for reentrancy
     function burn(uint256 tokenId) public onlyApprovedOrOwner(tokenId) {
         _burn(tokenId);
