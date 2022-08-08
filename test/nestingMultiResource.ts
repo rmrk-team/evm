@@ -3,6 +3,7 @@ import { ethers } from 'hardhat';
 import { BigNumber, Contract } from 'ethers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
+import { mintTokenId, nestMinttokenId, transfer, nestTransfer } from './utils';
 import shouldBehaveLikeNesting from './behavior/nesting';
 import {
   shouldHandleAcceptsForResources,
@@ -41,7 +42,7 @@ describe('Nesting', function () {
     this.childToken = petMonkey;
   });
 
-  shouldBehaveLikeNesting(name, symbol, name2, symbol2);
+  shouldBehaveLikeNesting(mintTokenId, nestMinttokenId, transfer, nestTransfer);
 });
 
 // --------------- MULTI RESOURCE BEHAVIOR -----------------------
