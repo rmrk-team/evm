@@ -3,34 +3,17 @@ import { ethers } from 'hardhat';
 import { BigNumber, Contract } from 'ethers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import { mintTokenId, nestMinttokenId, transfer, nestTransfer } from './utils';
+import { mintTokenId, nestMinttokenId, transfer, nestTransfer, addResourceToToken } from './utils';
 import shouldBehaveLikeNesting from './behavior/nesting';
-import {
-  shouldHandleAcceptsForResources,
-  shouldHandleApprovalsForResources,
-  shouldHandleOverwritesForResources,
-  shouldHandleRejectsForResources,
-  shouldHandleSetPriorities,
-  shouldSupportInterfacesForResources,
-} from './behavior/multiresource';
+import shouldBehaveLikeMultiResource from './behavior/multiresource';
 
 describe('Nesting', function () {
-  let ownerChunky: Contract;
-  let petMonkey: Contract;
-
-  const name = 'ownerChunky';
-  const symbol = 'CHNKY';
-
-  const name2 = 'petMonkey';
-  const symbol2 = 'MONKE';
-
   async function deployTokensFixture() {
-    const CHNKY = await ethers.getContractFactory('RMRKNestingMultiResourceMock');
-    ownerChunky = await CHNKY.deploy(name, symbol);
+    const NestingMRFactory = await ethers.getContractFactory('RMRKNestingMultiResourceMock');
+    const ownerChunky = await NestingMRFactory.deploy('Chunky', 'CHNK');
     await ownerChunky.deployed();
 
-    const MONKY = await ethers.getContractFactory('RMRKNestingMultiResourceMock');
-    petMonkey = await MONKY.deploy(name2, symbol2);
+    const petMonkey = await NestingMRFactory.deploy('Monkey', 'MONK');
     await petMonkey.deployed();
 
     return { ownerChunky, petMonkey };
@@ -63,54 +46,13 @@ async function addResourceEntry(token: Contract, data?: string): Promise<BigNumb
   return resourceId;
 }
 
-async function addResourceToToken(
-  token: Contract,
-  tokenId: number,
-  resId: BigNumber,
-  overwrites: BigNumber | number,
-): Promise<void> {
-  await token.addResourceToToken(tokenId, resId, overwrites);
-}
-
-describe('NestingMultiResourceMock MR behavior with minted token', async () => {
-  const tokenId = 1;
-
+describe('MultiResource MR behavior', async () => {
   beforeEach(async function () {
-    const tokenOwner = (await ethers.getSigners())[1];
     const { token } = await loadFixture(deployTokenFixture);
-    await token['mint(address,uint256)'](tokenOwner.address, tokenId);
     this.token = token;
   });
 
-  shouldSupportInterfacesForResources();
-  shouldHandleApprovalsForResources(tokenId);
-  shouldHandleOverwritesForResources(tokenId, addResourceEntry, addResourceToToken);
-});
-
-describe('NestingMultiResourceMock MR behavior with minted token and pending resources', async () => {
-  const tokenId = 1;
-  const resId1 = BigNumber.from(1);
-  const resData1 = 'data1';
-  const resId2 = BigNumber.from(2);
-  const resData2 = 'data2';
-
-  beforeEach(async function () {
-    const tokenOwner = (await ethers.getSigners())[1];
-    const { token } = await loadFixture(deployTokenFixture);
-
-    // Mint and add 2 resources to token
-    await token['mint(address,uint256)'](tokenOwner.address, tokenId);
-    await token.addResourceEntry(resId1, resData1);
-    await token.addResourceEntry(resId2, resData2);
-    await token.addResourceToToken(tokenId, resId1, 0);
-    await token.addResourceToToken(tokenId, resId2, 0);
-
-    this.token = token;
-  });
-
-  shouldHandleAcceptsForResources(tokenId, resId1, resData1, resId2, resData2);
-  shouldHandleRejectsForResources(tokenId, resId1, resData1, resId2, resData2);
-  shouldHandleSetPriorities(tokenId);
+  shouldBehaveLikeMultiResource(mintTokenId, addResourceEntry, addResourceToToken);
 });
 
 // --------------- MULTI RESOURCE BEHAVIOR END ------------------------

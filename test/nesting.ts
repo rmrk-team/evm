@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { Contract, utils } from 'ethers';
+import { Contract } from 'ethers';
 import { mintTokenId, nestMinttokenId, transfer, nestTransfer } from './utils';
 import shouldBehaveLikeNesting from './behavior/nesting';
 import shouldBehaveLikeERC721 from './behavior/erc721';
@@ -53,15 +53,15 @@ describe('Nesting', function () {
 
   describe('Minting', async function () {
     it('cannot mint already minted token', async function () {
-      const tokenId = await mint(child, owner.address);
+      const tokenId = await mintTokenId(child, owner.address);
       await expect(
         child['mint(address,uint256)'](owner.address, tokenId),
       ).to.be.revertedWithCustomError(child, 'ERC721TokenAlreadyMinted');
     });
 
     it('cannot nest mint already minted token', async function () {
-      const parentId = await mint(parent, owner.address);
-      const childId = await nestMint(child, parent.address, parentId);
+      const parentId = await mintTokenId(parent, owner.address);
+      const childId = await nestMinttokenId(child, parent.address, parentId);
 
       await expect(
         child['mint(address,uint256,uint256)'](parent.address, childId, parentId),

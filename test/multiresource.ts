@@ -2,19 +2,13 @@ import { BigNumber, Contract } from 'ethers';
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import {
-  shouldHandleAcceptsForResources,
-  shouldHandleApprovalsForResources,
-  shouldHandleOverwritesForResources,
-  shouldHandleRejectsForResources,
-  shouldHandleSetPriorities,
-  shouldSupportInterfacesForResources,
-} from './behavior/multiresource';
+import { mintTokenId, addResourceToToken } from './utils';
+import shouldBehaveLikeMultiResource from './behavior/multiresource';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 
 const name = 'RmrkTest';
 const symbol = 'RMRKTST';
-let nextTokenId = 1;
+
 let nextResourceId = 1;
 
 async function deployRmrkMultiResourceMockFixture() {
@@ -24,69 +18,12 @@ async function deployRmrkMultiResourceMockFixture() {
   return { token };
 }
 
-async function mint(token: Contract, to: string): Promise<number> {
-  const tokenId = nextTokenId;
-  nextTokenId++;
-  await token['mint(address,uint256)'](to, tokenId);
-  return tokenId;
-}
-
 async function addResourceEntry(token: Contract, data?: string): Promise<BigNumber> {
   const resourceId = BigNumber.from(nextResourceId);
   nextResourceId++;
   await token.addResourceEntry(resourceId, data !== undefined ? data : 'metaURI');
   return resourceId;
 }
-
-async function addResourceToToken(
-  token: Contract,
-  tokenId: number,
-  resId: BigNumber,
-  overwrites: BigNumber | number,
-): Promise<void> {
-  await token.addResourceToToken(tokenId, resId, overwrites);
-}
-
-describe('MultiresourceMock MR behavior with minted token', async () => {
-  const tokenId = 1;
-
-  beforeEach(async function () {
-    const tokenOwner = (await ethers.getSigners())[1];
-    const { token } = await loadFixture(deployRmrkMultiResourceMockFixture);
-    await token['mint(address,uint256)'](tokenOwner.address, tokenId);
-    this.token = token;
-  });
-
-  shouldSupportInterfacesForResources();
-  shouldHandleApprovalsForResources(tokenId);
-  shouldHandleOverwritesForResources(tokenId, addResourceEntry, addResourceToToken);
-});
-
-describe('MultiresourceMock MR behavior with minted token and pending resources', async () => {
-  const tokenId = 1;
-  const resId1 = BigNumber.from(1);
-  const resData1 = 'data1';
-  const resId2 = BigNumber.from(2);
-  const resData2 = 'data2';
-
-  beforeEach(async function () {
-    const tokenOwner = (await ethers.getSigners())[1];
-    const { token } = await loadFixture(deployRmrkMultiResourceMockFixture);
-
-    // Mint and add 2 resources to token
-    await token['mint(address,uint256)'](tokenOwner.address, tokenId);
-    await token.addResourceEntry(resId1, resData1);
-    await token.addResourceEntry(resId2, resData2);
-    await token.addResourceToToken(tokenId, resId1, 0);
-    await token.addResourceToToken(tokenId, resId2, 0);
-
-    this.token = token;
-  });
-
-  shouldHandleAcceptsForResources(tokenId, resId1, resData1, resId2, resData2);
-  shouldHandleRejectsForResources(tokenId, resId1, resData1, resId2, resData2);
-  shouldHandleSetPriorities(tokenId);
-});
 
 describe('MultiResourceMock Init', async function () {
   let token: Contract;
@@ -177,7 +114,7 @@ describe('MultiResourceMock Adding resources to tokens', async function () {
   it('can add resource to token', async function () {
     const resId = await addResourceEntry(token, 'data1');
     const resId2 = await addResourceEntry(token, 'data2');
-    const tokenId = await mint(token, tokenOwner.address);
+    const tokenId = await mintTokenId(token, tokenOwner.address);
 
     await expect(token.addResourceToToken(tokenId, resId, 0)).to.emit(
       token,
@@ -199,7 +136,7 @@ describe('MultiResourceMock Adding resources to tokens', async function () {
 
   it('cannot add non existing resource to token', async function () {
     const resId = BigNumber.from(1);
-    const tokenId = await mint(token, tokenOwner.address);
+    const tokenId = await mintTokenId(token, tokenOwner.address);
 
     await expect(token.addResourceToToken(tokenId, resId, 0)).to.be.revertedWithCustomError(
       token,
@@ -219,7 +156,7 @@ describe('MultiResourceMock Adding resources to tokens', async function () {
 
   it('cannot add resource twice to the same token', async function () {
     const resId = await addResourceEntry(token);
-    const tokenId = await mint(token, tokenOwner.address);
+    const tokenId = await mintTokenId(token, tokenOwner.address);
 
     await token.addResourceToToken(tokenId, resId, 0);
     await expect(token.addResourceToToken(tokenId, resId, 0)).to.be.revertedWithCustomError(
@@ -229,7 +166,7 @@ describe('MultiResourceMock Adding resources to tokens', async function () {
   });
 
   it('cannot add too many resources to the same token', async function () {
-    const tokenId = await mint(token, tokenOwner.address);
+    const tokenId = await mintTokenId(token, tokenOwner.address);
 
     for (let i = 1; i <= 128; i++) {
       const resId = await addResourceEntry(token);
@@ -246,8 +183,8 @@ describe('MultiResourceMock Adding resources to tokens', async function () {
 
   it('can add same resource to 2 different tokens', async function () {
     const resId = await addResourceEntry(token);
-    const tokenId1 = await mint(token, tokenOwner.address);
-    const tokenId2 = await mint(token, tokenOwner.address);
+    const tokenId1 = await mintTokenId(token, tokenOwner.address);
+    const tokenId2 = await mintTokenId(token, tokenOwner.address);
 
     await token.addResourceToToken(tokenId1, resId, 0);
     await token.addResourceToToken(tokenId2, resId, 0);
@@ -277,7 +214,7 @@ describe('MultiResourceMock Token URI', async function () {
 
   it('gets fallback URI if no active resources on token', async function () {
     const fallBackUri = 'fallback404';
-    const tokenId = await mint(token, owner.address);
+    const tokenId = await mintTokenId(token, owner.address);
 
     await token.setFallbackURI(fallBackUri);
     expect(await token.tokenURI(tokenId)).to.eql(fallBackUri);
@@ -286,7 +223,7 @@ describe('MultiResourceMock Token URI', async function () {
   it('can get token URI when resource is not enumerated', async function () {
     const resId = await addResourceEntry(token);
     const resId2 = await addResourceEntry(token);
-    const tokenId = await mint(token, owner.address);
+    const tokenId = await mintTokenId(token, owner.address);
 
     await token.addResourceToToken(tokenId, resId, 0);
     await token.addResourceToToken(tokenId, resId2, 0);
@@ -298,7 +235,7 @@ describe('MultiResourceMock Token URI', async function () {
   it('can get token URI when resource is enumerated', async function () {
     const resId = await addResourceEntry(token);
     const resId2 = await addResourceEntry(token);
-    const tokenId = await mint(token, owner.address);
+    const tokenId = await mintTokenId(token, owner.address);
 
     await token.addResourceToToken(tokenId, resId, 0);
     await token.addResourceToToken(tokenId, resId2, 0);
@@ -312,7 +249,7 @@ describe('MultiResourceMock Token URI', async function () {
   it('can get token URI at specific index', async function () {
     const resId = await addResourceEntry(token, 'UriA');
     const resId2 = await addResourceEntry(token, 'UriB');
-    const tokenId = await mint(token, owner.address);
+    const tokenId = await mintTokenId(token, owner.address);
 
     await token.addResourceToToken(tokenId, resId, 0);
     await token.addResourceToToken(tokenId, resId2, 0);
@@ -338,7 +275,7 @@ describe.skip('MultiResourceMock approvals cleaning', async () => {
     const tokenOwner = addrs[1];
     const newOwner = addrs[2];
     const approved = addrs[3];
-    const tokenId = await mint(token, tokenOwner.address);
+    const tokenId = await mintTokenId(token, tokenOwner.address);
     await token.connect(tokenOwner).approve(approved.address, tokenId);
     await token.connect(tokenOwner).approveForResources(approved.address, tokenId);
 
@@ -354,7 +291,7 @@ describe.skip('MultiResourceMock approvals cleaning', async () => {
   it('cleans token and resources approvals on burn', async function () {
     const tokenOwner = addrs[1];
     const approved = addrs[3];
-    const tokenId = await mint(token, tokenOwner.address);
+    const tokenId = await mintTokenId(token, tokenOwner.address);
     await token.connect(tokenOwner).approve(approved.address, tokenId);
     await token.connect(tokenOwner).approveForResources(approved.address, tokenId);
 
@@ -373,3 +310,16 @@ describe.skip('MultiResourceMock approvals cleaning', async () => {
     );
   });
 });
+
+// --------------- MULTI RESOURCE BEHAVIOR -----------------------
+
+describe('MultiResource MR behavior', async () => {
+  beforeEach(async function () {
+    const { token } = await loadFixture(deployRmrkMultiResourceMockFixture);
+    this.token = token;
+  });
+
+  shouldBehaveLikeMultiResource(mintTokenId, addResourceEntry, addResourceToToken);
+});
+
+// --------------- MULTI RESOURCE BEHAVIOR END ------------------------
