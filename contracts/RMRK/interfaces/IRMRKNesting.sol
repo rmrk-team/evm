@@ -6,8 +6,10 @@ import "./IRMRKNestingReceiver.sol";
 
 interface IRMRKNesting {
 
+    // FIXME, should we add more context to these events?
     event ChildProposed(uint parentTokenId);
     event ChildAccepted(uint tokenId);
+    // FIXME: ChildRejected seems more consistent
     event PendingChildRemoved(uint tokenId, uint index);
     event AllPendingChildrenRemoved(uint tokenId);
     event ChildRemoved(uint tokenId, uint index);
