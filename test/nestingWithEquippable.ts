@@ -1,8 +1,10 @@
 import { ethers } from "hardhat"
 import { Contract } from "ethers"
+import { mintTokenId, nestMinttokenId, transfer, nestTransfer } from './utils';
 import shouldBehaveLikeNesting from "./behavior/nesting"
 import shouldBehaveLikeERC721 from "./behavior/erc721"
 import { loadFixture } from "@nomicfoundation/hardhat-network-helpers"
+
 
 describe('Nesting', function () {
   const name = 'ownerChunky';
@@ -41,7 +43,7 @@ describe('Nesting', function () {
     this.childToken = petMonkey;
   });
 
-  shouldBehaveLikeNesting(name, symbol, name2, symbol2);
+  shouldBehaveLikeNesting(mintTokenId, nestMinttokenId, transfer, nestTransfer);
 });
 
 describe('ERC721 on NestingWithEquippable', function () {
