@@ -123,12 +123,12 @@ contract RMRKNesting is ERC721, IRMRKNesting {
         _sendToNFT(tokenId, destinationId, address(0), to);
     }
 
-    function _safeMintNesting(address to, uint256 tokenId) internal virtual {
-        _safeMintNesting(to, tokenId, "");
+    function _safeMintNesting(address to, uint256 tokenId, uint256 destinationId) internal virtual {
+        _safeMintNesting(to, tokenId, destinationId, "");
     }
 
-    function _safeMintNesting(address to, uint256 tokenId, bytes memory data) internal virtual {
-        _mint(to, tokenId);
+    function _safeMintNesting(address to, uint256 tokenId, uint256 destinationId, bytes memory data) internal virtual {
+        _mint(to, tokenId, destinationId);
         if (!_checkRMRKNestingImplementer(address(0), to, tokenId, data)) {
             revert RMRKMintToNonRMRKImplementer();
         }
