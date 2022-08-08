@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { BigNumber, Contract } from 'ethers';
+import { Contract } from 'ethers';
 import shouldBehaveLikeNesting from './behavior/nesting';
 import shouldBehaveLikeERC721 from './behavior/erc721';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
@@ -21,6 +21,25 @@ async function nestMint(token: Contract, to: string, parentId: number): Promise<
   nextChildTokenId++;
   await token['mint(address,uint256,uint256)'](to, childTokenId, parentId);
   return childTokenId;
+}
+
+async function transfer(
+  token: Contract,
+  caller: SignerWithAddress,
+  to: string,
+  tokenId: number,
+): Promise<void> {
+  await token.connect(caller)['transfer(address,uint256)'](to, tokenId);
+}
+
+async function nestTransfer(
+  token: Contract,
+  caller: SignerWithAddress,
+  to: string,
+  tokenId: number,
+  parentId: number,
+): Promise<void> {
+  await token.connect(caller)['nestTransfer(address,uint256,uint256)'](to, tokenId, parentId);
 }
 
 describe('Nesting', function () {
@@ -56,7 +75,7 @@ describe('Nesting', function () {
     this.childToken = child;
   });
 
-  shouldBehaveLikeNesting(mint, nestMint);
+  shouldBehaveLikeNesting(mint, nestMint, transfer, nestTransfer);
 
   describe('Init', async function () {
     it('Name', async function () {
