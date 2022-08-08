@@ -65,15 +65,17 @@ async function shouldBehaveLikeNesting(
     });
 
     it('cannot mint to zero address', async function () {
-      await expect(
-        child['mint(address,uint256)'](ethers.constants.AddressZero, 1),
-      ).to.be.revertedWithCustomError(child, 'ERC721MintToTheZeroAddress');
+      await expect(mint(child, ethers.constants.AddressZero)).to.be.revertedWithCustomError(
+        child,
+        'ERC721MintToTheZeroAddress',
+      );
     });
 
     it('cannot nest mint to a non-contract destination', async function () {
-      await expect(
-        child['mint(address,uint256,uint256)'](tokenOwner.address, 1, 0),
-      ).to.be.revertedWithCustomError(child, 'RMRKIsNotContract');
+      await expect(nestMint(child, tokenOwner.address, 0)).to.be.revertedWithCustomError(
+        child,
+        'RMRKIsNotContract',
+      );
     });
 
     it('cannot nest mint to non rmrk nesting receiver', async function () {
@@ -81,28 +83,19 @@ async function shouldBehaveLikeNesting(
       const nonReceiver = await ERC721.deploy('Non receiver', 'NR');
       await nonReceiver.deployed();
 
-      const parentId = 1;
-      const childId = 99;
-      await nonReceiver['mint(address,uint256)'](addrs[1].address, parentId);
+      const parentId = await mint(parent, addrs[1].address);
 
-      await expect(
-        child['mint(address,uint256,uint256)'](nonReceiver.address, childId, parentId),
-      ).to.be.revertedWithCustomError(child, 'RMRKMintToNonRMRKImplementer');
+      await expect(nestMint(child, nonReceiver.address, parentId)).to.be.revertedWithCustomError(
+        child,
+        'RMRKMintToNonRMRKImplementer',
+      );
     });
 
     it('cannot nest mint to a non-existent token', async function () {
-      await expect(
-        child['mint(address,uint256,uint256)'](parent.address, 1, 0),
-      ).to.be.revertedWithCustomError(child, 'ERC721InvalidTokenId');
-    });
-
-    it('cannot nest mint already minted token', async function () {
-      const parentId = await mint(parent, tokenOwner.address);
-      const childId = await nestMint(child, parent.address, parentId);
-
-      await expect(
-        child['mint(address,uint256,uint256)'](parent.address, childId, parentId),
-      ).to.be.revertedWithCustomError(child, 'ERC721TokenAlreadyMinted');
+      await expect(nestMint(child, parent.address, 1)).to.be.revertedWithCustomError(
+        child,
+        'ERC721InvalidTokenId',
+      );
     });
 
     it('cannot nest mint to zero address', async function () {
