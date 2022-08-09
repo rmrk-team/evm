@@ -1,5 +1,5 @@
 import { ethers } from 'hardhat';
-import { Contract } from 'ethers';
+import { Contract, ContractFactory } from 'ethers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 
 const baseSymbol = 'SSB';
@@ -22,15 +22,15 @@ const partIdForWeapon = 2;
 const partIdForWeaponGem = 3;
 const partIdForBackground = 4;
 
-// const uniqueSoldiers = 10;
+const uniqueSoldiers = 10;
 const uniqueWeapons = 4;
 // const uniqueWeaponGems = 2;
 // const uniqueBackgrounds = 3;
-// Ids could be the same since they are different collections, but to avoid log problems we have them unique
-const soldiers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-const weapons = [11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
-const weaponGems = [21, 22, 23, 24, 25, 26, 27, 28, 29, 30];
-const backgrounds = [31, 32, 33, 34, 35, 36, 37, 38, 39, 40];
+
+const soldiersIds: number[] = [];
+const weaponsIds: number[] = [];
+const weaponGemsIds: number[] = [];
+const backgroundsIds: number[] = [];
 
 const soldierResId = 100;
 const weaponResourcesFull = [1, 2, 3, 4]; // Must match the total of uniqueResources
@@ -47,69 +47,71 @@ enum ItemType {
 
 let addrs: SignerWithAddress[];
 
-let baseContract: Contract;
-let soldierContract: Contract;
-let soldierEquipContract: Contract;
-let weaponContract: Contract;
-let weaponEquipContract: Contract;
-let weaponGemContract: Contract;
-let weaponGemEquipContract: Contract;
-let backgroundContract: Contract;
-let backgroundEquipContract: Contract;
+let base: Contract;
+let soldier: Contract;
+let soldierEquip: Contract;
+let weapon: Contract;
+let weaponEquip: Contract;
+let weaponGem: Contract;
+let weaponGemEquip: Contract;
+let background: Contract;
+let backgroundEquip: Contract;
 
-export async function equippableSlotsContractsFixture() {
+async function equippableSlotsContractsFixture(
+  baseFactory: ContractFactory,
+  nestingFactory: ContractFactory,
+  equipFactory: ContractFactory,
+  mint: (token: Contract, to: string) => Promise<number>,
+  nestMint: (token: Contract, to: string, parentId: number) => Promise<number>,
+) {
   const [, ...signersAddr] = await ethers.getSigners();
   addrs = signersAddr;
 
-  const Base = await ethers.getContractFactory('RMRKBaseStorageMock');
-  const Nesting = await ethers.getContractFactory('RMRKNestingWithEquippableMock');
-  const Equip = await ethers.getContractFactory('RMRKEquippableMock');
-
   // Base
-  baseContract = await Base.deploy(baseSymbol, baseType);
-  await baseContract.deployed();
+  base = await baseFactory.deploy(baseSymbol, baseType);
+  await base.deployed();
 
   // Soldier token
-  soldierContract = await Nesting.deploy(soldierName, soldierSymbol);
-  await soldierContract.deployed();
-  soldierEquipContract = await Equip.deploy(soldierContract.address);
-  await soldierEquipContract.deployed();
+  soldier = await nestingFactory.deploy(soldierName, soldierSymbol);
+  await soldier.deployed();
+  soldierEquip = await equipFactory.deploy(soldier.address);
+  await soldierEquip.deployed();
 
   // Link nesting and equippable:
-  soldierEquipContract.setNestingAddress(soldierContract.address);
-  soldierContract.setEquippableAddress(soldierEquipContract.address);
+  soldierEquip.setNestingAddress(soldier.address);
+  soldier.setEquippableAddress(soldierEquip.address);
   // Weapon
-  weaponContract = await Nesting.deploy(weaponName, weaponSymbol);
-  await weaponContract.deployed();
-  weaponEquipContract = await Equip.deploy(weaponContract.address);
-  await weaponEquipContract.deployed();
+  weapon = await nestingFactory.deploy(weaponName, weaponSymbol);
+  await weapon.deployed();
+  weaponEquip = await equipFactory.deploy(weapon.address);
+  await weaponEquip.deployed();
   // Link nesting and equippable:
-  weaponEquipContract.setNestingAddress(weaponContract.address);
-  weaponContract.setEquippableAddress(weaponEquipContract.address);
+  weaponEquip.setNestingAddress(weapon.address);
+  weapon.setEquippableAddress(weaponEquip.address);
 
   // Weapon Gem
-  weaponGemContract = await Nesting.deploy(weaponGemName, weaponGemSymbol);
-  await weaponGemContract.deployed();
-  weaponGemEquipContract = await Equip.deploy(weaponGemContract.address);
-  await weaponGemEquipContract.deployed();
+  weaponGem = await nestingFactory.deploy(weaponGemName, weaponGemSymbol);
+  await weaponGem.deployed();
+  weaponGemEquip = await equipFactory.deploy(weaponGem.address);
+  await weaponGemEquip.deployed();
   // Link nesting and equippable:
-  weaponGemEquipContract.setNestingAddress(weaponGemContract.address);
-  weaponGemContract.setEquippableAddress(weaponGemEquipContract.address);
+  weaponGemEquip.setNestingAddress(weaponGem.address);
+  weaponGem.setEquippableAddress(weaponGemEquip.address);
 
   // Background
-  backgroundContract = await Nesting.deploy(backgroundName, backgroundSymbol);
-  await backgroundContract.deployed();
-  backgroundEquipContract = await Equip.deploy(backgroundContract.address);
-  await backgroundEquipContract.deployed();
+  background = await nestingFactory.deploy(backgroundName, backgroundSymbol);
+  await background.deployed();
+  backgroundEquip = await equipFactory.deploy(background.address);
+  await backgroundEquip.deployed();
   // Link nesting and equippable:
-  backgroundEquipContract.setNestingAddress(backgroundContract.address);
-  backgroundContract.setEquippableAddress(backgroundEquipContract.address);
+  backgroundEquip.setNestingAddress(background.address);
+  background.setEquippableAddress(backgroundEquip.address);
   await setupBase();
 
-  await mintSoldiers();
-  await mintWeapons();
-  await mintWeaponGems();
-  await mintBackgrounds();
+  await mintSoldiers(mint);
+  await mintWeapons(nestMint);
+  await mintWeaponGems(nestMint);
+  await mintBackgrounds(nestMint);
 
   await addResourcesToSoldier();
   await addResourcesToWeapon();
@@ -117,15 +119,15 @@ export async function equippableSlotsContractsFixture() {
   await addResourcesToBackground();
 
   return {
-    baseContract,
-    soldierContract,
-    soldierEquipContract,
-    weaponContract,
-    weaponEquipContract,
-    weaponGemContract,
-    weaponGemEquipContract,
-    backgroundContract,
-    backgroundEquipContract,
+    base,
+    soldier,
+    soldierEquip,
+    weapon,
+    weaponEquip,
+    weaponGem,
+    weaponGemEquip,
+    background,
+    backgroundEquip,
   };
 }
 
@@ -139,23 +141,23 @@ async function setupBase(): Promise<void> {
   const partForWeapon = {
     itemType: ItemType.Slot,
     z: 2,
-    equippable: [weaponEquipContract.address],
+    equippable: [weaponEquip.address],
     metadataURI: '',
   };
   const partForWeaponGem = {
     itemType: ItemType.Slot,
     z: 3,
-    equippable: [weaponGemEquipContract.address],
+    equippable: [weaponGemEquip.address],
     metadataURI: 'noGem.png',
   };
   const partForBackground = {
     itemType: ItemType.Slot,
     z: 0,
-    equippable: [backgroundEquipContract.address],
+    equippable: [backgroundEquip.address],
     metadataURI: 'noBackground.png',
   };
 
-  await baseContract.addPartList([
+  await base.addPartList([
     { partId: partIdForBody, part: partForBody },
     { partId: partIdForWeapon, part: partForWeapon },
     { partId: partIdForWeaponGem, part: partForWeaponGem },
@@ -163,64 +165,62 @@ async function setupBase(): Promise<void> {
   ]);
 }
 
-async function mintSoldiers(): Promise<void> {
+async function mintSoldiers(mint: (token: Contract, to: string) => Promise<number>): Promise<void> {
   // Using only first 3 addresses to mint
-  for (let i = 0; i < soldiers.length; i++) {
-    await soldierContract['mint(address,uint256)'](addrs[i % 3].address, soldiers[i]);
+  for (let i = 0; i < uniqueSoldiers; i++) {
+    const newId = await mint(soldier, addrs[i % 3].address);
+    soldiersIds.push(newId);
   }
 }
 
-async function mintWeapons(): Promise<void> {
+async function mintWeapons(
+  nestMint: (token: Contract, to: string, parentId: number) => Promise<number>,
+): Promise<void> {
   // Mint one weapon to soldier
-  for (let i = 0; i < soldiers.length; i++) {
-    await weaponContract['mint(address,uint256,uint256)'](
-      soldierContract.address,
-      weapons[i],
-      soldiers[i],
-    );
-    await soldierContract.connect(addrs[i % 3]).acceptChild(soldiers[i], 0);
+  for (let i = 0; i < uniqueSoldiers; i++) {
+    const newId = await nestMint(weapon, soldier.address, soldiersIds[i]);
+    weaponsIds.push(newId);
+    await soldier.connect(addrs[i % 3]).acceptChild(soldiersIds[i], 0);
   }
 }
 
-async function mintWeaponGems(): Promise<void> {
+async function mintWeaponGems(
+  nestMint: (token: Contract, to: string, parentId: number) => Promise<number>,
+): Promise<void> {
   // Mint one weapon gem for each weapon on each soldier
-  for (let i = 0; i < soldiers.length; i++) {
-    await weaponGemContract['mint(address,uint256,uint256)'](
-      weaponContract.address,
-      weaponGems[i],
-      weapons[i],
-    );
-    await weaponContract.connect(addrs[i % 3]).acceptChild(weapons[i], 0);
+  for (let i = 0; i < uniqueSoldiers; i++) {
+    const newId = await nestMint(weaponGem, weapon.address, weaponsIds[i]);
+    weaponGemsIds.push(newId);
+    await weapon.connect(addrs[i % 3]).acceptChild(weaponsIds[i], 0);
   }
 }
 
-async function mintBackgrounds(): Promise<void> {
+async function mintBackgrounds(
+  nestMint: (token: Contract, to: string, parentId: number) => Promise<number>,
+): Promise<void> {
   // Mint one background to soldier
-  for (let i = 0; i < soldiers.length; i++) {
-    await backgroundContract['mint(address,uint256,uint256)'](
-      soldierContract.address,
-      backgrounds[i],
-      soldiers[i],
-    );
-    await soldierContract.connect(addrs[i % 3]).acceptChild(soldiers[i], 0);
+  for (let i = 0; i < uniqueSoldiers; i++) {
+    const newId = await nestMint(background, soldier.address, soldiersIds[i]);
+    backgroundsIds.push(newId);
+    await soldier.connect(addrs[i % 3]).acceptChild(soldiersIds[i], 0);
   }
 }
 
 async function addResourcesToSoldier(): Promise<void> {
-  await soldierEquipContract.addResourceEntry(
+  await soldierEquip.addResourceEntry(
     {
       id: soldierResId,
       equippableRefId: 0,
       metadataURI: 'ipfs:soldier/',
-      baseAddress: baseContract.address,
+      baseAddress: base.address,
     },
     [partIdForBody], // Fixed parts
     [partIdForWeapon, partIdForBackground], // Can receive these
   );
-  await soldierEquipContract.setTokenEnumeratedResource(soldierResId, true);
-  for (let i = 0; i < soldiers.length; i++) {
-    await soldierEquipContract.addResourceToToken(soldiers[i], soldierResId, 0);
-    await soldierEquipContract.connect(addrs[i % 3]).acceptResource(soldiers[i], 0);
+  await soldierEquip.setTokenEnumeratedResource(soldierResId, true);
+  for (let i = 0; i < uniqueSoldiers; i++) {
+    await soldierEquip.addResourceToToken(soldiersIds[i], soldierResId, 0);
+    await soldierEquip.connect(addrs[i % 3]).acceptResource(soldiersIds[i], 0);
   }
 }
 
@@ -228,7 +228,7 @@ async function addResourcesToWeapon(): Promise<void> {
   const equippableRefId = 1; // Resources to equip will both use this
 
   for (let i = 0; i < weaponResourcesFull.length; i++) {
-    await weaponEquipContract.addResourceEntry(
+    await weaponEquip.addResourceEntry(
       {
         id: weaponResourcesFull[i],
         equippableRefId: 0, // Not meant to equip
@@ -240,12 +240,12 @@ async function addResourcesToWeapon(): Promise<void> {
     );
   }
   for (let i = 0; i < weaponResourcesEquip.length; i++) {
-    await weaponEquipContract.addResourceEntry(
+    await weaponEquip.addResourceEntry(
       {
         id: weaponResourcesEquip[i],
         equippableRefId: equippableRefId,
         metadataURI: `ipfs:weapon/equip/${weaponResourcesEquip[i]}`,
-        baseAddress: baseContract.address,
+        baseAddress: base.address,
       },
       [],
       [partIdForWeaponGem],
@@ -253,33 +253,21 @@ async function addResourcesToWeapon(): Promise<void> {
   }
 
   // Can be equipped into soldiers
-  await weaponEquipContract.setValidParentRefId(
-    equippableRefId,
-    soldierEquipContract.address,
-    partIdForWeapon,
-  );
+  await weaponEquip.setValidParentRefId(equippableRefId, soldierEquip.address, partIdForWeapon);
 
   // Add 2 resources to each weapon, one full, one for equip
   // There are 10 weapon tokens for 4 unique resources so we use %
-  for (let i = 0; i < weapons.length; i++) {
-    await weaponEquipContract.addResourceToToken(
-      weapons[i],
-      weaponResourcesFull[i % uniqueWeapons],
-      0,
-    );
-    await weaponEquipContract.addResourceToToken(
-      weapons[i],
-      weaponResourcesEquip[i % uniqueWeapons],
-      0,
-    );
-    await weaponEquipContract.connect(addrs[i % 3]).acceptResource(weapons[i], 0);
-    await weaponEquipContract.connect(addrs[i % 3]).acceptResource(weapons[i], 0);
+  for (let i = 0; i < weaponsIds.length; i++) {
+    await weaponEquip.addResourceToToken(weaponsIds[i], weaponResourcesFull[i % uniqueWeapons], 0);
+    await weaponEquip.addResourceToToken(weaponsIds[i], weaponResourcesEquip[i % uniqueWeapons], 0);
+    await weaponEquip.connect(addrs[i % 3]).acceptResource(weaponsIds[i], 0);
+    await weaponEquip.connect(addrs[i % 3]).acceptResource(weaponsIds[i], 0);
   }
 }
 
 async function addResourcesToWeaponGem(): Promise<void> {
   const equippableRefId = 1; // Resources to equip will use this
-  await weaponGemEquipContract.addResourceEntry(
+  await weaponGemEquip.addResourceEntry(
     {
       id: weaponGemResourceFull,
       equippableRefId: 0, // Not meant to equip
@@ -289,55 +277,74 @@ async function addResourcesToWeaponGem(): Promise<void> {
     [],
     [],
   );
-  await weaponGemEquipContract.addResourceEntry(
+  await weaponGemEquip.addResourceEntry(
     {
       id: weaponGemResourceEquip,
       equippableRefId: equippableRefId,
       metadataURI: 'ipfs:weagponGem/equip/',
-      baseAddress: baseContract.address,
+      baseAddress: base.address,
     },
     [],
     [],
   );
   // Can be equipped into weapons
-  await weaponGemEquipContract.setValidParentRefId(
+  await weaponGemEquip.setValidParentRefId(
     equippableRefId,
-    weaponEquipContract.address,
+    weaponEquip.address,
     partIdForWeaponGem,
   );
 
-  await weaponGemEquipContract.setTokenEnumeratedResource(weaponGemResourceFull, true);
-  await weaponGemEquipContract.setTokenEnumeratedResource(weaponGemResourceEquip, true);
-  for (let i = 0; i < soldiers.length; i++) {
-    await weaponGemEquipContract.addResourceToToken(weaponGems[i], weaponGemResourceFull, 0);
-    await weaponGemEquipContract.addResourceToToken(weaponGems[i], weaponGemResourceEquip, 0);
-    await weaponGemEquipContract.connect(addrs[i % 3]).acceptResource(weaponGems[i], 0);
-    await weaponGemEquipContract.connect(addrs[i % 3]).acceptResource(weaponGems[i], 0);
+  await weaponGemEquip.setTokenEnumeratedResource(weaponGemResourceFull, true);
+  await weaponGemEquip.setTokenEnumeratedResource(weaponGemResourceEquip, true);
+  for (let i = 0; i < uniqueSoldiers; i++) {
+    await weaponGemEquip.addResourceToToken(weaponGemsIds[i], weaponGemResourceFull, 0);
+    await weaponGemEquip.addResourceToToken(weaponGemsIds[i], weaponGemResourceEquip, 0);
+    await weaponGemEquip.connect(addrs[i % 3]).acceptResource(weaponGemsIds[i], 0);
+    await weaponGemEquip.connect(addrs[i % 3]).acceptResource(weaponGemsIds[i], 0);
   }
 }
 
 async function addResourcesToBackground(): Promise<void> {
   const equippableRefId = 1; // Resources to equip will use this
-  await backgroundEquipContract.addResourceEntry(
+  await backgroundEquip.addResourceEntry(
     {
       id: backgroundResourceId,
       equippableRefId: equippableRefId,
       metadataURI: 'ipfs:background/',
-      baseAddress: baseContract.address,
+      baseAddress: base.address,
     },
     [],
     [],
   );
   // Can be equipped into soldiers
-  await backgroundEquipContract.setValidParentRefId(
+  await backgroundEquip.setValidParentRefId(
     equippableRefId,
-    soldierEquipContract.address,
+    soldierEquip.address,
     partIdForBackground,
   );
 
-  await backgroundEquipContract.setTokenEnumeratedResource(backgroundResourceId, true);
-  for (let i = 0; i < soldiers.length; i++) {
-    await backgroundEquipContract.addResourceToToken(backgrounds[i], backgroundResourceId, 0);
-    await backgroundEquipContract.connect(addrs[i % 3]).acceptResource(backgrounds[i], 0);
+  await backgroundEquip.setTokenEnumeratedResource(backgroundResourceId, true);
+  for (let i = 0; i < uniqueSoldiers; i++) {
+    await backgroundEquip.addResourceToToken(backgroundsIds[i], backgroundResourceId, 0);
+    await backgroundEquip.connect(addrs[i % 3]).acceptResource(backgroundsIds[i], 0);
   }
 }
+
+export {
+  partIdForBody,
+  partIdForWeapon,
+  partIdForWeaponGem,
+  partIdForBackground,
+  soldierResId,
+  weaponResourcesFull,
+  weaponResourcesEquip,
+  weaponGemResourceFull,
+  weaponGemResourceEquip,
+  backgroundResourceId,
+  soldiersIds,
+  weaponsIds,
+  weaponGemsIds,
+  backgroundsIds,
+  ItemType,
+  equippableSlotsContractsFixture,
+};

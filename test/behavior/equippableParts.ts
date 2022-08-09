@@ -12,9 +12,7 @@ import { equippablePartsContractsFixture } from '../fixtures/equippablePartsFixt
 // Mask will have 2 resources per weapon, one for full view, one for equipping. Both are composed using fixed parts
 async function shouldBehaveLikeEquippableWithParts() {
   let baseContract: Contract;
-  let neonContract: Contract;
   let neonEquipContract: Contract;
-  let maskContract: Contract;
   let maskEquipContract: Contract;
 
   let addrs: SignerWithAddress[];
@@ -38,13 +36,9 @@ async function shouldBehaveLikeEquippableWithParts() {
   beforeEach(async () => {
     const [, ...signersAddr] = await ethers.getSigners();
     addrs = signersAddr;
-    const { base, neon, neonEquip, mask, maskEquip } = await loadFixture(
-      equippablePartsContractsFixture,
-    );
+    const { base, neonEquip, maskEquip } = await loadFixture(equippablePartsContractsFixture);
     baseContract = base;
-    neonContract = neon;
     neonEquipContract = neonEquip;
-    maskContract = mask;
     maskEquipContract = maskEquip;
   });
 
