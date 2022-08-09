@@ -2,8 +2,20 @@ import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { BigNumber, Contract } from 'ethers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import { equippablePartsContractsFixture } from '../fixtures/equippablePartsFixture';
+import {
+  partIdForHead1,
+  partIdForBody1,
+  partIdForHair1,
+  partIdForMaskBase1,
+  partIdForEars1,
+  partIdForHorns1,
+  partIdForMask,
+  neons,
+  masks,
+  neonResIds,
+  maskResourcesEquip,
+  maskEquippableRefId,
+} from '../fixtures/equippablePartsFixture'
 
 // The general idea is having these tokens: Neon and Mask
 // Masks can be equipped into Neons.
@@ -17,29 +29,13 @@ async function shouldBehaveLikeEquippableWithParts() {
 
   let addrs: SignerWithAddress[];
 
-  const partIdForHead1 = 1;
-  const partIdForBody1 = 4;
-  const partIdForHair1 = 6;
-  const partIdForMaskBase1 = 9;
-  const partIdForEars1 = 12;
-  const partIdForHorns1 = 14;
-  const partIdForMask = 25;
-
-  // Ids could be the same since they are different collections, but to avoid log problems we have them unique
-  const neons = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-  const masks = [11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
-
-  const neonResIds = [100, 101, 102, 103, 104];
-  const maskResourcesEquip = [5, 6, 7, 8]; // Must match the total of uniqueResources
-  const maskEquippableRefId = 1; // Resources to equip will all use this
-
-  beforeEach(async () => {
+  beforeEach(async function () {
     const [, ...signersAddr] = await ethers.getSigners();
     addrs = signersAddr;
-    const { base, neonEquip, maskEquip } = await loadFixture(equippablePartsContractsFixture);
-    baseContract = base;
-    neonEquipContract = neonEquip;
-    maskEquipContract = maskEquip;
+
+    baseContract = this.base;
+    neonEquipContract = this.neonEquip;
+    maskEquipContract = this.maskEquip;
   });
 
   describe('Equip', async function () {
