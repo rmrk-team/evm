@@ -249,6 +249,8 @@ async function setupContextForParts(
   }
 
   async function mintNeons(): Promise<void> {
+    // This array is reused, so we "empty" it before
+    neons.length = 0;
     // Using only first 3 addresses to mint
     for (let i = 0; i < uniqueNeons; i++) {
       const newId = await mint(neon, addrs[i % 3].address);
@@ -257,6 +259,8 @@ async function setupContextForParts(
   }
 
   async function mintMasks(): Promise<void> {
+    // This array is reused, so we "empty" it before
+    masks.length = 0;
     // Mint one weapon to neon
     for (let i = 0; i < uniqueNeons; i++) {
       const newId = await nestMint(mask, neon.address, neons[i]);
