@@ -1,7 +1,13 @@
-import { BigNumber, Contract } from 'ethers';
+import { Contract } from 'ethers';
 import { ethers } from 'hardhat';
+import { expect } from 'chai';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import { addResourceToToken, mintTokenId, nestMinttokenId } from './utils';
+import {
+  addResourceToToken,
+  mintTokenId,
+  nestMinttokenId,
+  addResourceEntryEquippables,
+} from './utils';
 import { equippablePartsContractsFixture } from './fixtures/equippablePartsFixture';
 import { equippableSlotsContractsFixture } from './fixtures/equippableSlotsFixture';
 import shouldBehaveLikeEquippableResources from './behavior/equippableResources';
@@ -9,6 +15,7 @@ import shouldBehaveLikeEquippableWithParts from './behavior/equippableParts';
 import shouldBehaveLikeEquippableWithSlots from './behavior/equippableSlots';
 import shouldBehaveLikeMultiResource from './behavior/multiresource';
 
+// --------------- FIXTURES -----------------------
 async function partsFixture() {
   const Base = await ethers.getContractFactory('RMRKBaseStorageMock');
   const Nesting = await ethers.getContractFactory('RMRKNestingWithEquippableMock');
@@ -25,6 +32,40 @@ async function slotsFixture() {
   return await equippableSlotsContractsFixture(Base, Nesting, Equip, mintTokenId, nestMinttokenId);
 }
 
+async function resourcesFixture() {
+  const Nesting = await ethers.getContractFactory('RMRKNestingWithEquippableMock');
+  const Equip = await ethers.getContractFactory('RMRKEquippableMock');
+
+  const nesting = await Nesting.deploy('Chunky', 'CHNK');
+  await nesting.deployed();
+
+  const equip = await Equip.deploy(nesting.address);
+  await equip.deployed();
+
+  await nesting.setEquippableAddress(equip.address);
+
+  return { nesting, equip };
+}
+
+async function multiResourceFixture() {
+  const NestingFactory = await ethers.getContractFactory('RMRKNestingWithEquippableMock');
+  const EquipFactory = await ethers.getContractFactory('RMRKEquippableMock');
+
+  const nesting = await NestingFactory.deploy('NestingWithEquippable', 'NWE');
+  await nesting.deployed();
+
+  const equip = await EquipFactory.deploy(nesting.address);
+  await equip.deployed();
+
+  await nesting.setEquippableAddress(equip.address);
+
+  return { nesting, equip };
+}
+
+// --------------- END FIXTURES -----------------------
+
+// --------------- EQUIPPABLE BEHAVIOR -----------------------
+
 describe('Equippable with Parts', async () => {
   beforeEach(async function () {
     const { base, neon, neonEquip, mask, maskEquip } = await loadFixture(partsFixture);
@@ -40,7 +81,20 @@ describe('Equippable with Parts', async () => {
 });
 
 describe('Equippable Resources', async () => {
-  shouldBehaveLikeEquippableResources('RMRKEquippableMock', 'RMRKNestingWithEquippableMock');
+  beforeEach(async function () {
+    const { nesting, equip } = await loadFixture(resourcesFixture);
+    this.nesting = nesting;
+    this.equip = equip;
+  });
+
+  describe('Init', async function () {
+    it('it can get names and symbols', async function () {
+      expect(await this.nesting.name()).to.equal('Chunky');
+      expect(await this.nesting.symbol()).to.equal('CHNK');
+    });
+  });
+
+  shouldBehaveLikeEquippableResources(mintTokenId);
 });
 
 describe('Equippable with Slots', async () => {
@@ -71,36 +125,7 @@ describe('Equippable with Slots', async () => {
   shouldBehaveLikeEquippableWithSlots(nestMinttokenId);
 });
 
-async function deployTokenFixture() {
-  const NestingFactory = await ethers.getContractFactory('RMRKNestingWithEquippableMock');
-  const EquipFactory = await ethers.getContractFactory('RMRKEquippableMock');
-
-  const nesting = await NestingFactory.deploy('NestingWithEquippable', 'NWE');
-  await nesting.deployed();
-
-  const equip = await EquipFactory.deploy(nesting.address);
-  await equip.deployed();
-
-  await nesting.setEquippableAddress(equip.address);
-
-  return { nesting, equip };
-}
-
-let nextResourceId = 1;
-
-async function addResourceEntry(token: Contract, data?: string): Promise<BigNumber> {
-  const resourceId = BigNumber.from(nextResourceId);
-  const refId = BigNumber.from(1);
-  const extendedResource = [
-    resourceId,
-    refId,
-    ethers.constants.AddressZero,
-    data !== undefined ? data : 'metaURI',
-  ];
-  nextResourceId++;
-  await token.addResourceEntry(extendedResource, [], []);
-  return resourceId;
-}
+// --------------- END EQUIPPABLE BEHAVIOR -----------------------
 
 // --------------- MULTI RESOURCE BEHAVIOR -----------------------
 
@@ -109,7 +134,7 @@ describe('Equippable MR behavior with minted token', async () => {
   let mintingContract: Contract;
 
   beforeEach(async function () {
-    const { nesting, equip } = await loadFixture(deployTokenFixture);
+    const { nesting, equip } = await loadFixture(multiResourceFixture);
     mintingContract = nesting;
     this.token = equip;
   });
@@ -121,7 +146,7 @@ describe('Equippable MR behavior with minted token', async () => {
     return tokenId;
   }
 
-  shouldBehaveLikeMultiResource(mintToNesting, addResourceEntry, addResourceToToken);
+  shouldBehaveLikeMultiResource(mintToNesting, addResourceEntryEquippables, addResourceToToken);
 });
 
 // --------------- MULTI RESOURCE BEHAVIOR END ------------------------
