@@ -1,11 +1,12 @@
 import { BigNumber, Contract } from 'ethers';
 import { ethers } from 'hardhat';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import { addResourceToToken } from './utils';
+import { addResourceToToken, mintTokenId, nestMinttokenId } from './utils';
 import shouldBehaveLikeEquippableWithParts from './behavior/equippableParts';
 import shouldBehaveLikeEquippableResources from './behavior/equippableResources';
 import shouldBehaveLikeEquippableWithSlots from './behavior/equippableSlots';
 import shouldBehaveLikeMultiResource from './behavior/multiresource';
+import { equippableSlotsContractsFixture } from './fixtures/equippableSlotsFixture';
 
 describe('Equippable with Parts', async () => {
   shouldBehaveLikeEquippableWithParts();
@@ -15,8 +16,40 @@ describe('Equippable Resources', async () => {
   shouldBehaveLikeEquippableResources('RMRKEquippableMock', 'RMRKNestingWithEquippableMock');
 });
 
+async function slotFixture() {
+  const Base = await ethers.getContractFactory('RMRKBaseStorageMock');
+  const Nesting = await ethers.getContractFactory('RMRKNestingWithEquippableMock');
+  const Equip = await ethers.getContractFactory('RMRKEquippableMock');
+
+  return await equippableSlotsContractsFixture(Base, Nesting, Equip, mintTokenId, nestMinttokenId);
+}
+
 describe('Equippable with Slots', async () => {
-  shouldBehaveLikeEquippableWithSlots();
+  beforeEach(async function () {
+    const {
+      base,
+      soldier,
+      soldierEquip,
+      weapon,
+      weaponEquip,
+      weaponGem,
+      weaponGemEquip,
+      background,
+      backgroundEquip,
+    } = await loadFixture(slotFixture);
+
+    this.base = base;
+    this.soldier = soldier;
+    this.soldierEquip = soldierEquip;
+    this.weapon = weapon;
+    this.weaponEquip = weaponEquip;
+    this.weaponGem = weaponGem;
+    this.weaponGemEquip = weaponGemEquip;
+    this.background = background;
+    this.backgroundEquip = backgroundEquip;
+  });
+
+  shouldBehaveLikeEquippableWithSlots(nestMinttokenId);
 });
 
 async function deployTokenFixture() {
