@@ -49,13 +49,9 @@ async function deployTokenFixture() {
   return { token };
 }
 
-let nextResourceId = 1;
-
 async function addResourceEntry(token: Contract, data?: string): Promise<BigNumber> {
-  const resourceId = BigNumber.from(nextResourceId);
-  nextResourceId++;
-  await token.addResourceEntry(resourceId, data !== undefined ? data : 'metaURI');
-  return resourceId;
+  await token.addResourceEntry(data !== undefined ? data : 'metaURI');
+  return await token.totalResources();
 }
 
 describe('NestingMultiResourceImpl MR behavior', async () => {

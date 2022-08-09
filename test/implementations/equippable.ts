@@ -282,7 +282,7 @@ describe('EquippableImpl Resources', async () => {
 
 // --------------- MULTI RESOURCE BEHAVIOR -----------------------
 
-describe('Equippable MR behavior with minted token', async () => {
+describe('EquippableImpl MR behavior with minted token', async () => {
   let mintingContract: Contract;
 
   beforeEach(async function () {
