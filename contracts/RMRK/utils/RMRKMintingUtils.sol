@@ -13,7 +13,7 @@ contract RMRKMintingUtils {
     constructor(
         uint256 maxSupply_,
         uint256 pricePerMint_
-      ) {
+    ) {
         _maxSupply = maxSupply_;
         _pricePerMint = pricePerMint_;
     }
