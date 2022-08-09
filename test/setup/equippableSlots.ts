@@ -107,6 +107,8 @@ async function setupContextForSlots(
   }
 
   async function mintSoldiers(): Promise<void> {
+    // This array is reused, so we "empty" it before
+    soldiersIds.length = 0;
     // Using only first 3 addresses to mint
     for (let i = 0; i < uniqueSoldiers; i++) {
       const newId = await mint(soldier, addrs[i % 3].address);
@@ -115,6 +117,8 @@ async function setupContextForSlots(
   }
 
   async function mintWeapons(): Promise<void> {
+    // This array is reused, so we "empty" it before
+    weaponsIds.length = 0;
     // Mint one weapon to soldier
     for (let i = 0; i < uniqueSoldiers; i++) {
       const newId = await nestMint(weapon, soldier.address, soldiersIds[i]);
@@ -124,6 +128,8 @@ async function setupContextForSlots(
   }
 
   async function mintWeaponGems(): Promise<void> {
+    // This array is reused, so we "empty" it before
+    weaponGemsIds.length = 0;
     // Mint one weapon gem for each weapon on each soldier
     for (let i = 0; i < uniqueSoldiers; i++) {
       const newId = await nestMint(weaponGem, weapon.address, weaponsIds[i]);
@@ -133,6 +139,8 @@ async function setupContextForSlots(
   }
 
   async function mintBackgrounds(): Promise<void> {
+    // This array is reused, so we "empty" it before
+    backgroundsIds.length = 0;
     // Mint one background to soldier
     for (let i = 0; i < uniqueSoldiers; i++) {
       const newId = await nestMint(background, soldier.address, soldiersIds[i]);
