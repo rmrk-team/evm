@@ -8,28 +8,141 @@ import {
   nestMinttokenId,
   addResourceEntryEquippables,
 } from './utils';
-import { equippablePartsContractsFixture } from './fixtures/equippablePartsFixture';
-import { equippableSlotsContractsFixture } from './fixtures/equippableSlotsFixture';
+import { setupContextForParts } from './setup/equippableParts';
+import { setupContextForSlots } from './setup/equippableSlots';
 import shouldBehaveLikeEquippableResources from './behavior/equippableResources';
 import shouldBehaveLikeEquippableWithParts from './behavior/equippableParts';
 import shouldBehaveLikeEquippableWithSlots from './behavior/equippableSlots';
 import shouldBehaveLikeMultiResource from './behavior/multiresource';
 
 // --------------- FIXTURES -----------------------
-async function partsFixture() {
-  const Base = await ethers.getContractFactory('RMRKBaseStorageMock');
-  const Nesting = await ethers.getContractFactory('RMRKNestingWithEquippableMock');
-  const Equip = await ethers.getContractFactory('RMRKEquippableMock');
 
-  return await equippablePartsContractsFixture(Base, Nesting, Equip, mintTokenId, nestMinttokenId);
+async function partsFixture() {
+  const baseSymbol = 'NCB';
+  const baseType = 'mixed';
+
+  const neonName = 'NeonCrisis';
+  const neonSymbol = 'NC';
+
+  const maskName = 'NeonMask';
+  const maskSymbol = 'NM';
+
+  const baseFactory = await ethers.getContractFactory('RMRKBaseStorageMock');
+  const nestingFactory = await ethers.getContractFactory('RMRKNestingWithEquippableMock');
+  const equipFactory = await ethers.getContractFactory('RMRKEquippableMock');
+
+  // Base
+  const base = await baseFactory.deploy(baseSymbol, baseType);
+  await base.deployed();
+
+  // Neon token
+  const neon = await nestingFactory.deploy(neonName, neonSymbol);
+  await neon.deployed();
+  const neonEquip = await equipFactory.deploy(neon.address);
+  await neonEquip.deployed();
+
+  // Link nesting and equippable:
+  neonEquip.setNestingAddress(neon.address);
+  neon.setEquippableAddress(neonEquip.address);
+  // Weapon
+  const mask = await nestingFactory.deploy(maskName, maskSymbol);
+  await mask.deployed();
+  const maskEquip = await equipFactory.deploy(mask.address);
+  await maskEquip.deployed();
+  // Link nesting and equippable:
+  maskEquip.setNestingAddress(mask.address);
+  mask.setEquippableAddress(maskEquip.address);
+
+  await setupContextForParts(base, neon, neonEquip, mask, maskEquip, mintTokenId, nestMinttokenId);
+  return { base, neon, neonEquip, mask, maskEquip };
 }
 
 async function slotsFixture() {
-  const Base = await ethers.getContractFactory('RMRKBaseStorageMock');
-  const Nesting = await ethers.getContractFactory('RMRKNestingWithEquippableMock');
-  const Equip = await ethers.getContractFactory('RMRKEquippableMock');
+  const baseSymbol = 'SSB';
+  const baseType = 'mixed';
 
-  return await equippableSlotsContractsFixture(Base, Nesting, Equip, mintTokenId, nestMinttokenId);
+  const soldierName = 'SnakeSoldier';
+  const soldierSymbol = 'SS';
+
+  const weaponName = 'SnakeWeapon';
+  const weaponSymbol = 'SW';
+
+  const weaponGemName = 'SnakeWeaponGem';
+  const weaponGemSymbol = 'SWG';
+
+  const backgroundName = 'SnakeBackground';
+  const backgroundSymbol = 'SB';
+
+  const baseFactory = await ethers.getContractFactory('RMRKBaseStorageMock');
+  const nestingFactory = await ethers.getContractFactory('RMRKNestingWithEquippableMock');
+  const equipFactory = await ethers.getContractFactory('RMRKEquippableMock');
+
+  // Base
+  const base = await baseFactory.deploy(baseSymbol, baseType);
+  await base.deployed();
+
+  // Soldier token
+  const soldier = await nestingFactory.deploy(soldierName, soldierSymbol);
+  await soldier.deployed();
+  const soldierEquip = await equipFactory.deploy(soldier.address);
+  await soldierEquip.deployed();
+
+  // Link nesting and equippable:
+  soldierEquip.setNestingAddress(soldier.address);
+  soldier.setEquippableAddress(soldierEquip.address);
+
+  // Weapon
+  const weapon = await nestingFactory.deploy(weaponName, weaponSymbol);
+  await weapon.deployed();
+  const weaponEquip = await equipFactory.deploy(weapon.address);
+  await weaponEquip.deployed();
+  // Link nesting and equippable:
+  weaponEquip.setNestingAddress(weapon.address);
+  weapon.setEquippableAddress(weaponEquip.address);
+
+  // Weapon Gem
+  const weaponGem = await nestingFactory.deploy(weaponGemName, weaponGemSymbol);
+  await weaponGem.deployed();
+  const weaponGemEquip = await equipFactory.deploy(weaponGem.address);
+  await weaponGemEquip.deployed();
+  // Link nesting and equippable:
+  weaponGemEquip.setNestingAddress(weaponGem.address);
+  weaponGem.setEquippableAddress(weaponGemEquip.address);
+
+  // Background
+  const background = await nestingFactory.deploy(backgroundName, backgroundSymbol);
+  await background.deployed();
+  const backgroundEquip = await equipFactory.deploy(background.address);
+  await backgroundEquip.deployed();
+  // Link nesting and equippable:
+  backgroundEquip.setNestingAddress(background.address);
+  background.setEquippableAddress(backgroundEquip.address);
+
+  await setupContextForSlots(
+    base,
+    soldier,
+    soldierEquip,
+    weapon,
+    weaponEquip,
+    weaponGem,
+    weaponGemEquip,
+    background,
+    backgroundEquip,
+    mintTokenId,
+    nestMinttokenId,
+  );
+
+  return {
+    base,
+    soldier,
+    soldierEquip,
+    weapon,
+    weaponEquip,
+    weaponGem,
+    weaponGemEquip,
+    background,
+    backgroundEquip,
+  };
 }
 
 async function resourcesFixture() {
@@ -66,7 +179,7 @@ async function multiResourceFixture() {
 
 // --------------- EQUIPPABLE BEHAVIOR -----------------------
 
-describe('Equippable with Parts', async () => {
+describe('EquippableMock with Parts', async () => {
   beforeEach(async function () {
     const { base, neon, neonEquip, mask, maskEquip } = await loadFixture(partsFixture);
 
@@ -80,24 +193,7 @@ describe('Equippable with Parts', async () => {
   shouldBehaveLikeEquippableWithParts();
 });
 
-describe('Equippable Resources', async () => {
-  beforeEach(async function () {
-    const { nesting, equip } = await loadFixture(resourcesFixture);
-    this.nesting = nesting;
-    this.equip = equip;
-  });
-
-  describe('Init', async function () {
-    it('it can get names and symbols', async function () {
-      expect(await this.nesting.name()).to.equal('Chunky');
-      expect(await this.nesting.symbol()).to.equal('CHNK');
-    });
-  });
-
-  shouldBehaveLikeEquippableResources(mintTokenId);
-});
-
-describe('Equippable with Slots', async () => {
+describe('EquippableMock with Slots', async () => {
   beforeEach(async function () {
     const {
       base,
@@ -123,6 +219,23 @@ describe('Equippable with Slots', async () => {
   });
 
   shouldBehaveLikeEquippableWithSlots(nestMinttokenId);
+});
+
+describe('EquippableMock Resources', async () => {
+  beforeEach(async function () {
+    const { nesting, equip } = await loadFixture(resourcesFixture);
+    this.nesting = nesting;
+    this.equip = equip;
+  });
+
+  describe('Init', async function () {
+    it('it can get names and symbols', async function () {
+      expect(await this.nesting.name()).to.equal('Chunky');
+      expect(await this.nesting.symbol()).to.equal('CHNK');
+    });
+  });
+
+  shouldBehaveLikeEquippableResources(mintTokenId);
 });
 
 // --------------- END EQUIPPABLE BEHAVIOR -----------------------

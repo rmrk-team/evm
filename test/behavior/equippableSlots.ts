@@ -18,7 +18,7 @@ import {
   weaponGemsIds,
   backgroundsIds,
   ItemType,
-} from '../fixtures/equippableSlotsFixture';
+} from '../setup/equippableSlots';
 
 // The general idea is having these tokens: Soldier, Weapon, WeaponGem and Background.
 // Weapon and Background can be equipped into Soldier. WeaponGem can be equipped into Weapon
