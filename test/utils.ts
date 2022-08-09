@@ -1,5 +1,6 @@
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { BigNumber, Contract } from 'ethers';
+import { ethers } from 'hardhat';
 
 let nextTokenId = 1;
 let nextChildTokenId = 100;
@@ -46,4 +47,27 @@ async function addResourceToToken(
   await token.addResourceToToken(tokenId, resId, overwrites);
 }
 
-export { mintTokenId, nestMinttokenId, transfer, nestTransfer, addResourceToToken };
+let nextResourceId = 1;
+
+async function addResourceEntryEquippables(token: Contract, data?: string): Promise<BigNumber> {
+  const resourceId = BigNumber.from(nextResourceId);
+  const refId = BigNumber.from(1);
+  const extendedResource = [
+    resourceId,
+    refId,
+    ethers.constants.AddressZero,
+    data !== undefined ? data : 'metaURI',
+  ];
+  nextResourceId++;
+  await token.addResourceEntry(extendedResource, [], []);
+  return resourceId;
+}
+
+export {
+  mintTokenId,
+  nestMinttokenId,
+  transfer,
+  nestTransfer,
+  addResourceToToken,
+  addResourceEntryEquippables,
+};

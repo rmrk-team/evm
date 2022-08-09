@@ -2,11 +2,9 @@ import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { BigNumber, Contract } from 'ethers';
-import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 
 async function shouldBehaveLikeEquippableResources(
-  equippableContractName: string,
-  nestingContractName: string,
+  mint: (token: Contract, to: string) => Promise<number>,
 ) {
   let chunky: Contract;
   let chunkyEquip: Contract;
@@ -14,42 +12,16 @@ async function shouldBehaveLikeEquippableResources(
   let owner: SignerWithAddress;
   let addrs: SignerWithAddress[];
 
-  const name = 'ownerChunky';
-  const symbol = 'CHNKY';
-
   const equippableRefIdDefault = BigNumber.from(1);
   const metaURIDefault = 'metaURI';
   const baseAddressDefault = ethers.constants.AddressZero;
 
-  async function deployTokensFixture() {
-    const CHNKY = await ethers.getContractFactory(nestingContractName);
-    const ChnkEqup = await ethers.getContractFactory(equippableContractName);
-
-    const chunkyContract = await CHNKY.deploy(name, symbol);
-    await chunkyContract.deployed();
-
-    const chunkyEquipContract = await ChnkEqup.deploy(chunkyContract.address);
-    await chunkyEquipContract.deployed();
-
-    await chunkyContract.setEquippableAddress(chunkyEquipContract.address);
-
-    return { chunkyContract, chunkyEquipContract };
-  }
-
-  beforeEach(async () => {
+  beforeEach(async function () {
     const [signersOwner, ...signersAddr] = await ethers.getSigners();
     owner = signersOwner;
     addrs = signersAddr;
-    const { chunkyContract, chunkyEquipContract } = await loadFixture(deployTokensFixture);
-    chunky = chunkyContract;
-    chunkyEquip = chunkyEquipContract;
-  });
-
-  describe('Init', async function () {
-    it('it can get names and symbols', async function () {
-      expect(await chunky.name()).to.equal(name);
-      expect(await chunky.symbol()).to.equal(symbol);
-    });
+    chunky = this.nesting;
+    chunkyEquip = this.equip;
   });
 
   describe('Interface support', async function () {
@@ -201,9 +173,7 @@ async function shouldBehaveLikeEquippableResources(
     it('can add resource to token', async function () {
       const resId = BigNumber.from(1);
       const resId2 = BigNumber.from(2);
-      const tokenId = 1;
-
-      await chunky['mint(address,uint256)'](owner.address, tokenId);
+      const tokenId = await mint(chunky, owner.address);
       await addResources([resId, resId2]);
       await expect(chunkyEquip.addResourceToToken(tokenId, resId, 0)).to.emit(
         chunkyEquip,
@@ -230,9 +200,7 @@ async function shouldBehaveLikeEquippableResources(
 
     it('cannot add non existing resource to token', async function () {
       const resId = BigNumber.from(1);
-      const tokenId = 1;
-
-      await chunky['mint(address,uint256)'](owner.address, tokenId);
+      const tokenId = await mint(chunky, owner.address);
       await expect(chunkyEquip.addResourceToToken(tokenId, resId, 0)).to.be.revertedWithCustomError(
         chunkyEquip,
         'RMRKNoResourceMatchingId',
@@ -252,9 +220,7 @@ async function shouldBehaveLikeEquippableResources(
 
     it('cannot add resource twice to the same token', async function () {
       const resId = BigNumber.from(1);
-      const tokenId = 1;
-
-      await chunky['mint(address,uint256)'](owner.address, tokenId);
+      const tokenId = await mint(chunky, owner.address);
       await addResources([resId]);
       await chunkyEquip.addResourceToToken(tokenId, resId, 0);
       await expect(chunkyEquip.addResourceToToken(tokenId, resId, 0)).to.be.revertedWithCustomError(
@@ -264,9 +230,7 @@ async function shouldBehaveLikeEquippableResources(
     });
 
     it('cannot add too many resources to the same token', async function () {
-      const tokenId = 1;
-
-      await chunky['mint(address,uint256)'](owner.address, tokenId);
+      const tokenId = await mint(chunky, owner.address);
       for (let i = 1; i <= 128; i++) {
         await addResources([BigNumber.from(i)]);
         await chunkyEquip.addResourceToToken(tokenId, i, 0);
@@ -283,11 +247,9 @@ async function shouldBehaveLikeEquippableResources(
 
     it('can add same resource to 2 different tokens', async function () {
       const resId = BigNumber.from(1);
-      const tokenId1 = 1;
-      const tokenId2 = 2;
+      const tokenId1 = await mint(chunky, owner.address);
+      const tokenId2 = await mint(chunky, owner.address);
 
-      await chunky['mint(address,uint256)'](owner.address, tokenId1);
-      await chunky['mint(address,uint256)'](owner.address, tokenId2);
       await addResources([resId]);
       await chunkyEquip.addResourceToToken(tokenId1, resId, 0);
       await chunkyEquip.addResourceToToken(tokenId2, resId, 0);
@@ -300,9 +262,7 @@ async function shouldBehaveLikeEquippableResources(
   describe('Accepting resources', async function () {
     it('can accept resource', async function () {
       const resId = BigNumber.from(1);
-      const tokenId = 1;
-
-      await chunky['mint(address,uint256)'](owner.address, tokenId);
+      const tokenId = await mint(chunky, owner.address);
       await addResources([resId]);
       await chunkyEquip.addResourceToToken(tokenId, resId, 0);
       await expect(chunkyEquip.acceptResource(tokenId, 0))
@@ -328,9 +288,7 @@ async function shouldBehaveLikeEquippableResources(
     it('can accept multiple resources', async function () {
       const resId = BigNumber.from(1);
       const resId2 = BigNumber.from(2);
-      const tokenId = 1;
-
-      await chunky['mint(address,uint256)'](owner.address, tokenId);
+      const tokenId = await mint(chunky, owner.address);
       await addResources([resId, resId2]);
       await chunkyEquip.addResourceToToken(tokenId, resId, 0);
       await chunkyEquip.addResourceToToken(tokenId, resId2, 0);
@@ -354,9 +312,8 @@ async function shouldBehaveLikeEquippableResources(
     // approved not implemented yet
     it('can accept resource if approved', async function () {
       const resId = BigNumber.from(1);
-      const tokenId = 1;
+      const tokenId = await mint(chunky, owner.address);
       const approvedAddress = addrs[1];
-      await chunky['mint(address,uint256)'](owner.address, tokenId);
       await chunkyEquip.approveForResources(approvedAddress.address, tokenId);
       await addResources([resId]);
 
@@ -369,9 +326,7 @@ async function shouldBehaveLikeEquippableResources(
 
     it('cannot accept resource twice', async function () {
       const resId = BigNumber.from(1);
-      const tokenId = 1;
-
-      await chunky['mint(address,uint256)'](owner.address, tokenId);
+      const tokenId = await mint(chunky, owner.address);
       await addResources([resId]);
       await chunkyEquip.addResourceToToken(tokenId, resId, 0);
       await chunkyEquip.acceptResource(tokenId, 0);
@@ -384,9 +339,7 @@ async function shouldBehaveLikeEquippableResources(
 
     it('cannot accept resource if not owner', async function () {
       const resId = BigNumber.from(1);
-      const tokenId = 1;
-
-      await chunky['mint(address,uint256)'](owner.address, tokenId);
+      const tokenId = await mint(chunky, owner.address);
       await addResources([resId]);
       await chunkyEquip.addResourceToToken(tokenId, resId, 0);
       await expect(
@@ -395,9 +348,7 @@ async function shouldBehaveLikeEquippableResources(
     });
 
     it('cannot accept non existing resource', async function () {
-      const tokenId = 1;
-
-      await chunky['mint(address,uint256)'](owner.address, tokenId);
+      const tokenId = await mint(chunky, owner.address);
       await expect(chunkyEquip.acceptResource(tokenId, 0)).to.be.revertedWithCustomError(
         chunkyEquip,
         'RMRKIndexOutOfRange',
@@ -409,9 +360,7 @@ async function shouldBehaveLikeEquippableResources(
     it('can add resource to token overwritting an existing one', async function () {
       const resId = BigNumber.from(1);
       const resId2 = BigNumber.from(2);
-      const tokenId = 1;
-
-      await chunky['mint(address,uint256)'](owner.address, tokenId);
+      const tokenId = await mint(chunky, owner.address);
       await addResources([resId, resId2]);
       await chunkyEquip.addResourceToToken(tokenId, resId, 0);
       await chunkyEquip.acceptResource(tokenId, 0);
@@ -443,9 +392,7 @@ async function shouldBehaveLikeEquippableResources(
 
     it('can overwrite non existing resource to token, it could have been deleted', async function () {
       const resId = BigNumber.from(1);
-      const tokenId = 1;
-
-      await chunky['mint(address,uint256)'](owner.address, tokenId);
+      const tokenId = await mint(chunky, owner.address);
       await addResources([resId]);
       await chunkyEquip.addResourceToToken(tokenId, resId, ethers.utils.hexZeroPad('0x1', 8));
       await chunkyEquip.acceptResource(tokenId, 0);
@@ -459,9 +406,7 @@ async function shouldBehaveLikeEquippableResources(
   describe('Rejecting resources', async function () {
     it('can reject resource', async function () {
       const resId = BigNumber.from(1);
-      const tokenId = 1;
-
-      await chunky['mint(address,uint256)'](owner.address, tokenId);
+      const tokenId = await mint(chunky, owner.address);
       await addResources([resId]);
       await chunkyEquip.addResourceToToken(tokenId, resId, 0);
 
@@ -476,9 +421,7 @@ async function shouldBehaveLikeEquippableResources(
     it('can reject resource and overwrites are cleared', async function () {
       const resId = BigNumber.from(1);
       const resId2 = BigNumber.from(2);
-      const tokenId = 1;
-
-      await chunky['mint(address,uint256)'](owner.address, tokenId);
+      const tokenId = await mint(chunky, owner.address);
       await addResources([resId, resId2]);
       await chunkyEquip.addResourceToToken(tokenId, resId, 0);
       await chunkyEquip.acceptResource(tokenId, 0);
@@ -493,9 +436,7 @@ async function shouldBehaveLikeEquippableResources(
     it('can reject resource if approved', async function () {
       const resId = BigNumber.from(1);
       const approvedAddress = addrs[1];
-      const tokenId = 1;
-
-      await chunky['mint(address,uint256)'](owner.address, tokenId);
+      const tokenId = await mint(chunky, owner.address);
       await chunkyEquip.approveForResources(approvedAddress.address, tokenId);
       await addResources([resId]);
       await chunkyEquip.addResourceToToken(tokenId, resId, 0);
@@ -511,9 +452,7 @@ async function shouldBehaveLikeEquippableResources(
     it('can reject all resources', async function () {
       const resId = BigNumber.from(1);
       const resId2 = BigNumber.from(2);
-      const tokenId = 1;
-
-      await chunky['mint(address,uint256)'](owner.address, tokenId);
+      const tokenId = await mint(chunky, owner.address);
       await addResources([resId, resId2]);
       await chunkyEquip.addResourceToToken(tokenId, resId, 0);
       await chunkyEquip.addResourceToToken(tokenId, resId2, 0);
@@ -532,9 +471,7 @@ async function shouldBehaveLikeEquippableResources(
     it('can reject all resources and overwrites are cleared', async function () {
       const resId = BigNumber.from(1);
       const resId2 = BigNumber.from(2);
-      const tokenId = 1;
-
-      await chunky['mint(address,uint256)'](owner.address, tokenId);
+      const tokenId = await mint(chunky, owner.address);
       await addResources([resId, resId2]);
       await chunkyEquip.addResourceToToken(tokenId, resId, 0);
       await chunkyEquip.acceptResource(tokenId, 0);
@@ -547,14 +484,12 @@ async function shouldBehaveLikeEquippableResources(
     });
 
     it('can reject all pending resources at max capacity', async function () {
-      const tokenId = 1;
+      const tokenId = await mint(chunky, owner.address);
       const resArr = [];
 
       for (let i = 1; i < 128; i++) {
         resArr.push(BigNumber.from(i));
       }
-
-      await chunky['mint(address,uint256)'](owner.address, tokenId);
       await addResources(resArr);
 
       for (let i = 1; i < 128; i++) {
@@ -568,10 +503,9 @@ async function shouldBehaveLikeEquippableResources(
     it('can reject all resources if approved', async function () {
       const resId = BigNumber.from(1);
       const resId2 = BigNumber.from(2);
-      const tokenId = 1;
+      const tokenId = await mint(chunky, owner.address);
       const approvedAddress = addrs[1];
 
-      await chunky['mint(address,uint256)'](owner.address, tokenId);
       await chunkyEquip.approveForResources(approvedAddress.address, tokenId);
       await addResources([resId, resId2]);
       await chunkyEquip.addResourceToToken(tokenId, resId, 0);
@@ -590,9 +524,7 @@ async function shouldBehaveLikeEquippableResources(
 
     it('cannot reject resource twice', async function () {
       const resId = BigNumber.from(1);
-      const tokenId = 1;
-
-      await chunky['mint(address,uint256)'](owner.address, tokenId);
+      const tokenId = await mint(chunky, owner.address);
       await addResources([resId]);
       await chunkyEquip.addResourceToToken(tokenId, resId, 0);
       await chunkyEquip.rejectResource(tokenId, 0);
@@ -605,9 +537,7 @@ async function shouldBehaveLikeEquippableResources(
 
     it('cannot reject resource nor reject all if not owner', async function () {
       const resId = BigNumber.from(1);
-      const tokenId = 1;
-
-      await chunky['mint(address,uint256)'](owner.address, tokenId);
+      const tokenId = await mint(chunky, owner.address);
       await addResources([resId]);
       await chunkyEquip.addResourceToToken(tokenId, resId, 0);
 
@@ -620,9 +550,7 @@ async function shouldBehaveLikeEquippableResources(
     });
 
     it('cannot reject non existing resource', async function () {
-      const tokenId = 1;
-
-      await chunky['mint(address,uint256)'](owner.address, tokenId);
+      const tokenId = await mint(chunky, owner.address);
       await expect(chunkyEquip.rejectResource(tokenId, 0)).to.be.revertedWithCustomError(
         chunkyEquip,
         'RMRKIndexOutOfRange',
@@ -632,8 +560,7 @@ async function shouldBehaveLikeEquippableResources(
 
   describe('Priorities', async function () {
     it('can set and get priorities', async function () {
-      const tokenId = 1;
-      await addResourcesToToken(tokenId);
+      const tokenId = await addResourcesToToken();
 
       expect(await chunkyEquip.getActiveResourcePriorities(tokenId)).to.be.eql([0, 0]);
       await expect(chunkyEquip.setPriority(tokenId, [2, 1]))
@@ -643,10 +570,9 @@ async function shouldBehaveLikeEquippableResources(
     });
 
     it('can set and get priorities if approved', async function () {
-      const tokenId = 1;
       const approvedAddress = addrs[1];
+      const tokenId = await addResourcesToToken();
 
-      await addResourcesToToken(tokenId);
       await chunkyEquip.approveForResources(approvedAddress.address, tokenId);
 
       expect(await chunkyEquip.getActiveResourcePriorities(tokenId)).to.be.eql([0, 0]);
@@ -657,16 +583,14 @@ async function shouldBehaveLikeEquippableResources(
     });
 
     it('cannot set priorities for non owned token', async function () {
-      const tokenId = 1;
-      await addResourcesToToken(tokenId);
+      const tokenId = await addResourcesToToken();
       await expect(
         chunkyEquip.connect(addrs[1]).setPriority(tokenId, [2, 1]),
       ).to.be.revertedWithCustomError(chunkyEquip, 'RMRKNotApprovedForResourcesOrOwner');
     });
 
     it('cannot set different number of priorities', async function () {
-      const tokenId = 1;
-      await addResourcesToToken(tokenId);
+      const tokenId = await addResourcesToToken();
       await expect(chunkyEquip.setPriority(tokenId, [1])).to.be.revertedWithCustomError(
         chunkyEquip,
         'RMRKBadPriorityListLength',
@@ -692,34 +616,30 @@ async function shouldBehaveLikeEquippableResources(
     });
 
     it('gets fallback URI if no active resources on token', async function () {
-      const tokenId = 1;
+      const tokenId = await mint(chunky, owner.address);
       const fallBackUri = 'fallback404';
-      await chunky['mint(address,uint256)'](owner.address, tokenId);
       await chunkyEquip.setFallbackURI(fallBackUri);
       expect(await chunkyEquip.tokenURI(tokenId)).to.eql(fallBackUri);
     });
 
     it('can get token URI when resource is not enumerated', async function () {
-      const tokenId = 1;
-      await addResourcesToToken(tokenId);
+      const tokenId = await addResourcesToToken();
       expect(await chunkyEquip.tokenURI(tokenId)).to.eql(metaURIDefault);
     });
 
     it('can get token URI when resource is enumerated', async function () {
-      const tokenId = 1;
       const resId = BigNumber.from(1);
-      await addResourcesToToken(tokenId);
+      const tokenId = await addResourcesToToken();
       await chunkyEquip.setTokenEnumeratedResource(resId, true);
       expect(await chunkyEquip.isTokenEnumeratedResource(resId)).to.eql(true);
       expect(await chunkyEquip.tokenURI(tokenId)).to.eql(`${metaURIDefault}${tokenId}`);
     });
 
     it('can get token URI at specific index', async function () {
-      const tokenId = 1;
+      const tokenId = await mint(chunky, owner.address);
       const resId = BigNumber.from(1);
       const resId2 = BigNumber.from(2);
 
-      await chunky['mint(address,uint256)'](owner.address, tokenId);
       await chunkyEquip.addResourceEntry(
         {
           id: resId,
@@ -751,11 +671,10 @@ async function shouldBehaveLikeEquippableResources(
 
   describe('Approval Cleaning', async function () {
     it('cleans token and resources approvals on transfer', async function () {
-      const tokenId = 1;
       const tokenOwner = addrs[1];
       const newOwner = addrs[2];
       const approved = addrs[3];
-      await chunky['mint(address,uint256)'](tokenOwner.address, tokenId);
+      const tokenId = await mint(chunky, tokenOwner.address);
       await chunky.connect(tokenOwner).approve(approved.address, tokenId);
       await chunkyEquip.connect(tokenOwner).approveForResources(approved.address, tokenId);
 
@@ -771,10 +690,9 @@ async function shouldBehaveLikeEquippableResources(
     });
 
     it('cleans token and resources approvals on burn', async function () {
-      const tokenId = 1;
       const tokenOwner = addrs[1];
       const approved = addrs[3];
-      await chunky['mint(address,uint256)'](tokenOwner.address, tokenId);
+      const tokenId = await mint(chunky, tokenOwner.address);
       await chunky.connect(tokenOwner).approve(approved.address, tokenId);
       await chunkyEquip.connect(tokenOwner).approveForResources(approved.address, tokenId);
 
@@ -809,15 +727,17 @@ async function shouldBehaveLikeEquippableResources(
     }
   }
 
-  async function addResourcesToToken(tokenId: number): Promise<void> {
+  async function addResourcesToToken(): Promise<number> {
     const resId = BigNumber.from(1);
     const resId2 = BigNumber.from(2);
-    await chunky['mint(address,uint256)'](owner.address, tokenId);
+    const tokenId = await mint(chunky, owner.address);
     await addResources([resId, resId2]);
     await chunkyEquip.addResourceToToken(tokenId, resId, 0);
     await chunkyEquip.addResourceToToken(tokenId, resId2, 0);
     await chunkyEquip.acceptResource(tokenId, 0);
     await chunkyEquip.acceptResource(tokenId, 0);
+
+    return tokenId;
   }
 }
 
