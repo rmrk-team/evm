@@ -2,27 +2,46 @@ import { BigNumber, Contract } from 'ethers';
 import { ethers } from 'hardhat';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { addResourceToToken, mintTokenId, nestMinttokenId } from './utils';
-import shouldBehaveLikeEquippableWithParts from './behavior/equippableParts';
+import { equippablePartsContractsFixture } from './fixtures/equippablePartsFixture';
+import { equippableSlotsContractsFixture } from './fixtures/equippableSlotsFixture';
 import shouldBehaveLikeEquippableResources from './behavior/equippableResources';
+import shouldBehaveLikeEquippableWithParts from './behavior/equippableParts';
 import shouldBehaveLikeEquippableWithSlots from './behavior/equippableSlots';
 import shouldBehaveLikeMultiResource from './behavior/multiresource';
-import { equippableSlotsContractsFixture } from './fixtures/equippableSlotsFixture';
 
-describe('Equippable with Parts', async () => {
-  shouldBehaveLikeEquippableWithParts();
-});
+async function partsFixture() {
+  const Base = await ethers.getContractFactory('RMRKBaseStorageMock');
+  const Nesting = await ethers.getContractFactory('RMRKNestingWithEquippableMock');
+  const Equip = await ethers.getContractFactory('RMRKEquippableMock');
 
-describe('Equippable Resources', async () => {
-  shouldBehaveLikeEquippableResources('RMRKEquippableMock', 'RMRKNestingWithEquippableMock');
-});
+  return await equippablePartsContractsFixture(Base, Nesting, Equip, mintTokenId, nestMinttokenId);
+}
 
-async function slotFixture() {
+async function slotsFixture() {
   const Base = await ethers.getContractFactory('RMRKBaseStorageMock');
   const Nesting = await ethers.getContractFactory('RMRKNestingWithEquippableMock');
   const Equip = await ethers.getContractFactory('RMRKEquippableMock');
 
   return await equippableSlotsContractsFixture(Base, Nesting, Equip, mintTokenId, nestMinttokenId);
 }
+
+describe('Equippable with Parts', async () => {
+  beforeEach(async function () {
+    const { base, neon, neonEquip, mask, maskEquip } = await loadFixture(partsFixture);
+
+    this.base = base;
+    this.neon = neon;
+    this.neonEquip = neonEquip;
+    this.mask = mask;
+    this.maskEquip = maskEquip;
+  });
+
+  shouldBehaveLikeEquippableWithParts();
+});
+
+describe('Equippable Resources', async () => {
+  shouldBehaveLikeEquippableResources('RMRKEquippableMock', 'RMRKNestingWithEquippableMock');
+});
 
 describe('Equippable with Slots', async () => {
   beforeEach(async function () {
@@ -36,7 +55,7 @@ describe('Equippable with Slots', async () => {
       weaponGemEquip,
       background,
       backgroundEquip,
-    } = await loadFixture(slotFixture);
+    } = await loadFixture(slotsFixture);
 
     this.base = base;
     this.soldier = soldier;

@@ -1,5 +1,5 @@
 import { ethers } from 'hardhat';
-import { Contract } from 'ethers';
+import { Contract, ContractFactory } from 'ethers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 
 let base: Contract;
@@ -45,11 +45,11 @@ const partIdForHornsEquipped2 = 23;
 const partIdForHornsEquipped3 = 24;
 const partIdForMask = 25;
 
-// const uniqueNeons = 10;
+const uniqueNeons = 10;
 const uniqueMasks = 4;
 // Ids could be the same since they are different collections, but to avoid log problems we have them unique
-const neons = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-const masks = [11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
+const neons: number[] = [];
+const masks: number[] = [];
 
 const neonResIds = [100, 101, 102, 103, 104];
 const maskResourcesFull = [1, 2, 3, 4]; // Must match the total of uniqueResources
@@ -62,30 +62,33 @@ enum ItemType {
   Fixed,
 }
 
-export async function equippablePartsContractsFixture() {
+async function equippablePartsContractsFixture(
+  baseFactory: ContractFactory,
+  nestingFactory: ContractFactory,
+  equipFactory: ContractFactory,
+  mint: (token: Contract, to: string) => Promise<number>,
+  nestMint: (token: Contract, to: string, parentId: number) => Promise<number>,
+) {
   const [, ...signersAddr] = await ethers.getSigners();
   addrs = signersAddr;
 
-  const Base = await ethers.getContractFactory('RMRKBaseStorageMock');
-  const Nesting = await ethers.getContractFactory('RMRKNestingWithEquippableMock');
-  const Equip = await ethers.getContractFactory('RMRKEquippableMock');
   // Base
-  base = await Base.deploy(baseSymbol, baseType);
+  base = await baseFactory.deploy(baseSymbol, baseType);
   await base.deployed();
 
   // Neon token
-  neon = await Nesting.deploy(neonName, neonSymbol);
+  neon = await nestingFactory.deploy(neonName, neonSymbol);
   await neon.deployed();
-  neonEquip = await Equip.deploy(neon.address);
+  neonEquip = await equipFactory.deploy(neon.address);
   await neonEquip.deployed();
 
   // Link nesting and equippable:
   neonEquip.setNestingAddress(neon.address);
   neon.setEquippableAddress(neonEquip.address);
   // Weapon
-  mask = await Nesting.deploy(maskName, maskSymbol);
+  mask = await nestingFactory.deploy(maskName, maskSymbol);
   await mask.deployed();
-  maskEquip = await Equip.deploy(mask.address);
+  maskEquip = await equipFactory.deploy(mask.address);
   await maskEquip.deployed();
   // Link nesting and equippable:
   maskEquip.setNestingAddress(mask.address);
@@ -93,8 +96,8 @@ export async function equippablePartsContractsFixture() {
 
   await setupBase();
 
-  await mintNeons();
-  await mintMasks();
+  await mintNeons(mint);
+  await mintMasks(nestMint);
 
   await addResourcesToNeon();
   await addResourcesToMask();
@@ -283,17 +286,21 @@ async function setupBase(): Promise<void> {
   ]);
 }
 
-async function mintNeons(): Promise<void> {
+async function mintNeons(mint: (token: Contract, to: string) => Promise<number>): Promise<void> {
   // Using only first 3 addresses to mint
-  for (let i = 0; i < neons.length; i++) {
-    await neon['mint(address,uint256)'](addrs[i % 3].address, neons[i]);
+  for (let i = 0; i < uniqueNeons; i++) {
+    const newId = await mint(neon, addrs[i % 3].address);
+    neons.push(newId);
   }
 }
 
-async function mintMasks(): Promise<void> {
+async function mintMasks(
+  nestMint: (token: Contract, to: string, parentId: number) => Promise<number>,
+): Promise<void> {
   // Mint one weapon to neon
-  for (let i = 0; i < neons.length; i++) {
-    await mask['mint(address,uint256,uint256)'](neon.address, masks[i], neons[i]);
+  for (let i = 0; i < uniqueNeons; i++) {
+    const newId = await nestMint(mask, neon.address, neons[i]);
+    masks.push(newId);
     await neon.connect(addrs[i % 3]).acceptChild(neons[i], 0);
   }
 }
@@ -350,7 +357,7 @@ async function addResourcesToNeon(): Promise<void> {
     [partIdForMask], // Can receive these
   );
 
-  for (let i = 0; i < neons.length; i++) {
+  for (let i = 0; i < uniqueNeons; i++) {
     await neonEquip.addResourceToToken(neons[i], neonResIds[i % neonResIds.length], 0);
     await neonEquip.connect(addrs[i % 3]).acceptResource(neons[i], 0);
   }
@@ -459,3 +466,40 @@ async function addResourcesToMask(): Promise<void> {
     await maskEquip.connect(addrs[i % 3]).acceptResource(masks[i], 0);
   }
 }
+
+export {
+  partIdForHead1,
+  partIdForHead2,
+  partIdForHead3,
+  partIdForBody1,
+  partIdForBody2,
+  partIdForHair1,
+  partIdForHair2,
+  partIdForHair3,
+  partIdForMaskBase1,
+  partIdForMaskBase2,
+  partIdForMaskBase3,
+  partIdForEars1,
+  partIdForEars2,
+  partIdForHorns1,
+  partIdForHorns2,
+  partIdForHorns3,
+  partIdForMaskBaseEquipped1,
+  partIdForMaskBaseEquipped2,
+  partIdForMaskBaseEquipped3,
+  partIdForEarsEquipped1,
+  partIdForEarsEquipped2,
+  partIdForHornsEquipped1,
+  partIdForHornsEquipped2,
+  partIdForHornsEquipped3,
+  partIdForMask,
+  uniqueNeons,
+  uniqueMasks,
+  neons,
+  masks,
+  neonResIds,
+  maskResourcesFull,
+  maskResourcesEquip,
+  maskEquippableRefId,
+  equippablePartsContractsFixture,
+};
