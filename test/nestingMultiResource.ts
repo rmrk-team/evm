@@ -7,7 +7,7 @@ import { mintTokenId, nestMinttokenId, transfer, nestTransfer, addResourceToToke
 import shouldBehaveLikeNesting from './behavior/nesting';
 import shouldBehaveLikeMultiResource from './behavior/multiresource';
 
-describe('Nesting', function () {
+describe('NestingMultiResourceMock Nesting Behavior', function () {
   async function deployTokensFixture() {
     const NestingMRFactory = await ethers.getContractFactory('RMRKNestingMultiResourceMock');
     const ownerChunky = await NestingMRFactory.deploy('Chunky', 'CHNK');
@@ -46,7 +46,7 @@ async function addResourceEntry(token: Contract, data?: string): Promise<BigNumb
   return resourceId;
 }
 
-describe('MultiResource MR behavior', async () => {
+describe('NestingMultiResourceMock MR behavior', async () => {
   beforeEach(async function () {
     const { token } = await loadFixture(deployTokenFixture);
     this.token = token;
@@ -57,7 +57,7 @@ describe('MultiResource MR behavior', async () => {
 
 // --------------- MULTI RESOURCE BEHAVIOR END ------------------------
 
-describe('Nesting MR', function () {
+describe('NestingMultiResourceMock', function () {
   let addrs: SignerWithAddress[];
   let chunky: Contract;
 

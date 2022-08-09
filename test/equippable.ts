@@ -242,7 +242,7 @@ describe('EquippableMock Resources', async () => {
 
 // --------------- MULTI RESOURCE BEHAVIOR -----------------------
 
-describe('Equippable MR behavior with minted token', async () => {
+describe('EquippableMock MR behavior', async () => {
   let nextTokenId = 1;
   let mintingContract: Contract;
 

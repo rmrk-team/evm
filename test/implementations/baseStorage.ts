@@ -1,5 +1,5 @@
 import shouldBehaveLikeBase from '../behavior/baseStorage';
 
-describe('MultiResource', async () => {
+describe('RMRKBaseStorageImpl', async () => {
   shouldBehaveLikeBase('RMRKBaseStorageImpl', 'BASE', 'misc');
 });

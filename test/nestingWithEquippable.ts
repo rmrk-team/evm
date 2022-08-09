@@ -6,7 +6,7 @@ import shouldBehaveLikeERC721 from "./behavior/erc721"
 import { loadFixture } from "@nomicfoundation/hardhat-network-helpers"
 
 
-describe('Nesting', function () {
+describe('NestingWithEquippableMock Nesting Behavior', function () {
   const name = 'ownerChunky';
   const symbol = 'CHNKY';
 
@@ -46,7 +46,7 @@ describe('Nesting', function () {
   shouldBehaveLikeNesting(mintTokenId, nestMinttokenId, transfer, nestTransfer);
 });
 
-describe('ERC721 on NestingWithEquippable', function () {
+describe('NestingWithEquippableMock ERC721 Behavior', function () {
   let token: Contract;
 
   const name = 'RmrkTest';

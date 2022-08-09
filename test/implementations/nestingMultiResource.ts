@@ -19,7 +19,7 @@ async function nestMint(token: Contract, to: string, destinationId: number): Pro
   return await token.totalSupply();
 }
 
-describe('Nesting', function () {
+describe('NestingMultiResourceImpl Nesting Behavior', function () {
   async function deployTokensFixture() {
     const NestingMRFactory = await ethers.getContractFactory('RMRKNestingMultiResourceImpl');
     const ownerChunky = await NestingMRFactory.deploy('Chunky', 'CHNK', 10000, ONE_ETH);
@@ -58,7 +58,7 @@ async function addResourceEntry(token: Contract, data?: string): Promise<BigNumb
   return resourceId;
 }
 
-describe('MultiResource MR behavior', async () => {
+describe('NestingMultiResourceImpl MR behavior', async () => {
   beforeEach(async function () {
     const { token } = await loadFixture(deployTokenFixture);
     this.token = token;
@@ -69,7 +69,7 @@ describe('MultiResource MR behavior', async () => {
 
 // --------------- MULTI RESOURCE BEHAVIOR END ------------------------
 
-describe('Nesting MR', function () {
+describe('NestingMultiResourceImpl', function () {
   let addrs: SignerWithAddress[];
   let chunky: Contract;
 

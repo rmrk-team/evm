@@ -313,7 +313,7 @@ describe.skip('MultiResourceMock approvals cleaning', async () => {
 
 // --------------- MULTI RESOURCE BEHAVIOR -----------------------
 
-describe('MultiResource MR behavior', async () => {
+describe('MultiResourceMock MR behavior', async () => {
   beforeEach(async function () {
     const { token } = await loadFixture(deployRmrkMultiResourceMockFixture);
     this.token = token;

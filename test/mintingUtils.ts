@@ -4,7 +4,7 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { Contract } from 'ethers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 
-describe('Nesting', async () => {
+describe('Minting Utils', async () => {
   let mintingUtils: Contract;
 
   let owner: SignerWithAddress;

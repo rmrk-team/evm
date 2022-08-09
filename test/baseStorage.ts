@@ -1,5 +1,5 @@
 import shouldBehaveLikeBase from './behavior/baseStorage';
 
-describe('MultiResource', async () => {
+describe('BaseStorageMock', async () => {
   shouldBehaveLikeBase('RMRKBaseStorageMock', 'BASE', 'misc');
 });
