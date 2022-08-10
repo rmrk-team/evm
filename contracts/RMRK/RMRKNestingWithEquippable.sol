@@ -44,6 +44,16 @@ contract RMRKNestingWithEquippable is IRMRKNestingWithEquippable, RMRKNesting {
         _;
     }
 
+    function _onlyUnequipped(uint256 tokenId) private view {
+        if (IRMRKEquippable(_equippableAddress).isEquipped(tokenId))
+            revert RMRKMustUnequipFirst();
+    }
+
+    modifier onlyUnequipped(uint256 tokenId) {
+        _onlyUnequipped(tokenId);
+        _;
+    }
+
     function markSelfEquipped(
         uint tokenId,
         address equippingParent,
@@ -66,10 +76,14 @@ contract RMRKNestingWithEquippable is IRMRKNestingWithEquippable, RMRKNesting {
             tokenId, _equippableAddress, resourceId, slotId, equipped);
     }
 
-    function _unnestSelf(uint256 tokenId, uint256 index) internal override {
-        if (IRMRKEquippable(_equippableAddress).isEquipped(tokenId))
-            revert RMRKMustUnequipFirst();
+    // This is done on the internal level so we don't relly on every implementer rememebering this check
+    function _unnestSelf(uint256 tokenId, uint256 index) internal override onlyUnequipped(tokenId) {
         super._unnestSelf(tokenId, index);
+    }
+
+    // This is done on the internal level so we don't relly on every implementer rememebering this check
+    function _burn(uint256 tokenId) internal override onlyUnequipped(tokenId) {
+        super._burn(tokenId);
     }
 
     function _setEquippableAddress(address equippable) internal virtual {

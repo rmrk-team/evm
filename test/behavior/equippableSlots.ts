@@ -499,7 +499,7 @@ async function shouldBehaveLikeEquippableWithSlots(
     });
   });
 
-  describe('Transfer equipped', async function () {
+  describe('Forbidden operations for equipped NFTs', async function () {
     it('Can unequip and unnest', async function () {
       // Weapon is child on index 0, background on index 1
       const soldierOwner = addrs[0];
@@ -514,7 +514,7 @@ async function shouldBehaveLikeEquippableWithSlots(
       await weapon.connect(soldierOwner).unnestSelf(weaponsIds[0], 0);
     });
 
-    it('Unnest fails if self is equipped', async function () {
+    it('cannot unnest self if equipped', async function () {
       // Weapon is child on index 0
       const childIndex = 0;
       const weaponResId = weaponResourcesEquip[0]; // This resource is assigned to weapon first weapon
@@ -525,6 +525,33 @@ async function shouldBehaveLikeEquippableWithSlots(
       await expect(
         weapon.connect(addrs[0]).unnestSelf(weaponsIds[0], 0),
       ).to.be.revertedWithCustomError(weapon, 'RMRKMustUnequipFirst');
+    });
+
+    it('cannot transfer self if equipped', async function () {
+      // Weapon is child on index 0
+      const childIndex = 0;
+      const weaponResId = weaponResourcesEquip[0]; // This resource is assigned to weapon first weapon
+      await soldierEquip
+        .connect(addrs[0])
+        .equip(soldiersIds[0], soldierResId, partIdForWeapon, childIndex, weaponResId);
+
+      await expect(
+        weapon.connect(addrs[0]).transfer(addrs[1].address, weaponsIds[0]),
+      ).to.be.revertedWithCustomError(weapon, 'RMRKMustUnnestFirst');
+    });
+
+    it('cannot burn if equipped', async function () {
+      // Weapon is child on index 0
+      const childIndex = 0;
+      const weaponResId = weaponResourcesEquip[0]; // This resource is assigned to weapon first weapon
+      await soldierEquip
+        .connect(addrs[0])
+        .equip(soldiersIds[0], soldierResId, partIdForWeapon, childIndex, weaponResId);
+
+      await expect(weapon.connect(addrs[0]).burn(weaponsIds[0])).to.be.revertedWithCustomError(
+        weapon,
+        'RMRKMustUnequipFirst',
+      );
     });
   });
 
