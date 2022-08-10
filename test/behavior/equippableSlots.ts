@@ -362,44 +362,25 @@ async function shouldBehaveLikeEquippableWithSlots(
     it('can unequip', async function () {
       // Weapon is child on index 0, background on index 1
       const soldierOwner = addrs[0];
-      const childIndex = 0;
-      const weaponResId = weaponResourcesEquip[0]; // This resource is assigned to weapon first weapon
-
-      await soldierEquip
-        .connect(soldierOwner)
-        .equip(soldiersIds[0], soldierResId, partIdForWeapon, childIndex, weaponResId);
-
-      await unequipWeaponAndCheckFromAddress(soldierOwner);
+      await unequipWeaponAndCheckFromAddress(soldierOwner, soldierOwner);
     });
 
     it('can unequip if approved', async function () {
       // Weapon is child on index 0, background on index 1
       const soldierOwner = addrs[0];
-      const childIndex = 0;
-      const weaponResId = weaponResourcesEquip[0]; // This resource is assigned to weapon first weapon
       const approved = addrs[1];
 
-      await soldierEquip
-        .connect(soldierOwner)
-        .equip(soldiersIds[0], soldierResId, partIdForWeapon, childIndex, weaponResId);
-
       await soldier.connect(soldierOwner).approve(approved.address, soldiersIds[0]);
-      await unequipWeaponAndCheckFromAddress(approved);
+      await unequipWeaponAndCheckFromAddress(soldierOwner, approved);
     });
 
     it('can unequip if approved for all', async function () {
       // Weapon is child on index 0, background on index 1
       const soldierOwner = addrs[0];
-      const childIndex = 0;
-      const weaponResId = weaponResourcesEquip[0]; // This resource is assigned to weapon first weapon
       const approved = addrs[1];
 
-      await soldierEquip
-        .connect(soldierOwner)
-        .equip(soldiersIds[0], soldierResId, partIdForWeapon, childIndex, weaponResId);
-
       await soldier.connect(soldierOwner).setApprovalForAll(approved.address, true);
-      await unequipWeaponAndCheckFromAddress(approved);
+      await unequipWeaponAndCheckFromAddress(soldierOwner, approved);
     });
 
     it('cannot unequip if not equipped', async function () {
@@ -503,14 +484,8 @@ async function shouldBehaveLikeEquippableWithSlots(
     it('Can unequip and unnest', async function () {
       // Weapon is child on index 0, background on index 1
       const soldierOwner = addrs[0];
-      const childIndex = 0;
-      const weaponResId = weaponResourcesEquip[0]; // This resource is assigned to weapon first weapon
 
-      await soldierEquip
-        .connect(soldierOwner)
-        .equip(soldiersIds[0], soldierResId, partIdForWeapon, childIndex, weaponResId);
-
-      await unequipWeaponAndCheckFromAddress(soldierOwner);
+      await unequipWeaponAndCheckFromAddress(soldierOwner, soldierOwner);
       await weapon.connect(soldierOwner).unnestSelf(weaponsIds[0], 0);
     });
 
@@ -657,7 +632,16 @@ async function shouldBehaveLikeEquippableWithSlots(
     expect(await weaponEquip.isEquipped(weaponsIds[0])).to.eql(true);
   }
 
-  async function unequipWeaponAndCheckFromAddress(from: SignerWithAddress): Promise<void> {
+  async function unequipWeaponAndCheckFromAddress(
+    soldierOwner: SignerWithAddress,
+    from: SignerWithAddress,
+  ): Promise<void> {
+    const childIndex = 0;
+    const weaponResId = weaponResourcesEquip[0]; // This resource is assigned to weapon first weapon
+    await soldierEquip
+      .connect(soldierOwner)
+      .equip(soldiersIds[0], soldierResId, partIdForWeapon, childIndex, weaponResId);
+
     await soldierEquip.connect(from).unequip(soldiersIds[0], soldierResId, partIdForWeapon);
 
     const expectedSlots = [bn(partIdForWeapon), bn(partIdForBackground)];
