@@ -2,9 +2,7 @@
 
 pragma solidity ^0.8.0;
 
-
-interface IRMRKMultiResource {
-
+interface IRMRKMultiResourceEventsAndStruct {
     event ResourceSet(uint64 resourceId);
 
     event ResourceAddedToToken(uint256 indexed tokenId, uint64 resourceId);
@@ -31,7 +29,9 @@ interface IRMRKMultiResource {
         uint64 id; //8 bytes
         string metadataURI; //32+
     }
-    
+}
+
+interface IRMRKMultiResource is IRMRKMultiResourceEventsAndStruct {
     function acceptResource(uint256 tokenId, uint256 index) external;
 
     function rejectResource(uint256 tokenId, uint256 index) external;
