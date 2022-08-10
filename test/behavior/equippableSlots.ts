@@ -391,14 +391,11 @@ async function shouldBehaveLikeEquippableWithSlots(
 
     it('cannot unequip if not owner', async function () {
       // Weapon is child on index 0, background on index 1
-      const childIndex = 0;
-      const weaponResId = weaponResourcesEquip[0]; // This resource is assigned to weapon first weapon
-      await soldierEquip
-        .connect(addrs[0])
-        .equip(soldiersIds[0], soldierResId, partIdForWeapon, childIndex, weaponResId);
+      const soldierOwner = addrs[0];
+      const notOwner = addrs[1];
 
       await expect(
-        soldierEquip.connect(addrs[1]).unequip(soldiersIds[0], soldierResId, partIdForWeapon),
+        unequipWeaponAndCheckFromAddress(soldierOwner, notOwner),
       ).to.be.revertedWithCustomError(soldierEquip, 'ERC721NotApprovedOrOwner');
     });
   });
