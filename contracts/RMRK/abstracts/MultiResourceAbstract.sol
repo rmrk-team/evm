@@ -27,7 +27,7 @@ abstract contract MultiResourceAbstract is Context, IRMRKMultiResource {
     using RMRKLib for uint64[];
 
     //mapping of uint64 Ids to resource object
-    mapping(uint64 => Resource) internal _resources;
+    mapping(uint64 => string) internal _resources;
     using RMRKLib for uint128[];
     
     //mapping of tokenId to new resource, to resource to be replaced
@@ -64,9 +64,13 @@ abstract contract MultiResourceAbstract is Context, IRMRKMultiResource {
         uint64 resourceId
     ) public view virtual returns (Resource memory)
     {
-        Resource memory resource = _resources[resourceId];
-        if(resource.id == uint64(0))
+        string memory resourceData = _resources[resourceId];
+        if(bytes(resourceData).length == 0)
             revert RMRKNoResourceMatchingId();
+        Resource memory resource = Resource({
+            id: resourceId,
+            metadataURI: resourceData
+        });
         return resource;
     }
 
@@ -156,15 +160,11 @@ abstract contract MultiResourceAbstract is Context, IRMRKMultiResource {
     ) internal {
         if(id == uint64(0))
             revert RMRKWriteToZero();
-        if(_resources[id].id != uint64(0))
+        if(bytes(_resources[id]).length > 0)
             revert RMRKResourceAlreadyExists();
-
-        Resource memory resource = Resource({
-            id: id,
-            metadataURI: metadataURI
-        });
-        _resources[id] = resource;
+        _resources[id] = metadataURI;
         _allResources.push(id);
+
 
         emit ResourceSet(id);
     }

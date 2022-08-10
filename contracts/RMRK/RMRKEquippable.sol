@@ -446,9 +446,7 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
         uint64 resourceId
     ) public view virtual returns (ExtendedResource memory)
     {
-        Resource memory resource = _resources[resourceId];
-        if(resource.id == uint64(0))
-            revert RMRKNoResourceMatchingId();
+        Resource memory resource = getResource(resourceId);
 
         return ExtendedResource({
             id: resource.id,
