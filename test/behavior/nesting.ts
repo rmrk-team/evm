@@ -719,6 +719,14 @@ async function shouldBehaveLikeNesting(
       await checkForgetPendingChildFromCaller(operator, pendingChildId);
     });
 
+    it('cannot forget pending child if not approved or owner', async function () {
+      const notOwner = addrs[3];
+      const pendingChildId = await nestMint(child, parent.address, parentId);
+      await expect(
+        checkForgetPendingChildFromCaller(notOwner, pendingChildId),
+      ).to.be.revertedWithCustomError(parent, 'RMRKNotApprovedOrOwnerOrChild');
+    });
+
     async function checkChildMovedToRootOwner() {
       expect(await child.ownerOf(childId)).to.eql(tokenOwner.address);
       expect(await child.rmrkOwnerOf(childId)).to.eql([
