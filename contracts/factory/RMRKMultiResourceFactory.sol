@@ -1,15 +1,18 @@
 // SPDX-License-Identifier: Apache-2.0
 
-pragma solidity ^0.8.15;
+pragma solidity ^0.8.16;
 
 import "../implementations/RMRKMultiResourceImpl.sol";
 
 contract RMRKMultiResourceFactory {
 
-    address[] public multiResourceNftCollections;
+    address[] public multiResourceCollections;
 
     event NewRMRKMultiResourceContract(address indexed multiResourceContract, address indexed deployer);
 
+    function getCollections() external view returns (address[] memory) {
+        return multiResourceCollections;
+    }
 
     function deployRMRKMultiResource(
         string memory name,
@@ -18,7 +21,7 @@ contract RMRKMultiResourceFactory {
         uint256 pricePerMint //in WEI
     ) public {
         RMRKMultiResourceImpl multiResourceContract = new RMRKMultiResourceImpl(name, symbol, maxSupply, pricePerMint);
-        multiResourceNftCollections.push(address(multiResourceContract));
+        multiResourceCollections.push(address(multiResourceContract));
         multiResourceContract.transferOwnership(msg.sender);
         emit NewRMRKMultiResourceContract(address(multiResourceContract), msg.sender);
     }

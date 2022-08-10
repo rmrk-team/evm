@@ -23,7 +23,7 @@ async function main() {
 
   const tx = await rmrkFactory.deployRMRKMultiResource('Test Collection', 'TEST', 10000, 0);
   await tx.wait(10);
-  const multiResourceCollection = await rmrkFactory.multiResourceNftCollections(0);
+  const multiResourceCollection = await rmrkFactory.multiResourceCollections(0);
 
   console.log('RMRK MR Factory deployed to:', rmrkFactory.address);
   console.log('RMRK MR Collection deployed to:', multiResourceCollection);

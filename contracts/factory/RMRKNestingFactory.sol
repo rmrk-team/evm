@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
-pragma solidity ^0.8.15;
+pragma solidity ^0.8.16;
 
 import "../implementations/RMRKNestingMultiResourceImpl.sol";
 
@@ -9,6 +9,10 @@ contract RMRKNestingFactory {
     address[] public nestingCollections;
 
     event NewRMRKNestingContract(address indexed nestingContract, address indexed deployer);
+
+    function getCollections() external view returns (address[] memory) {
+        return nestingCollections;
+    }
 
     function deployRMRKNesting(
         string memory name,
