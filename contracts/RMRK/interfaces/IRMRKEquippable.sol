@@ -31,4 +31,10 @@ interface IRMRKEquippable is IRMRKMultiResource {
         uint64 resourceId,
         uint64 slotId
     ) external view returns (bool);
+
+    function forgetEquipment(
+        uint256 tokenId,
+        uint64 resourceId,
+        uint64 slotId
+    ) external;
 }

@@ -400,6 +400,51 @@ async function shouldBehaveLikeEquippableWithSlots(
     });
   });
 
+  describe('Forget equip', async function () {
+    it('can forget equip', async function () {
+      // Weapon is child on index 0, background on index 1
+      const soldierOwner = addrs[0];
+      await forgetWeaponAndCheckFromAddress(soldierOwner, soldierOwner);
+    });
+
+    it('can forget equip if approved', async function () {
+      // Weapon is child on index 0, background on index 1
+      const soldierOwner = addrs[0];
+      const approved = addrs[1];
+
+      await soldier.connect(soldierOwner).approve(approved.address, soldiersIds[0]);
+      await forgetWeaponAndCheckFromAddress(soldierOwner, approved);
+    });
+
+    it('can forget equip if approved for all', async function () {
+      // Weapon is child on index 0, background on index 1
+      const soldierOwner = addrs[0];
+      const approved = addrs[1];
+
+      await soldier.connect(soldierOwner).setApprovalForAll(approved.address, true);
+      await forgetWeaponAndCheckFromAddress(soldierOwner, approved);
+    });
+
+    it('can forget equip if not equipped', async function () {
+      const soldierOwner = addrs[0];
+
+      await expect(
+        soldierEquip
+          .connect(soldierOwner)
+          .forgetEquipment(soldiersIds[0], soldierResId, partIdForWeapon),
+      ).to.be.not.reverted;
+    });
+
+    it('cannot forget equip if not owner', async function () {
+      const soldierOwner = addrs[0];
+      const notOwner = addrs[1];
+
+      await expect(
+        forgetWeaponAndCheckFromAddress(soldierOwner, notOwner),
+      ).to.be.revertedWithCustomError(soldierEquip, 'ERC721NotApprovedOrOwner');
+    });
+  });
+
   describe('Replace equip', async function () {
     it('can replace equip', async function () {
       // Weapon is child on index 0, background on index 1
@@ -654,6 +699,33 @@ async function shouldBehaveLikeEquippableWithSlots(
 
     // Child is marked as not equipped:
     expect(await weaponEquip.isEquipped(weaponsIds[0])).to.eql(false);
+  }
+
+  async function forgetWeaponAndCheckFromAddress(
+    soldierOwner: SignerWithAddress,
+    from: SignerWithAddress,
+  ): Promise<void> {
+    const childIndex = 0;
+    const weaponResId = weaponResourcesEquip[0]; // This resource is assigned to weapon first weapon
+    await soldierEquip
+      .connect(soldierOwner)
+      .equip(soldiersIds[0], soldierResId, partIdForWeapon, childIndex, weaponResId);
+
+    await soldierEquip.connect(from).forgetEquipment(soldiersIds[0], soldierResId, partIdForWeapon);
+
+    const expectedSlots = [bn(partIdForWeapon), bn(partIdForBackground)];
+    // If a slot has nothing equipped, it returns an empty equip:
+    const expectedEquips = [
+      [bn(0), bn(0), bn(0), ethers.constants.AddressZero],
+      [bn(0), bn(0), bn(0), ethers.constants.AddressZero],
+    ];
+    expect(await soldierEquip.getEquipped(soldiersIds[0], soldierResId)).to.eql([
+      expectedSlots,
+      expectedEquips,
+    ]);
+
+    // Child is still marked as equipped:
+    expect(await weaponEquip.isEquipped(weaponsIds[0])).to.eql(true);
   }
 
   async function replaceWeaponAndCheckFromAddress(from: SignerWithAddress): Promise<void> {

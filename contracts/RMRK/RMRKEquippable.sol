@@ -278,6 +278,16 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
         }
     }
 
+    function forgetEquipment(
+        uint256 tokenId,
+        uint64 resourceId,
+        uint64 slotId
+    ) external onlyOwnerOrApproved(tokenId) {
+        address targetBaseAddress = _baseAddresses[resourceId];
+        delete _equipments[tokenId][targetBaseAddress][slotId];
+        // FIXME: Shall it emit an event?
+    }
+
     //Gate for equippable array in here by check of slotPartDefinition to slotPartId
     function composeEquippables(
         uint tokenId,
