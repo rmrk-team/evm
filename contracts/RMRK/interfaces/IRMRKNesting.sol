@@ -15,6 +15,11 @@ interface IRMRKNesting {
     event ChildRemoved(uint tokenId, uint index);
     event ChildUnnested(uint tokenId, uint index);
 
+    struct RMRKOwner {
+        uint256 tokenId;
+        address ownerAddress;
+        bool isNft;
+    }
 
     struct Child {
         uint256 tokenId;

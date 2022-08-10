@@ -34,12 +34,6 @@ contract RMRKNesting is ERC721, IRMRKNesting {
     using Address for address;
     using Strings for uint256;
 
-    struct RMRKOwner {
-        uint256 tokenId;
-        address ownerAddress;
-        bool isNft;
-    }
-
     // Mapping from token ID to RMRKOwner struct
     mapping(uint256 => RMRKOwner) internal _RMRKOwners;
 
