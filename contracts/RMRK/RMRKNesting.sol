@@ -27,6 +27,7 @@ error RMRKUnnestChildIdMismatch();
 error RMRKUnnestForNonexistentToken();
 error RMRKUnnestForNonNftParent();
 error RMRKUnnestFromWrongChild();
+error RMRKNotApprovedOrOwnerOrChild();
 
 contract RMRKNesting is ERC721, IRMRKNesting {
 
@@ -161,7 +162,11 @@ contract RMRKNesting is ERC721, IRMRKNesting {
     //update for reentrancy
     function _burn(uint256 tokenId) internal override virtual {
         address owner = ownerOf(tokenId);
+        (address rmrkOwner, uint parentId, bool parentIsNft) = rmrkOwnerOf(tokenId);
         _burnForOwner(tokenId, owner);
+        if (parentIsNft) {
+            IRMRKNesting(rmrkOwner).forgetChild(parentId, address(this), tokenId);
+        }
     }
 
     //update for reentrancy
@@ -386,6 +391,7 @@ contract RMRKNesting is ERC721, IRMRKNesting {
     }
 
     //Child-scoped interaction
+    // FIXME: Should emit event
     function _unnestSelf(uint256 tokenId, uint256 indexOnParent) internal virtual {
       // A malicious contract which is parent to this token, could unnest any children
         RMRKOwner memory owner = _RMRKOwners[tokenId];
@@ -421,6 +427,58 @@ contract RMRKNesting is ERC721, IRMRKNesting {
 
     function _addChildToChildren(uint256 tokenId, Child memory child) internal {
         _children[tokenId].push(child);
+    }
+
+    /**
+    @dev Removes reference to a child, either pending ar accepted.
+        The caller must be owner or approved, or the very contract of the child to forget.
+    */
+    function forgetChild(
+        uint256 tokenId,
+        address childAddress,
+        uint256 childId
+    ) external virtual {
+        if (
+            !_isApprovedOrOwner(_msgSender(), tokenId)
+            && _msgSender() != childAddress
+        )
+            revert RMRKNotApprovedOrOwnerOrChild();
+
+        bool childFound;
+        Child[] memory children = _children[tokenId];
+        uint256 length = children.length;
+        for (uint i; i<length;) {
+            if (
+                children[i].contractAddress == childAddress
+                && children[i].tokenId == childId
+            ) {
+                removeItemByIndex_C(_children[tokenId], i);
+                childFound = true;
+                break;
+            }
+            unchecked {++i;}
+        }
+
+        if (childFound) {
+            return;
+        }
+
+        Child[] memory pendingChildren = _pendingChildren[tokenId];
+        length = pendingChildren.length;
+        for (uint i; i<length;) {
+            if (
+                pendingChildren[i].contractAddress == childAddress
+                && pendingChildren[i].tokenId == childId
+            ) {
+                removeItemByIndex_C(_pendingChildren[tokenId], i);
+                childFound = true;
+                break;
+            }
+            unchecked {++i;}
+        }
+
+        // FIXME: Shall we emit an event? Kind of:
+        // if childFound: emit ChildForgotten
     }
 
     ////////////////////////////////////////

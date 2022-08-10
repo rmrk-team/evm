@@ -231,7 +231,7 @@ async function shouldBehaveLikeNesting(
     });
 
     it('can support INesting', async function () {
-      expect(await parent.supportsInterface('0x71c8af03')).to.equal(true);
+      expect(await parent.supportsInterface('0x9ea61c21')).to.equal(true);
     });
 
     it('cannot support other interfaceId', async function () {
@@ -485,14 +485,31 @@ async function shouldBehaveLikeNesting(
       await checkBurntParent();
     });
 
-    it('can burn nested token', async function () {
+    it('can burn accepted nested token and it is removed from the parent', async function () {
       const childId = nestMint(child, parent.address, parentId);
       await parent.connect(tokenOwner).acceptChild(parentId, 0);
       await child.connect(tokenOwner).burn(childId);
 
       // Removed from the parent
-      // FIXME: This is broken, it's not being removed from parent
-      // expect(await parent.childrenOf(parentId)).to.eql([]);
+      expect(await parent.childrenOf(parentId)).to.eql([]);
+
+      // No owner for token
+      await expect(child.ownerOf(childId)).to.be.revertedWithCustomError(
+        child,
+        'ERC721InvalidTokenId',
+      );
+      await expect(child.rmrkOwnerOf(childId)).to.be.revertedWithCustomError(
+        child,
+        'ERC721InvalidTokenId',
+      );
+    });
+
+    it('can burn pending nested token and it is removed from the parent', async function () {
+      const childId = nestMint(child, parent.address, parentId);
+      await child.connect(tokenOwner).burn(childId);
+
+      // Removed from the parent
+      expect(await parent.pendingChildrenOf(parentId)).to.eql([]);
 
       // No owner for token
       await expect(child.ownerOf(childId)).to.be.revertedWithCustomError(
@@ -667,6 +684,41 @@ async function shouldBehaveLikeNesting(
       ).to.be.revertedWithCustomError(child, 'RMRKUnnestForNonNftParent');
     });
 
+    it('can forget accepted child if calling if owner', async function () {
+      await checkForgetAcceptedChildFromCaller(tokenOwner);
+    });
+
+    it('can forget pending child if calling if owner', async function () {
+      const pendingChildId = await nestMint(child, parent.address, parentId);
+      await checkForgetPendingChildFromCaller(tokenOwner, pendingChildId);
+    });
+
+    it('can forget accepted child if calling if approved', async function () {
+      const approved = addrs[1];
+      await parent.connect(tokenOwner).approve(approved.address, parentId);
+      await checkForgetAcceptedChildFromCaller(approved);
+    });
+
+    it('can forget pending child if calling if approved', async function () {
+      const approved = addrs[1];
+      await parent.connect(tokenOwner).approve(approved.address, parentId);
+      const pendingChildId = await nestMint(child, parent.address, parentId);
+      await checkForgetPendingChildFromCaller(approved, pendingChildId);
+    });
+
+    it('can forget accepted child if calling if approved for all', async function () {
+      const operator = addrs[2];
+      await parent.connect(tokenOwner).setApprovalForAll(operator.address, true);
+      await checkForgetAcceptedChildFromCaller(operator);
+    });
+
+    it('can forget pending child if calling if approved for all', async function () {
+      const operator = addrs[2];
+      await parent.connect(tokenOwner).setApprovalForAll(operator.address, true);
+      const pendingChildId = await nestMint(child, parent.address, parentId);
+      await checkForgetPendingChildFromCaller(operator, pendingChildId);
+    });
+
     async function checkChildMovedToRootOwner() {
       expect(await child.ownerOf(childId)).to.eql(tokenOwner.address);
       expect(await child.rmrkOwnerOf(childId)).to.eql([
@@ -678,6 +730,40 @@ async function shouldBehaveLikeNesting(
       // Unnesting must not affect balances:
       expect(await child.balanceOf(tokenOwner.address)).to.equal(1);
       expect(await parent.balanceOf(tokenOwner.address)).to.equal(1);
+    }
+
+    async function checkForgetAcceptedChildFromCaller(caller: SignerWithAddress) {
+      await parent.connect(caller).forgetChild(parentId, child.address, childId);
+      await checkNoChildrenNorPending(parentId);
+
+      // Child still considers initial parent as parent (this is expected)
+      expect(await child.ownerOf(childId)).to.eql(tokenOwner.address);
+      expect(await child.rmrkOwnerOf(childId)).to.eql([
+        parent.address,
+        BigNumber.from(parentId),
+        true,
+      ]);
+    }
+
+    async function checkForgetPendingChildFromCaller(
+      caller: SignerWithAddress,
+      pendingChildId: number,
+    ) {
+      await parent.connect(caller).forgetChild(parentId, child.address, pendingChildId);
+
+      // There was already an accepted child
+      const acceptedChildren = [[BigNumber.from(childId), child.address]];
+      // Pending must be empty now
+      const pendingChildren: any[] = [];
+      await checkAcceptedAndPendingChildren(parent, parentId, acceptedChildren, pendingChildren);
+
+      // Child still considers initial parent as parent (this is expected)
+      expect(await child.ownerOf(pendingChildId)).to.eql(tokenOwner.address);
+      expect(await child.rmrkOwnerOf(pendingChildId)).to.eql([
+        parent.address,
+        BigNumber.from(parentId),
+        true,
+      ]);
     }
   });
 
