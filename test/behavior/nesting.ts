@@ -251,17 +251,6 @@ async function shouldBehaveLikeNesting(
         'RMRKParentChildMismatch',
       );
     });
-
-    it('can add child to existing NFT', async function () {
-      const tokenOwner = addrs[0];
-      const parentId = await mint(parent, tokenOwner.address);
-      const childId = await mint(child, tokenOwner.address);
-
-      await expect(parent.addChild(parentId, childId, child.address)).to.emit(
-        parent,
-        'ChildProposed',
-      );
-    });
   });
 
   describe('Accept child', async function () {
