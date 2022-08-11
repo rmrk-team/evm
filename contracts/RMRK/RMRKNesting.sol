@@ -28,6 +28,7 @@ error RMRKUnnestForNonexistentToken();
 error RMRKUnnestForNonNftParent();
 error RMRKUnnestFromWrongChild();
 error RMRKNotApprovedOrOwnerOrChild();
+error RMRKChildIsNotOrphan();
 
 contract RMRKNesting is ERC721, IRMRKNesting {
 
@@ -393,9 +394,23 @@ contract RMRKNesting is ERC721, IRMRKNesting {
     //Child-scoped interaction
     // FIXME: Should emit event
     function _unnestSelf(uint256 tokenId, uint256 indexOnParent) internal virtual {
-      // A malicious contract which is parent to this token, could unnest any children
         RMRKOwner memory owner = _RMRKOwners[tokenId];
+        _transferToRootOwner(tokenId, owner);
+        IRMRKNesting(owner.ownerAddress).unnestChild(owner.tokenId, tokenId, indexOnParent);
+    }
 
+    function _unnestOrphanSelf(uint256 tokenId) internal virtual {
+        RMRKOwner memory owner = _RMRKOwners[tokenId];
+        (bool parentConsidersMeChild, , ) = IRMRKNesting(owner.ownerAddress).hasChild(
+            owner.tokenId, address(this), tokenId
+        );
+        if(parentConsidersMeChild)
+            revert RMRKChildIsNotOrphan();
+
+        _transferToRootOwner(tokenId, owner);
+    }
+
+    function _transferToRootOwner(uint256 tokenId, RMRKOwner memory owner) internal virtual {
         if(owner.ownerAddress == address(0))
             revert RMRKUnnestForNonexistentToken();
         if(!owner.isNft)
@@ -407,7 +422,6 @@ contract RMRKNesting is ERC721, IRMRKNesting {
             tokenId: 0,
             isNft: false
         });
-        IRMRKNesting(owner.ownerAddress).unnestChild(owner.tokenId, tokenId, indexOnParent);
     }
 
     /**
@@ -444,7 +458,23 @@ contract RMRKNesting is ERC721, IRMRKNesting {
         )
             revert RMRKNotApprovedOrOwnerOrChild();
 
-        bool childFound;
+        (bool found, bool accepted, uint index) = hasChild(tokenId, childAddress, childId);
+        if(found) {
+            if (accepted)
+                removeItemByIndex_C(_children[tokenId], index);
+            else
+                removeItemByIndex_C(_pendingChildren[tokenId], index);
+        }
+
+        // FIXME: Shall we emit an event? Kind of:
+        // if childFound: emit ChildForgotten
+    }
+
+    function hasChild(
+        uint256 tokenId,
+        address childAddress,
+        uint256 childId
+    ) public virtual view returns(bool found, bool accepted, uint index) {
         Child[] memory children = _children[tokenId];
         uint256 length = children.length;
         for (uint i; i<length;) {
@@ -452,33 +482,30 @@ contract RMRKNesting is ERC721, IRMRKNesting {
                 children[i].contractAddress == childAddress
                 && children[i].tokenId == childId
             ) {
-                removeItemByIndex_C(_children[tokenId], i);
-                childFound = true;
+                found = true;
+                accepted = true;
+                index = i;
                 break;
             }
             unchecked {++i;}
         }
 
-        if (childFound) {
-            return;
-        }
-
-        Child[] memory pendingChildren = _pendingChildren[tokenId];
-        length = pendingChildren.length;
-        for (uint i; i<length;) {
-            if (
-                pendingChildren[i].contractAddress == childAddress
-                && pendingChildren[i].tokenId == childId
-            ) {
-                removeItemByIndex_C(_pendingChildren[tokenId], i);
-                childFound = true;
-                break;
+        if (!found) {
+            Child[] memory pendingChildren = _pendingChildren[tokenId];
+            length = pendingChildren.length;
+            for (uint i; i<length;) {
+                if (
+                    pendingChildren[i].contractAddress == childAddress
+                    && pendingChildren[i].tokenId == childId
+                ) {
+                    found = true;
+                    // accepted = false; // It's already false
+                    index = i;
+                    break;
+                }
+                unchecked {++i;}
             }
-            unchecked {++i;}
         }
-
-        // FIXME: Shall we emit an event? Kind of:
-        // if childFound: emit ChildForgotten
     }
 
     ////////////////////////////////////////
@@ -525,8 +552,12 @@ contract RMRKNesting is ERC721, IRMRKNesting {
         _unnestChild(tokenId, index);
     }
 
-    function unnestSelf(uint256 tokenId, uint256 indexOnParent) public virtual onlyApprovedOrOwner(tokenId) {
+    function unnestSelf(uint256 tokenId, uint256 indexOnParent) external virtual onlyApprovedOrOwner(tokenId) {
         _unnestSelf(tokenId, indexOnParent);
+    }
+
+    function unnestOrphanSelf(uint256 tokenId) external virtual onlyApprovedOrOwner(tokenId) {
+        _unnestOrphanSelf(tokenId);
     }
 
 

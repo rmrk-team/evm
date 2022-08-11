@@ -231,7 +231,7 @@ async function shouldBehaveLikeNesting(
     });
 
     it('can support INesting', async function () {
-      expect(await parent.supportsInterface('0x9ea61c21')).to.equal(true);
+      expect(await parent.supportsInterface('0x1ceccc29')).to.equal(true);
     });
 
     it('cannot support other interfaceId', async function () {
@@ -684,6 +684,30 @@ async function shouldBehaveLikeNesting(
       ).to.be.revertedWithCustomError(child, 'RMRKUnnestForNonNftParent');
     });
 
+    async function checkChildMovedToRootOwner() {
+      expect(await child.ownerOf(childId)).to.eql(tokenOwner.address);
+      expect(await child.rmrkOwnerOf(childId)).to.eql([
+        tokenOwner.address,
+        BigNumber.from(0),
+        false,
+      ]);
+
+      // Unnesting must not affect balances:
+      expect(await child.balanceOf(tokenOwner.address)).to.equal(1);
+      expect(await parent.balanceOf(tokenOwner.address)).to.equal(1);
+    }
+  });
+
+  describe('Forgetting Child', async function () {
+    let parentId: number;
+    let childId: number;
+
+    beforeEach(async function () {
+      parentId = await mint(parent, tokenOwner.address);
+      childId = await nestMint(child, parent.address, parentId);
+      await parent.connect(tokenOwner).acceptChild(parentId, 0);
+    });
+
     it('can forget accepted child if calling if owner', async function () {
       await checkForgetAcceptedChildFromCaller(tokenOwner);
     });
@@ -727,19 +751,6 @@ async function shouldBehaveLikeNesting(
       ).to.be.revertedWithCustomError(parent, 'RMRKNotApprovedOrOwnerOrChild');
     });
 
-    async function checkChildMovedToRootOwner() {
-      expect(await child.ownerOf(childId)).to.eql(tokenOwner.address);
-      expect(await child.rmrkOwnerOf(childId)).to.eql([
-        tokenOwner.address,
-        BigNumber.from(0),
-        false,
-      ]);
-
-      // Unnesting must not affect balances:
-      expect(await child.balanceOf(tokenOwner.address)).to.equal(1);
-      expect(await parent.balanceOf(tokenOwner.address)).to.equal(1);
-    }
-
     async function checkForgetAcceptedChildFromCaller(caller: SignerWithAddress) {
       await parent.connect(caller).forgetChild(parentId, child.address, childId);
       await checkNoChildrenNorPending(parentId);
@@ -771,6 +782,70 @@ async function shouldBehaveLikeNesting(
         parent.address,
         BigNumber.from(parentId),
         true,
+      ]);
+    }
+  });
+
+  describe('Unnesting Orphan Child', async function () {
+    let parentId: number;
+    let childId: number;
+
+    beforeEach(async function () {
+      parentId = await mint(parent, tokenOwner.address);
+      childId = await nestMint(child, parent.address, parentId);
+    });
+
+    it('cannot unnest orphan if parent considers it child', async function () {
+      await parent.connect(tokenOwner).acceptChild(parentId, 0);
+      await expect(
+        child.connect(tokenOwner).unnestOrphanSelf(childId),
+      ).to.be.revertedWithCustomError(child, 'RMRKChildIsNotOrphan');
+    });
+
+    it('can unnest orphan if parent rejected it', async function () {
+      // Reject pending child so it becomes orphan
+      await parent.connect(tokenOwner).rejectChild(parentId, 0);
+      await unnestOrphanAndCheckOwnerFromAddress(tokenOwner);
+    });
+
+    it('can unnest orphan if parent forgot it', async function () {
+      // It can also become orphan if parent decides to forget/abandon it
+      await parent.connect(tokenOwner).forgetChild(parentId, child.address, childId);
+      await unnestOrphanAndCheckOwnerFromAddress(tokenOwner);
+    });
+
+    it('can unnest orphan if parent if approved', async function () {
+      const approved = addrs[1];
+      // Reject pending child so it becomes orphan
+      await parent.connect(tokenOwner).rejectChild(parentId, 0);
+      await child.connect(tokenOwner).approve(approved.address, childId);
+      await unnestOrphanAndCheckOwnerFromAddress(approved);
+    });
+
+    it('can unnest orphan if parent if approved for all', async function () {
+      const operator = addrs[2];
+      // Reject pending child so it becomes orphan
+      await parent.connect(tokenOwner).rejectChild(parentId, 0);
+      await child.connect(tokenOwner).setApprovalForAll(operator.address, true);
+      await unnestOrphanAndCheckOwnerFromAddress(operator);
+    });
+
+    it('cannot unnest orphan if not owner or approved', async function () {
+      const notApproved = addrs[3];
+      // Reject pending child so it becomes orphan
+      await parent.connect(tokenOwner).rejectChild(parentId, 0);
+      await expect(
+        child.connect(notApproved).unnestOrphanSelf(childId),
+      ).to.be.revertedWithCustomError(child, 'ERC721NotApprovedOrOwner');
+    });
+
+    async function unnestOrphanAndCheckOwnerFromAddress(caller: SignerWithAddress) {
+      await child.connect(caller).unnestOrphanSelf(childId);
+      expect(await child.ownerOf(childId)).to.eql(tokenOwner.address);
+      expect(await child.rmrkOwnerOf(childId)).to.eql([
+        tokenOwner.address,
+        BigNumber.from(0),
+        false,
       ]);
     }
   });

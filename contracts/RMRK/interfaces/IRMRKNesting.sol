@@ -60,6 +60,12 @@ interface IRMRKNesting {
         uint256 childId
     ) external;
 
+    function hasChild(
+        uint256 tokenId,
+        address childAddress,
+        uint256 childId
+    ) external view returns(bool found, bool accepted, uint index);
+
     function unnestChild(
         uint256 tokenId,
         uint256 childId,
@@ -69,6 +75,10 @@ interface IRMRKNesting {
     function unnestSelf(
         uint256 tokenId,
         uint256 indexOnParent
+    ) external;
+
+    function unnestOrphanSelf(
+        uint256 tokenId
     ) external;
 
     function childrenOf(
