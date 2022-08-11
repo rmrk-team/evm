@@ -576,6 +576,9 @@ async function shouldBehaveLikeNesting(
         parent,
         'ERC721InvalidTokenId',
       );
+
+      // Grand parent forgot the burnt child:
+      expect(await parent.childrenOf(parentId)).to.eql([]);
     });
 
     async function checkBurntParent() {
