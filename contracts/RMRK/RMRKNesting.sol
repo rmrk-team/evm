@@ -46,6 +46,9 @@ contract RMRKNesting is ERC721, IRMRKNesting {
     // Mapping of tokenId to array of active children structs
     mapping(uint256 => Child[]) internal _children;
 
+    // Mapping of tokenId to 
+    // mapping(uint256 => mapping())
+
     // Mapping of tokenId to array of pending children structs
     mapping(uint256 => Child[]) internal _pendingChildren;
 
@@ -249,7 +252,7 @@ contract RMRKNesting is ERC721, IRMRKNesting {
         bytes memory data
     ) internal virtual {
         _transfer(from, to, tokenId);
-        if(!_checkRMRKNestingImplementer(from, to, tokenId, data))
+        if (!_checkRMRKNestingImplementer(from, to, tokenId, data))
             revert RMRKNestingTransferToNonRMRKNestingImplementer();
     }
 
@@ -258,10 +261,9 @@ contract RMRKNesting is ERC721, IRMRKNesting {
         address to,
         uint256 tokenId
     ) internal override virtual {
-        if(ownerOf(tokenId) != from)
-            revert ERC721TransferFromIncorrectOwner();
-        if(to == address(0)) revert ERC721TransferToTheZeroAddress();
-        if(_RMRKOwners[tokenId].isNft) revert RMRKMustUnnestFirst();
+        (address immediateOwner,,) = rmrkOwnerOf(tokenId);
+        if (immediateOwner != from) revert ERC721TransferFromIncorrectOwner();
+        if (to == address(0)) revert ERC721TransferToTheZeroAddress();
 
         _beforeTokenTransfer(from, to, tokenId);
 
@@ -284,7 +286,6 @@ contract RMRKNesting is ERC721, IRMRKNesting {
     *
     * Emits a {Transfer} event.
     */
-    //Convert string to bytes in calldata for gas saving
     //Double check to make sure nested transfers update balanceOf correctly. Maybe add condition if rootOwner does not change for gas savings.
     //All children of transferred NFT should also have owner updated.
     function _transfer(
@@ -293,8 +294,8 @@ contract RMRKNesting is ERC721, IRMRKNesting {
         uint256 tokenId,
         uint256 destinationId
     ) internal virtual {
-        if(ownerOf(tokenId) != from)
-            revert ERC721TransferFromIncorrectOwner();
+        (address immediateOwner,,) = rmrkOwnerOf(tokenId);
+        if (immediateOwner != from) revert ERC721TransferFromIncorrectOwner();
         if(_RMRKOwners[tokenId].isNft) revert RMRKMustUnnestFirst();
         if(to == address(0)) revert ERC721TransferToTheZeroAddress();
         // Destination contract checks:
@@ -330,82 +331,13 @@ contract RMRKNesting is ERC721, IRMRKNesting {
     //      CHILD MANAGEMENT INTERNAL
     ////////////////////////////////////////
 
-    /**
-    @dev Sends an instance of Child from the pending children array at index to children array for tokenId.
-    * Updates _emptyIndexes of tokenId to preserve ordering.
-    */
-
-    // TODO low prio: preload mappings into memory for gas savings
-    function acceptChild(uint256 tokenId, uint256 index) public virtual onlyApprovedOrOwner(tokenId) {
-        if(_pendingChildren[tokenId].length <= index)
-            revert RMRKPendingChildIndexOutOfRange();
-
-        Child memory child_ = _pendingChildren[tokenId][index];
-
-        removeItemByIndex_C(_pendingChildren[tokenId], index);
-
-        _addChildToChildren(tokenId, child_);
-        emit ChildAccepted(tokenId);
-    }
-
-    /**
-    @dev Deletes all pending children.
-    */
-    function rejectAllChildren(uint256 tokenId) public virtual onlyApprovedOrOwner(tokenId) {
-        delete(_pendingChildren[tokenId]);
-        emit AllPendingChildrenRemoved(tokenId);
-    }
-
-    /**
-    @dev Deletes a single child from the pending array by index.
-    */
-
-    function rejectChild(uint256 tokenId, uint256 index) public virtual onlyApprovedOrOwner(tokenId) {
-        if(_pendingChildren[tokenId].length <= index)
-            revert RMRKPendingChildIndexOutOfRange();
-
-        removeItemByIndex_C(_pendingChildren[tokenId], index);
-        emit PendingChildRemoved(tokenId, index);
-    }
-
-    /**
-    @dev Deletes a single child from the child array by index.
-    */
-
-    function removeChild(uint256 tokenId, uint256 index) public virtual onlyApprovedOrOwner(tokenId) {
-        if(_children[tokenId].length <= index)
-            revert RMRKChildIndexOutOfRange();
-
-        removeItemByIndex_C(_children[tokenId], index);
-        emit ChildRemoved(tokenId, index);
-    }
-
     function _unnestChild(uint256 tokenId, uint256 index) internal virtual {
         removeItemByIndex_C(_children[tokenId], index);
         emit ChildUnnested(tokenId, index);
     }
 
-    //Child-scoped interaction
-    function _unnestSelf(uint256 tokenId, uint256 indexOnParent) internal virtual {
-      // A malicious contract which is parent to this token, could unnest any children
-        RMRKOwner memory owner = _RMRKOwners[tokenId];
-
-        if(owner.ownerAddress == address(0))
-            revert RMRKUnnestForNonexistentToken();
-        if(!owner.isNft)
-            revert RMRKUnnestForNonNftParent();
-
-        address rootOwner =  IRMRKNesting(owner.ownerAddress).ownerOf(owner.tokenId);
-        _RMRKOwners[tokenId] = RMRKOwner({
-            ownerAddress: rootOwner,
-            tokenId: 0,
-            isNft: false
-        });
-        IRMRKNesting(owner.ownerAddress).unnestChild(owner.tokenId, tokenId, indexOnParent);
-    }
-
     /**
-    @dev Adds an instance of Child to the pending children array for tokenId. This is hardcoded to be 128 by default.
+    * @notice Adds an instance of Child to the pending children array for tokenId. This is hardcoded to be 128 by default.
     */
     function _addChildToPending(uint256 tokenId, Child memory child) internal {
         if(_pendingChildren[tokenId].length < 128) {
@@ -416,7 +348,7 @@ contract RMRKNesting is ERC721, IRMRKNesting {
     }
 
     /**
-    @dev Adds an instance of Child to the children array for tokenId.
+    * @notice Adds an instance of Child to the children array for tokenId.
     */
 
     function _addChildToChildren(uint256 tokenId, Child memory child) internal {
@@ -442,8 +374,7 @@ contract RMRKNesting is ERC721, IRMRKNesting {
     ) public virtual {
         IRMRKNesting childTokenContract = IRMRKNesting(childTokenAddress);
         (address parent, , ) = childTokenContract.rmrkOwnerOf(childTokenId);
-        if(parent != address(this))
-            revert RMRKParentChildMismatch();
+        if (parent != address(this)) revert RMRKParentChildMismatch();
 
         Child memory child = Child({
             contractAddress: childTokenAddress,
@@ -453,22 +384,122 @@ contract RMRKNesting is ERC721, IRMRKNesting {
         emit ChildProposed(parentTokenId);
     }
 
-    //Must be called from the child contract
-    function unnestChild(uint256 tokenId, uint256 childId, uint256 index) public virtual {
+        /**
+    * @notice Sends an instance of Child from the pending children array at index to children array for tokenId.
+    * Updates _emptyIndexes of tokenId to preserve ordering.
+    */
+
+    // TODO low prio: preload mappings into memory for gas savings
+    function acceptChild(uint256 tokenId, uint256 index) public virtual onlyApprovedOrOwner(tokenId) {
+        if(_pendingChildren[tokenId].length <= index)
+            revert RMRKPendingChildIndexOutOfRange();
+
+        Child memory child_ = _pendingChildren[tokenId][index];
+
+        removeItemByIndex_C(_pendingChildren[tokenId], index);
+
+        _addChildToChildren(tokenId, child_);
+        emit ChildAccepted(tokenId);
+    }
+
+    /**
+    * @notice Deletes all pending children.
+    * @dev This does not update the ownership storage data on children. If necessary, ownership
+    * can be reclaimed by the rootOwner of the previous parent (this).
+    */
+    function rejectAllChildren(uint256 tokenId) public virtual onlyApprovedOrOwner(tokenId) {
+        delete(_pendingChildren[tokenId]);
+        emit AllPendingChildrenRemoved(tokenId);
+    }
+
+    /**
+    * @notice Deletes a single child from the pending array by index.
+    * @param tokenId tokenId whose pending child is to be rejected
+    * @param index index on tokenId pending child array to reject
+    * @param to if an address which is not the zero address is passed, this will attempt to transfer
+    * the child to `to` via a call-in to the child address.
+    * @dev If `to` is the zero address, the child's ownership structures will not be updated, resulting in an 
+    * 'orphaned' child. If a call with a populated `to` field fails, call this function with `to` set to the 
+    * zero address to orphan the child. Orphaned children can be reclaimed by a call to reclaimChild on this
+    * contract by the root owner. 
+    */
+
+    function rejectChild(
+        uint256 tokenId, 
+        uint256 index, 
+        address to
+    ) public virtual onlyApprovedOrOwner(tokenId) {
+        if(_pendingChildren[tokenId].length <= index)
+            revert RMRKPendingChildIndexOutOfRange();
+
+        Child memory pendingChild = _pendingChildren[tokenId][index];
+
+        removeItemByIndex_C(_pendingChildren[tokenId], index);
+
+        if (to != address(0)) {
+            IRMRKNesting(pendingChild.contractAddress).transferAsChild(pendingChild.tokenId, to);
+        }
+
+        emit PendingChildRemoved(tokenId, index);
+    }
+
+    /**
+    * @notice Deletes a single child from the child array by index.
+    * @dev This is an emergency-style function used to forcibly remove a child from the active children
+    * array, and should only be called in the event that a child is not removable via `unnestChild`.
+    */
+
+    function removeChild(uint256 tokenId, uint256 index) public virtual onlyApprovedOrOwner(tokenId) {
         if(_children[tokenId].length <= index)
             revert RMRKChildIndexOutOfRange();
 
-        Child memory child = _children[tokenId][index];
-        // This check is to prevent user errors, sending a bad index.
-        if(child.tokenId != childId)
-            revert RMRKUnnestChildIdMismatch();
-        if (child.contractAddress != _msgSender())
-            revert RMRKUnnestFromWrongChild();
-        _unnestChild(tokenId, index);
+        removeItemByIndex_C(_children[tokenId], index);
+        emit ChildRemoved(tokenId, index);
     }
 
-    function unnestSelf(uint256 tokenId, uint256 indexOnParent) public virtual onlyApprovedOrOwner(tokenId) {
-        _unnestSelf(tokenId, indexOnParent);
+    /**
+     * @notice Function to unnest a child from the active token array.
+     * param1 parentTokenId is the tokenId of the parent token on (this).
+     * param2 childTokenId is the tokenId of the child instance
+     * param3 childAddress is the address of the child contract as an IRMRK instance
+     */
+
+    function unnestChild(
+        uint256 tokenId,
+        uint256 index, 
+        address to
+    ) public virtual onlyApprovedOrOwner(tokenId) {
+        if (_children[tokenId].length <= index) revert RMRKChildIndexOutOfRange();
+
+        Child memory child = _children[tokenId][index];
+
+        if (child.contractAddress != _msgSender()) revert RMRKUnnestFromWrongChild();
+
+        _unnestChild(tokenId, index);
+
+        IRMRKNesting(child.contractAddress).transferAsChild(child.tokenId, to);
+    }
+
+    //TODO: Possibly have this delegate to safeTransferTo, bottom entry is too low-level
+    function transferAsChild(
+        uint256 tokenId, 
+        address to
+    ) public virtual {
+        RMRKOwner memory owner = _RMRKOwners[tokenId];
+
+        if(owner.ownerAddress != _msgSender()) revert ("FIXME: IMPLEMENT THIS ERROR");
+        if(owner.ownerAddress == address(0)) revert RMRKUnnestForNonexistentToken();
+
+        _RMRKOwners[tokenId] = RMRKOwner({
+            ownerAddress: to,
+            tokenId: 0,
+            isNft: false
+        });
+    }
+
+    //FIXME implement
+    function recliamChild() public {
+
     }
 
 
