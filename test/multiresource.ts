@@ -4,6 +4,7 @@ import { expect } from 'chai';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { mintTokenId, addResourceToToken } from './utils';
 import shouldBehaveLikeMultiResource from './behavior/multiresource';
+import shouldBehaveLikeERC721 from './behavior/erc721';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 
 const name = 'RmrkTest';
@@ -260,8 +261,7 @@ describe('MultiResourceMock Token URI', async function () {
   });
 });
 
-// FIXME: this is broken
-describe.skip('MultiResourceMock approvals cleaning', async () => {
+describe('MultiResourceMock approvals cleaning', async () => {
   let addrs: SignerWithAddress[];
   let token: Contract;
 
@@ -323,3 +323,21 @@ describe('MultiResourceMock MR behavior', async () => {
 });
 
 // --------------- MULTI RESOURCE BEHAVIOR END ------------------------
+describe('MultiResourceMock ERC721 behavior', function () {
+  let token: Contract;
+
+  const name = 'RmrkTest';
+  const symbol = 'RMRKTST';
+
+  beforeEach(async function () {
+    ({ token } = await loadFixture(deployRmrkMultiResourceMockFixture));
+    this.token = token;
+    this.ERC721Receiver = await ethers.getContractFactory(
+      'ERC721ReceiverMockWithRMRKNestingReceiver',
+    );
+    this.RMRKNestingReceiver = await ethers.getContractFactory('RMRKNestingReceiverMock');
+    this.commonERC721 = await ethers.getContractFactory('ERC721Mock');
+  });
+
+  shouldBehaveLikeERC721(name, symbol);
+});

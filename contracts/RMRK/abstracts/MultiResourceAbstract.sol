@@ -25,10 +25,10 @@ abstract contract MultiResourceAbstract is Context, IRMRKMultiResource {
 
     using Strings for uint256;
     using RMRKLib for uint64[];
+    using RMRKLib for uint128[];
 
     //mapping of uint64 Ids to resource object
     mapping(uint64 => string) internal _resources;
-    using RMRKLib for uint128[];
     
     //mapping of tokenId to new resource, to resource to be replaced
     mapping(uint256 => mapping(uint64 => uint64)) internal _resourceOverwrites;
@@ -330,6 +330,7 @@ abstract contract MultiResourceAbstract is Context, IRMRKMultiResource {
      * @dev Reverts if the `tokenId` has not been minted yet.
      */
     function _requireMinted(uint256 tokenId) internal view virtual {
+        // FIXME: error is not consistent (others use ERC721InvalidTokenId)
         if(!_exists(tokenId))
             revert RMRKInvalidTokenId();
     }

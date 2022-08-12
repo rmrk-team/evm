@@ -2,12 +2,12 @@
 
 pragma solidity ^0.8.15;
 
-import "../RMRK/RMRKMultiResource.sol";
+import "../RMRK/merged/RMRKMultiResourceMerged.sol";
 
-contract RMRKMultiResourceMock is RMRKMultiResource {
+contract RMRKMultiResourceMock is RMRKMultiResourceMerged {
 
     constructor(string memory name, string memory symbol)
-        RMRKMultiResource(name, symbol) {}
+        RMRKMultiResourceMerged(name, symbol) {}
 
     function setFallbackURI(string memory fallbackURI) external {
         _setFallbackURI(fallbackURI);
@@ -22,6 +22,14 @@ contract RMRKMultiResourceMock is RMRKMultiResource {
 
     function mint(address to, uint256 tokenId) external {
         _mint(to, tokenId);
+    }
+
+    function safeMint(address to, uint256 tokenId) external {
+        _safeMint(to, tokenId);
+    }
+
+    function safeMint(address to, uint256 tokenId, bytes memory data) external {
+        _safeMint(to, tokenId, data);
     }
 
     function transfer(address to, uint256 tokenId) external {
