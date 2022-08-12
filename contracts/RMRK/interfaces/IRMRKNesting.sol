@@ -50,18 +50,13 @@ interface IRMRKNesting {
         address to
     ) external;
 
-    function removeChild(
-        uint256 parentTokenId,
-        uint256 index
-    ) external;
-
     function unnestChild(
         uint256 tokenId,
         uint256 index, 
         address to
     ) external;
 
-    //TODO: Deprecate
+    //TODO: Deprecate (see RMRKNesting)
     // function transferAsChild(
     //     uint256 tokenId, 
     //     address to
