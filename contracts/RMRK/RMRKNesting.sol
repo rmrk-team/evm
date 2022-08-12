@@ -46,11 +46,14 @@ contract RMRKNesting is ERC721, IRMRKNesting {
     // Mapping of tokenId to array of active children structs
     mapping(uint256 => Child[]) internal _children;
 
-    // Mapping of tokenId to 
-    // mapping(uint256 => mapping())
+    // Mapping of tokenId to childAddress to child tokenId to child position in children array
+    mapping(uint256 => mapping(address => mapping(uint256 => uint256))) public childPosInArray;
 
     // Mapping of tokenId to array of pending children structs
     mapping(uint256 => Child[]) internal _pendingChildren;
+
+    // Mapping of tokenId to childAddress to child tokenId to child position in children array
+    mapping(uint256 => mapping(address => mapping(uint256 => uint256))) public pendingChildPosInArray;
 
     constructor(string memory name_, string memory symbol_) ERC721(name_, symbol_) {}
 
@@ -70,15 +73,32 @@ contract RMRKNesting is ERC721, IRMRKNesting {
     }
 
     /**
-    @dev Returns the immediate provenance data of the current RMRK NFT. In the event the NFT is owned
-    * by a wallet, tokenId will be zero and isNft will be false. Otherwise, the returned data is the
-    * contract address and tokenID of the owner NFT, as well as its isNft flag.
+    * @notice Returns the immediate provenance data of the current RMRK NFT. 
+    * @dev In the event the NFT is owned by a wallet, tokenId will be zero and isNft will be false. Otherwise, 
+    * the returned data is the contract address and tokenID of the owner NFT, as well as its isNft flag.
     */
     function rmrkOwnerOf(uint256 tokenId) public view virtual returns (address, uint256, bool) {
         RMRKOwner memory owner = _RMRKOwners[tokenId];
         if(owner.ownerAddress == address(0)) revert ERC721InvalidTokenId();
 
         return (owner.ownerAddress, owner.tokenId, owner.isNft);
+    }
+
+    /**
+    * @notice Internal function for checking token ownership relative to immediate parent.
+    * @dev This does not delegate to ownerOf, which returns the root owner. 
+    * Reverts if caller is not immediate owner.
+    * Used for parent-scoped transfers.
+    * @param tokenId tokenId to check owner against.
+    */
+    function _onlyImmediateOwner(uint256 tokenId) private view {
+        (address owner,,) = rmrkOwnerOf(tokenId);
+        if(owner != _msgSender()) revert ("FIXME: IMPLEMENT THIS ERROR");
+    }
+
+    modifier onlyImmediateOwner(uint256 tokenId) {
+        _onlyImmediateOwner(tokenId);
+        _;
     }
 
     function _exists(uint256 tokenId) internal view virtual override returns (bool) {
@@ -215,7 +235,7 @@ contract RMRKNesting is ERC721, IRMRKNesting {
         address to,
         uint256 tokenId,
         uint256 destinationId
-    ) public virtual onlyApprovedOrOwner(tokenId) {
+    ) public virtual onlyImmediateOwner(tokenId) {
         _transfer(_msgSender(), to, tokenId, destinationId);
     }
 
@@ -224,7 +244,7 @@ contract RMRKNesting is ERC721, IRMRKNesting {
         address to,
         uint256 tokenId,
         uint256 destinationId
-    ) public virtual onlyApprovedOrOwner(tokenId) {
+    ) public virtual onlyImmediateOwner(tokenId) {
         _transfer(from, to, tokenId, destinationId);
     }
 
@@ -232,7 +252,7 @@ contract RMRKNesting is ERC721, IRMRKNesting {
         address from,
         address to,
         uint256 tokenId
-    ) public virtual onlyApprovedOrOwner(tokenId) {
+    ) public virtual onlyImmediateOwner(tokenId) {
         _safeTransferNesting(from, to, tokenId, "");
     }
 
@@ -241,7 +261,7 @@ contract RMRKNesting is ERC721, IRMRKNesting {
         address to,
         uint256 tokenId,
         bytes memory data
-    ) public virtual onlyApprovedOrOwner(tokenId) {
+    ) public virtual onlyImmediateOwner(tokenId) {
         _safeTransferNesting(from, to, tokenId, data);
     }
 
@@ -331,17 +351,14 @@ contract RMRKNesting is ERC721, IRMRKNesting {
     //      CHILD MANAGEMENT INTERNAL
     ////////////////////////////////////////
 
-    function _unnestChild(uint256 tokenId, uint256 index) internal virtual {
-        removeItemByIndex_C(_children[tokenId], index);
-        emit ChildUnnested(tokenId, index);
-    }
-
     /**
     * @notice Adds an instance of Child to the pending children array for tokenId. This is hardcoded to be 128 by default.
     */
     function _addChildToPending(uint256 tokenId, Child memory child) internal {
         if(_pendingChildren[tokenId].length < 128) {
             _pendingChildren[tokenId].push(child);
+            uint256 newChildPosInArray = _pendingChildren[tokenId].length;
+            pendingChildPosInArray[tokenId][child.contractAddress][child.tokenId] = newChildPosInArray;
         } else {
             revert RMRKMaxPendingChildrenReached();
         }
@@ -352,6 +369,8 @@ contract RMRKNesting is ERC721, IRMRKNesting {
     */
 
     function _addChildToChildren(uint256 tokenId, Child memory child) internal {
+        uint256 newChildPosInArray = _pendingChildren[tokenId].length;
+        childPosInArray[tokenId][child.contractAddress][child.tokenId] = newChildPosInArray;
         _children[tokenId].push(child);
     }
 
@@ -435,9 +454,10 @@ contract RMRKNesting is ERC721, IRMRKNesting {
         Child memory pendingChild = _pendingChildren[tokenId][index];
 
         removeItemByIndex_C(_pendingChildren[tokenId], index);
+        delete pendingChildPosInArray[tokenId][pendingChild.contractAddress][pendingChild.tokenId];
 
         if (to != address(0)) {
-            IRMRKNesting(pendingChild.contractAddress).transferAsChild(pendingChild.tokenId, to);
+            IERC721(pendingChild.contractAddress).safeTransferFrom(address(this), to, pendingChild.tokenId);
         }
 
         emit PendingChildRemoved(tokenId, index);
@@ -452,16 +472,21 @@ contract RMRKNesting is ERC721, IRMRKNesting {
     function removeChild(uint256 tokenId, uint256 index) public virtual onlyApprovedOrOwner(tokenId) {
         if(_children[tokenId].length <= index)
             revert RMRKChildIndexOutOfRange();
+        
+        Child memory child = _children[tokenId][index];
 
+        //FIXME: These are called a few times together. Consider delegating to a single function if space allows.
+        delete childPosInArray[tokenId][child.contractAddress][child.tokenId];
         removeItemByIndex_C(_children[tokenId], index);
+
         emit ChildRemoved(tokenId, index);
     }
 
     /**
      * @notice Function to unnest a child from the active token array.
-     * param1 parentTokenId is the tokenId of the parent token on (this).
-     * param2 childTokenId is the tokenId of the child instance
-     * param3 childAddress is the address of the child contract as an IRMRK instance
+     * @param tokenId is the tokenId of the parent token to unnest from.
+     * @param index is the index of the child token ID.
+     * @param to is the address to transfer this 
      */
 
     function unnestChild(
@@ -475,31 +500,35 @@ contract RMRKNesting is ERC721, IRMRKNesting {
 
         if (child.contractAddress != _msgSender()) revert RMRKUnnestFromWrongChild();
 
-        _unnestChild(tokenId, index);
+        delete childPosInArray[tokenId][child.contractAddress][child.tokenId];
+        removeItemByIndex_C(_children[tokenId], index);
 
-        IRMRKNesting(child.contractAddress).transferAsChild(child.tokenId, to);
+        IERC721(child.contractAddress).safeTransferFrom(address(this), to, child.tokenId);
+
+        emit ChildUnnested(tokenId, index);
     }
 
-    //TODO: Possibly have this delegate to safeTransferTo, bottom entry is too low-level
-    function transferAsChild(
-        uint256 tokenId, 
-        address to
-    ) public virtual {
-        RMRKOwner memory owner = _RMRKOwners[tokenId];
+    // //TODO: Deprecate in favor of simply calling safeTransferFrom (Ditto IRMRKNesting)
+    // function transferAsChild(
+    //     uint256 tokenId, 
+    //     address to
+    // ) public virtual {
+    //     RMRKOwner memory owner = _RMRKOwners[tokenId];
 
-        if(owner.ownerAddress != _msgSender()) revert ("FIXME: IMPLEMENT THIS ERROR");
-        if(owner.ownerAddress == address(0)) revert RMRKUnnestForNonexistentToken();
+    //     if(owner.ownerAddress != _msgSender()) revert ("FIXME: IMPLEMENT THIS ERROR");
+    //     if(owner.ownerAddress == address(0)) revert RMRKUnnestForNonexistentToken();
 
-        _RMRKOwners[tokenId] = RMRKOwner({
-            ownerAddress: to,
-            tokenId: 0,
-            isNft: false
-        });
-    }
+    //     _RMRKOwners[tokenId] = RMRKOwner({
+    //         ownerAddress: to,
+    //         tokenId: 0,
+    //         isNft: false
+    //     });
+    // }
 
-    //FIXME implement
-    function recliamChild() public {
-
+    //TODO: implement test
+    function reclaimChild(uint256 tokenId, address childAddress, uint256 childTokenId) public onlyApprovedOrOwner(tokenId)  {
+        
+        IERC721(childAddress).safeTransferFrom(address(this), _msgSender(), childTokenId);
     }
 
 
@@ -508,7 +537,7 @@ contract RMRKNesting is ERC721, IRMRKNesting {
     ////////////////////////////////////////
 
     /**
-    @dev Returns all confirmed children
+    * @notice Returns all confirmed children
     */
 
     function childrenOf(uint256 parentTokenId) public view returns (Child[] memory) {
@@ -517,7 +546,7 @@ contract RMRKNesting is ERC721, IRMRKNesting {
     }
 
     /**
-    @dev Returns all pending children
+    * @notice Returns all pending children
     */
 
     function pendingChildrenOf(uint256 parentTokenId) public view returns (Child[] memory) {

@@ -61,10 +61,11 @@ interface IRMRKNesting {
         address to
     ) external;
 
-    function transferAsChild(
-        uint256 tokenId, 
-        address to
-    ) external;
+    //TODO: Deprecate
+    // function transferAsChild(
+    //     uint256 tokenId, 
+    //     address to
+    // ) external;
 
     function childrenOf(
         uint256 parentTokenId
