@@ -91,6 +91,7 @@ contract RMRKNesting is ERC721, IRMRKNesting {
     * Used for parent-scoped transfers.
     * @param tokenId tokenId to check owner against.
     */
+    //
     function _onlyImmediateOwner(uint256 tokenId) private view {
         (address owner,,) = rmrkOwnerOf(tokenId);
         if(owner != _msgSender()) revert ("FIXME: IMPLEMENT THIS ERROR");
@@ -403,12 +404,13 @@ contract RMRKNesting is ERC721, IRMRKNesting {
         emit ChildProposed(parentTokenId);
     }
 
-        /**
+    /**
     * @notice Sends an instance of Child from the pending children array at index to children array for tokenId.
     * Updates _emptyIndexes of tokenId to preserve ordering.
     */
 
     // TODO low prio: preload mappings into memory for gas savings
+    // FIXME: Update positionOf mapping
     function acceptChild(uint256 tokenId, uint256 index) public virtual onlyApprovedOrOwner(tokenId) {
         if(_pendingChildren[tokenId].length <= index)
             revert RMRKPendingChildIndexOutOfRange();
@@ -426,6 +428,7 @@ contract RMRKNesting is ERC721, IRMRKNesting {
     * @dev This does not update the ownership storage data on children. If necessary, ownership
     * can be reclaimed by the rootOwner of the previous parent (this).
     */
+    //FIXME: update all mappiungs during purge
     function rejectAllChildren(uint256 tokenId) public virtual onlyApprovedOrOwner(tokenId) {
         delete(_pendingChildren[tokenId]);
         emit AllPendingChildrenRemoved(tokenId);
@@ -448,8 +451,7 @@ contract RMRKNesting is ERC721, IRMRKNesting {
         uint256 index, 
         address to
     ) public virtual onlyApprovedOrOwner(tokenId) {
-        if(_pendingChildren[tokenId].length <= index)
-            revert RMRKPendingChildIndexOutOfRange();
+        if(_pendingChildren[tokenId].length <= index) revert RMRKPendingChildIndexOutOfRange();
 
         Child memory pendingChild = _pendingChildren[tokenId][index];
 
@@ -464,31 +466,12 @@ contract RMRKNesting is ERC721, IRMRKNesting {
     }
 
     /**
-    * @notice Deletes a single child from the child array by index.
-    * @dev This is an emergency-style function used to forcibly remove a child from the active children
-    * array, and should only be called in the event that a child is not removable via `unnestChild`.
+    * @notice Function to unnest a child from the active token array.
+    * @param tokenId is the tokenId of the parent token to unnest from.
+    * @param index is the index of the child token ID.
+    * @param to is the address to transfer this 
     */
-
-    function removeChild(uint256 tokenId, uint256 index) public virtual onlyApprovedOrOwner(tokenId) {
-        if(_children[tokenId].length <= index)
-            revert RMRKChildIndexOutOfRange();
-        
-        Child memory child = _children[tokenId][index];
-
-        //FIXME: These are called a few times together. Consider delegating to a single function if space allows.
-        delete childPosInArray[tokenId][child.contractAddress][child.tokenId];
-        removeItemByIndex_C(_children[tokenId], index);
-
-        emit ChildRemoved(tokenId, index);
-    }
-
-    /**
-     * @notice Function to unnest a child from the active token array.
-     * @param tokenId is the tokenId of the parent token to unnest from.
-     * @param index is the index of the child token ID.
-     * @param to is the address to transfer this 
-     */
-
+    //TODO: Check to see if parent can also call onlyApprovedOrOwner
     function unnestChild(
         uint256 tokenId,
         uint256 index, 
@@ -498,12 +481,12 @@ contract RMRKNesting is ERC721, IRMRKNesting {
 
         Child memory child = _children[tokenId][index];
 
-        if (child.contractAddress != _msgSender()) revert RMRKUnnestFromWrongChild();
-
         delete childPosInArray[tokenId][child.contractAddress][child.tokenId];
         removeItemByIndex_C(_children[tokenId], index);
 
-        IERC721(child.contractAddress).safeTransferFrom(address(this), to, child.tokenId);
+        if (to != address(0)) {
+            IERC721(child.contractAddress).safeTransferFrom(address(this), to, child.tokenId);
+        }
 
         emit ChildUnnested(tokenId, index);
     }
@@ -526,8 +509,11 @@ contract RMRKNesting is ERC721, IRMRKNesting {
     // }
 
     //TODO: implement test
-    function reclaimChild(uint256 tokenId, address childAddress, uint256 childTokenId) public onlyApprovedOrOwner(tokenId)  {
-        
+    function reclaimChild(
+        uint256 tokenId, 
+        address childAddress, 
+        uint256 childTokenId
+    ) public onlyApprovedOrOwner(tokenId)  {
         IERC721(childAddress).safeTransferFrom(address(this), _msgSender(), childTokenId);
     }
 
