@@ -46,7 +46,8 @@ interface IRMRKNesting {
 
     function rejectChild(
         uint256 parentTokenId,
-        uint256 index
+        uint256 index,
+        address to
     ) external;
 
     function removeChild(
@@ -56,13 +57,13 @@ interface IRMRKNesting {
 
     function unnestChild(
         uint256 tokenId,
-        uint256 childId,
-        uint256 index
+        uint256 index, 
+        address to
     ) external;
 
-    function unnestSelf(
-        uint256 tokenId,
-        uint256 indexOnParent
+    function transferAsChild(
+        uint256 tokenId, 
+        address to
     ) external;
 
     function childrenOf(
@@ -82,4 +83,5 @@ interface IRMRKNesting {
         uint256 parentTokenId,
         uint256 index
     ) external view returns (Child memory);
+
 }
