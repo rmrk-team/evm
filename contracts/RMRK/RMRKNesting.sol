@@ -27,7 +27,7 @@ error RMRKUnnestChildIdMismatch();
 error RMRKUnnestForNonexistentToken();
 error RMRKUnnestForNonNftParent();
 error RMRKUnnestFromWrongChild();
-error RMRKOnlyImmediateOwner();
+error RMRKNoTransferPermission();
 
 contract RMRKNesting is ERC721, IRMRKNesting {
 
@@ -94,14 +94,22 @@ contract RMRKNesting is ERC721, IRMRKNesting {
     * @param tokenId tokenId to check owner against.
     */
     //
-    function _onlyImmediateOwner(uint256 tokenId) private view {
-        (address owner,,) = rmrkOwnerOf(tokenId);
-        if(owner != _msgSender()) revert RMRKOnlyImmediateOwner();
+    function _onlyHasTransferPerm(uint256 tokenId) private view {
+        if(!_hasTransferPerm(_msgSender(), tokenId)) revert RMRKNoTransferPermission();
     }
 
-    modifier onlyImmediateOwner(uint256 tokenId) {
-        _onlyImmediateOwner(tokenId);
+    modifier onlyHasTransferPerm(uint256 tokenId) {
+        _onlyHasTransferPerm(tokenId);
         _;
+    }
+
+    //TODO: Code review here -- Accepting perms that aren't always used
+    function _hasTransferPerm(address spender, uint256 tokenId) internal view virtual returns (bool) {
+        (address owner, uint parentTokenId,) = rmrkOwnerOf(tokenId);
+        if (parentTokenId != 0) {
+            return (spender == owner);
+        }
+        return (spender == owner || isApprovedForAll(owner, spender) || getApproved(tokenId) == spender);
     }
 
     function _exists(uint256 tokenId) internal view virtual override returns (bool) {
@@ -140,7 +148,7 @@ contract RMRKNesting is ERC721, IRMRKNesting {
             revert RMRKMintToNonRMRKImplementer();
 
         //FIXME: do this better? feels like a hack. Just exists to revert if token does not exist
-        address owner = IRMRKNesting(to).ownerOf(destinationId);
+        IRMRKNesting(to).ownerOf(destinationId);
 
         _beforeTokenTransfer(address(0), to, tokenId);
 
@@ -220,13 +228,23 @@ contract RMRKNesting is ERC721, IRMRKNesting {
 
     //update for reentrancy
     //FIXME: This error reverts if caller is not owner contract, but this will also pass if owner is immediate owner
-    function burnFromParent(uint256 tokenId) external {
+    //Suggest delegate to _burn method, as both run same code
+    //FIXME: This should not be external by default, implement this top level only
+    function burnFromParent(uint256 tokenId) external onlyHasTransferPerm(tokenId) {
         (address _RMRKOwner, , ) = rmrkOwnerOf(tokenId);
         if(_RMRKOwner != _msgSender())
             revert RMRKCallerIsNotOwnerContract();
-        address owner = ownerOf(tokenId);
-        _balances[_RMRKOwner] -= 1;      
+        address owner = ownerOf(tokenId);   
         _burnForOwner(tokenId, owner);
+        _balances[_RMRKOwner] -= 1;   
+    }
+
+    //FIXME: This should not be external by default, implement this top level only
+    //TODO: Figure out if leaving a garbage value in enumeration will be an issue
+    function burnChild(uint256 tokenId, uint256 childIndex) external onlyHasTransferPerm(tokenId) {
+        Child memory child = _children[tokenId][childIndex];
+        IRMRKNesting(child.contractAddress).burnFromParent(child.tokenId);
+        removeItemByIndex_C(_children[tokenId], childIndex);
     }
 
     ////////////////////////////////////////
@@ -244,22 +262,26 @@ contract RMRKNesting is ERC721, IRMRKNesting {
         address to,
         uint256 tokenId,
         uint256 destinationId
-    ) public virtual onlyImmediateOwner(tokenId) {
+    ) public virtual onlyHasTransferPerm(tokenId) {
         _transfer(_msgSender(), to, tokenId, destinationId);
     }
 
-    // FIXME - This needs to be cleaned up. Ensure all ERC721-named transfer functions are ERC721 compatible
-    // and RMRK specific functions have the appropriate "Nest" nomenclature.
+    function transferFrom(
+        address from,
+        address to,
+        uint256 tokenId
+    ) public virtual override onlyHasTransferPerm(tokenId) {
+        _transfer(from, to, tokenId);
+    }
+
     function transferFrom(
         address from,
         address to,
         uint256 tokenId,
         uint256 destinationId
-    ) public virtual onlyImmediateOwner(tokenId) {
+    ) public virtual onlyHasTransferPerm(tokenId) {
         _transfer(from, to, tokenId, destinationId);
     }
-
-    // onlyImmediateOwner
 
     function safeTransferFrom(
         address from,
@@ -274,7 +296,7 @@ contract RMRKNesting is ERC721, IRMRKNesting {
         address to,
         uint256 tokenId,
         bytes memory data
-    ) public virtual override(ERC721) onlyImmediateOwner(tokenId) {
+    ) public virtual override(ERC721) onlyHasTransferPerm(tokenId) {
         _safeTransfer(from, to, tokenId, data);
     }
 
@@ -291,7 +313,7 @@ contract RMRKNesting is ERC721, IRMRKNesting {
         address to,
         uint256 tokenId,
         bytes memory data
-    ) public virtual onlyImmediateOwner(tokenId) {
+    ) public virtual onlyHasTransferPerm(tokenId) {
         _safeTransferNesting(from, to, tokenId, data);
     }
 

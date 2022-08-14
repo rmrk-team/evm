@@ -4,7 +4,7 @@ import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 
 // Based on https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/test/token/ERC721/ERC721.behavior.js
 
-describe('ERC721', function () {
+describe.skip('ERC721', function () {
   const name = 'Non Fungible Token';
   const symbol = 'NFT';
 

@@ -24,7 +24,7 @@ contract RMRKNestingMultiResourceMock is RMRKNestingMultiResource {
     }
 
     //update for reentrancy
-    function burn(uint256 tokenId) public onlyApprovedOrOwner(tokenId) {
+    function burn(uint256 tokenId) public onlyHasTransferPerm(tokenId) {
         _burn(tokenId);
     }
 
