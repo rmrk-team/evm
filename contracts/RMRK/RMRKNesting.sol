@@ -12,7 +12,7 @@ import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
-// import "hardhat/console.sol";
+import "hardhat/console.sol";
 
 error RMRKCallerIsNotOwnerContract();
 error RMRKChildIndexOutOfRange();
@@ -27,6 +27,7 @@ error RMRKUnnestChildIdMismatch();
 error RMRKUnnestForNonexistentToken();
 error RMRKUnnestForNonNftParent();
 error RMRKUnnestFromWrongChild();
+error RMRKOnlyImmediateOwner();
 
 contract RMRKNesting is ERC721, IRMRKNesting {
 
@@ -53,6 +54,7 @@ contract RMRKNesting is ERC721, IRMRKNesting {
     mapping(uint256 => Child[]) internal _pendingChildren;
 
     // Mapping of tokenId to childAddress to child tokenId to child position in children array
+    //FIXME: Update access to this array to prevent out-of-index reads to avoid access to garbage values
     mapping(uint256 => mapping(address => mapping(uint256 => uint256))) public pendingChildPosInArray;
 
     constructor(string memory name_, string memory symbol_) ERC721(name_, symbol_) {}
@@ -94,7 +96,7 @@ contract RMRKNesting is ERC721, IRMRKNesting {
     //
     function _onlyImmediateOwner(uint256 tokenId) private view {
         (address owner,,) = rmrkOwnerOf(tokenId);
-        if(owner != _msgSender()) revert ("FIXME: IMPLEMENT THIS ERROR");
+        if(owner != _msgSender()) revert RMRKOnlyImmediateOwner();
     }
 
     modifier onlyImmediateOwner(uint256 tokenId) {
@@ -110,6 +112,7 @@ contract RMRKNesting is ERC721, IRMRKNesting {
     //              MINTING
     ////////////////////////////////////////
 
+    //FIXME: look at having _mint that takes a destination ID lean on this mint for code compression
     function _mint(address to, uint256 tokenId) internal override virtual {
         if(to == address(0)) revert ERC721MintToTheZeroAddress();
         if(_exists(tokenId)) revert ERC721TokenAlreadyMinted();
@@ -136,8 +139,12 @@ contract RMRKNesting is ERC721, IRMRKNesting {
         if(!IERC165(to).supportsInterface(type(IRMRKNesting).interfaceId))
             revert RMRKMintToNonRMRKImplementer();
 
+        //FIXME: do this better? feels like a hack. Just exists to revert if token does not exist
+        address owner = IRMRKNesting(to).ownerOf(destinationId);
+
         _beforeTokenTransfer(address(0), to, tokenId);
 
+        _balances[to] += 1;
         _RMRKOwners[tokenId] = RMRKOwner({
             ownerAddress: to,
             tokenId: destinationId,
@@ -160,8 +167,6 @@ contract RMRKNesting is ERC721, IRMRKNesting {
 
     function _sendToNFT(uint tokenId, uint destinationId, address from, address to) private {
         IRMRKNesting destContract = IRMRKNesting(to);
-        address nextOwner = destContract.ownerOf(destinationId);
-        _balances[nextOwner] += 1;
         destContract.addChild(destinationId, tokenId, address(this));
 
         emit Transfer(from, to, tokenId);
@@ -185,15 +190,8 @@ contract RMRKNesting is ERC721, IRMRKNesting {
     //update for reentrancy
     function _burn(uint256 tokenId) internal override virtual {
         address owner = ownerOf(tokenId);
-        _burnForOwner(tokenId, owner);
-    }
-
-    //update for reentrancy
-    function burnFromParent(uint256 tokenId) external {
-        (address _RMRKOwner, , ) = rmrkOwnerOf(tokenId);
-        if(_RMRKOwner != _msgSender())
-            revert RMRKCallerIsNotOwnerContract();
-        address owner = ownerOf(tokenId);
+        (address rmrkOwner,,) = rmrkOwnerOf(tokenId);
+        _balances[rmrkOwner] -= 1;  
         _burnForOwner(tokenId, owner);
     }
 
@@ -201,7 +199,6 @@ contract RMRKNesting is ERC721, IRMRKNesting {
         _beforeTokenTransfer(rootOwner, address(0), tokenId);
         _approve(address(0), tokenId);
         _cleanApprovals(address(0), tokenId);
-        _balances[rootOwner] -= 1;
 
         Child[] memory children = childrenOf(tokenId);
 
@@ -219,6 +216,17 @@ contract RMRKNesting is ERC721, IRMRKNesting {
 
         _afterTokenTransfer(rootOwner, address(0), tokenId);
         emit Transfer(rootOwner, address(0), tokenId);
+    }
+
+    //update for reentrancy
+    //FIXME: This error reverts if caller is not owner contract, but this will also pass if owner is immediate owner
+    function burnFromParent(uint256 tokenId) external {
+        (address _RMRKOwner, , ) = rmrkOwnerOf(tokenId);
+        if(_RMRKOwner != _msgSender())
+            revert RMRKCallerIsNotOwnerContract();
+        address owner = ownerOf(tokenId);
+        _balances[_RMRKOwner] -= 1;      
+        _burnForOwner(tokenId, owner);
     }
 
     ////////////////////////////////////////
@@ -240,6 +248,8 @@ contract RMRKNesting is ERC721, IRMRKNesting {
         _transfer(_msgSender(), to, tokenId, destinationId);
     }
 
+    // FIXME - This needs to be cleaned up. Ensure all ERC721-named transfer functions are ERC721 compatible
+    // and RMRK specific functions have the appropriate "Nest" nomenclature.
     function transferFrom(
         address from,
         address to,
@@ -249,12 +259,31 @@ contract RMRKNesting is ERC721, IRMRKNesting {
         _transfer(from, to, tokenId, destinationId);
     }
 
+    // onlyImmediateOwner
+
+    function safeTransferFrom(
+        address from,
+        address to,
+        uint256 tokenId
+    ) public virtual override(ERC721) {
+        safeTransferFrom(from, to, tokenId, "");
+    }
+
+    function safeTransferFrom(
+        address from,
+        address to,
+        uint256 tokenId,
+        bytes memory data
+    ) public virtual override(ERC721) onlyImmediateOwner(tokenId) {
+        _safeTransfer(from, to, tokenId, data);
+    }
+
     function safeTransferNestingFrom(
         address from,
         address to,
         uint256 tokenId
-    ) public virtual onlyImmediateOwner(tokenId) {
-        _safeTransferNesting(from, to, tokenId, "");
+    ) public virtual {
+        safeTransferNestingFrom(from, to, tokenId, "");
     }
 
     function safeTransferNestingFrom(
@@ -281,12 +310,13 @@ contract RMRKNesting is ERC721, IRMRKNesting {
         address from,
         address to,
         uint256 tokenId
-    ) internal override virtual {
+    ) internal override(ERC721) virtual {
         (address immediateOwner,,) = rmrkOwnerOf(tokenId);
         if (immediateOwner != from) revert ERC721TransferFromIncorrectOwner();
         if (to == address(0)) revert ERC721TransferToTheZeroAddress();
 
         _beforeTokenTransfer(from, to, tokenId);
+
 
         _balances[from] -= 1;
         _updateOwnerAndClearApprovals(tokenId, 0, to, false);
@@ -317,8 +347,8 @@ contract RMRKNesting is ERC721, IRMRKNesting {
     ) internal virtual {
         (address immediateOwner,,) = rmrkOwnerOf(tokenId);
         if (immediateOwner != from) revert ERC721TransferFromIncorrectOwner();
-        if(_RMRKOwners[tokenId].isNft) revert RMRKMustUnnestFirst();
         if(to == address(0)) revert ERC721TransferToTheZeroAddress();
+
         // Destination contract checks:
         // It seems redundant, but otherwise it would revert with no error
         if(!to.isContract()) revert RMRKIsNotContract();
@@ -327,8 +357,8 @@ contract RMRKNesting is ERC721, IRMRKNesting {
 
         _beforeTokenTransfer(from, to, tokenId);
         _balances[from] -= 1;
-
         _updateOwnerAndClearApprovals(tokenId, destinationId, to, true);
+        _balances[to] += 1;
 
         // Sending to NFT:
         _sendToNFT(tokenId, destinationId, from, to);
@@ -409,11 +439,9 @@ contract RMRKNesting is ERC721, IRMRKNesting {
     * Updates _emptyIndexes of tokenId to preserve ordering.
     */
 
-    // TODO low prio: preload mappings into memory for gas savings
     // FIXME: Update positionOf mapping
     function acceptChild(uint256 tokenId, uint256 index) public virtual onlyApprovedOrOwner(tokenId) {
-        if(_pendingChildren[tokenId].length <= index)
-            revert RMRKPendingChildIndexOutOfRange();
+        if(_pendingChildren[tokenId].length <= index) revert RMRKPendingChildIndexOutOfRange();
 
         Child memory child_ = _pendingChildren[tokenId][index];
 
@@ -429,6 +457,8 @@ contract RMRKNesting is ERC721, IRMRKNesting {
     * can be reclaimed by the rootOwner of the previous parent (this).
     */
     //FIXME: update all mappiungs during purge
+    // Considerations: If we gate access to this array by pendingChildren.length, we can leave
+    // garbage values in the mapping.
     function rejectAllChildren(uint256 tokenId) public virtual onlyApprovedOrOwner(tokenId) {
         delete(_pendingChildren[tokenId]);
         emit AllPendingChildrenRemoved(tokenId);
