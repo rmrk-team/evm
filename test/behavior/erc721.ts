@@ -31,7 +31,7 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
     Panic,
   }
 
-  context.only('with minted tokens', function () {
+  context('with minted tokens', function () {
     beforeEach(async function () {
       [owner, approved, anotherApproved, operator, ...others] = await ethers.getSigners();
 
@@ -268,7 +268,7 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
           it('reverts', async function () {
             await expect(
               transferFunction(this.token, owner.address, others[0].address, tokenId, others[0]),
-            ).to.be.revertedWithCustomError(this.token, 'RMRKOnlyImmediateOwner');
+            ).to.be.revertedWithCustomError(this.token, 'RMRKNoTransferPermission');
           });
         });
 
