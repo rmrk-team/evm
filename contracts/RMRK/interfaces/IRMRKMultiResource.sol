@@ -21,11 +21,24 @@ interface IRMRKMultiResource {
         uint64 overwrites
     );
 
-    event ResourceOverwritten(uint256 indexed tokenId, uint64 overwritten);
+    event ResourceOverwritten(
+        uint256 indexed tokenId,
+        uint64 overwritten
+    );
 
-    event ApprovalForResources(address indexed owner, address indexed approved, uint256 indexed tokenId);
+    event ApprovalForResources(
+        address indexed owner,
+        address indexed
+        approved,
+        uint256 indexed tokenId
+    );
 
-    event ApprovalForAllForResources(address indexed owner, address indexed operator, bool approved);
+    event ApprovalForAllForResources(
+        address indexed owner,
+        address indexed
+        operator,
+        bool approved
+    );
 
     struct Resource {
         uint64 id; //8 bytes
@@ -73,10 +86,12 @@ interface IRMRKMultiResource {
         uint256 index
     ) external view returns(Resource memory);
 
+    // FIXME: This might be unnecesary, it can be done by getting ids and then each of them
     function getFullResources(
         uint256 tokenId
     ) external view returns (Resource[] memory);
 
+    // FIXME: This might be unnecesary, it can be done by getting ids and then each of them
     function getFullPendingResources(
         uint256 tokenId
     ) external view returns (Resource[] memory);
