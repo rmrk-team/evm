@@ -69,14 +69,6 @@ contract RMRKMultiResourceMerged is Context, IERC165, IERC721, IERC721Metadata, 
     // Mapping from owner to operator approvals
     mapping(address => mapping(address => bool)) private _operatorApprovals;
 
-    /**
-     * @dev Initializes the contract by setting a `name` and a `symbol` to the token collection.
-     */
-    constructor(string memory name_, string memory symbol_) {
-        _name = name_;
-        _symbol = symbol_;
-    }
-
     // ------------------- RESOURCES --------------
     //mapping of uint64 Ids to resource object
     mapping(uint64 => string) internal _resources;
@@ -143,6 +135,18 @@ contract RMRKMultiResourceMerged is Context, IERC165, IERC721, IERC721Metadata, 
         _;
     }
 
+    // ----------------------------- CONSTRUCTOR ------------------------------
+
+    /**
+     * @dev Initializes the contract by setting a `name` and a `symbol` to the token collection.
+     */
+    constructor(string memory name_, string memory symbol_) {
+        _name = name_;
+        _symbol = symbol_;
+    }
+
+
+    // ------------------------------- ERC721 ---------------------------------
     /**
      * @dev See {IERC165-supportsInterface}.
      */
@@ -550,7 +554,7 @@ contract RMRKMultiResourceMerged is Context, IERC165, IERC721, IERC721Metadata, 
 
     // ------------------------------- RESOURCES ------------------------------
 
-    // --------------------------- Getting Resources --------------------------
+    // --------------------------- GETTING RESOURCES --------------------------
 
     function getResource(
         uint64 resourceId
@@ -637,7 +641,7 @@ contract RMRKMultiResourceMerged is Context, IERC165, IERC721, IERC721Metadata, 
         return _resourceOverwrites[tokenId][resourceId];
     }
 
-    // --------------------------- Handling Resources -------------------------
+    // --------------------------- HANDLING RESOURCES -------------------------
 
     function acceptResource(
         uint256 tokenId,
@@ -825,7 +829,7 @@ contract RMRKMultiResourceMerged is Context, IERC165, IERC721, IERC721Metadata, 
         _tokenEnumeratedResource[resourceId] = state;
     }
 
-    // ----------------------- Approvals for Resources ------------------------
+    // ----------------------- APPROVALS FOR RESOURCES ------------------------
 
     function approveForResources(address to, uint256 tokenId) external virtual {
         address owner = ownerOf(tokenId);
