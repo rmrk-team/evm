@@ -8,22 +8,11 @@ interface IRMRKEquippable is IRMRKMultiResource {
 
     function getNestingAddress() external view returns(address);
 
-    function markEquipped(
+    function isChildEquipped(
         uint tokenId,
-        address equippingParent,
-        uint64 resourceId,
-        uint64 slotId,
-        bool equipped
-    ) external;
-
-    function isEquipped(uint tokenId) external view returns(bool);
-
-    function isChildEquipValid(
         address childAddress,
-        uint childTokenId,
-        uint64 childResourceId,
-        uint64 slotId
-    ) external view returns (bool);
+        uint childTokenId
+    ) external view returns(bool);
 
     function canTokenBeEquippedWithResourceIntoSlot(
         address parent,

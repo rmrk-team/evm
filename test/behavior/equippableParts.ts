@@ -26,6 +26,7 @@ async function shouldBehaveLikeEquippableWithParts() {
   let baseContract: Contract;
   let neonEquipContract: Contract;
   let maskEquipContract: Contract;
+  let maskContract: Contract;
 
   let addrs: SignerWithAddress[];
 
@@ -36,6 +37,7 @@ async function shouldBehaveLikeEquippableWithParts() {
     baseContract = this.base;
     neonEquipContract = this.neonEquip;
     maskEquipContract = this.maskEquip;
+    maskContract = this.mask;
   });
 
   describe('Equip', async function () {
@@ -57,7 +59,9 @@ async function shouldBehaveLikeEquippableWithParts() {
       ]);
 
       // Child is marked as equipped:
-      expect(await maskEquipContract.isEquipped(masks[0])).to.eql(true);
+      expect(
+        await neonEquipContract.isChildEquipped(neons[0], maskContract.address, masks[0]),
+      ).to.eql(true);
     });
 
     it('cannot equip non existing child in slot', async function () {
