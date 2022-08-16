@@ -56,12 +56,6 @@ interface IRMRKNesting {
         address to
     ) external;
 
-    //TODO: Deprecate (see RMRKNesting)
-    // function transferAsChild(
-    //     uint256 tokenId, 
-    //     address to
-    // ) external;
-
     function childrenOf(
         uint256 parentTokenId
     ) external view returns (Child[] memory);

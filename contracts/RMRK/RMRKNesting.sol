@@ -48,14 +48,13 @@ contract RMRKNesting is ERC721, IRMRKNesting {
     mapping(uint256 => Child[]) internal _children;
 
     // Mapping of tokenId to childAddress to child tokenId to child position in children array
-    mapping(uint256 => mapping(address => mapping(uint256 => uint256))) public childPosInArray;
+    mapping(uint256 => mapping(address => mapping(uint256 => uint256))) internal _childPosInArray;
 
     // Mapping of tokenId to array of pending children structs
     mapping(uint256 => Child[]) internal _pendingChildren;
 
     // Mapping of tokenId to childAddress to child tokenId to child position in children array
-    //FIXME: Update access to this array to prevent out-of-index reads to avoid access to garbage values
-    mapping(uint256 => mapping(address => mapping(uint256 => uint256))) public pendingChildPosInArray;
+    mapping(uint256 => mapping(address => mapping(uint256 => uint256))) internal _pendingChildPosInArray;
 
     constructor(string memory name_, string memory symbol_) ERC721(name_, symbol_) {}
 
@@ -244,6 +243,7 @@ contract RMRKNesting is ERC721, IRMRKNesting {
         Child memory child = _children[tokenId][childIndex];
         IRMRKNesting(child.contractAddress).burnFromParent(child.tokenId);
         removeItemByIndex_C(_children[tokenId], childIndex);
+        delete _childPosInArray[tokenId][child.contractAddress][child.tokenId];
     }
 
     ////////////////////////////////////////
@@ -410,7 +410,7 @@ contract RMRKNesting is ERC721, IRMRKNesting {
         if(_pendingChildren[tokenId].length < 128) {
             _pendingChildren[tokenId].push(child);
             uint256 newChildPosInArray = _pendingChildren[tokenId].length;
-            pendingChildPosInArray[tokenId][child.contractAddress][child.tokenId] = newChildPosInArray;
+            _pendingChildPosInArray[tokenId][child.contractAddress][child.tokenId] = newChildPosInArray;
         } else {
             revert RMRKMaxPendingChildrenReached();
         }
@@ -422,7 +422,7 @@ contract RMRKNesting is ERC721, IRMRKNesting {
 
     function _addChildToChildren(uint256 tokenId, Child memory child) internal {
         uint256 newChildPosInArray = _pendingChildren[tokenId].length;
-        childPosInArray[tokenId][child.contractAddress][child.tokenId] = newChildPosInArray;
+        _childPosInArray[tokenId][child.contractAddress][child.tokenId] = newChildPosInArray;
         _children[tokenId].push(child);
     }
 
@@ -460,15 +460,15 @@ contract RMRKNesting is ERC721, IRMRKNesting {
     * Updates _emptyIndexes of tokenId to preserve ordering.
     */
 
-    // FIXME: Update positionOf mapping
     function acceptChild(uint256 tokenId, uint256 index) public virtual onlyApprovedOrOwner(tokenId) {
         if(_pendingChildren[tokenId].length <= index) revert RMRKPendingChildIndexOutOfRange();
 
-        Child memory child_ = _pendingChildren[tokenId][index];
+        Child memory child = _pendingChildren[tokenId][index];
 
         removeItemByIndex_C(_pendingChildren[tokenId], index);
+        delete _pendingChildPosInArray[tokenId][child.contractAddress][child.tokenId];
 
-        _addChildToChildren(tokenId, child_);
+        _addChildToChildren(tokenId, child);
         emit ChildAccepted(tokenId);
     }
 
@@ -507,7 +507,7 @@ contract RMRKNesting is ERC721, IRMRKNesting {
         Child memory pendingChild = _pendingChildren[tokenId][index];
 
         removeItemByIndex_C(_pendingChildren[tokenId], index);
-        delete pendingChildPosInArray[tokenId][pendingChild.contractAddress][pendingChild.tokenId];
+        delete _pendingChildPosInArray[tokenId][pendingChild.contractAddress][pendingChild.tokenId];
 
         if (to != address(0)) {
             IERC721(pendingChild.contractAddress).safeTransferFrom(address(this), to, pendingChild.tokenId);
@@ -532,8 +532,8 @@ contract RMRKNesting is ERC721, IRMRKNesting {
 
         Child memory child = _children[tokenId][index];
 
-        delete childPosInArray[tokenId][child.contractAddress][child.tokenId];
         removeItemByIndex_C(_children[tokenId], index);
+        delete _childPosInArray[tokenId][child.contractAddress][child.tokenId];
 
         if (to != address(0)) {
             IERC721(child.contractAddress).safeTransferFrom(address(this), to, child.tokenId);
@@ -541,23 +541,6 @@ contract RMRKNesting is ERC721, IRMRKNesting {
 
         emit ChildUnnested(tokenId, index);
     }
-
-    // //TODO: Deprecate in favor of simply calling safeTransferFrom (Ditto IRMRKNesting)
-    // function transferAsChild(
-    //     uint256 tokenId, 
-    //     address to
-    // ) public virtual {
-    //     RMRKOwner memory owner = _RMRKOwners[tokenId];
-
-    //     if(owner.ownerAddress != _msgSender()) revert ("FIXME: IMPLEMENT THIS ERROR");
-    //     if(owner.ownerAddress == address(0)) revert RMRKUnnestForNonexistentToken();
-
-    //     _RMRKOwners[tokenId] = RMRKOwner({
-    //         ownerAddress: to,
-    //         tokenId: 0,
-    //         isNft: false
-    //     });
-    // }
 
     //TODO: implement test
     function reclaimChild(
