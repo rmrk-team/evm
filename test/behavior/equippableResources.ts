@@ -28,8 +28,8 @@ async function shouldBehaveLikeEquippableResources(
     it('can support IERC165', async function () {
       expect(await chunky.supportsInterface('0x01ffc9a7')).to.equal(true);
     });
-    it.skip('can support IEquippable', async function () {
-      expect(await chunkyEquip.supportsInterface('0xc3730101')).to.equal(true);
+    it('can support IEquippable', async function () {
+      expect(await chunkyEquip.supportsInterface('0x39c2f8b2')).to.equal(true);
     });
     it('cannot support other interfaceId', async function () {
       expect(await chunkyEquip.supportsInterface('0xffffffff')).to.equal(false);
