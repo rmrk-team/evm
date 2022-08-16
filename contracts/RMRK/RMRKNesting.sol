@@ -595,7 +595,7 @@ contract RMRKNesting is ERC721, IRMRKNesting {
     function childOf(
         uint256 parentTokenId,
         uint256 index
-    ) external view returns (Child memory) {
+    ) public view returns (Child memory) {
         if(_children[parentTokenId].length <= index)
             revert RMRKChildIndexOutOfRange();
         Child memory child = _children[parentTokenId][index];
@@ -605,7 +605,7 @@ contract RMRKNesting is ERC721, IRMRKNesting {
     function pendingChildOf(
         uint256 parentTokenId,
         uint256 index
-    ) external view returns (Child memory) {
+    ) public view returns (Child memory) {
         if(_pendingChildren[parentTokenId].length <= index)
             revert RMRKPendingChildIndexOutOfRange();
         Child memory child = _pendingChildren[parentTokenId][index];

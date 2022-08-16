@@ -68,8 +68,8 @@ async function shouldBehaveLikeEquippableWithSlots(
     it('can validate equips of weapons into soldiers', async function () {
       // This resource is not equippable
       expect(
-        await soldierEquip.isChildEquipValid(
-          weaponEquip.address,
+        await weaponEquip.canTokenBeEquippedWithResourceIntoSlot(
+          soldierEquip.address,
           weaponsIds[0],
           weaponResourcesFull[0],
           partIdForWeapon,
@@ -78,8 +78,8 @@ async function shouldBehaveLikeEquippableWithSlots(
 
       // This resource is equippable into weapon part
       expect(
-        await soldierEquip.isChildEquipValid(
-          weaponEquip.address,
+        await weaponEquip.canTokenBeEquippedWithResourceIntoSlot(
+          soldierEquip.address,
           weaponsIds[0],
           weaponResourcesEquip[0],
           partIdForWeapon,
@@ -88,8 +88,8 @@ async function shouldBehaveLikeEquippableWithSlots(
 
       // This resource is NOT equippable into weapon gem part
       expect(
-        await soldierEquip.isChildEquipValid(
-          weaponEquip.address,
+        await weaponEquip.canTokenBeEquippedWithResourceIntoSlot(
+          soldierEquip.address,
           weaponsIds[0],
           weaponResourcesEquip[0],
           partIdForWeaponGem,
@@ -100,8 +100,8 @@ async function shouldBehaveLikeEquippableWithSlots(
     it('can validate equips of weapon gems into weapons', async function () {
       // This resource is not equippable
       expect(
-        await weaponEquip.isChildEquipValid(
-          weaponGemEquip.address,
+        await weaponGemEquip.canTokenBeEquippedWithResourceIntoSlot(
+          weaponEquip.address,
           weaponGemsIds[0],
           weaponGemResourceFull,
           partIdForWeaponGem,
@@ -110,8 +110,8 @@ async function shouldBehaveLikeEquippableWithSlots(
 
       // This resource is equippable into weapon gem slot
       expect(
-        await weaponEquip.isChildEquipValid(
-          weaponGemEquip.address,
+        await weaponGemEquip.canTokenBeEquippedWithResourceIntoSlot(
+          weaponEquip.address,
           weaponGemsIds[0],
           weaponGemResourceEquip,
           partIdForWeaponGem,
@@ -120,8 +120,8 @@ async function shouldBehaveLikeEquippableWithSlots(
 
       // This resource is NOT equippable into background slot
       expect(
-        await weaponEquip.isChildEquipValid(
-          weaponGemEquip.address,
+        await weaponGemEquip.canTokenBeEquippedWithResourceIntoSlot(
+          weaponEquip.address,
           weaponGemsIds[0],
           weaponGemResourceEquip,
           partIdForBackground,
@@ -132,8 +132,8 @@ async function shouldBehaveLikeEquippableWithSlots(
     it('can validate equips of backgrounds into soldiers', async function () {
       // This resource is equippable into background slot
       expect(
-        await soldierEquip.isChildEquipValid(
-          backgroundEquip.address,
+        await backgroundEquip.canTokenBeEquippedWithResourceIntoSlot(
+          soldierEquip.address,
           backgroundsIds[0],
           backgroundResourceId,
           partIdForBackground,
@@ -142,8 +142,8 @@ async function shouldBehaveLikeEquippableWithSlots(
 
       // This resource is NOT equippable into weapon slot
       expect(
-        await soldierEquip.isChildEquipValid(
-          backgroundEquip.address,
+        await backgroundEquip.canTokenBeEquippedWithResourceIntoSlot(
+          soldierEquip.address,
           backgroundsIds[0],
           backgroundResourceId,
           partIdForWeapon,
@@ -215,8 +215,12 @@ async function shouldBehaveLikeEquippableWithSlots(
       ]);
 
       // Children are marked as equipped:
-      expect(await weaponEquip.isEquipped(weaponsIds[0])).to.eql(true);
-      expect(await backgroundEquip.isEquipped(backgroundsIds[0])).to.eql(true);
+      expect(
+        await soldierEquip.isChildEquipped(soldiersIds[0], weapon.address, weaponsIds[0]),
+      ).to.eql(true);
+      expect(
+        await soldierEquip.isChildEquipped(soldiersIds[0], background.address, backgroundsIds[0]),
+      ).to.eql(true);
     });
 
     it('cannot equip non existing child in slot (weapon in background)', async function () {
@@ -320,7 +324,8 @@ async function shouldBehaveLikeEquippableWithSlots(
       ).to.be.revertedWithCustomError(soldierEquip, 'RMRKEquippableEquipNotAllowedByBase');
     });
 
-    it('cannot equip child into 2 different slots', async function () {
+    // TODO: Discuss if we want to prevent this. A weird base implementation could allow it
+    it.skip('cannot equip child into 2 different slots', async function () {
       // Weapon is child on index 0, background on index 1.
       const childIndex = 0;
 
@@ -344,7 +349,7 @@ async function shouldBehaveLikeEquippableWithSlots(
         partIdForWeaponAlt,
       );
 
-      // If all went good, we can the weapon's new resource into the new slot
+      // If all went good, we can equip the weapon's new resource into the new slot
       await soldierEquip
         .connect(addrs[0])
         .equip(soldiersIds[0], soldierResId, partIdForWeaponAlt, childIndex, newWeaponResId);
@@ -511,13 +516,14 @@ async function shouldBehaveLikeEquippableWithSlots(
         .equip(soldiersIds[0], soldierResId, partIdForWeapon, childIndex, weaponResId);
 
       await unequipWeaponAndCheckFromAddress(soldierOwner);
-      await soldier.connect(soldierOwner).unnestChild(soldiersIds[0], 0, soldierOwner.address);
+      await soldier
+        .connect(soldierOwner)
+        .unnestChild(soldiersIds[0], childIndex, soldierOwner.address);
     });
 
-    //FIXME: bracketing this for now until equip is made parent-scoped as well.
-    it.skip('Unnest fails if self is equipped', async function () {
-      // Weapon is child on index 0
+    it('Unnest fails if child is equipped', async function () {
       const soldierOwner = addrs[0];
+      // Weapon is child on index 0
       const childIndex = 0;
       const weaponResId = weaponResourcesEquip[0]; // This resource is assigned to weapon first weapon
       await soldierEquip
@@ -525,7 +531,7 @@ async function shouldBehaveLikeEquippableWithSlots(
         .equip(soldiersIds[0], soldierResId, partIdForWeapon, childIndex, weaponResId);
 
       await expect(
-        weapon.connect(addrs[0]).unnestChild(soldiersIds[0], 0, soldierOwner.address),
+        soldier.connect(soldierOwner).unnestChild(soldiersIds[0], childIndex, soldierOwner.address),
       ).to.be.revertedWithCustomError(weapon, 'RMRKMustUnequipFirst');
     });
   });
@@ -629,7 +635,9 @@ async function shouldBehaveLikeEquippableWithSlots(
     ]);
 
     // Child is marked as equipped:
-    expect(await weaponEquip.isEquipped(weaponsIds[0])).to.eql(true);
+    expect(
+      await soldierEquip.isChildEquipped(soldiersIds[0], weapon.address, weaponsIds[0]),
+    ).to.eql(true);
   }
 
   async function unequipWeaponAndCheckFromAddress(from: SignerWithAddress): Promise<void> {
@@ -647,7 +655,9 @@ async function shouldBehaveLikeEquippableWithSlots(
     ]);
 
     // Child is marked as not equipped:
-    expect(await weaponEquip.isEquipped(weaponsIds[0])).to.eql(false);
+    expect(
+      await soldierEquip.isChildEquipped(soldiersIds[0], weapon.address, weaponsIds[0]),
+    ).to.eql(false);
   }
 
   async function replaceWeaponAndCheckFromAddress(from: SignerWithAddress): Promise<void> {
@@ -678,8 +688,12 @@ async function shouldBehaveLikeEquippableWithSlots(
     ]);
 
     // Child is marked as equipped:
-    expect(await weaponEquip.isEquipped(weaponsIds[0])).to.eql(false);
-    expect(await weaponEquip.isEquipped(newWeaponId)).to.eql(true);
+    expect(
+      await soldierEquip.isChildEquipped(soldiersIds[0], weapon.address, weaponsIds[0]),
+    ).to.eql(false);
+    expect(await soldierEquip.isChildEquipped(soldiersIds[0], weapon.address, newWeaponId)).to.eql(
+      true,
+    );
   }
 
   async function mintWeaponToSoldier(

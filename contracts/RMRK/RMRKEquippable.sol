@@ -19,7 +19,6 @@ import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 // import "hardhat/console.sol";
 
 error ERC721NotApprovedOrOwner();
-error RMRKAlreadyEquipped();
 error RMRKBadLength();
 error RMRKBaseRequiredForParts();
 error RMRKCallerCannotChangeEquipStatus();
@@ -80,12 +79,11 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
     mapping(uint64 => uint64[]) private _fixedPartIds;
     mapping(uint64 => uint64[]) private _slotPartIds;
 
-    //mapping of token id to base address to slot part Id to equipped information.
+    //mapping of token id to base address to slot part Id to equipped information. Used to compose an NFT
     mapping(uint => mapping(address => mapping(uint64 => Equipment))) private _equipments;
 
-    //mapping of token id to whether it is equipped into the parent
-    mapping(uint => bool) private _isEquipped;
-
+    //mapping of token id to child address to child Id to count of equips. Used to check if equipped.
+    mapping(uint => mapping(address => mapping(uint => uint8))) private _equipCountPerChild;
 
     //Mapping of refId to parent contract address and valid slotId
     mapping(uint64 => mapping(address => uint64)) private _validParentSlots;
@@ -168,18 +166,15 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
         address childEquippable = IRMRKNestingWithEquippable(child.contractAddress).getEquippablesAddress();
 
         // Check from child perspective intention to be used in part
-        if (!isChildEquipValid(
-                childEquippable,
-                child.tokenId,
-                childResourceId,
-                slotPartId
-            )
+        if (!IRMRKEquippable(childEquippable).canTokenBeEquippedWithResourceIntoSlot(
+            address(this), child.tokenId, childResourceId, slotPartId)
         )
             revert RMRKTokenCannotBeEquippedWithResourceIntoSlot();
 
         // Check from base perspective
         if(!_validateBaseEquip(_baseAddresses[resourceId], childEquippable, slotPartId))
             revert RMRKEquippableEquipNotAllowedByBase();
+
 
         Equipment memory newEquip = Equipment({
             resourceId: resourceId,
@@ -189,8 +184,7 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
         });
 
         _equipments[tokenId][_baseAddresses[resourceId]][slotPartId] = newEquip;
-        IRMRKNestingWithEquippable(_nestingAddress).markChildEquipped(
-            child.contractAddress, child.tokenId, childResourceId, slotPartId, true);
+        _equipCountPerChild[tokenId][child.contractAddress][child.tokenId] += 1;
     }
 
     function unequip(
@@ -212,13 +206,7 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
             revert RMRKNotEquipped();
         delete _equipments[tokenId][targetBaseAddress][slotPartId];
         address childNestingAddress = IRMRKEquippable(equipment.childEquippableAddress).getNestingAddress();
-        IRMRKNestingWithEquippable(_nestingAddress).markChildEquipped(
-            childNestingAddress,
-            equipment.childTokenId,
-            equipment.childResourceId,
-            slotPartId,
-            false
-        );
+        _equipCountPerChild[tokenId][childNestingAddress][equipment.childTokenId] -= 1;
     }
 
     function replaceEquipment(
@@ -232,25 +220,12 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
         _equip(tokenId, resourceId, slotPartId, childIndex, childResourceId);
     }
 
-    function markEquipped(
+    function isChildEquipped(
         uint tokenId,
-        address equippingParent,
-        uint64 resourceId,
-        uint64 slotId,
-        bool equipped
-    ) external onlyNesting() {
-        if (!canTokenBeEquippedWithResourceIntoSlot(equippingParent, tokenId, resourceId, slotId))
-            revert RMRKTokenCannotBeEquippedWithResourceIntoSlot();
-
-        if (_isEquipped[tokenId] && equipped)
-            revert RMRKAlreadyEquipped();
-        if(!_isEquipped[tokenId] && !equipped)
-            revert RMRKNotEquipped();
-        _isEquipped[tokenId] = equipped;
-    }
-
-    function isEquipped(uint tokenId) external view returns(bool) {
-        return _isEquipped[tokenId];
+        address childAddress,
+        uint childTokenId
+    ) external view returns(bool) {
+        return _equipCountPerChild[tokenId][childAddress][childTokenId] != uint8(0);
     }
 
     function getEquipped(
@@ -361,21 +336,6 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
         isEquippable = IRMRKBaseStorage(baseContract).checkIsEquippable(partId, childContract);
     }
 
-    function isChildEquipValid(
-        address childAddress,
-        uint childTokenId,
-        uint64 childResourceId,
-        uint64 slotId
-    ) public view returns (bool) {
-        return IRMRKEquippable(childAddress).canTokenBeEquippedWithResourceIntoSlot(
-            address(this),
-            childTokenId,
-            childResourceId,
-            slotId
-        );
-    }
-
-    // Not intented to check if it is already equipped, only if can be.
     function canTokenBeEquippedWithResourceIntoSlot(
         address parent,
         uint tokenId,
