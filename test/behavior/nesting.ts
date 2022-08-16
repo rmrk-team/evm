@@ -3,7 +3,7 @@ import { ethers } from 'hardhat';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { BigNumber, Contract } from 'ethers';
 
-//BIG OL FIXME: When minted, tokens should be minted from 1, not zero
+// BIG OL FIXME: When minted, tokens should be minted from 1, not zero
 
 async function shouldBehaveLikeNesting(
   mint: (token: Contract, to: string) => Promise<number>,
@@ -171,18 +171,18 @@ async function shouldBehaveLikeNesting(
     it('can mint multiple children', async function () {
       const parentId = await mint(parent, tokenOwner.address);
       const childId1 = await nestMint(child, parent.address, parentId);
-      // const childId2 = await nestMint(child, parent.address, parentId);
+      const childId2 = await nestMint(child, parent.address, parentId);
 
-      // expect(await child.ownerOf(childId1)).to.equal(tokenOwner.address);
-      // expect(await child.ownerOf(childId2)).to.equal(tokenOwner.address);
+      expect(await child.ownerOf(childId1)).to.equal(tokenOwner.address);
+      expect(await child.ownerOf(childId2)).to.equal(tokenOwner.address);
 
-      // expect(await child.balanceOf(parent.address)).to.equal(2);
+      expect(await child.balanceOf(parent.address)).to.equal(2);
 
-      // const pendingChildren = await parent.pendingChildrenOf(parentId);
-      // expect(pendingChildren).to.eql([
-      //   [BigNumber.from(childId1), child.address],
-      //   [BigNumber.from(childId2), child.address],
-      // ]);
+      const pendingChildren = await parent.pendingChildrenOf(parentId);
+      expect(pendingChildren).to.eql([
+        [BigNumber.from(childId1), child.address],
+        [BigNumber.from(childId2), child.address],
+      ]);
     });
 
     it('can mint child into child', async function () {
@@ -310,15 +310,14 @@ async function shouldBehaveLikeNesting(
   describe('Reject child', async function () {
     let parentId: number;
     let childId: number;
-    let zeroAddress = ethers.constants.AddressZero;
-    
+    const zeroAddress = ethers.constants.AddressZero;
+
     beforeEach(async function () {
       parentId = await mint(parent, tokenOwner.address);
       childId = await nestMint(child, parent.address, parentId);
     });
 
     it('can reject one pending child with abandon', async function () {
-      
       await expect(parent.connect(tokenOwner).rejectChild(parentId, 0, zeroAddress))
         .to.emit(parent, 'PendingChildRemoved')
         .withArgs(parentId, 0);
@@ -335,7 +334,6 @@ async function shouldBehaveLikeNesting(
     });
 
     it('can reject one pending child, set child owner to new address', async function () {
-      
       await expect(parent.connect(tokenOwner).rejectChild(parentId, 0, addrs[2].address))
         .to.emit(parent, 'PendingChildRemoved')
         .withArgs(parentId, 0);
@@ -361,10 +359,9 @@ async function shouldBehaveLikeNesting(
     it('cannot reject not owned pending child', async function () {
       const notOwner = addrs[3];
 
-      await expect(parent.connect(notOwner).rejectChild(parentId, 0, zeroAddress)).to.be.revertedWithCustomError(
-        parent,
-        'ERC721NotApprovedOrOwner',
-      );
+      await expect(
+        parent.connect(notOwner).rejectChild(parentId, 0, zeroAddress),
+      ).to.be.revertedWithCustomError(parent, 'ERC721NotApprovedOrOwner');
     });
 
     it('can reject all pending children', async function () {
@@ -469,7 +466,6 @@ async function shouldBehaveLikeNesting(
       await parent.connect(tokenOwner).burnChild(parentId, 0);
 
       // Removed from the parent
-      // FIXME: This is broken, it's not being removed from parent
       expect(await parent.childrenOf(parentId)).to.eql([]);
 
       // No owner for token
@@ -485,7 +481,7 @@ async function shouldBehaveLikeNesting(
 
     it('cannot burn not owned nested token', async function () {
       const notOwner = addrs[3];
-      const childId = nestMint(child, parent.address, parentId);
+      await nestMint(child, parent.address, parentId);
       await parent.connect(tokenOwner).acceptChild(parentId, 0);
 
       await expect(parent.connect(notOwner).burnChild(parentId, 0)).to.be.revertedWithCustomError(
@@ -514,7 +510,7 @@ async function shouldBehaveLikeNesting(
         true,
       ]);
 
-      console.log()
+      console.log();
 
       await parent.connect(tokenOwner).burnChild(parentId, 0);
 
@@ -562,8 +558,8 @@ async function shouldBehaveLikeNesting(
     });
 
     it('can unnest child with to as root owner', async function () {
-      let to_owner = tokenOwner.address;
-      await expect(parent.connect(tokenOwner).unnestChild(parentId, 0, to_owner))
+      const toOwner = tokenOwner.address;
+      await expect(parent.connect(tokenOwner).unnestChild(parentId, 0, toOwner))
         .to.emit(parent, 'ChildUnnested')
         .withArgs(parentId, 0);
 
@@ -572,30 +568,30 @@ async function shouldBehaveLikeNesting(
 
     it('can unnest child if approved', async function () {
       const unnester = addrs[1];
-      let to_owner = tokenOwner.address;
+      const toOwner = tokenOwner.address;
       // Since unnest is child scoped, approval must be on the child contract to child id
       await parent.connect(tokenOwner).approve(unnester.address, parentId);
 
-      await parent.connect(unnester).unnestChild(parentId, 0, to_owner);
+      await parent.connect(unnester).unnestChild(parentId, 0, toOwner);
       await checkChildMovedToRootOwner();
     });
 
     it('can unnest child if approved for all', async function () {
       const operator = addrs[2];
-      let to_owner = tokenOwner.address;
+      const toOwner = tokenOwner.address;
       // Since unnest is child scoped, approval must be on the child contract to child id
       await parent.connect(tokenOwner).setApprovalForAll(operator.address, true);
 
-      await parent.connect(operator).unnestChild(parentId, 0, to_owner);
+      await parent.connect(operator).unnestChild(parentId, 0, toOwner);
       await checkChildMovedToRootOwner();
     });
 
     it('can unnest child with grandchild and children are ok', async function () {
-      let to_owner = tokenOwner.address;
+      const toOwner = tokenOwner.address;
       const grandchildId = await nestMint(child, child.address, childId);
 
       // Unnest child from parent.
-      await parent.connect(tokenOwner).unnestChild(parentId, 0, to_owner);
+      await parent.connect(tokenOwner).unnestChild(parentId, 0, toOwner);
 
       // New owner of child
       expect(await child.ownerOf(childId)).to.eql(tokenOwner.address);
@@ -615,19 +611,18 @@ async function shouldBehaveLikeNesting(
     });
 
     it('cannot unnest if not child root owner', async function () {
-      let to_owner = tokenOwner.address;
+      const toOwner = tokenOwner.address;
       const notOwner = addrs[3];
-      await expect(parent.connect(notOwner).unnestChild(parentId, 0, to_owner)).to.be.revertedWithCustomError(
-        child,
-        'ERC721NotApprovedOrOwner',
-      );
+      await expect(
+        parent.connect(notOwner).unnestChild(parentId, 0, toOwner),
+      ).to.be.revertedWithCustomError(child, 'ERC721NotApprovedOrOwner');
     });
 
     it('cannot unnest not existing child', async function () {
       const badChildId = 99;
-      let to_owner = tokenOwner.address;
+      const toOwner = tokenOwner.address;
       await expect(
-        parent.connect(tokenOwner).unnestChild(badChildId, 0, to_owner),
+        parent.connect(tokenOwner).unnestChild(badChildId, 0, toOwner),
       ).to.be.revertedWithCustomError(child, 'ERC721InvalidTokenId');
     });
 
@@ -639,7 +634,7 @@ async function shouldBehaveLikeNesting(
         false,
       ]);
 
-      //Unnesting updates balances downstream
+      // Unnesting updates balances downstream
       expect(await child.balanceOf(tokenOwner.address)).to.equal(1);
       expect(await parent.balanceOf(tokenOwner.address)).to.equal(1);
     }
@@ -741,7 +736,7 @@ async function shouldBehaveLikeNesting(
       expect(await parent.balanceOf(firstOwner.address)).to.equal(2);
       expect(await child.balanceOf(parent.address)).to.equal(1);
 
-      //Transfers token parentId to (parent.address, token grandParentId)
+      // Transfers token parentId to (parent.address, token grandParentId)
       await nestTransfer(parent, firstOwner, parent.address, parentId, grandParentId);
 
       // Balances unchanged since root owner is the same
@@ -769,7 +764,7 @@ async function shouldBehaveLikeNesting(
       expect(await parent.balanceOf(firstOwner.address)).to.equal(1);
       expect(await child.balanceOf(parent.address)).to.equal(1);
 
-      //firstOwner calls parent to transfer parent token parent
+      // firstOwner calls parent to transfer parent token parent
       await nestTransfer(parent, firstOwner, parent.address, parentId, grandParentId);
 
       // Balances update
