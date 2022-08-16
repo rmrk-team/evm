@@ -74,4 +74,18 @@ interface IRMRKNesting {
         uint256 index
     ) external view returns (Child memory);
 
+    function nestTransferFrom(
+        address from,
+        address to,
+        uint256 tokenId,
+        uint256 destinationId
+    ) external;
+
+    function safeNestTransferFrom(
+        address from,
+        address to,
+        uint256 tokenId,
+        uint256 destinationId
+    ) external;
+
 }

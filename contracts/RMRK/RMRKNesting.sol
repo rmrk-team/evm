@@ -262,7 +262,7 @@ contract RMRKNesting is ERC721, IRMRKNesting {
         uint256 tokenId,
         uint256 destinationId
     ) public virtual onlyHasTransferPerm(tokenId) {
-        _transfer(_msgSender(), to, tokenId, destinationId);
+        nestTransferFrom(_msgSender(), to, tokenId, destinationId);
     }
 
     function transferFrom(
@@ -273,13 +273,13 @@ contract RMRKNesting is ERC721, IRMRKNesting {
         _transfer(from, to, tokenId);
     }
 
-    function transferFrom(
+    function nestTransferFrom(
         address from,
         address to,
         uint256 tokenId,
         uint256 destinationId
     ) public virtual onlyHasTransferPerm(tokenId) {
-        _transfer(from, to, tokenId, destinationId);
+        _nestTransfer(from, to, tokenId, destinationId);
     }
 
     function safeTransferFrom(
@@ -299,30 +299,33 @@ contract RMRKNesting is ERC721, IRMRKNesting {
         _safeTransfer(from, to, tokenId, data);
     }
 
-    function safeTransferNestingFrom(
-        address from,
-        address to,
-        uint256 tokenId
-    ) public virtual {
-        safeTransferNestingFrom(from, to, tokenId, "");
-    }
-
-    function safeTransferNestingFrom(
+    function safeNestTransferFrom(
         address from,
         address to,
         uint256 tokenId,
+        uint256 destinationId
+    ) public virtual {
+        safeNestTransferFrom(from, to, tokenId, destinationId, "");
+    }
+
+    function safeNestTransferFrom(
+        address from,
+        address to,
+        uint256 tokenId,
+        uint256 destinationId,
         bytes memory data
     ) public virtual onlyHasTransferPerm(tokenId) {
-        _safeTransferNesting(from, to, tokenId, data);
+        _safeNestTransfer(from, to, tokenId, destinationId, data);
     }
 
-    function _safeTransferNesting(
+    function _safeNestTransfer(
         address from,
         address to,
         uint256 tokenId,
+        uint256 destinationId,
         bytes memory data
     ) internal virtual {
-        _transfer(from, to, tokenId);
+        _nestTransfer(from, to, tokenId, destinationId);
         if (!_checkRMRKNestingImplementer(from, to, tokenId, data))
             revert RMRKNestingTransferToNonRMRKNestingImplementer();
     }
@@ -360,7 +363,7 @@ contract RMRKNesting is ERC721, IRMRKNesting {
     */
     //Double check to make sure nested transfers update balanceOf correctly. Maybe add condition if rootOwner does not change for gas savings.
     //All children of transferred NFT should also have owner updated.
-    function _transfer(
+    function _nestTransfer(
         address from,
         address to,
         uint256 tokenId,
