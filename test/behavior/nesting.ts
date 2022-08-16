@@ -442,7 +442,7 @@ async function shouldBehaveLikeNesting(
 
       await expect(child.connect(tokenOwner).burnFromParent(childId)).to.be.revertedWithCustomError(
         child,
-        'RMRKNoTransferPermission',
+        'RMRKCallerIsNotOwnerContract',
       );
     });
 
