@@ -47,12 +47,12 @@ contract RMRKNestingMock is  IRMRKNestingReceiver, RMRKNesting {
         _mint(to, tokenId);
     }
 
-    function mint(
+    function nestMint(
         address to,
         uint256 tokenId,
         uint256 destinationId
     ) external {
-        _mint(to, tokenId, destinationId);
+        _nestMint(to, tokenId, destinationId);
     }
 
     //update for reentrancy

@@ -15,7 +15,7 @@ async function mintTokenId(token: Contract, to: string): Promise<number> {
 async function nestMinttokenId(token: Contract, to: string, parentId: number): Promise<number> {
   const childTokenId = nextChildTokenId;
   nextChildTokenId++;
-  await token['mint(address,uint256,uint256)'](to, childTokenId, parentId);
+  await token['nestMint(address,uint256,uint256)'](to, childTokenId, parentId);
   return childTokenId;
 }
 
