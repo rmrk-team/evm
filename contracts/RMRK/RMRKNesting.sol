@@ -12,7 +12,7 @@ import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
-import "hardhat/console.sol";
+// import "hardhat/console.sol";
 
 error RMRKCallerIsNotOwnerContract();
 error RMRKChildIndexOutOfRange();
@@ -227,10 +227,9 @@ contract RMRKNesting is ERC721, IRMRKNesting {
     }
 
     //update for reentrancy
-    //FIXME: This error reverts if caller is not owner contract, but this will also pass if owner is immediate owner
     //Suggest delegate to _burn method, as both run same code
-    //FIXME: This should not be external by default, implement this top level only
-    function burnFromParent(uint256 tokenId) external onlyHasTransferPerm(tokenId) {
+    //FIXME: This should not be external by default, implement this top level only (Steven: I think this is good now, only parent is allowed)
+    function burnFromParent(uint256 tokenId) external {
         (address _RMRKOwner, , ) = rmrkOwnerOf(tokenId);
         if(_RMRKOwner != _msgSender())
             revert RMRKCallerIsNotOwnerContract();
@@ -239,7 +238,7 @@ contract RMRKNesting is ERC721, IRMRKNesting {
         _balances[_RMRKOwner] -= 1;   
     }
 
-    //FIXME: This should not be external by default, implement this top level only
+    //FIXME: This should not be external by default, implement this top level only. (Steven: We either remove this or make it part of the interface)
     //TODO: Figure out if leaving a garbage value in enumeration will be an issue
     function burnChild(uint256 tokenId, uint256 childIndex) external onlyHasTransferPerm(tokenId) {
         Child memory child = _children[tokenId][childIndex];
