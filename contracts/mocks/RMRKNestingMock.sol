@@ -56,9 +56,9 @@ contract RMRKNestingMock is  IRMRKNestingReceiver, RMRKNesting {
     }
 
     //update for reentrancy
-    // function burn(uint256 tokenId) public onlyHasTransferPerm(tokenId) {
-    //     _burn(tokenId);
-    // }
+    function burn(uint256 tokenId) public onlyHasTransferPerm(tokenId) {
+        _burn(tokenId);
+    }
 
     function onRMRKNestingReceived(
         address,

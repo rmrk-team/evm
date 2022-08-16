@@ -234,9 +234,8 @@ async function shouldBehaveLikeNesting(
       expect(await parent.supportsInterface('0x80ac58cd')).to.equal(true);
     });
 
-    //FIXME: SKIP What's the best way to automatically calculate INESTING interface ID?
-    it.skip('can support INesting', async function () {
-      expect(await parent.supportsInterface('0x71c8af03')).to.equal(true);
+    it('can support INesting', async function () {
+      expect(await parent.supportsInterface('0x3000c65e')).to.equal(true);
     });
 
     it('cannot support other interfaceId', async function () {
@@ -419,7 +418,7 @@ async function shouldBehaveLikeNesting(
     });
   });
 
-  describe.skip('Burning', async function () {
+  describe('Burning', async function () {
     let parentId: number;
 
     beforeEach(async function () {
@@ -440,10 +439,11 @@ async function shouldBehaveLikeNesting(
       );
     });
 
-    it('cannot burn from parent if not parent', async function () {
+    it('cannot burn from parent directly', async function () {
       const childId = nestMint(child, parent.address, parentId);
+      await parent.connect(tokenOwner).acceptChild(parentId, 0);
 
-      await expect(child.connect(tokenOwner).burnChild(parentId, 0)).to.be.revertedWithCustomError(
+      await expect(child.connect(tokenOwner).burnFromParent(childId)).to.be.revertedWithCustomError(
         child,
         'RMRKNoTransferPermission',
       );

@@ -266,9 +266,13 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
 
         context('when the sender is not authorized for the token id', function () {
           it('reverts', async function () {
+            // Standard ERC721 will use the latter. Every Nesting would have it defined and use it instead
+            const error = this.token.interface.errors['RMRKNoTransferPermission()']
+              ? 'RMRKNoTransferPermission'
+              : 'ERC721NotApprovedOrOwner';
             await expect(
               transferFunction(this.token, owner.address, others[0].address, tokenId, others[0]),
-            ).to.be.revertedWithCustomError(this.token, 'RMRKNoTransferPermission');
+            ).to.be.revertedWithCustomError(this.token, error);
           });
         });
 
