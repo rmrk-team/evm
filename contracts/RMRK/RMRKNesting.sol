@@ -19,15 +19,10 @@ error RMRKChildIndexOutOfRange();
 error RMRKIsNotContract();
 error RMRKMaxPendingChildrenReached();
 error RMRKMintToNonRMRKImplementer();
-error RMRKMustUnnestFirst();
 error RMRKNestingTransferToNonRMRKNestingImplementer();
+error RMRKNoTransferPermission();
 error RMRKParentChildMismatch();
 error RMRKPendingChildIndexOutOfRange();
-error RMRKUnnestChildIdMismatch();
-error RMRKUnnestForNonexistentToken();
-error RMRKUnnestForNonNftParent();
-error RMRKUnnestFromWrongChild();
-error RMRKNoTransferPermission();
 
 contract RMRKNesting is ERC721, IRMRKNesting {
 

@@ -9,8 +9,6 @@ import "../RMRK/interfaces/IRMRKNestingWithEquippable.sol";
 import "../RMRK/RMRKNesting.sol";
 // import "hardhat/console.sol";
 
-error RMRKNotParent();
-error RMRKNotEquippable();
 error RMRKMustUnequipFirst();
 
 contract RMRKNestingWithEquippable is IRMRKNestingWithEquippable, RMRKNesting {
@@ -22,28 +20,7 @@ contract RMRKNestingWithEquippable is IRMRKNestingWithEquippable, RMRKNesting {
         string memory symbol_
     ) RMRKNesting(name_, symbol_) {}
 
-    //FIXME: Check to make sure this cannot be called from non_RMRK owner
-    function _onlyParent(uint256 tokenId) private view {
-        (address owner,,bool isNFT) = rmrkOwnerOf(tokenId);
-        if(_msgSender() != owner || !isNFT)
-            revert RMRKNotParent();
-    }
-
-    modifier onlyParent(uint256 tokenId) {
-        _onlyParent(tokenId);
-        _;
-    }
-
-    function _onlyEquippable() private view {
-        if(_msgSender() != _equippableAddress)
-            revert RMRKNotParent();
-    }
-
-    modifier onlyEquippable() {
-        _onlyEquippable();
-        _;
-    }
-
+    // It's overriden to make check the child is not equipped when trying to unnest
     function unnestChild(
         uint256 tokenId,
         uint256 index, 

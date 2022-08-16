@@ -19,16 +19,13 @@ import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 // import "hardhat/console.sol";
 
 error ERC721NotApprovedOrOwner();
-error RMRKBadLength();
 error RMRKBaseRequiredForParts();
-error RMRKCallerCannotChangeEquipStatus();
 error RMRKTokenCannotBeEquippedWithResourceIntoSlot();
 error RMRKEquippableEquipNotAllowedByBase();
 error RMRKNotComposableResource();
 error RMRKNotEquipped();
 error RMRKSlotAlreadyUsed();
 error RMRKTokenDoesNotHaveActiveResource();
-error RMRKNotNesting();
 
 contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
 
@@ -114,15 +111,6 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
 
     modifier onlyApprovedForResourcesOrOwner(uint256 tokenId) {
         _onlyApprovedForResourcesOrOwner(tokenId);
-        _;
-    }
-
-    function _onlyNesting() internal view {
-        if(_msgSender() != _nestingAddress) revert RMRKNotNesting();
-    }
-
-    modifier onlyNesting() {
-        _onlyNesting();
         _;
     }
 
