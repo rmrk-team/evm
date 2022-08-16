@@ -15,12 +15,12 @@ contract RMRKNestingMultiResourceMock is RMRKNestingMultiResource {
         _mint(to, tokenId);
     }
 
-    function mint(
+    function nestMint(
         address to,
         uint256 tokenId,
         uint256 destId
     ) external {
-        _mint(to, tokenId, destId);
+        _nestMint(to, tokenId, destId);
     }
 
     //update for reentrancy

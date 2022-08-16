@@ -133,7 +133,7 @@ contract RMRKNesting is ERC721, IRMRKNesting {
         _afterTokenTransfer(address(0), to, tokenId);
     }
 
-    function _mint(address to, uint256 tokenId, uint256 destinationId) internal virtual {
+    function _nestMint(address to, uint256 tokenId, uint256 destinationId) internal virtual {
         if(to == address(0)) revert ERC721MintToTheZeroAddress();
         if(_exists(tokenId)) revert ERC721TokenAlreadyMinted();
         // It seems redundant, but otherwise it would revert with no error
@@ -161,7 +161,7 @@ contract RMRKNesting is ERC721, IRMRKNesting {
     }
 
     function _safeMintNesting(address to, uint256 tokenId, uint256 destinationId, bytes memory data) internal virtual {
-        _mint(to, tokenId, destinationId);
+        _nestMint(to, tokenId, destinationId);
         if (!_checkRMRKNestingImplementer(address(0), to, tokenId, data)) {
             revert RMRKMintToNonRMRKImplementer();
         }

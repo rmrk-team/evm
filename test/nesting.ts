@@ -64,7 +64,7 @@ describe('NestingMock', function () {
       const childId = await nestMinttokenId(child, parent.address, parentId);
 
       await expect(
-        child['mint(address,uint256,uint256)'](parent.address, childId, parentId),
+        child['nestMint(address,uint256,uint256)'](parent.address, childId, parentId),
       ).to.be.revertedWithCustomError(child, 'ERC721TokenAlreadyMinted');
     });
 
@@ -73,7 +73,7 @@ describe('NestingMock', function () {
       const childId = await nestMinttokenId(child, parent.address, parentId);
 
       await expect(
-        child['mint(address,uint256,uint256)'](parent.address, childId, parentId),
+        child['nestMint(address,uint256,uint256)'](parent.address, childId, parentId),
       ).to.be.revertedWithCustomError(child, 'ERC721TokenAlreadyMinted');
     });
   });
