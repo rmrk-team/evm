@@ -12,7 +12,6 @@ interface IRMRKNesting {
     // FIXME: ChildRejected seems more consistent
     event PendingChildRemoved(uint tokenId, uint index);
     event AllPendingChildrenRemoved(uint tokenId);
-    event ChildRemoved(uint tokenId, uint index);
     event ChildUnnested(uint tokenId, uint index);
 
 
