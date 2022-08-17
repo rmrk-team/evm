@@ -432,7 +432,7 @@ async function shouldBehaveLikeNesting(
       const notOwner = addrs[3];
       await expect(parent.connect(notOwner).burnChild(parentId, 0)).to.be.revertedWithCustomError(
         parent,
-        'RMRKNoTransferPermission',
+        'RMRKNotApprovedOrDirectOwner',
       );
     });
 
@@ -486,7 +486,7 @@ async function shouldBehaveLikeNesting(
 
       await expect(parent.connect(notOwner).burnChild(parentId, 0)).to.be.revertedWithCustomError(
         child,
-        'RMRKNoTransferPermission',
+        'RMRKNotApprovedOrDirectOwner',
       );
     });
 
@@ -659,7 +659,7 @@ async function shouldBehaveLikeNesting(
       const tokenId = await mint(parent, firstOwner.address);
       await expect(
         transfer(parent, newOwner, newOwner.address, tokenId),
-      ).to.be.revertedWithCustomError(child, 'RMRKNoTransferPermission');
+      ).to.be.revertedWithCustomError(child, 'RMRKNotApprovedOrDirectOwner');
     });
 
     it('cannot transfer to address zero', async function () {
@@ -723,7 +723,7 @@ async function shouldBehaveLikeNesting(
 
       await expect(
         transfer(child, firstOwner, newOwner.address, childId),
-      ).to.be.revertedWithCustomError(child, 'RMRKNoTransferPermission');
+      ).to.be.revertedWithCustomError(child, 'RMRKNotApprovedOrDirectOwner');
     });
 
     it('can transfer parent token to token with same owner, family tree is ok', async function () {

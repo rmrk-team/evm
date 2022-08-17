@@ -20,7 +20,7 @@ error RMRKIsNotContract();
 error RMRKMaxPendingChildrenReached();
 error RMRKMintToNonRMRKImplementer();
 error RMRKNestingTransferToNonRMRKNestingImplementer();
-error RMRKNoTransferPermission();
+error RMRKNotApprovedOrDirectOwner();
 error RMRKParentChildMismatch();
 error RMRKPendingChildIndexOutOfRange();
 
@@ -88,17 +88,17 @@ contract RMRKNesting is ERC721, IRMRKNesting {
     * @param tokenId tokenId to check owner against.
     */
     //
-    function _onlyHasTransferPerm(uint256 tokenId) private view {
-        if(!_hasTransferPerm(_msgSender(), tokenId)) revert RMRKNoTransferPermission();
+    function _onlyApprovedOrDirectOwner(uint256 tokenId) private view {
+        if(!_isApprovedOrDirectOwner(_msgSender(), tokenId)) revert RMRKNotApprovedOrDirectOwner();
     }
 
-    modifier onlyHasTransferPerm(uint256 tokenId) {
-        _onlyHasTransferPerm(tokenId);
+    modifier onlyApprovedOrDirectOwner(uint256 tokenId) {
+        _onlyApprovedOrDirectOwner(tokenId);
         _;
     }
 
     //TODO: Code review here -- Accepting perms that aren't always used
-    function _hasTransferPerm(address spender, uint256 tokenId) internal view virtual returns (bool) {
+    function _isApprovedOrDirectOwner(address spender, uint256 tokenId) internal view virtual returns (bool) {
         (address owner, uint parentTokenId,) = rmrkOwnerOf(tokenId);
         if (parentTokenId != 0) {
             return (spender == owner);
@@ -234,7 +234,7 @@ contract RMRKNesting is ERC721, IRMRKNesting {
 
     //FIXME: This should not be external by default, implement this top level only. (Steven: We either remove this or make it part of the interface)
     //TODO: Figure out if leaving a garbage value in enumeration will be an issue
-    function burnChild(uint256 tokenId, uint256 childIndex) external onlyHasTransferPerm(tokenId) {
+    function burnChild(uint256 tokenId, uint256 childIndex) external onlyApprovedOrDirectOwner(tokenId) {
         Child memory child = _children[tokenId][childIndex];
         IRMRKNesting(child.contractAddress).burnFromParent(child.tokenId);
         removeItemByIndex_C(_children[tokenId], childIndex);
@@ -245,26 +245,11 @@ contract RMRKNesting is ERC721, IRMRKNesting {
     //            TRANSFERING
     ////////////////////////////////////////
 
-    function transfer(
-        address to,
-        uint256 tokenId
-    ) public virtual {
-        transferFrom(_msgSender(), to, tokenId);
-    }
-
-    function nestTransfer(
-        address to,
-        uint256 tokenId,
-        uint256 destinationId
-    ) public virtual onlyHasTransferPerm(tokenId) {
-        nestTransferFrom(_msgSender(), to, tokenId, destinationId);
-    }
-
     function transferFrom(
         address from,
         address to,
         uint256 tokenId
-    ) public virtual override onlyHasTransferPerm(tokenId) {
+    ) public virtual override onlyApprovedOrDirectOwner(tokenId) {
         _transfer(from, to, tokenId);
     }
 
@@ -273,7 +258,7 @@ contract RMRKNesting is ERC721, IRMRKNesting {
         address to,
         uint256 tokenId,
         uint256 destinationId
-    ) public virtual onlyHasTransferPerm(tokenId) {
+    ) public virtual onlyApprovedOrDirectOwner(tokenId) {
         _nestTransfer(from, to, tokenId, destinationId);
     }
 
@@ -290,7 +275,7 @@ contract RMRKNesting is ERC721, IRMRKNesting {
         address to,
         uint256 tokenId,
         bytes memory data
-    ) public virtual override(ERC721) onlyHasTransferPerm(tokenId) {
+    ) public virtual override(ERC721) onlyApprovedOrDirectOwner(tokenId) {
         _safeTransfer(from, to, tokenId, data);
     }
 
@@ -309,7 +294,7 @@ contract RMRKNesting is ERC721, IRMRKNesting {
         uint256 tokenId,
         uint256 destinationId,
         bytes memory data
-    ) public virtual onlyHasTransferPerm(tokenId) {
+    ) public virtual onlyApprovedOrDirectOwner(tokenId) {
         _safeNestTransfer(from, to, tokenId, destinationId, data);
     }
 
