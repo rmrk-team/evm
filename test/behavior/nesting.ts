@@ -60,7 +60,7 @@ async function shouldBehaveLikeNesting(
       expect(await parent.balanceOf(tokenOwner.address)).to.equal(1);
       expect(await parent.balanceOf(otherOwner.address)).to.equal(2);
 
-      await expect(parent.ownerOf(100)).to.be.revertedWithCustomError(
+      await expect(parent.ownerOf(9999)).to.be.revertedWithCustomError(
         parent,
         'ERC721InvalidTokenId',
       );
