@@ -116,4 +116,19 @@ contract RMRKNestingMultiResourceImpl is OwnableLock, RMRKMintingUtils, IRMRKNes
     function totalResources() external view returns(uint256) {
         return _totalResources;
     }
+
+    function transfer(
+        address to,
+        uint256 tokenId
+    ) public virtual {
+        transferFrom(_msgSender(), to, tokenId);
+    }
+
+    function nestTransfer(
+        address to,
+        uint256 tokenId,
+        uint256 destinationId
+    ) public virtual {
+        nestTransferFrom(_msgSender(), to, tokenId, destinationId);
+    }
 }

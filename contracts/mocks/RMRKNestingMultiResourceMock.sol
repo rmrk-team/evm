@@ -73,4 +73,19 @@ contract RMRKNestingMultiResourceMock is RMRKNestingMultiResource {
     ) external {
         _addResourceEntry(id, metadataURI);
     }
+
+    function transfer(
+        address to,
+        uint256 tokenId
+    ) public virtual {
+        transferFrom(_msgSender(), to, tokenId);
+    }
+
+    function nestTransfer(
+        address to,
+        uint256 tokenId,
+        uint256 destinationId
+    ) public virtual {
+        nestTransferFrom(_msgSender(), to, tokenId, destinationId);
+    }
 }
