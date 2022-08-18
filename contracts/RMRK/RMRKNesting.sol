@@ -301,6 +301,18 @@ contract RMRKNesting is ERC721, IRMRKNesting {
             revert RMRKNestingTransferToNonRMRKNestingImplementer();
     }
 
+
+    /**
+    * @dev Transfers `tokenId` from `from` to `to`.
+    *  As opposed to {transferFrom}, this imposes no restrictions on msg.sender.
+    *
+    * Requirements:
+    *
+    * - `to` cannot be the zero address.
+    * - `tokenId` token must be owned by `from`.
+    *
+    * Emits a {Transfer} event.
+    */
     function _transfer(
         address from,
         address to,
@@ -321,19 +333,6 @@ contract RMRKNesting is ERC721, IRMRKNesting {
         _afterTokenTransfer(from, to, tokenId);
     }
 
-    /**
-    * @dev Transfers `tokenId` from `from` to `to`.
-    *  As opposed to {transferFrom}, this imposes no restrictions on msg.sender.
-    *
-    * Requirements:
-    *
-    * - `to` cannot be the zero address.
-    * - `tokenId` token must be owned by `from`.
-    *
-    * Emits a {Transfer} event.
-    */
-    //Double check to make sure nested transfers update balanceOf correctly. Maybe add condition if rootOwner does not change for gas savings.
-    //All children of transferred NFT should also have owner updated.
     function _nestTransfer(
         address from,
         address to,
