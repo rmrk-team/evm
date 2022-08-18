@@ -23,6 +23,7 @@ error RMRKNestingTransferToNonRMRKNestingImplementer();
 error RMRKNotApprovedOrDirectOwner();
 error RMRKParentChildMismatch();
 error RMRKPendingChildIndexOutOfRange();
+error RMRKInvalidChildReclaim();
 
 contract RMRKNesting is ERC721, IRMRKNesting {
 
@@ -487,12 +488,16 @@ contract RMRKNesting is ERC721, IRMRKNesting {
         emit ChildUnnested(tokenId, index);
     }
 
-    //TODO: implement test
     function reclaimChild(
         uint256 tokenId, 
         address childAddress, 
         uint256 childTokenId
     ) public onlyApprovedOrOwner(tokenId)  {
+        (
+            address owner, uint256 ownerTokenId, bool isNft
+        ) = IRMRKNesting(childAddress).rmrkOwnerOf(childTokenId);
+        if (owner != address(this) || ownerTokenId != tokenId || !isNft)
+            revert RMRKInvalidChildReclaim();
         IERC721(childAddress).safeTransferFrom(address(this), _msgSender(), childTokenId);
     }
 
