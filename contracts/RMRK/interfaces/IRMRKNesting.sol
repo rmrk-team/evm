@@ -30,6 +30,8 @@ interface IRMRKNesting {
         bool
     );
 
+    function burnChild(uint256 tokenId, uint256 childIndex) external;
+
     function burnFromParent(uint256 tokenId) external;
 
     function addChild(
@@ -40,7 +42,7 @@ interface IRMRKNesting {
 
     function acceptChild(
         uint256 parentTokenId,
-        uint256 childTokenId
+        uint256 index
     ) external;
 
     function rejectChild(
