@@ -216,7 +216,6 @@ contract RMRKNesting is ERC721, IRMRKNesting {
 
     //update for reentrancy
     //Suggest delegate to _burn method, as both run same code
-    //FIXME: This should not be external by default, implement this top level only (Steven: I think this is good now, only parent is allowed)
     function burnFromParent(uint256 tokenId) external {
         (address _RMRKOwner, , ) = rmrkOwnerOf(tokenId);
         if(_RMRKOwner != _msgSender())
@@ -226,8 +225,6 @@ contract RMRKNesting is ERC721, IRMRKNesting {
         _balances[_RMRKOwner] -= 1;   
     }
 
-    //FIXME: This should not be external by default, implement this top level only. (Steven: We either remove this or make it part of the interface)
-    //TODO: Figure out if leaving a garbage value in enumeration will be an issue
     function burnChild(uint256 tokenId, uint256 childIndex) external onlyApprovedOrDirectOwner(tokenId) {
         Child memory child = _children[tokenId][childIndex];
         IRMRKNesting(child.contractAddress).burnFromParent(child.tokenId);
@@ -431,9 +428,6 @@ contract RMRKNesting is ERC721, IRMRKNesting {
     * @dev This does not update the ownership storage data on children. If necessary, ownership
     * can be reclaimed by the rootOwner of the previous parent (this).
     */
-    //FIXME: update all mappiungs during purge
-    // Considerations: If we gate access to this array by pendingChildren.length, we can leave
-    // garbage values in the mapping.
     function rejectAllChildren(uint256 tokenId) public virtual onlyApprovedOrOwner(tokenId) {
         delete(_pendingChildren[tokenId]);
         emit AllPendingChildrenRemoved(tokenId);
@@ -475,7 +469,6 @@ contract RMRKNesting is ERC721, IRMRKNesting {
     * @param index is the index of the child token ID.
     * @param to is the address to transfer this 
     */
-    //TODO: Check to see if parent can also call onlyApprovedOrOwner
     function unnestChild(
         uint256 tokenId,
         uint256 index, 
