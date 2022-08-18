@@ -57,6 +57,12 @@ interface IRMRKNesting {
         address to
     ) external;
 
+    function reclaimChild(
+        uint256 tokenId,
+        address childAddress,
+        uint256 childTokenId
+    ) external;
+
     function childrenOf(
         uint256 parentTokenId
     ) external view returns (Child[] memory);

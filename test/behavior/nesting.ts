@@ -235,7 +235,7 @@ async function shouldBehaveLikeNesting(
     });
 
     it('can support INesting', async function () {
-      expect(await parent.supportsInterface('0xebb33952')).to.equal(true);
+      expect(await parent.supportsInterface('0xc406a39d')).to.equal(true);
     });
 
     it('cannot support other interfaceId', async function () {
@@ -558,12 +558,58 @@ async function shouldBehaveLikeNesting(
     });
 
     it('can unnest child with to as root owner', async function () {
-      const toOwner = tokenOwner.address;
-      await expect(parent.connect(tokenOwner).unnestChild(parentId, 0, toOwner))
+      await expect(parent.connect(tokenOwner).unnestChild(parentId, 0, tokenOwner.address))
         .to.emit(parent, 'ChildUnnested')
         .withArgs(parentId, 0);
 
       await checkChildMovedToRootOwner();
+    });
+
+    it('can unnest child to another address', async function () {
+      const toOwnerAddress = addrs[2].address;
+      await expect(parent.connect(tokenOwner).unnestChild(parentId, 0, toOwnerAddress))
+        .to.emit(parent, 'ChildUnnested')
+        .withArgs(parentId, 0);
+
+      await checkChildMovedToRootOwner(toOwnerAddress);
+    });
+
+    it('can reclaim unnested child if unnested to address zero', async function () {
+      await parent.connect(tokenOwner).unnestChild(parentId, 0, ethers.constants.AddressZero);
+
+      await parent.connect(tokenOwner).reclaimChild(parentId, child.address, childId);
+      expect(await child.ownerOf(childId)).to.eql(tokenOwner.address);
+      expect(await child.rmrkOwnerOf(childId)).to.eql([
+        tokenOwner.address,
+        BigNumber.from(0),
+        false,
+      ]);
+    });
+
+    it('cannot reclaim unnested child if unnested to a non zero address', async function () {
+      await parent.connect(tokenOwner).unnestChild(parentId, 0, addrs[2].address);
+
+      await expect(
+        parent.connect(tokenOwner).reclaimChild(parentId, child.address, childId),
+      ).to.be.revertedWithCustomError(parent, 'RMRKInvalidChildReclaim');
+    });
+
+    it('cannot reclaim unnested child from different parent token', async function () {
+      await parent.connect(tokenOwner).unnestChild(parentId, 0, ethers.constants.AddressZero);
+      const otherParentId = await mint(parent, tokenOwner.address);
+
+      await expect(
+        parent.connect(tokenOwner).reclaimChild(otherParentId, child.address, childId),
+      ).to.be.revertedWithCustomError(parent, 'RMRKInvalidChildReclaim');
+    });
+
+    it('cannot reclaim unnested child from a non owned parent token', async function () {
+      const notParent = addrs[2];
+      await parent.connect(tokenOwner).unnestChild(parentId, 0, ethers.constants.AddressZero);
+
+      await expect(
+        parent.connect(notParent).reclaimChild(parentId, child.address, childId),
+      ).to.be.revertedWithCustomError(parent, 'ERC721NotApprovedOrOwner');
     });
 
     it('can unnest child if approved', async function () {
@@ -626,16 +672,15 @@ async function shouldBehaveLikeNesting(
       ).to.be.revertedWithCustomError(child, 'ERC721InvalidTokenId');
     });
 
-    async function checkChildMovedToRootOwner() {
-      expect(await child.ownerOf(childId)).to.eql(tokenOwner.address);
-      expect(await child.rmrkOwnerOf(childId)).to.eql([
-        tokenOwner.address,
-        BigNumber.from(0),
-        false,
-      ]);
+    async function checkChildMovedToRootOwner(rootOwnerAddress?: string) {
+      if (rootOwnerAddress === undefined) {
+        rootOwnerAddress = tokenOwner.address;
+      }
+      expect(await child.ownerOf(childId)).to.eql(rootOwnerAddress);
+      expect(await child.rmrkOwnerOf(childId)).to.eql([rootOwnerAddress, BigNumber.from(0), false]);
 
       // Unnesting updates balances downstream
-      expect(await child.balanceOf(tokenOwner.address)).to.equal(1);
+      expect(await child.balanceOf(rootOwnerAddress)).to.equal(1);
       expect(await parent.balanceOf(tokenOwner.address)).to.equal(1);
     }
   });
