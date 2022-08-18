@@ -73,7 +73,7 @@ contract RMRKNestingWithEquippableImpl is OwnableLock, RMRKMintingUtils, IRMRKNe
     }
 
     //update for reentrancy
-    function burn(uint256 tokenId) public onlyHasTransferPerm(tokenId) {
+    function burn(uint256 tokenId) public onlyApprovedOrDirectOwner(tokenId) {
         _burn(tokenId);
     }
 

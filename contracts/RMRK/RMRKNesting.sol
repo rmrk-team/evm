@@ -42,14 +42,8 @@ contract RMRKNesting is ERC721, IRMRKNesting {
     // Mapping of tokenId to array of active children structs
     mapping(uint256 => Child[]) internal _children;
 
-    // Mapping of tokenId to childAddress to child tokenId to child position in children array
-    mapping(uint256 => mapping(address => mapping(uint256 => uint256))) internal _childPosInArray;
-
     // Mapping of tokenId to array of pending children structs
     mapping(uint256 => Child[]) internal _pendingChildren;
-
-    // Mapping of tokenId to childAddress to child tokenId to child position in children array
-    mapping(uint256 => mapping(address => mapping(uint256 => uint256))) internal _pendingChildPosInArray;
 
     constructor(string memory name_, string memory symbol_) ERC721(name_, symbol_) {}
 
@@ -238,7 +232,6 @@ contract RMRKNesting is ERC721, IRMRKNesting {
         Child memory child = _children[tokenId][childIndex];
         IRMRKNesting(child.contractAddress).burnFromParent(child.tokenId);
         removeItemByIndex_C(_children[tokenId], childIndex);
-        delete _childPosInArray[tokenId][child.contractAddress][child.tokenId];
     }
 
     ////////////////////////////////////////
@@ -383,33 +376,6 @@ contract RMRKNesting is ERC721, IRMRKNesting {
     function _cleanApprovals(address owner, uint256 tokenId) internal virtual {}
 
     ////////////////////////////////////////
-    //      CHILD MANAGEMENT INTERNAL
-    ////////////////////////////////////////
-
-    /**
-    * @notice Adds an instance of Child to the pending children array for tokenId. This is hardcoded to be 128 by default.
-    */
-    function _addChildToPending(uint256 tokenId, Child memory child) internal {
-        if(_pendingChildren[tokenId].length < 128) {
-            _pendingChildren[tokenId].push(child);
-            uint256 newChildPosInArray = _pendingChildren[tokenId].length;
-            _pendingChildPosInArray[tokenId][child.contractAddress][child.tokenId] = newChildPosInArray;
-        } else {
-            revert RMRKMaxPendingChildrenReached();
-        }
-    }
-
-    /**
-    * @notice Adds an instance of Child to the children array for tokenId.
-    */
-
-    function _addChildToChildren(uint256 tokenId, Child memory child) internal {
-        uint256 newChildPosInArray = _pendingChildren[tokenId].length;
-        _childPosInArray[tokenId][child.contractAddress][child.tokenId] = newChildPosInArray;
-        _children[tokenId].push(child);
-    }
-
-    ////////////////////////////////////////
     //      CHILD MANAGEMENT PUBLIC
     ////////////////////////////////////////
 
@@ -434,7 +400,13 @@ contract RMRKNesting is ERC721, IRMRKNesting {
             contractAddress: childTokenAddress,
             tokenId: childTokenId
         });
-        _addChildToPending(parentTokenId, child);
+
+        if(_pendingChildren[parentTokenId].length < 128) {
+            _pendingChildren[parentTokenId].push(child);
+        } else {
+            revert RMRKMaxPendingChildrenReached();
+        }
+
         emit ChildProposed(parentTokenId);
     }
 
@@ -449,9 +421,8 @@ contract RMRKNesting is ERC721, IRMRKNesting {
         Child memory child = _pendingChildren[tokenId][index];
 
         removeItemByIndex_C(_pendingChildren[tokenId], index);
-        delete _pendingChildPosInArray[tokenId][child.contractAddress][child.tokenId];
 
-        _addChildToChildren(tokenId, child);
+        _children[tokenId].push(child);
         emit ChildAccepted(tokenId);
     }
 
@@ -490,7 +461,6 @@ contract RMRKNesting is ERC721, IRMRKNesting {
         Child memory pendingChild = _pendingChildren[tokenId][index];
 
         removeItemByIndex_C(_pendingChildren[tokenId], index);
-        delete _pendingChildPosInArray[tokenId][pendingChild.contractAddress][pendingChild.tokenId];
 
         if (to != address(0)) {
             IERC721(pendingChild.contractAddress).safeTransferFrom(address(this), to, pendingChild.tokenId);
@@ -516,7 +486,6 @@ contract RMRKNesting is ERC721, IRMRKNesting {
         Child memory child = _children[tokenId][index];
 
         removeItemByIndex_C(_children[tokenId], index);
-        delete _childPosInArray[tokenId][child.contractAddress][child.tokenId];
 
         if (to != address(0)) {
             IERC721(child.contractAddress).safeTransferFrom(address(this), to, child.tokenId);
