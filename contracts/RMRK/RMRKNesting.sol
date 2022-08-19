@@ -109,35 +109,26 @@ contract RMRKNesting is ERC721, IRMRKNesting {
     //              MINTING
     ////////////////////////////////////////
 
-    //FIXME: look at having _mint that takes a destination ID lean on this mint for code compression
     function _mint(address to, uint256 tokenId) internal override virtual {
-        if(to == address(0)) revert ERC721MintToTheZeroAddress();
-        if(_exists(tokenId)) revert ERC721TokenAlreadyMinted();
-
-        _beforeTokenTransfer(address(0), to, tokenId);
-
-        _balances[to] += 1;
-        _RMRKOwners[tokenId] = RMRKOwner({
-            ownerAddress: to,
-            tokenId: 0,
-            isNft: false
-        });
+        _innerMint(to, tokenId, 0);
 
         emit Transfer(address(0), to, tokenId);
-
         _afterTokenTransfer(address(0), to, tokenId);
     }
 
     function _nestMint(address to, uint256 tokenId, uint256 destinationId) internal virtual {
-        if(to == address(0)) revert ERC721MintToTheZeroAddress();
-        if(_exists(tokenId)) revert ERC721TokenAlreadyMinted();
-        // It seems redundant, but otherwise it would revert with no error
         if(!to.isContract()) revert RMRKIsNotContract();
+        // It seems redundant, but otherwise it would revert with no error
         if(!IERC165(to).supportsInterface(type(IRMRKNesting).interfaceId))
             revert RMRKMintToNonRMRKImplementer();
 
-        //FIXME: do this better? feels like a hack. Just exists to revert if token does not exist
-        IRMRKNesting(to).ownerOf(destinationId);
+        _innerMint(to, tokenId, destinationId);
+        _sendToNFT(tokenId, destinationId, address(0), to);
+    }
+
+    function _innerMint(address to, uint256 tokenId, uint256 destinationId) private { 
+        if(to == address(0)) revert ERC721MintToTheZeroAddress();
+        if(_exists(tokenId)) revert ERC721TokenAlreadyMinted();
 
         _beforeTokenTransfer(address(0), to, tokenId);
 
@@ -145,10 +136,8 @@ contract RMRKNesting is ERC721, IRMRKNesting {
         _RMRKOwners[tokenId] = RMRKOwner({
             ownerAddress: to,
             tokenId: destinationId,
-            isNft: true
+            isNft: destinationId > 0
         });
-
-        _sendToNFT(tokenId, destinationId, address(0), to);
     }
 
     function _safeMintNesting(address to, uint256 tokenId, uint256 destinationId) internal virtual {
@@ -389,6 +378,8 @@ contract RMRKNesting is ERC721, IRMRKNesting {
         uint256 childTokenId,
         address childTokenAddress
     ) public virtual {
+        if(!_exists(parentTokenId)) revert ERC721InvalidTokenId();
+
         IRMRKNesting childTokenContract = IRMRKNesting(childTokenAddress);
         (address parent, , ) = childTokenContract.rmrkOwnerOf(childTokenId);
         if (parent != address(this)) revert RMRKParentChildMismatch();

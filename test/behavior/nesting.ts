@@ -104,7 +104,7 @@ async function shouldBehaveLikeNesting(
       const parentId = await mint(parent, tokenOwner.address);
       await expect(
         nestMint(child, ethers.constants.AddressZero, parentId),
-      ).to.be.revertedWithCustomError(child, 'ERC721MintToTheZeroAddress');
+      ).to.be.revertedWithCustomError(child, 'RMRKIsNotContract');
     });
 
     it('can mint to contract and owners are ok', async function () {
