@@ -4,6 +4,25 @@ pragma solidity ^0.8.15;
 
 interface IRMRKBaseStorage {
 
+  /**
+  * @dev emitted when one or more addresses are added for equippable status for partId.
+  */
+  event AddedEquippables(uint64 partId, address[] equippableAddresses);
+
+  /**
+  * @dev emitted when one or more addresses are whitelisted for equippable status for partId.
+  * Overwrites previous equippable addresses.
+  */
+  event SetEquippables(uint64 partId, address[] equippableAddresses);
+
+  /**
+  * @dev emitted when a partId is flagged as equippable by any.
+  */
+  event SetEquippableToAll(uint64 partId);
+
+  /**
+  * @dev Item type enum for fixed and slot parts.
+  */
   enum ItemType {
       None,
       Slot,
@@ -24,12 +43,32 @@ interface IRMRKBaseStorage {
       string metadataURI; //n bytes 32+
   }
 
+  /**
+  * @dev Returns true if the part at partId is equippable by targetAddress.
+  *
+  * Requirements: None
+  */
   function checkIsEquippable(uint64 partId, address targetAddress) external view returns (bool);
 
+  /**
+  * @dev Returns true if the part at partId is equippable by all addresses.
+  *
+  * Requirements: None
+  */
   function checkIsEquippableToAll(uint64 partId) external view returns (bool);
 
+  /**
+  * @dev Returns the part object at reference partId.
+  *
+  * Requirements: None
+  */
   function getPart(uint64 partId) external view returns (Part memory);
 
+  /**
+  * @dev Returns the part objects at reference partIds.
+  * 
+  * Requirements: None
+  */
   function getParts(uint64[] calldata partIds) external view returns (Part[] memory);
 
 }

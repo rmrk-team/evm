@@ -46,10 +46,6 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
     string private _symbol;
     string private _type;
 
-    event AddedEquippables(uint64 partId, address[] equippableAddresses);
-    event SetEquippables(uint64 partId, address[] equippableAddresses);
-    event SetEquippableToAll(uint64 partId);
-
     //Inquire about using an index instead of hashed ID to prevent any chance of collision
     //Consider moving to interface
     struct IntakeStruct {
