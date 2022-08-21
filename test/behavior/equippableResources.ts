@@ -92,7 +92,7 @@ async function shouldBehaveLikeEquippableResources(
       ).to.be.revertedWithCustomError(chunkyEquip, 'RMRKBaseRequiredForParts');
     });
 
-    it('cannot overwrite resource', async function () {
+    it('cannot add a resource with an existing ID', async function () {
       const id = BigNumber.from(1);
 
       await chunkyEquip.addResourceEntry(

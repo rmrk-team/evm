@@ -79,7 +79,7 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
     //mapping of token id to base address to slot part Id to equipped information. Used to compose an NFT
     mapping(uint => mapping(address => mapping(uint64 => Equipment))) private _equipments;
 
-    //mapping of token id to child address to child Id to count of equips. Used to check if equipped.
+    //mapping of token id to child (nesting) address to child Id to count of equips. Used to check if equipped.
     mapping(uint => mapping(address => mapping(uint => uint8))) private _equipCountPerChild;
 
     //Mapping of refId to parent contract address and valid slotId
