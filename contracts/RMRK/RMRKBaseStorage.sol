@@ -164,9 +164,6 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
     */
 
     function _setEquippableToAll(uint64 partId) internal onlySlot(partId) {
-        if(_parts[partId].itemType == ItemType.None)
-            revert RMRKPartDoesNotExist();
-
         _isEquippableToAll[partId] = true;
         emit SetEquippableToAll(partId);
     }

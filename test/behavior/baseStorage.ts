@@ -206,6 +206,14 @@ async function shouldBehaveLikeBase(contractName: string, symbol: string, type: 
       );
     });
 
+    it('cannot set equippable to all on non existing part', async function () {
+      const nonExistingPartId = 1;
+      await expect(testBase.setEquippableToAll(nonExistingPartId)).to.be.revertedWithCustomError(
+        testBase,
+        'RMRKPartDoesNotExist',
+      );
+    });
+
     it('resets equippable to all if addresses are set', async function () {
       const partId = 1;
       await testBase.addPart({ partId: partId, part: sampleSlotPartData });
