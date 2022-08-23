@@ -609,66 +609,6 @@ async function shouldBehaveLikeEquippableResources(
     });
   });
 
-  describe('Token URI', async function () {
-    it('can set fallback URI', async function () {
-      await chunkyEquip.setFallbackURI('TestURI');
-      expect(await chunkyEquip.getFallbackURI()).to.be.eql('TestURI');
-    });
-
-    it('gets fallback URI if no active resources on token', async function () {
-      const tokenId = await mint(chunky, owner.address);
-      const fallBackUri = 'fallback404';
-      await chunkyEquip.setFallbackURI(fallBackUri);
-      expect(await chunkyEquip.tokenURI(tokenId)).to.eql(fallBackUri);
-    });
-
-    it('can get token URI when resource is not enumerated', async function () {
-      const tokenId = await addResourcesToToken();
-      expect(await chunkyEquip.tokenURI(tokenId)).to.eql(metaURIDefault);
-    });
-
-    it('can get token URI when resource is enumerated', async function () {
-      const resId = BigNumber.from(1);
-      const tokenId = await addResourcesToToken();
-      await chunkyEquip.setTokenEnumeratedResource(resId, true);
-      expect(await chunkyEquip.isTokenEnumeratedResource(resId)).to.eql(true);
-      expect(await chunkyEquip.tokenURI(tokenId)).to.eql(`${metaURIDefault}${tokenId}`);
-    });
-
-    it('can get token URI at specific index', async function () {
-      const tokenId = await mint(chunky, owner.address);
-      const resId = BigNumber.from(1);
-      const resId2 = BigNumber.from(2);
-
-      await chunkyEquip.addResourceEntry(
-        {
-          id: resId,
-          equippableRefId: equippableRefIdDefault,
-          metadataURI: 'UriA',
-          baseAddress: baseAddressDefault,
-        },
-        [],
-        [],
-      );
-      await chunkyEquip.addResourceEntry(
-        {
-          id: resId2,
-          equippableRefId: equippableRefIdDefault,
-          metadataURI: 'UriB',
-          baseAddress: baseAddressDefault,
-        },
-        [],
-        [],
-      );
-      await chunkyEquip.addResourceToToken(tokenId, resId, 0);
-      await chunkyEquip.addResourceToToken(tokenId, resId2, 0);
-      await chunkyEquip.acceptResource(tokenId, 0);
-      await chunkyEquip.acceptResource(tokenId, 0);
-
-      expect(await chunkyEquip.tokenURIAtIndex(tokenId, 1)).to.eql('UriB');
-    });
-  });
-
   describe('Approval Cleaning', async function () {
     it('cleans token and resources approvals on transfer', async function () {
       const tokenOwner = addrs[1];

@@ -5,6 +5,7 @@ pragma solidity ^0.8.15;
 import "../RMRK/access/OwnableLock.sol";
 import "../RMRK/utils/RMRKMintingUtils.sol";
 import "../RMRK/RMRKMultiResource.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
 
 //import "hardhat/console.sol";
 
@@ -12,6 +13,7 @@ error RMRKMintUnderpriced();
 error RMRKMintZero();
 
 contract RMRKMultiResourceImpl is OwnableLock, RMRKMintingUtils, RMRKMultiResource {
+    using Strings for uint256;
 
     /*
     Top-level structures
@@ -19,6 +21,12 @@ contract RMRKMultiResourceImpl is OwnableLock, RMRKMintingUtils, RMRKMultiResour
 
     // Manage resources via increment
     uint256 private _totalResources;
+
+    //Mapping of uint64 resource ID to tokenEnumeratedResource for tokenURI
+    mapping(uint64 => bool) internal _tokenEnumeratedResource;
+
+    //fallback URI
+    string internal _fallbackURI;
 
     constructor(
         string memory name,
@@ -52,15 +60,25 @@ contract RMRKMultiResourceImpl is OwnableLock, RMRKMintingUtils, RMRKMultiResour
         }
     }
 
+    function getFallbackURI() external view virtual returns (string memory) {
+        return _fallbackURI;
+    }
+
     function setFallbackURI(string memory fallbackURI) external onlyOwner {
-        _setFallbackURI(fallbackURI);
+        _fallbackURI = fallbackURI;
+    }
+
+    function isTokenEnumeratedResource(
+        uint64 resourceId
+    ) public view virtual returns(bool) {
+        return _tokenEnumeratedResource[resourceId];
     }
 
     function setTokenEnumeratedResource(
         uint64 resourceId,
         bool state
     ) external onlyOwner {
-        _setTokenEnumeratedResource(resourceId, state);
+        _tokenEnumeratedResource[resourceId] = state;
     }
 
     function addResourceToToken(
@@ -83,4 +101,26 @@ contract RMRKMultiResourceImpl is OwnableLock, RMRKMintingUtils, RMRKMultiResour
         return _totalResources;
     }
 
+    function _tokenURIAtIndex(
+        uint256 tokenId,
+        uint256 index
+    ) internal override view returns (string memory) {
+        _requireMinted(tokenId);
+        if (_activeResources[tokenId].length > index)  {
+            uint64 activeResId = _activeResources[tokenId][index];
+            Resource memory _activeRes = getResource(activeResId);
+            string memory uri = string(
+                abi.encodePacked(
+                    _baseURI(),
+                    _activeRes.metadataURI,
+                    _tokenEnumeratedResource[activeResId] ? tokenId.toString() : ""
+                )
+            );
+
+            return uri;
+        }
+        else {
+            return _fallbackURI;
+        }
+    }
 }

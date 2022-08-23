@@ -46,17 +46,6 @@ contract RMRKNestingMultiResourceMock is RMRKNestingMultiResource {
         return IERC721Receiver.onERC721Received.selector;
     }
 
-    function setFallbackURI(string memory fallbackURI) external {
-        _setFallbackURI(fallbackURI);
-    }
-
-    function setTokenEnumeratedResource(
-        uint64 resourceId,
-        bool state
-    ) external {
-        _setTokenEnumeratedResource(resourceId, state);
-    }
-
     function addResourceToToken(
         uint256 tokenId,
         uint64 resourceId,

@@ -1,4 +1,5 @@
-import { Contract } from 'ethers';
+import { BigNumber, Contract } from 'ethers';
+import { expect } from 'chai';
 import { ethers } from 'hardhat';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { addResourceToToken, addResourceEntryEquippables } from '../utils';
@@ -8,6 +9,7 @@ import shouldBehaveLikeEquippableResources from '../behavior/equippableResources
 import shouldBehaveLikeEquippableWithParts from '../behavior/equippableParts';
 import shouldBehaveLikeEquippableWithSlots from '../behavior/equippableSlots';
 import shouldBehaveLikeMultiResource from '../behavior/multiresource';
+import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 
 async function mint(token: Contract, to: string): Promise<number> {
   await token.mint(to, 1, { value: ONE_ETH });
@@ -269,13 +271,85 @@ describe('EquippableImpl with Slots', async () => {
 });
 
 describe('EquippableImpl Resources', async () => {
+  const equippableRefIdDefault = BigNumber.from(1);
+  const metaURIDefault = 'metaURI';
+  const baseAddressDefault = ethers.constants.AddressZero;
+  let owner: SignerWithAddress;
+
   beforeEach(async function () {
     const { nesting, equip } = await loadFixture(resourcesFixture);
     this.nesting = nesting;
     this.equip = equip;
+
+    owner = (await ethers.getSigners())[0];
   });
 
   shouldBehaveLikeEquippableResources(mint);
+
+  describe('Token URI', async function () {
+    it('can set fallback URI', async function () {
+      await this.equip.setFallbackURI('TestURI');
+      expect(await this.equip.getFallbackURI()).to.be.eql('TestURI');
+    });
+
+    it('gets fallback URI if no active resources on token', async function () {
+      const tokenId = await mint(this.nesting, owner.address);
+      const fallBackUri = 'fallback404';
+      await this.equip.setFallbackURI(fallBackUri);
+      expect(await this.equip.tokenURI(tokenId)).to.eql(fallBackUri);
+    });
+
+    it('can get token URI when resource is not enumerated', async function () {
+      const tokenId = await mint(this.nesting, owner.address);
+      const resId = BigNumber.from(1);
+      await this.equip.addResourceEntry(
+        {
+          id: resId,
+          equippableRefId: equippableRefIdDefault,
+          metadataURI: metaURIDefault,
+          baseAddress: baseAddressDefault,
+        },
+        [],
+        [],
+      );
+      await this.equip.addResourceToToken(tokenId, resId, 0);
+      await this.equip.acceptResource(tokenId, 0);
+      expect(await this.equip.tokenURI(tokenId)).to.eql(metaURIDefault);
+    });
+
+    it('can get token URI at specific index', async function () {
+      const tokenId = await mint(this.nesting, owner.address);
+      const resId = BigNumber.from(1);
+      const resId2 = BigNumber.from(2);
+
+      await this.equip.addResourceEntry(
+        {
+          id: resId,
+          equippableRefId: equippableRefIdDefault,
+          metadataURI: 'UriA',
+          baseAddress: baseAddressDefault,
+        },
+        [],
+        [],
+      );
+      await this.equip.addResourceEntry(
+        {
+          id: resId2,
+          equippableRefId: equippableRefIdDefault,
+          metadataURI: 'UriB',
+          baseAddress: baseAddressDefault,
+        },
+        [],
+        [],
+      );
+      await this.equip.addResourceToToken(tokenId, resId, 0);
+      await this.equip.addResourceToToken(tokenId, resId2, 0);
+      await this.equip.acceptResource(tokenId, 0);
+      await this.equip.acceptResource(tokenId, 0);
+
+      expect(await this.equip.tokenURIAtIndex(tokenId, 1)).to.eql('UriB');
+    });
+  });
 });
 
 // --------------- END EQUIPPABLE BEHAVIOR -----------------------

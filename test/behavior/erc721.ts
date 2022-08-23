@@ -50,10 +50,6 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
       });
 
       describe('token URI', function () {
-        it('return empty SignerWithAddress by default', async function () {
-          expect(await this.token.tokenURI(firstTokenId)).to.be.equal('');
-        });
-
         it('reverts when queried for non existent token id', async function () {
           await expect(this.token.tokenURI(nonExistentTokenId)).to.be.revertedWithCustomError(
             this.token,

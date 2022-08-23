@@ -96,4 +96,8 @@ contract RMRKNestingMultiResource is MultiResourceAbstract, RMRKNesting {
     function _exists(uint256 tokenId) internal view virtual override(RMRKNesting, MultiResourceAbstract) returns (bool) {
         return RMRKNesting._exists(tokenId);
     }
+
+    function _baseURI() internal view override(ERC721, MultiResourceAbstract) virtual returns (string memory) {
+        return "";
+    }
 }

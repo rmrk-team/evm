@@ -9,17 +9,6 @@ contract RMRKMultiResourceMock is RMRKMultiResource {
     constructor(string memory name, string memory symbol)
         RMRKMultiResource(name, symbol) {}
 
-    function setFallbackURI(string memory fallbackURI) external {
-        _setFallbackURI(fallbackURI);
-    }
-
-    function setTokenEnumeratedResource(
-        uint64 resourceId,
-        bool state
-    ) external {
-        _setTokenEnumeratedResource(resourceId, state);
-    }
-
     function mint(address to, uint256 tokenId) external {
         _mint(to, tokenId);
     }
@@ -39,7 +28,6 @@ contract RMRKMultiResourceMock is RMRKMultiResource {
     function burn(uint256 tokenId) external {
         _burn(tokenId);
     }
-
 
     function addResourceToToken(
         uint256 tokenId,

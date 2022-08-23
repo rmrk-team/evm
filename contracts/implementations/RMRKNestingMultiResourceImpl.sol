@@ -7,15 +7,23 @@ import "../RMRK/utils/RMRKMintingUtils.sol";
 import "../RMRK/interfaces/IRMRKNestingReceiver.sol";
 import "../RMRK/interfaces/IRMRKNestingWithEquippable.sol";
 import "../RMRK/RMRKNestingMultiResource.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
 
 error RMRKMintUnderpriced();
 error RMRKMintZero();
 
 //Minimal public implementation of IRMRKNesting for testing.
 contract RMRKNestingMultiResourceImpl is OwnableLock, RMRKMintingUtils, IRMRKNestingReceiver, RMRKNestingMultiResource {
+    using Strings for uint256;
 
     // Manage resources via increment
     uint256 private _totalResources;
+
+    //Mapping of uint64 resource ID to tokenEnumeratedResource for tokenURI
+    mapping(uint64 => bool) internal _tokenEnumeratedResource;
+
+    //fallback URI
+    string internal _fallbackURI;
 
     constructor(
         string memory name_,
@@ -87,15 +95,25 @@ contract RMRKNestingMultiResourceImpl is OwnableLock, RMRKMintingUtils, IRMRKNes
         return _isApprovedOrOwner(spender, tokenId);
     }
 
-    function setFallbackURI(string memory fallbackURI) external {
-        _setFallbackURI(fallbackURI);
+    function getFallbackURI() external view virtual returns (string memory) {
+        return _fallbackURI;
+    }
+
+    function setFallbackURI(string memory fallbackURI) external onlyOwner {
+        _fallbackURI = fallbackURI;
+    }
+
+    function isTokenEnumeratedResource(
+        uint64 resourceId
+    ) public view virtual returns(bool) {
+        return _tokenEnumeratedResource[resourceId];
     }
 
     function setTokenEnumeratedResource(
         uint64 resourceId,
         bool state
-    ) external {
-        _setTokenEnumeratedResource(resourceId, state);
+    ) external onlyOwner {
+        _tokenEnumeratedResource[resourceId] = state;
     }
 
     function addResourceToToken(
@@ -130,5 +148,28 @@ contract RMRKNestingMultiResourceImpl is OwnableLock, RMRKMintingUtils, IRMRKNes
         uint256 destinationId
     ) public virtual {
         nestTransferFrom(_msgSender(), to, tokenId, destinationId);
+    }
+
+    function _tokenURIAtIndex(
+        uint256 tokenId,
+        uint256 index
+    ) internal override view returns (string memory) {
+        _requireMinted(tokenId);
+        if (_activeResources[tokenId].length > index)  {
+            uint64 activeResId = _activeResources[tokenId][index];
+            Resource memory _activeRes = getResource(activeResId);
+            string memory uri = string(
+                abi.encodePacked(
+                    _baseURI(),
+                    _activeRes.metadataURI,
+                    _tokenEnumeratedResource[activeResId] ? tokenId.toString() : ""
+                )
+            );
+
+            return uri;
+        }
+        else {
+            return _fallbackURI;
+        }
     }
 }

@@ -87,16 +87,8 @@ contract RMRKMultiResource is Context, IERC165, IERC721, IERC721Metadata, IRMRKM
     //mapping of tokenId to all resources by priority
     mapping(uint256 => uint64[]) internal _pendingResources;
 
-    //Mapping of uint64 resource ID to tokenEnumeratedResource for tokenURI
-    // FIXME: This should not be part of the minimal implementation
-    mapping(uint64 => bool) internal _tokenEnumeratedResource;
-
     //List of all resources
     uint64[] internal _allResources;
-
-    //fallback URI
-    // FIXME: This should not be part of the minimal implementation
-    string internal _fallbackURI;
 
     // Mapping from token ID to approved address for resources
     mapping(uint256 => address) internal _tokenApprovalsForResources;
@@ -780,48 +772,22 @@ contract RMRKMultiResource is Context, IERC165, IERC721, IERC721Metadata, IRMRKM
     function _tokenURIAtIndex(
         uint256 tokenId,
         uint256 index
-    ) internal view returns (string memory) {
+    ) internal virtual view returns (string memory) {
         _requireMinted(tokenId);
-        if (_activeResources[tokenId].length > index)  {
-            uint64 activeResId = _activeResources[tokenId][index];
-            Resource memory _activeRes = getResource(activeResId);
-            string memory uri = string(
-                abi.encodePacked(
-                    _baseURI(),
-                    _activeRes.metadataURI,
-                    _tokenEnumeratedResource[activeResId] ? tokenId.toString() : ""
-                )
-            );
+        // TODO: Discuss is this is the best default path.
+        // We could return empty string so it returns something if a token has no resources, but it might hide erros
+        if (!(index < _activeResources[tokenId].length))
+            revert RMRKIndexOutOfRange();
 
-            return uri;
-        }
-        else {
-            return _fallbackURI;
-        }
+        uint64 activeResId = _activeResources[tokenId][index];
+        Resource memory _activeRes = getResource(activeResId);
+        string memory uri = string(
+            abi.encodePacked( _baseURI(), _activeRes.metadataURI)
+        );
+
+        return uri;
     }
 
-    function getFallbackURI() external view virtual returns (string memory) {
-        return _fallbackURI;
-    }
-
-    // This is expected to be implemented with custom guard:
-    function _setFallbackURI(string memory fallbackURI) internal {
-        _fallbackURI = fallbackURI;
-    }
-
-    function isTokenEnumeratedResource(
-        uint64 resourceId
-    ) public view virtual returns(bool) {
-        return _tokenEnumeratedResource[resourceId];
-    }
-
-    // This is expected to be implemented with custom guard:
-    function _setTokenEnumeratedResource(
-        uint64 resourceId,
-        bool state
-    ) internal {
-        _tokenEnumeratedResource[resourceId] = state;
-    }
 
     // ----------------------- APPROVALS FOR RESOURCES ------------------------
 

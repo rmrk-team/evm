@@ -44,14 +44,8 @@ abstract contract MultiResourceAbstract is Context, IRMRKMultiResource {
     //mapping of tokenId to all resources by priority
     mapping(uint256 => uint64[]) internal _pendingResources;
 
-    //Mapping of uint64 resource ID to tokenEnumeratedResource for tokenURI
-    mapping(uint64 => bool) internal _tokenEnumeratedResource;
-
     //List of all resources
     uint64[] internal _allResources;
-
-    //fallback URI
-    string internal _fallbackURI;
 
     // Mapping from token ID to approved address for resources
     mapping(uint256 => address) internal _tokenApprovalsForResources;
@@ -73,31 +67,32 @@ abstract contract MultiResourceAbstract is Context, IRMRKMultiResource {
         return resource;
     }
 
+    /**
+     * @dev Base URI for computing {tokenURI}. If set, the resulting URI for each
+     * token will be the concatenation of the `baseURI` and the `tokenId`. Empty
+     * by default, can be overridden in child contracts.
+     */
+    function _baseURI() internal view virtual returns (string memory) {
+        return "";
+    }
+
     function _tokenURIAtIndex(
         uint256 tokenId,
         uint256 index
-    ) internal view returns (string memory) {
-        if (_activeResources[tokenId].length > index)  {
-            uint64 activeResId = _activeResources[tokenId][index];
-            string memory URI;
-            Resource memory _activeRes = getResource(activeResId);
-            if (!_tokenEnumeratedResource[activeResId]) {
-                URI = _activeRes.metadataURI;
-            }
-            else {
-                string memory baseURI = _activeRes.metadataURI;
-                URI = bytes(baseURI).length > 0 ?
-                    string(abi.encodePacked(baseURI, tokenId.toString())) : "";
-            }
-            return URI;
-        }
-        else {
-            return _fallbackURI;
-        }
-    }
+    ) internal virtual view returns (string memory) {
+        _requireMinted(tokenId);
+        // TODO: Discuss is this is the best default path.
+        // We could return empty string so it returns something if a token has no resources, but it might hide erros
+        if (!(index < _activeResources[tokenId].length))
+            revert RMRKIndexOutOfRange();
 
-    function getFallbackURI() external view virtual returns (string memory) {
-        return _fallbackURI;
+        uint64 activeResId = _activeResources[tokenId][index];
+        Resource memory _activeRes = getResource(activeResId);
+        string memory uri = string(
+            abi.encodePacked(_baseURI(), _activeRes.metadataURI)
+        );
+
+        return uri;
     }
 
     function _acceptResource(uint256 tokenId, uint256 index) internal {
@@ -233,17 +228,6 @@ abstract contract MultiResourceAbstract is Context, IRMRKMultiResource {
         return _tokenURIAtIndex(tokenId, index);
     }
 
-    function _setFallbackURI(string memory fallbackURI) internal {
-        _fallbackURI = fallbackURI;
-    }
-
-    function _setTokenEnumeratedResource(
-        uint64 resourceId,
-        bool state
-    ) internal {
-        _tokenEnumeratedResource[resourceId] = state;
-    }
-
     // Approvals
 
     function getApprovedForResources(uint256 tokenId) public virtual view returns (address) {
@@ -275,12 +259,6 @@ abstract contract MultiResourceAbstract is Context, IRMRKMultiResource {
 
     function getAllResources() public view virtual returns (uint64[] memory) {
         return _allResources;
-    }
-
-    function isTokenEnumeratedResource(
-        uint64 resourceId
-    ) public view virtual returns(bool) {
-        return _tokenEnumeratedResource[resourceId];
     }
 
     function getResObjectByIndex(

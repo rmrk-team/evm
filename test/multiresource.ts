@@ -198,7 +198,6 @@ describe('MultiResourceMock Adding resources to tokens', async function () {
 describe('MultiResourceMock Token URI', async function () {
   let token: Contract;
   let owner: SignerWithAddress;
-  const metaURIDefault = 'metaURI';
 
   before(async () => {
     owner = (await ethers.getSigners())[0];
@@ -208,56 +207,43 @@ describe('MultiResourceMock Token URI', async function () {
     ({ token } = await loadFixture(deployRmrkMultiResourceMockFixture));
   });
 
-  it('can set fallback URI', async function () {
-    await token.setFallbackURI('TestURI');
-    expect(await token.getFallbackURI()).to.be.eql('TestURI');
-  });
+  describe('token URI', async function () {
+    it('can get token URI', async function () {
+      const resId = await addResourceEntry(token, 'uri1');
+      const resId2 = await addResourceEntry(token, 'uri2');
+      const tokenId = await mintTokenId(token, owner.address);
 
-  it('gets fallback URI if no active resources on token', async function () {
-    const fallBackUri = 'fallback404';
-    const tokenId = await mintTokenId(token, owner.address);
+      await token.addResourceToToken(tokenId, resId, 0);
+      await token.addResourceToToken(tokenId, resId2, 0);
+      await token.acceptResource(tokenId, 0);
+      await token.acceptResource(tokenId, 0);
+      expect(await token.tokenURI(tokenId)).to.eql('uri1');
+    });
 
-    await token.setFallbackURI(fallBackUri);
-    expect(await token.tokenURI(tokenId)).to.eql(fallBackUri);
-  });
+    it('can get token URI at specific index', async function () {
+      const resId = await addResourceEntry(token, 'UriA');
+      const resId2 = await addResourceEntry(token, 'UriB');
+      const tokenId = await mintTokenId(token, owner.address);
 
-  it('can get token URI when resource is not enumerated', async function () {
-    const resId = await addResourceEntry(token);
-    const resId2 = await addResourceEntry(token);
-    const tokenId = await mintTokenId(token, owner.address);
+      await token.addResourceToToken(tokenId, resId, 0);
+      await token.addResourceToToken(tokenId, resId2, 0);
+      await token.acceptResource(tokenId, 0);
+      await token.acceptResource(tokenId, 0);
 
-    await token.addResourceToToken(tokenId, resId, 0);
-    await token.addResourceToToken(tokenId, resId2, 0);
-    await token.acceptResource(tokenId, 0);
-    await token.acceptResource(tokenId, 0);
-    expect(await token.tokenURI(tokenId)).to.eql(metaURIDefault);
-  });
+      expect(await token.tokenURIAtIndex(tokenId, 1)).to.eql('UriB');
+      await expect(token.tokenURIAtIndex(tokenId, 2)).to.be.revertedWithCustomError(
+        token,
+        'RMRKIndexOutOfRange',
+      );
+    });
 
-  it('can get token URI when resource is enumerated', async function () {
-    const resId = await addResourceEntry(token);
-    const resId2 = await addResourceEntry(token);
-    const tokenId = await mintTokenId(token, owner.address);
-
-    await token.addResourceToToken(tokenId, resId, 0);
-    await token.addResourceToToken(tokenId, resId2, 0);
-    await token.acceptResource(tokenId, 0);
-    await token.acceptResource(tokenId, 0);
-    await token.setTokenEnumeratedResource(resId, true);
-    expect(await token.isTokenEnumeratedResource(resId)).to.eql(true);
-    expect(await token.tokenURI(tokenId)).to.eql(`${metaURIDefault}${tokenId}`);
-  });
-
-  it('can get token URI at specific index', async function () {
-    const resId = await addResourceEntry(token, 'UriA');
-    const resId2 = await addResourceEntry(token, 'UriB');
-    const tokenId = await mintTokenId(token, owner.address);
-
-    await token.addResourceToToken(tokenId, resId, 0);
-    await token.addResourceToToken(tokenId, resId2, 0);
-    await token.acceptResource(tokenId, 0);
-    await token.acceptResource(tokenId, 0);
-
-    expect(await token.tokenURIAtIndex(tokenId, 1)).to.eql('UriB');
+    it('cannot get token URI if token has no resources', async function () {
+      const tokenId = await mintTokenId(token, owner.address);
+      await expect(token.tokenURI(tokenId)).to.be.revertedWithCustomError(
+        token,
+        'RMRKIndexOutOfRange',
+      );
+    });
   });
 });
 

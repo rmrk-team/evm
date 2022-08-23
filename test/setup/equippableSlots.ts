@@ -160,7 +160,6 @@ async function setupContextForSlots(
       [partIdForBody], // Fixed parts
       [partIdForWeapon, partIdForBackground], // Can receive these
     );
-    await soldierEquip.setTokenEnumeratedResource(soldierResId, true);
     for (let i = 0; i < uniqueSoldiers; i++) {
       await soldierEquip.addResourceToToken(soldiersIds[i], soldierResId, 0);
       await soldierEquip.connect(addrs[i % 3]).acceptResource(soldiersIds[i], 0);
@@ -245,8 +244,6 @@ async function setupContextForSlots(
       partIdForWeaponGem,
     );
 
-    await weaponGemEquip.setTokenEnumeratedResource(weaponGemResourceFull, true);
-    await weaponGemEquip.setTokenEnumeratedResource(weaponGemResourceEquip, true);
     for (let i = 0; i < uniqueSoldiers; i++) {
       await weaponGemEquip.addResourceToToken(weaponGemsIds[i], weaponGemResourceFull, 0);
       await weaponGemEquip.addResourceToToken(weaponGemsIds[i], weaponGemResourceEquip, 0);
@@ -274,7 +271,6 @@ async function setupContextForSlots(
       partIdForBackground,
     );
 
-    await backgroundEquip.setTokenEnumeratedResource(backgroundResourceId, true);
     for (let i = 0; i < uniqueSoldiers; i++) {
       await backgroundEquip.addResourceToToken(backgroundsIds[i], backgroundResourceId, 0);
       await backgroundEquip.connect(addrs[i % 3]).acceptResource(backgroundsIds[i], 0);

@@ -13,19 +13,8 @@ contract RMRKEquippableMock is RMRKEquippable {
     RMRKEquippable(nestingAddress)
     {}
 
-    function setFallbackURI(string memory fallbackURI) external {
-        _setFallbackURI(fallbackURI);
-    }
-
     function setNestingAddress(address nestingAddress) external {
         _setNestingAddress(nestingAddress);
-    }
-
-    function setTokenEnumeratedResource(
-        uint64 resourceId,
-        bool state
-    ) external {
-        _setTokenEnumeratedResource(resourceId, state);
     }
 
     function addResourceToToken(

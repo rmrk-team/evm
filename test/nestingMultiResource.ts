@@ -121,4 +121,28 @@ describe('NestingMultiResourceMock', function () {
       );
     });
   });
+
+  describe('token URI', async function () {
+    it('can get token URI', async function () {
+      const tokenOwner = addrs[1];
+      const resId = await addResourceEntry(chunky, 'uri1');
+      const resId2 = await addResourceEntry(chunky, 'uri2');
+      const tokenId = await mintTokenId(chunky, tokenOwner.address);
+
+      await chunky.addResourceToToken(tokenId, resId, 0);
+      await chunky.addResourceToToken(tokenId, resId2, 0);
+      await chunky.connect(tokenOwner).acceptResource(tokenId, 0);
+      await chunky.connect(tokenOwner).acceptResource(tokenId, 0);
+      expect(await chunky.tokenURI(tokenId)).to.eql('uri1');
+    });
+
+    it('cannot get token URI if token has no resources', async function () {
+      const tokenOwner = addrs[1];
+      const tokenId = await mintTokenId(chunky, tokenOwner.address);
+      await expect(chunky.tokenURI(tokenId)).to.be.revertedWithCustomError(
+        chunky,
+        'RMRKIndexOutOfRange',
+      );
+    });
+  });
 });
