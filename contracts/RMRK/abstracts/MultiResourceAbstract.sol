@@ -13,7 +13,6 @@ error RMRKInvalidTokenId();
 error RMRKMaxPendingResourcesReached();
 error RMRKNoResourceMatchingId();
 error RMRKResourceAlreadyExists();
-error RMRKResourceNotFoundInStorage();
 error RMRKWriteToZero();
 error RMRKNotApprovedForResourcesOrOwner();
 error RMRKApprovalForResourcesToCurrentOwner();
@@ -177,8 +176,8 @@ abstract contract MultiResourceAbstract is Context, IRMRKMultiResource {
         if(_tokenResources[tokenId][resourceId])
             revert RMRKResourceAlreadyExists();
 
-        if(getResource(resourceId).id == uint64(0))
-            revert RMRKResourceNotFoundInStorage();
+        if(bytes(_resources[resourceId]).length == 0)
+            revert RMRKNoResourceMatchingId();
 
         if(_pendingResources[tokenId].length >= 128)
             revert RMRKMaxPendingResourcesReached();

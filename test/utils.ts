@@ -44,7 +44,7 @@ async function addResourceToToken(
   resId: BigNumber,
   overwrites: BigNumber | number,
 ): Promise<void> {
-  await token.addResourceToToken(tokenId, resId, overwrites);
+  return await token.addResourceToToken(tokenId, resId, overwrites);
 }
 
 let nextResourceId = 1;

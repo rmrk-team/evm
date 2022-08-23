@@ -47,6 +47,22 @@ async function shouldBehaveLikeMultiResource(
       tokenId = await mint(this.token, tokenOwner.address);
     });
 
+    describe('Add resource', async function () {
+      it('can add resource to token', async function () {
+        const resId = await addResourceEntryFunc(this.token);
+        await expect(addResourceToTokenFunc(this.token, tokenId, resId, 0))
+          .to.emit(this.token, 'ResourceAddedToToken')
+          .withArgs(tokenId, resId);
+      });
+
+      it('cannot add non existing resource to token', async function () {
+        const badResId = BigNumber.from(10);
+        await expect(
+          addResourceToTokenFunc(this.token, tokenId, badResId, 0),
+        ).to.be.revertedWithCustomError(this.token, 'RMRKNoResourceMatchingId');
+      });
+    });
+
     describe('Approvals', async function () {
       it('can approve address for resources', async function () {
         await this.token.connect(tokenOwner).approveForResources(approved.address, tokenId);
@@ -102,19 +118,17 @@ async function shouldBehaveLikeMultiResource(
 
         // Add new resource to overwrite the first, and accept
         const activeResources = await this.token.getActiveResources(tokenId);
-        await expect(this.token.addResourceToToken(tokenId, resId2, activeResources[0])).to.emit(
-          this.token,
-          'ResourceOverwriteProposed',
-        );
+        await expect(this.token.addResourceToToken(tokenId, resId2, activeResources[0]))
+          .to.emit(this.token, 'ResourceOverwriteProposed')
+          .withArgs(tokenId, resId2, resId);
         const pendingResources = await this.token.getPendingResources(tokenId);
 
         expect(await this.token.getResourceOverwrites(tokenId, pendingResources[0])).to.eql(
           activeResources[0],
         );
-        await expect(this.token.connect(tokenOwner).acceptResource(tokenId, 0)).to.emit(
-          this.token,
-          'ResourceOverwritten',
-        );
+        await expect(this.token.connect(tokenOwner).acceptResource(tokenId, 0))
+          .to.emit(this.token, 'ResourceOverwritten')
+          .withArgs(tokenId, resId);
 
         expect(await this.token.getFullResources(tokenId)).to.be.eql([[resId2, metaURIDefault]]);
         // Overwrite should be gone
