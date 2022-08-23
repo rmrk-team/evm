@@ -580,6 +580,20 @@ async function shouldBehaveLikeEquippableWithSlots(
       expect(allResources).to.eql([expectedResource, expectedFixedParts, expectedSlotParts]);
     });
 
+    it('can get composables for simple resource', async function () {
+      const expectedResource = [
+        bn(backgroundResourceId), // id
+        bn(1), // equippableRefId
+        base.address, // baseAddress
+        'ipfs:background/', // metadataURI
+      ];
+      const allResources = await backgroundEquip.composeEquippables(
+        backgroundsIds[0],
+        backgroundResourceId,
+      );
+      expect(allResources).to.eql([expectedResource, [], []]);
+    });
+
     it('cannot get composables for soldier with not associated resource', async function () {
       const wrongResId = weaponResourcesEquip[1];
       await expect(

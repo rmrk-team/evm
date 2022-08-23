@@ -203,6 +203,10 @@ async function shouldBehaveLikeMultiResource(
         expect(await this.token.getResObjectByIndex(tokenId, 0)).to.eql([resId1, resData1]);
       });
 
+      it('can get all resources', async function () {
+        expect(await this.token.getAllResources()).to.eql([resId1, resId2]);
+      });
+
       it('can accept multiple resources', async function () {
         await expect(this.token.connect(tokenOwner).acceptResource(tokenId, 1)) // Accepting resId2
           .to.emit(this.token, 'ResourceAccepted')
