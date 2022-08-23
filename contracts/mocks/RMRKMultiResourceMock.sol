@@ -2,12 +2,12 @@
 
 pragma solidity ^0.8.15;
 
-import "../RMRK/merged/RMRKMultiResourceMerged.sol";
+import "../RMRK/RMRKMultiResource.sol";
 
-contract RMRKMultiResourceMock is RMRKMultiResourceMerged {
+contract RMRKMultiResourceMock is RMRKMultiResource {
 
     constructor(string memory name, string memory symbol)
-        RMRKMultiResourceMerged(name, symbol) {}
+        RMRKMultiResource(name, symbol) {}
 
     function setFallbackURI(string memory fallbackURI) external {
         _setFallbackURI(fallbackURI);

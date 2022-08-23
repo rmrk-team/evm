@@ -4,14 +4,14 @@ pragma solidity ^0.8.15;
 
 import "../RMRK/access/OwnableLock.sol";
 import "../RMRK/utils/RMRKMintingUtils.sol";
-import "../RMRK/merged/RMRKMultiResourceMerged.sol";
+import "../RMRK/RMRKMultiResource.sol";
 
 //import "hardhat/console.sol";
 
 error RMRKMintUnderpriced();
 error RMRKMintZero();
 
-contract RMRKMultiResourceImpl is OwnableLock, RMRKMintingUtils, RMRKMultiResourceMerged {
+contract RMRKMultiResourceImpl is OwnableLock, RMRKMintingUtils, RMRKMultiResource {
 
     /*
     Top-level structures
@@ -26,7 +26,7 @@ contract RMRKMultiResourceImpl is OwnableLock, RMRKMintingUtils, RMRKMultiResour
         uint256 maxSupply_,
         uint256 pricePerMint_ //in WEI
     )
-    RMRKMultiResourceMerged(name, symbol)
+    RMRKMultiResource(name, symbol)
     RMRKMintingUtils(maxSupply_, pricePerMint_)
     {
     }
