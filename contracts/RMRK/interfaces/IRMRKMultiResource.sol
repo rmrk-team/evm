@@ -52,8 +52,7 @@ interface IRMRKMultiResource {
     */
     event ApprovalForResources(
         address indexed owner,
-        address indexed
-        approved,
+        address indexed approved,
         uint256 indexed tokenId
     );
 
@@ -62,8 +61,7 @@ interface IRMRKMultiResource {
     */
     event ApprovalForAllForResources(
         address indexed owner,
-        address indexed
-        operator,
+        address indexed operator,
         bool approved
     );
 

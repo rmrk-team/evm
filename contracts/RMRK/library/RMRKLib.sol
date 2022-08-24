@@ -4,14 +4,6 @@ pragma solidity ^0.8.0;
 
 library RMRKLib {
 
-    //For reasource storage array
-    function removeItemByIndex(uint128[] storage array, uint256 index) internal {
-        //Check to see if this is already gated by require in all calls
-        require(index < array.length);
-        array[index] = array[array.length-1];
-        array.pop();
-    }
-
     function removeItemByValue(uint64[] storage array, uint64 value) internal {
         uint64[] memory memArr = array; //Copy array to memory, check for gas savings here
         uint256 length = memArr.length; //gas savings

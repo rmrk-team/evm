@@ -57,8 +57,6 @@ contract RMRKNesting is ERC721, IRMRKNesting {
         if (isNft) {
             owner = IRMRKNesting(owner).ownerOf(ownerTokenId);
         }
-        if(owner == address(0))
-            revert ERC721InvalidTokenId();
         return owner;
     }
 
@@ -203,10 +201,12 @@ contract RMRKNesting is ERC721, IRMRKNesting {
         _balances[_RMRKOwner] -= 1;   
     }
 
-    function burnChild(uint256 tokenId, uint256 childIndex) external onlyApprovedOrDirectOwner(tokenId) {
-        Child memory child = _children[tokenId][childIndex];
+    function burnChild(uint256 tokenId, uint256 index) external onlyApprovedOrDirectOwner(tokenId) {
+        if (_children[tokenId].length <= index) revert RMRKChildIndexOutOfRange();
+
+        Child memory child = _children[tokenId][index];
         IRMRKNesting(child.contractAddress).burnFromParent(child.tokenId);
-        removeItemByIndex_C(_children[tokenId], childIndex);
+        removeChildByIndex(_children[tokenId], index);
     }
 
     ////////////////////////////////////////
@@ -364,7 +364,7 @@ contract RMRKNesting is ERC721, IRMRKNesting {
 
         Child memory child = _pendingChildren[tokenId][index];
 
-        removeItemByIndex_C(_pendingChildren[tokenId], index);
+        removeChildByIndex(_pendingChildren[tokenId], index);
 
         _children[tokenId].push(child);
         emit ChildAccepted(tokenId);
@@ -401,7 +401,7 @@ contract RMRKNesting is ERC721, IRMRKNesting {
 
         Child memory pendingChild = _pendingChildren[tokenId][index];
 
-        removeItemByIndex_C(_pendingChildren[tokenId], index);
+        removeChildByIndex(_pendingChildren[tokenId], index);
 
         if (to != address(0)) {
             IERC721(pendingChild.contractAddress).safeTransferFrom(address(this), to, pendingChild.tokenId);
@@ -425,7 +425,7 @@ contract RMRKNesting is ERC721, IRMRKNesting {
 
         Child memory child = _children[tokenId][index];
 
-        removeItemByIndex_C(_children[tokenId], index);
+        removeChildByIndex(_children[tokenId], index);
 
         if (to != address(0)) {
             IERC721(child.contractAddress).safeTransferFrom(address(this), to, child.tokenId);
@@ -504,10 +504,8 @@ contract RMRKNesting is ERC721, IRMRKNesting {
     }
     //HELPERS
 
-    // For child storage array
-    function removeItemByIndex_C(Child[] storage array, uint256 index) internal {
-        //Check to see if this is already gated by require in all calls
-        require(index < array.length);
+    // For child storage array, callers must check valid length
+    function removeChildByIndex(Child[] storage array, uint256 index) internal {
         array[index] = array[array.length-1];
         array.pop();
     }

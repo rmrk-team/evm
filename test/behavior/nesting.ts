@@ -436,6 +436,13 @@ async function shouldBehaveLikeNesting(
       );
     });
 
+    it('cannot burn child out of index', async function () {
+      const badIndex = 2;
+      await expect(
+        parent.connect(tokenOwner).burnChild(parentId, badIndex),
+      ).to.be.revertedWithCustomError(parent, 'RMRKChildIndexOutOfRange');
+    });
+
     it('cannot burn from parent directly', async function () {
       const childId = nestMint(child, parent.address, parentId);
       await parent.connect(tokenOwner).acceptChild(parentId, 0);
@@ -572,6 +579,14 @@ async function shouldBehaveLikeNesting(
         .withArgs(parentId, 0);
 
       await checkChildMovedToRootOwner(toOwnerAddress);
+    });
+
+    it('cannost unnest child out of index', async function () {
+      const toOwnerAddress = addrs[2].address;
+      const badIndex = 2;
+      await expect(
+        parent.connect(tokenOwner).unnestChild(parentId, badIndex, toOwnerAddress),
+      ).to.be.revertedWithCustomError(parent, 'RMRKChildIndexOutOfRange');
     });
 
     it('can reclaim unnested child if unnested to address zero', async function () {
@@ -824,6 +839,74 @@ async function shouldBehaveLikeNesting(
       // Ownership: firstOwner > newGrandparent > parent > child
       expected = [BigNumber.from(parentId), parent.address];
       checkAcceptedAndPendingChildren(parent, grandParentId, [], [expected]);
+    });
+  });
+
+  describe('Nest Transfer', async function () {
+    let firstOwner: SignerWithAddress;
+    let parentId: number;
+    let childId: number;
+
+    beforeEach(async function () {
+      firstOwner = addrs[1];
+      parentId = await mint(parent, firstOwner.address);
+      childId = await mint(child, firstOwner.address);
+    });
+
+    it('cannot nest tranfer from non immediate owner (owner of parent)', async function () {
+      const otherParentId = await mint(parent, firstOwner.address);
+      // We send it to the parent first
+      await nestTransfer(child, firstOwner, parent.address, childId, parentId);
+      // We can no longer nest transfer it, even if we are the root owner:
+      await expect(
+        nestTransfer(child, firstOwner, parent.address, childId, otherParentId),
+      ).to.be.revertedWithCustomError(child, 'RMRKNotApprovedOrDirectOwner');
+    });
+
+    it('cannot nest tranfer if not owner', async function () {
+      const notOwner = addrs[3];
+      await expect(
+        nestTransfer(child, notOwner, parent.address, childId, parentId),
+      ).to.be.revertedWithCustomError(child, 'RMRKNotApprovedOrDirectOwner');
+    });
+
+    it('cannot nest tranfer to address 0', async function () {
+      await expect(
+        nestTransfer(child, firstOwner, ethers.constants.AddressZero, childId, parentId),
+      ).to.be.revertedWithCustomError(child, 'ERC721TransferToTheZeroAddress');
+    });
+
+    it('cannot nest tranfer to a non contract', async function () {
+      const newOwner = addrs[2];
+      await expect(
+        nestTransfer(child, firstOwner, newOwner.address, childId, parentId),
+      ).to.be.revertedWithCustomError(child, 'RMRKIsNotContract');
+    });
+
+    it('cannot nest tranfer to contract if it does implement IRMRKNesting', async function () {
+      const ERC721 = await ethers.getContractFactory('ERC721Mock');
+      const nonNesting = await ERC721.deploy('Non receiver', 'NR');
+      await nonNesting.deployed();
+      await expect(
+        nestTransfer(child, firstOwner, nonNesting.address, childId, parentId),
+      ).to.be.revertedWithCustomError(child, 'RMRKNestingTransferToNonRMRKNestingImplementer');
+    });
+
+    it('can nest tranfer to IRMRKNesting contract', async function () {
+      await nestTransfer(child, firstOwner, parent.address, childId, parentId);
+      expect(await child.ownerOf(childId)).to.eql(firstOwner.address);
+      expect(await child.rmrkOwnerOf(childId)).to.eql([
+        parent.address,
+        BigNumber.from(parentId),
+        true,
+      ]);
+    });
+
+    it('cannot nest tranfer to non existing parent token', async function () {
+      const notExistingParentId = 9999;
+      await expect(
+        nestTransfer(child, firstOwner, parent.address, childId, notExistingParentId),
+      ).to.be.revertedWithCustomError(parent, 'ERC721InvalidTokenId');
     });
   });
 

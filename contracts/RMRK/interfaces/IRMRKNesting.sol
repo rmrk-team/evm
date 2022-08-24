@@ -8,7 +8,7 @@ interface IRMRKNesting {
     /**
     * @dev emitted when a child NFT is added to a token's pending array
     */
-    event ChildProposed(uint parentTokenId);
+    event ChildProposed(uint tokenId);
 
     /**
     * @dev emitted when a child NFT accepts a token from its pending array, migrating it to the active array.
