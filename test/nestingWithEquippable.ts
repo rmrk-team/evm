@@ -68,10 +68,7 @@ describe('NestingWithEquippableMock ERC721 Behavior', function () {
   beforeEach(async function () {
     token = await loadFixture(nestingFixture);
     this.token = token;
-    this.ERC721Receiver = await ethers.getContractFactory(
-      'ERC721ReceiverMockWithRMRKNestingReceiver',
-    );
-    this.RMRKNestingReceiver = await ethers.getContractFactory('RMRKNestingReceiverMock');
+    this.ERC721Receiver = await ethers.getContractFactory('ERC721ReceiverMock');
     this.commonERC721 = await ethers.getContractFactory('ERC721Mock');
   });
 

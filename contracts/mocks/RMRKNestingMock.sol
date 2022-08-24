@@ -2,12 +2,11 @@
 
 pragma solidity ^0.8.15;
 
-import "../RMRK/interfaces/IRMRKNestingReceiver.sol";
 import "../RMRK/RMRKNesting.sol";
 // import "hardhat/console.sol";
 
 //Minimal public implementation of IRMRKNesting for testing.
-contract RMRKNestingMock is  IRMRKNestingReceiver, RMRKNesting {
+contract RMRKNestingMock is RMRKNesting {
 
     constructor(
         string memory name_,
@@ -26,23 +25,6 @@ contract RMRKNestingMock is  IRMRKNestingReceiver, RMRKNesting {
         _safeMint(to, tokenId, _data);
     }
 
-    function safeMintNesting(
-        address to,
-        uint256 tokenId,
-        uint256 destinationId
-    ) public {
-        _safeMintNesting(to, tokenId, destinationId);
-    }
-
-    function safeMintNesting(
-        address to,
-        uint256 tokenId,
-        uint256 destinationId,
-        bytes memory _data
-    ) public {
-        _safeMintNesting(to, tokenId, destinationId, _data);
-    }
-
     function mint(address to, uint256 tokenId) external {
         _mint(to, tokenId);
     }
@@ -58,15 +40,6 @@ contract RMRKNestingMock is  IRMRKNestingReceiver, RMRKNesting {
     //update for reentrancy
     function burn(uint256 tokenId) public onlyApprovedOrDirectOwner(tokenId) {
         _burn(tokenId);
-    }
-
-    function onRMRKNestingReceived(
-        address,
-        address,
-        uint256,
-        bytes calldata
-    ) external pure returns (bytes4) {
-        return IRMRKNestingReceiver.onRMRKNestingReceived.selector;
     }
 
     // Utility transfers:

@@ -4,7 +4,6 @@ pragma solidity ^0.8.15;
 
 import "../RMRK/access/OwnableLock.sol";
 import "../RMRK/utils/RMRKMintingUtils.sol";
-import "../RMRK/interfaces/IRMRKNestingReceiver.sol";
 import "../RMRK/interfaces/IRMRKNestingWithEquippable.sol";
 import "../RMRK/RMRKNestingWithEquippable.sol";
 
@@ -12,7 +11,7 @@ error RMRKMintUnderpriced();
 error RMRKMintZero();
 
 //Minimal public implementation of IRMRKNesting for testing.
-contract RMRKNestingWithEquippableImpl is OwnableLock, RMRKMintingUtils, IRMRKNestingReceiver, RMRKNestingWithEquippable {
+contract RMRKNestingWithEquippableImpl is OwnableLock, RMRKMintingUtils, RMRKNestingWithEquippable {
 
     address _equippableAddress;
 
@@ -67,7 +66,7 @@ contract RMRKNestingWithEquippableImpl is OwnableLock, RMRKMintingUtils, IRMRKNe
         uint256 totalSupplyOffset = _totalSupply+1;
 
         for(uint i = nextToken; i < totalSupplyOffset;) {
-            _safeMintNesting(to, i, destinationId);
+            _nestMint(to, i, destinationId);
             unchecked {++i;}
         }
     }
@@ -79,15 +78,6 @@ contract RMRKNestingWithEquippableImpl is OwnableLock, RMRKMintingUtils, IRMRKNe
 
     function setEquippableAddress(address equippable) external {
         _setEquippableAddress(equippable);
-    }
-
-    function onRMRKNestingReceived(
-        address,
-        address,
-        uint256,
-        bytes calldata
-    ) external pure returns (bytes4) {
-        return IRMRKNestingReceiver.onRMRKNestingReceived.selector;
     }
 
     function transfer(
