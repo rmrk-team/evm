@@ -28,7 +28,7 @@ abstract contract MultiResourceAbstract is Context, IRMRKMultiResource {
 
     //mapping of uint64 Ids to resource object
     mapping(uint64 => string) internal _resources;
-    
+
     //mapping of tokenId to new resource, to resource to be replaced
     mapping(uint256 => mapping(uint64 => uint64)) internal _resourceOverwrites;
 
@@ -53,6 +53,12 @@ abstract contract MultiResourceAbstract is Context, IRMRKMultiResource {
     // Mapping from owner to operator approvals for resources
     mapping(address => mapping(address => bool)) internal _operatorApprovalsForResources;
 
+    /**
+    * @notice Fetches resource data by resourceID
+    * @dev Resources are stored by reference mapping _resources[resourceId]
+    * @param resourceId The resourceID to query
+    * @return Resource returns a Resource struct
+    */
     function getResource(
         uint64 resourceId
     ) public view virtual returns (Resource memory)
@@ -189,25 +195,48 @@ abstract contract MultiResourceAbstract is Context, IRMRKMultiResource {
         emit ResourceAddedToToken(tokenId, resourceId);
     }
 
-    
+    /**
+    * @notice Returns active resource IDs for a given token
+    * @dev  Resources data is stored by reference mapping _resource[resourceId]
+    * @param tokenId the token ID to query
+    * @return uint64[] active resource IDs
+    */
     function getActiveResources(
         uint256 tokenId
     ) public view virtual returns(uint64[] memory) {
         return _activeResources[tokenId];
     }
 
+    /**
+    * @notice Returns pending resource IDs for a given token
+    * @dev Pending resources data is stored by reference mapping _pendingResource[resourceId]
+    * @param tokenId the token ID to query
+    * @return uint64[] pending resource IDs
+    */
     function getPendingResources(
         uint256 tokenId
     ) public view virtual returns(uint64[] memory) {
         return _pendingResources[tokenId];
     }
 
+    /**
+    * @notice Returns active resource priorities
+    * @dev Resource priorities are a non-sequential array of uint16 values with an array size equal to active resource priorites.
+    * @param tokenId the token ID to query
+    * @return uint16[] active resource priorities
+    */
     function getActiveResourcePriorities(
         uint256 tokenId
     ) public view virtual returns(uint16[] memory) {
         return _activeResourcePriorities[tokenId];
     }
 
+    /**
+    *  @notice Returns the resource ID that will be replaced (if any) if a given resourceID is accepted from the pending resources array.
+    *  @param tokenId the tokenId with the resource to query
+    *  @param resourceId the pending resourceID which will be accepted
+    *  @return uint64 the resourceId which will be replacted
+    */
     function getResourceOverwrites(
         uint256 tokenId,
         uint64 resourceId
@@ -215,12 +244,24 @@ abstract contract MultiResourceAbstract is Context, IRMRKMultiResource {
         return _resourceOverwrites[tokenId][resourceId];
     }
 
+    /**
+    *  @notice tokenURI function for ERC721 compatibility
+    *  @dev This function could be edited to display the resource with the lowest priority instead of simply the first resource in the array.
+    *  @param tokenId the tokenId to query
+    *  @return string a token metadata URI
+    */
     function tokenURI(
         uint256 tokenId
     ) public view virtual returns (string memory) {
         return _tokenURIAtIndex(tokenId, 0);
     }
 
+    /**
+    *  @notice Returns the tokenURI for a resource at a given index.
+    *  @param tokenId the tokenId to query
+    *  @param index the index of the resource to query
+    *  @return string a token metadata URI
+    */
     function tokenURIAtIndex(
         uint256 tokenId,
         uint256 index
@@ -230,22 +271,33 @@ abstract contract MultiResourceAbstract is Context, IRMRKMultiResource {
 
     // Approvals
 
+    /**
+    * @notice Returns the approved address for resource management of a token.
+    * @param tokenId the tokenId to query
+    * @return address the address of the approved account.
+    */
     function getApprovedForResources(uint256 tokenId) public virtual view returns (address) {
         _requireMinted(tokenId);
         return _tokenApprovalsForResources[tokenId];
     }
 
+    /**
+    * @notice Returns the bool status `operator`'s status for managing resources on `owner`'s tokens.
+    * @param owner the tokenId to query
+    * @param operator the tokenId to query
+    * @return address the address of the approved account.
+    */
     function isApprovedForAllForResources(address owner, address operator) public virtual view returns (bool) {
         return _operatorApprovalsForResources[owner][operator];
     }
 
-    // Cannot be fully implemented since ownership is not defined at this level
+    // TODO: comment? Cannot be fully implemented since ownership is not defined at this level
     function _approveForResources(address owner, address to, uint256 tokenId) internal virtual {
         _tokenApprovalsForResources[tokenId] = to;
         emit ApprovalForResources(owner, to, tokenId);
     }
 
-    // Cannot be fully implemented since ownership is not defined at this level
+    // TODO: comment? Cannot be fully implemented since ownership is not defined at this level
     function _setApprovalForAllForResources(
         address owner,
         address operator,
@@ -257,6 +309,10 @@ abstract contract MultiResourceAbstract is Context, IRMRKMultiResource {
 
     // Utilities
 
+    /**
+    * @notice Returns array of all resource IDs.
+    * @return uint64 array of all resource IDs.
+    */
     function getAllResources() public view virtual returns (uint64[] memory) {
         return _allResources;
     }
@@ -303,7 +359,7 @@ abstract contract MultiResourceAbstract is Context, IRMRKMultiResource {
         return resources;
     }
 
-        /**
+    /**
      * @dev Reverts if the `tokenId` has not been minted yet.
      */
     function _requireMinted(uint256 tokenId) internal view virtual {
