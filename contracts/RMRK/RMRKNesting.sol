@@ -5,7 +5,6 @@
 pragma solidity ^0.8.15;
 
 import "./interfaces/IRMRKNesting.sol";
-import "./interfaces/IRMRKNestingReceiver.sol";
 import "./library/RMRKLib.sol";
 import "./standard/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
@@ -140,17 +139,6 @@ contract RMRKNesting is ERC721, IRMRKNesting {
         });
     }
 
-    function _safeMintNesting(address to, uint256 tokenId, uint256 destinationId) internal virtual {
-        _safeMintNesting(to, tokenId, destinationId, "");
-    }
-
-    function _safeMintNesting(address to, uint256 tokenId, uint256 destinationId, bytes memory data) internal virtual {
-        _nestMint(to, tokenId, destinationId);
-        if (!_checkRMRKNestingImplementer(address(0), to, tokenId, data)) {
-            revert RMRKMintToNonRMRKImplementer();
-        }
-    }
-
     function _sendToNFT(uint tokenId, uint destinationId, address from, address to) private {
         IRMRKNesting destContract = IRMRKNesting(to);
         destContract.addChild(destinationId, tokenId, address(this));
@@ -258,38 +246,6 @@ contract RMRKNesting is ERC721, IRMRKNesting {
     ) public virtual override(ERC721) onlyApprovedOrDirectOwner(tokenId) {
         _safeTransfer(from, to, tokenId, data);
     }
-
-    function safeNestTransferFrom(
-        address from,
-        address to,
-        uint256 tokenId,
-        uint256 destinationId
-    ) public virtual {
-        safeNestTransferFrom(from, to, tokenId, destinationId, "");
-    }
-
-    function safeNestTransferFrom(
-        address from,
-        address to,
-        uint256 tokenId,
-        uint256 destinationId,
-        bytes memory data
-    ) public virtual onlyApprovedOrDirectOwner(tokenId) {
-        _safeNestTransfer(from, to, tokenId, destinationId, data);
-    }
-
-    function _safeNestTransfer(
-        address from,
-        address to,
-        uint256 tokenId,
-        uint256 destinationId,
-        bytes memory data
-    ) internal virtual {
-        _nestTransfer(from, to, tokenId, destinationId);
-        if (!_checkRMRKNestingImplementer(from, to, tokenId, data))
-            revert RMRKNestingTransferToNonRMRKNestingImplementer();
-    }
-
 
     /**
     * @dev Transfers `tokenId` from `from` to `to`.
@@ -539,29 +495,6 @@ contract RMRKNesting is ERC721, IRMRKNesting {
     ////////////////////////////////////////
     // I'm afraid I can't do that, Dave.
 
-
-    function _checkRMRKNestingImplementer(
-        address from,
-        address to,
-        uint256 tokenId,
-        bytes memory data
-    ) private returns (bool) {
-        if (to.isContract()) {
-            try IRMRKNestingReceiver(to).onRMRKNestingReceived(_msgSender(), from, tokenId, data) returns (bytes4 retval) {
-                return retval == IRMRKNestingReceiver.onRMRKNestingReceived.selector;
-            } catch (bytes memory reason) {
-                if (reason.length == 0) {
-                    return false;
-                } else {
-                    assembly {
-                        revert(add(32, reason), mload(reason))
-                    }
-                }
-            }
-        } else {
-            return true;
-        }
-    }
 
     function supportsInterface(bytes4 interfaceId) public override(ERC721) virtual view returns (bool) {
         return (

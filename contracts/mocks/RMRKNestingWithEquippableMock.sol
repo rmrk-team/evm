@@ -2,12 +2,11 @@
 
 pragma solidity ^0.8.15;
 
-import "../RMRK/interfaces/IRMRKNestingReceiver.sol";
 import "../RMRK/RMRKNestingWithEquippable.sol";
 // import "hardhat/console.sol";
 
 //Minimal public implementation of IRMRKNesting for testing.
-contract RMRKNestingWithEquippableMock is  IRMRKNestingReceiver, RMRKNestingWithEquippable {
+contract RMRKNestingWithEquippableMock is RMRKNestingWithEquippable {
 
     constructor(
         string memory name_,
@@ -41,15 +40,6 @@ contract RMRKNestingWithEquippableMock is  IRMRKNestingReceiver, RMRKNestingWith
     //update for reentrancy
     function burn(uint256 tokenId) public onlyApprovedOrDirectOwner(tokenId) {
         _burn(tokenId);
-    }
-
-    function onRMRKNestingReceived(
-        address,
-        address,
-        uint256,
-        bytes calldata
-    ) external pure returns (bytes4) {
-        return IRMRKNestingReceiver.onRMRKNestingReceived.selector;
     }
 
     function setEquippableAddress(address equippable) external {

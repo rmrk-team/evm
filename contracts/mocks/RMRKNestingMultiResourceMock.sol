@@ -28,15 +28,6 @@ contract RMRKNestingMultiResourceMock is RMRKNestingMultiResource {
         _burn(tokenId);
     }
 
-    function onRMRKNestingReceived(
-        address,
-        address,
-        uint256,
-        bytes calldata
-    ) external pure returns (bytes4) {
-        return IRMRKNestingReceiver.onRMRKNestingReceived.selector;
-    }
-
     function onERC721Received(
         address,
         address,

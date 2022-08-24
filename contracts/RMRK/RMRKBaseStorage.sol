@@ -4,7 +4,7 @@ pragma solidity ^0.8.15;
 
 import "./interfaces/IRMRKBaseStorage.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
-import "hardhat/console.sol";
+// import "hardhat/console.sol";
 
 error RMRKPartAlreadyExists();
 error RMRKPartDoesNotExist();

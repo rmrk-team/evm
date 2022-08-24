@@ -4,7 +4,6 @@ pragma solidity ^0.8.15;
 
 import "../RMRK/access/OwnableLock.sol";
 import "../RMRK/utils/RMRKMintingUtils.sol";
-import "../RMRK/interfaces/IRMRKNestingReceiver.sol";
 import "../RMRK/interfaces/IRMRKNestingWithEquippable.sol";
 import "../RMRK/RMRKNestingMultiResource.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
@@ -13,7 +12,7 @@ error RMRKMintUnderpriced();
 error RMRKMintZero();
 
 //Minimal public implementation of IRMRKNesting for testing.
-contract RMRKNestingMultiResourceImpl is OwnableLock, RMRKMintingUtils, IRMRKNestingReceiver, RMRKNestingMultiResource {
+contract RMRKNestingMultiResourceImpl is OwnableLock, RMRKMintingUtils, RMRKNestingMultiResource {
     using Strings for uint256;
 
     // Manage resources via increment
@@ -72,7 +71,7 @@ contract RMRKNestingMultiResourceImpl is OwnableLock, RMRKMintingUtils, IRMRKNes
         uint256 totalSupplyOffset = _totalSupply+1;
 
         for(uint i = nextToken; i < totalSupplyOffset;) {
-            _safeMintNesting(to, i, destinationId);
+            _nestMint(to, i, destinationId);
             unchecked {++i;}
         }
     }
@@ -80,15 +79,6 @@ contract RMRKNestingMultiResourceImpl is OwnableLock, RMRKMintingUtils, IRMRKNes
     //update for reentrancy
     function burn(uint256 tokenId) public onlyApprovedOrDirectOwner(tokenId) {
         _burn(tokenId);
-    }
-
-    function onRMRKNestingReceived(
-        address,
-        address,
-        uint256,
-        bytes calldata
-    ) external pure returns (bytes4) {
-        return IRMRKNestingReceiver.onRMRKNestingReceived.selector;
     }
 
     function isApprovedOrOwner(address spender, uint256 tokenId) external view returns (bool) {

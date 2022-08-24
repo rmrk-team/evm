@@ -235,7 +235,7 @@ async function shouldBehaveLikeNesting(
     });
 
     it('can support INesting', async function () {
-      expect(await parent.supportsInterface('0xc406a39d')).to.equal(true);
+      expect(await parent.supportsInterface('0x9c2a83a6')).to.equal(true);
     });
 
     it('cannot support other interfaceId', async function () {

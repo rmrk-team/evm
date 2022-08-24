@@ -2,8 +2,6 @@
 
 pragma solidity ^0.8.15;
 
-import "./IRMRKNestingReceiver.sol";
-
 interface IRMRKNesting {
 
     // FIXME, should we add more context to these events?
@@ -181,18 +179,6 @@ interface IRMRKNesting {
     *
     */
     function nestTransferFrom(
-        address from,
-        address to,
-        uint256 tokenId,
-        uint256 destinationId
-    ) external;
-
-    //TODO: Verify the mechanism by which we gate this.
-    /**
-    * @dev Safe variant of nestTransferFrom checks if the target is a RMRK NFT or not.
-    *
-    */
-    function safeNestTransferFrom(
         address from,
         address to,
         uint256 tokenId,
