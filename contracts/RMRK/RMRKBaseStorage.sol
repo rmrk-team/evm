@@ -37,8 +37,14 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
     */
 
 
-    //uint64 is sort of arbitrary here--resource IDs in RMRK substrate are uint64 for reference
+    /** 
+    * @dev Mapping of uint64 partId to IRMRKBaseStorage Part struct
+    */
     mapping(uint64 => Part) private _parts;
+
+    /** 
+    * @dev Mapping of uint64 partId to flag to set partd to be equippable by any
+    */
     mapping(uint64 => bool) private _isEquippableToAll;
 
     uint64[] private _partIds;
@@ -48,6 +54,7 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
 
     //Inquire about using an index instead of hashed ID to prevent any chance of collision
     //Consider moving to interface
+    //TODO: Doc this struct, put JSON intake format in comments here
     struct IntakeStruct {
         uint64 partId;
         Part part;
@@ -79,18 +86,27 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
             revert RMRKPartIsNotSlot();
     }
 
+    /**
+    * @dev Returns symbol of associated collection
+    * @return string base contract symbol   
+    */
     function symbol() external view returns (string memory) {
         return _symbol;
     }
 
+    /**
+    * @dev Returns type of data of associated base
+    * @return string data type
+    */
     function type_() external view returns (string memory) {
         return _type;
     }
 
     /**
-    @dev Private function for handling an array of base item inputs. Takes an array of type IntakeStruct.
+    * @dev Private helper function which writes n base item entries to storage.
+    * Delegates to { _addPart } below.
+    * @param partIntake array of structs of type IntakeStruct, which consists of partId and a nested part struct.
     */
-
     function _addPartList(IntakeStruct[] memory partIntake) internal {
         uint len = partIntake.length;
         for (uint256 i = 0; i < len;) {
@@ -100,10 +116,10 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
     }
 
     /**
-    @dev Private function which writes base item entries to storage. partIntake takes the form of a struct containing
-    * a uint64 identifier and a base struct object.
+    * @dev Private function which writes a single base item entry to storage.
+    * @param partIntake struct of type IntakeStruct, which consists of partId and a nested part struct.
+    *
     */
-
     function _addPart(IntakeStruct memory partIntake) internal {
         if(_parts[partIntake.partId].itemType != ItemType.None)
             revert RMRKPartAlreadyExists();
@@ -117,8 +133,9 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
     }
 
     /**
-    @dev Public function which adds a number of equippableAddresses to a single base entry. Only accessible by the contract
+    * @dev Public function which adds a number of equippableAddresses to a single base entry. Only accessible by the contract
     * deployer or transferred Issuer, designated by the modifier onlyIssuer as per the inherited contract issuerControl.
+    *
     */
 
     function _addEquippableAddresses(
@@ -158,11 +175,11 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
     }
 
     /**
-    @dev Public function which adds a single equippableId to every base item.
-    * Handle this function with care, this function can be extremely gas-expensive. Only accessible by the contract
-    * deployer or transferred Issuer, designated by the modifier onlyIssuer as per the inherited contract issuerControl.
+    * @notice Public function which adds a single equippableId to every base item.
+    * @dev Handle this function with care, this function can be extremely gas-expensive. 
+    * Only accessible by the contract deployer or transferred Issuer, designated by the 
+    * modifier onlyIssuer as per the inherited contract issuerControl.
     */
-
     function _setEquippableToAll(uint64 partId) internal onlySlot(partId) {
         _isEquippableToAll[partId] = true;
         emit SetEquippableToAll(partId);
