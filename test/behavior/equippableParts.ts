@@ -45,9 +45,21 @@ async function shouldBehaveLikeEquippableWithParts() {
       // Weapon is child on index 0, background on index 1
       const childIndex = 0;
       const weaponResId = maskResourcesEquip[0]; // This resource is assigned to weapon first weapon
-      await neonEquipContract
-        .connect(addrs[0])
-        .equip(neons[0], neonResIds[0], partIdForMask, childIndex, weaponResId);
+      await expect(
+        neonEquipContract
+          .connect(addrs[0])
+          .equip(neons[0], neonResIds[0], partIdForMask, childIndex, weaponResId),
+      )
+        .to.emit(neonEquipContract, 'ChildResourceEquipped')
+        .withArgs(
+          neons[0],
+          neonResIds[0],
+          partIdForMask,
+          masks[0],
+          maskEquipContract.address,
+          weaponResId,
+        );
+
       // All part slots are included on the response:
       const expectedSlots = [bn(partIdForMask)];
       const expectedEquips = [

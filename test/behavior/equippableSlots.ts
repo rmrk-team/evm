@@ -618,11 +618,12 @@ async function shouldBehaveLikeEquippableWithSlots(
       [partIdForWeaponGem],
     );
     // Make it equippable into soldier using new slot
-    await weaponEquip.setValidParentRefId(
-      newEquippableRefId,
-      soldierEquip.address,
-      partIdForWeaponAlt,
-    );
+    await expect(
+      weaponEquip.setValidParentRefId(newEquippableRefId, soldierEquip.address, partIdForWeaponAlt),
+    )
+      .to.emit(weaponEquip, 'ValidParentReferenceIdSet')
+      .withArgs(newEquippableRefId, soldierEquip.address, partIdForWeaponAlt);
+
     // Add the resource to the weapon and accept it
     await weaponEquip.addResourceToToken(weaponsIds[0], newWeaponResId, 0);
     await weaponEquip.connect(addrs[0]).acceptResource(weaponsIds[0], 0);
@@ -633,9 +634,20 @@ async function shouldBehaveLikeEquippableWithSlots(
     childIndex: number,
     weaponResId: number,
   ): Promise<void> {
-    await soldierEquip
-      .connect(from)
-      .equip(soldiersIds[0], soldierResId, partIdForWeapon, childIndex, weaponResId);
+    await expect(
+      soldierEquip
+        .connect(from)
+        .equip(soldiersIds[0], soldierResId, partIdForWeapon, childIndex, weaponResId),
+    )
+      .to.emit(soldierEquip, 'ChildResourceEquipped')
+      .withArgs(
+        soldiersIds[0],
+        soldierResId,
+        partIdForWeapon,
+        weaponsIds[0],
+        weaponEquip.address,
+        weaponResourcesEquip[0],
+      );
     // All part slots are included on the response:
     const expectedSlots = [bn(partIdForWeapon), bn(partIdForBackground)];
     // If a slot has nothing equipped, it returns an empty equip:
@@ -655,7 +667,16 @@ async function shouldBehaveLikeEquippableWithSlots(
   }
 
   async function unequipWeaponAndCheckFromAddress(from: SignerWithAddress): Promise<void> {
-    await soldierEquip.connect(from).unequip(soldiersIds[0], soldierResId, partIdForWeapon);
+    await expect(soldierEquip.connect(from).unequip(soldiersIds[0], soldierResId, partIdForWeapon))
+      .to.emit(soldierEquip, 'ChildResourceUnequipped')
+      .withArgs(
+        soldiersIds[0],
+        soldierResId,
+        partIdForWeapon,
+        weaponsIds[0],
+        weaponEquip.address,
+        weaponResourcesEquip[0],
+      );
 
     const expectedSlots = [bn(partIdForWeapon), bn(partIdForBackground)];
     // If a slot has nothing equipped, it returns an empty equip:

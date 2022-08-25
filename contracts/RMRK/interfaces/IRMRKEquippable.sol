@@ -7,6 +7,39 @@ import "./IRMRKMultiResource.sol";
 interface IRMRKEquippable is IRMRKMultiResource {
 
     /**
+    * @dev emitted when a child's resource is equipped into one of its parent resources.
+    */
+    event ChildResourceEquipped(
+        uint indexed tokenId,
+        uint64 indexed resourceId,
+        uint64 indexed slotPartId,
+        uint childTokenId,
+        address childAddress,
+        uint64 childResourceId
+    );
+
+    /**
+    * @dev emitted when a child's resource is removed from one of its parent resources.
+    */
+    event ChildResourceUnequipped(
+        uint indexed tokenId,
+        uint64 indexed resourceId,
+        uint64 indexed slotPartId,
+        uint childTokenId,
+        address childAddress,
+        uint64 childResourceId
+    );
+
+    /**
+    * @dev emitted when it's declared that resources with the referenceId, are equippable into the parent address, on the partId slot
+    */
+    event ValidParentReferenceIdSet(
+        uint64 indexed referenceId,
+        uint64 indexed slotPartId,
+        address parentAddress
+    );
+
+    /**
     * @dev Returns the Equippable contract's corresponding nesting address.
     */
     function getNestingAddress() external view returns(address);

@@ -163,7 +163,6 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
         if(!_validateBaseEquip(_baseAddresses[resourceId], childEquippable, slotPartId))
             revert RMRKEquippableEquipNotAllowedByBase();
 
-
         Equipment memory newEquip = Equipment({
             resourceId: resourceId,
             childResourceId: childResourceId,
@@ -173,6 +172,16 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
 
         _equipments[tokenId][_baseAddresses[resourceId]][slotPartId] = newEquip;
         _equipCountPerChild[tokenId][child.contractAddress][child.tokenId] += 1;
+
+        // TODO: When replacing, this event is emmited in the middle (bad practice). Shall we change it?
+        emit ChildResourceEquipped(
+            tokenId,
+            resourceId,
+            slotPartId,
+            child.tokenId,
+            childEquippable,
+            childResourceId
+        );
     }
 
     function unequip(
@@ -195,6 +204,15 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
         delete _equipments[tokenId][targetBaseAddress][slotPartId];
         address childNestingAddress = IRMRKEquippable(equipment.childEquippableAddress).getNestingAddress();
         _equipCountPerChild[tokenId][childNestingAddress][equipment.childTokenId] -= 1;
+
+        emit ChildResourceUnequipped(
+            tokenId,
+            resourceId,
+            slotPartId,
+            equipment.childTokenId,
+            equipment.childEquippableAddress,
+            equipment.childResourceId
+        );
     }
 
     function replaceEquipment(
@@ -315,8 +333,9 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
     // --------------------- VALIDATION ---------------------
 
     // Declares that resources with this refId, are equippable into the parent address, on the partId slot
-    function _setValidParentRefId(uint64 refId, address parentAddress, uint64 partId) internal {
-        _validParentSlots[refId][parentAddress] = partId;
+    function _setValidParentRefId(uint64 referenceId, address parentAddress, uint64 slotPartId) internal {
+        _validParentSlots[referenceId][parentAddress] = slotPartId;
+        emit ValidParentReferenceIdSet(referenceId, slotPartId, parentAddress);
     }
 
     // Checks on the base contract that the child can go into the part id
