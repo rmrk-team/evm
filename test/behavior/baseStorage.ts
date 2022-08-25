@@ -138,22 +138,36 @@ async function shouldBehaveLikeBase(contractName: string, symbol: string, type: 
 
     it('is equippable if added afterward', async function () {
       const partId = 1;
-      await testBase.addPart({ partId: partId, part: sampleSlotPartData });
-      await testBase.addEquippableAddresses(partId, [addrs[1].address]);
+      await expect(testBase.addPart({ partId: partId, part: sampleSlotPartData }))
+        .to.emit(testBase, 'AddedPart')
+        .withArgs(
+          partId,
+          sampleSlotPartData.itemType,
+          sampleSlotPartData.z,
+          sampleSlotPartData.equippable,
+          sampleSlotPartData.metadataURI,
+        );
+      await expect(testBase.addEquippableAddresses(partId, [addrs[1].address]))
+        .to.emit(testBase, 'AddedEquippables')
+        .withArgs(partId, [addrs[1].address]);
       expect(await testBase.checkIsEquippable(partId, addrs[1].address)).to.eql(true);
     });
 
     it('is equippable if set afterward', async function () {
       const partId = 1;
       await testBase.addPart({ partId: partId, part: sampleSlotPartData });
-      await testBase.setEquippableAddresses(partId, [addrs[1].address]);
+      await expect(testBase.setEquippableAddresses(partId, [addrs[1].address]))
+        .to.emit(testBase, 'SetEquippables')
+        .withArgs(partId, [addrs[1].address]);
       expect(await testBase.checkIsEquippable(partId, addrs[1].address)).to.eql(true);
     });
 
     it('is equippable if set to all', async function () {
       const partId = 1;
       await testBase.addPart({ partId: partId, part: sampleSlotPartData });
-      await testBase.setEquippableToAll(partId);
+      await expect(testBase.setEquippableToAll(partId))
+        .to.emit(testBase, 'SetEquippableToAll')
+        .withArgs(partId);
       expect(await testBase.checkIsEquippableToAll(partId)).to.eql(true);
       expect(await testBase.checkIsEquippable(partId, addrs[1].address)).to.eql(true);
     });

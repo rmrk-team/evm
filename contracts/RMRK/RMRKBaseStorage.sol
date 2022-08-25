@@ -121,15 +121,20 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
     *
     */
     function _addPart(IntakeStruct memory partIntake) internal {
-        if(_parts[partIntake.partId].itemType != ItemType.None)
+        uint64 partId = partIntake.partId;
+        Part memory part = partIntake.part;
+
+        if(_parts[partId].itemType != ItemType.None)
             revert RMRKPartAlreadyExists();
-        if(partIntake.part.itemType == ItemType.None)
+        if(part.itemType == ItemType.None)
             revert RMRKBadConfig();
-        if(partIntake.part.itemType == ItemType.Fixed && partIntake.part.equippable.length > 0)
+        if(part.itemType == ItemType.Fixed && part.equippable.length > 0)
             revert RMRKBadConfig();
 
-        _parts[partIntake.partId] = partIntake.part;
-        _partIds.push(partIntake.partId);
+        _parts[partId] = part;
+        _partIds.push(partId);
+
+        emit AddedPart(partId, part.itemType, part.z, part.equippable, part.metadataURI);
     }
 
     /**

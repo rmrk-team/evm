@@ -7,18 +7,29 @@ interface IRMRKBaseStorage {
   /**
   * @dev emitted when one or more addresses are added for equippable status for partId.
   */
-  event AddedEquippables(uint64 partId, address[] equippableAddresses);
+  event AddedPart(
+    uint64 indexed partId,
+    ItemType indexed itemType,
+    uint8 zIndex,
+    address[] equippableAddresses,
+    string metadataURI
+  );
+
+  /**
+  * @dev emitted when one or more addresses are added for equippable status for partId.
+  */
+  event AddedEquippables(uint64 indexed partId, address[] equippableAddresses);
 
   /**
   * @dev emitted when one or more addresses are whitelisted for equippable status for partId.
   * Overwrites previous equippable addresses.
   */
-  event SetEquippables(uint64 partId, address[] equippableAddresses);
+  event SetEquippables(uint64 indexed partId, address[] equippableAddresses);
 
   /**
   * @dev emitted when a partId is flagged as equippable by any.
   */
-  event SetEquippableToAll(uint64 partId);
+  event SetEquippableToAll(uint64 indexed partId);
 
   /**
   * @dev Item type enum for fixed and slot parts.
