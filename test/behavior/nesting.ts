@@ -517,8 +517,6 @@ async function shouldBehaveLikeNesting(
         true,
       ]);
 
-      console.log();
-
       await parent.connect(tokenOwner).burnChild(parentId, 0);
 
       // Child and grandchild were burnt, parent is still there
