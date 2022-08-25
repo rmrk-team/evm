@@ -4,32 +4,30 @@ pragma solidity ^0.8.15;
 
 interface IRMRKNesting {
 
-    // FIXME, should we add more context to these events?
     /**
     * @dev emitted when a child NFT is added to a token's pending array
     */
-    event ChildProposed(uint tokenId);
+    event ChildProposed(uint indexed tokenId, address indexed childAddress, uint indexed childId, uint childIndex);
 
     /**
     * @dev emitted when a child NFT accepts a token from its pending array, migrating it to the active array.
     */
-    event ChildAccepted(uint tokenId);
+    event ChildAccepted(uint indexed tokenId, address indexed childAddress, uint indexed childId, uint childIndex);
 
-    // FIXME: ChildRejected seems more consistent
     /**
     * @dev emitted when a token accepts removes a child token from its pending array.
     */
-    event PendingChildRemoved(uint tokenId, uint index);
+    event ChildRejected(uint indexed tokenId, address indexed childAddress, uint indexed childId, uint childIndex);
 
     /**
     * @dev emitted when a token removes all a child tokens from its pending array.
     */
-    event AllPendingChildrenRemoved(uint tokenId);
+    event AllChildrenRejected(uint indexed tokenId);
 
     /**
     * @dev emitted when a token unnests a child from itself, transferring ownership to the root owner.
     */
-    event ChildUnnested(uint tokenId, uint index);
+    event ChildUnnested(uint indexed tokenId, address indexed childAddress, uint indexed childId, uint childIndex);
 
     /**
     * @dev Struct used to store child object data.

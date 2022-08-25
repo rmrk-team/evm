@@ -128,7 +128,7 @@ async function shouldBehaveLikeMultiResource(
         );
         await expect(this.token.connect(tokenOwner).acceptResource(tokenId, 0))
           .to.emit(this.token, 'ResourceOverwritten')
-          .withArgs(tokenId, resId);
+          .withArgs(tokenId, resId, resId2);
 
         expect(await this.token.getFullResources(tokenId)).to.be.eql([[resId2, metaURIDefault]]);
         // Overwrite should be gone

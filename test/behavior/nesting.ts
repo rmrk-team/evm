@@ -269,7 +269,7 @@ async function shouldBehaveLikeNesting(
     it('can accept child', async function () {
       await expect(parent.connect(tokenOwner).acceptChild(parentId, 0))
         .to.emit(parent, 'ChildAccepted')
-        .withArgs(parentId);
+        .withArgs(parentId, child.address, childId, 0);
       await checkChildWasAccepted();
     });
 
@@ -319,8 +319,8 @@ async function shouldBehaveLikeNesting(
 
     it('can reject one pending child with abandon', async function () {
       await expect(parent.connect(tokenOwner).rejectChild(parentId, 0, zeroAddress))
-        .to.emit(parent, 'PendingChildRemoved')
-        .withArgs(parentId, 0);
+        .to.emit(parent, 'ChildRejected')
+        .withArgs(parentId, child.address, childId, 0);
       await checkNoChildrenNorPending(parentId);
 
       // It is still on the child
@@ -335,8 +335,8 @@ async function shouldBehaveLikeNesting(
 
     it('can reject one pending child, set child owner to new address', async function () {
       await expect(parent.connect(tokenOwner).rejectChild(parentId, 0, addrs[2].address))
-        .to.emit(parent, 'PendingChildRemoved')
-        .withArgs(parentId, 0);
+        .to.emit(parent, 'ChildRejected')
+        .withArgs(parentId, child.address, childId, 0);
       await checkNoChildrenNorPending(parentId);
 
       expect(await child.ownerOf(childId)).to.equal(addrs[2].address);
@@ -370,7 +370,7 @@ async function shouldBehaveLikeNesting(
       await nestMint(child, parent.address, parentId);
 
       await expect(parent.connect(tokenOwner).rejectAllChildren(parentId))
-        .to.emit(parent, 'AllPendingChildrenRemoved')
+        .to.emit(parent, 'AllChildrenRejected')
         .withArgs(parentId);
       await checkNoChildrenNorPending(parentId);
 
@@ -567,7 +567,7 @@ async function shouldBehaveLikeNesting(
     it('can unnest child with to as root owner', async function () {
       await expect(parent.connect(tokenOwner).unnestChild(parentId, 0, tokenOwner.address))
         .to.emit(parent, 'ChildUnnested')
-        .withArgs(parentId, 0);
+        .withArgs(parentId, child.address, childId, 0);
 
       await checkChildMovedToRootOwner();
     });
@@ -576,7 +576,7 @@ async function shouldBehaveLikeNesting(
       const toOwnerAddress = addrs[2].address;
       await expect(parent.connect(tokenOwner).unnestChild(parentId, 0, toOwnerAddress))
         .to.emit(parent, 'ChildUnnested')
-        .withArgs(parentId, 0);
+        .withArgs(parentId, child.address, childId, 0);
 
       await checkChildMovedToRootOwner(toOwnerAddress);
     });

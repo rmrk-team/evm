@@ -367,19 +367,17 @@ async function shouldBehaveLikeEquippableResources(
 
       // Add new resource to overwrite the first, and accept
       const activeResources = await chunkyEquip.getActiveResources(tokenId);
-      await expect(chunkyEquip.addResourceToToken(tokenId, resId2, activeResources[0])).to.emit(
-        chunkyEquip,
-        'ResourceOverwriteProposed',
-      );
+      await expect(chunkyEquip.addResourceToToken(tokenId, resId2, activeResources[0]))
+        .to.emit(chunkyEquip, 'ResourceOverwriteProposed')
+        .withArgs(tokenId, 2, 1);
       const pendingResources = await chunkyEquip.getPendingResources(tokenId);
 
       expect(await chunkyEquip.getResourceOverwrites(tokenId, pendingResources[0])).to.eql(
         activeResources[0],
       );
-      await expect(chunkyEquip.acceptResource(tokenId, 0)).to.emit(
-        chunkyEquip,
-        'ResourceOverwritten',
-      );
+      await expect(chunkyEquip.acceptResource(tokenId, 0))
+        .to.emit(chunkyEquip, 'ResourceOverwritten')
+        .withArgs(tokenId, 1, 2);
 
       expect(await chunkyEquip.getFullExtendedResources(tokenId)).to.be.eql([
         [resId2, equippableRefIdDefault, baseAddressDefault, metaURIDefault],

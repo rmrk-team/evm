@@ -345,13 +345,16 @@ contract RMRKNesting is ERC721, IRMRKNesting {
             tokenId: childTokenId
         });
 
-        if(_pendingChildren[parentTokenId].length < 128) {
+        uint length = _pendingChildren[parentTokenId].length;
+
+        if(length < 128) {
             _pendingChildren[parentTokenId].push(child);
         } else {
             revert RMRKMaxPendingChildrenReached();
         }
 
-        emit ChildProposed(parentTokenId);
+        // Previous lenght matches the index for the new child
+        emit ChildProposed(parentTokenId, childTokenAddress, childTokenId, length);
     }
 
     /**
@@ -367,7 +370,7 @@ contract RMRKNesting is ERC721, IRMRKNesting {
         removeChildByIndex(_pendingChildren[tokenId], index);
 
         _children[tokenId].push(child);
-        emit ChildAccepted(tokenId);
+        emit ChildAccepted(tokenId, child.contractAddress, child.tokenId, index);
     }
 
     /**
@@ -377,7 +380,7 @@ contract RMRKNesting is ERC721, IRMRKNesting {
     */
     function rejectAllChildren(uint256 tokenId) public virtual onlyApprovedOrOwner(tokenId) {
         delete(_pendingChildren[tokenId]);
-        emit AllPendingChildrenRemoved(tokenId);
+        emit AllChildrenRejected(tokenId);
     }
 
     /**
@@ -407,7 +410,7 @@ contract RMRKNesting is ERC721, IRMRKNesting {
             IERC721(pendingChild.contractAddress).safeTransferFrom(address(this), to, pendingChild.tokenId);
         }
 
-        emit PendingChildRemoved(tokenId, index);
+        emit ChildRejected(tokenId, pendingChild.contractAddress, pendingChild.tokenId, index);
     }
 
     /**
@@ -431,7 +434,7 @@ contract RMRKNesting is ERC721, IRMRKNesting {
             IERC721(child.contractAddress).safeTransferFrom(address(this), to, child.tokenId);
         }
 
-        emit ChildUnnested(tokenId, index);
+        emit ChildUnnested(tokenId, child.contractAddress, child.tokenId, index);
     }
 
     function reclaimChild(

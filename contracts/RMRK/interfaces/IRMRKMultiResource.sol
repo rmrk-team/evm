@@ -8,35 +8,35 @@ interface IRMRKMultiResource {
     /**
     * @notice emitted when a resource object is initialized at resourceId
     */
-    event ResourceSet(uint64 resourceId);
+    event ResourceSet(uint64 indexed resourceId);
 
     /**
     * @notice emitted when a resource object at resourceId is added to tokenId's pendingResource array
     */
-    event ResourceAddedToToken(uint256 indexed tokenId, uint64 resourceId);
+    event ResourceAddedToToken(uint256 indexed tokenId, uint64 indexed resourceId);
 
     /**
     * @notice emitted when a resource object at resourceId is accepted by tokenId and migrated from tokenId's pendingResource array to resource array
     */  
-    event ResourceAccepted(uint256 indexed tokenId, uint64 resourceId);
+    event ResourceAccepted(uint256 indexed tokenId, uint64 indexed resourceId);
 
     /**
     * @notice emitted when a resource object at resourceId is rejected from tokenId and is dropped from the pendingResource array
     */
-    event ResourceRejected(uint256 indexed tokenId, uint64 resourceId);
+    event ResourceRejected(uint256 indexed tokenId, uint64 indexed resourceId);
 
     /**
     * @notice emitted when tokenId's prioritiy array is reordered.
     */
     event ResourcePrioritySet(uint256 indexed tokenId);
 
-   /**
+    /**
     * @notice emitted when a resource object at resourceId is proposed to tokenId, and that proposal will initiate an overwrite of overwrites with resourceId if accepted.
     */
     event ResourceOverwriteProposed(
         uint256 indexed tokenId,
-        uint64 resourceId,
-        uint64 overwrites
+        uint64 indexed resourceId,
+        uint64 indexed overwritesId
     );
 
     /**
@@ -44,7 +44,8 @@ interface IRMRKMultiResource {
     */
     event ResourceOverwritten(
         uint256 indexed tokenId,
-        uint64 overwritten
+        uint64 indexed oldResourceId,
+        uint64 indexed newResourceId
     );
 
     /**

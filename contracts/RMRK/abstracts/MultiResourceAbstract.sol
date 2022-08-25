@@ -110,7 +110,7 @@ abstract contract MultiResourceAbstract is Context, IRMRKMultiResource {
         if (overwrite != uint64(0)) {
             // We could check here that the resource to overwrite actually exists but it is probably harmless.
             _activeResources[tokenId].removeItemByValue(overwrite);
-            emit ResourceOverwritten(tokenId, overwrite);
+            emit ResourceOverwritten(tokenId, overwrite, resourceId);
             delete(_resourceOverwrites[tokenId][resourceId]);
         }
         _activeResources[tokenId].push(resourceId);
