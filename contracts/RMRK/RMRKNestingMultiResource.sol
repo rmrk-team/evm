@@ -58,7 +58,7 @@ contract RMRKNestingMultiResource is MultiResourceAbstract, RMRKNesting {
     }
 
     function tokenURI(uint256 tokenId) public view override(
-            ERC721,
+            RMRKNesting,
             MultiResourceAbstract
         ) returns (string memory) {
         return _tokenURIAtIndex(tokenId, 0);
@@ -89,15 +89,15 @@ contract RMRKNestingMultiResource is MultiResourceAbstract, RMRKNesting {
 
     // Other
 
-    function _requireMinted(uint256 tokenId) internal view virtual override(ERC721, MultiResourceAbstract) {
-        ERC721._requireMinted(tokenId);
+    function _requireMinted(uint256 tokenId) internal view virtual override(RMRKNesting, MultiResourceAbstract) {
+        RMRKNesting._requireMinted(tokenId);
     }
 
     function _exists(uint256 tokenId) internal view virtual override(RMRKNesting, MultiResourceAbstract) returns (bool) {
         return RMRKNesting._exists(tokenId);
     }
 
-    function _baseURI() internal view override(ERC721, MultiResourceAbstract) virtual returns (string memory) {
+    function _baseURI() internal view override(RMRKNesting, MultiResourceAbstract) virtual returns (string memory) {
         return "";
     }
 }
