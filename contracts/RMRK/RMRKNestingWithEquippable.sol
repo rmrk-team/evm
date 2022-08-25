@@ -37,10 +37,12 @@ contract RMRKNestingWithEquippable is IRMRKNestingWithEquippable, RMRKNesting {
     }
 
     function _setEquippableAddress(address equippable) internal virtual {
+        address oldAddress = _equippableAddress;
         _equippableAddress = equippable;
+        emit EquippableAddressSet(oldAddress, equippable);
     }
 
-    function getEquippablesAddress() external virtual view returns (address) {
+    function getEquippableAddress() external virtual view returns (address) {
         return _equippableAddress;
     }
 

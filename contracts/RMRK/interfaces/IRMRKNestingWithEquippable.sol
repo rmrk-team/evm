@@ -10,9 +10,14 @@ pragma solidity ^0.8.0;
 interface IRMRKNestingWithEquippable {
 
     /**
+    * @dev emitted when the equippable address is set
+    */
+    event EquippableAddressSet( address old, address new_);
+
+    /**
     * @dev Returns address of Equippable contract
     */
-    function getEquippablesAddress() external view returns (address);
+    function getEquippableAddress() external view returns (address);
 
     /**
     * @dev Returns approved or owner status of `spender` for `tokenId`.

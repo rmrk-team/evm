@@ -115,7 +115,9 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
     }
 
     function _setNestingAddress(address nestingAddress) internal {
+        address oldAddress = _nestingAddress;
         _nestingAddress = nestingAddress;
+        emit NestingAddressSet(oldAddress, nestingAddress);
     }
 
     function getNestingAddress() external view returns(address) {
@@ -151,7 +153,7 @@ contract RMRKEquippable is IRMRKEquippable, MultiResourceAbstract {
             revert RMRKSlotAlreadyUsed();
 
         IRMRKNesting.Child memory child = IRMRKNesting(_nestingAddress).childOf(tokenId, childIndex);
-        address childEquippable = IRMRKNestingWithEquippable(child.contractAddress).getEquippablesAddress();
+        address childEquippable = IRMRKNestingWithEquippable(child.contractAddress).getEquippableAddress();
 
         // Check from child perspective intention to be used in part
         if (!IRMRKEquippable(childEquippable).canTokenBeEquippedWithResourceIntoSlot(

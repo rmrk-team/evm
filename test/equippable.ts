@@ -229,9 +229,21 @@ describe('EquippableMock Resources', async () => {
   });
 
   describe('Init', async function () {
-    it('it can get names and symbols', async function () {
+    it('can get names and symbols', async function () {
       expect(await this.nesting.name()).to.equal('Chunky');
       expect(await this.nesting.symbol()).to.equal('CHNK');
+    });
+  });
+
+  describe('Events', async function () {
+    it('can set nesting/equippable addresses', async function () {
+      expect(await this.nesting.setEquippableAddress(ethers.constants.AddressZero))
+        .to.emit(this.nesting, 'EquippableAddressSet')
+        .withArgs(this.equip.address, ethers.constants.AddressZero);
+
+      expect(await this.equip.setNestingAddress(ethers.constants.AddressZero))
+        .to.emit(this.equip, 'EquippableAddressSet')
+        .withArgs(this.nesting.address, ethers.constants.AddressZero);
     });
   });
 
