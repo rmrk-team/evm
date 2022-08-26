@@ -40,16 +40,6 @@ interface IRMRKEquippable is IRMRKMultiResource {
     );
 
     /**
-    * @dev emitted when the nesting address is set
-    */
-    event NestingAddressSet( address old, address new_);
-
-    /**
-    * @dev Returns the Equippable contract's corresponding nesting address.
-    */
-    function getNestingAddress() external view returns(address);
-
-    /**
     * @dev Returns if the tokenId is considered to be equipped into another resource.
     */
     function isChildEquipped(
