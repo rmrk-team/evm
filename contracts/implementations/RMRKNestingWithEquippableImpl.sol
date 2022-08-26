@@ -29,20 +29,12 @@ contract RMRKNestingWithEquippableImpl is OwnableLock, RMRKMintingUtils, RMRKNes
         // pattern can use OZ clone
         _equippableAddress = equippableAddress_;
     }
+
     /*
     Template minting logic
     */
-    function mint(address to, uint256 numToMint) external payable saleIsOpen notLocked {
-        if (numToMint == uint256(0)) revert RMRKMintZero();
-        if (numToMint + _totalSupply > _maxSupply) revert RMRKMintOverMax();
-
-        uint256 mintPriceRequired = numToMint * _pricePerMint;
-        if (mintPriceRequired != msg.value) 
-            revert RMRKMintUnderpriced();
-
-        uint256 nextToken = _totalSupply+1;
-        _totalSupply += numToMint;
-        uint256 totalSupplyOffset = _totalSupply+1;
+    function mint(address to, uint256 numToMint) external payable saleIsOpen {
+        (uint nextToken, uint totalSupplyOffset) = _preMint(numToMint);
 
         for(uint i = nextToken; i < totalSupplyOffset;) {
             _safeMint(to, i);
@@ -53,7 +45,16 @@ contract RMRKNestingWithEquippableImpl is OwnableLock, RMRKMintingUtils, RMRKNes
     /*
     Template minting logic
     */
-    function mintNesting(address to, uint256 numToMint, uint256 destinationId) external payable saleIsOpen notLocked {
+    function mintNesting(address to, uint256 numToMint, uint256 destinationId) external payable saleIsOpen {
+        (uint nextToken, uint totalSupplyOffset) = _preMint(numToMint);
+
+        for(uint i = nextToken; i < totalSupplyOffset;) {
+            _nestMint(to, i, destinationId);
+            unchecked {++i;}
+        }
+    }
+
+    function _preMint(uint256 numToMint) private returns(uint, uint) {
         if (numToMint == uint256(0)) revert RMRKMintZero();
         if (numToMint + _totalSupply > _maxSupply) revert RMRKMintOverMax();
 
@@ -65,10 +66,7 @@ contract RMRKNestingWithEquippableImpl is OwnableLock, RMRKMintingUtils, RMRKNes
         _totalSupply += numToMint;
         uint256 totalSupplyOffset = _totalSupply+1;
 
-        for(uint i = nextToken; i < totalSupplyOffset;) {
-            _nestMint(to, i, destinationId);
-            unchecked {++i;}
-        }
+        return (nextToken, totalSupplyOffset);
     }
 
     //update for reentrancy

@@ -19,7 +19,7 @@ describe('NestingMock', function () {
   const symbol2 = 'MONKE';
 
   async function nestingFixture() {
-    const NestingFactory = await ethers.getContractFactory('RMRKNestingMockWithReceiver');
+    const NestingFactory = await ethers.getContractFactory('RMRKNestingMock');
     parent = await NestingFactory.deploy(name, symbol);
     await parent.deployed();
 
