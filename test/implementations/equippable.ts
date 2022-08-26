@@ -37,7 +37,7 @@ async function partsFixture() {
 
   const baseFactory = await ethers.getContractFactory('RMRKBaseStorageImpl');
   const nestingFactory = await ethers.getContractFactory('RMRKNestingWithEquippableImpl');
-  const equipFactory = await ethers.getContractFactory('RMRKEquippableImpl');
+  const equipFactory = await ethers.getContractFactory('RMRKEquippableWithNestingImpl');
 
   // Base
   const base = await baseFactory.deploy(baseSymbol, baseType);
@@ -93,7 +93,7 @@ async function slotsFixture() {
 
   const baseFactory = await ethers.getContractFactory('RMRKBaseStorageImpl');
   const nestingFactory = await ethers.getContractFactory('RMRKNestingWithEquippableImpl');
-  const equipFactory = await ethers.getContractFactory('RMRKEquippableImpl');
+  const equipFactory = await ethers.getContractFactory('RMRKEquippableWithNestingImpl');
 
   // Base
   const base = await baseFactory.deploy(baseSymbol, baseType);
@@ -184,7 +184,7 @@ async function slotsFixture() {
 
 async function resourcesFixture() {
   const Nesting = await ethers.getContractFactory('RMRKNestingWithEquippableImpl');
-  const Equip = await ethers.getContractFactory('RMRKEquippableImpl');
+  const Equip = await ethers.getContractFactory('RMRKEquippableWithNestingImpl');
 
   const nesting = await Nesting.deploy(
     'Chunky',
@@ -205,7 +205,7 @@ async function resourcesFixture() {
 
 async function multiResourceFixture() {
   const NestingFactory = await ethers.getContractFactory('RMRKNestingWithEquippableImpl');
-  const EquipFactory = await ethers.getContractFactory('RMRKEquippableImpl');
+  const EquipFactory = await ethers.getContractFactory('RMRKEquippableWithNestingImpl');
 
   const nesting = await NestingFactory.deploy(
     'NestingWithEquippable',

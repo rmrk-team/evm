@@ -18,7 +18,7 @@ describe('NestingWithEquippableMock Nesting Behavior', function () {
     const ownerChunky = await CHNKY.deploy(name, symbol);
     await ownerChunky.deployed();
 
-    const CHNKYEQUIPPABLE = await ethers.getContractFactory('RMRKEquippableMock');
+    const CHNKYEQUIPPABLE = await ethers.getContractFactory('RMRKEquippableWithNestingMock');
     const chunkyEquippable = await CHNKYEQUIPPABLE.deploy(ownerChunky.address);
     await chunkyEquippable.deployed();
 
@@ -28,7 +28,7 @@ describe('NestingWithEquippableMock Nesting Behavior', function () {
     const petMonkey = await MONKY.deploy(name2, symbol2);
     await petMonkey.deployed();
 
-    const MONKYEQUIPPABLE = await ethers.getContractFactory('RMRKEquippableMock');
+    const MONKYEQUIPPABLE = await ethers.getContractFactory('RMRKEquippableWithNestingMock');
     const monkyEquippable = await MONKYEQUIPPABLE.deploy(petMonkey.address);
     await monkyEquippable.deployed();
 
@@ -57,7 +57,7 @@ describe('NestingWithEquippableMock ERC721 Behavior', function () {
     const tokenContract = await Token.deploy(name, symbol);
     await tokenContract.deployed();
 
-    const Equippable = await ethers.getContractFactory('RMRKEquippableMock');
+    const Equippable = await ethers.getContractFactory('RMRKEquippableWithNestingMock');
     const equippableContract = await Equippable.deploy(tokenContract.address);
     await equippableContract.deployed();
 

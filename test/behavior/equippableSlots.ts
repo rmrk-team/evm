@@ -58,12 +58,6 @@ async function shouldBehaveLikeEquippableWithSlots(
   });
 
   describe('Validations', async function () {
-    it('can get nesting address', async function () {
-      expect(await soldierEquip.getNestingAddress()).to.eql(soldier.address);
-      expect(await weaponEquip.getNestingAddress()).to.eql(weapon.address);
-      expect(await weaponGemEquip.getNestingAddress()).to.eql(weaponGem.address);
-      expect(await backgroundEquip.getNestingAddress()).to.eql(background.address);
-    });
 
     it('can validate equips of weapons into soldiers', async function () {
       // This resource is not equippable

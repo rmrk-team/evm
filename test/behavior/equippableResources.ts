@@ -28,9 +28,11 @@ async function shouldBehaveLikeEquippableResources(
     it('can support IERC165', async function () {
       expect(await chunky.supportsInterface('0x01ffc9a7')).to.equal(true);
     });
+
     it('can support IEquippable', async function () {
-      expect(await chunkyEquip.supportsInterface('0x39c2f8b2')).to.equal(true);
+      expect(await chunkyEquip.supportsInterface('0xdcfac6de')).to.equal(true);
     });
+
     it('cannot support other interfaceId', async function () {
       expect(await chunkyEquip.supportsInterface('0xffffffff')).to.equal(false);
     });
@@ -184,11 +186,20 @@ async function shouldBehaveLikeEquippableResources(
         'ResourceAddedToToken',
       );
 
-      const pending = await chunkyEquip.getFullPendingExtendedResources(tokenId);
-      expect(pending).to.be.eql([
-        [resId, equippableRefIdDefault, baseAddressDefault, metaURIDefault],
-        [resId2, equippableRefIdDefault, baseAddressDefault, metaURIDefault],
-      ]);
+      // The merged version does not implement this to save size:
+      if (chunkyEquip.getFullPendingExtendedResources === undefined) {
+        const pending = await chunkyEquip.getFullPendingResources(tokenId);
+        expect(pending).to.be.eql([
+          [resId, metaURIDefault],
+          [resId2, metaURIDefault],
+        ]);
+      } else {
+        const pending = await chunkyEquip.getFullPendingExtendedResources(tokenId);
+        expect(pending).to.be.eql([
+          [resId, equippableRefIdDefault, baseAddressDefault, metaURIDefault],
+          [resId2, equippableRefIdDefault, baseAddressDefault, metaURIDefault],
+        ]);
+      }
 
       expect(await chunkyEquip.getPendingExtendedResObjectByIndex(tokenId, 0)).to.eql([
         resId,
@@ -269,13 +280,21 @@ async function shouldBehaveLikeEquippableResources(
         .to.emit(chunkyEquip, 'ResourceAccepted')
         .withArgs(tokenId, resId);
 
-      const pending = await chunkyEquip.getFullPendingExtendedResources(tokenId);
-      expect(pending).to.be.eql([]);
+      // The merged version does not implement this to save size:
+      if (chunkyEquip.getFullPendingExtendedResources === undefined) {
+        expect(await chunkyEquip.getFullPendingResources(tokenId)).to.be.eql([]);
+      } else {
+        expect(await chunkyEquip.getFullPendingExtendedResources(tokenId)).to.be.eql([]);
+      }
 
-      const accepted = await chunkyEquip.getFullExtendedResources(tokenId);
-      expect(accepted).to.eql([
-        [resId, equippableRefIdDefault, baseAddressDefault, metaURIDefault],
-      ]);
+      // The merged version does not implement this to save size:
+      if (chunkyEquip.getFullExtendedResources === undefined) {
+        expect(await chunkyEquip.getFullResources(tokenId)).to.eql([[resId, metaURIDefault]]);
+      } else {
+        expect(await chunkyEquip.getFullExtendedResources(tokenId)).to.eql([
+          [resId, equippableRefIdDefault, baseAddressDefault, metaURIDefault],
+        ]);
+      }
 
       expect(await chunkyEquip.getExtendedResObjectByIndex(tokenId, 0)).to.eql([
         resId,
@@ -299,14 +318,25 @@ async function shouldBehaveLikeEquippableResources(
         .to.emit(chunkyEquip, 'ResourceAccepted')
         .withArgs(tokenId, resId);
 
-      const pending = await chunkyEquip.getFullPendingExtendedResources(tokenId);
-      expect(pending).to.be.eql([]);
+      // The merged version does not implement this to save size:
+      if (chunkyEquip.getFullPendingExtendedResources === undefined) {
+        expect(await chunkyEquip.getFullPendingResources(tokenId)).to.be.eql([]);
+      } else {
+        expect(await chunkyEquip.getFullPendingExtendedResources(tokenId)).to.be.eql([]);
+      }
 
-      const accepted = await chunkyEquip.getFullExtendedResources(tokenId);
-      expect(accepted).to.eql([
-        [resId2, equippableRefIdDefault, baseAddressDefault, metaURIDefault],
-        [resId, equippableRefIdDefault, baseAddressDefault, metaURIDefault],
-      ]);
+      // The merged version does not implement this to save size:
+      if (chunkyEquip.getFullExtendedResources === undefined) {
+        expect(await chunkyEquip.getFullResources(tokenId)).to.eql([
+          [resId2, metaURIDefault],
+          [resId, metaURIDefault],
+        ]);
+      } else {
+        expect(await chunkyEquip.getFullExtendedResources(tokenId)).to.eql([
+          [resId2, equippableRefIdDefault, baseAddressDefault, metaURIDefault],
+          [resId, equippableRefIdDefault, baseAddressDefault, metaURIDefault],
+        ]);
+      }
     });
 
     // approved not implemented yet
@@ -320,8 +350,12 @@ async function shouldBehaveLikeEquippableResources(
       await chunkyEquip.addResourceToToken(tokenId, resId, 0);
       await chunkyEquip.connect(approvedAddress).acceptResource(tokenId, 0);
 
-      const pending = await chunkyEquip.getFullPendingExtendedResources(tokenId);
-      expect(pending).to.be.eql([]);
+      // The merged version does not implement this to save size:
+      if (chunkyEquip.getFullPendingExtendedResources === undefined) {
+        expect(await chunkyEquip.getFullPendingResources(tokenId)).to.be.eql([]);
+      } else {
+        expect(await chunkyEquip.getFullPendingExtendedResources(tokenId)).to.be.eql([]);
+      }
     });
 
     it('cannot accept resource twice', async function () {
@@ -379,9 +413,14 @@ async function shouldBehaveLikeEquippableResources(
         .to.emit(chunkyEquip, 'ResourceOverwritten')
         .withArgs(tokenId, 1, 2);
 
-      expect(await chunkyEquip.getFullExtendedResources(tokenId)).to.be.eql([
-        [resId2, equippableRefIdDefault, baseAddressDefault, metaURIDefault],
-      ]);
+      // The merged version does not implement this to save size:
+      if (chunkyEquip.getFullExtendedResources === undefined) {
+        expect(await chunkyEquip.getFullResources(tokenId)).to.be.eql([[resId2, metaURIDefault]]);
+      } else {
+        expect(await chunkyEquip.getFullExtendedResources(tokenId)).to.be.eql([
+          [resId2, equippableRefIdDefault, baseAddressDefault, metaURIDefault],
+        ]);
+      }
       // Overwrite should be gone
       expect(await chunkyEquip.getResourceOverwrites(tokenId, pendingResources[0])).to.eql(
         BigNumber.from(0),
@@ -395,9 +434,14 @@ async function shouldBehaveLikeEquippableResources(
       await chunkyEquip.addResourceToToken(tokenId, resId, ethers.utils.hexZeroPad('0x1', 8));
       await chunkyEquip.acceptResource(tokenId, 0);
 
-      expect(await chunkyEquip.getFullExtendedResources(tokenId)).to.be.eql([
-        [resId, equippableRefIdDefault, baseAddressDefault, metaURIDefault],
-      ]);
+      // The merged version does not implement this to save size:
+      if (chunkyEquip.getFullExtendedResources === undefined) {
+        expect(await chunkyEquip.getFullResources(tokenId)).to.be.eql([[resId, metaURIDefault]]);
+      } else {
+        expect(await chunkyEquip.getFullExtendedResources(tokenId)).to.be.eql([
+          [resId, equippableRefIdDefault, baseAddressDefault, metaURIDefault],
+        ]);
+      }
     });
   });
 
@@ -410,10 +454,19 @@ async function shouldBehaveLikeEquippableResources(
 
       await expect(chunkyEquip.rejectResource(tokenId, 0)).to.emit(chunkyEquip, 'ResourceRejected');
 
-      const pending = await chunkyEquip.getFullPendingExtendedResources(tokenId);
-      expect(pending).to.be.eql([]);
-      const accepted = await chunkyEquip.getFullExtendedResources(tokenId);
-      expect(accepted).to.be.eql([]);
+      // The merged version does not implement this to save size:
+      if (chunkyEquip.getFullPendingExtendedResources === undefined) {
+        expect(await chunkyEquip.getFullPendingResources(tokenId)).to.be.eql([]);
+      } else {
+        expect(await chunkyEquip.getFullPendingExtendedResources(tokenId)).to.be.eql([]);
+      }
+
+      // The merged version does not implement this to save size:
+      if (chunkyEquip.getFullExtendedResources === undefined) {
+        expect(await chunkyEquip.getFullResources(tokenId)).to.be.eql([]);
+      } else {
+        expect(await chunkyEquip.getFullExtendedResources(tokenId)).to.be.eql([]);
+      }
     });
 
     it('can reject resource and overwrites are cleared', async function () {
@@ -441,10 +494,18 @@ async function shouldBehaveLikeEquippableResources(
 
       await expect(chunkyEquip.rejectResource(tokenId, 0)).to.emit(chunkyEquip, 'ResourceRejected');
 
-      const pending = await chunkyEquip.getFullPendingExtendedResources(tokenId);
-      expect(pending).to.be.eql([]);
-      const accepted = await chunkyEquip.getFullExtendedResources(tokenId);
-      expect(accepted).to.be.eql([]);
+      // The merged version does not implement this to save size:
+      if (chunkyEquip.getFullPendingExtendedResources === undefined) {
+        expect(await chunkyEquip.getFullPendingResources(tokenId)).to.be.eql([]);
+      } else {
+        expect(await chunkyEquip.getFullPendingExtendedResources(tokenId)).to.be.eql([]);
+      }
+      // The merged version does not implement this to save size:
+      if (chunkyEquip.getFullExtendedResources === undefined) {
+        expect(await chunkyEquip.getFullResources(tokenId)).to.be.eql([]);
+      } else {
+        expect(await chunkyEquip.getFullExtendedResources(tokenId)).to.be.eql([]);
+      }
     });
 
     it('can reject all resources', async function () {
@@ -460,10 +521,18 @@ async function shouldBehaveLikeEquippableResources(
         'ResourceRejected',
       );
 
-      const pending = await chunkyEquip.getFullPendingExtendedResources(tokenId);
-      expect(pending).to.be.eql([]);
-      const accepted = await chunkyEquip.getFullExtendedResources(tokenId);
-      expect(accepted).to.be.eql([]);
+      // The merged version does not implement this to save size:
+      if (chunkyEquip.getFullPendingExtendedResources === undefined) {
+        expect(await chunkyEquip.getFullPendingResources(tokenId)).to.be.eql([]);
+      } else {
+        expect(await chunkyEquip.getFullPendingExtendedResources(tokenId)).to.be.eql([]);
+      }
+      // The merged version does not implement this to save size:
+      if (chunkyEquip.getFullExtendedResources === undefined) {
+        expect(await chunkyEquip.getFullResources(tokenId)).to.be.eql([]);
+      } else {
+        expect(await chunkyEquip.getFullExtendedResources(tokenId)).to.be.eql([]);
+      }
     });
 
     it('can reject all resources and overwrites are cleared', async function () {
@@ -514,10 +583,18 @@ async function shouldBehaveLikeEquippableResources(
         'ResourceRejected',
       );
 
-      const pending = await chunkyEquip.getFullPendingExtendedResources(tokenId);
-      expect(pending).to.be.eql([]);
-      const accepted = await chunkyEquip.getFullExtendedResources(tokenId);
-      expect(accepted).to.be.eql([]);
+      // The merged version does not implement this to save size:
+      if (chunkyEquip.getFullPendingExtendedResources === undefined) {
+        expect(await chunkyEquip.getFullPendingResources(tokenId)).to.be.eql([]);
+      } else {
+        expect(await chunkyEquip.getFullPendingExtendedResources(tokenId)).to.be.eql([]);
+      }
+      // The merged version does not implement this to save size:
+      if (chunkyEquip.getFullExtendedResources === undefined) {
+        expect(await chunkyEquip.getFullResources(tokenId)).to.be.eql([]);
+      } else {
+        expect(await chunkyEquip.getFullExtendedResources(tokenId)).to.be.eql([]);
+      }
     });
 
     it('cannot reject resource twice', async function () {

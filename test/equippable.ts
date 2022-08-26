@@ -28,7 +28,6 @@ async function partsFixture() {
   const maskSymbol = 'NM';
 
   const baseFactory = await ethers.getContractFactory('RMRKBaseStorageMock');
-  const nestingFactory = await ethers.getContractFactory('RMRKNestingWithEquippableMock');
   const equipFactory = await ethers.getContractFactory('RMRKEquippableMock');
 
   // Base
@@ -36,25 +35,15 @@ async function partsFixture() {
   await base.deployed();
 
   // Neon token
-  const neon = await nestingFactory.deploy(neonName, neonSymbol);
+  const neon = await equipFactory.deploy(neonName, neonSymbol);
   await neon.deployed();
-  const neonEquip = await equipFactory.deploy(neon.address);
-  await neonEquip.deployed();
 
-  // Link nesting and equippable:
-  neonEquip.setNestingAddress(neon.address);
-  neon.setEquippableAddress(neonEquip.address);
   // Weapon
-  const mask = await nestingFactory.deploy(maskName, maskSymbol);
+  const mask = await equipFactory.deploy(maskName, maskSymbol);
   await mask.deployed();
-  const maskEquip = await equipFactory.deploy(mask.address);
-  await maskEquip.deployed();
-  // Link nesting and equippable:
-  maskEquip.setNestingAddress(mask.address);
-  mask.setEquippableAddress(maskEquip.address);
 
-  await setupContextForParts(base, neon, neonEquip, mask, maskEquip, mintTokenId, nestMinttokenId);
-  return { base, neon, neonEquip, mask, maskEquip };
+  await setupContextForParts(base, neon, neon, mask, mask, mintTokenId, nestMinttokenId);
+  return { base, neon, mask };
 }
 
 async function slotsFixture() {
@@ -74,7 +63,6 @@ async function slotsFixture() {
   const backgroundSymbol = 'SB';
 
   const baseFactory = await ethers.getContractFactory('RMRKBaseStorageMock');
-  const nestingFactory = await ethers.getContractFactory('RMRKNestingWithEquippableMock');
   const equipFactory = await ethers.getContractFactory('RMRKEquippableMock');
 
   // Base
@@ -82,97 +70,54 @@ async function slotsFixture() {
   await base.deployed();
 
   // Soldier token
-  const soldier = await nestingFactory.deploy(soldierName, soldierSymbol);
+  const soldier = await equipFactory.deploy(soldierName, soldierSymbol);
   await soldier.deployed();
-  const soldierEquip = await equipFactory.deploy(soldier.address);
-  await soldierEquip.deployed();
-
-  // Link nesting and equippable:
-  soldierEquip.setNestingAddress(soldier.address);
-  soldier.setEquippableAddress(soldierEquip.address);
 
   // Weapon
-  const weapon = await nestingFactory.deploy(weaponName, weaponSymbol);
+  const weapon = await equipFactory.deploy(weaponName, weaponSymbol);
   await weapon.deployed();
-  const weaponEquip = await equipFactory.deploy(weapon.address);
-  await weaponEquip.deployed();
-  // Link nesting and equippable:
-  weaponEquip.setNestingAddress(weapon.address);
-  weapon.setEquippableAddress(weaponEquip.address);
 
   // Weapon Gem
-  const weaponGem = await nestingFactory.deploy(weaponGemName, weaponGemSymbol);
+  const weaponGem = await equipFactory.deploy(weaponGemName, weaponGemSymbol);
   await weaponGem.deployed();
-  const weaponGemEquip = await equipFactory.deploy(weaponGem.address);
-  await weaponGemEquip.deployed();
-  // Link nesting and equippable:
-  weaponGemEquip.setNestingAddress(weaponGem.address);
-  weaponGem.setEquippableAddress(weaponGemEquip.address);
 
   // Background
-  const background = await nestingFactory.deploy(backgroundName, backgroundSymbol);
+  const background = await equipFactory.deploy(backgroundName, backgroundSymbol);
   await background.deployed();
-  const backgroundEquip = await equipFactory.deploy(background.address);
-  await backgroundEquip.deployed();
-  // Link nesting and equippable:
-  backgroundEquip.setNestingAddress(background.address);
-  background.setEquippableAddress(backgroundEquip.address);
 
   await setupContextForSlots(
     base,
     soldier,
-    soldierEquip,
+    soldier,
     weapon,
-    weaponEquip,
+    weapon,
     weaponGem,
-    weaponGemEquip,
+    weaponGem,
     background,
-    backgroundEquip,
+    background,
     mintTokenId,
     nestMinttokenId,
   );
 
-  return {
-    base,
-    soldier,
-    soldierEquip,
-    weapon,
-    weaponEquip,
-    weaponGem,
-    weaponGemEquip,
-    background,
-    backgroundEquip,
-  };
+  return { base, soldier, weapon, weaponGem, background };
 }
 
 async function resourcesFixture() {
-  const Nesting = await ethers.getContractFactory('RMRKNestingWithEquippableMock');
-  const Equip = await ethers.getContractFactory('RMRKEquippableMock');
+  const equipFactory = await ethers.getContractFactory('RMRKEquippableMock');
 
-  const nesting = await Nesting.deploy('Chunky', 'CHNK');
-  await nesting.deployed();
-
-  const equip = await Equip.deploy(nesting.address);
+  const equip = await equipFactory.deploy('Chunky', 'CHNK');
   await equip.deployed();
 
-  await nesting.setEquippableAddress(equip.address);
-
-  return { nesting, equip };
+  return { equip };
 }
 
 async function multiResourceFixture() {
-  const NestingFactory = await ethers.getContractFactory('RMRKNestingWithEquippableMock');
-  const EquipFactory = await ethers.getContractFactory('RMRKEquippableMock');
+  const equipFactory = await ethers.getContractFactory('RMRKEquippableMock');
 
-  const nesting = await NestingFactory.deploy('NestingWithEquippable', 'NWE');
-  await nesting.deployed();
-
-  const equip = await EquipFactory.deploy(nesting.address);
+  const equip = await equipFactory.deploy('equipWithEquippable', 'NWE');
   await equip.deployed();
 
-  await nesting.setEquippableAddress(equip.address);
-
-  return { nesting, equip };
+  return { equip };
 }
 
 // --------------- END FIXTURES -----------------------
@@ -181,13 +126,13 @@ async function multiResourceFixture() {
 
 describe('EquippableMock with Parts', async () => {
   beforeEach(async function () {
-    const { base, neon, neonEquip, mask, maskEquip } = await loadFixture(partsFixture);
+    const { base, neon, mask } = await loadFixture(partsFixture);
 
     this.base = base;
     this.neon = neon;
-    this.neonEquip = neonEquip;
+    this.neonEquip = neon;
     this.mask = mask;
-    this.maskEquip = maskEquip;
+    this.maskEquip = mask;
   });
 
   shouldBehaveLikeEquippableWithParts();
@@ -195,27 +140,17 @@ describe('EquippableMock with Parts', async () => {
 
 describe('EquippableMock with Slots', async () => {
   beforeEach(async function () {
-    const {
-      base,
-      soldier,
-      soldierEquip,
-      weapon,
-      weaponEquip,
-      weaponGem,
-      weaponGemEquip,
-      background,
-      backgroundEquip,
-    } = await loadFixture(slotsFixture);
+    const { base, soldier, weapon, weaponGem, background } = await loadFixture(slotsFixture);
 
     this.base = base;
     this.soldier = soldier;
-    this.soldierEquip = soldierEquip;
+    this.soldierEquip = soldier;
     this.weapon = weapon;
-    this.weaponEquip = weaponEquip;
+    this.weaponEquip = weapon;
     this.weaponGem = weaponGem;
-    this.weaponGemEquip = weaponGemEquip;
+    this.weaponGemEquip = weaponGem;
     this.background = background;
-    this.backgroundEquip = backgroundEquip;
+    this.backgroundEquip = background;
   });
 
   shouldBehaveLikeEquippableWithSlots(nestMinttokenId);
@@ -223,27 +158,15 @@ describe('EquippableMock with Slots', async () => {
 
 describe('EquippableMock Resources', async () => {
   beforeEach(async function () {
-    const { nesting, equip } = await loadFixture(resourcesFixture);
-    this.nesting = nesting;
+    const { equip } = await loadFixture(resourcesFixture);
+    this.nesting = equip;
     this.equip = equip;
   });
 
   describe('Init', async function () {
     it('can get names and symbols', async function () {
-      expect(await this.nesting.name()).to.equal('Chunky');
-      expect(await this.nesting.symbol()).to.equal('CHNK');
-    });
-  });
-
-  describe('Events', async function () {
-    it('can set nesting/equippable addresses', async function () {
-      expect(await this.nesting.setEquippableAddress(ethers.constants.AddressZero))
-        .to.emit(this.nesting, 'EquippableAddressSet')
-        .withArgs(this.equip.address, ethers.constants.AddressZero);
-
-      expect(await this.equip.setNestingAddress(ethers.constants.AddressZero))
-        .to.emit(this.equip, 'EquippableAddressSet')
-        .withArgs(this.nesting.address, ethers.constants.AddressZero);
+      expect(await this.equip.name()).to.equal('Chunky');
+      expect(await this.equip.symbol()).to.equal('CHNK');
     });
   });
 
@@ -256,18 +179,17 @@ describe('EquippableMock Resources', async () => {
 
 describe('EquippableMock MR behavior', async () => {
   let nextTokenId = 1;
-  let mintingContract: Contract;
+  let equip: Contract;
 
   beforeEach(async function () {
-    const { nesting, equip } = await loadFixture(multiResourceFixture);
-    mintingContract = nesting;
+    ({ equip } = await loadFixture(multiResourceFixture));
     this.token = equip;
   });
 
   async function mintToNesting(token: Contract, to: string): Promise<number> {
     const tokenId = nextTokenId;
     nextTokenId++;
-    await mintingContract['mint(address,uint256)'](to, tokenId);
+    await equip['mint(address,uint256)'](to, tokenId);
     return tokenId;
   }
 
