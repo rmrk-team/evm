@@ -37,6 +37,7 @@ error RMRKNotApprovedOrDirectOwner();
 error RMRKParentChildMismatch();
 error RMRKPendingChildIndexOutOfRange();
 error RMRKInvalidChildReclaim();
+error RMRKChildAlreadyExists();
 
 contract RMRKNesting is Context, IERC165, IERC721, IERC721Metadata, IRMRKNesting {
 
@@ -76,6 +77,10 @@ contract RMRKNesting is Context, IERC165, IERC721, IERC721Metadata, IRMRKNesting
 
     // Mapping of tokenId to array of active children structs
     mapping(uint256 => Child[]) internal _children;
+
+    // Mapping of tokenId to child token address to child token Id to position in children array.
+    // This may be able to be gas optimized if we can use the child as a mapping element directly.
+    mapping(uint256 => mapping(address => mapping(uint256 => uint256))) internal _posInChildArray;
 
     // Mapping of tokenId to array of pending children structs
     mapping(uint256 => Child[]) internal _pendingChildren;
@@ -311,7 +316,7 @@ contract RMRKNesting is Context, IERC165, IERC721, IERC721Metadata, IRMRKNesting
 
     function _sendToNFT(uint tokenId, uint destinationId, address from, address to) private {
         IRMRKNesting destContract = IRMRKNesting(to);
-        destContract.addChild(destinationId, tokenId, address(this));
+        destContract.addChild(destinationId, tokenId);
 
         emit Transfer(from, to, tokenId);
         _afterTokenTransfer(from, to, tokenId);
@@ -684,17 +689,16 @@ contract RMRKNesting is Context, IERC165, IERC721, IERC721Metadata, IRMRKNesting
     //update for reentrancy
     function addChild(
         uint256 parentTokenId,
-        uint256 childTokenId,
-        address childTokenAddress
+        uint256 childTokenId
     ) public virtual {
         if(!_exists(parentTokenId)) revert ERC721InvalidTokenId();
 
-        IRMRKNesting childTokenContract = IRMRKNesting(childTokenAddress);
+        IRMRKNesting childTokenContract = IRMRKNesting(_msgSender());
         (address parent, , ) = childTokenContract.rmrkOwnerOf(childTokenId);
         if (parent != address(this)) revert RMRKParentChildMismatch();
 
         Child memory child = Child({
-            contractAddress: childTokenAddress,
+            contractAddress: _msgSender(),
             tokenId: childTokenId
         });
 
@@ -707,24 +711,32 @@ contract RMRKNesting is Context, IERC165, IERC721, IERC721Metadata, IRMRKNesting
         }
 
         // Previous lenght matches the index for the new child
-        emit ChildProposed(parentTokenId, childTokenAddress, childTokenId, length);
+        emit ChildProposed(parentTokenId, _msgSender(), childTokenId, length);
     }
 
     /**
-    * @notice Sends an instance of Child from the pending children array at index to children array for tokenId.
-    * Updates _emptyIndexes of tokenId to preserve ordering.
-    */
-
+     * @notice Sends an instance of Child from the pending children array at index to children array for tokenId.
+     * @param tokenId tokenId of parent token to accept a child on
+     * @param index index of child in _pendingChildren array to accept.
+     */
     function acceptChild(uint256 tokenId, uint256 index) public virtual onlyApprovedOrOwner(tokenId) {
         if(_pendingChildren[tokenId].length <= index) revert RMRKPendingChildIndexOutOfRange();
 
         Child memory child = _pendingChildren[tokenId][index];
 
+        if (_posInChildArray[tokenId][child.contractAddress][child.tokenId] != 0)
+            revert RMRKChildAlreadyExists();
+
         removeChildByIndex(_pendingChildren[tokenId], index);
 
         _children[tokenId].push(child);
+
+        _posInChildArray[tokenId][child.contractAddress][child.tokenId] = _children[tokenId].length;
+
         emit ChildAccepted(tokenId, child.contractAddress, child.tokenId, index);
     }
+
+    
 
     /**
     * @notice Deletes all pending children.
@@ -780,7 +792,7 @@ contract RMRKNesting is Context, IERC165, IERC721, IERC721Metadata, IRMRKNesting
         if (_children[tokenId].length <= index) revert RMRKChildIndexOutOfRange();
 
         Child memory child = _children[tokenId][index];
-
+        delete _posInChildArray[tokenId][child.contractAddress][child.tokenId];
         removeChildByIndex(_children[tokenId], index);
 
         if (to != address(0)) {

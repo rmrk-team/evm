@@ -72,8 +72,7 @@ interface IRMRKNesting {
     */
     function addChild(
         uint256 parentTokenId,
-        uint256 childTokenId,
-        address childTokenAddress
+        uint256 childTokenId
     ) external;
 
     /**
