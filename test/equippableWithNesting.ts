@@ -179,7 +179,7 @@ async function multiResourceFixture() {
 
 // --------------- EQUIPPABLE BEHAVIOR -----------------------
 
-describe('EquippableMock with Parts', async () => {
+describe.only('EquippableMock with Parts', async () => {
   beforeEach(async function () {
     const { base, neon, neonEquip, mask, maskEquip } = await loadFixture(partsFixture);
 
