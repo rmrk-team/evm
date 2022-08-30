@@ -1,17 +1,18 @@
 {
-    "name": "rmrksol",
-    "version": "1.0.0",
-    "main": "index.js",
-    "license": "MIT",
+    "name": "@rmrk-team/evm-contracts",
+    "version": "0.1.0",
+    "license": "Apache-2.0",
+    "files": [
+        "contracts/RMRK/*",
+        "contracts/implementations/*"
+    ],
     "scripts": {
         "test": "yarn typechain && hardhat test",
         "typechain": "hardhat typechain",
         "prettier": "prettier --write ."
     },
     "dependencies": {
-        "@openzeppelin/contracts": "^4.6.0",
-        "hardhat": "^2.10.1",
-        "solc": "^0.8.9"
+        "@openzeppelin/contracts": "^4.6.0"
     },
     "devDependencies": {
         "@nomicfoundation/hardhat-chai-matchers": "^1.0.1",
@@ -28,18 +29,20 @@
         "@typescript-eslint/parser": "^5.30.6",
         "chai": "^4.3.6",
         "dotenv": "^10.0.0",
-        "eslint": "^8.19.0",
         "eslint-config-prettier": "^8.5.0",
         "eslint-config-standard": "^16.0.3",
         "eslint-plugin-import": "^2.26.0",
         "eslint-plugin-node": "^11.1.0",
         "eslint-plugin-prettier": "^4.2.1",
         "eslint-plugin-promise": "^6.0.0",
+        "eslint": "^8.19.0",
         "ethers": "^5.6.9",
         "hardhat-contract-sizer": "^2.6.1",
         "hardhat-gas-reporter": "^1.0.8",
-        "prettier": "2.7.1",
+        "hardhat": "^2.10.1",
         "prettier-plugin-solidity": "^1.0.0-beta.20",
+        "prettier": "2.7.1",
+        "solc": "^0.8.9",
         "solhint": "^3.3.7",
         "solidity-coverage": "^0.7.21",
         "ts-node": "^10.8.2",
