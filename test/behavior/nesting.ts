@@ -317,6 +317,8 @@ async function shouldBehaveLikeNesting(
     });
 
     it('can reject one pending child with abandon', async function () {
+      const childOwnerData = await child.rmrkOwnerOf(childId);
+
       await expect(parent.connect(tokenOwner).rejectChild(parentId, 0, zeroAddress))
         .to.emit(parent, 'ChildRejected')
         .withArgs(parentId, child.address, childId, 0);
@@ -324,12 +326,9 @@ async function shouldBehaveLikeNesting(
 
       // It is still on the child
       expect(await child.balanceOf(parent.address)).to.equal(1);
-
-      // FIXME: We should be able to check child storage struct as part of the call.
-      // Maybe return a tokenId as part of nestMint.
-
-      // Check child ownership struct
+      // Child ownership data is not updated
       expect(await child.ownerOf(childId)).to.equal(tokenOwner.address);
+      expect(await child.rmrkOwnerOf(childId)).to.eql(childOwnerData);
     });
 
     it('can reject one pending child, set child owner to new address', async function () {
