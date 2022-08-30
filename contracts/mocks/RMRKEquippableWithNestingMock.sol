@@ -8,9 +8,8 @@ import "../RMRK/RMRKEquippableWithNesting.sol";
 
 //Minimal public implementation of RMRKEquippableWithNesting for testing.
 contract RMRKEquippableWithNestingMock is RMRKEquippableWithNesting {
-
     constructor(address nestingAddress)
-    RMRKEquippableWithNesting(nestingAddress)
+        RMRKEquippableWithNesting(nestingAddress)
     {}
 
     function setNestingAddress(address nestingAddress) external {

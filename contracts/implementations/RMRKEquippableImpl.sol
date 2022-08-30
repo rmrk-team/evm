@@ -10,18 +10,13 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 error RMRKMintUnderpriced();
 error RMRKMintZero();
 
-
 contract RMRKEquippableImpl is Ownable, RMRKMintingUtils, RMRKEquippable {
-
     constructor(
         string memory name,
         string memory symbol,
         uint256 maxSupply,
         uint256 pricePerMint
-    )
-    RMRKEquippable(name, symbol)
-    RMRKMintingUtils(maxSupply, pricePerMint)
-    {}
+    ) RMRKEquippable(name, symbol) RMRKMintingUtils(maxSupply, pricePerMint) {}
 
     function safeMint(address to, uint256 tokenId) public {
         _safeMint(to, tokenId);
@@ -39,37 +34,44 @@ contract RMRKEquippableImpl is Ownable, RMRKMintingUtils, RMRKEquippable {
     Template minting logic
     */
     function mint(address to, uint256 numToMint) external payable saleIsOpen {
-        (uint nextToken, uint totalSupplyOffset) = _preMint(numToMint);
+        (uint256 nextToken, uint256 totalSupplyOffset) = _preMint(numToMint);
 
-        for(uint i = nextToken; i < totalSupplyOffset;) {
+        for (uint256 i = nextToken; i < totalSupplyOffset; ) {
             _safeMint(to, i);
-            unchecked {++i;}
+            unchecked {
+                ++i;
+            }
         }
     }
 
     /*
     Template minting logic
     */
-    function mintNesting(address to, uint256 numToMint, uint256 destinationId) external payable saleIsOpen {
-        (uint nextToken, uint totalSupplyOffset) = _preMint(numToMint);
+    function mintNesting(
+        address to,
+        uint256 numToMint,
+        uint256 destinationId
+    ) external payable saleIsOpen {
+        (uint256 nextToken, uint256 totalSupplyOffset) = _preMint(numToMint);
 
-        for(uint i = nextToken; i < totalSupplyOffset;) {
+        for (uint256 i = nextToken; i < totalSupplyOffset; ) {
             _nestMint(to, i, destinationId);
-            unchecked {++i;}
+            unchecked {
+                ++i;
+            }
         }
     }
 
-    function _preMint(uint256 numToMint) private returns(uint, uint) {
+    function _preMint(uint256 numToMint) private returns (uint256, uint256) {
         if (numToMint == uint256(0)) revert RMRKMintZero();
         if (numToMint + _totalSupply > _maxSupply) revert RMRKMintOverMax();
 
         uint256 mintPriceRequired = numToMint * _pricePerMint;
-        if (mintPriceRequired != msg.value)
-            revert RMRKMintUnderpriced();
+        if (mintPriceRequired != msg.value) revert RMRKMintUnderpriced();
 
-        uint256 nextToken = _totalSupply+1;
+        uint256 nextToken = _totalSupply + 1;
         _totalSupply += numToMint;
-        uint256 totalSupplyOffset = _totalSupply+1;
+        uint256 totalSupplyOffset = _totalSupply + 1;
 
         return (nextToken, totalSupplyOffset);
     }
@@ -81,10 +83,7 @@ contract RMRKEquippableImpl is Ownable, RMRKMintingUtils, RMRKEquippable {
 
     // Utility transfers:
 
-    function transfer(
-        address to,
-        uint256 tokenId
-    ) public virtual {
+    function transfer(address to, uint256 tokenId) public virtual {
         transferFrom(_msgSender(), to, tokenId);
     }
 

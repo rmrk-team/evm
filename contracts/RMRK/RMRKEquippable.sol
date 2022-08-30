@@ -40,7 +40,6 @@ error RMRKTokenCannotBeEquippedWithResourceIntoSlot();
 error RMRKTokenDoesNotHaveActiveResource();
 
 contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
-
     using RMRKLib for uint256;
     using Address for address;
     using Strings for uint256;
@@ -50,11 +49,12 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
     struct Equipment {
         uint64 resourceId;
         uint64 childResourceId;
-        uint childTokenId;
+        uint256 childTokenId;
         address childEquippableAddress;
     }
 
-    struct ExtendedResource { // Used for input/output only
+    struct ExtendedResource {
+        // Used for input/output only
         uint64 id; // ID of this resource
         uint64 equippableRefId;
         address baseAddress;
@@ -71,7 +71,7 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
         uint64 partId;
         uint64 childResourceId;
         uint8 z; //1 byte
-        uint childTokenId;
+        uint256 childTokenId;
         address childAddress;
         string metadataURI; //n bytes 32+
     }
@@ -102,7 +102,8 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
     mapping(uint256 => address) internal _tokenApprovalsForResources;
 
     // Mapping from owner to operator approvals for resources
-    mapping(address => mapping(address => bool)) internal _operatorApprovalsForResources;
+    mapping(address => mapping(address => bool))
+        internal _operatorApprovalsForResources;
 
     // ------------------- Equippable --------------
 
@@ -115,16 +116,18 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
     mapping(uint64 => uint64[]) private _slotPartIds;
 
     //mapping of token id to base address to slot part Id to equipped information. Used to compose an NFT
-    mapping(uint => mapping(address => mapping(uint64 => Equipment))) private _equipments;
+    mapping(uint256 => mapping(address => mapping(uint64 => Equipment)))
+        private _equipments;
 
     //mapping of token id to child (nesting) address to child Id to count of equips. Used to check if equipped.
-    mapping(uint => mapping(address => mapping(uint => uint8))) private _equipCountPerChild;
+    mapping(uint256 => mapping(address => mapping(uint256 => uint8)))
+        private _equipCountPerChild;
 
     //Mapping of refId to parent contract address and valid slotId
     mapping(uint64 => mapping(address => uint64)) private _validParentSlots;
 
     function _onlyApprovedForResourcesOrOwner(uint256 tokenId) private view {
-        if(!_isApprovedForResourcesOrOwner(_msgSender(), tokenId))
+        if (!_isApprovedForResourcesOrOwner(_msgSender(), tokenId))
             revert RMRKNotApprovedForResourcesOrOwner();
     }
 
@@ -132,18 +135,28 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
         _onlyApprovedForResourcesOrOwner(tokenId);
         _;
     }
+
     // ----------------------------- CONSTRUCTOR ------------------------------
 
     /**
      * @dev Initializes the contract by setting a `name` and a `symbol` to the token collection.
      */
-    constructor(string memory name_, string memory symbol_) RMRKNesting(name_, symbol_) {}
+    constructor(string memory name_, string memory symbol_)
+        RMRKNesting(name_, symbol_)
+    {}
 
     /**
      * @dev See {IERC165-supportsInterface}.
      */
-    function supportsInterface(bytes4 interfaceId) public view override virtual returns (bool) {
-        return RMRKNesting.supportsInterface(interfaceId) ||
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        virtual
+        override
+        returns (bool)
+    {
+        return
+            RMRKNesting.supportsInterface(interfaceId) ||
             interfaceId == type(IRMRKMultiResource).interfaceId ||
             interfaceId == type(IRMRKEquippable).interfaceId;
     }
@@ -152,13 +165,14 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
 
     // --------------------------- GETTING RESOURCES --------------------------
 
-    function getResource(
-        uint64 resourceId
-    ) public view virtual returns (Resource memory)
+    function getResource(uint64 resourceId)
+        public
+        view
+        virtual
+        returns (Resource memory)
     {
         string memory resourceData = _resources[resourceId];
-        if(bytes(resourceData).length == 0)
-            revert RMRKNoResourceMatchingId();
+        if (bytes(resourceData).length == 0) revert RMRKNoResourceMatchingId();
         Resource memory resource = Resource({
             id: resourceId,
             metadataURI: resourceData
@@ -170,104 +184,136 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
         return _allResources;
     }
 
-    function getResObjectByIndex(
-        uint256 tokenId,
-        uint256 index
-    ) external view virtual returns(Resource memory) {
+    function getResObjectByIndex(uint256 tokenId, uint256 index)
+        external
+        view
+        virtual
+        returns (Resource memory)
+    {
         uint64 resourceId = getActiveResources(tokenId)[index];
         return getResource(resourceId);
     }
 
-    function getPendingResObjectByIndex(
-        uint256 tokenId,
-        uint256 index
-    ) external view virtual returns(Resource memory) {
+    function getPendingResObjectByIndex(uint256 tokenId, uint256 index)
+        external
+        view
+        virtual
+        returns (Resource memory)
+    {
         uint64 resourceId = getPendingResources(tokenId)[index];
         return getResource(resourceId);
     }
 
-    function getFullResources(
-        uint256 tokenId
-    ) external view virtual returns (Resource[] memory) {
+    function getFullResources(uint256 tokenId)
+        external
+        view
+        virtual
+        returns (Resource[] memory)
+    {
         uint64[] memory resourceIds = _activeResources[tokenId];
         return _getResourcesById(resourceIds);
     }
 
-    function getFullPendingResources(
-        uint256 tokenId
-    ) external view virtual returns (Resource[] memory) {
+    function getFullPendingResources(uint256 tokenId)
+        external
+        view
+        virtual
+        returns (Resource[] memory)
+    {
         uint64[] memory resourceIds = _pendingResources[tokenId];
         return _getResourcesById(resourceIds);
     }
 
-    function _getResourcesById(
-        uint64[] memory resourceIds
-    ) internal view virtual returns (Resource[] memory) {
+    function _getResourcesById(uint64[] memory resourceIds)
+        internal
+        view
+        virtual
+        returns (Resource[] memory)
+    {
         uint256 len = resourceIds.length;
         Resource[] memory resources = new Resource[](len);
-        for (uint i; i<len;) {
+        for (uint256 i; i < len; ) {
             resources[i] = getResource(resourceIds[i]);
-            unchecked {++i;}
+            unchecked {
+                ++i;
+            }
         }
         return resources;
     }
 
-    function getActiveResources(
-        uint256 tokenId
-    ) public view virtual returns(uint64[] memory) {
+    function getActiveResources(uint256 tokenId)
+        public
+        view
+        virtual
+        returns (uint64[] memory)
+    {
         return _activeResources[tokenId];
     }
 
-    function getPendingResources(
-        uint256 tokenId
-    ) public view virtual returns(uint64[] memory) {
+    function getPendingResources(uint256 tokenId)
+        public
+        view
+        virtual
+        returns (uint64[] memory)
+    {
         return _pendingResources[tokenId];
     }
 
-    function getActiveResourcePriorities(
-        uint256 tokenId
-    ) public view virtual returns(uint16[] memory) {
+    function getActiveResourcePriorities(uint256 tokenId)
+        public
+        view
+        virtual
+        returns (uint16[] memory)
+    {
         return _activeResourcePriorities[tokenId];
     }
 
-    function getResourceOverwrites(
-        uint256 tokenId,
-        uint64 resourceId
-    ) public view virtual returns(uint64) {
+    function getResourceOverwrites(uint256 tokenId, uint64 resourceId)
+        public
+        view
+        virtual
+        returns (uint64)
+    {
         return _resourceOverwrites[tokenId][resourceId];
     }
 
     // --------------------------- HANDLING RESOURCES -------------------------
 
-    function acceptResource(
-        uint256 tokenId,
-        uint256 index
-    ) external virtual onlyApprovedForResourcesOrOwner(tokenId) {
+    function acceptResource(uint256 tokenId, uint256 index)
+        external
+        virtual
+        onlyApprovedForResourcesOrOwner(tokenId)
+    {
         _acceptResource(tokenId, index);
     }
 
-    function rejectResource(
-        uint256 tokenId,
-        uint256 index
-    ) external virtual onlyApprovedForResourcesOrOwner(tokenId) {
+    function rejectResource(uint256 tokenId, uint256 index)
+        external
+        virtual
+        onlyApprovedForResourcesOrOwner(tokenId)
+    {
         _rejectResource(tokenId, index);
     }
 
-    function rejectAllResources(
-        uint256 tokenId
-    ) external virtual onlyApprovedForResourcesOrOwner(tokenId) {
+    function rejectAllResources(uint256 tokenId)
+        external
+        virtual
+        onlyApprovedForResourcesOrOwner(tokenId)
+    {
         _rejectAllResources(tokenId);
     }
 
-    function setPriority(
-        uint256 tokenId,
-        uint16[] memory priorities
-    ) external virtual onlyApprovedForResourcesOrOwner(tokenId) {
+    function setPriority(uint256 tokenId, uint16[] memory priorities)
+        external
+        virtual
+        onlyApprovedForResourcesOrOwner(tokenId)
+    {
         _setPriority(tokenId, priorities);
     }
 
     function _acceptResource(uint256 tokenId, uint256 index) internal {
-        if(index >= _pendingResources[tokenId].length) revert RMRKIndexOutOfRange();
+        if (index >= _pendingResources[tokenId].length)
+            revert RMRKIndexOutOfRange();
         uint64 resourceId = _pendingResources[tokenId][index];
         _pendingResources[tokenId].removeItemByIndex(index);
 
@@ -276,7 +322,7 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
             // We could check here that the resource to overwrite actually exists but it is probably harmless.
             _activeResources[tokenId].removeItemByValue(overwrite);
             emit ResourceOverwritten(tokenId, overwrite, resourceId);
-            delete(_resourceOverwrites[tokenId][resourceId]);
+            delete (_resourceOverwrites[tokenId][resourceId]);
         }
         _activeResources[tokenId].push(resourceId);
         //Push 0 value of uint16 to array, e.g., uninitialized
@@ -285,33 +331,36 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
     }
 
     function _rejectResource(uint256 tokenId, uint256 index) internal {
-        if(index >= _pendingResources[tokenId].length) revert RMRKIndexOutOfRange();
+        if (index >= _pendingResources[tokenId].length)
+            revert RMRKIndexOutOfRange();
         uint64 resourceId = _pendingResources[tokenId][index];
         _pendingResources[tokenId].removeItemByIndex(index);
         _tokenResources[tokenId][resourceId] = false;
-        delete(_resourceOverwrites[tokenId][resourceId]);
+        delete (_resourceOverwrites[tokenId][resourceId]);
 
         emit ResourceRejected(tokenId, resourceId);
     }
 
     function _rejectAllResources(uint256 tokenId) internal {
         uint256 len = _pendingResources[tokenId].length;
-        for (uint i; i<len;) {
+        for (uint256 i; i < len; ) {
             uint64 resourceId = _pendingResources[tokenId][i];
             delete _resourceOverwrites[tokenId][resourceId];
-            unchecked {++i;}
+            unchecked {
+                ++i;
+            }
         }
 
-        delete(_pendingResources[tokenId]);
+        delete (_pendingResources[tokenId]);
         emit ResourceRejected(tokenId, uint64(0));
     }
 
-    function _setPriority(
-        uint256 tokenId,
-        uint16[] memory priorities
-    ) internal {
+    function _setPriority(uint256 tokenId, uint16[] memory priorities)
+        internal
+    {
         uint256 length = priorities.length;
-        if(length != _activeResources[tokenId].length) revert RMRKBadPriorityListLength();
+        if (length != _activeResources[tokenId].length)
+            revert RMRKBadPriorityListLength();
         _activeResourcePriorities[tokenId] = priorities;
 
         emit ResourcePrioritySet(tokenId);
@@ -324,12 +373,13 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
         uint64[] memory slotPartIds
     ) internal {
         uint64 id = resource.id;
-        if(id == uint64(0))
-            revert RMRKWriteToZero();
-        if(bytes(_resources[id]).length > 0)
+        if (id == uint64(0)) revert RMRKWriteToZero();
+        if (bytes(_resources[id]).length > 0)
             revert RMRKResourceAlreadyExists();
-        if (resource.baseAddress == address(0) && (fixedPartIds.length > 0 || slotPartIds.length > 0))
-            revert RMRKBaseRequiredForParts();
+        if (
+            resource.baseAddress == address(0) &&
+            (fixedPartIds.length > 0 || slotPartIds.length > 0)
+        ) revert RMRKBaseRequiredForParts();
 
         _resources[id] = resource.metadataURI;
         _allResources.push(id);
@@ -348,13 +398,13 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
         uint64 resourceId,
         uint64 overwrites
     ) internal {
-        if(_tokenResources[tokenId][resourceId])
+        if (_tokenResources[tokenId][resourceId])
             revert RMRKResourceAlreadyExists();
 
-        if(bytes(_resources[resourceId]).length == 0)
+        if (bytes(_resources[resourceId]).length == 0)
             revert RMRKNoResourceMatchingId();
 
-        if(_pendingResources[tokenId].length >= 128)
+        if (_pendingResources[tokenId].length >= 128)
             revert RMRKMaxPendingResourcesReached();
 
         _tokenResources[tokenId][resourceId] = true;
@@ -374,23 +424,31 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
     /**
      * @dev See {IERC721Metadata-tokenURI}. Overwritten for MR
      */
-    function tokenURI(
-        uint256 tokenId
-    ) public view virtual override(RMRKNesting, IRMRKMultiResource) returns (string memory) {
+    function tokenURI(uint256 tokenId)
+        public
+        view
+        virtual
+        override(RMRKNesting, IRMRKMultiResource)
+        returns (string memory)
+    {
         return _tokenURIAtIndex(tokenId, 0);
     }
 
-    function tokenURIAtIndex(
-        uint256 tokenId,
-        uint256 index
-    ) public view virtual returns (string memory) {
+    function tokenURIAtIndex(uint256 tokenId, uint256 index)
+        public
+        view
+        virtual
+        returns (string memory)
+    {
         return _tokenURIAtIndex(tokenId, index);
     }
 
-    function _tokenURIAtIndex(
-        uint256 tokenId,
-        uint256 index
-    ) internal virtual view returns (string memory) {
+    function _tokenURIAtIndex(uint256 tokenId, uint256 index)
+        internal
+        view
+        virtual
+        returns (string memory)
+    {
         _requireMinted(tokenId);
         // TODO: Discuss is this is the best default path.
         // We could return empty string so it returns something if a token has no resources, but it might hide erros
@@ -400,7 +458,7 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
         uint64 activeResId = _activeResources[tokenId][index];
         Resource memory _activeRes = getResource(activeResId);
         string memory uri = string(
-            abi.encodePacked( _baseURI(), _activeRes.metadataURI)
+            abi.encodePacked(_baseURI(), _activeRes.metadataURI)
         );
 
         return uri;
@@ -410,38 +468,58 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
 
     function approveForResources(address to, uint256 tokenId) external virtual {
         address owner = ownerOf(tokenId);
-        if(to == owner)
-            revert RMRKApprovalForResourcesToCurrentOwner();
+        if (to == owner) revert RMRKApprovalForResourcesToCurrentOwner();
 
-        if(_msgSender() != owner && !isApprovedForAllForResources(owner, _msgSender()))
-            revert RMRKApproveForResourcesCallerIsNotOwnerNorApprovedForAll();
+        if (
+            _msgSender() != owner &&
+            !isApprovedForAllForResources(owner, _msgSender())
+        ) revert RMRKApproveForResourcesCallerIsNotOwnerNorApprovedForAll();
         _approveForResources(to, tokenId);
     }
 
-    function getApprovedForResources(uint256 tokenId) public virtual view returns (address) {
+    function getApprovedForResources(uint256 tokenId)
+        public
+        view
+        virtual
+        returns (address)
+    {
         _requireMinted(tokenId);
         return _tokenApprovalsForResources[tokenId];
     }
 
-    function setApprovalForAllForResources(address operator, bool approved) external virtual {
+    function setApprovalForAllForResources(address operator, bool approved)
+        external
+        virtual
+    {
         address owner = _msgSender();
-        if(owner == operator)
-            revert RMRKApproveForResourcesToCaller();
+        if (owner == operator) revert RMRKApproveForResourcesToCaller();
 
         _operatorApprovalsForResources[owner][operator] = approved;
         emit ApprovalForAllForResources(owner, operator, approved);
     }
 
-    function isApprovedForAllForResources(address owner, address operator) public virtual view returns (bool) {
+    function isApprovedForAllForResources(address owner, address operator)
+        public
+        view
+        virtual
+        returns (bool)
+    {
         return _operatorApprovalsForResources[owner][operator];
     }
 
-    function _approveForResources(address to, uint256 tokenId) internal virtual {
+    function _approveForResources(address to, uint256 tokenId)
+        internal
+        virtual
+    {
         _tokenApprovalsForResources[tokenId] = to;
         emit ApprovalForResources(ownerOf(tokenId), to, tokenId);
     }
 
-    function _cleanApprovals(address owner, uint256 tokenId) internal override virtual {
+    function _cleanApprovals(address owner, uint256 tokenId)
+        internal
+        virtual
+        override
+    {
         _approveForResources(owner, tokenId);
     }
 
@@ -449,7 +527,7 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
 
     function unnestChild(
         uint256 tokenId,
-        uint256 index, 
+        uint256 index,
         address to
     ) public virtual override onlyApprovedOrOwner(tokenId) {
         Child memory child = childOf(tokenId, index);
@@ -475,20 +553,32 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
         uint256 childIndex,
         uint64 childResourceId
     ) private {
-        if (_equipments[tokenId][_baseAddresses[resourceId]][slotPartId].childEquippableAddress != address(0))
-            revert RMRKSlotAlreadyUsed();
+        if (
+            _equipments[tokenId][_baseAddresses[resourceId]][slotPartId]
+                .childEquippableAddress != address(0)
+        ) revert RMRKSlotAlreadyUsed();
 
         IRMRKNesting.Child memory child = childOf(tokenId, childIndex);
 
         // Check from child perspective intention to be used in part
-        if (!IRMRKEquippable(child.contractAddress).canTokenBeEquippedWithResourceIntoSlot(
-            address(this), child.tokenId, childResourceId, slotPartId)
-        )
-            revert RMRKTokenCannotBeEquippedWithResourceIntoSlot();
+        if (
+            !IRMRKEquippable(child.contractAddress)
+                .canTokenBeEquippedWithResourceIntoSlot(
+                    address(this),
+                    child.tokenId,
+                    childResourceId,
+                    slotPartId
+                )
+        ) revert RMRKTokenCannotBeEquippedWithResourceIntoSlot();
 
         // Check from base perspective
-        if(!_validateBaseEquip(_baseAddresses[resourceId], child.contractAddress, slotPartId))
-            revert RMRKEquippableEquipNotAllowedByBase();
+        if (
+            !_validateBaseEquip(
+                _baseAddresses[resourceId],
+                child.contractAddress,
+                slotPartId
+            )
+        ) revert RMRKEquippableEquipNotAllowedByBase();
 
         Equipment memory newEquip = Equipment({
             resourceId: resourceId,
@@ -525,11 +615,15 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
         uint64 slotPartId
     ) private {
         address targetBaseAddress = _baseAddresses[resourceId];
-        Equipment memory equipment = _equipments[tokenId][targetBaseAddress][slotPartId];
+        Equipment memory equipment = _equipments[tokenId][targetBaseAddress][
+            slotPartId
+        ];
         if (equipment.childEquippableAddress == address(0))
             revert RMRKNotEquipped();
         delete _equipments[tokenId][targetBaseAddress][slotPartId];
-        _equipCountPerChild[tokenId][equipment.childEquippableAddress][equipment.childTokenId] -= 1;
+        _equipCountPerChild[tokenId][equipment.childEquippableAddress][
+            equipment.childTokenId
+        ] -= 1;
 
         emit ChildResourceUnequipped(
             tokenId,
@@ -553,20 +647,20 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
     }
 
     function isChildEquipped(
-        uint tokenId,
+        uint256 tokenId,
         address childAddress,
-        uint childTokenId
-    ) public view returns(bool) {
-        return _equipCountPerChild[tokenId][childAddress][childTokenId] != uint8(0);
+        uint256 childTokenId
+    ) public view returns (bool) {
+        return
+            _equipCountPerChild[tokenId][childAddress][childTokenId] !=
+            uint8(0);
     }
 
-    function getEquipped(
-        uint64 tokenId,
-        uint64 resourceId
-    ) public view returns (
-        uint64[] memory slotParts,
-        Equipment[] memory childrenEquipped
-    ) {
+    function getEquipped(uint64 tokenId, uint64 resourceId)
+        public
+        view
+        returns (uint64[] memory slotParts, Equipment[] memory childrenEquipped)
+    {
         address targetBaseAddress = _baseAddresses[resourceId];
         uint64[] memory slotPartIds = _slotPartIds[resourceId];
 
@@ -575,35 +669,38 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
         childrenEquipped = new Equipment[](slotPartIds.length);
 
         uint256 len = slotPartIds.length;
-        for (uint i; i<len;) {
+        for (uint256 i; i < len; ) {
             slotParts[i] = slotPartIds[i];
-            Equipment memory equipment = _equipments[tokenId][targetBaseAddress][slotPartIds[i]];
+            Equipment memory equipment = _equipments[tokenId][
+                targetBaseAddress
+            ][slotPartIds[i]];
             if (equipment.resourceId == resourceId) {
                 childrenEquipped[i] = equipment;
             }
-            unchecked {++i;}
+            unchecked {
+                ++i;
+            }
         }
     }
 
     //Gate for equippable array in here by check of slotPartDefinition to slotPartId
-    function composeEquippables(
-        uint tokenId,
-        uint64 resourceId
-    ) public view returns (
-        ExtendedResource memory resource,
-        FixedPart[] memory fixedParts,
-        SlotPart[] memory slotParts
-    ) {
+    function composeEquippables(uint256 tokenId, uint64 resourceId)
+        public
+        view
+        returns (
+            ExtendedResource memory resource,
+            FixedPart[] memory fixedParts,
+            SlotPart[] memory slotParts
+        )
+    {
         resource = getExtendedResource(resourceId);
 
         // We make sure token has that resource. Alternative is to receive index but makes equipping more complex.
         (, bool found) = _activeResources[tokenId].indexOf(resourceId);
-        if (!found)
-            revert RMRKTokenDoesNotHaveActiveResource();
+        if (!found) revert RMRKTokenDoesNotHaveActiveResource();
 
         address targetBaseAddress = _baseAddresses[resourceId];
-        if (targetBaseAddress == address(0))
-            revert RMRKNotComposableResource();
+        if (targetBaseAddress == address(0)) revert RMRKNotComposableResource();
 
         // Fixed parts:
         uint64[] memory fixedPartIds = _fixedPartIds[resourceId];
@@ -611,14 +708,18 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
 
         uint256 len = fixedPartIds.length;
         if (len > 0) {
-            IRMRKBaseStorage.Part[] memory baseFixedParts = IRMRKBaseStorage(targetBaseAddress).getParts(fixedPartIds);
-            for (uint i; i<len;) {
+            IRMRKBaseStorage.Part[] memory baseFixedParts = IRMRKBaseStorage(
+                targetBaseAddress
+            ).getParts(fixedPartIds);
+            for (uint256 i; i < len; ) {
                 fixedParts[i] = FixedPart({
                     partId: fixedPartIds[i],
                     z: baseFixedParts[i].z,
                     metadataURI: baseFixedParts[i].metadataURI
                 });
-                unchecked {++i;}
+                unchecked {
+                    ++i;
+                }
             }
         }
 
@@ -628,9 +729,13 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
         len = slotPartIds.length;
 
         if (len > 0) {
-            IRMRKBaseStorage.Part[] memory baseSlotParts = IRMRKBaseStorage(targetBaseAddress).getParts(slotPartIds);
-            for (uint i; i<len;) {
-                Equipment memory equipment = _equipments[tokenId][targetBaseAddress][slotPartIds[i]];
+            IRMRKBaseStorage.Part[] memory baseSlotParts = IRMRKBaseStorage(
+                targetBaseAddress
+            ).getParts(slotPartIds);
+            for (uint256 i; i < len; ) {
+                Equipment memory equipment = _equipments[tokenId][
+                    targetBaseAddress
+                ][slotPartIds[i]];
                 if (equipment.resourceId == resourceId) {
                     slotParts[i] = SlotPart({
                         partId: slotPartIds[i],
@@ -640,18 +745,19 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
                         childAddress: equipment.childEquippableAddress,
                         metadataURI: baseSlotParts[i].metadataURI
                     });
-                }
-                else {
+                } else {
                     slotParts[i] = SlotPart({
                         partId: slotPartIds[i],
                         childResourceId: uint64(0),
                         z: baseSlotParts[i].z,
-                        childTokenId: uint(0),
+                        childTokenId: uint256(0),
                         childAddress: address(0),
                         metadataURI: baseSlotParts[i].metadataURI
                     });
                 }
-                unchecked {++i;}
+                unchecked {
+                    ++i;
+                }
             }
         }
     }
@@ -659,19 +765,30 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
     // --------------------- VALIDATION ---------------------
 
     // Declares that resources with this refId, are equippable into the parent address, on the partId slot
-    function _setValidParentRefId(uint64 referenceId, address parentAddress, uint64 slotPartId) internal {
+    function _setValidParentRefId(
+        uint64 referenceId,
+        address parentAddress,
+        uint64 slotPartId
+    ) internal {
         _validParentSlots[referenceId][parentAddress] = slotPartId;
         emit ValidParentReferenceIdSet(referenceId, slotPartId, parentAddress);
     }
 
     // Checks on the base contract that the child can go into the part id
-    function _validateBaseEquip(address baseContract, address childContract, uint64 partId) private view returns (bool isEquippable) {
-        isEquippable = IRMRKBaseStorage(baseContract).checkIsEquippable(partId, childContract);
+    function _validateBaseEquip(
+        address baseContract,
+        address childContract,
+        uint64 partId
+    ) private view returns (bool isEquippable) {
+        isEquippable = IRMRKBaseStorage(baseContract).checkIsEquippable(
+            partId,
+            childContract
+        );
     }
 
     function canTokenBeEquippedWithResourceIntoSlot(
         address parent,
-        uint tokenId,
+        uint256 tokenId,
         uint64 resourceId,
         uint64 slotId
     ) public view returns (bool) {
@@ -686,32 +803,39 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
 
     // --------------------- Getting Extended Resources ---------------------
 
-    function getExtendedResource(
-        uint64 resourceId
-    ) public view virtual returns (ExtendedResource memory)
+    function getExtendedResource(uint64 resourceId)
+        public
+        view
+        virtual
+        returns (ExtendedResource memory)
     {
         Resource memory resource = getResource(resourceId);
 
-        return ExtendedResource({
-            id: resource.id,
-            equippableRefId: _equippableRefIds[resource.id],
-            baseAddress: _baseAddresses[resource.id],
-            metadataURI: resource.metadataURI
-        });
+        return
+            ExtendedResource({
+                id: resource.id,
+                equippableRefId: _equippableRefIds[resource.id],
+                baseAddress: _baseAddresses[resource.id],
+                metadataURI: resource.metadataURI
+            });
     }
 
-    function getExtendedResObjectByIndex(
-        uint256 tokenId,
-        uint256 index
-    ) external view virtual returns(ExtendedResource memory) {
+    function getExtendedResObjectByIndex(uint256 tokenId, uint256 index)
+        external
+        view
+        virtual
+        returns (ExtendedResource memory)
+    {
         uint64 resourceId = getActiveResources(tokenId)[index];
         return getExtendedResource(resourceId);
     }
 
-    function getPendingExtendedResObjectByIndex(
-        uint256 tokenId,
-        uint256 index
-    ) external view virtual returns(ExtendedResource memory) {
+    function getPendingExtendedResObjectByIndex(uint256 tokenId, uint256 index)
+        external
+        view
+        virtual
+        returns (ExtendedResource memory)
+    {
         uint64 resourceId = getPendingResources(tokenId)[index];
         return getExtendedResource(resourceId);
     }
@@ -720,8 +844,15 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
     //              UTILS
     ////////////////////////////////////////
 
-    function _isApprovedForResourcesOrOwner(address user, uint256 tokenId) internal view virtual returns (bool) {
+    function _isApprovedForResourcesOrOwner(address user, uint256 tokenId)
+        internal
+        view
+        virtual
+        returns (bool)
+    {
         address owner = ownerOf(tokenId);
-        return (user == owner || isApprovedForAllForResources(owner, user) || getApprovedForResources(tokenId) == user);
+        return (user == owner ||
+            isApprovedForAllForResources(owner, user) ||
+            getApprovedForResources(tokenId) == user);
     }
 }

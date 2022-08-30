@@ -12,27 +12,26 @@ import "../RMRK/RMRKNesting.sol";
 error RMRKMustUnequipFirst();
 
 contract RMRKNestingWithEquippable is IRMRKNestingWithEquippable, RMRKNesting {
-
     address private _equippableAddress;
 
-    constructor(
-        string memory name_,
-        string memory symbol_
-    ) RMRKNesting(name_, symbol_) {}
+    constructor(string memory name_, string memory symbol_)
+        RMRKNesting(name_, symbol_)
+    {}
 
     // It's overriden to make check the child is not equipped when trying to unnest
     function unnestChild(
         uint256 tokenId,
-        uint256 index, 
+        uint256 index,
         address to
     ) public virtual override onlyApprovedOrOwner(tokenId) {
         Child memory child = childOf(tokenId, index);
         if (
             IRMRKEquippable(_equippableAddress).isChildEquipped(
-                tokenId, child.contractAddress, child.tokenId
+                tokenId,
+                child.contractAddress,
+                child.tokenId
             )
-        )
-            revert RMRKMustUnequipFirst();
+        ) revert RMRKMustUnequipFirst();
         super.unnestChild(tokenId, index, to);
     }
 
@@ -42,15 +41,27 @@ contract RMRKNestingWithEquippable is IRMRKNestingWithEquippable, RMRKNesting {
         emit EquippableAddressSet(oldAddress, equippable);
     }
 
-    function getEquippableAddress() external virtual view returns (address) {
+    function getEquippableAddress() external view virtual returns (address) {
         return _equippableAddress;
     }
 
-    function isApprovedOrOwner(address spender, uint256 tokenId) external virtual view returns (bool) {
+    function isApprovedOrOwner(address spender, uint256 tokenId)
+        external
+        view
+        virtual
+        returns (bool)
+    {
         return _isApprovedOrOwner(spender, tokenId);
     }
 
-    function _cleanApprovals(address, uint256 tokenId) internal override virtual {
-        IRMRKMultiResource(_equippableAddress).approveForResources(address(0), tokenId);
+    function _cleanApprovals(address, uint256 tokenId)
+        internal
+        virtual
+        override
+    {
+        IRMRKMultiResource(_equippableAddress).approveForResources(
+            address(0),
+            tokenId
+        );
     }
 }

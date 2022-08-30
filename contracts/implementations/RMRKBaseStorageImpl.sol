@@ -7,13 +7,22 @@ import "../RMRK/access/OwnableLock.sol";
 
 contract RMRKBaseStorageImpl is OwnableLock, RMRKBaseStorage {
     constructor(string memory symbol_, string memory type__)
-    RMRKBaseStorage(symbol_, type__) {}
+        RMRKBaseStorage(symbol_, type__)
+    {}
 
-    function addPart(IntakeStruct memory intakeStruct) external onlyOwner notLocked {
+    function addPart(IntakeStruct memory intakeStruct)
+        external
+        onlyOwner
+        notLocked
+    {
         _addPart(intakeStruct);
     }
 
-    function addPartList(IntakeStruct[] memory intakeStructs) external onlyOwner notLocked {
+    function addPartList(IntakeStruct[] memory intakeStructs)
+        external
+        onlyOwner
+        notLocked
+    {
         _addPartList(intakeStructs);
     }
 
@@ -38,5 +47,4 @@ contract RMRKBaseStorageImpl is OwnableLock, RMRKBaseStorage {
     function resetEquippableAddresses(uint64 partId) external onlyOwner {
         _resetEquippableAddresses(partId);
     }
-
 }

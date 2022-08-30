@@ -61,9 +61,8 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
         _symbol = symbol_;
     }
 
-
     function _onlyApprovedOrOwner(uint256 tokenId) private view {
-        if(!_isApprovedOrOwner(_msgSender(), tokenId))
+        if (!_isApprovedOrOwner(_msgSender(), tokenId))
             revert ERC721NotApprovedOrOwner();
     }
 
@@ -75,7 +74,13 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
     /**
      * @dev See {IERC165-supportsInterface}.
      */
-    function supportsInterface(bytes4 interfaceId) public view virtual override(ERC165, IERC165) returns (bool) {
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        virtual
+        override(ERC165, IERC165)
+        returns (bool)
+    {
         return
             interfaceId == type(IERC721).interfaceId ||
             interfaceId == type(IERC721Metadata).interfaceId ||
@@ -85,19 +90,29 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
     /**
      * @dev See {IERC721-balanceOf}.
      */
-    function balanceOf(address owner) public view virtual override returns (uint256) {
-        if(owner == address(0))
-            revert ERC721AddressZeroIsNotaValidOwner();
+    function balanceOf(address owner)
+        public
+        view
+        virtual
+        override
+        returns (uint256)
+    {
+        if (owner == address(0)) revert ERC721AddressZeroIsNotaValidOwner();
         return _balances[owner];
     }
 
     /**
      * @dev See {IERC721-ownerOf}.
      */
-    function ownerOf(uint256 tokenId) public view virtual override returns (address) {
+    function ownerOf(uint256 tokenId)
+        public
+        view
+        virtual
+        override
+        returns (address)
+    {
         address owner = _owners[tokenId];
-        if(owner == address(0) )
-            revert ERC721InvalidTokenId();
+        if (owner == address(0)) revert ERC721InvalidTokenId();
         return owner;
     }
 
@@ -118,11 +133,20 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
     /**
      * @dev See {IERC721Metadata-tokenURI}.
      */
-    function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
+    function tokenURI(uint256 tokenId)
+        public
+        view
+        virtual
+        override
+        returns (string memory)
+    {
         _requireMinted(tokenId);
 
         string memory baseURI = _baseURI();
-        return bytes(baseURI).length > 0 ? string(abi.encodePacked(baseURI, tokenId.toString())) : "";
+        return
+            bytes(baseURI).length > 0
+                ? string(abi.encodePacked(baseURI, tokenId.toString()))
+                : "";
     }
 
     /**
@@ -139,10 +163,9 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
      */
     function approve(address to, uint256 tokenId) public virtual override {
         address owner = ownerOf(tokenId);
-        if(to == owner)
-            revert ERC721ApprovalToCurrentOwner();
+        if (to == owner) revert ERC721ApprovalToCurrentOwner();
 
-        if(_msgSender() != owner && !isApprovedForAll(owner, _msgSender()))
+        if (_msgSender() != owner && !isApprovedForAll(owner, _msgSender()))
             revert ERC721ApproveCallerIsNotOwnerNorApprovedForAll();
 
         _approve(to, tokenId);
@@ -151,7 +174,13 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
     /**
      * @dev See {IERC721-getApproved}.
      */
-    function getApproved(uint256 tokenId) public view virtual override returns (address) {
+    function getApproved(uint256 tokenId)
+        public
+        view
+        virtual
+        override
+        returns (address)
+    {
         _requireMinted(tokenId);
 
         return _tokenApprovals[tokenId];
@@ -160,14 +189,24 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
     /**
      * @dev See {IERC721-setApprovalForAll}.
      */
-    function setApprovalForAll(address operator, bool approved) public virtual override {
+    function setApprovalForAll(address operator, bool approved)
+        public
+        virtual
+        override
+    {
         _setApprovalForAll(_msgSender(), operator, approved);
     }
 
     /**
      * @dev See {IERC721-isApprovedForAll}.
      */
-    function isApprovedForAll(address owner, address operator) public view virtual override returns (bool) {
+    function isApprovedForAll(address owner, address operator)
+        public
+        view
+        virtual
+        override
+        returns (bool)
+    {
         return _operatorApprovals[owner][operator];
     }
 
@@ -234,7 +273,7 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
         bytes memory data
     ) internal virtual {
         _transfer(from, to, tokenId);
-        if(!_checkOnERC721Received(from, to, tokenId, data))
+        if (!_checkOnERC721Received(from, to, tokenId, data))
             revert ERC721TransferToNonReceiverImplementer();
     }
 
@@ -257,9 +296,16 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
      *
      * - `tokenId` must exist.
      */
-    function _isApprovedOrOwner(address spender, uint256 tokenId) internal view virtual returns (bool) {
+    function _isApprovedOrOwner(address spender, uint256 tokenId)
+        internal
+        view
+        virtual
+        returns (bool)
+    {
         address owner = ownerOf(tokenId);
-        return (spender == owner || isApprovedForAll(owner, spender) || getApproved(tokenId) == spender);
+        return (spender == owner ||
+            isApprovedForAll(owner, spender) ||
+            getApproved(tokenId) == spender);
     }
 
     /**
@@ -286,7 +332,7 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
         bytes memory data
     ) internal virtual {
         _mint(to, tokenId);
-        if(!_checkOnERC721Received(address(0), to, tokenId, data))
+        if (!_checkOnERC721Received(address(0), to, tokenId, data))
             revert ERC721TransferToNonReceiverImplementer();
     }
 
@@ -303,10 +349,8 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
      * Emits a {Transfer} event.
      */
     function _mint(address to, uint256 tokenId) internal virtual {
-        if(to == address(0))
-            revert ERC721MintToTheZeroAddress();
-        if(_exists(tokenId))
-            revert ERC721TokenAlreadyMinted();
+        if (to == address(0)) revert ERC721MintToTheZeroAddress();
+        if (_exists(tokenId)) revert ERC721TokenAlreadyMinted();
 
         _beforeTokenTransfer(address(0), to, tokenId);
 
@@ -360,10 +404,8 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
         address to,
         uint256 tokenId
     ) internal virtual {
-        if(ownerOf(tokenId) != from)
-            revert ERC721TransferFromIncorrectOwner();
-        if(to == address(0))
-            revert ERC721TransferToTheZeroAddress();
+        if (ownerOf(tokenId) != from) revert ERC721TransferFromIncorrectOwner();
+        if (to == address(0)) revert ERC721TransferToTheZeroAddress();
 
         _beforeTokenTransfer(from, to, tokenId);
 
@@ -399,8 +441,7 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
         address operator,
         bool approved
     ) internal virtual {
-        if(owner == operator)
-            revert ERC721ApproveToCaller();
+        if (owner == operator) revert ERC721ApproveToCaller();
         _operatorApprovals[owner][operator] = approved;
         emit ApprovalForAll(owner, operator, approved);
     }
@@ -409,8 +450,7 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
      * @dev Reverts if the `tokenId` has not been minted yet.
      */
     function _requireMinted(uint256 tokenId) internal view virtual {
-        if(!_exists(tokenId))
-            revert ERC721InvalidTokenId();
+        if (!_exists(tokenId)) revert ERC721InvalidTokenId();
     }
 
     /**
@@ -430,7 +470,14 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
         bytes memory data
     ) internal returns (bool) {
         if (to.isContract()) {
-            try IERC721Receiver(to).onERC721Received(_msgSender(), from, tokenId, data) returns (bytes4 retval) {
+            try
+                IERC721Receiver(to).onERC721Received(
+                    _msgSender(),
+                    from,
+                    tokenId,
+                    data
+                )
+            returns (bytes4 retval) {
                 return retval == IERC721Receiver.onERC721Received.selector;
             } catch (bytes memory reason) {
                 if (reason.length == 0) {

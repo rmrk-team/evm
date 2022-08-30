@@ -43,7 +43,13 @@ error RMRKApproveForResourcesToCaller();
     Use of custom errors, having _balances and _tokenApprovals internal instead of private,
     call to ownerOf not fixed to ERC721.
  */
-contract RMRKMultiResource is Context, IERC165, IERC721, IERC721Metadata, IRMRKMultiResource {
+contract RMRKMultiResource is
+    Context,
+    IERC165,
+    IERC721,
+    IERC721Metadata,
+    IRMRKMultiResource
+{
     using Address for address;
     using Strings for uint256;
     using RMRKLib for uint64[];
@@ -94,12 +100,13 @@ contract RMRKMultiResource is Context, IERC165, IERC721, IERC721Metadata, IRMRKM
     mapping(uint256 => address) internal _tokenApprovalsForResources;
 
     // Mapping from owner to operator approvals for resources
-    mapping(address => mapping(address => bool)) internal _operatorApprovalsForResources;
+    mapping(address => mapping(address => bool))
+        internal _operatorApprovalsForResources;
 
     // -------------------------- ERC721 MODIFIERS ----------------------------
 
     function _onlyApprovedOrOwner(uint256 tokenId) private view {
-        if(!_isApprovedOrOwner(_msgSender(), tokenId))
+        if (!_isApprovedOrOwner(_msgSender(), tokenId))
             revert ERC721NotApprovedOrOwner();
     }
 
@@ -110,14 +117,20 @@ contract RMRKMultiResource is Context, IERC165, IERC721, IERC721Metadata, IRMRKM
 
     // ----------------------- MODIFIERS FOR RESOURCES ------------------------
 
-
-    function _isApprovedForResourcesOrOwner(address user, uint256 tokenId) internal view virtual returns (bool) {
+    function _isApprovedForResourcesOrOwner(address user, uint256 tokenId)
+        internal
+        view
+        virtual
+        returns (bool)
+    {
         address owner = ownerOf(tokenId);
-        return (user == owner || isApprovedForAllForResources(owner, user) || getApprovedForResources(tokenId) == user);
+        return (user == owner ||
+            isApprovedForAllForResources(owner, user) ||
+            getApprovedForResources(tokenId) == user);
     }
 
     function _onlyApprovedForResourcesOrOwner(uint256 tokenId) private view {
-        if(!_isApprovedForResourcesOrOwner(_msgSender(), tokenId))
+        if (!_isApprovedForResourcesOrOwner(_msgSender(), tokenId))
             revert RMRKNotApprovedForResourcesOrOwner();
     }
 
@@ -136,12 +149,16 @@ contract RMRKMultiResource is Context, IERC165, IERC721, IERC721Metadata, IRMRKM
         _symbol = symbol_;
     }
 
-
     // ------------------------------- ERC721 ---------------------------------
     /**
      * @dev See {IERC165-supportsInterface}.
      */
-    function supportsInterface(bytes4 interfaceId) public view virtual returns (bool) {
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        virtual
+        returns (bool)
+    {
         return
             interfaceId == type(IERC165).interfaceId ||
             interfaceId == type(IERC721).interfaceId ||
@@ -153,8 +170,7 @@ contract RMRKMultiResource is Context, IERC165, IERC721, IERC721Metadata, IRMRKM
      * @dev See {IERC721-balanceOf}.
      */
     function balanceOf(address owner) public view virtual returns (uint256) {
-        if(owner == address(0))
-            revert ERC721AddressZeroIsNotaValidOwner();
+        if (owner == address(0)) revert ERC721AddressZeroIsNotaValidOwner();
         return _balances[owner];
     }
 
@@ -163,8 +179,7 @@ contract RMRKMultiResource is Context, IERC165, IERC721, IERC721Metadata, IRMRKM
      */
     function ownerOf(uint256 tokenId) public view virtual returns (address) {
         address owner = _owners[tokenId];
-        if(owner == address(0) )
-            revert ERC721InvalidTokenId();
+        if (owner == address(0)) revert ERC721InvalidTokenId();
         return owner;
     }
 
@@ -196,10 +211,9 @@ contract RMRKMultiResource is Context, IERC165, IERC721, IERC721Metadata, IRMRKM
      */
     function approve(address to, uint256 tokenId) public virtual {
         address owner = ownerOf(tokenId);
-        if(to == owner)
-            revert ERC721ApprovalToCurrentOwner();
+        if (to == owner) revert ERC721ApprovalToCurrentOwner();
 
-        if(_msgSender() != owner && !isApprovedForAll(owner, _msgSender()))
+        if (_msgSender() != owner && !isApprovedForAll(owner, _msgSender()))
             revert ERC721ApproveCallerIsNotOwnerNorApprovedForAll();
 
         _approve(to, tokenId);
@@ -208,7 +222,12 @@ contract RMRKMultiResource is Context, IERC165, IERC721, IERC721Metadata, IRMRKM
     /**
      * @dev See {IERC721-getApproved}.
      */
-    function getApproved(uint256 tokenId) public view virtual returns (address) {
+    function getApproved(uint256 tokenId)
+        public
+        view
+        virtual
+        returns (address)
+    {
         _requireMinted(tokenId);
 
         return _tokenApprovals[tokenId];
@@ -224,7 +243,12 @@ contract RMRKMultiResource is Context, IERC165, IERC721, IERC721Metadata, IRMRKM
     /**
      * @dev See {IERC721-isApprovedForAll}.
      */
-    function isApprovedForAll(address owner, address operator) public view virtual returns (bool) {
+    function isApprovedForAll(address owner, address operator)
+        public
+        view
+        virtual
+        returns (bool)
+    {
         return _operatorApprovals[owner][operator];
     }
 
@@ -287,7 +311,7 @@ contract RMRKMultiResource is Context, IERC165, IERC721, IERC721Metadata, IRMRKM
         bytes memory data
     ) internal virtual {
         _transfer(from, to, tokenId);
-        if(!_checkOnERC721Received(from, to, tokenId, data))
+        if (!_checkOnERC721Received(from, to, tokenId, data))
             revert ERC721TransferToNonReceiverImplementer();
     }
 
@@ -310,9 +334,16 @@ contract RMRKMultiResource is Context, IERC165, IERC721, IERC721Metadata, IRMRKM
      *
      * - `tokenId` must exist.
      */
-    function _isApprovedOrOwner(address spender, uint256 tokenId) internal view virtual returns (bool) {
+    function _isApprovedOrOwner(address spender, uint256 tokenId)
+        internal
+        view
+        virtual
+        returns (bool)
+    {
         address owner = ownerOf(tokenId);
-        return (spender == owner || isApprovedForAll(owner, spender) || getApproved(tokenId) == spender);
+        return (spender == owner ||
+            isApprovedForAll(owner, spender) ||
+            getApproved(tokenId) == spender);
     }
 
     /**
@@ -339,7 +370,7 @@ contract RMRKMultiResource is Context, IERC165, IERC721, IERC721Metadata, IRMRKM
         bytes memory data
     ) internal virtual {
         _mint(to, tokenId);
-        if(!_checkOnERC721Received(address(0), to, tokenId, data))
+        if (!_checkOnERC721Received(address(0), to, tokenId, data))
             revert ERC721TransferToNonReceiverImplementer();
     }
 
@@ -356,10 +387,8 @@ contract RMRKMultiResource is Context, IERC165, IERC721, IERC721Metadata, IRMRKM
      * Emits a {Transfer} event.
      */
     function _mint(address to, uint256 tokenId) internal virtual {
-        if(to == address(0))
-            revert ERC721MintToTheZeroAddress();
-        if(_exists(tokenId))
-            revert ERC721TokenAlreadyMinted();
+        if (to == address(0)) revert ERC721MintToTheZeroAddress();
+        if (_exists(tokenId)) revert ERC721TokenAlreadyMinted();
 
         _beforeTokenTransfer(address(0), to, tokenId);
 
@@ -414,10 +443,8 @@ contract RMRKMultiResource is Context, IERC165, IERC721, IERC721Metadata, IRMRKM
         address to,
         uint256 tokenId
     ) internal virtual {
-        if(ownerOf(tokenId) != from)
-            revert ERC721TransferFromIncorrectOwner();
-        if(to == address(0))
-            revert ERC721TransferToTheZeroAddress();
+        if (ownerOf(tokenId) != from) revert ERC721TransferFromIncorrectOwner();
+        if (to == address(0)) revert ERC721TransferToTheZeroAddress();
 
         _beforeTokenTransfer(from, to, tokenId);
 
@@ -454,8 +481,7 @@ contract RMRKMultiResource is Context, IERC165, IERC721, IERC721Metadata, IRMRKM
         address operator,
         bool approved
     ) internal virtual {
-        if(owner == operator)
-            revert ERC721ApproveToCaller();
+        if (owner == operator) revert ERC721ApproveToCaller();
         _operatorApprovals[owner][operator] = approved;
         emit ApprovalForAll(owner, operator, approved);
     }
@@ -464,8 +490,7 @@ contract RMRKMultiResource is Context, IERC165, IERC721, IERC721Metadata, IRMRKM
      * @dev Reverts if the `tokenId` has not been minted yet.
      */
     function _requireMinted(uint256 tokenId) internal view virtual {
-        if(!_exists(tokenId))
-            revert ERC721InvalidTokenId();
+        if (!_exists(tokenId)) revert ERC721InvalidTokenId();
     }
 
     /**
@@ -485,7 +510,14 @@ contract RMRKMultiResource is Context, IERC165, IERC721, IERC721Metadata, IRMRKM
         bytes memory data
     ) internal returns (bool) {
         if (to.isContract()) {
-            try IERC721Receiver(to).onERC721Received(_msgSender(), from, tokenId, data) returns (bytes4 retval) {
+            try
+                IERC721Receiver(to).onERC721Received(
+                    _msgSender(),
+                    from,
+                    tokenId,
+                    data
+                )
+            returns (bytes4 retval) {
                 return retval == IERC721Receiver.onERC721Received.selector;
             } catch (bytes memory reason) {
                 if (reason.length == 0) {
@@ -543,13 +575,14 @@ contract RMRKMultiResource is Context, IERC165, IERC721, IERC721Metadata, IRMRKM
 
     // --------------------------- GETTING RESOURCES --------------------------
 
-    function getResource(
-        uint64 resourceId
-    ) public view virtual returns (Resource memory)
+    function getResource(uint64 resourceId)
+        public
+        view
+        virtual
+        returns (Resource memory)
     {
         string memory resourceData = _resources[resourceId];
-        if(bytes(resourceData).length == 0)
-            revert RMRKNoResourceMatchingId();
+        if (bytes(resourceData).length == 0) revert RMRKNoResourceMatchingId();
         Resource memory resource = Resource({
             id: resourceId,
             metadataURI: resourceData
@@ -561,104 +594,136 @@ contract RMRKMultiResource is Context, IERC165, IERC721, IERC721Metadata, IRMRKM
         return _allResources;
     }
 
-    function getResObjectByIndex(
-        uint256 tokenId,
-        uint256 index
-    ) external view virtual returns(Resource memory) {
+    function getResObjectByIndex(uint256 tokenId, uint256 index)
+        external
+        view
+        virtual
+        returns (Resource memory)
+    {
         uint64 resourceId = getActiveResources(tokenId)[index];
         return getResource(resourceId);
     }
 
-    function getPendingResObjectByIndex(
-        uint256 tokenId,
-        uint256 index
-    ) external view virtual returns(Resource memory) {
+    function getPendingResObjectByIndex(uint256 tokenId, uint256 index)
+        external
+        view
+        virtual
+        returns (Resource memory)
+    {
         uint64 resourceId = getPendingResources(tokenId)[index];
         return getResource(resourceId);
     }
 
-    function getFullResources(
-        uint256 tokenId
-    ) external view virtual returns (Resource[] memory) {
+    function getFullResources(uint256 tokenId)
+        external
+        view
+        virtual
+        returns (Resource[] memory)
+    {
         uint64[] memory resourceIds = _activeResources[tokenId];
         return _getResourcesById(resourceIds);
     }
 
-    function getFullPendingResources(
-        uint256 tokenId
-    ) external view virtual returns (Resource[] memory) {
+    function getFullPendingResources(uint256 tokenId)
+        external
+        view
+        virtual
+        returns (Resource[] memory)
+    {
         uint64[] memory resourceIds = _pendingResources[tokenId];
         return _getResourcesById(resourceIds);
     }
 
-    function _getResourcesById(
-        uint64[] memory resourceIds
-    ) internal view virtual returns (Resource[] memory) {
+    function _getResourcesById(uint64[] memory resourceIds)
+        internal
+        view
+        virtual
+        returns (Resource[] memory)
+    {
         uint256 len = resourceIds.length;
         Resource[] memory resources = new Resource[](len);
-        for (uint i; i<len;) {
+        for (uint256 i; i < len; ) {
             resources[i] = getResource(resourceIds[i]);
-            unchecked {++i;}
+            unchecked {
+                ++i;
+            }
         }
         return resources;
     }
 
-    function getActiveResources(
-        uint256 tokenId
-    ) public view virtual returns(uint64[] memory) {
+    function getActiveResources(uint256 tokenId)
+        public
+        view
+        virtual
+        returns (uint64[] memory)
+    {
         return _activeResources[tokenId];
     }
 
-    function getPendingResources(
-        uint256 tokenId
-    ) public view virtual returns(uint64[] memory) {
+    function getPendingResources(uint256 tokenId)
+        public
+        view
+        virtual
+        returns (uint64[] memory)
+    {
         return _pendingResources[tokenId];
     }
 
-    function getActiveResourcePriorities(
-        uint256 tokenId
-    ) public view virtual returns(uint16[] memory) {
+    function getActiveResourcePriorities(uint256 tokenId)
+        public
+        view
+        virtual
+        returns (uint16[] memory)
+    {
         return _activeResourcePriorities[tokenId];
     }
 
-    function getResourceOverwrites(
-        uint256 tokenId,
-        uint64 resourceId
-    ) public view virtual returns(uint64) {
+    function getResourceOverwrites(uint256 tokenId, uint64 resourceId)
+        public
+        view
+        virtual
+        returns (uint64)
+    {
         return _resourceOverwrites[tokenId][resourceId];
     }
 
     // --------------------------- HANDLING RESOURCES -------------------------
 
-    function acceptResource(
-        uint256 tokenId,
-        uint256 index
-    ) external virtual onlyApprovedForResourcesOrOwner(tokenId) {
+    function acceptResource(uint256 tokenId, uint256 index)
+        external
+        virtual
+        onlyApprovedForResourcesOrOwner(tokenId)
+    {
         _acceptResource(tokenId, index);
     }
 
-    function rejectResource(
-        uint256 tokenId,
-        uint256 index
-    ) external virtual onlyApprovedForResourcesOrOwner(tokenId) {
+    function rejectResource(uint256 tokenId, uint256 index)
+        external
+        virtual
+        onlyApprovedForResourcesOrOwner(tokenId)
+    {
         _rejectResource(tokenId, index);
     }
 
-    function rejectAllResources(
-        uint256 tokenId
-    ) external virtual onlyApprovedForResourcesOrOwner(tokenId) {
+    function rejectAllResources(uint256 tokenId)
+        external
+        virtual
+        onlyApprovedForResourcesOrOwner(tokenId)
+    {
         _rejectAllResources(tokenId);
     }
 
-    function setPriority(
-        uint256 tokenId,
-        uint16[] memory priorities
-    ) external virtual onlyApprovedForResourcesOrOwner(tokenId) {
+    function setPriority(uint256 tokenId, uint16[] memory priorities)
+        external
+        virtual
+        onlyApprovedForResourcesOrOwner(tokenId)
+    {
         _setPriority(tokenId, priorities);
     }
 
     function _acceptResource(uint256 tokenId, uint256 index) internal {
-        if(index >= _pendingResources[tokenId].length) revert RMRKIndexOutOfRange();
+        if (index >= _pendingResources[tokenId].length)
+            revert RMRKIndexOutOfRange();
         uint64 resourceId = _pendingResources[tokenId][index];
         _pendingResources[tokenId].removeItemByIndex(index);
 
@@ -667,7 +732,7 @@ contract RMRKMultiResource is Context, IERC165, IERC721, IERC721Metadata, IRMRKM
             // We could check here that the resource to overwrite actually exists but it is probably harmless.
             _activeResources[tokenId].removeItemByValue(overwrite);
             emit ResourceOverwritten(tokenId, overwrite, resourceId);
-            delete(_resourceOverwrites[tokenId][resourceId]);
+            delete (_resourceOverwrites[tokenId][resourceId]);
         }
         _activeResources[tokenId].push(resourceId);
         //Push 0 value of uint16 to array, e.g., uninitialized
@@ -676,50 +741,48 @@ contract RMRKMultiResource is Context, IERC165, IERC721, IERC721Metadata, IRMRKM
     }
 
     function _rejectResource(uint256 tokenId, uint256 index) internal {
-        if(index >= _pendingResources[tokenId].length) revert RMRKIndexOutOfRange();
+        if (index >= _pendingResources[tokenId].length)
+            revert RMRKIndexOutOfRange();
         uint64 resourceId = _pendingResources[tokenId][index];
         _pendingResources[tokenId].removeItemByIndex(index);
         _tokenResources[tokenId][resourceId] = false;
-        delete(_resourceOverwrites[tokenId][resourceId]);
+        delete (_resourceOverwrites[tokenId][resourceId]);
 
         emit ResourceRejected(tokenId, resourceId);
     }
 
     function _rejectAllResources(uint256 tokenId) internal {
         uint256 len = _pendingResources[tokenId].length;
-        for (uint i; i<len;) {
+        for (uint256 i; i < len; ) {
             uint64 resourceId = _pendingResources[tokenId][i];
             delete _resourceOverwrites[tokenId][resourceId];
-            unchecked {++i;}
+            unchecked {
+                ++i;
+            }
         }
 
-        delete(_pendingResources[tokenId]);
+        delete (_pendingResources[tokenId]);
         emit ResourceRejected(tokenId, uint64(0));
     }
 
-    function _setPriority(
-        uint256 tokenId,
-        uint16[] memory priorities
-    ) internal {
+    function _setPriority(uint256 tokenId, uint16[] memory priorities)
+        internal
+    {
         uint256 length = priorities.length;
-        if(length != _activeResources[tokenId].length) revert RMRKBadPriorityListLength();
+        if (length != _activeResources[tokenId].length)
+            revert RMRKBadPriorityListLength();
         _activeResourcePriorities[tokenId] = priorities;
 
         emit ResourcePrioritySet(tokenId);
     }
 
     // This is expected to be implemented with custom guard:
-    function _addResourceEntry(
-        uint64 id,
-        string memory metadataURI
-    ) internal {
-        if(id == uint64(0))
-            revert RMRKWriteToZero();
-        if(bytes(_resources[id]).length > 0)
+    function _addResourceEntry(uint64 id, string memory metadataURI) internal {
+        if (id == uint64(0)) revert RMRKWriteToZero();
+        if (bytes(_resources[id]).length > 0)
             revert RMRKResourceAlreadyExists();
         _resources[id] = metadataURI;
         _allResources.push(id);
-
 
         emit ResourceSet(id);
     }
@@ -730,13 +793,13 @@ contract RMRKMultiResource is Context, IERC165, IERC721, IERC721Metadata, IRMRKM
         uint64 resourceId,
         uint64 overwrites
     ) internal {
-        if(_tokenResources[tokenId][resourceId])
+        if (_tokenResources[tokenId][resourceId])
             revert RMRKResourceAlreadyExists();
 
-        if(bytes(_resources[resourceId]).length == 0)
+        if (bytes(_resources[resourceId]).length == 0)
             revert RMRKNoResourceMatchingId();
 
-        if(_pendingResources[tokenId].length >= 128)
+        if (_pendingResources[tokenId].length >= 128)
             revert RMRKMaxPendingResourcesReached();
 
         _tokenResources[tokenId][resourceId] = true;
@@ -756,23 +819,31 @@ contract RMRKMultiResource is Context, IERC165, IERC721, IERC721Metadata, IRMRKM
     /**
      * @dev See {IERC721Metadata-tokenURI}. Overwritten for MR
      */
-    function tokenURI(
-        uint256 tokenId
-    ) public view virtual override(IERC721Metadata, IRMRKMultiResource) returns (string memory) {
+    function tokenURI(uint256 tokenId)
+        public
+        view
+        virtual
+        override(IERC721Metadata, IRMRKMultiResource)
+        returns (string memory)
+    {
         return _tokenURIAtIndex(tokenId, 0);
     }
 
-    function tokenURIAtIndex(
-        uint256 tokenId,
-        uint256 index
-    ) public view virtual returns (string memory) {
+    function tokenURIAtIndex(uint256 tokenId, uint256 index)
+        public
+        view
+        virtual
+        returns (string memory)
+    {
         return _tokenURIAtIndex(tokenId, index);
     }
 
-    function _tokenURIAtIndex(
-        uint256 tokenId,
-        uint256 index
-    ) internal virtual view returns (string memory) {
+    function _tokenURIAtIndex(uint256 tokenId, uint256 index)
+        internal
+        view
+        virtual
+        returns (string memory)
+    {
         _requireMinted(tokenId);
         // TODO: Discuss is this is the best default path.
         // We could return empty string so it returns something if a token has no resources, but it might hide erros
@@ -782,44 +853,59 @@ contract RMRKMultiResource is Context, IERC165, IERC721, IERC721Metadata, IRMRKM
         uint64 activeResId = _activeResources[tokenId][index];
         Resource memory _activeRes = getResource(activeResId);
         string memory uri = string(
-            abi.encodePacked( _baseURI(), _activeRes.metadataURI)
+            abi.encodePacked(_baseURI(), _activeRes.metadataURI)
         );
 
         return uri;
     }
 
-
     // ----------------------- APPROVALS FOR RESOURCES ------------------------
 
     function approveForResources(address to, uint256 tokenId) external virtual {
         address owner = ownerOf(tokenId);
-        if(to == owner)
-            revert RMRKApprovalForResourcesToCurrentOwner();
+        if (to == owner) revert RMRKApprovalForResourcesToCurrentOwner();
 
-        if(_msgSender() != owner && !isApprovedForAllForResources(owner, _msgSender()))
-            revert RMRKApproveForResourcesCallerIsNotOwnerNorApprovedForAll();
+        if (
+            _msgSender() != owner &&
+            !isApprovedForAllForResources(owner, _msgSender())
+        ) revert RMRKApproveForResourcesCallerIsNotOwnerNorApprovedForAll();
         _approveForResources(to, tokenId);
     }
 
-    function getApprovedForResources(uint256 tokenId) public virtual view returns (address) {
+    function getApprovedForResources(uint256 tokenId)
+        public
+        view
+        virtual
+        returns (address)
+    {
         _requireMinted(tokenId);
         return _tokenApprovalsForResources[tokenId];
     }
 
-    function setApprovalForAllForResources(address operator, bool approved) external virtual {
+    function setApprovalForAllForResources(address operator, bool approved)
+        external
+        virtual
+    {
         address owner = _msgSender();
-        if(owner == operator)
-            revert RMRKApproveForResourcesToCaller();
+        if (owner == operator) revert RMRKApproveForResourcesToCaller();
 
         _operatorApprovalsForResources[owner][operator] = approved;
         emit ApprovalForAllForResources(owner, operator, approved);
     }
 
-    function isApprovedForAllForResources(address owner, address operator) public virtual view returns (bool) {
+    function isApprovedForAllForResources(address owner, address operator)
+        public
+        view
+        virtual
+        returns (bool)
+    {
         return _operatorApprovalsForResources[owner][operator];
     }
 
-    function _approveForResources(address to, uint256 tokenId) internal virtual {
+    function _approveForResources(address to, uint256 tokenId)
+        internal
+        virtual
+    {
         _tokenApprovalsForResources[tokenId] = to;
         emit ApprovalForResources(ownerOf(tokenId), to, tokenId);
     }

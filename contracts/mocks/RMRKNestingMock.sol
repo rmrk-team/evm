@@ -3,15 +3,14 @@
 pragma solidity ^0.8.15;
 
 import "../RMRK/RMRKNesting.sol";
+
 // import "hardhat/console.sol";
 
 //Minimal public implementation of IRMRKNesting for testing.
 contract RMRKNestingMock is RMRKNesting {
-
-    constructor(
-        string memory name_,
-        string memory symbol_
-    ) RMRKNesting(name_, symbol_) {}
+    constructor(string memory name_, string memory symbol_)
+        RMRKNesting(name_, symbol_)
+    {}
 
     function safeMint(address to, uint256 tokenId) public {
         _safeMint(to, tokenId);
@@ -44,10 +43,7 @@ contract RMRKNestingMock is RMRKNesting {
 
     // Utility transfers:
 
-    function transfer(
-        address to,
-        uint256 tokenId
-    ) public virtual {
+    function transfer(address to, uint256 tokenId) public virtual {
         transferFrom(_msgSender(), to, tokenId);
     }
 
@@ -58,5 +54,4 @@ contract RMRKNestingMock is RMRKNesting {
     ) public virtual {
         nestTransferFrom(_msgSender(), to, tokenId, destinationId);
     }
-
 }

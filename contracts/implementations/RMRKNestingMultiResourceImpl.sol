@@ -11,7 +11,11 @@ error RMRKMintUnderpriced();
 error RMRKMintZero();
 
 //Minimal public implementation of IRMRKNesting for testing.
-contract RMRKNestingMultiResourceImpl is OwnableLock, RMRKMintingUtils, RMRKNestingMultiResource {
+contract RMRKNestingMultiResourceImpl is
+    OwnableLock,
+    RMRKMintingUtils,
+    RMRKNestingMultiResource
+{
     using Strings for uint256;
 
     // Manage resources via increment
@@ -29,45 +33,52 @@ contract RMRKNestingMultiResourceImpl is OwnableLock, RMRKMintingUtils, RMRKNest
         uint256 maxSupply_,
         uint256 pricePerMint_
     )
-    RMRKNestingMultiResource(name_, symbol_)
-    RMRKMintingUtils(maxSupply_, pricePerMint_)
+        RMRKNestingMultiResource(name_, symbol_)
+        RMRKMintingUtils(maxSupply_, pricePerMint_)
     {}
 
     /*
     Template minting logic
     */
     function mint(address to, uint256 numToMint) external payable saleIsOpen {
-        (uint nextToken, uint totalSupplyOffset) = _preMint(numToMint);
+        (uint256 nextToken, uint256 totalSupplyOffset) = _preMint(numToMint);
 
-        for(uint i = nextToken; i < totalSupplyOffset;) {
+        for (uint256 i = nextToken; i < totalSupplyOffset; ) {
             _safeMint(to, i);
-            unchecked {++i;}
+            unchecked {
+                ++i;
+            }
         }
     }
 
     /*
     Template minting logic
     */
-    function mintNesting(address to, uint256 numToMint, uint256 destinationId) external payable saleIsOpen {
-        (uint nextToken, uint totalSupplyOffset) = _preMint(numToMint);
+    function mintNesting(
+        address to,
+        uint256 numToMint,
+        uint256 destinationId
+    ) external payable saleIsOpen {
+        (uint256 nextToken, uint256 totalSupplyOffset) = _preMint(numToMint);
 
-        for(uint i = nextToken; i < totalSupplyOffset;) {
+        for (uint256 i = nextToken; i < totalSupplyOffset; ) {
             _nestMint(to, i, destinationId);
-            unchecked {++i;}
+            unchecked {
+                ++i;
+            }
         }
     }
 
-    function _preMint(uint256 numToMint) private returns(uint, uint) {
+    function _preMint(uint256 numToMint) private returns (uint256, uint256) {
         if (numToMint == uint256(0)) revert RMRKMintZero();
         if (numToMint + _totalSupply > _maxSupply) revert RMRKMintOverMax();
 
         uint256 mintPriceRequired = numToMint * _pricePerMint;
-        if (mintPriceRequired != msg.value)
-            revert RMRKMintUnderpriced();
+        if (mintPriceRequired != msg.value) revert RMRKMintUnderpriced();
 
-        uint256 nextToken = _totalSupply+1;
+        uint256 nextToken = _totalSupply + 1;
         _totalSupply += numToMint;
-        uint256 totalSupplyOffset = _totalSupply+1;
+        uint256 totalSupplyOffset = _totalSupply + 1;
 
         return (nextToken, totalSupplyOffset);
     }
@@ -77,7 +88,11 @@ contract RMRKNestingMultiResourceImpl is OwnableLock, RMRKMintingUtils, RMRKNest
         _burn(tokenId);
     }
 
-    function isApprovedOrOwner(address spender, uint256 tokenId) external view returns (bool) {
+    function isApprovedOrOwner(address spender, uint256 tokenId)
+        external
+        view
+        returns (bool)
+    {
         return _isApprovedOrOwner(spender, tokenId);
     }
 
@@ -89,16 +104,19 @@ contract RMRKNestingMultiResourceImpl is OwnableLock, RMRKMintingUtils, RMRKNest
         _fallbackURI = fallbackURI;
     }
 
-    function isTokenEnumeratedResource(
-        uint64 resourceId
-    ) public view virtual returns(bool) {
+    function isTokenEnumeratedResource(uint64 resourceId)
+        public
+        view
+        virtual
+        returns (bool)
+    {
         return _tokenEnumeratedResource[resourceId];
     }
 
-    function setTokenEnumeratedResource(
-        uint64 resourceId,
-        bool state
-    ) external onlyOwner {
+    function setTokenEnumeratedResource(uint64 resourceId, bool state)
+        external
+        onlyOwner
+    {
         _tokenEnumeratedResource[resourceId] = state;
     }
 
@@ -107,24 +125,22 @@ contract RMRKNestingMultiResourceImpl is OwnableLock, RMRKMintingUtils, RMRKNest
         uint64 resourceId,
         uint64 overwrites
     ) external {
-        if(ownerOf(tokenId) == address(0))
-            revert ERC721InvalidTokenId();
+        if (ownerOf(tokenId) == address(0)) revert ERC721InvalidTokenId();
         _addResourceToToken(tokenId, resourceId, overwrites);
     }
 
     function addResourceEntry(string memory metadataURI) external onlyOwner {
-        unchecked {_totalResources += 1;}
+        unchecked {
+            _totalResources += 1;
+        }
         _addResourceEntry(uint64(_totalResources), metadataURI);
     }
 
-    function totalResources() external view returns(uint256) {
+    function totalResources() external view returns (uint256) {
         return _totalResources;
     }
 
-    function transfer(
-        address to,
-        uint256 tokenId
-    ) public virtual {
+    function transfer(address to, uint256 tokenId) public virtual {
         transferFrom(_msgSender(), to, tokenId);
     }
 
@@ -136,25 +152,28 @@ contract RMRKNestingMultiResourceImpl is OwnableLock, RMRKMintingUtils, RMRKNest
         nestTransferFrom(_msgSender(), to, tokenId, destinationId);
     }
 
-    function _tokenURIAtIndex(
-        uint256 tokenId,
-        uint256 index
-    ) internal override view returns (string memory) {
+    function _tokenURIAtIndex(uint256 tokenId, uint256 index)
+        internal
+        view
+        override
+        returns (string memory)
+    {
         _requireMinted(tokenId);
-        if (_activeResources[tokenId].length > index)  {
+        if (_activeResources[tokenId].length > index) {
             uint64 activeResId = _activeResources[tokenId][index];
             Resource memory _activeRes = getResource(activeResId);
             string memory uri = string(
                 abi.encodePacked(
                     _baseURI(),
                     _activeRes.metadataURI,
-                    _tokenEnumeratedResource[activeResId] ? tokenId.toString() : ""
+                    _tokenEnumeratedResource[activeResId]
+                        ? tokenId.toString()
+                        : ""
                 )
             );
 
             return uri;
-        }
-        else {
+        } else {
             return _fallbackURI;
         }
     }

@@ -3,13 +3,12 @@
 pragma solidity ^0.8.0;
 
 interface IRMRKRoyalties {
-
     /**
-    * @notice Returns the data for royalty distributions.
-    *
-    * Returns address for royalty capture, numerator, and denominator for percentage calculation with arbitrary precision.
-    *
-    */
+     * @notice Returns the data for royalty distributions.
+     *
+     * Returns address for royalty capture, numerator, and denominator for percentage calculation with arbitrary precision.
+     *
+     */
     function getRoyaltyData()
         external
         view
@@ -20,13 +19,12 @@ interface IRMRKRoyalties {
         );
 
     /**
-    * @notice Setter for royalty distribution data.
-    *
-    */
+     * @notice Setter for royalty distribution data.
+     *
+     */
     function setRoyaltyData(
         address _royaltyAddress,
         uint64 _numerator,
         uint64 _denominator
     ) external;
-
 }

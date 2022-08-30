@@ -36,15 +36,14 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
     longer mutable.
     */
 
-
-    /** 
-    * @dev Mapping of uint64 partId to IRMRKBaseStorage Part struct
-    */
+    /**
+     * @dev Mapping of uint64 partId to IRMRKBaseStorage Part struct
+     */
     mapping(uint64 => Part) private _parts;
 
-    /** 
-    * @dev Mapping of uint64 partId to flag to set partd to be equippable by any
-    */
+    /**
+     * @dev Mapping of uint64 partId to flag to set partd to be equippable by any
+     */
     mapping(uint64 => bool) private _isEquippableToAll;
 
     uint64[] private _partIds;
@@ -80,80 +79,86 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
 
     function _onlySlot(uint64 partId) internal view {
         ItemType itemType = _parts[partId].itemType;
-        if(itemType == ItemType.None)
-            revert RMRKPartDoesNotExist();
-        if(itemType == ItemType.Fixed)
-            revert RMRKPartIsNotSlot();
+        if (itemType == ItemType.None) revert RMRKPartDoesNotExist();
+        if (itemType == ItemType.Fixed) revert RMRKPartIsNotSlot();
     }
 
     /**
-    * @dev Returns symbol of associated collection
-    * @return string base contract symbol   
-    */
+     * @dev Returns symbol of associated collection
+     * @return string base contract symbol
+     */
     function symbol() external view returns (string memory) {
         return _symbol;
     }
 
     /**
-    * @dev Returns type of data of associated base
-    * @return string data type
-    */
+     * @dev Returns type of data of associated base
+     * @return string data type
+     */
     function type_() external view returns (string memory) {
         return _type;
     }
 
     /**
-    * @dev Private helper function which writes n base item entries to storage.
-    * Delegates to { _addPart } below.
-    * @param partIntake array of structs of type IntakeStruct, which consists of partId and a nested part struct.
-    */
+     * @dev Private helper function which writes n base item entries to storage.
+     * Delegates to { _addPart } below.
+     * @param partIntake array of structs of type IntakeStruct, which consists of partId and a nested part struct.
+     */
     function _addPartList(IntakeStruct[] memory partIntake) internal {
-        uint len = partIntake.length;
-        for (uint256 i = 0; i < len;) {
+        uint256 len = partIntake.length;
+        for (uint256 i = 0; i < len; ) {
             _addPart(partIntake[i]);
-            unchecked {++i;}
+            unchecked {
+                ++i;
+            }
         }
     }
 
     /**
-    * @dev Private function which writes a single base item entry to storage.
-    * @param partIntake struct of type IntakeStruct, which consists of partId and a nested part struct.
-    *
-    */
+     * @dev Private function which writes a single base item entry to storage.
+     * @param partIntake struct of type IntakeStruct, which consists of partId and a nested part struct.
+     *
+     */
     function _addPart(IntakeStruct memory partIntake) internal {
         uint64 partId = partIntake.partId;
         Part memory part = partIntake.part;
 
-        if(_parts[partId].itemType != ItemType.None)
+        if (_parts[partId].itemType != ItemType.None)
             revert RMRKPartAlreadyExists();
-        if(part.itemType == ItemType.None)
-            revert RMRKBadConfig();
-        if(part.itemType == ItemType.Fixed && part.equippable.length > 0)
+        if (part.itemType == ItemType.None) revert RMRKBadConfig();
+        if (part.itemType == ItemType.Fixed && part.equippable.length > 0)
             revert RMRKBadConfig();
 
         _parts[partId] = part;
         _partIds.push(partId);
 
-        emit AddedPart(partId, part.itemType, part.z, part.equippable, part.metadataURI);
+        emit AddedPart(
+            partId,
+            part.itemType,
+            part.z,
+            part.equippable,
+            part.metadataURI
+        );
     }
 
     /**
-    * @dev Public function which adds a number of equippableAddresses to a single base entry. Only accessible by the contract
-    * deployer or transferred Issuer, designated by the modifier onlyIssuer as per the inherited contract issuerControl.
-    *
-    */
+     * @dev Public function which adds a number of equippableAddresses to a single base entry. Only accessible by the contract
+     * deployer or transferred Issuer, designated by the modifier onlyIssuer as per the inherited contract issuerControl.
+     *
+     */
 
     function _addEquippableAddresses(
         uint64 partId,
         address[] memory equippableAddresses
     ) internal onlySlot(partId) {
-        if(equippableAddresses.length <= 0)
-            revert RMRKZeroLengthIdsPassed();
+        if (equippableAddresses.length <= 0) revert RMRKZeroLengthIdsPassed();
 
         uint256 len = equippableAddresses.length;
-        for (uint i; i<len;) {
+        for (uint256 i; i < len; ) {
             _parts[partId].equippable.push(equippableAddresses[i]);
-            unchecked {++i;}
+            unchecked {
+                ++i;
+            }
         }
         _isEquippableToAll[partId] = false;
 
@@ -164,15 +169,17 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
         uint64 partId,
         address[] memory equippableAddresses
     ) internal onlySlot(partId) {
-        if(equippableAddresses.length <= 0)
-            revert RMRKZeroLengthIdsPassed();
+        if (equippableAddresses.length <= 0) revert RMRKZeroLengthIdsPassed();
         _parts[partId].equippable = equippableAddresses;
         _isEquippableToAll[partId] = false;
 
         emit SetEquippables(partId, equippableAddresses);
     }
 
-    function _resetEquippableAddresses(uint64 partId) internal onlySlot(partId) {
+    function _resetEquippableAddresses(uint64 partId)
+        internal
+        onlySlot(partId)
+    {
         delete _parts[partId].equippable;
         _isEquippableToAll[partId] = false;
 
@@ -180,21 +187,29 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
     }
 
     /**
-    * @notice Public function which adds a single equippableId to every base item.
-    * @dev Handle this function with care, this function can be extremely gas-expensive. 
-    * Only accessible by the contract deployer or transferred Issuer, designated by the 
-    * modifier onlyIssuer as per the inherited contract issuerControl.
-    */
+     * @notice Public function which adds a single equippableId to every base item.
+     * @dev Handle this function with care, this function can be extremely gas-expensive.
+     * Only accessible by the contract deployer or transferred Issuer, designated by the
+     * modifier onlyIssuer as per the inherited contract issuerControl.
+     */
     function _setEquippableToAll(uint64 partId) internal onlySlot(partId) {
         _isEquippableToAll[partId] = true;
         emit SetEquippableToAll(partId);
     }
 
-    function checkIsEquippableToAll(uint64 partId) external view returns (bool) {
+    function checkIsEquippableToAll(uint64 partId)
+        external
+        view
+        returns (bool)
+    {
         return _isEquippableToAll[partId];
     }
 
-    function checkIsEquippable(uint64 partId, address targetAddress) external view returns (bool isEquippable) {
+    function checkIsEquippable(uint64 partId, address targetAddress)
+        external
+        view
+        returns (bool isEquippable)
+    {
         // If this is equippable to all, we're good
         isEquippable = _isEquippableToAll[partId];
 
@@ -202,12 +217,14 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
         if (!isEquippable && _parts[partId].itemType == ItemType.Slot) {
             address[] memory equippable = _parts[partId].equippable;
             uint256 len = equippable.length;
-            for (uint256 i = 0; i < len;) {
+            for (uint256 i = 0; i < len; ) {
                 if (targetAddress == equippable[i]) {
                     isEquippable = true;
                     break;
                 }
-                unchecked {++i;}
+                unchecked {
+                    ++i;
+                }
             }
         }
     }
@@ -232,10 +249,12 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
         uint256 numParts = partIds.length;
         Part[] memory parts = new Part[](numParts);
 
-        for(uint i; i<numParts;) {
+        for (uint256 i; i < numParts; ) {
             uint64 partId = partIds[i];
             parts[i] = _parts[partId];
-            unchecked { ++i; }
+            unchecked {
+                ++i;
+            }
         }
 
         return parts;

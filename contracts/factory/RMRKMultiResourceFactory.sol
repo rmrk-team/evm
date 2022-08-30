@@ -5,10 +5,12 @@ pragma solidity ^0.8.16;
 import "../implementations/RMRKMultiResourceImpl.sol";
 
 contract RMRKMultiResourceFactory {
-
     address[] public multiResourceCollections;
 
-    event NewRMRKMultiResourceContract(address indexed multiResourceContract, address indexed deployer);
+    event NewRMRKMultiResourceContract(
+        address indexed multiResourceContract,
+        address indexed deployer
+    );
 
     function getCollections() external view returns (address[] memory) {
         return multiResourceCollections;
@@ -20,9 +22,17 @@ contract RMRKMultiResourceFactory {
         uint256 maxSupply,
         uint256 pricePerMint //in WEI
     ) public {
-        RMRKMultiResourceImpl multiResourceContract = new RMRKMultiResourceImpl(name, symbol, maxSupply, pricePerMint);
+        RMRKMultiResourceImpl multiResourceContract = new RMRKMultiResourceImpl(
+            name,
+            symbol,
+            maxSupply,
+            pricePerMint
+        );
         multiResourceCollections.push(address(multiResourceContract));
         multiResourceContract.transferOwnership(msg.sender);
-        emit NewRMRKMultiResourceContract(address(multiResourceContract), msg.sender);
+        emit NewRMRKMultiResourceContract(
+            address(multiResourceContract),
+            msg.sender
+        );
     }
 }

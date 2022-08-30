@@ -3,15 +3,14 @@
 pragma solidity ^0.8.15;
 
 import "../RMRK/RMRKNestingWithEquippable.sol";
+
 // import "hardhat/console.sol";
 
 //Minimal public implementation of IRMRKNesting for testing.
 contract RMRKNestingWithEquippableMock is RMRKNestingWithEquippable {
-
-    constructor(
-        string memory name_,
-        string memory symbol_
-    ) RMRKNestingWithEquippable(name_, symbol_) {}
+    constructor(string memory name_, string memory symbol_)
+        RMRKNestingWithEquippable(name_, symbol_)
+    {}
 
     function safeMint(address to, uint256 tokenId) public {
         _safeMint(to, tokenId);
@@ -46,10 +45,7 @@ contract RMRKNestingWithEquippableMock is RMRKNestingWithEquippable {
         _setEquippableAddress(equippable);
     }
 
-    function transfer(
-        address to,
-        uint256 tokenId
-    ) public virtual {
+    function transfer(address to, uint256 tokenId) public virtual {
         transferFrom(_msgSender(), to, tokenId);
     }
 
@@ -60,5 +56,4 @@ contract RMRKNestingWithEquippableMock is RMRKNestingWithEquippable {
     ) public virtual {
         nestTransferFrom(_msgSender(), to, tokenId, destinationId);
     }
-
 }

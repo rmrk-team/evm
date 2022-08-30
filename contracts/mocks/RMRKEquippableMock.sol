@@ -8,9 +8,8 @@ import "../RMRK/RMRKEquippable.sol";
 
 //Minimal public implementation of RMRKEquippable for testing.
 contract RMRKEquippableMock is RMRKEquippable {
-
     constructor(string memory name, string memory symbol)
-    RMRKEquippable(name, symbol)
+        RMRKEquippable(name, symbol)
     {}
 
     function safeMint(address to, uint256 tokenId) public {
@@ -44,10 +43,7 @@ contract RMRKEquippableMock is RMRKEquippable {
 
     // Utility transfers:
 
-    function transfer(
-        address to,
-        uint256 tokenId
-    ) public virtual {
+    function transfer(address to, uint256 tokenId) public virtual {
         transferFrom(_msgSender(), to, tokenId);
     }
 

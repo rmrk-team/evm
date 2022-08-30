@@ -12,7 +12,9 @@ import "../RMRK/standard/ERC721.sol";
 contract ERC721Mock is ERC721 {
     string private _baseTokenURI;
 
-    constructor(string memory name, string memory symbol) ERC721(name, symbol) {}
+    constructor(string memory name, string memory symbol)
+        ERC721(name, symbol)
+    {}
 
     function setBaseURI(string calldata newBaseTokenURI) public {
         _baseTokenURI = newBaseTokenURI;
@@ -25,7 +27,6 @@ contract ERC721Mock is ERC721 {
     function _baseURI() internal view override returns (string memory) {
         return _baseTokenURI;
     }
-
 
     function exists(uint256 tokenId) public view returns (bool) {
         return _exists(tokenId);

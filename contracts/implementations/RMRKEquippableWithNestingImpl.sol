@@ -6,7 +6,6 @@ import "../RMRK/RMRKEquippableWithNesting.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
-
 //Minimal public implementation of RMRKEquippableWithNesting for testing.
 contract RMRKEquippableWithNestingImpl is Ownable, RMRKEquippableWithNesting {
     using Strings for uint256;
@@ -18,7 +17,7 @@ contract RMRKEquippableWithNestingImpl is Ownable, RMRKEquippableWithNesting {
     string internal _fallbackURI;
 
     constructor(address nestingAddress)
-    RMRKEquippableWithNesting(nestingAddress)
+        RMRKEquippableWithNesting(nestingAddress)
     {}
 
     function getFallbackURI() external view virtual returns (string memory) {
@@ -29,16 +28,19 @@ contract RMRKEquippableWithNestingImpl is Ownable, RMRKEquippableWithNesting {
         _fallbackURI = fallbackURI;
     }
 
-    function isTokenEnumeratedResource(
-        uint64 resourceId
-    ) public view virtual returns(bool) {
+    function isTokenEnumeratedResource(uint64 resourceId)
+        public
+        view
+        virtual
+        returns (bool)
+    {
         return _tokenEnumeratedResource[resourceId];
     }
 
-    function setTokenEnumeratedResource(
-        uint64 resourceId,
-        bool state
-    ) external onlyOwner {
+    function setTokenEnumeratedResource(uint64 resourceId, bool state)
+        external
+        onlyOwner
+    {
         _tokenEnumeratedResource[resourceId] = state;
     }
 
@@ -68,25 +70,28 @@ contract RMRKEquippableWithNestingImpl is Ownable, RMRKEquippableWithNesting {
         _setValidParentRefId(refId, parentAddress, partId);
     }
 
-    function _tokenURIAtIndex(
-        uint256 tokenId,
-        uint256 index
-    ) internal override view returns (string memory) {
+    function _tokenURIAtIndex(uint256 tokenId, uint256 index)
+        internal
+        view
+        override
+        returns (string memory)
+    {
         _requireMinted(tokenId);
-        if (_activeResources[tokenId].length > index)  {
+        if (_activeResources[tokenId].length > index) {
             uint64 activeResId = _activeResources[tokenId][index];
             Resource memory _activeRes = getResource(activeResId);
             string memory uri = string(
                 abi.encodePacked(
                     _baseURI(),
                     _activeRes.metadataURI,
-                    _tokenEnumeratedResource[activeResId] ? tokenId.toString() : ""
+                    _tokenEnumeratedResource[activeResId]
+                        ? tokenId.toString()
+                        : ""
                 )
             );
 
             return uri;
-        }
-        else {
+        } else {
             return _fallbackURI;
         }
     }

@@ -10,7 +10,6 @@ Minimal ownable lock
 error RMRKLocked();
 
 contract OwnableLock is Ownable {
-
     bool private lock;
 
     modifier notLocked() {
@@ -22,7 +21,7 @@ contract OwnableLock is Ownable {
         lock = true;
     }
 
-    function getLock() public view returns(bool) {
+    function getLock() public view returns (bool) {
         return lock;
     }
 }

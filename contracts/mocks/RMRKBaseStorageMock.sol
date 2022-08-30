@@ -6,7 +6,8 @@ import "../RMRK/RMRKBaseStorage.sol";
 
 contract RMRKBaseStorageMock is RMRKBaseStorage {
     constructor(string memory symbol_, string memory type__)
-    RMRKBaseStorage(symbol_, type__) {}
+        RMRKBaseStorage(symbol_, type__)
+    {}
 
     function addPart(IntakeStruct memory intakeStruct) external {
         _addPart(intakeStruct);
@@ -37,5 +38,4 @@ contract RMRKBaseStorageMock is RMRKBaseStorage {
     function resetEquippableAddresses(uint64 partId) external {
         _resetEquippableAddresses(partId);
     }
-
 }
