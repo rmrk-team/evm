@@ -34,7 +34,6 @@ error RMRKMaxPendingChildrenReached();
 error RMRKMintToNonRMRKImplementer();
 error RMRKNestingTransferToNonRMRKNestingImplementer();
 error RMRKNotApprovedOrDirectOwner();
-error RMRKParentChildMismatch();
 error RMRKPendingChildIndexOutOfRange();
 error RMRKInvalidChildReclaim();
 error RMRKChildAlreadyExists();
@@ -374,8 +373,8 @@ contract RMRKNesting is Context, IERC165, IERC721, IERC721Metadata, IRMRKNesting
     }
 
     function _nestMint(address to, uint256 tokenId, uint256 destinationId) internal virtual {
-        if(!to.isContract()) revert RMRKIsNotContract();
         // It seems redundant, but otherwise it would revert with no error
+        if(!to.isContract()) revert RMRKIsNotContract();
         if(!IERC165(to).supportsInterface(type(IRMRKNesting).interfaceId))
             revert RMRKMintToNonRMRKImplementer();
 
@@ -683,7 +682,6 @@ contract RMRKNesting is Context, IERC165, IERC721, IERC721Metadata, IRMRKNesting
      * @dev Function designed to be used by other instances of RMRK-Core contracts to update children.
      * param1 parentTokenId is the tokenId of the parent token on (this).
      * param2 childTokenId is the tokenId of the child instance
-     * param3 childAddress is the address of the child contract as an IRMRK instance
      */
 
     //update for reentrancy
@@ -693,9 +691,9 @@ contract RMRKNesting is Context, IERC165, IERC721, IERC721Metadata, IRMRKNesting
     ) public virtual {
         if(!_exists(parentTokenId)) revert ERC721InvalidTokenId();
 
-        IRMRKNesting childTokenContract = IRMRKNesting(_msgSender());
-        (address parent, , ) = childTokenContract.rmrkOwnerOf(childTokenId);
-        if (parent != address(this)) revert RMRKParentChildMismatch();
+        if(!_msgSender().isContract()) revert RMRKIsNotContract();
+        // TODO: Check if it's worth to call back the sender to assert it is the owner of the childId
+        // Probably not worth it since a malicious child contract could only affect itself.
 
         Child memory child = Child({
             contractAddress: _msgSender(),
