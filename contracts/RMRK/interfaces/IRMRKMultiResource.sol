@@ -220,7 +220,6 @@ interface IRMRKMultiResource {
     * - `tokenId` must exist.
     * - `index` must be inside the range of pending resource array
     */
-    // FIXME: This might be unnecesary, it can be done by getting ids and then each of them
     function getFullResources(
         uint256 tokenId
     ) external view returns (Resource[] memory);
@@ -232,7 +231,6 @@ interface IRMRKMultiResource {
     *
     * - `tokenId` must exist.
     */
-    // FIXME: This might be unnecesary, it can be done by getting ids and then each of them
     function getFullPendingResources(
         uint256 tokenId
     ) external view returns (Resource[] memory);
