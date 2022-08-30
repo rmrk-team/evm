@@ -782,7 +782,6 @@ contract RMRKEquippableWithNesting is Context, IRMRKEquippableWithNesting {
      * @dev Reverts if the `tokenId` has not been minted yet.
      */
     function _requireMinted(uint256 tokenId) internal view virtual {
-        // FIXME: error is not consistent (others use ERC721InvalidTokenId)
         if(!_exists(tokenId))
             revert ERC721InvalidTokenId();
     }
