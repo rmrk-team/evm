@@ -3,8 +3,6 @@ import { ethers } from 'hardhat';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { BigNumber, Contract } from 'ethers';
 
-// BIG OL FIXME: When minted, tokens should be minted from 1, not zero
-
 async function shouldBehaveLikeNesting(
   mint: (token: Contract, to: string) => Promise<number>,
   nestMint: (token: Contract, to: string, parentId: number) => Promise<number>,
