@@ -14,7 +14,7 @@ describe('NestingMock', function () {
     parent = await NestingFactory.deploy('Test', 'TST');
     await parent.deployed();
 
-    const Childadder = await ethers.getContractFactory('Childadder');
+    const Childadder = await ethers.getContractFactory('ChildAdder');
     adder = await Childadder.deploy();
     await adder.deployed();
 

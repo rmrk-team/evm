@@ -1,29 +1,18 @@
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
-import { BigNumber, Contract } from 'ethers';
+import { Contract } from 'ethers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { addResourceToToken } from '../utils';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import shouldBehaveLikeOwnableLock from '../behavior/ownableLock';
 import shouldBehaveLikeMultiResource from '../behavior/multiresource';
-
-const ONE_ETH = ethers.utils.parseEther('1.0');
+import { mintFromImpl, addResourceEntryFromImpl, ONE_ETH } from '../utils';
 
 async function deployTokenFixture() {
   const Token = await ethers.getContractFactory('RMRKMultiResourceImpl');
   const token = await Token.deploy('MultiResource', 'MR', 10000, ONE_ETH);
   await token.deployed();
   return { token };
-}
-
-async function mint(token: Contract, to: string): Promise<number> {
-  await token.mint(to, 1, { value: ONE_ETH });
-  return await token.totalSupply();
-}
-
-async function addResourceEntry(token: Contract, data?: string): Promise<BigNumber> {
-  await token.addResourceEntry(data !== undefined ? data : 'metaURI');
-  return await token.totalResources();
 }
 
 describe('MultiResourceImpl', async () => {
@@ -56,7 +45,7 @@ describe('MultiResourceImpl', async () => {
     shouldBehaveLikeOwnableLock(isOwnableLockMock);
 
     it('Can mint tokens through sale logic', async function () {
-      await mint(token, owner.address);
+      await mintFromImpl(token, owner.address);
       expect(await token.ownerOf(1)).to.equal(owner.address);
       expect(await token.totalSupply()).to.equal(1);
       expect(await token.balanceOf(owner.address)).to.equal(1);
@@ -103,22 +92,22 @@ describe('MultiResourceImpl', async () => {
       });
 
       it('return empty string by default', async function () {
-        const tokenId = await mint(token, owner.address);
+        const tokenId = await mintFromImpl(token, owner.address);
         expect(await token.tokenURI(tokenId)).to.be.equal('');
       });
 
       it('gets fallback URI if no active resources on token', async function () {
         const fallBackUri = 'fallback404';
-        const tokenId = await mint(token, owner.address);
+        const tokenId = await mintFromImpl(token, owner.address);
 
         await token.setFallbackURI(fallBackUri);
         expect(await token.tokenURI(tokenId)).to.eql(fallBackUri);
       });
 
       it('can get token URI when resource is not enumerated', async function () {
-        const resId = await addResourceEntry(token, 'uri1');
-        const resId2 = await addResourceEntry(token, 'uri2');
-        const tokenId = await mint(token, owner.address);
+        const resId = await addResourceEntryFromImpl(token, 'uri1');
+        const resId2 = await addResourceEntryFromImpl(token, 'uri2');
+        const tokenId = await mintFromImpl(token, owner.address);
 
         await token.addResourceToToken(tokenId, resId, 0);
         await token.addResourceToToken(tokenId, resId2, 0);
@@ -128,9 +117,9 @@ describe('MultiResourceImpl', async () => {
       });
 
       it('can get token URI when resource is enumerated', async function () {
-        const resId = await addResourceEntry(token, 'uri1');
-        const resId2 = await addResourceEntry(token, 'uri2');
-        const tokenId = await mint(token, owner.address);
+        const resId = await addResourceEntryFromImpl(token, 'uri1');
+        const resId2 = await addResourceEntryFromImpl(token, 'uri2');
+        const tokenId = await mintFromImpl(token, owner.address);
 
         await token.addResourceToToken(tokenId, resId, 0);
         await token.addResourceToToken(tokenId, resId2, 0);
@@ -152,7 +141,7 @@ describe('MultiResourceImpl MR behavior', async () => {
     this.token = token;
   });
 
-  shouldBehaveLikeMultiResource(mint, addResourceEntry, addResourceToToken);
+  shouldBehaveLikeMultiResource(mintFromImpl, addResourceEntryFromImpl, addResourceToToken);
 });
 
 // --------------- MULTI RESOURCE BEHAVIOR END ------------------------

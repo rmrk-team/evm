@@ -4,8 +4,8 @@ import { expect } from 'chai';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import {
   addResourceToToken,
-  mintTokenId,
-  nestMinttokenId,
+  mintFromMock,
+  nestMintFromMock,
   addResourceEntryEquippables,
 } from './utils';
 import { setupContextForParts } from './setup/equippableParts';
@@ -42,7 +42,7 @@ async function partsFixture() {
   const mask = await equipFactory.deploy(maskName, maskSymbol);
   await mask.deployed();
 
-  await setupContextForParts(base, neon, neon, mask, mask, mintTokenId, nestMinttokenId);
+  await setupContextForParts(base, neon, neon, mask, mask, mintFromMock, nestMintFromMock);
   return { base, neon, mask };
 }
 
@@ -95,8 +95,8 @@ async function slotsFixture() {
     weaponGem,
     background,
     background,
-    mintTokenId,
-    nestMinttokenId,
+    mintFromMock,
+    nestMintFromMock,
   );
 
   return { base, soldier, weapon, weaponGem, background };
@@ -153,7 +153,7 @@ describe('EquippableMock with Slots', async () => {
     this.backgroundEquip = background;
   });
 
-  shouldBehaveLikeEquippableWithSlots(nestMinttokenId);
+  shouldBehaveLikeEquippableWithSlots(nestMintFromMock);
 });
 
 describe('EquippableMock Resources', async () => {
@@ -170,7 +170,7 @@ describe('EquippableMock Resources', async () => {
     });
   });
 
-  shouldBehaveLikeEquippableResources(mintTokenId);
+  shouldBehaveLikeEquippableResources(mintFromMock);
 });
 
 // --------------- END EQUIPPABLE BEHAVIOR -----------------------

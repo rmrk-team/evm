@@ -1,6 +1,6 @@
 import { ethers } from "hardhat"
 import { Contract } from "ethers"
-import { mintTokenId, nestMinttokenId, transfer, nestTransfer } from './utils';
+import { mintFromMock, nestMintFromMock, transfer, nestTransfer } from './utils';
 import shouldBehaveLikeNesting from "./behavior/nesting"
 import shouldBehaveLikeERC721 from "./behavior/erc721"
 import { loadFixture } from "@nomicfoundation/hardhat-network-helpers"
@@ -43,7 +43,7 @@ describe('NestingWithEquippableMock Nesting Behavior', function () {
     this.childToken = petMonkey;
   });
 
-  shouldBehaveLikeNesting(mintTokenId, nestMinttokenId, transfer, nestTransfer);
+  shouldBehaveLikeNesting(mintFromMock, nestMintFromMock, transfer, nestTransfer);
 });
 
 describe('NestingWithEquippableMock ERC721 Behavior', function () {

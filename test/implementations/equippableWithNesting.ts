@@ -10,20 +10,9 @@ import shouldBehaveLikeEquippableWithParts from '../behavior/equippableParts';
 import shouldBehaveLikeEquippableWithSlots from '../behavior/equippableSlots';
 import shouldBehaveLikeMultiResource from '../behavior/multiresource';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-
-async function mint(token: Contract, to: string): Promise<number> {
-  await token.mint(to, 1, { value: ONE_ETH });
-  return await token.totalSupply();
-}
-
-async function nestMint(token: Contract, to: string, destinationId: number): Promise<number> {
-  await token.mintNesting(to, 1, destinationId, { value: ONE_ETH });
-  return await token.totalSupply();
-}
+import { mintFromImpl, nestMintFromImpl, ONE_ETH } from '../utils';
 
 // --------------- FIXTURES -----------------------
-
-const ONE_ETH = ethers.utils.parseEther('1.0');
 
 async function partsFixture() {
   const baseSymbol = 'NCB';
@@ -71,7 +60,15 @@ async function partsFixture() {
   // Link nesting and equippable:
   mask.setEquippableAddress(maskEquip.address);
 
-  await setupContextForParts(base, neon, neonEquip, mask, maskEquip, mint, nestMint);
+  await setupContextForParts(
+    base,
+    neon,
+    neonEquip,
+    mask,
+    maskEquip,
+    mintFromImpl,
+    nestMintFromImpl,
+  );
   return { base, neon, neonEquip, mask, maskEquip };
 }
 
@@ -165,8 +162,8 @@ async function slotsFixture() {
     weaponGemEquip,
     background,
     backgroundEquip,
-    mint,
-    nestMint,
+    mintFromImpl,
+    nestMintFromImpl,
   );
 
   return {
@@ -267,7 +264,7 @@ describe('EquippableImpl with Slots', async () => {
     this.backgroundEquip = backgroundEquip;
   });
 
-  shouldBehaveLikeEquippableWithSlots(nestMint);
+  shouldBehaveLikeEquippableWithSlots(nestMintFromImpl);
 });
 
 describe('EquippableImpl Resources', async () => {
@@ -284,7 +281,7 @@ describe('EquippableImpl Resources', async () => {
     owner = (await ethers.getSigners())[0];
   });
 
-  shouldBehaveLikeEquippableResources(mint);
+  shouldBehaveLikeEquippableResources(mintFromImpl);
 
   describe('Token URI', async function () {
     it('can set fallback URI', async function () {
@@ -293,14 +290,14 @@ describe('EquippableImpl Resources', async () => {
     });
 
     it('gets fallback URI if no active resources on token', async function () {
-      const tokenId = await mint(this.nesting, owner.address);
+      const tokenId = await mintFromImpl(this.nesting, owner.address);
       const fallBackUri = 'fallback404';
       await this.equip.setFallbackURI(fallBackUri);
       expect(await this.equip.tokenURI(tokenId)).to.eql(fallBackUri);
     });
 
     it('can get token URI when resource is not enumerated', async function () {
-      const tokenId = await mint(this.nesting, owner.address);
+      const tokenId = await mintFromImpl(this.nesting, owner.address);
       const resId = BigNumber.from(1);
       await this.equip.addResourceEntry(
         {
@@ -318,7 +315,7 @@ describe('EquippableImpl Resources', async () => {
     });
 
     it('can get token URI at specific index', async function () {
-      const tokenId = await mint(this.nesting, owner.address);
+      const tokenId = await mintFromImpl(this.nesting, owner.address);
       const resId = BigNumber.from(1);
       const resId2 = BigNumber.from(2);
 
@@ -357,17 +354,18 @@ describe('EquippableImpl Resources', async () => {
 // --------------- MULTI RESOURCE BEHAVIOR -----------------------
 
 describe('EquippableImpl MR behavior with minted token', async () => {
-  let mintingContract: Contract;
+  let nesting: Contract;
+  let equip: Contract;
 
   beforeEach(async function () {
-    const { nesting, equip } = await loadFixture(multiResourceFixture);
-    mintingContract = nesting;
+    ({ nesting, equip } = await loadFixture(multiResourceFixture));
     this.token = equip;
   });
 
+  // Mint needs to happen on the nesting contract, but the MR behavior happens on the equip one.
   async function mintToNesting(token: Contract, to: string): Promise<number> {
-    await mintingContract.mint(to, 1, { value: ONE_ETH });
-    return await mintingContract.totalSupply();
+    await nesting.mint(to, 1, { value: ONE_ETH });
+    return await nesting.totalSupply();
   }
 
   shouldBehaveLikeMultiResource(mintToNesting, addResourceEntryEquippables, addResourceToToken);

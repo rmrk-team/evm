@@ -2,7 +2,7 @@ import { BigNumber, Contract } from 'ethers';
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { mintTokenId, addResourceToToken } from './utils';
+import { mintFromMock, addResourceToToken, addResourceEntryFromMock } from './utils';
 import shouldBehaveLikeMultiResource from './behavior/multiresource';
 import shouldBehaveLikeERC721 from './behavior/erc721';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
@@ -10,20 +10,11 @@ import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 const name = 'RmrkTest';
 const symbol = 'RMRKTST';
 
-let nextResourceId = 1;
-
 async function deployRmrkMultiResourceMockFixture() {
   const Token = await ethers.getContractFactory('RMRKMultiResourceMock');
   const token = await Token.deploy(name, symbol);
   await token.deployed();
   return { token };
-}
-
-async function addResourceEntry(token: Contract, data?: string): Promise<BigNumber> {
-  const resourceId = BigNumber.from(nextResourceId);
-  nextResourceId++;
-  await token.addResourceEntry(resourceId, data !== undefined ? data : 'metaURI');
-  return resourceId;
 }
 
 describe('MultiResourceMock Init', async function () {
@@ -113,9 +104,9 @@ describe('MultiResourceMock Adding resources to tokens', async function () {
   });
 
   it('can add resource to token', async function () {
-    const resId = await addResourceEntry(token, 'data1');
-    const resId2 = await addResourceEntry(token, 'data2');
-    const tokenId = await mintTokenId(token, tokenOwner.address);
+    const resId = await addResourceEntryFromMock(token, 'data1');
+    const resId2 = await addResourceEntryFromMock(token, 'data2');
+    const tokenId = await mintFromMock(token, tokenOwner.address);
 
     await expect(token.addResourceToToken(tokenId, resId, 0)).to.emit(
       token,
@@ -137,7 +128,7 @@ describe('MultiResourceMock Adding resources to tokens', async function () {
 
   it('cannot add non existing resource to token', async function () {
     const resId = BigNumber.from(1);
-    const tokenId = await mintTokenId(token, tokenOwner.address);
+    const tokenId = await mintFromMock(token, tokenOwner.address);
 
     await expect(token.addResourceToToken(tokenId, resId, 0)).to.be.revertedWithCustomError(
       token,
@@ -146,7 +137,7 @@ describe('MultiResourceMock Adding resources to tokens', async function () {
   });
 
   it('cannot add resource to non existing token', async function () {
-    const resId = await addResourceEntry(token);
+    const resId = await addResourceEntryFromMock(token);
     const tokenId = 1;
 
     await expect(token.addResourceToToken(tokenId, resId, 0)).to.be.revertedWithCustomError(
@@ -156,8 +147,8 @@ describe('MultiResourceMock Adding resources to tokens', async function () {
   });
 
   it('cannot add resource twice to the same token', async function () {
-    const resId = await addResourceEntry(token);
-    const tokenId = await mintTokenId(token, tokenOwner.address);
+    const resId = await addResourceEntryFromMock(token);
+    const tokenId = await mintFromMock(token, tokenOwner.address);
 
     await token.addResourceToToken(tokenId, resId, 0);
     await expect(token.addResourceToToken(tokenId, resId, 0)).to.be.revertedWithCustomError(
@@ -167,15 +158,15 @@ describe('MultiResourceMock Adding resources to tokens', async function () {
   });
 
   it('cannot add too many resources to the same token', async function () {
-    const tokenId = await mintTokenId(token, tokenOwner.address);
+    const tokenId = await mintFromMock(token, tokenOwner.address);
 
     for (let i = 1; i <= 128; i++) {
-      const resId = await addResourceEntry(token);
+      const resId = await addResourceEntryFromMock(token);
       await token.addResourceToToken(tokenId, resId, 0);
     }
 
     // Now it's full, next should fail
-    const resId = await addResourceEntry(token);
+    const resId = await addResourceEntryFromMock(token);
     await expect(token.addResourceToToken(tokenId, resId, 0)).to.be.revertedWithCustomError(
       token,
       'RMRKMaxPendingResourcesReached',
@@ -183,9 +174,9 @@ describe('MultiResourceMock Adding resources to tokens', async function () {
   });
 
   it('can add same resource to 2 different tokens', async function () {
-    const resId = await addResourceEntry(token);
-    const tokenId1 = await mintTokenId(token, tokenOwner.address);
-    const tokenId2 = await mintTokenId(token, tokenOwner.address);
+    const resId = await addResourceEntryFromMock(token);
+    const tokenId1 = await mintFromMock(token, tokenOwner.address);
+    const tokenId2 = await mintFromMock(token, tokenOwner.address);
 
     await token.addResourceToToken(tokenId1, resId, 0);
     await token.addResourceToToken(tokenId2, resId, 0);
@@ -209,9 +200,9 @@ describe('MultiResourceMock Token URI', async function () {
 
   describe('token URI', async function () {
     it('can get token URI', async function () {
-      const resId = await addResourceEntry(token, 'uri1');
-      const resId2 = await addResourceEntry(token, 'uri2');
-      const tokenId = await mintTokenId(token, owner.address);
+      const resId = await addResourceEntryFromMock(token, 'uri1');
+      const resId2 = await addResourceEntryFromMock(token, 'uri2');
+      const tokenId = await mintFromMock(token, owner.address);
 
       await token.addResourceToToken(tokenId, resId, 0);
       await token.addResourceToToken(tokenId, resId2, 0);
@@ -221,9 +212,9 @@ describe('MultiResourceMock Token URI', async function () {
     });
 
     it('can get token URI at specific index', async function () {
-      const resId = await addResourceEntry(token, 'UriA');
-      const resId2 = await addResourceEntry(token, 'UriB');
-      const tokenId = await mintTokenId(token, owner.address);
+      const resId = await addResourceEntryFromMock(token, 'UriA');
+      const resId2 = await addResourceEntryFromMock(token, 'UriB');
+      const tokenId = await mintFromMock(token, owner.address);
 
       await token.addResourceToToken(tokenId, resId, 0);
       await token.addResourceToToken(tokenId, resId2, 0);
@@ -238,7 +229,7 @@ describe('MultiResourceMock Token URI', async function () {
     });
 
     it('cannot get token URI if token has no resources', async function () {
-      const tokenId = await mintTokenId(token, owner.address);
+      const tokenId = await mintFromMock(token, owner.address);
       await expect(token.tokenURI(tokenId)).to.be.revertedWithCustomError(
         token,
         'RMRKIndexOutOfRange',
@@ -261,7 +252,7 @@ describe('MultiResourceMock approvals cleaning', async () => {
     const tokenOwner = addrs[1];
     const newOwner = addrs[2];
     const approved = addrs[3];
-    const tokenId = await mintTokenId(token, tokenOwner.address);
+    const tokenId = await mintFromMock(token, tokenOwner.address);
     await token.connect(tokenOwner).approve(approved.address, tokenId);
     await token.connect(tokenOwner).approveForResources(approved.address, tokenId);
 
@@ -277,7 +268,7 @@ describe('MultiResourceMock approvals cleaning', async () => {
   it('cleans token and resources approvals on burn', async function () {
     const tokenOwner = addrs[1];
     const approved = addrs[3];
-    const tokenId = await mintTokenId(token, tokenOwner.address);
+    const tokenId = await mintFromMock(token, tokenOwner.address);
     await token.connect(tokenOwner).approve(approved.address, tokenId);
     await token.connect(tokenOwner).approveForResources(approved.address, tokenId);
 
@@ -305,7 +296,7 @@ describe('MultiResourceMock MR behavior', async () => {
     this.token = token;
   });
 
-  shouldBehaveLikeMultiResource(mintTokenId, addResourceEntry, addResourceToToken);
+  shouldBehaveLikeMultiResource(mintFromMock, addResourceEntryFromMock, addResourceToToken);
 });
 
 // --------------- MULTI RESOURCE BEHAVIOR END ------------------------

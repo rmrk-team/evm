@@ -1,9 +1,16 @@
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
-import { BigNumber, Contract } from 'ethers';
+import { Contract } from 'ethers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import { mintTokenId, nestMinttokenId, transfer, nestTransfer, addResourceToToken } from './utils';
+import {
+  mintFromMock,
+  nestMintFromMock,
+  transfer,
+  nestTransfer,
+  addResourceToToken,
+  addResourceEntryFromMock,
+} from './utils';
 import shouldBehaveLikeNesting from './behavior/nesting';
 import shouldBehaveLikeMultiResource from './behavior/multiresource';
 
@@ -25,7 +32,7 @@ describe('NestingMultiResourceMock Nesting Behavior', function () {
     this.childToken = petMonkey;
   });
 
-  shouldBehaveLikeNesting(mintTokenId, nestMinttokenId, transfer, nestTransfer);
+  shouldBehaveLikeNesting(mintFromMock, nestMintFromMock, transfer, nestTransfer);
 });
 
 // --------------- MULTI RESOURCE BEHAVIOR -----------------------
@@ -37,22 +44,13 @@ async function deployTokenFixture() {
   return { token };
 }
 
-let nextResourceId = 1;
-
-async function addResourceEntry(token: Contract, data?: string): Promise<BigNumber> {
-  const resourceId = BigNumber.from(nextResourceId);
-  nextResourceId++;
-  await token.addResourceEntry(resourceId, data !== undefined ? data : 'metaURI');
-  return resourceId;
-}
-
 describe('NestingMultiResourceMock MR behavior', async () => {
   beforeEach(async function () {
     const { token } = await loadFixture(deployTokenFixture);
     this.token = token;
   });
 
-  shouldBehaveLikeMultiResource(mintTokenId, addResourceEntry, addResourceToToken);
+  shouldBehaveLikeMultiResource(mintFromMock, addResourceEntryFromMock, addResourceToToken);
 });
 
 // --------------- MULTI RESOURCE BEHAVIOR END ------------------------
@@ -125,9 +123,9 @@ describe('NestingMultiResourceMock', function () {
   describe('token URI', async function () {
     it('can get token URI', async function () {
       const tokenOwner = addrs[1];
-      const resId = await addResourceEntry(chunky, 'uri1');
-      const resId2 = await addResourceEntry(chunky, 'uri2');
-      const tokenId = await mintTokenId(chunky, tokenOwner.address);
+      const resId = await addResourceEntryFromMock(chunky, 'uri1');
+      const resId2 = await addResourceEntryFromMock(chunky, 'uri2');
+      const tokenId = await mintFromMock(chunky, tokenOwner.address);
 
       await chunky.addResourceToToken(tokenId, resId, 0);
       await chunky.addResourceToToken(tokenId, resId2, 0);
@@ -138,7 +136,7 @@ describe('NestingMultiResourceMock', function () {
 
     it('cannot get token URI if token has no resources', async function () {
       const tokenOwner = addrs[1];
-      const tokenId = await mintTokenId(chunky, tokenOwner.address);
+      const tokenId = await mintFromMock(chunky, tokenOwner.address);
       await expect(chunky.tokenURI(tokenId)).to.be.revertedWithCustomError(
         chunky,
         'RMRKIndexOutOfRange',

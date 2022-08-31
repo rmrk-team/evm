@@ -4,18 +4,7 @@ import { transfer, nestTransfer } from '../utils';
 import shouldBehaveLikeNesting from '../behavior/nesting';
 import shouldBehaveLikeERC721 from '../behavior/erc721';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-
-const ONE_ETH = ethers.utils.parseEther('1.0');
-
-async function mint(token: Contract, to: string): Promise<number> {
-  await token.mint(to, 1, { value: ONE_ETH });
-  return await token.totalSupply();
-}
-
-async function nestMint(token: Contract, to: string, destinationId: number): Promise<number> {
-  await token.mintNesting(to, 1, destinationId, { value: ONE_ETH });
-  return await token.totalSupply();
-}
+import { mintFromImpl, nestMintFromImpl, ONE_ETH } from '../utils';
 
 describe('NestingMultiResourceImpl Nesting Behavior', function () {
   async function deployTokensFixture() {
@@ -35,7 +24,7 @@ describe('NestingMultiResourceImpl Nesting Behavior', function () {
     this.childToken = petMonkey;
   });
 
-  shouldBehaveLikeNesting(mint, nestMint, transfer, nestTransfer);
+  shouldBehaveLikeNesting(mintFromImpl, nestMintFromImpl, transfer, nestTransfer);
 });
 
 // describe('NestingImpl ERC721 behavior', function () {
@@ -46,7 +35,7 @@ describe('NestingMultiResourceImpl Nesting Behavior', function () {
 
 //   async function erc721NestingFixture() {
 //     const Token = await ethers.getContractFactory('RMRKNestingImpl');
-//     const tokenContract = await Token.deploy(name, symbol);
+//     const tokenContract = await Token.deploy(name, symbol, 10000, ONE_ETH);
 //     await tokenContract.deployed();
 //     return tokenContract;
 //   }

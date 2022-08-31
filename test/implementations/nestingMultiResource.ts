@@ -1,23 +1,12 @@
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
-import { BigNumber, Contract } from 'ethers';
+import { Contract } from 'ethers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import { transfer, nestTransfer, addResourceToToken } from '../utils';
+import { transfer, nestTransfer, addResourceToToken, addResourceEntryFromImpl } from '../utils';
 import shouldBehaveLikeNesting from '../behavior/nesting';
 import shouldBehaveLikeMultiResource from '../behavior/multiresource';
-
-const ONE_ETH = ethers.utils.parseEther('1.0');
-
-async function mint(token: Contract, to: string): Promise<number> {
-  await token.mint(to, 1, { value: ONE_ETH });
-  return await token.totalSupply();
-}
-
-async function nestMint(token: Contract, to: string, destinationId: number): Promise<number> {
-  await token.mintNesting(to, 1, destinationId, { value: ONE_ETH });
-  return await token.totalSupply();
-}
+import { mintFromImpl, nestMintFromImpl, ONE_ETH } from '../utils';
 
 describe('NestingMultiResourceImpl Nesting Behavior', function () {
   async function deployTokensFixture() {
@@ -37,7 +26,7 @@ describe('NestingMultiResourceImpl Nesting Behavior', function () {
     this.childToken = petMonkey;
   });
 
-  shouldBehaveLikeNesting(mint, nestMint, transfer, nestTransfer);
+  shouldBehaveLikeNesting(mintFromImpl, nestMintFromImpl, transfer, nestTransfer);
 });
 
 // --------------- MULTI RESOURCE BEHAVIOR -----------------------
@@ -49,18 +38,13 @@ async function deployTokenFixture() {
   return { token };
 }
 
-async function addResourceEntry(token: Contract, data?: string): Promise<BigNumber> {
-  await token.addResourceEntry(data !== undefined ? data : 'metaURI');
-  return await token.totalResources();
-}
-
 describe('NestingMultiResourceImpl MR behavior', async () => {
   beforeEach(async function () {
     const { token } = await loadFixture(deployTokenFixture);
     this.token = token;
   });
 
-  shouldBehaveLikeMultiResource(mint, addResourceEntry, addResourceToToken);
+  shouldBehaveLikeMultiResource(mintFromImpl, addResourceEntryFromImpl, addResourceToToken);
 });
 
 // --------------- MULTI RESOURCE BEHAVIOR END ------------------------
@@ -92,7 +76,7 @@ describe('NestingMultiResourceImpl', function () {
       const tokenOwner = addrs[1];
       const newOwner = addrs[2];
       const approved = addrs[3];
-      const tokenId = await mint(chunky, tokenOwner.address);
+      const tokenId = await mintFromImpl(chunky, tokenOwner.address);
       await chunky.connect(tokenOwner).approve(approved.address, tokenId);
       await chunky.connect(tokenOwner).approveForResources(approved.address, tokenId);
 
@@ -108,7 +92,7 @@ describe('NestingMultiResourceImpl', function () {
     it('cleans token and resources approvals on burn', async function () {
       const tokenOwner = addrs[1];
       const approved = addrs[3];
-      const tokenId = await mint(chunky, tokenOwner.address);
+      const tokenId = await mintFromImpl(chunky, tokenOwner.address);
       await chunky.connect(tokenOwner).approve(approved.address, tokenId);
       await chunky.connect(tokenOwner).approveForResources(approved.address, tokenId);
 

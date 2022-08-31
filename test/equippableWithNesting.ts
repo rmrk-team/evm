@@ -4,8 +4,8 @@ import { expect } from 'chai';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import {
   addResourceToToken,
-  mintTokenId,
-  nestMinttokenId,
+  mintFromMock,
+  nestMintFromMock,
   addResourceEntryEquippables,
 } from './utils';
 import { setupContextForParts } from './setup/equippableParts';
@@ -53,7 +53,7 @@ async function partsFixture() {
   maskEquip.setNestingAddress(mask.address);
   mask.setEquippableAddress(maskEquip.address);
 
-  await setupContextForParts(base, neon, neonEquip, mask, maskEquip, mintTokenId, nestMinttokenId);
+  await setupContextForParts(base, neon, neonEquip, mask, maskEquip, mintFromMock, nestMintFromMock);
   return { base, neon, neonEquip, mask, maskEquip };
 }
 
@@ -128,8 +128,8 @@ async function slotsFixture() {
     weaponGemEquip,
     background,
     backgroundEquip,
-    mintTokenId,
-    nestMinttokenId,
+    mintFromMock,
+    nestMintFromMock,
   );
 
   return {
@@ -218,7 +218,7 @@ describe('EquippableMock with Slots', async () => {
     this.backgroundEquip = backgroundEquip;
   });
 
-  shouldBehaveLikeEquippableWithSlots(nestMinttokenId);
+  shouldBehaveLikeEquippableWithSlots(nestMintFromMock);
 });
 
 describe('EquippableMock Resources', async () => {
@@ -252,7 +252,7 @@ describe('EquippableMock Resources', async () => {
     });
   });
 
-  shouldBehaveLikeEquippableResources(mintTokenId);
+  shouldBehaveLikeEquippableResources(mintFromMock);
 });
 
 // --------------- END EQUIPPABLE BEHAVIOR -----------------------
@@ -261,18 +261,19 @@ describe('EquippableMock Resources', async () => {
 
 describe('EquippableMock MR behavior', async () => {
   let nextTokenId = 1;
-  let mintingContract: Contract;
+  let nesting: Contract;
+  let equip: Contract;
 
   beforeEach(async function () {
-    const { nesting, equip } = await loadFixture(multiResourceFixture);
-    mintingContract = nesting;
+    ({ nesting, equip } = await loadFixture(multiResourceFixture));
     this.token = equip;
   });
 
+  // Mint needs to happen on the nesting contract, but the MR behavior happens on the equip one.
   async function mintToNesting(token: Contract, to: string): Promise<number> {
     const tokenId = nextTokenId;
     nextTokenId++;
-    await mintingContract['mint(address,uint256)'](to, tokenId);
+    await nesting['mint(address,uint256)'](to, tokenId);
     return tokenId;
   }
 

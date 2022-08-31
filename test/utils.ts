@@ -4,19 +4,34 @@ import { ethers } from 'hardhat';
 
 let nextTokenId = 1;
 let nextChildTokenId = 100;
+const ONE_ETH = ethers.utils.parseEther('1.0');
 
-async function mintTokenId(token: Contract, to: string): Promise<number> {
+async function mintFromMock(token: Contract, to: string): Promise<number> {
   const tokenId = nextTokenId;
   nextTokenId++;
   await token['mint(address,uint256)'](to, tokenId);
   return tokenId;
 }
 
-async function nestMinttokenId(token: Contract, to: string, parentId: number): Promise<number> {
+async function nestMintFromMock(token: Contract, to: string, parentId: number): Promise<number> {
   const childTokenId = nextChildTokenId;
   nextChildTokenId++;
   await token['nestMint(address,uint256,uint256)'](to, childTokenId, parentId);
   return childTokenId;
+}
+
+async function mintFromImpl(token: Contract, to: string): Promise<number> {
+  await token.mint(to, 1, { value: ONE_ETH });
+  return await token.totalSupply();
+}
+
+async function nestMintFromImpl(
+  token: Contract,
+  to: string,
+  destinationId: number,
+): Promise<number> {
+  await token.mintNesting(to, 1, destinationId, { value: ONE_ETH });
+  return await token.totalSupply();
 }
 
 async function transfer(
@@ -49,6 +64,18 @@ async function addResourceToToken(
 
 let nextResourceId = 1;
 
+async function addResourceEntryFromMock(token: Contract, data?: string): Promise<BigNumber> {
+  const resourceId = BigNumber.from(nextResourceId);
+  nextResourceId++;
+  await token.addResourceEntry(resourceId, data !== undefined ? data : 'metaURI');
+  return resourceId;
+}
+
+async function addResourceEntryFromImpl(token: Contract, data?: string): Promise<BigNumber> {
+  await token.addResourceEntry(data !== undefined ? data : 'metaURI');
+  return await token.totalResources();
+}
+
 async function addResourceEntryEquippables(token: Contract, data?: string): Promise<BigNumber> {
   const resourceId = BigNumber.from(nextResourceId);
   const refId = BigNumber.from(1);
@@ -64,10 +91,15 @@ async function addResourceEntryEquippables(token: Contract, data?: string): Prom
 }
 
 export {
-  mintTokenId,
-  nestMinttokenId,
-  transfer,
-  nestTransfer,
-  addResourceToToken,
   addResourceEntryEquippables,
+  addResourceEntryFromImpl,
+  addResourceEntryFromMock,
+  addResourceToToken,
+  mintFromImpl,
+  mintFromMock,
+  nestMintFromImpl,
+  nestMintFromMock,
+  nestTransfer,
+  ONE_ETH,
+  transfer,
 };

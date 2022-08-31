@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { ethers } from 'hardhat';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { Contract } from 'ethers';
-import { mintTokenId, nestMinttokenId, transfer, nestTransfer } from './utils';
+import { mintFromMock, nestMintFromMock, transfer, nestTransfer } from './utils';
 import shouldBehaveLikeNesting from './behavior/nesting';
 import shouldBehaveLikeERC721 from './behavior/erc721';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
@@ -37,7 +37,7 @@ describe('NestingMock', function () {
     this.childToken = child;
   });
 
-  shouldBehaveLikeNesting(mintTokenId, nestMinttokenId, transfer, nestTransfer);
+  shouldBehaveLikeNesting(mintFromMock, nestMintFromMock, transfer, nestTransfer);
 
   describe('Init', async function () {
     it('Name', async function () {
@@ -53,15 +53,15 @@ describe('NestingMock', function () {
 
   describe('Minting', async function () {
     it('cannot mint already minted token', async function () {
-      const tokenId = await mintTokenId(child, owner.address);
+      const tokenId = await mintFromMock(child, owner.address);
       await expect(
         child['mint(address,uint256)'](owner.address, tokenId),
       ).to.be.revertedWithCustomError(child, 'ERC721TokenAlreadyMinted');
     });
 
     it('cannot nest mint already minted token', async function () {
-      const parentId = await mintTokenId(parent, owner.address);
-      const childId = await nestMinttokenId(child, parent.address, parentId);
+      const parentId = await mintFromMock(parent, owner.address);
+      const childId = await nestMintFromMock(child, parent.address, parentId);
 
       await expect(
         child['nestMint(address,uint256,uint256)'](parent.address, childId, parentId),
@@ -69,8 +69,8 @@ describe('NestingMock', function () {
     });
 
     it('cannot nest mint already minted token', async function () {
-      const parentId = await mintTokenId(parent, owner.address);
-      const childId = await nestMinttokenId(child, parent.address, parentId);
+      const parentId = await mintFromMock(parent, owner.address);
+      const childId = await nestMintFromMock(child, parent.address, parentId);
 
       await expect(
         child['nestMint(address,uint256,uint256)'](parent.address, childId, parentId),
