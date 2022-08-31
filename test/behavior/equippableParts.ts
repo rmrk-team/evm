@@ -1,6 +1,6 @@
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
-import { BigNumber, Contract } from 'ethers';
+import { Contract } from 'ethers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import {
   partIdForHead1,
@@ -16,6 +16,7 @@ import {
   maskResourcesEquip,
   maskEquippableRefId,
 } from '../setup/equippableParts';
+import { bn } from '../utils';
 
 // The general idea is having these tokens: Neon and Mask
 // Masks can be equipped into Neons.
@@ -190,10 +191,6 @@ async function shouldBehaveLikeEquippableWithParts() {
       ).to.be.revertedWithCustomError(maskEquipContract, 'RMRKNotComposableResource');
     });
   });
-
-  function bn(x: number): BigNumber {
-    return BigNumber.from(x);
-  }
 }
 
 export default shouldBehaveLikeEquippableWithParts;

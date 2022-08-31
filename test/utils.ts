@@ -6,6 +6,10 @@ let nextTokenId = 1;
 let nextChildTokenId = 100;
 const ONE_ETH = ethers.utils.parseEther('1.0');
 
+function bn(x: number): BigNumber {
+  return BigNumber.from(x);
+}
+
 async function mintFromMock(token: Contract, to: string): Promise<number> {
   const tokenId = nextTokenId;
   nextTokenId++;
@@ -65,7 +69,7 @@ async function addResourceToToken(
 let nextResourceId = 1;
 
 async function addResourceEntryFromMock(token: Contract, data?: string): Promise<BigNumber> {
-  const resourceId = BigNumber.from(nextResourceId);
+  const resourceId = bn(nextResourceId);
   nextResourceId++;
   await token.addResourceEntry(resourceId, data !== undefined ? data : 'metaURI');
   return resourceId;
@@ -77,8 +81,8 @@ async function addResourceEntryFromImpl(token: Contract, data?: string): Promise
 }
 
 async function addResourceEntryEquippables(token: Contract, data?: string): Promise<BigNumber> {
-  const resourceId = BigNumber.from(nextResourceId);
-  const refId = BigNumber.from(1);
+  const resourceId = bn(nextResourceId);
+  const refId = bn(1);
   const extendedResource = [
     resourceId,
     refId,
@@ -95,6 +99,7 @@ export {
   addResourceEntryFromImpl,
   addResourceEntryFromMock,
   addResourceToToken,
+  bn,
   mintFromImpl,
   mintFromMock,
   nestMintFromImpl,

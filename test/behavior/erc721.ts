@@ -1,8 +1,8 @@
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { ERC721ReceiverMock } from '../../typechain-types/contracts/mocks';
 import { BigNumber, Contract, ContractTransaction } from 'ethers';
+import { bn } from '../utils';
 
 // Based on https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/test/token/ERC721/ERC721.behavior.js
 
@@ -16,10 +16,10 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
   let receipt: ContractTransaction;
   let receiver: Contract;
 
-  const firstTokenId = BigNumber.from(5042);
-  const secondTokenId = BigNumber.from(79217);
-  const nonExistentTokenId = BigNumber.from(13);
-  const fourthTokenId = BigNumber.from(4);
+  const firstTokenId = bn(5042);
+  const secondTokenId = bn(79217);
+  const nonExistentTokenId = bn(13);
+  const fourthTokenId = bn(4);
   const baseURI = 'https://api.example.com/v1/';
   const RECEIVER_MAGIC_VALUE = '0x150b7a02';
   const RECEIVER_MAGIC_VALUE_RMRK_NESTING = '0xb0d59c67';
@@ -91,13 +91,13 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
     describe('balanceOf', function () {
       context('when the given address owns some tokens', function () {
         it('returns the amount of tokens owned by the given address', async function () {
-          expect(await this.token.balanceOf(owner.address)).to.eql(BigNumber.from(2));
+          expect(await this.token.balanceOf(owner.address)).to.eql(bn(2));
         });
       });
 
       context('when the given address does not own any tokens', function () {
         it('returns 0', async function () {
-          expect(await this.token.balanceOf(others[0].address)).to.eql(BigNumber.from(0));
+          expect(await this.token.balanceOf(others[0].address)).to.eql(bn(0));
         });
       });
 
@@ -156,7 +156,7 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
         });
 
         it('adjusts owners balances', async function () {
-          expect(await this.token.balanceOf(owner.address)).to.eql(BigNumber.from(1));
+          expect(await this.token.balanceOf(owner.address)).to.eql(bn(1));
         });
       };
 
@@ -248,7 +248,7 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
           });
 
           it('keeps the owner balance', async function () {
-            expect(await this.token.balanceOf(owner.address)).to.eql(BigNumber.from(2));
+            expect(await this.token.balanceOf(owner.address)).to.eql(bn(2));
           });
         });
 
@@ -870,7 +870,7 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
       });
 
       it('creates the token', async function () {
-        expect(await this.token.balanceOf(owner.address)).to.eql(BigNumber.from(1));
+        expect(await this.token.balanceOf(owner.address)).to.eql(bn(1));
         expect(await this.token.ownerOf(firstTokenId)).to.equal(owner.address);
       });
 
@@ -918,7 +918,7 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
         });
 
         it('deletes the token', async function () {
-          expect(await this.token.balanceOf(owner.address)).to.eql(BigNumber.from(1));
+          expect(await this.token.balanceOf(owner.address)).to.eql(bn(1));
           await expect(this.token.ownerOf(firstTokenId)).to.be.revertedWithCustomError(
             this.token,
             'ERC721InvalidTokenId',

@@ -2,6 +2,7 @@ import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { BigNumber, Contract } from 'ethers';
+import { bn } from '../utils';
 
 async function shouldBehaveLikeMultiResource(
   mint: (token: Contract, to: string) => Promise<number>,
@@ -56,7 +57,7 @@ async function shouldBehaveLikeMultiResource(
       });
 
       it('cannot add non existing resource to token', async function () {
-        const badResId = BigNumber.from(10);
+        const badResId = bn(10);
         await expect(
           addResourceToTokenFunc(this.token, tokenId, badResId, 0),
         ).to.be.revertedWithCustomError(this.token, 'RMRKNoResourceMatchingId');
@@ -132,9 +133,7 @@ async function shouldBehaveLikeMultiResource(
 
         expect(await this.token.getFullResources(tokenId)).to.be.eql([[resId2, metaURIDefault]]);
         // Overwrite should be gone
-        expect(await this.token.getResourceOverwrites(tokenId, pendingResources[0])).to.eql(
-          BigNumber.from(0),
-        );
+        expect(await this.token.getResourceOverwrites(tokenId, pendingResources[0])).to.eql(bn(0));
       });
 
       it('can overwrite non existing resource to token, it could have been deleted', async function () {
@@ -155,7 +154,7 @@ async function shouldBehaveLikeMultiResource(
         await addResourceToTokenFunc(this.token, tokenId, resId2, resId);
         await this.token.connect(tokenOwner).rejectResource(tokenId, 0);
 
-        expect(await this.token.getResourceOverwrites(tokenId, resId2)).to.eql(BigNumber.from(0));
+        expect(await this.token.getResourceOverwrites(tokenId, resId2)).to.eql(bn(0));
       });
 
       it('can reject all resources and overwrites are cleared', async function () {
@@ -167,7 +166,7 @@ async function shouldBehaveLikeMultiResource(
         await addResourceToTokenFunc(this.token, tokenId, resId2, resId);
         await this.token.connect(tokenOwner).rejectAllResources(tokenId);
 
-        expect(await this.token.getResourceOverwrites(tokenId, resId2)).to.eql(BigNumber.from(0));
+        expect(await this.token.getResourceOverwrites(tokenId, resId2)).to.eql(bn(0));
       });
     });
   });

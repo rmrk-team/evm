@@ -1,4 +1,4 @@
-import { BigNumber, Contract } from 'ethers';
+import { Contract } from 'ethers';
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
@@ -6,6 +6,7 @@ import { mintFromMock, addResourceToToken, addResourceEntryFromMock } from './ut
 import shouldBehaveLikeMultiResource from './behavior/multiresource';
 import shouldBehaveLikeERC721 from './behavior/erc721';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
+import { bn } from './utils';
 
 const name = 'RmrkTest';
 const symbol = 'RMRKTST';
@@ -46,7 +47,7 @@ describe('MultiResourceMock Resource storage', async function () {
   });
 
   it('can add resource', async function () {
-    const id = BigNumber.from(1);
+    const id = bn(1);
 
     await expect(token.addResourceEntry(id, metaURIDefault))
       .to.emit(token, 'ResourceSet')
@@ -54,7 +55,7 @@ describe('MultiResourceMock Resource storage', async function () {
   });
 
   it('cannot get non existing resource', async function () {
-    const id = BigNumber.from(1);
+    const id = bn(1);
     await expect(token.getResource(id)).to.be.revertedWithCustomError(
       token,
       'RMRKNoResourceMatchingId',
@@ -62,7 +63,7 @@ describe('MultiResourceMock Resource storage', async function () {
   });
 
   it('cannot add existing resource', async function () {
-    const id = BigNumber.from(1);
+    const id = bn(1);
 
     await token.addResourceEntry(id, metaURIDefault);
     await expect(token.addResourceEntry(id, 'newMetaUri')).to.be.revertedWithCustomError(
@@ -81,7 +82,7 @@ describe('MultiResourceMock Resource storage', async function () {
   });
 
   it('cannot add same resource twice', async function () {
-    const id = BigNumber.from(1);
+    const id = bn(1);
 
     await expect(token.addResourceEntry(id, metaURIDefault))
       .to.emit(token, 'ResourceSet')
@@ -127,7 +128,7 @@ describe('MultiResourceMock Adding resources to tokens', async function () {
   });
 
   it('cannot add non existing resource to token', async function () {
-    const resId = BigNumber.from(1);
+    const resId = bn(1);
     const tokenId = await mintFromMock(token, tokenOwner.address);
 
     await expect(token.addResourceToToken(tokenId, resId, 0)).to.be.revertedWithCustomError(

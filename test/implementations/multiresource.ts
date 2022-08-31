@@ -6,7 +6,7 @@ import { addResourceToToken } from '../utils';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import shouldBehaveLikeOwnableLock from '../behavior/ownableLock';
 import shouldBehaveLikeMultiResource from '../behavior/multiresource';
-import { mintFromImpl, addResourceEntryFromImpl, ONE_ETH } from '../utils';
+import { bn, mintFromImpl, addResourceEntryFromImpl, ONE_ETH } from '../utils';
 
 async function deployTokenFixture() {
   const Token = await ethers.getContractFactory('RMRKMultiResourceImpl');
@@ -74,8 +74,8 @@ describe('MultiResourceImpl', async () => {
       await token.connect(owner).addResourceEntry(defaultResource1, []);
       await token.connect(owner).addResourceEntry(defaultResource2, []);
 
-      expect(await token.getResource(1)).to.eql([ethers.BigNumber.from(1), defaultResource1]);
-      expect(await token.getResource(2)).to.eql([ethers.BigNumber.from(2), defaultResource2]);
+      expect(await token.getResource(1)).to.eql([bn(1), defaultResource1]);
+      expect(await token.getResource(2)).to.eql([bn(2), defaultResource2]);
     });
 
     describe('token URI', async function () {

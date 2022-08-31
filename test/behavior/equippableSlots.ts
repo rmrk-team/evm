@@ -1,7 +1,7 @@
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { BigNumber, Contract } from 'ethers';
+import { Contract } from 'ethers';
 import {
   partIdForBody,
   partIdForWeapon,
@@ -19,6 +19,7 @@ import {
   backgroundsIds,
   ItemType,
 } from '../setup/equippableSlots';
+import { bn } from '../utils';
 
 // The general idea is having these tokens: Soldier, Weapon, WeaponGem and Background.
 // Weapon and Background can be equipped into Soldier. WeaponGem can be equipped into Weapon
@@ -740,10 +741,6 @@ async function shouldBehaveLikeEquippableWithSlots(
     await weaponEquip.connect(soldierOwner).acceptResource(newWeaponId, 0);
 
     return newWeaponId;
-  }
-
-  function bn(x: number): BigNumber {
-    return BigNumber.from(x);
   }
 }
 

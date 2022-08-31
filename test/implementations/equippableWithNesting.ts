@@ -1,4 +1,4 @@
-import { BigNumber, Contract } from 'ethers';
+import { Contract } from 'ethers';
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
@@ -10,7 +10,7 @@ import shouldBehaveLikeEquippableWithParts from '../behavior/equippableParts';
 import shouldBehaveLikeEquippableWithSlots from '../behavior/equippableSlots';
 import shouldBehaveLikeMultiResource from '../behavior/multiresource';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { mintFromImpl, nestMintFromImpl, ONE_ETH } from '../utils';
+import { bn, mintFromImpl, nestMintFromImpl, ONE_ETH } from '../utils';
 
 // --------------- FIXTURES -----------------------
 
@@ -268,7 +268,7 @@ describe('EquippableImpl with Slots', async () => {
 });
 
 describe('EquippableImpl Resources', async () => {
-  const equippableRefIdDefault = BigNumber.from(1);
+  const equippableRefIdDefault = bn(1);
   const metaURIDefault = 'metaURI';
   const baseAddressDefault = ethers.constants.AddressZero;
   let owner: SignerWithAddress;
@@ -298,7 +298,7 @@ describe('EquippableImpl Resources', async () => {
 
     it('can get token URI when resource is not enumerated', async function () {
       const tokenId = await mintFromImpl(this.nesting, owner.address);
-      const resId = BigNumber.from(1);
+      const resId = bn(1);
       await this.equip.addResourceEntry(
         {
           id: resId,
@@ -316,8 +316,8 @@ describe('EquippableImpl Resources', async () => {
 
     it('can get token URI at specific index', async function () {
       const tokenId = await mintFromImpl(this.nesting, owner.address);
-      const resId = BigNumber.from(1);
-      const resId2 = BigNumber.from(2);
+      const resId = bn(1);
+      const resId2 = bn(2);
 
       await this.equip.addResourceEntry(
         {
