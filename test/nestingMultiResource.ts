@@ -1,80 +1,61 @@
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
 import { Contract } from 'ethers';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
+import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import {
+  addResourceEntryFromMock,
+  addResourceToToken,
+  parentChildFixtureWithArgs,
+  singleFixtureWithArgs,
   mintFromMock,
   nestMintFromMock,
-  transfer,
   nestTransfer,
-  addResourceToToken,
-  addResourceEntryFromMock,
+  transfer,
 } from './utils';
 import shouldBehaveLikeNesting from './behavior/nesting';
 import shouldBehaveLikeMultiResource from './behavior/multiresource';
 
+async function singleFixture(): Promise<Contract> {
+  return singleFixtureWithArgs('RMRKNestingMultiResourceMock', ['NestingMultiResource', 'NMR']);
+}
+
+async function parentChildFixture(): Promise<{ parent: Contract; child: Contract }> {
+  return parentChildFixtureWithArgs(
+    'RMRKNestingMultiResourceMock',
+    ['Chunky', 'CHNK'],
+    ['Monkey', 'MONK'],
+  );
+}
+
 describe('NestingMultiResourceMock Nesting Behavior', function () {
-  async function deployTokensFixture() {
-    const NestingMRFactory = await ethers.getContractFactory('RMRKNestingMultiResourceMock');
-    const ownerChunky = await NestingMRFactory.deploy('Chunky', 'CHNK');
-    await ownerChunky.deployed();
-
-    const petMonkey = await NestingMRFactory.deploy('Monkey', 'MONK');
-    await petMonkey.deployed();
-
-    return { ownerChunky, petMonkey };
-  }
-
   beforeEach(async function () {
-    const { ownerChunky, petMonkey } = await loadFixture(deployTokensFixture);
-    this.parentToken = ownerChunky;
-    this.childToken = petMonkey;
+    const { parent, child } = await loadFixture(parentChildFixture);
+    this.parentToken = parent;
+    this.childToken = child;
   });
 
   shouldBehaveLikeNesting(mintFromMock, nestMintFromMock, transfer, nestTransfer);
 });
 
-// --------------- MULTI RESOURCE BEHAVIOR -----------------------
-
-async function deployTokenFixture() {
-  const Token = await ethers.getContractFactory('RMRKNestingMultiResourceMock');
-  const token = await Token.deploy('NestingMultiResource', 'NMR');
-  await token.deployed();
-  return { token };
-}
-
 describe('NestingMultiResourceMock MR behavior', async () => {
   beforeEach(async function () {
-    const { token } = await loadFixture(deployTokenFixture);
-    this.token = token;
+    this.token = await loadFixture(singleFixture);
   });
 
   shouldBehaveLikeMultiResource(mintFromMock, addResourceEntryFromMock, addResourceToToken);
 });
 
-// --------------- MULTI RESOURCE BEHAVIOR END ------------------------
-
-describe('NestingMultiResourceMock', function () {
+describe('NestingMultiResourceMock Other Behavior', function () {
   let addrs: SignerWithAddress[];
-  let chunky: Contract;
-
-  const name = 'ownerChunky';
-  const symbol = 'CHNKY';
-
-  async function deployTokensFixture() {
-    const CHNKY = await ethers.getContractFactory('RMRKNestingMultiResourceMock');
-    chunky = await CHNKY.deploy(name, symbol);
-    await chunky.deployed();
-    return { chunky };
-  }
+  let token: Contract;
 
   beforeEach(async function () {
     const [, ...signersAddr] = await ethers.getSigners();
     addrs = signersAddr;
 
-    const { chunky } = await loadFixture(deployTokensFixture);
-    this.parentToken = chunky;
+    token = await loadFixture(singleFixture);
+    this.parentToken = token;
   });
 
   describe('Approval Cleaning', async function () {
@@ -83,38 +64,38 @@ describe('NestingMultiResourceMock', function () {
       const tokenOwner = addrs[1];
       const newOwner = addrs[2];
       const approved = addrs[3];
-      await chunky['mint(address,uint256)'](tokenOwner.address, tokenId);
-      await chunky.connect(tokenOwner).approve(approved.address, tokenId);
-      await chunky.connect(tokenOwner).approveForResources(approved.address, tokenId);
+      await token['mint(address,uint256)'](tokenOwner.address, tokenId);
+      await token.connect(tokenOwner).approve(approved.address, tokenId);
+      await token.connect(tokenOwner).approveForResources(approved.address, tokenId);
 
-      expect(await chunky.getApproved(tokenId)).to.eql(approved.address);
-      expect(await chunky.getApprovedForResources(tokenId)).to.eql(approved.address);
+      expect(await token.getApproved(tokenId)).to.eql(approved.address);
+      expect(await token.getApprovedForResources(tokenId)).to.eql(approved.address);
 
-      await chunky.connect(tokenOwner).transfer(newOwner.address, tokenId);
+      await token.connect(tokenOwner).transfer(newOwner.address, tokenId);
 
-      expect(await chunky.getApproved(tokenId)).to.eql(ethers.constants.AddressZero);
-      expect(await chunky.getApprovedForResources(tokenId)).to.eql(ethers.constants.AddressZero);
+      expect(await token.getApproved(tokenId)).to.eql(ethers.constants.AddressZero);
+      expect(await token.getApprovedForResources(tokenId)).to.eql(ethers.constants.AddressZero);
     });
 
     it('cleans token and resources approvals on burn', async function () {
       const tokenId = 1;
       const tokenOwner = addrs[1];
       const approved = addrs[3];
-      await chunky['mint(address,uint256)'](tokenOwner.address, tokenId);
-      await chunky.connect(tokenOwner).approve(approved.address, tokenId);
-      await chunky.connect(tokenOwner).approveForResources(approved.address, tokenId);
+      await token['mint(address,uint256)'](tokenOwner.address, tokenId);
+      await token.connect(tokenOwner).approve(approved.address, tokenId);
+      await token.connect(tokenOwner).approveForResources(approved.address, tokenId);
 
-      expect(await chunky.getApproved(tokenId)).to.eql(approved.address);
-      expect(await chunky.getApprovedForResources(tokenId)).to.eql(approved.address);
+      expect(await token.getApproved(tokenId)).to.eql(approved.address);
+      expect(await token.getApprovedForResources(tokenId)).to.eql(approved.address);
 
-      await chunky.connect(tokenOwner).burn(tokenId);
+      await token.connect(tokenOwner).burn(tokenId);
 
-      await expect(chunky.getApproved(tokenId)).to.be.revertedWithCustomError(
-        chunky,
+      await expect(token.getApproved(tokenId)).to.be.revertedWithCustomError(
+        token,
         'ERC721InvalidTokenId',
       );
-      await expect(chunky.getApprovedForResources(tokenId)).to.be.revertedWithCustomError(
-        chunky,
+      await expect(token.getApprovedForResources(tokenId)).to.be.revertedWithCustomError(
+        token,
         'ERC721InvalidTokenId',
       );
     });
@@ -123,22 +104,22 @@ describe('NestingMultiResourceMock', function () {
   describe('token URI', async function () {
     it('can get token URI', async function () {
       const tokenOwner = addrs[1];
-      const resId = await addResourceEntryFromMock(chunky, 'uri1');
-      const resId2 = await addResourceEntryFromMock(chunky, 'uri2');
-      const tokenId = await mintFromMock(chunky, tokenOwner.address);
+      const resId = await addResourceEntryFromMock(token, 'uri1');
+      const resId2 = await addResourceEntryFromMock(token, 'uri2');
+      const tokenId = await mintFromMock(token, tokenOwner.address);
 
-      await chunky.addResourceToToken(tokenId, resId, 0);
-      await chunky.addResourceToToken(tokenId, resId2, 0);
-      await chunky.connect(tokenOwner).acceptResource(tokenId, 0);
-      await chunky.connect(tokenOwner).acceptResource(tokenId, 0);
-      expect(await chunky.tokenURI(tokenId)).to.eql('uri1');
+      await token.addResourceToToken(tokenId, resId, 0);
+      await token.addResourceToToken(tokenId, resId2, 0);
+      await token.connect(tokenOwner).acceptResource(tokenId, 0);
+      await token.connect(tokenOwner).acceptResource(tokenId, 0);
+      expect(await token.tokenURI(tokenId)).to.eql('uri1');
     });
 
     it('cannot get token URI if token has no resources', async function () {
       const tokenOwner = addrs[1];
-      const tokenId = await mintFromMock(chunky, tokenOwner.address);
-      await expect(chunky.tokenURI(tokenId)).to.be.revertedWithCustomError(
-        chunky,
+      const tokenId = await mintFromMock(token, tokenOwner.address);
+      await expect(token.tokenURI(tokenId)).to.be.revertedWithCustomError(
+        token,
         'RMRKIndexOutOfRange',
       );
     });

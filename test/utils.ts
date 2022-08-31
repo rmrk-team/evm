@@ -94,6 +94,28 @@ async function addResourceEntryEquippables(token: Contract, data?: string): Prom
   return resourceId;
 }
 
+async function singleFixtureWithArgs(contractName: string, args: any[]): Promise<Contract> {
+  const factory = await ethers.getContractFactory(contractName);
+  const token = await factory.deploy(...args);
+  await token.deployed();
+  return token;
+}
+
+async function parentChildFixtureWithArgs(
+  contractName: string,
+  parentArgs: any[],
+  childArgs: any[],
+): Promise<{ parent: Contract; child: Contract }> {
+  const factory = await ethers.getContractFactory(contractName);
+
+  const parent = await factory.deploy(...parentArgs);
+  await parent.deployed();
+  const child = await factory.deploy(...childArgs);
+  await child.deployed();
+
+  return { parent, child };
+}
+
 export {
   addResourceEntryEquippables,
   addResourceEntryFromImpl,
@@ -106,5 +128,7 @@ export {
   nestMintFromMock,
   nestTransfer,
   ONE_ETH,
+  parentChildFixtureWithArgs,
+  singleFixtureWithArgs,
   transfer,
 };

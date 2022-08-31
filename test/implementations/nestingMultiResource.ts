@@ -1,73 +1,63 @@
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
 import { Contract } from 'ethers';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
+import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { transfer, nestTransfer, addResourceToToken, addResourceEntryFromImpl } from '../utils';
 import shouldBehaveLikeNesting from '../behavior/nesting';
 import shouldBehaveLikeMultiResource from '../behavior/multiresource';
-import { mintFromImpl, nestMintFromImpl, ONE_ETH } from '../utils';
+import {
+  singleFixtureWithArgs,
+  parentChildFixtureWithArgs,
+  mintFromImpl,
+  nestMintFromImpl,
+  ONE_ETH,
+} from '../utils';
+
+async function singleFixture(): Promise<Contract> {
+  return singleFixtureWithArgs('RMRKNestingMultiResourceImpl', [
+    'NestingMultiResource',
+    'NMR',
+    10000,
+    ONE_ETH,
+  ]);
+}
+
+async function parentChildFixture(): Promise<{ parent: Contract; child: Contract }> {
+  return parentChildFixtureWithArgs(
+    'RMRKNestingMultiResourceImpl',
+    ['Chunky', 'CHNK', 10000, ONE_ETH],
+    ['Monkey', 'MONK', 10000, ONE_ETH],
+  );
+}
 
 describe('NestingMultiResourceImpl Nesting Behavior', function () {
-  async function deployTokensFixture() {
-    const NestingMRFactory = await ethers.getContractFactory('RMRKNestingMultiResourceImpl');
-    const ownerChunky = await NestingMRFactory.deploy('Chunky', 'CHNK', 10000, ONE_ETH);
-    await ownerChunky.deployed();
-
-    const petMonkey = await NestingMRFactory.deploy('Monkey', 'MONK', 10000, ONE_ETH);
-    await petMonkey.deployed();
-
-    return { ownerChunky, petMonkey };
-  }
-
   beforeEach(async function () {
-    const { ownerChunky, petMonkey } = await loadFixture(deployTokensFixture);
-    this.parentToken = ownerChunky;
-    this.childToken = petMonkey;
+    const { parent, child } = await loadFixture(parentChildFixture);
+    this.parentToken = parent;
+    this.childToken = child;
   });
 
   shouldBehaveLikeNesting(mintFromImpl, nestMintFromImpl, transfer, nestTransfer);
 });
 
-// --------------- MULTI RESOURCE BEHAVIOR -----------------------
-
-async function deployTokenFixture() {
-  const Token = await ethers.getContractFactory('RMRKNestingMultiResourceImpl');
-  const token = await Token.deploy('NestingMultiResource', 'NMR', 10000, ONE_ETH);
-  await token.deployed();
-  return { token };
-}
-
 describe('NestingMultiResourceImpl MR behavior', async () => {
   beforeEach(async function () {
-    const { token } = await loadFixture(deployTokenFixture);
-    this.token = token;
+    this.token = await loadFixture(singleFixture);
   });
 
   shouldBehaveLikeMultiResource(mintFromImpl, addResourceEntryFromImpl, addResourceToToken);
 });
 
-// --------------- MULTI RESOURCE BEHAVIOR END ------------------------
-
-describe('NestingMultiResourceImpl', function () {
+describe('NestingMultiResourceImpl Other Behavior', function () {
   let addrs: SignerWithAddress[];
   let chunky: Contract;
-
-  const name = 'ownerChunky';
-  const symbol = 'CHNKY';
-
-  async function deployTokensFixture() {
-    const CHNKY = await ethers.getContractFactory('RMRKNestingMultiResourceImpl');
-    chunky = await CHNKY.deploy(name, symbol, 10000, ONE_ETH);
-    await chunky.deployed();
-    return { chunky };
-  }
 
   beforeEach(async function () {
     const [, ...signersAddr] = await ethers.getSigners();
     addrs = signersAddr;
 
-    const { chunky } = await loadFixture(deployTokensFixture);
+    chunky = await loadFixture(singleFixture);
     this.parentToken = chunky;
   });
 

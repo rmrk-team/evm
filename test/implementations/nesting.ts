@@ -1,50 +1,48 @@
 import { ethers } from 'hardhat';
 import { Contract } from 'ethers';
+import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { transfer, nestTransfer } from '../utils';
 import shouldBehaveLikeNesting from '../behavior/nesting';
-import shouldBehaveLikeERC721 from '../behavior/erc721';
-import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import { mintFromImpl, nestMintFromImpl, ONE_ETH } from '../utils';
+// import shouldBehaveLikeERC721 from '../behavior/erc721';
+import {
+  singleFixtureWithArgs,
+  parentChildFixtureWithArgs,
+  mintFromImpl,
+  nestMintFromImpl,
+  ONE_ETH,
+} from '../utils';
+
+async function singleFixture(): Promise<Contract> {
+  return singleFixtureWithArgs('RMRKNestingImpl', ['RMRK Test', 'RMRKTST', 10000, ONE_ETH]);
+}
+
+async function parentChildFixture(): Promise<{ parent: Contract; child: Contract }> {
+  return parentChildFixtureWithArgs(
+    'RMRKNestingImpl',
+    ['Chunky', 'CHNK', 10000, ONE_ETH],
+    ['Monkey', 'MONK', 10000, ONE_ETH],
+  );
+}
 
 describe('NestingMultiResourceImpl Nesting Behavior', function () {
-  async function deployTokensFixture() {
-    const NestingMRFactory = await ethers.getContractFactory('RMRKNestingImpl');
-    const ownerChunky = await NestingMRFactory.deploy('Chunky', 'CHNK', 10000, ONE_ETH);
-    await ownerChunky.deployed();
-
-    const petMonkey = await NestingMRFactory.deploy('Monkey', 'MONK', 10000, ONE_ETH);
-    await petMonkey.deployed();
-
-    return { ownerChunky, petMonkey };
-  }
-
   beforeEach(async function () {
-    const { ownerChunky, petMonkey } = await loadFixture(deployTokensFixture);
-    this.parentToken = ownerChunky;
-    this.childToken = petMonkey;
+    const { parent, child } = await loadFixture(parentChildFixture);
+    this.parentToken = parent;
+    this.childToken = child;
   });
 
   shouldBehaveLikeNesting(mintFromImpl, nestMintFromImpl, transfer, nestTransfer);
 });
 
-// describe('NestingImpl ERC721 behavior', function () {
-//   let token: Contract;
+// FIXME: This test don't fully pass due to difference in minting
+describe('NestingImpl ERC721 behavior', function () {
+  let token: Contract;
 
-//   const name = 'RmrkTest';
-//   const symbol = 'RMRKTST';
+  beforeEach(async function () {
+    token = await loadFixture(singleFixture);
+    this.token = token;
+    this.ERC721Receiver = await ethers.getContractFactory('ERC721ReceiverMock');
+  });
 
-//   async function erc721NestingFixture() {
-//     const Token = await ethers.getContractFactory('RMRKNestingImpl');
-//     const tokenContract = await Token.deploy(name, symbol, 10000, ONE_ETH);
-//     await tokenContract.deployed();
-//     return tokenContract;
-//   }
-
-//   beforeEach(async function () {
-//     token = await loadFixture(erc721NestingFixture);
-//     this.token = token;
-//     this.ERC721Receiver = await ethers.getContractFactory('ERC721ReceiverMock');
-//   });
-
-//   shouldBehaveLikeERC721(name, symbol);
-// });
+  // shouldBehaveLikeERC721(name, symbol);
+});

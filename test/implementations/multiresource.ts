@@ -1,21 +1,18 @@
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { Contract } from 'ethers';
+import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { addResourceToToken } from '../utils';
-import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import shouldBehaveLikeOwnableLock from '../behavior/ownableLock';
 import shouldBehaveLikeMultiResource from '../behavior/multiresource';
-import { bn, mintFromImpl, addResourceEntryFromImpl, ONE_ETH } from '../utils';
+import { bn, singleFixtureWithArgs, mintFromImpl, addResourceEntryFromImpl, ONE_ETH } from '../utils';
 
-async function deployTokenFixture() {
-  const Token = await ethers.getContractFactory('RMRKMultiResourceImpl');
-  const token = await Token.deploy('MultiResource', 'MR', 10000, ONE_ETH);
-  await token.deployed();
-  return { token };
+async function singleFixture(): Promise<Contract> {
+  return singleFixtureWithArgs('RMRKMultiResourceImpl', ['MultiResource', 'MR', 10000, ONE_ETH]);
 }
 
-describe('MultiResourceImpl', async () => {
+describe('MultiResourceImpl Other Behavior', async () => {
   let token: Contract;
 
   let owner: SignerWithAddress;
@@ -34,7 +31,7 @@ describe('MultiResourceImpl', async () => {
 
   describe('Deployment', async function () {
     beforeEach(async function () {
-      ({ token } = await loadFixture(deployTokenFixture));
+      token = await loadFixture(singleFixture);
       this.token = token;
     });
 
@@ -133,15 +130,10 @@ describe('MultiResourceImpl', async () => {
   });
 });
 
-// --------------- MULTI RESOURCE BEHAVIOR -----------------------
-
 describe('MultiResourceImpl MR behavior', async () => {
   beforeEach(async function () {
-    const { token } = await loadFixture(deployTokenFixture);
-    this.token = token;
+    this.token = await loadFixture(singleFixture);
   });
 
   shouldBehaveLikeMultiResource(mintFromImpl, addResourceEntryFromImpl, addResourceToToken);
 });
-
-// --------------- MULTI RESOURCE BEHAVIOR END ------------------------

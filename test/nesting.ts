@@ -1,38 +1,40 @@
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { Contract } from 'ethers';
+import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { mintFromMock, nestMintFromMock, transfer, nestTransfer } from './utils';
 import shouldBehaveLikeNesting from './behavior/nesting';
 import shouldBehaveLikeERC721 from './behavior/erc721';
-import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
+import { singleFixtureWithArgs, parentChildFixtureWithArgs } from './utils';
+
+const parentName = 'ownerChunky';
+const parentSymbol = 'CHNKY';
+
+const childName = 'petMonkey';
+const childSymbol = 'MONKE';
+
+async function singleFixture(): Promise<Contract> {
+  return singleFixtureWithArgs('RMRKNestingMock', [parentName, parentSymbol]);
+}
+
+async function parentChildFixture(): Promise<{ parent: Contract; child: Contract }> {
+  return parentChildFixtureWithArgs(
+    'RMRKNestingMock',
+    [parentName, parentSymbol],
+    [childName, childSymbol],
+  );
+}
 
 describe('NestingMock', function () {
   let parent: Contract;
   let child: Contract;
   let owner: SignerWithAddress;
 
-  const name = 'ownerChunky';
-  const symbol = 'CHNKY';
-
-  const name2 = 'petMonkey';
-  const symbol2 = 'MONKE';
-
-  async function nestingFixture() {
-    const NestingFactory = await ethers.getContractFactory('RMRKNestingMock');
-    parent = await NestingFactory.deploy(name, symbol);
-    await parent.deployed();
-
-    child = await NestingFactory.deploy(name2, symbol2);
-    await child.deployed();
-
-    return { parent, child };
-  }
-
   beforeEach(async function () {
     owner = (await ethers.getSigners())[0];
 
-    const { parent, child } = await loadFixture(nestingFixture);
+    ({ parent, child } = await loadFixture(parentChildFixture));
     this.parentToken = parent;
     this.childToken = child;
   });
@@ -41,13 +43,13 @@ describe('NestingMock', function () {
 
   describe('Init', async function () {
     it('Name', async function () {
-      expect(await parent.name()).to.equal(name);
-      expect(await child.name()).to.equal(name2);
+      expect(await parent.name()).to.equal(parentName);
+      expect(await child.name()).to.equal(childName);
     });
 
     it('Symbol', async function () {
-      expect(await parent.symbol()).to.equal(symbol);
-      expect(await child.symbol()).to.equal(symbol2);
+      expect(await parent.symbol()).to.equal(parentSymbol);
+      expect(await child.symbol()).to.equal(childSymbol);
     });
   });
 
@@ -82,21 +84,11 @@ describe('NestingMock', function () {
 describe('NestingMock ERC721 behavior', function () {
   let token: Contract;
 
-  const name = 'RmrkTest';
-  const symbol = 'RMRKTST';
-
-  async function erc721NestingFixture() {
-    const Token = await ethers.getContractFactory('RMRKNestingMock');
-    const tokenContract = await Token.deploy(name, symbol);
-    await tokenContract.deployed();
-    return tokenContract;
-  }
-
   beforeEach(async function () {
-    token = await loadFixture(erc721NestingFixture);
+    token = await loadFixture(singleFixture);
     this.token = token;
     this.ERC721Receiver = await ethers.getContractFactory('ERC721ReceiverMock');
   });
 
-  shouldBehaveLikeERC721(name, symbol);
+  shouldBehaveLikeERC721(parentName, parentSymbol);
 });
