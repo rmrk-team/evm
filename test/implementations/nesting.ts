@@ -44,7 +44,6 @@ describe('NestingMultiResourceImpl Nesting Behavior', function () {
 //     token = await loadFixture(erc721NestingFixture);
 //     this.token = token;
 //     this.ERC721Receiver = await ethers.getContractFactory('ERC721ReceiverMock');
-//     this.commonERC721 = await ethers.getContractFactory('ERC721Mock');
 //   });
 
 //   shouldBehaveLikeERC721(name, symbol);
