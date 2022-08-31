@@ -53,7 +53,15 @@ async function partsFixture() {
   maskEquip.setNestingAddress(mask.address);
   mask.setEquippableAddress(maskEquip.address);
 
-  await setupContextForParts(base, neon, neonEquip, mask, maskEquip, mintFromMock, nestMintFromMock);
+  await setupContextForParts(
+    base,
+    neon,
+    neonEquip,
+    mask,
+    maskEquip,
+    mintFromMock,
+    nestMintFromMock,
+  );
   return { base, neon, neonEquip, mask, maskEquip };
 }
 

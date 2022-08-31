@@ -1,10 +1,9 @@
-import { ethers } from "hardhat"
-import { Contract } from "ethers"
+import { ethers } from 'hardhat';
+import { Contract } from 'ethers';
 import { mintFromMock, nestMintFromMock, transfer, nestTransfer } from './utils';
-import shouldBehaveLikeNesting from "./behavior/nesting"
-import shouldBehaveLikeERC721 from "./behavior/erc721"
-import { loadFixture } from "@nomicfoundation/hardhat-network-helpers"
-
+import shouldBehaveLikeNesting from './behavior/nesting';
+import shouldBehaveLikeERC721 from './behavior/erc721';
+import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 
 describe('NestingWithEquippableMock Nesting Behavior', function () {
   const name = 'ownerChunky';

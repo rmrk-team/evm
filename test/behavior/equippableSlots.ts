@@ -58,7 +58,6 @@ async function shouldBehaveLikeEquippableWithSlots(
   });
 
   describe('Validations', async function () {
-
     it('can validate equips of weapons into soldiers', async function () {
       // This resource is not equippable
       expect(

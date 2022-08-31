@@ -15,7 +15,7 @@ import {
   neonResIds,
   maskResourcesEquip,
   maskEquippableRefId,
-} from '../setup/equippableParts'
+} from '../setup/equippableParts';
 
 // The general idea is having these tokens: Neon and Mask
 // Masks can be equipped into Neons.
