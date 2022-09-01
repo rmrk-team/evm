@@ -45,36 +45,6 @@ contract RMRKEquippableWithNesting is Context, IRMRKEquippableWithNesting {
     using RMRKLib for uint128[];
     using Strings for uint256;
 
-    struct Equipment {
-        uint64 resourceId;
-        uint64 childResourceId;
-        uint256 childTokenId;
-        address childEquippableAddress;
-    }
-
-    struct ExtendedResource {
-        // Used for input/output only
-        uint64 id; // ID of this resource
-        uint64 equippableRefId;
-        address baseAddress;
-        string metadataURI;
-    }
-
-    struct FixedPart {
-        uint64 partId;
-        uint8 z; //1 byte
-        string metadataURI; //n bytes 32+
-    }
-
-    struct SlotPart {
-        uint64 partId;
-        uint64 childResourceId;
-        uint8 z; //1 byte
-        uint256 childTokenId;
-        address childAddress;
-        string metadataURI; //n bytes 32+
-    }
-
     // ------------------- RESOURCES --------------
     //mapping of uint64 Ids to resource object
     mapping(uint64 => string) internal _resources;
