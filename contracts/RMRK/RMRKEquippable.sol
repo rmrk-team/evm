@@ -683,7 +683,7 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
     // --------------------- Getting Extended Resources ---------------------
 
     function getExtendedResource(uint64 resourceId)
-        public
+        external
         view
         virtual
         returns (ExtendedResource memory)
@@ -697,26 +697,6 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
                 baseAddress: _baseAddresses[resource.id],
                 metadataURI: resource.metadataURI
             });
-    }
-
-    function getExtendedResObjectByIndex(uint256 tokenId, uint256 index)
-        external
-        view
-        virtual
-        returns (ExtendedResource memory)
-    {
-        uint64 resourceId = getActiveResources(tokenId)[index];
-        return getExtendedResource(resourceId);
-    }
-
-    function getPendingExtendedResObjectByIndex(uint256 tokenId, uint256 index)
-        external
-        view
-        virtual
-        returns (ExtendedResource memory)
-    {
-        uint64 resourceId = getPendingResources(tokenId)[index];
-        return getExtendedResource(resourceId);
     }
 
     ////////////////////////////////////////

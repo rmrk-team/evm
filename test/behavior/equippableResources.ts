@@ -201,13 +201,6 @@ async function shouldBehaveLikeEquippableResources(
           [resId2, equippableRefIdDefault, baseAddressDefault, metaURIDefault],
         ]);
       }
-
-      expect(await chunkyEquip.getPendingExtendedResObjectByIndex(tokenId, 0)).to.eql([
-        resId,
-        equippableRefIdDefault,
-        baseAddressDefault,
-        metaURIDefault,
-      ]);
     });
 
     it('cannot add non existing resource to token', async function () {
@@ -296,13 +289,6 @@ async function shouldBehaveLikeEquippableResources(
           [resId, equippableRefIdDefault, baseAddressDefault, metaURIDefault],
         ]);
       }
-
-      expect(await chunkyEquip.getExtendedResObjectByIndex(tokenId, 0)).to.eql([
-        resId,
-        equippableRefIdDefault,
-        baseAddressDefault,
-        metaURIDefault,
-      ]);
     });
 
     it('can accept multiple resources', async function () {
