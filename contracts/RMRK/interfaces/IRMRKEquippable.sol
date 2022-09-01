@@ -47,6 +47,36 @@ interface IRMRKEquippable is IRMRKMultiResource {
         uint256 childTokenId
     ) external view returns (bool);
 
+    struct Equipment {
+        uint64 resourceId;
+        uint64 childResourceId;
+        uint256 childTokenId;
+        address childEquippableAddress;
+    }
+
+    struct ExtendedResource {
+        // Used for input/output only
+        uint64 id; // ID of this resource
+        uint64 equippableRefId;
+        address baseAddress;
+        string metadataURI;
+    }
+
+    struct FixedPart {
+        uint64 partId;
+        uint8 z; //1 byte
+        string metadataURI; //n bytes 32+
+    }
+
+    struct SlotPart {
+        uint64 partId;
+        uint64 childResourceId;
+        uint8 z; //1 byte
+        uint256 childTokenId;
+        address childAddress;
+        string metadataURI; //n bytes 32+
+    }
+
     /**
      * @dev Returns whether or not tokenId with resourceId can be equipped into parent contract at slot
      *
