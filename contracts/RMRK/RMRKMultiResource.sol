@@ -615,7 +615,7 @@ contract RMRKMultiResource is
         return getResource(resourceId);
     }
 
-    function getResourcesById(uint64[] memory resourceIds)
+    function getResourcesById(uint64[] calldata resourceIds)
         public
         view
         virtual
@@ -694,7 +694,7 @@ contract RMRKMultiResource is
         _rejectAllResources(tokenId);
     }
 
-    function setPriority(uint256 tokenId, uint16[] memory priorities)
+    function setPriority(uint256 tokenId, uint16[] calldata priorities)
         external
         virtual
         onlyApprovedForResourcesOrOwner(tokenId)

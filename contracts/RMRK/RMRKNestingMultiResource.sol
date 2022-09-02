@@ -142,7 +142,7 @@ contract RMRKNestingMultiResource is RMRKNesting, IRMRKMultiResource {
         return getResource(resourceId);
     }
 
-    function getResourcesById(uint64[] memory resourceIds)
+    function getResourcesById(uint64[] calldata resourceIds)
         public
         view
         virtual
@@ -221,7 +221,7 @@ contract RMRKNestingMultiResource is RMRKNesting, IRMRKMultiResource {
         _rejectAllResources(tokenId);
     }
 
-    function setPriority(uint256 tokenId, uint16[] memory priorities)
+    function setPriority(uint256 tokenId, uint16[] calldata priorities)
         external
         virtual
         onlyApprovedForResourcesOrOwner(tokenId)
@@ -273,7 +273,7 @@ contract RMRKNestingMultiResource is RMRKNesting, IRMRKMultiResource {
         emit ResourceRejected(tokenId, uint64(0));
     }
 
-    function _setPriority(uint256 tokenId, uint16[] memory priorities)
+    function _setPriority(uint256 tokenId, uint16[] calldata priorities)
         internal
     {
         uint256 length = priorities.length;

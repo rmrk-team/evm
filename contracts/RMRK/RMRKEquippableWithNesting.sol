@@ -205,7 +205,7 @@ contract RMRKEquippableWithNesting is Context, IRMRKEquippableWithNesting {
         return getResource(resourceId);
     }
 
-    function getResourcesById(uint64[] memory resourceIds)
+    function getResourcesById(uint64[] calldata resourceIds)
         public
         view
         virtual
@@ -284,7 +284,7 @@ contract RMRKEquippableWithNesting is Context, IRMRKEquippableWithNesting {
         _rejectAllResources(tokenId);
     }
 
-    function setPriority(uint256 tokenId, uint16[] memory priorities)
+    function setPriority(uint256 tokenId, uint16[] calldata priorities)
         external
         virtual
         onlyApprovedForResourcesOrOwner(tokenId)
@@ -336,7 +336,7 @@ contract RMRKEquippableWithNesting is Context, IRMRKEquippableWithNesting {
         emit ResourceRejected(tokenId, uint64(0));
     }
 
-    function _setPriority(uint256 tokenId, uint16[] memory priorities)
+    function _setPriority(uint256 tokenId, uint16[] calldata priorities)
         internal
     {
         uint256 length = priorities.length;
@@ -736,8 +736,8 @@ contract RMRKEquippableWithNesting is Context, IRMRKEquippableWithNesting {
 
     function _addResourceEntry(
         ExtendedResource memory resource,
-        uint64[] memory fixedPartIds,
-        uint64[] memory slotPartIds
+        uint64[] calldata fixedPartIds,
+        uint64[] calldata slotPartIds
     ) internal {
         uint64 id = resource.id;
 
