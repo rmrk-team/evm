@@ -509,31 +509,19 @@ contract RMRKEquippableWithNesting is Context, IRMRKEquippableWithNesting {
 
     // ------------------------------- EQUIPPING ------------------------------
 
-    function equip(
-        uint256 tokenId,
-        uint64 resourceId,
-        uint64 slotPartId,
-        uint256 childIndex,
-        uint64 childResourceId
-    ) external onlyApprovedOrOwner(tokenId) {
-        _equip(tokenId, resourceId, slotPartId, childIndex, childResourceId);
+    function equip(IntakeEquip memory data) external onlyApprovedOrOwner(data.tokenId) {
+        _equip(data);
     }
 
-    function _equip(
-        uint256 tokenId,
-        uint64 resourceId,
-        uint64 slotPartId,
-        uint256 childIndex,
-        uint64 childResourceId
-    ) private {
+    function _equip(IntakeEquip memory data) private {
         if (
-            _equipments[tokenId][_baseAddresses[resourceId]][slotPartId]
+            _equipments[data.tokenId][_baseAddresses[data.resourceId]][data.slotPartId]
                 .childEquippableAddress != address(0)
         ) revert RMRKSlotAlreadyUsed();
 
         IRMRKNesting.Child memory child = IRMRKNesting(_nestingAddress).childOf(
-            tokenId,
-            childIndex
+            data.tokenId,
+            data.childIndex
         );
         address childEquippable = IRMRKNestingWithEquippable(
             child.contractAddress
@@ -545,46 +533,41 @@ contract RMRKEquippableWithNesting is Context, IRMRKEquippableWithNesting {
                 .canTokenBeEquippedWithResourceIntoSlot(
                     address(this),
                     child.tokenId,
-                    childResourceId,
-                    slotPartId
+                    data.childResourceId,
+                    data.slotPartId
                 )
         ) revert RMRKTokenCannotBeEquippedWithResourceIntoSlot();
 
         // Check from base perspective
         if (
-            !_validateBaseEquip(
-                _baseAddresses[resourceId],
-                childEquippable,
-                slotPartId
+            !IRMRKBaseStorage(_baseAddresses[data.resourceId]).checkIsEquippable(
+                data.slotPartId,
+                childEquippable
             )
         ) revert RMRKEquippableEquipNotAllowedByBase();
 
         Equipment memory newEquip = Equipment({
-            resourceId: resourceId,
-            childResourceId: childResourceId,
+            resourceId: data.resourceId,
+            childResourceId: data.childResourceId,
             childTokenId: child.tokenId,
             childEquippableAddress: childEquippable
         });
 
-        _equipments[tokenId][_baseAddresses[resourceId]][slotPartId] = newEquip;
-        _equipCountPerChild[tokenId][child.contractAddress][child.tokenId] += 1;
+        _equipments[data.tokenId][_baseAddresses[data.resourceId]][data.slotPartId] = newEquip;
+        _equipCountPerChild[data.tokenId][child.contractAddress][child.tokenId] += 1;
 
         // TODO: When replacing, this event is emmited in the middle (bad practice). Shall we change it?
         emit ChildResourceEquipped(
-            tokenId,
-            resourceId,
-            slotPartId,
+            data.tokenId,
+            data.resourceId,
+            data.slotPartId,
             child.tokenId,
             childEquippable,
-            childResourceId
+            data.childResourceId
         );
     }
 
-    function unequip(
-        uint256 tokenId,
-        uint64 resourceId,
-        uint64 slotPartId
-    ) external onlyApprovedOrOwner(tokenId) {
+    function unequip(uint256 tokenId, uint64 resourceId, uint64 slotPartId) external onlyApprovedOrOwner(tokenId) {
         _unequip(tokenId, resourceId, slotPartId);
     }
 
@@ -618,14 +601,10 @@ contract RMRKEquippableWithNesting is Context, IRMRKEquippableWithNesting {
     }
 
     function replaceEquipment(
-        uint256 tokenId,
-        uint64 resourceId,
-        uint64 slotPartId,
-        uint256 childIndex,
-        uint64 childResourceId
-    ) external onlyApprovedOrOwner(tokenId) {
-        _unequip(tokenId, resourceId, slotPartId);
-        _equip(tokenId, resourceId, slotPartId, childIndex, childResourceId);
+        IntakeEquip memory data
+    ) external onlyApprovedOrOwner(data.tokenId) {
+        _unequip(data.tokenId, data.resourceId, data.slotPartId);
+        _equip(data);
     }
 
     function isChildEquipped(
@@ -754,18 +733,6 @@ contract RMRKEquippableWithNesting is Context, IRMRKEquippableWithNesting {
     ) internal {
         _validParentSlots[referenceId][parentAddress] = slotPartId;
         emit ValidParentReferenceIdSet(referenceId, slotPartId, parentAddress);
-    }
-
-    // Checks on the base contract that the child can go into the part id
-    function _validateBaseEquip(
-        address baseContract,
-        address childContract,
-        uint64 partId
-    ) private view returns (bool isEquippable) {
-        isEquippable = IRMRKBaseStorage(baseContract).checkIsEquippable(
-            partId,
-            childContract
-        );
     }
 
     function canTokenBeEquippedWithResourceIntoSlot(

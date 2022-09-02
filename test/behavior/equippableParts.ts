@@ -49,7 +49,7 @@ async function shouldBehaveLikeEquippableWithParts() {
       await expect(
         neonEquipContract
           .connect(addrs[0])
-          .equip(neons[0], neonResIds[0], partIdForMask, childIndex, weaponResId),
+          .equip([neons[0], childIndex, neonResIds[0], partIdForMask, weaponResId]),
       )
         .to.emit(neonEquipContract, 'ChildResourceEquipped')
         .withArgs(
@@ -84,7 +84,7 @@ async function shouldBehaveLikeEquippableWithParts() {
       await expect(
         neonEquipContract
           .connect(addrs[0])
-          .equip(neons[0], neonResIds[0], partIdForMask, badChildIndex, weaponResId),
+          .equip([neons[0], badChildIndex, neonResIds[0], partIdForMask, weaponResId]),
       ).to.be.reverted; // Bad index
     });
   });
@@ -95,7 +95,7 @@ async function shouldBehaveLikeEquippableWithParts() {
       const weaponResId = maskResourcesEquip[0]; // This resource is assigned to weapon first weapon
       await neonEquipContract
         .connect(addrs[0])
-        .equip(neons[0], neonResIds[0], partIdForMask, childIndex, weaponResId);
+        .equip([neons[0], childIndex, neonResIds[0], partIdForMask, weaponResId]);
 
       const expectedResource = [
         bn(neonResIds[0]), // id
