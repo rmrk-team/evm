@@ -464,17 +464,24 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
         super.unnestChild(tokenId, index, to);
     }
 
-    function equip(IntakeEquip memory data) external onlyApprovedOrOwner(data.tokenId) {
+    function equip(IntakeEquip memory data)
+        external
+        onlyApprovedOrOwner(data.tokenId)
+    {
         _equip(data);
     }
 
     function _equip(IntakeEquip memory data) private {
         if (
-            _equipments[data.tokenId][_baseAddresses[data.resourceId]][data.slotPartId]
-                .childEquippableAddress != address(0)
+            _equipments[data.tokenId][_baseAddresses[data.resourceId]][
+                data.slotPartId
+            ].childEquippableAddress != address(0)
         ) revert RMRKSlotAlreadyUsed();
 
-        IRMRKNesting.Child memory child = childOf(data.tokenId, data.childIndex);
+        IRMRKNesting.Child memory child = childOf(
+            data.tokenId,
+            data.childIndex
+        );
 
         // Check from child perspective intention to be used in part
         if (
@@ -489,10 +496,8 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
 
         // Check from base perspective
         if (
-            !IRMRKBaseStorage(_baseAddresses[data.resourceId]).checkIsEquippable(
-                data.slotPartId,
-                child.contractAddress
-            )
+            !IRMRKBaseStorage(_baseAddresses[data.resourceId])
+                .checkIsEquippable(data.slotPartId, child.contractAddress)
         ) revert RMRKEquippableEquipNotAllowedByBase();
 
         Equipment memory newEquip = Equipment({
@@ -502,8 +507,12 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
             childEquippableAddress: child.contractAddress
         });
 
-        _equipments[data.tokenId][_baseAddresses[data.resourceId]][data.slotPartId] = newEquip;
-        _equipCountPerChild[data.tokenId][child.contractAddress][child.tokenId] += 1;
+        _equipments[data.tokenId][_baseAddresses[data.resourceId]][
+            data.slotPartId
+        ] = newEquip;
+        _equipCountPerChild[data.tokenId][child.contractAddress][
+            child.tokenId
+        ] += 1;
 
         // TODO: When replacing, this event is emmited in the middle (bad practice). Shall we change it?
         emit ChildResourceEquipped(
@@ -516,7 +525,11 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
         );
     }
 
-    function unequip(uint256 tokenId, uint64 resourceId, uint64 slotPartId) external onlyApprovedOrOwner(tokenId) {
+    function unequip(
+        uint256 tokenId,
+        uint64 resourceId,
+        uint64 slotPartId
+    ) external onlyApprovedOrOwner(tokenId) {
         _unequip(tokenId, resourceId, slotPartId);
     }
 
@@ -546,9 +559,10 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
         );
     }
 
-    function replaceEquipment(
-        IntakeEquip memory data
-    ) external onlyApprovedOrOwner(data.tokenId) {
+    function replaceEquipment(IntakeEquip memory data)
+        external
+        onlyApprovedOrOwner(data.tokenId)
+    {
         _unequip(data.tokenId, data.resourceId, data.slotPartId);
         _equip(data);
     }
@@ -568,7 +582,8 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
         view
         returns (uint64[] memory slotParts, Equipment[] memory childrenEquipped)
     {
-        return _views.getEquipped(tokenId, resourceId, _baseAddresses[resourceId]);
+        return
+            _views.getEquipped(tokenId, resourceId, _baseAddresses[resourceId]);
     }
 
     //Gate for equippable array in here by check of slotPartDefinition to slotPartId
@@ -587,7 +602,8 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
 
         address targetBaseAddress = _baseAddresses[resourceId];
         if (targetBaseAddress == address(0)) revert RMRKNotComposableResource();
-        return _views.composeEquippables(tokenId, resourceId, targetBaseAddress);
+        return
+            _views.composeEquippables(tokenId, resourceId, targetBaseAddress);
     }
 
     // --------------------- VALIDATION ---------------------
@@ -652,16 +668,27 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
             getApprovedForResources(tokenId) == user);
     }
 
-    function getSlotPartIds(uint64 resourceId) external view returns (uint64[] memory) {
+    function getSlotPartIds(uint64 resourceId)
+        external
+        view
+        returns (uint64[] memory)
+    {
         return _slotPartIds[resourceId];
     }
 
-    function getFixedPartIds(uint64 resourceId) external view returns (uint64[] memory) {
+    function getFixedPartIds(uint64 resourceId)
+        external
+        view
+        returns (uint64[] memory)
+    {
         return _fixedPartIds[resourceId];
     }
 
-    function getEquipment(uint tokenId, address targetBaseAddress, uint64 slotPartId) external view returns (Equipment memory) {
+    function getEquipment(
+        uint256 tokenId,
+        address targetBaseAddress,
+        uint64 slotPartId
+    ) external view returns (Equipment memory) {
         return _equipments[tokenId][targetBaseAddress][slotPartId];
     }
-
 }
