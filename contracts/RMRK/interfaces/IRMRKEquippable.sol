@@ -77,6 +77,14 @@ interface IRMRKEquippable is IRMRKMultiResource {
         string metadataURI; //n bytes 32+
     }
 
+    struct IntakeEquip {
+        uint256 tokenId;
+        uint256 childIndex;
+        uint64 resourceId;
+        uint64 slotPartId;
+        uint64 childResourceId;
+    }
+
     /**
      * @dev Returns whether or not tokenId with resourceId can be equipped into parent contract at slot
      *
