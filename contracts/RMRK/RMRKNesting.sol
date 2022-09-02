@@ -81,10 +81,11 @@ contract RMRKNesting is
     // Mapping of tokenId to array of active children structs
     mapping(uint256 => Child[]) internal _children;
 
-    // Mapping of tokenId to child token address to child token Id to position in children array.
+    // Mapping of child token address to child token Id to position in children array.
     // This may be able to be gas optimized if we can use the child as a mapping element directly.
-    mapping(uint256 => mapping(address => mapping(uint256 => uint256)))
-        internal _posInChildArray;
+    // We might have a first extra mapping from token Id, but since the same child cannot be 
+    // nested into multiple tokens we can strip it for size/gas savings.
+    mapping(address => mapping(uint256 => uint256)) internal _posInChildArray;
 
     // Mapping of tokenId to array of pending children structs
     mapping(uint256 => Child[]) internal _pendingChildren;
@@ -813,14 +814,14 @@ contract RMRKNesting is
         Child memory child = _pendingChildren[tokenId][index];
 
         if (
-            _posInChildArray[tokenId][child.contractAddress][child.tokenId] != 0
+            _posInChildArray[child.contractAddress][child.tokenId] != 0
         ) revert RMRKChildAlreadyExists();
 
         removeChildByIndex(_pendingChildren[tokenId], index);
 
         _children[tokenId].push(child);
 
-        _posInChildArray[tokenId][child.contractAddress][
+        _posInChildArray[child.contractAddress][
             child.tokenId
         ] = _children[tokenId].length;
 
@@ -901,7 +902,7 @@ contract RMRKNesting is
             revert RMRKChildIndexOutOfRange();
 
         Child memory child = _children[tokenId][index];
-        delete _posInChildArray[tokenId][child.contractAddress][child.tokenId];
+        delete _posInChildArray[child.contractAddress][child.tokenId];
         removeChildByIndex(_children[tokenId], index);
 
         if (to != address(0)) {
