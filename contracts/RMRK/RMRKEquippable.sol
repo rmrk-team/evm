@@ -10,13 +10,7 @@ import "./interfaces/IRMRKNesting.sol";
 import "./library/RMRKLib.sol";
 import "./RMRKNesting.sol";
 import "./RMRKEquippableViews.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
-import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
-import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
-import "@openzeppelin/contracts/utils/Strings.sol";
 // import "hardhat/console.sol";
 
 // MultiResource
@@ -41,11 +35,7 @@ error RMRKTokenCannotBeEquippedWithResourceIntoSlot();
 error RMRKTokenDoesNotHaveActiveResource();
 
 contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
-    using RMRKLib for uint256;
-    using Address for address;
-    using Strings for uint256;
     using RMRKLib for uint64[];
-    using RMRKLib for uint128[];
 
     // ------------------- RESOURCES --------------
     //mapping of uint64 Ids to resource object
