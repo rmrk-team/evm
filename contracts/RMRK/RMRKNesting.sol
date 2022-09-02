@@ -86,7 +86,7 @@ contract RMRKNesting is
 
     // Mapping of child token address to child token Id to position in children array.
     // This may be able to be gas optimized if we can use the child as a mapping element directly.
-    // We might have a first extra mapping from token Id, but since the same child cannot be 
+    // We might have a first extra mapping from token Id, but since the same child cannot be
     // nested into multiple tokens we can strip it for size/gas savings.
     mapping(address => mapping(uint256 => uint256)) internal _posInChildArray;
 
@@ -813,17 +813,16 @@ contract RMRKNesting is
 
         Child memory child = _pendingChildren[tokenId][index];
 
-        if (
-            _posInChildArray[child.contractAddress][child.tokenId] != 0
-        ) revert RMRKChildAlreadyExists();
+        if (_posInChildArray[child.contractAddress][child.tokenId] != 0)
+            revert RMRKChildAlreadyExists();
 
         removeChildByIndex(_pendingChildren[tokenId], index);
 
         _children[tokenId].push(child);
 
-        _posInChildArray[child.contractAddress][
-            child.tokenId
-        ] = _children[tokenId].length;
+        _posInChildArray[child.contractAddress][child.tokenId] = _children[
+            tokenId
+        ].length;
 
         emit ChildAccepted(
             tokenId,

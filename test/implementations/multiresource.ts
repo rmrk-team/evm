@@ -6,7 +6,13 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { addResourceToToken } from '../utils';
 import shouldBehaveLikeOwnableLock from '../behavior/ownableLock';
 import shouldBehaveLikeMultiResource from '../behavior/multiresource';
-import { bn, singleFixtureWithArgs, mintFromImpl, addResourceEntryFromImpl, ONE_ETH } from '../utils';
+import {
+  bn,
+  singleFixtureWithArgs,
+  mintFromImpl,
+  addResourceEntryFromImpl,
+  ONE_ETH,
+} from '../utils';
 
 async function singleFixture(): Promise<Contract> {
   return singleFixtureWithArgs('RMRKMultiResourceImpl', ['MultiResource', 'MR', 10000, ONE_ETH]);

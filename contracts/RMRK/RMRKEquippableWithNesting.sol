@@ -489,14 +489,18 @@ contract RMRKEquippableWithNesting is Context, IRMRKEquippableWithNesting {
 
     // ------------------------------- EQUIPPING ------------------------------
 
-    function equip(IntakeEquip memory data) external onlyApprovedOrOwner(data.tokenId) {
+    function equip(IntakeEquip memory data)
+        external
+        onlyApprovedOrOwner(data.tokenId)
+    {
         _equip(data);
     }
 
     function _equip(IntakeEquip memory data) private {
         if (
-            _equipments[data.tokenId][_baseAddresses[data.resourceId]][data.slotPartId]
-                .childEquippableAddress != address(0)
+            _equipments[data.tokenId][_baseAddresses[data.resourceId]][
+                data.slotPartId
+            ].childEquippableAddress != address(0)
         ) revert RMRKSlotAlreadyUsed();
 
         IRMRKNesting.Child memory child = IRMRKNesting(_nestingAddress).childOf(
@@ -520,10 +524,8 @@ contract RMRKEquippableWithNesting is Context, IRMRKEquippableWithNesting {
 
         // Check from base perspective
         if (
-            !IRMRKBaseStorage(_baseAddresses[data.resourceId]).checkIsEquippable(
-                data.slotPartId,
-                childEquippable
-            )
+            !IRMRKBaseStorage(_baseAddresses[data.resourceId])
+                .checkIsEquippable(data.slotPartId, childEquippable)
         ) revert RMRKEquippableEquipNotAllowedByBase();
 
         Equipment memory newEquip = Equipment({
@@ -533,8 +535,12 @@ contract RMRKEquippableWithNesting is Context, IRMRKEquippableWithNesting {
             childEquippableAddress: childEquippable
         });
 
-        _equipments[data.tokenId][_baseAddresses[data.resourceId]][data.slotPartId] = newEquip;
-        _equipCountPerChild[data.tokenId][child.contractAddress][child.tokenId] += 1;
+        _equipments[data.tokenId][_baseAddresses[data.resourceId]][
+            data.slotPartId
+        ] = newEquip;
+        _equipCountPerChild[data.tokenId][child.contractAddress][
+            child.tokenId
+        ] += 1;
 
         // TODO: When replacing, this event is emmited in the middle (bad practice). Shall we change it?
         emit ChildResourceEquipped(
@@ -547,7 +553,11 @@ contract RMRKEquippableWithNesting is Context, IRMRKEquippableWithNesting {
         );
     }
 
-    function unequip(uint256 tokenId, uint64 resourceId, uint64 slotPartId) external onlyApprovedOrOwner(tokenId) {
+    function unequip(
+        uint256 tokenId,
+        uint64 resourceId,
+        uint64 slotPartId
+    ) external onlyApprovedOrOwner(tokenId) {
         _unequip(tokenId, resourceId, slotPartId);
     }
 
@@ -580,9 +590,10 @@ contract RMRKEquippableWithNesting is Context, IRMRKEquippableWithNesting {
         );
     }
 
-    function replaceEquipment(
-        IntakeEquip memory data
-    ) external onlyApprovedOrOwner(data.tokenId) {
+    function replaceEquipment(IntakeEquip memory data)
+        external
+        onlyApprovedOrOwner(data.tokenId)
+    {
         _unequip(data.tokenId, data.resourceId, data.slotPartId);
         _equip(data);
     }
