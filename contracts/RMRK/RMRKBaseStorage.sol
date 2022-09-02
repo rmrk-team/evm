@@ -104,7 +104,7 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
      * Delegates to { _addPart } below.
      * @param partIntake array of structs of type IntakeStruct, which consists of partId and a nested part struct.
      */
-    function _addPartList(IntakeStruct[] memory partIntake) internal {
+    function _addPartList(IntakeStruct[] calldata partIntake) internal {
         uint256 len = partIntake.length;
         for (uint256 i = 0; i < len; ) {
             _addPart(partIntake[i]);
@@ -119,7 +119,7 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
      * @param partIntake struct of type IntakeStruct, which consists of partId and a nested part struct.
      *
      */
-    function _addPart(IntakeStruct memory partIntake) internal {
+    function _addPart(IntakeStruct calldata partIntake) internal {
         uint64 partId = partIntake.partId;
         Part memory part = partIntake.part;
 

@@ -10,7 +10,7 @@ contract RMRKBaseStorageImpl is OwnableLock, RMRKBaseStorage {
         RMRKBaseStorage(symbol_, type__)
     {}
 
-    function addPart(IntakeStruct memory intakeStruct)
+    function addPart(IntakeStruct calldata intakeStruct)
         external
         onlyOwner
         notLocked
@@ -18,7 +18,7 @@ contract RMRKBaseStorageImpl is OwnableLock, RMRKBaseStorage {
         _addPart(intakeStruct);
     }
 
-    function addPartList(IntakeStruct[] memory intakeStructs)
+    function addPartList(IntakeStruct[] calldata intakeStructs)
         external
         onlyOwner
         notLocked

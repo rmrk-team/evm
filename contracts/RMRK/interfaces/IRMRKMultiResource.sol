@@ -131,7 +131,7 @@ interface IRMRKMultiResource {
      *
      * Emits a {ResourcePrioritySet} event.
      */
-    function setPriority(uint256 tokenId, uint16[] memory priorities) external;
+    function setPriority(uint256 tokenId, uint16[] calldata priorities) external;
 
     /**
      * @notice Returns IDs of active resources of `tokenId`.
@@ -224,7 +224,7 @@ interface IRMRKMultiResource {
      *
      * - `resourceIds` must exist.
      */
-    function getResourcesById(uint64[] memory resourceIds)
+    function getResourcesById(uint64[] calldata resourceIds)
         external
         view
         returns (Resource[] memory);

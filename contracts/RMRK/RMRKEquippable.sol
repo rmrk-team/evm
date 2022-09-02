@@ -170,7 +170,7 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
         return getResource(resourceId);
     }
 
-    function getResourcesById(uint64[] memory resourceIds)
+    function getResourcesById(uint64[] calldata resourceIds)
         public
         view
         virtual
@@ -281,7 +281,7 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
         emit ResourceRejected(tokenId, uint64(0));
     }
 
-    function setPriority(uint256 tokenId, uint16[] memory priorities)
+    function setPriority(uint256 tokenId, uint16[] calldata priorities)
         external
         virtual
         onlyApprovedForResourcesOrOwner(tokenId)
@@ -297,8 +297,8 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
     // This is expected to be implemented with custom guard:
     function _addResourceEntry(
         ExtendedResource memory resource,
-        uint64[] memory fixedPartIds,
-        uint64[] memory slotPartIds
+        uint64[] calldata fixedPartIds,
+        uint64[] calldata slotPartIds
     ) internal {
         uint64 id = resource.id;
         if (id == uint64(0)) revert RMRKWriteToZero();

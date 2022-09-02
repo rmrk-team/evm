@@ -9,11 +9,11 @@ contract RMRKBaseStorageMock is RMRKBaseStorage {
         RMRKBaseStorage(symbol_, type__)
     {}
 
-    function addPart(IntakeStruct memory intakeStruct) external {
+    function addPart(IntakeStruct calldata intakeStruct) external {
         _addPart(intakeStruct);
     }
 
-    function addPartList(IntakeStruct[] memory intakeStructs) external {
+    function addPartList(IntakeStruct[] calldata intakeStructs) external {
         _addPartList(intakeStructs);
     }
 
