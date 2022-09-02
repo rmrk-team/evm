@@ -111,8 +111,8 @@ describe('MultiResourceMock Other Behavior', async function () {
         'ResourceAddedToToken',
       );
 
-      const pending = await token.getFullPendingResources(tokenId);
-      expect(pending).to.be.eql([
+      const pendingIds = await token.getPendingResources(tokenId);
+      expect(await token.getResourcesById(pendingIds)).to.be.eql([
         [resId, 'data1'],
         [resId2, 'data2'],
       ]);
