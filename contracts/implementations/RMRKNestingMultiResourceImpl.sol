@@ -77,7 +77,9 @@ contract RMRKNestingMultiResourceImpl is
         if (mintPriceRequired != msg.value) revert RMRKMintUnderpriced();
 
         uint256 nextToken = _totalSupply + 1;
-        _totalSupply += numToMint;
+        unchecked {
+            _totalSupply += numToMint;
+        }
         uint256 totalSupplyOffset = _totalSupply + 1;
 
         return (nextToken, totalSupplyOffset);

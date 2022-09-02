@@ -81,14 +81,14 @@ contract RMRKNesting is
     // Mapping of tokenId to array of active children structs
     mapping(uint256 => Child[]) internal _children;
 
+    // Mapping of tokenId to array of pending children structs
+    mapping(uint256 => Child[]) internal _pendingChildren;
+
     // Mapping of child token address to child token Id to position in children array.
     // This may be able to be gas optimized if we can use the child as a mapping element directly.
     // We might have a first extra mapping from token Id, but since the same child cannot be 
     // nested into multiple tokens we can strip it for size/gas savings.
     mapping(address => mapping(uint256 => uint256)) internal _posInChildArray;
-
-    // Mapping of tokenId to array of pending children structs
-    mapping(uint256 => Child[]) internal _pendingChildren;
 
     // -------------------------- MODIFIERS ----------------------------
 
