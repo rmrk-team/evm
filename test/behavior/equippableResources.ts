@@ -189,8 +189,8 @@ async function shouldBehaveLikeEquippableResources(
 
       // The merged version does not implement this to save size:
       if (chunkyEquip.getFullPendingExtendedResources === undefined) {
-        const pending = await chunkyEquip.getFullPendingResources(tokenId);
-        expect(pending).to.be.eql([
+        const pendingResources = await chunkyEquip.getPendingResources(tokenId);
+        expect(await chunkyEquip.getResourcesById(pendingResources)).to.be.eql([
           [resId, metaURIDefault],
           [resId2, metaURIDefault],
         ]);
@@ -276,14 +276,17 @@ async function shouldBehaveLikeEquippableResources(
 
       // The merged version does not implement this to save size:
       if (chunkyEquip.getFullPendingExtendedResources === undefined) {
-        expect(await chunkyEquip.getFullPendingResources(tokenId)).to.be.eql([]);
+        expect(await chunkyEquip.getPendingResources(tokenId)).to.be.eql([]);
       } else {
         expect(await chunkyEquip.getFullPendingExtendedResources(tokenId)).to.be.eql([]);
       }
 
       // The merged version does not implement this to save size:
       if (chunkyEquip.getFullExtendedResources === undefined) {
-        expect(await chunkyEquip.getFullResources(tokenId)).to.eql([[resId, metaURIDefault]]);
+        const activeResources = await chunkyEquip.getActiveResources(tokenId);
+        expect(await chunkyEquip.getResourcesById(activeResources)).to.eql([
+          [resId, metaURIDefault],
+        ]);
       } else {
         expect(await chunkyEquip.getFullExtendedResources(tokenId)).to.eql([
           [resId, equippableRefIdDefault, baseAddressDefault, metaURIDefault],
@@ -307,14 +310,15 @@ async function shouldBehaveLikeEquippableResources(
 
       // The merged version does not implement this to save size:
       if (chunkyEquip.getFullPendingExtendedResources === undefined) {
-        expect(await chunkyEquip.getFullPendingResources(tokenId)).to.be.eql([]);
+        expect(await chunkyEquip.getPendingResources(tokenId)).to.be.eql([]);
       } else {
         expect(await chunkyEquip.getFullPendingExtendedResources(tokenId)).to.be.eql([]);
       }
 
       // The merged version does not implement this to save size:
       if (chunkyEquip.getFullExtendedResources === undefined) {
-        expect(await chunkyEquip.getFullResources(tokenId)).to.eql([
+        const activeResources = await chunkyEquip.getActiveResources(tokenId);
+        expect(await chunkyEquip.getResourcesById(activeResources)).to.eql([
           [resId2, metaURIDefault],
           [resId, metaURIDefault],
         ]);
@@ -339,7 +343,7 @@ async function shouldBehaveLikeEquippableResources(
 
       // The merged version does not implement this to save size:
       if (chunkyEquip.getFullPendingExtendedResources === undefined) {
-        expect(await chunkyEquip.getFullPendingResources(tokenId)).to.be.eql([]);
+        expect(await chunkyEquip.getPendingResources(tokenId)).to.be.eql([]);
       } else {
         expect(await chunkyEquip.getFullPendingExtendedResources(tokenId)).to.be.eql([]);
       }
@@ -402,7 +406,10 @@ async function shouldBehaveLikeEquippableResources(
 
       // The merged version does not implement this to save size:
       if (chunkyEquip.getFullExtendedResources === undefined) {
-        expect(await chunkyEquip.getFullResources(tokenId)).to.be.eql([[resId2, metaURIDefault]]);
+        const activeResources = await chunkyEquip.getActiveResources(tokenId);
+        expect(await chunkyEquip.getResourcesById(activeResources)).to.be.eql([
+          [resId2, metaURIDefault],
+        ]);
       } else {
         expect(await chunkyEquip.getFullExtendedResources(tokenId)).to.be.eql([
           [resId2, equippableRefIdDefault, baseAddressDefault, metaURIDefault],
@@ -421,7 +428,10 @@ async function shouldBehaveLikeEquippableResources(
 
       // The merged version does not implement this to save size:
       if (chunkyEquip.getFullExtendedResources === undefined) {
-        expect(await chunkyEquip.getFullResources(tokenId)).to.be.eql([[resId, metaURIDefault]]);
+        const activeResources = await chunkyEquip.getActiveResources(tokenId);
+        expect(await chunkyEquip.getResourcesById(activeResources)).to.be.eql([
+          [resId, metaURIDefault],
+        ]);
       } else {
         expect(await chunkyEquip.getFullExtendedResources(tokenId)).to.be.eql([
           [resId, equippableRefIdDefault, baseAddressDefault, metaURIDefault],
@@ -441,14 +451,15 @@ async function shouldBehaveLikeEquippableResources(
 
       // The merged version does not implement this to save size:
       if (chunkyEquip.getFullPendingExtendedResources === undefined) {
-        expect(await chunkyEquip.getFullPendingResources(tokenId)).to.be.eql([]);
+        expect(await chunkyEquip.getPendingResources(tokenId)).to.be.eql([]);
       } else {
         expect(await chunkyEquip.getFullPendingExtendedResources(tokenId)).to.be.eql([]);
       }
 
       // The merged version does not implement this to save size:
       if (chunkyEquip.getFullExtendedResources === undefined) {
-        expect(await chunkyEquip.getFullResources(tokenId)).to.be.eql([]);
+        const activeResources = await chunkyEquip.getActiveResources(tokenId);
+        expect(await chunkyEquip.getResourcesById(activeResources)).to.be.eql([]);
       } else {
         expect(await chunkyEquip.getFullExtendedResources(tokenId)).to.be.eql([]);
       }
@@ -481,13 +492,14 @@ async function shouldBehaveLikeEquippableResources(
 
       // The merged version does not implement this to save size:
       if (chunkyEquip.getFullPendingExtendedResources === undefined) {
-        expect(await chunkyEquip.getFullPendingResources(tokenId)).to.be.eql([]);
+        expect(await chunkyEquip.getPendingResources(tokenId)).to.be.eql([]);
       } else {
         expect(await chunkyEquip.getFullPendingExtendedResources(tokenId)).to.be.eql([]);
       }
       // The merged version does not implement this to save size:
       if (chunkyEquip.getFullExtendedResources === undefined) {
-        expect(await chunkyEquip.getFullResources(tokenId)).to.be.eql([]);
+        const activeResources = await chunkyEquip.getActiveResources(tokenId);
+        expect(await chunkyEquip.getResourcesById(activeResources)).to.be.eql([]);
       } else {
         expect(await chunkyEquip.getFullExtendedResources(tokenId)).to.be.eql([]);
       }
@@ -508,13 +520,14 @@ async function shouldBehaveLikeEquippableResources(
 
       // The merged version does not implement this to save size:
       if (chunkyEquip.getFullPendingExtendedResources === undefined) {
-        expect(await chunkyEquip.getFullPendingResources(tokenId)).to.be.eql([]);
+        expect(await chunkyEquip.getPendingResources(tokenId)).to.be.eql([]);
       } else {
         expect(await chunkyEquip.getFullPendingExtendedResources(tokenId)).to.be.eql([]);
       }
       // The merged version does not implement this to save size:
       if (chunkyEquip.getFullExtendedResources === undefined) {
-        expect(await chunkyEquip.getFullResources(tokenId)).to.be.eql([]);
+        const activeResources = await chunkyEquip.getActiveResources(tokenId);
+        expect(await chunkyEquip.getResourcesById(activeResources)).to.be.eql([]);
       } else {
         expect(await chunkyEquip.getFullExtendedResources(tokenId)).to.be.eql([]);
       }
@@ -570,13 +583,14 @@ async function shouldBehaveLikeEquippableResources(
 
       // The merged version does not implement this to save size:
       if (chunkyEquip.getFullPendingExtendedResources === undefined) {
-        expect(await chunkyEquip.getFullPendingResources(tokenId)).to.be.eql([]);
+        expect(await chunkyEquip.getPendingResources(tokenId)).to.be.eql([]);
       } else {
         expect(await chunkyEquip.getFullPendingExtendedResources(tokenId)).to.be.eql([]);
       }
       // The merged version does not implement this to save size:
       if (chunkyEquip.getFullExtendedResources === undefined) {
-        expect(await chunkyEquip.getFullResources(tokenId)).to.be.eql([]);
+        const activeResources = await chunkyEquip.getActiveResources(tokenId);
+        expect(await chunkyEquip.getResourcesById(activeResources)).to.be.eql([]);
       } else {
         expect(await chunkyEquip.getFullExtendedResources(tokenId)).to.be.eql([]);
       }

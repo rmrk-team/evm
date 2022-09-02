@@ -12,6 +12,7 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import "./interfaces/IRMRKMultiResource.sol";
 import "./library/RMRKLib.sol";
+// import "hardhat/console.sol";
 
 error ERC721AddressZeroIsNotaValidOwner();
 error ERC721ApprovalToCurrentOwner();
@@ -614,28 +615,8 @@ contract RMRKMultiResource is
         return getResource(resourceId);
     }
 
-    function getFullResources(uint256 tokenId)
-        external
-        view
-        virtual
-        returns (Resource[] memory)
-    {
-        uint64[] memory resourceIds = _activeResources[tokenId];
-        return _getResourcesById(resourceIds);
-    }
-
-    function getFullPendingResources(uint256 tokenId)
-        external
-        view
-        virtual
-        returns (Resource[] memory)
-    {
-        uint64[] memory resourceIds = _pendingResources[tokenId];
-        return _getResourcesById(resourceIds);
-    }
-
-    function _getResourcesById(uint64[] memory resourceIds)
-        internal
+    function getResourcesById(uint64[] memory resourceIds)
+        public
         view
         virtual
         returns (Resource[] memory)

@@ -218,26 +218,13 @@ interface IRMRKMultiResource {
         returns (Resource memory);
 
     /**
-     * @notice Returns `Resource` object at `index` of pending resource array on `tokenId`
+     * @notice Returns `Resource` objects for the given ids
      *
      * Requirements:
      *
-     * - `tokenId` must exist.
-     * - `index` must be inside the range of pending resource array
+     * - `resourceIds` must exist.
      */
-    function getFullResources(uint256 tokenId)
-        external
-        view
-        returns (Resource[] memory);
-
-    /**
-     * @notice Returns all `Resource` objects of active resource array on `tokenId`
-     *
-     * Requirements:
-     *
-     * - `tokenId` must exist.
-     */
-    function getFullPendingResources(uint256 tokenId)
+    function getResourcesById(uint64[] memory resourceIds)
         external
         view
         returns (Resource[] memory);
