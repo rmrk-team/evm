@@ -94,7 +94,6 @@ async function slotsFixture() {
   const equipFactory = await ethers.getContractFactory('RMRKEquippableWithNestingMock');
   const viewFactory = await ethers.getContractFactory('RMRKEquippableViews');
 
-
   // View
   const view = await viewFactory.deploy();
   await view.deployed();
@@ -164,7 +163,7 @@ async function slotsFixture() {
     weaponGemEquip,
     background,
     backgroundEquip,
-    view
+    view,
   };
 }
 
@@ -229,7 +228,7 @@ describe('EquippableMock with Slots', async () => {
       weaponGemEquip,
       background,
       backgroundEquip,
-      view
+      view,
     } = await loadFixture(slotsFixture);
 
     this.base = base;

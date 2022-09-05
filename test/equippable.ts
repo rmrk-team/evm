@@ -71,7 +71,6 @@ async function slotsFixture() {
   const equipFactory = await ethers.getContractFactory('RMRKEquippableMock');
   const viewFactory = await ethers.getContractFactory('RMRKEquippableViews');
 
-
   // View
   const view = await viewFactory.deploy();
   await view.deployed();

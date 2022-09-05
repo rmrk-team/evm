@@ -16,9 +16,7 @@ contract RMRKEquippableWithNestingImpl is Ownable, RMRKExternalEquip {
     //fallback URI
     string internal _fallbackURI;
 
-    constructor(address nestingAddress)
-        RMRKExternalEquip(nestingAddress)
-    {}
+    constructor(address nestingAddress) RMRKExternalEquip(nestingAddress) {}
 
     function getFallbackURI() external view virtual returns (string memory) {
         return _fallbackURI;

@@ -117,5 +117,8 @@ interface IRMRKEquippable is IRMRKMultiResource {
         view
         returns (ExtendedResource memory);
 
-    function getBaseAddressOfResource(uint64 resourceId) external view returns(address);
+    function getBaseAddressOfResource(uint64 resourceId)
+        external
+        view
+        returns (address);
 }

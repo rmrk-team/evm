@@ -12,7 +12,7 @@ import "../RMRK/access/OwnableLock.sol";
  * the deployer to freeze the state of the base contract.
  *
  * In addition, this implementation treats the base registry as an
- * append-only ledger, so 
+ * append-only ledger, so
  */
 
 contract RMRKBaseStorageImpl is OwnableLock, RMRKBaseStorage {

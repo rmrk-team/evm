@@ -40,7 +40,7 @@ async function shouldBehaveLikeEquippableWithSlots(
   let weaponGemEquip: Contract;
   let background: Contract;
   let backgroundEquip: Contract;
-  let view: Contract
+  let view: Contract;
 
   let addrs: SignerWithAddress[];
 

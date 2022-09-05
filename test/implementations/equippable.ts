@@ -32,7 +32,6 @@ async function partsFixture() {
   const equipFactory = await ethers.getContractFactory('RMRKEquippableImpl');
   const viewFactory = await ethers.getContractFactory('RMRKEquippableViews');
 
-
   // Base
   const base = await baseFactory.deploy(baseSymbol, baseType);
   await base.deployed();
@@ -72,7 +71,6 @@ async function slotsFixture() {
   const baseFactory = await ethers.getContractFactory('RMRKBaseStorageImpl');
   const equipFactory = await ethers.getContractFactory('RMRKEquippableImpl');
   const viewFactory = await ethers.getContractFactory('RMRKEquippableViews');
-
 
   // View
   const view = await viewFactory.deploy();
