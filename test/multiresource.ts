@@ -231,7 +231,7 @@ describe('MultiResourceMock Other Behavior', async function () {
       expect(await token.getApproved(tokenId)).to.eql(approved.address);
       expect(await token.getApprovedForResources(tokenId)).to.eql(approved.address);
 
-      await token.connect(tokenOwner).transfer(newOwner.address, tokenId);
+      await token.connect(tokenOwner).transferFrom(newOwner.address, tokenId);
 
       expect(await token.getApproved(tokenId)).to.eql(ethers.constants.AddressZero);
       expect(await token.getApprovedForResources(tokenId)).to.eql(ethers.constants.AddressZero);

@@ -2,7 +2,6 @@
 
 pragma solidity ^0.8.15;
 
-import "../RMRK/access/OwnableLock.sol";
 import "../RMRK/utils/RMRKMintingUtils.sol";
 import "../RMRK/RMRKNestingMultiResource.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
@@ -11,11 +10,7 @@ error RMRKMintUnderpriced();
 error RMRKMintZero();
 
 //Minimal public implementation of IRMRKNesting for testing.
-contract RMRKNestingMultiResourceImpl is
-    OwnableLock,
-    RMRKMintingUtils,
-    RMRKNestingMultiResource
-{
+contract RMRKNestingMultiResourceImpl is RMRKMintingUtils, RMRKNestingMultiResource {
     using Strings for uint256;
 
     // Manage resources via increment

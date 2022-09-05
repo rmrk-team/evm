@@ -95,4 +95,27 @@ interface IRMRKEquippable is IRMRKMultiResource {
         uint64 resourceId,
         uint64 slotId
     ) external view returns (bool);
+
+    function getSlotPartIds(uint64 resourceId)
+        external
+        view
+        returns (uint64[] memory);
+
+    function getFixedPartIds(uint64 resourceId)
+        external
+        view
+        returns (uint64[] memory);
+
+    function getEquipment(
+        uint256 tokenId,
+        address targetBaseAddress,
+        uint64 slotPartId
+    ) external view returns (Equipment memory);
+
+    function getExtendedResource(uint64 resourceId)
+        external
+        view
+        returns (ExtendedResource memory);
+
+    function getBaseAddressOfResource(uint64 resourceId) external view returns(address);
 }

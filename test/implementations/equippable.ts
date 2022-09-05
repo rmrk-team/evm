@@ -30,6 +30,8 @@ async function partsFixture() {
 
   const baseFactory = await ethers.getContractFactory('RMRKBaseStorageImpl');
   const equipFactory = await ethers.getContractFactory('RMRKEquippableImpl');
+  const viewFactory = await ethers.getContractFactory('RMRKEquippableViews');
+
 
   // Base
   const base = await baseFactory.deploy(baseSymbol, baseType);
@@ -43,8 +45,12 @@ async function partsFixture() {
   const mask = await equipFactory.deploy(maskName, maskSymbol, 10000, ONE_ETH);
   await mask.deployed();
 
+  // View
+  const view = await viewFactory.deploy();
+  await view.deployed();
+
   await setupContextForParts(base, neon, neon, mask, mask, mintFromImpl, nestMintFromImpl);
-  return { base, neon, mask };
+  return { base, neon, mask, view };
 }
 
 async function slotsFixture() {
@@ -65,6 +71,12 @@ async function slotsFixture() {
 
   const baseFactory = await ethers.getContractFactory('RMRKBaseStorageImpl');
   const equipFactory = await ethers.getContractFactory('RMRKEquippableImpl');
+  const viewFactory = await ethers.getContractFactory('RMRKEquippableViews');
+
+
+  // View
+  const view = await viewFactory.deploy();
+  await view.deployed();
 
   // Base
   const base = await baseFactory.deploy(baseSymbol, baseType);
@@ -100,7 +112,7 @@ async function slotsFixture() {
     nestMintFromImpl,
   );
 
-  return { base, soldier, weapon, weaponGem, background };
+  return { base, soldier, weapon, weaponGem, background, view };
 }
 
 async function resourcesFixture() {
@@ -127,13 +139,14 @@ async function multiResourceFixture() {
 
 describe('EquippableMock with Parts', async () => {
   beforeEach(async function () {
-    const { base, neon, mask } = await loadFixture(partsFixture);
+    const { base, neon, mask, view } = await loadFixture(partsFixture);
 
     this.base = base;
     this.neon = neon;
     this.neonEquip = neon;
     this.mask = mask;
     this.maskEquip = mask;
+    this.view = view;
   });
 
   shouldBehaveLikeEquippableWithParts();

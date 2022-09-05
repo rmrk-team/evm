@@ -185,43 +185,6 @@ contract RMRKEquippableWithNesting is Context, IRMRKEquippableWithNesting {
         return _allResources;
     }
 
-    function getResObjectByIndex(uint256 tokenId, uint256 index)
-        external
-        view
-        virtual
-        returns (Resource memory)
-    {
-        uint64 resourceId = getActiveResources(tokenId)[index];
-        return getResource(resourceId);
-    }
-
-    function getPendingResObjectByIndex(uint256 tokenId, uint256 index)
-        external
-        view
-        virtual
-        returns (Resource memory)
-    {
-        uint64 resourceId = getPendingResources(tokenId)[index];
-        return getResource(resourceId);
-    }
-
-    function getResourcesById(uint64[] calldata resourceIds)
-        public
-        view
-        virtual
-        returns (Resource[] memory)
-    {
-        uint256 len = resourceIds.length;
-        Resource[] memory resources = new Resource[](len);
-        for (uint256 i; i < len; ) {
-            resources[i] = getResource(resourceIds[i]);
-            unchecked {
-                ++i;
-            }
-        }
-        return resources;
-    }
-
     function getActiveResources(uint256 tokenId)
         public
         view
@@ -608,110 +571,114 @@ contract RMRKEquippableWithNesting is Context, IRMRKEquippableWithNesting {
             uint8(0);
     }
 
-    function getEquipped(uint64 tokenId, uint64 resourceId)
-        public
-        view
-        returns (uint64[] memory slotParts, Equipment[] memory childrenEquipped)
-    {
-        address targetBaseAddress = _baseAddresses[resourceId];
-        uint64[] memory slotPartIds = _slotPartIds[resourceId];
+    // function getEquipped(uint64 tokenId, uint64 resourceId)
+    //     public
+    //     view
+    //     returns (uint64[] memory slotParts, Equipment[] memory childrenEquipped)
+    // {
+    //     address targetBaseAddress = _baseAddresses[resourceId];
+    //     uint64[] memory slotPartIds = _slotPartIds[resourceId];
 
-        // TODO: Clarify on docs: Some children equipped might be empty.
-        slotParts = new uint64[](slotPartIds.length);
-        childrenEquipped = new Equipment[](slotPartIds.length);
+    //     // TODO: Clarify on docs: Some children equipped might be empty.
+    //     slotParts = new uint64[](slotPartIds.length);
+    //     childrenEquipped = new Equipment[](slotPartIds.length);
 
-        uint256 len = slotPartIds.length;
-        for (uint256 i; i < len; ) {
-            slotParts[i] = slotPartIds[i];
-            Equipment memory equipment = _equipments[tokenId][
-                targetBaseAddress
-            ][slotPartIds[i]];
-            if (equipment.resourceId == resourceId) {
-                childrenEquipped[i] = equipment;
-            }
-            unchecked {
-                ++i;
-            }
-        }
-    }
+    //     uint256 len = slotPartIds.length;
+    //     for (uint256 i; i < len; ) {
+    //         slotParts[i] = slotPartIds[i];
+    //         Equipment memory equipment = _equipments[tokenId][
+    //             targetBaseAddress
+    //         ][slotPartIds[i]];
+    //         if (equipment.resourceId == resourceId) {
+    //             childrenEquipped[i] = equipment;
+    //         }
+    //         unchecked {
+    //             ++i;
+    //         }
+    //     }
+    // }
 
-    //Gate for equippable array in here by check of slotPartDefinition to slotPartId
-    function composeEquippables(uint256 tokenId, uint64 resourceId)
-        public
-        view
-        returns (
-            ExtendedResource memory resource,
-            FixedPart[] memory fixedParts,
-            SlotPart[] memory slotParts
-        )
-    {
-        resource = getExtendedResource(resourceId);
+    // //Gate for equippable array in here by check of slotPartDefinition to slotPartId
+    // function composeEquippables(uint256 tokenId, uint64 resourceId)
+    //     public
+    //     view
+    //     returns (
+    //         ExtendedResource memory resource,
+    //         FixedPart[] memory fixedParts,
+    //         SlotPart[] memory slotParts
+    //     )
+    // {
+    //     resource = getExtendedResource(resourceId);
 
-        // We make sure token has that resource. Alternative is to receive index but makes equipping more complex.
-        (, bool found) = _activeResources[tokenId].indexOf(resourceId);
-        if (!found) revert RMRKTokenDoesNotHaveActiveResource();
+    //     // We make sure token has that resource. Alternative is to receive index but makes equipping more complex.
+    //     (, bool found) = _activeResources[tokenId].indexOf(resourceId);
+    //     if (!found) revert RMRKTokenDoesNotHaveActiveResource();
 
-        address targetBaseAddress = _baseAddresses[resourceId];
-        if (targetBaseAddress == address(0)) revert RMRKNotComposableResource();
+    //     address targetBaseAddress = _baseAddresses[resourceId];
+    //     if (targetBaseAddress == address(0)) revert RMRKNotComposableResource();
 
-        // Fixed parts:
-        uint64[] memory fixedPartIds = _fixedPartIds[resourceId];
-        fixedParts = new FixedPart[](fixedPartIds.length);
+    //     // Fixed parts:
+    //     uint64[] memory fixedPartIds = _fixedPartIds[resourceId];
+    //     fixedParts = new FixedPart[](fixedPartIds.length);
 
-        uint256 len = fixedPartIds.length;
-        if (len > 0) {
-            IRMRKBaseStorage.Part[] memory baseFixedParts = IRMRKBaseStorage(
-                targetBaseAddress
-            ).getParts(fixedPartIds);
-            for (uint256 i; i < len; ) {
-                fixedParts[i] = FixedPart({
-                    partId: fixedPartIds[i],
-                    z: baseFixedParts[i].z,
-                    metadataURI: baseFixedParts[i].metadataURI
-                });
-                unchecked {
-                    ++i;
-                }
-            }
-        }
+    //     uint256 len = fixedPartIds.length;
+    //     if (len > 0) {
+    //         IRMRKBaseStorage.Part[] memory baseFixedParts = IRMRKBaseStorage(
+    //             targetBaseAddress
+    //         ).getParts(fixedPartIds);
+    //         for (uint256 i; i < len; ) {
+    //             fixedParts[i] = FixedPart({
+    //                 partId: fixedPartIds[i],
+    //                 z: baseFixedParts[i].z,
+    //                 metadataURI: baseFixedParts[i].metadataURI
+    //             });
+    //             unchecked {
+    //                 ++i;
+    //             }
+    //         }
+    //     }
 
-        // Slot parts:
-        uint64[] memory slotPartIds = _slotPartIds[resourceId];
-        slotParts = new SlotPart[](slotPartIds.length);
-        len = slotPartIds.length;
+    //     // Slot parts:
+    //     uint64[] memory slotPartIds = _slotPartIds[resourceId];
+    //     slotParts = new SlotPart[](slotPartIds.length);
+    //     len = slotPartIds.length;
 
-        if (len > 0) {
-            IRMRKBaseStorage.Part[] memory baseSlotParts = IRMRKBaseStorage(
-                targetBaseAddress
-            ).getParts(slotPartIds);
-            for (uint256 i; i < len; ) {
-                Equipment memory equipment = _equipments[tokenId][
-                    targetBaseAddress
-                ][slotPartIds[i]];
-                if (equipment.resourceId == resourceId) {
-                    slotParts[i] = SlotPart({
-                        partId: slotPartIds[i],
-                        childResourceId: equipment.childResourceId,
-                        z: baseSlotParts[i].z,
-                        childTokenId: equipment.childTokenId,
-                        childAddress: equipment.childEquippableAddress,
-                        metadataURI: baseSlotParts[i].metadataURI
-                    });
-                } else {
-                    slotParts[i] = SlotPart({
-                        partId: slotPartIds[i],
-                        childResourceId: uint64(0),
-                        z: baseSlotParts[i].z,
-                        childTokenId: uint256(0),
-                        childAddress: address(0),
-                        metadataURI: baseSlotParts[i].metadataURI
-                    });
-                }
-                unchecked {
-                    ++i;
-                }
-            }
-        }
+    //     if (len > 0) {
+    //         IRMRKBaseStorage.Part[] memory baseSlotParts = IRMRKBaseStorage(
+    //             targetBaseAddress
+    //         ).getParts(slotPartIds);
+    //         for (uint256 i; i < len; ) {
+    //             Equipment memory equipment = _equipments[tokenId][
+    //                 targetBaseAddress
+    //             ][slotPartIds[i]];
+    //             if (equipment.resourceId == resourceId) {
+    //                 slotParts[i] = SlotPart({
+    //                     partId: slotPartIds[i],
+    //                     childResourceId: equipment.childResourceId,
+    //                     z: baseSlotParts[i].z,
+    //                     childTokenId: equipment.childTokenId,
+    //                     childAddress: equipment.childEquippableAddress,
+    //                     metadataURI: baseSlotParts[i].metadataURI
+    //                 });
+    //             } else {
+    //                 slotParts[i] = SlotPart({
+    //                     partId: slotPartIds[i],
+    //                     childResourceId: uint64(0),
+    //                     z: baseSlotParts[i].z,
+    //                     childTokenId: uint256(0),
+    //                     childAddress: address(0),
+    //                     metadataURI: baseSlotParts[i].metadataURI
+    //                 });
+    //             }
+    //             unchecked {
+    //                 ++i;
+    //             }
+    //         }
+    //     }
+    // }
+
+    function getBaseAddressOfResource(uint64 resourceId) external view returns(address) {
+        return _baseAddresses[resourceId];
     }
 
     // --------------------- VALIDATION ---------------------
@@ -831,6 +798,30 @@ contract RMRKEquippableWithNesting is Context, IRMRKEquippableWithNesting {
     ////////////////////////////////////////
     //              UTILS
     ////////////////////////////////////////
+
+    function getSlotPartIds(uint64 resourceId)
+        external
+        view
+        returns (uint64[] memory)
+    {
+        return _slotPartIds[resourceId];
+    }
+
+    function getFixedPartIds(uint64 resourceId)
+        external
+        view
+        returns (uint64[] memory)
+    {
+        return _fixedPartIds[resourceId];
+    }
+
+    function getEquipment(
+        uint256 tokenId,
+        address targetBaseAddress,
+        uint64 slotPartId
+    ) external view returns (Equipment memory) {
+        return _equipments[tokenId][targetBaseAddress][slotPartId];
+    }
 
     /**
      * @dev Reverts if the `tokenId` has not been minted yet.

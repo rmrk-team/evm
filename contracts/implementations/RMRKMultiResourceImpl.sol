@@ -2,7 +2,6 @@
 
 pragma solidity ^0.8.15;
 
-import "../RMRK/access/OwnableLock.sol";
 import "../RMRK/utils/RMRKMintingUtils.sol";
 import "../RMRK/RMRKMultiResource.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
@@ -13,7 +12,6 @@ error RMRKMintUnderpriced();
 error RMRKMintZero();
 
 contract RMRKMultiResourceImpl is
-    OwnableLock,
     RMRKMintingUtils,
     RMRKMultiResource
 {

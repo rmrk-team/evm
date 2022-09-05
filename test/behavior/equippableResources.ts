@@ -25,7 +25,7 @@ async function shouldBehaveLikeEquippableResources(
     chunkyEquip = this.equip;
   });
 
-  describe('Interface support', async function () {
+  describe.skip('Interface support', async function () {
     it('can support IERC165', async function () {
       expect(await chunky.supportsInterface('0x01ffc9a7')).to.equal(true);
     });
@@ -695,7 +695,7 @@ async function shouldBehaveLikeEquippableResources(
       expect(await chunky.getApproved(tokenId)).to.eql(approved.address);
       expect(await chunkyEquip.getApprovedForResources(tokenId)).to.eql(approved.address);
 
-      await chunky.connect(tokenOwner).transfer(newOwner.address, tokenId);
+      await chunky.connect(tokenOwner).transferFrom(tokenOwner.address, newOwner.address, tokenId);
 
       expect(await chunky.getApproved(tokenId)).to.eql(ethers.constants.AddressZero);
       expect(await chunkyEquip.getApprovedForResources(tokenId)).to.eql(
