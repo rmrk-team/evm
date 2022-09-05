@@ -30,6 +30,7 @@ async function partsFixture() {
   const baseFactory = await ethers.getContractFactory('RMRKBaseStorageMock');
   const nestingFactory = await ethers.getContractFactory('RMRKNestingWithEquippableMock');
   const equipFactory = await ethers.getContractFactory('RMRKEquippableWithNestingMock');
+  const viewFactory = await ethers.getContractFactory('RMRKEquippableViews');
 
   // Base
   const base = await baseFactory.deploy(baseSymbol, baseType);
@@ -38,8 +39,15 @@ async function partsFixture() {
   // Neon token
   const neon = await nestingFactory.deploy(neonName, neonSymbol);
   await neon.deployed();
+
+  // Neon Equip
+
   const neonEquip = await equipFactory.deploy(neon.address);
   await neonEquip.deployed();
+
+  // View contract
+  const view = await viewFactory.deploy();
+  await view.deployed();
 
   // Link nesting and equippable:
   neonEquip.setNestingAddress(neon.address);
@@ -62,7 +70,7 @@ async function partsFixture() {
     mintFromMock,
     nestMintFromMock,
   );
-  return { base, neon, neonEquip, mask, maskEquip };
+  return { base, neon, neonEquip, mask, maskEquip, view };
 }
 
 async function slotsFixture() {
@@ -84,6 +92,12 @@ async function slotsFixture() {
   const baseFactory = await ethers.getContractFactory('RMRKBaseStorageMock');
   const nestingFactory = await ethers.getContractFactory('RMRKNestingWithEquippableMock');
   const equipFactory = await ethers.getContractFactory('RMRKEquippableWithNestingMock');
+  const viewFactory = await ethers.getContractFactory('RMRKEquippableViews');
+
+
+  // View
+  const view = await viewFactory.deploy();
+  await view.deployed();
 
   // Base
   const base = await baseFactory.deploy(baseSymbol, baseType);
@@ -150,6 +164,7 @@ async function slotsFixture() {
     weaponGemEquip,
     background,
     backgroundEquip,
+    view
   };
 }
 
@@ -189,13 +204,14 @@ async function multiResourceFixture() {
 
 describe('EquippableMock with Parts', async () => {
   beforeEach(async function () {
-    const { base, neon, neonEquip, mask, maskEquip } = await loadFixture(partsFixture);
+    const { base, neon, neonEquip, mask, maskEquip, view } = await loadFixture(partsFixture);
 
     this.base = base;
     this.neon = neon;
     this.neonEquip = neonEquip;
     this.mask = mask;
     this.maskEquip = maskEquip;
+    this.view = view;
   });
 
   shouldBehaveLikeEquippableWithParts();
@@ -212,7 +228,7 @@ describe('EquippableMock with Slots', async () => {
       weaponGem,
       weaponGemEquip,
       background,
-      backgroundEquip,
+      backgroundEquip
     } = await loadFixture(slotsFixture);
 
     this.base = base;

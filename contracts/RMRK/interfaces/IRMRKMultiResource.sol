@@ -192,44 +192,6 @@ interface IRMRKMultiResource {
         view
         returns (Resource memory);
 
-    /**
-     * @notice Returns `Resource` object associated with `resourceId`
-     *
-     * Requirements:
-     *
-     * - `resourceId` must exist.
-     *
-     */
-    function getResObjectByIndex(uint256 tokenId, uint256 index)
-        external
-        view
-        returns (Resource memory);
-
-    /**
-     * @notice Returns `Resource` object at `index` of active resource array on `tokenId`
-     *
-     * Requirements:
-     *
-     * - `tokenId` must exist.
-     * - `index` must be inside the range of active resource array
-     */
-    function getPendingResObjectByIndex(uint256 tokenId, uint256 index)
-        external
-        view
-        returns (Resource memory);
-
-    /**
-     * @notice Returns `Resource` objects for the given ids
-     *
-     * Requirements:
-     *
-     * - `resourceIds` must exist.
-     */
-    function getResourcesById(uint64[] calldata resourceIds)
-        external
-        view
-        returns (Resource[] memory);
-
     // Approvals
 
     //TODO: Make 'management action' more explicit?

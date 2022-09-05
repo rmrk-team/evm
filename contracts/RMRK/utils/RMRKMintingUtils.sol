@@ -1,10 +1,16 @@
 // SPDX-License-Identifier: Apache-2.0
+import "contracts/RMRK/access/OwnableLock.sol";
 
 pragma solidity ^0.8.15;
 
 error RMRKMintOverMax();
 
-contract RMRKMintingUtils {
+/**
+* @dev Top-level utilities for managing minting. Implements OwnableLock by default.
+* Max supply-related and pricing variables are immutable after deployment.
+*/
+
+contract RMRKMintingUtils is OwnableLock {
     uint256 internal _totalSupply;
     uint256 internal immutable _maxSupply;
     uint256 internal immutable _pricePerMint;
@@ -29,5 +35,14 @@ contract RMRKMintingUtils {
 
     function pricePerMint() public view returns (uint256) {
         return _pricePerMint;
+    }
+
+    function withdrawRaised(address to, uint256 amount) external onlyOwner {
+        _withdraw(to, amount);
+    }
+
+    function _withdraw(address _address, uint256 _amount) private {
+        (bool success, ) = _address.call{value: _amount}("");
+        require(success, "Transfer failed.");
     }
 }

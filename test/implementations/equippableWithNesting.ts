@@ -27,6 +27,12 @@ async function partsFixture() {
   const baseFactory = await ethers.getContractFactory('RMRKBaseStorageImpl');
   const nestingFactory = await ethers.getContractFactory('RMRKNestingWithEquippableImpl');
   const equipFactory = await ethers.getContractFactory('RMRKEquippableWithNestingImpl');
+  const viewFactory = await ethers.getContractFactory('RMRKEquippableViews');
+
+
+  // View
+  const view = await viewFactory.deploy();
+  await view.deployed();
 
   // Base
   const base = await baseFactory.deploy(baseSymbol, baseType);
@@ -69,7 +75,7 @@ async function partsFixture() {
     mintFromImpl,
     nestMintFromImpl,
   );
-  return { base, neon, neonEquip, mask, maskEquip };
+  return { base, neon, neonEquip, mask, maskEquip, view };
 }
 
 async function slotsFixture() {
@@ -91,6 +97,12 @@ async function slotsFixture() {
   const baseFactory = await ethers.getContractFactory('RMRKBaseStorageImpl');
   const nestingFactory = await ethers.getContractFactory('RMRKNestingWithEquippableImpl');
   const equipFactory = await ethers.getContractFactory('RMRKEquippableWithNestingImpl');
+  const viewFactory = await ethers.getContractFactory('RMRKEquippableViews');
+
+
+  // View
+  const view = await viewFactory.deploy();
+  await view.deployed();
 
   // Base
   const base = await baseFactory.deploy(baseSymbol, baseType);
@@ -176,6 +188,7 @@ async function slotsFixture() {
     weaponGemEquip,
     background,
     backgroundEquip,
+    view
   };
 }
 
@@ -227,13 +240,14 @@ async function multiResourceFixture() {
 
 describe('EquippableImpl with Parts', async () => {
   beforeEach(async function () {
-    const { base, neon, neonEquip, mask, maskEquip } = await loadFixture(partsFixture);
+    const { base, neon, neonEquip, mask, maskEquip, view } = await loadFixture(partsFixture);
 
     this.base = base;
     this.neon = neon;
     this.neonEquip = neonEquip;
     this.mask = mask;
     this.maskEquip = maskEquip;
+    this.view = view;
   });
 
   shouldBehaveLikeEquippableWithParts();
@@ -251,6 +265,7 @@ describe('EquippableImpl with Slots', async () => {
       weaponGemEquip,
       background,
       backgroundEquip,
+      view
     } = await loadFixture(slotsFixture);
 
     this.base = base;

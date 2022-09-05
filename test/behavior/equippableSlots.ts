@@ -40,6 +40,7 @@ async function shouldBehaveLikeEquippableWithSlots(
   let weaponGemEquip: Contract;
   let background: Contract;
   let backgroundEquip: Contract;
+  let view: Contract
 
   let addrs: SignerWithAddress[];
 
@@ -56,9 +57,10 @@ async function shouldBehaveLikeEquippableWithSlots(
     weaponGemEquip = this.weaponGemEquip;
     background = this.background;
     backgroundEquip = this.backgroundEquip;
+    view = this.view;
   });
 
-  describe('Validations', async function () {
+  describe.only('Validations', async function () {
     it('can validate equips of weapons into soldiers', async function () {
       // This resource is not equippable
       expect(
@@ -146,7 +148,7 @@ async function shouldBehaveLikeEquippableWithSlots(
     });
   });
 
-  describe('Equip', async function () {
+  describe.only('Equip', async function () {
     it('can equip weapon', async function () {
       // Weapon is child on index 0, background on index 1
       const soldierOwner = addrs[0];
@@ -661,7 +663,7 @@ async function shouldBehaveLikeEquippableWithSlots(
       [bn(soldierResId), bn(weaponResId), bn(weaponsIds[0]), weaponEquip.address],
       [bn(0), bn(0), bn(0), ethers.constants.AddressZero],
     ];
-    expect(await soldierEquip.getEquipped(soldiersIds[0], soldierResId)).to.eql([
+    expect(await view.getEquipped(soldierEquip.address, soldiersIds[0], soldierResId)).to.eql([
       expectedSlots,
       expectedEquips,
     ]);

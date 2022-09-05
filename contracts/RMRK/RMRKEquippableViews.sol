@@ -19,26 +19,25 @@ contract RMRKEquippableViews {
     using RMRKLib for uint64[];
     using RMRKLib for uint128[];
 
-    address _equippableContract;
-
-    constructor(address equippable) {
-        _equippableContract = equippable;
-    }
+    constructor() {}
 
     function getEquipped(
+        address equippableContract,
         uint64 tokenId,
-        uint64 resourceId,
-        address targetBaseAddress
+        uint64 resourceId
+    ) public view returns (
+        uint64[] memory slotParts,
+        IRMRKEquippable.Equipment[] memory childrenEquipped
     )
-        public
-        view
-        returns (
-            uint64[] memory slotParts,
-            IRMRKEquippable.Equipment[] memory childrenEquipped
-        )
     {
-        uint64[] memory slotPartIds = RMRKEquippable(_equippableContract)
-            .getSlotPartIds(resourceId);
+        IRMRKEquippable _equippableContract = IRMRKEquippable(
+            equippableContract
+        );
+
+        address targetBaseAddress = _equippableContract.getBaseAddressOfResource(resourceId);
+        uint64[] memory slotPartIds = _equippableContract.getSlotPartIds(
+            resourceId
+        );
 
         // TODO: Clarify on docs: Some children equipped might be empty.
         slotParts = new uint64[](slotPartIds.length);
@@ -47,9 +46,8 @@ contract RMRKEquippableViews {
         uint256 len = slotPartIds.length;
         for (uint256 i; i < len; ) {
             slotParts[i] = slotPartIds[i];
-            IRMRKEquippable.Equipment memory equipment = RMRKEquippable(
-                _equippableContract
-            ).getEquipment(tokenId, targetBaseAddress, slotPartIds[i]);
+            IRMRKEquippable.Equipment memory equipment = _equippableContract
+                .getEquipment(tokenId, targetBaseAddress, slotPartIds[i]);
             if (equipment.resourceId == resourceId) {
                 childrenEquipped[i] = equipment;
             }
@@ -61,25 +59,26 @@ contract RMRKEquippableViews {
 
     //Gate for equippable array in here by check of slotPartDefinition to slotPartId
     function composeEquippables(
+        address equippableContract,
         uint256 tokenId,
-        uint64 resourceId,
-        address targetBaseAddress
+        uint64 resourceId
+    ) public view returns (
+        IRMRKEquippable.ExtendedResource memory resource,
+        IRMRKEquippable.FixedPart[] memory fixedParts,
+        IRMRKEquippable.SlotPart[] memory slotParts
     )
-        public
-        view
-        returns (
-            IRMRKEquippable.ExtendedResource memory resource,
-            IRMRKEquippable.FixedPart[] memory fixedParts,
-            IRMRKEquippable.SlotPart[] memory slotParts
-        )
     {
-        resource = RMRKEquippable(_equippableContract).getExtendedResource(
-            resourceId
+        IRMRKEquippable _equippableContract = IRMRKEquippable(
+            equippableContract
         );
 
+        resource = _equippableContract.getExtendedResource(resourceId);
+        address targetBaseAddress = _equippableContract.getBaseAddressOfResource(resourceId);
+
         // Fixed parts:
-        uint64[] memory fixedPartIds = RMRKEquippable(_equippableContract)
-            .getFixedPartIds(resourceId);
+        uint64[] memory fixedPartIds = _equippableContract.getFixedPartIds(
+            resourceId
+        );
         fixedParts = new IRMRKEquippable.FixedPart[](fixedPartIds.length);
 
         uint256 len = fixedPartIds.length;
@@ -100,8 +99,9 @@ contract RMRKEquippableViews {
         }
 
         // Slot parts:
-        uint64[] memory slotPartIds = RMRKEquippable(_equippableContract)
-            .getSlotPartIds(resourceId);
+        uint64[] memory slotPartIds = _equippableContract.getSlotPartIds(
+            resourceId
+        );
         slotParts = new IRMRKEquippable.SlotPart[](slotPartIds.length);
         len = slotPartIds.length;
 
@@ -110,9 +110,8 @@ contract RMRKEquippableViews {
                 targetBaseAddress
             ).getParts(slotPartIds);
             for (uint256 i; i < len; ) {
-                IRMRKEquippable.Equipment memory equipment = RMRKEquippable(
-                    _equippableContract
-                ).getEquipment(tokenId, targetBaseAddress, slotPartIds[i]);
+                IRMRKEquippable.Equipment memory equipment = _equippableContract
+                    .getEquipment(tokenId, targetBaseAddress, slotPartIds[i]);
                 if (equipment.resourceId == resourceId) {
                     slotParts[i] = IRMRKEquippable.SlotPart({
                         partId: slotPartIds[i],

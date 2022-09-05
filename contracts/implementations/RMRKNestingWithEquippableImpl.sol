@@ -2,7 +2,6 @@
 
 pragma solidity ^0.8.15;
 
-import "../RMRK/access/OwnableLock.sol";
 import "../RMRK/utils/RMRKMintingUtils.sol";
 import "../RMRK/interfaces/IRMRKNestingWithEquippable.sol";
 import "../RMRK/RMRKNestingWithEquippable.sol";
@@ -11,11 +10,7 @@ error RMRKMintUnderpriced();
 error RMRKMintZero();
 
 //Minimal public implementation of IRMRKNesting for testing.
-contract RMRKNestingWithEquippableImpl is
-    OwnableLock,
-    RMRKMintingUtils,
-    RMRKNestingWithEquippable
-{
+contract RMRKNestingWithEquippableImpl is RMRKMintingUtils, RMRKNestingWithEquippable {
     address _equippableAddress;
 
     constructor(
@@ -89,16 +84,5 @@ contract RMRKNestingWithEquippableImpl is
     function setEquippableAddress(address equippable) external {
         _setEquippableAddress(equippable);
     }
-
-    function transfer(address to, uint256 tokenId) public virtual {
-        transferFrom(_msgSender(), to, tokenId);
-    }
-
-    function nestTransfer(
-        address to,
-        uint256 tokenId,
-        uint256 destinationId
-    ) public virtual {
-        nestTransferFrom(_msgSender(), to, tokenId, destinationId);
-    }
+    
 }

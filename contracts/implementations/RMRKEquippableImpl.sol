@@ -18,18 +18,6 @@ contract RMRKEquippableImpl is Ownable, RMRKMintingUtils, RMRKEquippable {
         uint256 pricePerMint
     ) RMRKEquippable(name, symbol) RMRKMintingUtils(maxSupply, pricePerMint) {}
 
-    function safeMint(address to, uint256 tokenId) public {
-        _safeMint(to, tokenId);
-    }
-
-    function safeMint(
-        address to,
-        uint256 tokenId,
-        bytes memory _data
-    ) public {
-        _safeMint(to, tokenId, _data);
-    }
-
     /*
     Template minting logic
     */
@@ -81,20 +69,6 @@ contract RMRKEquippableImpl is Ownable, RMRKMintingUtils, RMRKEquippable {
     //update for reentrancy
     function burn(uint256 tokenId) public onlyApprovedOrDirectOwner(tokenId) {
         _burn(tokenId);
-    }
-
-    // Utility transfers:
-
-    function transfer(address to, uint256 tokenId) public virtual {
-        transferFrom(_msgSender(), to, tokenId);
-    }
-
-    function nestTransfer(
-        address to,
-        uint256 tokenId,
-        uint256 destinationId
-    ) public virtual {
-        nestTransferFrom(_msgSender(), to, tokenId, destinationId);
     }
 
     function addResourceToToken(

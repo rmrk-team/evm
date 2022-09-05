@@ -9,7 +9,6 @@ import "./interfaces/IRMRKEquippable.sol";
 import "./interfaces/IRMRKNesting.sol";
 import "./library/RMRKLib.sol";
 import "./RMRKNesting.sol";
-import "./RMRKEquippableViews.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
 // import "hardhat/console.sol";
 
@@ -59,6 +58,8 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
     //List of all resources
     uint64[] internal _allResources;
 
+    // ------------------- RESOURCE APPROVALS --------------
+
     // Mapping from token ID to approved address for resources
     mapping(uint256 => address) internal _tokenApprovalsForResources;
 
@@ -66,13 +67,15 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
     mapping(address => mapping(address => bool))
         internal _operatorApprovalsForResources;
 
-    // ------------------- Equippable --------------
+    // ------------------- EQUIPPABLE --------------
 
+    // FIXME: Deprecate this, move Views to fully external
     // External contract used for heavy views to save contract size. Deployed on contructor
-    RMRKEquippableViews private _views;
+    // RMRKEquippableViews private _views;
 
-    //mapping of uint64 Ids to resource object
+    //Mapping of uint64 resource ID to corresponding base address
     mapping(uint64 => address) private _baseAddresses;
+    //Mapping of uint64 Ids to resource object
     mapping(uint64 => uint64) private _equippableRefIds;
 
     //Mapping of resourceId to all base parts (slot and fixed) applicable to this resource. Check cost of adding these to resource struct.
@@ -107,9 +110,7 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
      */
     constructor(string memory name_, string memory symbol_)
         RMRKNesting(name_, symbol_)
-    {
-        _views = new RMRKEquippableViews(address(this));
-    }
+    {}
 
     /**
      * @dev See {IERC165-supportsInterface}.
@@ -129,7 +130,7 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
 
     // ------------------------------- RESOURCES ------------------------------
 
-    // --------------------------- GETTING RESOURCES --------------------------
+    // --------------------------- RESOURCE GETTERS ---------------------------
 
     function getResource(uint64 resourceId)
         public
@@ -223,7 +224,7 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
         return _resourceOverwrites[tokenId][resourceId];
     }
 
-    // --------------------------- HANDLING RESOURCES -------------------------
+    // --------------------------- RESOURCE HANDLERS -------------------------
 
     function acceptResource(uint256 tokenId, uint256 index)
         external
@@ -293,6 +294,8 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
 
         emit ResourcePrioritySet(tokenId);
     }
+
+    // --------------------------- RESOURCE INTERNALS -------------------------
 
     // This is expected to be implemented with custom guard:
     function _addResourceEntry(
@@ -392,7 +395,7 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
         return uri;
     }
 
-    // ----------------------- APPROVALS FOR RESOURCES ------------------------
+    // ----------------------- RESOURCE APPROVALS ------------------------
 
     function approveForResources(address to, uint256 tokenId) external virtual {
         address owner = ownerOf(tokenId);
@@ -559,6 +562,7 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
         );
     }
 
+    //FIXME: This can probably be optimized. Instead of running unequip first, can we just replace the data?
     function replaceEquipment(IntakeEquip memory data)
         external
         onlyApprovedOrOwner(data.tokenId)
@@ -577,36 +581,41 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
             uint8(0);
     }
 
-    function getEquipped(uint64 tokenId, uint64 resourceId)
-        public
-        view
-        returns (uint64[] memory slotParts, Equipment[] memory childrenEquipped)
-    {
-        return
-            _views.getEquipped(tokenId, resourceId, _baseAddresses[resourceId]);
+    //FIXME: Ensure deprecation does not remove functionality
+    // function getEquipped(uint64 tokenId, uint64 resourceId)
+    //     public
+    //     view
+    //     returns (uint64[] memory slotParts, Equipment[] memory childrenEquipped)
+    // {
+    //     return
+    //         _views.getEquipped(tokenId, resourceId, _baseAddresses[resourceId]);
+    // }
+
+    // //Gate for equippable array in here by check of slotPartDefinition to slotPartId
+    // function composeEquippables(uint256 tokenId, uint64 resourceId)
+    //     public
+    //     view
+    //     returns (
+    //         ExtendedResource memory resource,
+    //         FixedPart[] memory fixedParts,
+    //         SlotPart[] memory slotParts
+    //     )
+    // {
+    //     // We make sure token has that resource. Alternative is to receive index but makes equipping more complex.
+    //     (, bool found) = getActiveResources(tokenId).indexOf(resourceId);
+    //     if (!found) revert RMRKTokenDoesNotHaveActiveResource();
+
+    //     address targetBaseAddress = _baseAddresses[resourceId];
+    //     if (targetBaseAddress == address(0)) revert RMRKNotComposableResource();
+    //     return
+    //         _views.composeEquippables(tokenId, resourceId, targetBaseAddress);
+    // }
+
+    function getBaseAddressOfResource(uint64 resourceId) external view returns(address) {
+        return _baseAddresses[resourceId];
     }
 
-    //Gate for equippable array in here by check of slotPartDefinition to slotPartId
-    function composeEquippables(uint256 tokenId, uint64 resourceId)
-        public
-        view
-        returns (
-            ExtendedResource memory resource,
-            FixedPart[] memory fixedParts,
-            SlotPart[] memory slotParts
-        )
-    {
-        // We make sure token has that resource. Alternative is to receive index but makes equipping more complex.
-        (, bool found) = getActiveResources(tokenId).indexOf(resourceId);
-        if (!found) revert RMRKTokenDoesNotHaveActiveResource();
-
-        address targetBaseAddress = _baseAddresses[resourceId];
-        if (targetBaseAddress == address(0)) revert RMRKNotComposableResource();
-        return
-            _views.composeEquippables(tokenId, resourceId, targetBaseAddress);
-    }
-
-    // --------------------- VALIDATION ---------------------
+    // --------------------- ADMIN VALIDATION ---------------------
 
     // Declares that resources with this refId, are equippable into the parent address, on the partId slot
     function _setValidParentRefId(
