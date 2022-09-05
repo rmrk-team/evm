@@ -4,14 +4,20 @@
 
 pragma solidity ^0.8.15;
 
-import "../RMRK/interfaces/IRMRKEquippable.sol";
-import "../RMRK/interfaces/IRMRKNestingWithEquippable.sol";
-import "../RMRK/RMRKNesting.sol";
+import "../../RMRK/equippable/IRMRKEquippable.sol";
+import "../../RMRK/equippable/IRMRKNestingExternalEquip.sol";
+import "../../RMRK/nesting/RMRKNesting.sol";
 // import "hardhat/console.sol";
 
 error RMRKMustUnequipFirst();
 
-contract RMRKNestingWithEquippable is IRMRKNestingWithEquippable, RMRKNesting {
+/**
+ * @dev RMRKNesting contract with external equippable contract for space saving purposes. Expected to be deployed along
+ * an instance of RMRKExternalEquip.sol. To make use of the equippable module with this contract, expose the _setEquippableAddress
+ * function and set it to the corresponding equipment contraft after deployment. Consider using RMRKOwnableLock to lock the equippable
+ * address after deployment.
+ */
+contract RMRKNestingExternalEquip is IRMRKNestingExternalEquip, RMRKNesting {
     address private _equippableAddress;
 
     constructor(string memory name_, string memory symbol_)

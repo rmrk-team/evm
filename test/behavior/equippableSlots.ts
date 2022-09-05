@@ -60,7 +60,7 @@ async function shouldBehaveLikeEquippableWithSlots(
     view = this.view;
   });
 
-  describe.only('Validations', async function () {
+  describe('Validations', async function () {
     it('can validate equips of weapons into soldiers', async function () {
       // This resource is not equippable
       expect(
@@ -148,7 +148,7 @@ async function shouldBehaveLikeEquippableWithSlots(
     });
   });
 
-  describe.only('Equip', async function () {
+  describe('Equip', async function () {
     it('can equip weapon', async function () {
       // Weapon is child on index 0, background on index 1
       const soldierOwner = addrs[0];
@@ -205,7 +205,7 @@ async function shouldBehaveLikeEquippableWithSlots(
           backgroundEquip.address,
         ],
       ];
-      expect(await soldierEquip.getEquipped(soldiersIds[0], soldierResId)).to.eql([
+      expect(await view.getEquipped(soldierEquip.address, soldiersIds[0], soldierResId)).to.eql([
         expectedSlots,
         expectedEquips,
       ]);
@@ -584,7 +584,7 @@ async function shouldBehaveLikeEquippableWithSlots(
           'noBackground.png', // metadataURI
         ],
       ];
-      const allResources = await soldierEquip.composeEquippables(soldiersIds[0], soldierResId);
+      const allResources = await view.composeEquippables(soldierEquip.address, soldiersIds[0], soldierResId);
       expect(allResources).to.eql([expectedResource, expectedFixedParts, expectedSlotParts]);
     });
 
@@ -595,7 +595,7 @@ async function shouldBehaveLikeEquippableWithSlots(
         base.address, // baseAddress
         'ipfs:background/', // metadataURI
       ];
-      const allResources = await backgroundEquip.composeEquippables(
+      const allResources = await view.composeEquippables(backgroundEquip.address, 
         backgroundsIds[0],
         backgroundResourceId,
       );
@@ -692,7 +692,7 @@ async function shouldBehaveLikeEquippableWithSlots(
       [bn(0), bn(0), bn(0), ethers.constants.AddressZero],
       [bn(0), bn(0), bn(0), ethers.constants.AddressZero],
     ];
-    expect(await soldierEquip.getEquipped(soldiersIds[0], soldierResId)).to.eql([
+    expect(await view.getEquipped(soldierEquip.address, soldiersIds[0], soldierResId)).to.eql([
       expectedSlots,
       expectedEquips,
     ]);
@@ -725,7 +725,7 @@ async function shouldBehaveLikeEquippableWithSlots(
       [bn(soldierResId), bn(newWeaponResId), bn(newWeaponId), weaponEquip.address],
       [bn(0), bn(0), bn(0), ethers.constants.AddressZero],
     ];
-    expect(await soldierEquip.getEquipped(soldiersIds[0], soldierResId)).to.eql([
+    expect(await view.getEquipped(soldierEquip.address, soldiersIds[0], soldierResId)).to.eql([
       expectedSlots,
       expectedEquips,
     ]);

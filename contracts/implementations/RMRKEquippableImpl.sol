@@ -3,7 +3,7 @@
 pragma solidity ^0.8.16;
 
 import "../RMRK/utils/RMRKMintingUtils.sol";
-import "../RMRK/RMRKEquippable.sol";
+import "../RMRK/equippable/RMRKEquippable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 /* import "hardhat/console.sol"; */
 

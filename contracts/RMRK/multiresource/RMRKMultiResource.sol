@@ -10,8 +10,8 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
-import "./interfaces/IRMRKMultiResource.sol";
-import "./library/RMRKLib.sol";
+import "./IRMRKMultiResource.sol";
+import "../library/RMRKLib.sol";
 // import "hardhat/console.sol";
 
 error ERC721AddressZeroIsNotaValidOwner();
@@ -38,11 +38,7 @@ error RMRKApproveForResourcesCallerIsNotOwnerNorApprovedForAll();
 error RMRKApproveForResourcesToCaller();
 
 /**
- * @dev Implementation of https://eips.ethereum.org/EIPS/eip-721[ERC721] Non-Fungible Token Standard, 
-    based on https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC721/ERC721.sol
-    with some modifications for RMRK standards, including:
-    Use of custom errors, having _balances and _tokenApprovals internal instead of private,
-    call to ownerOf not fixed to ERC721.
+ * @dev Implementation of RMRK Multiresource contract, on top of ERC721.
  */
 contract RMRKMultiResource is
     Context,

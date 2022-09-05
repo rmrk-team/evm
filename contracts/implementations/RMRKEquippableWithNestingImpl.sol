@@ -2,12 +2,12 @@
 
 pragma solidity ^0.8.15;
 
-import "../RMRK/RMRKEquippableWithNesting.sol";
+import "../RMRK/equippable/RMRKExternalEquip.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
 //Minimal public implementation of RMRKEquippableWithNesting for testing.
-contract RMRKEquippableWithNestingImpl is Ownable, RMRKEquippableWithNesting {
+contract RMRKEquippableWithNestingImpl is Ownable, RMRKExternalEquip {
     using Strings for uint256;
 
     //Mapping of uint64 resource ID to tokenEnumeratedResource for tokenURI
@@ -17,7 +17,7 @@ contract RMRKEquippableWithNestingImpl is Ownable, RMRKEquippableWithNesting {
     string internal _fallbackURI;
 
     constructor(address nestingAddress)
-        RMRKEquippableWithNesting(nestingAddress)
+        RMRKExternalEquip(nestingAddress)
     {}
 
     function getFallbackURI() external view virtual returns (string memory) {

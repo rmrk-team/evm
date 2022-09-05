@@ -2,14 +2,14 @@
 
 pragma solidity ^0.8.15;
 
-import "../RMRK/RMRKNestingWithEquippable.sol";
+import "../RMRK/equippable/RMRKNestingExternalEquip.sol";
 
 // import "hardhat/console.sol";
 
 //Minimal public implementation of IRMRKNesting for testing.
-contract RMRKNestingWithEquippableMock is RMRKNestingWithEquippable {
+contract RMRKNestingWithEquippableMock is RMRKNestingExternalEquip {
     constructor(string memory name_, string memory symbol_)
-        RMRKNestingWithEquippable(name_, symbol_)
+        RMRKNestingExternalEquip(name_, symbol_)
     {}
 
     function safeMint(address to, uint256 tokenId) public {

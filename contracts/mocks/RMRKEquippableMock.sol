@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.15;
 
-import "../RMRK/RMRKEquippable.sol";
+import "../RMRK/equippable/RMRKEquippable.sol";
 
 /* import "hardhat/console.sol"; */
 

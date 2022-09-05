@@ -4,7 +4,7 @@ pragma solidity ^0.8.15;
 
 import "../RMRK/access/OwnableLock.sol";
 import "../RMRK/utils/RMRKMintingUtils.sol";
-import "../RMRK/RMRKNesting.sol";
+import "../RMRK/nesting/RMRKNesting.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
 error RMRKMintUnderpriced();

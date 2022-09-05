@@ -4,9 +4,9 @@
 
 pragma solidity ^0.8.15;
 
-import "./interfaces/IRMRKMultiResource.sol";
-import "./interfaces/IRMRKNesting.sol";
-import "./library/RMRKLib.sol";
+import "../multiresource/IRMRKMultiResource.sol";
+import "./IRMRKNesting.sol";
+import "../library/RMRKLib.sol";
 import "./RMRKNesting.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
@@ -28,6 +28,11 @@ error RMRKNotApprovedForResourcesOrOwner();
 error RMRKApprovalForResourcesToCurrentOwner();
 error RMRKApproveForResourcesCallerIsNotOwnerNorApprovedForAll();
 error RMRKApproveForResourcesToCaller();
+
+/**
+ * @dev Mid-level contract implementing multiresource on top of nesting.
+ *
+ */
 
 contract RMRKNestingMultiResource is RMRKNesting, IRMRKMultiResource {
     using RMRKLib for uint256;

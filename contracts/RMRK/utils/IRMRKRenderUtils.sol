@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.0;
 
-import "contracts/RMRK/interfaces/IRMRKMultiResource.sol";
+import "contracts/RMRK/multiresource/IRMRKMultiResource.sol";
 
 interface IRMRKRenderUtils {
     /**

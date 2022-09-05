@@ -7,7 +7,7 @@ pragma solidity ^0.8.0;
  * @dev Interface for any contract that wants to support safeTransfers
  * from ERC721 asset contracts.
  */
-interface IRMRKNestingWithEquippable {
+interface IRMRKNestingExternalEquip {
     /**
      * @dev emitted when the equippable address is set
      */

@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.0;
 
-import "./IRMRKMultiResource.sol";
+import "../multiresource/IRMRKMultiResource.sol";
 
 interface IRMRKEquippable is IRMRKMultiResource {
     /**

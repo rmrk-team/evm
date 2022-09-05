@@ -3,7 +3,7 @@
 pragma solidity ^0.8.15;
 
 import "../RMRK/utils/RMRKMintingUtils.sol";
-import "../RMRK/RMRKNestingMultiResource.sol";
+import "../RMRK/nesting/RMRKNestingMultiResource.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
 error RMRKMintUnderpriced();
