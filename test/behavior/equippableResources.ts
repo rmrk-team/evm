@@ -25,13 +25,13 @@ async function shouldBehaveLikeEquippableResources(
     chunkyEquip = this.equip;
   });
 
-  describe.skip('Interface support', async function () {
+  describe('Interface support', async function () {
     it('can support IERC165', async function () {
       expect(await chunky.supportsInterface('0x01ffc9a7')).to.equal(true);
     });
 
     it('can support IEquippable', async function () {
-      expect(await chunkyEquip.supportsInterface('0xdcfac6de')).to.equal(true);
+      expect(await chunkyEquip.supportsInterface('0xd3a28ca0')).to.equal(true);
     });
 
     it('cannot support other interfaceId', async function () {

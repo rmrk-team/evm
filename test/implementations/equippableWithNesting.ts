@@ -238,7 +238,7 @@ async function multiResourceFixture() {
 
 // --------------- EQUIPPABLE BEHAVIOR -----------------------
 
-describe.skip('EquippableImpl with Parts', async () => {
+describe('EquippableImpl with Parts', async () => {
   beforeEach(async function () {
     const { base, neon, neonEquip, mask, maskEquip, view } = await loadFixture(partsFixture);
 
@@ -253,7 +253,7 @@ describe.skip('EquippableImpl with Parts', async () => {
   shouldBehaveLikeEquippableWithParts();
 });
 
-describe.skip('EquippableImpl with Slots', async () => {
+describe('EquippableImpl with Slots', async () => {
   beforeEach(async function () {
     const {
       base,
@@ -283,7 +283,7 @@ describe.skip('EquippableImpl with Slots', async () => {
   shouldBehaveLikeEquippableWithSlots(nestMintFromImpl);
 });
 
-describe.skip('EquippableImpl Resources', async () => {
+describe('EquippableImpl Resources', async () => {
   const equippableRefIdDefault = bn(1);
   const metaURIDefault = 'metaURI';
   const baseAddressDefault = ethers.constants.AddressZero;
@@ -299,7 +299,7 @@ describe.skip('EquippableImpl Resources', async () => {
 
   shouldBehaveLikeEquippableResources(mintFromImpl);
 
-  describe.skip('Token URI', async function () {
+  describe('Token URI', async function () {
     it('can set fallback URI', async function () {
       await this.equip.setFallbackURI('TestURI');
       expect(await this.equip.getFallbackURI()).to.be.eql('TestURI');
@@ -369,7 +369,7 @@ describe.skip('EquippableImpl Resources', async () => {
 
 // --------------- MULTI RESOURCE BEHAVIOR -----------------------
 
-describe.skip('EquippableImpl MR behavior with minted token', async () => {
+describe('EquippableImpl MR behavior with minted token', async () => {
   let nesting: Contract;
   let equip: Contract;
 

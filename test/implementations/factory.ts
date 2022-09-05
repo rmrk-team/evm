@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 
-describe.skip('RMRKFactory', async () => {
+describe('RMRKFactory', async () => {
   const name = 'RmrkTest';
   const symbol = 'RMRKTST';
   const ONE_ETH = ethers.utils.parseEther('1.0');

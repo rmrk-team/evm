@@ -9,9 +9,11 @@ import "../library/RMRKLib.sol";
 import "./IRMRKEquippable.sol";
 
 import "@openzeppelin/contracts/utils/Address.sol";
-
-
 // import "hardhat/console.sol";
+
+
+error RMRKTokenDoesNotHaveActiveResource();
+error RMRKNotComposableResource();
 
 contract RMRKEquippableViews {
     using RMRKLib for uint256;
@@ -72,8 +74,14 @@ contract RMRKEquippableViews {
             equippableContract
         );
 
-        resource = _equippableContract.getExtendedResource(resourceId);
+        // We make sure token has that resource. Alternative is to receive index but makes equipping more complex.
+        (, bool found) = _equippableContract.getActiveResources(tokenId).indexOf(resourceId);
+        if (!found) revert RMRKTokenDoesNotHaveActiveResource();
+
         address targetBaseAddress = _equippableContract.getBaseAddressOfResource(resourceId);
+        if (targetBaseAddress == address(0)) revert RMRKNotComposableResource();
+
+        resource = _equippableContract.getExtendedResource(resourceId);
 
         // Fixed parts:
         uint64[] memory fixedPartIds = _equippableContract.getFixedPartIds(

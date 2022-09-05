@@ -584,7 +584,11 @@ async function shouldBehaveLikeEquippableWithSlots(
           'noBackground.png', // metadataURI
         ],
       ];
-      const allResources = await view.composeEquippables(soldierEquip.address, soldiersIds[0], soldierResId);
+      const allResources = await view.composeEquippables(
+        soldierEquip.address,
+        soldiersIds[0],
+        soldierResId,
+      );
       expect(allResources).to.eql([expectedResource, expectedFixedParts, expectedSlotParts]);
     });
 
@@ -595,7 +599,8 @@ async function shouldBehaveLikeEquippableWithSlots(
         base.address, // baseAddress
         'ipfs:background/', // metadataURI
       ];
-      const allResources = await view.composeEquippables(backgroundEquip.address, 
+      const allResources = await view.composeEquippables(
+        backgroundEquip.address,
         backgroundsIds[0],
         backgroundResourceId,
       );
@@ -605,8 +610,8 @@ async function shouldBehaveLikeEquippableWithSlots(
     it('cannot get composables for soldier with not associated resource', async function () {
       const wrongResId = weaponResourcesEquip[1];
       await expect(
-        weaponEquip.composeEquippables(weaponsIds[0], wrongResId),
-      ).to.be.revertedWithCustomError(weaponEquip, 'RMRKTokenDoesNotHaveActiveResource');
+        view.composeEquippables(weaponEquip.address, weaponsIds[0], wrongResId),
+      ).to.be.revertedWithCustomError(view, 'RMRKTokenDoesNotHaveActiveResource');
     });
   });
 

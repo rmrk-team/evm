@@ -18,7 +18,7 @@ async function singleFixture(): Promise<Contract> {
   return singleFixtureWithArgs('RMRKMultiResourceImpl', ['MultiResource', 'MR', 10000, ONE_ETH]);
 }
 
-describe.skip('MultiResourceImpl Other Behavior', async () => {
+describe('MultiResourceImpl Other Behavior', async () => {
   let token: Contract;
 
   let owner: SignerWithAddress;
@@ -136,7 +136,7 @@ describe.skip('MultiResourceImpl Other Behavior', async () => {
   });
 });
 
-describe.skip('MultiResourceImpl MR behavior', async () => {
+describe('MultiResourceImpl MR behavior', async () => {
   beforeEach(async function () {
     this.token = await loadFixture(singleFixture);
   });
