@@ -8,15 +8,15 @@
 
 pragma solidity ^0.8.15;
 
-import "./interfaces/IRMRKBaseStorage.sol";
-import "./interfaces/IRMRKEquippableWithNesting.sol";
-import "./interfaces/IRMRKNesting.sol";
-import "./interfaces/IRMRKNestingWithEquippable.sol";
-import "./library/RMRKLib.sol";
+import "../base/IRMRKBaseStorage.sol";
+import "../nesting/IRMRKNesting.sol";
+import "../library/RMRKLib.sol";
+import "./IRMRKNestingExternalEquip.sol";
+import "./IRMRKExternalEquip.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
-import "hardhat/console.sol";
+// import "hardhat/console.sol";
 
 // MultiResource
 error RMRKBadPriorityListLength();
@@ -40,7 +40,11 @@ error RMRKNotEquipped();
 error RMRKSlotAlreadyUsed();
 error RMRKTokenDoesNotHaveActiveResource();
 
-contract RMRKEquippableWithNesting is Context, IRMRKEquippableWithNesting {
+/**
+ * @dev RMRKEquippable external contract, expected to be paired with an instance of RMRKNestingExternalEquip.sol. This
+ * contract takes over
+ */
+contract RMRKExternalEquip is Context, IRMRKExternalEquip {
     using RMRKLib for uint64[];
     using RMRKLib for uint128[];
     using Strings for uint256;
@@ -99,7 +103,7 @@ contract RMRKEquippableWithNesting is Context, IRMRKEquippableWithNesting {
 
     function _onlyApprovedOrOwner(uint256 tokenId) internal view {
         if (
-            !IRMRKNestingWithEquippable(_nestingAddress).isApprovedOrOwner(
+            !IRMRKNestingExternalEquip(_nestingAddress).isApprovedOrOwner(
                 _msgSender(),
                 tokenId
             )
@@ -146,7 +150,7 @@ contract RMRKEquippableWithNesting is Context, IRMRKEquippableWithNesting {
         virtual
         returns (bool)
     {
-        return (interfaceId == type(IRMRKEquippableWithNesting).interfaceId ||
+        return (interfaceId == type(IRMRKExternalEquip).interfaceId ||
             interfaceId == type(IRMRKEquippable).interfaceId ||
             interfaceId == type(IRMRKMultiResource).interfaceId ||
             interfaceId == type(IERC165).interfaceId);
@@ -219,6 +223,43 @@ contract RMRKEquippableWithNesting is Context, IRMRKEquippableWithNesting {
         returns (uint64)
     {
         return _resourceOverwrites[tokenId][resourceId];
+    }
+
+    function getResObjectByIndex(uint256 tokenId, uint256 index)
+        external
+        view
+        virtual
+        returns (Resource memory)
+    {
+        uint64 resourceId = getActiveResources(tokenId)[index];
+        return getResource(resourceId);
+    }
+
+    function getPendingResObjectByIndex(uint256 tokenId, uint256 index)
+        external
+        view
+        virtual
+        returns (Resource memory)
+    {
+        uint64 resourceId = getPendingResources(tokenId)[index];
+        return getResource(resourceId);
+    }
+
+    function getResourcesById(uint64[] calldata resourceIds)
+        public
+        view
+        virtual
+        returns (Resource[] memory)
+    {
+        uint256 len = resourceIds.length;
+        Resource[] memory resources = new Resource[](len);
+        for (uint256 i; i < len; ) {
+            resources[i] = getResource(resourceIds[i]);
+            unchecked {
+                ++i;
+            }
+        }
+        return resources;
     }
 
     // --------------------------- HANDLING RESOURCES -------------------------
@@ -470,7 +511,7 @@ contract RMRKEquippableWithNesting is Context, IRMRKEquippableWithNesting {
             data.tokenId,
             data.childIndex
         );
-        address childEquippable = IRMRKNestingWithEquippable(
+        address childEquippable = IRMRKNestingExternalEquip(
             child.contractAddress
         ).getEquippableAddress();
 
@@ -536,7 +577,7 @@ contract RMRKEquippableWithNesting is Context, IRMRKEquippableWithNesting {
         if (equipment.childEquippableAddress == address(0))
             revert RMRKNotEquipped();
         delete _equipments[tokenId][targetBaseAddress][slotPartId];
-        address childNestingAddress = IRMRKEquippableWithNesting(
+        address childNestingAddress = IRMRKExternalEquip(
             equipment.childEquippableAddress
         ).getNestingAddress();
         _equipCountPerChild[tokenId][childNestingAddress][
@@ -677,7 +718,11 @@ contract RMRKEquippableWithNesting is Context, IRMRKEquippableWithNesting {
     //     }
     // }
 
-    function getBaseAddressOfResource(uint64 resourceId) external view returns(address) {
+    function getBaseAddressOfResource(uint64 resourceId)
+        external
+        view
+        returns (address)
+    {
         return _baseAddresses[resourceId];
     }
 

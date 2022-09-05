@@ -4,8 +4,8 @@
 
 pragma solidity ^0.8.15;
 
-import "./interfaces/IRMRKNesting.sol";
-import "./library/RMRKLib.sol";
+import "./IRMRKNesting.sol";
+import "../library/RMRKLib.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
@@ -37,6 +37,13 @@ error RMRKNotApprovedOrDirectOwner();
 error RMRKPendingChildIndexOutOfRange();
 error RMRKInvalidChildReclaim();
 error RMRKChildAlreadyExists();
+
+/**
+ * @dev RMRK nesting implementation. This contract is heirarchy agnostic, and can
+ * support an arbitrary number of nested levels up and down, as long as gas limits
+ * allow
+ *
+ */
 
 contract RMRKNesting is
     Context,

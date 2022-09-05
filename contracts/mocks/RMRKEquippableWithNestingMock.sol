@@ -2,14 +2,14 @@
 
 pragma solidity ^0.8.15;
 
-import "../RMRK/RMRKEquippableWithNesting.sol";
+import "../RMRK/equippable/RMRKExternalEquip.sol";
 
 /* import "hardhat/console.sol"; */
 
 //Minimal public implementation of RMRKEquippableWithNesting for testing.
-contract RMRKEquippableWithNestingMock is RMRKEquippableWithNesting {
+contract RMRKEquippableWithNestingMock is RMRKExternalEquip {
     constructor(address nestingAddress)
-        RMRKEquippableWithNesting(nestingAddress)
+        RMRKExternalEquip(nestingAddress)
     {}
 
     function setNestingAddress(address nestingAddress) external {

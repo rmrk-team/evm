@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.15;
 
-import "../RMRK/RMRKBaseStorage.sol";
+import "../RMRK/base/RMRKBaseStorage.sol";
 
 contract RMRKBaseStorageMock is RMRKBaseStorage {
     constructor(string memory symbol_, string memory type__)

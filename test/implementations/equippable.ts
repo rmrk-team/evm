@@ -137,7 +137,7 @@ async function multiResourceFixture() {
 
 // --------------- EQUIPPABLE BEHAVIOR -----------------------
 
-describe('EquippableMock with Parts', async () => {
+describe.skip('EquippableMock with Parts', async () => {
   beforeEach(async function () {
     const { base, neon, mask, view } = await loadFixture(partsFixture);
 
@@ -152,9 +152,9 @@ describe('EquippableMock with Parts', async () => {
   shouldBehaveLikeEquippableWithParts();
 });
 
-describe('EquippableMock with Slots', async () => {
+describe.skip('EquippableMock with Slots', async () => {
   beforeEach(async function () {
-    const { base, soldier, weapon, weaponGem, background } = await loadFixture(slotsFixture);
+    const { base, soldier, weapon, weaponGem, background, view } = await loadFixture(slotsFixture);
 
     this.base = base;
     this.soldier = soldier;
@@ -165,19 +165,20 @@ describe('EquippableMock with Slots', async () => {
     this.weaponGemEquip = weaponGem;
     this.background = background;
     this.backgroundEquip = background;
+    this.view = view;
   });
 
   shouldBehaveLikeEquippableWithSlots(nestMintFromImpl);
 });
 
-describe('EquippableMock Resources', async () => {
+describe.skip('EquippableMock Resources', async () => {
   beforeEach(async function () {
     const { equip } = await loadFixture(resourcesFixture);
     this.nesting = equip;
     this.equip = equip;
   });
 
-  describe('Init', async function () {
+  describe.skip('Init', async function () {
     it('can get names and symbols', async function () {
       expect(await this.equip.name()).to.equal('Chunky');
       expect(await this.equip.symbol()).to.equal('CHNK');
@@ -191,7 +192,7 @@ describe('EquippableMock Resources', async () => {
 
 // --------------- MULTI RESOURCE BEHAVIOR -----------------------
 
-describe('EquippableMock MR behavior', async () => {
+describe.skip('EquippableMock MR behavior', async () => {
   let equip: Contract;
 
   beforeEach(async function () {

@@ -3,14 +3,13 @@
 pragma solidity ^0.8.15;
 
 import "../RMRK/utils/RMRKMintingUtils.sol";
-import "../RMRK/interfaces/IRMRKNestingWithEquippable.sol";
-import "../RMRK/RMRKNestingWithEquippable.sol";
+import "../RMRK/equippable/RMRKNestingExternalEquip.sol";
 
 error RMRKMintUnderpriced();
 error RMRKMintZero();
 
 //Minimal public implementation of IRMRKNesting for testing.
-contract RMRKNestingWithEquippableImpl is RMRKMintingUtils, RMRKNestingWithEquippable {
+contract RMRKNestingWithEquippableImpl is RMRKMintingUtils, RMRKNestingExternalEquip {
     address _equippableAddress;
 
     constructor(
@@ -20,7 +19,7 @@ contract RMRKNestingWithEquippableImpl is RMRKMintingUtils, RMRKNestingWithEquip
         uint256 pricePerMint_,
         address equippableAddress_
     )
-        RMRKNestingWithEquippable(name_, symbol_)
+        RMRKNestingExternalEquip(name_, symbol_)
         RMRKMintingUtils(maxSupply_, pricePerMint_)
     {
         // Can't add an equippable deployment here due to contract size, for factory

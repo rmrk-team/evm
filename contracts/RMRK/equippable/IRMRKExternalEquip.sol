@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 
 import "./IRMRKEquippable.sol";
 
-interface IRMRKEquippableWithNesting is IRMRKEquippable {
+interface IRMRKExternalEquip is IRMRKEquippable {
     /**
      * @dev emitted when the nesting address is set
      */

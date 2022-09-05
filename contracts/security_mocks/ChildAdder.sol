@@ -1,6 +1,6 @@
 pragma solidity ^0.8.16;
 
-import "../RMRK/interfaces/IRMRKNesting.sol";
+import "../RMRK/nesting/IRMRKNesting.sol";
 
 import "hardhat/console.sol";
 

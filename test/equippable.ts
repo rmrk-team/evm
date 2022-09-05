@@ -152,7 +152,7 @@ describe('EquippableMock with Parts', async () => {
 
 describe('EquippableMock with Slots', async () => {
   beforeEach(async function () {
-    const { base, soldier, weapon, weaponGem, background } = await loadFixture(slotsFixture);
+    const { base, soldier, weapon, weaponGem, background, view } = await loadFixture(slotsFixture);
 
     this.base = base;
     this.soldier = soldier;
@@ -163,6 +163,7 @@ describe('EquippableMock with Slots', async () => {
     this.weaponGemEquip = weaponGem;
     this.background = background;
     this.backgroundEquip = background;
+    this.view = view;
   });
 
   shouldBehaveLikeEquippableWithSlots(nestMintFromMock);

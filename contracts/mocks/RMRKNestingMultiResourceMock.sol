@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.15;
 
-import "../RMRK/RMRKNestingMultiResource.sol";
+import "../RMRK/nesting/RMRKNestingMultiResource.sol";
 
 // import "hardhat/console.sol";
 

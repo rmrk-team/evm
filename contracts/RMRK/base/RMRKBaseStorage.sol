@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.15;
 
-import "./interfaces/IRMRKBaseStorage.sol";
+import "./IRMRKBaseStorage.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 // import "hardhat/console.sol";
 
@@ -12,29 +12,11 @@ error RMRKPartIsNotSlot();
 error RMRKZeroLengthIdsPassed();
 error RMRKBadConfig();
 
+/**
+ * @dev Base storage contract for RMRK equippable module.
+ */
 contract RMRKBaseStorage is IRMRKBaseStorage {
     using Address for address;
-    /*
-    REVIEW NOTES:
-
-    This contract represents an initial working implementation for a representation of a single RMRK base.
-
-    In its current implementation, the single base struct is overloaded to handle both fixed and slot-style
-    assets. This implementation is simple but inefficient, as each stores a complete string representation.
-    of each asset. Future implementations may want to include a mapping of common prefixes / suffixes and
-    getters that recompose these assets on the fly.
-
-    IntakeStruct currently requires the user to pass an id of type uint64 as an identifier. Other options
-    include computing the id on-chain as a hash of attributes of the struct, or a simple incrementer. Passing
-    an ID or an incrementer will likely be the cheapest in terms of gas cost.
-
-    TODO: Clarify: This is not true at the moment: We could add a lock (could be auto timed)
-    In its current implementation, all base asset entries MUST be passed via an array during contract construction.
-    This is the only way to ensure contract immutability after deployment, though due to the gas costs of RMRK
-    base assets it is highly recommended that developers are offered a commit > freeze pattern, by which developers
-    are allowed multiple commits until a 'freeze' function is called, after which the base contract is no
-    longer mutable.
-    */
 
     /**
      * @dev Mapping of uint64 partId to IRMRKBaseStorage Part struct

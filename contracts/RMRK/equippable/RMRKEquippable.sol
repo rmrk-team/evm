@@ -4,11 +4,10 @@
 
 pragma solidity ^0.8.15;
 
-import "./interfaces/IRMRKBaseStorage.sol";
-import "./interfaces/IRMRKEquippable.sol";
-import "./interfaces/IRMRKNesting.sol";
-import "./library/RMRKLib.sol";
-import "./RMRKNesting.sol";
+import "../base/IRMRKBaseStorage.sol";
+import "../library/RMRKLib.sol";
+import "../nesting/RMRKNesting.sol";
+import "./IRMRKEquippable.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
 // import "hardhat/console.sol";
 

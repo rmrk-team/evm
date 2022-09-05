@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
-import "contracts/RMRK/interfaces/IRMRKMultiResource.sol";
-import "contracts/RMRK/interfaces/IRMRKRenderUtils.sol";
+import "contracts/RMRK/multiresource/IRMRKMultiResource.sol";
+import "contracts/RMRK/utils/IRMRKRenderUtils.sol";
 
 pragma solidity ^0.8.15;
 

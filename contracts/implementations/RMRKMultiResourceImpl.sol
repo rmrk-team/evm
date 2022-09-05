@@ -3,7 +3,7 @@
 pragma solidity ^0.8.15;
 
 import "../RMRK/utils/RMRKMintingUtils.sol";
-import "../RMRK/RMRKMultiResource.sol";
+import "../RMRK/multiresource/RMRKMultiResource.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
 //import "hardhat/console.sol";

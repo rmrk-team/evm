@@ -228,7 +228,8 @@ describe('EquippableMock with Slots', async () => {
       weaponGem,
       weaponGemEquip,
       background,
-      backgroundEquip
+      backgroundEquip,
+      view
     } = await loadFixture(slotsFixture);
 
     this.base = base;
@@ -240,6 +241,7 @@ describe('EquippableMock with Slots', async () => {
     this.weaponGemEquip = weaponGemEquip;
     this.background = background;
     this.backgroundEquip = backgroundEquip;
+    this.view = view;
   });
 
   shouldBehaveLikeEquippableWithSlots(nestMintFromMock);

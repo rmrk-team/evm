@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.15;
 
-import "../RMRK/RMRKMultiResource.sol";
+import "../RMRK/multiresource/RMRKMultiResource.sol";
 
 contract RMRKMultiResourceMock is RMRKMultiResource {
     constructor(string memory name, string memory symbol)
