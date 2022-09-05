@@ -11,7 +11,6 @@ import "./IRMRKEquippable.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 // import "hardhat/console.sol";
 
-
 error RMRKTokenDoesNotHaveActiveResource();
 error RMRKNotComposableResource();
 
@@ -27,16 +26,20 @@ contract RMRKEquippableViews {
         address equippableContract,
         uint64 tokenId,
         uint64 resourceId
-    ) public view returns (
-        uint64[] memory slotParts,
-        IRMRKEquippable.Equipment[] memory childrenEquipped
     )
+        public
+        view
+        returns (
+            uint64[] memory slotParts,
+            IRMRKEquippable.Equipment[] memory childrenEquipped
+        )
     {
         IRMRKEquippable _equippableContract = IRMRKEquippable(
             equippableContract
         );
 
-        address targetBaseAddress = _equippableContract.getBaseAddressOfResource(resourceId);
+        address targetBaseAddress = _equippableContract
+            .getBaseAddressOfResource(resourceId);
         uint64[] memory slotPartIds = _equippableContract.getSlotPartIds(
             resourceId
         );
@@ -64,21 +67,27 @@ contract RMRKEquippableViews {
         address equippableContract,
         uint256 tokenId,
         uint64 resourceId
-    ) public view returns (
-        IRMRKEquippable.ExtendedResource memory resource,
-        IRMRKEquippable.FixedPart[] memory fixedParts,
-        IRMRKEquippable.SlotPart[] memory slotParts
     )
+        public
+        view
+        returns (
+            IRMRKEquippable.ExtendedResource memory resource,
+            IRMRKEquippable.FixedPart[] memory fixedParts,
+            IRMRKEquippable.SlotPart[] memory slotParts
+        )
     {
         IRMRKEquippable _equippableContract = IRMRKEquippable(
             equippableContract
         );
 
         // We make sure token has that resource. Alternative is to receive index but makes equipping more complex.
-        (, bool found) = _equippableContract.getActiveResources(tokenId).indexOf(resourceId);
+        (, bool found) = _equippableContract
+            .getActiveResources(tokenId)
+            .indexOf(resourceId);
         if (!found) revert RMRKTokenDoesNotHaveActiveResource();
 
-        address targetBaseAddress = _equippableContract.getBaseAddressOfResource(resourceId);
+        address targetBaseAddress = _equippableContract
+            .getBaseAddressOfResource(resourceId);
         if (targetBaseAddress == address(0)) revert RMRKNotComposableResource();
 
         resource = _equippableContract.getExtendedResource(resourceId);

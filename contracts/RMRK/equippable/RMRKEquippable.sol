@@ -573,7 +573,11 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
             uint8(0);
     }
 
-    function getBaseAddressOfResource(uint64 resourceId) external view returns(address) {
+    function getBaseAddressOfResource(uint64 resourceId)
+        external
+        view
+        returns (address)
+    {
         return _baseAddresses[resourceId];
     }
 

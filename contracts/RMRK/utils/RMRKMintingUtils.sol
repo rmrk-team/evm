@@ -6,9 +6,9 @@ pragma solidity ^0.8.15;
 error RMRKMintOverMax();
 
 /**
-* @dev Top-level utilities for managing minting. Implements OwnableLock by default.
-* Max supply-related and pricing variables are immutable after deployment.
-*/
+ * @dev Top-level utilities for managing minting. Implements OwnableLock by default.
+ * Max supply-related and pricing variables are immutable after deployment.
+ */
 
 contract RMRKMintingUtils is OwnableLock {
     uint256 internal _totalSupply;

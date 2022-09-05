@@ -10,7 +10,10 @@ error RMRKMintUnderpriced();
 error RMRKMintZero();
 
 //Minimal public implementation of IRMRKNesting for testing.
-contract RMRKNestingMultiResourceImpl is RMRKMintingUtils, RMRKNestingMultiResource {
+contract RMRKNestingMultiResourceImpl is
+    RMRKMintingUtils,
+    RMRKNestingMultiResource
+{
     using Strings for uint256;
 
     // Manage resources via increment

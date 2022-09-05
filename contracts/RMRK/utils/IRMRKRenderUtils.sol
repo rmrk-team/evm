@@ -13,10 +13,11 @@ interface IRMRKRenderUtils {
      * - `resourceId` must exist.
      *
      */
-    function getResObjectByIndex(address target, uint256 tokenId, uint256 index)
-        external
-        view
-        returns (IRMRKMultiResource.Resource memory);
+    function getResObjectByIndex(
+        address target,
+        uint256 tokenId,
+        uint256 index
+    ) external view returns (IRMRKMultiResource.Resource memory);
 
     /**
      * @notice Returns `Resource` object at `index` of active resource array on `tokenId`
@@ -26,10 +27,11 @@ interface IRMRKRenderUtils {
      * - `tokenId` must exist.
      * - `index` must be inside the range of active resource array
      */
-    function getPendingResObjectByIndex(address target, uint256 tokenId, uint256 index)
-        external
-        view
-        returns (IRMRKMultiResource.Resource memory);
+    function getPendingResObjectByIndex(
+        address target,
+        uint256 tokenId,
+        uint256 index
+    ) external view returns (IRMRKMultiResource.Resource memory);
 
     /**
      * @notice Returns `Resource` objects for the given ids

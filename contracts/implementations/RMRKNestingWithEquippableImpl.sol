@@ -9,7 +9,10 @@ error RMRKMintUnderpriced();
 error RMRKMintZero();
 
 //Minimal public implementation of IRMRKNesting for testing.
-contract RMRKNestingWithEquippableImpl is RMRKMintingUtils, RMRKNestingExternalEquip {
+contract RMRKNestingWithEquippableImpl is
+    RMRKMintingUtils,
+    RMRKNestingExternalEquip
+{
     address _equippableAddress;
 
     constructor(
@@ -83,5 +86,4 @@ contract RMRKNestingWithEquippableImpl is RMRKMintingUtils, RMRKNestingExternalE
     function setEquippableAddress(address equippable) external {
         _setEquippableAddress(equippable);
     }
-    
 }
