@@ -26,11 +26,9 @@ error RMRKApproveForResourcesToCaller();
 error RMRKBaseRequiredForParts();
 error RMRKEquippableEquipNotAllowedByBase();
 error RMRKMustUnequipFirst();
-error RMRKNotComposableResource();
 error RMRKNotEquipped();
 error RMRKSlotAlreadyUsed();
 error RMRKTokenCannotBeEquippedWithResourceIntoSlot();
-error RMRKTokenDoesNotHaveActiveResource();
 
 contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
     using RMRKLib for uint64[];
@@ -67,11 +65,6 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
         internal _operatorApprovalsForResources;
 
     // ------------------- EQUIPPABLE --------------
-
-    // FIXME: Deprecate this, move Views to fully external
-    // External contract used for heavy views to save contract size. Deployed on contructor
-    // RMRKEquippableViews private _views;
-
     //Mapping of uint64 resource ID to corresponding base address
     mapping(uint64 => address) private _baseAddresses;
     //Mapping of uint64 Ids to resource object
@@ -579,36 +572,6 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
             _equipCountPerChild[tokenId][childAddress][childTokenId] !=
             uint8(0);
     }
-
-    //FIXME: Ensure deprecation does not remove functionality
-    // function getEquipped(uint64 tokenId, uint64 resourceId)
-    //     public
-    //     view
-    //     returns (uint64[] memory slotParts, Equipment[] memory childrenEquipped)
-    // {
-    //     return
-    //         _views.getEquipped(tokenId, resourceId, _baseAddresses[resourceId]);
-    // }
-
-    // //Gate for equippable array in here by check of slotPartDefinition to slotPartId
-    // function composeEquippables(uint256 tokenId, uint64 resourceId)
-    //     public
-    //     view
-    //     returns (
-    //         ExtendedResource memory resource,
-    //         FixedPart[] memory fixedParts,
-    //         SlotPart[] memory slotParts
-    //     )
-    // {
-    //     // We make sure token has that resource. Alternative is to receive index but makes equipping more complex.
-    //     (, bool found) = getActiveResources(tokenId).indexOf(resourceId);
-    //     if (!found) revert RMRKTokenDoesNotHaveActiveResource();
-
-    //     address targetBaseAddress = _baseAddresses[resourceId];
-    //     if (targetBaseAddress == address(0)) revert RMRKNotComposableResource();
-    //     return
-    //         _views.composeEquippables(tokenId, resourceId, targetBaseAddress);
-    // }
 
     function getBaseAddressOfResource(uint64 resourceId) external view returns(address) {
         return _baseAddresses[resourceId];

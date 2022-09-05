@@ -35,10 +35,8 @@ error ERC721NotApprovedOrOwner();
 error RMRKBaseRequiredForParts();
 error RMRKTokenCannotBeEquippedWithResourceIntoSlot();
 error RMRKEquippableEquipNotAllowedByBase();
-error RMRKNotComposableResource();
 error RMRKNotEquipped();
 error RMRKSlotAlreadyUsed();
-error RMRKTokenDoesNotHaveActiveResource();
 
 /**
  * @dev RMRKEquippable external contract, expected to be paired with an instance of RMRKNestingExternalEquip.sol. This
@@ -611,112 +609,6 @@ contract RMRKExternalEquip is Context, IRMRKExternalEquip {
             _equipCountPerChild[tokenId][childAddress][childTokenId] !=
             uint8(0);
     }
-
-    // function getEquipped(uint64 tokenId, uint64 resourceId)
-    //     public
-    //     view
-    //     returns (uint64[] memory slotParts, Equipment[] memory childrenEquipped)
-    // {
-    //     address targetBaseAddress = _baseAddresses[resourceId];
-    //     uint64[] memory slotPartIds = _slotPartIds[resourceId];
-
-    //     // TODO: Clarify on docs: Some children equipped might be empty.
-    //     slotParts = new uint64[](slotPartIds.length);
-    //     childrenEquipped = new Equipment[](slotPartIds.length);
-
-    //     uint256 len = slotPartIds.length;
-    //     for (uint256 i; i < len; ) {
-    //         slotParts[i] = slotPartIds[i];
-    //         Equipment memory equipment = _equipments[tokenId][
-    //             targetBaseAddress
-    //         ][slotPartIds[i]];
-    //         if (equipment.resourceId == resourceId) {
-    //             childrenEquipped[i] = equipment;
-    //         }
-    //         unchecked {
-    //             ++i;
-    //         }
-    //     }
-    // }
-
-    // //Gate for equippable array in here by check of slotPartDefinition to slotPartId
-    // function composeEquippables(uint256 tokenId, uint64 resourceId)
-    //     public
-    //     view
-    //     returns (
-    //         ExtendedResource memory resource,
-    //         FixedPart[] memory fixedParts,
-    //         SlotPart[] memory slotParts
-    //     )
-    // {
-    //     resource = getExtendedResource(resourceId);
-
-    //     // We make sure token has that resource. Alternative is to receive index but makes equipping more complex.
-    //     (, bool found) = _activeResources[tokenId].indexOf(resourceId);
-    //     if (!found) revert RMRKTokenDoesNotHaveActiveResource();
-
-    //     address targetBaseAddress = _baseAddresses[resourceId];
-    //     if (targetBaseAddress == address(0)) revert RMRKNotComposableResource();
-
-    //     // Fixed parts:
-    //     uint64[] memory fixedPartIds = _fixedPartIds[resourceId];
-    //     fixedParts = new FixedPart[](fixedPartIds.length);
-
-    //     uint256 len = fixedPartIds.length;
-    //     if (len > 0) {
-    //         IRMRKBaseStorage.Part[] memory baseFixedParts = IRMRKBaseStorage(
-    //             targetBaseAddress
-    //         ).getParts(fixedPartIds);
-    //         for (uint256 i; i < len; ) {
-    //             fixedParts[i] = FixedPart({
-    //                 partId: fixedPartIds[i],
-    //                 z: baseFixedParts[i].z,
-    //                 metadataURI: baseFixedParts[i].metadataURI
-    //             });
-    //             unchecked {
-    //                 ++i;
-    //             }
-    //         }
-    //     }
-
-    //     // Slot parts:
-    //     uint64[] memory slotPartIds = _slotPartIds[resourceId];
-    //     slotParts = new SlotPart[](slotPartIds.length);
-    //     len = slotPartIds.length;
-
-    //     if (len > 0) {
-    //         IRMRKBaseStorage.Part[] memory baseSlotParts = IRMRKBaseStorage(
-    //             targetBaseAddress
-    //         ).getParts(slotPartIds);
-    //         for (uint256 i; i < len; ) {
-    //             Equipment memory equipment = _equipments[tokenId][
-    //                 targetBaseAddress
-    //             ][slotPartIds[i]];
-    //             if (equipment.resourceId == resourceId) {
-    //                 slotParts[i] = SlotPart({
-    //                     partId: slotPartIds[i],
-    //                     childResourceId: equipment.childResourceId,
-    //                     z: baseSlotParts[i].z,
-    //                     childTokenId: equipment.childTokenId,
-    //                     childAddress: equipment.childEquippableAddress,
-    //                     metadataURI: baseSlotParts[i].metadataURI
-    //                 });
-    //             } else {
-    //                 slotParts[i] = SlotPart({
-    //                     partId: slotPartIds[i],
-    //                     childResourceId: uint64(0),
-    //                     z: baseSlotParts[i].z,
-    //                     childTokenId: uint256(0),
-    //                     childAddress: address(0),
-    //                     metadataURI: baseSlotParts[i].metadataURI
-    //                 });
-    //             }
-    //             unchecked {
-    //                 ++i;
-    //             }
-    //         }
-    //     }
-    // }
 
     function getBaseAddressOfResource(uint64 resourceId)
         external

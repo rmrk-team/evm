@@ -29,13 +29,13 @@ async function shouldBehaveLikeMultiResource(
     notApproved = signersAddr[3];
   });
 
-  describe.skip('Interface support', async function () {
+  describe('Interface support', async function () {
     it('can support IERC165', async function () {
       expect(await this.token.supportsInterface('0x01ffc9a7')).to.equal(true);
     });
 
     it('can support IMultiResource', async function () {
-      expect(await this.token.supportsInterface('0xc742e0b5')).to.equal(true);
+      expect(await this.token.supportsInterface('0xb9f83a77')).to.equal(true);
     });
 
     it('cannot support other interfaceId', async function () {

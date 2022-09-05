@@ -1,5 +1,5 @@
 import shouldBehaveLikeBase from '../behavior/baseStorage';
 
-describe.skip('BaseStorageImpl', async () => {
+describe('BaseStorageImpl', async () => {
   shouldBehaveLikeBase('RMRKBaseStorageImpl', 'BASE', 'misc');
 });

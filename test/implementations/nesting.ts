@@ -24,7 +24,7 @@ async function parentChildFixture(): Promise<{ parent: Contract; child: Contract
   );
 }
 
-describe.skip('NestingMultiResourceImpl Nesting Behavior', function () {
+describe('NestingMultiResourceImpl Nesting Behavior', function () {
   beforeEach(async function () {
     const { parent, child } = await loadFixture(parentChildFixture);
     this.parentToken = parent;
@@ -35,7 +35,7 @@ describe.skip('NestingMultiResourceImpl Nesting Behavior', function () {
 });
 
 // FIXME: This test don't fully pass due to difference in minting
-describe.skip('NestingImpl ERC721 behavior', function () {
+describe('NestingImpl ERC721 behavior', function () {
   let token: Contract;
 
   beforeEach(async function () {
