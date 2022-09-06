@@ -7,18 +7,15 @@ pragma solidity ^0.8.15;
 import "../base/IRMRKBaseStorage.sol";
 import "../library/RMRKLib.sol";
 import "./IRMRKEquippable.sol";
+import "./IRMRKEquippableViews.sol";
 
-import "@openzeppelin/contracts/utils/Address.sol";
 // import "hardhat/console.sol";
 
 error RMRKTokenDoesNotHaveActiveResource();
 error RMRKNotComposableResource();
 
-contract RMRKEquippableViews {
-    using RMRKLib for uint256;
-    using Address for address;
+contract RMRKEquippableViews is IRMRKEquippableViews {
     using RMRKLib for uint64[];
-    using RMRKLib for uint128[];
 
     constructor() {}
 
