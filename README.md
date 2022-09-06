@@ -2,7 +2,7 @@
 
 A set of Solidity contracts for RMRK.app.
 
-Please note that any implementations which are not marked `//////EXAMPLE//////` will not include any externally accessible functions which may modify the state of a user-owned token without that user's express authorization. Implementers are advised to inherit from these contracts and create a top-level wrapper that defines the logic of these functions as per the needs of their own deployment.
+For each of the Multiresource, Nesting and Equippable combinations, we provide samples of simple and advance usage in [this repo](https://github.com/rmrk-team/evm-sample-contracts).
 
 ## Multiresource (RMRKMultiresource)
 
