@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-import "contracts/RMRK/access/OwnableLock.sol";
+import "../access/OwnableLock.sol";
 
 pragma solidity ^0.8.15;
 

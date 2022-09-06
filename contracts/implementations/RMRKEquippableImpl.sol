@@ -4,13 +4,13 @@ pragma solidity ^0.8.16;
 
 import "../RMRK/utils/RMRKMintingUtils.sol";
 import "../RMRK/equippable/RMRKEquippable.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "../RMRK/access/OwnableLock.sol";
 /* import "hardhat/console.sol"; */
 
 error RMRKMintUnderpriced();
 error RMRKMintZero();
 
-contract RMRKEquippableImpl is Ownable, RMRKMintingUtils, RMRKEquippable {
+contract RMRKEquippableImpl is OwnableLock, RMRKMintingUtils, RMRKEquippable {
     constructor(
         string memory name,
         string memory symbol,
