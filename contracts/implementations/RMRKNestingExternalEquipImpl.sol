@@ -9,7 +9,7 @@ error RMRKMintUnderpriced();
 error RMRKMintZero();
 
 //Minimal public implementation of IRMRKNesting for testing.
-contract RMRKNestingWithEquippableImpl is
+contract RMRKNestingExternalEquipImpl is
     RMRKMintingUtils,
     RMRKNestingExternalEquip
 {

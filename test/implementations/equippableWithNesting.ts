@@ -25,8 +25,8 @@ async function partsFixture() {
   const maskSymbol = 'NM';
 
   const baseFactory = await ethers.getContractFactory('RMRKBaseStorageImpl');
-  const nestingFactory = await ethers.getContractFactory('RMRKNestingWithEquippableImpl');
-  const equipFactory = await ethers.getContractFactory('RMRKEquippableWithNestingImpl');
+  const nestingFactory = await ethers.getContractFactory('RMRKNestingExternalEquipImpl');
+  const equipFactory = await ethers.getContractFactory('RMRKExternalEquipImpl');
   const viewFactory = await ethers.getContractFactory('RMRKEquippableViews');
 
   // View
@@ -94,8 +94,8 @@ async function slotsFixture() {
   const backgroundSymbol = 'SB';
 
   const baseFactory = await ethers.getContractFactory('RMRKBaseStorageImpl');
-  const nestingFactory = await ethers.getContractFactory('RMRKNestingWithEquippableImpl');
-  const equipFactory = await ethers.getContractFactory('RMRKEquippableWithNestingImpl');
+  const nestingFactory = await ethers.getContractFactory('RMRKNestingExternalEquipImpl');
+  const equipFactory = await ethers.getContractFactory('RMRKExternalEquipImpl');
   const viewFactory = await ethers.getContractFactory('RMRKEquippableViews');
 
   // View
@@ -191,8 +191,8 @@ async function slotsFixture() {
 }
 
 async function resourcesFixture() {
-  const Nesting = await ethers.getContractFactory('RMRKNestingWithEquippableImpl');
-  const Equip = await ethers.getContractFactory('RMRKEquippableWithNestingImpl');
+  const Nesting = await ethers.getContractFactory('RMRKNestingExternalEquipImpl');
+  const Equip = await ethers.getContractFactory('RMRKExternalEquipImpl');
 
   const nesting = await Nesting.deploy(
     'Chunky',
@@ -212,8 +212,8 @@ async function resourcesFixture() {
 }
 
 async function multiResourceFixture() {
-  const NestingFactory = await ethers.getContractFactory('RMRKNestingWithEquippableImpl');
-  const EquipFactory = await ethers.getContractFactory('RMRKEquippableWithNestingImpl');
+  const NestingFactory = await ethers.getContractFactory('RMRKNestingExternalEquipImpl');
+  const EquipFactory = await ethers.getContractFactory('RMRKExternalEquipImpl');
 
   const nesting = await NestingFactory.deploy(
     'NestingWithEquippable',

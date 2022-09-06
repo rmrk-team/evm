@@ -7,7 +7,7 @@ import "../RMRK/access/OwnableLock.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
 //Minimal public implementation of RMRKEquippableWithNesting for testing.
-contract RMRKEquippableWithNestingImpl is OwnableLock, RMRKExternalEquip {
+contract RMRKExternalEquipImpl is OwnableLock, RMRKExternalEquip {
     using Strings for uint256;
 
     //Mapping of uint64 resource ID to tokenEnumeratedResource for tokenURI
