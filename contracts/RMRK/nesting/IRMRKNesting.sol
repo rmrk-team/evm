@@ -122,6 +122,17 @@ interface IRMRKNesting is IERC165 {
     ) external;
 
     /**
+     * @dev Function called to reject all pending children. Removes the children from the pending array mapping.
+     * The children's ownership structures are not updated.
+     *
+     * Requirements:
+     *
+     * - `parentTokenId` must exist
+     *
+     */
+    function rejectAllChildren(uint256 parentTokenId) external;
+
+    /**
      * @dev Function called to unnest a child from `tokenId`'s child array. The owner of the token
      * is set to `to`, or is not updated in the event `to` is the zero address
      *
