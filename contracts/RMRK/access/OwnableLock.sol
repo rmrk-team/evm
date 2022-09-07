@@ -15,7 +15,10 @@ contract OwnableLock is Context {
     bool private _lock;
     address private _owner;
 
-    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
+    event OwnershipTransferred(
+        address indexed previousOwner,
+        address indexed newOwner
+    );
 
     /**
      * @dev Throws if called by any account other than the owner.
@@ -25,6 +28,9 @@ contract OwnableLock is Context {
         _;
     }
 
+    /**
+     * @dev Throws if the lock flag is set to true.
+     */
     modifier notLocked() {
         _onlyNotLocked();
         _;
@@ -44,10 +50,16 @@ contract OwnableLock is Context {
         return _owner;
     }
 
+    /**
+     * @dev Sets the lock -- once locked functions marked notLocked cannot be accessed.
+     */
     function setLock() external onlyOwner {
         _lock = true;
     }
 
+    /**
+     * @dev Returns lock status.
+     */
     function getLock() public view returns (bool) {
         return _lock;
     }
@@ -68,8 +80,7 @@ contract OwnableLock is Context {
      * Can only be called by the current owner.
      */
     function transferOwnership(address newOwner) public virtual onlyOwner {
-        if (owner() == address(0))
-            revert RMRKNewOwnerIsZeroAddress();
+        if (owner() == address(0)) revert RMRKNewOwnerIsZeroAddress();
         _transferOwnership(newOwner);
     }
 
@@ -84,8 +95,7 @@ contract OwnableLock is Context {
     }
 
     function _onlyOwner() private view {
-        if (owner() != _msgSender())
-            revert RMRKNotOwner();
+        if (owner() != _msgSender()) revert RMRKNotOwner();
     }
 
     function _onlyNotLocked() private view {

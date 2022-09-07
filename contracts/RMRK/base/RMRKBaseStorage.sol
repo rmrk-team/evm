@@ -41,19 +41,14 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
         Part part;
     }
 
-    //Consider merkel tree for equippables validation?
-
-    /**
-    TODO: Clarify: This is not true at the moment: We could add a lock (could be auto timed)
-    @dev Part items are only settable during contract deployment (with one exception, see addEquippableIds).
-    * This may need to be changed for contracts which would reach the block gas limit.
-    */
-
     constructor(string memory symbol_, string memory type__) {
         _symbol = symbol_;
         _type = type__;
     }
 
+    /**
+     * @dev Throws if the partId is uninitailized or is Fixed.
+     */
     modifier onlySlot(uint64 partId) {
         _onlySlot(partId);
         _;
@@ -124,11 +119,8 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
     }
 
     /**
-     * @dev Public function which adds a number of equippableAddresses to a single base entry. Only accessible by the contract
-     * deployer or transferred Issuer, designated by the modifier onlyIssuer as per the inherited contract issuerControl.
-     *
+     * @dev Function which adds a number of equippableAddresses to a single base entry.
      */
-
     function _addEquippableAddresses(
         uint64 partId,
         address[] memory equippableAddresses
@@ -147,6 +139,10 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
         emit AddedEquippables(partId, equippableAddresses);
     }
 
+    /**
+     * @dev Public function which sets a number of equippableAddresses, overwrites existing addresses.
+     *
+     */
     function _setEquippableAddresses(
         uint64 partId,
         address[] memory equippableAddresses
@@ -158,6 +154,10 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
         emit SetEquippables(partId, equippableAddresses);
     }
 
+    /**
+     * @dev Public function which removes all equippableAddresses for a partId.
+     *
+     */
     function _resetEquippableAddresses(uint64 partId)
         internal
         onlySlot(partId)
@@ -169,16 +169,16 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
     }
 
     /**
-     * @notice Public function which adds a single equippableId to every base item.
-     * @dev Handle this function with care, this function can be extremely gas-expensive.
-     * Only accessible by the contract deployer or transferred Issuer, designated by the
-     * modifier onlyIssuer as per the inherited contract issuerControl.
+     * @dev Sets the isEquippableToAll flag to true, meaning that any collection may equip this partId.
      */
     function _setEquippableToAll(uint64 partId) internal onlySlot(partId) {
         _isEquippableToAll[partId] = true;
         emit SetEquippableToAll(partId);
     }
 
+    /**
+     * @dev Returns true if part is equippable to all.
+     */
     function checkIsEquippableToAll(uint64 partId)
         external
         view
@@ -187,6 +187,9 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
         return _isEquippableToAll[partId];
     }
 
+    /**
+     * @dev Returns true if a collection may equip resource with partId.
+     */
     function checkIsEquippable(uint64 partId, address targetAddress)
         external
         view
@@ -214,7 +217,6 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
     /**
     @dev Getter for a single base part.
     */
-
     function getPart(uint64 partId) external view returns (Part memory) {
         return (_parts[partId]);
     }
@@ -222,7 +224,6 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
     /**
     @dev Getter for multiple base item entries.
     */
-
     function getParts(uint64[] calldata partIds)
         external
         view
