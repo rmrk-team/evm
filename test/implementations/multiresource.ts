@@ -6,6 +6,7 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { addResourceToToken } from '../utils';
 import shouldBehaveLikeOwnableLock from '../behavior/ownableLock';
 import shouldBehaveLikeMultiResource from '../behavior/multiresource';
+import shouldControlValidMinting from '../behavior/mintingImpl';
 import {
   bn,
   singleFixtureWithArgs,
@@ -154,4 +155,13 @@ describe('MultiResourceImpl MR behavior', async () => {
   });
 
   shouldBehaveLikeMultiResource(mintFromImpl, addResourceEntryFromImpl, addResourceToToken);
+});
+
+describe('MultiResourceImpl Minting', async function () {
+  beforeEach(async function () {
+    const { token } = await loadFixture(singleFixture);
+    this.token = token;
+  });
+
+  shouldControlValidMinting();
 });

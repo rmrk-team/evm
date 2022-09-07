@@ -9,6 +9,7 @@ import shouldBehaveLikeEquippableResources from '../behavior/equippableResources
 import shouldBehaveLikeEquippableWithParts from '../behavior/equippableParts';
 import shouldBehaveLikeEquippableWithSlots from '../behavior/equippableSlots';
 import shouldBehaveLikeMultiResource from '../behavior/multiresource';
+import shouldControlValidMinting from '../behavior/mintingImpl';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { bn, mintFromImpl, nestMintFromImpl, ONE_ETH } from '../utils';
 
@@ -215,7 +216,7 @@ async function resourcesFixture() {
   return { nesting, equip, renderUtils };
 }
 
-async function multiResourceFixture() {
+async function equipFixture() {
   const NestingFactory = await ethers.getContractFactory('RMRKNestingExternalEquipImpl');
   const EquipFactory = await ethers.getContractFactory('RMRKExternalEquipImpl');
   const renderUtilsFactory = await ethers.getContractFactory('RMRKRenderUtils');
@@ -244,7 +245,7 @@ async function multiResourceFixture() {
 
 // --------------- EQUIPPABLE BEHAVIOR -----------------------
 
-describe('EquippableImpl with Parts', async () => {
+describe('ExtenralEquippableImpl with Parts', async () => {
   beforeEach(async function () {
     const { base, neon, neonEquip, mask, maskEquip, view } = await loadFixture(partsFixture);
 
@@ -259,7 +260,7 @@ describe('EquippableImpl with Parts', async () => {
   shouldBehaveLikeEquippableWithParts();
 });
 
-describe('EquippableImpl with Slots', async () => {
+describe('ExtenralEquippableImpl with Slots', async () => {
   beforeEach(async function () {
     const {
       base,
@@ -289,7 +290,7 @@ describe('EquippableImpl with Slots', async () => {
   shouldBehaveLikeEquippableWithSlots(nestMintFromImpl);
 });
 
-describe('EquippableImpl Resources', async () => {
+describe('ExtenralEquippableImpl Resources', async () => {
   const equippableRefIdDefault = bn(1);
   const metaURIDefault = 'metaURI';
   const baseAddressDefault = ethers.constants.AddressZero;
@@ -376,13 +377,13 @@ describe('EquippableImpl Resources', async () => {
 
 // --------------- MULTI RESOURCE BEHAVIOR -----------------------
 
-describe('EquippableImpl MR behavior with minted token', async () => {
+describe('ExtenralEquippableImpl MR behavior', async () => {
   let nesting: Contract;
   let equip: Contract;
   let renderUtils: Contract;
 
   beforeEach(async function () {
-    ({ nesting, equip, renderUtils } = await loadFixture(multiResourceFixture));
+    ({ nesting, equip, renderUtils } = await loadFixture(equipFixture));
     this.token = equip;
     this.renderUtils = renderUtils;
   });
@@ -397,3 +398,12 @@ describe('EquippableImpl MR behavior with minted token', async () => {
 });
 
 // --------------- MULTI RESOURCE BEHAVIOR END ------------------------
+
+describe('ExtenralEquippableImpl Minting', async function () {
+  beforeEach(async function () {
+    const { nesting } = await loadFixture(equipFixture);
+    this.token = nesting;
+  });
+
+  shouldControlValidMinting();
+});

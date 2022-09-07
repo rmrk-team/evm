@@ -15,6 +15,7 @@ import shouldBehaveLikeEquippableResources from '../behavior/equippableResources
 import shouldBehaveLikeEquippableWithParts from '../behavior/equippableParts';
 import shouldBehaveLikeEquippableWithSlots from '../behavior/equippableSlots';
 import shouldBehaveLikeMultiResource from '../behavior/multiresource';
+import shouldControlValidMinting from '../behavior/mintingImpl';
 
 // --------------- FIXTURES -----------------------
 
@@ -126,7 +127,7 @@ async function resourcesFixture() {
   return { equip, renderUtils };
 }
 
-async function multiResourceFixture() {
+async function equipFixture() {
   const equipFactory = await ethers.getContractFactory('RMRKEquippableImpl');
   const renderUtilsFactory = await ethers.getContractFactory('RMRKRenderUtils');
 
@@ -204,7 +205,7 @@ describe('EquippableMock MR behavior', async () => {
   let renderUtils: Contract;
 
   beforeEach(async function () {
-    ({ equip, renderUtils } = await loadFixture(multiResourceFixture));
+    ({ equip, renderUtils } = await loadFixture(equipFixture));
     this.token = equip;
     this.renderUtils = renderUtils;
   });
@@ -218,3 +219,12 @@ describe('EquippableMock MR behavior', async () => {
 });
 
 // --------------- MULTI RESOURCE BEHAVIOR END ------------------------
+
+describe('EquippableMock Minting', async function () {
+  beforeEach(async function () {
+    const { equip } = await loadFixture(equipFixture);
+    this.token = equip;
+  });
+
+  shouldControlValidMinting();
+});

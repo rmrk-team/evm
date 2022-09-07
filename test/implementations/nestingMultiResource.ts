@@ -6,6 +6,7 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { transfer, nestTransfer, addResourceToToken, addResourceEntryFromImpl } from '../utils';
 import shouldBehaveLikeNesting from '../behavior/nesting';
 import shouldBehaveLikeMultiResource from '../behavior/multiresource';
+import shouldControlValidMinting from '../behavior/mintingImpl';
 import {
   singleFixtureWithArgs,
   parentChildFixtureWithArgs,
@@ -109,7 +110,7 @@ describe('NestingMultiResourceImpl Other Behavior', function () {
     });
   });
 
-  describe('token URI', async function () {
+  describe('Token URI', async function () {
     let owner: SignerWithAddress;
 
     before(async function () {
@@ -180,4 +181,13 @@ describe('NestingMultiResourceImpl Other Behavior', function () {
       expect(await token.tokenURI(tokenId)).to.eql('uri1');
     });
   });
+});
+
+describe('NestingMultiResourceImpl Minting', async function () {
+  beforeEach(async function () {
+    const { token } = await loadFixture(singleFixture);
+    this.token = token;
+  });
+
+  shouldControlValidMinting();
 });
