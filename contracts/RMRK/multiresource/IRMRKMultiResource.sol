@@ -194,6 +194,14 @@ interface IRMRKMultiResource is IERC165 {
         view
         returns (Resource memory);
 
+    /**
+     * @notice Returns the ids of all stored resources
+     */
+    function getAllResources()
+        external
+        view
+        returns (uint64[] memory);
+
     // Approvals
 
     //TODO: Make 'management action' more explicit?

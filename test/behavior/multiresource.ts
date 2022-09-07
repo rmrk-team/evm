@@ -35,7 +35,7 @@ async function shouldBehaveLikeMultiResource(
     });
 
     it('can support IMultiResource', async function () {
-      expect(await this.token.supportsInterface('0xb9f83a77')).to.equal(true);
+      expect(await this.token.supportsInterface('0x0354d949')).to.equal(true);
     });
 
     it('cannot support other interfaceId', async function () {
