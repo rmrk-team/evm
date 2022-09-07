@@ -21,7 +21,7 @@ async function main() {
   const rmrkFactory = await RMRKMultiResourceFactory.deploy();
   await rmrkFactory.deployed();
 
-  const tx = await rmrkFactory.deployRMRKMultiResource('Test Collection', 'TEST', 10000, 0);
+  const tx = await rmrkFactory.deployRMRKMultiResource('Test Collection', 'TEST', 10000, 0, 'testCollectionMetadataUri');
   await tx.wait(10);
   const multiResourceCollection = await rmrkFactory.multiResourceCollections(0);
 
@@ -36,7 +36,7 @@ async function main() {
 
   await run('verify:verify', {
     address: multiResourceCollection,
-    constructorArguments: ['Test Collection', 'TEST', 10000, 0],
+    constructorArguments: ['Test Collection', 'TEST', 10000, 0, 'testCollectionMetadataUri'],
   });
 }
 

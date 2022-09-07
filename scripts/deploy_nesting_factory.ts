@@ -21,7 +21,7 @@ async function main() {
   const rmrkFactory = await RMRKNestingFactory.deploy();
   await rmrkFactory.deployed();
 
-  const tx = await rmrkFactory.deployRMRKNesting('Test Collection', 'TEST', 10000, 0);
+  const tx = await rmrkFactory.deployRMRKNesting('Test Collection', 'TEST', 10000, 0, 'testCollectionMetadataUri');
   await tx.wait(10);
   const nestingCollection = await rmrkFactory.nestingCollections(0);
 
@@ -37,7 +37,7 @@ async function main() {
 
   await run('verify:verify', {
     address: nestingCollection,
-    constructorArguments: ['Test Collection', 'TEST', 10000, 0],
+    constructorArguments: ['Test Collection', 'TEST', 10000, 0, 'testCollectionMetadataUri'],
   });
 }
 
