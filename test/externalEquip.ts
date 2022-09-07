@@ -28,8 +28,8 @@ async function partsFixture() {
   const maskSymbol = 'NM';
 
   const baseFactory = await ethers.getContractFactory('RMRKBaseStorageMock');
-  const nestingFactory = await ethers.getContractFactory('RMRKNestingWithEquippableMock');
-  const equipFactory = await ethers.getContractFactory('RMRKEquippableWithNestingMock');
+  const nestingFactory = await ethers.getContractFactory('RMRKNestingExternalEquipMock');
+  const equipFactory = await ethers.getContractFactory('RMRKExternalEquipMock');
   const viewFactory = await ethers.getContractFactory('RMRKEquippableViews');
 
   // Base
@@ -90,8 +90,8 @@ async function slotsFixture() {
   const backgroundSymbol = 'SB';
 
   const baseFactory = await ethers.getContractFactory('RMRKBaseStorageMock');
-  const nestingFactory = await ethers.getContractFactory('RMRKNestingWithEquippableMock');
-  const equipFactory = await ethers.getContractFactory('RMRKEquippableWithNestingMock');
+  const nestingFactory = await ethers.getContractFactory('RMRKNestingExternalEquipMock');
+  const equipFactory = await ethers.getContractFactory('RMRKExternalEquipMock');
   const viewFactory = await ethers.getContractFactory('RMRKEquippableViews');
 
   // View
@@ -168,8 +168,8 @@ async function slotsFixture() {
 }
 
 async function resourcesFixture() {
-  const Nesting = await ethers.getContractFactory('RMRKNestingWithEquippableMock');
-  const Equip = await ethers.getContractFactory('RMRKEquippableWithNestingMock');
+  const Nesting = await ethers.getContractFactory('RMRKNestingExternalEquipMock');
+  const Equip = await ethers.getContractFactory('RMRKExternalEquipMock');
   const renderUtilsFactory = await ethers.getContractFactory('RMRKRenderUtils');
 
   const nesting = await Nesting.deploy('Chunky', 'CHNK');
@@ -187,8 +187,8 @@ async function resourcesFixture() {
 }
 
 async function multiResourceFixture() {
-  const NestingFactory = await ethers.getContractFactory('RMRKNestingWithEquippableMock');
-  const EquipFactory = await ethers.getContractFactory('RMRKEquippableWithNestingMock');
+  const NestingFactory = await ethers.getContractFactory('RMRKNestingExternalEquipMock');
+  const EquipFactory = await ethers.getContractFactory('RMRKExternalEquipMock');
   const renderUtilsFactory = await ethers.getContractFactory('RMRKRenderUtils');
 
   const nesting = await NestingFactory.deploy('NestingWithEquippable', 'NWE');

@@ -13,21 +13,21 @@ describe('NestingWithEquippableMock Nesting Behavior', function () {
   const symbol2 = 'MONKE';
 
   async function nestingFixture() {
-    const CHNKY = await ethers.getContractFactory('RMRKNestingWithEquippableMock');
+    const CHNKY = await ethers.getContractFactory('RMRKNestingExternalEquipMock');
     const ownerChunky = await CHNKY.deploy(name, symbol);
     await ownerChunky.deployed();
 
-    const CHNKYEQUIPPABLE = await ethers.getContractFactory('RMRKEquippableWithNestingMock');
+    const CHNKYEQUIPPABLE = await ethers.getContractFactory('RMRKExternalEquipMock');
     const chunkyEquippable = await CHNKYEQUIPPABLE.deploy(ownerChunky.address);
     await chunkyEquippable.deployed();
 
     await ownerChunky.setEquippableAddress(chunkyEquippable.address);
 
-    const MONKY = await ethers.getContractFactory('RMRKNestingWithEquippableMock');
+    const MONKY = await ethers.getContractFactory('RMRKNestingExternalEquipMock');
     const petMonkey = await MONKY.deploy(name2, symbol2);
     await petMonkey.deployed();
 
-    const MONKYEQUIPPABLE = await ethers.getContractFactory('RMRKEquippableWithNestingMock');
+    const MONKYEQUIPPABLE = await ethers.getContractFactory('RMRKExternalEquipMock');
     const monkyEquippable = await MONKYEQUIPPABLE.deploy(petMonkey.address);
     await monkyEquippable.deployed();
 
@@ -52,11 +52,11 @@ describe('NestingWithEquippableMock ERC721 Behavior', function () {
   const symbol = 'RMRKTST';
 
   async function nestingFixture() {
-    const Token = await ethers.getContractFactory('RMRKNestingWithEquippableMock');
+    const Token = await ethers.getContractFactory('RMRKNestingExternalEquipMock');
     const tokenContract = await Token.deploy(name, symbol);
     await tokenContract.deployed();
 
-    const Equippable = await ethers.getContractFactory('RMRKEquippableWithNestingMock');
+    const Equippable = await ethers.getContractFactory('RMRKExternalEquipMock');
     const equippableContract = await Equippable.deploy(tokenContract.address);
     await equippableContract.deployed();
 

@@ -7,7 +7,7 @@ import "../RMRK/equippable/RMRKNestingExternalEquip.sol";
 // import "hardhat/console.sol";
 
 //Minimal public implementation of IRMRKNesting for testing.
-contract RMRKNestingWithEquippableMock is RMRKNestingExternalEquip {
+contract RMRKNestingExternalEquipMock is RMRKNestingExternalEquip {
     constructor(string memory name_, string memory symbol_)
         RMRKNestingExternalEquip(name_, symbol_)
     {}
