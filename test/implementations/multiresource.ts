@@ -89,9 +89,9 @@ describe('MultiResourceImpl Other Behavior', async () => {
 
       it('cannot set fallback URI if not owner', async function () {
         const newFallbackURI = 'NewFallbackURI';
-        await expect(token.connect(addrs[0]).setFallbackURI(newFallbackURI)).to.be.revertedWith(
-          'Ownable: caller is not the owner',
-        );
+        await expect(
+          token.connect(addrs[0]).setFallbackURI(newFallbackURI),
+        ).to.be.revertedWithCustomError(token, 'RMRKNotOwner');
       });
 
       it('return empty string by default', async function () {

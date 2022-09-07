@@ -32,8 +32,9 @@ async function shouldBehaveOwnableLock(ismock: boolean) {
     });
 
     it('Reverts if setLock caller is not owner', async function () {
-      await expect(ownableLock.connect(addrs[0]).setLock()).to.be.revertedWith(
-        'Ownable: caller is not the owner',
+      await expect(ownableLock.connect(addrs[0]).setLock()).to.be.revertedWithCustomError(
+        ownableLock,
+        'RMRKNotOwner',
       );
     });
 
