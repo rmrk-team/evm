@@ -3,6 +3,7 @@
 pragma solidity ^0.8.15;
 
 import "../RMRK/utils/RMRKMintingUtils.sol";
+import "../RMRK/utils/RMRKCollectionMetadata.sol";
 import "../RMRK/multiresource/RMRKMultiResource.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
@@ -11,7 +12,7 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 error RMRKMintUnderpriced();
 error RMRKMintZero();
 
-contract RMRKMultiResourceImpl is RMRKMintingUtils, RMRKMultiResource {
+contract RMRKMultiResourceImpl is RMRKMintingUtils, RMRKCollectionMetadata, RMRKMultiResource {
     using Strings for uint256;
 
     /*
@@ -31,10 +32,12 @@ contract RMRKMultiResourceImpl is RMRKMintingUtils, RMRKMultiResource {
         string memory name,
         string memory symbol,
         uint256 maxSupply_,
-        uint256 pricePerMint_ //in WEI
+        uint256 pricePerMint_, //in WEI
+        string memory collectionMetadata_
     )
         RMRKMultiResource(name, symbol)
         RMRKMintingUtils(maxSupply_, pricePerMint_)
+        RMRKCollectionMetadata(collectionMetadata_)
     {}
 
     /*

@@ -20,13 +20,15 @@ contract RMRKNestingFactory {
         string memory name,
         string memory symbol,
         uint256 maxSupply,
-        uint256 pricePerMint //in WEI
+        uint256 pricePerMint, //in WEI
+        string memory collectionMetadata
     ) public {
         RMRKNestingMultiResourceImpl nestingContract = new RMRKNestingMultiResourceImpl(
                 name,
                 symbol,
                 maxSupply,
-                pricePerMint
+                pricePerMint,
+                collectionMetadata
             );
         nestingCollections.push(address(nestingContract));
         nestingContract.transferOwnership(msg.sender);

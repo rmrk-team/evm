@@ -25,6 +25,7 @@ async function singleFixture(): Promise<{ token: Contract; renderUtils: Contract
     'NMR',
     10000,
     ONE_ETH,
+    'exampleCollectionMetadataIPFSUri',
   ]);
   return { token, renderUtils };
 }
@@ -32,8 +33,8 @@ async function singleFixture(): Promise<{ token: Contract; renderUtils: Contract
 async function parentChildFixture(): Promise<{ parent: Contract; child: Contract }> {
   return parentChildFixtureWithArgs(
     'RMRKNestingMultiResourceImpl',
-    ['Chunky', 'CHNK', 10000, ONE_ETH],
-    ['Monkey', 'MONK', 10000, ONE_ETH],
+    ['Chunky', 'CHNK', 10000, ONE_ETH, 'exampleCollectionMetadataIPFSUri'],
+    ['Monkey', 'MONK', 10000, ONE_ETH, 'exampleCollectionMetadataIPFSUri'],
   );
 }
 

@@ -25,6 +25,7 @@ async function singleFixture(): Promise<{ token: Contract; renderUtils: Contract
     'MR',
     10000,
     ONE_ETH,
+    'exampleCollectionMetadataIPFSUri',
   ]);
   return { token, renderUtils };
 }

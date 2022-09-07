@@ -20,13 +20,15 @@ contract RMRKMultiResourceFactory {
         string memory name,
         string memory symbol,
         uint256 maxSupply,
-        uint256 pricePerMint //in WEI
+        uint256 pricePerMint, //in WEI
+        string memory collectionMetadata
     ) public {
         RMRKMultiResourceImpl multiResourceContract = new RMRKMultiResourceImpl(
             name,
             symbol,
             maxSupply,
-            pricePerMint
+            pricePerMint,
+            collectionMetadata
         );
         multiResourceCollections.push(address(multiResourceContract));
         multiResourceContract.transferOwnership(msg.sender);

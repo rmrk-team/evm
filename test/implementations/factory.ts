@@ -8,6 +8,7 @@ describe('RMRKFactory', async () => {
   const symbol = 'RMRKTST';
   const ONE_ETH = ethers.utils.parseEther('1.0');
   const maxSupply = 10000;
+  const collectionMetadata = 'someIPFSUri';
 
   async function deployFactoriesFixture() {
     const [owner, ...signersAddr] = await ethers.getSigners();
@@ -26,14 +27,16 @@ describe('RMRKFactory', async () => {
     await expect(
       rmrkMultiResourceFactory
         .connect(owner)
-        .deployRMRKMultiResource(name, symbol, maxSupply, ONE_ETH),
+        .deployRMRKMultiResource(name, symbol, maxSupply, ONE_ETH, collectionMetadata),
     ).to.emit(rmrkMultiResourceFactory, 'NewRMRKMultiResourceContract');
   });
 
   it('Deploy a new RMRK Nesting contract', async function () {
     const { rmrkNestingFactory, owner } = await loadFixture(deployFactoriesFixture);
     await expect(
-      rmrkNestingFactory.connect(owner).deployRMRKNesting(name, symbol, maxSupply, ONE_ETH),
+      rmrkNestingFactory
+        .connect(owner)
+        .deployRMRKNesting(name, symbol, maxSupply, ONE_ETH, collectionMetadata),
     ).to.emit(rmrkNestingFactory, 'NewRMRKNestingContract');
   });
 });

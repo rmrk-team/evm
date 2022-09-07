@@ -3,6 +3,7 @@
 pragma solidity ^0.8.15;
 
 import "../RMRK/utils/RMRKMintingUtils.sol";
+import "../RMRK/utils/RMRKCollectionMetadata.sol";
 import "../RMRK/nesting/RMRKNestingMultiResource.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
@@ -12,6 +13,7 @@ error RMRKMintZero();
 //Minimal public implementation of IRMRKNesting for testing.
 contract RMRKNestingMultiResourceImpl is
     RMRKMintingUtils,
+    RMRKCollectionMetadata,
     RMRKNestingMultiResource
 {
     using Strings for uint256;
@@ -29,10 +31,12 @@ contract RMRKNestingMultiResourceImpl is
         string memory name_,
         string memory symbol_,
         uint256 maxSupply_,
-        uint256 pricePerMint_
+        uint256 pricePerMint_,
+        string memory collectionMetadata_
     )
         RMRKNestingMultiResource(name_, symbol_)
         RMRKMintingUtils(maxSupply_, pricePerMint_)
+        RMRKCollectionMetadata(collectionMetadata_)
     {}
 
     /*
