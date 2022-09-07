@@ -76,12 +76,6 @@ contract RMRKNesting is
 
     // ------------------- NESTING --------------
 
-    struct RMRKOwner {
-        uint256 tokenId;
-        address ownerAddress;
-        bool isNft;
-    }
-
     // Mapping from token ID to RMRKOwner struct
     mapping(uint256 => RMRKOwner) internal _RMRKOwners;
 
@@ -502,7 +496,7 @@ contract RMRKNesting is
 
         Child memory child = _children[tokenId][index];
         IRMRKNesting(child.contractAddress).burnFromParent(child.tokenId);
-        removeChildByIndex(_children[tokenId], index);
+        _removeChildByIndex(_children[tokenId], index);
     }
 
     /**
@@ -823,7 +817,7 @@ contract RMRKNesting is
         if (_posInChildArray[child.contractAddress][child.tokenId] != 0)
             revert RMRKChildAlreadyExists();
 
-        removeChildByIndex(_pendingChildren[tokenId], index);
+        _removeChildByIndex(_pendingChildren[tokenId], index);
 
         _children[tokenId].push(child);
 
@@ -875,7 +869,7 @@ contract RMRKNesting is
 
         Child memory pendingChild = _pendingChildren[tokenId][index];
 
-        removeChildByIndex(_pendingChildren[tokenId], index);
+        _removeChildByIndex(_pendingChildren[tokenId], index);
 
         if (to != address(0)) {
             IERC721(pendingChild.contractAddress).safeTransferFrom(
@@ -909,7 +903,7 @@ contract RMRKNesting is
 
         Child memory child = _children[tokenId][index];
         delete _posInChildArray[child.contractAddress][child.tokenId];
-        removeChildByIndex(_children[tokenId], index);
+        _removeChildByIndex(_children[tokenId], index);
 
         if (to != address(0)) {
             IERC721(child.contractAddress).safeTransferFrom(
@@ -999,7 +993,7 @@ contract RMRKNesting is
     //HELPERS
 
     // For child storage array, callers must check valid length
-    function removeChildByIndex(Child[] storage array, uint256 index) internal {
+    function _removeChildByIndex(Child[] storage array, uint256 index) private {
         array[index] = array[array.length - 1];
         array.pop();
     }

@@ -5,6 +5,13 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 
 interface IRMRKNesting is IERC165 {
+
+    struct RMRKOwner {
+        uint256 tokenId;
+        address ownerAddress;
+        bool isNft;
+    }
+
     /**
      * @dev emitted when a child NFT is added to a token's pending array
      */
