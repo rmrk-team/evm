@@ -197,10 +197,7 @@ interface IRMRKMultiResource is IERC165 {
     /**
      * @notice Returns the ids of all stored resources
      */
-    function getAllResources()
-        external
-        view
-        returns (uint64[] memory);
+    function getAllResources() external view returns (uint64[] memory);
 
     // Approvals
 

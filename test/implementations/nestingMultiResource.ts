@@ -14,13 +14,18 @@ import {
   ONE_ETH,
 } from '../utils';
 
-async function singleFixture(): Promise<Contract> {
-  return singleFixtureWithArgs('RMRKNestingMultiResourceImpl', [
+async function singleFixture(): Promise<{ token: Contract; renderUtils: Contract }> {
+  const renderUtilsFactory = await ethers.getContractFactory('RMRKRenderUtils');
+  const renderUtils = await renderUtilsFactory.deploy();
+  await renderUtils.deployed();
+
+  const token = await singleFixtureWithArgs('RMRKNestingMultiResourceImpl', [
     'NestingMultiResource',
     'NMR',
     10000,
     ONE_ETH,
   ]);
+  return { token, renderUtils };
 }
 
 async function parentChildFixture(): Promise<{ parent: Contract; child: Contract }> {
@@ -43,7 +48,9 @@ describe('NestingMultiResourceImpl Nesting Behavior', function () {
 
 describe('NestingMultiResourceImpl MR behavior', async () => {
   beforeEach(async function () {
-    this.token = await loadFixture(singleFixture);
+    const { token, renderUtils } = await loadFixture(singleFixture);
+    this.token = token;
+    this.renderUtils = renderUtils;
   });
 
   shouldBehaveLikeMultiResource(mintFromImpl, addResourceEntryFromImpl, addResourceToToken);
@@ -57,7 +64,7 @@ describe('NestingMultiResourceImpl Other Behavior', function () {
     const [, ...signersAddr] = await ethers.getSigners();
     addrs = signersAddr;
 
-    chunky = await loadFixture(singleFixture);
+    ({ token: chunky } = await loadFixture(singleFixture));
     this.parentToken = chunky;
   });
 

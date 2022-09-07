@@ -115,20 +115,28 @@ async function slotsFixture() {
 
 async function resourcesFixture() {
   const equipFactory = await ethers.getContractFactory('RMRKEquippableImpl');
+  const renderUtilsFactory = await ethers.getContractFactory('RMRKRenderUtils');
 
   const equip = await equipFactory.deploy('Chunky', 'CHNK', 10000, ONE_ETH);
   await equip.deployed();
 
-  return { equip };
+  const renderUtils = await renderUtilsFactory.deploy();
+  await renderUtils.deployed();
+
+  return { equip, renderUtils };
 }
 
 async function multiResourceFixture() {
   const equipFactory = await ethers.getContractFactory('RMRKEquippableImpl');
+  const renderUtilsFactory = await ethers.getContractFactory('RMRKRenderUtils');
 
   const equip = await equipFactory.deploy('equipWithEquippable', 'NWE', 10000, ONE_ETH);
   await equip.deployed();
 
-  return { equip };
+  const renderUtils = await renderUtilsFactory.deploy();
+  await renderUtils.deployed();
+
+  return { equip, renderUtils };
 }
 
 // --------------- END FIXTURES -----------------------
@@ -171,9 +179,10 @@ describe('EquippableMock with Slots', async () => {
 
 describe('EquippableMock Resources', async () => {
   beforeEach(async function () {
-    const { equip } = await loadFixture(resourcesFixture);
+    const { equip, renderUtils } = await loadFixture(resourcesFixture);
     this.nesting = equip;
     this.equip = equip;
+    this.renderUtils = renderUtils;
   });
 
   describe('Init', async function () {
@@ -192,10 +201,12 @@ describe('EquippableMock Resources', async () => {
 
 describe('EquippableMock MR behavior', async () => {
   let equip: Contract;
+  let renderUtils: Contract;
 
   beforeEach(async function () {
-    ({ equip } = await loadFixture(multiResourceFixture));
+    ({ equip, renderUtils } = await loadFixture(multiResourceFixture));
     this.token = equip;
+    this.renderUtils = renderUtils;
   });
 
   async function mintToNesting(token: Contract, to: string): Promise<number> {

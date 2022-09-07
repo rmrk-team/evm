@@ -14,8 +14,18 @@ import {
   ONE_ETH,
 } from '../utils';
 
-async function singleFixture(): Promise<Contract> {
-  return singleFixtureWithArgs('RMRKMultiResourceImpl', ['MultiResource', 'MR', 10000, ONE_ETH]);
+async function singleFixture(): Promise<{ token: Contract; renderUtils: Contract }> {
+  const renderUtilsFactory = await ethers.getContractFactory('RMRKRenderUtils');
+  const renderUtils = await renderUtilsFactory.deploy();
+  await renderUtils.deployed();
+
+  const token = await singleFixtureWithArgs('RMRKMultiResourceImpl', [
+    'MultiResource',
+    'MR',
+    10000,
+    ONE_ETH,
+  ]);
+  return { token, renderUtils };
 }
 
 describe('MultiResourceImpl Other Behavior', async () => {
@@ -37,7 +47,7 @@ describe('MultiResourceImpl Other Behavior', async () => {
 
   describe('Deployment', async function () {
     beforeEach(async function () {
-      token = await loadFixture(singleFixture);
+      ({ token } = await loadFixture(singleFixture));
       this.token = token;
     });
 
@@ -138,7 +148,9 @@ describe('MultiResourceImpl Other Behavior', async () => {
 
 describe('MultiResourceImpl MR behavior', async () => {
   beforeEach(async function () {
-    this.token = await loadFixture(singleFixture);
+    const { token, renderUtils } = await loadFixture(singleFixture);
+    this.token = token;
+    this.renderUtils = renderUtils;
   });
 
   shouldBehaveLikeMultiResource(mintFromImpl, addResourceEntryFromImpl, addResourceToToken);

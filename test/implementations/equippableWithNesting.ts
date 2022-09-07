@@ -193,6 +193,7 @@ async function slotsFixture() {
 async function resourcesFixture() {
   const Nesting = await ethers.getContractFactory('RMRKNestingExternalEquipImpl');
   const Equip = await ethers.getContractFactory('RMRKExternalEquipImpl');
+  const renderUtilsFactory = await ethers.getContractFactory('RMRKRenderUtils');
 
   const nesting = await Nesting.deploy(
     'Chunky',
@@ -206,14 +207,18 @@ async function resourcesFixture() {
   const equip = await Equip.deploy(nesting.address);
   await equip.deployed();
 
+  const renderUtils = await renderUtilsFactory.deploy();
+  await renderUtils.deployed();
+
   await nesting.setEquippableAddress(equip.address);
 
-  return { nesting, equip };
+  return { nesting, equip, renderUtils };
 }
 
 async function multiResourceFixture() {
   const NestingFactory = await ethers.getContractFactory('RMRKNestingExternalEquipImpl');
   const EquipFactory = await ethers.getContractFactory('RMRKExternalEquipImpl');
+  const renderUtilsFactory = await ethers.getContractFactory('RMRKRenderUtils');
 
   const nesting = await NestingFactory.deploy(
     'NestingWithEquippable',
@@ -227,9 +232,12 @@ async function multiResourceFixture() {
   const equip = await EquipFactory.deploy(nesting.address);
   await equip.deployed();
 
+  const renderUtils = await renderUtilsFactory.deploy();
+  await renderUtils.deployed();
+
   await nesting.setEquippableAddress(equip.address);
 
-  return { nesting, equip };
+  return { nesting, equip, renderUtils };
 }
 
 // --------------- END FIXTURES -----------------------
@@ -288,9 +296,10 @@ describe('EquippableImpl Resources', async () => {
   let owner: SignerWithAddress;
 
   beforeEach(async function () {
-    const { nesting, equip } = await loadFixture(resourcesFixture);
+    const { nesting, equip, renderUtils } = await loadFixture(resourcesFixture);
     this.nesting = nesting;
     this.equip = equip;
+    this.renderUtils = renderUtils;
 
     owner = (await ethers.getSigners())[0];
   });
@@ -370,10 +379,12 @@ describe('EquippableImpl Resources', async () => {
 describe('EquippableImpl MR behavior with minted token', async () => {
   let nesting: Contract;
   let equip: Contract;
+  let renderUtils: Contract;
 
   beforeEach(async function () {
-    ({ nesting, equip } = await loadFixture(multiResourceFixture));
+    ({ nesting, equip, renderUtils } = await loadFixture(multiResourceFixture));
     this.token = equip;
+    this.renderUtils = renderUtils;
   });
 
   // Mint needs to happen on the nesting contract, but the MR behavior happens on the equip one.

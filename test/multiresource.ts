@@ -16,17 +16,23 @@ import shouldBehaveLikeERC721 from './behavior/erc721';
 const name = 'RmrkTest';
 const symbol = 'RMRKTST';
 
-async function singleFixture(): Promise<Contract> {
-  return singleFixtureWithArgs('RMRKMultiResourceMock', [name, symbol]);
+async function singleFixture(): Promise<{ token: Contract; renderUtils: Contract }> {
+  const renderUtilsFactory = await ethers.getContractFactory('RMRKRenderUtils');
+  const renderUtils = await renderUtilsFactory.deploy();
+  await renderUtils.deployed();
+
+  const token = await singleFixtureWithArgs('RMRKMultiResourceMock', [name, symbol]);
+  return { token, renderUtils };
 }
 
 describe('MultiResourceMock Other Behavior', async function () {
   let token: Contract;
+  let renderUtils: Contract;
   let tokenOwner: SignerWithAddress;
   let addrs: SignerWithAddress[];
 
   before(async function () {
-    token = await loadFixture(singleFixture);
+    ({ token, renderUtils } = await loadFixture(singleFixture));
     [tokenOwner, ...addrs] = await ethers.getSigners();
   });
 
@@ -112,12 +118,15 @@ describe('MultiResourceMock Other Behavior', async function () {
       );
 
       const pendingIds = await token.getPendingResources(tokenId);
-      expect(await token.getResourcesById(pendingIds)).to.be.eql([
+      expect(await renderUtils.getResourcesById(token.address, pendingIds)).to.be.eql([
         [resId, 'data1'],
         [resId2, 'data2'],
       ]);
 
-      expect(await token.getPendingResourceByIndex(tokenId, 0)).to.eql([resId, 'data1']);
+      expect(await renderUtils.getPendingResourceByIndex(token.address, tokenId, 0)).to.eql([
+        resId,
+        'data1',
+      ]);
     });
 
     it('cannot add non existing resource to token', async function () {
@@ -263,7 +272,9 @@ describe('MultiResourceMock Other Behavior', async function () {
 
 describe('MultiResourceMock MR behavior', async () => {
   beforeEach(async function () {
-    this.token = await loadFixture(singleFixture);
+    const { token, renderUtils } = await loadFixture(singleFixture);
+    this.token = token;
+    this.renderUtils = renderUtils;
   });
 
   shouldBehaveLikeMultiResource(mintFromMock, addResourceEntryFromMock, addResourceToToken);
@@ -271,7 +282,8 @@ describe('MultiResourceMock MR behavior', async () => {
 
 describe('MultiResourceMock ERC721 behavior', function () {
   beforeEach(async function () {
-    this.token = await loadFixture(singleFixture);
+    const { token } = await loadFixture(singleFixture);
+    this.token = token;
     this.ERC721Receiver = await ethers.getContractFactory('ERC721ReceiverMock');
   });
 

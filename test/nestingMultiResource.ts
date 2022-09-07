@@ -16,8 +16,16 @@ import {
 import shouldBehaveLikeNesting from './behavior/nesting';
 import shouldBehaveLikeMultiResource from './behavior/multiresource';
 
-async function singleFixture(): Promise<Contract> {
-  return singleFixtureWithArgs('RMRKNestingMultiResourceMock', ['NestingMultiResource', 'NMR']);
+async function singleFixture(): Promise<{ token: Contract; renderUtils: Contract }> {
+  const renderUtilsFactory = await ethers.getContractFactory('RMRKRenderUtils');
+  const renderUtils = await renderUtilsFactory.deploy();
+  await renderUtils.deployed();
+
+  const token = await singleFixtureWithArgs('RMRKNestingMultiResourceMock', [
+    'NestingMultiResource',
+    'NMR',
+  ]);
+  return { token, renderUtils };
 }
 
 async function parentChildFixture(): Promise<{ parent: Contract; child: Contract }> {
@@ -40,7 +48,9 @@ describe('NestingMultiResourceMock Nesting Behavior', function () {
 
 describe('NestingMultiResourceMock MR behavior', async () => {
   beforeEach(async function () {
-    this.token = await loadFixture(singleFixture);
+    const { token, renderUtils } = await loadFixture(singleFixture);
+    this.token = token;
+    this.renderUtils = renderUtils;
   });
 
   shouldBehaveLikeMultiResource(mintFromMock, addResourceEntryFromMock, addResourceToToken);
@@ -54,7 +64,7 @@ describe('NestingMultiResourceMock Other Behavior', function () {
     const [, ...signersAddr] = await ethers.getSigners();
     addrs = signersAddr;
 
-    token = await loadFixture(singleFixture);
+    ({ token } = await loadFixture(singleFixture));
     this.parentToken = token;
   });
 

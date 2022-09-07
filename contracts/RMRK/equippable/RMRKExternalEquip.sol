@@ -223,43 +223,6 @@ contract RMRKExternalEquip is Context, IRMRKExternalEquip {
         return _resourceOverwrites[tokenId][resourceId];
     }
 
-    function getResourceByIndex(uint256 tokenId, uint256 index)
-        external
-        view
-        virtual
-        returns (Resource memory)
-    {
-        uint64 resourceId = getActiveResources(tokenId)[index];
-        return getResource(resourceId);
-    }
-
-    function getPendingResourceByIndex(uint256 tokenId, uint256 index)
-        external
-        view
-        virtual
-        returns (Resource memory)
-    {
-        uint64 resourceId = getPendingResources(tokenId)[index];
-        return getResource(resourceId);
-    }
-
-    function getResourcesById(uint64[] calldata resourceIds)
-        public
-        view
-        virtual
-        returns (Resource[] memory)
-    {
-        uint256 len = resourceIds.length;
-        Resource[] memory resources = new Resource[](len);
-        for (uint256 i; i < len; ) {
-            resources[i] = getResource(resourceIds[i]);
-            unchecked {
-                ++i;
-            }
-        }
-        return resources;
-    }
-
     // --------------------------- HANDLING RESOURCES -------------------------
 
     function acceptResource(uint256 tokenId, uint256 index)
