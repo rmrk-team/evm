@@ -14,7 +14,7 @@ interface IRMRKRenderUtils is IERC165 {
      * - `resourceId` must exist.
      *
      */
-    function getResObjectByIndex(
+    function getResourceByIndex(
         address target,
         uint256 tokenId,
         uint256 index
@@ -28,7 +28,7 @@ interface IRMRKRenderUtils is IERC165 {
      * - `tokenId` must exist.
      * - `index` must be inside the range of active resource array
      */
-    function getPendingResObjectByIndex(
+    function getPendingResourceByIndex(
         address target,
         uint256 tokenId,
         uint256 index

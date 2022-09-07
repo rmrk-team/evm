@@ -117,7 +117,7 @@ describe('MultiResourceMock Other Behavior', async function () {
         [resId2, 'data2'],
       ]);
 
-      expect(await token.getPendingResObjectByIndex(tokenId, 0)).to.eql([resId, 'data1']);
+      expect(await token.getPendingResourceByIndex(tokenId, 0)).to.eql([resId, 'data1']);
     });
 
     it('cannot add non existing resource to token', async function () {

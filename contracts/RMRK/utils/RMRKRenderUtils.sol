@@ -21,7 +21,7 @@ contract RMRKRenderUtils is IRMRKRenderUtils {
             interfaceId == type(IRMRKRenderUtils).interfaceId;
     }
 
-    function getResObjectByIndex(
+    function getResourceByIndex(
         address target,
         uint256 tokenId,
         uint256 index
@@ -31,7 +31,7 @@ contract RMRKRenderUtils is IRMRKRenderUtils {
         return target_.getResource(resourceId);
     }
 
-    function getPendingResObjectByIndex(
+    function getPendingResourceByIndex(
         address target,
         uint256 tokenId,
         uint256 index

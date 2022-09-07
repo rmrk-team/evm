@@ -143,7 +143,7 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
         return _allResources;
     }
 
-    function getResObjectByIndex(uint256 tokenId, uint256 index)
+    function getResourceByIndex(uint256 tokenId, uint256 index)
         external
         view
         virtual
@@ -153,7 +153,7 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
         return getResource(resourceId);
     }
 
-    function getPendingResObjectByIndex(uint256 tokenId, uint256 index)
+    function getPendingResourceByIndex(uint256 tokenId, uint256 index)
         external
         view
         virtual

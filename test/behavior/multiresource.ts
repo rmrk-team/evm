@@ -208,7 +208,7 @@ async function shouldBehaveLikeMultiResource(
         expect(await this.token.getResourcesById(activeResources)).to.eql([[resId1, resData1]]);
         pendingResources = await this.token.getPendingResources(tokenId);
         expect(await this.token.getResourcesById(pendingResources)).to.eql([[resId2, resData2]]);
-        expect(await this.token.getResObjectByIndex(tokenId, 0)).to.eql([resId1, resData1]);
+        expect(await this.token.getResourceByIndex(tokenId, 0)).to.eql([resId1, resData1]);
       });
 
       it('can get all resources', async function () {

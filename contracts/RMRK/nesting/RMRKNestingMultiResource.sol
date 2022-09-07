@@ -127,7 +127,7 @@ contract RMRKNestingMultiResource is RMRKNesting, IRMRKMultiResource {
         return _allResources;
     }
 
-    function getResObjectByIndex(uint256 tokenId, uint256 index)
+    function getResourceByIndex(uint256 tokenId, uint256 index)
         external
         view
         virtual
@@ -137,7 +137,7 @@ contract RMRKNestingMultiResource is RMRKNesting, IRMRKMultiResource {
         return getResource(resourceId);
     }
 
-    function getPendingResObjectByIndex(uint256 tokenId, uint256 index)
+    function getPendingResourceByIndex(uint256 tokenId, uint256 index)
         external
         view
         virtual
