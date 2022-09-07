@@ -19,6 +19,17 @@ contract RMRKEquippableViews is IRMRKEquippableViews {
 
     constructor() {}
 
+    function supportsInterface(bytes4 interfaceId)
+        external
+        view
+        virtual
+        returns (bool)
+    {
+        return
+            interfaceId == type(IERC165).interfaceId ||
+            interfaceId == type(IRMRKEquippableViews).interfaceId;
+    }
+
     function getEquipped(
         address equippableContract,
         uint64 tokenId,

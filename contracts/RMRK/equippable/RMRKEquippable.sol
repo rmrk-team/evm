@@ -111,7 +111,7 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
         public
         view
         virtual
-        override
+        override(IERC165, RMRKNesting)
         returns (bool)
     {
         return

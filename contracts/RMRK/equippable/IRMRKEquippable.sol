@@ -5,7 +5,6 @@ pragma solidity ^0.8.0;
 import "../multiresource/IRMRKMultiResource.sol";
 
 interface IRMRKEquippable is IRMRKMultiResource {
-
     struct Equipment {
         uint64 resourceId;
         uint64 childResourceId;

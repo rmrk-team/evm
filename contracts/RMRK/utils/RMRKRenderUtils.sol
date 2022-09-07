@@ -10,6 +10,17 @@ pragma solidity ^0.8.15;
  */
 
 contract RMRKRenderUtils is IRMRKRenderUtils {
+    function supportsInterface(bytes4 interfaceId)
+        external
+        view
+        virtual
+        returns (bool)
+    {
+        return
+            interfaceId == type(IERC165).interfaceId ||
+            interfaceId == type(IRMRKRenderUtils).interfaceId;
+    }
+
     function getResObjectByIndex(
         address target,
         uint256 tokenId,

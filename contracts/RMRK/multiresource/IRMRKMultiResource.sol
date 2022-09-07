@@ -2,7 +2,9 @@
 
 pragma solidity ^0.8.0;
 
-interface IRMRKMultiResource {
+import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+
+interface IRMRKMultiResource is IERC165 {
     /**
      * @notice emitted when a resource object is initialized at resourceId
      */

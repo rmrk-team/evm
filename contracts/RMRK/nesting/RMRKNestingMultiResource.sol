@@ -96,7 +96,7 @@ contract RMRKNestingMultiResource is RMRKNesting, IRMRKMultiResource {
         public
         view
         virtual
-        override
+        override(IERC165, RMRKNesting)
         returns (bool)
     {
         return

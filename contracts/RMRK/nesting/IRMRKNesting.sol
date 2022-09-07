@@ -1,8 +1,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
-pragma solidity ^0.8.15;
+pragma solidity ^0.8.0;
 
-interface IRMRKNesting {
+import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+
+interface IRMRKNesting is IERC165 {
     /**
      * @dev emitted when a child NFT is added to a token's pending array
      */

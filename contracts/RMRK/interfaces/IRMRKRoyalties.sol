@@ -2,7 +2,9 @@
 
 pragma solidity ^0.8.0;
 
-interface IRMRKRoyalties {
+import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+
+interface IRMRKRoyalties is IERC165 {
     /**
      * @notice Returns the data for royalty distributions.
      *

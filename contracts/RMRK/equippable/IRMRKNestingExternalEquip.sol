@@ -2,12 +2,14 @@
 
 pragma solidity ^0.8.0;
 
+import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+
 /**
  * @title ERC721 token receiver interface
  * @dev Interface for any contract that wants to support safeTransfers
  * from ERC721 asset contracts.
  */
-interface IRMRKNestingExternalEquip {
+interface IRMRKNestingExternalEquip is IERC165 {
     /**
      * @dev emitted when the equippable address is set
      */

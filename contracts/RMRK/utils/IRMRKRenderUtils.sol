@@ -3,8 +3,9 @@
 pragma solidity ^0.8.0;
 
 import "contracts/RMRK/multiresource/IRMRKMultiResource.sol";
+import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 
-interface IRMRKRenderUtils {
+interface IRMRKRenderUtils is IERC165 {
     /**
      * @notice Returns `Resource` object associated with `resourceId`
      *

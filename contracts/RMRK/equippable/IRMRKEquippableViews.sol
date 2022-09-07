@@ -2,13 +2,12 @@
 
 //Generally all interactions should propagate downstream
 
-pragma solidity ^0.8.15;
+pragma solidity ^0.8.0;
 
+import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import "./IRMRKEquippable.sol";
 
-
-interface IRMRKEquippableViews {
-
+interface IRMRKEquippableViews is IERC165 {
     function getEquipped(
         address equippableContract,
         uint64 tokenId,
