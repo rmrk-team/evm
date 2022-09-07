@@ -88,14 +88,6 @@ contract RMRKNestingMultiResourceImpl is
         _burn(tokenId);
     }
 
-    function isApprovedOrOwner(address spender, uint256 tokenId)
-        external
-        view
-        returns (bool)
-    {
-        return _isApprovedOrOwner(spender, tokenId);
-    }
-
     function getFallbackURI() external view virtual returns (string memory) {
         return _fallbackURI;
     }
@@ -117,6 +109,7 @@ contract RMRKNestingMultiResourceImpl is
         external
         onlyOwner
     {
+        // TODO: shall we check that resource exists?
         _tokenEnumeratedResource[resourceId] = state;
     }
 
