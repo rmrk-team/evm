@@ -34,7 +34,7 @@ contract RMRKNestingMultiResourceMock is RMRKNestingMultiResource {
         uint64 resourceId,
         uint64 overwrites
     ) external {
-        if (ownerOf(tokenId) == address(0)) revert ERC721InvalidTokenId();
+        _requireMinted(tokenId);
         _addResourceToToken(tokenId, resourceId, overwrites);
     }
 

@@ -776,7 +776,7 @@ contract RMRKNesting is
         public
         virtual
     {
-        if (!_exists(parentTokenId)) revert ERC721InvalidTokenId();
+        _requireMinted(parentTokenId);
 
         if (!_msgSender().isContract()) revert RMRKIsNotContract();
         // TODO: Check if it's worth to call back the sender to assert it is the owner of the childId
