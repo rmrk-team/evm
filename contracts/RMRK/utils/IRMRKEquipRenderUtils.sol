@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.0;
 
-import "contracts/RMRK/equippable/IRMRKEquippable.sol";
+import "../equippable/IRMRKEquippable.sol";
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 
 interface IRMRKEquipRenderUtils is IERC165 {

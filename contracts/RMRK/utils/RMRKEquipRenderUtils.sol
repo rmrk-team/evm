@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import "../base/IRMRKBaseStorage.sol";
+import "../equippable/IRMRKEquippable.sol";
 import "../library/RMRKLib.sol";
-import "contracts/RMRK/equippable/IRMRKEquippable.sol";
-import "contracts/RMRK/utils/IRMRKEquipRenderUtils.sol";
+import "./IRMRKEquipRenderUtils.sol";
 // import "hardhat/console.sol";
 
 pragma solidity ^0.8.15;
