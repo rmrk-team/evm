@@ -5,6 +5,7 @@
 pragma solidity ^0.8.15;
 
 import "../../RMRK/equippable/IRMRKEquippable.sol";
+import "../../RMRK/equippable/IRMRKExternalEquip.sol";
 import "../../RMRK/equippable/IRMRKNestingExternalEquip.sol";
 import "../../RMRK/nesting/RMRKNesting.sol";
 // import "hardhat/console.sol";
@@ -23,6 +24,18 @@ contract RMRKNestingExternalEquip is IRMRKNestingExternalEquip, RMRKNesting {
     constructor(string memory name_, string memory symbol_)
         RMRKNesting(name_, symbol_)
     {}
+
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        override(IERC165, RMRKNesting)
+        virtual
+        returns (bool)
+    {
+        return
+            interfaceId == type(IRMRKNestingExternalEquip).interfaceId ||
+            super.supportsInterface(interfaceId);
+    }
 
     // It's overriden to make check the child is not equipped when trying to unnest
     function unnestChild(

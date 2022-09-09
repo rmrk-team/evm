@@ -1,4 +1,5 @@
 import { ethers } from 'hardhat';
+import { expect } from 'chai';
 import { Contract } from 'ethers';
 import { mintFromMock, nestMintFromMock, transfer, nestTransfer } from './utils';
 import shouldBehaveLikeNesting from './behavior/nesting';
@@ -52,22 +53,37 @@ describe('NestingWithEquippableMock ERC721 Behavior', function () {
   const symbol = 'RMRKTST';
 
   async function nestingFixture() {
-    const Token = await ethers.getContractFactory('RMRKNestingExternalEquipMock');
-    const tokenContract = await Token.deploy(name, symbol);
-    await tokenContract.deployed();
+    const nestingFactory = await ethers.getContractFactory('RMRKNestingExternalEquipMock');
+    const nesting = await nestingFactory.deploy(name, symbol);
+    await nesting.deployed();
 
-    const Equippable = await ethers.getContractFactory('RMRKExternalEquipMock');
-    const equippableContract = await Equippable.deploy(tokenContract.address);
-    await equippableContract.deployed();
+    const equipFactory = await ethers.getContractFactory('RMRKExternalEquipMock');
+    const equip = await equipFactory.deploy(nesting.address);
+    await equip.deployed();
 
-    await tokenContract.setEquippableAddress(equippableContract.address);
-    return tokenContract;
+    await nesting.setEquippableAddress(equip.address);
+    return { equip, nesting };
   }
 
   beforeEach(async function () {
-    token = await loadFixture(nestingFixture);
-    this.token = token;
+    const { nesting, equip } = await loadFixture(nestingFixture);
+    this.token = nesting;
+    this.equip = equip;
     this.ERC721Receiver = await ethers.getContractFactory('ERC721ReceiverMock');
+  });
+
+  describe('Interface support', function () {
+    it('supports NestingExternalEquip', async function () {
+      expect(await this.token.supportsInterface('0x8b7f3e99')).to.equal(true);
+    });
+    it('supports IExternalNesting', async function () {
+      expect(await this.equip.supportsInterface('0xe5383e6c')).to.equal(true);
+    });
+
+    it('cannot support other interfaceId', async function () {
+      expect(await this.token.supportsInterface('0xffffffff')).to.equal(false);
+      expect(await this.equip.supportsInterface('0xffffffff')).to.equal(false);
+    });
   });
 
   shouldBehaveLikeERC721(name, symbol);
