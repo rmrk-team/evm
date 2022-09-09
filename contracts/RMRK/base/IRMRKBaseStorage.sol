@@ -2,7 +2,9 @@
 
 pragma solidity ^0.8.15;
 
-interface IRMRKBaseStorage {
+import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+
+interface IRMRKBaseStorage is IERC165 {
     /**
      * @dev emitted when one or more addresses are added for equippable status for partId.
      */

@@ -61,6 +61,20 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
     }
 
     /**
+     * @dev See {IERC165-supportsInterface}.
+     */
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        virtual
+        returns (bool)
+    {
+        return
+            interfaceId == type(IERC165).interfaceId ||
+            interfaceId == type(IRMRKBaseStorage).interfaceId;
+    }
+
+    /**
      * @dev Returns symbol of associated collection
      * @return string base contract symbol
      */

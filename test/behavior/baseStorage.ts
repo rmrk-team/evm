@@ -37,6 +37,14 @@ async function shouldBehaveLikeBase(contractName: string, symbol: string, type: 
     it('has right type', async function () {
       expect(await testBase.type_()).to.equal(type);
     });
+
+    it('supports interface', async function () {
+      expect(await testBase.supportsInterface('0x4a618ad6')).to.equal(true);
+    });
+
+    it('does not support other interfaces', async function () {
+      expect(await testBase.supportsInterface('0xffffffff')).to.equal(false);
+    });
   });
 
   describe('add base entries', async function () {
