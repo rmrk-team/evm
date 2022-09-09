@@ -16,7 +16,7 @@ import {
 } from '../utils';
 
 async function singleFixture(): Promise<{ token: Contract; renderUtils: Contract }> {
-  const renderUtilsFactory = await ethers.getContractFactory('RMRKRenderUtils');
+  const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiResourceRenderUtils');
   const renderUtils = await renderUtilsFactory.deploy();
   await renderUtils.deployed();
 

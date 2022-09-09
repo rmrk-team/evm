@@ -260,11 +260,11 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
     ) internal {
         uint64 id = resource.id;
         if (id == uint64(0)) revert RMRKWriteToZero();
-        if (bytes(_resources[id]).length > 0)
+        if (bytes(_resources[id]).length != 0)
             revert RMRKResourceAlreadyExists();
         if (
             resource.baseAddress == address(0) &&
-            (fixedPartIds.length > 0 || slotPartIds.length > 0)
+            (fixedPartIds.length != 0 || slotPartIds.length != 0)
         ) revert RMRKBaseRequiredForParts();
 
         _resources[id] = resource.metadataURI;

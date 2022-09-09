@@ -31,7 +31,7 @@ async function partsFixture() {
 
   const baseFactory = await ethers.getContractFactory('RMRKBaseStorageImpl');
   const equipFactory = await ethers.getContractFactory('RMRKEquippableImpl');
-  const viewFactory = await ethers.getContractFactory('RMRKEquippableViews');
+  const viewFactory = await ethers.getContractFactory('RMRKEquipRenderUtils');
 
   // Base
   const base = await baseFactory.deploy(baseSymbol, baseType);
@@ -71,7 +71,7 @@ async function slotsFixture() {
 
   const baseFactory = await ethers.getContractFactory('RMRKBaseStorageImpl');
   const equipFactory = await ethers.getContractFactory('RMRKEquippableImpl');
-  const viewFactory = await ethers.getContractFactory('RMRKEquippableViews');
+  const viewFactory = await ethers.getContractFactory('RMRKEquipRenderUtils');
 
   // View
   const view = await viewFactory.deploy();
@@ -116,7 +116,7 @@ async function slotsFixture() {
 
 async function resourcesFixture() {
   const equipFactory = await ethers.getContractFactory('RMRKEquippableImpl');
-  const renderUtilsFactory = await ethers.getContractFactory('RMRKRenderUtils');
+  const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiResourceRenderUtils');
 
   const equip = await equipFactory.deploy('Chunky', 'CHNK', 10000, ONE_ETH);
   await equip.deployed();
@@ -129,7 +129,7 @@ async function resourcesFixture() {
 
 async function equipFixture() {
   const equipFactory = await ethers.getContractFactory('RMRKEquippableImpl');
-  const renderUtilsFactory = await ethers.getContractFactory('RMRKRenderUtils');
+  const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiResourceRenderUtils');
 
   const equip = await equipFactory.deploy('equipWithEquippable', 'NWE', 10000, ONE_ETH);
   await equip.deployed();

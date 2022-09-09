@@ -719,7 +719,7 @@ contract RMRKMultiResource is
     // This is expected to be implemented with custom guard:
     function _addResourceEntry(uint64 id, string memory metadataURI) internal {
         if (id == uint64(0)) revert RMRKWriteToZero();
-        if (bytes(_resources[id]).length > 0)
+        if (bytes(_resources[id]).length != 0)
             revert RMRKResourceAlreadyExists();
         _resources[id] = metadataURI;
         _allResources.push(id);

@@ -28,7 +28,7 @@ async function partsFixture() {
   const baseFactory = await ethers.getContractFactory('RMRKBaseStorageImpl');
   const nestingFactory = await ethers.getContractFactory('RMRKNestingExternalEquipImpl');
   const equipFactory = await ethers.getContractFactory('RMRKExternalEquipImpl');
-  const viewFactory = await ethers.getContractFactory('RMRKEquippableViews');
+  const viewFactory = await ethers.getContractFactory('RMRKEquipRenderUtils');
 
   // View
   const view = await viewFactory.deploy();
@@ -97,7 +97,7 @@ async function slotsFixture() {
   const baseFactory = await ethers.getContractFactory('RMRKBaseStorageImpl');
   const nestingFactory = await ethers.getContractFactory('RMRKNestingExternalEquipImpl');
   const equipFactory = await ethers.getContractFactory('RMRKExternalEquipImpl');
-  const viewFactory = await ethers.getContractFactory('RMRKEquippableViews');
+  const viewFactory = await ethers.getContractFactory('RMRKEquipRenderUtils');
 
   // View
   const view = await viewFactory.deploy();
@@ -194,7 +194,7 @@ async function slotsFixture() {
 async function resourcesFixture() {
   const Nesting = await ethers.getContractFactory('RMRKNestingExternalEquipImpl');
   const Equip = await ethers.getContractFactory('RMRKExternalEquipImpl');
-  const renderUtilsFactory = await ethers.getContractFactory('RMRKRenderUtils');
+  const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiResourceRenderUtils');
 
   const nesting = await Nesting.deploy(
     'Chunky',
@@ -219,7 +219,7 @@ async function resourcesFixture() {
 async function equipFixture() {
   const NestingFactory = await ethers.getContractFactory('RMRKNestingExternalEquipImpl');
   const EquipFactory = await ethers.getContractFactory('RMRKExternalEquipImpl');
-  const renderUtilsFactory = await ethers.getContractFactory('RMRKRenderUtils');
+  const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiResourceRenderUtils');
 
   const nesting = await NestingFactory.deploy(
     'NestingWithEquippable',

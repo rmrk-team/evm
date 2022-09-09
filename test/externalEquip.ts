@@ -30,7 +30,7 @@ async function partsFixture() {
   const baseFactory = await ethers.getContractFactory('RMRKBaseStorageMock');
   const nestingFactory = await ethers.getContractFactory('RMRKNestingExternalEquipMock');
   const equipFactory = await ethers.getContractFactory('RMRKExternalEquipMock');
-  const viewFactory = await ethers.getContractFactory('RMRKEquippableViews');
+  const viewFactory = await ethers.getContractFactory('RMRKEquipRenderUtils');
 
   // Base
   const base = await baseFactory.deploy(baseSymbol, baseType);
@@ -92,7 +92,7 @@ async function slotsFixture() {
   const baseFactory = await ethers.getContractFactory('RMRKBaseStorageMock');
   const nestingFactory = await ethers.getContractFactory('RMRKNestingExternalEquipMock');
   const equipFactory = await ethers.getContractFactory('RMRKExternalEquipMock');
-  const viewFactory = await ethers.getContractFactory('RMRKEquippableViews');
+  const viewFactory = await ethers.getContractFactory('RMRKEquipRenderUtils');
 
   // View
   const view = await viewFactory.deploy();
@@ -170,7 +170,7 @@ async function slotsFixture() {
 async function resourcesFixture() {
   const Nesting = await ethers.getContractFactory('RMRKNestingExternalEquipMock');
   const Equip = await ethers.getContractFactory('RMRKExternalEquipMock');
-  const renderUtilsFactory = await ethers.getContractFactory('RMRKRenderUtils');
+  const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiResourceRenderUtils');
 
   const nesting = await Nesting.deploy('Chunky', 'CHNK');
   await nesting.deployed();
@@ -189,7 +189,7 @@ async function resourcesFixture() {
 async function multiResourceFixture() {
   const NestingFactory = await ethers.getContractFactory('RMRKNestingExternalEquipMock');
   const EquipFactory = await ethers.getContractFactory('RMRKExternalEquipMock');
-  const renderUtilsFactory = await ethers.getContractFactory('RMRKRenderUtils');
+  const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiResourceRenderUtils');
 
   const nesting = await NestingFactory.deploy('NestingWithEquippable', 'NWE');
   await nesting.deployed();

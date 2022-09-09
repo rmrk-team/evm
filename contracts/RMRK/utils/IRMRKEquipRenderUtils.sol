@@ -5,7 +5,7 @@ pragma solidity ^0.8.0;
 import "contracts/RMRK/equippable/IRMRKEquippable.sol";
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 
-interface IRMRKRenderUtilsEquip is IERC165 {
+interface IRMRKEquipRenderUtils is IERC165 {
     /**
      * @notice Returns `ExtendedResource` object associated with `resourceId`
      *
@@ -45,4 +45,29 @@ interface IRMRKRenderUtilsEquip is IERC165 {
         address target,
         uint64[] calldata resourceIds
     ) external view returns (IRMRKEquippable.ExtendedResource[] memory);
+
+    function getEquipped(
+        address target,
+        uint64 tokenId,
+        uint64 resourceId
+    )
+        external
+        view
+        returns (
+            uint64[] memory slotParts,
+            IRMRKEquippable.Equipment[] memory childrenEquipped
+        );
+
+    function composeEquippables(
+        address target,
+        uint256 tokenId,
+        uint64 resourceId
+    )
+        external
+        view
+        returns (
+            IRMRKEquippable.ExtendedResource memory resource,
+            IRMRKEquippable.FixedPart[] memory fixedParts,
+            IRMRKEquippable.SlotPart[] memory slotParts
+        );
 }

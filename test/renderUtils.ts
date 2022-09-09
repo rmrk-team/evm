@@ -9,8 +9,8 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 
 async function resourcesFixture() {
   const equipFactory = await ethers.getContractFactory('RMRKEquippableMock');
-  const renderUtilsFactory = await ethers.getContractFactory('RMRKRenderUtils');
-  const renderUtilsEquipFactory = await ethers.getContractFactory('RMRKRenderUtilsEquip');
+  const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiResourceRenderUtils');
+  const renderUtilsEquipFactory = await ethers.getContractFactory('RMRKEquipRenderUtils');
 
   const equip = await equipFactory.deploy('Chunky', 'CHNK');
   await equip.deployed();
@@ -97,7 +97,7 @@ describe('Render Utils', async function () {
 
   describe('Render Utils Equip', async function () {
     it('supports interface', async function () {
-      expect(await renderUtilsEquip.supportsInterface('0x51c33385')).to.equal(true);
+      expect(await renderUtilsEquip.supportsInterface('0x65307461')).to.equal(true);
     });
 
     it('can get extended active resource by index', async function () {

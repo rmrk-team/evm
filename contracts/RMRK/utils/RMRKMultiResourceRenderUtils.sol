@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import "contracts/RMRK/multiresource/IRMRKMultiResource.sol";
-import "contracts/RMRK/utils/IRMRKRenderUtils.sol";
+import "contracts/RMRK/utils/IRMRKMultiResourceRenderUtils.sol";
 
 pragma solidity ^0.8.15;
 
@@ -9,7 +9,7 @@ pragma solidity ^0.8.15;
  * @dev Extra utility functions for composing RMRK resources.
  */
 
-contract RMRKRenderUtils is IRMRKRenderUtils {
+contract RMRKMultiResourceRenderUtils is IRMRKMultiResourceRenderUtils {
     function supportsInterface(bytes4 interfaceId)
         external
         view
@@ -18,7 +18,7 @@ contract RMRKRenderUtils is IRMRKRenderUtils {
     {
         return
             interfaceId == type(IERC165).interfaceId ||
-            interfaceId == type(IRMRKRenderUtils).interfaceId;
+            interfaceId == type(IRMRKMultiResourceRenderUtils).interfaceId;
     }
 
     function getResourceByIndex(

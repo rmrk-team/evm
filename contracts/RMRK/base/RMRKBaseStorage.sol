@@ -103,7 +103,7 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
         if (_parts[partId].itemType != ItemType.None)
             revert RMRKPartAlreadyExists();
         if (part.itemType == ItemType.None) revert RMRKBadConfig();
-        if (part.itemType == ItemType.Fixed && part.equippable.length > 0)
+        if (part.itemType == ItemType.Fixed && part.equippable.length != 0)
             revert RMRKBadConfig();
 
         _parts[partId] = part;

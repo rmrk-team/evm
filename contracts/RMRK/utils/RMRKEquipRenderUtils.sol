@@ -1,23 +1,22 @@
 // SPDX-License-Identifier: Apache-2.0
 
-//Generally all interactions should propagate downstream
-
-pragma solidity ^0.8.15;
-
 import "../base/IRMRKBaseStorage.sol";
 import "../library/RMRKLib.sol";
-import "./IRMRKEquippable.sol";
-import "./IRMRKEquippableViews.sol";
+import "contracts/RMRK/equippable/IRMRKEquippable.sol";
+import "contracts/RMRK/utils/IRMRKEquipRenderUtils.sol";
+import "hardhat/console.sol";
 
-// import "hardhat/console.sol";
+pragma solidity ^0.8.15;
 
 error RMRKTokenDoesNotHaveActiveResource();
 error RMRKNotComposableResource();
 
-contract RMRKEquippableViews is IRMRKEquippableViews {
-    using RMRKLib for uint64[];
+/**
+ * @dev Extra utility functions for composing RMRK extended resources.
+ */
 
-    constructor() {}
+contract RMRKEquipRenderUtils is IRMRKEquipRenderUtils {
+    using RMRKLib for uint64[];
 
     function supportsInterface(bytes4 interfaceId)
         external
@@ -25,13 +24,56 @@ contract RMRKEquippableViews is IRMRKEquippableViews {
         virtual
         returns (bool)
     {
+        console.logBytes4(type(IRMRKEquipRenderUtils).interfaceId);
         return
             interfaceId == type(IERC165).interfaceId ||
-            interfaceId == type(IRMRKEquippableViews).interfaceId;
+            interfaceId == type(IRMRKEquipRenderUtils).interfaceId;
+    }
+
+    function getExtendedResourceByIndex(
+        address target,
+        uint256 tokenId,
+        uint256 index
+    ) external view virtual returns (IRMRKEquippable.ExtendedResource memory) {
+        IRMRKEquippable target_ = IRMRKEquippable(target);
+        uint64 resourceId = target_.getActiveResources(tokenId)[index];
+        return target_.getExtendedResource(resourceId);
+    }
+
+    function getPendingExtendedResourceByIndex(
+        address target,
+        uint256 tokenId,
+        uint256 index
+    ) external view virtual returns (IRMRKEquippable.ExtendedResource memory) {
+        IRMRKEquippable target_ = IRMRKEquippable(target);
+        uint64 resourceId = target_.getPendingResources(tokenId)[index];
+        return target_.getExtendedResource(resourceId);
+    }
+
+    function getExtendedResourcesById(
+        address target,
+        uint64[] calldata resourceIds
+    )
+        external
+        view
+        virtual
+        returns (IRMRKEquippable.ExtendedResource[] memory)
+    {
+        IRMRKEquippable target_ = IRMRKEquippable(target);
+        uint256 len = resourceIds.length;
+        IRMRKEquippable.ExtendedResource[]
+            memory resources = new IRMRKEquippable.ExtendedResource[](len);
+        for (uint256 i; i < len; ) {
+            resources[i] = target_.getExtendedResource(resourceIds[i]);
+            unchecked {
+                ++i;
+            }
+        }
+        return resources;
     }
 
     function getEquipped(
-        address equippableContract,
+        address target,
         uint64 tokenId,
         uint64 resourceId
     )
@@ -42,13 +84,13 @@ contract RMRKEquippableViews is IRMRKEquippableViews {
             IRMRKEquippable.Equipment[] memory childrenEquipped
         )
     {
-        IRMRKEquippable _equippableContract = IRMRKEquippable(
-            equippableContract
+        IRMRKEquippable target_ = IRMRKEquippable(
+            target
         );
 
-        address targetBaseAddress = _equippableContract
+        address targetBaseAddress = target_
             .getBaseAddressOfResource(resourceId);
-        uint64[] memory slotPartIds = _equippableContract.getSlotPartIds(
+        uint64[] memory slotPartIds = target_.getSlotPartIds(
             resourceId
         );
 
@@ -59,7 +101,7 @@ contract RMRKEquippableViews is IRMRKEquippableViews {
         uint256 len = slotPartIds.length;
         for (uint256 i; i < len; ) {
             slotParts[i] = slotPartIds[i];
-            IRMRKEquippable.Equipment memory equipment = _equippableContract
+            IRMRKEquippable.Equipment memory equipment = target_
                 .getEquipment(tokenId, targetBaseAddress, slotPartIds[i]);
             if (equipment.resourceId == resourceId) {
                 childrenEquipped[i] = equipment;
@@ -70,9 +112,8 @@ contract RMRKEquippableViews is IRMRKEquippableViews {
         }
     }
 
-    //Gate for equippable array in here by check of slotPartDefinition to slotPartId
     function composeEquippables(
-        address equippableContract,
+        address target,
         uint256 tokenId,
         uint64 resourceId
     )
@@ -84,30 +125,30 @@ contract RMRKEquippableViews is IRMRKEquippableViews {
             IRMRKEquippable.SlotPart[] memory slotParts
         )
     {
-        IRMRKEquippable _equippableContract = IRMRKEquippable(
-            equippableContract
+        IRMRKEquippable target_ = IRMRKEquippable(
+            target
         );
 
         // We make sure token has that resource. Alternative is to receive index but makes equipping more complex.
-        (, bool found) = _equippableContract
+        (, bool found) = target_
             .getActiveResources(tokenId)
             .indexOf(resourceId);
         if (!found) revert RMRKTokenDoesNotHaveActiveResource();
 
-        address targetBaseAddress = _equippableContract
+        address targetBaseAddress = target_
             .getBaseAddressOfResource(resourceId);
         if (targetBaseAddress == address(0)) revert RMRKNotComposableResource();
 
-        resource = _equippableContract.getExtendedResource(resourceId);
+        resource = target_.getExtendedResource(resourceId);
 
         // Fixed parts:
-        uint64[] memory fixedPartIds = _equippableContract.getFixedPartIds(
+        uint64[] memory fixedPartIds = target_.getFixedPartIds(
             resourceId
         );
         fixedParts = new IRMRKEquippable.FixedPart[](fixedPartIds.length);
 
         uint256 len = fixedPartIds.length;
-        if (len > 0) {
+        if (len != 0) {
             IRMRKBaseStorage.Part[] memory baseFixedParts = IRMRKBaseStorage(
                 targetBaseAddress
             ).getParts(fixedPartIds);
@@ -124,18 +165,18 @@ contract RMRKEquippableViews is IRMRKEquippableViews {
         }
 
         // Slot parts:
-        uint64[] memory slotPartIds = _equippableContract.getSlotPartIds(
+        uint64[] memory slotPartIds = target_.getSlotPartIds(
             resourceId
         );
         slotParts = new IRMRKEquippable.SlotPart[](slotPartIds.length);
         len = slotPartIds.length;
 
-        if (len > 0) {
+        if (len != 0) {
             IRMRKBaseStorage.Part[] memory baseSlotParts = IRMRKBaseStorage(
                 targetBaseAddress
             ).getParts(slotPartIds);
             for (uint256 i; i < len; ) {
-                IRMRKEquippable.Equipment memory equipment = _equippableContract
+                IRMRKEquippable.Equipment memory equipment = target_
                     .getEquipment(tokenId, targetBaseAddress, slotPartIds[i]);
                 if (equipment.resourceId == resourceId) {
                     slotParts[i] = IRMRKEquippable.SlotPart({

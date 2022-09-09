@@ -186,7 +186,7 @@ contract RMRKNesting is
 
         string memory baseURI = _baseURI();
         return
-            bytes(baseURI).length > 0
+            bytes(baseURI).length != 0
                 ? string(abi.encodePacked(baseURI, tokenId.toString()))
                 : "";
     }
@@ -424,7 +424,7 @@ contract RMRKNesting is
         _RMRKOwners[tokenId] = RMRKOwner({
             ownerAddress: to,
             tokenId: destinationId,
-            isNft: destinationId > 0
+            isNft: destinationId != 0
         });
     }
 
