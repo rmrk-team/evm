@@ -73,6 +73,10 @@ describe('Render Utils', async function () {
       expect(await renderUtils.supportsInterface('0xb0926bfc')).to.equal(true);
     });
 
+    it('does not support other interfaces', async function () {
+      expect(await renderUtils.supportsInterface('0xffffffff')).to.equal(false);
+    });
+
     it('can get active resource by index', async function () {
       expect(await renderUtils.getResourceByIndex(equip.address, tokenId, 0)).to.eql([
         resId,
