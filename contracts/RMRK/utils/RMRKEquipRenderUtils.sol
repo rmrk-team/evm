@@ -4,7 +4,7 @@ import "../base/IRMRKBaseStorage.sol";
 import "../library/RMRKLib.sol";
 import "contracts/RMRK/equippable/IRMRKEquippable.sol";
 import "contracts/RMRK/utils/IRMRKEquipRenderUtils.sol";
-import "hardhat/console.sol";
+// import "hardhat/console.sol";
 
 pragma solidity ^0.8.15;
 
@@ -24,7 +24,6 @@ contract RMRKEquipRenderUtils is IRMRKEquipRenderUtils {
         virtual
         returns (bool)
     {
-        console.logBytes4(type(IRMRKEquipRenderUtils).interfaceId);
         return
             interfaceId == type(IERC165).interfaceId ||
             interfaceId == type(IRMRKEquipRenderUtils).interfaceId;
