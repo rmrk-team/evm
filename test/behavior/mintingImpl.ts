@@ -29,13 +29,6 @@ async function shouldControlValidMinting(): Promise<void> {
       this.token.mint(addrs[0].address, 99999, { value: ONE_ETH }),
     ).to.be.revertedWithCustomError(this.token, 'RMRKMintOverMax');
   });
-
-  // FIXME: We should set a limit per address also, probably on deploy.
-  // it('cannot mint over max quantity at a time', async function () {
-  //   await expect(
-  //     this.token.mint(addrs[0].address, 100, { value: ONE_ETH.mul(100) }),
-  //   ).to.be.revertedWithCustomError(this.token, 'RMRKMintOverMax');
-  // });
 }
 
 export default shouldControlValidMinting;
