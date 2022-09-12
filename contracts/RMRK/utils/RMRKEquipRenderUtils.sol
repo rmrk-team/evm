@@ -83,15 +83,12 @@ contract RMRKEquipRenderUtils is IRMRKEquipRenderUtils {
             IRMRKEquippable.Equipment[] memory childrenEquipped
         )
     {
-        IRMRKEquippable target_ = IRMRKEquippable(
-            target
-        );
+        IRMRKEquippable target_ = IRMRKEquippable(target);
 
-        address targetBaseAddress = target_
-            .getBaseAddressOfResource(resourceId);
-        uint64[] memory slotPartIds = target_.getSlotPartIds(
+        address targetBaseAddress = target_.getBaseAddressOfResource(
             resourceId
         );
+        uint64[] memory slotPartIds = target_.getSlotPartIds(resourceId);
 
         // TODO: Clarify on docs: Some children equipped might be empty.
         slotParts = new uint64[](slotPartIds.length);
@@ -100,8 +97,11 @@ contract RMRKEquipRenderUtils is IRMRKEquipRenderUtils {
         uint256 len = slotPartIds.length;
         for (uint256 i; i < len; ) {
             slotParts[i] = slotPartIds[i];
-            IRMRKEquippable.Equipment memory equipment = target_
-                .getEquipment(tokenId, targetBaseAddress, slotPartIds[i]);
+            IRMRKEquippable.Equipment memory equipment = target_.getEquipment(
+                tokenId,
+                targetBaseAddress,
+                slotPartIds[i]
+            );
             if (equipment.resourceId == resourceId) {
                 childrenEquipped[i] = equipment;
             }
@@ -124,26 +124,23 @@ contract RMRKEquipRenderUtils is IRMRKEquipRenderUtils {
             IRMRKEquippable.SlotPart[] memory slotParts
         )
     {
-        IRMRKEquippable target_ = IRMRKEquippable(
-            target
-        );
+        IRMRKEquippable target_ = IRMRKEquippable(target);
 
         // We make sure token has that resource. Alternative is to receive index but makes equipping more complex.
-        (, bool found) = target_
-            .getActiveResources(tokenId)
-            .indexOf(resourceId);
+        (, bool found) = target_.getActiveResources(tokenId).indexOf(
+            resourceId
+        );
         if (!found) revert RMRKTokenDoesNotHaveActiveResource();
 
-        address targetBaseAddress = target_
-            .getBaseAddressOfResource(resourceId);
+        address targetBaseAddress = target_.getBaseAddressOfResource(
+            resourceId
+        );
         if (targetBaseAddress == address(0)) revert RMRKNotComposableResource();
 
         resource = target_.getExtendedResource(resourceId);
 
         // Fixed parts:
-        uint64[] memory fixedPartIds = target_.getFixedPartIds(
-            resourceId
-        );
+        uint64[] memory fixedPartIds = target_.getFixedPartIds(resourceId);
         fixedParts = new IRMRKEquippable.FixedPart[](fixedPartIds.length);
 
         uint256 len = fixedPartIds.length;
@@ -164,9 +161,7 @@ contract RMRKEquipRenderUtils is IRMRKEquipRenderUtils {
         }
 
         // Slot parts:
-        uint64[] memory slotPartIds = target_.getSlotPartIds(
-            resourceId
-        );
+        uint64[] memory slotPartIds = target_.getSlotPartIds(resourceId);
         slotParts = new IRMRKEquippable.SlotPart[](slotPartIds.length);
         len = slotPartIds.length;
 

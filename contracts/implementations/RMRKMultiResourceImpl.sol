@@ -12,7 +12,11 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 error RMRKMintUnderpriced();
 error RMRKMintZero();
 
-contract RMRKMultiResourceImpl is RMRKMintingUtils, RMRKCollectionMetadata, RMRKMultiResource {
+contract RMRKMultiResourceImpl is
+    RMRKMintingUtils,
+    RMRKCollectionMetadata,
+    RMRKMultiResource
+{
     using Strings for uint256;
 
     /*

@@ -28,8 +28,8 @@ contract RMRKNestingExternalEquip is IRMRKNestingExternalEquip, RMRKNesting {
     function supportsInterface(bytes4 interfaceId)
         public
         view
-        override(IERC165, RMRKNesting)
         virtual
+        override(IERC165, RMRKNesting)
         returns (bool)
     {
         return

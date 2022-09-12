@@ -21,7 +21,13 @@ async function main() {
   const rmrkFactory = await RMRKMultiResourceFactory.deploy();
   await rmrkFactory.deployed();
 
-  const tx = await rmrkFactory.deployRMRKMultiResource('Test Collection', 'TEST', 10000, 0, 'testCollectionMetadataUri');
+  const tx = await rmrkFactory.deployRMRKMultiResource(
+    'Test Collection',
+    'TEST',
+    10000,
+    0,
+    'testCollectionMetadataUri',
+  );
   await tx.wait(10);
   const multiResourceCollection = await rmrkFactory.multiResourceCollections(0);
 

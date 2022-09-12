@@ -4,7 +4,6 @@ pragma solidity ^0.8.16;
 
 import "../implementations/RMRKEquippableImpl.sol";
 
-
 contract RMRKEquippableFactory {
     address[] public equippableCollections;
 

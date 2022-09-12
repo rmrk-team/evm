@@ -21,7 +21,13 @@ async function main() {
   const rmrkFactory = await RMRKNestingFactory.deploy();
   await rmrkFactory.deployed();
 
-  const tx = await rmrkFactory.deployRMRKNesting('Test Collection', 'TEST', 10000, 0, 'testCollectionMetadataUri');
+  const tx = await rmrkFactory.deployRMRKNesting(
+    'Test Collection',
+    'TEST',
+    10000,
+    0,
+    'testCollectionMetadataUri',
+  );
   await tx.wait(10);
   const nestingCollection = await rmrkFactory.nestingCollections(0);
 
