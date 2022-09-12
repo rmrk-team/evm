@@ -214,7 +214,7 @@ interface IRMRKMultiResource is IERC165 {
      * - The caller must own the token or be an approved operator.
      * - `tokenId` must exist.
      *
-     * Emits an {Approval} event.
+     * Emits an {ApprovalForResources} event.
      */
     function approveForResources(address to, uint256 tokenId) external;
 
@@ -231,7 +231,14 @@ interface IRMRKMultiResource is IERC165 {
         returns (address);
 
     /**
-     * @notice Emitted when `owner` enables or disables (`approved`) `operator` to manage all of its resources.
+     * @dev Approve or remove `operator` as an operator of resources for the caller.
+     * Operators can call {acceptResource}, {rejectResource}, {rejectAllResources} or {setPriority} for any token owned by the caller.
+     *
+     * Requirements:
+     *
+     * - The `operator` cannot be the caller.
+     *
+     * Emits an {ApprovalForAllForResources} event.
      */
     function setApprovalForAllForResources(address operator, bool approved)
         external;
@@ -239,7 +246,7 @@ interface IRMRKMultiResource is IERC165 {
     /**
      * @notice Returns if the `operator` is allowed to manage all resources of `owner`.
      *
-     * See {setApprovalForAll}
+     * See {setApprovalForAllForResources}
      */
     function isApprovedForAllForResources(address owner, address operator)
         external
