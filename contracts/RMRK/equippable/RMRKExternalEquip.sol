@@ -281,7 +281,7 @@ contract RMRKExternalEquip is Context, IRMRKExternalEquip {
             revert RMRKIndexOutOfRange();
         uint64 resourceId = _pendingResources[tokenId][index];
         _pendingResources[tokenId].removeItemByIndex(index);
-        _tokenResources[tokenId][resourceId] = false;
+        delete _tokenResources[tokenId][resourceId];
         delete (_resourceOverwrites[tokenId][resourceId]);
 
         emit ResourceRejected(tokenId, resourceId);

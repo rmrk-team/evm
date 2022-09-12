@@ -32,7 +32,7 @@ library RMRKLib {
         returns (uint256, bool)
     {
         uint256 length = A.length;
-        for (uint256 i = 0; i < length; ) {
+        for (uint256 i; i < length; ) {
             if (A[i] == a) {
                 return (i, true);
             }
