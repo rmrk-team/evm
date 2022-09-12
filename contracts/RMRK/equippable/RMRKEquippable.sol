@@ -35,34 +35,34 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
 
     // ------------------- RESOURCES --------------
     //mapping of uint64 Ids to resource object
-    mapping(uint64 => string) internal _resources;
+    mapping(uint64 => string) private _resources;
 
     //mapping of tokenId to new resource, to resource to be replaced
-    mapping(uint256 => mapping(uint64 => uint64)) internal _resourceOverwrites;
+    mapping(uint256 => mapping(uint64 => uint64)) private _resourceOverwrites;
 
     //mapping of tokenId to all resources
-    mapping(uint256 => uint64[]) internal _activeResources;
+    mapping(uint256 => uint64[]) private _activeResources;
 
     //mapping of tokenId to an array of resource priorities
-    mapping(uint256 => uint16[]) internal _activeResourcePriorities;
+    mapping(uint256 => uint16[]) private _activeResourcePriorities;
 
     //Double mapping of tokenId to active resources
-    mapping(uint256 => mapping(uint64 => bool)) internal _tokenResources;
+    mapping(uint256 => mapping(uint64 => bool)) private _tokenResources;
 
     //mapping of tokenId to all resources by priority
-    mapping(uint256 => uint64[]) internal _pendingResources;
+    mapping(uint256 => uint64[]) private _pendingResources;
 
     //List of all resources
-    uint64[] internal _allResources;
+    uint64[] private _allResources;
 
     // ------------------- RESOURCE APPROVALS --------------
 
     // Mapping from token ID to approved address for resources
-    mapping(uint256 => address) internal _tokenApprovalsForResources;
+    mapping(uint256 => address) private _tokenApprovalsForResources;
 
     // Mapping from owner to operator approvals for resources
     mapping(address => mapping(address => bool))
-        internal _operatorApprovalsForResources;
+        private _operatorApprovalsForResources;
 
     // ------------------- EQUIPPABLE --------------
     //Mapping of uint64 resource ID to corresponding base address
@@ -182,7 +182,7 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
     // --------------------------- RESOURCE HANDLERS -------------------------
 
     function acceptResource(uint256 tokenId, uint256 index)
-        external
+        public
         virtual
         onlyApprovedForResourcesOrOwner(tokenId)
     {
@@ -205,7 +205,7 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
     }
 
     function rejectResource(uint256 tokenId, uint256 index)
-        external
+        public
         virtual
         onlyApprovedForResourcesOrOwner(tokenId)
     {
@@ -220,7 +220,7 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
     }
 
     function rejectAllResources(uint256 tokenId)
-        external
+        public
         virtual
         onlyApprovedForResourcesOrOwner(tokenId)
     {
@@ -238,7 +238,7 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
     }
 
     function setPriority(uint256 tokenId, uint16[] calldata priorities)
-        external
+        public
         virtual
         onlyApprovedForResourcesOrOwner(tokenId)
     {
@@ -352,7 +352,7 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
 
     // ----------------------- RESOURCE APPROVALS ------------------------
 
-    function approveForResources(address to, uint256 tokenId) external virtual {
+    function approveForResources(address to, uint256 tokenId) public virtual {
         address owner = ownerOf(tokenId);
         if (to == owner) revert RMRKApprovalForResourcesToCurrentOwner();
 
@@ -374,7 +374,7 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
     }
 
     function setApprovalForAllForResources(address operator, bool approved)
-        external
+        public
         virtual
     {
         address owner = _msgSender();
@@ -423,7 +423,7 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
     }
 
     function equip(IntakeEquip memory data)
-        external
+        public
         onlyApprovedOrOwner(data.tokenId)
     {
         _equip(data);
@@ -487,7 +487,7 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
         uint256 tokenId,
         uint64 resourceId,
         uint64 slotPartId
-    ) external onlyApprovedOrOwner(tokenId) {
+    ) public onlyApprovedOrOwner(tokenId) {
         _unequip(tokenId, resourceId, slotPartId);
     }
 
@@ -519,7 +519,7 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
 
     //FIXME: This can probably be optimized. Instead of running unequip first, can we just replace the data?
     function replaceEquipment(IntakeEquip memory data)
-        external
+        public
         onlyApprovedOrOwner(data.tokenId)
     {
         _unequip(data.tokenId, data.resourceId, data.slotPartId);
@@ -537,7 +537,7 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
     }
 
     function getBaseAddressOfResource(uint64 resourceId)
-        external
+        public
         view
         returns (address)
     {
@@ -574,7 +574,7 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
     // --------------------- Getting Extended Resources ---------------------
 
     function getExtendedResource(uint64 resourceId)
-        external
+        public
         view
         virtual
         returns (ExtendedResource memory)
@@ -607,7 +607,7 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
     }
 
     function getSlotPartIds(uint64 resourceId)
-        external
+        public
         view
         returns (uint64[] memory)
     {
@@ -615,7 +615,7 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
     }
 
     function getFixedPartIds(uint64 resourceId)
-        external
+        public
         view
         returns (uint64[] memory)
     {
@@ -626,7 +626,7 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
         uint256 tokenId,
         address targetBaseAddress,
         uint64 slotPartId
-    ) external view returns (Equipment memory) {
+    ) public view returns (Equipment memory) {
         return _equipments[tokenId][targetBaseAddress][slotPartId];
     }
 }

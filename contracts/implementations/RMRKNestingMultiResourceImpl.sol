@@ -156,8 +156,8 @@ contract RMRKNestingMultiResourceImpl is
         returns (string memory)
     {
         _requireMinted(tokenId);
-        if (_activeResources[tokenId].length > index) {
-            uint64 activeResId = _activeResources[tokenId][index];
+        if (getActiveResources(tokenId).length > index) {
+            uint64 activeResId = getActiveResources(tokenId)[index];
             Resource memory _activeRes = getResource(activeResId);
             string memory uri = string(
                 abi.encodePacked(
