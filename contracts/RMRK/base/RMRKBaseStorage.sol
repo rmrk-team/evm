@@ -78,7 +78,7 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
      * @dev Returns symbol of associated collection
      * @return string base contract symbol
      */
-    function symbol() external view returns (string memory) {
+    function symbol() public view returns (string memory) {
         return _symbol;
     }
 
@@ -86,7 +86,7 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
      * @dev Returns type of data of associated base
      * @return string data type
      */
-    function type_() external view returns (string memory) {
+    function type_() public view returns (string memory) {
         return _type;
     }
 
@@ -194,7 +194,7 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
      * @dev Returns true if part is equippable to all.
      */
     function checkIsEquippableToAll(uint64 partId)
-        external
+        public
         view
         returns (bool)
     {
@@ -205,7 +205,7 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
      * @dev Returns true if a collection may equip resource with partId.
      */
     function checkIsEquippable(uint64 partId, address targetAddress)
-        external
+        public
         view
         returns (bool isEquippable)
     {
@@ -231,7 +231,7 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
     /**
     @dev Getter for a single base part.
     */
-    function getPart(uint64 partId) external view returns (Part memory) {
+    function getPart(uint64 partId) public view returns (Part memory) {
         return (_parts[partId]);
     }
 
@@ -239,7 +239,7 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
     @dev Getter for multiple base item entries.
     */
     function getParts(uint64[] calldata partIds)
-        external
+        public
         view
         returns (Part[] memory)
     {
