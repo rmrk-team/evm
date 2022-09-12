@@ -66,10 +66,10 @@ contract RMRKNesting is
     mapping(uint256 => address) private _owners;
 
     // Mapping owner address to token count
-    mapping(address => uint256) internal _balances;
+    mapping(address => uint256) private _balances;
 
     // Mapping from token ID to approved address
-    mapping(uint256 => address) internal _tokenApprovals;
+    mapping(uint256 => address) private _tokenApprovals;
 
     // Mapping from owner to operator approvals
     mapping(address => mapping(address => bool)) private _operatorApprovals;
@@ -77,19 +77,19 @@ contract RMRKNesting is
     // ------------------- NESTING --------------
 
     // Mapping from token ID to RMRKOwner struct
-    mapping(uint256 => RMRKOwner) internal _RMRKOwners;
+    mapping(uint256 => RMRKOwner) private _RMRKOwners;
 
     // Mapping of tokenId to array of active children structs
-    mapping(uint256 => Child[]) internal _children;
+    mapping(uint256 => Child[]) private _children;
 
     // Mapping of tokenId to array of pending children structs
-    mapping(uint256 => Child[]) internal _pendingChildren;
+    mapping(uint256 => Child[]) private _pendingChildren;
 
     // Mapping of child token address to child token Id to position in children array.
     // This may be able to be gas optimized if we can use the child as a mapping element directly.
     // We might have a first extra mapping from token Id, but since the same child cannot be
     // nested into multiple tokens we can strip it for size/gas savings.
-    mapping(address => mapping(uint256 => uint256)) internal _posInChildArray;
+    mapping(address => mapping(uint256 => uint256)) private _posInChildArray;
 
     // -------------------------- MODIFIERS ----------------------------
 
@@ -488,7 +488,7 @@ contract RMRKNesting is
     }
 
     function burnChild(uint256 tokenId, uint256 index)
-        external
+        public
         onlyApprovedOrDirectOwner(tokenId)
     {
         if (_children[tokenId].length <= index)
