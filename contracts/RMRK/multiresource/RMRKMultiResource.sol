@@ -50,8 +50,6 @@ contract RMRKMultiResource is
     using Address for address;
     using Strings for uint256;
     using RMRKLib for uint64[];
-    using RMRKLib for uint128[];
-    using RMRKLib for uint256;
 
     // Token name
     string private _name;
@@ -63,42 +61,42 @@ contract RMRKMultiResource is
     mapping(uint256 => address) private _owners;
 
     // Mapping owner address to token count
-    mapping(address => uint256) internal _balances;
+    mapping(address => uint256) private _balances;
 
     // Mapping from token ID to approved address
-    mapping(uint256 => address) internal _tokenApprovals;
+    mapping(uint256 => address) private _tokenApprovals;
 
     // Mapping from owner to operator approvals
     mapping(address => mapping(address => bool)) private _operatorApprovals;
 
     // ------------------- RESOURCES --------------
     //mapping of uint64 Ids to resource object
-    mapping(uint64 => string) internal _resources;
+    mapping(uint64 => string) private _resources;
 
     //mapping of tokenId to new resource, to resource to be replaced
-    mapping(uint256 => mapping(uint64 => uint64)) internal _resourceOverwrites;
+    mapping(uint256 => mapping(uint64 => uint64)) private _resourceOverwrites;
 
     //mapping of tokenId to all resources
-    mapping(uint256 => uint64[]) internal _activeResources;
+    mapping(uint256 => uint64[]) private _activeResources;
 
     //mapping of tokenId to an array of resource priorities
-    mapping(uint256 => uint16[]) internal _activeResourcePriorities;
+    mapping(uint256 => uint16[]) private _activeResourcePriorities;
 
     //Double mapping of tokenId to active resources
-    mapping(uint256 => mapping(uint64 => bool)) internal _tokenResources;
+    mapping(uint256 => mapping(uint64 => bool)) private _tokenResources;
 
     //mapping of tokenId to all resources by priority
-    mapping(uint256 => uint64[]) internal _pendingResources;
+    mapping(uint256 => uint64[]) private _pendingResources;
 
     //List of all resources
-    uint64[] internal _allResources;
+    uint64[] private _allResources;
 
     // Mapping from token ID to approved address for resources
-    mapping(uint256 => address) internal _tokenApprovalsForResources;
+    mapping(uint256 => address) private _tokenApprovalsForResources;
 
     // Mapping from owner to operator approvals for resources
     mapping(address => mapping(address => bool))
-        internal _operatorApprovalsForResources;
+        private _operatorApprovalsForResources;
 
     // -------------------------- ERC721 MODIFIERS ----------------------------
 
@@ -630,38 +628,10 @@ contract RMRKMultiResource is
     // --------------------------- HANDLING RESOURCES -------------------------
 
     function acceptResource(uint256 tokenId, uint256 index)
-        external
+        public
         virtual
         onlyApprovedForResourcesOrOwner(tokenId)
     {
-        _acceptResource(tokenId, index);
-    }
-
-    function rejectResource(uint256 tokenId, uint256 index)
-        external
-        virtual
-        onlyApprovedForResourcesOrOwner(tokenId)
-    {
-        _rejectResource(tokenId, index);
-    }
-
-    function rejectAllResources(uint256 tokenId)
-        external
-        virtual
-        onlyApprovedForResourcesOrOwner(tokenId)
-    {
-        _rejectAllResources(tokenId);
-    }
-
-    function setPriority(uint256 tokenId, uint16[] calldata priorities)
-        external
-        virtual
-        onlyApprovedForResourcesOrOwner(tokenId)
-    {
-        _setPriority(tokenId, priorities);
-    }
-
-    function _acceptResource(uint256 tokenId, uint256 index) internal {
         if (index >= _pendingResources[tokenId].length)
             revert RMRKIndexOutOfRange();
         uint64 resourceId = _pendingResources[tokenId][index];
@@ -680,7 +650,11 @@ contract RMRKMultiResource is
         emit ResourceAccepted(tokenId, resourceId);
     }
 
-    function _rejectResource(uint256 tokenId, uint256 index) internal {
+    function rejectResource(uint256 tokenId, uint256 index)
+        public
+        virtual
+        onlyApprovedForResourcesOrOwner(tokenId)
+    {
         if (index >= _pendingResources[tokenId].length)
             revert RMRKIndexOutOfRange();
         uint64 resourceId = _pendingResources[tokenId][index];
@@ -691,7 +665,11 @@ contract RMRKMultiResource is
         emit ResourceRejected(tokenId, resourceId);
     }
 
-    function _rejectAllResources(uint256 tokenId) internal {
+    function rejectAllResources(uint256 tokenId)
+        public
+        virtual
+        onlyApprovedForResourcesOrOwner(tokenId)
+    {
         uint256 len = _pendingResources[tokenId].length;
         for (uint256 i; i < len; ) {
             uint64 resourceId = _pendingResources[tokenId][i];
@@ -705,8 +683,10 @@ contract RMRKMultiResource is
         emit ResourceRejected(tokenId, uint64(0));
     }
 
-    function _setPriority(uint256 tokenId, uint16[] memory priorities)
-        internal
+    function setPriority(uint256 tokenId, uint16[] calldata priorities)
+        public
+        virtual
+        onlyApprovedForResourcesOrOwner(tokenId)
     {
         uint256 length = priorities.length;
         if (length != _activeResources[tokenId].length)
@@ -801,7 +781,7 @@ contract RMRKMultiResource is
 
     // ----------------------- APPROVALS FOR RESOURCES ------------------------
 
-    function approveForResources(address to, uint256 tokenId) external virtual {
+    function approveForResources(address to, uint256 tokenId) public virtual {
         address owner = ownerOf(tokenId);
         if (to == owner) revert RMRKApprovalForResourcesToCurrentOwner();
 
@@ -823,7 +803,7 @@ contract RMRKMultiResource is
     }
 
     function setApprovalForAllForResources(address operator, bool approved)
-        external
+        public
         virtual
     {
         address owner = _msgSender();
