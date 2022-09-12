@@ -49,32 +49,32 @@ contract RMRKExternalEquip is Context, IRMRKExternalEquip {
 
     // ------------------- RESOURCES --------------
     //mapping of uint64 Ids to resource object
-    mapping(uint64 => string) internal _resources;
+    mapping(uint64 => string) private _resources;
 
     //mapping of tokenId to new resource, to resource to be replaced
-    mapping(uint256 => mapping(uint64 => uint64)) internal _resourceOverwrites;
+    mapping(uint256 => mapping(uint64 => uint64)) private _resourceOverwrites;
 
     //mapping of tokenId to all resources
-    mapping(uint256 => uint64[]) internal _activeResources;
+    mapping(uint256 => uint64[]) private _activeResources;
 
     //mapping of tokenId to an array of resource priorities
-    mapping(uint256 => uint16[]) internal _activeResourcePriorities;
+    mapping(uint256 => uint16[]) private _activeResourcePriorities;
 
     //Double mapping of tokenId to active resources
-    mapping(uint256 => mapping(uint64 => bool)) internal _tokenResources;
+    mapping(uint256 => mapping(uint64 => bool)) private _tokenResources;
 
     //mapping of tokenId to all resources by priority
-    mapping(uint256 => uint64[]) internal _pendingResources;
+    mapping(uint256 => uint64[]) private _pendingResources;
 
     //List of all resources
-    uint64[] internal _allResources;
+    uint64[] private _allResources;
 
     // Mapping from token ID to approved address for resources
-    mapping(uint256 => address) internal _tokenApprovalsForResources;
+    mapping(uint256 => address) private _tokenApprovalsForResources;
 
     // Mapping from owner to operator approvals for resources
     mapping(address => mapping(address => bool))
-        internal _operatorApprovalsForResources;
+        private _operatorApprovalsForResources;
 
     // ------------------- Equippable --------------
 
@@ -160,7 +160,7 @@ contract RMRKExternalEquip is Context, IRMRKExternalEquip {
         emit NestingAddressSet(oldAddress, nestingAddress);
     }
 
-    function getNestingAddress() external view returns (address) {
+    function getNestingAddress() public view returns (address) {
         return _nestingAddress;
     }
 
@@ -226,7 +226,7 @@ contract RMRKExternalEquip is Context, IRMRKExternalEquip {
     // --------------------------- HANDLING RESOURCES -------------------------
 
     function acceptResource(uint256 tokenId, uint256 index)
-        external
+        public
         virtual
         onlyApprovedForResourcesOrOwner(tokenId)
     {
@@ -234,7 +234,7 @@ contract RMRKExternalEquip is Context, IRMRKExternalEquip {
     }
 
     function rejectResource(uint256 tokenId, uint256 index)
-        external
+        public
         virtual
         onlyApprovedForResourcesOrOwner(tokenId)
     {
@@ -242,7 +242,7 @@ contract RMRKExternalEquip is Context, IRMRKExternalEquip {
     }
 
     function rejectAllResources(uint256 tokenId)
-        external
+        public
         virtual
         onlyApprovedForResourcesOrOwner(tokenId)
     {
@@ -250,7 +250,7 @@ contract RMRKExternalEquip is Context, IRMRKExternalEquip {
     }
 
     function setPriority(uint256 tokenId, uint16[] calldata priorities)
-        external
+        public
         virtual
         onlyApprovedForResourcesOrOwner(tokenId)
     {
@@ -393,7 +393,7 @@ contract RMRKExternalEquip is Context, IRMRKExternalEquip {
 
     // ----------------------- APPROVALS FOR RESOURCES ------------------------
 
-    function approveForResources(address to, uint256 tokenId) external virtual {
+    function approveForResources(address to, uint256 tokenId) public virtual {
         address owner = ownerOf(tokenId);
         if (to == owner) revert RMRKApprovalForResourcesToCurrentOwner();
 
@@ -421,7 +421,7 @@ contract RMRKExternalEquip is Context, IRMRKExternalEquip {
     }
 
     function setApprovalForAllForResources(address operator, bool approved)
-        external
+        public
         virtual
     {
         address owner = _msgSender();
@@ -455,7 +455,7 @@ contract RMRKExternalEquip is Context, IRMRKExternalEquip {
     // ------------------------------- EQUIPPING ------------------------------
 
     function equip(IntakeEquip memory data)
-        external
+        public
         onlyApprovedOrOwner(data.tokenId)
     {
         _equip(data);
@@ -522,7 +522,7 @@ contract RMRKExternalEquip is Context, IRMRKExternalEquip {
         uint256 tokenId,
         uint64 resourceId,
         uint64 slotPartId
-    ) external onlyApprovedOrOwner(tokenId) {
+    ) public onlyApprovedOrOwner(tokenId) {
         _unequip(tokenId, resourceId, slotPartId);
     }
 
@@ -556,7 +556,7 @@ contract RMRKExternalEquip is Context, IRMRKExternalEquip {
     }
 
     function replaceEquipment(IntakeEquip memory data)
-        external
+        public
         onlyApprovedOrOwner(data.tokenId)
     {
         _unequip(data.tokenId, data.resourceId, data.slotPartId);
@@ -567,14 +567,14 @@ contract RMRKExternalEquip is Context, IRMRKExternalEquip {
         uint256 tokenId,
         address childAddress,
         uint256 childTokenId
-    ) external view returns (bool) {
+    ) public view returns (bool) {
         return
             _equipCountPerChild[tokenId][childAddress][childTokenId] !=
             uint8(0);
     }
 
     function getBaseAddressOfResource(uint64 resourceId)
-        external
+        public
         view
         returns (address)
     {
@@ -656,7 +656,7 @@ contract RMRKExternalEquip is Context, IRMRKExternalEquip {
     }
 
     function getFullExtendedResources(uint256 tokenId)
-        external
+        public
         view
         virtual
         returns (ExtendedResource[] memory)
@@ -666,7 +666,7 @@ contract RMRKExternalEquip is Context, IRMRKExternalEquip {
     }
 
     function getFullPendingExtendedResources(uint256 tokenId)
-        external
+        public
         view
         virtual
         returns (ExtendedResource[] memory)
@@ -700,7 +700,7 @@ contract RMRKExternalEquip is Context, IRMRKExternalEquip {
     ////////////////////////////////////////
 
     function getSlotPartIds(uint64 resourceId)
-        external
+        public
         view
         returns (uint64[] memory)
     {
@@ -708,7 +708,7 @@ contract RMRKExternalEquip is Context, IRMRKExternalEquip {
     }
 
     function getFixedPartIds(uint64 resourceId)
-        external
+        public
         view
         returns (uint64[] memory)
     {
@@ -719,7 +719,7 @@ contract RMRKExternalEquip is Context, IRMRKExternalEquip {
         uint256 tokenId,
         address targetBaseAddress,
         uint64 slotPartId
-    ) external view returns (Equipment memory) {
+    ) public view returns (Equipment memory) {
         return _equipments[tokenId][targetBaseAddress][slotPartId];
     }
 
