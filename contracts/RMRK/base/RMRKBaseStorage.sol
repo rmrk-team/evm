@@ -97,7 +97,7 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
      */
     function _addPartList(IntakeStruct[] calldata partIntake) internal {
         uint256 len = partIntake.length;
-        for (uint256 i = 0; i < len; ) {
+        for (uint256 i; i < len; ) {
             _addPart(partIntake[i]);
             unchecked {
                 ++i;
@@ -148,7 +148,7 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
                 ++i;
             }
         }
-        _isEquippableToAll[partId] = false;
+        delete _isEquippableToAll[partId];
 
         emit AddedEquippables(partId, equippableAddresses);
     }
@@ -163,7 +163,7 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
     ) internal onlySlot(partId) {
         if (equippableAddresses.length <= 0) revert RMRKZeroLengthIdsPassed();
         _parts[partId].equippable = equippableAddresses;
-        _isEquippableToAll[partId] = false;
+        delete _isEquippableToAll[partId];
 
         emit SetEquippables(partId, equippableAddresses);
     }
@@ -177,7 +177,7 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
         onlySlot(partId)
     {
         delete _parts[partId].equippable;
-        _isEquippableToAll[partId] = false;
+        delete _isEquippableToAll[partId];
 
         emit SetEquippables(partId, new address[](0));
     }
@@ -216,7 +216,7 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
         if (!isEquippable && _parts[partId].itemType == ItemType.Slot) {
             address[] memory equippable = _parts[partId].equippable;
             uint256 len = equippable.length;
-            for (uint256 i = 0; i < len; ) {
+            for (uint256 i; i < len; ) {
                 if (targetAddress == equippable[i]) {
                     isEquippable = true;
                     break;
