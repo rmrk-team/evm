@@ -38,6 +38,7 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
     mapping(uint64 => string) private _resources;
 
     //mapping of tokenId to new resource, to resource to be replaced
+    //TODO: Check this mapping, ensure above is correct
     mapping(uint256 => mapping(uint64 => uint64)) private _resourceOverwrites;
 
     //mapping of tokenId to all resources
@@ -393,6 +394,27 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
         return _operatorApprovalsForResources[owner][operator];
     }
 
+    /**
+     * @notice Internal function to check three conditions: the queried user is either:
+     *   1. The root owner of tokenId
+     *   2. Is approved for all given the current owner via the setApprovalForAllForResources function
+     *   3. Was granted one-time approval for resource management via the approveForResources function
+     * @param user user to query for permissioning
+     * @param tokenId tokenId to query for permissioning given `user`
+     * @return bool returns true if user is approved, false if not.
+     */
+    function _isApprovedForResourcesOrOwner(address user, uint256 tokenId)
+        internal
+        view
+        virtual
+        returns (bool)
+    {
+        address owner = ownerOf(tokenId);
+        return (user == owner ||
+            isApprovedForAllForResources(owner, user) ||
+            getApprovedForResources(tokenId) == user);
+    }
+
     function _approveForResources(address to, uint256 tokenId)
         internal
         virtual
@@ -593,18 +615,6 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
     ////////////////////////////////////////
     //              UTILS
     ////////////////////////////////////////
-
-    function _isApprovedForResourcesOrOwner(address user, uint256 tokenId)
-        internal
-        view
-        virtual
-        returns (bool)
-    {
-        address owner = ownerOf(tokenId);
-        return (user == owner ||
-            isApprovedForAllForResources(owner, user) ||
-            getApprovedForResources(tokenId) == user);
-    }
 
     function getSlotPartIds(uint64 resourceId)
         public

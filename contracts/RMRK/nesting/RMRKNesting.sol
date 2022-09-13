@@ -340,9 +340,9 @@ contract RMRKNesting is
     ) private {
         IRMRKNesting destContract = IRMRKNesting(to);
         destContract.addChild(destinationId, tokenId);
+        _afterTokenTransfer(from, to, tokenId);
 
         emit Transfer(from, to, tokenId);
-        _afterTokenTransfer(from, to, tokenId);
     }
 
     ////////////////////////////////////////

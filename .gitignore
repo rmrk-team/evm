@@ -10,3 +10,6 @@ temp
 #Hardhat files
 cache
 artifacts
+
+#sec notes
+sec-review.md

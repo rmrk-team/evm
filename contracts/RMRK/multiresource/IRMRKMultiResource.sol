@@ -205,7 +205,7 @@ interface IRMRKMultiResource is IERC165 {
     //TODO: Check event
     /**
      * @notice Gives permission to `to`  to manage `tokenId` resources.
-     * The approval is cleared when a management action is taken.
+     * The approval is cleared when resources are modified by `to`.
      *
      * Only a single account can be approved at a time, so approving the zero address clears previous approvals.
      *

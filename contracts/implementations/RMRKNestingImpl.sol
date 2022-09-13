@@ -80,7 +80,8 @@ contract RMRKNestingImpl is OwnableLock, RMRKMintingUtils, RMRKNesting {
 
     //update for reentrancy
     // TODO: Is this the right modifier? Parent should call burnFromParent, not this
-    function burn(uint256 tokenId) public onlyApprovedOrDirectOwner(tokenId) {
+    // REVIEW: Fixed changed modifier from onlyApprovedOrDirectOwner to onlyApprovedOrOwner.
+    function burn(uint256 tokenId) public onlyApprovedOrOwner(tokenId) {
         _burn(tokenId);
     }
 
