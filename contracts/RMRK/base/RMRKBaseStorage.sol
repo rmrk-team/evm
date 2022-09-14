@@ -33,8 +33,7 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
     string private _symbol;
     string private _type;
 
-    //Inquire about using an index instead of hashed ID to prevent any chance of collision
-    //Consider moving to interface
+    //TODO: Move to interface
     //TODO: Doc this struct, put JSON intake format in comments here
     struct IntakeStruct {
         uint64 partId;

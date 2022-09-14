@@ -38,7 +38,6 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
     mapping(uint64 => string) private _resources;
 
     //mapping of tokenId to new resource, to resource to be replaced
-    //TODO: Check this mapping, ensure above is correct
     mapping(uint256 => mapping(uint64 => uint64)) private _resourceOverwrites;
 
     //mapping of tokenId to all resources
@@ -337,7 +336,6 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
         returns (string memory)
     {
         _requireMinted(tokenId);
-        // TODO: Discuss is this is the best default path.
         // We could return empty string so it returns something if a token has no resources, but it might hide erros
         if (!(index < _activeResources[tokenId].length))
             revert RMRKIndexOutOfRange();
@@ -494,7 +492,8 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
             child.tokenId
         ] += 1;
 
-        // TODO: When replacing, this event is emmited in the middle (bad practice). Shall we change it?
+        // TODO: Decouple Equip and Unequip events.
+        // TODO: Add ChildReplaced event.
         emit ChildResourceEquipped(
             data.tokenId,
             data.resourceId,

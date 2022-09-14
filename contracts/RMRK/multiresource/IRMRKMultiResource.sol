@@ -162,9 +162,10 @@ interface IRMRKMultiResource is IERC165 {
         view
         returns (uint16[] memory);
 
-    //TODO: double check this definition, make sure it's clear enough
+    //TODO: review definition
     /**
-     * @notice Returns pending overwrite of `resourceId` on `tokenId`.
+     * @notice Returns the resource which will be overridden if resourceId is accepted from
+     * a pending resource array on `tokenId`.
      * Resource data is stored by reference, in order to access the data corresponding to the id, call `getResource(resourceId)`
      */
     function getResourceOverwrites(uint256 tokenId, uint64 resourceId)
@@ -201,11 +202,10 @@ interface IRMRKMultiResource is IERC165 {
 
     // Approvals
 
-    //TODO: Make 'management action' more explicit?
-    //TODO: Check event
     /**
-     * @notice Gives permission to `to`  to manage `tokenId` resources.
-     * The approval is cleared when resources are modified by `to`.
+     * @notice Gives permission to `to` to manage `tokenId` resources.
+     * This differs from transfer approvals, as approvals are not cleared when the approved
+     * party accepts or rejects a resource, or sets resource priorities. This approval is cleared on token transfer.
      *
      * Only a single account can be approved at a time, so approving the zero address clears previous approvals.
      *

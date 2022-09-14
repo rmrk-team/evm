@@ -113,7 +113,7 @@ contract RMRKNestingMultiResourceImpl is
         external
         onlyOwner
     {
-        // TODO: shall we check that resource exists?
+        // TODO: check that resource exists?
         _tokenEnumeratedResource[resourceId] = state;
     }
 

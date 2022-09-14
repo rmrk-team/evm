@@ -325,44 +325,6 @@ async function shouldBehaveLikeEquippableWithSlots(
           .equip([soldiersIds[0], childIndex, soldierResId, partIdForWeapon, weaponResId]),
       ).to.be.revertedWithCustomError(soldierEquip, 'RMRKEquippableEquipNotAllowedByBase');
     });
-
-    // TODO: Discuss if we want to prevent this. A weird base implementation could allow it.
-    it.skip('cannot equip child into 2 different slots', async function () {
-      // Weapon is child on index 0, background on index 1.
-      const childIndex = 0;
-
-      // We add a new partId which receives weapons
-      const partIdForWeaponAlt = 5;
-      const partForWeaponAlt = {
-        itemType: ItemType.Slot,
-        z: 2,
-        equippable: [weaponEquip.address],
-        metadataURI: '',
-      };
-      await base.addPart({ partId: partIdForWeaponAlt, part: partForWeaponAlt });
-
-      // Ad a new resource to first weapon, which can go into new slot
-      const weaponResId = weaponResourcesEquip[0]; // This resource is assigned to weapon first weapon
-      const newWeaponResId = 99;
-      const newEquippableRefId = 2; // New resources to equip will use this
-      await addNewEquippableResourceToWeapon(
-        newWeaponResId,
-        newEquippableRefId,
-        partIdForWeaponAlt,
-      );
-
-      // If all went good, we can equip the weapon's new resource into the new slot
-      await soldierEquip
-        .connect(addrs[0])
-        .equip([soldiersIds[0], childIndex, soldierResId, partIdForWeaponAlt, newWeaponResId]);
-
-      // Trying to equip the same child again into another slot must fail
-      await expect(
-        soldierEquip
-          .connect(addrs[0]) // Owner is addrs[0]
-          .equip([soldiersIds[0], childIndex, soldierResId, partIdForWeapon, weaponResId]),
-      ).to.be.revertedWithCustomError(soldierEquip, 'RMRKAlreadyEquipped');
-    });
   });
 
   describe('Unequip', async function () {

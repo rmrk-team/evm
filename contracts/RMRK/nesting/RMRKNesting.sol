@@ -779,8 +779,6 @@ contract RMRKNesting is
         _requireMinted(parentTokenId);
 
         if (!_msgSender().isContract()) revert RMRKIsNotContract();
-        // TODO: Check if it's worth to call back the sender to assert it is the owner of the childId
-        // Probably not worth it since a malicious child contract could only affect itself.
 
         Child memory child = Child({
             contractAddress: _msgSender(),

@@ -765,7 +765,6 @@ contract RMRKMultiResource is
         returns (string memory)
     {
         _requireMinted(tokenId);
-        // TODO: Discuss is this is the best default path.
         // We could return empty string so it returns something if a token has no resources, but it might hide erros
         if (!(index < _activeResources[tokenId].length))
             revert RMRKIndexOutOfRange();

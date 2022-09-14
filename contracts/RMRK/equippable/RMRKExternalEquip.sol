@@ -377,7 +377,6 @@ contract RMRKExternalEquip is Context, IRMRKExternalEquip {
         returns (string memory)
     {
         _requireMinted(tokenId);
-        // TODO: Discuss is this is the best default path.
         // We could return empty string so it returns something if a token has no resources, but it might hide erros
         if (!(index < _activeResources[tokenId].length))
             revert RMRKIndexOutOfRange();
@@ -507,7 +506,8 @@ contract RMRKExternalEquip is Context, IRMRKExternalEquip {
             child.tokenId
         ] += 1;
 
-        // TODO: When replacing, this event is emmited in the middle (bad practice). Shall we change it?
+        // TODO: Decouple Equip and Unequip events.
+        // TODO: Add ChildReplaced event.
         emit ChildResourceEquipped(
             data.tokenId,
             data.resourceId,
