@@ -192,11 +192,7 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
     /**
      * @dev Returns true if part is equippable to all.
      */
-    function checkIsEquippableToAll(uint64 partId)
-        public
-        view
-        returns (bool)
-    {
+    function checkIsEquippableToAll(uint64 partId) public view returns (bool) {
         return _isEquippableToAll[partId];
     }
 
