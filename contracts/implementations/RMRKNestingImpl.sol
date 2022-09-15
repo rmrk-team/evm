@@ -17,12 +17,6 @@ contract RMRKNestingImpl is OwnableLock, RMRKMintingUtils, RMRKNesting {
     // Manage resources via increment
     uint256 private _totalResources;
 
-    //Mapping of uint64 resource ID to tokenEnumeratedResource for tokenURI
-    mapping(uint64 => bool) internal _tokenEnumeratedResource;
-
-    //fallback URI
-    string internal _fallbackURI;
-
     constructor(
         string memory name_,
         string memory symbol_,

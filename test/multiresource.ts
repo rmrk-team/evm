@@ -189,45 +189,6 @@ describe('MultiResourceMock Other Behavior', async function () {
     });
   });
 
-  describe('token URI', async function () {
-    it('can get token URI', async function () {
-      const resId = await addResourceEntryFromMock(token, 'uri1');
-      const resId2 = await addResourceEntryFromMock(token, 'uri2');
-      const tokenId = await mintFromMock(token, tokenOwner.address);
-
-      await token.addResourceToToken(tokenId, resId, 0);
-      await token.addResourceToToken(tokenId, resId2, 0);
-      await token.connect(tokenOwner).acceptResource(tokenId, 0);
-      await token.connect(tokenOwner).acceptResource(tokenId, 0);
-      expect(await token.tokenURI(tokenId)).to.eql('uri1');
-    });
-
-    it('can get token URI at specific index', async function () {
-      const resId = await addResourceEntryFromMock(token, 'UriA');
-      const resId2 = await addResourceEntryFromMock(token, 'UriB');
-      const tokenId = await mintFromMock(token, tokenOwner.address);
-
-      await token.addResourceToToken(tokenId, resId, 0);
-      await token.addResourceToToken(tokenId, resId2, 0);
-      await token.connect(tokenOwner).acceptResource(tokenId, 0);
-      await token.connect(tokenOwner).acceptResource(tokenId, 0);
-
-      expect(await token.tokenURIAtIndex(tokenId, 1)).to.eql('UriB');
-      await expect(token.tokenURIAtIndex(tokenId, 2)).to.be.revertedWithCustomError(
-        token,
-        'RMRKIndexOutOfRange',
-      );
-    });
-
-    it('cannot get token URI if token has no resources', async function () {
-      const tokenId = await mintFromMock(token, tokenOwner.address);
-      await expect(token.tokenURI(tokenId)).to.be.revertedWithCustomError(
-        token,
-        'RMRKIndexOutOfRange',
-      );
-    });
-  });
-
   describe('Approvals cleaning', async () => {
     it('cleans token and resources approvals on transfer', async function () {
       const tokenOwner = addrs[1];

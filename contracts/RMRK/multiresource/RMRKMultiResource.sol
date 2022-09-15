@@ -135,9 +135,8 @@ contract RMRKMultiResource is
      * @dev Initializes the contract by setting a `name` and a `symbol` to the token collection.
      */
     constructor(string memory name_, string memory symbol_)
-    RMRKCore(name_, symbol_)
-    {
-    }
+        RMRKCore(name_, symbol_)
+    {}
 
     // ------------------------------- ERC721 ---------------------------------
     /**
@@ -171,15 +170,6 @@ contract RMRKMultiResource is
         address owner = _owners[tokenId];
         if (owner == address(0)) revert ERC721InvalidTokenId();
         return owner;
-    }
-
-    /**
-     * @dev Base URI for computing {tokenURI}. If set, the resulting URI for each
-     * token will be the concatenation of the `baseURI` and the `tokenId`. Empty
-     * by default, can be overridden in child contracts.
-     */
-    function _baseURI() internal view virtual returns (string memory) {
-        return "";
     }
 
     /**

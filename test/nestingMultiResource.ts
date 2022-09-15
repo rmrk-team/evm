@@ -110,28 +110,4 @@ describe('NestingMultiResourceMock Other Behavior', function () {
       );
     });
   });
-
-  describe('token URI', async function () {
-    it('can get token URI', async function () {
-      const tokenOwner = addrs[1];
-      const resId = await addResourceEntryFromMock(token, 'uri1');
-      const resId2 = await addResourceEntryFromMock(token, 'uri2');
-      const tokenId = await mintFromMock(token, tokenOwner.address);
-
-      await token.addResourceToToken(tokenId, resId, 0);
-      await token.addResourceToToken(tokenId, resId2, 0);
-      await token.connect(tokenOwner).acceptResource(tokenId, 0);
-      await token.connect(tokenOwner).acceptResource(tokenId, 0);
-      expect(await token.tokenURI(tokenId)).to.eql('uri1');
-    });
-
-    it('cannot get token URI if token has no resources', async function () {
-      const tokenOwner = addrs[1];
-      const tokenId = await mintFromMock(token, tokenOwner.address);
-      await expect(token.tokenURI(tokenId)).to.be.revertedWithCustomError(
-        token,
-        'RMRKIndexOutOfRange',
-      );
-    });
-  });
 });

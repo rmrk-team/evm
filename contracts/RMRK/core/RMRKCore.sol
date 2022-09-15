@@ -34,7 +34,13 @@ contract RMRKCore is IRMRKCore {
         return _symbol;
     }
 
-    function tokenURI(uint256) public view virtual override returns (string memory) {
+    function tokenURI(uint256)
+        public
+        view
+        virtual
+        override
+        returns (string memory)
+    {
         return "";
     }
 }

@@ -46,13 +46,7 @@ error RMRKChildAlreadyExists();
  *
  */
 
-contract RMRKNesting is
-    Context,
-    IERC165,
-    IERC721,
-    IRMRKNesting,
-    RMRKCore
-{
+contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
     using RMRKLib for uint256;
     using Address for address;
     using Strings for uint256;
@@ -121,10 +115,8 @@ contract RMRKNesting is
      * @dev Initializes the contract by setting a `name` and a `symbol` to the token collection.
      */
     constructor(string memory name_, string memory symbol_)
-    RMRKCore(name_, symbol_)
-    {
-    }
-    
+        RMRKCore(name_, symbol_)
+    {}
 
     // ------------------------------- ERC721 ---------------------------------
     /**

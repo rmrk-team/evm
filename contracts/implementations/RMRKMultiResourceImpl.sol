@@ -26,12 +26,6 @@ contract RMRKMultiResourceImpl is
     // Manage resources via increment
     uint256 private _totalResources;
 
-    //Mapping of uint64 resource ID to tokenEnumeratedResource for tokenURI
-    mapping(uint64 => bool) internal _tokenEnumeratedResource;
-
-    //fallback URI
-    string internal _fallbackURI;
-
     constructor(
         string memory name,
         string memory symbol,
@@ -71,30 +65,6 @@ contract RMRKMultiResourceImpl is
                 ++i;
             }
         }
-    }
-
-    function getFallbackURI() external view virtual returns (string memory) {
-        return _fallbackURI;
-    }
-
-    function setFallbackURI(string memory fallbackURI) external onlyOwner {
-        _fallbackURI = fallbackURI;
-    }
-
-    function isTokenEnumeratedResource(uint64 resourceId)
-        public
-        view
-        virtual
-        returns (bool)
-    {
-        return _tokenEnumeratedResource[resourceId];
-    }
-
-    function setTokenEnumeratedResource(uint64 resourceId, bool state)
-        external
-        onlyOwner
-    {
-        _tokenEnumeratedResource[resourceId] = state;
     }
 
     function addResourceToToken(

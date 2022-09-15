@@ -21,12 +21,6 @@ contract RMRKNestingMultiResourceImpl is
     // Manage resources via increment
     uint256 private _totalResources;
 
-    //Mapping of uint64 resource ID to tokenEnumeratedResource for tokenURI
-    mapping(uint64 => bool) internal _tokenEnumeratedResource;
-
-    //fallback URI
-    string internal _fallbackURI;
-
     constructor(
         string memory name_,
         string memory symbol_,
@@ -92,31 +86,6 @@ contract RMRKNestingMultiResourceImpl is
         _burn(tokenId);
     }
 
-    function getFallbackURI() external view virtual returns (string memory) {
-        return _fallbackURI;
-    }
-
-    function setFallbackURI(string memory fallbackURI) external onlyOwner {
-        _fallbackURI = fallbackURI;
-    }
-
-    function isTokenEnumeratedResource(uint64 resourceId)
-        public
-        view
-        virtual
-        returns (bool)
-    {
-        return _tokenEnumeratedResource[resourceId];
-    }
-
-    function setTokenEnumeratedResource(uint64 resourceId, bool state)
-        external
-        onlyOwner
-    {
-        // TODO: check that resource exists?
-        _tokenEnumeratedResource[resourceId] = state;
-    }
-
     function addResourceToToken(
         uint256 tokenId,
         uint64 resourceId,
@@ -148,5 +117,4 @@ contract RMRKNestingMultiResourceImpl is
     ) public virtual {
         nestTransferFrom(_msgSender(), to, tokenId, destinationId);
     }
-
 }
