@@ -12,6 +12,7 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import "./IRMRKMultiResource.sol";
 import "../library/RMRKLib.sol";
+import "../core/RMRKCore.sol";
 // import "hardhat/console.sol";
 
 error ERC721AddressZeroIsNotaValidOwner();
@@ -44,18 +45,12 @@ contract RMRKMultiResource is
     Context,
     IERC165,
     IERC721,
-    IERC721Metadata,
-    IRMRKMultiResource
+    IRMRKMultiResource,
+    RMRKCore
 {
     using Address for address;
     using Strings for uint256;
     using RMRKLib for uint64[];
-
-    // Token name
-    string private _name;
-
-    // Token symbol
-    string private _symbol;
 
     // Mapping from token ID to owner address
     mapping(uint256 => address) private _owners;
@@ -139,9 +134,9 @@ contract RMRKMultiResource is
     /**
      * @dev Initializes the contract by setting a `name` and a `symbol` to the token collection.
      */
-    constructor(string memory name_, string memory symbol_) {
-        _name = name_;
-        _symbol = symbol_;
+    constructor(string memory name_, string memory symbol_)
+    RMRKCore(name_, symbol_)
+    {
     }
 
     // ------------------------------- ERC721 ---------------------------------
@@ -176,20 +171,6 @@ contract RMRKMultiResource is
         address owner = _owners[tokenId];
         if (owner == address(0)) revert ERC721InvalidTokenId();
         return owner;
-    }
-
-    /**
-     * @dev See {IERC721Metadata-name}.
-     */
-    function name() public view virtual returns (string memory) {
-        return _name;
-    }
-
-    /**
-     * @dev See {IERC721Metadata-symbol}.
-     */
-    function symbol() public view virtual returns (string memory) {
-        return _symbol;
     }
 
     /**
@@ -732,50 +713,6 @@ contract RMRKMultiResource is
         }
 
         emit ResourceAddedToToken(tokenId, resourceId);
-    }
-
-    // ----------------------------- TOKEN URI --------------------------------
-
-    /**
-     * @dev See {IERC721Metadata-tokenURI}. Overwritten for MR
-     */
-    function tokenURI(uint256 tokenId)
-        public
-        view
-        virtual
-        override(IERC721Metadata, IRMRKMultiResource)
-        returns (string memory)
-    {
-        return _tokenURIAtIndex(tokenId, 0);
-    }
-
-    function tokenURIAtIndex(uint256 tokenId, uint256 index)
-        public
-        view
-        virtual
-        returns (string memory)
-    {
-        return _tokenURIAtIndex(tokenId, index);
-    }
-
-    function _tokenURIAtIndex(uint256 tokenId, uint256 index)
-        internal
-        view
-        virtual
-        returns (string memory)
-    {
-        _requireMinted(tokenId);
-        // We could return empty string so it returns something if a token has no resources, but it might hide erros
-        if (!(index < _activeResources[tokenId].length))
-            revert RMRKIndexOutOfRange();
-
-        uint64 activeResId = _activeResources[tokenId][index];
-        Resource memory _activeRes = getResource(activeResId);
-        string memory uri = string(
-            abi.encodePacked(_baseURI(), _activeRes.metadataURI)
-        );
-
-        return uri;
     }
 
     // ----------------------- APPROVALS FOR RESOURCES ------------------------

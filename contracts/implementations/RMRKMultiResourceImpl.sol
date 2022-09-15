@@ -116,30 +116,4 @@ contract RMRKMultiResourceImpl is
     function totalResources() external view returns (uint256) {
         return _totalResources;
     }
-
-    function _tokenURIAtIndex(uint256 tokenId, uint256 index)
-        internal
-        view
-        override
-        returns (string memory)
-    {
-        _requireMinted(tokenId);
-        if (getActiveResources(tokenId).length > index) {
-            uint64 activeResId = getActiveResources(tokenId)[index];
-            Resource memory _activeRes = getResource(activeResId);
-            string memory uri = string(
-                abi.encodePacked(
-                    _baseURI(),
-                    _activeRes.metadataURI,
-                    _tokenEnumeratedResource[activeResId]
-                        ? tokenId.toString()
-                        : ""
-                )
-            );
-
-            return uri;
-        } else {
-            return _fallbackURI;
-        }
-    }
 }

@@ -180,16 +180,6 @@ interface IRMRKMultiResource is IERC165 {
      * Custom data is intended to be stored as generic bytes and decode by various protocols on an as-needed basis
      *
      */
-    function tokenURI(uint256 tokenId) external view returns (string memory);
-
-    /**
-     * @notice Returns metadata string tokenURI of tokenId
-     *
-     * Requirements:
-     *
-     * - `tokenId` must exist.
-     *
-     */
     function getResource(uint64 resourceId)
         external
         view

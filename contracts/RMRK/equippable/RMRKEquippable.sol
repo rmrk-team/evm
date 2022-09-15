@@ -305,50 +305,6 @@ contract RMRKEquippable is RMRKNesting, IRMRKEquippable {
         emit ResourceAddedToToken(tokenId, resourceId);
     }
 
-    // ----------------------------- TOKEN URI --------------------------------
-
-    /**
-     * @dev See {IERC721Metadata-tokenURI}. Overwritten for MR
-     */
-    function tokenURI(uint256 tokenId)
-        public
-        view
-        virtual
-        override(RMRKNesting, IRMRKMultiResource)
-        returns (string memory)
-    {
-        return _tokenURIAtIndex(tokenId, 0);
-    }
-
-    function tokenURIAtIndex(uint256 tokenId, uint256 index)
-        public
-        view
-        virtual
-        returns (string memory)
-    {
-        return _tokenURIAtIndex(tokenId, index);
-    }
-
-    function _tokenURIAtIndex(uint256 tokenId, uint256 index)
-        internal
-        view
-        virtual
-        returns (string memory)
-    {
-        _requireMinted(tokenId);
-        // We could return empty string so it returns something if a token has no resources, but it might hide erros
-        if (!(index < _activeResources[tokenId].length))
-            revert RMRKIndexOutOfRange();
-
-        uint64 activeResId = _activeResources[tokenId][index];
-        Resource memory _activeRes = getResource(activeResId);
-        string memory uri = string(
-            abi.encodePacked(_baseURI(), _activeRes.metadataURI)
-        );
-
-        return uri;
-    }
-
     // ----------------------- RESOURCE APPROVALS ------------------------
 
     function approveForResources(address to, uint256 tokenId) public virtual {
