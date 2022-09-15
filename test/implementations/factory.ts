@@ -1,6 +1,5 @@
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 
 describe('RMRKFactory', async () => {
@@ -11,7 +10,7 @@ describe('RMRKFactory', async () => {
   const collectionMetadata = 'someIPFSUri';
 
   async function deployFactoriesFixture() {
-    const [owner, ...signersAddr] = await ethers.getSigners();
+    const owner = (await ethers.getSigners())[0];
 
     const RMRKMultiResourceFactory = await ethers.getContractFactory('RMRKMultiResourceFactory');
     const RMRKNestingFactory = await ethers.getContractFactory('RMRKNestingFactory');

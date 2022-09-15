@@ -8,7 +8,6 @@ describe('Minting Utils', async () => {
   let mintingUtils: Contract;
 
   let owner: SignerWithAddress;
-  let addrs: SignerWithAddress[];
 
   async function deployMintingUtilsFixture() {
     const [signersOwner, ...signersAddr] = await ethers.getSigners();
@@ -20,11 +19,8 @@ describe('Minting Utils', async () => {
   }
 
   beforeEach(async function () {
-    const { mintingUtilsContract, signersOwner, signersAddr } = await loadFixture(
-      deployMintingUtilsFixture,
-    );
+    const { mintingUtilsContract, signersOwner } = await loadFixture(deployMintingUtilsFixture);
     owner = signersOwner;
-    addrs = signersAddr;
     mintingUtils = mintingUtilsContract;
   });
 

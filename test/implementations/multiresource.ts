@@ -3,11 +3,11 @@ import { expect } from 'chai';
 import { Contract } from 'ethers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { addResourceToToken } from '../utils';
 import shouldBehaveLikeOwnableLock from '../behavior/ownableLock';
 import shouldBehaveLikeMultiResource from '../behavior/multiresource';
 import shouldControlValidMinting from '../behavior/mintingImpl';
 import {
+  addResourceToToken,
   bn,
   singleFixtureWithArgs,
   mintFromImpl,

@@ -3,17 +3,20 @@ import { ethers } from 'hardhat';
 import { Contract } from 'ethers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { transfer, nestTransfer, addResourceToToken, addResourceEntryFromImpl } from '../utils';
-import shouldBehaveLikeNesting from '../behavior/nesting';
-import shouldBehaveLikeMultiResource from '../behavior/multiresource';
-import shouldControlValidMinting from '../behavior/mintingImpl';
 import {
+  transfer,
+  nestTransfer,
+  addResourceToToken,
+  addResourceEntryFromImpl,
   singleFixtureWithArgs,
   parentChildFixtureWithArgs,
   mintFromImpl,
   nestMintFromImpl,
   ONE_ETH,
 } from '../utils';
+import shouldBehaveLikeNesting from '../behavior/nesting';
+import shouldBehaveLikeMultiResource from '../behavior/multiresource';
+import shouldControlValidMinting from '../behavior/mintingImpl';
 
 async function singleFixture(): Promise<{ token: Contract; renderUtils: Contract }> {
   const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiResourceRenderUtils');

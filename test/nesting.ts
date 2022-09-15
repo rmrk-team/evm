@@ -3,10 +3,16 @@ import { ethers } from 'hardhat';
 import { Contract } from 'ethers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import { mintFromMock, nestMintFromMock, transfer, nestTransfer } from './utils';
+import {
+  mintFromMock,
+  nestMintFromMock,
+  transfer,
+  nestTransfer,
+  singleFixtureWithArgs,
+  parentChildFixtureWithArgs,
+} from './utils';
 import shouldBehaveLikeNesting from './behavior/nesting';
 import shouldBehaveLikeERC721 from './behavior/erc721';
-import { singleFixtureWithArgs, parentChildFixtureWithArgs } from './utils';
 
 const parentName = 'ownerChunky';
 const parentSymbol = 'CHNKY';
