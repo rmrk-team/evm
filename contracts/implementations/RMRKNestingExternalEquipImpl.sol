@@ -78,11 +78,6 @@ contract RMRKNestingExternalEquipImpl is
         return (nextToken, totalSupplyOffset);
     }
 
-    //update for reentrancy
-    function burn(uint256 tokenId) public onlyApprovedOrDirectOwner(tokenId) {
-        _burn(tokenId);
-    }
-
     function setEquippableAddress(address equippable) external {
         _setEquippableAddress(equippable);
     }

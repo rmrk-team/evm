@@ -24,11 +24,6 @@ contract RMRKNestingMultiResourceMock is RMRKNestingMultiResource {
         _nestMint(to, tokenId, destId);
     }
 
-    //update for reentrancy
-    function burn(uint256 tokenId) public onlyApprovedOrDirectOwner(tokenId) {
-        _burn(tokenId);
-    }
-
     function addResourceToToken(
         uint256 tokenId,
         uint64 resourceId,
