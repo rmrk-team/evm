@@ -27,7 +27,6 @@ error ERC721TokenAlreadyMinted();
 error ERC721TransferFromIncorrectOwner();
 error ERC721TransferToNonReceiverImplementer();
 error ERC721TransferToTheZeroAddress();
-error RMRKCallerIsNotOwnerContract();
 error RMRKChildIndexOutOfRange();
 error RMRKIsNotContract();
 error RMRKMaxPendingChildrenReached();
@@ -477,26 +476,19 @@ contract RMRKNesting is
     //              BURNING
     ////////////////////////////////////////
 
-    //update for reentrancy
-    //Suggest delegate to _burn method, as both run same code
-    function burnFromParent(uint256 tokenId) external {
-        (address _RMRKOwner, , ) = rmrkOwnerOf(tokenId);
-        if (_RMRKOwner != _msgSender()) revert RMRKCallerIsNotOwnerContract();
-        address owner = ownerOf(tokenId);
-        _burnForOwner(tokenId, owner);
-        _balances[_RMRKOwner] -= 1;
-    }
-
     function burnChild(uint256 tokenId, uint256 index)
         public
         onlyApprovedOrDirectOwner(tokenId)
     {
         if (_children[tokenId].length <= index)
             revert RMRKChildIndexOutOfRange();
-
-        Child memory child = _children[tokenId][index];
-        IRMRKNesting(child.contractAddress).burnFromParent(child.tokenId);
+        _burnChild(tokenId, index);
         _removeChildByIndex(_children[tokenId], index);
+    }
+
+    function _burnChild(uint256 tokenId, uint256 index) private {
+        Child memory child = _children[tokenId][index];
+        IRMRKNesting(child.contractAddress).burn(child.tokenId);
     }
 
     /**
@@ -511,15 +503,12 @@ contract RMRKNesting is
      */
 
     //update for reentrancy
-    function _burn(uint256 tokenId) internal virtual {
+    function burn(uint256 tokenId) public virtual {
+        (address _RMRKOwner, , ) = rmrkOwnerOf(tokenId);
         address owner = ownerOf(tokenId);
-        (address rmrkOwner, , ) = rmrkOwnerOf(tokenId);
-        _balances[rmrkOwner] -= 1;
-        _burnForOwner(tokenId, owner);
-    }
+        _balances[_RMRKOwner] -= 1;
 
-    function _burnForOwner(uint256 tokenId, address rootOwner) private {
-        _beforeTokenTransfer(rootOwner, address(0), tokenId);
+        _beforeTokenTransfer(owner, address(0), tokenId);
         _approve(address(0), tokenId);
         _cleanApprovals(address(0), tokenId);
 
@@ -527,9 +516,7 @@ contract RMRKNesting is
 
         uint256 length = children.length; //gas savings
         for (uint256 i; i < length; ) {
-            address childContractAddress = children[i].contractAddress;
-            uint256 childTokenId = children[i].tokenId;
-            IRMRKNesting(childContractAddress).burnFromParent(childTokenId);
+            _burnChild(tokenId, i);
             unchecked {
                 ++i;
             }
@@ -537,10 +524,11 @@ contract RMRKNesting is
         delete _RMRKOwners[tokenId];
         delete _pendingChildren[tokenId];
         delete _children[tokenId];
+        // Review: is this redundant with _approve(0)
         delete _tokenApprovals[tokenId];
 
-        _afterTokenTransfer(rootOwner, address(0), tokenId);
-        emit Transfer(rootOwner, address(0), tokenId);
+        _afterTokenTransfer(owner, address(0), tokenId);
+        emit Transfer(owner, address(0), tokenId);
     }
 
     ////////////////////////////////////////
@@ -647,7 +635,6 @@ contract RMRKNesting is
             getApproved(tokenId) == spender);
     }
 
-    //TODO: Code review here -- Accepting perms that aren't always used
     function _isApprovedOrDirectOwner(address spender, uint256 tokenId)
         internal
         view
@@ -655,9 +642,11 @@ contract RMRKNesting is
         returns (bool)
     {
         (address owner, uint256 parentTokenId, ) = rmrkOwnerOf(tokenId);
+        // When the parent is an NFT, only it can do operations
         if (parentTokenId != 0) {
             return (spender == owner);
         }
+        // Otherwise, the owner or approved address can
         return (spender == owner ||
             isApprovedForAll(owner, spender) ||
             getApproved(tokenId) == spender);
@@ -677,7 +666,7 @@ contract RMRKNesting is
      * Tokens can be managed by their owner or approved accounts via {approve} or {setApprovalForAll}.
      *
      * Tokens start existing when they are minted (`_mint`),
-     * and stop existing when they are burned (`_burn`).
+     * and stop existing when they are burned (`burn`).
      */
     function _exists(uint256 tokenId) internal view virtual returns (bool) {
         return _RMRKOwners[tokenId].ownerAddress != address(0);
