@@ -56,8 +56,10 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
     // Mapping owner address to token count
     mapping(address => uint256) private _balances;
 
-    // Mapping from token ID to approved address
-    mapping(uint256 => address) private _tokenApprovals;
+    // Mapping from token ID to approver address to approved address
+    // The approver is necessary so approvals are invalidated for nested children on transfer
+    // WARNING: If a child NFT returns the original root owner, old permissions would be active again
+    mapping(uint256 => mapping(address => address)) private _tokenApprovals;
 
     // Mapping from owner to operator approvals
     mapping(address => mapping(address => bool)) private _operatorApprovals;
@@ -453,7 +455,7 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
 
         _beforeTokenTransfer(owner, address(0), tokenId);
         _approve(address(0), tokenId);
-        _cleanApprovals(address(0), tokenId);
+        _cleanApprovals(tokenId);
 
         Child[] memory children = childrenOf(tokenId);
 
@@ -468,7 +470,7 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         delete _pendingChildren[tokenId];
         delete _children[tokenId];
         // Review: is this redundant with _approve(0)
-        delete _tokenApprovals[tokenId];
+        delete _tokenApprovals[tokenId][owner];
 
         _afterTokenTransfer(owner, address(0), tokenId);
         emit Transfer(owner, address(0), tokenId);
@@ -502,7 +504,7 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
     {
         _requireMinted(tokenId);
 
-        return _tokenApprovals[tokenId];
+        return _tokenApprovals[tokenId][ownerOf(tokenId)];
     }
 
     /**
@@ -532,8 +534,9 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
      * Emits an {Approval} event.
      */
     function _approve(address to, uint256 tokenId) internal virtual {
-        _tokenApprovals[tokenId] = to;
-        emit Approval(ownerOf(tokenId), to, tokenId);
+        address owner = ownerOf(tokenId);
+        _tokenApprovals[tokenId][owner] = to;
+        emit Approval(owner, to, tokenId);
     }
 
     function _updateOwnerAndClearApprovals(
@@ -550,10 +553,10 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
 
         // Clear approvals from the previous owner
         _approve(address(0), tokenId);
-        _cleanApprovals(address(0), tokenId);
+        _cleanApprovals(tokenId);
     }
 
-    function _cleanApprovals(address owner, uint256 tokenId) internal virtual {}
+    function _cleanApprovals(uint256 tokenId) internal virtual {}
 
     ////////////////////////////////////////
     //              UTILS
