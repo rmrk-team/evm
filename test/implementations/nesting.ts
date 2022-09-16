@@ -1,17 +1,18 @@
 import { ethers } from 'hardhat';
 import { Contract } from 'ethers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import { transfer, nestTransfer } from '../utils';
-import shouldBehaveLikeNesting from '../behavior/nesting';
-import shouldControlValidMinting from '../behavior/mintingImpl';
-// import shouldBehaveLikeERC721 from '../behavior/erc721';
 import {
+  transfer,
+  nestTransfer,
   singleFixtureWithArgs,
   parentChildFixtureWithArgs,
   mintFromImpl,
   nestMintFromImpl,
   ONE_ETH,
 } from '../utils';
+import shouldBehaveLikeNesting from '../behavior/nesting';
+import shouldControlValidMinting from '../behavior/mintingImpl';
+// import shouldBehaveLikeERC721 from '../behavior/erc721';
 
 async function singleFixture(): Promise<Contract> {
   return singleFixtureWithArgs('RMRKNestingImpl', ['RMRK Test', 'RMRKTST', 10000, ONE_ETH]);

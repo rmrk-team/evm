@@ -349,45 +349,7 @@ contract RMRKExternalEquip is Context, IRMRKExternalEquip {
         virtual
         returns (string memory)
     {
-        return _tokenURIAtIndex(tokenId, 0);
-    }
-
-    /**
-     * @dev Base URI for computing {tokenURI}. If set, the resulting URI for each
-     * token will be the concatenation of the `baseURI` and the `tokenId`. Empty
-     * by default, can be overridden in child contracts.
-     */
-    function _baseURI() internal view virtual returns (string memory) {
         return "";
-    }
-
-    function tokenURIAtIndex(uint256 tokenId, uint256 index)
-        public
-        view
-        virtual
-        returns (string memory)
-    {
-        return _tokenURIAtIndex(tokenId, index);
-    }
-
-    function _tokenURIAtIndex(uint256 tokenId, uint256 index)
-        internal
-        view
-        virtual
-        returns (string memory)
-    {
-        _requireMinted(tokenId);
-        // We could return empty string so it returns something if a token has no resources, but it might hide erros
-        if (!(index < _activeResources[tokenId].length))
-            revert RMRKIndexOutOfRange();
-
-        uint64 activeResId = _activeResources[tokenId][index];
-        Resource memory _activeRes = getResource(activeResId);
-        string memory uri = string(
-            abi.encodePacked(_baseURI(), _activeRes.metadataURI)
-        );
-
-        return uri;
     }
 
     // ----------------------- APPROVALS FOR RESOURCES ------------------------

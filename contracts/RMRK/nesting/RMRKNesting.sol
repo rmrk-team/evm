@@ -5,6 +5,7 @@
 pragma solidity ^0.8.15;
 
 import "./IRMRKNesting.sol";
+import "../core/RMRKCore.sol";
 import "../library/RMRKLib.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
@@ -44,22 +45,10 @@ error RMRKChildAlreadyExists();
  *
  */
 
-contract RMRKNesting is
-    Context,
-    IERC165,
-    IERC721,
-    IERC721Metadata,
-    IRMRKNesting
-{
+contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
     using RMRKLib for uint256;
     using Address for address;
     using Strings for uint256;
-
-    // Token name
-    string private _name;
-
-    // Token symbol
-    string private _symbol;
 
     // Mapping from token ID to owner address
     mapping(uint256 => address) private _owners;
@@ -124,10 +113,9 @@ contract RMRKNesting is
     /**
      * @dev Initializes the contract by setting a `name` and a `symbol` to the token collection.
      */
-    constructor(string memory name_, string memory symbol_) {
-        _name = name_;
-        _symbol = symbol_;
-    }
+    constructor(string memory name_, string memory symbol_)
+        RMRKCore(name_, symbol_)
+    {}
 
     // ------------------------------- ERC721 ---------------------------------
     /**
@@ -152,51 +140,6 @@ contract RMRKNesting is
     function balanceOf(address owner) public view virtual returns (uint256) {
         if (owner == address(0)) revert ERC721AddressZeroIsNotaValidOwner();
         return _balances[owner];
-    }
-
-    ////////////////////////////////////////
-    //              METADATA
-    ////////////////////////////////////////
-
-    /**
-     * @dev See {IERC721Metadata-name}.
-     */
-    function name() public view virtual returns (string memory) {
-        return _name;
-    }
-
-    /**
-     * @dev See {IERC721Metadata-symbol}.
-     */
-    function symbol() public view virtual returns (string memory) {
-        return _symbol;
-    }
-
-    /**
-     * @dev See {IERC721Metadata-tokenURI}.
-     */
-    function tokenURI(uint256 tokenId)
-        public
-        view
-        virtual
-        returns (string memory)
-    {
-        _requireMinted(tokenId);
-
-        string memory baseURI = _baseURI();
-        return
-            bytes(baseURI).length != 0
-                ? string(abi.encodePacked(baseURI, tokenId.toString()))
-                : "";
-    }
-
-    /**
-     * @dev Base URI for computing {tokenURI}. If set, the resulting URI for each
-     * token will be the concatenation of the `baseURI` and the `tokenId`. Empty
-     * by default, can be overridden in child contracts.
-     */
-    function _baseURI() internal view virtual returns (string memory) {
-        return "";
     }
 
     ////////////////////////////////////////

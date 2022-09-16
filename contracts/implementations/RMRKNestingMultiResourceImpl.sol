@@ -21,12 +21,6 @@ contract RMRKNestingMultiResourceImpl is
     // Manage resources via increment
     uint256 private _totalResources;
 
-    //Mapping of uint64 resource ID to tokenEnumeratedResource for tokenURI
-    mapping(uint64 => bool) internal _tokenEnumeratedResource;
-
-    //fallback URI
-    string internal _fallbackURI;
-
     constructor(
         string memory name_,
         string memory symbol_,
@@ -87,31 +81,6 @@ contract RMRKNestingMultiResourceImpl is
         return (nextToken, totalSupplyOffset);
     }
 
-    function getFallbackURI() external view virtual returns (string memory) {
-        return _fallbackURI;
-    }
-
-    function setFallbackURI(string memory fallbackURI) external onlyOwner {
-        _fallbackURI = fallbackURI;
-    }
-
-    function isTokenEnumeratedResource(uint64 resourceId)
-        public
-        view
-        virtual
-        returns (bool)
-    {
-        return _tokenEnumeratedResource[resourceId];
-    }
-
-    function setTokenEnumeratedResource(uint64 resourceId, bool state)
-        external
-        onlyOwner
-    {
-        // TODO: check that resource exists?
-        _tokenEnumeratedResource[resourceId] = state;
-    }
-
     function addResourceToToken(
         uint256 tokenId,
         uint64 resourceId,
@@ -142,31 +111,5 @@ contract RMRKNestingMultiResourceImpl is
         uint256 destinationId
     ) public virtual {
         nestTransferFrom(_msgSender(), to, tokenId, destinationId);
-    }
-
-    function _tokenURIAtIndex(uint256 tokenId, uint256 index)
-        internal
-        view
-        override
-        returns (string memory)
-    {
-        _requireMinted(tokenId);
-        if (getActiveResources(tokenId).length > index) {
-            uint64 activeResId = getActiveResources(tokenId)[index];
-            Resource memory _activeRes = getResource(activeResId);
-            string memory uri = string(
-                abi.encodePacked(
-                    _baseURI(),
-                    _activeRes.metadataURI,
-                    _tokenEnumeratedResource[activeResId]
-                        ? tokenId.toString()
-                        : ""
-                )
-            );
-
-            return uri;
-        } else {
-            return _fallbackURI;
-        }
     }
 }
