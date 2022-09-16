@@ -215,7 +215,7 @@ async function shouldBehaveLikeNesting(
     });
 
     it('can support INesting', async function () {
-      expect(await parent.supportsInterface('0x91c0ad5d')).to.equal(true);
+      expect(await parent.supportsInterface('0xf790390a')).to.equal(true);
     });
 
     it('cannot support other interfaceId', async function () {
@@ -419,16 +419,6 @@ async function shouldBehaveLikeNesting(
       await expect(
         parent.connect(tokenOwner).burnChild(parentId, badIndex),
       ).to.be.revertedWithCustomError(parent, 'RMRKChildIndexOutOfRange');
-    });
-
-    it('cannot burn from parent directly', async function () {
-      const childId = nestMint(child, parent.address, parentId);
-      await parent.connect(tokenOwner).acceptChild(parentId, 0);
-
-      await expect(child.connect(tokenOwner).burnFromParent(childId)).to.be.revertedWithCustomError(
-        child,
-        'RMRKCallerIsNotOwnerContract',
-      );
     });
 
     it('can burn token if approved', async function () {

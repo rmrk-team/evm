@@ -72,16 +72,6 @@ contract RMRKNestingImpl is OwnableLock, RMRKMintingUtils, RMRKNesting {
         return (nextToken, totalSupplyOffset);
     }
 
-    //update for reentrancy
-    // TODO: Is this the right modifier? Parent should call burnFromParent, not this
-    // REVIEW: Fixed changed modifier from onlyApprovedOrDirectOwner to onlyApprovedOrOwner.
-    // TODO: revert if owner is not an NFT
-    // TODO: test revert if owner is not an NFT
-    // TODO: Ensure this happens in all burns
-    function burn(uint256 tokenId) public onlyApprovedOrDirectOwner(tokenId) {
-        _burn(tokenId);
-    }
-
     function transfer(address to, uint256 tokenId) public virtual {
         transferFrom(_msgSender(), to, tokenId);
     }

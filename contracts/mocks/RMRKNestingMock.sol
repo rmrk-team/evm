@@ -36,11 +36,6 @@ contract RMRKNestingMock is RMRKNesting {
         _nestMint(to, tokenId, destinationId);
     }
 
-    //update for reentrancy
-    function burn(uint256 tokenId) public onlyApprovedOrDirectOwner(tokenId) {
-        _burn(tokenId);
-    }
-
     // Utility transfers:
 
     function transfer(address to, uint256 tokenId) public virtual {
