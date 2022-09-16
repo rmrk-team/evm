@@ -63,8 +63,10 @@ contract RMRKNestingMultiResource is RMRKNesting, IRMRKMultiResource {
     //List of all resources
     uint64[] private _allResources;
 
-    // Mapping from token ID to approved address for resources
-    mapping(uint256 => address) private _tokenApprovalsForResources;
+    // Mapping from token ID to approver address to approved address for resources
+    // The approver is necessary so approvals are invalidated for nested children on transfer
+    // WARNING: If a child NFT returns the original root owner, old permissions would be active again
+    mapping(uint256 => mapping(address => address)) private _tokenApprovalsForResources;
 
     // Mapping from owner to operator approvals for resources
     mapping(address => mapping(address => bool))
@@ -310,7 +312,7 @@ contract RMRKNestingMultiResource is RMRKNesting, IRMRKMultiResource {
         returns (address)
     {
         _requireMinted(tokenId);
-        return _tokenApprovalsForResources[tokenId];
+        return _tokenApprovalsForResources[tokenId][ownerOf(tokenId)];
     }
 
     function setApprovalForAllForResources(address operator, bool approved)
@@ -337,16 +339,17 @@ contract RMRKNestingMultiResource is RMRKNesting, IRMRKMultiResource {
         internal
         virtual
     {
-        _tokenApprovalsForResources[tokenId] = to;
-        emit ApprovalForResources(ownerOf(tokenId), to, tokenId);
+        address owner = ownerOf(tokenId);
+        _tokenApprovalsForResources[tokenId][owner] = to;
+        emit ApprovalForResources(owner, to, tokenId);
     }
 
-    function _cleanApprovals(address owner, uint256 tokenId)
+    function _cleanApprovals(uint256 tokenId)
         internal
         virtual
         override
     {
-        _approveForResources(owner, tokenId);
+        _approveForResources(address(0), tokenId);
     }
 
     ////////////////////////////////////////
