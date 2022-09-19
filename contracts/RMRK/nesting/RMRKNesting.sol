@@ -448,7 +448,11 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
      */
 
     //update for reentrancy
-    function burn(uint256 tokenId) public virtual onlyApprovedOrDirectOwner(tokenId) {
+    function burn(uint256 tokenId)
+        public
+        virtual
+        onlyApprovedOrDirectOwner(tokenId)
+    {
         (address _RMRKOwner, , ) = rmrkOwnerOf(tokenId);
         address owner = ownerOf(tokenId);
         _balances[_RMRKOwner] -= 1;

@@ -42,7 +42,8 @@ contract RMRKExternalEquip is AbstractMultiResource, IRMRKExternalEquip {
     // Mapping from token ID to approver address to approved address for resources
     // The approver is necessary so approvals are invalidated for nested children on transfer
     // WARNING: If a child NFT returns the original root owner, old permissions would be active again
-    mapping(uint256 => mapping(address => address)) private _tokenApprovalsForResources;
+    mapping(uint256 => mapping(address => address))
+        private _tokenApprovalsForResources;
 
     // ------------------- Equippable --------------
 
@@ -167,7 +168,6 @@ contract RMRKExternalEquip is AbstractMultiResource, IRMRKExternalEquip {
     {
         _setPriority(tokenId, priorities);
     }
-
 
     // ----------------------- APPROVALS FOR RESOURCES ------------------------
 
