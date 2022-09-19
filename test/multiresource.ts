@@ -63,7 +63,7 @@ describe('MultiResourceMock Other Behavior', async function () {
 
     it('cannot get non existing resource', async function () {
       const id = bn(9999);
-      await expect(token.getResource(id)).to.be.revertedWithCustomError(
+      await expect(token.getResourceMeta(id)).to.be.revertedWithCustomError(
         token,
         'RMRKNoResourceMatchingId',
       );
@@ -119,14 +119,13 @@ describe('MultiResourceMock Other Behavior', async function () {
 
       const pendingIds = await token.getPendingResources(tokenId);
       expect(await renderUtils.getResourcesById(token.address, pendingIds)).to.be.eql([
-        [resId, 'data1'],
-        [resId2, 'data2'],
+        'data1',
+        'data2',
       ]);
 
-      expect(await renderUtils.getPendingResourceByIndex(token.address, tokenId, 0)).to.eql([
-        resId,
+      expect(await renderUtils.getPendingResourceByIndex(token.address, tokenId, 0)).to.eql(
         'data1',
-      ]);
+      );
     });
 
     it('cannot add non existing resource to token', async function () {

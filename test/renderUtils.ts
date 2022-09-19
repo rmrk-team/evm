@@ -78,23 +78,21 @@ describe('Render Utils', async function () {
     });
 
     it('can get active resource by index', async function () {
-      expect(await renderUtils.getResourceByIndex(equip.address, tokenId, 0)).to.eql([
-        resId,
+      expect(await renderUtils.getResourceByIndex(equip.address, tokenId, 0)).to.eql(
         'ipfs://res1.jpg',
-      ]);
+      );
     });
 
     it('can get pending resource by index', async function () {
-      expect(await renderUtils.getPendingResourceByIndex(equip.address, tokenId, 0)).to.eql([
-        resId2,
+      expect(await renderUtils.getPendingResourceByIndex(equip.address, tokenId, 0)).to.eql(
         'ipfs://res2.jpg',
-      ]);
+      );
     });
 
     it('can get resources by id', async function () {
       expect(await renderUtils.getResourcesById(equip.address, [resId, resId2])).to.eql([
-        [resId, 'ipfs://res1.jpg'],
-        [resId2, 'ipfs://res2.jpg'],
+        'ipfs://res1.jpg',
+        'ipfs://res2.jpg',
       ]);
     });
   });
