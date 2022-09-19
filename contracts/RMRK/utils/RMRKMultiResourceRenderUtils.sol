@@ -49,8 +49,7 @@ contract RMRKMultiResourceRenderUtils is IRMRKMultiResourceRenderUtils {
     {
         IRMRKMultiResource target_ = IRMRKMultiResource(target);
         uint256 len = resourceIds.length;
-        string[]
-            memory resources = new string[](len);
+        string[] memory resources = new string[](len);
         for (uint256 i; i < len; ) {
             resources[i] = target_.getResourceMeta(resourceIds[i]);
             unchecked {
