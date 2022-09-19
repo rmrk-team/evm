@@ -60,6 +60,26 @@ abstract contract AbstractMultiResource is Context, IRMRKMultiResource {
     }
 
     /**
+     * @notice Fetches resource data for the token's active resource with the given index.
+     * @dev Resources are stored by reference mapping _resources[resourceId]
+     * @dev Can be overriden to implement enumerate, fallback or other custom logic
+     * @param tokenId the token ID to query
+     * @param resourceIndex from the token's active resources
+     * @return string with the meta
+     */
+    function getResourceMetaForToken(uint256 tokenId, uint64 resourceIndex)
+        public
+        view
+        virtual
+        returns (string memory)
+    {
+        if (resourceIndex >= getActiveResources(tokenId).length)
+            revert RMRKIndexOutOfRange();
+        uint64 resourceId = getActiveResources(tokenId)[resourceIndex];
+        return getResourceMeta(resourceId);
+    }
+
+    /**
      * @notice Returns array of all resource IDs.
      * @return uint64 array of all resource IDs.
      */

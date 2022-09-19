@@ -35,7 +35,7 @@ async function shouldBehaveLikeMultiResource(
     });
 
     it('can support IMultiResource', async function () {
-      expect(await this.token.supportsInterface('0x1c21cc26')).to.equal(true);
+      expect(await this.token.supportsInterface('0xc65a6425')).to.equal(true);
     });
 
     it('cannot support other interfaceId', async function () {
@@ -214,6 +214,13 @@ async function shouldBehaveLikeMultiResource(
         expect(await this.renderUtils.getResourceByIndex(this.token.address, tokenId, 0)).to.eql(
           resData1,
         );
+
+        // Other ways of getting the token info:
+        if (this.token.tokenURI !== undefined) {
+          expect(await this.token.tokenURI(tokenId)).equal('');
+        }
+        expect(await this.token.getResourceMeta(resId1)).equal(resData1);
+        expect(await this.token.getResourceMetaForToken(tokenId, 0)).equal(resData1);
       });
 
       it('can get all resources', async function () {
