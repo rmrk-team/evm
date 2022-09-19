@@ -209,7 +209,7 @@ async function multiResourceFixture() {
 
 // --------------- EQUIPPABLE BEHAVIOR -----------------------
 
-describe('EquippableMock with Parts', async () => {
+describe('ExternalEquippableMock with Parts', async () => {
   beforeEach(async function () {
     const { base, neon, neonEquip, mask, maskEquip, view } = await loadFixture(partsFixture);
 
@@ -224,7 +224,7 @@ describe('EquippableMock with Parts', async () => {
   shouldBehaveLikeEquippableWithParts();
 });
 
-describe('EquippableMock with Slots', async () => {
+describe('ExternalEquippableMock with Slots', async () => {
   beforeEach(async function () {
     const {
       base,
@@ -254,7 +254,7 @@ describe('EquippableMock with Slots', async () => {
   shouldBehaveLikeEquippableWithSlots(nestMintFromMock);
 });
 
-describe('EquippableMock Resources', async () => {
+describe('ExternalEquippableMock Resources', async () => {
   beforeEach(async function () {
     const { nesting, equip, renderUtils } = await loadFixture(resourcesFixture);
     this.nesting = nesting;
@@ -293,7 +293,7 @@ describe('EquippableMock Resources', async () => {
 
 // --------------- MULTI RESOURCE BEHAVIOR -----------------------
 
-describe('EquippableMock MR behavior', async () => {
+describe('ExternalEquippableMock MR behavior', async () => {
   let nextTokenId = 1;
   let nesting: Contract;
   let equip: Contract;
