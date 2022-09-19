@@ -138,7 +138,7 @@ interface IRMRKMultiResource is IERC165 {
 
     /**
      * @notice Returns IDs of active resources of `tokenId`.
-     * Resource data is stored by reference, in order to access the data corresponding to the id, call `getResource(resourceId)`
+     * Resource data is stored by reference, in order to access the data corresponding to the id, call `getResourceMeta(resourceId)`
      */
     function getActiveResources(uint256 tokenId)
         external
@@ -147,7 +147,7 @@ interface IRMRKMultiResource is IERC165 {
 
     /**
      * @notice Returns IDs of pending resources of `tokenId`.
-     * Resource data is stored by reference, in order to access the data corresponding to the id, call `getResource(resourceId)`
+     * Resource data is stored by reference, in order to access the data corresponding to the id, call `getResourceMeta(resourceId)`
      */
     function getPendingResources(uint256 tokenId)
         external
@@ -166,7 +166,7 @@ interface IRMRKMultiResource is IERC165 {
     /**
      * @notice Returns the resource which will be overridden if resourceId is accepted from
      * a pending resource array on `tokenId`.
-     * Resource data is stored by reference, in order to access the data corresponding to the id, call `getResource(resourceId)`
+     * Resource data is stored by reference, in order to access the data corresponding to the id, call `getResourceMeta(resourceId)`
      */
     function getResourceOverwrites(uint256 tokenId, uint64 resourceId)
         external
@@ -180,10 +180,10 @@ interface IRMRKMultiResource is IERC165 {
      * Custom data is intended to be stored as generic bytes and decode by various protocols on an as-needed basis
      *
      */
-    function getResource(uint64 resourceId)
+    function getResourceMeta(uint64 resourceId)
         external
         view
-        returns (Resource memory);
+        returns (string memory);
 
     /**
      * @notice Returns the ids of all stored resources

@@ -393,14 +393,14 @@ contract RMRKExternalEquip is AbstractMultiResource, IRMRKExternalEquip {
         virtual
         returns (ExtendedResource memory)
     {
-        Resource memory resource = getResource(resourceId);
+        string memory meta = getResourceMeta(resourceId);
 
         return
             ExtendedResource({
-                id: resource.id,
-                equippableRefId: _equippableRefIds[resource.id],
-                baseAddress: _baseAddresses[resource.id],
-                metadataURI: resource.metadataURI
+                id: resourceId,
+                equippableRefId: _equippableRefIds[resourceId],
+                baseAddress: _baseAddresses[resourceId],
+                metadataURI: meta
             });
     }
 

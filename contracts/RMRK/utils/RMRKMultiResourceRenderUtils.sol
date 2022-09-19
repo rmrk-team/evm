@@ -25,34 +25,34 @@ contract RMRKMultiResourceRenderUtils is IRMRKMultiResourceRenderUtils {
         address target,
         uint256 tokenId,
         uint256 index
-    ) external view virtual returns (IRMRKMultiResource.Resource memory) {
+    ) external view virtual returns (string memory) {
         IRMRKMultiResource target_ = IRMRKMultiResource(target);
         uint64 resourceId = target_.getActiveResources(tokenId)[index];
-        return target_.getResource(resourceId);
+        return target_.getResourceMeta(resourceId);
     }
 
     function getPendingResourceByIndex(
         address target,
         uint256 tokenId,
         uint256 index
-    ) external view virtual returns (IRMRKMultiResource.Resource memory) {
+    ) external view virtual returns (string memory) {
         IRMRKMultiResource target_ = IRMRKMultiResource(target);
         uint64 resourceId = target_.getPendingResources(tokenId)[index];
-        return target_.getResource(resourceId);
+        return target_.getResourceMeta(resourceId);
     }
 
     function getResourcesById(address target, uint64[] calldata resourceIds)
         public
         view
         virtual
-        returns (IRMRKMultiResource.Resource[] memory)
+        returns (string[] memory)
     {
         IRMRKMultiResource target_ = IRMRKMultiResource(target);
         uint256 len = resourceIds.length;
-        IRMRKMultiResource.Resource[]
-            memory resources = new IRMRKMultiResource.Resource[](len);
+        string[]
+            memory resources = new string[](len);
         for (uint256 i; i < len; ) {
-            resources[i] = target_.getResource(resourceIds[i]);
+            resources[i] = target_.getResourceMeta(resourceIds[i]);
             unchecked {
                 ++i;
             }

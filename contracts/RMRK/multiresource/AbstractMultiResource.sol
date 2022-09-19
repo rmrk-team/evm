@@ -46,21 +46,17 @@ abstract contract AbstractMultiResource is Context, IRMRKMultiResource {
      * @notice Fetches resource data by resourceID
      * @dev Resources are stored by reference mapping _resources[resourceId]
      * @param resourceId The resourceID to query
-     * @return Resource returns a Resource struct
+     * @return string with the meta
      */
-    function getResource(uint64 resourceId)
+    function getResourceMeta(uint64 resourceId)
         public
         view
         virtual
-        returns (Resource memory)
+        returns (string memory)
     {
-        string memory resourceData = _resources[resourceId];
-        if (bytes(resourceData).length == 0) revert RMRKNoResourceMatchingId();
-        Resource memory resource = Resource({
-            id: resourceId,
-            metadataURI: resourceData
-        });
-        return resource;
+        string memory meta = _resources[resourceId];
+        if (bytes(meta).length == 0) revert RMRKNoResourceMatchingId();
+        return meta;
     }
 
     /**

@@ -193,10 +193,7 @@ async function shouldBehaveLikeEquippableResources(
       if (chunkyEquip.getFullPendingExtendedResources === undefined) {
         const pendingResources = await chunkyEquip.getPendingResources(tokenId);
         expect(await renderUtils.getResourcesById(chunkyEquip.address, pendingResources)).to.be.eql(
-          [
-            [resId, metaURIDefault],
-            [resId2, metaURIDefault],
-          ],
+          [metaURIDefault, metaURIDefault],
         );
       } else {
         const pending = await chunkyEquip.getFullPendingExtendedResources(tokenId);
@@ -289,7 +286,7 @@ async function shouldBehaveLikeEquippableResources(
       if (chunkyEquip.getFullExtendedResources === undefined) {
         const activeResources = await chunkyEquip.getActiveResources(tokenId);
         expect(await renderUtils.getResourcesById(chunkyEquip.address, activeResources)).to.eql([
-          [resId, metaURIDefault],
+          metaURIDefault,
         ]);
       } else {
         expect(await chunkyEquip.getFullExtendedResources(tokenId)).to.eql([
@@ -323,8 +320,8 @@ async function shouldBehaveLikeEquippableResources(
       if (chunkyEquip.getFullExtendedResources === undefined) {
         const activeResources = await chunkyEquip.getActiveResources(tokenId);
         expect(await renderUtils.getResourcesById(chunkyEquip.address, activeResources)).to.eql([
-          [resId2, metaURIDefault],
-          [resId, metaURIDefault],
+          metaURIDefault,
+          metaURIDefault,
         ]);
       } else {
         expect(await chunkyEquip.getFullExtendedResources(tokenId)).to.eql([
@@ -412,7 +409,7 @@ async function shouldBehaveLikeEquippableResources(
       if (chunkyEquip.getFullExtendedResources === undefined) {
         const activeResources = await chunkyEquip.getActiveResources(tokenId);
         expect(await renderUtils.getResourcesById(chunkyEquip.address, activeResources)).to.be.eql([
-          [resId2, metaURIDefault],
+          metaURIDefault,
         ]);
       } else {
         expect(await chunkyEquip.getFullExtendedResources(tokenId)).to.be.eql([
@@ -434,7 +431,7 @@ async function shouldBehaveLikeEquippableResources(
       if (chunkyEquip.getFullExtendedResources === undefined) {
         const activeResources = await chunkyEquip.getActiveResources(tokenId);
         expect(await renderUtils.getResourcesById(chunkyEquip.address, activeResources)).to.be.eql([
-          [resId, metaURIDefault],
+          metaURIDefault,
         ]);
       } else {
         expect(await chunkyEquip.getFullExtendedResources(tokenId)).to.be.eql([
