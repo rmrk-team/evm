@@ -73,11 +73,7 @@ contract RMRKNestingExternalEquip is IRMRKNestingExternalEquip, RMRKNesting {
         return _isApprovedOrOwner(spender, tokenId);
     }
 
-    function _cleanApprovals(uint256 tokenId)
-        internal
-        virtual
-        override
-    {
+    function _cleanApprovals(uint256 tokenId) internal virtual override {
         IRMRKMultiResource(_equippableAddress).approveForResources(
             address(0),
             tokenId

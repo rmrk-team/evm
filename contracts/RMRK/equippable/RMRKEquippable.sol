@@ -33,8 +33,8 @@ contract RMRKEquippable is RMRKNesting, AbstractMultiResource, IRMRKEquippable {
     // Mapping from token ID to approver address to approved address for resources
     // The approver is necessary so approvals are invalidated for nested children on transfer
     // WARNING: If a child NFT returns the original root owner, old permissions would be active again
-    mapping(uint256 => mapping(address => address)) private _tokenApprovalsForResources;
-
+    mapping(uint256 => mapping(address => address))
+        private _tokenApprovalsForResources;
 
     // ------------------- EQUIPPABLE --------------
     //Mapping of uint64 resource ID to corresponding base address
@@ -203,11 +203,7 @@ contract RMRKEquippable is RMRKNesting, AbstractMultiResource, IRMRKEquippable {
         emit ApprovalForResources(owner, to, tokenId);
     }
 
-    function _cleanApprovals(uint256 tokenId)
-        internal
-        virtual
-        override
-    {
+    function _cleanApprovals(uint256 tokenId) internal virtual override {
         _approveForResources(address(0), tokenId);
     }
 
