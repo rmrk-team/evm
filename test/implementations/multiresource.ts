@@ -89,8 +89,8 @@ describe('MultiResourceImpl Other Behavior', async () => {
       await token.connect(owner).addResourceEntry(defaultResource1, []);
       await token.connect(owner).addResourceEntry(defaultResource2, []);
 
-      expect(await token.getResource(1)).to.eql([bn(1), defaultResource1]);
-      expect(await token.getResource(2)).to.eql([bn(2), defaultResource2]);
+      expect(await token.getResourceMeta(1)).to.eql(defaultResource1);
+      expect(await token.getResourceMeta(2)).to.eql(defaultResource2);
     });
   });
 });

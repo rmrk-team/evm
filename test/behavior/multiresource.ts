@@ -35,7 +35,7 @@ async function shouldBehaveLikeMultiResource(
     });
 
     it('can support IMultiResource', async function () {
-      expect(await this.token.supportsInterface('0xcb2f8f94')).to.equal(true);
+      expect(await this.token.supportsInterface('0x1c21cc26')).to.equal(true);
     });
 
     it('cannot support other interfaceId', async function () {
@@ -134,7 +134,7 @@ async function shouldBehaveLikeMultiResource(
         activeResources = await this.token.getActiveResources(tokenId);
         expect(
           await this.renderUtils.getResourcesById(this.token.address, activeResources),
-        ).to.be.eql([[resId2, metaURIDefault]]);
+        ).to.be.eql([metaURIDefault]);
         // Overwrite should be gone
         expect(await this.token.getResourceOverwrites(tokenId, pendingResources[0])).to.eql(bn(0));
       });
@@ -148,7 +148,7 @@ async function shouldBehaveLikeMultiResource(
         const activeResources = await this.token.getActiveResources(tokenId);
         expect(
           await this.renderUtils.getResourcesById(this.token.address, activeResources),
-        ).to.be.eql([[resId, metaURIDefault]]);
+        ).to.be.eql([metaURIDefault]);
       });
 
       it('can reject resource and overwrites are cleared', async function () {
@@ -197,10 +197,7 @@ async function shouldBehaveLikeMultiResource(
         let pendingResources = await this.token.getPendingResources(tokenId);
         expect(
           await this.renderUtils.getResourcesById(this.token.address, pendingResources),
-        ).to.eql([
-          [resId1, resData1],
-          [resId2, resData2],
-        ]);
+        ).to.eql([resData1, resData2]);
 
         await expect(this.token.connect(tokenOwner).acceptResource(tokenId, 0))
           .to.emit(this.token, 'ResourceAccepted')
@@ -208,16 +205,15 @@ async function shouldBehaveLikeMultiResource(
 
         const activeResources = await this.token.getActiveResources(tokenId);
         expect(await this.renderUtils.getResourcesById(this.token.address, activeResources)).to.eql(
-          [[resId1, resData1]],
+          [resData1],
         );
         pendingResources = await this.token.getPendingResources(tokenId);
         expect(
           await this.renderUtils.getResourcesById(this.token.address, pendingResources),
-        ).to.eql([[resId2, resData2]]);
-        expect(await this.renderUtils.getResourceByIndex(this.token.address, tokenId, 0)).to.eql([
-          resId1,
+        ).to.eql([resData2]);
+        expect(await this.renderUtils.getResourceByIndex(this.token.address, tokenId, 0)).to.eql(
           resData1,
-        ]);
+        );
       });
 
       it('can get all resources', async function () {
@@ -239,10 +235,7 @@ async function shouldBehaveLikeMultiResource(
           this.token.address,
           activeResources,
         );
-        expect(accepted).to.eql([
-          [resId2, resData2],
-          [resId1, resData1],
-        ]);
+        expect(accepted).to.eql([resData2, resData1]);
       });
 
       it('can accept resource if approved', async function () {
@@ -251,7 +244,7 @@ async function shouldBehaveLikeMultiResource(
 
         const activeResources = await this.token.getActiveResources(tokenId);
         expect(await this.renderUtils.getResourcesById(this.token.address, activeResources)).to.eql(
-          [[resId1, resData1]],
+          [resData1],
         );
       });
 
@@ -261,7 +254,7 @@ async function shouldBehaveLikeMultiResource(
 
         const activeResources = await this.token.getActiveResources(tokenId);
         expect(await this.renderUtils.getResourcesById(this.token.address, activeResources)).to.eql(
-          [[resId1, resData1]],
+          [resData1],
         );
       });
 
@@ -293,10 +286,7 @@ async function shouldBehaveLikeMultiResource(
         let pendingResources = await this.token.getPendingResources(tokenId);
         expect(
           await this.renderUtils.getResourcesById(this.token.address, pendingResources),
-        ).to.eql([
-          [resId1, resData1],
-          [resId2, resData2],
-        ]);
+        ).to.eql([resData1, resData2]);
 
         await expect(this.token.connect(tokenOwner).rejectResource(tokenId, 0))
           .to.emit(this.token, 'ResourceRejected')
@@ -306,7 +296,7 @@ async function shouldBehaveLikeMultiResource(
         pendingResources = await this.token.getPendingResources(tokenId);
         expect(
           await this.renderUtils.getResourcesById(this.token.address, pendingResources),
-        ).to.eql([[resId2, resData2]]);
+        ).to.eql([resData2]);
       });
 
       it('can reject resource if approved', async function () {
@@ -317,7 +307,7 @@ async function shouldBehaveLikeMultiResource(
         const pendingResources = await this.token.getPendingResources(tokenId);
         expect(
           await this.renderUtils.getResourcesById(this.token.address, pendingResources),
-        ).to.eql([[resId2, resData2]]);
+        ).to.eql([resData2]);
       });
 
       it('can reject resource if approved for all', async function () {
@@ -328,7 +318,7 @@ async function shouldBehaveLikeMultiResource(
         const pendingResources = await this.token.getPendingResources(tokenId);
         expect(
           await this.renderUtils.getResourcesById(this.token.address, pendingResources),
-        ).to.eql([[resId2, resData2]]);
+        ).to.eql([resData2]);
       });
 
       it('can reject all resources', async function () {

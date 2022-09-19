@@ -18,7 +18,7 @@ interface IRMRKMultiResourceRenderUtils is IERC165 {
         address target,
         uint256 tokenId,
         uint256 index
-    ) external view returns (IRMRKMultiResource.Resource memory);
+    ) external view returns (string memory);
 
     /**
      * @notice Returns `Resource` object at `index` of active resource array on `tokenId`
@@ -32,7 +32,7 @@ interface IRMRKMultiResourceRenderUtils is IERC165 {
         address target,
         uint256 tokenId,
         uint256 index
-    ) external view returns (IRMRKMultiResource.Resource memory);
+    ) external view returns (string memory);
 
     /**
      * @notice Returns `Resource` objects for the given ids
@@ -44,5 +44,5 @@ interface IRMRKMultiResourceRenderUtils is IERC165 {
     function getResourcesById(address target, uint64[] calldata resourceIds)
         external
         view
-        returns (IRMRKMultiResource.Resource[] memory);
+        returns (string[] memory);
 }
