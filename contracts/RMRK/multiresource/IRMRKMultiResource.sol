@@ -186,6 +186,16 @@ interface IRMRKMultiResource is IERC165 {
         returns (string memory);
 
     /**
+     * @notice Fetches resource data for the token's active resource with the given index.
+     * @dev Resources are stored by reference mapping _resources[resourceId]
+     * @dev Can be overriden to implement enumerate, fallback or other custom logic
+     */
+    function getResourceMetaForToken(uint256 tokenId, uint64 resourceIndex)
+        external
+        view
+        returns (string memory);
+
+    /**
      * @notice Returns the ids of all stored resources
      */
     function getAllResources() external view returns (uint64[] memory);
