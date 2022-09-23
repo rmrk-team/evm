@@ -46,8 +46,8 @@ async function typedExternalEquippableFixture() {
 }
 
 describe('RMRKTypedMultiResourceMock', async function () {
-  let owner: SignerWithAddress;
   let typedMultiResource: Contract;
+  let owner: SignerWithAddress;
   let tokenId: number;
 
   const resId = bn(1);
@@ -114,9 +114,16 @@ describe('RMRKTypedMultiResourceMock', async function () {
 
 describe('RMRKNestingTypedMultiResourceMock', async function () {
   let typedNestingMultiResource: Contract;
+  let owner: SignerWithAddress;
+  let tokenId: number;
 
   beforeEach(async function () {
     ({ typedNestingMultiResource } = await loadFixture(nestingTypedMultiResourceFixture));
+
+    const signers = await ethers.getSigners();
+    owner = signers[0];
+
+    tokenId = await mintFromMock(typedNestingMultiResource, owner.address);
   });
 
   it('can support IERC165', async function () {
@@ -140,13 +147,28 @@ describe('RMRKNestingTypedMultiResourceMock', async function () {
     await typedNestingMultiResource.addTypedResourceEntry(resId, 'ipfs://res1.jpg', 'image/jpeg');
     expect(await typedNestingMultiResource.getResourceType(resId)).to.eql('image/jpeg');
   });
+
+  it('can add typed resources to tokens', async function () {
+    const resId = bn(1);
+    await typedNestingMultiResource.addTypedResourceEntry(resId, 'ipfs://res1.jpg', 'image/jpeg');
+    await typedNestingMultiResource.addResourceToToken(tokenId, resId, 0);
+
+    expect(await typedNestingMultiResource.getPendingResources(tokenId)).to.eql([resId]);
+  });
 });
 
 describe('RMRKTypedEquippableMock', async function () {
   let typedEquippable: Contract;
+  let owner: SignerWithAddress;
+  let tokenId: number;
 
   beforeEach(async function () {
     ({ typedEquippable } = await loadFixture(typedEquippableFixture));
+
+    const signers = await ethers.getSigners();
+    owner = signers[0];
+
+    tokenId = await mintFromMock(typedEquippable, owner.address);
   });
 
   it('can support IERC165', async function () {
@@ -180,14 +202,38 @@ describe('RMRKTypedEquippableMock', async function () {
     );
     expect(await typedEquippable.getResourceType(resId)).to.eql('image/jpeg');
   });
+
+  it('can add typed resources to tokens', async function () {
+    const resId = bn(1);
+    await typedEquippable.addTypedResourceEntry(
+      {
+        id: resId,
+        equippableRefId: 0,
+        metadataURI: 'fallback.json',
+        baseAddress: ethers.constants.AddressZero,
+      },
+      [],
+      [],
+      'image/jpeg',
+    );
+    await typedEquippable.addResourceToToken(tokenId, resId, 0);
+    expect(await typedEquippable.getPendingResources(tokenId)).to.eql([resId]);
+  });
 });
 
 describe('RMRKTypedExternalEquippableMock', async function () {
   let typedExternalEquippable: Contract;
   let nesting: Contract;
+  let owner: SignerWithAddress;
+  let tokenId: number;
 
   beforeEach(async function () {
     ({ nesting, typedExternalEquippable } = await loadFixture(typedExternalEquippableFixture));
+
+    const signers = await ethers.getSigners();
+    owner = signers[0];
+
+    tokenId = await mintFromMock(nesting, owner.address);
   });
 
   it('can support IERC165', async function () {
@@ -220,5 +266,22 @@ describe('RMRKTypedExternalEquippableMock', async function () {
       'image/jpeg',
     );
     expect(await typedExternalEquippable.getResourceType(resId)).to.eql('image/jpeg');
+  });
+
+  it('can add typed resources to tokens', async function () {
+    const resId = bn(1);
+    await typedExternalEquippable.addTypedResourceEntry(
+      {
+        id: resId,
+        equippableRefId: 0,
+        metadataURI: 'fallback.json',
+        baseAddress: ethers.constants.AddressZero,
+      },
+      [],
+      [],
+      'image/jpeg',
+    );
+    await typedExternalEquippable.addResourceToToken(tokenId, resId, 0);
+    expect(await typedExternalEquippable.getPendingResources(tokenId)).to.eql([resId]);
   });
 });
