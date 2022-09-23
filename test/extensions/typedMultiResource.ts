@@ -134,6 +134,10 @@ describe('RMRKNestingTypedMultiResourceMock', async function () {
     expect(await typedNestingMultiResource.supportsInterface('0xc65a6425')).to.equal(true);
   });
 
+  it('can support INesting', async function () {
+    expect(await typedNestingMultiResource.supportsInterface('0xf790390a')).to.equal(true);
+  });
+
   it('can support IRMRKTypedMultiResource', async function () {
     expect(await typedNestingMultiResource.supportsInterface('0xb6a3032e')).to.equal(true);
   });
@@ -177,6 +181,14 @@ describe('RMRKTypedEquippableMock', async function () {
 
   it('can support IMultiResource', async function () {
     expect(await typedEquippable.supportsInterface('0xc65a6425')).to.equal(true);
+  });
+
+  it('can support INesting', async function () {
+    expect(await typedEquippable.supportsInterface('0xf790390a')).to.equal(true);
+  });
+
+  it('can support IEquippable', async function () {
+    expect(await typedEquippable.supportsInterface('0xd3a28ca0')).to.equal(true);
   });
 
   it('can support IRMRKTypedMultiResource', async function () {
@@ -242,6 +254,14 @@ describe('RMRKTypedExternalEquippableMock', async function () {
 
   it('can support IMultiResource', async function () {
     expect(await typedExternalEquippable.supportsInterface('0xc65a6425')).to.equal(true);
+  });
+
+  it('can support IEquippable', async function () {
+    expect(await typedExternalEquippable.supportsInterface('0xd3a28ca0')).to.equal(true);
+  });
+
+  it('can support IExternalEquip', async function () {
+    expect(await typedExternalEquippable.supportsInterface('0xe5383e6c')).to.equal(true);
   });
 
   it('can support IRMRKTypedMultiResource', async function () {
