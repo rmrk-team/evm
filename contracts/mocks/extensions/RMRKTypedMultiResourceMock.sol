@@ -3,7 +3,6 @@
 pragma solidity ^0.8.15;
 
 import "../../RMRK/extension/typedMultiResource/RMRKTypedMultiResource.sol";
-import "hardhat/console.sol";
 
 error RMRKTokenHasNoResourcesWithType();
 
@@ -55,7 +54,6 @@ contract RMRKTypedMultiResourceMock is RMRKTypedMultiResource {
                 resourceTypeEncoded == targetTypeEncoded &&
                 currentPrio < maxPriority
             ) {
-                console.log("Found at i: ", i);
                 maxPriority = currentPrio;
                 maxPriorityIndex = i;
             }
