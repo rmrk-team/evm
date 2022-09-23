@@ -31,6 +31,20 @@ async function typedEquippableFixture() {
   return { typedEquippable };
 }
 
+async function typedExternalEquippableFixture() {
+  const nestingFactory = await ethers.getContractFactory('RMRKNestingExternalEquipMock');
+  const nesting = await nestingFactory.deploy('Chunky', 'CHNK');
+  await nesting.deployed();
+
+  const equipFactory = await ethers.getContractFactory('RMRKTypedExternalEquippableMock');
+  const typedExternalEquippable = await equipFactory.deploy(nesting.address);
+  await typedExternalEquippable.deployed();
+
+  await nesting.setEquippableAddress(typedExternalEquippable.address);
+
+  return { nesting, typedExternalEquippable };
+}
+
 describe('RMRKTypedMultiResourceMock', async function () {
   let owner: SignerWithAddress;
   let typedMultiResource: Contract;
@@ -165,5 +179,46 @@ describe('RMRKTypedEquippableMock', async function () {
       'image/jpeg',
     );
     expect(await typedEquippable.getResourceType(resId)).to.eql('image/jpeg');
+  });
+});
+
+describe('RMRKTypedExternalEquippableMock', async function () {
+  let typedExternalEquippable: Contract;
+  let nesting: Contract;
+
+  beforeEach(async function () {
+    ({ nesting, typedExternalEquippable } = await loadFixture(typedExternalEquippableFixture));
+  });
+
+  it('can support IERC165', async function () {
+    expect(await typedExternalEquippable.supportsInterface('0x01ffc9a7')).to.equal(true);
+  });
+
+  it('can support IMultiResource', async function () {
+    expect(await typedExternalEquippable.supportsInterface('0xc65a6425')).to.equal(true);
+  });
+
+  it('can support IRMRKTypedMultiResource', async function () {
+    expect(await typedExternalEquippable.supportsInterface('0xb6a3032e')).to.equal(true);
+  });
+
+  it('does not support other interfaces', async function () {
+    expect(await typedExternalEquippable.supportsInterface('0xffffffff')).to.equal(false);
+  });
+
+  it('can add typed resources', async function () {
+    const resId = bn(1);
+    await typedExternalEquippable.addTypedResourceEntry(
+      {
+        id: resId,
+        equippableRefId: 0,
+        metadataURI: 'fallback.json',
+        baseAddress: ethers.constants.AddressZero,
+      },
+      [],
+      [],
+      'image/jpeg',
+    );
+    expect(await typedExternalEquippable.getResourceType(resId)).to.eql('image/jpeg');
   });
 });
