@@ -26,10 +26,11 @@ contract RMRKNestingTypedMultiResourceMock is RMRKNestingTypedMultiResource {
     }
 
     function addTypedResourceEntry(
-        uint64 id,
+        uint64 resourceId,
         string memory metadataURI,
         string memory type_
     ) external {
-        _addTypedResourceEntry(id, metadataURI, type_);
+        _addResourceEntry(resourceId, metadataURI);
+        _setResourceType(resourceId, type_);
     }
 }

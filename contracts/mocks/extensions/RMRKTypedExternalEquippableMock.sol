@@ -26,6 +26,7 @@ contract RMRKTypedExternalEquippableMock is RMRKTypedExternalEquippable {
         uint64[] calldata slotPartIds,
         string memory type_
     ) external {
-        _addTypedResourceEntry(resource, fixedPartIds, slotPartIds, type_);
+        _addResourceEntry(resource, fixedPartIds, slotPartIds);
+        _setResourceType(resource.id, type_);
     }
 }

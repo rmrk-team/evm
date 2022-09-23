@@ -3,11 +3,9 @@
 pragma solidity ^0.8.15;
 
 import "../../equippable/RMRKEquippable.sol";
-import "./IRMRKTypedMultiResource.sol";
+import "./RMRKTypedMultiResourceAbstract.sol";
 
-contract RMRKTypedEquippable is IRMRKTypedMultiResource, RMRKEquippable {
-    mapping(uint64 => string) private _resourceTypes;
-
+contract RMRKTypedEquippable is RMRKTypedMultiResourceAbstract, RMRKEquippable {
     constructor(string memory name, string memory symbol)
         RMRKEquippable(name, symbol)
     {}
@@ -25,23 +23,5 @@ contract RMRKTypedEquippable is IRMRKTypedMultiResource, RMRKEquippable {
         return
             RMRKEquippable.supportsInterface(interfaceId) ||
             interfaceId == type(IRMRKTypedMultiResource).interfaceId;
-    }
-
-    function _addTypedResourceEntry(
-        ExtendedResource memory resource,
-        uint64[] calldata fixedPartIds,
-        uint64[] calldata slotPartIds,
-        string memory type_
-    ) internal {
-        _addResourceEntry(resource, fixedPartIds, slotPartIds);
-        _resourceTypes[resource.id] = type_;
-    }
-
-    function getResourceType(uint64 resourceId)
-        public
-        view
-        returns (string memory)
-    {
-        return _resourceTypes[resourceId];
     }
 }
