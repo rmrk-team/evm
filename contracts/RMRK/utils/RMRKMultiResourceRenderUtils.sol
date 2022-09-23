@@ -80,9 +80,9 @@ contract RMRKMultiResourceRenderUtils is IRMRKMultiResourceRenderUtils {
         uint16 maxPriority = _LOWEST_POSSIBLE_PRIORITY;
         uint64 maxPriorityIndex = 0;
         for (uint64 i; i < len; ) {
-            uint64 currentPrio = priorities[i];
+            uint16 currentPrio = priorities[i];
             if (currentPrio < maxPriority) {
-                currentPrio = maxPriority;
+                maxPriority = currentPrio;
                 maxPriorityIndex = i;
             }
             unchecked {
