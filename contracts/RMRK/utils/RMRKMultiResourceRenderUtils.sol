@@ -9,7 +9,11 @@ pragma solidity ^0.8.15;
  * @dev Extra utility functions for composing RMRK resources.
  */
 
+error RMRKTokenHasNoResources();
+
 contract RMRKMultiResourceRenderUtils is IRMRKMultiResourceRenderUtils {
+    uint16 private constant _LOWEST_POSSIBLE_PRIORITY = 2**16 - 1;
+
     function supportsInterface(bytes4 interfaceId)
         external
         view
@@ -57,5 +61,34 @@ contract RMRKMultiResourceRenderUtils is IRMRKMultiResourceRenderUtils {
             }
         }
         return resources;
+    }
+
+    function getTopResourceMetaForToken(address target, uint256 tokenId)
+        external
+        view
+        returns (string memory)
+    {
+        IRMRKMultiResource target_ = IRMRKMultiResource(target);
+        uint16[] memory priorities = target_.getActiveResourcePriorities(
+            tokenId
+        );
+        uint256 len = priorities.length;
+        if (len == 0) {
+            revert RMRKTokenHasNoResources();
+        }
+
+        uint16 maxPriority = _LOWEST_POSSIBLE_PRIORITY;
+        uint64 maxPriorityIndex = 0;
+        for (uint64 i; i < len; ) {
+            uint64 currentPrio = priorities[i];
+            if (currentPrio < maxPriority) {
+                currentPrio = maxPriority;
+                maxPriorityIndex = i;
+            }
+            unchecked {
+                ++i;
+            }
+        }
+        return target_.getResourceMetaForToken(tokenId, maxPriorityIndex);
     }
 }

@@ -70,7 +70,7 @@ describe('Render Utils', async function () {
 
   describe('Render Utils MultiResource', async function () {
     it('supports interface', async function () {
-      expect(await renderUtils.supportsInterface('0xb0926bfc')).to.equal(true);
+      expect(await renderUtils.supportsInterface('0x93668f28')).to.equal(true);
     });
 
     it('does not support other interfaces', async function () {
@@ -94,6 +94,25 @@ describe('Render Utils', async function () {
         'ipfs://res1.jpg',
         'ipfs://res2.jpg',
       ]);
+    });
+
+    it('can get top resource by priority', async function () {
+      const otherTokenId = await mintFromMock(equip, owner.address);
+      await equip.addResourceToToken(otherTokenId, resId, 0);
+      await equip.addResourceToToken(otherTokenId, resId2, 0);
+      await equip.acceptResource(otherTokenId, 0);
+      await equip.acceptResource(otherTokenId, 0);
+      await equip.setPriority(otherTokenId, [1, 0]);
+      expect(await renderUtils.getTopResourceMetaForToken(equip.address, otherTokenId)).to.eql(
+        'ipfs://res2.jpg',
+      );
+    });
+
+    it('cannot get top resource if token has no resources', async function () {
+      const otherTokenId = await mintFromMock(equip, owner.address);
+      await expect(
+        renderUtils.getTopResourceMetaForToken(equip.address, otherTokenId),
+      ).to.be.revertedWithCustomError(renderUtils, 'RMRKTokenHasNoResources');
     });
   });
 

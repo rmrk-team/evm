@@ -45,4 +45,12 @@ interface IRMRKMultiResourceRenderUtils is IERC165 {
         external
         view
         returns (string[] memory);
+
+    /**
+     * @notice Returns the resource meta with the highest priority for the given token
+     */
+    function getTopResourceMetaForToken(address target, uint256 tokenId)
+        external
+        view
+        returns (string memory);
 }
