@@ -7,12 +7,20 @@ import { bn, mintFromMock } from '../utils';
 
 // --------------- FIXTURES -----------------------
 
-async function fixture() {
+async function typeMultiResourceFixture() {
   const factory = await ethers.getContractFactory('RMRKTypedMultiResourceMock');
   const typedMultiResource = await factory.deploy('Chunky', 'CHNK');
   await typedMultiResource.deployed();
 
   return { typedMultiResource };
+}
+
+async function nestingTypedMultiResourceFixture() {
+  const factory = await ethers.getContractFactory('RMRKNestingTypedMultiResourceMock');
+  const typedNestingMultiResource = await factory.deploy('Chunky', 'CHNK');
+  await typedNestingMultiResource.deployed();
+
+  return { typedNestingMultiResource };
 }
 
 describe('RMRKTypedMultiResourceMock', async function () {
@@ -25,7 +33,7 @@ describe('RMRKTypedMultiResourceMock', async function () {
   const resId3 = bn(3);
 
   beforeEach(async function () {
-    ({ typedMultiResource } = await loadFixture(fixture));
+    ({ typedMultiResource } = await loadFixture(typeMultiResourceFixture));
 
     const signers = await ethers.getSigners();
     owner = signers[0];
@@ -80,5 +88,35 @@ describe('RMRKTypedMultiResourceMock', async function () {
     await expect(
       typedMultiResource.getTopResourceMetaForTokenWithType(tokenId, 'application/pdf'),
     ).to.be.revertedWithCustomError(typedMultiResource, 'RMRKTokenHasNoResourcesWithType');
+  });
+});
+
+describe('RMRKNestingTypedMultiResourceMock', async function () {
+  let typedNestingMultiResource: Contract;
+
+  beforeEach(async function () {
+    ({ typedNestingMultiResource } = await loadFixture(nestingTypedMultiResourceFixture));
+  });
+
+  it('can support IERC165', async function () {
+    expect(await typedNestingMultiResource.supportsInterface('0x01ffc9a7')).to.equal(true);
+  });
+
+  it('can support IMultiResource', async function () {
+    expect(await typedNestingMultiResource.supportsInterface('0xc65a6425')).to.equal(true);
+  });
+
+  it('can support IRMRKTypedMultiResource', async function () {
+    expect(await typedNestingMultiResource.supportsInterface('0xb6a3032e')).to.equal(true);
+  });
+
+  it('does not support other interfaces', async function () {
+    expect(await typedNestingMultiResource.supportsInterface('0xffffffff')).to.equal(false);
+  });
+
+  it('can add typed resources', async function () {
+    const resId = bn(1);
+    await typedNestingMultiResource.addTypedResourceEntry(resId, 'ipfs://res1.jpg', 'image/jpeg');
+    expect(await typedNestingMultiResource.getResourceType(resId)).to.eql('image/jpeg');
   });
 });
