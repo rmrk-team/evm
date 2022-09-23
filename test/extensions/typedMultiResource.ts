@@ -23,6 +23,14 @@ async function nestingTypedMultiResourceFixture() {
   return { typedNestingMultiResource };
 }
 
+async function typedEquippableFixture() {
+  const factory = await ethers.getContractFactory('RMRKTypedEquippableMock');
+  const typedEquippable = await factory.deploy('Chunky', 'CHNK');
+  await typedEquippable.deployed();
+
+  return { typedEquippable };
+}
+
 describe('RMRKTypedMultiResourceMock', async function () {
   let owner: SignerWithAddress;
   let typedMultiResource: Contract;
@@ -72,7 +80,6 @@ describe('RMRKTypedMultiResourceMock', async function () {
     await typedMultiResource.acceptResource(tokenId, 0);
     await typedMultiResource.addResourceToToken(tokenId, resId3, 0);
     await typedMultiResource.acceptResource(tokenId, 0);
-    console.log(await typedMultiResource.getActiveResources(tokenId));
     await typedMultiResource.setPriority(tokenId, [1, 0, 2]); // Pdf has higher priority but it's the wanted type
 
     expect(
@@ -118,5 +125,45 @@ describe('RMRKNestingTypedMultiResourceMock', async function () {
     const resId = bn(1);
     await typedNestingMultiResource.addTypedResourceEntry(resId, 'ipfs://res1.jpg', 'image/jpeg');
     expect(await typedNestingMultiResource.getResourceType(resId)).to.eql('image/jpeg');
+  });
+});
+
+describe('RMRKTypedEquippableMock', async function () {
+  let typedEquippable: Contract;
+
+  beforeEach(async function () {
+    ({ typedEquippable } = await loadFixture(typedEquippableFixture));
+  });
+
+  it('can support IERC165', async function () {
+    expect(await typedEquippable.supportsInterface('0x01ffc9a7')).to.equal(true);
+  });
+
+  it('can support IMultiResource', async function () {
+    expect(await typedEquippable.supportsInterface('0xc65a6425')).to.equal(true);
+  });
+
+  it('can support IRMRKTypedMultiResource', async function () {
+    expect(await typedEquippable.supportsInterface('0xb6a3032e')).to.equal(true);
+  });
+
+  it('does not support other interfaces', async function () {
+    expect(await typedEquippable.supportsInterface('0xffffffff')).to.equal(false);
+  });
+
+  it('can add typed resources', async function () {
+    const resId = bn(1);
+    await typedEquippable.addTypedResourceEntry(
+      {
+        id: resId,
+        equippableRefId: 0,
+        metadataURI: 'fallback.json',
+        baseAddress: ethers.constants.AddressZero,
+      },
+      [],
+      [],
+      'image/jpeg',
+    );
+    expect(await typedEquippable.getResourceType(resId)).to.eql('image/jpeg');
   });
 });
