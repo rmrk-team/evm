@@ -801,6 +801,13 @@ async function shouldBehaveLikeNesting(
       ).to.be.revertedWithCustomError(child, 'RMRKNotApprovedOrDirectOwner');
     });
 
+    it('cannot nest tranfer to same NFT', async function () {
+      // We can no longer nest transfer it, even if we are the root owner:
+      await expect(
+        nestTransfer(child, firstOwner, child.address, childId, childId),
+      ).to.be.revertedWithCustomError(child, 'RMRKNestingTransferToSelf');
+    });
+
     it('cannot nest tranfer if not owner', async function () {
       const notOwner = addrs[3];
       await expect(
