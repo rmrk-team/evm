@@ -261,7 +261,8 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         (address immediateOwner, , ) = rmrkOwnerOf(tokenId);
         if (immediateOwner != from) revert ERC721TransferFromIncorrectOwner();
         if (to == address(0)) revert ERC721TransferToTheZeroAddress();
-        if (to == address(this) && tokenId == destinationId) revert RMRKNestingTransferToSelf();
+        if (to == address(this) && tokenId == destinationId)
+            revert RMRKNestingTransferToSelf();
 
         // Destination contract checks:
         // It seems redundant, but otherwise it would revert with no error

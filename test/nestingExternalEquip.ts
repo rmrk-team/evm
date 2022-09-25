@@ -73,10 +73,10 @@ describe('NestingWithEquippableMock ERC721 Behavior', function () {
   });
 
   describe('Interface support', function () {
-    it('supports NestingExternalEquip', async function () {
+    it('can support INestingExternalEquip', async function () {
       expect(await this.token.supportsInterface('0x8b7f3e99')).to.equal(true);
     });
-    it('supports IExternalNesting', async function () {
+    it('can support IExternalEquip', async function () {
       expect(await this.equip.supportsInterface('0xe5383e6c')).to.equal(true);
     });
 
