@@ -3,13 +3,18 @@
 pragma solidity ^0.8.15;
 
 contract RMRKCollectionMetadata {
+
+    string private _collectionMetadata;
+
     constructor(string memory collectionMetadata_) {
-        collectionMetadata = collectionMetadata_;
+        _setCollectionMetadata(collectionMetadata_);
     }
 
-    string public collectionMetadata;
-
     function _setCollectionMetadata(string memory newMetadata) internal {
-        collectionMetadata = newMetadata;
+        _collectionMetadata = newMetadata;
+    }
+
+    function collectionMetadata() public view returns(string memory) {
+        return _collectionMetadata;
     }
 }
