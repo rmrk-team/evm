@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import { Contract } from 'ethers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 
-async function shouldBehaveLikeBase(contractName: string, symbol: string, type: string) {
+async function shouldBehaveLikeBase(contractName: string, metadataURI: string, type: string) {
   let testBase: Contract;
 
   let addrs: SignerWithAddress[];
@@ -25,21 +25,21 @@ async function shouldBehaveLikeBase(contractName: string, symbol: string, type: 
     addrs = signersAddr;
 
     const Base = await ethers.getContractFactory(contractName);
-    testBase = await Base.deploy(symbol, type);
+    testBase = await Base.deploy(metadataURI, type);
     await testBase.deployed();
   });
 
   describe('Init Base Storage', async function () {
-    it('has right symbol', async function () {
-      expect(await testBase.symbol()).to.equal(symbol);
+    it('has right metadataURI', async function () {
+      expect(await testBase.getMetadataURI()).to.equal(metadataURI);
     });
 
     it('has right type', async function () {
-      expect(await testBase.type_()).to.equal(type);
+      expect(await testBase.getType()).to.equal(type);
     });
 
     it('supports interface', async function () {
-      expect(await testBase.supportsInterface('0x4a618ad6')).to.equal(true);
+      expect(await testBase.supportsInterface('0xd912401f')).to.equal(true);
     });
 
     it('does not support other interfaces', async function () {

@@ -57,6 +57,24 @@ interface IRMRKBaseStorage is IERC165 {
         string metadataURI; //n bytes 32+
     }
 
+    //TODO: Doc this struct, put JSON intake format in comments here
+    struct IntakeStruct {
+        uint64 partId;
+        Part part;
+    }
+
+    /**
+     * @dev Returns URI of the metadata of associated collection
+     * @return string base contract metadata URI
+     */
+    function getMetadataURI() external view returns (string memory);
+
+    /**
+     * @dev Returns type of data of associated base
+     * @return string data type
+     */
+    function getType() external view returns (string memory);
+
     /**
      * @dev Returns true if the part at partId is equippable by targetAddress.
      *
