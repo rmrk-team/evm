@@ -16,8 +16,8 @@ import "../RMRK/base/RMRKBaseStorage.sol";
  */
 
 contract RMRKBaseStorageImpl is OwnableLock, RMRKBaseStorage {
-    constructor(string memory symbol_, string memory type__)
-        RMRKBaseStorage(symbol_, type__)
+    constructor(string memory metadataURI, string memory type_)
+        RMRKBaseStorage(metadataURI, type_)
     {}
 
     function addPart(IntakeStruct calldata intakeStruct)

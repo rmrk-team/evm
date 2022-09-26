@@ -30,19 +30,12 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
 
     uint64[] private _partIds;
 
-    string private _symbol;
+    string private _metadataURI;
     string private _type;
 
-    //TODO: Move to interface
-    //TODO: Doc this struct, put JSON intake format in comments here
-    struct IntakeStruct {
-        uint64 partId;
-        Part part;
-    }
-
-    constructor(string memory symbol_, string memory type__) {
-        _symbol = symbol_;
-        _type = type__;
+    constructor(string memory metadataURI, string memory type_) {
+        _metadataURI = metadataURI;
+        _type = type_;
     }
 
     /**
@@ -53,7 +46,7 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
         _;
     }
 
-    function _onlySlot(uint64 partId) internal view {
+    function _onlySlot(uint64 partId) private view {
         ItemType itemType = _parts[partId].itemType;
         if (itemType == ItemType.None) revert RMRKPartDoesNotExist();
         if (itemType == ItemType.Fixed) revert RMRKPartIsNotSlot();
@@ -77,15 +70,15 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
      * @dev Returns symbol of associated collection
      * @return string base contract symbol
      */
-    function symbol() public view returns (string memory) {
-        return _symbol;
+    function getMetadataURI() external view returns (string memory) {
+        return _metadataURI;
     }
 
     /**
      * @dev Returns type of data of associated base
      * @return string data type
      */
-    function type_() public view returns (string memory) {
+    function getType() external view returns (string memory) {
         return _type;
     }
 
