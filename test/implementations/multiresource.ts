@@ -8,7 +8,6 @@ import shouldBehaveLikeMultiResource from '../behavior/multiresource';
 import shouldControlValidMinting from '../behavior/mintingImpl';
 import {
   addResourceToToken,
-  bn,
   singleFixtureWithArgs,
   mintFromImpl,
   addResourceEntryFromImpl,
@@ -26,6 +25,7 @@ async function singleFixture(): Promise<{ token: Contract; renderUtils: Contract
     10000,
     ONE_ETH,
     'exampleCollectionMetadataIPFSUri',
+    'ipfs://tokenURI',
   ]);
   return { token, renderUtils };
 }
@@ -34,7 +34,6 @@ describe('MultiResourceImpl Other Behavior', async () => {
   let token: Contract;
 
   let owner: SignerWithAddress;
-  let addrs: SignerWithAddress[];
 
   const defaultResource1 = 'default1.ipfs';
   const defaultResource2 = 'default2.ipfs';
@@ -42,9 +41,7 @@ describe('MultiResourceImpl Other Behavior', async () => {
   const isOwnableLockMock = false;
 
   beforeEach(async function () {
-    const [signersOwner, ...signersAddr] = await ethers.getSigners();
-    owner = signersOwner;
-    addrs = signersAddr;
+    owner = (await ethers.getSigners())[0];
   });
 
   describe('Deployment', async function () {
@@ -105,11 +102,17 @@ describe('MultiResourceImpl MR behavior', async () => {
   shouldBehaveLikeMultiResource(mintFromImpl, addResourceEntryFromImpl, addResourceToToken);
 });
 
-describe('MultiResourceImpl Minting', async function () {
+describe('MultiResourceImpl Other', async function () {
   beforeEach(async function () {
     const { token } = await loadFixture(singleFixture);
     this.token = token;
   });
 
   shouldControlValidMinting();
+
+  it('can get tokenURI', async function () {
+    const owner = (await ethers.getSigners())[0];
+    const tokenId = await mintFromImpl(this.token, owner.address);
+    expect(await this.token.tokenURI(tokenId)).to.eql('ipfs://tokenURI');
+  });
 });

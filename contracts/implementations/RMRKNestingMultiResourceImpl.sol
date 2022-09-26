@@ -20,18 +20,22 @@ contract RMRKNestingMultiResourceImpl is
 
     // Manage resources via increment
     uint256 private _totalResources;
+    string private _tokenURI;
 
     constructor(
         string memory name_,
         string memory symbol_,
         uint256 maxSupply_,
         uint256 pricePerMint_,
-        string memory collectionMetadata_
+        string memory collectionMetadata_,
+        string memory tokenURI_
     )
         RMRKNestingMultiResource(name_, symbol_)
         RMRKMintingUtils(maxSupply_, pricePerMint_)
         RMRKCollectionMetadata(collectionMetadata_)
-    {}
+    {
+        _tokenURI = tokenURI_;
+    }
 
     /*
     Template minting logic
@@ -111,5 +115,9 @@ contract RMRKNestingMultiResourceImpl is
         uint256 destinationId
     ) public virtual {
         nestTransferFrom(_msgSender(), to, tokenId, destinationId);
+    }
+
+    function tokenURI(uint256) public view override returns (string memory) {
+        return _tokenURI;
     }
 }

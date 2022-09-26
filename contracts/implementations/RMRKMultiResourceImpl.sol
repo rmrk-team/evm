@@ -25,18 +25,22 @@ contract RMRKMultiResourceImpl is
 
     // Manage resources via increment
     uint256 private _totalResources;
+    string private _tokenURI;
 
     constructor(
         string memory name,
         string memory symbol,
         uint256 maxSupply_,
         uint256 pricePerMint_, //in WEI
-        string memory collectionMetadata_
+        string memory collectionMetadata_,
+        string memory tokenURI_
     )
         RMRKMultiResource(name, symbol)
         RMRKMintingUtils(maxSupply_, pricePerMint_)
         RMRKCollectionMetadata(collectionMetadata_)
-    {}
+    {
+        _tokenURI = tokenURI_;
+    }
 
     /*
     Template minting logic
@@ -85,5 +89,9 @@ contract RMRKMultiResourceImpl is
 
     function totalResources() external view returns (uint256) {
         return _totalResources;
+    }
+
+    function tokenURI(uint256) public view override returns (string memory) {
+        return _tokenURI;
     }
 }

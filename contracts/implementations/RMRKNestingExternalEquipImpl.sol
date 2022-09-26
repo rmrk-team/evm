@@ -14,13 +14,15 @@ contract RMRKNestingExternalEquipImpl is
     RMRKNestingExternalEquip
 {
     address _equippableAddress;
+    string private _tokenURI;
 
     constructor(
         string memory name_,
         string memory symbol_,
         uint256 maxSupply_,
         uint256 pricePerMint_,
-        address equippableAddress_
+        address equippableAddress_,
+        string memory tokenURI_
     )
         RMRKNestingExternalEquip(name_, symbol_)
         RMRKMintingUtils(maxSupply_, pricePerMint_)
@@ -28,6 +30,7 @@ contract RMRKNestingExternalEquipImpl is
         // Can't add an equippable deployment here due to contract size, for factory
         // pattern can use OZ clone
         _equippableAddress = equippableAddress_;
+        _tokenURI = tokenURI_;
     }
 
     /*
@@ -80,5 +83,9 @@ contract RMRKNestingExternalEquipImpl is
 
     function setEquippableAddress(address equippable) external {
         _setEquippableAddress(equippable);
+    }
+
+    function tokenURI(uint256) public view override returns (string memory) {
+        return _tokenURI;
     }
 }

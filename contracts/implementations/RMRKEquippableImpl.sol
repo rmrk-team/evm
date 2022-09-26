@@ -11,12 +11,17 @@ error RMRKMintUnderpriced();
 error RMRKMintZero();
 
 contract RMRKEquippableImpl is OwnableLock, RMRKMintingUtils, RMRKEquippable {
+    string private _tokenURI;
+
     constructor(
         string memory name,
         string memory symbol,
         uint256 maxSupply,
-        uint256 pricePerMint
-    ) RMRKEquippable(name, symbol) RMRKMintingUtils(maxSupply, pricePerMint) {}
+        uint256 pricePerMint,
+        string memory tokenURI_
+    ) RMRKEquippable(name, symbol) RMRKMintingUtils(maxSupply, pricePerMint) {
+        _tokenURI = tokenURI_;
+    }
 
     /*
     Template minting logic
@@ -90,5 +95,9 @@ contract RMRKEquippableImpl is OwnableLock, RMRKMintingUtils, RMRKEquippable {
         uint64 partId
     ) external {
         _setValidParentRefId(refId, parentAddress, partId);
+    }
+
+    function tokenURI(uint256) public view override returns (string memory) {
+        return _tokenURI;
     }
 }

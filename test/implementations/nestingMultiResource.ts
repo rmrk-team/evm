@@ -1,5 +1,5 @@
-import { expect } from 'chai';
 import { ethers } from 'hardhat';
+import { expect } from 'chai';
 import { Contract } from 'ethers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
@@ -29,6 +29,7 @@ async function singleFixture(): Promise<{ token: Contract; renderUtils: Contract
     10000,
     ONE_ETH,
     'exampleCollectionMetadataIPFSUri',
+    'ipfs://tokenURI',
   ]);
   return { token, renderUtils };
 }
@@ -36,8 +37,8 @@ async function singleFixture(): Promise<{ token: Contract; renderUtils: Contract
 async function parentChildFixture(): Promise<{ parent: Contract; child: Contract }> {
   return parentChildFixtureWithArgs(
     'RMRKNestingMultiResourceImpl',
-    ['Chunky', 'CHNK', 10000, ONE_ETH, 'exampleCollectionMetadataIPFSUri'],
-    ['Monkey', 'MONK', 10000, ONE_ETH, 'exampleCollectionMetadataIPFSUri'],
+    ['Chunky', 'CHNK', 10000, ONE_ETH, 'exampleCollectionMetadataIPFSUri', 'ipfs://tokenURI'],
+    ['Monkey', 'MONK', 10000, ONE_ETH, 'exampleCollectionMetadataIPFSUri', 'ipfs://tokenURI'],
   );
 }
 
@@ -115,11 +116,17 @@ describe('NestingMultiResourceImpl Other Behavior', function () {
   });
 });
 
-describe('NestingMultiResourceImpl Minting', async function () {
+describe('NestingMultiResourceImpl Other', async function () {
   beforeEach(async function () {
     const { token } = await loadFixture(singleFixture);
     this.token = token;
   });
 
   shouldControlValidMinting();
+
+  it('can get tokenURI', async function () {
+    const owner = (await ethers.getSigners())[0];
+    const tokenId = await mintFromImpl(this.token, owner.address);
+    expect(await this.token.tokenURI(tokenId)).to.eql('ipfs://tokenURI');
+  });
 });

@@ -16,13 +16,17 @@ contract RMRKNestingImpl is OwnableLock, RMRKMintingUtils, RMRKNesting {
 
     // Manage resources via increment
     uint256 private _totalResources;
+    string private _tokenURI;
 
     constructor(
         string memory name_,
         string memory symbol_,
         uint256 maxSupply_,
-        uint256 pricePerMint_
-    ) RMRKNesting(name_, symbol_) RMRKMintingUtils(maxSupply_, pricePerMint_) {}
+        uint256 pricePerMint_,
+        string memory tokenURI_
+    ) RMRKNesting(name_, symbol_) RMRKMintingUtils(maxSupply_, pricePerMint_) {
+        _tokenURI = tokenURI_;
+    }
 
     /*
     Template minting logic
@@ -82,5 +86,9 @@ contract RMRKNestingImpl is OwnableLock, RMRKMintingUtils, RMRKNesting {
         uint256 destinationId
     ) public virtual {
         nestTransferFrom(_msgSender(), to, tokenId, destinationId);
+    }
+
+    function tokenURI(uint256) public view override returns (string memory) {
+        return _tokenURI;
     }
 }

@@ -38,11 +38,11 @@ async function partsFixture() {
   await base.deployed();
 
   // Neon token
-  const neon = await equipFactory.deploy(neonName, neonSymbol, 10000, ONE_ETH);
+  const neon = await equipFactory.deploy(neonName, neonSymbol, 10000, ONE_ETH, 'ipfs://tokenURI');
   await neon.deployed();
 
   // Weapon
-  const mask = await equipFactory.deploy(maskName, maskSymbol, 10000, ONE_ETH);
+  const mask = await equipFactory.deploy(maskName, maskSymbol, 10000, ONE_ETH, 'ipfs://tokenURI');
   await mask.deployed();
 
   // View
@@ -82,19 +82,43 @@ async function slotsFixture() {
   await base.deployed();
 
   // Soldier token
-  const soldier = await equipFactory.deploy(soldierName, soldierSymbol, 10000, ONE_ETH);
+  const soldier = await equipFactory.deploy(
+    soldierName,
+    soldierSymbol,
+    10000,
+    ONE_ETH,
+    'ipfs://tokenURI',
+  );
   await soldier.deployed();
 
   // Weapon
-  const weapon = await equipFactory.deploy(weaponName, weaponSymbol, 10000, ONE_ETH);
+  const weapon = await equipFactory.deploy(
+    weaponName,
+    weaponSymbol,
+    10000,
+    ONE_ETH,
+    'ipfs://tokenURI',
+  );
   await weapon.deployed();
 
   // Weapon Gem
-  const weaponGem = await equipFactory.deploy(weaponGemName, weaponGemSymbol, 10000, ONE_ETH);
+  const weaponGem = await equipFactory.deploy(
+    weaponGemName,
+    weaponGemSymbol,
+    10000,
+    ONE_ETH,
+    'ipfs://tokenURI',
+  );
   await weaponGem.deployed();
 
   // Background
-  const background = await equipFactory.deploy(backgroundName, backgroundSymbol, 10000, ONE_ETH);
+  const background = await equipFactory.deploy(
+    backgroundName,
+    backgroundSymbol,
+    10000,
+    ONE_ETH,
+    'ipfs://tokenURI',
+  );
   await background.deployed();
 
   await setupContextForSlots(
@@ -118,7 +142,7 @@ async function resourcesFixture() {
   const equipFactory = await ethers.getContractFactory('RMRKEquippableImpl');
   const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiResourceRenderUtils');
 
-  const equip = await equipFactory.deploy('Chunky', 'CHNK', 10000, ONE_ETH);
+  const equip = await equipFactory.deploy('Chunky', 'CHNK', 10000, ONE_ETH, 'ipfs://tokenURI');
   await equip.deployed();
 
   const renderUtils = await renderUtilsFactory.deploy();
@@ -131,7 +155,13 @@ async function equipFixture() {
   const equipFactory = await ethers.getContractFactory('RMRKEquippableImpl');
   const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiResourceRenderUtils');
 
-  const equip = await equipFactory.deploy('equipWithEquippable', 'NWE', 10000, ONE_ETH);
+  const equip = await equipFactory.deploy(
+    'equipWithEquippable',
+    'NWE',
+    10000,
+    ONE_ETH,
+    'ipfs://tokenURI',
+  );
   await equip.deployed();
 
   const renderUtils = await renderUtilsFactory.deploy();
@@ -220,11 +250,17 @@ describe('RMRKEquippableImpl MR behavior', async () => {
 
 // --------------- MULTI RESOURCE BEHAVIOR END ------------------------
 
-describe('RMRKEquippableImpl Minting', async function () {
+describe('RMRKEquippableImpl Other', async function () {
   beforeEach(async function () {
     const { equip } = await loadFixture(equipFixture);
     this.token = equip;
   });
 
   shouldControlValidMinting();
+
+  it('can get tokenURI', async function () {
+    const owner = (await ethers.getSigners())[0];
+    const tokenId = await mintFromImpl(this.token, owner.address);
+    expect(await this.token.tokenURI(tokenId)).to.eql('ipfs://tokenURI');
+  });
 });

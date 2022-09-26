@@ -215,10 +215,6 @@ async function shouldBehaveLikeMultiResource(
           resData1,
         );
 
-        // Other ways of getting the token info:
-        if (this.token.tokenURI !== undefined) {
-          expect(await this.token.tokenURI(tokenId)).equal('');
-        }
         expect(await this.token.getResourceMeta(resId1)).equal(resData1);
         expect(await this.token.getResourceMetaForToken(tokenId, 0)).equal(resData1);
       });

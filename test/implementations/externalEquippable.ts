@@ -1,5 +1,6 @@
 import { Contract } from 'ethers';
 import { ethers } from 'hardhat';
+import { expect } from 'chai';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import {
   addResourceToToken,
@@ -48,6 +49,7 @@ async function partsFixture() {
     10000,
     ONE_ETH,
     ethers.constants.AddressZero,
+    'ipfs://tokenURI',
   );
   const neonEquip = await equipFactory.deploy(neon.address);
   await neon.deployed();
@@ -62,6 +64,7 @@ async function partsFixture() {
     10000,
     ONE_ETH,
     ethers.constants.AddressZero,
+    'ipfs://tokenURI',
   );
   await mask.deployed();
   const maskEquip = await equipFactory.deploy(mask.address);
@@ -117,6 +120,7 @@ async function slotsFixture() {
     10000,
     ONE_ETH,
     ethers.constants.AddressZero,
+    'ipfs://tokenURI',
   );
   await soldier.deployed();
   const soldierEquip = await equipFactory.deploy(soldier.address);
@@ -131,6 +135,7 @@ async function slotsFixture() {
     10000,
     ONE_ETH,
     ethers.constants.AddressZero,
+    'ipfs://tokenURI',
   );
   await weapon.deployed();
   const weaponEquip = await equipFactory.deploy(weapon.address);
@@ -145,6 +150,7 @@ async function slotsFixture() {
     10000,
     ONE_ETH,
     ethers.constants.AddressZero,
+    'ipfs://tokenURI',
   );
   await weaponGem.deployed();
   const weaponGemEquip = await equipFactory.deploy(weaponGem.address);
@@ -159,6 +165,7 @@ async function slotsFixture() {
     10000,
     ONE_ETH,
     ethers.constants.AddressZero,
+    'ipfs://tokenURI',
   );
   await background.deployed();
   const backgroundEquip = await equipFactory.deploy(background.address);
@@ -195,20 +202,21 @@ async function slotsFixture() {
 }
 
 async function resourcesFixture() {
-  const Nesting = await ethers.getContractFactory('RMRKNestingExternalEquipImpl');
-  const Equip = await ethers.getContractFactory('RMRKExternalEquipImpl');
+  const nestingFactory = await ethers.getContractFactory('RMRKNestingExternalEquipImpl');
+  const equipFactory = await ethers.getContractFactory('RMRKExternalEquipImpl');
   const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiResourceRenderUtils');
 
-  const nesting = await Nesting.deploy(
+  const nesting = await nestingFactory.deploy(
     'Chunky',
     'CHNK',
     10000,
     ONE_ETH,
     ethers.constants.AddressZero,
+    'ipfs://tokenURI',
   );
   await nesting.deployed();
 
-  const equip = await Equip.deploy(nesting.address);
+  const equip = await equipFactory.deploy(nesting.address);
   await equip.deployed();
 
   const renderUtils = await renderUtilsFactory.deploy();
@@ -220,20 +228,21 @@ async function resourcesFixture() {
 }
 
 async function equipFixture() {
-  const NestingFactory = await ethers.getContractFactory('RMRKNestingExternalEquipImpl');
-  const EquipFactory = await ethers.getContractFactory('RMRKExternalEquipImpl');
+  const nestingFactory = await ethers.getContractFactory('RMRKNestingExternalEquipImpl');
+  const equipFactory = await ethers.getContractFactory('RMRKExternalEquipImpl');
   const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiResourceRenderUtils');
 
-  const nesting = await NestingFactory.deploy(
+  const nesting = await nestingFactory.deploy(
     'NestingWithEquippable',
     'NWE',
     10000,
     ONE_ETH,
     ethers.constants.AddressZero,
+    'ipfs://tokenURI',
   );
   await nesting.deployed();
 
-  const equip = await EquipFactory.deploy(nesting.address);
+  const equip = await equipFactory.deploy(nesting.address);
   await equip.deployed();
 
   const renderUtils = await renderUtilsFactory.deploy();
@@ -248,7 +257,7 @@ async function equipFixture() {
 
 // --------------- EQUIPPABLE BEHAVIOR -----------------------
 
-describe('ExtenralEquippableImpl with Parts', async () => {
+describe('ExternalEquippableImpl with Parts', async () => {
   beforeEach(async function () {
     const { base, neon, neonEquip, mask, maskEquip, view } = await loadFixture(partsFixture);
 
@@ -263,7 +272,7 @@ describe('ExtenralEquippableImpl with Parts', async () => {
   shouldBehaveLikeEquippableWithParts();
 });
 
-describe('ExtenralEquippableImpl with Slots', async () => {
+describe('ExternalEquippableImpl with Slots', async () => {
   beforeEach(async function () {
     const {
       base,
@@ -293,7 +302,7 @@ describe('ExtenralEquippableImpl with Slots', async () => {
   shouldBehaveLikeEquippableWithSlots(nestMintFromImpl);
 });
 
-describe('ExtenralEquippableImpl Resources', async () => {
+describe('ExternalEquippableImpl Resources', async () => {
   beforeEach(async function () {
     const { nesting, equip, renderUtils } = await loadFixture(resourcesFixture);
     this.nesting = nesting;
@@ -308,7 +317,7 @@ describe('ExtenralEquippableImpl Resources', async () => {
 
 // --------------- MULTI RESOURCE BEHAVIOR -----------------------
 
-describe('ExtenralEquippableImpl MR behavior', async () => {
+describe('ExternalEquippableImpl MR behavior', async () => {
   let nesting: Contract;
   let equip: Contract;
   let renderUtils: Contract;
@@ -330,11 +339,17 @@ describe('ExtenralEquippableImpl MR behavior', async () => {
 
 // --------------- MULTI RESOURCE BEHAVIOR END ------------------------
 
-describe('ExtenralEquippableImpl Minting', async function () {
+describe('ExternalEquippableImpl Other', async function () {
   beforeEach(async function () {
     const { nesting } = await loadFixture(equipFixture);
     this.token = nesting;
   });
 
   shouldControlValidMinting();
+
+  it('can get tokenURI', async function () {
+    const owner = (await ethers.getSigners())[0];
+    const tokenId = await mintFromImpl(this.token, owner.address);
+    expect(await this.token.tokenURI(tokenId)).to.eql('ipfs://tokenURI');
+  });
 });

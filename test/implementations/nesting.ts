@@ -1,4 +1,5 @@
 import { ethers } from 'hardhat';
+import { expect } from 'chai';
 import { Contract } from 'ethers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import {
@@ -15,14 +16,20 @@ import shouldControlValidMinting from '../behavior/mintingImpl';
 // import shouldBehaveLikeERC721 from '../behavior/erc721';
 
 async function singleFixture(): Promise<Contract> {
-  return singleFixtureWithArgs('RMRKNestingImpl', ['RMRK Test', 'RMRKTST', 10000, ONE_ETH]);
+  return singleFixtureWithArgs('RMRKNestingImpl', [
+    'RMRK Test',
+    'RMRKTST',
+    10000,
+    ONE_ETH,
+    'ipfs://tokenURI',
+  ]);
 }
 
 async function parentChildFixture(): Promise<{ parent: Contract; child: Contract }> {
   return parentChildFixtureWithArgs(
     'RMRKNestingImpl',
-    ['Chunky', 'CHNK', 10000, ONE_ETH],
-    ['Monkey', 'MONK', 10000, ONE_ETH],
+    ['Chunky', 'CHNK', 10000, ONE_ETH, 'ipfs://tokenURI'],
+    ['Monkey', 'MONK', 10000, ONE_ETH, 'ipfs://tokenURI'],
   );
 }
 
@@ -49,10 +56,16 @@ describe('NestingImpl ERC721 behavior', function () {
   // shouldBehaveLikeERC721(name, symbol);
 });
 
-describe('NestingImpl Minting', async function () {
+describe('NestingImpl Other', async function () {
   beforeEach(async function () {
     this.token = await loadFixture(singleFixture);
   });
 
   shouldControlValidMinting();
+
+  it('can get tokenURI', async function () {
+    const owner = (await ethers.getSigners())[0];
+    const tokenId = await mintFromImpl(this.token, owner.address);
+    expect(await this.token.tokenURI(tokenId)).to.eql('ipfs://tokenURI');
+  });
 });
