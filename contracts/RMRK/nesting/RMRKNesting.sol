@@ -34,6 +34,7 @@ error RMRKMaxPendingChildrenReached();
 error RMRKMintToNonRMRKImplementer();
 error RMRKNestingTransferToNonRMRKNestingImplementer();
 error RMRKNestingTransferToSelf();
+error RMRKNestingTransferToDescendant();
 error RMRKNotApprovedOrDirectOwner();
 error RMRKPendingChildIndexOutOfRange();
 error RMRKInvalidChildReclaim();
@@ -50,6 +51,8 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
     using RMRKLib for uint256;
     using Address for address;
     using Strings for uint256;
+
+    uint private constant _LEVELS_TO_CHECK_FOR_INHERITANCE_LOOP = 10;
 
     // Mapping from token ID to owner address
     mapping(uint256 => address) private _owners;
@@ -269,6 +272,7 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         if (!to.isContract()) revert RMRKIsNotContract();
         if (!IERC165(to).supportsInterface(type(IRMRKNesting).interfaceId))
             revert RMRKNestingTransferToNonRMRKNestingImplementer();
+        _checkForInheritanceLoop(tokenId, to, destinationId);
 
         _beforeTokenTransfer(from, to, tokenId);
         _balances[from] -= 1;
@@ -290,6 +294,32 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         _afterTokenTransfer(from, to, tokenId);
 
         emit Transfer(from, to, tokenId);
+    }
+
+    function _checkForInheritanceLoop(
+        uint256 currentId,
+        address targetContract,
+        uint256 targetId
+    ) private view {
+        for (uint256 i; i < _LEVELS_TO_CHECK_FOR_INHERITANCE_LOOP; ) {
+            (address nextOwner, uint256 nextOwnerTokenId, bool isNft) = IRMRKNesting(targetContract).rmrkOwnerOf(
+                targetId
+            );
+            // If there's a final address, we're good. There's no loop.
+            if (!isNft) {
+                break;
+            }
+            // Ff the current nft is an ancestor at some point, there is an inheritance loop
+            if (nextOwner == address(this) && nextOwnerTokenId == currentId) {
+                revert RMRKNestingTransferToDescendant();
+            }
+            // We reuse the parameters to save some contract size
+            targetContract = nextOwner;
+            targetId = nextOwnerTokenId;
+            unchecked {
+                ++i;
+            }
+        }
     }
 
     ////////////////////////////////////////

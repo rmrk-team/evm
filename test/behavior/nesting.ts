@@ -808,6 +808,21 @@ async function shouldBehaveLikeNesting(
       ).to.be.revertedWithCustomError(child, 'RMRKNestingTransferToSelf');
     });
 
+    it('cannot nest tranfer a descendant same NFT', async function () {
+      // We can no longer nest transfer it, even if we are the root owner:
+      await nestTransfer(child, firstOwner, parent.address, childId, parentId);
+      const grandChildId = await nestMint(child, child.address, childId);
+      // Ownership is now parent->child->granChild
+      // Cannot send parent to grandChild
+      await expect(
+        nestTransfer(parent, firstOwner, child.address, parentId, grandChildId),
+      ).to.be.revertedWithCustomError(child, 'RMRKNestingTransferToDescendant');
+      // Cannot send parent to child
+      await expect(
+        nestTransfer(parent, firstOwner, child.address, parentId, childId),
+      ).to.be.revertedWithCustomError(child, 'RMRKNestingTransferToDescendant');
+    });
+
     it('cannot nest tranfer if not owner', async function () {
       const notOwner = addrs[3];
       await expect(
