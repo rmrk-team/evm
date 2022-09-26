@@ -823,6 +823,19 @@ async function shouldBehaveLikeNesting(
       ).to.be.revertedWithCustomError(child, 'RMRKNestingTransferToDescendant');
     });
 
+    it('cannot nest tranfer if ancestors tree is too deep', async function () {
+      let lastId = childId;
+      for (let i = 0; i < 100; i++) {
+        const newChildId = await nestMint(child, child.address, lastId);
+        lastId = newChildId;
+      }
+      // Ownership is now parent->child->child->child->child...->lastChild
+      // Cannot send parent to lastChild
+      await expect(
+        nestTransfer(parent, firstOwner, child.address, parentId, lastId),
+      ).to.be.revertedWithCustomError(child, 'RMRKNestingTooDeep');
+    });
+
     it('cannot nest tranfer if not owner', async function () {
       const notOwner = addrs[3];
       await expect(
