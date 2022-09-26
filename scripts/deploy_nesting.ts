@@ -24,6 +24,7 @@ async function main() {
     maxSupply: 100000, // supply
     pricePerMint: 1, // in WEI
     equippableAddress: '0x0000000000000000000000000000000000000000',
+    tokenURI: 'ipfs://tokenURI',
   };
 
   const rmrkNesting = await RMRKNestingImpl.deploy(
@@ -32,6 +33,7 @@ async function main() {
     args.maxSupply,
     args.pricePerMint,
     args.equippableAddress,
+    args.tokenURI,
   );
 
   await rmrkNesting.deployed();
@@ -47,6 +49,7 @@ async function main() {
       args.maxSupply,
       args.pricePerMint,
       args.equippableAddress,
+      args.tokenURI,
     ],
   });
 }

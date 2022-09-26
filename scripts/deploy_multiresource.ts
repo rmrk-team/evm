@@ -23,6 +23,7 @@ async function main() {
     symbol: 'RMRK',
     maxSupply: 100000, // supply
     pricePerMint: 0, // in WEI
+    tokenURI: 'ipfs://tokenURI',
   };
 
   const rmrkMultiResource = await RMRKMultiResourceImpl.deploy(
@@ -30,6 +31,7 @@ async function main() {
     args.symbol,
     args.maxSupply,
     args.pricePerMint,
+    args.tokenURI,
   );
 
   await rmrkMultiResource.deployed();
@@ -39,7 +41,13 @@ async function main() {
   console.log('Etherscan contract verification starting now.');
   await run('verify:verify', {
     address: rmrkMultiResource.address,
-    constructorArguments: [args.name, args.symbol, args.maxSupply, args.pricePerMint],
+    constructorArguments: [
+      args.name,
+      args.symbol,
+      args.maxSupply,
+      args.pricePerMint,
+      args.tokenURI,
+    ],
   });
 }
 
