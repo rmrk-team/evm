@@ -2,15 +2,15 @@
 
 pragma solidity ^0.8.16;
 
-import "../RMRK/utils/RMRKMintingUtils.sol";
-import "../RMRK/equippable/RMRKEquippable.sol";
 import "../RMRK/access/OwnableLock.sol";
-/* import "hardhat/console.sol"; */
+import "../RMRK/equippable/RMRKEquippable.sol";
+import "../RMRK/utils/RMRKCollectionMetadata.sol";
+import "../RMRK/utils/RMRKMintingUtils.sol";
 
 error RMRKMintUnderpriced();
 error RMRKMintZero();
 
-contract RMRKEquippableImpl is OwnableLock, RMRKMintingUtils, RMRKEquippable {
+contract RMRKEquippableImpl is RMRKMintingUtils, RMRKCollectionMetadata, RMRKEquippable {
     string private _tokenURI;
 
     constructor(
@@ -18,8 +18,13 @@ contract RMRKEquippableImpl is OwnableLock, RMRKMintingUtils, RMRKEquippable {
         string memory symbol,
         uint256 maxSupply,
         uint256 pricePerMint,
+        string memory collectionMetadata_,
         string memory tokenURI_
-    ) RMRKEquippable(name, symbol) RMRKMintingUtils(maxSupply, pricePerMint) {
+    )
+        RMRKEquippable(name, symbol)
+        RMRKMintingUtils(maxSupply, pricePerMint)
+        RMRKCollectionMetadata(collectionMetadata_)
+    {
         _tokenURI = tokenURI_;
     }
 

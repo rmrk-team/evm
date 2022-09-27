@@ -28,7 +28,7 @@ async function singleFixture(): Promise<{ token: Contract; renderUtils: Contract
     'NMR',
     10000,
     ONE_ETH,
-    'exampleCollectionMetadataIPFSUri',
+    'ipfs://collection-meta',
     'ipfs://tokenURI',
   ]);
   return { token, renderUtils };
@@ -37,8 +37,8 @@ async function singleFixture(): Promise<{ token: Contract; renderUtils: Contract
 async function parentChildFixture(): Promise<{ parent: Contract; child: Contract }> {
   return parentChildFixtureWithArgs(
     'RMRKNestingMultiResourceImpl',
-    ['Chunky', 'CHNK', 10000, ONE_ETH, 'exampleCollectionMetadataIPFSUri', 'ipfs://tokenURI'],
-    ['Monkey', 'MONK', 10000, ONE_ETH, 'exampleCollectionMetadataIPFSUri', 'ipfs://tokenURI'],
+    ['Chunky', 'CHNK', 10000, ONE_ETH, 'ipfs://collection-meta', 'ipfs://tokenURI'],
+    ['Monkey', 'MONK', 10000, ONE_ETH, 'ipfs://collection-meta', 'ipfs://tokenURI'],
   );
 }
 
@@ -128,5 +128,9 @@ describe('NestingMultiResourceImpl Other', async function () {
     const owner = (await ethers.getSigners())[0];
     const tokenId = await mintFromImpl(this.token, owner.address);
     expect(await this.token.tokenURI(tokenId)).to.eql('ipfs://tokenURI');
+  });
+
+  it('can get collection meta', async function () {
+    expect(await this.token.collectionMetadata()).to.eql('ipfs://collection-meta');
   });
 });
