@@ -49,6 +49,7 @@ async function partsFixture() {
     10000,
     ONE_ETH,
     ethers.constants.AddressZero,
+    'ipfs://collection-meta',
     'ipfs://tokenURI',
   );
   const neonEquip = await equipFactory.deploy(neon.address);
@@ -64,6 +65,7 @@ async function partsFixture() {
     10000,
     ONE_ETH,
     ethers.constants.AddressZero,
+    'ipfs://collection-meta',
     'ipfs://tokenURI',
   );
   await mask.deployed();
@@ -120,6 +122,7 @@ async function slotsFixture() {
     10000,
     ONE_ETH,
     ethers.constants.AddressZero,
+    'ipfs://collection-meta',
     'ipfs://tokenURI',
   );
   await soldier.deployed();
@@ -135,6 +138,7 @@ async function slotsFixture() {
     10000,
     ONE_ETH,
     ethers.constants.AddressZero,
+    'ipfs://collection-meta',
     'ipfs://tokenURI',
   );
   await weapon.deployed();
@@ -150,6 +154,7 @@ async function slotsFixture() {
     10000,
     ONE_ETH,
     ethers.constants.AddressZero,
+    'ipfs://collection-meta',
     'ipfs://tokenURI',
   );
   await weaponGem.deployed();
@@ -165,6 +170,7 @@ async function slotsFixture() {
     10000,
     ONE_ETH,
     ethers.constants.AddressZero,
+    'ipfs://collection-meta',
     'ipfs://tokenURI',
   );
   await background.deployed();
@@ -212,6 +218,7 @@ async function resourcesFixture() {
     10000,
     ONE_ETH,
     ethers.constants.AddressZero,
+    'ipfs://collection-meta',
     'ipfs://tokenURI',
   );
   await nesting.deployed();
@@ -238,6 +245,7 @@ async function equipFixture() {
     10000,
     ONE_ETH,
     ethers.constants.AddressZero,
+    'ipfs://collection-meta',
     'ipfs://tokenURI',
   );
   await nesting.deployed();
@@ -351,5 +359,9 @@ describe('ExternalEquippableImpl Other', async function () {
     const owner = (await ethers.getSigners())[0];
     const tokenId = await mintFromImpl(this.token, owner.address);
     expect(await this.token.tokenURI(tokenId)).to.eql('ipfs://tokenURI');
+  });
+
+  it('can get collection meta', async function () {
+    expect(await this.token.collectionMetadata()).to.eql('ipfs://collection-meta');
   });
 });

@@ -38,11 +38,25 @@ async function partsFixture() {
   await base.deployed();
 
   // Neon token
-  const neon = await equipFactory.deploy(neonName, neonSymbol, 10000, ONE_ETH, 'ipfs://tokenURI');
+  const neon = await equipFactory.deploy(
+    neonName,
+    neonSymbol,
+    10000,
+    ONE_ETH,
+    'ipfs://collection-meta',
+    'ipfs://tokenURI',
+  );
   await neon.deployed();
 
   // Weapon
-  const mask = await equipFactory.deploy(maskName, maskSymbol, 10000, ONE_ETH, 'ipfs://tokenURI');
+  const mask = await equipFactory.deploy(
+    maskName,
+    maskSymbol,
+    10000,
+    ONE_ETH,
+    'ipfs://collection-meta',
+    'ipfs://tokenURI',
+  );
   await mask.deployed();
 
   // View
@@ -87,6 +101,7 @@ async function slotsFixture() {
     soldierSymbol,
     10000,
     ONE_ETH,
+    'ipfs://collection-meta',
     'ipfs://tokenURI',
   );
   await soldier.deployed();
@@ -97,6 +112,7 @@ async function slotsFixture() {
     weaponSymbol,
     10000,
     ONE_ETH,
+    'ipfs://collection-meta',
     'ipfs://tokenURI',
   );
   await weapon.deployed();
@@ -107,6 +123,7 @@ async function slotsFixture() {
     weaponGemSymbol,
     10000,
     ONE_ETH,
+    'ipfs://collection-meta',
     'ipfs://tokenURI',
   );
   await weaponGem.deployed();
@@ -117,6 +134,7 @@ async function slotsFixture() {
     backgroundSymbol,
     10000,
     ONE_ETH,
+    'ipfs://collection-meta',
     'ipfs://tokenURI',
   );
   await background.deployed();
@@ -142,7 +160,14 @@ async function resourcesFixture() {
   const equipFactory = await ethers.getContractFactory('RMRKEquippableImpl');
   const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiResourceRenderUtils');
 
-  const equip = await equipFactory.deploy('Chunky', 'CHNK', 10000, ONE_ETH, 'ipfs://tokenURI');
+  const equip = await equipFactory.deploy(
+    'Chunky',
+    'CHNK',
+    10000,
+    ONE_ETH,
+    'ipfs://collection-meta',
+    'ipfs://tokenURI',
+  );
   await equip.deployed();
 
   const renderUtils = await renderUtilsFactory.deploy();
@@ -160,6 +185,7 @@ async function equipFixture() {
     'NWE',
     10000,
     ONE_ETH,
+    'ipfs://collection-meta',
     'ipfs://tokenURI',
   );
   await equip.deployed();
@@ -262,5 +288,9 @@ describe('RMRKEquippableImpl Other', async function () {
     const owner = (await ethers.getSigners())[0];
     const tokenId = await mintFromImpl(this.token, owner.address);
     expect(await this.token.tokenURI(tokenId)).to.eql('ipfs://tokenURI');
+  });
+
+  it('can get collection meta', async function () {
+    expect(await this.token.collectionMetadata()).to.eql('ipfs://collection-meta');
   });
 });

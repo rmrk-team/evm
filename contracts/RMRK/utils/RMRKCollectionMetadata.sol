@@ -3,6 +3,7 @@
 pragma solidity ^0.8.15;
 
 contract RMRKCollectionMetadata {
+
     string private _collectionMetadata;
 
     constructor(string memory collectionMetadata_) {
@@ -13,7 +14,7 @@ contract RMRKCollectionMetadata {
         _collectionMetadata = newMetadata;
     }
 
-    function collectionMetadata() public view returns (string memory) {
+    function collectionMetadata() public view returns(string memory) {
         return _collectionMetadata;
     }
 }
