@@ -2,10 +2,9 @@
 
 pragma solidity ^0.8.15;
 
-import "../RMRK/utils/RMRKMintingUtils.sol";
-import "../RMRK/utils/RMRKCollectionMetadata.sol";
 import "../RMRK/nesting/RMRKNestingMultiResource.sol";
-import "@openzeppelin/contracts/utils/Strings.sol";
+import "../RMRK/utils/RMRKCollectionMetadata.sol";
+import "../RMRK/utils/RMRKMintingUtils.sol";
 
 error RMRKMintUnderpriced();
 error RMRKMintZero();
@@ -16,8 +15,6 @@ contract RMRKNestingMultiResourceImpl is
     RMRKCollectionMetadata,
     RMRKNestingMultiResource
 {
-    using Strings for uint256;
-
     // Manage resources via increment
     uint256 private _totalResources;
     string private _tokenURI;

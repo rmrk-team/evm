@@ -2,8 +2,8 @@
 
 pragma solidity ^0.8.15;
 
-import "../RMRK/base/RMRKBaseStorage.sol";
 import "../RMRK/access/OwnableLock.sol";
+import "../RMRK/base/RMRKBaseStorage.sol";
 
 /**
  * @dev Contract for storing 'base' elements of NFTs to be accessed

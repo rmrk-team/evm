@@ -2,18 +2,15 @@
 
 pragma solidity ^0.8.15;
 
-import "../RMRK/access/OwnableLock.sol";
-import "../RMRK/utils/RMRKMintingUtils.sol";
 import "../RMRK/nesting/RMRKNesting.sol";
-import "@openzeppelin/contracts/utils/Strings.sol";
+import "../RMRK/utils/RMRKCollectionMetadata.sol";
+import "../RMRK/utils/RMRKMintingUtils.sol";
 
 error RMRKMintUnderpriced();
 error RMRKMintZero();
 
 //Minimal public implementation of IRMRKNesting for testing.
-contract RMRKNestingImpl is OwnableLock, RMRKMintingUtils, RMRKNesting {
-    using Strings for uint256;
-
+contract RMRKNestingImpl is RMRKMintingUtils, RMRKCollectionMetadata, RMRKNesting {
     // Manage resources via increment
     uint256 private _totalResources;
     string private _tokenURI;
@@ -23,8 +20,12 @@ contract RMRKNestingImpl is OwnableLock, RMRKMintingUtils, RMRKNesting {
         string memory symbol_,
         uint256 maxSupply_,
         uint256 pricePerMint_,
+        string memory collectionMetadata_,
         string memory tokenURI_
-    ) RMRKNesting(name_, symbol_) RMRKMintingUtils(maxSupply_, pricePerMint_) {
+    )
+        RMRKNesting(name_, symbol_)
+        RMRKMintingUtils(maxSupply_, pricePerMint_)
+        RMRKCollectionMetadata(collectionMetadata_){
         _tokenURI = tokenURI_;
     }
 
