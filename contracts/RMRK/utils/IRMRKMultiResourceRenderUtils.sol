@@ -7,12 +7,12 @@ import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 
 interface IRMRKMultiResourceRenderUtils is IERC165 {
     /**
-     * @notice Returns `Resource` object associated with `resourceId`
+     * @notice Returns resource meta at `index` of active resource array on `tokenId`
      *
      * Requirements:
      *
-     * - `resourceId` must exist.
-     *
+     * - `tokenId` must exist.
+     * - `index` must be inside the range of active resource array
      */
     function getResourceByIndex(
         address target,
@@ -21,12 +21,12 @@ interface IRMRKMultiResourceRenderUtils is IERC165 {
     ) external view returns (string memory);
 
     /**
-     * @notice Returns `Resource` object at `index` of active resource array on `tokenId`
+     * @notice Returns resource meta at `index` of pending resource array on `tokenId`
      *
      * Requirements:
      *
      * - `tokenId` must exist.
-     * - `index` must be inside the range of active resource array
+     * - `index` must be inside the range of pending resource array
      */
     function getPendingResourceByIndex(
         address target,
@@ -35,7 +35,7 @@ interface IRMRKMultiResourceRenderUtils is IERC165 {
     ) external view returns (string memory);
 
     /**
-     * @notice Returns `Resource` objects for the given ids
+     * @notice Returns resource meta strings for the given ids
      *
      * Requirements:
      *
