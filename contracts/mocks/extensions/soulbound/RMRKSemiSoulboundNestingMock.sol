@@ -6,8 +6,7 @@ import "../../../RMRK/extension/soulbound/RMRKSoulbound.sol";
 import "../../RMRKNestingMock.sol";
 
 contract RMRKSemiSoulboundNestingMock is RMRKSoulbound, RMRKNestingMock {
-
-    mapping(uint256=>bool) soulboundExempt;
+    mapping(uint256 => bool) soulboundExempt;
 
     constructor(string memory name, string memory symbol)
         RMRKNestingMock(name, symbol)
@@ -20,7 +19,8 @@ contract RMRKSemiSoulboundNestingMock is RMRKSoulbound, RMRKNestingMock {
         override(RMRKSoulbound, RMRKNesting)
         returns (bool)
     {
-        return RMRKSoulbound.supportsInterface(interfaceId) ||
+        return
+            RMRKSoulbound.supportsInterface(interfaceId) ||
             super.supportsInterface(interfaceId);
     }
 
@@ -33,7 +33,7 @@ contract RMRKSemiSoulboundNestingMock is RMRKSoulbound, RMRKNestingMock {
     }
 
     // This shows how the method can be overwritten for custom soulbound logic
-    function isSoulbound(uint256 tokenId) public view override returns(bool) {
+    function isSoulbound(uint256 tokenId) public view override returns (bool) {
         return !soulboundExempt[tokenId];
     }
 

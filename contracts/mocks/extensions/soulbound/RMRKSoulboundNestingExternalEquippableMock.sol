@@ -5,11 +5,14 @@ pragma solidity ^0.8.15;
 import "../../../RMRK/extension/soulbound/RMRKSoulbound.sol";
 import "../../RMRKNestingExternalEquipMock.sol";
 
-contract RMRKSoulboundNestingExternalEquippableMock is RMRKSoulbound, RMRKNestingExternalEquipMock {
+contract RMRKSoulboundNestingExternalEquippableMock is
+    RMRKSoulbound,
+    RMRKNestingExternalEquipMock
+{
     constructor(string memory name, string memory symbol)
         RMRKNestingExternalEquipMock(name, symbol)
     {}
-    
+
     function supportsInterface(bytes4 interfaceId)
         public
         view
@@ -17,7 +20,8 @@ contract RMRKSoulboundNestingExternalEquippableMock is RMRKSoulbound, RMRKNestin
         override(RMRKSoulbound, RMRKNestingExternalEquip)
         returns (bool)
     {
-        return RMRKSoulbound.supportsInterface(interfaceId) ||
+        return
+            RMRKSoulbound.supportsInterface(interfaceId) ||
             super.supportsInterface(interfaceId);
     }
 

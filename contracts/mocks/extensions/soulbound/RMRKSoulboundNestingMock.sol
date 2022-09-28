@@ -17,7 +17,8 @@ contract RMRKSoulboundNestingMock is RMRKSoulbound, RMRKNestingMock {
         override(RMRKSoulbound, RMRKNesting)
         returns (bool)
     {
-        return RMRKSoulbound.supportsInterface(interfaceId) ||
+        return
+            RMRKSoulbound.supportsInterface(interfaceId) ||
             super.supportsInterface(interfaceId);
     }
 

@@ -5,7 +5,6 @@ pragma solidity ^0.8.15;
 import "../../../RMRK/extension/soulbound/RMRKSoulbound.sol";
 import "../../RMRKMultiResourceMock.sol";
 
-
 contract RMRKSoulboundMultiResourceMock is
     RMRKSoulbound,
     RMRKMultiResourceMock
@@ -21,7 +20,8 @@ contract RMRKSoulboundMultiResourceMock is
         override(RMRKSoulbound, RMRKMultiResource)
         returns (bool)
     {
-        return RMRKSoulbound.supportsInterface(interfaceId) ||
+        return
+            RMRKSoulbound.supportsInterface(interfaceId) ||
             super.supportsInterface(interfaceId);
     }
 

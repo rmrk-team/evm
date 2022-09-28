@@ -18,7 +18,8 @@ contract RMRKSoulboundEquippableMock is RMRKSoulbound, RMRKEquippableMock {
         override(RMRKSoulbound, RMRKEquippable)
         returns (bool)
     {
-        return RMRKSoulbound.supportsInterface(interfaceId) ||
+        return
+            RMRKSoulbound.supportsInterface(interfaceId) ||
             super.supportsInterface(interfaceId);
     }
 

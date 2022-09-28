@@ -20,7 +20,8 @@ contract RMRKSoulboundNestingMultiResourceMock is
         override(RMRKSoulbound, RMRKNestingMultiResource)
         returns (bool)
     {
-        return RMRKSoulbound.supportsInterface(interfaceId) ||
+        return
+            RMRKSoulbound.supportsInterface(interfaceId) ||
             super.supportsInterface(interfaceId);
     }
 

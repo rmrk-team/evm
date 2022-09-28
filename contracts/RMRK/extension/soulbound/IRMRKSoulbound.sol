@@ -8,8 +8,5 @@ interface IRMRKSoulbound is IERC165 {
     /**
      * @notice Returns whether or not the token is soulbound
      */
-    function isSoulbound(uint256 tokenId)
-        external
-        view
-        returns (bool);
+    function isSoulbound(uint256 tokenId) external view returns (bool);
 }

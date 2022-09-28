@@ -22,7 +22,7 @@ abstract contract RMRKSoulbound is IRMRKSoulbound, RMRKCore {
         super._beforeTokenTransfer(from, to, tokenId);
     }
 
-    function isSoulbound(uint256) public virtual view returns (bool) {
+    function isSoulbound(uint256) public view virtual returns (bool) {
         return true;
     }
 
