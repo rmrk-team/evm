@@ -12,18 +12,6 @@ contract RMRKEquippableMock is RMRKEquippable {
         RMRKEquippable(name, symbol)
     {}
 
-    function safeMint(address to, uint256 tokenId) public {
-        _safeMint(to, tokenId);
-    }
-
-    function safeMint(
-        address to,
-        uint256 tokenId,
-        bytes memory _data
-    ) public {
-        _safeMint(to, tokenId, _data);
-    }
-
     function mint(address to, uint256 tokenId) external {
         _mint(to, tokenId);
     }
