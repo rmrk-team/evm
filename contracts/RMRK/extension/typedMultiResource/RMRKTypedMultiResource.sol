@@ -2,25 +2,30 @@
 
 pragma solidity ^0.8.15;
 
-import "../../multiresource/RMRKMultiResource.sol";
-import "./RMRKTypedMultiResourceAbstract.sol";
+import "./IRMRKTypedMultiResource.sol";
 
-abstract contract RMRKTypedMultiResource is
-    RMRKTypedMultiResourceAbstract,
-    RMRKMultiResource
-{
-    /**
-     * @dev See {IERC165-supportsInterface}.
-     */
+abstract contract RMRKTypedMultiResource is IRMRKTypedMultiResource {
+    mapping(uint64 => string) private _resourceTypes;
+
     function supportsInterface(bytes4 interfaceId)
         public
         view
         virtual
-        override(IERC165, RMRKMultiResource)
         returns (bool)
     {
-        return
-            RMRKMultiResource.supportsInterface(interfaceId) ||
-            interfaceId == type(IRMRKTypedMultiResource).interfaceId;
+        return interfaceId == type(IRMRKTypedMultiResource).interfaceId ||
+            interfaceId == type(IRMRKMultiResource).interfaceId;
+    }
+
+    function getResourceType(uint64 resourceId)
+        public
+        view
+        returns (string memory)
+    {
+        return _resourceTypes[resourceId];
+    }
+
+    function _setResourceType(uint64 resourceId, string memory type_) internal {
+        _resourceTypes[resourceId] = type_;
     }
 }
