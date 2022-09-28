@@ -104,200 +104,6 @@ describe('RMRKSoulboundNestingExternalEquippableMock', async function () {
   shouldBehaveLikeSoulboundNesting();
 });
 
-// describe('RMRKNestingSoulboundMultiResourceMock', async function () {
-//   let soulboundNestingMultiResource: Contract;
-//   let owner: SignerWithAddress;
-//   let tokenId: number;
-
-//   beforeEach(async function () {
-//     ({ soulboundNestingMultiResource } = await loadFixture(nestingSoulboundMultiResourceFixture));
-
-//     const signers = await ethers.getSigners();
-//     owner = signers[0];
-
-//     tokenId = await mintFromMock(soulboundNestingMultiResource, owner.address);
-//   });
-
-//   it('can support IERC165', async function () {
-//     expect(await soulboundNestingMultiResource.supportsInterface('0x01ffc9a7')).to.equal(true);
-//   });
-
-//   it('can support IMultiResource', async function () {
-//     expect(await soulboundNestingMultiResource.supportsInterface('0xc65a6425')).to.equal(true);
-//   });
-
-//   it('can support INesting', async function () {
-//     expect(await soulboundNestingMultiResource.supportsInterface('0xf790390a')).to.equal(true);
-//   });
-
-//   it('can support IRMRKSoulboundMultiResource', async function () {
-//     expect(await soulboundNestingMultiResource.supportsInterface('0xb6a3032e')).to.equal(true);
-//   });
-
-//   it('does not support other interfaces', async function () {
-//     expect(await soulboundNestingMultiResource.supportsInterface('0xffffffff')).to.equal(false);
-//   });
-
-//   it('can add soulbound resources', async function () {
-//     const resId = bn(1);
-//     await soulboundNestingMultiResource.addSoulboundResourceEntry(resId, 'ipfs://res1.jpg', 'image/jpeg');
-//     expect(await soulboundNestingMultiResource.getResourceType(resId)).to.eql('image/jpeg');
-//   });
-
-//   it('can add soulbound resources to tokens', async function () {
-//     const resId = bn(1);
-//     await soulboundNestingMultiResource.addSoulboundResourceEntry(resId, 'ipfs://res1.jpg', 'image/jpeg');
-//     await soulboundNestingMultiResource.addResourceToToken(tokenId, resId, 0);
-
-//     expect(await soulboundNestingMultiResource.getPendingResources(tokenId)).to.eql([resId]);
-//   });
-// });
-
-// describe('RMRKSoulboundEquippableMock', async function () {
-//   let soulboundEquippable: Contract;
-//   let owner: SignerWithAddress;
-//   let tokenId: number;
-
-//   beforeEach(async function () {
-//     ({ soulboundEquippable } = await loadFixture(soulboundEquippableFixture));
-
-//     const signers = await ethers.getSigners();
-//     owner = signers[0];
-
-//     tokenId = await mintFromMock(soulboundEquippable, owner.address);
-//   });
-
-//   it('can support IERC165', async function () {
-//     expect(await soulboundEquippable.supportsInterface('0x01ffc9a7')).to.equal(true);
-//   });
-
-//   it('can support IMultiResource', async function () {
-//     expect(await soulboundEquippable.supportsInterface('0xc65a6425')).to.equal(true);
-//   });
-
-//   it('can support INesting', async function () {
-//     expect(await soulboundEquippable.supportsInterface('0xf790390a')).to.equal(true);
-//   });
-
-//   it('can support IEquippable', async function () {
-//     expect(await soulboundEquippable.supportsInterface('0xd3a28ca0')).to.equal(true);
-//   });
-
-//   it('can support IRMRKSoulboundMultiResource', async function () {
-//     expect(await soulboundEquippable.supportsInterface('0xb6a3032e')).to.equal(true);
-//   });
-
-//   it('does not support other interfaces', async function () {
-//     expect(await soulboundEquippable.supportsInterface('0xffffffff')).to.equal(false);
-//   });
-
-//   it('can add soulbound resources', async function () {
-//     const resId = bn(1);
-//     await soulboundEquippable.addSoulboundResourceEntry(
-//       {
-//         id: resId,
-//         equippableRefId: 0,
-//         metadataURI: 'fallback.json',
-//         baseAddress: ethers.constants.AddressZero,
-//       },
-//       [],
-//       [],
-//       'image/jpeg',
-//     );
-//     expect(await soulboundEquippable.getResourceType(resId)).to.eql('image/jpeg');
-//   });
-
-//   it('can add soulbound resources to tokens', async function () {
-//     const resId = bn(1);
-//     await soulboundEquippable.addSoulboundResourceEntry(
-//       {
-//         id: resId,
-//         equippableRefId: 0,
-//         metadataURI: 'fallback.json',
-//         baseAddress: ethers.constants.AddressZero,
-//       },
-//       [],
-//       [],
-//       'image/jpeg',
-//     );
-//     await soulboundEquippable.addResourceToToken(tokenId, resId, 0);
-//     expect(await soulboundEquippable.getPendingResources(tokenId)).to.eql([resId]);
-//   });
-// });
-
-// describe('RMRKSoulboundExternalEquippableMock', async function () {
-//   let soulboundExternalEquippable: Contract;
-//   let nesting: Contract;
-//   let owner: SignerWithAddress;
-//   let tokenId: number;
-
-//   beforeEach(async function () {
-//     ({ nesting, soulboundExternalEquippable } = await loadFixture(soulboundExternalEquippableFixture));
-
-//     const signers = await ethers.getSigners();
-//     owner = signers[0];
-
-//     tokenId = await mintFromMock(nesting, owner.address);
-//   });
-
-//   it('can support IERC165', async function () {
-//     expect(await soulboundExternalEquippable.supportsInterface('0x01ffc9a7')).to.equal(true);
-//   });
-
-//   it('can support IMultiResource', async function () {
-//     expect(await soulboundExternalEquippable.supportsInterface('0xc65a6425')).to.equal(true);
-//   });
-
-//   it('can support IEquippable', async function () {
-//     expect(await soulboundExternalEquippable.supportsInterface('0xd3a28ca0')).to.equal(true);
-//   });
-
-//   it('can support IExternalEquip', async function () {
-//     expect(await soulboundExternalEquippable.supportsInterface('0xe5383e6c')).to.equal(true);
-//   });
-
-//   it('can support IRMRKSoulboundMultiResource', async function () {
-//     expect(await soulboundExternalEquippable.supportsInterface('0xb6a3032e')).to.equal(true);
-//   });
-
-//   it('does not support other interfaces', async function () {
-//     expect(await soulboundExternalEquippable.supportsInterface('0xffffffff')).to.equal(false);
-//   });
-
-//   it('can add soulbound resources', async function () {
-//     const resId = bn(1);
-//     await soulboundExternalEquippable.addSoulboundResourceEntry(
-//       {
-//         id: resId,
-//         equippableRefId: 0,
-//         metadataURI: 'fallback.json',
-//         baseAddress: ethers.constants.AddressZero,
-//       },
-//       [],
-//       [],
-//       'image/jpeg',
-//     );
-//     expect(await soulboundExternalEquippable.getResourceType(resId)).to.eql('image/jpeg');
-//   });
-
-//   it('can add soulbound resources to tokens', async function () {
-//     const resId = bn(1);
-//     await soulboundExternalEquippable.addSoulboundResourceEntry(
-//       {
-//         id: resId,
-//         equippableRefId: 0,
-//         metadataURI: 'fallback.json',
-//         baseAddress: ethers.constants.AddressZero,
-//       },
-//       [],
-//       [],
-//       'image/jpeg',
-//     );
-//     await soulboundExternalEquippable.addResourceToToken(tokenId, resId, 0);
-//     expect(await soulboundExternalEquippable.getPendingResources(tokenId)).to.eql([resId]);
-//   });
-// });
-
 async function shouldBehaveLikeSoulboundBasic() {
   let soulbound: Contract;
   let owner: SignerWithAddress;
@@ -330,6 +136,14 @@ async function shouldBehaveLikeSoulboundBasic() {
       soulbound.connect(owner).transfer(otherOwner.address, tokenId),
     ).to.be.revertedWithCustomError(soulbound, 'RMRKCannotTransferSoulbound');
   });
+
+  it('can burn', async function () {
+    await soulbound.connect(owner).burn(tokenId);
+    await expect(soulbound.ownerOf(tokenId)).to.be.revertedWithCustomError(
+      soulbound,
+      'ERC721InvalidTokenId',
+    );
+  });
 }
 
 async function shouldBehaveLikeSoulboundNesting() {
@@ -358,7 +172,7 @@ async function shouldBehaveLikeSoulboundNesting() {
     await nestMintFromMock(soulbound, soulbound.address, tokenId);
     await soulbound.connect(owner).acceptChild(tokenId, 0);
     expect(
-      soulbound.connect(owner).unnestChild(tokenId, 0, owner.address)
+      soulbound.connect(owner).unnestChild(tokenId, 0, owner.address),
     ).to.be.revertedWithCustomError(soulbound, 'RMRKCannotTransferSoulbound');
   });
 }
