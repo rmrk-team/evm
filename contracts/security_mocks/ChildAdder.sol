@@ -15,16 +15,4 @@ contract ChildAdder {
             IRMRKNesting(destContract).addChild(parentId, childId);
         }
     }
-
-    function rmrkOwnerOf(uint256)
-        external
-        view
-        returns (
-            address,
-            uint256,
-            bool
-        )
-    {
-        return (msg.sender, 1, true);
-    }
 }
