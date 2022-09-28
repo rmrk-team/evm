@@ -10,7 +10,11 @@ import "../RMRK/utils/RMRKMintingUtils.sol";
 error RMRKMintUnderpriced();
 error RMRKMintZero();
 
-contract RMRKEquippableImpl is RMRKMintingUtils, RMRKCollectionMetadata, RMRKEquippable {
+contract RMRKEquippableImpl is
+    RMRKMintingUtils,
+    RMRKCollectionMetadata,
+    RMRKEquippable
+{
     string private _tokenURI;
 
     constructor(

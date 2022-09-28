@@ -53,7 +53,7 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
     using Address for address;
     using Strings for uint256;
 
-    uint private constant _MAX_LEVELS_TO_CHECK_FOR_INHERITANCE_LOOP = 100;
+    uint256 private constant _MAX_LEVELS_TO_CHECK_FOR_INHERITANCE_LOOP = 100;
 
     // Mapping from token ID to owner address
     mapping(uint256 => address) private _owners;
@@ -303,9 +303,11 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         uint256 targetId
     ) private view {
         for (uint256 i; i < _MAX_LEVELS_TO_CHECK_FOR_INHERITANCE_LOOP; ) {
-            (address nextOwner, uint256 nextOwnerTokenId, bool isNft) = IRMRKNesting(targetContract).rmrkOwnerOf(
-                targetId
-            );
+            (
+                address nextOwner,
+                uint256 nextOwnerTokenId,
+                bool isNft
+            ) = IRMRKNesting(targetContract).rmrkOwnerOf(targetId);
             // If there's a final address, we're good. There's no loop.
             if (!isNft) {
                 return;

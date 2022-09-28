@@ -10,7 +10,11 @@ error RMRKMintUnderpriced();
 error RMRKMintZero();
 
 //Minimal public implementation of IRMRKNesting for testing.
-contract RMRKNestingImpl is RMRKMintingUtils, RMRKCollectionMetadata, RMRKNesting {
+contract RMRKNestingImpl is
+    RMRKMintingUtils,
+    RMRKCollectionMetadata,
+    RMRKNesting
+{
     // Manage resources via increment
     uint256 private _totalResources;
     string private _tokenURI;
@@ -25,7 +29,8 @@ contract RMRKNestingImpl is RMRKMintingUtils, RMRKCollectionMetadata, RMRKNestin
     )
         RMRKNesting(name_, symbol_)
         RMRKMintingUtils(maxSupply_, pricePerMint_)
-        RMRKCollectionMetadata(collectionMetadata_){
+        RMRKCollectionMetadata(collectionMetadata_)
+    {
         _tokenURI = tokenURI_;
     }
 
