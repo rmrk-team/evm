@@ -2,14 +2,14 @@
 
 pragma solidity ^0.8.15;
 
-import "../../../RMRK/extension/typedMultiResource/RMRKTypedExternalEquippable.sol";
+import "../../../RMRK/extension/typedMultiResource/RMRKTypedMultiResource.sol";
 import "../../RMRKExternalEquipMock.sol";
 
 error RMRKTokenHasNoResourcesWithType();
 
-abstract contract RMRKTypedExternalEquippableMock is
+contract RMRKTypedExternalEquippableMock is
     RMRKExternalEquipMock,
-    RMRKTypedExternalEquippable
+    RMRKTypedMultiResource
 {
     constructor(address nestingAddress) RMRKExternalEquipMock(nestingAddress) {}
 
@@ -17,10 +17,12 @@ abstract contract RMRKTypedExternalEquippableMock is
         public
         view
         virtual
-        override(RMRKExternalEquip, RMRKTypedExternalEquippable)
+        override(RMRKExternalEquip, RMRKTypedMultiResource)
         returns (bool)
     {
-        return super.supportsInterface(interfaceId);
+        return
+            RMRKTypedMultiResource.supportsInterface(interfaceId) ||
+            RMRKExternalEquip.supportsInterface(interfaceId);
     }
 
     function addTypedResourceEntry(

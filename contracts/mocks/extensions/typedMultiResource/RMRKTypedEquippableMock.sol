@@ -2,15 +2,12 @@
 
 pragma solidity ^0.8.15;
 
-import "../../../RMRK/extension/typedMultiResource/RMRKTypedEquippable.sol";
+import "../../../RMRK/extension/typedMultiResource/RMRKTypedMultiResource.sol";
 import "../../RMRKEquippableMock.sol";
 
 error RMRKTokenHasNoResourcesWithType();
 
-abstract contract RMRKTypedEquippableMock is
-    RMRKEquippableMock,
-    RMRKTypedEquippable
-{
+contract RMRKTypedEquippableMock is RMRKEquippableMock, RMRKTypedMultiResource {
     constructor(string memory name, string memory symbol)
         RMRKEquippableMock(name, symbol)
     {}
@@ -19,10 +16,12 @@ abstract contract RMRKTypedEquippableMock is
         public
         view
         virtual
-        override(RMRKEquippable, RMRKTypedEquippable)
+        override(RMRKEquippable, RMRKTypedMultiResource)
         returns (bool)
     {
-        return super.supportsInterface(interfaceId);
+        return
+            RMRKTypedMultiResource.supportsInterface(interfaceId) ||
+            RMRKEquippable.supportsInterface(interfaceId);
     }
 
     function addTypedResourceEntry(

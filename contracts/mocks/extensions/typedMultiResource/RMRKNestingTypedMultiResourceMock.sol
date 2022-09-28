@@ -2,14 +2,14 @@
 
 pragma solidity ^0.8.15;
 
-import "../../../RMRK/extension/typedMultiResource/RMRKNestingTypedMultiResource.sol";
+import "../../../RMRK/extension/typedMultiResource/RMRKTypedMultiResource.sol";
 import "../../RMRKNestingMultiResourceMock.sol";
 
 error RMRKTokenHasNoResourcesWithType();
 
 contract RMRKNestingTypedMultiResourceMock is
     RMRKNestingMultiResourceMock,
-    RMRKNestingTypedMultiResource
+    RMRKTypedMultiResource
 {
     constructor(string memory name, string memory symbol)
         RMRKNestingMultiResourceMock(name, symbol)
@@ -19,10 +19,12 @@ contract RMRKNestingTypedMultiResourceMock is
         public
         view
         virtual
-        override(RMRKNestingMultiResource, RMRKNestingTypedMultiResource)
+        override(RMRKNestingMultiResource, RMRKTypedMultiResource)
         returns (bool)
     {
-        return super.supportsInterface(interfaceId);
+        return
+            RMRKTypedMultiResource.supportsInterface(interfaceId) ||
+            RMRKNestingMultiResource.supportsInterface(interfaceId);
     }
 
     function addTypedResourceEntry(

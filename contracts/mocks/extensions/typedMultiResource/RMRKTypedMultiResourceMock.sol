@@ -24,7 +24,9 @@ contract RMRKTypedMultiResourceMock is
         override(RMRKMultiResource, RMRKTypedMultiResource)
         returns (bool)
     {
-        return super.supportsInterface(interfaceId);
+        return
+            RMRKTypedMultiResource.supportsInterface(interfaceId) ||
+            RMRKMultiResource.supportsInterface(interfaceId);
     }
 
     function addTypedResourceEntry(
