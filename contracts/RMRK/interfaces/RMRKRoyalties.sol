@@ -1,11 +1,13 @@
+// SPDX-License-Identifier: Apache-2.0
+
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/interfaces/IERC2981.sol";
 
 abstract contract RMRKRoyalties is IERC2981 {
     //@notice Royalty details
-    address _royaltyRecipient;
-    uint256 _royaltyPercentageBps;
+    address private _royaltyRecipient;
+    uint256 private _royaltyPercentageBps;
 
     constructor(
         address royaltyRecipient,
