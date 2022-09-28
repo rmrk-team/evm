@@ -5,14 +5,10 @@ pragma solidity ^0.8.15;
 import "../../nesting/RMRKNestingMultiResource.sol";
 import "./RMRKTypedMultiResourceAbstract.sol";
 
-contract RMRKNestingTypedMultiResource is
+abstract contract RMRKNestingTypedMultiResource is
     RMRKTypedMultiResourceAbstract,
     RMRKNestingMultiResource
 {
-    constructor(string memory name, string memory symbol)
-        RMRKNestingMultiResource(name, symbol)
-    {}
-
     /**
      * @dev See {IERC165-supportsInterface}.
      */

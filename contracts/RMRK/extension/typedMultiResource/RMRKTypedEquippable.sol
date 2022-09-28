@@ -5,11 +5,10 @@ pragma solidity ^0.8.15;
 import "../../equippable/RMRKEquippable.sol";
 import "./RMRKTypedMultiResourceAbstract.sol";
 
-contract RMRKTypedEquippable is RMRKTypedMultiResourceAbstract, RMRKEquippable {
-    constructor(string memory name, string memory symbol)
-        RMRKEquippable(name, symbol)
-    {}
-
+abstract contract RMRKTypedEquippable is
+    RMRKTypedMultiResourceAbstract,
+    RMRKEquippable
+{
     /**
      * @dev See {IERC165-supportsInterface}.
      */

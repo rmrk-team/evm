@@ -5,14 +5,10 @@ pragma solidity ^0.8.15;
 import "../../multiresource/RMRKMultiResource.sol";
 import "./RMRKTypedMultiResourceAbstract.sol";
 
-contract RMRKTypedMultiResource is
+abstract contract RMRKTypedMultiResource is
     RMRKTypedMultiResourceAbstract,
     RMRKMultiResource
 {
-    constructor(string memory name, string memory symbol)
-        RMRKMultiResource(name, symbol)
-    {}
-
     /**
      * @dev See {IERC165-supportsInterface}.
      */

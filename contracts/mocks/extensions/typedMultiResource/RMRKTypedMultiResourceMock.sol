@@ -2,28 +2,29 @@
 
 pragma solidity ^0.8.15;
 
-import "../../RMRK/extension/typedMultiResource/RMRKTypedMultiResource.sol";
+import "../../../RMRK/extension/typedMultiResource/RMRKTypedMultiResource.sol";
+import "../../RMRKMultiResourceMock.sol";
 
 error RMRKTokenHasNoResourcesWithType();
 
-contract RMRKTypedMultiResourceMock is RMRKTypedMultiResource {
+contract RMRKTypedMultiResourceMock is
+    RMRKMultiResourceMock,
+    RMRKTypedMultiResource
+{
     uint16 private constant _LOWEST_POSSIBLE_PRIORITY = 2**16 - 1;
 
     constructor(string memory name, string memory symbol)
-        RMRKTypedMultiResource(name, symbol)
+        RMRKMultiResourceMock(name, symbol)
     {}
 
-    function mint(address to, uint256 tokenId) external {
-        _mint(to, tokenId);
-    }
-
-    function addResourceToToken(
-        uint256 tokenId,
-        uint64 resourceId,
-        uint64 overwrites
-    ) external {
-        _requireMinted(tokenId);
-        _addResourceToToken(tokenId, resourceId, overwrites);
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        virtual
+        override(RMRKMultiResource, RMRKTypedMultiResource)
+        returns (bool)
+    {
+        return super.supportsInterface(interfaceId);
     }
 
     function addTypedResourceEntry(

@@ -5,12 +5,10 @@ pragma solidity ^0.8.15;
 import "../../equippable/RMRKExternalEquip.sol";
 import "./RMRKTypedMultiResourceAbstract.sol";
 
-contract RMRKTypedExternalEquippable is
+abstract contract RMRKTypedExternalEquippable is
     RMRKTypedMultiResourceAbstract,
     RMRKExternalEquip
 {
-    constructor(address nestingAddress) RMRKExternalEquip(nestingAddress) {}
-
     /**
      * @dev See {IERC165-supportsInterface}.
      */
