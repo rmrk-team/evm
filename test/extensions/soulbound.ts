@@ -3,7 +3,7 @@ import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { mintFromMock, nestMintFromMock } from '../utils';
+import { bn, mintFromMock, nestMintFromMock } from '../utils';
 
 // --------------- FIXTURES -----------------------
 
@@ -104,6 +104,48 @@ describe('RMRKSoulboundNestingExternalEquippableMock', async function () {
   shouldBehaveLikeSoulboundNesting();
 });
 
+describe('RMRKSoulbound exempt', async function () {
+  let token: Contract;
+  let owner: SignerWithAddress;
+  let otherOwner: SignerWithAddress;
+
+  beforeEach(async function () {
+    const signers = await ethers.getSigners();
+    owner = signers[0];
+    otherOwner = signers[1];
+    const factory = await ethers.getContractFactory('RMRKSemiSoulboundNestingMock');
+    token = await factory.deploy('Chunky', 'CHNK');
+    await token.deployed();
+  });
+
+  it('can transfer if soulbound exempt', async function () {
+    const tokenId = await mintFromMock(token, owner.address);
+    await token.setSoulboundExempt(tokenId);
+
+    await token.transfer(otherOwner.address, tokenId);
+    expect(await token.ownerOf(tokenId)).eql(otherOwner.address);
+  });
+
+  it('can nest transfer if soulbound exempt', async function () {
+    const tokenId = await mintFromMock(token, owner.address);
+    const otherTokenId = await mintFromMock(token, owner.address);
+    await token.setSoulboundExempt(tokenId);
+
+    await token.connect(owner).nestTransfer(token.address, tokenId, otherTokenId);
+    expect(await token.rmrkOwnerOf(tokenId)).eql([token.address, bn(otherTokenId), true]);
+  });
+
+  it('can unnest child if soulbound exempt', async function () {
+    const tokenId = await mintFromMock(token, owner.address);
+    const otherTokenId = await nestMintFromMock(token, token.address, tokenId);
+    await token.connect(owner).acceptChild(tokenId, 0);
+    await token.setSoulboundExempt(otherTokenId);
+
+    await token.connect(owner).unnestChild(tokenId, 0, owner.address);
+    expect(await token.rmrkOwnerOf(otherTokenId)).eql([owner.address, bn(0), false]);
+  });
+});
+
 async function shouldBehaveLikeSoulboundBasic() {
   let soulbound: Contract;
   let owner: SignerWithAddress;
@@ -149,13 +191,11 @@ async function shouldBehaveLikeSoulboundBasic() {
 async function shouldBehaveLikeSoulboundNesting() {
   let soulbound: Contract;
   let owner: SignerWithAddress;
-  let otherOwner: SignerWithAddress;
   let tokenId: number;
 
   beforeEach(async function () {
     const signers = await ethers.getSigners();
     owner = signers[0];
-    otherOwner = signers[1];
     soulbound = this.token;
 
     tokenId = await mintFromMock(soulbound, owner.address);
@@ -164,11 +204,11 @@ async function shouldBehaveLikeSoulboundNesting() {
   it('cannot nest transfer', async function () {
     const otherTokenId = await mintFromMock(soulbound, owner.address);
     expect(
-      soulbound.connect(owner).nestTransfer(otherOwner.address, tokenId, otherTokenId),
+      soulbound.connect(owner).nestTransfer(soulbound.address, tokenId, otherTokenId),
     ).to.be.revertedWithCustomError(soulbound, 'RMRKCannotTransferSoulbound');
   });
 
-  it('cannot unnest transfer', async function () {
+  it('cannot unnest', async function () {
     await nestMintFromMock(soulbound, soulbound.address, tokenId);
     await soulbound.connect(owner).acceptChild(tokenId, 0);
     expect(
