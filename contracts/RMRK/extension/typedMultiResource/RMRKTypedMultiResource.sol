@@ -4,7 +4,7 @@ pragma solidity ^0.8.15;
 
 import "./IRMRKTypedMultiResource.sol";
 
-abstract contract RMRKTypedMultiResource is IRMRKTypedMultiResource {
+contract RMRKTypedMultiResource is IRMRKTypedMultiResource {
     mapping(uint64 => string) private _resourceTypes;
 
     function supportsInterface(bytes4 interfaceId)
@@ -13,8 +13,7 @@ abstract contract RMRKTypedMultiResource is IRMRKTypedMultiResource {
         virtual
         returns (bool)
     {
-        return interfaceId == type(IRMRKTypedMultiResource).interfaceId ||
-            interfaceId == type(IRMRKMultiResource).interfaceId;
+        return interfaceId == type(IRMRKTypedMultiResource).interfaceId;
     }
 
     function getResourceType(uint64 resourceId)
