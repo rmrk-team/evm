@@ -29,7 +29,7 @@ error ERC721TransferFromIncorrectOwner();
 error ERC721TransferToNonReceiverImplementer();
 error ERC721TransferToTheZeroAddress();
 error RMRKCannotBurnGuestNestedNFT();
-error RMRKCanOnlyUnnestToGuestOwnerOrGuestOwner();
+error RMRKCanOnlyUnnestToGuestOwnerOrZeroAddress();
 error RMRKChildAlreadyExists();
 error RMRKChildIndexOutOfRange();
 error RMRKInvalidChildReclaim();
@@ -722,43 +722,6 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         }
     }
 
-    /**
-     * @dev Hook that is called before any token transfer. This includes minting
-     * and burning.
-     *
-     * Calling conditions:
-     *
-     * - When `from` and `to` are both non-zero, ``from``'s `tokenId` will be
-     * transferred to `to`.
-     * - When `from` is zero, `tokenId` will be minted for `to`.
-     * - When `to` is zero, ``from``'s `tokenId` will be burned.
-     * - `from` and `to` are never both zero.
-     *
-     * To learn more about hooks, head to xref:ROOT:extending-contracts.adoc#using-hooks[Using Hooks].
-     */
-    function _beforeTokenTransfer(
-        address from,
-        address to,
-        uint256 tokenId
-    ) internal virtual {}
-
-    /**
-     * @dev Hook that is called after any transfer of tokens. This includes
-     * minting and burning.
-     *
-     * Calling conditions:
-     *
-     * - when `from` and `to` are both non-zero.
-     * - `from` and `to` are never both zero.
-     *
-     * To learn more about hooks, head to xref:ROOT:extending-contracts.adoc#using-hooks[Using Hooks].
-     */
-    function _afterTokenTransfer(
-        address from,
-        address to,
-        uint256 tokenId
-    ) internal virtual {}
-
     ////////////////////////////////////////
     //      CHILD MANAGEMENT PUBLIC
     ////////////////////////////////////////
@@ -904,7 +867,7 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
                 to != guestOwner &&
                 to != address(0)
             ) {
-                revert RMRKCanOnlyUnnestToGuestOwnerOrGuestOwner();
+                revert RMRKCanOnlyUnnestToGuestOwnerOrZeroAddress();
             }
             // When abandoning, we still need the guest owner to be able to claim it back
             if (to != address(0)) {
