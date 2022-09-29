@@ -53,8 +53,11 @@ async function nestTransfer(
   to: string,
   tokenId: number,
   parentId: number,
+  asGuest: boolean,
 ): Promise<void> {
-  await token.connect(caller)['nestTransfer(address,uint256,uint256)'](to, tokenId, parentId);
+  await token
+    .connect(caller)
+    ['nestTransfer(address,uint256,uint256,bool)'](to, tokenId, parentId, asGuest);
 }
 
 async function addResourceToToken(

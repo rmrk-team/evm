@@ -12,7 +12,7 @@ contract ChildAdder {
         uint256 numChildren
     ) external {
         for (uint256 i; i < numChildren; i++) {
-            IRMRKNesting(destContract).addChild(parentId, childId);
+            IRMRKNesting(destContract).addChild(parentId, childId, address(0));
         }
     }
 }

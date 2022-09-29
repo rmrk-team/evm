@@ -109,9 +109,10 @@ contract RMRKNestingMultiResourceImpl is
     function nestTransfer(
         address to,
         uint256 tokenId,
-        uint256 destinationId
+        uint256 destinationId,
+        bool asGuest
     ) public virtual {
-        nestTransferFrom(_msgSender(), to, tokenId, destinationId);
+        nestTransferFrom(_msgSender(), to, tokenId, destinationId, asGuest);
     }
 
     function tokenURI(uint256) public view override returns (string memory) {

@@ -33,9 +33,10 @@ contract RMRKEquippableMock is RMRKEquippable {
     function nestTransfer(
         address to,
         uint256 tokenId,
-        uint256 destinationId
+        uint256 destinationId,
+        bool asGuest
     ) public virtual {
-        nestTransferFrom(_msgSender(), to, tokenId, destinationId);
+        nestTransferFrom(_msgSender(), to, tokenId, destinationId, asGuest);
     }
 
     function addResourceToToken(

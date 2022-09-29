@@ -28,7 +28,11 @@ error ERC721TokenAlreadyMinted();
 error ERC721TransferFromIncorrectOwner();
 error ERC721TransferToNonReceiverImplementer();
 error ERC721TransferToTheZeroAddress();
+error RMRKCannotBurnGuestNestedNFT();
+error RMRKCanOnlyUnnestToGuestOwnerOrGuestOwner();
+error RMRKChildAlreadyExists();
 error RMRKChildIndexOutOfRange();
+error RMRKInvalidChildReclaim();
 error RMRKIsNotContract();
 error RMRKMaxPendingChildrenReached();
 error RMRKMintToNonRMRKImplementer();
@@ -38,8 +42,6 @@ error RMRKNestingTransferToNonRMRKNestingImplementer();
 error RMRKNestingTransferToSelf();
 error RMRKNotApprovedOrDirectOwner();
 error RMRKPendingChildIndexOutOfRange();
-error RMRKInvalidChildReclaim();
-error RMRKChildAlreadyExists();
 
 /**
  * @dev RMRK nesting implementation. This contract is heirarchy agnostic, and can
@@ -73,6 +75,9 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
 
     // Mapping from token ID to RMRKOwner struct
     mapping(uint256 => RMRKOwner) private _RMRKOwners;
+
+    // Mapping from token ID to RMRKOwner struct
+    mapping(address => mapping(uint256 => address)) private _guestOwners;
 
     // Mapping of tokenId to array of active children structs
     mapping(uint256 => Child[]) private _children;
@@ -134,6 +139,7 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         virtual
         returns (bool)
     {
+        // console.logBytes4(type(IRMRKNesting).interfaceId);
         return
             interfaceId == type(IERC165).interfaceId ||
             interfaceId == type(IERC721).interfaceId ||
@@ -191,9 +197,10 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         address from,
         address to,
         uint256 tokenId,
-        uint256 destinationId
+        uint256 destinationId,
+        bool asGuest
     ) public virtual onlyApprovedOrDirectOwner(tokenId) {
-        _nestTransfer(from, to, tokenId, destinationId);
+        _nestTransfer(from, to, tokenId, destinationId, asGuest);
     }
 
     /**
@@ -260,7 +267,8 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         address from,
         address to,
         uint256 tokenId,
-        uint256 destinationId
+        uint256 destinationId,
+        bool asGuest
     ) internal virtual {
         (address immediateOwner, , ) = rmrkOwnerOf(tokenId);
         if (immediateOwner != from) revert ERC721TransferFromIncorrectOwner();
@@ -281,17 +289,20 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         _balances[to] += 1;
 
         // Sending to NFT:
-        _sendToNFT(tokenId, destinationId, from, to);
+        _sendToNFT(tokenId, destinationId, from, to, asGuest);
     }
 
     function _sendToNFT(
         uint256 tokenId,
         uint256 destinationId,
         address from,
-        address to
+        address to,
+        bool asGuest
     ) private {
         IRMRKNesting destContract = IRMRKNesting(to);
-        destContract.addChild(destinationId, tokenId);
+        // TODO: Review this is the right guest owner
+        address guestOwner = asGuest ? from : address(0);
+        destContract.addChild(destinationId, tokenId, guestOwner);
         _afterTokenTransfer(from, to, tokenId);
 
         emit Transfer(from, to, tokenId);
@@ -388,7 +399,7 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
             revert RMRKMintToNonRMRKImplementer();
 
         _innerMint(to, tokenId, destinationId);
-        _sendToNFT(tokenId, destinationId, address(0), to);
+        _sendToNFT(tokenId, destinationId, address(0), to, false);
     }
 
     function _innerMint(
@@ -454,6 +465,14 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         return (owner.ownerAddress, owner.tokenId, owner.isNft);
     }
 
+    function guestOwnerOf(address childAddress, uint256 childId)
+        public
+        view
+        returns (address)
+    {
+        return _guestOwners[childAddress][childId];
+    }
+
     ////////////////////////////////////////
     //              BURNING
     ////////////////////////////////////////
@@ -470,6 +489,9 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
 
     function _burnChild(uint256 tokenId, uint256 index) private {
         Child memory child = _children[tokenId][index];
+        if (guestOwnerOf(child.contractAddress, child.tokenId) != address(0))
+            revert RMRKCannotBurnGuestNestedNFT();
+
         IRMRKNesting(child.contractAddress).burn(child.tokenId);
     }
 
@@ -748,10 +770,11 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
      */
 
     //update for reentrancy
-    function addChild(uint256 parentTokenId, uint256 childTokenId)
-        public
-        virtual
-    {
+    function addChild(
+        uint256 parentTokenId,
+        uint256 childTokenId,
+        address guestOwner
+    ) public virtual {
         _requireMinted(parentTokenId);
 
         if (!_msgSender().isContract()) revert RMRKIsNotContract();
@@ -765,6 +788,7 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
 
         if (length < 128) {
             _pendingChildren[parentTokenId].push(child);
+            _guestOwners[_msgSender()][childTokenId] = guestOwner;
         } else {
             revert RMRKMaxPendingChildrenReached();
         }
@@ -837,28 +861,8 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         uint256 tokenId,
         uint256 index,
         address to
-    ) public virtual onlyApprovedOrOwner(tokenId) {
-        if (_pendingChildren[tokenId].length <= index)
-            revert RMRKPendingChildIndexOutOfRange();
-
-        Child memory pendingChild = _pendingChildren[tokenId][index];
-
-        _removeChildByIndex(_pendingChildren[tokenId], index);
-
-        if (to != address(0)) {
-            IERC721(pendingChild.contractAddress).safeTransferFrom(
-                address(this),
-                to,
-                pendingChild.tokenId
-            );
-        }
-
-        emit ChildRejected(
-            tokenId,
-            pendingChild.contractAddress,
-            pendingChild.tokenId,
-            index
-        );
+    ) public virtual {
+        _unnestChild(tokenId, index, to, true);
     }
 
     /**
@@ -866,18 +870,54 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
      * @param tokenId is the tokenId of the parent token to unnest from.
      * @param index is the index of the child token ID.
      * @param to is the address to transfer this
+     * @param isPending indicates if the child is pending (active otherwise).
      */
     function unnestChild(
         uint256 tokenId,
         uint256 index,
-        address to
-    ) public virtual onlyApprovedOrOwner(tokenId) {
-        if (_children[tokenId].length <= index)
-            revert RMRKChildIndexOutOfRange();
+        address to,
+        bool isPending
+    ) public virtual {
+        _unnestChild(tokenId, index, to, isPending);
+    }
 
-        Child memory child = _children[tokenId][index];
-        delete _posInChildArray[child.contractAddress][child.tokenId];
-        _removeChildByIndex(_children[tokenId], index);
+    function _unnestChild(
+        uint256 tokenId,
+        uint256 index,
+        address to,
+        bool isPending
+    ) internal virtual {
+        bool isApprovedOrOwner = _isApprovedOrOwner(_msgSender(), tokenId);
+        Child memory child = isPending
+            ? pendingChildOf(tokenId, index)
+            : childOf(tokenId, index);
+        address guestOwner = guestOwnerOf(child.contractAddress, child.tokenId);
+
+        if (!isApprovedOrOwner && _msgSender() != guestOwner)
+            revert ERC721NotApprovedOrOwner();
+
+        // If there's a guestOwner, only guestOwner can unnest to a different address.
+        // We still allow owner or approve to unnest to guest owner.
+        if (guestOwner != address(0)) {
+            if (
+                _msgSender() != guestOwner &&
+                to != guestOwner &&
+                to != address(0)
+            ) {
+                revert RMRKCanOnlyUnnestToGuestOwnerOrGuestOwner();
+            }
+            // When abandoning, we still need the guest owner to be able to claim it back
+            if (to != address(0)) {
+                delete _guestOwners[child.contractAddress][child.tokenId];
+            }
+        }
+
+        if (isPending) {
+            _removeChildByIndex(_pendingChildren[tokenId], index);
+        } else {
+            delete _posInChildArray[child.contractAddress][child.tokenId];
+            _removeChildByIndex(_children[tokenId], index);
+        }
 
         if (to != address(0)) {
             IERC721(child.contractAddress).safeTransferFrom(
@@ -887,24 +927,44 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
             );
         }
 
-        emit ChildUnnested(
-            tokenId,
-            child.contractAddress,
-            child.tokenId,
-            index
-        );
+        if (isPending) {
+            emit ChildRejected(
+                tokenId,
+                child.contractAddress,
+                child.tokenId,
+                index
+            );
+        } else {
+            emit ChildUnnested(
+                tokenId,
+                child.contractAddress,
+                child.tokenId,
+                index
+            );
+        }
     }
 
     function reclaimChild(
         uint256 tokenId,
         address childAddress,
         uint256 childTokenId
-    ) public onlyApprovedOrOwner(tokenId) {
+    ) public {
+        address guestOwner = guestOwnerOf(childAddress, childTokenId);
+        // If caller is guest owner we don't check for approval since token might be deleted
+        if (
+            _msgSender() != guestOwner &&
+            !_isApprovedOrOwner(_msgSender(), tokenId)
+        ) revert ERC721NotApprovedOrOwner();
+
         (address owner, uint256 ownerTokenId, bool isNft) = IRMRKNesting(
             childAddress
         ).rmrkOwnerOf(childTokenId);
         if (owner != address(this) || ownerTokenId != tokenId || !isNft)
             revert RMRKInvalidChildReclaim();
+
+        if (guestOwner != address(0))
+            delete _guestOwners[childAddress][childTokenId];
+
         IERC721(childAddress).safeTransferFrom(
             address(this),
             _msgSender(),

@@ -84,6 +84,15 @@ interface IRMRKNesting is IERC165 {
             bool
         );
 
+    /**
+     * @dev Returns the owner of an NFT which is guest nested into a token of this contract.
+     *
+     */
+    function guestOwnerOf(address childAddress, uint256 childId)
+        external
+        view
+        returns (address);
+
     //TODO: Docs
     function burnChild(uint256 tokenId, uint256 childIndex) external;
 
@@ -99,7 +108,11 @@ interface IRMRKNesting is IERC165 {
      * - `ownerOf` on the child contract must resolve to the called contract.
      * - the pending array of the parent contract must not be full.
      */
-    function addChild(uint256 parentTokenId, uint256 childTokenId) external;
+    function addChild(
+        uint256 parentTokenId,
+        uint256 childTokenId,
+        address guestOwner
+    ) external;
 
     /**
      * @dev Function called to accept a pending child. Migrates the child at `index` on `parentTokenId` to
@@ -150,7 +163,8 @@ interface IRMRKNesting is IERC165 {
     function unnestChild(
         uint256 tokenId,
         uint256 index,
-        address to
+        address to,
+        bool isPending
     ) external;
 
     /**
@@ -214,6 +228,7 @@ interface IRMRKNesting is IERC165 {
         address from,
         address to,
         uint256 tokenId,
-        uint256 destinationId
+        uint256 destinationId,
+        bool asGuest
     ) external;
 }
