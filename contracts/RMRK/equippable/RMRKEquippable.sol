@@ -217,7 +217,7 @@ contract RMRKEquippable is RMRKNesting, AbstractMultiResource, IRMRKEquippable {
         Child memory child = childOf(tokenId, index);
         if (isChildEquipped(tokenId, child.contractAddress, child.tokenId))
             revert RMRKMustUnequipFirst();
-        super.unnestChild(tokenId, index, to);
+        _unnestChild(tokenId, index, to);
     }
 
     function equip(IntakeEquip memory data)
