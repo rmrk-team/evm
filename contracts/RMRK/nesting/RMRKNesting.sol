@@ -785,26 +785,6 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
     }
 
     /**
-     * @notice Deletes a single child from the pending array by index.
-     * @param tokenId tokenId whose pending child is to be rejected
-     * @param index index on tokenId pending child array to reject
-     * @param to if an address which is not the zero address is passed, this will attempt to transfer
-     * the child to `to` via a call-in to the child address.
-     * @dev If `to` is the zero address, the child's ownership structures will not be updated, resulting in an
-     * 'orphaned' child. If a call with a populated `to` field fails, call this function with `to` set to the
-     * zero address to orphan the child. Orphaned children can be reclaimed by a call to reclaimChild on this
-     * contract by the root owner.
-     */
-
-    function rejectChild(
-        uint256 tokenId,
-        uint256 index,
-        address to
-    ) public virtual onlyApprovedOrOwner(tokenId) {
-        _unnestChild(tokenId, index, to, true);
-    }
-
-    /**
      * @notice Function to unnest a child from the active token array.
      * @param tokenId is the tokenId of the parent token to unnest from.
      * @param index is the index of the child token ID.
@@ -844,21 +824,13 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
             );
         }
 
-        if (isPending) {
-            emit ChildRejected(
-                tokenId,
-                child.contractAddress,
-                child.tokenId,
-                index
-            );
-        } else {
-            emit ChildUnnested(
-                tokenId,
-                child.contractAddress,
-                child.tokenId,
-                index
-            );
-        }
+        emit ChildUnnested(
+            tokenId,
+            child.contractAddress,
+            child.tokenId,
+            index,
+            isPending
+        );
     }
 
     function reclaimChild(
