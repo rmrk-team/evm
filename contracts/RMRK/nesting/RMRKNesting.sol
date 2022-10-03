@@ -462,14 +462,14 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         public
         onlyApprovedOrDirectOwner(tokenId)
     {
-        if (_children[tokenId].length <= index)
+        if (childrenOf(tokenId).length <= index)
             revert RMRKChildIndexOutOfRange();
         _burnChild(tokenId, index);
         _removeChildByIndex(_children[tokenId], index);
     }
 
     function _burnChild(uint256 tokenId, uint256 index) private {
-        Child memory child = _children[tokenId][index];
+        Child memory child = childOf(tokenId, index);
         IRMRKNesting(child.contractAddress).burn(child.tokenId);
     }
 
@@ -724,7 +724,7 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
             tokenId: childTokenId
         });
 
-        uint256 length = _pendingChildren[parentTokenId].length;
+        uint256 length = pendingChildrenOf(parentTokenId).length;
 
         if (length < 128) {
             _pendingChildren[parentTokenId].push(child);
@@ -746,10 +746,10 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         virtual
         onlyApprovedOrOwner(tokenId)
     {
-        if (_pendingChildren[tokenId].length <= index)
+        if (pendingChildrenOf(tokenId).length <= index)
             revert RMRKPendingChildIndexOutOfRange();
 
-        Child memory child = _pendingChildren[tokenId][index];
+        Child memory child = pendingChildOf(tokenId, index);
 
         if (_posInChildArray[child.contractAddress][child.tokenId] != 0)
             revert RMRKChildAlreadyExists();
@@ -885,7 +885,7 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         view
         returns (Child memory)
     {
-        if (_children[parentTokenId].length <= index)
+        if (childrenOf(parentTokenId).length <= index)
             revert RMRKChildIndexOutOfRange();
         Child memory child = _children[parentTokenId][index];
         return child;
@@ -896,7 +896,7 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         view
         returns (Child memory)
     {
-        if (_pendingChildren[parentTokenId].length <= index)
+        if (pendingChildrenOf(parentTokenId).length <= index)
             revert RMRKPendingChildIndexOutOfRange();
         Child memory child = _pendingChildren[parentTokenId][index];
         return child;
