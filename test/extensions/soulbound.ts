@@ -141,7 +141,7 @@ describe('RMRKSoulbound exempt', async function () {
     await token.connect(owner).acceptChild(tokenId, 0);
     await token.setSoulboundExempt(otherTokenId);
 
-    await token.connect(owner).unnestChild(tokenId, 0, owner.address);
+    await token.connect(owner).unnestChild(tokenId, 0, owner.address, false);
     expect(await token.rmrkOwnerOf(otherTokenId)).eql([owner.address, bn(0), false]);
   });
 });
@@ -212,7 +212,7 @@ async function shouldBehaveLikeSoulboundNesting() {
     await nestMintFromMock(soulbound, soulbound.address, tokenId);
     await soulbound.connect(owner).acceptChild(tokenId, 0);
     expect(
-      soulbound.connect(owner).unnestChild(tokenId, 0, owner.address),
+      soulbound.connect(owner).unnestChild(tokenId, 0, owner.address, false),
     ).to.be.revertedWithCustomError(soulbound, 'RMRKCannotTransferSoulbound');
   });
 }

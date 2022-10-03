@@ -5,6 +5,7 @@ import { ethers } from 'hardhat';
 let nextTokenId = 1;
 let nextChildTokenId = 100;
 const ONE_ETH = ethers.utils.parseEther('1.0');
+const ADDRESS_ZERO = ethers.constants.AddressZero;
 
 function bn(x: number): BigNumber {
   return BigNumber.from(x);
@@ -83,12 +84,7 @@ async function addResourceEntryFromImpl(token: Contract, data?: string): Promise
 async function addResourceEntryEquippables(token: Contract, data?: string): Promise<BigNumber> {
   const resourceId = bn(nextResourceId);
   const refId = bn(1);
-  const extendedResource = [
-    resourceId,
-    refId,
-    ethers.constants.AddressZero,
-    data !== undefined ? data : 'metaURI',
-  ];
+  const extendedResource = [resourceId, refId, ADDRESS_ZERO, data !== undefined ? data : 'metaURI'];
   nextResourceId++;
   await token.addResourceEntry(extendedResource, [], []);
   return resourceId;
@@ -121,6 +117,7 @@ export {
   addResourceEntryFromImpl,
   addResourceEntryFromMock,
   addResourceToToken,
+  ADDRESS_ZERO,
   bn,
   mintFromImpl,
   mintFromMock,
