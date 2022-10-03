@@ -216,7 +216,7 @@ async function shouldBehaveLikeNesting(
     });
 
     it('can support INesting', async function () {
-      expect(await parent.supportsInterface('0xe83a6be7')).to.equal(true);
+      expect(await parent.supportsInterface('0xc71287ad')).to.equal(true);
     });
 
     it('cannot support other interfaceId', async function () {
@@ -296,52 +296,6 @@ async function shouldBehaveLikeNesting(
       childId = await nestMint(child, parent.address, parentId);
     });
 
-    it('can reject one pending child with abandon', async function () {
-      const childOwnerData = await child.rmrkOwnerOf(childId);
-
-      await expect(parent.connect(tokenOwner).rejectChild(parentId, 0, ADDRESS_ZERO))
-        .to.emit(parent, 'ChildRejected')
-        .withArgs(parentId, child.address, childId, 0);
-      await checkNoChildrenNorPending(parentId);
-
-      // It is still on the child
-      expect(await child.balanceOf(parent.address)).to.equal(1);
-      // Child ownership data is not updated
-      expect(await child.ownerOf(childId)).to.equal(tokenOwner.address);
-      expect(await child.rmrkOwnerOf(childId)).to.eql(childOwnerData);
-    });
-
-    it('can reject one pending child, set child owner to new address', async function () {
-      await expect(parent.connect(tokenOwner).rejectChild(parentId, 0, addrs[2].address))
-        .to.emit(parent, 'ChildRejected')
-        .withArgs(parentId, child.address, childId, 0);
-      await checkNoChildrenNorPending(parentId);
-
-      expect(await child.ownerOf(childId)).to.equal(addrs[2].address);
-    });
-
-    it('can reject child if approved', async function () {
-      const rejecter = addrs[1];
-      await parent.connect(tokenOwner).approve(rejecter.address, parentId);
-      await parent.connect(rejecter).rejectChild(parentId, 0, ADDRESS_ZERO);
-      await checkNoChildrenNorPending(parentId);
-    });
-
-    it('can reject child if approved for all', async function () {
-      const operator = addrs[2];
-      await parent.connect(tokenOwner).setApprovalForAll(operator.address, true);
-      await parent.connect(operator).rejectChild(parentId, 0, ADDRESS_ZERO);
-      await checkNoChildrenNorPending(parentId);
-    });
-
-    it('cannot reject not owned pending child', async function () {
-      const notOwner = addrs[3];
-
-      await expect(
-        parent.connect(notOwner).rejectChild(parentId, 0, ADDRESS_ZERO),
-      ).to.be.revertedWithCustomError(parent, 'ERC721NotApprovedOrOwner');
-    });
-
     it('can reject all pending children', async function () {
       // Mint a couple of more children
       await nestMint(child, parent.address, parentId);
@@ -384,12 +338,6 @@ async function shouldBehaveLikeNesting(
       await expect(
         parent.connect(notOwner).rejectAllChildren(parentId),
       ).to.be.revertedWithCustomError(parent, 'ERC721NotApprovedOrOwner');
-    });
-
-    it('cannot reject children for non existing index', async () => {
-      await expect(
-        parent.connect(tokenOwner).rejectChild(parentId, 2, ADDRESS_ZERO),
-      ).to.be.revertedWithCustomError(parent, 'RMRKPendingChildIndexOutOfRange');
     });
   });
 
@@ -527,7 +475,7 @@ async function shouldBehaveLikeNesting(
     it('can unnest child with to as root owner', async function () {
       await expect(parent.connect(tokenOwner).unnestChild(parentId, 0, tokenOwner.address, false))
         .to.emit(parent, 'ChildUnnested')
-        .withArgs(parentId, child.address, childId, 0);
+        .withArgs(parentId, child.address, childId, 0, false);
 
       await checkChildMovedToRootOwner();
     });
@@ -536,7 +484,7 @@ async function shouldBehaveLikeNesting(
       const toOwnerAddress = addrs[2].address;
       await expect(parent.connect(tokenOwner).unnestChild(parentId, 0, toOwnerAddress, false))
         .to.emit(parent, 'ChildUnnested')
-        .withArgs(parentId, child.address, childId, 0);
+        .withArgs(parentId, child.address, childId, 0, false);
 
       await checkChildMovedToRootOwner(toOwnerAddress);
     });
@@ -659,8 +607,8 @@ async function shouldBehaveLikeNesting(
 
     it('can unnest child with to as root owner', async function () {
       await expect(parent.connect(tokenOwner).unnestChild(parentId, 0, tokenOwner.address, true))
-        .to.emit(parent, 'ChildRejected')
-        .withArgs(parentId, child.address, childId, 0);
+        .to.emit(parent, 'ChildUnnested')
+        .withArgs(parentId, child.address, childId, 0, true);
 
       await checkChildMovedToRootOwner();
     });
@@ -668,8 +616,8 @@ async function shouldBehaveLikeNesting(
     it('can unnest child to another address', async function () {
       const toOwnerAddress = addrs[2].address;
       await expect(parent.connect(tokenOwner).unnestChild(parentId, 0, toOwnerAddress, true))
-        .to.emit(parent, 'ChildRejected')
-        .withArgs(parentId, child.address, childId, 0);
+        .to.emit(parent, 'ChildUnnested')
+        .withArgs(parentId, child.address, childId, 0, true);
 
       await checkChildMovedToRootOwner(toOwnerAddress);
     });

@@ -32,16 +32,6 @@ interface IRMRKNesting is IERC165 {
     );
 
     /**
-     * @dev emitted when a token accepts removes a child token from its pending array.
-     */
-    event ChildRejected(
-        uint256 indexed tokenId,
-        address indexed childAddress,
-        uint256 indexed childId,
-        uint256 childIndex
-    );
-
-    /**
      * @dev emitted when a token removes all a child tokens from its pending array.
      */
     event AllChildrenRejected(uint256 indexed tokenId);
@@ -53,7 +43,8 @@ interface IRMRKNesting is IERC165 {
         uint256 indexed tokenId,
         address indexed childAddress,
         uint256 indexed childId,
-        uint256 childIndex
+        uint256 childIndex,
+        bool fromPending
     );
 
     /**
@@ -111,21 +102,6 @@ interface IRMRKNesting is IERC165 {
      *
      */
     function acceptChild(uint256 parentTokenId, uint256 index) external;
-
-    /**
-     * @dev Function called to reject a pending child. Removes the child from the pending array mapping.
-     * The child's ownership structures are not updated.
-     *
-     * Requirements:
-     *
-     * - `parentTokenId` must exist
-     *
-     */
-    function rejectChild(
-        uint256 parentTokenId,
-        uint256 index,
-        address to
-    ) external;
 
     /**
      * @dev Function called to reject all pending children. Removes the children from the pending array mapping.

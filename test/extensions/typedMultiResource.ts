@@ -135,7 +135,7 @@ describe('RMRKNestingTypedMultiResourceMock', async function () {
   });
 
   it('can support INesting', async function () {
-    expect(await typedNestingMultiResource.supportsInterface('0xe83a6be7')).to.equal(true);
+    expect(await typedNestingMultiResource.supportsInterface('0xc71287ad')).to.equal(true);
   });
 
   it('can support IRMRKTypedMultiResource', async function () {
@@ -184,7 +184,7 @@ describe('RMRKTypedEquippableMock', async function () {
   });
 
   it('can support INesting', async function () {
-    expect(await typedEquippable.supportsInterface('0xe83a6be7')).to.equal(true);
+    expect(await typedEquippable.supportsInterface('0xc71287ad')).to.equal(true);
   });
 
   it('can support IEquippable', async function () {
