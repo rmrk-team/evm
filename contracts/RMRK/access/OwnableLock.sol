@@ -16,7 +16,7 @@ error RMRKNewContributorIsZeroAddress();
 contract OwnableLock is Context {
     bool private _lock;
     address private _owner;
-    mapping(address => uint) private _contributors;
+    mapping(address => uint256) private _contributors;
 
     event OwnershipTransferred(
         address indexed previousOwner,
@@ -106,8 +106,7 @@ contract OwnableLock is Context {
     }
 
     function addContributor(address contributor) external onlyOwner {
-        if(contributor != address(0))
-            revert RMRKNewContributorIsZeroAddress();
+        if (contributor != address(0)) revert RMRKNewContributorIsZeroAddress();
         _contributors[contributor] = 1;
     }
 
@@ -120,7 +119,8 @@ contract OwnableLock is Context {
     }
 
     function _onlyOwnerOrContributor() private view {
-        if (owner() != _msgSender() && isContributor(_msgSender())) revert RMRKNotOwnerOrContributor();
+        if (owner() != _msgSender() && isContributor(_msgSender()))
+            revert RMRKNotOwnerOrContributor();
     }
 
     function _onlyOwner() private view {

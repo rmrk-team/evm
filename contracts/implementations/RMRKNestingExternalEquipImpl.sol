@@ -85,7 +85,10 @@ contract RMRKNestingExternalEquipImpl is
         return (nextToken, totalSupplyOffset);
     }
 
-    function setEquippableAddress(address equippable) external onlyOwnerOrContributor {
+    function setEquippableAddress(address equippable)
+        external
+        onlyOwnerOrContributor
+    {
         _setEquippableAddress(equippable);
     }
 

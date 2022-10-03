@@ -54,7 +54,10 @@ contract RMRKBaseStorageImpl is OwnableLock, RMRKBaseStorage {
         _setEquippableToAll(partId);
     }
 
-    function resetEquippableAddresses(uint64 partId) external onlyOwnerOrContributor {
+    function resetEquippableAddresses(uint64 partId)
+        external
+        onlyOwnerOrContributor
+    {
         _resetEquippableAddresses(partId);
     }
 }

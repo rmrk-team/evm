@@ -91,7 +91,10 @@ contract RMRKNestingMultiResourceImpl is
         _addResourceToToken(tokenId, resourceId, overwrites);
     }
 
-    function addResourceEntry(string memory metadataURI) external onlyOwnerOrContributor {
+    function addResourceEntry(string memory metadataURI)
+        external
+        onlyOwnerOrContributor
+    {
         unchecked {
             _totalResources += 1;
         }
