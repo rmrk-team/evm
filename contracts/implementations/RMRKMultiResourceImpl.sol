@@ -75,12 +75,12 @@ contract RMRKMultiResourceImpl is
         uint256 tokenId,
         uint64 resourceId,
         uint64 overwrites
-    ) external onlyOwner {
+    ) external onlyOwnerOrContributor {
         _requireMinted(tokenId);
         _addResourceToToken(tokenId, resourceId, overwrites);
     }
 
-    function addResourceEntry(string memory metadataURI) external onlyOwner {
+    function addResourceEntry(string memory metadataURI) external onlyOwnerOrContributor {
         unchecked {
             _totalResources += 1;
         }

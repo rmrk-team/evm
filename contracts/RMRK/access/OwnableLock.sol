@@ -9,16 +9,27 @@ Minimal ownable lock, based on "openzeppelin's access/Ownable.sol";
 */
 error RMRKLocked();
 error RMRKNotOwner();
+error RMRKNotOwnerOrContributor();
 error RMRKNewOwnerIsZeroAddress();
+error RMRKNewContributorIsZeroAddress();
 
 contract OwnableLock is Context {
     bool private _lock;
     address private _owner;
+    mapping(address => uint) private _contributors;
 
     event OwnershipTransferred(
         address indexed previousOwner,
         address indexed newOwner
     );
+
+    /**
+     * @dev Throws if called by any account other than the owner or an approved contributer
+     */
+    modifier onlyOwnerOrContributor() {
+        _onlyOwnerOrContributor();
+        _;
+    }
 
     /**
      * @dev Throws if called by any account other than the owner.
@@ -92,6 +103,24 @@ contract OwnableLock is Context {
         address oldOwner = _owner;
         _owner = newOwner;
         emit OwnershipTransferred(oldOwner, newOwner);
+    }
+
+    function addContributor(address contributor) external onlyOwner {
+        if(contributor != address(0))
+            revert RMRKNewContributorIsZeroAddress();
+        _contributors[contributor] = 1;
+    }
+
+    function revokeContributor(address contributor) external onlyOwner {
+        delete _contributors[contributor];
+    }
+
+    function isContributor(address contributor) public view returns (bool) {
+        return _contributors[contributor] == 1;
+    }
+
+    function _onlyOwnerOrContributor() private view {
+        if (owner() != _msgSender() && isContributor(_msgSender())) revert RMRKNotOwnerOrContributor();
     }
 
     function _onlyOwner() private view {
