@@ -212,12 +212,15 @@ contract RMRKEquippable is RMRKNesting, AbstractMultiResource, IRMRKEquippable {
     function unnestChild(
         uint256 tokenId,
         uint256 index,
-        address to
+        address to,
+        bool isPending
     ) public virtual override onlyApprovedOrOwner(tokenId) {
-        Child memory child = childOf(tokenId, index);
-        if (isChildEquipped(tokenId, child.contractAddress, child.tokenId))
-            revert RMRKMustUnequipFirst();
-        _unnestChild(tokenId, index, to);
+        if (!isPending) {
+            Child memory child = childOf(tokenId, index);
+            if (isChildEquipped(tokenId, child.contractAddress, child.tokenId))
+                revert RMRKMustUnequipFirst();
+        }
+        _unnestChild(tokenId, index, to, isPending);
     }
 
     function equip(IntakeEquip memory data)

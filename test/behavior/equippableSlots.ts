@@ -488,7 +488,7 @@ async function shouldBehaveLikeEquippableWithSlots(
       await unequipWeaponAndCheckFromAddress(soldierOwner);
       await soldier
         .connect(soldierOwner)
-        .unnestChild(soldiersIds[0], childIndex, soldierOwner.address);
+        .unnestChild(soldiersIds[0], childIndex, soldierOwner.address, false);
     });
 
     it('Unnest fails if child is equipped', async function () {
@@ -501,7 +501,9 @@ async function shouldBehaveLikeEquippableWithSlots(
         .equip([soldiersIds[0], childIndex, soldierResId, partIdForWeapon, weaponResId]);
 
       await expect(
-        soldier.connect(soldierOwner).unnestChild(soldiersIds[0], childIndex, soldierOwner.address),
+        soldier
+          .connect(soldierOwner)
+          .unnestChild(soldiersIds[0], childIndex, soldierOwner.address, false),
       ).to.be.revertedWithCustomError(weapon, 'RMRKMustUnequipFirst');
     });
   });

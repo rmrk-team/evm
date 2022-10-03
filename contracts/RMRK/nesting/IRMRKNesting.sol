@@ -150,7 +150,8 @@ interface IRMRKNesting is IERC165 {
     function unnestChild(
         uint256 tokenId,
         uint256 index,
-        address to
+        address to,
+        bool isPending
     ) external;
 
     /**

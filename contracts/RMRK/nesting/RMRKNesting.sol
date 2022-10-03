@@ -801,27 +801,7 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         uint256 index,
         address to
     ) public virtual onlyApprovedOrOwner(tokenId) {
-        if (_pendingChildren[tokenId].length <= index)
-            revert RMRKPendingChildIndexOutOfRange();
-
-        Child memory pendingChild = _pendingChildren[tokenId][index];
-
-        _removeChildByIndex(_pendingChildren[tokenId], index);
-
-        if (to != address(0)) {
-            IERC721(pendingChild.contractAddress).safeTransferFrom(
-                address(this),
-                to,
-                pendingChild.tokenId
-            );
-        }
-
-        emit ChildRejected(
-            tokenId,
-            pendingChild.contractAddress,
-            pendingChild.tokenId,
-            index
-        );
+        _unnestChild(tokenId, index, to, true);
     }
 
     /**
@@ -829,26 +809,32 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
      * @param tokenId is the tokenId of the parent token to unnest from.
      * @param index is the index of the child token ID.
      * @param to is the address to transfer this
+     * @param isPending indicates if the child is pending (active otherwise).
      */
     function unnestChild(
         uint256 tokenId,
         uint256 index,
-        address to
+        address to,
+        bool isPending
     ) public virtual onlyApprovedOrOwner(tokenId) {
-        _unnestChild(tokenId, index, to);
+        _unnestChild(tokenId, index, to, isPending);
     }
 
     function _unnestChild(
         uint256 tokenId,
         uint256 index,
-        address to
+        address to,
+        bool isPending
     ) internal virtual {
-        if (_children[tokenId].length <= index)
-            revert RMRKChildIndexOutOfRange();
-
-        Child memory child = _children[tokenId][index];
-        delete _posInChildArray[child.contractAddress][child.tokenId];
-        _removeChildByIndex(_children[tokenId], index);
+        Child memory child;
+        if (isPending) {
+            child = pendingChildOf(tokenId, index);
+            _removeChildByIndex(_pendingChildren[tokenId], index);
+        } else {
+            child = childOf(tokenId, index);
+            delete _posInChildArray[child.contractAddress][child.tokenId];
+            _removeChildByIndex(_children[tokenId], index);
+        }
 
         if (to != address(0)) {
             IERC721(child.contractAddress).safeTransferFrom(
@@ -858,12 +844,21 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
             );
         }
 
-        emit ChildUnnested(
-            tokenId,
-            child.contractAddress,
-            child.tokenId,
-            index
-        );
+        if (isPending) {
+            emit ChildRejected(
+                tokenId,
+                child.contractAddress,
+                child.tokenId,
+                index
+            );
+        } else {
+            emit ChildUnnested(
+                tokenId,
+                child.contractAddress,
+                child.tokenId,
+                index
+            );
+        }
     }
 
     function reclaimChild(
