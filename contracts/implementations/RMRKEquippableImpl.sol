@@ -84,7 +84,7 @@ contract RMRKEquippableImpl is
         uint256 tokenId,
         uint64 resourceId,
         uint64 overwrites
-    ) external {
+    ) external onlyOwnerOrContributor {
         // This reverts if token does not exist:
         ownerOf(tokenId);
         _addResourceToToken(tokenId, resourceId, overwrites);
@@ -94,7 +94,7 @@ contract RMRKEquippableImpl is
         ExtendedResource calldata resource,
         uint64[] calldata fixedPartIds,
         uint64[] calldata slotPartIds
-    ) external {
+    ) external onlyOwnerOrContributor {
         _addResourceEntry(resource, fixedPartIds, slotPartIds);
     }
 
@@ -102,7 +102,7 @@ contract RMRKEquippableImpl is
         uint64 refId,
         address parentAddress,
         uint64 partId
-    ) external {
+    ) external onlyOwnerOrContributor {
         _setValidParentRefId(refId, parentAddress, partId);
     }
 

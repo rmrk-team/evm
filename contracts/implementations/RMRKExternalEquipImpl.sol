@@ -16,7 +16,7 @@ contract RMRKExternalEquipImpl is OwnableLock, RMRKExternalEquip {
         uint256 tokenId,
         uint64 resourceId,
         uint64 overwrites
-    ) public onlyOwner {
+    ) public onlyOwnerOrContributor {
         // This reverts if token does not exist:
         ownerOf(tokenId);
         _addResourceToToken(tokenId, resourceId, overwrites);
@@ -26,7 +26,7 @@ contract RMRKExternalEquipImpl is OwnableLock, RMRKExternalEquip {
         ExtendedResource calldata resource,
         uint64[] calldata fixedPartIds,
         uint64[] calldata slotPartIds
-    ) public onlyOwner {
+    ) public onlyOwnerOrContributor {
         _addResourceEntry(resource, fixedPartIds, slotPartIds);
     }
 
@@ -34,7 +34,7 @@ contract RMRKExternalEquipImpl is OwnableLock, RMRKExternalEquip {
         uint64 refId,
         address parentAddress,
         uint64 partId
-    ) public onlyOwner {
+    ) public onlyOwnerOrContributor {
         _setValidParentRefId(refId, parentAddress, partId);
     }
 }
