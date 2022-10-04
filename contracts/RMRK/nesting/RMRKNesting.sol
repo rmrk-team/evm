@@ -75,16 +75,19 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
     mapping(uint256 => RMRKOwner) private _RMRKOwners;
 
     // Mapping of tokenId to array of active children structs
-    mapping(uint256 => Child[]) private _children;
+    mapping(uint256 => Child[]) private _activeChildren;
 
     // Mapping of tokenId to array of pending children structs
     mapping(uint256 => Child[]) private _pendingChildren;
 
-    // Mapping of child token address to child token Id to position in children array.
-    // This may be able to be gas optimized if we can use the child as a mapping element directly.
+    // Mapping of child token address to child token Id to whether they are pending or active on any token
     // We might have a first extra mapping from token Id, but since the same child cannot be
     // nested into multiple tokens we can strip it for size/gas savings.
-    mapping(address => mapping(uint256 => uint256)) private _posInChildArray;
+    mapping(address => mapping(uint256 => uint256)) private _childIsInActive;
+
+    // WARNING: This mapping is not updated on burn or reject all, to save gas.
+    // This is only used to cheaply forbid reclaiming a child which is pending
+    mapping(address => mapping(uint256 => uint256)) private _childIsInPending;
 
     // -------------------------- MODIFIERS ----------------------------
 
@@ -465,11 +468,12 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         if (childrenOf(tokenId).length <= index)
             revert RMRKChildIndexOutOfRange();
         _burnChild(tokenId, index);
-        _removeChildByIndex(_children[tokenId], index);
+        _removeChildByIndex(_activeChildren[tokenId], index);
     }
 
     function _burnChild(uint256 tokenId, uint256 index) private {
         Child memory child = childOf(tokenId, index);
+        delete _childIsInActive[child.contractAddress][child.tokenId];
         IRMRKNesting(child.contractAddress).burn(child.tokenId);
     }
 
@@ -496,6 +500,7 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
 
         _beforeTokenTransfer(owner, address(0), tokenId);
         _approve(address(0), tokenId);
+
         _cleanApprovals(tokenId);
 
         Child[] memory children = childrenOf(tokenId);
@@ -509,8 +514,7 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         }
         delete _RMRKOwners[tokenId];
         delete _pendingChildren[tokenId];
-        delete _children[tokenId];
-        // Review: is this redundant with _approve(0)
+        delete _activeChildren[tokenId];
         delete _tokenApprovals[tokenId][owner];
 
         _afterTokenTransfer(owner, address(0), tokenId);
@@ -724,15 +728,22 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
             tokenId: childTokenId
         });
 
+        // This check is not done since there's no guarantee of mapping being
+        // up to date, see defintion for details. A similar protection does
+        // exist when accepting a child:
+        // if (_childIsInPending[child.contractAddress][child.tokenId] != 0)
+        //     revert RMRKChildAlreadyExists();
+
         uint256 length = pendingChildrenOf(parentTokenId).length;
 
         if (length < 128) {
+            _childIsInPending[child.contractAddress][child.tokenId] = 1; // We use 1 as true
             _pendingChildren[parentTokenId].push(child);
         } else {
             revert RMRKMaxPendingChildrenReached();
         }
 
-        // Previous lenght matches the index for the new child
+        // Previous length matches the index for the new child
         emit ChildProposed(parentTokenId, _msgSender(), childTokenId, length);
     }
 
@@ -751,16 +762,16 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
 
         Child memory child = pendingChildOf(tokenId, index);
 
-        if (_posInChildArray[child.contractAddress][child.tokenId] != 0)
+        if (_childIsInActive[child.contractAddress][child.tokenId] != 0)
             revert RMRKChildAlreadyExists();
 
+        // Remove from pending:
         _removeChildByIndex(_pendingChildren[tokenId], index);
+        delete _childIsInPending[child.contractAddress][child.tokenId];
 
-        _children[tokenId].push(child);
-
-        _posInChildArray[child.contractAddress][child.tokenId] = _children[
-            tokenId
-        ].length;
+        // Add to active:
+        _activeChildren[tokenId].push(child);
+        _childIsInActive[child.contractAddress][child.tokenId] = 1; // We use 1 as true
 
         emit ChildAccepted(
             tokenId,
@@ -780,7 +791,7 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         virtual
         onlyApprovedOrOwner(tokenId)
     {
-        delete (_pendingChildren[tokenId]);
+        delete _pendingChildren[tokenId];
         emit AllChildrenRejected(tokenId);
     }
 
@@ -809,11 +820,12 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         Child memory child;
         if (isPending) {
             child = pendingChildOf(tokenId, index);
+            delete _childIsInPending[child.contractAddress][child.tokenId];
             _removeChildByIndex(_pendingChildren[tokenId], index);
         } else {
             child = childOf(tokenId, index);
-            delete _posInChildArray[child.contractAddress][child.tokenId];
-            _removeChildByIndex(_children[tokenId], index);
+            delete _childIsInActive[child.contractAddress][child.tokenId];
+            _removeChildByIndex(_activeChildren[tokenId], index);
         }
 
         if (to != address(0)) {
@@ -838,6 +850,11 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         address childAddress,
         uint256 childTokenId
     ) public onlyApprovedOrOwner(tokenId) {
+        if (_childIsInActive[childAddress][childTokenId] != 0)
+            revert RMRKInvalidChildReclaim();
+        if (_childIsInPending[childAddress][childTokenId] != 0)
+            revert RMRKInvalidChildReclaim();
+
         (address owner, uint256 ownerTokenId, bool isNft) = IRMRKNesting(
             childAddress
         ).rmrkOwnerOf(childTokenId);
@@ -863,7 +880,7 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         view
         returns (Child[] memory)
     {
-        Child[] memory children = _children[parentTokenId];
+        Child[] memory children = _activeChildren[parentTokenId];
         return children;
     }
 
@@ -887,7 +904,7 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
     {
         if (childrenOf(parentTokenId).length <= index)
             revert RMRKChildIndexOutOfRange();
-        Child memory child = _children[parentTokenId][index];
+        Child memory child = _activeChildren[parentTokenId][index];
         return child;
     }
 

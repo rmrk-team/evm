@@ -505,6 +505,12 @@ async function shouldBehaveLikeNesting(
       expect(await child.rmrkOwnerOf(childId)).to.eql([tokenOwner.address, bn(0), false]);
     });
 
+    it('cannot reclaim active child', async function () {
+      await expect(
+        parent.connect(tokenOwner).reclaimChild(parentId, child.address, childId),
+      ).to.be.revertedWithCustomError(parent, 'RMRKInvalidChildReclaim');
+    });
+
     it('cannot reclaim unnested child if unnested to a non zero address', async function () {
       await parent.connect(tokenOwner).unnestChild(parentId, 0, addrs[2].address, false);
 
@@ -636,6 +642,12 @@ async function shouldBehaveLikeNesting(
       await parent.connect(tokenOwner).reclaimChild(parentId, child.address, childId);
       expect(await child.ownerOf(childId)).to.eql(tokenOwner.address);
       expect(await child.rmrkOwnerOf(childId)).to.eql([tokenOwner.address, bn(0), false]);
+    });
+
+    it('cannot reclaim pending child', async function () {
+      await expect(
+        parent.connect(tokenOwner).reclaimChild(parentId, child.address, childId),
+      ).to.be.revertedWithCustomError(parent, 'RMRKInvalidChildReclaim');
     });
 
     it('cannot reclaim unnested child if unnested to a non zero address', async function () {
