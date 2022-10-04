@@ -21,14 +21,15 @@ import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 error RMRKNotApprovedForResourcesOrOwner();
 error RMRKApprovalForResourcesToCurrentOwner();
 error RMRKApproveForResourcesCallerIsNotOwnerNorApprovedForAll();
-
+// Equippable
 error ERC721InvalidTokenId();
 error ERC721NotApprovedOrOwner();
 error RMRKBaseRequiredForParts();
-error RMRKTokenCannotBeEquippedWithResourceIntoSlot();
 error RMRKEquippableEquipNotAllowedByBase();
 error RMRKNotEquipped();
 error RMRKSlotAlreadyUsed();
+error RMRKTargetResourceCannotReceiveSlot();
+error RMRKTokenCannotBeEquippedWithResourceIntoSlot();
 
 /**
  * @dev RMRKEquippable external contract, expected to be paired with an instance of RMRKNestingExternalEquip.sol. This
@@ -223,6 +224,9 @@ contract RMRKExternalEquip is AbstractMultiResource, IRMRKExternalEquip {
             ].childEquippableAddress != address(0)
         ) revert RMRKSlotAlreadyUsed();
 
+        // Check from parent's resource perspective:
+        _checkResourceAcceptsSlot(data.resourceId, data.slotPartId);
+
         IRMRKNesting.Child memory child = IRMRKNesting(_nestingAddress).childOf(
             data.tokenId,
             data.childIndex
@@ -272,6 +276,12 @@ contract RMRKExternalEquip is AbstractMultiResource, IRMRKExternalEquip {
             childEquippable,
             data.childResourceId
         );
+    }
+
+    function _checkResourceAcceptsSlot(uint64 resourceId, uint64 slotPartId) private view {
+        (, bool found) = _slotPartIds[resourceId].indexOf(slotPartId);
+        if (!found)
+            revert RMRKTargetResourceCannotReceiveSlot();
     }
 
     function unequip(

@@ -230,6 +230,35 @@ async function shouldBehaveLikeEquippableWithSlots(
       ).to.be.reverted; // Bad index
     });
 
+    it('cannot equip into a slot not set on the parent resource (gem into soldier)', async function () {
+      const soldierOwner = addrs[0];
+      const soldierId = soldiersIds[0];
+      const childIndex = 2;
+
+      const newWeaponGemId = await nestMint(weaponGem, soldier.address, soldierId);
+      await soldier.connect(soldierOwner).acceptChild(soldierId, 0);
+
+      // Add resources to weapon
+      await weaponGemEquip.addResourceToToken(newWeaponGemId, weaponGemResourceFull, 0);
+      await weaponGemEquip.addResourceToToken(newWeaponGemId, weaponGemResourceEquip, 0);
+      await weaponGemEquip.connect(soldierOwner).acceptResource(newWeaponGemId, 0);
+      await weaponGemEquip.connect(soldierOwner).acceptResource(newWeaponGemId, 0);
+
+      // The malicious child indicates it can be equipped into soldier:
+      await weaponGemEquip.setValidParentRefId(
+        1, // equippableRefId for gems
+        soldierEquip.address,
+        partIdForWeaponGem,
+      );
+
+      // Weapon is child on index 0, background on index 1
+      await expect(
+        soldierEquip
+          .connect(addrs[0])
+          .equip([soldierId, childIndex, soldierResId, partIdForWeaponGem, weaponGemResourceEquip]),
+      ).to.be.revertedWithCustomError(soldierEquip, 'RMRKTargetResourceCannotReceiveSlot');
+    });
+
     it('cannot equip wrong child in slot (weapon in background)', async function () {
       // Weapon is child on index 0, background on index 1
       const backgroundChildIndex = 1;

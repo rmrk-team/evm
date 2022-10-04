@@ -21,6 +21,7 @@ error RMRKEquippableEquipNotAllowedByBase();
 error RMRKMustUnequipFirst();
 error RMRKNotEquipped();
 error RMRKSlotAlreadyUsed();
+error RMRKTargetResourceCannotReceiveSlot();
 error RMRKTokenCannotBeEquippedWithResourceIntoSlot();
 
 contract RMRKEquippable is RMRKNesting, AbstractMultiResource, IRMRKEquippable {
@@ -237,6 +238,9 @@ contract RMRKEquippable is RMRKNesting, AbstractMultiResource, IRMRKEquippable {
             ].childEquippableAddress != address(0)
         ) revert RMRKSlotAlreadyUsed();
 
+        // Check from parent's resource perspective:
+        _checkResourceAcceptsSlot(data.resourceId, data.slotPartId);
+
         IRMRKNesting.Child memory child = childOf(
             data.tokenId,
             data.childIndex
@@ -283,6 +287,12 @@ contract RMRKEquippable is RMRKNesting, AbstractMultiResource, IRMRKEquippable {
             child.contractAddress,
             data.childResourceId
         );
+    }
+
+    function _checkResourceAcceptsSlot(uint64 resourceId, uint64 slotPartId) private view {
+        (, bool found) = _slotPartIds[resourceId].indexOf(slotPartId);
+        if (!found)
+            revert RMRKTargetResourceCannotReceiveSlot();
     }
 
     function unequip(
