@@ -221,9 +221,8 @@ contract RMRKExternalEquip is AbstractMultiResource, IRMRKExternalEquip {
         address baseAddress = getBaseAddressOfResource(data.resourceId);
         uint64 slotPartId = data.slotPartId;
         if (
-            _equipments[data.tokenId][baseAddress][
-                slotPartId
-            ].childEquippableAddress != address(0)
+            _equipments[data.tokenId][baseAddress][slotPartId]
+                .childEquippableAddress != address(0)
         ) revert RMRKSlotAlreadyUsed();
 
         // Check from parent's resource perspective:
@@ -250,8 +249,10 @@ contract RMRKExternalEquip is AbstractMultiResource, IRMRKExternalEquip {
 
         // Check from base perspective
         if (
-            !IRMRKBaseStorage(baseAddress)
-                .checkIsEquippable(slotPartId, childEquippable)
+            !IRMRKBaseStorage(baseAddress).checkIsEquippable(
+                slotPartId,
+                childEquippable
+            )
         ) revert RMRKEquippableEquipNotAllowedByBase();
 
         Equipment memory newEquip = Equipment({
@@ -261,9 +262,7 @@ contract RMRKExternalEquip is AbstractMultiResource, IRMRKExternalEquip {
             childEquippableAddress: childEquippable
         });
 
-        _equipments[data.tokenId][baseAddress][
-            slotPartId
-        ] = newEquip;
+        _equipments[data.tokenId][baseAddress][slotPartId] = newEquip;
         _equipCountPerChild[data.tokenId][child.contractAddress][
             child.tokenId
         ] += 1;
@@ -278,10 +277,12 @@ contract RMRKExternalEquip is AbstractMultiResource, IRMRKExternalEquip {
         );
     }
 
-    function _checkResourceAcceptsSlot(uint64 resourceId, uint64 slotPartId) private view {
+    function _checkResourceAcceptsSlot(uint64 resourceId, uint64 slotPartId)
+        private
+        view
+    {
         (, bool found) = _slotPartIds[resourceId].indexOf(slotPartId);
-        if (!found)
-            revert RMRKTargetResourceCannotReceiveSlot();
+        if (!found) revert RMRKTargetResourceCannotReceiveSlot();
     }
 
     function unequip(

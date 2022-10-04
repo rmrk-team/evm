@@ -235,9 +235,8 @@ contract RMRKEquippable is RMRKNesting, AbstractMultiResource, IRMRKEquippable {
         address baseAddress = getBaseAddressOfResource(data.resourceId);
         uint64 slotPartId = data.slotPartId;
         if (
-            _equipments[data.tokenId][baseAddress][
-                slotPartId
-            ].childEquippableAddress != address(0)
+            _equipments[data.tokenId][baseAddress][slotPartId]
+                .childEquippableAddress != address(0)
         ) revert RMRKSlotAlreadyUsed();
 
         // Check from parent's resource perspective:
@@ -261,8 +260,10 @@ contract RMRKEquippable is RMRKNesting, AbstractMultiResource, IRMRKEquippable {
 
         // Check from base perspective
         if (
-            !IRMRKBaseStorage(baseAddress)
-                .checkIsEquippable(slotPartId, child.contractAddress)
+            !IRMRKBaseStorage(baseAddress).checkIsEquippable(
+                slotPartId,
+                child.contractAddress
+            )
         ) revert RMRKEquippableEquipNotAllowedByBase();
 
         Equipment memory newEquip = Equipment({
@@ -272,9 +273,7 @@ contract RMRKEquippable is RMRKNesting, AbstractMultiResource, IRMRKEquippable {
             childEquippableAddress: child.contractAddress
         });
 
-        _equipments[data.tokenId][baseAddress][
-            slotPartId
-        ] = newEquip;
+        _equipments[data.tokenId][baseAddress][slotPartId] = newEquip;
         _equipCountPerChild[data.tokenId][child.contractAddress][
             child.tokenId
         ] += 1;
@@ -289,10 +288,12 @@ contract RMRKEquippable is RMRKNesting, AbstractMultiResource, IRMRKEquippable {
         );
     }
 
-    function _checkResourceAcceptsSlot(uint64 resourceId, uint64 slotPartId) private view {
+    function _checkResourceAcceptsSlot(uint64 resourceId, uint64 slotPartId)
+        private
+        view
+    {
         (, bool found) = _slotPartIds[resourceId].indexOf(slotPartId);
-        if (!found)
-            revert RMRKTargetResourceCannotReceiveSlot();
+        if (!found) revert RMRKTargetResourceCannotReceiveSlot();
     }
 
     function unequip(
