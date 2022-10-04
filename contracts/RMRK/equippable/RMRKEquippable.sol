@@ -232,14 +232,16 @@ contract RMRKEquippable is RMRKNesting, AbstractMultiResource, IRMRKEquippable {
     }
 
     function _equip(IntakeEquip memory data) private {
+        address baseAddress = getBaseAddressOfResource(data.resourceId);
+        uint64 slotPartId = data.slotPartId;
         if (
-            _equipments[data.tokenId][_baseAddresses[data.resourceId]][
-                data.slotPartId
+            _equipments[data.tokenId][baseAddress][
+                slotPartId
             ].childEquippableAddress != address(0)
         ) revert RMRKSlotAlreadyUsed();
 
         // Check from parent's resource perspective:
-        _checkResourceAcceptsSlot(data.resourceId, data.slotPartId);
+        _checkResourceAcceptsSlot(data.resourceId, slotPartId);
 
         IRMRKNesting.Child memory child = childOf(
             data.tokenId,
@@ -253,14 +255,14 @@ contract RMRKEquippable is RMRKNesting, AbstractMultiResource, IRMRKEquippable {
                     address(this),
                     child.tokenId,
                     data.childResourceId,
-                    data.slotPartId
+                    slotPartId
                 )
         ) revert RMRKTokenCannotBeEquippedWithResourceIntoSlot();
 
         // Check from base perspective
         if (
-            !IRMRKBaseStorage(_baseAddresses[data.resourceId])
-                .checkIsEquippable(data.slotPartId, child.contractAddress)
+            !IRMRKBaseStorage(baseAddress)
+                .checkIsEquippable(slotPartId, child.contractAddress)
         ) revert RMRKEquippableEquipNotAllowedByBase();
 
         Equipment memory newEquip = Equipment({
@@ -270,19 +272,17 @@ contract RMRKEquippable is RMRKNesting, AbstractMultiResource, IRMRKEquippable {
             childEquippableAddress: child.contractAddress
         });
 
-        _equipments[data.tokenId][_baseAddresses[data.resourceId]][
-            data.slotPartId
+        _equipments[data.tokenId][baseAddress][
+            slotPartId
         ] = newEquip;
         _equipCountPerChild[data.tokenId][child.contractAddress][
             child.tokenId
         ] += 1;
 
-        // TODO: Decouple Equip and Unequip events.
-        // TODO: Add ChildReplaced event.
         emit ChildResourceEquipped(
             data.tokenId,
             data.resourceId,
-            data.slotPartId,
+            slotPartId,
             child.tokenId,
             child.contractAddress,
             data.childResourceId

@@ -162,7 +162,6 @@ interface IRMRKMultiResource is IERC165 {
         view
         returns (uint16[] memory);
 
-    //TODO: review definition
     /**
      * @notice Returns the resource which will be overridden if resourceId is accepted from
      * a pending resource array on `tokenId`.
