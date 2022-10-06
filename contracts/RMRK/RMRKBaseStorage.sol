@@ -12,7 +12,7 @@ error RMRKPartIsNotSlot();
 error RMRKZeroLengthIdsPassed();
 error RMRKBadConfig();
 
-contract RMRKBaseStorage is IRMRKBaseStorage, ERC165 {
+contract RMRKBaseStorage is IRMRKBaseStorage, ERC165, ERC165 {
     using Address for address;
     /*
     REVIEW NOTES:
@@ -89,6 +89,11 @@ contract RMRKBaseStorage is IRMRKBaseStorage, ERC165 {
 
     function type_() external view returns (string memory) {
         return _type;
+    }
+
+    function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
+        return super.supportsInterface(interfaceId) ||
+            interfaceId == type(IRMRKBaseStorage).interfaceId;
     }
 
     function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
