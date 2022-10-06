@@ -8,6 +8,12 @@ import 'hardhat-gas-reporter';
 import 'solidity-coverage';
 import 'hardhat-contract-sizer';
 
+// If facing the fetching error while doing contract verifing, uncomment the code below
+// const { ProxyAgent, setGlobalDispatcher } = require("undici");
+// const proxyUrl = 'http://127.0.0.1:7890'; // change to yours, With the global proxy enabled, change the proxyUrl to your own proxy link. The port may be different for each client.
+// const proxyAgent = new ProxyAgent(proxyUrl);
+// setGlobalDispatcher(proxyAgent);
+
 dotenv.config();
 
 // This is a sample Hardhat task. To learn how to create your own go to
@@ -34,12 +40,18 @@ const config: HardhatUserConfig = {
     },
   },
   networks: {
+    hardhat: {
+      mining: {
+        auto: true,
+        interval: 5000,
+      },
+    },
     ropsten: {
-      url: process.env.ROPSTEN_URL || '',
+      url: process.env.ROPSTEN_URL || 'http://127.0.0.1:8545',
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
     goerli: {
-      url: process.env.GOERLI_URL || '',
+      url: process.env.GOERLI_URL || 'http://127.0.0.1:8545',
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
     moonbaseAlpha: {
@@ -49,6 +61,22 @@ const config: HardhatUserConfig = {
     moonriver: {
       url: 'https://rpc.api.moonriver.moonbeam.network',
       chainId: 1285, // (hex: 0x505),
+      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+    },
+    fuji: {
+      url: 'https://rpc.ankr.com/avalanche_fuji',
+      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+    },
+    mumbai: {
+      url: 'https://public-rpc.blockpi.io/http/polygon-mumbai-testnet',
+      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+    },
+    localhost: {
+      url: 'http://localhost:8545',
+      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+    },
+    sepolia: {
+      url: process.env.SEPOLIA_URL || 'http://127.0.0.1:8545',
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
   },
@@ -63,6 +91,7 @@ const config: HardhatUserConfig = {
       moonriver: process.env.MOONRIVER_MOONSCAN_APIKEY || '', // Moonriver Moonscan API Key
       moonbaseAlpha: process.env.MOONBEAM_MOONSCAN_APIKEY || '', // Moonbeam Moonscan API Key
       goerli: process.env.ETHERSCAN_API_KEY || '', // Goerli Etherscan API Key
+      sepolia: process.env.ETHERSCAN_API_KEY || '', // Sepolia Etherscan API Key
     },
   },
 };

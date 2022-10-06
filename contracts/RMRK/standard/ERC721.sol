@@ -11,10 +11,9 @@ import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/introspection/ERC165.sol";
 
-error ERC721AddressZeroIsNotaValidOwner();
+error ERC721AddressZeroIsNotAValidOwner();
 error ERC721ApprovalToCurrentOwner();
 error ERC721ApproveCallerIsNotOwnerNorApprovedForAll();
-error ERC721ApprovedQueryForNonexistentToken();
 error ERC721ApproveToCaller();
 error ERC721InvalidTokenId();
 error ERC721MintToTheZeroAddress();
@@ -87,7 +86,7 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
      */
     function balanceOf(address owner) public view virtual override returns (uint256) {
         if(owner == address(0))
-            revert ERC721AddressZeroIsNotaValidOwner();
+            revert ERC721AddressZeroIsNotAValidOwner();
         return _balances[owner];
     }
 

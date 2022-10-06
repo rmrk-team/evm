@@ -109,7 +109,7 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
         it('throws', async function () {
           await expect(
             this.token.balanceOf(ethers.constants.AddressZero),
-          ).to.be.revertedWithCustomError(this.token, 'ERC721AddressZeroIsNotaValidOwner');
+          ).to.be.revertedWithCustomError(this.token, 'ERC721AddressZeroIsNotAValidOwner');
         });
       });
     });
