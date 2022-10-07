@@ -330,7 +330,6 @@ contract RMRKEquippable is RMRKNesting, AbstractMultiResource, IRMRKEquippable {
         );
     }
 
-    //FIXME: This can probably be optimized. Instead of running unequip first, can we just replace the data?
     function replaceEquipment(IntakeEquip memory data)
         public
         onlyApprovedOrOwner(data.tokenId)
