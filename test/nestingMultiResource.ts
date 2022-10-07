@@ -15,6 +15,7 @@ import {
 } from './utils';
 import shouldBehaveLikeNesting from './behavior/nesting';
 import shouldBehaveLikeMultiResource from './behavior/multiresource';
+import shouldBehaveLikeERC721 from './behavior/erc721';
 
 async function singleFixture(): Promise<{ token: Contract; renderUtils: Contract }> {
   const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiResourceRenderUtils');
@@ -54,6 +55,18 @@ describe('NestingMultiResourceMock MR behavior', async () => {
   });
 
   shouldBehaveLikeMultiResource(mintFromMock, addResourceEntryFromMock, addResourceToToken);
+});
+
+describe('NestingMultiResourceMock ERC721 behavior', function () {
+  let token: Contract;
+
+  beforeEach(async function () {
+    ({ token } = await loadFixture(singleFixture));
+    this.token = token;
+    this.ERC721Receiver = await ethers.getContractFactory('ERC721ReceiverMock');
+  });
+
+  shouldBehaveLikeERC721('NestingMultiResource', 'NMR');
 });
 
 describe('NestingMultiResourceMock Other Behavior', function () {

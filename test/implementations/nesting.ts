@@ -13,7 +13,6 @@ import {
 } from '../utils';
 import shouldBehaveLikeNesting from '../behavior/nesting';
 import shouldControlValidMinting from '../behavior/mintingImpl';
-// import shouldBehaveLikeERC721 from '../behavior/erc721';
 
 async function singleFixture(): Promise<Contract> {
   return singleFixtureWithArgs('RMRKNestingImpl', [
@@ -42,19 +41,6 @@ describe('NestingMultiResourceImpl Nesting Behavior', function () {
   });
 
   shouldBehaveLikeNesting(mintFromImpl, nestMintFromImpl, transfer, nestTransfer);
-});
-
-// FIXME: This test don't fully pass due to difference in minting
-describe('NestingImpl ERC721 behavior', function () {
-  let token: Contract;
-
-  beforeEach(async function () {
-    token = await loadFixture(singleFixture);
-    this.token = token;
-    this.ERC721Receiver = await ethers.getContractFactory('ERC721ReceiverMock');
-  });
-
-  // shouldBehaveLikeERC721(name, symbol);
 });
 
 describe('NestingImpl Other', async function () {
