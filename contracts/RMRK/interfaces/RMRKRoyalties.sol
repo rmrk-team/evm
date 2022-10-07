@@ -13,7 +13,7 @@ abstract contract RMRKRoyalties is IERC2981 {
         address royaltyRecipient,
         uint256 royaltyPercentageBps //in basis points
     ) {
-        _royaltyRecipient = royaltyRecipient;
+        _setRoyaltyRecipient(royaltyRecipient);
         _royaltyPercentageBps = royaltyPercentageBps;
     }
 
@@ -21,6 +21,12 @@ abstract contract RMRKRoyalties is IERC2981 {
     function updateRoyaltyRecipient(address newRoyaltyRecipient)
         external
         virtual;
+
+    function _setRoyaltyRecipient(address newRoyaltyRecipient)
+        internal
+    {
+        _royaltyRecipient = newRoyaltyRecipient;
+    }
 
     //@param tokenId - the token id to get the royalty info for
     //@param salePrice - the sale price of the NFT
