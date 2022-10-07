@@ -4,6 +4,7 @@ import { Contract } from 'ethers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import {
+  ADDRESS_ZERO,
   transfer,
   nestTransfer,
   addResourceToToken,
@@ -30,6 +31,8 @@ async function singleFixture(): Promise<{ token: Contract; renderUtils: Contract
     ONE_ETH,
     'ipfs://collection-meta',
     'ipfs://tokenURI',
+    ADDRESS_ZERO,
+    0,
   ]);
   return { token, renderUtils };
 }
@@ -37,8 +40,26 @@ async function singleFixture(): Promise<{ token: Contract; renderUtils: Contract
 async function parentChildFixture(): Promise<{ parent: Contract; child: Contract }> {
   return parentChildFixtureWithArgs(
     'RMRKNestingMultiResourceImpl',
-    ['Chunky', 'CHNK', 10000, ONE_ETH, 'ipfs://collection-meta', 'ipfs://tokenURI'],
-    ['Monkey', 'MONK', 10000, ONE_ETH, 'ipfs://collection-meta', 'ipfs://tokenURI'],
+    [
+      'Chunky',
+      'CHNK',
+      10000,
+      ONE_ETH,
+      'ipfs://collection-meta',
+      'ipfs://tokenURI',
+      ADDRESS_ZERO,
+      0,
+    ],
+    [
+      'Monkey',
+      'MONK',
+      10000,
+      ONE_ETH,
+      'ipfs://collection-meta',
+      'ipfs://tokenURI',
+      ADDRESS_ZERO,
+      0,
+    ],
   );
 }
 

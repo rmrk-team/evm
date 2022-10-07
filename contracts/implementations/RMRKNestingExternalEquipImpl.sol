@@ -1,18 +1,19 @@
 // SPDX-License-Identifier: Apache-2.0
 
-pragma solidity ^0.8.15;
+pragma solidity ^0.8.16;
 
 import "../RMRK/equippable/RMRKNestingExternalEquip.sol";
+import "../RMRK/extension/RMRKRoyalties.sol";
 import "../RMRK/utils/RMRKCollectionMetadata.sol";
 import "../RMRK/utils/RMRKMintingUtils.sol";
 
 error RMRKMintUnderpriced();
 error RMRKMintZero();
 
-//Minimal public implementation of IRMRKNesting for testing.
 contract RMRKNestingExternalEquipImpl is
     RMRKMintingUtils,
     RMRKCollectionMetadata,
+    RMRKRoyalties,
     RMRKNestingExternalEquip
 {
     address _equippableAddress;
@@ -25,11 +26,14 @@ contract RMRKNestingExternalEquipImpl is
         uint256 pricePerMint_,
         address equippableAddress_,
         string memory collectionMetadata_,
-        string memory tokenURI_
+        string memory tokenURI_,
+        address royaltyRecipient,
+        uint256 royaltyPercentageBps //in basis points
     )
         RMRKNestingExternalEquip(name_, symbol_)
         RMRKMintingUtils(maxSupply_, pricePerMint_)
         RMRKCollectionMetadata(collectionMetadata_)
+        RMRKRoyalties(royaltyRecipient, royaltyPercentageBps)
     {
         // Can't add an equippable deployment here due to contract size, for factory
         // pattern can use OZ clone
@@ -94,5 +98,9 @@ contract RMRKNestingExternalEquipImpl is
 
     function tokenURI(uint256) public view override returns (string memory) {
         return _tokenURI;
+    }
+
+    function updateRoyaltyRecipient(address newRoyaltyRecipient) external override {
+        _setRoyaltyRecipient(newRoyaltyRecipient);
     }
 }

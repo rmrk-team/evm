@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
-pragma solidity ^0.8.15;
+pragma solidity ^0.8.16;
 
+import "../RMRK/extension/RMRKRoyalties.sol";
 import "../RMRK/nesting/RMRKNesting.sol";
 import "../RMRK/utils/RMRKCollectionMetadata.sol";
 import "../RMRK/utils/RMRKMintingUtils.sol";
@@ -9,14 +10,12 @@ import "../RMRK/utils/RMRKMintingUtils.sol";
 error RMRKMintUnderpriced();
 error RMRKMintZero();
 
-//Minimal public implementation of IRMRKNesting for testing.
 contract RMRKNestingImpl is
     RMRKMintingUtils,
     RMRKCollectionMetadata,
+    RMRKRoyalties,
     RMRKNesting
 {
-    // Manage resources via increment
-    uint256 private _totalResources;
     string private _tokenURI;
 
     constructor(
@@ -25,11 +24,14 @@ contract RMRKNestingImpl is
         uint256 maxSupply_,
         uint256 pricePerMint_,
         string memory collectionMetadata_,
-        string memory tokenURI_
+        string memory tokenURI_,
+        address royaltyRecipient,
+        uint256 royaltyPercentageBps //in basis points
     )
         RMRKNesting(name_, symbol_)
         RMRKMintingUtils(maxSupply_, pricePerMint_)
         RMRKCollectionMetadata(collectionMetadata_)
+        RMRKRoyalties(royaltyRecipient, royaltyPercentageBps)
     {
         _tokenURI = tokenURI_;
     }
@@ -96,5 +98,9 @@ contract RMRKNestingImpl is
 
     function tokenURI(uint256) public view override returns (string memory) {
         return _tokenURI;
+    }
+
+    function updateRoyaltyRecipient(address newRoyaltyRecipient) external override {
+        _setRoyaltyRecipient(newRoyaltyRecipient);
     }
 }

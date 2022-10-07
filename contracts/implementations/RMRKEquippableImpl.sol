@@ -2,8 +2,8 @@
 
 pragma solidity ^0.8.16;
 
-import "../RMRK/access/OwnableLock.sol";
 import "../RMRK/equippable/RMRKEquippable.sol";
+import "../RMRK/extension/RMRKRoyalties.sol";
 import "../RMRK/utils/RMRKCollectionMetadata.sol";
 import "../RMRK/utils/RMRKMintingUtils.sol";
 
@@ -13,8 +13,10 @@ error RMRKMintZero();
 contract RMRKEquippableImpl is
     RMRKMintingUtils,
     RMRKCollectionMetadata,
+    RMRKRoyalties,
     RMRKEquippable
 {
+    uint256 private _totalResources;
     string private _tokenURI;
 
     constructor(
@@ -23,11 +25,14 @@ contract RMRKEquippableImpl is
         uint256 maxSupply,
         uint256 pricePerMint,
         string memory collectionMetadata_,
-        string memory tokenURI_
+        string memory tokenURI_,
+        address royaltyRecipient,
+        uint256 royaltyPercentageBps //in basis points
     )
         RMRKEquippable(name, symbol)
         RMRKMintingUtils(maxSupply, pricePerMint)
         RMRKCollectionMetadata(collectionMetadata_)
+        RMRKRoyalties(royaltyRecipient, royaltyPercentageBps)
     {
         _tokenURI = tokenURI_;
     }
@@ -95,6 +100,9 @@ contract RMRKEquippableImpl is
         uint64[] calldata fixedPartIds,
         uint64[] calldata slotPartIds
     ) external onlyOwnerOrContributor {
+        unchecked {
+            _totalResources += 1;
+        }
         _addResourceEntry(resource, fixedPartIds, slotPartIds);
     }
 
@@ -110,7 +118,15 @@ contract RMRKEquippableImpl is
         );
     }
 
+    function totalResources() external view returns (uint256) {
+        return _totalResources;
+    }
+
     function tokenURI(uint256) public view override returns (string memory) {
         return _tokenURI;
+    }
+
+    function updateRoyaltyRecipient(address newRoyaltyRecipient) external override {
+        _setRoyaltyRecipient(newRoyaltyRecipient);
     }
 }

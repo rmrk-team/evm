@@ -3,6 +3,7 @@ import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import {
+  ADDRESS_ZERO,
   addResourceToToken,
   addResourceEntryEquippables,
   mintFromImpl,
@@ -51,6 +52,8 @@ async function partsFixture() {
     ethers.constants.AddressZero,
     'ipfs://collection-meta',
     'ipfs://tokenURI',
+    ADDRESS_ZERO,
+    0,
   );
   const neonEquip = await equipFactory.deploy(neon.address);
   await neon.deployed();
@@ -67,6 +70,8 @@ async function partsFixture() {
     ethers.constants.AddressZero,
     'ipfs://collection-meta',
     'ipfs://tokenURI',
+    ADDRESS_ZERO,
+    0,
   );
   await mask.deployed();
   const maskEquip = await equipFactory.deploy(mask.address);
@@ -124,6 +129,8 @@ async function slotsFixture() {
     ethers.constants.AddressZero,
     'ipfs://collection-meta',
     'ipfs://tokenURI',
+    ADDRESS_ZERO,
+    0,
   );
   await soldier.deployed();
   const soldierEquip = await equipFactory.deploy(soldier.address);
@@ -140,6 +147,8 @@ async function slotsFixture() {
     ethers.constants.AddressZero,
     'ipfs://collection-meta',
     'ipfs://tokenURI',
+    ADDRESS_ZERO,
+    0,
   );
   await weapon.deployed();
   const weaponEquip = await equipFactory.deploy(weapon.address);
@@ -156,6 +165,8 @@ async function slotsFixture() {
     ethers.constants.AddressZero,
     'ipfs://collection-meta',
     'ipfs://tokenURI',
+    ADDRESS_ZERO,
+    0,
   );
   await weaponGem.deployed();
   const weaponGemEquip = await equipFactory.deploy(weaponGem.address);
@@ -172,6 +183,8 @@ async function slotsFixture() {
     ethers.constants.AddressZero,
     'ipfs://collection-meta',
     'ipfs://tokenURI',
+    ADDRESS_ZERO,
+    0,
   );
   await background.deployed();
   const backgroundEquip = await equipFactory.deploy(background.address);
@@ -220,6 +233,8 @@ async function resourcesFixture() {
     ethers.constants.AddressZero,
     'ipfs://collection-meta',
     'ipfs://tokenURI',
+    ADDRESS_ZERO,
+    0,
   );
   await nesting.deployed();
 
@@ -247,6 +262,8 @@ async function equipFixture() {
     ethers.constants.AddressZero,
     'ipfs://collection-meta',
     'ipfs://tokenURI',
+    ADDRESS_ZERO,
+    0,
   );
   await nesting.deployed();
 

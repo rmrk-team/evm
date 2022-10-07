@@ -3,6 +3,7 @@ import { expect } from 'chai';
 import { Contract } from 'ethers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import {
+  ADDRESS_ZERO,
   transfer,
   nestTransfer,
   singleFixtureWithArgs,
@@ -22,18 +23,38 @@ async function singleFixture(): Promise<Contract> {
     ONE_ETH,
     'ipfs://collection-meta',
     'ipfs://tokenURI',
+    ADDRESS_ZERO,
+    0,
   ]);
 }
 
 async function parentChildFixture(): Promise<{ parent: Contract; child: Contract }> {
   return parentChildFixtureWithArgs(
     'RMRKNestingImpl',
-    ['Chunky', 'CHNK', 10000, ONE_ETH, 'ipfs://collection-meta', 'ipfs://tokenURI'],
-    ['Monkey', 'MONK', 10000, ONE_ETH, 'ipfs://collection-meta', 'ipfs://tokenURI'],
+    [
+      'Chunky',
+      'CHNK',
+      10000,
+      ONE_ETH,
+      'ipfs://collection-meta',
+      'ipfs://tokenURI',
+      ADDRESS_ZERO,
+      0,
+    ],
+    [
+      'Monkey',
+      'MONK',
+      10000,
+      ONE_ETH,
+      'ipfs://collection-meta',
+      'ipfs://tokenURI',
+      ADDRESS_ZERO,
+      0,
+    ],
   );
 }
 
-describe('NestingMultiResourceImpl Nesting Behavior', function () {
+describe('NestingImpl Nesting Behavior', function () {
   beforeEach(async function () {
     const { parent, child } = await loadFixture(parentChildFixture);
     this.parentToken = parent;

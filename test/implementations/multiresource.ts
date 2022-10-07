@@ -7,6 +7,7 @@ import shouldBehaveLikeOwnableLock from '../behavior/ownableLock';
 import shouldBehaveLikeMultiResource from '../behavior/multiresource';
 import shouldControlValidMinting from '../behavior/mintingImpl';
 import {
+  ADDRESS_ZERO,
   addResourceToToken,
   singleFixtureWithArgs,
   mintFromImpl,
@@ -26,6 +27,8 @@ async function singleFixture(): Promise<{ token: Contract; renderUtils: Contract
     ONE_ETH,
     'ipfs://collection-meta',
     'ipfs://tokenURI',
+    ADDRESS_ZERO,
+    0,
   ]);
   return { token, renderUtils };
 }
