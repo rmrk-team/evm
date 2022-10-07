@@ -83,8 +83,13 @@ async function addResourceEntryFromImpl(token: Contract, data?: string): Promise
 
 async function addResourceEntryEquippables(token: Contract, data?: string): Promise<BigNumber> {
   const resourceId = bn(nextResourceId);
-  const refId = bn(1);
-  const extendedResource = [resourceId, refId, ADDRESS_ZERO, data !== undefined ? data : 'metaURI'];
+  const equippableGroupId = bn(1);
+  const extendedResource = [
+    resourceId,
+    equippableGroupId,
+    ADDRESS_ZERO,
+    data !== undefined ? data : 'metaURI',
+  ];
   nextResourceId++;
   await token.addResourceEntry(extendedResource, [], []);
   return resourceId;

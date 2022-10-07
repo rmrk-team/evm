@@ -46,7 +46,7 @@ describe('Render Utils', async function () {
     await equip.addResourceEntry(
       {
         id: resId,
-        equippableRefId: 0,
+        equippableGroupId: 0,
         metadataURI: 'ipfs://res1.jpg',
         baseAddress: ethers.constants.AddressZero,
       },
@@ -56,7 +56,7 @@ describe('Render Utils', async function () {
     await equip.addResourceEntry(
       {
         id: resId2,
-        equippableRefId: 1,
+        equippableGroupId: 1,
         metadataURI: 'ipfs://res2.jpg',
         baseAddress: other.address,
       },

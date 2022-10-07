@@ -22,9 +22,7 @@ abstract contract RMRKRoyalties is IERC2981 {
         external
         virtual;
 
-    function _setRoyaltyRecipient(address newRoyaltyRecipient)
-        internal
-    {
+    function _setRoyaltyRecipient(address newRoyaltyRecipient) internal {
         _royaltyRecipient = newRoyaltyRecipient;
     }
 

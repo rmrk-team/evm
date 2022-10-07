@@ -14,7 +14,7 @@ import {
   masks,
   neonResIds,
   maskResourcesEquip,
-  maskEquippableRefId,
+  maskEquippableGroupId,
 } from '../setup/equippableParts';
 import { bn } from '../utils';
 
@@ -99,7 +99,7 @@ async function shouldBehaveLikeEquippableWithParts() {
 
       const expectedResource = [
         bn(neonResIds[0]), // id
-        bn(0), // equippableRefId
+        bn(0), // equippableGroupId
         baseContract.address, // baseAddress
         'ipfs:neonRes/1', // metadataURI
       ];
@@ -141,7 +141,7 @@ async function shouldBehaveLikeEquippableWithParts() {
     it('can compose all parts for mask', async function () {
       const expectedResource = [
         bn(maskResourcesEquip[0]), // id
-        bn(maskEquippableRefId), // equippableRefId
+        bn(maskEquippableGroupId), // equippableGroupId
         baseContract.address, // baseAddress
         `ipfs:weapon/equip/${maskResourcesEquip[0]}`, // metadataURI
       ];
@@ -182,7 +182,7 @@ async function shouldBehaveLikeEquippableWithParts() {
       await maskEquipContract.addResourceEntry(
         {
           id: noBaseResourceId,
-          equippableRefId: 0, // Not meant to equip
+          equippableGroupId: 0, // Not meant to equip
           metadataURI: `ipfs:weapon/full/customResource.png`,
           baseAddress: ethers.constants.AddressZero, // Not meant to equip
         },

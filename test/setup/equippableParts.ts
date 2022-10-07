@@ -39,7 +39,7 @@ const masks: number[] = [];
 const neonResIds = [100, 101, 102, 103, 104];
 const maskResourcesFull = [1, 2, 3, 4]; // Must match the total of uniqueResources
 const maskResourcesEquip = [5, 6, 7, 8]; // Must match the total of uniqueResources
-const maskEquippableRefId = 1; // Resources to equip will all use this
+const maskEquippableGroupId = 1; // Resources to equip will all use this
 
 enum ItemType {
   None,
@@ -273,7 +273,7 @@ async function setupContextForParts(
     await neonEquip.addResourceEntry(
       {
         id: neonResIds[0],
-        equippableRefId: 0,
+        equippableGroupId: 0,
         metadataURI: 'ipfs:neonRes/1',
         baseAddress: base.address,
       },
@@ -283,7 +283,7 @@ async function setupContextForParts(
     await neonEquip.addResourceEntry(
       {
         id: neonResIds[1],
-        equippableRefId: 0,
+        equippableGroupId: 0,
         metadataURI: 'ipfs:neonRes/2',
         baseAddress: base.address,
       },
@@ -293,7 +293,7 @@ async function setupContextForParts(
     await neonEquip.addResourceEntry(
       {
         id: neonResIds[2],
-        equippableRefId: 0,
+        equippableGroupId: 0,
         metadataURI: 'ipfs:neonRes/3',
         baseAddress: base.address,
       },
@@ -303,7 +303,7 @@ async function setupContextForParts(
     await neonEquip.addResourceEntry(
       {
         id: neonResIds[3],
-        equippableRefId: 0,
+        equippableGroupId: 0,
         metadataURI: 'ipfs:neonRes/4',
         baseAddress: base.address,
       },
@@ -313,7 +313,7 @@ async function setupContextForParts(
     await neonEquip.addResourceEntry(
       {
         id: neonResIds[4],
-        equippableRefId: 0,
+        equippableGroupId: 0,
         metadataURI: 'ipfs:neonRes/1',
         baseAddress: base.address,
       },
@@ -332,7 +332,7 @@ async function setupContextForParts(
     await maskEquip.addResourceEntry(
       {
         id: maskResourcesFull[0],
-        equippableRefId: 0, // Not meant to equip
+        equippableGroupId: 0, // Not meant to equip
         metadataURI: `ipfs:weapon/full/${maskResourcesFull[0]}`,
         baseAddress: base.address, // Not meant to equip, but base needed for parts
       },
@@ -342,7 +342,7 @@ async function setupContextForParts(
     await maskEquip.addResourceEntry(
       {
         id: maskResourcesFull[1],
-        equippableRefId: 0, // Not meant to equip
+        equippableGroupId: 0, // Not meant to equip
         metadataURI: `ipfs:weapon/full/${maskResourcesFull[1]}`,
         baseAddress: base.address, // Not meant to equip, but base needed for parts
       },
@@ -352,7 +352,7 @@ async function setupContextForParts(
     await maskEquip.addResourceEntry(
       {
         id: maskResourcesFull[2],
-        equippableRefId: 0, // Not meant to equip
+        equippableGroupId: 0, // Not meant to equip
         metadataURI: `ipfs:weapon/full/${maskResourcesFull[2]}`,
         baseAddress: base.address, // Not meant to equip, but base needed for parts
       },
@@ -362,7 +362,7 @@ async function setupContextForParts(
     await maskEquip.addResourceEntry(
       {
         id: maskResourcesFull[3],
-        equippableRefId: 0, // Not meant to equip
+        equippableGroupId: 0, // Not meant to equip
         metadataURI: `ipfs:weapon/full/${maskResourcesFull[3]}`,
         baseAddress: base.address, // Not meant to equip, but base needed for parts
       },
@@ -374,7 +374,7 @@ async function setupContextForParts(
     await maskEquip.addResourceEntry(
       {
         id: maskResourcesEquip[0],
-        equippableRefId: maskEquippableRefId,
+        equippableGroupId: maskEquippableGroupId,
         metadataURI: `ipfs:weapon/equip/${maskResourcesEquip[0]}`,
         baseAddress: base.address,
       },
@@ -386,7 +386,7 @@ async function setupContextForParts(
     await maskEquip.addResourceEntry(
       {
         id: maskResourcesEquip[1],
-        equippableRefId: maskEquippableRefId,
+        equippableGroupId: maskEquippableGroupId,
         metadataURI: `ipfs:weapon/equip/${maskResourcesEquip[1]}`,
         baseAddress: base.address,
       },
@@ -398,7 +398,7 @@ async function setupContextForParts(
     await maskEquip.addResourceEntry(
       {
         id: maskResourcesEquip[2],
-        equippableRefId: maskEquippableRefId,
+        equippableGroupId: maskEquippableGroupId,
         metadataURI: `ipfs:weapon/equip/${maskResourcesEquip[2]}`,
         baseAddress: base.address,
       },
@@ -410,7 +410,7 @@ async function setupContextForParts(
     await maskEquip.addResourceEntry(
       {
         id: maskResourcesEquip[3],
-        equippableRefId: maskEquippableRefId,
+        equippableGroupId: maskEquippableGroupId,
         metadataURI: `ipfs:weapon/equip/${maskResourcesEquip[3]}`,
         baseAddress: base.address,
       },
@@ -419,7 +419,11 @@ async function setupContextForParts(
     );
 
     // Can be equipped into neons
-    await maskEquip.setValidParentRefId(maskEquippableRefId, neonEquip.address, partIdForMask);
+    await maskEquip.setValidParentForEquippableGroup(
+      maskEquippableGroupId,
+      neonEquip.address,
+      partIdForMask,
+    );
 
     // Add 2 resources to each weapon, one full, one for equip
     // There are 10 weapon tokens for 4 unique resources so we use %
@@ -465,6 +469,6 @@ export {
   neonResIds,
   maskResourcesFull,
   maskResourcesEquip,
-  maskEquippableRefId,
+  maskEquippableGroupId,
   setupContextForParts,
 };

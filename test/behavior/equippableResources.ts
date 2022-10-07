@@ -14,7 +14,7 @@ async function shouldBehaveLikeEquippableResources(
   let owner: SignerWithAddress;
   let addrs: SignerWithAddress[];
 
-  const equippableRefIdDefault = bn(1);
+  const equippableGroupIdDefault = bn(1);
   const metaURIDefault = 'metaURI';
   const baseAddressDefault = ethers.constants.AddressZero;
 
@@ -49,7 +49,7 @@ async function shouldBehaveLikeEquippableResources(
         chunkyEquip.addResourceEntry(
           {
             id: id,
-            equippableRefId: equippableRefIdDefault,
+            equippableGroupId: equippableGroupIdDefault,
             metadataURI: metaURIDefault,
             baseAddress: baseAddressDefault,
           },
@@ -75,7 +75,7 @@ async function shouldBehaveLikeEquippableResources(
         chunkyEquip.addResourceEntry(
           {
             id: id,
-            equippableRefId: equippableRefIdDefault,
+            equippableGroupId: equippableGroupIdDefault,
             metadataURI: metaURIDefault,
             baseAddress: baseAddressDefault,
           },
@@ -87,7 +87,7 @@ async function shouldBehaveLikeEquippableResources(
         chunkyEquip.addResourceEntry(
           {
             id: id,
-            equippableRefId: equippableRefIdDefault,
+            equippableGroupId: equippableGroupIdDefault,
             metadataURI: metaURIDefault,
             baseAddress: baseAddressDefault,
           },
@@ -103,7 +103,7 @@ async function shouldBehaveLikeEquippableResources(
       await chunkyEquip.addResourceEntry(
         {
           id: id,
-          equippableRefId: equippableRefIdDefault,
+          equippableGroupId: equippableGroupIdDefault,
           metadataURI: metaURIDefault,
           baseAddress: baseAddressDefault,
         },
@@ -114,7 +114,7 @@ async function shouldBehaveLikeEquippableResources(
         chunkyEquip.addResourceEntry(
           {
             id: id,
-            equippableRefId: equippableRefIdDefault,
+            equippableGroupId: equippableGroupIdDefault,
             metadataURI: metaURIDefault,
             baseAddress: baseAddressDefault,
           },
@@ -131,7 +131,7 @@ async function shouldBehaveLikeEquippableResources(
         chunkyEquip.addResourceEntry(
           {
             id: id,
-            equippableRefId: equippableRefIdDefault,
+            equippableGroupId: equippableGroupIdDefault,
             metadataURI: metaURIDefault,
             baseAddress: baseAddressDefault,
           },
@@ -148,7 +148,7 @@ async function shouldBehaveLikeEquippableResources(
         chunkyEquip.addResourceEntry(
           {
             id: id,
-            equippableRefId: equippableRefIdDefault,
+            equippableGroupId: equippableGroupIdDefault,
             metadataURI: metaURIDefault,
             baseAddress: baseAddressDefault,
           },
@@ -163,7 +163,7 @@ async function shouldBehaveLikeEquippableResources(
         chunkyEquip.addResourceEntry(
           {
             id: id,
-            equippableRefId: equippableRefIdDefault,
+            equippableGroupId: equippableGroupIdDefault,
             metadataURI: metaURIDefault,
             baseAddress: baseAddressDefault,
           },
@@ -198,8 +198,8 @@ async function shouldBehaveLikeEquippableResources(
       } else {
         const pending = await chunkyEquip.getFullPendingExtendedResources(tokenId);
         expect(pending).to.be.eql([
-          [resId, equippableRefIdDefault, baseAddressDefault, metaURIDefault],
-          [resId2, equippableRefIdDefault, baseAddressDefault, metaURIDefault],
+          [resId, equippableGroupIdDefault, baseAddressDefault, metaURIDefault],
+          [resId2, equippableGroupIdDefault, baseAddressDefault, metaURIDefault],
         ]);
       }
     });
@@ -290,7 +290,7 @@ async function shouldBehaveLikeEquippableResources(
         ]);
       } else {
         expect(await chunkyEquip.getFullExtendedResources(tokenId)).to.eql([
-          [resId, equippableRefIdDefault, baseAddressDefault, metaURIDefault],
+          [resId, equippableGroupIdDefault, baseAddressDefault, metaURIDefault],
         ]);
       }
     });
@@ -325,8 +325,8 @@ async function shouldBehaveLikeEquippableResources(
         ]);
       } else {
         expect(await chunkyEquip.getFullExtendedResources(tokenId)).to.eql([
-          [resId2, equippableRefIdDefault, baseAddressDefault, metaURIDefault],
-          [resId, equippableRefIdDefault, baseAddressDefault, metaURIDefault],
+          [resId2, equippableGroupIdDefault, baseAddressDefault, metaURIDefault],
+          [resId, equippableGroupIdDefault, baseAddressDefault, metaURIDefault],
         ]);
       }
     });
@@ -413,7 +413,7 @@ async function shouldBehaveLikeEquippableResources(
         ]);
       } else {
         expect(await chunkyEquip.getFullExtendedResources(tokenId)).to.be.eql([
-          [resId2, equippableRefIdDefault, baseAddressDefault, metaURIDefault],
+          [resId2, equippableGroupIdDefault, baseAddressDefault, metaURIDefault],
         ]);
       }
       // Overwrite should be gone
@@ -435,7 +435,7 @@ async function shouldBehaveLikeEquippableResources(
         ]);
       } else {
         expect(await chunkyEquip.getFullExtendedResources(tokenId)).to.be.eql([
-          [resId, equippableRefIdDefault, baseAddressDefault, metaURIDefault],
+          [resId, equippableGroupIdDefault, baseAddressDefault, metaURIDefault],
         ]);
       }
     });
@@ -740,7 +740,7 @@ async function shouldBehaveLikeEquippableResources(
       await chunkyEquip.addResourceEntry(
         {
           id: ids[i],
-          equippableRefId: equippableRefIdDefault,
+          equippableGroupId: equippableGroupIdDefault,
           metadataURI: metaURIDefault,
           baseAddress: baseAddressDefault,
         },

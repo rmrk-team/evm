@@ -153,7 +153,7 @@ async function setupContextForSlots(
     await soldierEquip.addResourceEntry(
       {
         id: soldierResId,
-        equippableRefId: 0,
+        equippableGroupId: 0,
         metadataURI: 'ipfs:soldier/',
         baseAddress: base.address,
       },
@@ -167,13 +167,13 @@ async function setupContextForSlots(
   }
 
   async function addResourcesToWeapon(): Promise<void> {
-    const equippableRefId = 1; // Resources to equip will both use this
+    const equippableGroupId = 1; // Resources to equip will both use this
 
     for (let i = 0; i < weaponResourcesFull.length; i++) {
       await weaponEquip.addResourceEntry(
         {
           id: weaponResourcesFull[i],
-          equippableRefId: 0, // Not meant to equip
+          equippableGroupId: 0, // Not meant to equip
           metadataURI: `ipfs:weapon/full/${weaponResourcesFull[i]}`,
           baseAddress: ethers.constants.AddressZero, // Not meant to equip
         },
@@ -185,7 +185,7 @@ async function setupContextForSlots(
       await weaponEquip.addResourceEntry(
         {
           id: weaponResourcesEquip[i],
-          equippableRefId: equippableRefId,
+          equippableGroupId: equippableGroupId,
           metadataURI: `ipfs:weapon/equip/${weaponResourcesEquip[i]}`,
           baseAddress: base.address,
         },
@@ -195,7 +195,11 @@ async function setupContextForSlots(
     }
 
     // Can be equipped into soldiers
-    await weaponEquip.setValidParentRefId(equippableRefId, soldierEquip.address, partIdForWeapon);
+    await weaponEquip.setValidParentForEquippableGroup(
+      equippableGroupId,
+      soldierEquip.address,
+      partIdForWeapon,
+    );
 
     // Add 2 resources to each weapon, one full, one for equip
     // There are 10 weapon tokens for 4 unique resources so we use %
@@ -216,11 +220,11 @@ async function setupContextForSlots(
   }
 
   async function addResourcesToWeaponGem(): Promise<void> {
-    const equippableRefId = 1; // Resources to equip will use this
+    const equippableGroupId = 1; // Resources to equip will use this
     await weaponGemEquip.addResourceEntry(
       {
         id: weaponGemResourceFull,
-        equippableRefId: 0, // Not meant to equip
+        equippableGroupId: 0, // Not meant to equip
         metadataURI: 'ipfs:weagponGem/full/',
         baseAddress: ethers.constants.AddressZero, // Not meant to equip
       },
@@ -230,7 +234,7 @@ async function setupContextForSlots(
     await weaponGemEquip.addResourceEntry(
       {
         id: weaponGemResourceEquip,
-        equippableRefId: equippableRefId,
+        equippableGroupId: equippableGroupId,
         metadataURI: 'ipfs:weagponGem/equip/',
         baseAddress: base.address,
       },
@@ -238,8 +242,8 @@ async function setupContextForSlots(
       [],
     );
     // Can be equipped into weapons
-    await weaponGemEquip.setValidParentRefId(
-      equippableRefId,
+    await weaponGemEquip.setValidParentForEquippableGroup(
+      equippableGroupId,
       weaponEquip.address,
       partIdForWeaponGem,
     );
@@ -253,11 +257,11 @@ async function setupContextForSlots(
   }
 
   async function addResourcesToBackground(): Promise<void> {
-    const equippableRefId = 1; // Resources to equip will use this
+    const equippableGroupId = 1; // Resources to equip will use this
     await backgroundEquip.addResourceEntry(
       {
         id: backgroundResourceId,
-        equippableRefId: equippableRefId,
+        equippableGroupId: equippableGroupId,
         metadataURI: 'ipfs:background/',
         baseAddress: base.address,
       },
@@ -265,8 +269,8 @@ async function setupContextForSlots(
       [],
     );
     // Can be equipped into soldiers
-    await backgroundEquip.setValidParentRefId(
-      equippableRefId,
+    await backgroundEquip.setValidParentForEquippableGroup(
+      equippableGroupId,
       soldierEquip.address,
       partIdForBackground,
     );

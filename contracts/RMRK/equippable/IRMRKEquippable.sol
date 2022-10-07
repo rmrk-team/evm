@@ -15,7 +15,7 @@ interface IRMRKEquippable is IRMRKMultiResource {
     struct ExtendedResource {
         // Used for input/output only
         uint64 id; // ID of this resource
-        uint64 equippableRefId;
+        uint64 equippableGroupId;
         address baseAddress;
         string metadataURI;
     }
@@ -68,10 +68,10 @@ interface IRMRKEquippable is IRMRKMultiResource {
     );
 
     /**
-     * @dev emitted when it's declared that resources with the referenceId, are equippable into the parent address, on the partId slot
+     * @dev emitted when it's declared that resources with the equippableGroupId, are equippable into the parent address, on the partId slot
      */
-    event ValidParentReferenceIdSet(
-        uint64 indexed referenceId,
+    event ValidParentEquippableGroupIdSet(
+        uint64 indexed equippableGroupId,
         uint64 indexed slotPartId,
         address parentAddress
     );

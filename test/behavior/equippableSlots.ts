@@ -245,8 +245,8 @@ async function shouldBehaveLikeEquippableWithSlots(
       await weaponGemEquip.connect(soldierOwner).acceptResource(newWeaponGemId, 0);
 
       // The malicious child indicates it can be equipped into soldier:
-      await weaponGemEquip.setValidParentRefId(
-        1, // equippableRefId for gems
+      await weaponGemEquip.setValidParentForEquippableGroup(
+        1, // equippableGroupId for gems
         soldierEquip.address,
         partIdForWeaponGem,
       );
@@ -346,7 +346,7 @@ async function shouldBehaveLikeEquippableWithSlots(
       const childIndex = 0;
       const weaponResId = weaponResourcesEquip[0]; // This resource is assigned to weapon first weapon
 
-      // Remove equipable addresses for part.
+      // Remove equippable addresses for part.
       await base.resetEquippableAddresses(partIdForWeapon);
       await expect(
         soldierEquip
@@ -547,7 +547,7 @@ async function shouldBehaveLikeEquippableWithSlots(
 
       const expectedResource = [
         bn(soldierResId), // id
-        bn(0), // equippableRefId
+        bn(0), // equippableGroupId
         base.address, // baseAddress
         'ipfs:soldier/', // metadataURI
       ];
@@ -588,7 +588,7 @@ async function shouldBehaveLikeEquippableWithSlots(
     it('can get composables for simple resource', async function () {
       const expectedResource = [
         bn(backgroundResourceId), // id
-        bn(1), // equippableRefId
+        bn(1), // equippableGroupId
         base.address, // baseAddress
         'ipfs:background/', // metadataURI
       ];
@@ -610,13 +610,13 @@ async function shouldBehaveLikeEquippableWithSlots(
 
   async function addNewEquippableResourceToWeapon(
     newWeaponResId: number,
-    newEquippableRefId: number,
+    newequippableGroupId: number,
     partIdForWeaponAlt: number,
   ): Promise<void> {
     await weaponEquip.addResourceEntry(
       {
         id: newWeaponResId,
-        equippableRefId: newEquippableRefId,
+        equippableGroupId: newequippableGroupId,
         metadataURI: `ipfs:weapon/equipAlt/${newWeaponResId}`,
         baseAddress: base.address,
       },
@@ -625,10 +625,14 @@ async function shouldBehaveLikeEquippableWithSlots(
     );
     // Make it equippable into soldier using new slot
     await expect(
-      weaponEquip.setValidParentRefId(newEquippableRefId, soldierEquip.address, partIdForWeaponAlt),
+      weaponEquip.setValidParentForEquippableGroup(
+        newequippableGroupId,
+        soldierEquip.address,
+        partIdForWeaponAlt,
+      ),
     )
-      .to.emit(weaponEquip, 'ValidParentReferenceIdSet')
-      .withArgs(newEquippableRefId, soldierEquip.address, partIdForWeaponAlt);
+      .to.emit(weaponEquip, 'ValidParentEquippableGroupIdSet')
+      .withArgs(newequippableGroupId, soldierEquip.address, partIdForWeaponAlt);
 
     // Add the resource to the weapon and accept it
     await weaponEquip.addResourceToToken(weaponsIds[0], newWeaponResId, 0);

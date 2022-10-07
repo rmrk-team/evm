@@ -52,7 +52,7 @@ contract RMRKExternalEquip is AbstractMultiResource, IRMRKExternalEquip {
 
     //mapping of uint64 Ids to resource object
     mapping(uint64 => address) private _baseAddresses;
-    mapping(uint64 => uint64) private _equippableRefIds;
+    mapping(uint64 => uint64) private _equippableGroupIds;
 
     //Mapping of resourceId to all base parts (slot and fixed) applicable to this resource. Check cost of adding these to resource struct.
     mapping(uint64 => uint64[]) private _fixedPartIds;
@@ -66,7 +66,7 @@ contract RMRKExternalEquip is AbstractMultiResource, IRMRKExternalEquip {
     mapping(uint256 => mapping(address => mapping(uint256 => uint8)))
         private _equipCountPerChild;
 
-    //Mapping of refId to parent contract address and valid slotId
+    //Mapping of equippableGroupId to parent contract address and valid slotId
     mapping(uint64 => mapping(address => uint64)) private _validParentSlots;
 
     function _onlyApprovedOrOwner(uint256 tokenId) internal view {
@@ -350,14 +350,18 @@ contract RMRKExternalEquip is AbstractMultiResource, IRMRKExternalEquip {
 
     // --------------------- VALIDATION ---------------------
 
-    // Declares that resources with this refId, are equippable into the parent address, on the partId slot
-    function _setValidParentRefId(
-        uint64 referenceId,
+    // Declares that resources with this equippableGroupId, are equippable into the parent address, on the partId slot
+    function _setValidParentForEquippableGroup(
+        uint64 equippableGroupId,
         address parentAddress,
         uint64 slotPartId
     ) internal {
-        _validParentSlots[referenceId][parentAddress] = slotPartId;
-        emit ValidParentReferenceIdSet(referenceId, slotPartId, parentAddress);
+        _validParentSlots[equippableGroupId][parentAddress] = slotPartId;
+        emit ValidParentEquippableGroupIdSet(
+            equippableGroupId,
+            slotPartId,
+            parentAddress
+        );
     }
 
     function canTokenBeEquippedWithResourceIntoSlot(
@@ -366,8 +370,8 @@ contract RMRKExternalEquip is AbstractMultiResource, IRMRKExternalEquip {
         uint64 resourceId,
         uint64 slotId
     ) public view returns (bool) {
-        uint64 refId = _equippableRefIds[resourceId];
-        uint64 equippableSlot = _validParentSlots[refId][parent];
+        uint64 equippableGroupId = _equippableGroupIds[resourceId];
+        uint64 equippableSlot = _validParentSlots[equippableGroupId][parent];
         if (equippableSlot == slotId) {
             (, bool found) = getActiveResources(tokenId).indexOf(resourceId);
             return found;
@@ -393,7 +397,7 @@ contract RMRKExternalEquip is AbstractMultiResource, IRMRKExternalEquip {
         ) revert RMRKBaseRequiredForParts();
 
         _baseAddresses[id] = resource.baseAddress;
-        _equippableRefIds[id] = resource.equippableRefId;
+        _equippableGroupIds[id] = resource.equippableGroupId;
         _fixedPartIds[id] = fixedPartIds;
         _slotPartIds[id] = slotPartIds;
     }
@@ -409,7 +413,7 @@ contract RMRKExternalEquip is AbstractMultiResource, IRMRKExternalEquip {
         return
             ExtendedResource({
                 id: resourceId,
-                equippableRefId: _equippableRefIds[resourceId],
+                equippableGroupId: _equippableGroupIds[resourceId],
                 baseAddress: _baseAddresses[resourceId],
                 metadataURI: meta
             });

@@ -204,7 +204,7 @@ describe('RMRKTypedEquippableMock', async function () {
     await typedEquippable.addTypedResourceEntry(
       {
         id: resId,
-        equippableRefId: 0,
+        equippableGroupId: 0,
         metadataURI: 'fallback.json',
         baseAddress: ethers.constants.AddressZero,
       },
@@ -220,7 +220,7 @@ describe('RMRKTypedEquippableMock', async function () {
     await typedEquippable.addTypedResourceEntry(
       {
         id: resId,
-        equippableRefId: 0,
+        equippableGroupId: 0,
         metadataURI: 'fallback.json',
         baseAddress: ethers.constants.AddressZero,
       },
@@ -277,7 +277,7 @@ describe('RMRKTypedExternalEquippableMock', async function () {
     await typedExternalEquippable.addTypedResourceEntry(
       {
         id: resId,
-        equippableRefId: 0,
+        equippableGroupId: 0,
         metadataURI: 'fallback.json',
         baseAddress: ethers.constants.AddressZero,
       },
@@ -293,7 +293,7 @@ describe('RMRKTypedExternalEquippableMock', async function () {
     await typedExternalEquippable.addTypedResourceEntry(
       {
         id: resId,
-        equippableRefId: 0,
+        equippableGroupId: 0,
         metadataURI: 'fallback.json',
         baseAddress: ethers.constants.AddressZero,
       },

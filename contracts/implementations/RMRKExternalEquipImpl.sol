@@ -30,11 +30,15 @@ contract RMRKExternalEquipImpl is OwnableLock, RMRKExternalEquip {
         _addResourceEntry(resource, fixedPartIds, slotPartIds);
     }
 
-    function setValidParentRefId(
-        uint64 refId,
+    function setValidParentForEquippableGroup(
+        uint64 equippableGroupId,
         address parentAddress,
         uint64 partId
     ) public onlyOwnerOrContributor {
-        _setValidParentRefId(refId, parentAddress, partId);
+        _setValidParentForEquippableGroup(
+            equippableGroupId,
+            parentAddress,
+            partId
+        );
     }
 }
