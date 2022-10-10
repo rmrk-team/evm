@@ -9,12 +9,14 @@ abstract contract RMRKRoyalties is IERC2981 {
     address private _royaltyRecipient;
     uint256 private _royaltyPercentageBps;
 
-    constructor(
-        address royaltyRecipient,
-        uint256 royaltyPercentageBps //in basis points
-    ) {
-        _setRoyaltyRecipient(royaltyRecipient);
-        _royaltyPercentageBps = royaltyPercentageBps;
+    struct RoyaltyDetails {
+        address royaltyRecipient;
+        uint256 royaltyPercentageBps;
+    }
+
+    constructor(RoyaltyDetails memory _royaltyDetails) {
+        _royaltyRecipient = _royaltyDetails.royaltyRecipient;
+        _royaltyPercentageBps = _royaltyDetails.royaltyPercentageBps;
     }
 
     //@notice Requires access control on the implementation contract like implementing Ownable and setting onlyOwner modifier
@@ -37,5 +39,13 @@ abstract contract RMRKRoyalties is IERC2981 {
     {
         receiver = _royaltyRecipient;
         royaltyAmount = (salePrice * _royaltyPercentageBps) / 10000;
+    }
+
+    function getRoyaltyRecipient() external view virtual returns (address) {
+        return _royaltyRecipient;
+    }
+
+    function getRoyaltyBps() external view virtual returns (uint256) {
+        return _royaltyPercentageBps;
     }
 }

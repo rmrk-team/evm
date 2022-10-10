@@ -27,13 +27,12 @@ contract RMRKNestingExternalEquipImpl is
         address equippableAddress_,
         string memory collectionMetadata_,
         string memory tokenURI_,
-        address royaltyRecipient,
-        uint256 royaltyPercentageBps //in basis points
+        RoyaltyDetails memory royaltyDetails_
     )
         RMRKNestingExternalEquip(name_, symbol_)
         RMRKMintingUtils(maxSupply_, pricePerMint_)
         RMRKCollectionMetadata(collectionMetadata_)
-        RMRKRoyalties(royaltyRecipient, royaltyPercentageBps)
+        RMRKRoyalties(royaltyDetails_)
     {
         // Can't add an equippable deployment here due to contract size, for factory
         // pattern can use OZ clone

@@ -23,8 +23,7 @@ async function singleFixture(): Promise<Contract> {
     ONE_ETH,
     'ipfs://collection-meta',
     'ipfs://tokenURI',
-    ADDRESS_ZERO,
-    0,
+    [ADDRESS_ZERO, 0],
   ]);
 }
 
@@ -38,8 +37,7 @@ async function parentChildFixture(): Promise<{ parent: Contract; child: Contract
       ONE_ETH,
       'ipfs://collection-meta',
       'ipfs://tokenURI',
-      ADDRESS_ZERO,
-      0,
+      [ADDRESS_ZERO, 0],
     ],
     [
       'Monkey',
@@ -48,8 +46,7 @@ async function parentChildFixture(): Promise<{ parent: Contract; child: Contract
       ONE_ETH,
       'ipfs://collection-meta',
       'ipfs://tokenURI',
-      ADDRESS_ZERO,
-      0,
+      [ADDRESS_ZERO, 0],
     ],
   );
 }

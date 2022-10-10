@@ -46,8 +46,7 @@ async function partsFixture() {
     ONE_ETH,
     'ipfs://collection-meta',
     'ipfs://tokenURI',
-    ADDRESS_ZERO,
-    0,
+    [ADDRESS_ZERO, 0],
   );
   await neon.deployed();
 
@@ -59,8 +58,7 @@ async function partsFixture() {
     ONE_ETH,
     'ipfs://collection-meta',
     'ipfs://tokenURI',
-    ADDRESS_ZERO,
-    0,
+    [ADDRESS_ZERO, 0],
   );
   await mask.deployed();
 
@@ -108,8 +106,7 @@ async function slotsFixture() {
     ONE_ETH,
     'ipfs://collection-meta',
     'ipfs://tokenURI',
-    ADDRESS_ZERO,
-    0,
+    [ADDRESS_ZERO, 0],
   );
   await soldier.deployed();
 
@@ -121,8 +118,7 @@ async function slotsFixture() {
     ONE_ETH,
     'ipfs://collection-meta',
     'ipfs://tokenURI',
-    ADDRESS_ZERO,
-    0,
+    [ADDRESS_ZERO, 0],
   );
   await weapon.deployed();
 
@@ -134,8 +130,7 @@ async function slotsFixture() {
     ONE_ETH,
     'ipfs://collection-meta',
     'ipfs://tokenURI',
-    ADDRESS_ZERO,
-    0,
+    [ADDRESS_ZERO, 0],
   );
   await weaponGem.deployed();
 
@@ -147,8 +142,7 @@ async function slotsFixture() {
     ONE_ETH,
     'ipfs://collection-meta',
     'ipfs://tokenURI',
-    ADDRESS_ZERO,
-    0,
+    [ADDRESS_ZERO, 0],
   );
   await background.deployed();
 
@@ -180,8 +174,7 @@ async function resourcesFixture() {
     ONE_ETH,
     'ipfs://collection-meta',
     'ipfs://tokenURI',
-    ADDRESS_ZERO,
-    0,
+    [ADDRESS_ZERO, 0],
   );
   await equip.deployed();
 
@@ -202,8 +195,7 @@ async function equipFixture() {
     ONE_ETH,
     'ipfs://collection-meta',
     'ipfs://tokenURI',
-    ADDRESS_ZERO,
-    0,
+    [ADDRESS_ZERO, 0],
   );
   await equip.deployed();
 

@@ -27,8 +27,7 @@ async function singleFixture(): Promise<{ token: Contract; renderUtils: Contract
     ONE_ETH,
     'ipfs://collection-meta',
     'ipfs://tokenURI',
-    ADDRESS_ZERO,
-    0,
+    [ADDRESS_ZERO, 0],
   ]);
   return { token, renderUtils };
 }

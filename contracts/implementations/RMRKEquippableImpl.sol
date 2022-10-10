@@ -26,13 +26,12 @@ contract RMRKEquippableImpl is
         uint256 pricePerMint,
         string memory collectionMetadata_,
         string memory tokenURI_,
-        address royaltyRecipient,
-        uint256 royaltyPercentageBps //in basis points
+        RoyaltyDetails memory royaltyDetails_
     )
         RMRKEquippable(name, symbol)
         RMRKMintingUtils(maxSupply, pricePerMint)
         RMRKCollectionMetadata(collectionMetadata_)
-        RMRKRoyalties(royaltyRecipient, royaltyPercentageBps)
+        RMRKRoyalties(royaltyDetails_)
     {
         _tokenURI = tokenURI_;
     }
@@ -126,7 +125,10 @@ contract RMRKEquippableImpl is
         return _tokenURI;
     }
 
-    function updateRoyaltyRecipient(address newRoyaltyRecipient) external override {
+    function updateRoyaltyRecipient(address newRoyaltyRecipient)
+        external
+        override
+    {
         _setRoyaltyRecipient(newRoyaltyRecipient);
     }
 }

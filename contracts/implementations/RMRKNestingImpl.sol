@@ -25,13 +25,12 @@ contract RMRKNestingImpl is
         uint256 pricePerMint_,
         string memory collectionMetadata_,
         string memory tokenURI_,
-        address royaltyRecipient,
-        uint256 royaltyPercentageBps //in basis points
+        RoyaltyDetails memory royaltyDetails_
     )
         RMRKNesting(name_, symbol_)
         RMRKMintingUtils(maxSupply_, pricePerMint_)
         RMRKCollectionMetadata(collectionMetadata_)
-        RMRKRoyalties(royaltyRecipient, royaltyPercentageBps)
+        RMRKRoyalties(royaltyDetails_)
     {
         _tokenURI = tokenURI_;
     }
