@@ -334,10 +334,10 @@ contract RMRKEquippableNestingFacet is
         );
 
         if (to != address(0)) {
-            IERC721(pendingChild.contractAddress).safeTransferFrom(
+            IERC721(childContract).safeTransferFrom(
                 address(this),
                 to,
-                pendingChild.tokenId
+                childTokenId
             );
         }
 
