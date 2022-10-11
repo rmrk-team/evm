@@ -29,6 +29,8 @@ abstract contract RMRKMultiResourceInternal is
     using RMRKLib for uint64[];
     using RMRKLib for uint128[];
 
+    uint16 internal constant LOWEST_PRIORITY = 2**16 - 1;
+
     function getMRState()
         internal
         pure
@@ -130,8 +132,7 @@ abstract contract RMRKMultiResourceInternal is
             delete (s._resourceOverwrites[tokenId][resourceId]);
         }
         s._activeResources[tokenId].push(resourceId);
-        //Push 0 value of uint16 to array, e.g., uninitialized
-        s._activeResourcePriorities[tokenId].push(uint16(0));
+        s._activeResourcePriorities[tokenId].push(LOWEST_PRIORITY);
         emit ResourceAccepted(tokenId, resourceId);
     }
 

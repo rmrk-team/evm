@@ -582,8 +582,7 @@ abstract contract RMRKEquippableInternal is
             delete (getMRState()._resourceOverwrites[tokenId][resourceId]);
         }
         getMRState()._activeResources[tokenId].push(resourceId);
-        // Push 0 value of uint16 to array, e.g., uninitialized
-        getMRState()._activeResourcePriorities[tokenId].push(uint16(0));
+        getMRState()._activeResourcePriorities[tokenId].push(LOWEST_PRIORITY);
 
         // If baseRelatedDataExist, add resourceId to `activeBaseResources`
         if (
