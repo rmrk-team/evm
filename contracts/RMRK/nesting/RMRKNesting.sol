@@ -467,12 +467,12 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
     {
         if (childrenOf(tokenId).length <= index)
             revert RMRKChildIndexOutOfRange();
-        _burnChild(tokenId, index);
+        Child memory child = childOf(tokenId, index);
         _removeChildByIndex(_activeChildren[tokenId], index);
+        _burnChild(child);
     }
 
-    function _burnChild(uint256 tokenId, uint256 index) private {
-        Child memory child = childOf(tokenId, index);
+    function _burnChild(Child memory child) private {
         delete _childIsInActive[child.contractAddress][child.tokenId];
         IRMRKNesting(child.contractAddress).burn(child.tokenId);
     }
@@ -507,7 +507,7 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
 
         uint256 length = children.length; //gas savings
         for (uint256 i; i < length; ) {
-            _burnChild(tokenId, i);
+            _burnChild(children[i]);
             unchecked {
                 ++i;
             }
