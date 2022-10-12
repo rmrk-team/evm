@@ -494,16 +494,22 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         virtual
         onlyApprovedOrDirectOwner(tokenId)
     {
-        (address _RMRKOwner, , ) = rmrkOwnerOf(tokenId);
+        (address immediateOwner, , ) = rmrkOwnerOf(tokenId);
         address owner = ownerOf(tokenId);
-        _balances[_RMRKOwner] -= 1;
+        _balances[immediateOwner] -= 1;
 
+        // TODO: Should this really be owner or immediateOwner instead?
+        // TODO: We probably need a _(before/after)TokenTransfer which sends the immediate owner and token Id.
+        // That would allow for an easy implementation of balances per owner and token, an other custom logic.
         _beforeTokenTransfer(owner, address(0), tokenId);
         _approve(address(0), tokenId);
-
         _cleanApprovals(tokenId);
 
         Child[] memory children = childrenOf(tokenId);
+
+        delete _activeChildren[tokenId];
+        delete _pendingChildren[tokenId];
+        delete _tokenApprovals[tokenId][owner];
 
         uint256 length = children.length; //gas savings
         for (uint256 i; i < length; ) {
@@ -512,10 +518,8 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
                 ++i;
             }
         }
+        // Can't remove before burning child since child will call back to get root owner
         delete _RMRKOwners[tokenId];
-        delete _pendingChildren[tokenId];
-        delete _activeChildren[tokenId];
-        delete _tokenApprovals[tokenId][owner];
 
         _afterTokenTransfer(owner, address(0), tokenId);
         emit Transfer(owner, address(0), tokenId);
