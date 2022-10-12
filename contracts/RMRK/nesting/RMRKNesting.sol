@@ -102,7 +102,7 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
     }
 
     /**
-     * @notice Internal function for checking token ownership relative to immediate parent.
+     * @notice Private function for checking token ownership relative to immediate parent.
      * @dev This does not delegate to ownerOf, which returns the root owner.
      * Reverts if caller is not immediate owner.
      * Used for parent-scoped transfers.
@@ -463,6 +463,7 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
 
     function burnChild(uint256 tokenId, uint256 index)
         public
+        virtual
         onlyApprovedOrDirectOwner(tokenId)
     {
         if (childrenOf(tokenId).length <= index)
@@ -853,7 +854,7 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         uint256 tokenId,
         address childAddress,
         uint256 childTokenId
-    ) public onlyApprovedOrOwner(tokenId) {
+    ) public virtual onlyApprovedOrOwner(tokenId) {
         if (_childIsInActive[childAddress][childTokenId] != 0)
             revert RMRKInvalidChildReclaim();
         if (_childIsInPending[childAddress][childTokenId] != 0)
@@ -882,6 +883,7 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
     function childrenOf(uint256 parentTokenId)
         public
         view
+        virtual
         returns (Child[] memory)
     {
         Child[] memory children = _activeChildren[parentTokenId];
@@ -895,6 +897,7 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
     function pendingChildrenOf(uint256 parentTokenId)
         public
         view
+        virtual
         returns (Child[] memory)
     {
         Child[] memory pendingChildren = _pendingChildren[parentTokenId];
@@ -904,6 +907,7 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
     function childOf(uint256 parentTokenId, uint256 index)
         public
         view
+        virtual
         returns (Child memory)
     {
         if (childrenOf(parentTokenId).length <= index)
@@ -915,6 +919,7 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
     function pendingChildOf(uint256 parentTokenId, uint256 index)
         public
         view
+        virtual
         returns (Child memory)
     {
         if (pendingChildrenOf(parentTokenId).length <= index)

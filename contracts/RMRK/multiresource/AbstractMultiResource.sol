@@ -173,7 +173,7 @@ abstract contract AbstractMultiResource is Context, IRMRKMultiResource {
         emit ApprovalForAllForResources(owner, operator, approved);
     }
 
-    function _acceptResource(uint256 tokenId, uint256 index) internal {
+    function _acceptResource(uint256 tokenId, uint256 index) internal virtual {
         if (index >= _pendingResources[tokenId].length)
             revert RMRKIndexOutOfRange();
         uint64 resourceId = _pendingResources[tokenId][index];
@@ -192,7 +192,7 @@ abstract contract AbstractMultiResource is Context, IRMRKMultiResource {
         emit ResourceAccepted(tokenId, resourceId);
     }
 
-    function _rejectResource(uint256 tokenId, uint256 index) internal {
+    function _rejectResource(uint256 tokenId, uint256 index) internal virtual {
         if (index >= _pendingResources[tokenId].length)
             revert RMRKIndexOutOfRange();
         uint64 resourceId = _pendingResources[tokenId][index];
@@ -203,7 +203,7 @@ abstract contract AbstractMultiResource is Context, IRMRKMultiResource {
         emit ResourceRejected(tokenId, resourceId);
     }
 
-    function _rejectAllResources(uint256 tokenId) internal {
+    function _rejectAllResources(uint256 tokenId) internal virtual {
         uint256 len = _pendingResources[tokenId].length;
         for (uint256 i; i < len; ) {
             uint64 resourceId = _pendingResources[tokenId][i];
@@ -219,6 +219,7 @@ abstract contract AbstractMultiResource is Context, IRMRKMultiResource {
 
     function _setPriority(uint256 tokenId, uint16[] memory priorities)
         internal
+        virtual
     {
         uint256 length = priorities.length;
         if (length != _activeResources[tokenId].length)
@@ -228,7 +229,10 @@ abstract contract AbstractMultiResource is Context, IRMRKMultiResource {
         emit ResourcePrioritySet(tokenId);
     }
 
-    function _addResourceEntry(uint64 id, string memory metadataURI) internal {
+    function _addResourceEntry(uint64 id, string memory metadataURI)
+        internal
+        virtual
+    {
         if (id == uint64(0)) revert RMRKWriteToZero();
         if (bytes(_resources[id]).length > 0)
             revert RMRKResourceAlreadyExists();
@@ -242,7 +246,7 @@ abstract contract AbstractMultiResource is Context, IRMRKMultiResource {
         uint256 tokenId,
         uint64 resourceId,
         uint64 overwrites
-    ) internal {
+    ) internal virtual {
         if (_tokenResources[tokenId][resourceId])
             revert RMRKResourceAlreadyExists();
 

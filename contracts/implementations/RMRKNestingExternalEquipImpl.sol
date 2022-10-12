@@ -100,7 +100,10 @@ contract RMRKNestingExternalEquipImpl is
         return _tokenURI;
     }
 
-    function updateRoyaltyRecipient(address newRoyaltyRecipient) external override {
+    function updateRoyaltyRecipient(address newRoyaltyRecipient)
+        external
+        override
+    {
         _setRoyaltyRecipient(newRoyaltyRecipient);
     }
 }
