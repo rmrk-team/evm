@@ -12,6 +12,7 @@ import "../base/IRMRKBaseStorage.sol";
 import "../multiresource/AbstractMultiResource.sol";
 import "../nesting/IRMRKNesting.sol";
 import "../library/RMRKLib.sol";
+import "../security/ReentrancyGuard.sol";
 import "./IRMRKNestingExternalEquip.sol";
 import "./IRMRKExternalEquip.sol";
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
@@ -35,7 +36,11 @@ error RMRKTokenCannotBeEquippedWithResourceIntoSlot();
  * @dev RMRKEquippable external contract, expected to be paired with an instance of RMRKNestingExternalEquip.sol. This
  * contract takes over
  */
-contract RMRKExternalEquip is AbstractMultiResource, IRMRKExternalEquip {
+contract RMRKExternalEquip is
+    ReentrancyGuard,
+    AbstractMultiResource,
+    IRMRKExternalEquip
+{
     using RMRKLib for uint64[];
 
     // ------------------- RESOURCES --------------
@@ -212,7 +217,9 @@ contract RMRKExternalEquip is AbstractMultiResource, IRMRKExternalEquip {
 
     function equip(IntakeEquip memory data)
         public
+        virtual
         onlyApprovedOrOwner(data.tokenId)
+        nonReentrant
     {
         _equip(data);
     }
@@ -289,7 +296,7 @@ contract RMRKExternalEquip is AbstractMultiResource, IRMRKExternalEquip {
         uint256 tokenId,
         uint64 resourceId,
         uint64 slotPartId
-    ) public onlyApprovedOrOwner(tokenId) {
+    ) public virtual onlyApprovedOrOwner(tokenId) nonReentrant {
         _unequip(tokenId, resourceId, slotPartId);
     }
 
@@ -324,7 +331,9 @@ contract RMRKExternalEquip is AbstractMultiResource, IRMRKExternalEquip {
 
     function replaceEquipment(IntakeEquip memory data)
         public
+        virtual
         onlyApprovedOrOwner(data.tokenId)
+        nonReentrant
     {
         _unequip(data.tokenId, data.resourceId, data.slotPartId);
         _equip(data);
