@@ -146,6 +146,7 @@ export async function oneTimeDeploy(create2DeployerAddress: string, deployed = f
     'RMRKEquippableMultiResourceFacet',
     'RMRKEquippableNestingFacet',
     'RMRKEquippableFacet',
+    'RMRKCollectionMetadataFacet',
     'RMRKEquippableImpl',
   ];
   const useNormalDeploy: { [k: string]: boolean } = {

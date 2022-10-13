@@ -8,6 +8,7 @@ import {IDiamondCut} from "./interfaces/IDiamondCut.sol";
 import {IRMRKNesting} from "./interfaces/IRMRKNesting.sol";
 import {IRMRKMultiResource} from "./interfaces/IRMRKMultiResource.sol";
 import {IRMRKEquippable} from "./interfaces/IRMRKEquippableAyuilosVer.sol";
+import {IRMRKCollectionMetadata} from "./interfaces/IRMRKCollectionMetadata.sol";
 import {ERC721Storage, MultiResourceStorage} from "./internalFunctionSet/Storage.sol";
 
 // It is expected that this contract is customized if you want to deploy your diamond
@@ -32,6 +33,7 @@ contract EquippableInit {
         ds.supportedInterfaces[type(IRMRKNesting).interfaceId] = true;
         ds.supportedInterfaces[type(IRMRKMultiResource).interfaceId] = true;
         ds.supportedInterfaces[type(IRMRKEquippable).interfaceId] = true;
+        ds.supportedInterfaces[type(IRMRKCollectionMetadata).interfaceId] = true;
 
         // add your own state variables
         // EIP-2535 specifies that the `diamondCut` function takes two optional

@@ -120,3 +120,19 @@ library RMRKEquippableStorage {
         }
     }
 }
+
+library RMRKCollectionMetadataStorage {
+    struct State {
+        string _collectionMetadata;
+    }
+
+    bytes32 constant STORAGE_POSITION =
+        keccak256("rmrk.collection_metadata.storage");
+
+    function getState() internal pure returns (State storage s) {
+        bytes32 position = STORAGE_POSITION;
+        assembly {
+            s.slot := position
+        }
+    }
+}

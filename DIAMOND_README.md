@@ -4,7 +4,6 @@ RMRK Diamond Implementation use the [EIP-2535](https://eips.ethereum.org/EIPS/ei
 
 ### Note
 
-
 ### Deployment
 
 Go to [./scripts/deploy_diamond_equippable.ts](./scripts/deploy_diamond_equippable.ts).
@@ -16,5 +15,6 @@ Go to [./scripts/deploy_diamond_equippable.ts](./scripts/deploy_diamond_equippab
 | [DiamondLoupeFacet](./contracts/RMRK/DiamondLoupeFacet.sol)                               | The diamond raw facet used to explore facets of diamond             | yes                                      |
 | [RMRKEquippableNestingFacet](./contracts/RMRK/RMRKEquippableNestingFacet.sol)             | The nesting part of equipment function supported facet              | optional (check the comment in the file) |
 | [RMRKEquippableMultiResourceFacet](./contracts/RMRK/RMRKEquippableMultiResourceFacet.sol) | The multi-resource part of equipment function supported facet       | yes                                      |
+| [RMRKCollectionMetadataFacet](./contracts/RMRK/RMRKCollectionMetadataFacet.sol)           | The collection-metadata part of RMRK NFT                            | yes                                      |
 | [Diamond](./contracts/RMRK/Diamond.sol)                                                   | The real contract that store all state                              | no                                       |
 | [EquippableInit](./contracts/RMRK/EquippableInit.sol)                                     | The diamond raw facet used to initializes the state of the contract | no                                       |
