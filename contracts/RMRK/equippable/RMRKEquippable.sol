@@ -8,6 +8,7 @@ import "../base/IRMRKBaseStorage.sol";
 import "../library/RMRKLib.sol";
 import "../multiresource/AbstractMultiResource.sol";
 import "../nesting/RMRKNesting.sol";
+import "../security/ReentrancyGuard.sol";
 import "./IRMRKEquippable.sol";
 // import "hardhat/console.sol";
 
@@ -24,7 +25,12 @@ error RMRKSlotAlreadyUsed();
 error RMRKTargetResourceCannotReceiveSlot();
 error RMRKTokenCannotBeEquippedWithResourceIntoSlot();
 
-contract RMRKEquippable is RMRKNesting, AbstractMultiResource, IRMRKEquippable {
+contract RMRKEquippable is
+    ReentrancyGuard,
+    RMRKNesting,
+    AbstractMultiResource,
+    IRMRKEquippable
+{
     using RMRKLib for uint64[];
 
     // ------------------- RESOURCES --------------
@@ -228,6 +234,7 @@ contract RMRKEquippable is RMRKNesting, AbstractMultiResource, IRMRKEquippable {
         public
         virtual
         onlyApprovedOrOwner(data.tokenId)
+        nonReentrant
     {
         _equip(data);
     }
@@ -301,7 +308,7 @@ contract RMRKEquippable is RMRKNesting, AbstractMultiResource, IRMRKEquippable {
         uint256 tokenId,
         uint64 resourceId,
         uint64 slotPartId
-    ) public virtual onlyApprovedOrOwner(tokenId) {
+    ) public virtual onlyApprovedOrOwner(tokenId) nonReentrant {
         _unequip(tokenId, resourceId, slotPartId);
     }
 
@@ -335,6 +342,7 @@ contract RMRKEquippable is RMRKNesting, AbstractMultiResource, IRMRKEquippable {
         public
         virtual
         onlyApprovedOrOwner(data.tokenId)
+        nonReentrant
     {
         _unequip(data.tokenId, data.resourceId, data.slotPartId);
         _equip(data);
