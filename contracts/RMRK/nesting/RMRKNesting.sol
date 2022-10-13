@@ -723,10 +723,11 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
     {
         _requireMinted(parentTokenId);
 
-        if (!_msgSender().isContract()) revert RMRKIsNotContract();
+        address childAddress = _msgSender();
+        if (!childAddress.isContract()) revert RMRKIsNotContract();
 
         Child memory child = Child({
-            contractAddress: _msgSender(),
+            contractAddress: childAddress,
             tokenId: childTokenId
         });
 
@@ -739,14 +740,14 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         uint256 length = pendingChildrenOf(parentTokenId).length;
 
         if (length < 128) {
-            _childIsInPending[child.contractAddress][child.tokenId] = 1; // We use 1 as true
+            _childIsInPending[childAddress][childTokenId] = 1; // We use 1 as true
             _pendingChildren[parentTokenId].push(child);
         } else {
             revert RMRKMaxPendingChildrenReached();
         }
 
         // Previous length matches the index for the new child
-        emit ChildProposed(parentTokenId, _msgSender(), childTokenId, length);
+        emit ChildProposed(parentTokenId, childAddress, childTokenId, length);
     }
 
     /**
