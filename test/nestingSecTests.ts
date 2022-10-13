@@ -4,26 +4,25 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { Contract } from 'ethers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 
-describe('NestingMock', function () {
+async function nestingFixture() {
+  const NestingFactory = await ethers.getContractFactory('RMRKNestingMock');
+  const parent = await NestingFactory.deploy('Test', 'TST');
+  await parent.deployed();
+
+  return parent;
+}
+
+describe('Nesting with ChildAdder', function () {
   let parent: Contract;
   let adder: Contract;
   let owner: SignerWithAddress;
 
-  async function nestingFixture() {
-    const NestingFactory = await ethers.getContractFactory('RMRKNestingMock');
-    parent = await NestingFactory.deploy('Test', 'TST');
-    await parent.deployed();
-
+  beforeEach(async function () {
+    owner = (await ethers.getSigners())[0];
+    parent = await loadFixture(nestingFixture);
     const Childadder = await ethers.getContractFactory('ChildAdder');
     adder = await Childadder.deploy();
     await adder.deployed();
-
-    return { parent, adder };
-  }
-
-  beforeEach(async function () {
-    owner = (await ethers.getSigners())[0];
-    ({ parent, adder } = await loadFixture(nestingFixture));
   });
 
   describe('add children', async function () {
