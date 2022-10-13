@@ -344,7 +344,7 @@ contract RMRKMultiResource is
         _beforeTokenTransfer(owner, address(0), tokenId);
 
         // Clear approvals
-        _approve(address(0), tokenId);
+        _approve(address(0), tokenId); // I don't get why we are setting approval for 0x0 if we are also deleting it (assigning it to the same address)
         _approveForResources(address(0), tokenId);
 
         _balances[owner] -= 1;

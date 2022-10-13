@@ -76,7 +76,7 @@ contract RMRKEquippableImpl is
         uint256 mintPriceRequired = numToMint * _pricePerMint;
         if (mintPriceRequired != msg.value) revert RMRKMintUnderpriced();
 
-        uint256 nextToken = _totalSupply + 1;
+        uint256 nextToken = _totalSupply + 1; // Doesn't this cause gaps in the IDs? So for example, if this would be the first mint ever on a collection, it would set the initial ID of the token to 1 instead of 0.
         unchecked {
             _totalSupply += numToMint;
         }

@@ -287,6 +287,8 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         _sendToNFT(tokenId, destinationId, from, to);
     }
 
+    // This function calls an address passed as parameter when burning a child. This could potentailly be used as reentrancy vector.
+    // We might want to potentially import the reentrancy guard and invoke it here.
     function _sendToNFT(
         uint256 tokenId,
         uint256 destinationId,
@@ -471,6 +473,8 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         _removeChildByIndex(_activeChildren[tokenId], index);
     }
 
+    // This function calls an address passed as parameter when burning a child. This could potentailly be used as reentrancy vector.
+    // We might want to potentially import the reentrancy guard and invoke it here.
     function _burnChild(uint256 tokenId, uint256 index) private {
         Child memory child = childOf(tokenId, index);
         delete _childIsInActive[child.contractAddress][child.tokenId];
@@ -811,6 +815,8 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         _unnestChild(tokenId, index, to, isPending);
     }
 
+    // This function calls an address passed as parameter. This could potentailly be used as reentrancy vector.
+    // We might want to potentially import the reentrancy guard and invoke it here.
     function _unnestChild(
         uint256 tokenId,
         uint256 index,
@@ -833,7 +839,7 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
                 address(this),
                 to,
                 child.tokenId
-            );
+            ); // While `safeTransferFrom` is included in the ERC-721, its business logic can still be modified to be malicious
         }
 
         emit ChildUnnested(
