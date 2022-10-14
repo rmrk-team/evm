@@ -42,7 +42,7 @@ error RMRKInvalidChildReclaim();
 error RMRKChildAlreadyExists();
 
 /**
- * @dev RMRK nesting implementation. This contract is heirarchy agnostic, and can
+ * @dev RMRK nesting implementation. This contract is hierarchy agnostic, and can
  * support an arbitrary number of nested levels up and down, as long as gas limits
  * allow
  *
@@ -54,9 +54,6 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
     using Strings for uint256;
 
     uint256 private constant _MAX_LEVELS_TO_CHECK_FOR_INHERITANCE_LOOP = 100;
-
-    // Mapping from token ID to owner address
-    mapping(uint256 => address) private _owners;
 
     // Mapping owner address to token count
     mapping(address => uint256) private _balances;
@@ -729,7 +726,7 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         });
 
         // This check is not done since there's no guarantee of mapping being
-        // up to date, see defintion for details. A similar protection does
+        // up to date, see definition for details. A similar protection does
         // exist when accepting a child:
         // if (_childIsInPending[child.contractAddress][child.tokenId] != 0)
         //     revert RMRKChildAlreadyExists();

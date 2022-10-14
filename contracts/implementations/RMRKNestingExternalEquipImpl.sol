@@ -93,6 +93,7 @@ contract RMRKNestingExternalEquipImpl is
         external
         onlyOwnerOrContributor
     {
+        //TODO: should we add a check if passed address supports IRMRKNestingExternalEquip
         _setEquippableAddress(equippable);
     }
 
