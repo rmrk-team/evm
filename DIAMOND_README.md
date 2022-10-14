@@ -17,4 +17,4 @@ Go to [./scripts/deploy_diamond_equippable.ts](./scripts/deploy_diamond_equippab
 | [RMRKEquippableMultiResourceFacet](./contracts/RMRK/RMRKEquippableMultiResourceFacet.sol) | The multi-resource part of equipment function supported facet       | yes                                      |
 | [RMRKCollectionMetadataFacet](./contracts/RMRK/RMRKCollectionMetadataFacet.sol)           | The collection-metadata part of RMRK NFT                            | yes                                      |
 | [Diamond](./contracts/RMRK/Diamond.sol)                                                   | The real contract that store all state                              | no                                       |
-| [EquippableInit](./contracts/RMRK/EquippableInit.sol)                                     | The diamond raw facet used to initializes the state of the contract | no                                       |
+| [LightmInit](./contracts/RMRK/LightmInit.sol)                                             | The diamond raw facet used to initializes the state of the contract | no                                       |

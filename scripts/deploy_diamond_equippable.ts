@@ -300,31 +300,31 @@ export async function deployDiamondAndCutFacet(
 
   console.log('Diamond deployed:', diamond.address);
 
-  // deploy EquippableInit
-  // EquippableInit provides a function that is called when the diamond is upgraded to initialize state variables
+  // deploy LightmInit
+  // LightmInit provides a function that is called when the diamond is upgraded to initialize state variables
   // Read about how the diamondCut function works here: https://eips.ethereum.org/EIPS/eip-2535#addingreplacingremoving-functions
-  const EquippableInit = await ethers.getContractFactory('EquippableInit');
+  const LightmInit = await ethers.getContractFactory('LightmInit');
 
   // ---------- Normal deployment
-  const equippableInit = await EquippableInit.deploy();
-  await equippableInit.deployed();
+  const lightmInit = await LightmInit.deploy();
+  await lightmInit.deployed();
 
-  const equippableInitAddress = equippableInit.address;
+  const lightmInitAddress = lightmInit.address;
   // -----------------
 
   // ---------- Create2 deployment
-  // const equippableInitHash = ethers.utils.id('EquippableInit');
+  // const lightmInitHash = ethers.utils.id('LightmInit');
 
-  // const equippableInitByteCode = EquippableInit.bytecode;
-  // await create2Deployer.deploy(0, equippableInitHash, equippableInitByteCode);
+  // const lightmInitByteCode = LightmInit.bytecode;
+  // await create2Deployer.deploy(0, lightmInitHash, lightmInitByteCode);
 
-  // const equippableInitAddress = await create2Deployer['computeAddress(bytes32,bytes32)'](
-  //   equippableInitHash,
-  //   ethers.utils.keccak256(equippableInitByteCode),
+  // const lightmInitAddress = await create2Deployer['computeAddress(bytes32,bytes32)'](
+  //   lightmInitHash,
+  //   ethers.utils.keccak256(lightmInitByteCode),
   // );
   // ------------------
 
-  console.log('EquippableInit deployed:', equippableInitAddress);
+  console.log('LightmInit deployed:', lightmInitAddress);
 
   // upgrade diamond with facets
   console.log('');
@@ -335,11 +335,8 @@ export async function deployDiamondAndCutFacet(
   const nameAndSymbolAndFallbackURI = ['Test', 'TEST', ''];
 
   // call to init function
-  const functionCall = EquippableInit.interface.encodeFunctionData(
-    'init',
-    nameAndSymbolAndFallbackURI,
-  );
-  const tx = await diamondCut.diamondCut(cut, equippableInitAddress, functionCall);
+  const functionCall = LightmInit.interface.encodeFunctionData('init', nameAndSymbolAndFallbackURI);
+  const tx = await diamondCut.diamondCut(cut, lightmInitAddress, functionCall);
   console.log('Diamond cut tx: ', tx.hash);
   const receipt = await tx.wait();
   if (!receipt.status) {
