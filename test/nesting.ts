@@ -60,6 +60,21 @@ describe('NestingMock', function () {
   });
 
   describe('Minting', async function () {
+    it('cannot mint id 0', async function () {
+      const tokenId = 0;
+      await expect(
+        child['mint(address,uint256)'](owner.address, tokenId),
+      ).to.be.revertedWithCustomError(child, 'RMRKTokenIdZeroForbidden');
+    });
+
+    it('cannot nest mint id 0', async function () {
+      const parentId = await mintFromMock(child, owner.address);
+      const childId = 0;
+      await expect(
+        child['nestMint(address,uint256,uint256)'](parent.address, childId, parentId),
+      ).to.be.revertedWithCustomError(child, 'RMRKTokenIdZeroForbidden');
+    });
+
     it('cannot mint already minted token', async function () {
       const tokenId = await mintFromMock(child, owner.address);
       await expect(

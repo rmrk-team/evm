@@ -364,6 +364,8 @@ contract RMRKEquippable is RMRKNesting, AbstractMultiResource, IRMRKEquippable {
         address parentAddress,
         uint64 slotPartId
     ) internal {
+        if (equippableGroupId == uint64(0) || slotPartId == uint64(0))
+            revert RMRKIdZeroForbidden();
         _validParentSlots[equippableGroupId][parentAddress] = slotPartId;
         emit ValidParentEquippableGroupIdSet(
             equippableGroupId,

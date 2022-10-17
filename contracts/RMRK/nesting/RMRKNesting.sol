@@ -28,7 +28,9 @@ error ERC721TokenAlreadyMinted();
 error ERC721TransferFromIncorrectOwner();
 error ERC721TransferToNonReceiverImplementer();
 error ERC721TransferToTheZeroAddress();
+error RMRKChildAlreadyExists();
 error RMRKChildIndexOutOfRange();
+error RMRKInvalidChildReclaim();
 error RMRKIsNotContract();
 error RMRKMaxPendingChildrenReached();
 error RMRKMintToNonRMRKImplementer();
@@ -38,8 +40,7 @@ error RMRKNestingTransferToNonRMRKNestingImplementer();
 error RMRKNestingTransferToSelf();
 error RMRKNotApprovedOrDirectOwner();
 error RMRKPendingChildIndexOutOfRange();
-error RMRKInvalidChildReclaim();
-error RMRKChildAlreadyExists();
+error RMRKTokenIdZeroForbidden();
 
 /**
  * @dev RMRK nesting implementation. This contract is hierarchy agnostic, and can
@@ -398,6 +399,7 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
     ) private {
         if (to == address(0)) revert ERC721MintToTheZeroAddress();
         if (_exists(tokenId)) revert ERC721TokenAlreadyMinted();
+        if (tokenId == 0) revert RMRKTokenIdZeroForbidden();
 
         _beforeTokenTransfer(address(0), to, tokenId);
 

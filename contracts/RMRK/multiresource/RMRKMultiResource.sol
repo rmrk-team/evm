@@ -23,9 +23,10 @@ error ERC721TokenAlreadyMinted();
 error ERC721TransferFromIncorrectOwner();
 error ERC721TransferToNonReceiverImplementer();
 error ERC721TransferToTheZeroAddress();
-error RMRKNotApprovedForResourcesOrOwner();
 error RMRKApprovalForResourcesToCurrentOwner();
 error RMRKApproveForResourcesCallerIsNotOwnerNorApprovedForAll();
+error RMRKNotApprovedForResourcesOrOwner();
+error RMRKTokenIdZeroForbidden();
 
 /**
  * @dev Implementation of RMRK Multiresource contract, on top of ERC721.
@@ -317,6 +318,7 @@ contract RMRKMultiResource is
     function _mint(address to, uint256 tokenId) internal virtual {
         if (to == address(0)) revert ERC721MintToTheZeroAddress();
         if (_exists(tokenId)) revert ERC721TokenAlreadyMinted();
+        if (tokenId == 0) revert RMRKTokenIdZeroForbidden();
 
         _beforeTokenTransfer(address(0), to, tokenId);
 

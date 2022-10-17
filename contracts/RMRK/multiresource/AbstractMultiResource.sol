@@ -12,7 +12,7 @@ error RMRKIndexOutOfRange();
 error RMRKMaxPendingResourcesReached();
 error RMRKNoResourceMatchingId();
 error RMRKResourceAlreadyExists();
-error RMRKWriteToZero();
+error RMRKIdZeroForbidden();
 
 abstract contract AbstractMultiResource is Context, IRMRKMultiResource {
     using RMRKLib for uint64[];
@@ -229,7 +229,7 @@ abstract contract AbstractMultiResource is Context, IRMRKMultiResource {
     }
 
     function _addResourceEntry(uint64 id, string memory metadataURI) internal {
-        if (id == uint64(0)) revert RMRKWriteToZero();
+        if (id == uint64(0)) revert RMRKIdZeroForbidden();
         if (bytes(_resources[id]).length > 0)
             revert RMRKResourceAlreadyExists();
         _resources[id] = metadataURI;
