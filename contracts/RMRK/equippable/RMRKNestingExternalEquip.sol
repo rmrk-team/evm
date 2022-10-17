@@ -15,7 +15,7 @@ error RMRKMustUnequipFirst();
 /**
  * @dev RMRKNesting contract with external equippable contract for space saving purposes. Expected to be deployed along
  * an instance of RMRKExternalEquip.sol. To make use of the equippable module with this contract, expose the _setEquippableAddress
- * function and set it to the corresponding equipment contraft after deployment. Consider using RMRKOwnableLock to lock the equippable
+ * function and set it to the corresponding equipment contract after deployment. Consider using RMRKOwnableLock to lock the equippable
  * address after deployment.
  */
 contract RMRKNestingExternalEquip is IRMRKNestingExternalEquip, RMRKNesting {
@@ -37,7 +37,7 @@ contract RMRKNestingExternalEquip is IRMRKNestingExternalEquip, RMRKNesting {
             super.supportsInterface(interfaceId);
     }
 
-    // It's overriden to make check the child is not equipped when trying to unnest
+    // It's overridden to make check the child is not equipped when trying to unnest
     function unnestChild(
         uint256 tokenId,
         uint256 index,
