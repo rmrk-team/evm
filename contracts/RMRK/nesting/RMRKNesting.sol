@@ -245,11 +245,13 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         address to,
         uint256 tokenId
     ) internal virtual {
-        (address immediateOwner, , ) = rmrkOwnerOf(tokenId);
+        // TODO: Shall we require parentId to be 0? Otherwise should a be a _nestTransfer call
+        (address immediateOwner, uint256 parentId, ) = rmrkOwnerOf(tokenId);
         if (immediateOwner != from) revert ERC721TransferFromIncorrectOwner();
         if (to == address(0)) revert ERC721TransferToTheZeroAddress();
 
         _beforeTokenTransfer(from, to, tokenId);
+        _beforeNestedTokenTransfer(immediateOwner, to, parentId, 0, tokenId);
 
         _balances[from] -= 1;
         _updateOwnerAndClearApprovals(tokenId, 0, to, false);
@@ -257,6 +259,7 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
 
         emit Transfer(from, to, tokenId);
         _afterTokenTransfer(from, to, tokenId);
+        _afterNestedTokenTransfer(immediateOwner, to, parentId, 0, tokenId);
     }
 
     function _nestTransfer(
@@ -265,7 +268,8 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         uint256 tokenId,
         uint256 destinationId
     ) internal virtual {
-        (address immediateOwner, , ) = rmrkOwnerOf(tokenId);
+        // TODO: Shall we require parentId to be 0? Otherwise it should unnest first children won't be updated.
+        (address immediateOwner, uint256 parentId, ) = rmrkOwnerOf(tokenId);
         if (immediateOwner != from) revert ERC721TransferFromIncorrectOwner();
         if (to == address(0)) revert ERC721TransferToTheZeroAddress();
         if (to == address(this) && tokenId == destinationId)
@@ -279,23 +283,32 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         _checkForInheritanceLoop(tokenId, to, destinationId);
 
         _beforeTokenTransfer(from, to, tokenId);
+        _beforeNestedTokenTransfer(
+            immediateOwner,
+            to,
+            parentId,
+            destinationId,
+            tokenId
+        );
         _balances[from] -= 1;
         _updateOwnerAndClearApprovals(tokenId, destinationId, to, true);
         _balances[to] += 1;
 
         // Sending to NFT:
-        _sendToNFT(tokenId, destinationId, from, to);
+        _sendToNFT(immediateOwner, to, parentId, destinationId, tokenId);
     }
 
     function _sendToNFT(
-        uint256 tokenId,
-        uint256 destinationId,
         address from,
-        address to
+        address to,
+        uint256 parentId,
+        uint256 destinationId,
+        uint256 tokenId
     ) private {
         IRMRKNesting destContract = IRMRKNesting(to);
         destContract.addChild(destinationId, tokenId);
         _afterTokenTransfer(from, to, tokenId);
+        _afterNestedTokenTransfer(from, to, parentId, destinationId, tokenId);
 
         emit Transfer(from, to, tokenId);
     }
@@ -378,6 +391,7 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
 
         emit Transfer(address(0), to, tokenId);
         _afterTokenTransfer(address(0), to, tokenId);
+        _afterNestedTokenTransfer(address(0), to, 0, 0, tokenId);
     }
 
     function _nestMint(
@@ -391,7 +405,7 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
             revert RMRKMintToNonRMRKImplementer();
 
         _innerMint(to, tokenId, destinationId);
-        _sendToNFT(tokenId, destinationId, address(0), to);
+        _sendToNFT(address(0), to, 0, destinationId, tokenId);
     }
 
     function _innerMint(
@@ -403,6 +417,7 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         if (_exists(tokenId)) revert ERC721TokenAlreadyMinted();
 
         _beforeTokenTransfer(address(0), to, tokenId);
+        _beforeNestedTokenTransfer(address(0), to, 0, destinationId, tokenId);
 
         _balances[to] += 1;
         _RMRKOwners[tokenId] = RMRKOwner({
@@ -495,14 +510,19 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         virtual
         onlyApprovedOrDirectOwner(tokenId)
     {
-        (address immediateOwner, , ) = rmrkOwnerOf(tokenId);
+        (address immediateOwner, uint256 parentId, ) = rmrkOwnerOf(tokenId);
         address owner = ownerOf(tokenId);
         _balances[immediateOwner] -= 1;
 
-        // TODO: Should this really be owner or immediateOwner instead?
-        // TODO: We probably need a _(before/after)TokenTransfer which sends the immediate owner and token Id.
-        // That would allow for an easy implementation of balances per owner and token, an other custom logic.
         _beforeTokenTransfer(owner, address(0), tokenId);
+        _beforeNestedTokenTransfer(
+            immediateOwner,
+            address(0),
+            parentId,
+            0,
+            tokenId
+        );
+
         _approve(address(0), tokenId);
         _cleanApprovals(tokenId);
 
@@ -523,6 +543,13 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         delete _RMRKOwners[tokenId];
 
         _afterTokenTransfer(owner, address(0), tokenId);
+        _afterNestedTokenTransfer(
+            immediateOwner,
+            address(0),
+            parentId,
+            0,
+            tokenId
+        );
         emit Transfer(owner, address(0), tokenId);
     }
 
@@ -928,6 +955,22 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         Child memory child = _pendingChildren[parentTokenId][index];
         return child;
     }
+
+    function _beforeNestedTokenTransfer(
+        address from,
+        address to,
+        uint256 fromTokenId,
+        uint256 toTokenId,
+        uint256 tokenId
+    ) internal virtual {}
+
+    function _afterNestedTokenTransfer(
+        address from,
+        address to,
+        uint256 fromTokenId,
+        uint256 toTokenId,
+        uint256 tokenId
+    ) internal virtual {}
 
     //HELPERS
 
