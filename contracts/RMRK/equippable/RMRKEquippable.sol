@@ -308,7 +308,7 @@ contract RMRKEquippable is
         uint256 tokenId,
         uint64 resourceId,
         uint64 slotPartId
-    ) public virtual onlyApprovedOrOwner(tokenId) nonReentrant {
+    ) public virtual onlyApprovedOrOwner(tokenId) {
         _unequip(tokenId, resourceId, slotPartId);
     }
 
