@@ -12,7 +12,7 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 
 import "./RMRKLib.sol";
 
-library RMRKValidatorLib {
+library LightmValidatorLib {
     using RMRKLib for uint64[];
     using Address for address;
 

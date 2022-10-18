@@ -6,7 +6,7 @@ import "../interfaces/IRMRKNesting.sol";
 import "./ERC721Internal.sol";
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
-import {RMRKNestingStorage} from "./Storage.sol";
+import {NestingStorage} from "./Storage.sol";
 
 import "hardhat/console.sol";
 
@@ -33,9 +33,9 @@ abstract contract RMRKNestingInternal is
     function getNestingState()
         internal
         pure
-        returns (RMRKNestingStorage.State storage)
+        returns (NestingStorage.State storage)
     {
-        return RMRKNestingStorage.getState();
+        return NestingStorage.getState();
     }
 
     // ------------------------ Ownership ------------------------
@@ -174,7 +174,7 @@ abstract contract RMRKNestingInternal is
     {
         _requireMinted(tokenId);
 
-        RMRKNestingStorage.State storage ns = getNestingState();
+        NestingStorage.State storage ns = getNestingState();
 
         uint256 _index = ns._posInChildArray[childContract][childTokenId];
 
@@ -291,7 +291,7 @@ abstract contract RMRKNestingInternal is
         _beforeTokenTransfer(owner, address(0), tokenId);
 
         ERC721Storage.State storage s = getState();
-        RMRKNestingStorage.State storage ns = getNestingState();
+        NestingStorage.State storage ns = getNestingState();
 
         _approve(address(0), tokenId);
         _cleanApprovals(address(0), tokenId);
@@ -307,7 +307,7 @@ abstract contract RMRKNestingInternal is
     }
 
     function _burnChild(uint256 tokenId, uint256 index) internal virtual {
-        RMRKNestingStorage.State storage ns = getNestingState();
+        NestingStorage.State storage ns = getNestingState();
 
         if (ns._children[tokenId].length <= index)
             revert RMRKChildIndexOutOfRange();
@@ -411,7 +411,7 @@ abstract contract RMRKNestingInternal is
     ) internal virtual {
         _isOverLength(tokenId, index, false);
 
-        RMRKNestingStorage.State storage ns = getNestingState();
+        NestingStorage.State storage ns = getNestingState();
 
         Child memory child = ns._children[tokenId][index];
         address childContract = child.contractAddress;
@@ -435,7 +435,7 @@ abstract contract RMRKNestingInternal is
      * @dev Adds an instance of Child to the pending children array for tokenId. This is hardcoded to be 128 by default.
      */
     function _addChildToPending(uint256 tokenId, Child memory child) internal {
-        RMRKNestingStorage.State storage ns = getNestingState();
+        NestingStorage.State storage ns = getNestingState();
         uint256 len = ns._pendingChildren[tokenId].length;
         if (len < 128) {
             ns._posInChildArray[child.contractAddress][child.tokenId] = len;
@@ -449,7 +449,7 @@ abstract contract RMRKNestingInternal is
      * @dev Adds an instance of Child to the children array for tokenId.
      */
     function _addChildToChildren(uint256 tokenId, Child memory child) internal {
-        RMRKNestingStorage.State storage ns = getNestingState();
+        NestingStorage.State storage ns = getNestingState();
 
         ns._posInChildArray[child.contractAddress][child.tokenId] = ns
             ._children[tokenId]

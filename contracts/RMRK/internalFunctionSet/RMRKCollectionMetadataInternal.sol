@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {RMRKCollectionMetadataStorage} from "./Storage.sol";
+import {CollectionMetadataStorage} from "./Storage.sol";
 
 abstract contract RMRKCollectionMetadataInternal {
     function getCollectionMetadataState()
         internal
         pure
-        returns (RMRKCollectionMetadataStorage.State storage)
+        returns (CollectionMetadataStorage.State storage)
     {
-        return RMRKCollectionMetadataStorage.getState();
+        return CollectionMetadataStorage.getState();
     }
 
     function _setCollectionMetadata(string memory newMetadata) internal {

@@ -6,7 +6,11 @@ RMRK Diamond Implementation use the [EIP-2535](https://eips.ethereum.org/EIPS/ei
 
 ### Deployment
 
-Go to [./scripts/deploy_diamond_equippable.ts](./scripts/deploy_diamond_equippable.ts).
+#### Full-automatic on-chain deployment
+
+
+#### Semi-automatic deployment
+Go to [./scripts/deploy_diamond_equippable.ts](./scripts/deploy_diamond_equippable.ts) to deploy your own custom RMRK NFT.
 
 | Contract                                                                                  | Description                                                         | Can reuse                                |
 | ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------- | ---------------------------------------- |

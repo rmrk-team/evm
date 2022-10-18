@@ -5,6 +5,8 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 import "./ERC721Internal.sol";
 import "../interfaces/IRMRKMultiResource.sol";
 import "../library/RMRKLib.sol";
+import "../library/RMRKMultiResourceRenderUtils.sol";
+
 import {MultiResourceStorage} from "./Storage.sol";
 
 error RMRKBadPriorityListLength();
@@ -55,6 +57,34 @@ abstract contract RMRKMultiResourceInternal is
         emit Transfer(owner, address(0), tokenId);
 
         _afterTokenTransfer(owner, address(0), tokenId);
+    }
+
+    function _tokenURI(uint256 tokenId)
+        internal
+        view
+        virtual
+        override
+        returns (string memory)
+    {
+        MultiResourceStorage.State storage mrs = getMRState();
+
+        try
+            RMRKMultiResourceRenderUtils.getTopResourceMetaForToken(
+                address(this),
+                tokenId
+            )
+        returns (string memory meta) {
+            return meta;
+        } catch (bytes memory err) {
+            if (
+                bytes4(err) ==
+                RMRKMultiResourceRenderUtils.RMRKTokenHasNoResources.selector
+            ) {
+                return mrs._fallbackURI;
+            }
+
+            revert(string(err));
+        }
     }
 
     function _isApprovedForResourcesOrOwner(address user, uint256 tokenId)

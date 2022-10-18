@@ -80,23 +80,7 @@ contract RMRKMultiResourceFacet is
         override
         returns (string memory)
     {
-        try
-            RMRKMultiResourceRenderUtils.getTopResourceMetaForToken(
-                address(this),
-                tokenId
-            )
-        returns (string memory meta) {
-            return meta;
-        } catch (bytes memory err) {
-            if (
-                bytes4(err) ==
-                RMRKMultiResourceRenderUtils.RMRKTokenHasNoResources.selector
-            ) {
-                return getMRState()._fallbackURI;
-            }
-
-            revert(string(err));
-        }
+        return _tokenURI(tokenId);
     }
 
     // ------------------------ Ownership ------------------------

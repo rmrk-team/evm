@@ -66,7 +66,7 @@ library MultiResourceStorage {
     }
 }
 
-library RMRKNestingStorage {
+library NestingStorage {
     struct State {
         // Mapping from token ID to RMRKOwner struct
         mapping(uint256 => IRMRKNesting.RMRKOwner) _RMRKOwners;
@@ -88,7 +88,7 @@ library RMRKNestingStorage {
     }
 }
 
-library RMRKEquippableStorage {
+library EquippableStorage {
     struct State {
         mapping(uint64 => IRMRKEquippable.BaseRelatedData) _baseRelatedDatas;
         uint64[] _allBaseRelatedResourceIds;
@@ -121,13 +121,28 @@ library RMRKEquippableStorage {
     }
 }
 
-library RMRKCollectionMetadataStorage {
+library CollectionMetadataStorage {
     struct State {
         string _collectionMetadata;
     }
 
     bytes32 constant STORAGE_POSITION =
         keccak256("rmrk.collection_metadata.storage");
+
+    function getState() internal pure returns (State storage s) {
+        bytes32 position = STORAGE_POSITION;
+        assembly {
+            s.slot := position
+        }
+    }
+}
+
+library LightmImplStorage {
+    struct State {
+        address _owner;
+    }
+
+    bytes32 constant STORAGE_POSITION = keccak256("lightm.impl.storage");
 
     function getState() internal pure returns (State storage s) {
         bytes32 position = STORAGE_POSITION;

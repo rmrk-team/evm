@@ -5,7 +5,6 @@ import "../interfaces/IRMRKEquippableAyuilosVer.sol";
 import "../library/ValidatorLib.sol";
 import "./RMRKNestingInternal.sol";
 import "./RMRKMultiResourceInternal.sol";
-import {RMRKEquippableStorage} from "./Storage.sol";
 
 abstract contract RMRKNestingMultiResourceInternal is
     RMRKNestingInternal,
@@ -46,7 +45,7 @@ abstract contract RMRKNestingMultiResourceInternal is
         _beforeTokenTransfer(owner, address(0), tokenId);
 
         ERC721Storage.State storage s = getState();
-        RMRKNestingStorage.State storage ns = getNestingState();
+        NestingStorage.State storage ns = getNestingState();
 
         _approve(address(0), tokenId);
         _approveForResources(address(0), tokenId);
@@ -76,5 +75,15 @@ abstract contract RMRKNestingMultiResourceInternal is
         uint256 tokenId
     ) internal virtual override(ERC721Internal, RMRKNestingInternal) {
         RMRKNestingInternal._transfer(from, to, tokenId);
+    }
+
+    function _tokenURI(uint256 tokenId)
+        internal
+        view
+        virtual
+        override(ERC721Internal, RMRKMultiResourceInternal)
+        returns (string memory)
+    {
+        return RMRKMultiResourceInternal._tokenURI(tokenId);
     }
 }

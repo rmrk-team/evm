@@ -8,8 +8,8 @@ const PUBLIC_ACCOUNT_PRIVATE_KEY =
   '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80';
 const TRANSACTION_SIGNER_ADDRESS = '0xFBa50dD46Af71D60721C6E38F40Bce4d2416A34B';
 
-const versionSuffix = '-0.2.0-alpha';
-const create2DeployerAddress = '0xcf2281070e6a50e4050694eef1a9a7376628d663';
+export const versionSuffix = '0.1.0-alpha';
+export const create2DeployerAddress = '0xcf2281070e6a50e4050694eef1a9a7376628d663';
 
 async function isHardhatChain() {
   const network = await ethers.provider.getNetwork();
@@ -52,12 +52,21 @@ export async function deployCreate2Deployer() {
   return create2DeployerAddress;
 }
 
-export async function oneTimeDeploy(create2DeployerAddress: string, deployed = false) {
+/**
+ * @param create2DeployerAddress The deployer used for deploy contract in `CREATE2` way
+ * @param deployed Mark if "the contract waiting to be deployed" is already `deployed`,
+ * when set to `true`, this function will only compute the address of all facets.
+ */
+export async function oneTimeDeploy(
+  create2DeployerAddress: string,
+  deployed = false,
+  noNormalDeploy = false,
+) {
   const create2Deployer = await ethers.getContractAt('Create2Deployer', create2DeployerAddress);
   const RMRKMultiResourceRenderUtils = await ethers.getContractFactory(
     'RMRKMultiResourceRenderUtils',
   );
-  const RMRKValidatorLib = await ethers.getContractFactory('RMRKValidatorLib');
+  const LightmValidatorLib = await ethers.getContractFactory('LightmValidatorLib');
 
   // ---------- Normal deployment
   // if (!deployed) {
@@ -77,14 +86,14 @@ export async function oneTimeDeploy(create2DeployerAddress: string, deployed = f
     );
   }
 
-  const rmrkMultiResourceRenderUtilsAddress = await create2Deployer[
+  const rmrkMultiResourceRenderUtilsAddress: string = await create2Deployer[
     'computeAddress(bytes32,bytes32)'
   ](
     rmrkMultiResourceRenderUtilsHash,
     ethers.utils.keccak256(RMRKMultiResourceRenderUtils.bytecode),
   );
   const rmrkMultiResourceRenderUtils = await ethers.getContractAt(
-    'RMRKValidatorLib',
+    'LightmValidatorLib',
     rmrkMultiResourceRenderUtilsAddress,
   );
 
@@ -93,25 +102,27 @@ export async function oneTimeDeploy(create2DeployerAddress: string, deployed = f
 
   // ---------- Normal deployment
   // if (!deployed) {
-  //   const rmrkValidatorLib = await RMRKValidatorLib.deploy();
+  //   const lightmValidatorLib = await LightmValidatorLib.deploy();
 
-  //   await rmrkValidatorLib.deployed();
+  //   await lightmValidatorLib.deployed();
   // }
   // -----------------
 
   // ---------- Create2 deployment
-  const rmrkValidatorLibHash = ethers.utils.id('RMRKValidatorLib');
+  const lightmValidatorLibHash = ethers.utils.id('LightmValidatorLib');
   if (!deployed) {
-    await create2Deployer.deploy(0, rmrkValidatorLibHash, RMRKValidatorLib.bytecode);
+    await create2Deployer.deploy(0, lightmValidatorLibHash, LightmValidatorLib.bytecode);
   }
 
-  const rmrkValidatorLibAddress = await create2Deployer['computeAddress(bytes32,bytes32)'](
-    rmrkValidatorLibHash,
-    ethers.utils.keccak256(RMRKValidatorLib.bytecode),
+  const lightmValidatorLibAddress: string = await create2Deployer[
+    'computeAddress(bytes32,bytes32)'
+  ](lightmValidatorLibHash, ethers.utils.keccak256(LightmValidatorLib.bytecode));
+  const lightmValidatorLib = await ethers.getContractAt(
+    'LightmValidatorLib',
+    lightmValidatorLibAddress,
   );
-  const rmrkValidatorLib = await ethers.getContractAt('RMRKValidatorLib', rmrkValidatorLibAddress);
 
-  console.log('RMRKValidator Lib deployed', rmrkValidatorLib.address);
+  console.log('RMRKValidator Lib deployed', lightmValidatorLib.address);
   // ------------------
 
   // deploy DiamondCutFacet
@@ -129,7 +140,7 @@ export async function oneTimeDeploy(create2DeployerAddress: string, deployed = f
     await create2Deployer.deploy(0, diamondCutFacetHash, DiamondCutFacet.bytecode);
   }
 
-  const diamondCutFacetAddress = await create2Deployer['computeAddress(bytes32,bytes32)'](
+  const diamondCutFacetAddress: string = await create2Deployer['computeAddress(bytes32,bytes32)'](
     diamondCutFacetHash,
     ethers.utils.keccak256(DiamondCutFacet.bytecode),
   );
@@ -141,32 +152,41 @@ export async function oneTimeDeploy(create2DeployerAddress: string, deployed = f
   // deploy facets
   console.log('');
   console.log('Deploying facets');
+
   const FacetNames = [
     'DiamondLoupeFacet',
     'RMRKEquippableMultiResourceFacet',
     'RMRKEquippableNestingFacet',
     'RMRKEquippableFacet',
     'RMRKCollectionMetadataFacet',
-    'RMRKEquippableImpl',
+    'LightmImpl',
   ];
+
   const useNormalDeploy: { [k: string]: boolean } = {
-    RMRKEquippableImpl: true,
+    LightmImpl: true,
   };
+
   const hashConcat: { [k: string]: string } = {
     RMRKEquippableMultiResourceFacet: versionSuffix,
     RMRKEquippableNestingFacet: versionSuffix,
   };
+
   const constructorParams: { [k: string]: [any[], any[]] } = {
     RMRKEquippableNestingFacet: [
       ['string', 'string'],
-      ['RMRKNesting-0.2.0-alpha', 'RN-0.2.0-alpha'],
+      [`LightmNesting${versionSuffix}`, `LN${versionSuffix}`],
     ],
     RMRKEquippableMultiResourceFacet: [
       ['string', 'string'],
-      ['RMRKMultiResource-0.2.0-alpha', 'RMR-0.2.0-alpha'],
+      [`LightmMultiResource${versionSuffix}`, `LMR${versionSuffix}`],
     ],
   };
   const libraryLinking: { [k: string]: any } = {
+    RMRKEquippableNestingFacet: {
+      libraries: {
+        RMRKMultiResourceRenderUtils: rmrkMultiResourceRenderUtils.address,
+      },
+    },
     RMRKEquippableMultiResourceFacet: {
       libraries: {
         RMRKMultiResourceRenderUtils: rmrkMultiResourceRenderUtils.address,
@@ -174,7 +194,7 @@ export async function oneTimeDeploy(create2DeployerAddress: string, deployed = f
     },
     RMRKEquippableFacet: {
       libraries: {
-        RMRKValidatorLib: rmrkValidatorLib.address,
+        LightmValidatorLib: lightmValidatorLib.address,
       },
     },
   };
@@ -205,7 +225,7 @@ export async function oneTimeDeploy(create2DeployerAddress: string, deployed = f
       : ethers.getContractFactory(FacetName));
     let facet: Contract;
 
-    if (useNormalDeploy[FacetName]) {
+    if (!noNormalDeploy && useNormalDeploy[FacetName]) {
       // ---------- Normal deployment
       facet = await Facet.deploy();
       await facet.deployed();
@@ -262,13 +282,19 @@ export async function oneTimeDeploy(create2DeployerAddress: string, deployed = f
     });
   }
 
-  return [diamondCutFacetAddress, cut];
+  return {
+    cut,
+    lightmValidatorLibAddress,
+    rmrkMultiResourceRenderUtilsAddress,
+    diamondCutFacetAddress,
+  };
 }
+
+type PromiseResultType<P> = P extends Promise<infer R> ? R : P;
 
 export async function deployDiamondAndCutFacet(
   create2DeployerAddress: string,
-  diamondCutFacetAddress: string,
-  cut: ReturnType<typeof oneTimeDeploy>,
+  { diamondCutFacetAddress, cut }: PromiseResultType<ReturnType<typeof oneTimeDeploy>>,
 ) {
   const contractOwner = (await ethers.getSigners())[0];
 
@@ -291,9 +317,10 @@ export async function deployDiamondAndCutFacet(
   // ]);
   // await create2Deployer.deploy(0, diamondHash, diamondByteCode);
 
-  // const diamondAddress = await create2Deployer['computeAddress(bytes32,bytes32)'](
+  // const diamondAddress = await create2Deployer['computeAddress(bytes32,bytes32,byte32)'](
   //   diamondHash,
   //   ethers.utils.keccak256(diamondByteCode),
+  //   deployerAddressForComputing,
   // );
   // const diamond = await ethers.getContractAt('Diamond', diamondAddress);
   // -------------------
@@ -318,9 +345,10 @@ export async function deployDiamondAndCutFacet(
   // const lightmInitByteCode = LightmInit.bytecode;
   // await create2Deployer.deploy(0, lightmInitHash, lightmInitByteCode);
 
-  // const lightmInitAddress = await create2Deployer['computeAddress(bytes32,bytes32)'](
+  // const lightmInitAddress = await create2Deployer['computeAddress(bytes32,bytes32,byte32)'](
   //   lightmInitHash,
   //   ethers.utils.keccak256(lightmInitByteCode),
+  //   deployerAddressForComputing,
   // );
   // ------------------
 
@@ -332,7 +360,7 @@ export async function deployDiamondAndCutFacet(
   const diamondCut = await ethers.getContractAt('IDiamondCut', diamond.address);
 
   // Write down your own token's name & symbol & fallbackURI below
-  const nameAndSymbolAndFallbackURI = ['Test', 'TEST', ''];
+  const nameAndSymbolAndFallbackURI = [['Test', 'TEST', '']];
 
   // call to init function
   const functionCall = LightmInit.interface.encodeFunctionData('init', nameAndSymbolAndFallbackURI);
@@ -350,11 +378,13 @@ async function deploy() {
   // If create2Deployer is already deployed, comment this line.
   const create2DeployerAddress = await deployCreate2Deployer();
 
-  // If these one-time deployment contracts in this function have been deployed,
-  // you could set the 2nd param to `true` to avoid deploying and take the return value for invoking `deployDiamondAndCutFacet`.
-  const [diamondCutFacetAddress, cut] = await oneTimeDeploy(create2DeployerAddress, false);
+  // - If these one-time deployment contracts in this function have been deployed,
+  // you should set the 2nd param to `true` to avoid deploying and take the return value for invoking `deployDiamondAndCutFacet`.
+  // - If wanna take the `cut` for using in `RMRKUniversalFactory` to make deployment process totally happen on chain,
+  // set 2nd param to `true`, set 3rd param to the address of `RMRKUniversalFactory` to make sure the address is computed correctly.
+  const returnValue = await oneTimeDeploy(create2DeployerAddress);
 
-  return await deployDiamondAndCutFacet(create2DeployerAddress, diamondCutFacetAddress, cut);
+  return await deployDiamondAndCutFacet(create2DeployerAddress, returnValue);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

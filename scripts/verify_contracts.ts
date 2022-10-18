@@ -1,7 +1,7 @@
 import hre from 'hardhat';
 
 const Create2DeployerAddr = '0x193F37A630B1380F92D2Aea5177Aa5C5b6BF7D1F';
-const RMRKValidatorLibAddr = '0x578Dcfff22a463d50dD03AB7c269E6544e2f5419';
+const LightmValidatorLibAddr = '0x578Dcfff22a463d50dD03AB7c269E6544e2f5419';
 const DiamondCutFacetAddr = '0x6c21ED39c85492E73CcBe4f354A0B765a8971f45';
 const DiamondLoupeFacetAddr = '0xb7bAb9639FA88702081406627417febd34973db7';
 const RMRKEquippableMultiResourceFacetAddr = '0xffBA44B1dA0145F2Eae7498461082923352E3608';
@@ -17,9 +17,9 @@ const RMRKEquippableImplAddr = '0x31175A579847DEe105DF2d751950010EcE0FF911';
     {
       address: Create2DeployerAddr,
     },
-    // RMRKValidatorLib 0.1.0
+    // LightmValidatorLib 0.1.0
     {
-      address: RMRKValidatorLibAddr,
+      address: LightmValidatorLibAddr,
     },
     // DiamondCutFacet
     {
@@ -33,7 +33,7 @@ const RMRKEquippableImplAddr = '0x31175A579847DEe105DF2d751950010EcE0FF911';
     {
       address: RMRKEquippableMultiResourceFacetAddr,
       libraries: {
-        RMRKValidatorLib: RMRKValidatorLibAddr,
+        LightmValidatorLib: LightmValidatorLibAddr,
       },
     },
     // RMRKEquippableNestingFacet 0.1.0-alpha

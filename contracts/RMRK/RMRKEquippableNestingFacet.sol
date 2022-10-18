@@ -322,7 +322,7 @@ contract RMRKEquippableNestingFacet is
     ) public virtual onlyApprovedOrOwner(tokenId) {
         _isOverLength(tokenId, index, true);
 
-        RMRKNestingStorage.State storage ns = getNestingState();
+        NestingStorage.State storage ns = getNestingState();
 
         Child storage pendingChild = ns._pendingChildren[tokenId][index];
         address childContract = pendingChild.contractAddress;
@@ -354,7 +354,7 @@ contract RMRKEquippableNestingFacet is
         virtual
         onlyApprovedOrOwner(tokenId)
     {
-        RMRKNestingStorage.State storage ns = getNestingState();
+        NestingStorage.State storage ns = getNestingState();
         for (uint256 i; i < ns._pendingChildren[tokenId].length; ++i) {
             Child memory child = ns._pendingChildren[tokenId][i];
             address childContract = child.contractAddress;

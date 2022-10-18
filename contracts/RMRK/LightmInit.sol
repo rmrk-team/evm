@@ -9,20 +9,22 @@ import {IRMRKNesting} from "./interfaces/IRMRKNesting.sol";
 import {IRMRKMultiResource} from "./interfaces/IRMRKMultiResource.sol";
 import {IRMRKEquippable} from "./interfaces/IRMRKEquippableAyuilosVer.sol";
 import {IRMRKCollectionMetadata} from "./interfaces/IRMRKCollectionMetadata.sol";
-import {ERC721Storage, MultiResourceStorage} from "./internalFunctionSet/Storage.sol";
+import {ERC721Storage, MultiResourceStorage, EquippableStorage, LightmImplStorage} from "./internalFunctionSet/Storage.sol";
 
 // It is expected that this contract is customized if you want to deploy your diamond
 // with data from a deployment script. Use the init function to initialize state variables
 // of your diamond. Add parameters to the init funciton if you need to.
 
 contract LightmInit {
+    struct InitStruct {
+        string name;
+        string symbol;
+        string fallbackURI;
+    }
+
     // You can add parameters to this function in order to pass in
     // data to set your own state variables
-    function init(
-        string memory name,
-        string memory symbol,
-        string memory fallbackURI
-    ) external {
+    function init(InitStruct calldata _initStruct, address _owner) external {
         // adding ERC165 data
         LibDiamond.DiamondStorage storage ds = LibDiamond.diamondStorage();
         ds.supportedInterfaces[type(IERC165).interfaceId] = true;
@@ -33,7 +35,9 @@ contract LightmInit {
         ds.supportedInterfaces[type(IRMRKNesting).interfaceId] = true;
         ds.supportedInterfaces[type(IRMRKMultiResource).interfaceId] = true;
         ds.supportedInterfaces[type(IRMRKEquippable).interfaceId] = true;
-        ds.supportedInterfaces[type(IRMRKCollectionMetadata).interfaceId] = true;
+        ds.supportedInterfaces[
+            type(IRMRKCollectionMetadata).interfaceId
+        ] = true;
 
         // add your own state variables
         // EIP-2535 specifies that the `diamondCut` function takes two optional
@@ -41,12 +45,15 @@ contract LightmInit {
         // These arguments are used to execute an arbitrary function using delegatecall
         // in order to set state variables in the diamond during deployment or an upgrade
         // More info here: https://eips.ethereum.org/EIPS/eip-2535#diamond-interface
+        LightmImplStorage.State storage lis = LightmImplStorage.getState();
+        lis._owner = _owner;
+
         ERC721Storage.State storage s = ERC721Storage.getState();
-        s._name = name;
-        s._symbol = symbol;
+        s._name = _initStruct.name;
+        s._symbol = _initStruct.symbol;
 
         MultiResourceStorage.State storage mrs = MultiResourceStorage
             .getState();
-        mrs._fallbackURI = fallbackURI;
+        mrs._fallbackURI = _initStruct.fallbackURI;
     }
 }

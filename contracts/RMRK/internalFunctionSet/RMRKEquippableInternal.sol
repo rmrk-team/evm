@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import "../interfaces/IRMRKEquippableAyuilosVer.sol";
 import "../library/ValidatorLib.sol";
 import "./RMRKNestingMultiResourceInternal.sol";
-import {RMRKEquippableStorage} from "./Storage.sol";
+import {EquippableStorage} from "./Storage.sol";
 
 error RMRKBaseRelatedResourceDidNotExist();
 error RMRKCurrentBaseInstanceAlreadyEquippedThisChild();
@@ -25,9 +25,9 @@ abstract contract RMRKEquippableInternal is
     function getEquippableState()
         internal
         pure
-        returns (RMRKEquippableStorage.State storage)
+        returns (EquippableStorage.State storage)
     {
-        return RMRKEquippableStorage.getState();
+        return EquippableStorage.getState();
     }
 
     function _getBaseRelatedResource(uint64 baseRelatedResourceId)
@@ -241,6 +241,7 @@ abstract contract RMRKEquippableInternal is
 
         for (uint256 i; i < len; ++i) {
             SlotEquipment memory sE = slotEquipments[i];
+            EquippableStorage.State storage es = getEquippableState();
 
             // 1. Make sure slotEquipment is valid
             // 2. Make sure slot is not occupied
@@ -249,7 +250,7 @@ abstract contract RMRKEquippableInternal is
             if (doMoreCheck) {
                 {
                     address ownAddress = address(this);
-                    (bool isValid, string memory reason) = RMRKValidatorLib
+                    (bool isValid, string memory reason) = LightmValidatorLib
                         .isSlotEquipmentValid(
                             ownAddress,
                             tokenId,
@@ -263,12 +264,12 @@ abstract contract RMRKEquippableInternal is
                 }
 
                 {
-                    EquipmentPointer memory pointer = getEquippableState()
-                        ._equipmentPointers[tokenId][baseRelatedResourceId][
-                            sE.slotId
-                        ];
-                    SlotEquipment memory existSE = getEquippableState()
-                        ._slotEquipments[pointer.equipmentIndex];
+                    EquipmentPointer memory pointer = es._equipmentPointers[
+                        tokenId
+                    ][baseRelatedResourceId][sE.slotId];
+                    SlotEquipment memory existSE = es._slotEquipments[
+                        pointer.equipmentIndex
+                    ];
 
                     if (
                         existSE.slotId != uint64(0) ||
@@ -280,18 +281,17 @@ abstract contract RMRKEquippableInternal is
                 }
 
                 {
-                    bool alreadyEquipped = getEquippableState()
-                        ._baseAlreadyEquippedChild[tokenId][
-                            baseRelatedResourceId
-                        ][sE.child.contractAddress][sE.child.tokenId];
+                    bool alreadyEquipped = es._baseAlreadyEquippedChild[
+                        tokenId
+                    ][baseRelatedResourceId][sE.child.contractAddress][
+                            sE.child.tokenId
+                        ];
 
                     if (alreadyEquipped) {
                         revert RMRKCurrentBaseInstanceAlreadyEquippedThisChild();
                     }
                 }
             }
-
-            RMRKEquippableStorage.State storage es = getEquippableState();
 
             address childContract = sE.child.contractAddress;
             uint256 childTokenId = sE.child.tokenId;
@@ -359,7 +359,7 @@ abstract contract RMRKEquippableInternal is
         for (uint256 i; i < len; ++i) {
             uint64 slotId = slotIds[i];
 
-            RMRKEquippableStorage.State storage es = getEquippableState();
+            EquippableStorage.State storage es = getEquippableState();
 
             EquipmentPointer memory ePointer = es._equipmentPointers[tokenId][
                 baseRelatedResourceId
@@ -634,8 +634,8 @@ abstract contract RMRKEquippableInternal is
         _beforeTokenTransfer(owner, address(0), tokenId);
 
         ERC721Storage.State storage s = getState();
-        RMRKNestingStorage.State storage ns = getNestingState();
-        RMRKEquippableStorage.State storage es = getEquippableState();
+        NestingStorage.State storage ns = getNestingState();
+        EquippableStorage.State storage es = getEquippableState();
 
         // remove all corresponding slotEquipments
         uint64[] memory baseRelatedResourceIds = es._activeBaseResources[

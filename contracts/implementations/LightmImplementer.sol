@@ -5,22 +5,23 @@ pragma solidity ^0.8.15;
 import "../RMRK/library/LibDiamond.sol";
 import "../RMRK/internalFunctionSet/RMRKEquippableInternal.sol";
 import "../RMRK/internalFunctionSet/RMRKCollectionMetadataInternal.sol";
+import "../RMRK/internalFunctionSet/LightmImplInternal.sol";
 import "@openzeppelin/contracts/utils/Multicall.sol";
 
-contract RMRKEquippableImpl is
+contract LightmImpl is
     RMRKEquippableInternal,
     RMRKCollectionMetadataInternal,
+    LightmImplInternal,
     Multicall
 {
-    function mint(address to, uint256 tokenId) public {
-        LibDiamond.enforceIsContractOwner();
-
+    function mint(address to, uint256 tokenId) public onlyOwner {
         _safeMint(to, tokenId);
     }
 
-    function setCollectionMetadata(string calldata newMetadata) external {
-        LibDiamond.enforceIsContractOwner();
-
+    function setCollectionMetadata(string calldata newMetadata)
+        external
+        onlyOwner
+    {
         _setCollectionMetadata(newMetadata);
     }
 
@@ -28,15 +29,14 @@ contract RMRKEquippableImpl is
         uint64 id,
         BaseRelatedData calldata baseRelatedResourceData,
         string memory metadataURI
-    ) external {
-        LibDiamond.enforceIsContractOwner();
-
+    ) external onlyOwner {
         _addBaseRelatedResourceEntry(id, baseRelatedResourceData, metadataURI);
     }
 
-    function addResourceEntry(uint64 id, string memory metadataURI) external {
-        LibDiamond.enforceIsContractOwner();
-
+    function addResourceEntry(uint64 id, string memory metadataURI)
+        external
+        onlyOwner
+    {
         _addResourceEntry(id, metadataURI);
     }
 
@@ -44,7 +44,7 @@ contract RMRKEquippableImpl is
         uint256 tokenId,
         uint64 resourceId,
         uint64 overwrites
-    ) external {
+    ) external onlyApprovedForResourcesOrOwner(tokenId) {
         _addResourceToToken(tokenId, resourceId, overwrites);
     }
 }
