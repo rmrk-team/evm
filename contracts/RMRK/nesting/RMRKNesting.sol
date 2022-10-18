@@ -758,6 +758,8 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
             tokenId: childTokenId
         });
 
+        _beforeAddChild(parentTokenId, child);
+
         // This check is not done since there's no guarantee of mapping being
         // up to date, see definition for details. A similar protection does
         // exist when accepting a child:
@@ -775,6 +777,8 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
 
         // Previous length matches the index for the new child
         emit ChildProposed(parentTokenId, childAddress, childTokenId, length);
+
+        _afterAddChild(parentTokenId, child);
     }
 
     /**
@@ -795,6 +799,8 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         if (_childIsInActive[child.contractAddress][child.tokenId] != 0)
             revert RMRKChildAlreadyExists();
 
+        _beforeAcceptChild(tokenId, index, child);
+
         // Remove from pending:
         _removeChildByIndex(_pendingChildren[tokenId], index);
         delete _childIsInPending[child.contractAddress][child.tokenId];
@@ -809,6 +815,8 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
             child.tokenId,
             index
         );
+
+        _afterAcceptChild(tokenId, index, child);
     }
 
     /**
@@ -821,8 +829,10 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         virtual
         onlyApprovedOrOwner(tokenId)
     {
+        _beforeRejectAllChildren(tokenId);
         delete _pendingChildren[tokenId];
         emit AllChildrenRejected(tokenId);
+        _afterRejectAllChildren(tokenId);
     }
 
     /**
@@ -857,6 +867,7 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
             delete _childIsInActive[child.contractAddress][child.tokenId];
             _removeChildByIndex(_activeChildren[tokenId], index);
         }
+        _beforeUnnestChild(tokenId, index, child, isPending);
 
         if (to != address(0)) {
             IERC721(child.contractAddress).safeTransferFrom(
@@ -873,6 +884,7 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
             index,
             isPending
         );
+        _afterUnnestChild(tokenId, index, child, isPending);
     }
 
     function reclaimChild(
@@ -953,6 +965,8 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         return child;
     }
 
+    // HOOKS
+
     function _beforeNestedTokenTransfer(
         address from,
         address to,
@@ -968,6 +982,46 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         uint256 toTokenId,
         uint256 tokenId
     ) internal virtual {}
+
+    function _beforeAddChild(uint256 tokenId, Child memory child)
+        internal
+        virtual
+    {}
+
+    function _afterAddChild(uint256 tokenId, Child memory child)
+        internal
+        virtual
+    {}
+
+    function _beforeAcceptChild(
+        uint256 tokenId,
+        uint256 index,
+        Child memory child
+    ) internal virtual {}
+
+    function _afterAcceptChild(
+        uint256 tokenId,
+        uint256 index,
+        Child memory child
+    ) internal virtual {}
+
+    function _beforeUnnestChild(
+        uint256 tokenId,
+        uint256 index,
+        Child memory child,
+        bool isPending
+    ) internal virtual {}
+
+    function _afterUnnestChild(
+        uint256 tokenId,
+        uint256 index,
+        Child memory child,
+        bool isPending
+    ) internal virtual {}
+
+    function _beforeRejectAllChildren(uint256 tokenId) internal virtual {}
+
+    function _afterRejectAllChildren(uint256 tokenId) internal virtual {}
 
     //HELPERS
 
