@@ -563,7 +563,11 @@ abstract contract RMRKEquippableInternal is
 
     // ------------------------ MultiResource internal and override ------------------------
 
-    function _acceptResource(uint256 tokenId, uint256 index) internal override {
+    function _acceptResource(uint256 tokenId, uint256 index)
+        internal
+        virtual
+        override
+    {
         if (index >= getMRState()._pendingResources[tokenId].length)
             revert RMRKIndexOutOfRange();
         uint64 resourceId = getMRState()._pendingResources[tokenId][index];
