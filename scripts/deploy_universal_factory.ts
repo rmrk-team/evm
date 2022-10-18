@@ -28,7 +28,6 @@ export default async function deployUniversalFactory(
   const bytecode = ethers.utils.concat([UniversalFactory.bytecode, constructorParams]);
 
   const tx = await create2Deployer.deploy(0, hash, bytecode);
-  console.log('Factory deployment tx: ', tx.hash);
   const receipt = await tx.wait();
   if (!receipt.status) {
     throw Error(`Factory deployment failed: ${tx.hash}`);
