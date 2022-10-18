@@ -1,6 +1,6 @@
 ## RMRK_DIAMOND_IMPLEMENTATION
 
-RMRK Diamond Implementation use the [EIP-2535](https://eips.ethereum.org/EIPS/eip-2535)'s [diamond 3](https://github.com/mudgen/diamond-3-hardhat) implementation to implement [RMRK Spec](https://github.com/rmrk-team/rmrk-spec/tree/master/standards/abstract).
+RMRK Diamond Implementation use the [EIP-2535](https://eips.ethereum.org/EIPS/eip-2535)'s [diamond 2](https://github.com/mudgen/diamond-2-hardhat) implementation to implement [RMRK Spec](https://github.com/rmrk-team/rmrk-spec/tree/master/standards/abstract).
 
 ### Note
 
