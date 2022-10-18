@@ -256,6 +256,7 @@ contract RMRKEquippable is
         );
 
         // Check from child perspective intention to be used in part
+        // We add reentrancy guard because of this call, it happens before updating state
         if (
             !IRMRKEquippable(child.contractAddress)
                 .canTokenBeEquippedWithResourceIntoSlot(
