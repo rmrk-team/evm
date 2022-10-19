@@ -59,8 +59,7 @@ abstract contract ReentrancyGuard {
 
     function _nonReentrantIn() private {
         // On the first call to nonReentrant, _notEntered will be true
-        if(_status == _ENTERED)
-            revert RentrantCall();
+        if (_status == _ENTERED) revert RentrantCall();
 
         // Any calls to nonReentrant after this point will fail
         _status = _ENTERED;
