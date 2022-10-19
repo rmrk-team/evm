@@ -275,6 +275,7 @@ contract RMRKEquippable is
             )
         ) revert RMRKEquippableEquipNotAllowedByBase();
 
+        _beforeEquip(data);
         Equipment memory newEquip = Equipment({
             resourceId: data.resourceId,
             childResourceId: data.childResourceId,
@@ -295,6 +296,7 @@ contract RMRKEquippable is
             child.contractAddress,
             data.childResourceId
         );
+        _afterEquip(data);
     }
 
     function _checkResourceAcceptsSlot(uint64 resourceId, uint64 slotPartId)
@@ -447,4 +449,22 @@ contract RMRKEquippable is
     ) public view virtual returns (Equipment memory) {
         return _equipments[tokenId][targetBaseAddress][slotPartId];
     }
+
+    // HOOKS
+
+    function _beforeEquip(IntakeEquip memory data) internal virtual {}
+
+    function _afterEquip(IntakeEquip memory data) internal virtual {}
+
+    function _beforeUnequip(
+        uint256 tokenId,
+        uint64 resourceId,
+        uint64 slotPartId
+    ) internal virtual {}
+
+    function _afterUnequip(
+        uint256 tokenId,
+        uint64 resourceId,
+        uint64 slotPartId
+    ) internal virtual {}
 }
