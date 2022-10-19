@@ -131,22 +131,6 @@ interface IRMRKNesting is IERC165 {
     ) external;
 
     /**
-     * @dev Function called to reclaim an abandoned child created by unnesting with `to` as the zero
-     * address. This function will set the child's owner to the rootOwner of the caller, allowing
-     * the rootOwner management permissions for the child.
-     *
-     * Requirements:
-     *
-     * - `tokenId` must exist
-     *
-     */
-    function reclaimChild(
-        uint256 tokenId,
-        address childAddress,
-        uint256 childTokenId
-    ) external;
-
-    /**
      * @dev Returns array of child objects existing for `parentTokenId`.
      *
      */

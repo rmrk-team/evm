@@ -59,7 +59,7 @@ contract RMRKNestingMock is RMRKNesting {
         uint256 fromTokenId,
         uint256 toTokenId,
         uint256 tokenId
-    ) internal override {
+    ) internal virtual override {
         super._beforeNestedTokenTransfer(
             from,
             to,
@@ -76,7 +76,7 @@ contract RMRKNestingMock is RMRKNesting {
         uint256 fromTokenId,
         uint256 toTokenId,
         uint256 tokenId
-    ) internal override {
+    ) internal virtual override {
         super._afterNestedTokenTransfer(
             from,
             to,
