@@ -269,6 +269,7 @@ contract RMRKExternalEquip is
             childEquippableAddress: childEquippable
         });
 
+        _beforeEquip(data);
         _equipments[data.tokenId][baseAddress][slotPartId] = newEquip;
         _equipCountPerChild[data.tokenId][child.contractAddress][
             child.tokenId
@@ -282,6 +283,7 @@ contract RMRKExternalEquip is
             childEquippable,
             data.childResourceId
         );
+        _afterEquip(data);
     }
 
     function _checkResourceAcceptsSlot(uint64 resourceId, uint64 slotPartId)
@@ -311,6 +313,8 @@ contract RMRKExternalEquip is
         ];
         if (equipment.childEquippableAddress == address(0))
             revert RMRKNotEquipped();
+
+        _beforeUnequip(tokenId, resourceId, slotPartId);
         delete _equipments[tokenId][targetBaseAddress][slotPartId];
         address childNestingAddress = IRMRKExternalEquip(
             equipment.childEquippableAddress
@@ -327,6 +331,7 @@ contract RMRKExternalEquip is
             equipment.childEquippableAddress,
             equipment.childResourceId
         );
+        _afterUnequip(tokenId, resourceId, slotPartId);
     }
 
     function replaceEquipment(IntakeEquip memory data)
@@ -470,4 +475,22 @@ contract RMRKExternalEquip is
     function ownerOf(uint256 tokenId) internal view returns (address) {
         return IRMRKNesting(_nestingAddress).ownerOf(tokenId);
     }
+
+    // HOOKS
+
+    function _beforeEquip(IntakeEquip memory data) internal virtual {}
+
+    function _afterEquip(IntakeEquip memory data) internal virtual {}
+
+    function _beforeUnequip(
+        uint256 tokenId,
+        uint64 resourceId,
+        uint64 slotPartId
+    ) internal virtual {}
+
+    function _afterUnequip(
+        uint256 tokenId,
+        uint64 resourceId,
+        uint64 slotPartId
+    ) internal virtual {}
 }
