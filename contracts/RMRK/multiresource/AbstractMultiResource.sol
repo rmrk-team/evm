@@ -196,14 +196,19 @@ abstract contract AbstractMultiResource is Context, IRMRKMultiResource {
         if (index >= _pendingResources[tokenId].length)
             revert RMRKIndexOutOfRange();
         uint64 resourceId = _pendingResources[tokenId][index];
+
+        _beforeRejectResource(tokenId, index, resourceId);
         _pendingResources[tokenId].removeItemByIndex(index);
         _tokenResources[tokenId][resourceId] = false;
         delete (_resourceOverwrites[tokenId][resourceId]);
 
         emit ResourceRejected(tokenId, resourceId);
+        _afterRejectResource(tokenId, index, resourceId);
     }
 
     function _rejectAllResources(uint256 tokenId) internal virtual {
+        _beforeRejectAllResources(tokenId);
+
         uint256 len = _pendingResources[tokenId].length;
         for (uint256 i; i < len; ) {
             uint64 resourceId = _pendingResources[tokenId][i];
@@ -212,9 +217,10 @@ abstract contract AbstractMultiResource is Context, IRMRKMultiResource {
                 ++i;
             }
         }
-
         delete (_pendingResources[tokenId]);
+
         emit ResourceRejected(tokenId, uint64(0));
+        _afterRejectAllResources(tokenId);
     }
 
     function _setPriority(uint256 tokenId, uint16[] memory priorities)
@@ -224,9 +230,12 @@ abstract contract AbstractMultiResource is Context, IRMRKMultiResource {
         uint256 length = priorities.length;
         if (length != _activeResources[tokenId].length)
             revert RMRKBadPriorityListLength();
+
+        _beforeSetPriority(tokenId, priorities);
         _activeResourcePriorities[tokenId] = priorities;
 
         emit ResourcePrioritySet(tokenId);
+        _afterSetPriority(tokenId, priorities);
     }
 
     function _addResourceEntry(uint64 id, string memory metadataURI)
@@ -236,10 +245,13 @@ abstract contract AbstractMultiResource is Context, IRMRKMultiResource {
         if (id == uint64(0)) revert RMRKWriteToZero();
         if (bytes(_resources[id]).length > 0)
             revert RMRKResourceAlreadyExists();
+
+        _beforeAddResource(id, metadataURI);
         _resources[id] = metadataURI;
         _allResources.push(id);
 
         emit ResourceSet(id);
+        _afterAddResource(id, metadataURI);
     }
 
     function _addResourceToToken(
@@ -256,8 +268,8 @@ abstract contract AbstractMultiResource is Context, IRMRKMultiResource {
         if (_pendingResources[tokenId].length >= 128)
             revert RMRKMaxPendingResourcesReached();
 
+        _beforeAddResourceToToken(tokenId, resourceId, overwrites);
         _tokenResources[tokenId][resourceId] = true;
-
         _pendingResources[tokenId].push(resourceId);
 
         if (overwrites != uint64(0)) {
@@ -266,5 +278,54 @@ abstract contract AbstractMultiResource is Context, IRMRKMultiResource {
         }
 
         emit ResourceAddedToToken(tokenId, resourceId);
+        _afterAddResourceToToken(tokenId, resourceId, overwrites);
     }
+
+    function _beforeAddResource(uint64 id, string memory metadataURI)
+        internal
+        virtual
+    {}
+
+    function _afterAddResource(uint64 id, string memory metadataURI)
+        internal
+        virtual
+    {}
+
+    function _beforeAddResourceToToken(
+        uint256 tokenId,
+        uint64 resourceId,
+        uint64 overwrites
+    ) internal virtual {}
+
+    function _afterAddResourceToToken(
+        uint256 tokenId,
+        uint64 resourceId,
+        uint64 overwrites
+    ) internal virtual {}
+
+    function _beforeRejectResource(
+        uint256 tokenId,
+        uint256 index,
+        uint256 resourceId
+    ) internal virtual {}
+
+    function _afterRejectResource(
+        uint256 tokenId,
+        uint256 index,
+        uint256 resourceId
+    ) internal virtual {}
+
+    function _beforeRejectAllResources(uint256 tokenId) internal virtual {}
+
+    function _afterRejectAllResources(uint256 tokenId) internal virtual {}
+
+    function _beforeSetPriority(uint256 tokenId, uint16[] memory priorities)
+        internal
+        virtual
+    {}
+
+    function _afterSetPriority(uint256 tokenId, uint16[] memory priorities)
+        internal
+        virtual
+    {}
 }
