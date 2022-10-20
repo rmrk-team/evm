@@ -4,9 +4,21 @@ pragma solidity ^0.8.15;
 
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 
+/**
+ * @title IRMRKBaseStorage
+ * @author RMRK team
+ * @notice An interface Base storage for RMRK equippable module.
+ */
 interface IRMRKBaseStorage is IERC165 {
     /**
-     * @dev emitted when one or more addresses are added for equippable status for partId.
+     * @notice Event to announce addition of a new part.
+     * @dev It is emitted when a new part is added.
+     * @param partId ID of the part that was added
+     * @param itemType Enum value specifying wether the part is `None`, `Slot` and `Fixed`
+     * @param zIndex An uint specifying the z value of the part. It is used to specify the depth at wich the part should
+     *  be rendered at
+     * @param equippableAddresses An array of addresses that can equip this part
+     * @param metadataURI The metadata URI of the part
      */
     event AddedPart(
         uint64 indexed partId,
@@ -17,7 +29,10 @@ interface IRMRKBaseStorage is IERC165 {
     );
 
     /**
-     * @dev emitted when one or more addresses are added for equippable status for partId.
+     * @notice Event to announce new equippables to the part.
+     * @dev It is emitted when new addresses are marked as equippable for `partId`.
+     * @param partId ID of the part that had new equippable addresses added
+     * @param equippableAddresses An array of the new addresses that can equip this part
      */
     event AddedEquippables(
         uint64 indexed partId,
@@ -25,18 +40,23 @@ interface IRMRKBaseStorage is IERC165 {
     );
 
     /**
-     * @dev emitted when one or more addresses are whitelisted for equippable status for partId.
-     * Overwrites previous equippable addresses.
+     * @notice Event to announce the overriding of equippable addresses of the part.
+     * @dev It is emitted the existing list of addresses marked as equippable for `partId` is overwritten by a new one.
+     * @param partId ID of the part that the list of equippable addresses overwritten
+     * @param equippableAddresses The new, full, list of addresses that can equip this part
      */
     event SetEquippables(uint64 indexed partId, address[] equippableAddresses);
 
     /**
-     * @dev emitted when a partId is flagged as equippable by any.
+     * @notice Event to announce that a given part can be equipped by any address.
+     * @dev It is emitted when a given part is marked as equippable by any.
+     * @param partId ID of the part marked as equippable by any address
      */
     event SetEquippableToAll(uint64 indexed partId);
 
     /**
-     * @dev Item type enum for fixed and slot parts.
+     * @notice Used to define a type of the item. Possible values are `None`, `Slot` or `Fixed`.
+     * @dev Used for fixed and slot parts.
      */
     enum ItemType {
         None,
@@ -45,11 +65,16 @@ interface IRMRKBaseStorage is IERC165 {
     }
 
     /**
-    @dev Base struct for a standard RMRK base item. Requires a minimum of 3 storage slots per base item,
-    * equivalent to roughly 60,000 gas as of Berlin hard fork (April 14, 2021), though 5-7 storage slots
-    * is more realistic, given the standard length of an IPFS URI. This will result in between 25,000,000
-    * and 35,000,000 gas per 250 resources--the maximum block size of ETH mainnet is 30M at peak usage.
-    */
+     * @notice The integral structure of a standard RMRK base item defining it.
+     * @dev Requires a minimum of 3 storage slots per base item, equivalent to roughly 60,000 gas as of Berlin hard fork
+     *  (April 14, 2021), though 5-7 storage slots is more realistic, given the standard length of an IPFS URI. This
+     *  will result in between 25,000,000 and 35,000,000 gas per 250 resources--the maximum block size of Ethereum
+     *  mainnet is 30M at peak usage.
+     * @return itemType The item type of the part
+     * @return z The z value of the part defining how it should be rendered when presenting the full NFT
+     * @return equippable The array of addresses allowed to equip this part
+     * @return metadataURI The metadata URI of the part
+     */
     struct Part {
         ItemType itemType; //1 byte
         uint8 z; //1 byte
@@ -58,27 +83,49 @@ interface IRMRKBaseStorage is IERC165 {
     }
 
     //TODO: Doc this struct, put JSON intake format in comments here
+    /**
+     * @notice The structure used to add a new `Part`.
+     * @dev The part is added with specified ID, so you have to make sure that you are using an unused `partId`,
+     *  otherwise the addition of the part vill be reverted.
+     * @dev The full `IntakeStruct` looks like this:
+     *  [
+     *          partID,
+     *      [
+     *          itemType,
+     *          z,
+     *          [
+     *               permittedCollectionAddress0,
+     *               permittedCollectionAddress1,
+     *               permittedCollectionAddress2
+     *           ],
+     *           metadataURI
+     *       ]
+     *   ]
+     * @return partId ID to be assigned to the `Part`
+     * @return part A `Part` to be added
+    */
     struct IntakeStruct {
         uint64 partId;
         Part part;
     }
 
     /**
-     * @dev Returns URI of the metadata of associated collection
-     * @return string base contract metadata URI
+     * @notice Used to return the metadata URI of the associated collection.
+     * @return string Base contract metadata URI
      */
     function getMetadataURI() external view returns (string memory);
 
     /**
-     * @dev Returns type of data of associated base
-     * @return string data type
+     * @notice Used to return the `itemType` of the associated base
+     * @return string `itemType` of the associated base
      */
     function getType() external view returns (string memory);
 
     /**
-     * @dev Returns true if the part at partId is equippable by targetAddress.
-     *
-     * Requirements: None
+     * @notice Used to check whether the part is equippable by targetAddress.
+     * @param partId The ID of the part that we are checking
+     * @param targetAddress The address that we are checking for whether the part can be equipped into it or not
+     * @return bool The status indicating whether the part with `partId` can be equipped into `targetAddress`or not
      */
     function checkIsEquippable(uint64 partId, address targetAddress)
         external
@@ -86,23 +133,23 @@ interface IRMRKBaseStorage is IERC165 {
         returns (bool);
 
     /**
-     * @dev Returns true if the part at partId is equippable by all addresses.
-     *
-     * Requirements: None
+     * @notice Used to check if the part is equippable by all addresses.
+     * @param partId ID of the part that we are checking
+     * @return bool The status indicating whether the part with `partId` can be equipped into and address or not
      */
     function checkIsEquippableToAll(uint64 partId) external view returns (bool);
 
     /**
-     * @dev Returns the part object at reference partId.
-     *
-     * Requirements: None
+     * @notice Used to retrieve a `Part` located at `partId`
+     * @param partId ID of the part that we are retrieving
+     * @return struct The `Part` struct associated with given `partId`
      */
     function getPart(uint64 partId) external view returns (Part memory);
 
     /**
-     * @dev Returns the part objects at reference partIds.
-     *
-     * Requirements: None
+     * @notice Used to retrieve multiple parts at the same time.
+     * @param partIds An array of part IDs that we want to retrieve
+     * @return struct An array of `Part` structs associated with given `partIds`
      */
     function getParts(uint64[] calldata partIds)
         external
