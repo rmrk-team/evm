@@ -242,7 +242,7 @@ abstract contract AbstractMultiResource is Context, IRMRKMultiResource {
         internal
         virtual
     {
-        if (id == uint64(0)) revert RMRKWriteToZero();
+        if (id == uint64(0)) revert RMRKIdZeroForbidden();
         if (bytes(_resources[id]).length > 0)
             revert RMRKResourceAlreadyExists();
 

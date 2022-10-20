@@ -30,7 +30,6 @@ error ERC721TransferToNonReceiverImplementer();
 error ERC721TransferToTheZeroAddress();
 error RMRKChildAlreadyExists();
 error RMRKChildIndexOutOfRange();
-error RMRKInvalidChildReclaim();
 error RMRKIsNotContract();
 error RMRKMaxPendingChildrenReached();
 error RMRKMintToNonRMRKImplementer();
@@ -41,7 +40,6 @@ error RMRKNestingTransferToSelf();
 error RMRKNotApprovedOrDirectOwner();
 error RMRKPendingChildIndexOutOfRange();
 error RMRKTokenIdZeroForbidden();
-error RMRKChildAlreadyExists();
 
 /**
  * @dev RMRK nesting implementation. This contract is hierarchy agnostic, and can
