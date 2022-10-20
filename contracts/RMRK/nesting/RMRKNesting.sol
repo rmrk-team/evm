@@ -238,7 +238,6 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         address to,
         uint256 tokenId
     ) internal virtual {
-        // TODO: Shall we require parentId to be 0? Otherwise should a be a _nestTransfer call
         (address immediateOwner, uint256 parentId, ) = rmrkOwnerOf(tokenId);
         if (immediateOwner != from) revert ERC721TransferFromIncorrectOwner();
         if (to == address(0)) revert ERC721TransferToTheZeroAddress();
@@ -261,7 +260,6 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         uint256 tokenId,
         uint256 destinationId
     ) internal virtual {
-        // TODO: Shall we require parentId to be 0? Otherwise it should unnest first children won't be updated.
         (address immediateOwner, uint256 parentId, ) = rmrkOwnerOf(tokenId);
         if (immediateOwner != from) revert ERC721TransferFromIncorrectOwner();
         if (to == address(0)) revert ERC721TransferToTheZeroAddress();
