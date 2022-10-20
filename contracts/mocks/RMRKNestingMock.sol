@@ -8,6 +8,9 @@ import "../RMRK/nesting/RMRKNesting.sol";
 
 //Minimal public implementation of IRMRKNesting for testing.
 contract RMRKNestingMock is RMRKNesting {
+    // This is used to test the usage of hooks
+    mapping(address => mapping(uint256 => uint256)) private _balancesPerNft;
+
     constructor(string memory name_, string memory symbol_)
         RMRKNesting(name_, symbol_)
     {}
@@ -48,5 +51,47 @@ contract RMRKNestingMock is RMRKNesting {
         uint256 destinationId
     ) public virtual {
         nestTransferFrom(_msgSender(), to, tokenId, destinationId);
+    }
+
+    function _beforeNestedTokenTransfer(
+        address from,
+        address to,
+        uint256 fromTokenId,
+        uint256 toTokenId,
+        uint256 tokenId
+    ) internal virtual override {
+        super._beforeNestedTokenTransfer(
+            from,
+            to,
+            fromTokenId,
+            toTokenId,
+            tokenId
+        );
+        if (from != address(0)) _balancesPerNft[from][fromTokenId] -= 1;
+    }
+
+    function _afterNestedTokenTransfer(
+        address from,
+        address to,
+        uint256 fromTokenId,
+        uint256 toTokenId,
+        uint256 tokenId
+    ) internal virtual override {
+        super._afterNestedTokenTransfer(
+            from,
+            to,
+            fromTokenId,
+            toTokenId,
+            tokenId
+        );
+        if (to != address(0)) _balancesPerNft[to][toTokenId] += 1;
+    }
+
+    function balancePerNftOf(address owner, uint256 parentId)
+        public
+        view
+        returns (uint256)
+    {
+        return _balancesPerNft[owner][parentId];
     }
 }

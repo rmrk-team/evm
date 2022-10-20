@@ -12,6 +12,7 @@ import "../base/IRMRKBaseStorage.sol";
 import "../multiresource/AbstractMultiResource.sol";
 import "../nesting/IRMRKNesting.sol";
 import "../library/RMRKLib.sol";
+import "../security/ReentrancyGuard.sol";
 import "./IRMRKNestingExternalEquip.sol";
 import "./IRMRKExternalEquip.sol";
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
@@ -35,7 +36,11 @@ error RMRKTokenCannotBeEquippedWithResourceIntoSlot();
  * @dev RMRKEquippable external contract, expected to be paired with an instance of RMRKNestingExternalEquip.sol. This
  * contract takes over
  */
-contract RMRKExternalEquip is AbstractMultiResource, IRMRKExternalEquip {
+contract RMRKExternalEquip is
+    ReentrancyGuard,
+    AbstractMultiResource,
+    IRMRKExternalEquip
+{
     using RMRKLib for uint64[];
 
     // ------------------- RESOURCES --------------
@@ -212,7 +217,9 @@ contract RMRKExternalEquip is AbstractMultiResource, IRMRKExternalEquip {
 
     function equip(IntakeEquip memory data)
         public
+        virtual
         onlyApprovedOrOwner(data.tokenId)
+        nonReentrant
     {
         _equip(data);
     }
@@ -262,6 +269,7 @@ contract RMRKExternalEquip is AbstractMultiResource, IRMRKExternalEquip {
             childEquippableAddress: childEquippable
         });
 
+        _beforeEquip(data);
         _equipments[data.tokenId][baseAddress][slotPartId] = newEquip;
         _equipCountPerChild[data.tokenId][child.contractAddress][
             child.tokenId
@@ -275,6 +283,7 @@ contract RMRKExternalEquip is AbstractMultiResource, IRMRKExternalEquip {
             childEquippable,
             data.childResourceId
         );
+        _afterEquip(data);
     }
 
     function _checkResourceAcceptsSlot(uint64 resourceId, uint64 slotPartId)
@@ -289,7 +298,7 @@ contract RMRKExternalEquip is AbstractMultiResource, IRMRKExternalEquip {
         uint256 tokenId,
         uint64 resourceId,
         uint64 slotPartId
-    ) public onlyApprovedOrOwner(tokenId) {
+    ) public virtual onlyApprovedOrOwner(tokenId) {
         _unequip(tokenId, resourceId, slotPartId);
     }
 
@@ -304,6 +313,8 @@ contract RMRKExternalEquip is AbstractMultiResource, IRMRKExternalEquip {
         ];
         if (equipment.childEquippableAddress == address(0))
             revert RMRKNotEquipped();
+
+        _beforeUnequip(tokenId, resourceId, slotPartId);
         delete _equipments[tokenId][targetBaseAddress][slotPartId];
         address childNestingAddress = IRMRKExternalEquip(
             equipment.childEquippableAddress
@@ -320,11 +331,14 @@ contract RMRKExternalEquip is AbstractMultiResource, IRMRKExternalEquip {
             equipment.childEquippableAddress,
             equipment.childResourceId
         );
+        _afterUnequip(tokenId, resourceId, slotPartId);
     }
 
     function replaceEquipment(IntakeEquip memory data)
         public
+        virtual
         onlyApprovedOrOwner(data.tokenId)
+        nonReentrant
     {
         _unequip(data.tokenId, data.resourceId, data.slotPartId);
         _equip(data);
@@ -463,4 +477,22 @@ contract RMRKExternalEquip is AbstractMultiResource, IRMRKExternalEquip {
     function ownerOf(uint256 tokenId) internal view returns (address) {
         return IRMRKNesting(_nestingAddress).ownerOf(tokenId);
     }
+
+    // HOOKS
+
+    function _beforeEquip(IntakeEquip memory data) internal virtual {}
+
+    function _afterEquip(IntakeEquip memory data) internal virtual {}
+
+    function _beforeUnequip(
+        uint256 tokenId,
+        uint64 resourceId,
+        uint64 slotPartId
+    ) internal virtual {}
+
+    function _afterUnequip(
+        uint256 tokenId,
+        uint64 resourceId,
+        uint64 slotPartId
+    ) internal virtual {}
 }

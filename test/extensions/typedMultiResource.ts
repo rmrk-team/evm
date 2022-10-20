@@ -4,6 +4,14 @@ import { expect } from 'chai';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { bn, mintFromMock } from '../utils';
+import {
+  IERC165,
+  IRMRKEquippable,
+  IRMRKMultiResource,
+  IRMRKNesting,
+  IRMRKTypedMultiResource,
+  IOtherInterface,
+} from '../interfaces';
 
 // --------------- FIXTURES -----------------------
 
@@ -127,23 +135,25 @@ describe('RMRKNestingTypedMultiResourceMock', async function () {
   });
 
   it('can support IERC165', async function () {
-    expect(await typedNestingMultiResource.supportsInterface('0x01ffc9a7')).to.equal(true);
+    expect(await typedNestingMultiResource.supportsInterface(IERC165)).to.equal(true);
   });
 
   it('can support IMultiResource', async function () {
-    expect(await typedNestingMultiResource.supportsInterface('0xc65a6425')).to.equal(true);
+    expect(await typedNestingMultiResource.supportsInterface(IRMRKMultiResource)).to.equal(true);
   });
 
   it('can support INesting', async function () {
-    expect(await typedNestingMultiResource.supportsInterface('0xc71287ad')).to.equal(true);
+    expect(await typedNestingMultiResource.supportsInterface(IRMRKNesting)).to.equal(true);
   });
 
   it('can support IRMRKTypedMultiResource', async function () {
-    expect(await typedNestingMultiResource.supportsInterface('0xb6a3032e')).to.equal(true);
+    expect(await typedNestingMultiResource.supportsInterface(IRMRKTypedMultiResource)).to.equal(
+      true,
+    );
   });
 
   it('does not support other interfaces', async function () {
-    expect(await typedNestingMultiResource.supportsInterface('0xffffffff')).to.equal(false);
+    expect(await typedNestingMultiResource.supportsInterface(IOtherInterface)).to.equal(false);
   });
 
   it('can add typed resources', async function () {
@@ -176,27 +186,27 @@ describe('RMRKTypedEquippableMock', async function () {
   });
 
   it('can support IERC165', async function () {
-    expect(await typedEquippable.supportsInterface('0x01ffc9a7')).to.equal(true);
+    expect(await typedEquippable.supportsInterface(IERC165)).to.equal(true);
   });
 
   it('can support IMultiResource', async function () {
-    expect(await typedEquippable.supportsInterface('0xc65a6425')).to.equal(true);
+    expect(await typedEquippable.supportsInterface(IRMRKMultiResource)).to.equal(true);
   });
 
   it('can support INesting', async function () {
-    expect(await typedEquippable.supportsInterface('0xc71287ad')).to.equal(true);
+    expect(await typedEquippable.supportsInterface(IRMRKNesting)).to.equal(true);
   });
 
   it('can support IEquippable', async function () {
-    expect(await typedEquippable.supportsInterface('0xd3a28ca0')).to.equal(true);
+    expect(await typedEquippable.supportsInterface(IRMRKEquippable)).to.equal(true);
   });
 
   it('can support IRMRKTypedMultiResource', async function () {
-    expect(await typedEquippable.supportsInterface('0xb6a3032e')).to.equal(true);
+    expect(await typedEquippable.supportsInterface(IRMRKTypedMultiResource)).to.equal(true);
   });
 
   it('does not support other interfaces', async function () {
-    expect(await typedEquippable.supportsInterface('0xffffffff')).to.equal(false);
+    expect(await typedEquippable.supportsInterface(IOtherInterface)).to.equal(false);
   });
 
   it('can add typed resources', async function () {

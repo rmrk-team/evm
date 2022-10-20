@@ -3,6 +3,8 @@
 
 pragma solidity ^0.8.0;
 
+error RentrantCall();
+
 /**
  * @dev Contract module that helps prevent reentrant calls to a function.
  *
@@ -48,16 +50,18 @@ abstract contract ReentrancyGuard {
      * `private` function that does the actual work.
      */
     modifier nonReentrant() {
-        // On the first call to nonReentrant, _notEntered will be true
-        require(_status != _ENTERED, "ReentrancyGuard: reentrant call");
-
-        // Any calls to nonReentrant after this point will fail
-        _status = _ENTERED;
-
+        _nonReentrantIn();
         _;
-
         // By storing the original value once again, a refund is triggered (see
         // https://eips.ethereum.org/EIPS/eip-2200)
         _status = _NOT_ENTERED;
+    }
+
+    function _nonReentrantIn() private {
+        // On the first call to nonReentrant, _notEntered will be true
+        if (_status == _ENTERED) revert RentrantCall();
+
+        // Any calls to nonReentrant after this point will fail
+        _status = _ENTERED;
     }
 }

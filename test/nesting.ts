@@ -4,6 +4,7 @@ import { Contract } from 'ethers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import {
+  bn,
   mintFromMock,
   nestMintFromMock,
   transfer,
@@ -112,4 +113,48 @@ describe('NestingMock ERC721 behavior', function () {
   });
 
   shouldBehaveLikeERC721(parentName, parentSymbol);
+});
+
+describe('NestingMock transfer hooks', function () {
+  let parent: Contract;
+  let child: Contract;
+  let owner: SignerWithAddress;
+  let otherOwner: SignerWithAddress;
+
+  beforeEach(async function () {
+    const signers = await ethers.getSigners();
+    owner = signers[0];
+    otherOwner = signers[1];
+
+    ({ parent, child } = await loadFixture(parentChildFixture));
+    this.parentToken = parent;
+    this.childToken = child;
+  });
+
+  it('keeps track of balances per NFTs', async function () {
+    const parentId = await mintFromMock(parent, owner.address);
+    const childId = await nestMintFromMock(child, parent.address, parentId);
+
+    expect(await parent.balancePerNftOf(owner.address, 0)).to.eql(bn(1));
+    expect(await child.balancePerNftOf(parent.address, parentId)).to.eql(bn(1));
+
+    await parent.unnestChild(parentId, 0, otherOwner.address, true);
+    expect(await child.balancePerNftOf(parent.address, parentId)).to.eql(bn(0));
+    expect(await child.balancePerNftOf(otherOwner.address, 0)).to.eql(bn(1));
+
+    // Nest again
+    await child
+      .connect(otherOwner)
+      .nestTransferFrom(otherOwner.address, parent.address, childId, parentId);
+
+    expect(await child.balancePerNftOf(parent.address, parentId)).to.eql(bn(1));
+    expect(await child.balancePerNftOf(otherOwner.address, 0)).to.eql(bn(0));
+
+    await parent.acceptChild(parentId, 0);
+
+    await parent.burn(parentId);
+    expect(await parent.balancePerNftOf(owner.address, 0)).to.eql(bn(0));
+    expect(await child.balancePerNftOf(parent.address, parentId)).to.eql(bn(0));
+    expect(await child.balancePerNftOf(otherOwner.address, 0)).to.eql(bn(0));
+  });
 });
