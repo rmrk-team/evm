@@ -50,6 +50,14 @@ describe('MultiResourceMock Other Behavior', async function () {
     });
   });
 
+  describe('Minting', async function () {
+    it('cannot mint id 0', async function () {
+      await expect(
+        token['mint(address,uint256)'](addrs[0].address, 0),
+      ).to.be.revertedWithCustomError(token, 'RMRKTokenIdZeroForbidden');
+    });
+  });
+
   describe('Resource storage', async function () {
     const metaURIDefault = 'ipfs//something';
 
@@ -84,7 +92,7 @@ describe('MultiResourceMock Other Behavior', async function () {
 
       await expect(token.addResourceEntry(id, metaURIDefault)).to.be.revertedWithCustomError(
         token,
-        'RMRKWriteToZero',
+        'RMRKIdZeroForbidden',
       );
     });
 

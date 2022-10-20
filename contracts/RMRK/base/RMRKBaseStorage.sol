@@ -6,11 +6,12 @@ import "./IRMRKBaseStorage.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 // import "hardhat/console.sol";
 
+error RMRKBadConfig();
+error RMRKIdZeroForbidden();
 error RMRKPartAlreadyExists();
 error RMRKPartDoesNotExist();
 error RMRKPartIsNotSlot();
 error RMRKZeroLengthIdsPassed();
-error RMRKBadConfig();
 
 /**
  * @dev Base storage contract for RMRK equippable module.
@@ -106,6 +107,7 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
         uint64 partId = partIntake.partId;
         Part memory part = partIntake.part;
 
+        if (partId == uint64(0)) revert RMRKIdZeroForbidden();
         if (_parts[partId].itemType != ItemType.None)
             revert RMRKPartAlreadyExists();
         if (part.itemType == ItemType.None) revert RMRKBadConfig();

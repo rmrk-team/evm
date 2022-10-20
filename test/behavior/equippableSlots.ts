@@ -230,6 +230,31 @@ async function shouldBehaveLikeEquippableWithSlots(
       ).to.be.reverted; // Bad index
     });
 
+    it('cannot set a valid equippable group with id 0', async function () {
+      const equippableGroupId = 0;
+      // The malicious child indicates it can be equipped into soldier:
+      await expect(
+        weaponGemEquip.setValidParentForEquippableGroup(
+          equippableGroupId,
+          soldierEquip.address,
+          partIdForWeaponGem,
+        ),
+      ).to.be.revertedWithCustomError(weaponGemEquip, 'RMRKIdZeroForbidden');
+    });
+
+    it('cannot set a valid equippable group with part id 0', async function () {
+      const equippableGroupId = 1;
+      const partId = 0;
+      // The malicious child indicates it can be equipped into soldier:
+      await expect(
+        weaponGemEquip.setValidParentForEquippableGroup(
+          equippableGroupId,
+          soldierEquip.address,
+          partId,
+        ),
+      ).to.be.revertedWithCustomError(weaponGemEquip, 'RMRKIdZeroForbidden');
+    });
+
     it('cannot equip into a slot not set on the parent resource (gem into soldier)', async function () {
       const soldierOwner = addrs[0];
       const soldierId = soldiersIds[0];

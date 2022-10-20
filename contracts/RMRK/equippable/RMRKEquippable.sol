@@ -378,6 +378,8 @@ contract RMRKEquippable is
         address parentAddress,
         uint64 slotPartId
     ) internal virtual {
+        if (equippableGroupId == uint64(0) || slotPartId == uint64(0))
+            revert RMRKIdZeroForbidden();
         _validParentSlots[equippableGroupId][parentAddress] = slotPartId;
         emit ValidParentEquippableGroupIdSet(
             equippableGroupId,

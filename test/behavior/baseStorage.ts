@@ -92,6 +92,13 @@ async function shouldBehaveLikeBase(contractName: string, metadataURI: string, t
       ]);
     });
 
+    it('cannot add part with id 0', async function () {
+      const partId = 0;
+      await expect(
+        testBase.addPart({ partId: partId, part: sampleSlotPartData })
+      ).to.be.revertedWithCustomError(testBase, 'RMRKIdZeroForbidden');
+    });
+
     it('cannot add part with existing partId', async function () {
       const partId = 3;
       await testBase.addPart({ partId: partId, part: sampleSlotPartData });

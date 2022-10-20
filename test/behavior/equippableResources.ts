@@ -138,7 +138,7 @@ async function shouldBehaveLikeEquippableResources(
           [],
           [],
         ),
-      ).to.be.revertedWithCustomError(chunkyEquip, 'RMRKWriteToZero');
+      ).to.be.revertedWithCustomError(chunkyEquip, 'RMRKIdZeroForbidden');
     });
 
     it('cannot add same resource twice', async function () {
