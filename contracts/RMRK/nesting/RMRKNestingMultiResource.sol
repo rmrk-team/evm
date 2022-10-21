@@ -13,11 +13,6 @@ import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 // import "hardhat/console.sol";
 
-// MultiResource
-error RMRKNotApprovedForResourcesOrOwner();
-error RMRKApprovalForResourcesToCurrentOwner();
-error RMRKApproveForResourcesCallerIsNotOwnerNorApprovedForAll();
-
 /**
  * @dev Mid-level contract implementing multiresource on top of nesting.
  *

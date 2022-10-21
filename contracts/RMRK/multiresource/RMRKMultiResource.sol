@@ -10,23 +10,9 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import "./AbstractMultiResource.sol";
 import "../core/RMRKCore.sol";
+import "../library/RMRKErrors.sol";
 // import "hardhat/console.sol";
 
-error ERC721AddressZeroIsNotaValidOwner();
-error ERC721ApprovalToCurrentOwner();
-error ERC721ApproveCallerIsNotOwnerNorApprovedForAll();
-error ERC721ApproveToCaller();
-error ERC721InvalidTokenId();
-error ERC721MintToTheZeroAddress();
-error ERC721NotApprovedOrOwner();
-error ERC721TokenAlreadyMinted();
-error ERC721TransferFromIncorrectOwner();
-error ERC721TransferToNonReceiverImplementer();
-error ERC721TransferToTheZeroAddress();
-error RMRKApprovalForResourcesToCurrentOwner();
-error RMRKApproveForResourcesCallerIsNotOwnerNorApprovedForAll();
-error RMRKNotApprovedForResourcesOrOwner();
-error RMRKTokenIdZeroForbidden();
 
 /**
  * @dev Implementation of RMRK Multiresource contract, on top of ERC721.
@@ -318,7 +304,7 @@ contract RMRKMultiResource is
     function _mint(address to, uint256 tokenId) internal virtual {
         if (to == address(0)) revert ERC721MintToTheZeroAddress();
         if (_exists(tokenId)) revert ERC721TokenAlreadyMinted();
-        if (tokenId == 0) revert RMRKTokenIdZeroForbidden();
+        if (tokenId == 0) revert RMRKIdZeroForbidden();
 
         _beforeTokenTransfer(address(0), to, tokenId);
 

@@ -5,8 +5,6 @@ pragma solidity ^0.8.15;
 import "../../nesting/RMRKNesting.sol";
 import "./IRMRKReclaimableChild.sol";
 
-error RMRKInvalidChildReclaim();
-
 abstract contract RMRKReclaimableChild is IRMRKReclaimableChild, RMRKNesting {
     // WARNING: This mapping is not updated on burn or reject all, to save gas.
     // This is only used to cheaply forbid reclaiming a child which is pending

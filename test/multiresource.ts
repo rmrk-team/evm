@@ -54,7 +54,7 @@ describe('MultiResourceMock Other Behavior', async function () {
     it('cannot mint id 0', async function () {
       await expect(
         token['mint(address,uint256)'](addrs[0].address, 0),
-      ).to.be.revertedWithCustomError(token, 'RMRKTokenIdZeroForbidden');
+      ).to.be.revertedWithCustomError(token, 'RMRKIdZeroForbidden');
     });
   });
 

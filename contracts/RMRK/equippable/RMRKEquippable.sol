@@ -12,19 +12,6 @@ import "../security/ReentrancyGuard.sol";
 import "./IRMRKEquippable.sol";
 // import "hardhat/console.sol";
 
-// MultiResource
-error RMRKNotApprovedForResourcesOrOwner();
-error RMRKApprovalForResourcesToCurrentOwner();
-error RMRKApproveForResourcesCallerIsNotOwnerNorApprovedForAll();
-// Equippable
-error RMRKBaseRequiredForParts();
-error RMRKEquippableEquipNotAllowedByBase();
-error RMRKMustUnequipFirst();
-error RMRKNotEquipped();
-error RMRKSlotAlreadyUsed();
-error RMRKTargetResourceCannotReceiveSlot();
-error RMRKTokenCannotBeEquippedWithResourceIntoSlot();
-
 contract RMRKEquippable is
     ReentrancyGuard,
     RMRKNesting,

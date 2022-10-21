@@ -10,8 +10,6 @@ import "../../RMRK/equippable/IRMRKNestingExternalEquip.sol";
 import "../../RMRK/nesting/RMRKNesting.sol";
 // import "hardhat/console.sol";
 
-error RMRKMustUnequipFirst();
-
 /**
  * @dev RMRKNesting contract with external equippable contract for space saving purposes. Expected to be deployed along
  * an instance of RMRKExternalEquip.sol. To make use of the equippable module with this contract, expose the _setEquippableAddress
