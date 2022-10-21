@@ -17,8 +17,6 @@ contract RMRKExternalEquipImpl is OwnableLock, RMRKExternalEquip {
         uint64 resourceId,
         uint64 overwrites
     ) public onlyOwnerOrContributor {
-        // This reverts if token does not exist:
-        ownerOf(tokenId);
         _addResourceToToken(tokenId, resourceId, overwrites);
     }
 

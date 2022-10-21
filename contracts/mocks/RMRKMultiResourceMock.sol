@@ -38,7 +38,6 @@ contract RMRKMultiResourceMock is RMRKMultiResource {
         uint64 resourceId,
         uint64 overwrites
     ) external {
-        _requireMinted(tokenId);
         _addResourceToToken(tokenId, resourceId, overwrites);
     }
 
