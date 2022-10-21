@@ -11,8 +11,8 @@ import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import "./AbstractMultiResource.sol";
 import "../core/RMRKCore.sol";
 import "../library/RMRKErrors.sol";
-// import "hardhat/console.sol";
 
+// import "hardhat/console.sol";
 
 /**
  * @dev Implementation of RMRK Multiresource contract, on top of ERC721.

@@ -10,6 +10,7 @@ import "../multiresource/AbstractMultiResource.sol";
 import "../nesting/RMRKNesting.sol";
 import "../security/ReentrancyGuard.sol";
 import "./IRMRKEquippable.sol";
+
 // import "hardhat/console.sol";
 
 contract RMRKEquippable is

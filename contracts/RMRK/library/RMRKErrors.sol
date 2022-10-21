@@ -58,7 +58,3 @@ error RMRKTokenCannotBeEquippedWithResourceIntoSlot();
 error RMRKTokenDoesNotHaveActiveResource();
 error RMRKTokenHasNoResources();
 error RMRKZeroLengthIdsPassed();
-
-contract RMRKErrors {
-
-}
