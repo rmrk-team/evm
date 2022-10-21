@@ -679,7 +679,7 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         address to,
         uint256 tokenId,
         bytes memory data
-    ) internal returns (bool) {
+    ) private returns (bool) {
         if (to.isContract()) {
             try
                 IERC721Receiver(to).onERC721Received(
