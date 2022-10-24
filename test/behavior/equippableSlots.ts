@@ -17,7 +17,6 @@ import {
   weaponsIds,
   weaponGemsIds,
   backgroundsIds,
-  ItemType,
 } from '../setup/equippableSlots';
 import { bn } from '../utils';
 
@@ -632,37 +631,6 @@ async function shouldBehaveLikeEquippableWithSlots(
       ).to.be.revertedWithCustomError(view, 'RMRKTokenDoesNotHaveActiveResource');
     });
   });
-
-  async function addNewEquippableResourceToWeapon(
-    newWeaponResId: number,
-    newequippableGroupId: number,
-    partIdForWeaponAlt: number,
-  ): Promise<void> {
-    await weaponEquip.addResourceEntry(
-      {
-        id: newWeaponResId,
-        equippableGroupId: newequippableGroupId,
-        metadataURI: `ipfs:weapon/equipAlt/${newWeaponResId}`,
-        baseAddress: base.address,
-      },
-      [],
-      [partIdForWeaponGem],
-    );
-    // Make it equippable into soldier using new slot
-    await expect(
-      weaponEquip.setValidParentForEquippableGroup(
-        newequippableGroupId,
-        soldierEquip.address,
-        partIdForWeaponAlt,
-      ),
-    )
-      .to.emit(weaponEquip, 'ValidParentEquippableGroupIdSet')
-      .withArgs(newequippableGroupId, soldierEquip.address, partIdForWeaponAlt);
-
-    // Add the resource to the weapon and accept it
-    await weaponEquip.addResourceToToken(weaponsIds[0], newWeaponResId, 0);
-    await weaponEquip.connect(addrs[0]).acceptResource(weaponsIds[0], 0);
-  }
 
   async function equipWeaponAndCheckFromAddress(
     from: SignerWithAddress,

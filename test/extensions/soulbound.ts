@@ -4,6 +4,7 @@ import { expect } from 'chai';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { bn, mintFromMock, nestMintFromMock } from '../utils';
+import { IERC165, IRMRKSoulboundMultiResource, IOtherInterface } from '../interfaces';
 
 // --------------- FIXTURES -----------------------
 
@@ -162,15 +163,15 @@ async function shouldBehaveLikeSoulboundBasic() {
   });
 
   it('can support IERC165', async function () {
-    expect(await soulbound.supportsInterface('0x01ffc9a7')).to.equal(true);
+    expect(await soulbound.supportsInterface(IERC165)).to.equal(true);
   });
 
   it('can support IRMRKSoulboundMultiResource', async function () {
-    expect(await soulbound.supportsInterface('0x911ec470')).to.equal(true);
+    expect(await soulbound.supportsInterface(IRMRKSoulboundMultiResource)).to.equal(true);
   });
 
   it('does not support other interfaces', async function () {
-    expect(await soulbound.supportsInterface('0xffffffff')).to.equal(false);
+    expect(await soulbound.supportsInterface(IOtherInterface)).to.equal(false);
   });
 
   it('cannot transfer', async function () {

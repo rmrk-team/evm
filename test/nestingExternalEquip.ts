@@ -1,7 +1,7 @@
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
-import { Contract } from 'ethers';
 import { mintFromMock, nestMintFromMock, transfer, nestTransfer } from './utils';
+import { IOtherInterface, IRMRKNestingExternalEquip, IRMRKExternalEquip } from './interfaces';
 import shouldBehaveLikeNesting from './behavior/nesting';
 import shouldBehaveLikeERC721 from './behavior/erc721';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
@@ -47,8 +47,6 @@ describe('NestingWithEquippableMock Nesting Behavior', function () {
 });
 
 describe('NestingWithEquippableMock ERC721 Behavior', function () {
-  let token: Contract;
-
   const name = 'RmrkTest';
   const symbol = 'RMRKTST';
 
@@ -74,15 +72,15 @@ describe('NestingWithEquippableMock ERC721 Behavior', function () {
 
   describe('Interface support', function () {
     it('can support INestingExternalEquip', async function () {
-      expect(await this.token.supportsInterface('0x8b7f3e99')).to.equal(true);
+      expect(await this.token.supportsInterface(IRMRKNestingExternalEquip)).to.equal(true);
     });
     it('can support IExternalEquip', async function () {
-      expect(await this.equip.supportsInterface('0xe5383e6c')).to.equal(true);
+      expect(await this.equip.supportsInterface(IRMRKExternalEquip)).to.equal(true);
     });
 
     it('cannot support other interfaceId', async function () {
-      expect(await this.token.supportsInterface('0xffffffff')).to.equal(false);
-      expect(await this.equip.supportsInterface('0xffffffff')).to.equal(false);
+      expect(await this.token.supportsInterface(IOtherInterface)).to.equal(false);
+      expect(await this.equip.supportsInterface(IOtherInterface)).to.equal(false);
     });
   });
 

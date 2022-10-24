@@ -3,6 +3,7 @@ import { expect } from 'chai';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { BigNumber, Contract } from 'ethers';
 import { bn } from '../utils';
+import { IERC165, IOtherInterface, IRMRKMultiResource } from '../interfaces';
 
 async function shouldBehaveLikeMultiResource(
   mint: (token: Contract, to: string) => Promise<number>,
@@ -31,15 +32,15 @@ async function shouldBehaveLikeMultiResource(
 
   describe('Interface support', async function () {
     it('can support IERC165', async function () {
-      expect(await this.token.supportsInterface('0x01ffc9a7')).to.equal(true);
+      expect(await this.token.supportsInterface(IERC165)).to.equal(true);
     });
 
     it('can support IMultiResource', async function () {
-      expect(await this.token.supportsInterface('0xc65a6425')).to.equal(true);
+      expect(await this.token.supportsInterface(IRMRKMultiResource)).to.equal(true);
     });
 
     it('cannot support other interfaceId', async function () {
-      expect(await this.token.supportsInterface('0xffffffff')).to.equal(false);
+      expect(await this.token.supportsInterface(IOtherInterface)).to.equal(false);
     });
   });
 

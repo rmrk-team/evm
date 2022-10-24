@@ -290,11 +290,10 @@ async function shouldBehaveLikeNesting(
 
   describe('Reject child', async function () {
     let parentId: number;
-    let childId: number;
 
     beforeEach(async function () {
       parentId = await mint(parent, tokenOwner.address);
-      childId = await nestMint(child, parent.address, parentId);
+      await nestMint(child, parent.address, parentId);
     });
 
     it('can reject all pending children', async function () {

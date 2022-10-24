@@ -14,6 +14,7 @@ import {
   addResourceEntryFromImpl,
   ONE_ETH,
 } from '../utils';
+import { IERC721 } from '../interfaces';
 
 async function singleFixture(): Promise<{ token: Contract; renderUtils: Contract }> {
   const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiResourceRenderUtils');
@@ -54,7 +55,7 @@ describe('MultiResourceImpl Other Behavior', async () => {
     });
 
     it('can support IERC721', async function () {
-      expect(await token.supportsInterface('0x80ac58cd')).to.equal(true);
+      expect(await token.supportsInterface(IERC721)).to.equal(true);
     });
 
     shouldBehaveLikeOwnableLock(isOwnableLockMock);

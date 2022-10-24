@@ -10,6 +10,7 @@ import {
   mintFromMock,
   singleFixtureWithArgs,
 } from './utils';
+import { IERC721 } from './interfaces';
 import shouldBehaveLikeMultiResource from './behavior/multiresource';
 import shouldBehaveLikeERC721 from './behavior/erc721';
 
@@ -46,7 +47,7 @@ describe('MultiResourceMock Other Behavior', async function () {
     });
 
     it('can support IERC721', async function () {
-      expect(await token.supportsInterface('0x80ac58cd')).to.equal(true);
+      expect(await token.supportsInterface(IERC721)).to.equal(true);
     });
   });
 

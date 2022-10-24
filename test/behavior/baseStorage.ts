@@ -2,6 +2,7 @@ import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { Contract } from 'ethers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { IOtherInterface, IRMRKBaseStorage } from '../interfaces';
 
 async function shouldBehaveLikeBase(contractName: string, metadataURI: string, type: string) {
   let testBase: Contract;
@@ -39,11 +40,11 @@ async function shouldBehaveLikeBase(contractName: string, metadataURI: string, t
     });
 
     it('supports interface', async function () {
-      expect(await testBase.supportsInterface('0xd912401f')).to.equal(true);
+      expect(await testBase.supportsInterface(IRMRKBaseStorage)).to.equal(true);
     });
 
     it('does not support other interfaces', async function () {
-      expect(await testBase.supportsInterface('0xffffffff')).to.equal(false);
+      expect(await testBase.supportsInterface(IOtherInterface)).to.equal(false);
     });
   });
 
@@ -95,7 +96,7 @@ async function shouldBehaveLikeBase(contractName: string, metadataURI: string, t
     it('cannot add part with id 0', async function () {
       const partId = 0;
       await expect(
-        testBase.addPart({ partId: partId, part: sampleSlotPartData })
+        testBase.addPart({ partId: partId, part: sampleSlotPartData }),
       ).to.be.revertedWithCustomError(testBase, 'RMRKIdZeroForbidden');
     });
 
