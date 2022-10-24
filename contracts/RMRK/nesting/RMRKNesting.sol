@@ -250,6 +250,8 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         _balances[to] += 1;
 
         emit Transfer(from, to, tokenId);
+        emit NestTransfer(immediateOwner, to, parentId, 0, tokenId);
+
         _afterTokenTransfer(from, to, tokenId);
         _afterNestedTokenTransfer(immediateOwner, to, parentId, 0, tokenId);
     }
@@ -302,6 +304,7 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         _afterNestedTokenTransfer(from, to, parentId, destinationId, tokenId);
 
         emit Transfer(from, to, tokenId);
+        emit NestTransfer(from, to, parentId, destinationId, tokenId);
     }
 
     function _checkForInheritanceLoop(
@@ -381,6 +384,8 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         _innerMint(to, tokenId, 0);
 
         emit Transfer(address(0), to, tokenId);
+        emit NestTransfer(address(0), to, 0, 0, tokenId);
+
         _afterTokenTransfer(address(0), to, tokenId);
         _afterNestedTokenTransfer(address(0), to, 0, 0, tokenId);
     }
@@ -543,6 +548,7 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
             tokenId
         );
         emit Transfer(owner, address(0), tokenId);
+        emit NestTransfer(immediateOwner, address(0), parentId, 0, tokenId);
     }
 
     ////////////////////////////////////////
