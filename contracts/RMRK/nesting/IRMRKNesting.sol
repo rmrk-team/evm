@@ -12,6 +12,20 @@ interface IRMRKNesting is IERC165 {
     }
 
     /**
+     * @dev Emitted when `tokenId` token is transferred from `from` to `to`.
+     * from indicates the immediate owner, which is a contract if nested.
+     * If token was nested, `fromTokenId` indicates former parent id.
+     * If destination is an NFT, `toTokenId` indicates the new parent id.
+     */
+    event NestTransfer(
+        address indexed from,
+        address indexed to,
+        uint256 fromTokenId,
+        uint256 toTokenId,
+        uint256 indexed tokenId
+    );
+
+    /**
      * @dev emitted when a child NFT is added to a token's pending array
      */
     event ChildProposed(
