@@ -40,7 +40,7 @@ error RMRKApproveForResourcesCallerIsNotOwnerNorApprovedForAll();
 error RMRKBadConfig();
 /// Attempting to set the priorities with an array of length that doesn't match the length of active resources array
 error RMRKBadPriorityListLength();
-/// Attempting to add a resource entry without a `Part`
+/// Attempting to add a resource entry with `Part`s, without setting the `Base` address
 error RMRKBaseRequiredForParts();
 /// Attempting to transfer a soulbound (non-transferrable) token
 error RMRKCannotTransferSoulbound();
