@@ -91,7 +91,7 @@ async function shouldBehaveLikeMultiResource(
       it('cannot approve owner for all resources', async function () {
         await expect(
           this.token.connect(tokenOwner).setApprovalForAllForResources(tokenOwner.address, true),
-        ).to.be.revertedWithCustomError(this.token, 'RMRKApproveForResourcesToCaller');
+        ).to.be.revertedWithCustomError(this.token, 'RMRKApprovalForResourcesToCurrentOwner');
       });
 
       it('cannot approve owner if not owner', async function () {

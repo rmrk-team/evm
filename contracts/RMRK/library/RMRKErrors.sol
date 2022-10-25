@@ -20,15 +20,15 @@ error ERC721ApprovedQueryForNonexistentToken();
 error ERC721ApproveToCaller();
 /// Attempting to use an invalid token ID
 error ERC721InvalidTokenId();
-/// Attempting to mint to 0x0 addressß
+/// Attempting to mint to 0x0 address
 error ERC721MintToTheZeroAddress();
 /// Attempting to manage a token without being its owner or approved by the owner
 error ERC721NotApprovedOrOwner();
 /// Attempting to mint an already minted token
 error ERC721TokenAlreadyMinted();
-/// Attempting to transfer the token form and address that is not the owner
+/// Attempting to transfer the token from an address that is not the owner
 error ERC721TransferFromIncorrectOwner();
-/// Attempting to transfer to an address that is unable to receive the token
+/// Attempting to safe transfer to an address that is unable to receive the token
 error ERC721TransferToNonReceiverImplementer();
 /// Attempting to transfer the token to a 0x0 address
 error ERC721TransferToTheZeroAddress();
@@ -36,11 +36,9 @@ error ERC721TransferToTheZeroAddress();
 error RMRKApprovalForResourcesToCurrentOwner();
 /// Attempting to grant approval of resources without being the caller or approved for all
 error RMRKApproveForResourcesCallerIsNotOwnerNorApprovedForAll();
-/// Attempting to grant resource approval to self
-error RMRKApproveForResourcesToCaller();
 /// Attempting to incorrectly configue a Base item
 error RMRKBadConfig();
-/// Attempting to set the priorities with an array of length that doesn't match the resource length
+/// Attempting to set the priorities with an array of length that doesn't match the length of active resources array
 error RMRKBadPriorityListLength();
 /// Attempting to add a resource entry without a `Part`
 error RMRKBaseRequiredForParts();
@@ -50,7 +48,7 @@ error RMRKCannotTransferSoulbound();
 error RMRKChildAlreadyExists();
 /// Attempting to interact with a child, using index that is higher than the number of children
 error RMRKChildIndexOutOfRange();
-/// Attempting to equip a `Part` that does not allow equipping to the desired address
+/// Attempting to equip a `Part` with a child not approved by the base
 error RMRKEquippableEquipNotAllowedByBase();
 /// Attempting to use ID 0, which is not supported
 /// @dev The ID 0 in RMRK suite is reserved for empty values. Guarding against its use ensures the expected operation
@@ -59,9 +57,9 @@ error RMRKIdZeroForbidden();
 error RMRKIndexOutOfRange();
 /// Attempting to reclaim a child that can't be reclaimed
 error RMRKInvalidChildReclaim();
-/// Attempting to interact with an end-user accoutn when the contract account is expected
+/// Attempting to interact with an end-user account when the contract account is expected
 error RMRKIsNotContract();
-/// Attempting to interact with a contract that had its operation paused
+/// Attempting to interact with a contract that had its operation locked
 error RMRKLocked();
 /// Attempting to add a pending child after the number of pending children has reached the limit (default limit is 128)
 error RMRKMaxPendingChildrenReached();
@@ -86,14 +84,16 @@ error RMRKNestingTransferToSelf();
 error RMRKNoResourceMatchingId();
 /// Attempting to manage a resource without owning it or having been granted permission by the owner to do so
 error RMRKNotApprovedForResourcesOrOwner();
-/// Attempting to interact with a token or resource without being its owner or having been granted permission by the
+/// Attempting to interact with a token without being its owner or having been granted permission by the
 ///  owner to do so
+/// @dev When a token is nested, only the direct owner (NFT parent) can mange it. In that case, approved addresses are
+///  not allowed to manage it, in order to ensure the expected behaviour
 error RMRKNotApprovedOrDirectOwner();
-/// Attempting to compose a resource wihtout an address
+/// Attempting to compose a resource wihtout having an associated Base
 error RMRKNotComposableResource();
 /// Attempting to unequip an item that isn't equipped
 error RMRKNotEquipped();
-/// Attempting to interact with a token or resource without being its owner
+/// Attempting to interact with a management function without being the smart contract's owner
 error RMRKNotOwner();
 /// Attempting to interact with a function without being the owner or contributor of the collection
 error RMRKNotOwnerOrContributor();
@@ -111,15 +111,15 @@ error RMRKPartIsNotSlot();
 error RMRKPendingChildIndexOutOfRange();
 /// Attempting to add a resource using an ID that has already been used
 error RMRKResourceAlreadyExists();
-/// Attempting to equip an item into a slot that already has an item euipped
+/// Attempting to equip an item into a slot that already has an item equipped
 error RMRKSlotAlreadyUsed();
-/// Attempting to equip an item into a resource that is not a `Slot`
+/// Attempting to equip an item into a `Slot` that the target resource does not implement
 error RMRKTargetResourceCannotReceiveSlot();
-/// Attempting to equip a child into a slot that doesn't support the tokens from child's collection
+/// Attempting to equip a child into a `Slot` and parent that the child's collection doesn't support
 error RMRKTokenCannotBeEquippedWithResourceIntoSlot();
 /// Attempting to compose a NFT of a token without active resources
 error RMRKTokenDoesNotHaveActiveResource();
-/// Attempting to determine a priority of tokens resources wihtout them being defined
+/// Attempting to determine the resource with the top priority on a token without resources
 error RMRKTokenHasNoResources();
-/// Attempting not to pass an empth array of equippable addresses when adding or setting the equippable addresses
+/// Attempting not to pass an empty array of equippable addresses when adding or setting the equippable addresses
 error RMRKZeroLengthIdsPassed();

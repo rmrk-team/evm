@@ -160,7 +160,7 @@ abstract contract AbstractMultiResource is Context, IRMRKMultiResource {
         virtual
     {
         address owner = _msgSender();
-        if (owner == operator) revert RMRKApproveForResourcesToCaller();
+        if (owner == operator) revert RMRKApprovalForResourcesToCurrentOwner();
 
         _operatorApprovalsForResources[owner][operator] = approved;
         emit ApprovalForAllForResources(owner, operator, approved);
