@@ -25,8 +25,38 @@ async function nestMintFromMock(token: Contract, to: string, parentId: number): 
   return childTokenId;
 }
 
+async function mintFromImplErc20Pay(token: Contract, to: string): Promise<number> {
+  const erc20Address = token.tokenAddress();
+  const erc20Factory = await ethers.getContractFactory('ERC20Mock');
+  const erc20 = erc20Factory.attach(erc20Address);
+  const owner = (await ethers.getSigners())[0];
+
+  await erc20.mint(owner.address, ONE_ETH);
+  await erc20.approve(token.address, ONE_ETH);
+
+  await token.mint(to, 1);
+  return await token.totalSupply();
+}
+
 async function mintFromImpl(token: Contract, to: string): Promise<number> {
   await token.mint(to, 1, { value: ONE_ETH });
+  return await token.totalSupply();
+}
+
+async function nestMintFromImplErc20Pay(
+  token: Contract,
+  to: string,
+  destinationId: number,
+): Promise<number> {
+  const erc20Address = token.tokenAddress();
+  const erc20Factory = await ethers.getContractFactory('ERC20Mock');
+  const erc20 = erc20Factory.attach(erc20Address);
+  const owner = (await ethers.getSigners())[0];
+
+  await erc20.mint(owner.address, ONE_ETH);
+  await erc20.approve(token.address, ONE_ETH);
+
+  await token.mintNesting(to, 1, destinationId);
   return await token.totalSupply();
 }
 
@@ -125,8 +155,10 @@ export {
   ADDRESS_ZERO,
   bn,
   mintFromImpl,
+  mintFromImplErc20Pay,
   mintFromMock,
   nestMintFromImpl,
+  nestMintFromImplErc20Pay,
   nestMintFromMock,
   nestTransfer,
   ONE_ETH,
