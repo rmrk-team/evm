@@ -3,16 +3,11 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/utils/Context.sol";
+import "../library/RMRKErrors.sol";
 
 /*
 Minimal ownable lock, based on "openzeppelin's access/Ownable.sol";
 */
-error RMRKLocked();
-error RMRKNotOwner();
-error RMRKNotOwnerOrContributor();
-error RMRKNewOwnerIsZeroAddress();
-error RMRKNewContributorIsZeroAddress();
-
 contract OwnableLock is Context {
     bool private _lock;
     address private _owner;

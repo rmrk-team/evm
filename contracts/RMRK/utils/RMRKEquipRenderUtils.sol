@@ -3,13 +3,11 @@
 import "../base/IRMRKBaseStorage.sol";
 import "../equippable/IRMRKEquippable.sol";
 import "../library/RMRKLib.sol";
+import "../library/RMRKErrors.sol";
 import "./IRMRKEquipRenderUtils.sol";
 // import "hardhat/console.sol";
 
 pragma solidity ^0.8.15;
-
-error RMRKTokenDoesNotHaveActiveResource();
-error RMRKNotComposableResource();
 
 /**
  * @dev Extra utility functions for composing RMRK extended resources.

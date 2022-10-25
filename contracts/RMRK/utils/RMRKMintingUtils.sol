@@ -1,9 +1,8 @@
 // SPDX-License-Identifier: Apache-2.0
 import "../access/OwnableLock.sol";
+import "../library/RMRKErrors.sol";
 
 pragma solidity ^0.8.15;
-
-error RMRKMintOverMax();
 
 /**
  * @dev Top-level utilities for managing minting. Implements OwnableLock by default.

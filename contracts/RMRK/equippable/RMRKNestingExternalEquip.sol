@@ -8,9 +8,8 @@ import "../../RMRK/equippable/IRMRKEquippable.sol";
 import "../../RMRK/equippable/IRMRKExternalEquip.sol";
 import "../../RMRK/equippable/IRMRKNestingExternalEquip.sol";
 import "../../RMRK/nesting/RMRKNesting.sol";
-// import "hardhat/console.sol";
 
-error RMRKMustUnequipFirst();
+// import "hardhat/console.sol";
 
 /**
  * @dev RMRKNesting contract with external equippable contract for space saving purposes. Expected to be deployed along

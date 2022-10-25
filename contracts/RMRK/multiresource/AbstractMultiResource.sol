@@ -5,14 +5,7 @@ pragma solidity ^0.8.15;
 import "./IRMRKMultiResource.sol";
 import "../library/RMRKLib.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
-
-error RMRKApproveForResourcesToCaller();
-error RMRKBadPriorityListLength();
-error RMRKIndexOutOfRange();
-error RMRKMaxPendingResourcesReached();
-error RMRKNoResourceMatchingId();
-error RMRKResourceAlreadyExists();
-error RMRKIdZeroForbidden();
+import "../library/RMRKErrors.sol";
 
 abstract contract AbstractMultiResource is Context, IRMRKMultiResource {
     using RMRKLib for uint64[];
@@ -167,7 +160,7 @@ abstract contract AbstractMultiResource is Context, IRMRKMultiResource {
         virtual
     {
         address owner = _msgSender();
-        if (owner == operator) revert RMRKApproveForResourcesToCaller();
+        if (owner == operator) revert RMRKApprovalForResourcesToCurrentOwner();
 
         _operatorApprovalsForResources[owner][operator] = approved;
         emit ApprovalForAllForResources(owner, operator, approved);

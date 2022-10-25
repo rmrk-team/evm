@@ -4,8 +4,7 @@ pragma solidity ^0.8.15;
 
 import "../../core/RMRKCore.sol";
 import "./IRMRKSoulbound.sol";
-
-error RMRKCannotTransferSoulbound();
+import "../../library/RMRKErrors.sol";
 
 abstract contract RMRKSoulbound is IRMRKSoulbound, RMRKCore {
     function _beforeTokenTransfer(

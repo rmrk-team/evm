@@ -14,32 +14,9 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
-// import "hardhat/console.sol";
+import "../library/RMRKErrors.sol";
 
-error ERC721AddressZeroIsNotaValidOwner();
-error ERC721ApprovalToCurrentOwner();
-error ERC721ApproveCallerIsNotOwnerNorApprovedForAll();
-error ERC721ApprovedQueryForNonexistentToken();
-error ERC721ApproveToCaller();
-error ERC721InvalidTokenId();
-error ERC721MintToTheZeroAddress();
-error ERC721NotApprovedOrOwner();
-error ERC721TokenAlreadyMinted();
-error ERC721TransferFromIncorrectOwner();
-error ERC721TransferToNonReceiverImplementer();
-error ERC721TransferToTheZeroAddress();
-error RMRKChildAlreadyExists();
-error RMRKChildIndexOutOfRange();
-error RMRKIsNotContract();
-error RMRKMaxPendingChildrenReached();
-error RMRKMintToNonRMRKImplementer();
-error RMRKNestingTooDeep();
-error RMRKNestingTransferToDescendant();
-error RMRKNestingTransferToNonRMRKNestingImplementer();
-error RMRKNestingTransferToSelf();
-error RMRKNotApprovedOrDirectOwner();
-error RMRKPendingChildIndexOutOfRange();
-error RMRKTokenIdZeroForbidden();
+// import "hardhat/console.sol";
 
 /**
  * @dev RMRK nesting implementation. This contract is hierarchy agnostic, and can
@@ -406,7 +383,7 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
     ) private {
         if (to == address(0)) revert ERC721MintToTheZeroAddress();
         if (_exists(tokenId)) revert ERC721TokenAlreadyMinted();
-        if (tokenId == 0) revert RMRKTokenIdZeroForbidden();
+        if (tokenId == 0) revert RMRKIdZeroForbidden();
 
         _beforeTokenTransfer(address(0), to, tokenId);
         _beforeNestedTokenTransfer(address(0), to, 0, destinationId, tokenId);
@@ -702,7 +679,7 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         address to,
         uint256 tokenId,
         bytes memory data
-    ) internal returns (bool) {
+    ) private returns (bool) {
         if (to.isContract()) {
             try
                 IERC721Receiver(to).onERC721Received(

@@ -41,7 +41,6 @@ contract RMRKNestingMultiResourceMock is RMRKNestingMultiResource {
         uint64 resourceId,
         uint64 overwrites
     ) external {
-        _requireMinted(tokenId);
         _addResourceToToken(tokenId, resourceId, overwrites);
     }
 

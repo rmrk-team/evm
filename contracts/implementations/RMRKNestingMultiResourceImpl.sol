@@ -91,7 +91,6 @@ contract RMRKNestingMultiResourceImpl is
         uint64 resourceId,
         uint64 overwrites
     ) external onlyOwnerOrContributor {
-        _requireMinted(tokenId);
         _addResourceToToken(tokenId, resourceId, overwrites);
     }
 
