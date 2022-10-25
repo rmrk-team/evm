@@ -6,7 +6,7 @@
  * RMRK Equippables accessory contract, responsible for state storage and management of equippable items.
  */
 
-pragma solidity ^0.8.15;
+pragma solidity ^0.8.16;
 
 import "../base/IRMRKBaseStorage.sol";
 import "../multiresource/AbstractMultiResource.sol";

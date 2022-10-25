@@ -6,7 +6,7 @@ import "../library/RMRKLib.sol";
 import "./IRMRKEquipRenderUtils.sol";
 // import "hardhat/console.sol";
 
-pragma solidity ^0.8.15;
+pragma solidity ^0.8.16;
 
 error RMRKTokenDoesNotHaveActiveResource();
 error RMRKNotComposableResource();

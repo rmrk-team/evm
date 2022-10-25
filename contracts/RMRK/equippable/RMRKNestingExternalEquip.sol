@@ -2,7 +2,7 @@
 
 //Generally all interactions should propagate downstream
 
-pragma solidity ^0.8.15;
+pragma solidity ^0.8.16;
 
 import "../../RMRK/equippable/IRMRKEquippable.sol";
 import "../../RMRK/equippable/IRMRKExternalEquip.sol";

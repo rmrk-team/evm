@@ -3,7 +3,7 @@
 import "contracts/RMRK/multiresource/IRMRKMultiResource.sol";
 import "contracts/RMRK/utils/IRMRKMultiResourceRenderUtils.sol";
 
-pragma solidity ^0.8.15;
+pragma solidity ^0.8.16;
 
 /**
  * @dev Extra utility functions for composing RMRK resources.
