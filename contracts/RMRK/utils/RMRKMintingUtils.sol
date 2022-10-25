@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 import "../access/OwnableLock.sol";
 
-pragma solidity ^0.8.15;
+pragma solidity ^0.8.16;
 
 error RMRKMintOverMax();
 
