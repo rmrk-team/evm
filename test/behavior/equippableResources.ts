@@ -214,15 +214,16 @@ async function shouldBehaveLikeEquippableResources(
       );
     });
 
-    it('cannot add resource to non existing token', async function () {
+    it('can add resource to non existing token and it is pending when minted', async function () {
       const resId = bn(1);
-      const tokenId = 1;
+      const lastTokenId = await mint(chunky, owner.address);
+      const nextTokenId = lastTokenId + 1; // not existing yet
 
       await addResources([resId]);
-      await expect(chunkyEquip.addResourceToToken(tokenId, resId, 0)).to.be.revertedWithCustomError(
-        chunky,
-        'ERC721InvalidTokenId',
-      );
+      await chunkyEquip.addResourceToToken(nextTokenId, resId, 0);
+      await mint(chunky, owner.address);
+
+      expect(await chunkyEquip.getPendingResources(nextTokenId)).to.eql([resId]);
     });
 
     it('cannot add resource twice to the same token', async function () {

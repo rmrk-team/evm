@@ -2,14 +2,13 @@
 
 import "contracts/RMRK/multiresource/IRMRKMultiResource.sol";
 import "contracts/RMRK/utils/IRMRKMultiResourceRenderUtils.sol";
+import "../library/RMRKErrors.sol";
 
 pragma solidity ^0.8.16;
 
 /**
  * @dev Extra utility functions for composing RMRK resources.
  */
-
-error RMRKTokenHasNoResources();
 
 contract RMRKMultiResourceRenderUtils is IRMRKMultiResourceRenderUtils {
     uint16 private constant _LOWEST_POSSIBLE_PRIORITY = 2**16 - 1;

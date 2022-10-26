@@ -43,8 +43,6 @@ contract RMRKEquippableMock is RMRKEquippable {
         uint64 resourceId,
         uint64 overwrites
     ) external {
-        // This reverts if token does not exist:
-        ownerOf(tokenId);
         _addResourceToToken(tokenId, resourceId, overwrites);
     }
 

@@ -16,21 +16,8 @@ import "../security/ReentrancyGuard.sol";
 import "./IRMRKNestingExternalEquip.sol";
 import "./IRMRKExternalEquip.sol";
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
-// import "hardhat/console.sol";
 
-// MultiResource
-error RMRKNotApprovedForResourcesOrOwner();
-error RMRKApprovalForResourcesToCurrentOwner();
-error RMRKApproveForResourcesCallerIsNotOwnerNorApprovedForAll();
-// Equippable
-error ERC721InvalidTokenId();
-error ERC721NotApprovedOrOwner();
-error RMRKBaseRequiredForParts();
-error RMRKEquippableEquipNotAllowedByBase();
-error RMRKNotEquipped();
-error RMRKSlotAlreadyUsed();
-error RMRKTargetResourceCannotReceiveSlot();
-error RMRKTokenCannotBeEquippedWithResourceIntoSlot();
+// import "hardhat/console.sol";
 
 /**
  * @dev RMRKEquippable external contract, expected to be paired with an instance of RMRKNestingExternalEquip.sol. This

@@ -4,14 +4,9 @@ pragma solidity ^0.8.16;
 
 import "./IRMRKBaseStorage.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
-// import "hardhat/console.sol";
+import "../library/RMRKErrors.sol";
 
-error RMRKBadConfig();
-error RMRKIdZeroForbidden();
-error RMRKPartAlreadyExists();
-error RMRKPartDoesNotExist();
-error RMRKPartIsNotSlot();
-error RMRKZeroLengthIdsPassed();
+// import "hardhat/console.sol";
 
 /**
  * @dev Base storage contract for RMRK equippable module.

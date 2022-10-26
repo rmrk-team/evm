@@ -55,7 +55,7 @@ describe('MultiResourceMock Other Behavior', async function () {
     it('cannot mint id 0', async function () {
       await expect(
         token['mint(address,uint256)'](addrs[0].address, 0),
-      ).to.be.revertedWithCustomError(token, 'RMRKTokenIdZeroForbidden');
+      ).to.be.revertedWithCustomError(token, 'RMRKIdZeroForbidden');
     });
   });
 
@@ -147,14 +147,14 @@ describe('MultiResourceMock Other Behavior', async function () {
       );
     });
 
-    it('cannot add resource to non existing token', async function () {
+    it('can add resource to non existing token and it is pending when minted', async function () {
       const resId = await addResourceEntryFromMock(token);
-      const tokenId = 9999;
+      const lastTokenId = await mintFromMock(token, tokenOwner.address);
+      const nextTokenId = lastTokenId + 1; // not existing yet
 
-      await expect(token.addResourceToToken(tokenId, resId, 0)).to.be.revertedWithCustomError(
-        token,
-        'ERC721InvalidTokenId',
-      );
+      await token.addResourceToToken(nextTokenId, resId, 0);
+      await mintFromMock(token, tokenOwner.address);
+      expect(await token.getPendingResources(nextTokenId)).to.eql([resId]);
     });
 
     it('cannot add resource twice to the same token', async function () {
