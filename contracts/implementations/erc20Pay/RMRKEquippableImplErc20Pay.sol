@@ -2,19 +2,19 @@
 
 pragma solidity ^0.8.16;
 
+import "../../RMRK/equippable/RMRKEquippable.sol";
 import "../../RMRK/extension/RMRKRoyalties.sol";
-import "../../RMRK/multiresource/RMRKMultiResource.sol";
 import "../../RMRK/utils/RMRKCollectionMetadata.sol";
 import "../../RMRK/utils/RMRKMintingUtilsErc20Pay.sol";
 
 error RMRKMintZero();
 error RMRKNotEnoughAllowance();
 
-contract RMRKMultiResourceImplErc20Pay is
+contract RMRKEquippableImplErc20Pay is
     RMRKMintingUtilsErc20Pay,
     RMRKCollectionMetadata,
     RMRKRoyalties,
-    RMRKMultiResource
+    RMRKEquippable
 {
     struct InitData {
         address tokenAddress;
@@ -24,7 +24,6 @@ contract RMRKMultiResourceImplErc20Pay is
         uint16 royaltyPercentageBps; // in basis points
     }
 
-    // Manage resources via increment
     uint256 private _totalResources;
     string private _tokenURI;
 
@@ -35,7 +34,7 @@ contract RMRKMultiResourceImplErc20Pay is
         string memory tokenURI_,
         InitData memory data
     )
-        RMRKMultiResource(name, symbol)
+        RMRKEquippable(name, symbol)
         RMRKMintingUtilsErc20Pay(data.tokenAddress, data.maxSupply, data.pricePerMint)
         RMRKCollectionMetadata(collectionMetadata_)
         RMRKRoyalties(data.royaltyRecipient, data.royaltyPercentageBps)
@@ -46,11 +45,36 @@ contract RMRKMultiResourceImplErc20Pay is
     /*
     Template minting logic
     */
-    function mint(address to, uint256 numToMint)
-        external
-        saleIsOpen
-        notLocked
-    {
+    function mint(address to, uint256 numToMint) external payable saleIsOpen {
+        (uint256 nextToken, uint256 totalSupplyOffset) = _preMint(numToMint);
+
+        for (uint256 i = nextToken; i < totalSupplyOffset; ) {
+            _safeMint(to, i);
+            unchecked {
+                ++i;
+            }
+        }
+    }
+
+    /*
+    Template minting logic
+    */
+    function mintNesting(
+        address to,
+        uint256 numToMint,
+        uint256 destinationId
+    ) external payable saleIsOpen {
+        (uint256 nextToken, uint256 totalSupplyOffset) = _preMint(numToMint);
+
+        for (uint256 i = nextToken; i < totalSupplyOffset; ) {
+            _nestMint(to, i, destinationId);
+            unchecked {
+                ++i;
+            }
+        }
+    }
+
+    function _preMint(uint256 numToMint) private returns (uint256, uint256) {
         if (numToMint == uint256(0)) revert RMRKMintZero();
         if (numToMint + _totalSupply > _maxSupply) revert RMRKMintOverMax();
 
@@ -66,12 +90,7 @@ contract RMRKMultiResourceImplErc20Pay is
         }
         uint256 totalSupplyOffset = _totalSupply + 1;
 
-        for (uint256 i = nextToken; i < totalSupplyOffset; ) {
-            _safeMint(to, i);
-            unchecked {
-                ++i;
-            }
-        }
+        return (nextToken, totalSupplyOffset);
     }
 
     function addResourceToToken(
@@ -79,18 +98,30 @@ contract RMRKMultiResourceImplErc20Pay is
         uint64 resourceId,
         uint64 overwrites
     ) external onlyOwnerOrContributor {
-        _requireMinted(tokenId);
         _addResourceToToken(tokenId, resourceId, overwrites);
     }
 
-    function addResourceEntry(string memory metadataURI)
-        external
-        onlyOwnerOrContributor
-    {
+    function addResourceEntry(
+        ExtendedResource calldata resource,
+        uint64[] calldata fixedPartIds,
+        uint64[] calldata slotPartIds
+    ) external onlyOwnerOrContributor {
         unchecked {
             _totalResources += 1;
         }
-        _addResourceEntry(uint64(_totalResources), metadataURI);
+        _addResourceEntry(resource, fixedPartIds, slotPartIds);
+    }
+
+    function setValidParentForEquippableGroup(
+        uint64 equippableGroupId,
+        address parentAddress,
+        uint64 partId
+    ) external onlyOwnerOrContributor {
+        _setValidParentForEquippableGroup(
+            equippableGroupId,
+            parentAddress,
+            partId
+        );
     }
 
     function totalResources() external view returns (uint256) {

@@ -2,21 +2,22 @@
 
 pragma solidity ^0.8.16;
 
+import "../../RMRK/equippable/RMRKNestingExternalEquip.sol";
 import "../../RMRK/extension/RMRKRoyalties.sol";
-import "../../RMRK/multiresource/RMRKMultiResource.sol";
 import "../../RMRK/utils/RMRKCollectionMetadata.sol";
 import "../../RMRK/utils/RMRKMintingUtilsErc20Pay.sol";
 
 error RMRKMintZero();
 error RMRKNotEnoughAllowance();
 
-contract RMRKMultiResourceImplErc20Pay is
+contract RMRKNestingExternalEquipImplErc20Pay is
     RMRKMintingUtilsErc20Pay,
     RMRKCollectionMetadata,
     RMRKRoyalties,
-    RMRKMultiResource
+    RMRKNestingExternalEquip
 {
     struct InitData {
+        address equippableAddress;
         address tokenAddress;
         address royaltyRecipient;
         uint128 pricePerMint;
@@ -24,33 +25,60 @@ contract RMRKMultiResourceImplErc20Pay is
         uint16 royaltyPercentageBps; // in basis points
     }
 
-    // Manage resources via increment
-    uint256 private _totalResources;
+    address _equippableAddress;
     string private _tokenURI;
 
     constructor(
-        string memory name,
-        string memory symbol,
+        string memory name_,
+        string memory symbol_,
         string memory collectionMetadata_,
         string memory tokenURI_,
         InitData memory data
     )
-        RMRKMultiResource(name, symbol)
+        RMRKNestingExternalEquip(name_, symbol_)
         RMRKMintingUtilsErc20Pay(data.tokenAddress, data.maxSupply, data.pricePerMint)
         RMRKCollectionMetadata(collectionMetadata_)
         RMRKRoyalties(data.royaltyRecipient, data.royaltyPercentageBps)
     {
+        // Can't add an equippable deployment here due to contract size, for factory
+        // pattern can use OZ clone
+        _equippableAddress = data.equippableAddress;
         _tokenURI = tokenURI_;
     }
 
     /*
     Template minting logic
     */
-    function mint(address to, uint256 numToMint)
-        external
-        saleIsOpen
-        notLocked
-    {
+    function mint(address to, uint256 numToMint) external payable saleIsOpen {
+        (uint256 nextToken, uint256 totalSupplyOffset) = _preMint(numToMint);
+
+        for (uint256 i = nextToken; i < totalSupplyOffset; ) {
+            _safeMint(to, i);
+            unchecked {
+                ++i;
+            }
+        }
+    }
+
+    /*
+    Template minting logic
+    */
+    function mintNesting(
+        address to,
+        uint256 numToMint,
+        uint256 destinationId
+    ) external payable saleIsOpen {
+        (uint256 nextToken, uint256 totalSupplyOffset) = _preMint(numToMint);
+
+        for (uint256 i = nextToken; i < totalSupplyOffset; ) {
+            _nestMint(to, i, destinationId);
+            unchecked {
+                ++i;
+            }
+        }
+    }
+
+    function _preMint(uint256 numToMint) private returns (uint256, uint256) {
         if (numToMint == uint256(0)) revert RMRKMintZero();
         if (numToMint + _totalSupply > _maxSupply) revert RMRKMintOverMax();
 
@@ -66,35 +94,15 @@ contract RMRKMultiResourceImplErc20Pay is
         }
         uint256 totalSupplyOffset = _totalSupply + 1;
 
-        for (uint256 i = nextToken; i < totalSupplyOffset; ) {
-            _safeMint(to, i);
-            unchecked {
-                ++i;
-            }
-        }
+        return (nextToken, totalSupplyOffset);
     }
 
-    function addResourceToToken(
-        uint256 tokenId,
-        uint64 resourceId,
-        uint64 overwrites
-    ) external onlyOwnerOrContributor {
-        _requireMinted(tokenId);
-        _addResourceToToken(tokenId, resourceId, overwrites);
-    }
-
-    function addResourceEntry(string memory metadataURI)
+    function setEquippableAddress(address equippable)
         external
         onlyOwnerOrContributor
     {
-        unchecked {
-            _totalResources += 1;
-        }
-        _addResourceEntry(uint64(_totalResources), metadataURI);
-    }
-
-    function totalResources() external view returns (uint256) {
-        return _totalResources;
+        //TODO: should we add a check if passed address supports IRMRKNestingExternalEquip
+        _setEquippableAddress(equippable);
     }
 
     function tokenURI(uint256) public view override returns (string memory) {
