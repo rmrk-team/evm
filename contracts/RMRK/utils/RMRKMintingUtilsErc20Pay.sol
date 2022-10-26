@@ -10,7 +10,7 @@ pragma solidity ^0.8.15;
  * Payments are done through an ERC20 supplied on constructor's `tokenAddress_`
  */
 
-contract RMRKMintingUtilsERC20Pay is OwnableLock {
+contract RMRKMintingUtilsErc20Pay is OwnableLock {
     uint256 internal _totalSupply;
     uint256 internal immutable _maxSupply;
     uint256 internal immutable _pricePerMint;

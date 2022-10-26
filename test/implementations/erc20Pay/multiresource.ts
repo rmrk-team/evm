@@ -5,7 +5,7 @@ import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import shouldBehaveLikeOwnableLock from '../../behavior/ownableLock';
 import shouldBehaveLikeMultiResource from '../../behavior/multiresource';
-// import shouldControlValidMinting from '../../behavior/mintingImpl';
+import shouldControlValidMintingErc20Pay from '../../behavior/mintingImplErc20Pay';
 import {
   ADDRESS_ZERO,
   addResourceToToken,
@@ -31,13 +31,9 @@ async function singleFixture(): Promise<{
   const token = await singleFixtureWithArgs('RMRKMultiResourceImplErc20Pay', [
     'MultiResource',
     'MR',
-    10000,
-    ONE_ETH,
     'ipfs://collection-meta',
     'ipfs://tokenURI',
-    erc20.address,
-    ADDRESS_ZERO,
-    0,
+    [erc20.address, ADDRESS_ZERO, ONE_ETH, 10000, 0],
   ]);
   return { erc20, token, renderUtils };
 }
@@ -116,8 +112,7 @@ describe('MultiResourceImpl Other', async function () {
     this.token = token;
   });
 
-  // FIXME: Implement version for ERC20
-  // shouldControlValidMinting();
+  shouldControlValidMintingErc20Pay();
 
   it('can get tokenURI', async function () {
     const owner = (await ethers.getSigners())[0];
