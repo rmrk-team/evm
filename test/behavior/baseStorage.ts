@@ -95,7 +95,7 @@ async function shouldBehaveLikeBase(contractName: string, metadataURI: string, t
     it('cannot add part with id 0', async function () {
       const partId = 0;
       await expect(
-        testBase.addPart({ partId: partId, part: sampleSlotPartData })
+        testBase.addPart({ partId: partId, part: sampleSlotPartData }),
       ).to.be.revertedWithCustomError(testBase, 'RMRKIdZeroForbidden');
     });
 

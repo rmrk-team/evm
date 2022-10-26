@@ -33,7 +33,7 @@ async function singleFixture(): Promise<{
     'MR',
     'ipfs://collection-meta',
     'ipfs://tokenURI',
-    [erc20.address, ADDRESS_ZERO, ONE_ETH, 10000, 0],
+    [erc20.address, 10000, 0, ADDRESS_ZERO, ONE_ETH],
   ]);
   return { erc20, token, renderUtils };
 }
