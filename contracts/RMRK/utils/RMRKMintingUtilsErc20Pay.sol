@@ -16,7 +16,11 @@ contract RMRKMintingUtilsErc20Pay is OwnableLock {
     uint256 internal immutable _pricePerMint;
     address internal immutable _tokenAddress;
 
-    constructor(address tokenAddress_, uint256 maxSupply_, uint256 pricePerMint_) {
+    constructor(
+        address tokenAddress_,
+        uint256 maxSupply_,
+        uint256 pricePerMint_
+    ) {
         _tokenAddress = tokenAddress_;
         _maxSupply = maxSupply_;
         _pricePerMint = pricePerMint_;
