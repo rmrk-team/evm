@@ -4,9 +4,17 @@ pragma solidity ^0.8.0;
 
 import "./IRMRKEquippable.sol";
 
+/**
+ * @title IRMRKExternalEquip
+ * @author RMRK team
+ * @notice Interface smart contract of the RMRK external equippable module.
+ */
 interface IRMRKExternalEquip is IRMRKEquippable {
     /**
-     * @dev emitted when the nesting address is set
+     * @notice Used to notify listeners of a new `Nesting` smart contract address being set.
+     * @dev When initially setting the `Nesting` smart contract address, the `old` value should equal `0x0` address.
+     * @param old Previous `Nesting` smart contract address
+     * @param new_ New `Nesting` smart contract address
      */
     event NestingAddressSet(address old, address new_);
 

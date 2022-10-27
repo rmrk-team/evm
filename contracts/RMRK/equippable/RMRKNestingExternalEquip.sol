@@ -13,10 +13,13 @@ import "../../RMRK/nesting/RMRKNesting.sol";
 error RMRKMustUnequipFirst();
 
 /**
- * @dev RMRKNesting contract with external equippable contract for space saving purposes. Expected to be deployed along
- * an instance of RMRKExternalEquip.sol. To make use of the equippable module with this contract, expose the _setEquippableAddress
- * function and set it to the corresponding equipment contract after deployment. Consider using RMRKOwnableLock to lock the equippable
- * address after deployment.
+ * @title RMRKNestingExternalEquip
+ * @author RMRK team
+ * @notice Smart contract of the RMRK Nesting External Equippable module.
+ * @dev This is a RMRKNesting smart contract with external `Equippable` smart contract for space saving purposes. It is
+ *  expected to be deployed along an instance of `RMRKExternalEquip`. To make use of the equippable module with this
+ *  contract, the `_setEquippableAddress` function has to be exposed and used to set the corresponding equipment
+ *  contract after deployment. Consider using `RMRKOwnableLock` to lock the equippable address after deployment.
  */
 contract RMRKNestingExternalEquip is IRMRKNestingExternalEquip, RMRKNesting {
     address private _equippableAddress;
@@ -25,6 +28,9 @@ contract RMRKNestingExternalEquip is IRMRKNestingExternalEquip, RMRKNesting {
         RMRKNesting(name_, symbol_)
     {}
 
+    /**
+     * @inheritdoc IERC165
+     */
     function supportsInterface(bytes4 interfaceId)
         public
         view
@@ -37,7 +43,17 @@ contract RMRKNestingExternalEquip is IRMRKNestingExternalEquip, RMRKNesting {
             super.supportsInterface(interfaceId);
     }
 
-    // It's overridden to make check the child is not equipped when trying to unnest
+    /**
+     * @notice Used to unnest a child from the parent.
+     * @dev The function is overriden, so that additional verification is added, making sure that the child is not
+     *  currently equipped when trying to unnest it.
+     * @param tokenId ID of the parent token
+     * @param index Index of a child token being unnested in the array it's located in. This can be either pending or
+     *  active array
+     * @param to Address that should receive the token once unnestedđ
+     * @param isPending Boolean value indicating wether the token is in the pending array of the parent (`true`) or in
+     *  the active array (`false`)
+     */
     function unnestChild(
         uint256 tokenId,
         uint256 index,
@@ -59,16 +75,32 @@ contract RMRKNestingExternalEquip is IRMRKNestingExternalEquip, RMRKNesting {
         _unnestChild(tokenId, index, to, isPending);
     }
 
+    /**
+     * @notice Used to set the address of the `Equippable` smart contract.
+     * @param equippable Address of the `Equippable` smart contract
+     */
     function _setEquippableAddress(address equippable) internal virtual {
         address oldAddress = _equippableAddress;
         _equippableAddress = equippable;
         emit EquippableAddressSet(oldAddress, equippable);
     }
 
+    /**
+     * @notice Used to retrieve the address of the `Equippable` smart contract.
+     * @return address Address of the `Equippable` smart contract
+     */
     function getEquippableAddress() external view virtual returns (address) {
         return _equippableAddress;
     }
 
+    /**
+     * @notice Used to verify that the specified address is either the owner of the given token or approved by the owner
+     *  to manage it.
+     * @param spender Address that we are verifying
+     * @param tokenId ID of the token we are checking
+     * @return bool A boolean value indicating whether the specified address is the owner of the given token or approved
+     *  to manage it (`true`) or not (`false`)
+     */
     function isApprovedOrOwner(address spender, uint256 tokenId)
         external
         view
@@ -78,6 +110,10 @@ contract RMRKNestingExternalEquip is IRMRKNestingExternalEquip, RMRKNesting {
         return _isApprovedOrOwner(spender, tokenId);
     }
 
+    /**
+     * @notice Used to clear approvals for the given token.
+     * @param tokenId ID of the token for which the approvals should be cleared
+     */
     function _cleanApprovals(uint256 tokenId) internal virtual override {
         IRMRKMultiResource(_equippableAddress).approveForResources(
             address(0),

@@ -5,23 +5,32 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 
 /**
- * @title ERC721 token receiver interface
- * @dev Interface for any contract that wants to support safeTransfers
- * from ERC721 asset contracts.
+ * @title IRMRKNestingExternalEquip
+ * @author RMRK team
+ * @notice Interface smart contract of the RMRK nesting external equippable module.
  */
 interface IRMRKNestingExternalEquip is IERC165 {
     /**
-     * @dev emitted when the equippable address is set
+     * @notice Ised to notify the listeners that the address of the `Equippable` smart contract has beem set.
+     * @dev When the address is set fot the first time, the `old` value should equal `0x0` address.
+     * @param old Address of the previous `Equippable` smart contract
+     * @param new_ Address of the new `Equippable` smart contract 
      */
     event EquippableAddressSet(address old, address new_);
 
     /**
-     * @dev Returns address of Equippable contract
+     * @notice Used to retrieve the `Equippable` smart contract's address.
+     * @return address Address of the `Equippable` smart contract
      */
     function getEquippableAddress() external view returns (address);
 
     /**
-     * @dev Returns approved or owner status of `spender` for `tokenId`.
+     * @notice Used to verify that the specified address is either the owner of the given token or approved to manage
+     *  it.
+     * @param spender Address of the account we are checking for ownership or approval
+     * @param tokenId ID of the token that we are checking
+     * @return bool A boolean value indicating whether the specified address is the owner of the given token or approved
+     *  to manage it (`true`) or not (`false`)
      */
     function isApprovedOrOwner(address spender, uint256 tokenId)
         external
