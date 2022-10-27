@@ -9,7 +9,7 @@ import "./IRMRKCore.sol";
  * base-level ERC721 functions,
  */
 contract RMRKCore is IRMRKCore {
-    string public constant VERSION = "0.12.0";
+    string public constant VERSION = "0.12.1";
 
     constructor(string memory name_, string memory symbol_) {
         _name = name_;
