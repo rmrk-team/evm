@@ -30,6 +30,10 @@ abstract contract RMRKRoyalties is IERC2981 {
         return _royaltyRecipient;
     }
 
+    function getRoyaltyPercentage() external view virtual returns (uint256) {
+        return _royaltyPercentageBps;
+    }
+
     //@param tokenId - the token id to get the royalty info for
     //@param salePrice - the sale price of the NFT
     function royaltyInfo(uint256 tokenId, uint256 salePrice)
