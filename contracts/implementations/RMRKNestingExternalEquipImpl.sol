@@ -41,9 +41,6 @@ contract RMRKNestingExternalEquipImpl is
         _tokenURI = tokenURI_;
     }
 
-    /*
-    Template minting logic
-    */
     function mint(address to, uint256 numToMint) external payable saleIsOpen {
         (uint256 nextToken, uint256 totalSupplyOffset) = _preMint(numToMint);
 
@@ -55,9 +52,6 @@ contract RMRKNestingExternalEquipImpl is
         }
     }
 
-    /*
-    Template minting logic
-    */
     function mintNesting(
         address to,
         uint256 numToMint,

@@ -13,7 +13,7 @@ async function shouldControlValidMintingErc20Pay(): Promise<void> {
 
   it('cannot mint under price', async function () {
     const HALF_ETH = ethers.utils.parseEther('0.05');
-    const erc20Address = this.token.tokenAddress();
+    const erc20Address = this.token.erc20TokenAddress();
     const erc20Factory = await ethers.getContractFactory('ERC20Mock');
     const erc20 = erc20Factory.attach(erc20Address);
     const owner = (await ethers.getSigners())[0];
