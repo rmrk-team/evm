@@ -1,7 +1,7 @@
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { Contract } from 'ethers';
-import { ADDRESS_ZERO, ONE_ETH } from '../utils';
+import { ADDRESS_ZERO, bn, ONE_ETH } from '../utils';
 
 async function shouldHaveRoyalties(
   mint: (token: Contract, to: string) => Promise<number>,
@@ -12,9 +12,13 @@ async function shouldHaveRoyalties(
     expect(await this.token.royaltyInfo(tokenId, ONE_ETH.mul(10))).to.eql([ADDRESS_ZERO, ONE_ETH]);
   });
 
-  it('can get and update royalty receipient', async function () {
+  it('can get royalty receipient and % in base points', async function () {
+    // These 2 values are used on all implementation deploys:
     expect(await this.token.getRoyaltyRecipient()).to.eql(ADDRESS_ZERO);
+    expect(await this.token.getRoyaltyPercentage()).to.eql(bn(1000));
+  });
 
+  it('can get and update royalty receipient', async function () {
     const newRecipient = (await ethers.getSigners())[5];
     await this.token.updateRoyaltyRecipient(newRecipient.address);
     expect(await this.token.getRoyaltyRecipient()).to.eql(newRecipient.address);
