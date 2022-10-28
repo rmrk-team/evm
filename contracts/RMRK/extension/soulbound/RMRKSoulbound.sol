@@ -6,8 +6,20 @@ import "../../core/RMRKCore.sol";
 import "./IRMRKSoulbound.sol";
 
 error RMRKCannotTransferSoulbound();
-
+/**
+ * @title RMRKSoulbound
+ * @author RMRK team
+ * @notice Smart contract of the RMRK Soulbound module.
+ */
 abstract contract RMRKSoulbound is IRMRKSoulbound, RMRKCore {
+    /**
+     * @notice Used to validate that the token is not being transferred,
+     * @dev This is a hook ensuring that all transfers of tokens are reverted.
+     * @dev The only exception of transfers being allowed is when the tokens are minted or when they are being burned.
+     * @param from Address from which the token is originating (current owner of the token)
+     * @param to Address to which the token would be sent
+     * @param tokenId ID of the token that would be transferred
+     */
     function _beforeTokenTransfer(
         address from,
         address to,
@@ -22,10 +34,18 @@ abstract contract RMRKSoulbound is IRMRKSoulbound, RMRKCore {
         super._beforeTokenTransfer(from, to, tokenId);
     }
 
-    function isSoulbound(uint256) public view virtual returns (bool) {
+    /**
+     * @notice Used to verify that the token is soulbound.
+     * @param tokenId ID of the token we are verifying
+     * @return bool Boolean verifying whether the token is soulbound (`true`) or not (`false`)
+     */
+    function isSoulbound(uint256 tokenId) public view virtual returns (bool) {
         return true;
     }
 
+    /**
+     * @inheritdoc IERC165
+     */
     function supportsInterface(bytes4 interfaceId)
         public
         view
