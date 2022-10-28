@@ -26,7 +26,7 @@ async function nestMintFromMock(token: Contract, to: string, parentId: number): 
 }
 
 async function mintFromImplErc20Pay(token: Contract, to: string): Promise<number> {
-  const erc20Address = token.tokenAddress();
+  const erc20Address = token.erc20TokenAddress();
   const erc20Factory = await ethers.getContractFactory('ERC20Mock');
   const erc20 = erc20Factory.attach(erc20Address);
   const owner = (await ethers.getSigners())[0];
@@ -48,7 +48,7 @@ async function nestMintFromImplErc20Pay(
   to: string,
   destinationId: number,
 ): Promise<number> {
-  const erc20Address = token.tokenAddress();
+  const erc20Address = token.erc20TokenAddress();
   const erc20Factory = await ethers.getContractFactory('ERC20Mock');
   const erc20 = erc20Factory.attach(erc20Address);
   const owner = (await ethers.getSigners())[0];

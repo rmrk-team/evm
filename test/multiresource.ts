@@ -12,7 +12,6 @@ import {
 } from './utils';
 import { IERC721 } from './interfaces';
 import shouldBehaveLikeMultiResource from './behavior/multiresource';
-import shouldBehaveLikeERC721 from './behavior/erc721';
 
 const name = 'RmrkTest';
 const symbol = 'RMRKTST';
@@ -247,14 +246,4 @@ describe('MultiResourceMock MR behavior', async () => {
   });
 
   shouldBehaveLikeMultiResource(mintFromMock, addResourceEntryFromMock, addResourceToToken);
-});
-
-describe('MultiResourceMock ERC721 behavior', function () {
-  beforeEach(async function () {
-    const { token } = await loadFixture(singleFixture);
-    this.token = token;
-    this.ERC721Receiver = await ethers.getContractFactory('ERC721ReceiverMock');
-  });
-
-  shouldBehaveLikeERC721(name, symbol);
 });
