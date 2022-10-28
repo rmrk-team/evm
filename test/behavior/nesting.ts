@@ -354,21 +354,6 @@ async function shouldBehaveLikeNesting(
       await checkBurntParent();
     });
 
-    it('cannot burn not owned token', async function () {
-      const notOwner = addrs[3];
-      await expect(parent.connect(notOwner).burnChild(parentId, 0)).to.be.revertedWithCustomError(
-        parent,
-        'RMRKNotApprovedOrDirectOwner',
-      );
-    });
-
-    it('cannot burn child out of index', async function () {
-      const badIndex = 2;
-      await expect(
-        parent.connect(tokenOwner).burnChild(parentId, badIndex),
-      ).to.be.revertedWithCustomError(parent, 'RMRKChildIndexOutOfRange');
-    });
-
     it('can burn token if approved', async function () {
       const approved = addrs[1];
       await parent.connect(tokenOwner).approve(approved.address, parentId);
@@ -381,36 +366,6 @@ async function shouldBehaveLikeNesting(
       await parent.connect(tokenOwner).setApprovalForAll(operator.address, true);
       await parent.connect(operator).burn(parentId);
       await checkBurntParent();
-    });
-
-    it('can burn nested token', async function () {
-      const childId = nestMint(child, parent.address, parentId);
-      await parent.connect(tokenOwner).acceptChild(parentId, 0);
-      await parent.connect(tokenOwner).burnChild(parentId, 0);
-
-      // Removed from the parent
-      expect(await parent.childrenOf(parentId)).to.eql([]);
-
-      // No owner for token
-      await expect(child.ownerOf(childId)).to.be.revertedWithCustomError(
-        child,
-        'ERC721InvalidTokenId',
-      );
-      await expect(child.rmrkOwnerOf(childId)).to.be.revertedWithCustomError(
-        child,
-        'ERC721InvalidTokenId',
-      );
-    });
-
-    it('cannot burn not owned nested token', async function () {
-      const notOwner = addrs[3];
-      await nestMint(child, parent.address, parentId);
-      await parent.connect(tokenOwner).acceptChild(parentId, 0);
-
-      await expect(parent.connect(notOwner).burnChild(parentId, 0)).to.be.revertedWithCustomError(
-        child,
-        'RMRKNotApprovedOrDirectOwner',
-      );
     });
 
     it('can recursively burn nested token', async function () {
@@ -427,12 +382,20 @@ async function shouldBehaveLikeNesting(
       expect(await child.childrenOf(childId)).to.eql([[bn(granchildId), child.address]]);
       expect(await child.rmrkOwnerOf(granchildId)).to.eql([child.address, bn(childId), true]);
 
-      await parent.connect(tokenOwner).burnChild(parentId, 0);
+      await parent.connect(tokenOwner).burn(parentId);
 
-      // Child and grandchild were burnt, parent is still there
-      expect(await parent.balanceOf(tokenOwner.address)).to.equal(1);
+      expect(await parent.balanceOf(tokenOwner.address)).to.equal(0);
       expect(await child.balanceOf(parent.address)).to.equal(0);
       expect(await child.balanceOf(child.address)).to.equal(0);
+
+      await expect(parent.ownerOf(parentId)).to.be.revertedWithCustomError(
+        parent,
+        'ERC721InvalidTokenId',
+      );
+      await expect(parent.rmrkOwnerOf(parentId)).to.be.revertedWithCustomError(
+        parent,
+        'ERC721InvalidTokenId',
+      );
 
       await expect(child.ownerOf(childId)).to.be.revertedWithCustomError(
         child,

@@ -90,9 +90,6 @@ interface IRMRKNesting is IERC165 {
         );
 
     //TODO: Docs
-    function burnChild(uint256 tokenId, uint256 childIndex) external;
-
-    //TODO: Docs
     function burn(uint256 tokenId) external;
 
     /**
