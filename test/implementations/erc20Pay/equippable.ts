@@ -14,7 +14,7 @@ async function singleFixture(): Promise<{
   const erc20 = await erc20Factory.deploy();
   await erc20.deployed();
 
-  const token = await singleFixtureWithArgs('RMRKMultiResourceImplErc20Pay', [
+  const token = await singleFixtureWithArgs('RMRKEquippableImplErc20Pay', [
     'MultiResource',
     'MR',
     'ipfs://collection-meta',
@@ -24,7 +24,7 @@ async function singleFixture(): Promise<{
   return { erc20, token };
 }
 
-describe('MultiResourceImplErc20Pay Minting', async () => {
+describe('EquippableImplErc20Pay Minting', async () => {
   let token: Contract;
   let erc20: Contract;
   let owner: SignerWithAddress;
