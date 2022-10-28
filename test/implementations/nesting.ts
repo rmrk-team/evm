@@ -1,19 +1,21 @@
+import { Contract } from 'ethers';
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
-import { Contract } from 'ethers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import {
-  ADDRESS_ZERO,
-  transfer,
-  nestTransfer,
-  singleFixtureWithArgs,
-  parentChildFixtureWithArgs,
-  mintFromImpl,
-  nestMintFromImpl,
-  ONE_ETH,
-} from '../utils';
 import shouldBehaveLikeNesting from '../behavior/nesting';
 import shouldControlValidMinting from '../behavior/mintingImpl';
+import shouldHaveMetadata from '../behavior/metadata';
+import shouldHaveRoyalties from '../behavior/royalties';
+import {
+  ADDRESS_ZERO,
+  mintFromImpl,
+  nestMintFromImpl,
+  nestTransfer,
+  ONE_ETH,
+  parentChildFixtureWithArgs,
+  singleFixtureWithArgs,
+  transfer,
+} from '../utils';
 
 async function singleFixture(): Promise<Contract> {
   return singleFixtureWithArgs('RMRKNestingImpl', [
@@ -24,7 +26,7 @@ async function singleFixture(): Promise<Contract> {
     'ipfs://collection-meta',
     'ipfs://tokenURI',
     ADDRESS_ZERO,
-    0,
+    1000, // 10%
   ]);
 }
 
@@ -70,14 +72,6 @@ describe('NestingImpl Other', async function () {
   });
 
   shouldControlValidMinting();
-
-  it('can get tokenURI', async function () {
-    const owner = (await ethers.getSigners())[0];
-    const tokenId = await mintFromImpl(this.token, owner.address);
-    expect(await this.token.tokenURI(tokenId)).to.eql('ipfs://tokenURI');
-  });
-
-  it('can get collection meta', async function () {
-    expect(await this.token.collectionMetadata()).to.eql('ipfs://collection-meta');
-  });
+  shouldHaveRoyalties(mintFromImpl);
+  shouldHaveMetadata(mintFromImpl);
 });
