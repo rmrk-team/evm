@@ -2,7 +2,18 @@
 
 pragma solidity ^0.8.0;
 
+/**
+ * @title RMRKLib
+ * @author RMRK team
+ * @notice RMRK library smart contract.
+ */
 library RMRKLib {
+    /**
+     * @notice Used to remove an item from the array using the specified value.
+     * @dev The value is removed by replacing it with the last value.
+     * @param array An array of values containing the value to be removed
+     * @param value The value of the resource to remove from the array
+     */
     function removeItemByValue(uint64[] storage array, uint64 value) internal {
         uint64[] memory memArr = array; //Copy array to memory, check for gas savings here
         uint256 length = memArr.length; //gas savings
@@ -17,7 +28,12 @@ library RMRKLib {
         }
     }
 
-    //For resource storage array
+    /**
+     * @notice Used to remove an item from the array using the specified index.
+     * @dev The item is removed by replacing it with the last item.
+     * @param array An array of items containing the item to be removed
+     * @param index Index of the item to remove
+     */
     function removeItemByIndex(uint64[] storage array, uint256 index) internal {
         //Check to see if this is already gated by require in all calls
         require(index < array.length);
@@ -25,7 +41,15 @@ library RMRKLib {
         array.pop();
     }
 
-    // indexOf adapted from Cryptofin-Solidity arrayUtils
+    /**
+     * @notice Used to determine the index of the item in the array by spedifying its value.
+     * @dev This was adapted from Cryptofin-Solidity `arrayUtils`.
+     * @dev If the item is not found the index returned will equal `0`.
+     * @param A The array containing the item to be found
+     * @param a The value of the item to find the index of
+     * @return uint256 The index of the item in the array
+     * @return bool A boolean value specifying whether the item was found (`true`) or not (`false`)
+     */
     function indexOf(uint64[] memory A, uint64 a)
         internal
         pure
