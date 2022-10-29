@@ -2,4 +2,9 @@
 
 pragma solidity ^0.8.15;
 
+/**
+ * @title RMRKCustomData
+ * @author RMRK team
+ * @notice Smart contract of the RMRK Custom data module.
+ */
 contract RMRKCustomData {}
