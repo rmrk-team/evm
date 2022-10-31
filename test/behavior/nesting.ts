@@ -350,21 +350,21 @@ async function shouldBehaveLikeNesting(
 
     it('can burn token', async function () {
       expect(await parent.balanceOf(tokenOwner.address)).to.equal(1);
-      await parent.connect(tokenOwner).burn(parentId);
+      await parent.connect(tokenOwner)['burn(uint256)'](parentId);
       await checkBurntParent();
     });
 
     it('can burn token if approved', async function () {
       const approved = addrs[1];
       await parent.connect(tokenOwner).approve(approved.address, parentId);
-      await parent.connect(approved).burn(parentId);
+      await parent.connect(approved)['burn(uint256)'](parentId);
       await checkBurntParent();
     });
 
     it('can burn token if approved for all', async function () {
       const operator = addrs[2];
       await parent.connect(tokenOwner).setApprovalForAll(operator.address, true);
-      await parent.connect(operator).burn(parentId);
+      await parent.connect(operator)['burn(uint256)'](parentId);
       await checkBurntParent();
     });
 
@@ -382,7 +382,8 @@ async function shouldBehaveLikeNesting(
       expect(await child.childrenOf(childId)).to.eql([[bn(granchildId), child.address]]);
       expect(await child.rmrkOwnerOf(granchildId)).to.eql([child.address, bn(childId), true]);
 
-      await parent.connect(tokenOwner).burn(parentId);
+      // Sets recursive burns to 2
+      await parent.connect(tokenOwner)['burn(uint256,uint256)'](parentId, 2);
 
       expect(await parent.balanceOf(tokenOwner.address)).to.equal(0);
       expect(await child.balanceOf(parent.address)).to.equal(0);
@@ -414,6 +415,49 @@ async function shouldBehaveLikeNesting(
         parent,
         'ERC721InvalidTokenId',
       );
+    });
+
+    it('can recursively burn nested token with the right number of recursive burns', async function () {
+      // Parent
+      // -> Child1
+      //      -> GrandChild1
+      //      -> GrandChild2
+      //        -> GreatGrandChild1
+      // -> Child2
+      // Total tree 5 (4 recursive burns)
+      const childId = await nestMint(child, parent.address, parentId);
+      const childId2 = await nestMint(child, parent.address, parentId);
+      const grandChild1 = await nestMint(child, child.address, childId);
+      const grandChild2 = await nestMint(child, child.address, childId);
+      const greatGrandChild2 = await nestMint(child, child.address, grandChild2);
+      await parent.connect(tokenOwner).acceptChild(parentId, 0);
+      await parent.connect(tokenOwner).acceptChild(parentId, 0);
+      await child.connect(tokenOwner).acceptChild(childId, 0);
+      await child.connect(tokenOwner).acceptChild(childId, 0);
+      await child.connect(tokenOwner).acceptChild(grandChild2, 0);
+
+      // 0 is not enough
+      await expect(parent.connect(tokenOwner)['burn(uint256,uint256)'](parentId, 0))
+        .to.be.revertedWithCustomError(parent, 'RMRKMaxRecursiveBurnsReached')
+        .withArgs(child.address, childId);
+      // 1 is not enough
+      await expect(parent.connect(tokenOwner)['burn(uint256,uint256)'](parentId, 1))
+        .to.be.revertedWithCustomError(parent, 'RMRKMaxRecursiveBurnsReached')
+        .withArgs(child.address, grandChild1);
+      // 2 is not enough
+      await expect(parent.connect(tokenOwner)['burn(uint256,uint256)'](parentId, 2))
+        .to.be.revertedWithCustomError(parent, 'RMRKMaxRecursiveBurnsReached')
+        .withArgs(child.address, grandChild2);
+      // 3 is not enough
+      await expect(parent.connect(tokenOwner)['burn(uint256,uint256)'](parentId, 3))
+        .to.be.revertedWithCustomError(parent, 'RMRKMaxRecursiveBurnsReached')
+        .withArgs(child.address, greatGrandChild2);
+      // 4 is not enough
+      await expect(parent.connect(tokenOwner)['burn(uint256,uint256)'](parentId, 4))
+        .to.be.revertedWithCustomError(parent, 'RMRKMaxRecursiveBurnsReached')
+        .withArgs(child.address, childId2);
+      // 5 is just enough
+      await parent.connect(tokenOwner)['burn(uint256,uint256)'](parentId, 5);
     });
 
     async function checkBurntParent() {

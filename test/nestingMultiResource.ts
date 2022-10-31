@@ -111,7 +111,7 @@ describe('NestingMultiResourceMock Other Behavior', function () {
       expect(await token.getApproved(tokenId)).to.eql(approved.address);
       expect(await token.getApprovedForResources(tokenId)).to.eql(approved.address);
 
-      await token.connect(tokenOwner).burn(tokenId);
+      await token.connect(tokenOwner)['burn(uint256)'](tokenId);
 
       await expect(token.getApproved(tokenId)).to.be.revertedWithCustomError(
         token,

@@ -181,7 +181,7 @@ async function shouldBehaveLikeSoulboundBasic() {
   });
 
   it('can burn', async function () {
-    await soulbound.connect(owner).burn(tokenId);
+    await soulbound.connect(owner)['burn(uint256)'](tokenId);
     await expect(soulbound.ownerOf(tokenId)).to.be.revertedWithCustomError(
       soulbound,
       'ERC721InvalidTokenId',

@@ -66,6 +66,8 @@ error RMRKMaxPendingChildrenReached();
 /// Attempting to add a pending resource after the number of pending resources has reached the limit (default limit is
 ///  128)
 error RMRKMaxPendingResourcesReached();
+/// Attempting to burn a total number of recursive children higher than maximum set
+error RMRKMaxRecursiveBurnsReached(address childContract, uint256 childTokenId);
 /// Attempting to mint a number of tokens that would cause the total supply to be greater than maximum supply
 error RMRKMintOverMax();
 /// Attempting to mint a nested token to a smart contract that doesn't support nesting
