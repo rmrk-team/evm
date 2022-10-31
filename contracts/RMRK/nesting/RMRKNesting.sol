@@ -465,9 +465,17 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
      * Emits a {Transfer} event.
      */
 
-    //update for reentrancy
     function burn(uint256 tokenId, uint256 maxChildrenBurns)
         public
+        virtual
+        onlyApprovedOrDirectOwner(tokenId)
+        returns (uint256)
+    {
+        return _burn(tokenId, maxChildrenBurns);
+    }
+
+    function _burn(uint256 tokenId, uint256 maxChildrenBurns)
+        internal
         virtual
         onlyApprovedOrDirectOwner(tokenId)
         returns (uint256)
@@ -500,7 +508,10 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         uint256 length = children.length; //gas savings
         for (uint256 i; i < length; ) {
             if (totalChildBurns >= maxChildrenBurns)
-                revert RMRKMaxRecursiveBurnsReached(children[i].contractAddress, children[i].tokenId);
+                revert RMRKMaxRecursiveBurnsReached(
+                    children[i].contractAddress,
+                    children[i].tokenId
+                );
             delete _childIsInActive[children[i].contractAddress][
                 children[i].tokenId
             ];
@@ -730,7 +741,6 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
      * param2 childTokenId is the tokenId of the child instance
      */
 
-    //update for reentrancy
     function addChild(uint256 parentTokenId, uint256 childTokenId)
         public
         virtual
@@ -771,6 +781,10 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         virtual
         onlyApprovedOrOwner(tokenId)
     {
+        _acceptChild(tokenId, index);
+    }
+
+    function _acceptChild(uint256 tokenId, uint256 index) internal virtual {
         if (pendingChildrenOf(tokenId).length <= index)
             revert RMRKPendingChildIndexOutOfRange();
 
@@ -808,6 +822,10 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         virtual
         onlyApprovedOrOwner(tokenId)
     {
+        _rejectAllChildren(tokenId);
+    }
+
+    function _rejectAllChildren(uint256 tokenId) internal virtual {
         _beforeRejectAllChildren(tokenId);
         delete _pendingChildren[tokenId];
         emit AllChildrenRejected(tokenId);

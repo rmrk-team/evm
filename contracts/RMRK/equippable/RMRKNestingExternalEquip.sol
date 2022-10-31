@@ -37,12 +37,12 @@ contract RMRKNestingExternalEquip is IRMRKNestingExternalEquip, RMRKNesting {
     }
 
     // It's overridden to make check the child is not equipped when trying to unnest
-    function unnestChild(
+    function _unnestChild(
         uint256 tokenId,
         uint256 index,
         address to,
         bool isPending
-    ) public virtual override onlyApprovedOrOwner(tokenId) {
+    ) internal virtual override {
         if (!isPending) {
             _requireMinted(tokenId);
             Child memory child = childOf(tokenId, index);
@@ -55,7 +55,7 @@ contract RMRKNestingExternalEquip is IRMRKNestingExternalEquip, RMRKNesting {
             ) revert RMRKMustUnequipFirst();
         }
 
-        _unnestChild(tokenId, index, to, isPending);
+        super._unnestChild(tokenId, index, to, isPending);
     }
 
     function _setEquippableAddress(address equippable) internal virtual {

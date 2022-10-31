@@ -26,7 +26,15 @@ abstract contract RMRKReclaimableChild is IRMRKReclaimableChild, RMRKNesting {
         uint256 tokenId,
         address childAddress,
         uint256 childTokenId
-    ) public virtual override onlyApprovedOrOwner(tokenId) {
+    ) public virtual onlyApprovedOrOwner(tokenId) {
+        _reclaimChild(tokenId, childAddress, childTokenId);
+    }
+
+    function _reclaimChild(
+        uint256 tokenId,
+        address childAddress,
+        uint256 childTokenId
+    ) internal virtual {
         if (childIsInActive(childAddress, childTokenId))
             revert RMRKInvalidChildReclaim();
         if (_childIsInPending[childAddress][childTokenId] != 0)
