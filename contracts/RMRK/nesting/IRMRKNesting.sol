@@ -90,7 +90,9 @@ interface IRMRKNesting is IERC165 {
         );
 
     //TODO: Docs
-    function burn(uint256 tokenId) external;
+    function burn(uint256 tokenId, uint256 maxRecursiveBurns)
+        external
+        returns (uint256);
 
     /**
      * @dev Function to be called into by other instances of RMRK nesting contracts to update the `child` struct

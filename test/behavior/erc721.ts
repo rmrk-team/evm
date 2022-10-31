@@ -859,7 +859,7 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
     });
 
     it('reverts when burning a non-existent token id', async function () {
-      await expect(this.token.burn(nonExistentTokenId)).to.be.revertedWithCustomError(
+      await expect(this.token['burn(uint256)'](nonExistentTokenId)).to.be.revertedWithCustomError(
         this.token,
         'ERC721InvalidTokenId',
       );
@@ -873,7 +873,7 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
 
       context('with burnt token', function () {
         beforeEach(async function () {
-          receipt = await this.token.burn(firstTokenId);
+          receipt = await this.token['burn(uint256)'](firstTokenId);
         });
 
         it('emits a Transfer event', function () {
@@ -897,7 +897,7 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
         });
 
         it('reverts when burning a token id that has been deleted', async function () {
-          await expect(this.token.burn(firstTokenId)).to.be.revertedWithCustomError(
+          await expect(this.token['burn(uint256)'](firstTokenId)).to.be.revertedWithCustomError(
             this.token,
             'ERC721InvalidTokenId',
           );

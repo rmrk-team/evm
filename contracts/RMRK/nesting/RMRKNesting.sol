@@ -450,6 +450,9 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
     //              BURNING
     ////////////////////////////////////////
 
+    function burn(uint256 tokenId) public virtual {
+        burn(tokenId, 0);
+    }
 
     /**
      * @dev Destroys `tokenId`.
@@ -463,10 +466,11 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
      */
 
     //update for reentrancy
-    function burn(uint256 tokenId)
+    function burn(uint256 tokenId, uint256 maxChildrenBurns)
         public
         virtual
         onlyApprovedOrDirectOwner(tokenId)
+        returns (uint256)
     {
         (address immediateOwner, uint256 parentId, ) = rmrkOwnerOf(tokenId);
         address owner = ownerOf(tokenId);
@@ -490,10 +494,28 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         delete _pendingChildren[tokenId];
         delete _tokenApprovals[tokenId][owner];
 
+        uint256 pendingRecursiveBurns;
+        uint256 totalChildBurns;
+
         uint256 length = children.length; //gas savings
         for (uint256 i; i < length; ) {
-            delete _childIsInActive[children[i].contractAddress][children[i].tokenId];
-            IRMRKNesting(children[i].contractAddress).burn(children[i].tokenId);
+            if (totalChildBurns >= maxChildrenBurns)
+                revert RMRKMaxRecursiveBurnsReached(children[i].contractAddress, children[i].tokenId);
+            delete _childIsInActive[children[i].contractAddress][
+                children[i].tokenId
+            ];
+            unchecked {
+                // At this point we know pendingRecursiveBurns must be at least 1
+                pendingRecursiveBurns = maxChildrenBurns - totalChildBurns;
+            }
+            // We substract one to the next level to count for the token being burned, then add it again on returns
+            // This is to allow the behavior of 0 recursive burns meaning only the current token is deleted.
+            totalChildBurns +=
+                IRMRKNesting(children[i].contractAddress).burn(
+                    children[i].tokenId,
+                    pendingRecursiveBurns - 1
+                ) +
+                1;
             unchecked {
                 ++i;
             }
@@ -511,6 +533,8 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         );
         emit Transfer(owner, address(0), tokenId);
         emit NestTransfer(immediateOwner, address(0), parentId, 0, tokenId);
+
+        return totalChildBurns;
     }
 
     ////////////////////////////////////////

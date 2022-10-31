@@ -724,7 +724,7 @@ async function shouldBehaveLikeEquippableResources(
       expect(await chunky.getApproved(tokenId)).to.eql(approved.address);
       expect(await chunkyEquip.getApprovedForResources(tokenId)).to.eql(approved.address);
 
-      await chunky.connect(tokenOwner).burn(tokenId);
+      await chunky.connect(tokenOwner)['burn(uint256)'](tokenId);
 
       await expect(chunky.getApproved(tokenId)).to.be.revertedWithCustomError(
         chunky,
