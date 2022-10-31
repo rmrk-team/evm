@@ -17,7 +17,11 @@ abstract contract RMRKAbstractNestingImpl is
 {
     string private _tokenURI;
 
-    function _preMint(uint256 numToMint) internal returns (uint256, uint256) {
+    function _preMint(uint256 numToMint)
+        internal
+        virtual
+        returns (uint256, uint256)
+    {
         if (numToMint == uint256(0)) revert RMRKMintZero();
         if (numToMint + _totalSupply > _maxSupply) revert RMRKMintOverMax();
 
@@ -33,6 +37,8 @@ abstract contract RMRKAbstractNestingImpl is
         return (nextToken, totalSupplyOffset);
     }
 
+    function _charge(uint256 value) internal virtual;
+
     function transfer(address to, uint256 tokenId) public virtual {
         transferFrom(_msgSender(), to, tokenId);
     }
@@ -45,20 +51,26 @@ abstract contract RMRKAbstractNestingImpl is
         nestTransferFrom(_msgSender(), to, tokenId, destinationId);
     }
 
-    function tokenURI(uint256) public view override returns (string memory) {
+    function tokenURI(uint256)
+        public
+        view
+        virtual
+        override
+        returns (string memory)
+    {
         return _tokenURI;
     }
 
     function updateRoyaltyRecipient(address newRoyaltyRecipient)
-        external
+        public
+        virtual
         override
+        onlyOwner
     {
         _setRoyaltyRecipient(newRoyaltyRecipient);
     }
 
-    function _setTokenURI(string memory tokenURI_) internal {
+    function _setTokenURI(string memory tokenURI_) internal virtual {
         _tokenURI = tokenURI_;
     }
-
-    function _charge(uint256 value) internal virtual;
 }

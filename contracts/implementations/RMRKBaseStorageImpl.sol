@@ -21,7 +21,8 @@ contract RMRKBaseStorageImpl is OwnableLock, RMRKBaseStorage {
     {}
 
     function addPart(IntakeStruct calldata intakeStruct)
-        external
+        public
+        virtual
         onlyOwnerOrContributor
         notLocked
     {
@@ -29,7 +30,8 @@ contract RMRKBaseStorageImpl is OwnableLock, RMRKBaseStorage {
     }
 
     function addPartList(IntakeStruct[] calldata intakeStructs)
-        external
+        public
+        virtual
         onlyOwnerOrContributor
         notLocked
     {
@@ -39,23 +41,28 @@ contract RMRKBaseStorageImpl is OwnableLock, RMRKBaseStorage {
     function addEquippableAddresses(
         uint64 partId,
         address[] memory equippableAddresses
-    ) external onlyOwnerOrContributor {
+    ) public virtual onlyOwnerOrContributor {
         _addEquippableAddresses(partId, equippableAddresses);
     }
 
     function setEquippableAddresses(
         uint64 partId,
         address[] memory equippableAddresses
-    ) external onlyOwnerOrContributor {
+    ) public virtual onlyOwnerOrContributor {
         _setEquippableAddresses(partId, equippableAddresses);
     }
 
-    function setEquippableToAll(uint64 partId) external onlyOwnerOrContributor {
+    function setEquippableToAll(uint64 partId)
+        public
+        virtual
+        onlyOwnerOrContributor
+    {
         _setEquippableToAll(partId);
     }
 
     function resetEquippableAddresses(uint64 partId)
-        external
+        public
+        virtual
         onlyOwnerOrContributor
     {
         _resetEquippableAddresses(partId);

@@ -22,12 +22,13 @@ abstract contract RMRKAbstractMultiResourceImpl is
         uint256 tokenId,
         uint64 resourceId,
         uint64 overwrites
-    ) external onlyOwnerOrContributor {
+    ) public virtual onlyOwnerOrContributor {
         _addResourceToToken(tokenId, resourceId, overwrites);
     }
 
     function addResourceEntry(string memory metadataURI)
-        external
+        public
+        virtual
         onlyOwnerOrContributor
     {
         unchecked {
@@ -36,22 +37,30 @@ abstract contract RMRKAbstractMultiResourceImpl is
         _addResourceEntry(uint64(_totalResources), metadataURI);
     }
 
-    function totalResources() external view returns (uint256) {
+    function totalResources() public view virtual returns (uint256) {
         return _totalResources;
     }
 
-    function tokenURI(uint256) public view override returns (string memory) {
+    function tokenURI(uint256)
+        public
+        view
+        virtual
+        override
+        returns (string memory)
+    {
         return _tokenURI;
     }
 
     function updateRoyaltyRecipient(address newRoyaltyRecipient)
-        external
+        public
+        virtual
         override
+        onlyOwner
     {
         _setRoyaltyRecipient(newRoyaltyRecipient);
     }
 
-    function _setTokenURI(string memory tokenURI_) internal {
+    function _setTokenURI(string memory tokenURI_) internal virtual {
         _tokenURI = tokenURI_;
     }
 }

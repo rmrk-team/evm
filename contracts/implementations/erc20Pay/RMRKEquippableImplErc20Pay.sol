@@ -27,7 +27,7 @@ contract RMRKEquippableImplErc20Pay is
         _setTokenURI(tokenURI_);
     }
 
-    function mint(address to, uint256 numToMint) external saleIsOpen {
+    function mint(address to, uint256 numToMint) public virtual saleIsOpen {
         (uint256 nextToken, uint256 totalSupplyOffset) = _preMint(numToMint);
 
         for (uint256 i = nextToken; i < totalSupplyOffset; ) {
@@ -42,7 +42,7 @@ contract RMRKEquippableImplErc20Pay is
         address to,
         uint256 numToMint,
         uint256 destinationId
-    ) external saleIsOpen {
+    ) public virtual saleIsOpen {
         (uint256 nextToken, uint256 totalSupplyOffset) = _preMint(numToMint);
 
         for (uint256 i = nextToken; i < totalSupplyOffset; ) {

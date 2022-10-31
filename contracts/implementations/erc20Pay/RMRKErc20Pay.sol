@@ -24,7 +24,7 @@ abstract contract RMRKErc20Pay is IRMRKErc20Pay {
         IERC20(_erc20TokenAddress).transferFrom(from, to, value);
     }
 
-    function erc20TokenAddress() public view returns (address) {
+    function erc20TokenAddress() public view virtual returns (address) {
         return _erc20TokenAddress;
     }
 }

@@ -26,8 +26,9 @@ contract RMRKMultiResourceImpl is RMRKAbstractMultiResourceImpl {
     }
 
     function mint(address to, uint256 numToMint)
-        external
+        public
         payable
+        virtual
         saleIsOpen
         notLocked
     {

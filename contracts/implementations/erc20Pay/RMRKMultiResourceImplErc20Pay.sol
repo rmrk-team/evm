@@ -27,7 +27,12 @@ contract RMRKMultiResourceImplErc20Pay is
         _setTokenURI(tokenURI_);
     }
 
-    function mint(address to, uint256 numToMint) external saleIsOpen notLocked {
+    function mint(address to, uint256 numToMint)
+        public
+        virtual
+        saleIsOpen
+        notLocked
+    {
         if (numToMint == uint256(0)) revert RMRKMintZero();
         if (numToMint + _totalSupply > _maxSupply) revert RMRKMintOverMax();
 

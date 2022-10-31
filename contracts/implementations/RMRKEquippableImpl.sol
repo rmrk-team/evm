@@ -25,7 +25,12 @@ contract RMRKEquippableImpl is RMRKAbstractEquippableImpl {
         _setTokenURI(tokenURI_);
     }
 
-    function mint(address to, uint256 numToMint) external payable saleIsOpen {
+    function mint(address to, uint256 numToMint)
+        public
+        payable
+        virtual
+        saleIsOpen
+    {
         (uint256 nextToken, uint256 totalSupplyOffset) = _preMint(numToMint);
 
         for (uint256 i = nextToken; i < totalSupplyOffset; ) {
@@ -40,7 +45,7 @@ contract RMRKEquippableImpl is RMRKAbstractEquippableImpl {
         address to,
         uint256 numToMint,
         uint256 destinationId
-    ) external payable saleIsOpen {
+    ) public payable virtual saleIsOpen {
         (uint256 nextToken, uint256 totalSupplyOffset) = _preMint(numToMint);
 
         for (uint256 i = nextToken; i < totalSupplyOffset; ) {

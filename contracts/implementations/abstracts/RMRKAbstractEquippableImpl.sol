@@ -36,11 +36,13 @@ abstract contract RMRKAbstractEquippableImpl is
         return (nextToken, totalSupplyOffset);
     }
 
+    function _charge(uint256 value) internal virtual;
+
     function addResourceToToken(
         uint256 tokenId,
         uint64 resourceId,
         uint64 overwrites
-    ) external onlyOwnerOrContributor {
+    ) public virtual onlyOwnerOrContributor {
         _addResourceToToken(tokenId, resourceId, overwrites);
     }
 
@@ -48,7 +50,7 @@ abstract contract RMRKAbstractEquippableImpl is
         ExtendedResource calldata resource,
         uint64[] calldata fixedPartIds,
         uint64[] calldata slotPartIds
-    ) external onlyOwnerOrContributor {
+    ) public virtual onlyOwnerOrContributor {
         unchecked {
             _totalResources += 1;
         }
@@ -59,7 +61,7 @@ abstract contract RMRKAbstractEquippableImpl is
         uint64 equippableGroupId,
         address parentAddress,
         uint64 partId
-    ) external onlyOwnerOrContributor {
+    ) public virtual onlyOwnerOrContributor {
         _setValidParentForEquippableGroup(
             equippableGroupId,
             parentAddress,
@@ -67,7 +69,7 @@ abstract contract RMRKAbstractEquippableImpl is
         );
     }
 
-    function totalResources() external view returns (uint256) {
+    function totalResources() public view virtual returns (uint256) {
         return _totalResources;
     }
 
@@ -82,15 +84,15 @@ abstract contract RMRKAbstractEquippableImpl is
     }
 
     function updateRoyaltyRecipient(address newRoyaltyRecipient)
-        external
+        public
+        virtual
         override
+        onlyOwner
     {
         _setRoyaltyRecipient(newRoyaltyRecipient);
     }
 
-    function _setTokenURI(string memory tokenURI_) internal {
+    function _setTokenURI(string memory tokenURI_) internal virtual {
         _tokenURI = tokenURI_;
     }
-
-    function _charge(uint256 value) internal virtual;
 }

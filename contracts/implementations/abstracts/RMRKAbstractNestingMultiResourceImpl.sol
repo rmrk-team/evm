@@ -34,16 +34,18 @@ abstract contract RMRKAbstractNestingMultiResourceImpl is
         return (nextToken, totalSupplyOffset);
     }
 
+    function _charge(uint256 value) internal virtual;
+
     function addResourceToToken(
         uint256 tokenId,
         uint64 resourceId,
         uint64 overwrites
-    ) external onlyOwnerOrContributor {
+    ) public onlyOwnerOrContributor {
         _addResourceToToken(tokenId, resourceId, overwrites);
     }
 
     function addResourceEntry(string memory metadataURI)
-        external
+        public
         onlyOwnerOrContributor
     {
         unchecked {
@@ -52,7 +54,7 @@ abstract contract RMRKAbstractNestingMultiResourceImpl is
         _addResourceEntry(uint64(_totalResources), metadataURI);
     }
 
-    function totalResources() external view returns (uint256) {
+    function totalResources() public view returns (uint256) {
         return _totalResources;
     }
 
@@ -68,13 +70,20 @@ abstract contract RMRKAbstractNestingMultiResourceImpl is
         nestTransferFrom(_msgSender(), to, tokenId, destinationId);
     }
 
-    function tokenURI(uint256) public view override returns (string memory) {
+    function tokenURI(uint256)
+        public
+        view
+        virtual
+        override
+        returns (string memory)
+    {
         return _tokenURI;
     }
 
     function updateRoyaltyRecipient(address newRoyaltyRecipient)
-        external
+        public
         override
+        onlyOwner
     {
         _setRoyaltyRecipient(newRoyaltyRecipient);
     }
@@ -82,6 +91,4 @@ abstract contract RMRKAbstractNestingMultiResourceImpl is
     function _setTokenURI(string memory tokenURI_) internal {
         _tokenURI = tokenURI_;
     }
-
-    function _charge(uint256 value) internal virtual;
 }

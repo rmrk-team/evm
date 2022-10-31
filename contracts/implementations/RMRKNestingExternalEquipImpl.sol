@@ -16,7 +16,7 @@ contract RMRKNestingExternalEquipImpl is
     RMRKRoyalties,
     RMRKNestingExternalEquip
 {
-    address _equippableAddress;
+    address private _equippableAddress;
     string private _tokenURI;
 
     constructor(
@@ -41,7 +41,12 @@ contract RMRKNestingExternalEquipImpl is
         _tokenURI = tokenURI_;
     }
 
-    function mint(address to, uint256 numToMint) external payable saleIsOpen {
+    function mint(address to, uint256 numToMint)
+        public
+        payable
+        virtual
+        saleIsOpen
+    {
         (uint256 nextToken, uint256 totalSupplyOffset) = _preMint(numToMint);
 
         for (uint256 i = nextToken; i < totalSupplyOffset; ) {
@@ -56,7 +61,7 @@ contract RMRKNestingExternalEquipImpl is
         address to,
         uint256 numToMint,
         uint256 destinationId
-    ) external payable saleIsOpen {
+    ) public payable virtual saleIsOpen {
         (uint256 nextToken, uint256 totalSupplyOffset) = _preMint(numToMint);
 
         for (uint256 i = nextToken; i < totalSupplyOffset; ) {
@@ -84,20 +89,29 @@ contract RMRKNestingExternalEquipImpl is
     }
 
     function setEquippableAddress(address equippable)
-        external
+        public
+        virtual
         onlyOwnerOrContributor
     {
         //TODO: should we add a check if passed address supports IRMRKNestingExternalEquip
         _setEquippableAddress(equippable);
     }
 
-    function tokenURI(uint256) public view override returns (string memory) {
+    function tokenURI(uint256)
+        public
+        view
+        virtual
+        override
+        returns (string memory)
+    {
         return _tokenURI;
     }
 
     function updateRoyaltyRecipient(address newRoyaltyRecipient)
-        external
+        public
+        virtual
         override
+        onlyOwner
     {
         _setRoyaltyRecipient(newRoyaltyRecipient);
     }
