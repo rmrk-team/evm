@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.16;
 
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 
@@ -10,6 +10,20 @@ interface IRMRKNesting is IERC165 {
         address ownerAddress;
         bool isNft;
     }
+
+    /**
+     * @dev Emitted when `tokenId` token is transferred from `from` to `to`.
+     * from indicates the immediate owner, which is a contract if nested.
+     * If token was nested, `fromTokenId` indicates former parent id.
+     * If destination is an NFT, `toTokenId` indicates the new parent id.
+     */
+    event NestTransfer(
+        address indexed from,
+        address indexed to,
+        uint256 fromTokenId,
+        uint256 toTokenId,
+        uint256 indexed tokenId
+    );
 
     /**
      * @dev emitted when a child NFT is added to a token's pending array
@@ -76,10 +90,9 @@ interface IRMRKNesting is IERC165 {
         );
 
     //TODO: Docs
-    function burnChild(uint256 tokenId, uint256 childIndex) external;
-
-    //TODO: Docs
-    function burn(uint256 tokenId) external;
+    function burn(uint256 tokenId, uint256 maxRecursiveBurns)
+        external
+        returns (uint256);
 
     /**
      * @dev Function to be called into by other instances of RMRK nesting contracts to update the `child` struct

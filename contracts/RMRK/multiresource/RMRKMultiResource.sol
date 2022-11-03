@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 // OpenZeppelin Contracts (last updated v4.7.0) (token/ERC721/ERC721.sol)
 
-pragma solidity ^0.8.15;
+pragma solidity ^0.8.16;
 
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
@@ -10,23 +10,9 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import "./AbstractMultiResource.sol";
 import "../core/RMRKCore.sol";
-// import "hardhat/console.sol";
+import "../library/RMRKErrors.sol";
 
-error ERC721AddressZeroIsNotaValidOwner();
-error ERC721ApprovalToCurrentOwner();
-error ERC721ApproveCallerIsNotOwnerNorApprovedForAll();
-error ERC721ApproveToCaller();
-error ERC721InvalidTokenId();
-error ERC721MintToTheZeroAddress();
-error ERC721NotApprovedOrOwner();
-error ERC721TokenAlreadyMinted();
-error ERC721TransferFromIncorrectOwner();
-error ERC721TransferToNonReceiverImplementer();
-error ERC721TransferToTheZeroAddress();
-error RMRKApprovalForResourcesToCurrentOwner();
-error RMRKApproveForResourcesCallerIsNotOwnerNorApprovedForAll();
-error RMRKNotApprovedForResourcesOrOwner();
-error RMRKTokenIdZeroForbidden();
+// import "hardhat/console.sol";
 
 /**
  * @title RMRKMultiResource
@@ -354,7 +340,7 @@ contract RMRKMultiResource is
     function _mint(address to, uint256 tokenId) internal virtual {
         if (to == address(0)) revert ERC721MintToTheZeroAddress();
         if (_exists(tokenId)) revert ERC721TokenAlreadyMinted();
-        if (tokenId == 0) revert RMRKTokenIdZeroForbidden();
+        if (tokenId == 0) revert RMRKIdZeroForbidden();
 
         _beforeTokenTransfer(address(0), to, tokenId);
 
@@ -481,7 +467,7 @@ contract RMRKMultiResource is
         address to,
         uint256 tokenId,
         bytes memory data
-    ) internal returns (bool) {
+    ) private returns (bool) {
         if (to.isContract()) {
             try
                 IERC721Receiver(to).onERC721Received(

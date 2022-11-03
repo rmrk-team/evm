@@ -1,19 +1,22 @@
+import { Contract } from 'ethers';
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
-import { Contract } from 'ethers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import shouldBehaveLikeOwnableLock from '../behavior/ownableLock';
 import shouldBehaveLikeMultiResource from '../behavior/multiresource';
+import shouldBehaveLikeOwnableLock from '../behavior/ownableLock';
 import shouldControlValidMinting from '../behavior/mintingImpl';
+import shouldHaveMetadata from '../behavior/metadata';
+import shouldHaveRoyalties from '../behavior/royalties';
 import {
-  ADDRESS_ZERO,
-  addResourceToToken,
-  singleFixtureWithArgs,
-  mintFromImpl,
   addResourceEntryFromImpl,
+  addResourceToToken,
+  ADDRESS_ZERO,
+  mintFromImpl,
   ONE_ETH,
+  singleFixtureWithArgs,
 } from '../utils';
+import { IERC721 } from '../interfaces';
 
 async function singleFixture(): Promise<{ token: Contract; renderUtils: Contract }> {
   const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiResourceRenderUtils');
@@ -28,7 +31,7 @@ async function singleFixture(): Promise<{ token: Contract; renderUtils: Contract
     'ipfs://collection-meta',
     'ipfs://tokenURI',
     ADDRESS_ZERO,
-    0,
+    1000, // 10%
   ]);
   return { token, renderUtils };
 }
@@ -54,7 +57,7 @@ describe('MultiResourceImpl Other Behavior', async () => {
     });
 
     it('can support IERC721', async function () {
-      expect(await token.supportsInterface('0x80ac58cd')).to.equal(true);
+      expect(await token.supportsInterface(IERC721)).to.equal(true);
     });
 
     shouldBehaveLikeOwnableLock(isOwnableLockMock);
@@ -112,14 +115,6 @@ describe('MultiResourceImpl Other', async function () {
   });
 
   shouldControlValidMinting();
-
-  it('can get tokenURI', async function () {
-    const owner = (await ethers.getSigners())[0];
-    const tokenId = await mintFromImpl(this.token, owner.address);
-    expect(await this.token.tokenURI(tokenId)).to.eql('ipfs://tokenURI');
-  });
-
-  it('can get collection meta', async function () {
-    expect(await this.token.collectionMetadata()).to.eql('ipfs://collection-meta');
-  });
+  shouldHaveRoyalties(mintFromImpl);
+  shouldHaveMetadata(mintFromImpl);
 });

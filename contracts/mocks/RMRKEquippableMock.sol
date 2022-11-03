@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
-pragma solidity ^0.8.15;
+pragma solidity ^0.8.16;
 
 import "../RMRK/equippable/RMRKEquippable.sol";
 
@@ -43,8 +43,6 @@ contract RMRKEquippableMock is RMRKEquippable {
         uint64 resourceId,
         uint64 overwrites
     ) external {
-        // This reverts if token does not exist:
-        ownerOf(tokenId);
         _addResourceToToken(tokenId, resourceId, overwrites);
     }
 

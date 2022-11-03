@@ -6,7 +6,7 @@
  * RMRK Equippables accessory contract, responsible for state storage and management of equippable items.
  */
 
-pragma solidity ^0.8.15;
+pragma solidity ^0.8.16;
 
 import "../base/IRMRKBaseStorage.sol";
 import "../multiresource/AbstractMultiResource.sol";
@@ -16,21 +16,8 @@ import "../security/ReentrancyGuard.sol";
 import "./IRMRKNestingExternalEquip.sol";
 import "./IRMRKExternalEquip.sol";
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
-// import "hardhat/console.sol";
 
-// MultiResource
-error RMRKNotApprovedForResourcesOrOwner();
-error RMRKApprovalForResourcesToCurrentOwner();
-error RMRKApproveForResourcesCallerIsNotOwnerNorApprovedForAll();
-// Equippable
-error ERC721InvalidTokenId();
-error ERC721NotApprovedOrOwner();
-error RMRKBaseRequiredForParts();
-error RMRKEquippableEquipNotAllowedByBase();
-error RMRKNotEquipped();
-error RMRKSlotAlreadyUsed();
-error RMRKTargetResourceCannotReceiveSlot();
-error RMRKTokenCannotBeEquippedWithResourceIntoSlot();
+// import "hardhat/console.sol";
 
 
 /**
@@ -337,7 +324,7 @@ contract RMRKExternalEquip is
      *  ]
      * @param data An `IntakeEquip` struct specifying the equip data
      */
-    function _equip(IntakeEquip memory data) private {
+     function _equip(IntakeEquip memory data) internal virtual {
         address baseAddress = getBaseAddressOfResource(data.resourceId);
         uint64 slotPartId = data.slotPartId;
         if (
@@ -439,7 +426,7 @@ contract RMRKExternalEquip is
         uint256 tokenId,
         uint64 resourceId,
         uint64 slotPartId
-    ) private {
+    ) internal virtual {
         address targetBaseAddress = _baseAddresses[resourceId];
         Equipment memory equipment = _equipments[tokenId][targetBaseAddress][
             slotPartId

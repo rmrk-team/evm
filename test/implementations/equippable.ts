@@ -2,14 +2,6 @@ import { Contract } from 'ethers';
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import {
-  ADDRESS_ZERO,
-  addResourceToToken,
-  addResourceEntryEquippables,
-  mintFromImpl,
-  nestMintFromImpl,
-  ONE_ETH,
-} from '../utils';
 import { setupContextForParts } from '../setup/equippableParts';
 import { setupContextForSlots } from '../setup/equippableSlots';
 import shouldBehaveLikeEquippableResources from '../behavior/equippableResources';
@@ -17,6 +9,16 @@ import shouldBehaveLikeEquippableWithParts from '../behavior/equippableParts';
 import shouldBehaveLikeEquippableWithSlots from '../behavior/equippableSlots';
 import shouldBehaveLikeMultiResource from '../behavior/multiresource';
 import shouldControlValidMinting from '../behavior/mintingImpl';
+import shouldHaveMetadata from '../behavior/metadata';
+import shouldHaveRoyalties from '../behavior/royalties';
+import {
+  addResourceEntryEquippables,
+  addResourceToToken,
+  ADDRESS_ZERO,
+  mintFromImpl,
+  nestMintFromImpl,
+  ONE_ETH,
+} from '../utils';
 
 // --------------- FIXTURES -----------------------
 
@@ -203,7 +205,7 @@ async function equipFixture() {
     'ipfs://collection-meta',
     'ipfs://tokenURI',
     ADDRESS_ZERO,
-    0,
+    1000, // 10%
   );
   await equip.deployed();
 
@@ -300,14 +302,6 @@ describe('RMRKEquippableImpl Other', async function () {
   });
 
   shouldControlValidMinting();
-
-  it('can get tokenURI', async function () {
-    const owner = (await ethers.getSigners())[0];
-    const tokenId = await mintFromImpl(this.token, owner.address);
-    expect(await this.token.tokenURI(tokenId)).to.eql('ipfs://tokenURI');
-  });
-
-  it('can get collection meta', async function () {
-    expect(await this.token.collectionMetadata()).to.eql('ipfs://collection-meta');
-  });
+  shouldHaveRoyalties(mintFromImpl);
+  shouldHaveMetadata(mintFromImpl);
 });

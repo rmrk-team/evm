@@ -2,15 +2,14 @@
 
 //Generally all interactions should propagate downstream
 
-pragma solidity ^0.8.15;
+pragma solidity ^0.8.16;
 
 import "../../RMRK/equippable/IRMRKEquippable.sol";
 import "../../RMRK/equippable/IRMRKExternalEquip.sol";
 import "../../RMRK/equippable/IRMRKNestingExternalEquip.sol";
 import "../../RMRK/nesting/RMRKNesting.sol";
-// import "hardhat/console.sol";
 
-error RMRKMustUnequipFirst();
+// import "hardhat/console.sol";
 
 /**
  * @title RMRKNestingExternalEquip
@@ -54,12 +53,12 @@ contract RMRKNestingExternalEquip is IRMRKNestingExternalEquip, RMRKNesting {
      * @param isPending Boolean value indicating wether the token is in the pending array of the parent (`true`) or in
      *  the active array (`false`)
      */
-    function unnestChild(
+    function _unnestChild(
         uint256 tokenId,
         uint256 index,
         address to,
         bool isPending
-    ) public virtual override onlyApprovedOrOwner(tokenId) {
+    ) internal virtual override {
         if (!isPending) {
             _requireMinted(tokenId);
             Child memory child = childOf(tokenId, index);
@@ -72,7 +71,7 @@ contract RMRKNestingExternalEquip is IRMRKNestingExternalEquip, RMRKNesting {
             ) revert RMRKMustUnequipFirst();
         }
 
-        _unnestChild(tokenId, index, to, isPending);
+        super._unnestChild(tokenId, index, to, isPending);
     }
 
     /**

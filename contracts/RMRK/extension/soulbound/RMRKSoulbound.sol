@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
-pragma solidity ^0.8.15;
+pragma solidity ^0.8.16;
 
 import "../../core/RMRKCore.sol";
 import "./IRMRKSoulbound.sol";
+import "../../library/RMRKErrors.sol";
 
-error RMRKCannotTransferSoulbound();
 /**
  * @title RMRKSoulbound
  * @author RMRK team

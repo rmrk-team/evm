@@ -1,17 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
-pragma solidity ^0.8.15;
+pragma solidity ^0.8.16;
 
 import "./IRMRKBaseStorage.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
-// import "hardhat/console.sol";
+import "../library/RMRKErrors.sol";
 
-error RMRKBadConfig();
-error RMRKIdZeroForbidden();
-error RMRKPartAlreadyExists();
-error RMRKPartDoesNotExist();
-error RMRKPartIsNotSlot();
-error RMRKZeroLengthIdsPassed();
+// import "hardhat/console.sol";
 
 /**
  * @title RMRKBaseStorage

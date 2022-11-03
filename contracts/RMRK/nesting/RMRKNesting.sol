@@ -2,7 +2,7 @@
 
 //Generally all interactions should propagate downstream
 
-pragma solidity ^0.8.15;
+pragma solidity ^0.8.16;
 
 import "./IRMRKNesting.sol";
 import "../core/RMRKCore.sol";
@@ -14,32 +14,9 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
-// import "hardhat/console.sol";
+import "../library/RMRKErrors.sol";
 
-error ERC721AddressZeroIsNotaValidOwner();
-error ERC721ApprovalToCurrentOwner();
-error ERC721ApproveCallerIsNotOwnerNorApprovedForAll();
-error ERC721ApprovedQueryForNonexistentToken();
-error ERC721ApproveToCaller();
-error ERC721InvalidTokenId();
-error ERC721MintToTheZeroAddress();
-error ERC721NotApprovedOrOwner();
-error ERC721TokenAlreadyMinted();
-error ERC721TransferFromIncorrectOwner();
-error ERC721TransferToNonReceiverImplementer();
-error ERC721TransferToTheZeroAddress();
-error RMRKChildAlreadyExists();
-error RMRKChildIndexOutOfRange();
-error RMRKIsNotContract();
-error RMRKMaxPendingChildrenReached();
-error RMRKMintToNonRMRKImplementer();
-error RMRKNestingTooDeep();
-error RMRKNestingTransferToDescendant();
-error RMRKNestingTransferToNonRMRKNestingImplementer();
-error RMRKNestingTransferToSelf();
-error RMRKNotApprovedOrDirectOwner();
-error RMRKPendingChildIndexOutOfRange();
-error RMRKTokenIdZeroForbidden();
+// import "hardhat/console.sol";
 
 /**
  * @dev RMRK nesting implementation. This contract is hierarchy agnostic, and can
@@ -250,6 +227,8 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         _balances[to] += 1;
 
         emit Transfer(from, to, tokenId);
+        emit NestTransfer(immediateOwner, to, parentId, 0, tokenId);
+
         _afterTokenTransfer(from, to, tokenId);
         _afterNestedTokenTransfer(immediateOwner, to, parentId, 0, tokenId);
     }
@@ -302,6 +281,7 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         _afterNestedTokenTransfer(from, to, parentId, destinationId, tokenId);
 
         emit Transfer(from, to, tokenId);
+        emit NestTransfer(from, to, parentId, destinationId, tokenId);
     }
 
     function _checkForInheritanceLoop(
@@ -381,6 +361,8 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         _innerMint(to, tokenId, 0);
 
         emit Transfer(address(0), to, tokenId);
+        emit NestTransfer(address(0), to, 0, 0, tokenId);
+
         _afterTokenTransfer(address(0), to, tokenId);
         _afterNestedTokenTransfer(address(0), to, 0, 0, tokenId);
     }
@@ -406,7 +388,7 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
     ) private {
         if (to == address(0)) revert ERC721MintToTheZeroAddress();
         if (_exists(tokenId)) revert ERC721TokenAlreadyMinted();
-        if (tokenId == 0) revert RMRKTokenIdZeroForbidden();
+        if (tokenId == 0) revert RMRKIdZeroForbidden();
 
         _beforeTokenTransfer(address(0), to, tokenId);
         _beforeNestedTokenTransfer(address(0), to, 0, destinationId, tokenId);
@@ -468,21 +450,8 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
     //              BURNING
     ////////////////////////////////////////
 
-    function burnChild(uint256 tokenId, uint256 index)
-        public
-        virtual
-        onlyApprovedOrDirectOwner(tokenId)
-    {
-        if (childrenOf(tokenId).length <= index)
-            revert RMRKChildIndexOutOfRange();
-        Child memory child = childOf(tokenId, index);
-        _removeChildByIndex(_activeChildren[tokenId], index);
-        _burnChild(child);
-    }
-
-    function _burnChild(Child memory child) private {
-        delete _childIsInActive[child.contractAddress][child.tokenId];
-        IRMRKNesting(child.contractAddress).burn(child.tokenId);
+    function burn(uint256 tokenId) public virtual {
+        burn(tokenId, 0);
     }
 
     /**
@@ -496,11 +465,20 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
      * Emits a {Transfer} event.
      */
 
-    //update for reentrancy
-    function burn(uint256 tokenId)
+    function burn(uint256 tokenId, uint256 maxChildrenBurns)
         public
         virtual
         onlyApprovedOrDirectOwner(tokenId)
+        returns (uint256)
+    {
+        return _burn(tokenId, maxChildrenBurns);
+    }
+
+    function _burn(uint256 tokenId, uint256 maxChildrenBurns)
+        internal
+        virtual
+        onlyApprovedOrDirectOwner(tokenId)
+        returns (uint256)
     {
         (address immediateOwner, uint256 parentId, ) = rmrkOwnerOf(tokenId);
         address owner = ownerOf(tokenId);
@@ -524,9 +502,31 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         delete _pendingChildren[tokenId];
         delete _tokenApprovals[tokenId][owner];
 
+        uint256 pendingRecursiveBurns;
+        uint256 totalChildBurns;
+
         uint256 length = children.length; //gas savings
         for (uint256 i; i < length; ) {
-            _burnChild(children[i]);
+            if (totalChildBurns >= maxChildrenBurns)
+                revert RMRKMaxRecursiveBurnsReached(
+                    children[i].contractAddress,
+                    children[i].tokenId
+                );
+            delete _childIsInActive[children[i].contractAddress][
+                children[i].tokenId
+            ];
+            unchecked {
+                // At this point we know pendingRecursiveBurns must be at least 1
+                pendingRecursiveBurns = maxChildrenBurns - totalChildBurns;
+            }
+            // We substract one to the next level to count for the token being burned, then add it again on returns
+            // This is to allow the behavior of 0 recursive burns meaning only the current token is deleted.
+            totalChildBurns +=
+                IRMRKNesting(children[i].contractAddress).burn(
+                    children[i].tokenId,
+                    pendingRecursiveBurns - 1
+                ) +
+                1;
             unchecked {
                 ++i;
             }
@@ -543,6 +543,9 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
             tokenId
         );
         emit Transfer(owner, address(0), tokenId);
+        emit NestTransfer(immediateOwner, address(0), parentId, 0, tokenId);
+
+        return totalChildBurns;
     }
 
     ////////////////////////////////////////
@@ -702,7 +705,7 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         address to,
         uint256 tokenId,
         bytes memory data
-    ) internal returns (bool) {
+    ) private returns (bool) {
         if (to.isContract()) {
             try
                 IERC721Receiver(to).onERC721Received(
@@ -738,7 +741,6 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
      * param2 childTokenId is the tokenId of the child instance
      */
 
-    //update for reentrancy
     function addChild(uint256 parentTokenId, uint256 childTokenId)
         public
         virtual
@@ -779,6 +781,10 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         virtual
         onlyApprovedOrOwner(tokenId)
     {
+        _acceptChild(tokenId, index);
+    }
+
+    function _acceptChild(uint256 tokenId, uint256 index) internal virtual {
         if (pendingChildrenOf(tokenId).length <= index)
             revert RMRKPendingChildIndexOutOfRange();
 
@@ -816,6 +822,10 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         virtual
         onlyApprovedOrOwner(tokenId)
     {
+        _rejectAllChildren(tokenId);
+    }
+
+    function _rejectAllChildren(uint256 tokenId) internal virtual {
         _beforeRejectAllChildren(tokenId);
         delete _pendingChildren[tokenId];
         emit AllChildrenRejected(tokenId);

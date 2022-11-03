@@ -65,7 +65,7 @@ describe('NestingMock', function () {
       const tokenId = 0;
       await expect(
         child['mint(address,uint256)'](owner.address, tokenId),
-      ).to.be.revertedWithCustomError(child, 'RMRKTokenIdZeroForbidden');
+      ).to.be.revertedWithCustomError(child, 'RMRKIdZeroForbidden');
     });
 
     it('cannot nest mint id 0', async function () {
@@ -73,7 +73,7 @@ describe('NestingMock', function () {
       const childId = 0;
       await expect(
         child['nestMint(address,uint256,uint256)'](parent.address, childId, parentId),
-      ).to.be.revertedWithCustomError(child, 'RMRKTokenIdZeroForbidden');
+      ).to.be.revertedWithCustomError(child, 'RMRKIdZeroForbidden');
     });
 
     it('cannot mint already minted token', async function () {
@@ -152,7 +152,7 @@ describe('NestingMock transfer hooks', function () {
 
     await parent.acceptChild(parentId, 0);
 
-    await parent.burn(parentId);
+    await parent['burn(uint256,uint256)'](parentId, 1);
     expect(await parent.balancePerNftOf(owner.address, 0)).to.eql(bn(0));
     expect(await child.balancePerNftOf(parent.address, parentId)).to.eql(bn(0));
     expect(await child.balancePerNftOf(otherOwner.address, 0)).to.eql(bn(0));

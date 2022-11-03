@@ -4,6 +4,7 @@ import { expect } from 'chai';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { bn, mintFromMock } from './utils';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { IOtherInterface, IRMRKRenderUtils, IRMRKRenderUtilsEquip } from './interfaces';
 
 // --------------- FIXTURES -----------------------
 
@@ -70,11 +71,11 @@ describe('Render Utils', async function () {
 
   describe('Render Utils MultiResource', async function () {
     it('supports interface', async function () {
-      expect(await renderUtils.supportsInterface('0x93668f28')).to.equal(true);
+      expect(await renderUtils.supportsInterface(IRMRKRenderUtils)).to.equal(true);
     });
 
     it('does not support other interfaces', async function () {
-      expect(await renderUtils.supportsInterface('0xffffffff')).to.equal(false);
+      expect(await renderUtils.supportsInterface(IOtherInterface)).to.equal(false);
     });
 
     it('can get active resource by index', async function () {
@@ -118,7 +119,7 @@ describe('Render Utils', async function () {
 
   describe('Render Utils Equip', async function () {
     it('supports interface', async function () {
-      expect(await renderUtilsEquip.supportsInterface('0x65307461')).to.equal(true);
+      expect(await renderUtilsEquip.supportsInterface(IRMRKRenderUtilsEquip)).to.equal(true);
     });
 
     it('can get extended active resource by index', async function () {

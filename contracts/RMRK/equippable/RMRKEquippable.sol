@@ -2,7 +2,7 @@
 
 //Generally all interactions should propagate downstream
 
-pragma solidity ^0.8.15;
+pragma solidity ^0.8.16;
 
 import "../base/IRMRKBaseStorage.sol";
 import "../library/RMRKLib.sol";
@@ -10,20 +10,8 @@ import "../multiresource/AbstractMultiResource.sol";
 import "../nesting/RMRKNesting.sol";
 import "../security/ReentrancyGuard.sol";
 import "./IRMRKEquippable.sol";
-// import "hardhat/console.sol";
 
-// MultiResource
-error RMRKNotApprovedForResourcesOrOwner();
-error RMRKApprovalForResourcesToCurrentOwner();
-error RMRKApproveForResourcesCallerIsNotOwnerNorApprovedForAll();
-// Equippable
-error RMRKBaseRequiredForParts();
-error RMRKEquippableEquipNotAllowedByBase();
-error RMRKMustUnequipFirst();
-error RMRKNotEquipped();
-error RMRKSlotAlreadyUsed();
-error RMRKTargetResourceCannotReceiveSlot();
-error RMRKTokenCannotBeEquippedWithResourceIntoSlot();
+// import "hardhat/console.sol";
 
 /**
  * @title RMRKEquippable
@@ -317,18 +305,18 @@ contract RMRKEquippable is
      * @param isPending Specifies whether the child being unnested is in the pending array (`true`) or in an active
      *  array (`false`)
     */
-    function unnestChild(
+    function _unnestChild(
         uint256 tokenId,
         uint256 index,
         address to,
         bool isPending
-    ) public virtual override onlyApprovedOrOwner(tokenId) {
+    ) internal virtual override {
         if (!isPending) {
             Child memory child = childOf(tokenId, index);
             if (isChildEquipped(tokenId, child.contractAddress, child.tokenId))
                 revert RMRKMustUnequipFirst();
         }
-        _unnestChild(tokenId, index, to, isPending);
+        super._unnestChild(tokenId, index, to, isPending);
     }
 
     /**
@@ -367,7 +355,7 @@ contract RMRKEquippable is
      *  ]
      * @param data An `IntakeEquip` struct specifying the equip data
     */
-    function _equip(IntakeEquip memory data) private {
+    function _equip(IntakeEquip memory data) internal virtual {
         address baseAddress = getBaseAddressOfResource(data.resourceId);
         uint64 slotPartId = data.slotPartId;
         if (
@@ -467,7 +455,7 @@ contract RMRKEquippable is
         uint256 tokenId,
         uint64 resourceId,
         uint64 slotPartId
-    ) private {
+    ) internal virtual {
         address targetBaseAddress = _baseAddresses[resourceId];
         Equipment memory equipment = _equipments[tokenId][targetBaseAddress][
             slotPartId

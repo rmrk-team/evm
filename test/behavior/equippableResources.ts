@@ -3,6 +3,7 @@ import { expect } from 'chai';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { BigNumber, Contract } from 'ethers';
 import { bn } from '../utils';
+import { IERC165, IRMRKEquippable, IOtherInterface } from '../interfaces';
 
 async function shouldBehaveLikeEquippableResources(
   mint: (token: Contract, to: string) => Promise<number>,
@@ -29,15 +30,15 @@ async function shouldBehaveLikeEquippableResources(
 
   describe('Interface support', async function () {
     it('can support IERC165', async function () {
-      expect(await chunky.supportsInterface('0x01ffc9a7')).to.equal(true);
+      expect(await chunky.supportsInterface(IERC165)).to.equal(true);
     });
 
     it('can support IEquippable', async function () {
-      expect(await chunkyEquip.supportsInterface('0xd3a28ca0')).to.equal(true);
+      expect(await chunkyEquip.supportsInterface(IRMRKEquippable)).to.equal(true);
     });
 
     it('cannot support other interfaceId', async function () {
-      expect(await chunkyEquip.supportsInterface('0xffffffff')).to.equal(false);
+      expect(await chunkyEquip.supportsInterface(IOtherInterface)).to.equal(false);
     });
   });
 
@@ -213,15 +214,16 @@ async function shouldBehaveLikeEquippableResources(
       );
     });
 
-    it('cannot add resource to non existing token', async function () {
+    it('can add resource to non existing token and it is pending when minted', async function () {
       const resId = bn(1);
-      const tokenId = 1;
+      const lastTokenId = await mint(chunky, owner.address);
+      const nextTokenId = lastTokenId + 1; // not existing yet
 
       await addResources([resId]);
-      await expect(chunkyEquip.addResourceToToken(tokenId, resId, 0)).to.be.revertedWithCustomError(
-        chunky,
-        'ERC721InvalidTokenId',
-      );
+      await chunkyEquip.addResourceToToken(nextTokenId, resId, 0);
+      await mint(chunky, owner.address);
+
+      expect(await chunkyEquip.getPendingResources(nextTokenId)).to.eql([resId]);
     });
 
     it('cannot add resource twice to the same token', async function () {
@@ -722,7 +724,7 @@ async function shouldBehaveLikeEquippableResources(
       expect(await chunky.getApproved(tokenId)).to.eql(approved.address);
       expect(await chunkyEquip.getApprovedForResources(tokenId)).to.eql(approved.address);
 
-      await chunky.connect(tokenOwner).burn(tokenId);
+      await chunky.connect(tokenOwner)['burn(uint256)'](tokenId);
 
       await expect(chunky.getApproved(tokenId)).to.be.revertedWithCustomError(
         chunky,

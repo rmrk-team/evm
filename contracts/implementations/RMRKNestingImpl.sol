@@ -2,22 +2,11 @@
 
 pragma solidity ^0.8.16;
 
-import "../RMRK/extension/RMRKRoyalties.sol";
-import "../RMRK/nesting/RMRKNesting.sol";
-import "../RMRK/utils/RMRKCollectionMetadata.sol";
-import "../RMRK/utils/RMRKMintingUtils.sol";
+import "./abstracts/RMRKAbstractNestingImpl.sol";
 
 error RMRKMintUnderpriced();
-error RMRKMintZero();
 
-contract RMRKNestingImpl is
-    RMRKMintingUtils,
-    RMRKCollectionMetadata,
-    RMRKRoyalties,
-    RMRKNesting
-{
-    string private _tokenURI;
-
+contract RMRKNestingImpl is RMRKAbstractNestingImpl {
     constructor(
         string memory name_,
         string memory symbol_,
@@ -28,18 +17,20 @@ contract RMRKNestingImpl is
         address royaltyRecipient,
         uint256 royaltyPercentageBps //in basis points
     )
-        RMRKNesting(name_, symbol_)
         RMRKMintingUtils(maxSupply_, pricePerMint_)
         RMRKCollectionMetadata(collectionMetadata_)
         RMRKRoyalties(royaltyRecipient, royaltyPercentageBps)
+        RMRKNesting(name_, symbol_)
     {
-        _tokenURI = tokenURI_;
+        _setTokenURI(tokenURI_);
     }
 
-    /*
-    Template minting logic
-    */
-    function mint(address to, uint256 numToMint) external payable saleIsOpen {
+    function mint(address to, uint256 numToMint)
+        public
+        payable
+        virtual
+        saleIsOpen
+    {
         (uint256 nextToken, uint256 totalSupplyOffset) = _preMint(numToMint);
 
         for (uint256 i = nextToken; i < totalSupplyOffset; ) {
@@ -50,14 +41,11 @@ contract RMRKNestingImpl is
         }
     }
 
-    /*
-    Template minting logic
-    */
     function mintNesting(
         address to,
         uint256 numToMint,
         uint256 destinationId
-    ) external payable saleIsOpen {
+    ) public payable virtual saleIsOpen {
         (uint256 nextToken, uint256 totalSupplyOffset) = _preMint(numToMint);
 
         for (uint256 i = nextToken; i < totalSupplyOffset; ) {
@@ -68,42 +56,7 @@ contract RMRKNestingImpl is
         }
     }
 
-    function _preMint(uint256 numToMint) private returns (uint256, uint256) {
-        if (numToMint == uint256(0)) revert RMRKMintZero();
-        if (numToMint + _totalSupply > _maxSupply) revert RMRKMintOverMax();
-
-        uint256 mintPriceRequired = numToMint * _pricePerMint;
-        if (mintPriceRequired != msg.value) revert RMRKMintUnderpriced();
-
-        uint256 nextToken = _totalSupply + 1;
-        unchecked {
-            _totalSupply += numToMint;
-        }
-        uint256 totalSupplyOffset = _totalSupply + 1;
-
-        return (nextToken, totalSupplyOffset);
-    }
-
-    function transfer(address to, uint256 tokenId) public virtual {
-        transferFrom(_msgSender(), to, tokenId);
-    }
-
-    function nestTransfer(
-        address to,
-        uint256 tokenId,
-        uint256 destinationId
-    ) public virtual {
-        nestTransferFrom(_msgSender(), to, tokenId, destinationId);
-    }
-
-    function tokenURI(uint256) public view override returns (string memory) {
-        return _tokenURI;
-    }
-
-    function updateRoyaltyRecipient(address newRoyaltyRecipient)
-        external
-        override
-    {
-        _setRoyaltyRecipient(newRoyaltyRecipient);
+    function _charge(uint256 value) internal virtual override {
+        if (value != msg.value) revert RMRKMintUnderpriced();
     }
 }

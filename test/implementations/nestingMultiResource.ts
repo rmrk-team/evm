@@ -1,23 +1,25 @@
+import { Contract } from 'ethers';
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
-import { Contract } from 'ethers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import shouldBehaveLikeMultiResource from '../behavior/multiresource';
+import shouldBehaveLikeNesting from '../behavior/nesting';
+import shouldControlValidMinting from '../behavior/mintingImpl';
+import shouldHaveMetadata from '../behavior/metadata';
+import shouldHaveRoyalties from '../behavior/royalties';
 import {
-  ADDRESS_ZERO,
-  transfer,
-  nestTransfer,
-  addResourceToToken,
   addResourceEntryFromImpl,
-  singleFixtureWithArgs,
-  parentChildFixtureWithArgs,
+  addResourceToToken,
+  ADDRESS_ZERO,
   mintFromImpl,
   nestMintFromImpl,
+  nestTransfer,
   ONE_ETH,
+  parentChildFixtureWithArgs,
+  singleFixtureWithArgs,
+  transfer,
 } from '../utils';
-import shouldBehaveLikeNesting from '../behavior/nesting';
-import shouldBehaveLikeMultiResource from '../behavior/multiresource';
-import shouldControlValidMinting from '../behavior/mintingImpl';
 
 async function singleFixture(): Promise<{ token: Contract; renderUtils: Contract }> {
   const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiResourceRenderUtils');
@@ -32,7 +34,7 @@ async function singleFixture(): Promise<{ token: Contract; renderUtils: Contract
     'ipfs://collection-meta',
     'ipfs://tokenURI',
     ADDRESS_ZERO,
-    0,
+    1000, // 10%
   ]);
   return { token, renderUtils };
 }
@@ -123,7 +125,7 @@ describe('NestingMultiResourceImpl Other Behavior', function () {
       expect(await token.getApproved(tokenId)).to.eql(approved.address);
       expect(await token.getApprovedForResources(tokenId)).to.eql(approved.address);
 
-      await token.connect(tokenOwner).burn(tokenId);
+      await token.connect(tokenOwner)['burn(uint256)'](tokenId);
 
       await expect(token.getApproved(tokenId)).to.be.revertedWithCustomError(
         token,
@@ -144,14 +146,6 @@ describe('NestingMultiResourceImpl Other', async function () {
   });
 
   shouldControlValidMinting();
-
-  it('can get tokenURI', async function () {
-    const owner = (await ethers.getSigners())[0];
-    const tokenId = await mintFromImpl(this.token, owner.address);
-    expect(await this.token.tokenURI(tokenId)).to.eql('ipfs://tokenURI');
-  });
-
-  it('can get collection meta', async function () {
-    expect(await this.token.collectionMetadata()).to.eql('ipfs://collection-meta');
-  });
+  shouldHaveRoyalties(mintFromImpl);
+  shouldHaveMetadata(mintFromImpl);
 });

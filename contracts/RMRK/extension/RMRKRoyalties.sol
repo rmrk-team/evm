@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.16;
 
 import "@openzeppelin/contracts/interfaces/IERC2981.sol";
 
@@ -53,6 +53,14 @@ abstract contract RMRKRoyalties is IERC2981 {
      */
     function getRoyaltyRecipient() external view virtual returns (address) {
         return _royaltyRecipient;
+    }
+
+    /**
+     * @notice Used to retrieve the specified royalty percentage.
+     + @return uint256 The royalty percentage expressed in the basis points
+     */
+    function getRoyaltyPercentage() external view virtual returns (uint256) {
+        return _royaltyPercentageBps;
     }
 
     /**

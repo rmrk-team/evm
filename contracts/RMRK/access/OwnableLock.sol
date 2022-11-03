@@ -1,19 +1,16 @@
 // SPDX-License-Identifier: Apache-2.0
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.16;
 
 import "@openzeppelin/contracts/utils/Context.sol";
+import "../library/RMRKErrors.sol";
 
-error RMRKLocked();
-error RMRKNotOwner();
-error RMRKNotOwnerOrContributor();
-error RMRKNewOwnerIsZeroAddress();
-error RMRKNewContributorIsZeroAddress();
-
-/// @title OwnableLock
-/// @author RMRK team
-/// @notice A minimal ownable lock smart contract.
-/// @dev This smart contract is based on "openzeppelin's access/Ownable.sol".
+/**
+ * @title OwnableLock
+ * @author RMRK team
+ * @notice A minimal ownable lock smart contract.
+ * @dev This smart contract is based on "openzeppelin's access/Ownable.sol".
+ */
 contract OwnableLock is Context {
     bool private _lock;
     address private _owner;

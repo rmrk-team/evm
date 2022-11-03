@@ -2,7 +2,7 @@
 
 //Generally all interactions should propagate downstream
 
-pragma solidity ^0.8.15;
+pragma solidity ^0.8.16;
 
 import "../multiresource/AbstractMultiResource.sol";
 import "./IRMRKNesting.sol";
@@ -11,12 +11,8 @@ import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
-// import "hardhat/console.sol";
 
-// MultiResource
-error RMRKNotApprovedForResourcesOrOwner();
-error RMRKApprovalForResourcesToCurrentOwner();
-error RMRKApproveForResourcesCallerIsNotOwnerNorApprovedForAll();
+// import "hardhat/console.sol";
 
 /**
  * @dev Mid-level contract implementing multiresource on top of nesting.
