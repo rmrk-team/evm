@@ -68,7 +68,8 @@ contract OwnableLock is Context {
     }
 
     /**
-     * @notice Reenables the operation of functions using `notLocked` modifier.
+     * @notice Used to retrieve the status of a lockable smart contract.
+     * @return bool A boolean value signifying whether the smart contract has been locked (`true`) or not (`false`)
      */
     function getLock() public view returns (bool) {
         return _lock;
