@@ -668,16 +668,52 @@ contract RMRKEquippable is
 
     // HOOKS
 
+    /**
+     * @notice A hook to be called before a equipping a resource to the token.
+     * @dev The `IntakeEquip` struct consist of the following data:
+     *  [
+     *      tokenId,
+     *      childIndex,
+     *      resourceId,
+     *      slotPartId,
+     *      childResourceId
+     *  ]
+     * @param data The `IntakeEquip` struct containing data of the resource that is being equipped
+     */
     function _beforeEquip(IntakeEquip memory data) internal virtual {}
 
+    /**
+     * @notice A hook to be called after equipping a resource to the token.
+     * @dev The `IntakeEquip` struct consist of the following data:
+     *  [
+     *      tokenId,
+     *      childIndex,
+     *      resourceId,
+     *      slotPartId,
+     *      childResourceId
+     *  ]
+     * @param data The `IntakeEquip` struct containing data of the resource that was equipped
+     */
     function _afterEquip(IntakeEquip memory data) internal virtual {}
 
+    /**
+     * @notice A hook to be called before unequipping a resource from the token.
+     * @param tokenId ID of the token from which the resource is being unequipped
+     * @param resourceId ID of the resource being unequipped
+     * @param slotPartId ID of the slot from which the resource is being unequipped
+     */
     function _beforeUnequip(
         uint256 tokenId,
         uint64 resourceId,
         uint64 slotPartId
     ) internal virtual {}
 
+    /**
+     * @notice A hook to be called after unequipping a resource from the token.
+     * @param tokenId ID of the token from which the resource was unequipped
+     * @param resourceId ID of the resource that was unequipped
+     * @param slotPartId ID of the slot from which the resource was unequipped
+     */
     function _afterUnequip(
         uint256 tokenId,
         uint64 resourceId,

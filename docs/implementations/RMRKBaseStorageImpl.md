@@ -480,7 +480,7 @@ Event to announce the overriding of equippable addresses of the part.
 error RMRKBadConfig()
 ```
 
-
+Attempting to incorrectly configue a Base item
 
 
 
@@ -491,9 +491,9 @@ error RMRKBadConfig()
 error RMRKIdZeroForbidden()
 ```
 
+Attempting to use ID 0, which is not supported
 
-
-
+*The ID 0 in RMRK suite is reserved for empty values. Guarding against its use ensures the expected operation*
 
 
 ### RMRKLocked
@@ -502,7 +502,7 @@ error RMRKIdZeroForbidden()
 error RMRKLocked()
 ```
 
-
+Attempting to interact with a contract that had its operation locked
 
 
 
@@ -513,7 +513,7 @@ error RMRKLocked()
 error RMRKNewContributorIsZeroAddress()
 ```
 
-
+Attempting to assign a 0x0 address as a contributor
 
 
 
@@ -524,7 +524,7 @@ error RMRKNewContributorIsZeroAddress()
 error RMRKNewOwnerIsZeroAddress()
 ```
 
-
+Attempting to transfer the ownership to the 0x0 address
 
 
 
@@ -535,7 +535,7 @@ error RMRKNewOwnerIsZeroAddress()
 error RMRKNotOwner()
 ```
 
-
+Attempting to interact with a management function without being the smart contract&#39;s owner
 
 
 
@@ -546,7 +546,7 @@ error RMRKNotOwner()
 error RMRKNotOwnerOrContributor()
 ```
 
-
+Attempting to interact with a function without being the owner or contributor of the collection
 
 
 
@@ -557,7 +557,7 @@ error RMRKNotOwnerOrContributor()
 error RMRKPartAlreadyExists()
 ```
 
-
+Attempting to add a `Part` with an ID that is already used
 
 
 
@@ -568,7 +568,7 @@ error RMRKPartAlreadyExists()
 error RMRKPartDoesNotExist()
 ```
 
-
+Attempting to use a `Part` that doesn&#39;t exist
 
 
 
@@ -579,7 +579,7 @@ error RMRKPartDoesNotExist()
 error RMRKPartIsNotSlot()
 ```
 
-
+Attempting to use a `Part` that is `Fixed` when `Slot` kind of `Part` should be used
 
 
 
@@ -590,7 +590,7 @@ error RMRKPartIsNotSlot()
 error RMRKZeroLengthIdsPassed()
 ```
 
-
+Attempting not to pass an empty array of equippable addresses when adding or setting the equippable addresses
 
 
 

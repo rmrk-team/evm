@@ -142,6 +142,22 @@ function burn(uint256 tokenId) external nonpayable
 
 
 
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId | uint256 | undefined |
+
+### burn
+
+```solidity
+function burn(uint256 tokenId, uint256 maxChildrenBurns) external nonpayable returns (uint256)
+```
+
+
+
 *Destroys `tokenId`. The approval is cleared when the token is burned. Requirements: - `tokenId` must exist. Emits a {Transfer} event.*
 
 #### Parameters
@@ -149,23 +165,13 @@ function burn(uint256 tokenId) external nonpayable
 | Name | Type | Description |
 |---|---|---|
 | tokenId | uint256 | undefined |
+| maxChildrenBurns | uint256 | undefined |
 
-### burnChild
-
-```solidity
-function burnChild(uint256 tokenId, uint256 index) external nonpayable
-```
-
-
-
-
-
-#### Parameters
+#### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | undefined |
-| index | uint256 | undefined |
+| _0 | uint256 | undefined |
 
 ### canTokenBeEquippedWithResourceIntoSlot
 
@@ -1036,18 +1042,18 @@ Used to unequip child from parent token.
 function unnestChild(uint256 tokenId, uint256 index, address to, bool isPending) external nonpayable
 ```
 
-Used to unnest a given child.
+Function to unnest a child from the active token array.
 
-*The function doesn&#39;t contain a check validating that `to` is not a contract. To ensure that a token is not  transferred to an incompatible smart contract, custom validation has to be added when using this function.*
+
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | ID of the token we are unnesting a child from |
-| index | uint256 | Index of a token we are unnesting in the array it belongs to (can be either active array or pending  array) |
-| to | address | End user address to unnest the token to |
-| isPending | bool | Specifies whether the child being unnested is in the pending array (`true`) or in an active  array (`false`) |
+| tokenId | uint256 | is the tokenId of the parent token to unnest from. |
+| index | uint256 | is the index of the child token ID. |
+| to | address | is the address to transfer this |
+| isPending | bool | indicates if the child is pending (active otherwise). |
 
 
 
@@ -1241,6 +1247,26 @@ event ChildUnnested(uint256 indexed tokenId, address indexed childAddress, uint2
 | childIndex  | uint256 | undefined |
 | fromPending  | bool | undefined |
 
+### NestTransfer
+
+```solidity
+event NestTransfer(address indexed from, address indexed to, uint256 fromTokenId, uint256 toTokenId, uint256 indexed tokenId)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| from `indexed` | address | undefined |
+| to `indexed` | address | undefined |
+| fromTokenId  | uint256 | undefined |
+| toTokenId  | uint256 | undefined |
+| tokenId `indexed` | uint256 | undefined |
+
 ### ResourceAccepted
 
 ```solidity
@@ -1406,7 +1432,7 @@ Used to notify listeners that the resources belonging to a `equippableGroupId` h
 error ERC721AddressZeroIsNotaValidOwner()
 ```
 
-
+Attempting to grant the token to 0x0 address
 
 
 
@@ -1417,7 +1443,7 @@ error ERC721AddressZeroIsNotaValidOwner()
 error ERC721ApprovalToCurrentOwner()
 ```
 
-
+Attempting to grant approval to the current owner of the token
 
 
 
@@ -1428,7 +1454,7 @@ error ERC721ApprovalToCurrentOwner()
 error ERC721ApproveCallerIsNotOwnerNorApprovedForAll()
 ```
 
-
+Attempting to grant approval when not being owner or approved for all should not be permitted
 
 
 
@@ -1439,7 +1465,7 @@ error ERC721ApproveCallerIsNotOwnerNorApprovedForAll()
 error ERC721ApproveToCaller()
 ```
 
-
+Attempting to grant approval to self
 
 
 
@@ -1450,7 +1476,7 @@ error ERC721ApproveToCaller()
 error ERC721InvalidTokenId()
 ```
 
-
+Attempting to use an invalid token ID
 
 
 
@@ -1461,7 +1487,7 @@ error ERC721InvalidTokenId()
 error ERC721NotApprovedOrOwner()
 ```
 
-
+Attempting to manage a token without being its owner or approved by the owner
 
 
 
@@ -1472,7 +1498,7 @@ error ERC721NotApprovedOrOwner()
 error ERC721TransferFromIncorrectOwner()
 ```
 
-
+Attempting to transfer the token from an address that is not the owner
 
 
 
@@ -1483,7 +1509,7 @@ error ERC721TransferFromIncorrectOwner()
 error ERC721TransferToNonReceiverImplementer()
 ```
 
-
+Attempting to safe transfer to an address that is unable to receive the token
 
 
 
@@ -1494,7 +1520,7 @@ error ERC721TransferToNonReceiverImplementer()
 error ERC721TransferToTheZeroAddress()
 ```
 
-
+Attempting to transfer the token to a 0x0 address
 
 
 
@@ -1505,7 +1531,7 @@ error ERC721TransferToTheZeroAddress()
 error RMRKApprovalForResourcesToCurrentOwner()
 ```
 
-
+Attempting to grant approval of resources to their current owner
 
 
 
@@ -1516,18 +1542,7 @@ error RMRKApprovalForResourcesToCurrentOwner()
 error RMRKApproveForResourcesCallerIsNotOwnerNorApprovedForAll()
 ```
 
-
-
-
-
-
-### RMRKApproveForResourcesToCaller
-
-```solidity
-error RMRKApproveForResourcesToCaller()
-```
-
-
+Attempting to grant approval of resources without being the caller or approved for all
 
 
 
@@ -1538,7 +1553,7 @@ error RMRKApproveForResourcesToCaller()
 error RMRKBadPriorityListLength()
 ```
 
-
+Attempting to set the priorities with an array of length that doesn&#39;t match the length of active resources array
 
 
 
@@ -1549,7 +1564,7 @@ error RMRKBadPriorityListLength()
 error RMRKChildAlreadyExists()
 ```
 
-
+Attempting to accept a child that has already been accepted
 
 
 
@@ -1560,7 +1575,7 @@ error RMRKChildAlreadyExists()
 error RMRKChildIndexOutOfRange()
 ```
 
-
+Attempting to interact with a child, using index that is higher than the number of children
 
 
 
@@ -1571,7 +1586,7 @@ error RMRKChildIndexOutOfRange()
 error RMRKEquippableEquipNotAllowedByBase()
 ```
 
-
+Attempting to equip a `Part` with a child not approved by the base
 
 
 
@@ -1582,7 +1597,7 @@ error RMRKEquippableEquipNotAllowedByBase()
 error RMRKIndexOutOfRange()
 ```
 
-
+Attempting to interact with a resource, using index greater than number of resources
 
 
 
@@ -1593,7 +1608,7 @@ error RMRKIndexOutOfRange()
 error RMRKIsNotContract()
 ```
 
-
+Attempting to interact with an end-user account when the contract account is expected
 
 
 
@@ -1604,10 +1619,27 @@ error RMRKIsNotContract()
 error RMRKMaxPendingChildrenReached()
 ```
 
+Attempting to add a pending child after the number of pending children has reached the limit (default limit is 128)
 
 
 
 
+### RMRKMaxRecursiveBurnsReached
+
+```solidity
+error RMRKMaxRecursiveBurnsReached(address childContract, uint256 childTokenId)
+```
+
+Attempting to burn a total number of recursive children higher than maximum set
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| childContract | address | undefined |
+| childTokenId | uint256 | undefined |
 
 ### RMRKMustUnequipFirst
 
@@ -1615,7 +1647,7 @@ error RMRKMaxPendingChildrenReached()
 error RMRKMustUnequipFirst()
 ```
 
-
+Attempting to unnest a child before it is unequipped
 
 
 
@@ -1626,7 +1658,7 @@ error RMRKMustUnequipFirst()
 error RMRKNestingTooDeep()
 ```
 
-
+Attempting to nest a child over the nesting limit (current limit is 100 levels of nesting)
 
 
 
@@ -1637,7 +1669,7 @@ error RMRKNestingTooDeep()
 error RMRKNestingTransferToDescendant()
 ```
 
-
+Attempting to nest the token to own descendant, which would create a loop and leave the looped tokens in limbo
 
 
 
@@ -1648,7 +1680,7 @@ error RMRKNestingTransferToDescendant()
 error RMRKNestingTransferToNonRMRKNestingImplementer()
 ```
 
-
+Attempting to nest the token to a smart contract that doesn&#39;t support nesting
 
 
 
@@ -1659,7 +1691,7 @@ error RMRKNestingTransferToNonRMRKNestingImplementer()
 error RMRKNestingTransferToSelf()
 ```
 
-
+Attempting to nest the token into itself
 
 
 
@@ -1670,7 +1702,7 @@ error RMRKNestingTransferToSelf()
 error RMRKNoResourceMatchingId()
 ```
 
-
+Attempting to interact with a resource that can not be found
 
 
 
@@ -1681,7 +1713,7 @@ error RMRKNoResourceMatchingId()
 error RMRKNotApprovedForResourcesOrOwner()
 ```
 
-
+Attempting to manage a resource without owning it or having been granted permission by the owner to do so
 
 
 
@@ -1692,9 +1724,9 @@ error RMRKNotApprovedForResourcesOrOwner()
 error RMRKNotApprovedOrDirectOwner()
 ```
 
+Attempting to interact with a token without being its owner or having been granted permission by the  owner to do so
 
-
-
+*When a token is nested, only the direct owner (NFT parent) can mange it. In that case, approved addresses are  not allowed to manage it, in order to ensure the expected behaviour*
 
 
 ### RMRKNotEquipped
@@ -1703,7 +1735,7 @@ error RMRKNotApprovedOrDirectOwner()
 error RMRKNotEquipped()
 ```
 
-
+Attempting to unequip an item that isn&#39;t equipped
 
 
 
@@ -1714,7 +1746,7 @@ error RMRKNotEquipped()
 error RMRKPendingChildIndexOutOfRange()
 ```
 
-
+Attempting to interact with a pending child using an index greater than the size of pending array
 
 
 
@@ -1725,7 +1757,7 @@ error RMRKPendingChildIndexOutOfRange()
 error RMRKSlotAlreadyUsed()
 ```
 
-
+Attempting to equip an item into a slot that already has an item equipped
 
 
 
@@ -1736,7 +1768,7 @@ error RMRKSlotAlreadyUsed()
 error RMRKTargetResourceCannotReceiveSlot()
 ```
 
-
+Attempting to equip an item into a `Slot` that the target resource does not implement
 
 
 
@@ -1747,7 +1779,7 @@ error RMRKTargetResourceCannotReceiveSlot()
 error RMRKTokenCannotBeEquippedWithResourceIntoSlot()
 ```
 
-
+Attempting to equip a child into a `Slot` and parent that the child&#39;s collection doesn&#39;t support
 
 
 

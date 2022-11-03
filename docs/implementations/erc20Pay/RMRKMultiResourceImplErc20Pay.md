@@ -1,4 +1,4 @@
-# RMRKMultiResourceMock
+# RMRKMultiResourceImplErc20Pay
 
 
 
@@ -44,10 +44,26 @@ Used to accept a resource from the pending array of a given token.
 | tokenId | uint256 | ID of the token for which the resource is being accepted |
 | index | uint256 | Index of the resource in the given token&#39;s penoding resources array to accept |
 
+### addContributor
+
+```solidity
+function addContributor(address contributor) external nonpayable
+```
+
+Adds a contributor to the smart contract.
+
+*Can only be called by the owner.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| contributor | address | Address of the contributor&#39;s account |
+
 ### addResourceEntry
 
 ```solidity
-function addResourceEntry(uint64 id, string metadataURI) external nonpayable
+function addResourceEntry(string metadataURI) external nonpayable
 ```
 
 
@@ -58,7 +74,6 @@ function addResourceEntry(uint64 id, string metadataURI) external nonpayable
 
 | Name | Type | Description |
 |---|---|---|
-| id | uint64 | undefined |
 | metadataURI | string | undefined |
 
 ### addResourceToToken
@@ -135,21 +150,39 @@ function balanceOf(address owner) external view returns (uint256)
 |---|---|---|
 | _0 | uint256 | undefined |
 
-### burn
+### collectionMetadata
 
 ```solidity
-function burn(uint256 tokenId) external nonpayable
+function collectionMetadata() external view returns (string)
 ```
 
 
 
 
 
-#### Parameters
+
+#### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | undefined |
+| _0 | string | undefined |
+
+### erc20TokenAddress
+
+```solidity
+function erc20TokenAddress() external view returns (address)
+```
+
+
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | address | undefined |
 
 ### getActiveResourcePriorities
 
@@ -256,6 +289,23 @@ Used to retrieve the address approved to manage the given token&#39;s resources.
 |---|---|---|
 | _0 | address | address Address of the account approved to manage the resources of a given token |
 
+### getLock
+
+```solidity
+function getLock() external view returns (bool)
+```
+
+Reenables the operation of functions using `notLocked` modifier.
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | bool | undefined |
+
 ### getPendingResources
 
 ```solidity
@@ -346,6 +396,40 @@ Used to retrieve the resource ID that will be replaced (if any) if a given resou
 |---|---|---|
 | _0 | uint64 | uint64 ID of the resource which will be replacted |
 
+### getRoyaltyPercentage
+
+```solidity
+function getRoyaltyPercentage() external view returns (uint256)
+```
+
+Used to retrieve the specified royalty percentage.
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint256 | uint256 The royalty percentage expressed in the basis points |
+
+### getRoyaltyRecipient
+
+```solidity
+function getRoyaltyRecipient() external view returns (address)
+```
+
+Used to retrieve the recipient of royalties.
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | address | address Address of the recipient of royalties |
+
 ### isApprovedForAll
 
 ```solidity
@@ -392,10 +476,49 @@ Used to retrieve the permission of the `operator` to manage the resources on `ow
 |---|---|---|
 | _0 | bool | bool Boolean value indicating whether the `operator` is authorised to manage `owner`&#39;s tokens&#39; resources  (`true`) or not (`false`) |
 
+### isContributor
+
+```solidity
+function isContributor(address contributor) external view returns (bool)
+```
+
+Used to check if the address is one of the contributors.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| contributor | address | Address of the contributor whoose status we are checking |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | bool | Boolean value indicating wether the address is a contributor or not |
+
+### maxSupply
+
+```solidity
+function maxSupply() external view returns (uint256)
+```
+
+
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint256 | undefined |
+
 ### mint
 
 ```solidity
-function mint(address to, uint256 tokenId) external nonpayable
+function mint(address to, uint256 numToMint) external nonpayable
 ```
 
 
@@ -407,7 +530,7 @@ function mint(address to, uint256 tokenId) external nonpayable
 | Name | Type | Description |
 |---|---|---|
 | to | address | undefined |
-| tokenId | uint256 | undefined |
+| numToMint | uint256 | undefined |
 
 ### name
 
@@ -425,6 +548,23 @@ Used to retrieve the collection name.
 | Name | Type | Description |
 |---|---|---|
 | _0 | string | string Name of the collection |
+
+### owner
+
+```solidity
+function owner() external view returns (address)
+```
+
+Returns the address of the current owner.
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | address | undefined |
 
 ### ownerOf
 
@@ -447,6 +587,23 @@ function ownerOf(uint256 tokenId) external view returns (address)
 | Name | Type | Description |
 |---|---|---|
 | _0 | address | undefined |
+
+### pricePerMint
+
+```solidity
+function pricePerMint() external view returns (uint256)
+```
+
+
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint256 | undefined |
 
 ### rejectAllResources
 
@@ -481,13 +638,40 @@ Used to reject a resource from the pending array of a given token.
 | tokenId | uint256 | ID of the token for which the resource is being rejected |
 | index | uint256 | Index of the resource in the given token&#39;s pending resources array to reject |
 
-### safeMint
+### renounceOwnership
 
 ```solidity
-function safeMint(address to, uint256 tokenId, bytes data) external nonpayable
+function renounceOwnership() external nonpayable
 ```
 
+Leaves the contract without owner. Functions using the `onlyOwner` modifier will be disabled.
 
+*Can only be called by the current owner.Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is  only available to the owner.*
+
+
+### revokeContributor
+
+```solidity
+function revokeContributor(address contributor) external nonpayable
+```
+
+Removes a contributor from the smart contract.
+
+*Can only be called by the owner.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| contributor | address | Address of the contributor&#39;s account |
+
+### royaltyInfo
+
+```solidity
+function royaltyInfo(uint256 tokenId, uint256 salePrice) external view returns (address receiver, uint256 royaltyAmount)
+```
+
+Used to retrieve the information about who shall receive royalties of a sale of the specified token and  how much they will be.
 
 
 
@@ -495,26 +679,15 @@ function safeMint(address to, uint256 tokenId, bytes data) external nonpayable
 
 | Name | Type | Description |
 |---|---|---|
-| to | address | undefined |
-| tokenId | uint256 | undefined |
-| data | bytes | undefined |
+| tokenId | uint256 | ID of the token for which the royalty info is being retrieved |
+| salePrice | uint256 | Price of the token sale |
 
-### safeMint
-
-```solidity
-function safeMint(address to, uint256 tokenId) external nonpayable
-```
-
-
-
-
-
-#### Parameters
+#### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| to | address | undefined |
-| tokenId | uint256 | undefined |
+| receiver | address | The beneficiary receiving royalties of the sale |
+| royaltyAmount | uint256 | The value of the royalties recieved by the `receiver` from the sale |
 
 ### safeTransferFrom
 
@@ -587,6 +760,17 @@ Used to manage approval to manage own tokens&#39; resources.
 | operator | address | Address of the user of which we are managing the approval |
 | approved | bool | Boolean value indicating whether the approval is being granted (`true`) or revoked (`false`) |
 
+### setLock
+
+```solidity
+function setLock() external nonpayable
+```
+
+Locks the operation.
+
+*Once locked, functions using `notLocked` modifier cannot be executed.*
+
+
 ### setPriority
 
 ```solidity
@@ -646,10 +830,10 @@ Used to retrieve the collection symbol.
 ### tokenURI
 
 ```solidity
-function tokenURI(uint256 tokenId) external view returns (string)
+function tokenURI(uint256) external view returns (string)
 ```
 
-Used to retrieve the metadata URI of a token.
+
 
 
 
@@ -657,30 +841,47 @@ Used to retrieve the metadata URI of a token.
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | ID of the token to retrieve the metadata URI for |
+| _0 | uint256 | undefined |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | string Metadata URI of the specified token |
+| _0 | string | undefined |
 
-### transfer
+### totalResources
 
 ```solidity
-function transfer(address to, uint256 tokenId) external nonpayable
+function totalResources() external view returns (uint256)
 ```
 
 
 
 
 
-#### Parameters
+
+#### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| to | address | undefined |
-| tokenId | uint256 | undefined |
+| _0 | uint256 | undefined |
+
+### totalSupply
+
+```solidity
+function totalSupply() external view returns (uint256)
+```
+
+
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint256 | undefined |
 
 ### transferFrom
 
@@ -699,6 +900,55 @@ function transferFrom(address from, address to, uint256 tokenId) external nonpay
 | from | address | undefined |
 | to | address | undefined |
 | tokenId | uint256 | undefined |
+
+### transferOwnership
+
+```solidity
+function transferOwnership(address newOwner) external nonpayable
+```
+
+Transfers ownership of the contract to a new owner.
+
+*Can only be called by the current owner.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| newOwner | address | Address of the new owner&#39;s account |
+
+### updateRoyaltyRecipient
+
+```solidity
+function updateRoyaltyRecipient(address newRoyaltyRecipient) external nonpayable
+```
+
+Used to update recipient of royalties.
+
+*Custom access control has to be implemented to ensure that only the intedned actors can update the  beneficiary.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| newRoyaltyRecipient | address | Address of the new recipient of royalties |
+
+### withdrawRaised
+
+```solidity
+function withdrawRaised(address to, uint256 amount) external nonpayable
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| to | address | undefined |
+| amount | uint256 | undefined |
 
 
 
@@ -775,6 +1025,23 @@ Used to notify listeners that owner has granted an approval to the user to manag
 | owner `indexed` | address | undefined |
 | approved `indexed` | address | undefined |
 | tokenId `indexed` | uint256 | undefined |
+
+### OwnershipTransferred
+
+```solidity
+event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| previousOwner `indexed` | address | undefined |
+| newOwner `indexed` | address | undefined |
 
 ### ResourceAccepted
 
@@ -1093,6 +1360,17 @@ Attempting to interact with a resource, using index greater than number of resou
 
 
 
+### RMRKLocked
+
+```solidity
+error RMRKLocked()
+```
+
+Attempting to interact with a contract that had its operation locked
+
+
+
+
 ### RMRKMaxPendingResourcesReached
 
 ```solidity
@@ -1100,6 +1378,50 @@ error RMRKMaxPendingResourcesReached()
 ```
 
 Attempting to add a pending resource after the number of pending resources has reached the limit (default limit is  128)
+
+
+
+
+### RMRKMintOverMax
+
+```solidity
+error RMRKMintOverMax()
+```
+
+Attempting to mint a number of tokens that would cause the total supply to be greater than maximum supply
+
+
+
+
+### RMRKMintZero
+
+```solidity
+error RMRKMintZero()
+```
+
+
+
+
+
+
+### RMRKNewContributorIsZeroAddress
+
+```solidity
+error RMRKNewContributorIsZeroAddress()
+```
+
+Attempting to assign a 0x0 address as a contributor
+
+
+
+
+### RMRKNewOwnerIsZeroAddress
+
+```solidity
+error RMRKNewOwnerIsZeroAddress()
+```
+
+Attempting to transfer the ownership to the 0x0 address
 
 
 
@@ -1122,6 +1444,39 @@ error RMRKNotApprovedForResourcesOrOwner()
 ```
 
 Attempting to manage a resource without owning it or having been granted permission by the owner to do so
+
+
+
+
+### RMRKNotEnoughAllowance
+
+```solidity
+error RMRKNotEnoughAllowance()
+```
+
+
+
+
+
+
+### RMRKNotOwner
+
+```solidity
+error RMRKNotOwner()
+```
+
+Attempting to interact with a management function without being the smart contract&#39;s owner
+
+
+
+
+### RMRKNotOwnerOrContributor
+
+```solidity
+error RMRKNotOwnerOrContributor()
+```
+
+Attempting to interact with a function without being the owner or contributor of the collection
 
 
 

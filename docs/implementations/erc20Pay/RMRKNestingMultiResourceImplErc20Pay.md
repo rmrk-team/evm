@@ -1,4 +1,4 @@
-# RMRKNestingImpl
+# RMRKNestingMultiResourceImplErc20Pay
 
 
 
@@ -44,6 +44,23 @@ Sends an instance of Child from the pending children array at index to children 
 | tokenId | uint256 | tokenId of parent token to accept a child on |
 | index | uint256 | index of child in _pendingChildren array to accept. |
 
+### acceptResource
+
+```solidity
+function acceptResource(uint256 tokenId, uint256 index) external nonpayable
+```
+
+Accepts a resource at from the pending array of given token.
+
+*Migrates the resource from the token&#39;s pending resource array to the token&#39;s active resource array.Active resources cannot be removed by anyone, but can be replaced by a new resource.Requirements:  - The caller must own the token or be an approved operator.  - `tokenId` must exist.  - `index` must be in range of the length of the pending resource array.Emits an {ResourceAccepted} event.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId | uint256 | ID of the token for which to accept the pending resource |
+| index | uint256 | Index of the resource in the pending array to accept |
+
 ### addChild
 
 ```solidity
@@ -77,6 +94,40 @@ Adds a contributor to the smart contract.
 |---|---|---|
 | contributor | address | Address of the contributor&#39;s account |
 
+### addResourceEntry
+
+```solidity
+function addResourceEntry(string metadataURI) external nonpayable
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| metadataURI | string | undefined |
+
+### addResourceToToken
+
+```solidity
+function addResourceToToken(uint256 tokenId, uint64 resourceId, uint64 overwrites) external nonpayable
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId | uint256 | undefined |
+| resourceId | uint64 | undefined |
+| overwrites | uint64 | undefined |
+
 ### approve
 
 ```solidity
@@ -93,6 +144,23 @@ function approve(address to, uint256 tokenId) external nonpayable
 |---|---|---|
 | to | address | undefined |
 | tokenId | uint256 | undefined |
+
+### approveForResources
+
+```solidity
+function approveForResources(address to, uint256 tokenId) external nonpayable
+```
+
+Used to grant permission to the user to manage token&#39;s resources.
+
+*This differs from transfer approvals, as approvals are not cleared when the approved party accepts or  rejects a resource, or sets resource priorities. This approval is cleared on token transfer.Only a single account can be approved at a time, so approving the `0x0` address clears previous approvals.Requirements:  - The caller must own the token or be an approved operator.  - `tokenId` must exist.Emits an {ApprovalForResources} event.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| to | address | Address of the account to grant the approval to |
+| tokenId | uint256 | ID of the token for which the approval to manage the resources is granted |
 
 ### balanceOf
 
@@ -240,6 +308,84 @@ function collectionMetadata() external view returns (string)
 |---|---|---|
 | _0 | string | undefined |
 
+### erc20TokenAddress
+
+```solidity
+function erc20TokenAddress() external view returns (address)
+```
+
+
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | address | undefined |
+
+### getActiveResourcePriorities
+
+```solidity
+function getActiveResourcePriorities(uint256 tokenId) external view returns (uint16[])
+```
+
+Used to retrieve active resource priorities of a given token.
+
+*Resource priorities are a non-sequential array of uint16 values with an array size equal to active resource  priorites.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId | uint256 | ID of the token to query |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint16[] | uint16[] Array of active resource priorities |
+
+### getActiveResources
+
+```solidity
+function getActiveResources(uint256 tokenId) external view returns (uint64[])
+```
+
+Used to retrieve the active resource IDs of a given token.
+
+*Resources data is stored by reference mapping `_resource[resourceId]`.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId | uint256 | ID of the token to query |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint64[] | uint64[] Array of active resource IDs |
+
+### getAllResources
+
+```solidity
+function getAllResources() external view returns (uint64[])
+```
+
+Used to retrieve an array containing all of the resource IDs.
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint64[] | uint64[] Array of all resource IDs. |
+
 ### getApproved
 
 ```solidity
@@ -262,6 +408,28 @@ function getApproved(uint256 tokenId) external view returns (address)
 |---|---|---|
 | _0 | address | undefined |
 
+### getApprovedForResources
+
+```solidity
+function getApprovedForResources(uint256 tokenId) external view returns (address)
+```
+
+Used to retrieve the address of the account approved to manage resources of a given token.
+
+*Requirements:  - `tokenId` must exist.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId | uint256 | ID of the token for which to retrieve the approved address |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | address | address Address of the account that is approved to manage the specified token&#39;s resources |
+
 ### getLock
 
 ```solidity
@@ -278,6 +446,96 @@ Reenables the operation of functions using `notLocked` modifier.
 | Name | Type | Description |
 |---|---|---|
 | _0 | bool | undefined |
+
+### getPendingResources
+
+```solidity
+function getPendingResources(uint256 tokenId) external view returns (uint64[])
+```
+
+Returns pending resource IDs for a given token
+
+*Pending resources data is stored by reference mapping _pendingResource[resourceId]*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId | uint256 | the token ID to query |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint64[] | uint64[] pending resource IDs |
+
+### getResourceMeta
+
+```solidity
+function getResourceMeta(uint64 resourceId) external view returns (string)
+```
+
+Used to fetch the resource data of the specified resource.
+
+*Resources are stored by reference mapping `_resources[resourceId]`.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| resourceId | uint64 | ID of the resource to query |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | string | string Metadata of the resource |
+
+### getResourceMetaForToken
+
+```solidity
+function getResourceMetaForToken(uint256 tokenId, uint64 resourceIndex) external view returns (string)
+```
+
+Used to fetch the resource data of the specified token&#39;s active resource with the given index.
+
+*Resources are stored by reference mapping `_resources[resourceId]`.Can be overriden to implement enumerate, fallback or other custom logic.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId | uint256 | ID of the token to query |
+| resourceIndex | uint64 | Index of the resource to query in the token&#39;s active resources |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | string | string Metadata of the resource |
+
+### getResourceOverwrites
+
+```solidity
+function getResourceOverwrites(uint256 tokenId, uint64 resourceId) external view returns (uint64)
+```
+
+Used to retrieve the resource ID that will be replaced (if any) if a given resourceID is accepted from  the pending resources array.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId | uint256 | ID of the token to query |
+| resourceId | uint64 | ID of the pending resource which will be accepted |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint64 | uint64 ID of the resource which will be replacted |
 
 ### getRoyaltyPercentage
 
@@ -335,6 +593,29 @@ function isApprovedForAll(address owner, address operator) external view returns
 | Name | Type | Description |
 |---|---|---|
 | _0 | bool | undefined |
+
+### isApprovedForAllForResources
+
+```solidity
+function isApprovedForAllForResources(address owner, address operator) external view returns (bool)
+```
+
+Used to retrieve the permission of the `operator` to manage the resources on `owner`&#39;s tokens.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| owner | address | Address of the owner of the tokens |
+| operator | address | Address of the user being checked for permission to manage `owner`&#39;s tokens&#39; resources |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | bool | bool Boolean value indicating whether the `operator` is authorised to manage `owner`&#39;s tokens&#39; resources  (`true`) or not (`false`) |
 
 ### isContributor
 
@@ -581,6 +862,39 @@ Deletes all pending children.
 |---|---|---|
 | tokenId | uint256 | undefined |
 
+### rejectAllResources
+
+```solidity
+function rejectAllResources(uint256 tokenId) external nonpayable
+```
+
+Rejects all resources from the pending array of a given token.
+
+*Effecitvely deletes the pending array.Requirements:  - The caller must own the token or be an approved operator.  - `tokenId` must exist.Emits a {ResourceRejected} event with resourceId = 0.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId | uint256 | ID of the token of which to clear the pending array |
+
+### rejectResource
+
+```solidity
+function rejectResource(uint256 tokenId, uint256 index) external nonpayable
+```
+
+Rejects a resource from the pending array of given token.
+
+*Removes the resource from the token&#39;s pending resource array.Requirements:  - The caller must own the token or be an approved operator.  - `tokenId` must exist.  - `index` must be in range of the length of the pending resource array.Emits a {ResourceRejected} event.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId | uint256 | ID of the token that the resource is being rejected from |
+| index | uint256 | Index of the resource in the pending array to be rejected  |
+
 ### renounceOwnership
 
 ```solidity
@@ -710,6 +1024,23 @@ function setApprovalForAll(address operator, bool approved) external nonpayable
 | operator | address | undefined |
 | approved | bool | undefined |
 
+### setApprovalForAllForResources
+
+```solidity
+function setApprovalForAllForResources(address operator, bool approved) external nonpayable
+```
+
+Used to manage approval to manage own tokens&#39; resources.
+
+*Passing the value of `true` for the `approved` argument grants the approval and `false` revokes it.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| operator | address | Address of the user of which we are managing the approval |
+| approved | bool | Boolean value indicating whether the approval is being granted (`true`) or revoked (`false`) |
+
 ### setLock
 
 ```solidity
@@ -720,6 +1051,23 @@ Locks the operation.
 
 *Once locked, functions using `notLocked` modifier cannot be executed.*
 
+
+### setPriority
+
+```solidity
+function setPriority(uint256 tokenId, uint16[] priorities) external nonpayable
+```
+
+Sets a new priority array for a given token.
+
+*The priority array is a non-sequential list of `uint16`s, where the lowest value is considered highest  priority.Value `0` of a priority is a special case equivalent to unitialized.Requirements:  - The caller must own the token or be an approved operator.  - `tokenId` must exist.  - The length of `priorities` must be equal the length of the active resources array.Emits a {ResourcePrioritySet} event.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId | uint256 | ID of the token to set the priorities for |
+| priorities | uint16[] | An array of priority values |
 
 ### supportsInterface
 
@@ -781,6 +1129,23 @@ function tokenURI(uint256) external view returns (string)
 | Name | Type | Description |
 |---|---|---|
 | _0 | string | undefined |
+
+### totalResources
+
+```solidity
+function totalResources() external view returns (uint256)
+```
+
+
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint256 | undefined |
 
 ### totalSupply
 
@@ -958,6 +1323,42 @@ event ApprovalForAll(address indexed owner, address indexed operator, bool appro
 | operator `indexed` | address | undefined |
 | approved  | bool | undefined |
 
+### ApprovalForAllForResources
+
+```solidity
+event ApprovalForAllForResources(address indexed owner, address indexed operator, bool approved)
+```
+
+Used to notify listeners that owner has granted approval to the user to manage resources of all of their  tokens.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| owner `indexed` | address | undefined |
+| operator `indexed` | address | undefined |
+| approved  | bool | undefined |
+
+### ApprovalForResources
+
+```solidity
+event ApprovalForResources(address indexed owner, address indexed approved, uint256 indexed tokenId)
+```
+
+Used to notify listeners that owner has granted an approval to the user to manage the resources of a  given token.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| owner `indexed` | address | undefined |
+| approved `indexed` | address | undefined |
+| tokenId `indexed` | uint256 | undefined |
+
 ### ChildAccepted
 
 ```solidity
@@ -1052,6 +1453,125 @@ event OwnershipTransferred(address indexed previousOwner, address indexed newOwn
 |---|---|---|
 | previousOwner `indexed` | address | undefined |
 | newOwner `indexed` | address | undefined |
+
+### ResourceAccepted
+
+```solidity
+event ResourceAccepted(uint256 indexed tokenId, uint64 indexed resourceId)
+```
+
+Used to notify listeners that a resource object at `resourceId` is accepted by the token and migrated  from token&#39;s pending resources array to active resources array of the token.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId `indexed` | uint256 | undefined |
+| resourceId `indexed` | uint64 | undefined |
+
+### ResourceAddedToToken
+
+```solidity
+event ResourceAddedToToken(uint256 indexed tokenId, uint64 indexed resourceId)
+```
+
+Used to notify listeners that a resource object at `resourceId` is added to token&#39;s pending resource  array.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId `indexed` | uint256 | undefined |
+| resourceId `indexed` | uint64 | undefined |
+
+### ResourceOverwriteProposed
+
+```solidity
+event ResourceOverwriteProposed(uint256 indexed tokenId, uint64 indexed resourceId, uint64 indexed overwritesId)
+```
+
+Used to notify listeners that a resource object at `resourceId` is proposed to token, and that the  proposal will initiate an overwrite of the resource with a new one if accepted.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId `indexed` | uint256 | undefined |
+| resourceId `indexed` | uint64 | undefined |
+| overwritesId `indexed` | uint64 | undefined |
+
+### ResourceOverwritten
+
+```solidity
+event ResourceOverwritten(uint256 indexed tokenId, uint64 indexed oldResourceId, uint64 indexed newResourceId)
+```
+
+Used to notify listeners that a pending resource with an overwrite is accepted, overwriting a token&#39;s  resource.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId `indexed` | uint256 | undefined |
+| oldResourceId `indexed` | uint64 | undefined |
+| newResourceId `indexed` | uint64 | undefined |
+
+### ResourcePrioritySet
+
+```solidity
+event ResourcePrioritySet(uint256 indexed tokenId)
+```
+
+Used to notify listeners that token&#39;s prioritiy array is reordered.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId `indexed` | uint256 | undefined |
+
+### ResourceRejected
+
+```solidity
+event ResourceRejected(uint256 indexed tokenId, uint64 indexed resourceId)
+```
+
+Used to notify listeners that a resource object at `resourceId` is rejected from token and is dropped  from the pending resources array of the token.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId `indexed` | uint256 | undefined |
+| resourceId `indexed` | uint64 | undefined |
+
+### ResourceSet
+
+```solidity
+event ResourceSet(uint64 indexed resourceId)
+```
+
+Used to notify listeners that a resource object is initialized at `resourceId`.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| resourceId `indexed` | uint64 | undefined |
 
 ### Transfer
 
@@ -1196,6 +1716,39 @@ Attempting to transfer the token to a 0x0 address
 
 
 
+### RMRKApprovalForResourcesToCurrentOwner
+
+```solidity
+error RMRKApprovalForResourcesToCurrentOwner()
+```
+
+Attempting to grant approval of resources to their current owner
+
+
+
+
+### RMRKApproveForResourcesCallerIsNotOwnerNorApprovedForAll
+
+```solidity
+error RMRKApproveForResourcesCallerIsNotOwnerNorApprovedForAll()
+```
+
+Attempting to grant approval of resources without being the caller or approved for all
+
+
+
+
+### RMRKBadPriorityListLength
+
+```solidity
+error RMRKBadPriorityListLength()
+```
+
+Attempting to set the priorities with an array of length that doesn&#39;t match the length of active resources array
+
+
+
+
 ### RMRKChildAlreadyExists
 
 ```solidity
@@ -1229,6 +1782,17 @@ Attempting to use ID 0, which is not supported
 *The ID 0 in RMRK suite is reserved for empty values. Guarding against its use ensures the expected operation*
 
 
+### RMRKIndexOutOfRange
+
+```solidity
+error RMRKIndexOutOfRange()
+```
+
+Attempting to interact with a resource, using index greater than number of resources
+
+
+
+
 ### RMRKIsNotContract
 
 ```solidity
@@ -1247,6 +1811,17 @@ error RMRKMaxPendingChildrenReached()
 ```
 
 Attempting to add a pending child after the number of pending children has reached the limit (default limit is 128)
+
+
+
+
+### RMRKMaxPendingResourcesReached
+
+```solidity
+error RMRKMaxPendingResourcesReached()
+```
+
+Attempting to add a pending resource after the number of pending resources has reached the limit (default limit is  128)
 
 
 
@@ -1286,17 +1861,6 @@ error RMRKMintToNonRMRKImplementer()
 ```
 
 Attempting to mint a nested token to a smart contract that doesn&#39;t support nesting
-
-
-
-
-### RMRKMintUnderpriced
-
-```solidity
-error RMRKMintUnderpriced()
-```
-
-
 
 
 
@@ -1378,6 +1942,28 @@ Attempting to transfer the ownership to the 0x0 address
 
 
 
+### RMRKNoResourceMatchingId
+
+```solidity
+error RMRKNoResourceMatchingId()
+```
+
+Attempting to interact with a resource that can not be found
+
+
+
+
+### RMRKNotApprovedForResourcesOrOwner
+
+```solidity
+error RMRKNotApprovedForResourcesOrOwner()
+```
+
+Attempting to manage a resource without owning it or having been granted permission by the owner to do so
+
+
+
+
 ### RMRKNotApprovedOrDirectOwner
 
 ```solidity
@@ -1387,6 +1973,17 @@ error RMRKNotApprovedOrDirectOwner()
 Attempting to interact with a token without being its owner or having been granted permission by the  owner to do so
 
 *When a token is nested, only the direct owner (NFT parent) can mange it. In that case, approved addresses are  not allowed to manage it, in order to ensure the expected behaviour*
+
+
+### RMRKNotEnoughAllowance
+
+```solidity
+error RMRKNotEnoughAllowance()
+```
+
+
+
+
 
 
 ### RMRKNotOwner
@@ -1400,6 +1997,17 @@ Attempting to interact with a management function without being the smart contra
 
 
 
+### RMRKNotOwnerOrContributor
+
+```solidity
+error RMRKNotOwnerOrContributor()
+```
+
+Attempting to interact with a function without being the owner or contributor of the collection
+
+
+
+
 ### RMRKPendingChildIndexOutOfRange
 
 ```solidity
@@ -1407,6 +2015,17 @@ error RMRKPendingChildIndexOutOfRange()
 ```
 
 Attempting to interact with a pending child using an index greater than the size of pending array
+
+
+
+
+### RMRKResourceAlreadyExists
+
+```solidity
+error RMRKResourceAlreadyExists()
+```
+
+Attempting to add a resource using an ID that has already been used
 
 
 

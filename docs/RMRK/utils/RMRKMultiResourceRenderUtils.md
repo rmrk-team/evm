@@ -6,7 +6,7 @@
 
 
 
-
+*Extra utility functions for composing RMRK resources.*
 
 ## Methods
 
@@ -137,9 +137,9 @@ function supportsInterface(bytes4 interfaceId) external view returns (bool)
 error RMRKTokenHasNoResources()
 ```
 
+Attempting to determine the resource with the top priority on a token without resources
 
 
-*Extra utility functions for composing RMRK resources.*
 
 
 

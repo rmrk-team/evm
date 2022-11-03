@@ -108,6 +108,22 @@ function burn(uint256 tokenId) external nonpayable
 
 
 
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId | uint256 | undefined |
+
+### burn
+
+```solidity
+function burn(uint256 tokenId, uint256 maxChildrenBurns) external nonpayable returns (uint256)
+```
+
+
+
 *Destroys `tokenId`. The approval is cleared when the token is burned. Requirements: - `tokenId` must exist. Emits a {Transfer} event.*
 
 #### Parameters
@@ -115,23 +131,13 @@ function burn(uint256 tokenId) external nonpayable
 | Name | Type | Description |
 |---|---|---|
 | tokenId | uint256 | undefined |
+| maxChildrenBurns | uint256 | undefined |
 
-### burnChild
-
-```solidity
-function burnChild(uint256 tokenId, uint256 index) external nonpayable
-```
-
-
-
-
-
-#### Parameters
+#### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | undefined |
-| index | uint256 | undefined |
+| _0 | uint256 | undefined |
 
 ### childIsInActive
 
@@ -673,6 +679,26 @@ event ChildUnnested(uint256 indexed tokenId, address indexed childAddress, uint2
 | childIndex  | uint256 | undefined |
 | fromPending  | bool | undefined |
 
+### NestTransfer
+
+```solidity
+event NestTransfer(address indexed from, address indexed to, uint256 fromTokenId, uint256 toTokenId, uint256 indexed tokenId)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| from `indexed` | address | undefined |
+| to `indexed` | address | undefined |
+| fromTokenId  | uint256 | undefined |
+| toTokenId  | uint256 | undefined |
+| tokenId `indexed` | uint256 | undefined |
+
 ### Transfer
 
 ```solidity
@@ -701,7 +727,7 @@ event Transfer(address indexed from, address indexed to, uint256 indexed tokenId
 error ERC721AddressZeroIsNotaValidOwner()
 ```
 
-
+Attempting to grant the token to 0x0 address
 
 
 
@@ -712,7 +738,7 @@ error ERC721AddressZeroIsNotaValidOwner()
 error ERC721ApprovalToCurrentOwner()
 ```
 
-
+Attempting to grant approval to the current owner of the token
 
 
 
@@ -723,7 +749,7 @@ error ERC721ApprovalToCurrentOwner()
 error ERC721ApproveCallerIsNotOwnerNorApprovedForAll()
 ```
 
-
+Attempting to grant approval when not being owner or approved for all should not be permitted
 
 
 
@@ -734,7 +760,7 @@ error ERC721ApproveCallerIsNotOwnerNorApprovedForAll()
 error ERC721ApproveToCaller()
 ```
 
-
+Attempting to grant approval to self
 
 
 
@@ -745,7 +771,7 @@ error ERC721ApproveToCaller()
 error ERC721InvalidTokenId()
 ```
 
-
+Attempting to use an invalid token ID
 
 
 
@@ -756,7 +782,7 @@ error ERC721InvalidTokenId()
 error ERC721NotApprovedOrOwner()
 ```
 
-
+Attempting to manage a token without being its owner or approved by the owner
 
 
 
@@ -767,7 +793,7 @@ error ERC721NotApprovedOrOwner()
 error ERC721TransferFromIncorrectOwner()
 ```
 
-
+Attempting to transfer the token from an address that is not the owner
 
 
 
@@ -778,7 +804,7 @@ error ERC721TransferFromIncorrectOwner()
 error ERC721TransferToNonReceiverImplementer()
 ```
 
-
+Attempting to safe transfer to an address that is unable to receive the token
 
 
 
@@ -789,7 +815,7 @@ error ERC721TransferToNonReceiverImplementer()
 error ERC721TransferToTheZeroAddress()
 ```
 
-
+Attempting to transfer the token to a 0x0 address
 
 
 
@@ -800,7 +826,7 @@ error ERC721TransferToTheZeroAddress()
 error RMRKChildAlreadyExists()
 ```
 
-
+Attempting to accept a child that has already been accepted
 
 
 
@@ -811,7 +837,7 @@ error RMRKChildAlreadyExists()
 error RMRKChildIndexOutOfRange()
 ```
 
-
+Attempting to interact with a child, using index that is higher than the number of children
 
 
 
@@ -822,7 +848,7 @@ error RMRKChildIndexOutOfRange()
 error RMRKInvalidChildReclaim()
 ```
 
-
+Attempting to reclaim a child that can&#39;t be reclaimed
 
 
 
@@ -833,7 +859,7 @@ error RMRKInvalidChildReclaim()
 error RMRKIsNotContract()
 ```
 
-
+Attempting to interact with an end-user account when the contract account is expected
 
 
 
@@ -844,10 +870,27 @@ error RMRKIsNotContract()
 error RMRKMaxPendingChildrenReached()
 ```
 
+Attempting to add a pending child after the number of pending children has reached the limit (default limit is 128)
 
 
 
 
+### RMRKMaxRecursiveBurnsReached
+
+```solidity
+error RMRKMaxRecursiveBurnsReached(address childContract, uint256 childTokenId)
+```
+
+Attempting to burn a total number of recursive children higher than maximum set
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| childContract | address | undefined |
+| childTokenId | uint256 | undefined |
 
 ### RMRKNestingTooDeep
 
@@ -855,7 +898,7 @@ error RMRKMaxPendingChildrenReached()
 error RMRKNestingTooDeep()
 ```
 
-
+Attempting to nest a child over the nesting limit (current limit is 100 levels of nesting)
 
 
 
@@ -866,7 +909,7 @@ error RMRKNestingTooDeep()
 error RMRKNestingTransferToDescendant()
 ```
 
-
+Attempting to nest the token to own descendant, which would create a loop and leave the looped tokens in limbo
 
 
 
@@ -877,7 +920,7 @@ error RMRKNestingTransferToDescendant()
 error RMRKNestingTransferToNonRMRKNestingImplementer()
 ```
 
-
+Attempting to nest the token to a smart contract that doesn&#39;t support nesting
 
 
 
@@ -888,7 +931,7 @@ error RMRKNestingTransferToNonRMRKNestingImplementer()
 error RMRKNestingTransferToSelf()
 ```
 
-
+Attempting to nest the token into itself
 
 
 
@@ -899,9 +942,9 @@ error RMRKNestingTransferToSelf()
 error RMRKNotApprovedOrDirectOwner()
 ```
 
+Attempting to interact with a token without being its owner or having been granted permission by the  owner to do so
 
-
-
+*When a token is nested, only the direct owner (NFT parent) can mange it. In that case, approved addresses are  not allowed to manage it, in order to ensure the expected behaviour*
 
 
 ### RMRKPendingChildIndexOutOfRange
@@ -910,7 +953,7 @@ error RMRKNotApprovedOrDirectOwner()
 error RMRKPendingChildIndexOutOfRange()
 ```
 
-
+Attempting to interact with a pending child using an index greater than the size of pending array
 
 
 

@@ -47,7 +47,7 @@ function addChild(uint256 parentTokenId, uint256 childTokenId) external nonpayab
 ### burn
 
 ```solidity
-function burn(uint256 tokenId) external nonpayable
+function burn(uint256 tokenId, uint256 maxRecursiveBurns) external nonpayable returns (uint256)
 ```
 
 
@@ -59,23 +59,13 @@ function burn(uint256 tokenId) external nonpayable
 | Name | Type | Description |
 |---|---|---|
 | tokenId | uint256 | undefined |
+| maxRecursiveBurns | uint256 | undefined |
 
-### burnChild
-
-```solidity
-function burnChild(uint256 tokenId, uint256 childIndex) external nonpayable
-```
-
-
-
-
-
-#### Parameters
+#### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | undefined |
-| childIndex | uint256 | undefined |
+| _0 | uint256 | undefined |
 
 ### childOf
 
@@ -366,6 +356,26 @@ event ChildUnnested(uint256 indexed tokenId, address indexed childAddress, uint2
 | childId `indexed` | uint256 | undefined |
 | childIndex  | uint256 | undefined |
 | fromPending  | bool | undefined |
+
+### NestTransfer
+
+```solidity
+event NestTransfer(address indexed from, address indexed to, uint256 fromTokenId, uint256 toTokenId, uint256 indexed tokenId)
+```
+
+
+
+*Emitted when `tokenId` token is transferred from `from` to `to`. from indicates the immediate owner, which is a contract if nested. If token was nested, `fromTokenId` indicates former parent id. If destination is an NFT, `toTokenId` indicates the new parent id.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| from `indexed` | address | undefined |
+| to `indexed` | address | undefined |
+| fromTokenId  | uint256 | undefined |
+| toTokenId  | uint256 | undefined |
+| tokenId `indexed` | uint256 | undefined |
 
 
 

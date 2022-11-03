@@ -10,6 +10,23 @@ Smart contract of the RMRK Royalties module.
 
 ## Methods
 
+### getRoyaltyPercentage
+
+```solidity
+function getRoyaltyPercentage() external view returns (uint256)
+```
+
+Used to retrieve the specified royalty percentage.
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint256 | uint256 The royalty percentage expressed in the basis points |
+
 ### getRoyaltyRecipient
 
 ```solidity

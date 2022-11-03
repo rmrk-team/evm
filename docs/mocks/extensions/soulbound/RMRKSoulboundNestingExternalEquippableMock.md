@@ -108,6 +108,22 @@ function burn(uint256 tokenId) external nonpayable
 
 
 
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId | uint256 | undefined |
+
+### burn
+
+```solidity
+function burn(uint256 tokenId, uint256 maxChildrenBurns) external nonpayable returns (uint256)
+```
+
+
+
 *Destroys `tokenId`. The approval is cleared when the token is burned. Requirements: - `tokenId` must exist. Emits a {Transfer} event.*
 
 #### Parameters
@@ -115,23 +131,13 @@ function burn(uint256 tokenId) external nonpayable
 | Name | Type | Description |
 |---|---|---|
 | tokenId | uint256 | undefined |
+| maxChildrenBurns | uint256 | undefined |
 
-### burnChild
-
-```solidity
-function burnChild(uint256 tokenId, uint256 index) external nonpayable
-```
-
-
-
-
-
-#### Parameters
+#### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | undefined |
-| index | uint256 | undefined |
+| _0 | uint256 | undefined |
 
 ### childIsInActive
 
@@ -711,18 +717,18 @@ function transferFrom(address from, address to, uint256 tokenId) external nonpay
 function unnestChild(uint256 tokenId, uint256 index, address to, bool isPending) external nonpayable
 ```
 
-Used to unnest a child from the parent.
+Function to unnest a child from the active token array.
 
-*The function is overriden, so that additional verification is added, making sure that the child is not  currently equipped when trying to unnest it.*
+
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | ID of the parent token |
-| index | uint256 | Index of a child token being unnested in the array it&#39;s located in. This can be either pending or  active array |
-| to | address | Address that should receive the token once unnestedđ |
-| isPending | bool | Boolean value indicating wether the token is in the pending array of the parent (`true`) or in  the active array (`false`) |
+| tokenId | uint256 | is the tokenId of the parent token to unnest from. |
+| index | uint256 | is the index of the child token ID. |
+| to | address | is the address to transfer this |
+| isPending | bool | indicates if the child is pending (active otherwise). |
 
 
 
@@ -855,6 +861,26 @@ Ised to notify the listeners that the address of the `Equippable` smart contract
 | old  | address | undefined |
 | new_  | address | undefined |
 
+### NestTransfer
+
+```solidity
+event NestTransfer(address indexed from, address indexed to, uint256 fromTokenId, uint256 toTokenId, uint256 indexed tokenId)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| from `indexed` | address | undefined |
+| to `indexed` | address | undefined |
+| fromTokenId  | uint256 | undefined |
+| toTokenId  | uint256 | undefined |
+| tokenId `indexed` | uint256 | undefined |
+
 ### Transfer
 
 ```solidity
@@ -883,7 +909,7 @@ event Transfer(address indexed from, address indexed to, uint256 indexed tokenId
 error ERC721AddressZeroIsNotaValidOwner()
 ```
 
-
+Attempting to grant the token to 0x0 address
 
 
 
@@ -894,7 +920,7 @@ error ERC721AddressZeroIsNotaValidOwner()
 error ERC721ApprovalToCurrentOwner()
 ```
 
-
+Attempting to grant approval to the current owner of the token
 
 
 
@@ -905,7 +931,7 @@ error ERC721ApprovalToCurrentOwner()
 error ERC721ApproveCallerIsNotOwnerNorApprovedForAll()
 ```
 
-
+Attempting to grant approval when not being owner or approved for all should not be permitted
 
 
 
@@ -916,7 +942,7 @@ error ERC721ApproveCallerIsNotOwnerNorApprovedForAll()
 error ERC721ApproveToCaller()
 ```
 
-
+Attempting to grant approval to self
 
 
 
@@ -927,7 +953,7 @@ error ERC721ApproveToCaller()
 error ERC721InvalidTokenId()
 ```
 
-
+Attempting to use an invalid token ID
 
 
 
@@ -938,7 +964,7 @@ error ERC721InvalidTokenId()
 error ERC721MintToTheZeroAddress()
 ```
 
-
+Attempting to mint to 0x0 address
 
 
 
@@ -949,7 +975,7 @@ error ERC721MintToTheZeroAddress()
 error ERC721NotApprovedOrOwner()
 ```
 
-
+Attempting to manage a token without being its owner or approved by the owner
 
 
 
@@ -960,7 +986,7 @@ error ERC721NotApprovedOrOwner()
 error ERC721TokenAlreadyMinted()
 ```
 
-
+Attempting to mint an already minted token
 
 
 
@@ -971,7 +997,7 @@ error ERC721TokenAlreadyMinted()
 error ERC721TransferFromIncorrectOwner()
 ```
 
-
+Attempting to transfer the token from an address that is not the owner
 
 
 
@@ -982,7 +1008,7 @@ error ERC721TransferFromIncorrectOwner()
 error ERC721TransferToNonReceiverImplementer()
 ```
 
-
+Attempting to safe transfer to an address that is unable to receive the token
 
 
 
@@ -993,7 +1019,7 @@ error ERC721TransferToNonReceiverImplementer()
 error ERC721TransferToTheZeroAddress()
 ```
 
-
+Attempting to transfer the token to a 0x0 address
 
 
 
@@ -1004,7 +1030,7 @@ error ERC721TransferToTheZeroAddress()
 error RMRKCannotTransferSoulbound()
 ```
 
-
+Attempting to transfer a soulbound (non-transferrable) token
 
 
 
@@ -1015,7 +1041,7 @@ error RMRKCannotTransferSoulbound()
 error RMRKChildAlreadyExists()
 ```
 
-
+Attempting to accept a child that has already been accepted
 
 
 
@@ -1026,9 +1052,20 @@ error RMRKChildAlreadyExists()
 error RMRKChildIndexOutOfRange()
 ```
 
+Attempting to interact with a child, using index that is higher than the number of children
 
 
 
+
+### RMRKIdZeroForbidden
+
+```solidity
+error RMRKIdZeroForbidden()
+```
+
+Attempting to use ID 0, which is not supported
+
+*The ID 0 in RMRK suite is reserved for empty values. Guarding against its use ensures the expected operation*
 
 
 ### RMRKIsNotContract
@@ -1037,7 +1074,7 @@ error RMRKChildIndexOutOfRange()
 error RMRKIsNotContract()
 ```
 
-
+Attempting to interact with an end-user account when the contract account is expected
 
 
 
@@ -1048,10 +1085,27 @@ error RMRKIsNotContract()
 error RMRKMaxPendingChildrenReached()
 ```
 
+Attempting to add a pending child after the number of pending children has reached the limit (default limit is 128)
 
 
 
 
+### RMRKMaxRecursiveBurnsReached
+
+```solidity
+error RMRKMaxRecursiveBurnsReached(address childContract, uint256 childTokenId)
+```
+
+Attempting to burn a total number of recursive children higher than maximum set
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| childContract | address | undefined |
+| childTokenId | uint256 | undefined |
 
 ### RMRKMintToNonRMRKImplementer
 
@@ -1059,7 +1113,7 @@ error RMRKMaxPendingChildrenReached()
 error RMRKMintToNonRMRKImplementer()
 ```
 
-
+Attempting to mint a nested token to a smart contract that doesn&#39;t support nesting
 
 
 
@@ -1070,7 +1124,7 @@ error RMRKMintToNonRMRKImplementer()
 error RMRKMustUnequipFirst()
 ```
 
-
+Attempting to unnest a child before it is unequipped
 
 
 
@@ -1081,7 +1135,7 @@ error RMRKMustUnequipFirst()
 error RMRKNestingTooDeep()
 ```
 
-
+Attempting to nest a child over the nesting limit (current limit is 100 levels of nesting)
 
 
 
@@ -1092,7 +1146,7 @@ error RMRKNestingTooDeep()
 error RMRKNestingTransferToDescendant()
 ```
 
-
+Attempting to nest the token to own descendant, which would create a loop and leave the looped tokens in limbo
 
 
 
@@ -1103,7 +1157,7 @@ error RMRKNestingTransferToDescendant()
 error RMRKNestingTransferToNonRMRKNestingImplementer()
 ```
 
-
+Attempting to nest the token to a smart contract that doesn&#39;t support nesting
 
 
 
@@ -1114,7 +1168,7 @@ error RMRKNestingTransferToNonRMRKNestingImplementer()
 error RMRKNestingTransferToSelf()
 ```
 
-
+Attempting to nest the token into itself
 
 
 
@@ -1125,9 +1179,9 @@ error RMRKNestingTransferToSelf()
 error RMRKNotApprovedOrDirectOwner()
 ```
 
+Attempting to interact with a token without being its owner or having been granted permission by the  owner to do so
 
-
-
+*When a token is nested, only the direct owner (NFT parent) can mange it. In that case, approved addresses are  not allowed to manage it, in order to ensure the expected behaviour*
 
 
 ### RMRKPendingChildIndexOutOfRange
@@ -1136,18 +1190,7 @@ error RMRKNotApprovedOrDirectOwner()
 error RMRKPendingChildIndexOutOfRange()
 ```
 
-
-
-
-
-
-### RMRKTokenIdZeroForbidden
-
-```solidity
-error RMRKTokenIdZeroForbidden()
-```
-
-
+Attempting to interact with a pending child using an index greater than the size of pending array
 
 
 

@@ -492,13 +492,13 @@ Used to notify listeners that a resource object is initialized at `resourceId`.
 
 ## Errors
 
-### RMRKApproveForResourcesToCaller
+### RMRKApprovalForResourcesToCurrentOwner
 
 ```solidity
-error RMRKApproveForResourcesToCaller()
+error RMRKApprovalForResourcesToCurrentOwner()
 ```
 
-
+Attempting to grant approval of resources to their current owner
 
 
 
@@ -509,7 +509,7 @@ error RMRKApproveForResourcesToCaller()
 error RMRKIndexOutOfRange()
 ```
 
-
+Attempting to interact with a resource, using index greater than number of resources
 
 
 
@@ -520,7 +520,7 @@ error RMRKIndexOutOfRange()
 error RMRKNoResourceMatchingId()
 ```
 
-
+Attempting to interact with a resource that can not be found
 
 
 

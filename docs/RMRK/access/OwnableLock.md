@@ -167,7 +167,7 @@ event OwnershipTransferred(address indexed previousOwner, address indexed newOwn
 error RMRKNewContributorIsZeroAddress()
 ```
 
-
+Attempting to assign a 0x0 address as a contributor
 
 
 
@@ -178,7 +178,7 @@ error RMRKNewContributorIsZeroAddress()
 error RMRKNewOwnerIsZeroAddress()
 ```
 
-
+Attempting to transfer the ownership to the 0x0 address
 
 
 
@@ -189,7 +189,7 @@ error RMRKNewOwnerIsZeroAddress()
 error RMRKNotOwner()
 ```
 
-
+Attempting to interact with a management function without being the smart contract&#39;s owner
 
 
 

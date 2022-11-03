@@ -194,6 +194,22 @@ function burn(uint256 tokenId) external nonpayable
 
 
 
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId | uint256 | undefined |
+
+### burn
+
+```solidity
+function burn(uint256 tokenId, uint256 maxChildrenBurns) external nonpayable returns (uint256)
+```
+
+
+
 *Destroys `tokenId`. The approval is cleared when the token is burned. Requirements: - `tokenId` must exist. Emits a {Transfer} event.*
 
 #### Parameters
@@ -201,23 +217,13 @@ function burn(uint256 tokenId) external nonpayable
 | Name | Type | Description |
 |---|---|---|
 | tokenId | uint256 | undefined |
+| maxChildrenBurns | uint256 | undefined |
 
-### burnChild
-
-```solidity
-function burnChild(uint256 tokenId, uint256 index) external nonpayable
-```
-
-
-
-
-
-#### Parameters
+#### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | undefined |
-| index | uint256 | undefined |
+| _0 | uint256 | undefined |
 
 ### canTokenBeEquippedWithResourceIntoSlot
 
@@ -646,6 +652,23 @@ Used to retrieve the resource ID that will be replaced (if any) if a given resou
 | Name | Type | Description |
 |---|---|---|
 | _0 | uint64 | uint64 ID of the resource which will be replacted |
+
+### getRoyaltyPercentage
+
+```solidity
+function getRoyaltyPercentage() external view returns (uint256)
+```
+
+Used to retrieve the specified royalty percentage.
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint256 | uint256 The royalty percentage expressed in the basis points |
 
 ### getRoyaltyRecipient
 
@@ -1377,18 +1400,18 @@ Used to unequip child from parent token.
 function unnestChild(uint256 tokenId, uint256 index, address to, bool isPending) external nonpayable
 ```
 
-Used to unnest a given child.
+Function to unnest a child from the active token array.
 
-*The function doesn&#39;t contain a check validating that `to` is not a contract. To ensure that a token is not  transferred to an incompatible smart contract, custom validation has to be added when using this function.*
+
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | ID of the token we are unnesting a child from |
-| index | uint256 | Index of a token we are unnesting in the array it belongs to (can be either active array or pending  array) |
-| to | address | End user address to unnest the token to |
-| isPending | bool | Specifies whether the child being unnested is in the pending array (`true`) or in an active  array (`false`) |
+| tokenId | uint256 | is the tokenId of the parent token to unnest from. |
+| index | uint256 | is the index of the child token ID. |
+| to | address | is the address to transfer this |
+| isPending | bool | indicates if the child is pending (active otherwise). |
 
 ### updateRoyaltyRecipient
 
@@ -1615,6 +1638,26 @@ event ChildUnnested(uint256 indexed tokenId, address indexed childAddress, uint2
 | childIndex  | uint256 | undefined |
 | fromPending  | bool | undefined |
 
+### NestTransfer
+
+```solidity
+event NestTransfer(address indexed from, address indexed to, uint256 fromTokenId, uint256 toTokenId, uint256 indexed tokenId)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| from `indexed` | address | undefined |
+| to `indexed` | address | undefined |
+| fromTokenId  | uint256 | undefined |
+| toTokenId  | uint256 | undefined |
+| tokenId `indexed` | uint256 | undefined |
+
 ### OwnershipTransferred
 
 ```solidity
@@ -1797,7 +1840,7 @@ Used to notify listeners that the resources belonging to a `equippableGroupId` h
 error ERC721AddressZeroIsNotaValidOwner()
 ```
 
-
+Attempting to grant the token to 0x0 address
 
 
 
@@ -1808,7 +1851,7 @@ error ERC721AddressZeroIsNotaValidOwner()
 error ERC721ApprovalToCurrentOwner()
 ```
 
-
+Attempting to grant approval to the current owner of the token
 
 
 
@@ -1819,7 +1862,7 @@ error ERC721ApprovalToCurrentOwner()
 error ERC721ApproveCallerIsNotOwnerNorApprovedForAll()
 ```
 
-
+Attempting to grant approval when not being owner or approved for all should not be permitted
 
 
 
@@ -1830,7 +1873,7 @@ error ERC721ApproveCallerIsNotOwnerNorApprovedForAll()
 error ERC721ApproveToCaller()
 ```
 
-
+Attempting to grant approval to self
 
 
 
@@ -1841,7 +1884,7 @@ error ERC721ApproveToCaller()
 error ERC721InvalidTokenId()
 ```
 
-
+Attempting to use an invalid token ID
 
 
 
@@ -1852,7 +1895,7 @@ error ERC721InvalidTokenId()
 error ERC721MintToTheZeroAddress()
 ```
 
-
+Attempting to mint to 0x0 address
 
 
 
@@ -1863,7 +1906,7 @@ error ERC721MintToTheZeroAddress()
 error ERC721NotApprovedOrOwner()
 ```
 
-
+Attempting to manage a token without being its owner or approved by the owner
 
 
 
@@ -1874,7 +1917,7 @@ error ERC721NotApprovedOrOwner()
 error ERC721TokenAlreadyMinted()
 ```
 
-
+Attempting to mint an already minted token
 
 
 
@@ -1885,7 +1928,7 @@ error ERC721TokenAlreadyMinted()
 error ERC721TransferFromIncorrectOwner()
 ```
 
-
+Attempting to transfer the token from an address that is not the owner
 
 
 
@@ -1896,7 +1939,7 @@ error ERC721TransferFromIncorrectOwner()
 error ERC721TransferToNonReceiverImplementer()
 ```
 
-
+Attempting to safe transfer to an address that is unable to receive the token
 
 
 
@@ -1907,7 +1950,7 @@ error ERC721TransferToNonReceiverImplementer()
 error ERC721TransferToTheZeroAddress()
 ```
 
-
+Attempting to transfer the token to a 0x0 address
 
 
 
@@ -1918,7 +1961,7 @@ error ERC721TransferToTheZeroAddress()
 error RMRKApprovalForResourcesToCurrentOwner()
 ```
 
-
+Attempting to grant approval of resources to their current owner
 
 
 
@@ -1929,18 +1972,7 @@ error RMRKApprovalForResourcesToCurrentOwner()
 error RMRKApproveForResourcesCallerIsNotOwnerNorApprovedForAll()
 ```
 
-
-
-
-
-
-### RMRKApproveForResourcesToCaller
-
-```solidity
-error RMRKApproveForResourcesToCaller()
-```
-
-
+Attempting to grant approval of resources without being the caller or approved for all
 
 
 
@@ -1951,7 +1983,7 @@ error RMRKApproveForResourcesToCaller()
 error RMRKBadPriorityListLength()
 ```
 
-
+Attempting to set the priorities with an array of length that doesn&#39;t match the length of active resources array
 
 
 
@@ -1962,7 +1994,7 @@ error RMRKBadPriorityListLength()
 error RMRKBaseRequiredForParts()
 ```
 
-
+Attempting to add a resource entry with `Part`s, without setting the `Base` address
 
 
 
@@ -1973,7 +2005,7 @@ error RMRKBaseRequiredForParts()
 error RMRKChildAlreadyExists()
 ```
 
-
+Attempting to accept a child that has already been accepted
 
 
 
@@ -1984,7 +2016,7 @@ error RMRKChildAlreadyExists()
 error RMRKChildIndexOutOfRange()
 ```
 
-
+Attempting to interact with a child, using index that is higher than the number of children
 
 
 
@@ -1995,7 +2027,7 @@ error RMRKChildIndexOutOfRange()
 error RMRKEquippableEquipNotAllowedByBase()
 ```
 
-
+Attempting to equip a `Part` with a child not approved by the base
 
 
 
@@ -2006,9 +2038,9 @@ error RMRKEquippableEquipNotAllowedByBase()
 error RMRKIdZeroForbidden()
 ```
 
+Attempting to use ID 0, which is not supported
 
-
-
+*The ID 0 in RMRK suite is reserved for empty values. Guarding against its use ensures the expected operation*
 
 
 ### RMRKIndexOutOfRange
@@ -2017,7 +2049,7 @@ error RMRKIdZeroForbidden()
 error RMRKIndexOutOfRange()
 ```
 
-
+Attempting to interact with a resource, using index greater than number of resources
 
 
 
@@ -2028,7 +2060,7 @@ error RMRKIndexOutOfRange()
 error RMRKIsNotContract()
 ```
 
-
+Attempting to interact with an end-user account when the contract account is expected
 
 
 
@@ -2039,7 +2071,7 @@ error RMRKIsNotContract()
 error RMRKMaxPendingChildrenReached()
 ```
 
-
+Attempting to add a pending child after the number of pending children has reached the limit (default limit is 128)
 
 
 
@@ -2050,10 +2082,27 @@ error RMRKMaxPendingChildrenReached()
 error RMRKMaxPendingResourcesReached()
 ```
 
+Attempting to add a pending resource after the number of pending resources has reached the limit (default limit is  128)
 
 
 
 
+### RMRKMaxRecursiveBurnsReached
+
+```solidity
+error RMRKMaxRecursiveBurnsReached(address childContract, uint256 childTokenId)
+```
+
+Attempting to burn a total number of recursive children higher than maximum set
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| childContract | address | undefined |
+| childTokenId | uint256 | undefined |
 
 ### RMRKMintOverMax
 
@@ -2061,7 +2110,7 @@ error RMRKMaxPendingResourcesReached()
 error RMRKMintOverMax()
 ```
 
-
+Attempting to mint a number of tokens that would cause the total supply to be greater than maximum supply
 
 
 
@@ -2072,7 +2121,7 @@ error RMRKMintOverMax()
 error RMRKMintToNonRMRKImplementer()
 ```
 
-
+Attempting to mint a nested token to a smart contract that doesn&#39;t support nesting
 
 
 
@@ -2105,7 +2154,7 @@ error RMRKMintZero()
 error RMRKMustUnequipFirst()
 ```
 
-
+Attempting to unnest a child before it is unequipped
 
 
 
@@ -2116,7 +2165,7 @@ error RMRKMustUnequipFirst()
 error RMRKNestingTooDeep()
 ```
 
-
+Attempting to nest a child over the nesting limit (current limit is 100 levels of nesting)
 
 
 
@@ -2127,7 +2176,7 @@ error RMRKNestingTooDeep()
 error RMRKNestingTransferToDescendant()
 ```
 
-
+Attempting to nest the token to own descendant, which would create a loop and leave the looped tokens in limbo
 
 
 
@@ -2138,7 +2187,7 @@ error RMRKNestingTransferToDescendant()
 error RMRKNestingTransferToNonRMRKNestingImplementer()
 ```
 
-
+Attempting to nest the token to a smart contract that doesn&#39;t support nesting
 
 
 
@@ -2149,7 +2198,7 @@ error RMRKNestingTransferToNonRMRKNestingImplementer()
 error RMRKNestingTransferToSelf()
 ```
 
-
+Attempting to nest the token into itself
 
 
 
@@ -2160,7 +2209,7 @@ error RMRKNestingTransferToSelf()
 error RMRKNewContributorIsZeroAddress()
 ```
 
-
+Attempting to assign a 0x0 address as a contributor
 
 
 
@@ -2171,7 +2220,7 @@ error RMRKNewContributorIsZeroAddress()
 error RMRKNewOwnerIsZeroAddress()
 ```
 
-
+Attempting to transfer the ownership to the 0x0 address
 
 
 
@@ -2182,7 +2231,7 @@ error RMRKNewOwnerIsZeroAddress()
 error RMRKNoResourceMatchingId()
 ```
 
-
+Attempting to interact with a resource that can not be found
 
 
 
@@ -2193,7 +2242,7 @@ error RMRKNoResourceMatchingId()
 error RMRKNotApprovedForResourcesOrOwner()
 ```
 
-
+Attempting to manage a resource without owning it or having been granted permission by the owner to do so
 
 
 
@@ -2204,9 +2253,9 @@ error RMRKNotApprovedForResourcesOrOwner()
 error RMRKNotApprovedOrDirectOwner()
 ```
 
+Attempting to interact with a token without being its owner or having been granted permission by the  owner to do so
 
-
-
+*When a token is nested, only the direct owner (NFT parent) can mange it. In that case, approved addresses are  not allowed to manage it, in order to ensure the expected behaviour*
 
 
 ### RMRKNotEquipped
@@ -2215,7 +2264,7 @@ error RMRKNotApprovedOrDirectOwner()
 error RMRKNotEquipped()
 ```
 
-
+Attempting to unequip an item that isn&#39;t equipped
 
 
 
@@ -2226,7 +2275,7 @@ error RMRKNotEquipped()
 error RMRKNotOwner()
 ```
 
-
+Attempting to interact with a management function without being the smart contract&#39;s owner
 
 
 
@@ -2237,7 +2286,7 @@ error RMRKNotOwner()
 error RMRKNotOwnerOrContributor()
 ```
 
-
+Attempting to interact with a function without being the owner or contributor of the collection
 
 
 
@@ -2248,7 +2297,7 @@ error RMRKNotOwnerOrContributor()
 error RMRKPendingChildIndexOutOfRange()
 ```
 
-
+Attempting to interact with a pending child using an index greater than the size of pending array
 
 
 
@@ -2259,7 +2308,7 @@ error RMRKPendingChildIndexOutOfRange()
 error RMRKResourceAlreadyExists()
 ```
 
-
+Attempting to add a resource using an ID that has already been used
 
 
 
@@ -2270,7 +2319,7 @@ error RMRKResourceAlreadyExists()
 error RMRKSlotAlreadyUsed()
 ```
 
-
+Attempting to equip an item into a slot that already has an item equipped
 
 
 
@@ -2281,7 +2330,7 @@ error RMRKSlotAlreadyUsed()
 error RMRKTargetResourceCannotReceiveSlot()
 ```
 
-
+Attempting to equip an item into a `Slot` that the target resource does not implement
 
 
 
@@ -2292,18 +2341,7 @@ error RMRKTargetResourceCannotReceiveSlot()
 error RMRKTokenCannotBeEquippedWithResourceIntoSlot()
 ```
 
-
-
-
-
-
-### RMRKTokenIdZeroForbidden
-
-```solidity
-error RMRKTokenIdZeroForbidden()
-```
-
-
+Attempting to equip a child into a `Slot` and parent that the child&#39;s collection doesn&#39;t support
 
 
 

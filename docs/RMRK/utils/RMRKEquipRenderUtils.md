@@ -165,7 +165,7 @@ function supportsInterface(bytes4 interfaceId) external view returns (bool)
 error RMRKNotComposableResource()
 ```
 
-
+Attempting to compose a resource wihtout having an associated Base
 
 
 
@@ -176,7 +176,7 @@ error RMRKNotComposableResource()
 error RMRKTokenDoesNotHaveActiveResource()
 ```
 
-
+Attempting to compose a NFT of a token without active resources
 
 
 

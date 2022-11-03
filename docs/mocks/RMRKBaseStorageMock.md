@@ -337,7 +337,7 @@ Event to announce the overriding of equippable addresses of the part.
 error RMRKBadConfig()
 ```
 
-
+Attempting to incorrectly configue a Base item
 
 
 
@@ -348,9 +348,9 @@ error RMRKBadConfig()
 error RMRKIdZeroForbidden()
 ```
 
+Attempting to use ID 0, which is not supported
 
-
-
+*The ID 0 in RMRK suite is reserved for empty values. Guarding against its use ensures the expected operation*
 
 
 ### RMRKPartAlreadyExists
@@ -359,7 +359,7 @@ error RMRKIdZeroForbidden()
 error RMRKPartAlreadyExists()
 ```
 
-
+Attempting to add a `Part` with an ID that is already used
 
 
 
@@ -370,7 +370,7 @@ error RMRKPartAlreadyExists()
 error RMRKPartDoesNotExist()
 ```
 
-
+Attempting to use a `Part` that doesn&#39;t exist
 
 
 
@@ -381,7 +381,7 @@ error RMRKPartDoesNotExist()
 error RMRKPartIsNotSlot()
 ```
 
-
+Attempting to use a `Part` that is `Fixed` when `Slot` kind of `Part` should be used
 
 
 
@@ -392,7 +392,7 @@ error RMRKPartIsNotSlot()
 error RMRKZeroLengthIdsPassed()
 ```
 
-
+Attempting not to pass an empty array of equippable addresses when adding or setting the equippable addresses
 
 
 

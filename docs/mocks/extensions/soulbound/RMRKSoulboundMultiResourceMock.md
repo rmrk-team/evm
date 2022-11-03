@@ -945,7 +945,7 @@ event Transfer(address indexed from, address indexed to, uint256 indexed tokenId
 error ERC721AddressZeroIsNotaValidOwner()
 ```
 
-
+Attempting to grant the token to 0x0 address
 
 
 
@@ -956,7 +956,7 @@ error ERC721AddressZeroIsNotaValidOwner()
 error ERC721ApprovalToCurrentOwner()
 ```
 
-
+Attempting to grant approval to the current owner of the token
 
 
 
@@ -967,7 +967,7 @@ error ERC721ApprovalToCurrentOwner()
 error ERC721ApproveCallerIsNotOwnerNorApprovedForAll()
 ```
 
-
+Attempting to grant approval when not being owner or approved for all should not be permitted
 
 
 
@@ -978,7 +978,7 @@ error ERC721ApproveCallerIsNotOwnerNorApprovedForAll()
 error ERC721ApproveToCaller()
 ```
 
-
+Attempting to grant approval to self
 
 
 
@@ -989,7 +989,7 @@ error ERC721ApproveToCaller()
 error ERC721InvalidTokenId()
 ```
 
-
+Attempting to use an invalid token ID
 
 
 
@@ -1000,7 +1000,7 @@ error ERC721InvalidTokenId()
 error ERC721MintToTheZeroAddress()
 ```
 
-
+Attempting to mint to 0x0 address
 
 
 
@@ -1011,7 +1011,7 @@ error ERC721MintToTheZeroAddress()
 error ERC721NotApprovedOrOwner()
 ```
 
-
+Attempting to manage a token without being its owner or approved by the owner
 
 
 
@@ -1022,7 +1022,7 @@ error ERC721NotApprovedOrOwner()
 error ERC721TokenAlreadyMinted()
 ```
 
-
+Attempting to mint an already minted token
 
 
 
@@ -1033,7 +1033,7 @@ error ERC721TokenAlreadyMinted()
 error ERC721TransferFromIncorrectOwner()
 ```
 
-
+Attempting to transfer the token from an address that is not the owner
 
 
 
@@ -1044,7 +1044,7 @@ error ERC721TransferFromIncorrectOwner()
 error ERC721TransferToNonReceiverImplementer()
 ```
 
-
+Attempting to safe transfer to an address that is unable to receive the token
 
 
 
@@ -1055,7 +1055,7 @@ error ERC721TransferToNonReceiverImplementer()
 error ERC721TransferToTheZeroAddress()
 ```
 
-
+Attempting to transfer the token to a 0x0 address
 
 
 
@@ -1066,7 +1066,7 @@ error ERC721TransferToTheZeroAddress()
 error RMRKApprovalForResourcesToCurrentOwner()
 ```
 
-
+Attempting to grant approval of resources to their current owner
 
 
 
@@ -1077,18 +1077,7 @@ error RMRKApprovalForResourcesToCurrentOwner()
 error RMRKApproveForResourcesCallerIsNotOwnerNorApprovedForAll()
 ```
 
-
-
-
-
-
-### RMRKApproveForResourcesToCaller
-
-```solidity
-error RMRKApproveForResourcesToCaller()
-```
-
-
+Attempting to grant approval of resources without being the caller or approved for all
 
 
 
@@ -1099,7 +1088,7 @@ error RMRKApproveForResourcesToCaller()
 error RMRKBadPriorityListLength()
 ```
 
-
+Attempting to set the priorities with an array of length that doesn&#39;t match the length of active resources array
 
 
 
@@ -1110,7 +1099,7 @@ error RMRKBadPriorityListLength()
 error RMRKCannotTransferSoulbound()
 ```
 
-
+Attempting to transfer a soulbound (non-transferrable) token
 
 
 
@@ -1121,9 +1110,9 @@ error RMRKCannotTransferSoulbound()
 error RMRKIdZeroForbidden()
 ```
 
+Attempting to use ID 0, which is not supported
 
-
-
+*The ID 0 in RMRK suite is reserved for empty values. Guarding against its use ensures the expected operation*
 
 
 ### RMRKIndexOutOfRange
@@ -1132,7 +1121,7 @@ error RMRKIdZeroForbidden()
 error RMRKIndexOutOfRange()
 ```
 
-
+Attempting to interact with a resource, using index greater than number of resources
 
 
 
@@ -1143,7 +1132,7 @@ error RMRKIndexOutOfRange()
 error RMRKMaxPendingResourcesReached()
 ```
 
-
+Attempting to add a pending resource after the number of pending resources has reached the limit (default limit is  128)
 
 
 
@@ -1154,7 +1143,7 @@ error RMRKMaxPendingResourcesReached()
 error RMRKNoResourceMatchingId()
 ```
 
-
+Attempting to interact with a resource that can not be found
 
 
 
@@ -1165,7 +1154,7 @@ error RMRKNoResourceMatchingId()
 error RMRKNotApprovedForResourcesOrOwner()
 ```
 
-
+Attempting to manage a resource without owning it or having been granted permission by the owner to do so
 
 
 
@@ -1176,18 +1165,7 @@ error RMRKNotApprovedForResourcesOrOwner()
 error RMRKResourceAlreadyExists()
 ```
 
-
-
-
-
-
-### RMRKTokenIdZeroForbidden
-
-```solidity
-error RMRKTokenIdZeroForbidden()
-```
-
-
+Attempting to add a resource using an ID that has already been used
 
 
 

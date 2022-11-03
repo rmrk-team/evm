@@ -914,7 +914,7 @@ Used to notify listeners that the resources belonging to a `equippableGroupId` h
 error ERC721InvalidTokenId()
 ```
 
-
+Attempting to use an invalid token ID
 
 
 
@@ -925,7 +925,7 @@ error ERC721InvalidTokenId()
 error ERC721NotApprovedOrOwner()
 ```
 
-
+Attempting to manage a token without being its owner or approved by the owner
 
 
 
@@ -936,7 +936,7 @@ error ERC721NotApprovedOrOwner()
 error RMRKApprovalForResourcesToCurrentOwner()
 ```
 
-
+Attempting to grant approval of resources to their current owner
 
 
 
@@ -947,18 +947,7 @@ error RMRKApprovalForResourcesToCurrentOwner()
 error RMRKApproveForResourcesCallerIsNotOwnerNorApprovedForAll()
 ```
 
-
-
-
-
-
-### RMRKApproveForResourcesToCaller
-
-```solidity
-error RMRKApproveForResourcesToCaller()
-```
-
-
+Attempting to grant approval of resources without being the caller or approved for all
 
 
 
@@ -969,7 +958,7 @@ error RMRKApproveForResourcesToCaller()
 error RMRKBadPriorityListLength()
 ```
 
-
+Attempting to set the priorities with an array of length that doesn&#39;t match the length of active resources array
 
 
 
@@ -980,7 +969,7 @@ error RMRKBadPriorityListLength()
 error RMRKBaseRequiredForParts()
 ```
 
-
+Attempting to add a resource entry with `Part`s, without setting the `Base` address
 
 
 
@@ -991,7 +980,7 @@ error RMRKBaseRequiredForParts()
 error RMRKEquippableEquipNotAllowedByBase()
 ```
 
-
+Attempting to equip a `Part` with a child not approved by the base
 
 
 
@@ -1002,9 +991,9 @@ error RMRKEquippableEquipNotAllowedByBase()
 error RMRKIdZeroForbidden()
 ```
 
+Attempting to use ID 0, which is not supported
 
-
-
+*The ID 0 in RMRK suite is reserved for empty values. Guarding against its use ensures the expected operation*
 
 
 ### RMRKIndexOutOfRange
@@ -1013,7 +1002,7 @@ error RMRKIdZeroForbidden()
 error RMRKIndexOutOfRange()
 ```
 
-
+Attempting to interact with a resource, using index greater than number of resources
 
 
 
@@ -1024,7 +1013,7 @@ error RMRKIndexOutOfRange()
 error RMRKMaxPendingResourcesReached()
 ```
 
-
+Attempting to add a pending resource after the number of pending resources has reached the limit (default limit is  128)
 
 
 
@@ -1035,7 +1024,7 @@ error RMRKMaxPendingResourcesReached()
 error RMRKNoResourceMatchingId()
 ```
 
-
+Attempting to interact with a resource that can not be found
 
 
 
@@ -1046,7 +1035,7 @@ error RMRKNoResourceMatchingId()
 error RMRKNotApprovedForResourcesOrOwner()
 ```
 
-
+Attempting to manage a resource without owning it or having been granted permission by the owner to do so
 
 
 
@@ -1057,7 +1046,7 @@ error RMRKNotApprovedForResourcesOrOwner()
 error RMRKNotEquipped()
 ```
 
-
+Attempting to unequip an item that isn&#39;t equipped
 
 
 
@@ -1068,7 +1057,7 @@ error RMRKNotEquipped()
 error RMRKResourceAlreadyExists()
 ```
 
-
+Attempting to add a resource using an ID that has already been used
 
 
 
@@ -1079,7 +1068,7 @@ error RMRKResourceAlreadyExists()
 error RMRKSlotAlreadyUsed()
 ```
 
-
+Attempting to equip an item into a slot that already has an item equipped
 
 
 
@@ -1090,7 +1079,7 @@ error RMRKSlotAlreadyUsed()
 error RMRKTargetResourceCannotReceiveSlot()
 ```
 
-
+Attempting to equip an item into a `Slot` that the target resource does not implement
 
 
 
@@ -1101,7 +1090,7 @@ error RMRKTargetResourceCannotReceiveSlot()
 error RMRKTokenCannotBeEquippedWithResourceIntoSlot()
 ```
 
-
+Attempting to equip a child into a `Slot` and parent that the child&#39;s collection doesn&#39;t support
 
 
 

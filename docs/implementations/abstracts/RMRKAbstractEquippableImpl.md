@@ -1,4 +1,4 @@
-# RMRKTypedEquippableMock
+# RMRKAbstractEquippableImpl
 
 
 
@@ -78,6 +78,22 @@ function addChild(uint256 parentTokenId, uint256 childTokenId) external nonpayab
 | parentTokenId | uint256 | undefined |
 | childTokenId | uint256 | undefined |
 
+### addContributor
+
+```solidity
+function addContributor(address contributor) external nonpayable
+```
+
+Adds a contributor to the smart contract.
+
+*Can only be called by the owner.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| contributor | address | Address of the contributor&#39;s account |
+
 ### addResourceEntry
 
 ```solidity
@@ -113,25 +129,6 @@ function addResourceToToken(uint256 tokenId, uint64 resourceId, uint64 overwrite
 | tokenId | uint256 | undefined |
 | resourceId | uint64 | undefined |
 | overwrites | uint64 | undefined |
-
-### addTypedResourceEntry
-
-```solidity
-function addTypedResourceEntry(IRMRKEquippable.ExtendedResource resource, uint64[] fixedPartIds, uint64[] slotPartIds, string type_) external nonpayable
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| resource | IRMRKEquippable.ExtendedResource | undefined |
-| fixedPartIds | uint64[] | undefined |
-| slotPartIds | uint64[] | undefined |
-| type_ | string | undefined |
 
 ### approve
 
@@ -320,6 +317,23 @@ Returns all confirmed children
 | Name | Type | Description |
 |---|---|---|
 | _0 | IRMRKNesting.Child[] | undefined |
+
+### collectionMetadata
+
+```solidity
+function collectionMetadata() external view returns (string)
+```
+
+
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | string | undefined |
 
 ### equip
 
@@ -532,6 +546,23 @@ Used to get IDs of the fixed parts present on a given resource.
 |---|---|---|
 | _0 | uint64[] | uint64[] An array of active fixed parts present on resource |
 
+### getLock
+
+```solidity
+function getLock() external view returns (bool)
+```
+
+Reenables the operation of functions using `notLocked` modifier.
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | bool | undefined |
+
 ### getPendingResources
 
 ```solidity
@@ -622,27 +653,39 @@ Used to retrieve the resource ID that will be replaced (if any) if a given resou
 |---|---|---|
 | _0 | uint64 | uint64 ID of the resource which will be replacted |
 
-### getResourceType
+### getRoyaltyPercentage
 
 ```solidity
-function getResourceType(uint64 resourceId) external view returns (string)
+function getRoyaltyPercentage() external view returns (uint256)
 ```
 
-Used to get the type of the resource.
+Used to retrieve the specified royalty percentage.
 
 
 
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| resourceId | uint64 | ID of the resource to check |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | string The type of the resource |
+| _0 | uint256 | uint256 The royalty percentage expressed in the basis points |
+
+### getRoyaltyRecipient
+
+```solidity
+function getRoyaltyRecipient() external view returns (address)
+```
+
+Used to retrieve the recipient of royalties.
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | address | address Address of the recipient of royalties |
 
 ### getSlotPartIds
 
@@ -736,13 +779,13 @@ Used to check whether the given token has a child token equipped.
 |---|---|---|
 | _0 | bool | bool Boolean value indicating whether the child is equipped into the given parent |
 
-### mint
+### isContributor
 
 ```solidity
-function mint(address to, uint256 tokenId) external nonpayable
+function isContributor(address contributor) external view returns (bool)
 ```
 
-
+Used to check if the address is one of the contributors.
 
 
 
@@ -750,8 +793,30 @@ function mint(address to, uint256 tokenId) external nonpayable
 
 | Name | Type | Description |
 |---|---|---|
-| to | address | undefined |
-| tokenId | uint256 | undefined |
+| contributor | address | Address of the contributor whoose status we are checking |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | bool | Boolean value indicating wether the address is a contributor or not |
+
+### maxSupply
+
+```solidity
+function maxSupply() external view returns (uint256)
+```
+
+
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint256 | undefined |
 
 ### name
 
@@ -769,42 +834,6 @@ Used to retrieve the collection name.
 | Name | Type | Description |
 |---|---|---|
 | _0 | string | string Name of the collection |
-
-### nestMint
-
-```solidity
-function nestMint(address to, uint256 tokenId, uint256 destinationId) external nonpayable
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| to | address | undefined |
-| tokenId | uint256 | undefined |
-| destinationId | uint256 | undefined |
-
-### nestTransfer
-
-```solidity
-function nestTransfer(address to, uint256 tokenId, uint256 destinationId) external nonpayable
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| to | address | undefined |
-| tokenId | uint256 | undefined |
-| destinationId | uint256 | undefined |
 
 ### nestTransferFrom
 
@@ -824,6 +853,23 @@ function nestTransferFrom(address from, address to, uint256 tokenId, uint256 des
 | to | address | undefined |
 | tokenId | uint256 | undefined |
 | destinationId | uint256 | undefined |
+
+### owner
+
+```solidity
+function owner() external view returns (address)
+```
+
+Returns the address of the current owner.
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | address | undefined |
 
 ### ownerOf
 
@@ -892,6 +938,23 @@ Returns all pending children
 |---|---|---|
 | _0 | IRMRKNesting.Child[] | undefined |
 
+### pricePerMint
+
+```solidity
+function pricePerMint() external view returns (uint256)
+```
+
+
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint256 | undefined |
+
 ### rejectAllChildren
 
 ```solidity
@@ -941,6 +1004,17 @@ Used to reject a pending resource of a given token.
 | tokenId | uint256 | ID of the token for which we are rejecting the resource |
 | index | uint256 | Index of the resource to reject in token&#39;s pending array |
 
+### renounceOwnership
+
+```solidity
+function renounceOwnership() external nonpayable
+```
+
+Leaves the contract without owner. Functions using the `onlyOwner` modifier will be disabled.
+
+*Can only be called by the current owner.Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is  only available to the owner.*
+
+
 ### replaceEquipment
 
 ```solidity
@@ -956,6 +1030,22 @@ function replaceEquipment(IRMRKEquippable.IntakeEquip data) external nonpayable
 | Name | Type | Description |
 |---|---|---|
 | data | IRMRKEquippable.IntakeEquip | undefined |
+
+### revokeContributor
+
+```solidity
+function revokeContributor(address contributor) external nonpayable
+```
+
+Removes a contributor from the smart contract.
+
+*Can only be called by the owner.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| contributor | address | Address of the contributor&#39;s account |
 
 ### rmrkOwnerOf
 
@@ -980,6 +1070,30 @@ Returns the immediate provenance data of the current RMRK NFT.
 | _0 | address | undefined |
 | _1 | uint256 | undefined |
 | _2 | bool | undefined |
+
+### royaltyInfo
+
+```solidity
+function royaltyInfo(uint256 tokenId, uint256 salePrice) external view returns (address receiver, uint256 royaltyAmount)
+```
+
+Used to retrieve the information about who shall receive royalties of a sale of the specified token and  how much they will be.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId | uint256 | ID of the token for which the royalty info is being retrieved |
+| salePrice | uint256 | Price of the token sale |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| receiver | address | The beneficiary receiving royalties of the sale |
+| royaltyAmount | uint256 | The value of the royalties recieved by the `receiver` from the sale |
 
 ### safeTransferFrom
 
@@ -1052,6 +1166,17 @@ Used to manage approval to manage own tokens&#39; resources.
 | operator | address | Address of the user of which we are managing the approval |
 | approved | bool | Boolean value indicating whether the approval is being granted (`true`) or revoked (`false`) |
 
+### setLock
+
+```solidity
+function setLock() external nonpayable
+```
+
+Locks the operation.
+
+*Once locked, functions using `notLocked` modifier cannot be executed.*
+
+
 ### setPriority
 
 ```solidity
@@ -1095,7 +1220,7 @@ function supportsInterface(bytes4 interfaceId) external view returns (bool)
 
 
 
-
+*Returns true if this contract implements the interface defined by `interfaceId`. See the corresponding https://eips.ethereum.org/EIPS/eip-165#how-interfaces-are-identified[EIP section] to learn more about how these ids are created. This function call must use less than 30 000 gas.*
 
 #### Parameters
 
@@ -1129,10 +1254,10 @@ Used to retrieve the collection symbol.
 ### tokenURI
 
 ```solidity
-function tokenURI(uint256 tokenId) external view returns (string)
+function tokenURI(uint256) external view returns (string)
 ```
 
-Used to retrieve the metadata URI of a token.
+
 
 
 
@@ -1140,30 +1265,47 @@ Used to retrieve the metadata URI of a token.
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | ID of the token to retrieve the metadata URI for |
+| _0 | uint256 | undefined |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | string Metadata URI of the specified token |
+| _0 | string | undefined |
 
-### transfer
+### totalResources
 
 ```solidity
-function transfer(address to, uint256 tokenId) external nonpayable
+function totalResources() external view returns (uint256)
 ```
 
 
 
 
 
-#### Parameters
+
+#### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| to | address | undefined |
-| tokenId | uint256 | undefined |
+| _0 | uint256 | undefined |
+
+### totalSupply
+
+```solidity
+function totalSupply() external view returns (uint256)
+```
+
+
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint256 | undefined |
 
 ### transferFrom
 
@@ -1182,6 +1324,22 @@ function transferFrom(address from, address to, uint256 tokenId) external nonpay
 | from | address | undefined |
 | to | address | undefined |
 | tokenId | uint256 | undefined |
+
+### transferOwnership
+
+```solidity
+function transferOwnership(address newOwner) external nonpayable
+```
+
+Transfers ownership of the contract to a new owner.
+
+*Can only be called by the current owner.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| newOwner | address | Address of the new owner&#39;s account |
 
 ### unequip
 
@@ -1219,6 +1377,39 @@ Function to unnest a child from the active token array.
 | index | uint256 | is the index of the child token ID. |
 | to | address | is the address to transfer this |
 | isPending | bool | indicates if the child is pending (active otherwise). |
+
+### updateRoyaltyRecipient
+
+```solidity
+function updateRoyaltyRecipient(address newRoyaltyRecipient) external nonpayable
+```
+
+Used to update recipient of royalties.
+
+*Custom access control has to be implemented to ensure that only the intedned actors can update the  beneficiary.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| newRoyaltyRecipient | address | Address of the new recipient of royalties |
+
+### withdrawRaised
+
+```solidity
+function withdrawRaised(address to, uint256 amount) external nonpayable
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| to | address | undefined |
+| amount | uint256 | undefined |
 
 
 
@@ -1431,6 +1622,23 @@ event NestTransfer(address indexed from, address indexed to, uint256 fromTokenId
 | fromTokenId  | uint256 | undefined |
 | toTokenId  | uint256 | undefined |
 | tokenId `indexed` | uint256 | undefined |
+
+### OwnershipTransferred
+
+```solidity
+event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| previousOwner `indexed` | address | undefined |
+| newOwner `indexed` | address | undefined |
 
 ### ResourceAccepted
 
@@ -1646,17 +1854,6 @@ Attempting to use an invalid token ID
 
 
 
-### ERC721MintToTheZeroAddress
-
-```solidity
-error ERC721MintToTheZeroAddress()
-```
-
-Attempting to mint to 0x0 address
-
-
-
-
 ### ERC721NotApprovedOrOwner
 
 ```solidity
@@ -1664,17 +1861,6 @@ error ERC721NotApprovedOrOwner()
 ```
 
 Attempting to manage a token without being its owner or approved by the owner
-
-
-
-
-### ERC721TokenAlreadyMinted
-
-```solidity
-error ERC721TokenAlreadyMinted()
-```
-
-Attempting to mint an already minted token
 
 
 
@@ -1861,17 +2047,6 @@ Attempting to burn a total number of recursive children higher than maximum set
 | childContract | address | undefined |
 | childTokenId | uint256 | undefined |
 
-### RMRKMintToNonRMRKImplementer
-
-```solidity
-error RMRKMintToNonRMRKImplementer()
-```
-
-Attempting to mint a nested token to a smart contract that doesn&#39;t support nesting
-
-
-
-
 ### RMRKMustUnequipFirst
 
 ```solidity
@@ -1927,6 +2102,28 @@ Attempting to nest the token into itself
 
 
 
+### RMRKNewContributorIsZeroAddress
+
+```solidity
+error RMRKNewContributorIsZeroAddress()
+```
+
+Attempting to assign a 0x0 address as a contributor
+
+
+
+
+### RMRKNewOwnerIsZeroAddress
+
+```solidity
+error RMRKNewOwnerIsZeroAddress()
+```
+
+Attempting to transfer the ownership to the 0x0 address
+
+
+
+
 ### RMRKNoResourceMatchingId
 
 ```solidity
@@ -1967,6 +2164,28 @@ error RMRKNotEquipped()
 ```
 
 Attempting to unequip an item that isn&#39;t equipped
+
+
+
+
+### RMRKNotOwner
+
+```solidity
+error RMRKNotOwner()
+```
+
+Attempting to interact with a management function without being the smart contract&#39;s owner
+
+
+
+
+### RMRKNotOwnerOrContributor
+
+```solidity
+error RMRKNotOwnerOrContributor()
+```
+
+Attempting to interact with a function without being the owner or contributor of the collection
 
 
 
