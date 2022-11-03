@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 
 interface IRMRKMultiResourceRenderUtils is IERC165 {
     /**
-     * @notice Returns resource meta at `index` of active resource array on `tokenId`
+     * @notice Returns resource metadata at `index` of active resource array on `tokenId`
      *
      * Requirements:
      *
@@ -21,7 +21,7 @@ interface IRMRKMultiResourceRenderUtils is IERC165 {
     ) external view returns (string memory);
 
     /**
-     * @notice Returns resource meta at `index` of pending resource array on `tokenId`
+     * @notice Returns resource metadata at `index` of pending resource array on `tokenId`
      *
      * Requirements:
      *
@@ -35,7 +35,7 @@ interface IRMRKMultiResourceRenderUtils is IERC165 {
     ) external view returns (string memory);
 
     /**
-     * @notice Returns resource meta strings for the given ids
+     * @notice Returns resource metadata strings for the given ids
      *
      * Requirements:
      *
@@ -47,7 +47,7 @@ interface IRMRKMultiResourceRenderUtils is IERC165 {
         returns (string[] memory);
 
     /**
-     * @notice Returns the resource meta with the highest priority for the given token
+     * @notice Returns the resource metadata with the highest priority for the given token
      */
     function getTopResourceMetaForToken(address target, uint256 tokenId)
         external

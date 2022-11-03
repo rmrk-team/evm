@@ -17,7 +17,7 @@ abstract contract RMRKRoyalties is IERC2981 {
      * @notice Used to initiate the smart contract.
      * @dev `royaltyPercentageBps` is expressed in basis points, so 1 basis point equals 0.01% and 500 basis points
      *  equal 5%.
-     * @param royaltyRecipient Address to which to send the royalties to
+     * @param royaltyRecipient Address to which royalties should be sent
      * @param royaltyPercentageBps The royalty percentage expressed in basis points
      */
     constructor(
@@ -31,7 +31,7 @@ abstract contract RMRKRoyalties is IERC2981 {
     //@notice Requires access control on the implementation contract like implementing Ownable and setting onlyOwner modifier
     /**
      * @notice Used to update recipient of royalties.
-     * @dev Custom access control has to be implemented to ensure that only the intedned actors can update the
+     * @dev Custom access control has to be implemented to ensure that only the intended actors can update the
      *  beneficiary.
      * @param newRoyaltyRecipient Address of the new recipient of royalties
      */

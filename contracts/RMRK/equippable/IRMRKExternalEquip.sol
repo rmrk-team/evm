@@ -11,7 +11,7 @@ import "./IRMRKEquippable.sol";
  */
 interface IRMRKExternalEquip is IRMRKEquippable {
     /**
-     * @notice Used to notify listeners of a new `Nesting` smart contract address being set.
+     * @notice Used to notify listeners of a new `Nesting` associated  smart contract address being set.
      * @dev When initially setting the `Nesting` smart contract address, the `old` value should equal `0x0` address.
      * @param old Previous `Nesting` smart contract address
      * @param new_ New `Nesting` smart contract address

@@ -50,7 +50,7 @@ contract RMRKNestingExternalEquip is IRMRKNestingExternalEquip, RMRKNesting {
      * @param index Index of a child token being unnested in the array it's located in. This can be either pending or
      *  active array
      * @param to Address that should receive the token once unnestedđ
-     * @param isPending Boolean value indicating wether the token is in the pending array of the parent (`true`) or in
+     * @param isPending Boolean value indicating whether the token is in the pending array of the parent (`true`) or in
      *  the active array (`false`)
      */
     function _unnestChild(
@@ -98,7 +98,7 @@ contract RMRKNestingExternalEquip is IRMRKNestingExternalEquip, RMRKNesting {
      * @param spender Address that we are verifying
      * @param tokenId ID of the token we are checking
      * @return bool A boolean value indicating whether the specified address is the owner of the given token or approved
-     *  to manage it (`true`) or not (`false`)
+     *  to manage it
      */
     function isApprovedOrOwner(address spender, uint256 tokenId)
         external

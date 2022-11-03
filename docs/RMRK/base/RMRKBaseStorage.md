@@ -13,7 +13,7 @@ Base storage contract for RMRK equippable module.
 ### checkIsEquippable
 
 ```solidity
-function checkIsEquippable(uint64 partId, address targetAddress) external view returns (bool isEquippable)
+function checkIsEquippable(uint64 partId, address targetAddress) external view returns (bool)
 ```
 
 Used to check whether the given address is allowed to equip the desired `Part`
@@ -24,14 +24,14 @@ Used to check whether the given address is allowed to equip the desired `Part`
 
 | Name | Type | Description |
 |---|---|---|
-| partId | uint64 | ID of the `Part` that we are checking |
-| targetAddress | address | Address of the collection that we want to equip the `Part` in |
+| partId | uint64 | The ID of the part that we are checking |
+| targetAddress | address | The address that we are checking for whether the part can be equipped into it or not |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| isEquippable | bool | Boolean value indicating whether the given `Part` can be equipped into the collection or not |
+| _0 | bool | bool The status indicating whether the `targetAddress` can be equipped into `Part` with `partId` or not |
 
 ### checkIsEquippableToAll
 
@@ -39,7 +39,7 @@ Used to check whether the given address is allowed to equip the desired `Part`
 function checkIsEquippableToAll(uint64 partId) external view returns (bool)
 ```
 
-Used to check whether the given `Part` is equippable by any address or not.
+Used to check if the part is equippable by all addresses.
 
 *Returns true if part is equippable to all.*
 
@@ -47,13 +47,13 @@ Used to check whether the given `Part` is equippable by any address or not.
 
 | Name | Type | Description |
 |---|---|---|
-| partId | uint64 | ID of the `Part` that we are checking |
+| partId | uint64 | ID of the part that we are checking |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | bool Status of equippable to all for the given `Part` |
+| _0 | bool | bool The status indicating whether the part with `partId` can be equipped by any address or not |
 
 ### getMetadataURI
 
@@ -61,7 +61,7 @@ Used to check whether the given `Part` is equippable by any address or not.
 function getMetadataURI() external view returns (string)
 ```
 
-Used to retrieve the metadata URI of the associated collection.
+Used to return the metadata URI of the associated base.
 
 
 
@@ -70,7 +70,7 @@ Used to retrieve the metadata URI of the associated collection.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | string Metedata URI of the collection |
+| _0 | string | string Base metadata URI |
 
 ### getPart
 
@@ -78,7 +78,7 @@ Used to retrieve the metadata URI of the associated collection.
 function getPart(uint64 partId) external view returns (struct IRMRKBaseStorage.Part)
 ```
 
-Used to retrieve a single `Part`.
+Used to retrieve a `Part` with id `partId`
 
 
 
@@ -86,13 +86,13 @@ Used to retrieve a single `Part`.
 
 | Name | Type | Description |
 |---|---|---|
-| partId | uint64 | The ID of the part to retriieve |
+| partId | uint64 | ID of the part that we are retrieving |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IRMRKBaseStorage.Part | struct `Part` associated with the specified `partId` |
+| _0 | IRMRKBaseStorage.Part | struct The `Part` struct associated with given `partId` |
 
 ### getParts
 
@@ -100,7 +100,7 @@ Used to retrieve a single `Part`.
 function getParts(uint64[] partIds) external view returns (struct IRMRKBaseStorage.Part[])
 ```
 
-Used to retrieve multiple `Part`s at the same time.
+Used to retrieve multiple parts at the same time.
 
 
 
@@ -108,13 +108,13 @@ Used to retrieve multiple `Part`s at the same time.
 
 | Name | Type | Description |
 |---|---|---|
-| partIds | uint64[] | Array of IDs of the `Part`s  to retrieve |
+| partIds | uint64[] | An array of part IDs that we want to retrieve |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IRMRKBaseStorage.Part[] | struct An array of `Part`s associated with the specified `partIds` |
+| _0 | IRMRKBaseStorage.Part[] | struct An array of `Part` structs associated with given `partIds` |
 
 ### getType
 
@@ -122,7 +122,7 @@ Used to retrieve multiple `Part`s at the same time.
 function getType() external view returns (string)
 ```
 
-Used to retrieve the `itemType` of the associated base.
+Used to return the `itemType` of the associated base
 
 
 
@@ -131,7 +131,7 @@ Used to retrieve the `itemType` of the associated base.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | string The value of the base&#39;s `itemType`, it can be either `None`, `Slot` or `Fixed` |
+| _0 | string | string `itemType` of the associated base |
 
 ### supportsInterface
 

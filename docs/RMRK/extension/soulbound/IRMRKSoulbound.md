@@ -16,7 +16,7 @@ Interface smart contract of the RMRK soulbound module.
 function isSoulbound(uint256 tokenId) external view returns (bool)
 ```
 
-Used to check wether the given token is soulbound or not.
+Used to check whether the given token is soulbound or not.
 
 
 
@@ -30,7 +30,7 @@ Used to check wether the given token is soulbound or not.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | bool Boolean value indicating whether the given token is soulbound (`true`) or not (`false`) |
+| _0 | bool | bool Boolean value indicating whether the given token is soulbound |
 
 ### supportsInterface
 

@@ -68,23 +68,23 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
     }
 
     /**
-     * @notice Used to retrieve the metadata URI of the associated collection.
-     * @return string Metedata URI of the collection
+     * @notice Used to return the metadata URI of the associated base.
+     * @return string Base metadata URI
      */
     function getMetadataURI() external view returns (string memory) {
         return _metadataURI;
     }
 
     /**
-     * @notice Used to retrieve the `itemType` of the associated base.
-     * @return string The value of the base's `itemType`, it can be either `None`, `Slot` or `Fixed`
+     * @notice Used to return the `itemType` of the associated base
+     * @return string `itemType` of the associated base
      */
     function getType() external view returns (string memory) {
         return _type;
     }
 
     /**
-     * @dev Internal helper function that adds `n` base item entries to storage.
+     * @dev Internal helper function that adds `Part` entries to storage.
      * @dev Delegates to { _addPart } below.
      * @param partIntake An array of `IntakeStruct` structs, consisting of `partId` and a nested `Part` struct
      */
@@ -99,7 +99,7 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
     }
 
     /**
-     * @dev Internal function that adds a single base item entry to storage.
+     * @dev Internal function that adds a single `Part` to storage.
      * @param partIntake `IntakeStruct` struct consisting of `partId` and a nested `Part` struct
      *
      */
@@ -129,8 +129,8 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
     /**
      * @dev Internal function used to add multiple `equippableAddresses` to a single base entry.
      * @dev Can only be called on `Slot` type of `Part`s.
-     * @param partId ID of the part that we are adding the equippable addresses to
-     * @param equippableAddresses An array of addresses that can equip the `Part` associated with the `partId`
+     * @param partId ID of the `Part` that we are adding the equippable addresses to
+     * @param equippableAddresses An array of addresses that can be equipped into the `Part` associated with the `partId`
      */
     function _addEquippableAddresses(
         uint64 partId,
@@ -155,7 +155,7 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
      * @dev Overwrites existing `equippableAddresses`.
      * @dev Can only be called on `Slot` type of `Part`s.
      * @param partId ID of the `Part`s that we are overwiting the `equippableAddresses` for
-     * @param equippableAddresses A full array of addresses that can equip this `Part`
+     * @param equippableAddresses A full array of addresses that can be equipped into this `Part`
      */
     function _setEquippableAddresses(
         uint64 partId,
@@ -184,7 +184,7 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
     }
 
     /**
-     * @dev Sets the isEquippableToAll flag to true, meaning that any collection may equip the `Part` with this
+     * @dev Sets the isEquippableToAll flag to true, meaning that any collection may be equipped into the `Part` with this
      *  `partId`.
      * @dev Can only be called on `Slot` type of `Part`s.
      * @param partId ID of the `Part` that we are setting as equippable by any address
@@ -195,10 +195,10 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
     }
 
     /**
-     * @notice Used to check whether the given `Part` is equippable by any address or not.
+     * @notice Used to check if the part is equippable by all addresses.
      * @dev Returns true if part is equippable to all.
-     * @param partId ID of the `Part` that we are checking
-     * @return bool Status of equippable to all for the given `Part`
+     * @param partId ID of the part that we are checking
+     * @return bool The status indicating whether the part with `partId` can be equipped by any address or not
      */
     function checkIsEquippableToAll(uint64 partId) public view returns (bool) {
         return _isEquippableToAll[partId];
@@ -207,17 +207,17 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
     /**
      * @notice Used to check whether the given address is allowed to equip the desired `Part`
      * @dev Returns true if a collection may equip resource with `partId`.
-     * @param partId ID of the `Part` that we are checking
-     * @param targetAddress Address of the collection that we want to equip the `Part` in
-     * @return isEquippable Boolean value indicating whether the given `Part` can be equipped into the collection or not
+     * @param partId The ID of the part that we are checking
+     * @param targetAddress The address that we are checking for whether the part can be equipped into it or not
+     * @return bool The status indicating whether the `targetAddress` can be equipped into `Part` with `partId` or not
      */
     function checkIsEquippable(uint64 partId, address targetAddress)
         public
         view
-        returns (bool isEquippable)
+        returns (bool)
     {
         // If this is equippable to all, we're good
-        isEquippable = _isEquippableToAll[partId];
+        bool isEquippable = _isEquippableToAll[partId];
 
         // Otherwise, must check against each of the equippable for the part
         if (!isEquippable && _parts[partId].itemType == ItemType.Slot) {
@@ -233,21 +233,22 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
                 }
             }
         }
+        return isEquippable;
     }
 
     /**
-     * @notice Used to retrieve a single `Part`.
-     * @param partId The ID of the part to retriieve
-     * @return struct `Part` associated with the specified `partId`
+     * @notice Used to retrieve a `Part` with id `partId`
+     * @param partId ID of the part that we are retrieving
+     * @return struct The `Part` struct associated with given `partId`
      */
     function getPart(uint64 partId) public view returns (Part memory) {
         return (_parts[partId]);
     }
 
     /**
-     * @notice Used to retrieve multiple `Part`s at the same time.
-     * @param partIds Array of IDs of the `Part`s  to retrieve
-     * @return struct An array of `Part`s associated with the specified `partIds`
+     * @notice Used to retrieve multiple parts at the same time.
+     * @param partIds An array of part IDs that we want to retrieve
+     * @return struct An array of `Part` structs associated with given `partIds`
      */
     function getParts(uint64[] calldata partIds)
         public

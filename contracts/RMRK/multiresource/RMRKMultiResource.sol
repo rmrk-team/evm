@@ -68,10 +68,13 @@ contract RMRKMultiResource is
     // ----------------------- MODIFIERS FOR RESOURCES ------------------------
 
     /**
-     * @notice Used to check if the specified address is the owner of the given token or approved by its owner to
-     *  manage it.
-     * @param user Address of the user being checked
-     * @param tokenId ID of the token being checked
+     * @notice Internal function to check whether the queried user is either:
+     *   1. The root owner of the token associated with `tokenId`.
+     *   2. Is approved for all resources of the current owner via the `setApprovalForAllForResources` function.
+     *   3. Is granted approval for the specific tokenId for resource management via the `approveForResources` function.
+     * @param user Address of the user we are checking for permission
+     * @param tokenId ID of the token to query for permission for a given `user`
+     * @return bool A boolean value indicating whether the user is approved to manage the token or not
      */
     function _isApprovedForResourcesOrOwner(address user, uint256 tokenId)
         internal
@@ -267,7 +270,7 @@ contract RMRKMultiResource is
      * @dev Tokens can be managed by their owner or approved accounts via {approve} or {setApprovalForAll}.
      * @dev Tokens start existing when they are minted (`_mint`) and stop existing when they are burned (`_burn`).
      * @param tokenId ID of the token being checked
-     * @return bool The boolean value signifying whether the token exists (`true`) or not (`false`)
+     * @return bool The boolean value signifying whether the token exists
      */
     function _exists(uint256 tokenId) internal view virtual returns (bool) {
         return _owners[tokenId] != address(0);
@@ -280,8 +283,7 @@ contract RMRKMultiResource is
      *  - `tokenId` must exist.
      * @param spender Address that is being checked for approval
      * @param tokenId ID of the token being checked
-     * @return bool The boolean value indicating whether the `spender` is approved to manage the given token (`true`) or
-     *  not (`false`)
+     * @return bool The boolean value indicating whether the `spender` is approved to manage the given token
      */
     function _isApprovedOrOwner(address spender, uint256 tokenId)
         internal
@@ -430,7 +432,7 @@ contract RMRKMultiResource is
      * @dev Emits an {ApprovalForAll} event.
      * @param owner Address of the account for which the approval is being granted
      * @param operator Address receiving approval to manage all of the tokens of the `owner`
-     * @param approved Boolean value signifying whether 
+     * @param approved Boolean value signifying whether
      */
     function _setApprovalForAll(
         address owner,
@@ -496,10 +498,17 @@ contract RMRKMultiResource is
     // ------------------------------- RESOURCES ------------------------------
 
     /**
-     * @notice Used to accept a resource from the pending array of a given token.
-     * @dev When the resource is accepted, the last resource in the pending array is moved to its place.
-     * @param tokenId ID of the token for which the resource is being accepted
-     * @param index Index of the resource in the given token's penoding resources array to accept
+     * @notice Accepts a resource at from the pending array of given token.
+     * @dev Migrates the resource from the token's pending resource array to the token's active resource array.
+     * @dev Active resources cannot be removed by anyone, but can be replaced by a new resource.
+     * @dev Requirements:
+     *
+     *  - The caller must own the token or be approved to manage the token's resources
+     *  - `tokenId` must exist.
+     *  - `index` must be in range of the length of the pending resource array.
+     * @dev Emits an {ResourceAccepted} event.
+     * @param tokenId ID of the token for which to accept the pending resource
+     * @param index Index of the resource in the pending array to accept
      */
     function acceptResource(uint256 tokenId, uint256 index)
         public
@@ -510,10 +519,16 @@ contract RMRKMultiResource is
     }
 
     /**
-     * @notice Used to reject a resource from the pending array of a given token.
-     * @dev When the resource is rejected, the last resource in the pending array is moved to its place.
-     * @param tokenId ID of the token for which the resource is being rejected
-     * @param index Index of the resource in the given token's pending resources array to reject
+     * @notice Rejects a resource from the pending array of given token.
+     * @dev Removes the resource from the token's pending resource array.
+     * @dev Requirements:
+     *
+     *  - The caller must own the token or be approved to manage the token's resources
+     *  - `tokenId` must exist.
+     *  - `index` must be in range of the length of the pending resource array.
+     * @dev Emits a {ResourceRejected} event.
+     * @param tokenId ID of the token that the resource is being rejected from
+     * @param index Index of the resource in the pending array to be rejected
      */
     function rejectResource(uint256 tokenId, uint256 index)
         public
@@ -524,8 +539,14 @@ contract RMRKMultiResource is
     }
 
     /**
-     * @notice Used to reject all resources from the pending array of a given token.
-     * @param tokenId ID of the token for which the pending resources array is being cleared
+     * @notice Rejects all resources from the pending array of a given token.
+     * @dev Effecitvely deletes the pending array.
+     * @dev Requirements:
+     *
+     *  - The caller must own the token or be approved to manage the token's resources
+     *  - `tokenId` must exist.
+     * @dev Emits a {ResourceRejected} event with resourceId = 0.
+     * @param tokenId ID of the token of which to clear the pending array
      */
     function rejectAllResources(uint256 tokenId)
         public
@@ -536,11 +557,19 @@ contract RMRKMultiResource is
     }
 
     /**
-     * @notice Used to set the priorities of resources in the given token's active resources array.
-     * @dev If the array of priorities in not the same length as the active resources array, the execution will be
-     *  reverted.
-     * @param tokenId ID of the token for which the prioritied are being set
-     * @param priorities Array of priorities to apply to the token's resources
+     * @notice Sets a new priority array for a given token.
+     * @dev The priority array is a non-sequential list of `uint16`s, where the lowest value is considered highest
+     *  priority.
+     * @dev Value `0` of a priority is a special case equivalent to unitialized.
+     * @dev Requirements:
+     *
+     *  - The caller must own the token or be approved to manage the token's resources
+     *  - `tokenId` must exist.
+     *  - The length of `priorities` must be equal the length of the active resources array.
+     * @dev Emits a {ResourcePrioritySet} event.
+     * @param tokenId ID of the token to set the priorities for
+     * @param priorities An array of priorities of active resources. The succesion of items in the priorities array
+     *  matches that of the succesion of items in the active array
      */
     function setPriority(uint256 tokenId, uint16[] calldata priorities)
         public
@@ -553,10 +582,17 @@ contract RMRKMultiResource is
     // ----------------------- APPROVALS FOR RESOURCES ------------------------
 
     /**
-     * @notice Used to grant an approval to an address to manage resources of a given token.
-     * @dev If the current owner of the token attempts to grant the approval to self, the execution will be reverted.
+     * @notice Used to grant permission to the user to manage token's resources.
+     * @dev This differs from transfer approvals, as approvals are not cleared when the approved party accepts or
+     *  rejects a resource, or sets resource priorities. This approval is cleared on token transfer.
+     * @dev Only a single account can be approved at a time, so approving the `0x0` address clears previous approvals.
+     * @dev Requirements:
+     *
+     *  - The caller must own the token or be an approved operator.
+     *  - `tokenId` must exist.
+     * @dev Emits an {ApprovalForResources} event.
      * @param to Address of the account to grant the approval to
-     * @param tokenId ID of the token for which the approval is being given
+     * @param tokenId ID of the token for which the approval to manage the resources is granted
      */
     function approveForResources(address to, uint256 tokenId) public virtual {
         address owner = ownerOf(tokenId);
@@ -583,10 +619,12 @@ contract RMRKMultiResource is
     }
 
     /**
-     * @notice Used to retrieve the address approved to manage the given token's resources.
-     * @dev If the specified token isn't minted, the execution will be reverted.
-     * @param tokenId ID of the token for which the approved address is being retrieved
-     * @return address Address of the account approved to manage the resources of a given token
+     * @notice Used to retrieve the address of the account approved to manage resources of a given token.
+     * @dev Requirements:
+     *
+     *  - `tokenId` must exist.
+     * @param tokenId ID of the token for which to retrieve the approved address
+     * @return address Address of the account that is approved to manage the specified token's resources
      */
     function getApprovedForResources(uint256 tokenId)
         public

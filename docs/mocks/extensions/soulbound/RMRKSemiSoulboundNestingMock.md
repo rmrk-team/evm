@@ -281,7 +281,7 @@ function isApprovedForAll(address owner, address operator) external view returns
 function isSoulbound(uint256 tokenId) external view returns (bool)
 ```
 
-Used to verify that the token is soulbound.
+Used to verify if the token is soulbound.
 
 
 
@@ -295,7 +295,7 @@ Used to verify that the token is soulbound.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | bool Boolean verifying whether the token is soulbound (`true`) or not (`false`) |
+| _0 | bool | bool Boolean verifying whether the token is soulbound |
 
 ### mint
 

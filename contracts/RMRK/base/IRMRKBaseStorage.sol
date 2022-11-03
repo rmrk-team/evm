@@ -14,8 +14,8 @@ interface IRMRKBaseStorage is IERC165 {
      * @notice Event to announce addition of a new part.
      * @dev It is emitted when a new part is added.
      * @param partId ID of the part that was added
-     * @param itemType Enum value specifying wether the part is `None`, `Slot` and `Fixed`
-     * @param zIndex An uint specifying the z value of the part. It is used to specify the depth at wich the part should
+     * @param itemType Enum value specifying whether the part is `None`, `Slot` and `Fixed`
+     * @param zIndex An uint specifying the z value of the part. It is used to specify the depth which the part should
      *  be rendered at
      * @param equippableAddresses An array of addresses that can equip this part
      * @param metadataURI The metadata URI of the part
@@ -72,7 +72,7 @@ interface IRMRKBaseStorage is IERC165 {
      *  mainnet is 30M at peak usage.
      * @return itemType The item type of the part
      * @return z The z value of the part defining how it should be rendered when presenting the full NFT
-     * @return equippable The array of addresses allowed to equip this part
+     * @return equippable The array of addresses allowed to be equipped in this part
      * @return metadataURI The metadata URI of the part
      */
     struct Part {
@@ -103,15 +103,15 @@ interface IRMRKBaseStorage is IERC165 {
      *   ]
      * @return partId ID to be assigned to the `Part`
      * @return part A `Part` to be added
-    */
+     */
     struct IntakeStruct {
         uint64 partId;
         Part part;
     }
 
     /**
-     * @notice Used to return the metadata URI of the associated collection.
-     * @return string Base contract metadata URI
+     * @notice Used to return the metadata URI of the associated base.
+     * @return string Base metadata URI
      */
     function getMetadataURI() external view returns (string memory);
 
@@ -125,7 +125,7 @@ interface IRMRKBaseStorage is IERC165 {
      * @notice Used to check whether the part is equippable by targetAddress.
      * @param partId The ID of the part that we are checking
      * @param targetAddress The address that we are checking for whether the part can be equipped into it or not
-     * @return bool The status indicating whether the part with `partId` can be equipped into `targetAddress`or not
+     * @return bool The status indicating whether the `targetAddress` can be equipped into `Part` with `partId` or not
      */
     function checkIsEquippable(uint64 partId, address targetAddress)
         external
@@ -135,12 +135,12 @@ interface IRMRKBaseStorage is IERC165 {
     /**
      * @notice Used to check if the part is equippable by all addresses.
      * @param partId ID of the part that we are checking
-     * @return bool The status indicating whether the part with `partId` can be equipped into and address or not
+     * @return bool The status indicating whether the part with `partId` can be equipped by any address or not
      */
     function checkIsEquippableToAll(uint64 partId) external view returns (bool);
 
     /**
-     * @notice Used to retrieve a `Part` located at `partId`
+     * @notice Used to retrieve a `Part` with id `partId`
      * @param partId ID of the part that we are retrieving
      * @return struct The `Part` struct associated with given `partId`
      */

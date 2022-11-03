@@ -16,7 +16,7 @@ interface IRMRKEquippable is IRMRKMultiResource {
      * @return childResourceId The ID of the resource used as equipment
      * @return childTokenId The ID of token that is equipped
      * @return childEquippableAddress Address of the collection to which the child resource belongs to
-    */
+     */
     struct Equipment {
         uint64 resourceId;
         uint64 childResourceId;
@@ -28,12 +28,12 @@ interface IRMRKEquippable is IRMRKMultiResource {
      * @notice Used to provide additional information about the resource.
      * @dev Only used for input and output, not as storage.
      * @return id ID of the resource
-     * @return equippableGroupId The equippable group ID is used to specify which addresses can equip a group of
-     *  resource, this way multiple resources can be classified as equippable to a collection rather to having to do so
+     * @return equippableGroupId The equippable group ID is used to group resources meant to be equipped into the same slot,
+     *  this way multiple resources can be classified as equippable to a slot and collection rather to having to do so
      *  for each resource separately
      * @return baseAddress The address of the collection to which the resource belongs to
      * @return metadataURI The metadata URI of the resource
-    */
+     */
     struct ExtendedResource {
         uint64 id;
         uint64 equippableGroupId;
@@ -46,7 +46,7 @@ interface IRMRKEquippable is IRMRKMultiResource {
      * @return partId ID of the part
      * @return z The z value of the resource, specifying how the part should be rendered in a composed NFT
      * @return matadataURI The metadata URI of the fixed part
-    */
+     */
     struct FixedPart {
         uint64 partId;
         uint8 z; //1 byte
@@ -56,12 +56,12 @@ interface IRMRKEquippable is IRMRKMultiResource {
     /**
      * @notice Used to provide data about slot parts.
      * @return partId ID of the part
-     * @return childResourceId The ID of resource associated with token eqiupped into this slot
+     * @return childResourceId The ID of resource associated with token equipped into this slot
      * @return z The z value of the resource, specifying how the part should be rendered in a composed NFT
      * @return childTokenId The ID of the token equipped into this part
      * @return childAddress The address of the child token's collection
      * @return metadataURI The metadata URI of the slot part
-    */
+     */
     struct SlotPart {
         uint64 partId;
         uint64 childResourceId;
@@ -75,11 +75,11 @@ interface IRMRKEquippable is IRMRKMultiResource {
      * @notice Used to provide a struct for inputing equip data.
      * @dev Only used for input and not storage of data.
      * @return tokenId ID of the token we are managing
-     * @return childIndex Index of a child in the active list of token's equipped parts
-     * @return resourceId ID of the resource that we are adding
-     * @return slotPartId ID of the slot part that we are equipping the desired resource into
+     * @return childIndex Index of a child in the list of token's active children
+     * @return resourceId ID of the resource that we are equipping into
+     * @return slotPartId ID of the slot part that we are using to equip
      * @return childResourceId ID of the resource that we are equipping
-    */
+     */
     struct IntakeEquip {
         uint256 tokenId;
         uint256 childIndex;
@@ -91,8 +91,8 @@ interface IRMRKEquippable is IRMRKMultiResource {
     /**
      * @notice Used to notify listeners that a child's resource has been equipped into one of its parent resources.
      * @param tokenId ID of the token that had a resource equipped
-     * @param resourceId ID of the resource associated with the token we are equipping to
-     * @param slotPartId ID of the slot we are equipping the child into
+     * @param resourceId ID of the resource associated with the token we are equipping into
+     * @param slotPartId ID of the slot we are using to equip
      * @param childTokenId ID of the child token we are equipping into the slot
      * @param childAddress Address of the child token's collection
      * @param childResourceId ID of the resource associated with the token we are equipping
@@ -107,7 +107,7 @@ interface IRMRKEquippable is IRMRKMultiResource {
     );
 
     /**
-     * @notice Used to notify listeners that a child's resource has been removed from one of its parent resources.
+     * @notice Used to notify listeners that a child's resource has been unequipped from one of its parent resources.
      * @param tokenId ID of the token that had a resource unequipped
      * @param resourceId ID of the resource associated with the token we are unequipping out of
      * @param slotPartId ID of the slot we are unequipping from
@@ -125,11 +125,11 @@ interface IRMRKEquippable is IRMRKMultiResource {
     );
 
     /**
-     * @notice Used to notify listeners that the resources belonging to a `equippableGroupId` have beem marked as
-     *  equippable into a given slot
+     * @notice Used to notify listeners that the resources belonging to a `equippableGroupId` have been marked as
+     *  equippable into a given slot and parent
      * @param equippableGroupId ID of the equippable group being marked as equippable into the slot associated with
      *  `slotPartId` of the `parentAddress` collection
-     * @param slotPartId ID of the slot part of the collection into which the parts belonging to the equippable group
+     * @param slotPartId ID of the slot part of the base into which the parts belonging to the equippable group
      *  associated with `equippableGroupId` can be equipped
      * @param parentAddress Address of the collection into which the parts belonging to `equippableGroupId` can be
      *  equipped
@@ -141,11 +141,11 @@ interface IRMRKEquippable is IRMRKMultiResource {
     );
 
     /**
-     * @notice Used to check whether the token has a given token equipped.
-     * @param tokenId ID of the token for which we are querrying if it has another equipped
-     * @param childAddress Address of the child token's smart cotntract
-     * @param childTokenId ID of the child token for which we are checking if it is equipped
-     * @return bool The boolean value indicating whether the child toke is equipped into the given token or not
+     * @notice Used to check whether the token has a given child equipped.
+     * @param tokenId ID of the parent token for which we are querying for
+     * @param childAddress Address of the child token's smart contract
+     * @param childTokenId ID of the child token
+     * @return bool The boolean value indicating whether the child token is equipped into the given token or not
      */
     function isChildEquipped(
         uint256 tokenId,
@@ -181,7 +181,7 @@ interface IRMRKEquippable is IRMRKMultiResource {
 
     /**
      * @notice Used to get IDs of the fixed parts present on a given resource.
-     * @param resourceId ID of the resource of which to get the active fiixed parts
+     * @param resourceId ID of the resource of which to get the active fixed parts
      * @return uint64[] An array of active fixed parts present on resource
      */
     function getFixedPartIds(uint64 resourceId)
@@ -204,7 +204,7 @@ interface IRMRKEquippable is IRMRKMultiResource {
 
     /**
      * @notice Used to get the extended resource struct of the resource associated with given `resourceId`.
-     * @param resourceId ID of the resource of which we are retrieving the extended resource struct
+     * @param resourceId ID of the resource of which we are retrieving
      * @return struct The `ExtendedResource` struct associated with the resource
      */
     function getExtendedResource(uint64 resourceId)

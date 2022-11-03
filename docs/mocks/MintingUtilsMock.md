@@ -32,7 +32,7 @@ Adds a contributor to the smart contract.
 function getLock() external view returns (bool)
 ```
 
-Reenables the operation of functions using `notLocked` modifier.
+Used to retrieve the status of a lockable smart contract.
 
 
 
@@ -41,7 +41,7 @@ Reenables the operation of functions using `notLocked` modifier.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | undefined |
+| _0 | bool | bool A boolean value signifying whether the smart contract has been locked |
 
 ### isContributor
 
@@ -57,13 +57,13 @@ Used to check if the address is one of the contributors.
 
 | Name | Type | Description |
 |---|---|---|
-| contributor | address | Address of the contributor whoose status we are checking |
+| contributor | address | Address of the contributor whose status we are checking |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | Boolean value indicating wether the address is a contributor or not |
+| _0 | bool | Boolean value indicating whether the address is a contributor or not |
 
 ### maxSupply
 

@@ -18,7 +18,7 @@ function acceptResource(uint256 tokenId, uint256 index) external nonpayable
 
 Accepts a resource at from the pending array of given token.
 
-*Migrates the resource from the token&#39;s pending resource array to the token&#39;s active resource array.Active resources cannot be removed by anyone, but can be replaced by a new resource.Requirements:  - The caller must own the token or be an approved operator.  - `tokenId` must exist.  - `index` must be in range of the length of the pending resource array.Emits an {ResourceAccepted} event.*
+*Migrates the resource from the token&#39;s pending resource array to the token&#39;s active resource array.Active resources cannot be removed by anyone, but can be replaced by a new resource.Requirements:  - The caller must own the token or be approved to manage the token&#39;s resources  - `tokenId` must exist.  - `index` must be in range of the length of the pending resource array.Emits an {ResourceAccepted} event.*
 
 #### Parameters
 
@@ -77,7 +77,7 @@ function getActiveResourcePriorities(uint256 tokenId) external view returns (uin
 
 Used to retrieve the priorities of the active resoources of a given token.
 
-
+*Resource priorities are a non-sequential array of uint16 values with an array size equal to active resource  priorites.*
 
 #### Parameters
 
@@ -212,7 +212,7 @@ Used to get the extended resource struct of the resource associated with given `
 
 | Name | Type | Description |
 |---|---|---|
-| resourceId | uint64 | ID of the resource of which we are retrieving the extended resource struct |
+| resourceId | uint64 | ID of the resource of which we are retrieving |
 
 #### Returns
 
@@ -234,7 +234,7 @@ Used to get IDs of the fixed parts present on a given resource.
 
 | Name | Type | Description |
 |---|---|---|
-| resourceId | uint64 | ID of the resource of which to get the active fiixed parts |
+| resourceId | uint64 | ID of the resource of which to get the active fixed parts |
 
 #### Returns
 
@@ -309,7 +309,7 @@ Used to retrieve the metadata of the resource associated with `resourceId`.
 function getResourceMetaForToken(uint256 tokenId, uint64 resourceIndex) external view returns (string)
 ```
 
-Used to fetch the resource data for the token&#39;s active resource using its index.
+Used to fetch the resource metadata of the specified token&#39;s active resource with the given index.
 
 *Resources are stored by reference mapping `_resources[resourceId]`.Can be overriden to implement enumerate, fallback or other custom logic.*
 
@@ -317,7 +317,7 @@ Used to fetch the resource data for the token&#39;s active resource using its in
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | ID of the token from which to retrieve the resource data |
+| tokenId | uint256 | ID of the token from which to retrieve the resource metadata |
 | resourceIndex | uint64 | Index of the resource in the active resources array for which to retrieve the metadata |
 
 #### Returns
@@ -329,7 +329,7 @@ Used to fetch the resource data for the token&#39;s active resource using its in
 ### getResourceOverwrites
 
 ```solidity
-function getResourceOverwrites(uint256 tokenId, uint64 resourceId) external view returns (uint64)
+function getResourceOverwrites(uint256 tokenId, uint64 newResourceId) external view returns (uint64)
 ```
 
 Used to retrieve the resource that will be overriden if a given resource from the token&#39;s pending array  is accepted.
@@ -341,13 +341,13 @@ Used to retrieve the resource that will be overriden if a given resource from th
 | Name | Type | Description |
 |---|---|---|
 | tokenId | uint256 | ID of the token to check |
-| resourceId | uint64 | ID of the resource that would be accepted |
+| newResourceId | uint64 | ID of the pending resource which will be accepted |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint64 | uint64 ID of the resource that would be overriden |
+| _0 | uint64 | uint64 ID of the resource which will be replaced |
 
 ### getSlotPartIds
 
@@ -392,7 +392,7 @@ Used to check whether the address has been granted the operator role by a given 
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | bool The boolean value indicating wehter the account we are checking has been granted the operator role  (`true`) or not (`false`) |
+| _0 | bool | bool The boolean value indicating wehter the account we are checking has been granted the operator role |
 
 ### isChildEquipped
 
@@ -400,7 +400,7 @@ Used to check whether the address has been granted the operator role by a given 
 function isChildEquipped(uint256 tokenId, address childAddress, uint256 childTokenId) external view returns (bool)
 ```
 
-Used to check whether the token has a given token equipped.
+Used to check whether the token has a given child equipped.
 
 
 
@@ -408,15 +408,15 @@ Used to check whether the token has a given token equipped.
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | ID of the token for which we are querrying if it has another equipped |
-| childAddress | address | Address of the child token&#39;s smart cotntract |
-| childTokenId | uint256 | ID of the child token for which we are checking if it is equipped |
+| tokenId | uint256 | ID of the parent token for which we are querying for |
+| childAddress | address | Address of the child token&#39;s smart contract |
+| childTokenId | uint256 | ID of the child token |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | bool The boolean value indicating whether the child toke is equipped into the given token or not |
+| _0 | bool | bool The boolean value indicating whether the child token is equipped into the given token or not |
 
 ### rejectAllResources
 
@@ -426,7 +426,7 @@ function rejectAllResources(uint256 tokenId) external nonpayable
 
 Rejects all resources from the pending array of a given token.
 
-*Effecitvely deletes the pending array.Requirements:  - The caller must own the token or be an approved operator.  - `tokenId` must exist.Emits a {ResourceRejected} event with resourceId = 0.*
+*Effecitvely deletes the pending array.Requirements:  - The caller must own the token or be approved to manage the token&#39;s resources  - `tokenId` must exist.Emits a {ResourceRejected} event with resourceId = 0.*
 
 #### Parameters
 
@@ -442,7 +442,7 @@ function rejectResource(uint256 tokenId, uint256 index) external nonpayable
 
 Rejects a resource from the pending array of given token.
 
-*Removes the resource from the token&#39;s pending resource array.Requirements:  - The caller must own the token or be an approved operator.  - `tokenId` must exist.  - `index` must be in range of the length of the pending resource array.Emits a {ResourceRejected} event.*
+*Removes the resource from the token&#39;s pending resource array.Requirements:  - The caller must own the token or be approved to manage the token&#39;s resources  - `tokenId` must exist.  - `index` must be in range of the length of the pending resource array.Emits a {ResourceRejected} event.*
 
 #### Parameters
 
@@ -466,7 +466,7 @@ Used to add or remove an operator of resources for the caller.
 | Name | Type | Description |
 |---|---|---|
 | operator | address | Address of the account to which the operator role is granted or revoked from |
-| approved | bool | The boolean value indicating wether the operator role is being granted (`true`) or revoked  (`false`) |
+| approved | bool | The boolean value indicating whether the operator role is being granted (`true`) or revoked  (`false`) |
 
 ### setPriority
 
@@ -476,14 +476,14 @@ function setPriority(uint256 tokenId, uint16[] priorities) external nonpayable
 
 Sets a new priority array for a given token.
 
-*The priority array is a non-sequential list of `uint16`s, where the lowest value is considered highest  priority.Value `0` of a priority is a special case equivalent to unitialized.Requirements:  - The caller must own the token or be an approved operator.  - `tokenId` must exist.  - The length of `priorities` must be equal the length of the active resources array.Emits a {ResourcePrioritySet} event.*
+*The priority array is a non-sequential list of `uint16`s, where the lowest value is considered highest  priority.Value `0` of a priority is a special case equivalent to unitialized.Requirements:  - The caller must own the token or be approved to manage the token&#39;s resources  - `tokenId` must exist.  - The length of `priorities` must be equal the length of the active resources array.Emits a {ResourcePrioritySet} event.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
 | tokenId | uint256 | ID of the token to set the priorities for |
-| priorities | uint16[] | An array of priority values |
+| priorities | uint16[] | An array of priorities of active resources. The succesion of items in the priorities array  matches that of the succesion of items in the active array |
 
 ### supportsInterface
 
@@ -574,7 +574,7 @@ Used to notify listeners that a child&#39;s resource has been equipped into one 
 event ChildResourceUnequipped(uint256 indexed tokenId, uint64 indexed resourceId, uint64 indexed slotPartId, uint256 childTokenId, address childAddress, uint64 childResourceId)
 ```
 
-Used to notify listeners that a child&#39;s resource has been removed from one of its parent resources.
+Used to notify listeners that a child&#39;s resource has been unequipped from one of its parent resources.
 
 
 
@@ -595,7 +595,7 @@ Used to notify listeners that a child&#39;s resource has been removed from one o
 event NestingAddressSet(address old, address new_)
 ```
 
-Used to notify listeners of a new `Nesting` smart contract address being set.
+Used to notify listeners of a new `Nesting` associated  smart contract address being set.
 
 *When initially setting the `Nesting` smart contract address, the `old` value should equal `0x0` address.*
 
@@ -731,7 +731,7 @@ Used to notify listeners that a resource object is initialized at `resourceId`.
 event ValidParentEquippableGroupIdSet(uint64 indexed equippableGroupId, uint64 indexed slotPartId, address parentAddress)
 ```
 
-Used to notify listeners that the resources belonging to a `equippableGroupId` have beem marked as  equippable into a given slot
+Used to notify listeners that the resources belonging to a `equippableGroupId` have been marked as  equippable into a given slot and parent
 
 
 

@@ -19,7 +19,6 @@ import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 
 // import "hardhat/console.sol";
 
-
 /**
  * @title RMRKExternalEquip
  * @author RMRK team
@@ -48,13 +47,14 @@ contract RMRKExternalEquip is
 
     address private _nestingAddress;
 
-    /// Mapping of uint64 Ids to resource object.
+    /// Mapping of uint64 resource ID to corresponding base address.
     mapping(uint64 => address) private _baseAddresses;
+    /// Mapping of uint64 ID to resource object.
     mapping(uint64 => uint64) private _equippableGroupIds;
 
-    /// Mapping of resourceId to all base parts (slot and fixed) applicable to this resource. Check cost of adding these
-    ///  to resource struct.
+    /// Mapping of resourceId to fixed base parts applicable to this resource.
     mapping(uint64 => uint64[]) private _fixedPartIds;
+    /// Mapping of resourceId to slot base parts applicable to this resource.
     mapping(uint64 => uint64[]) private _slotPartIds;
 
     /// Mapping of token ID to base address to slot part Id to equipped information. Used to compose an NFT.
@@ -92,9 +92,13 @@ contract RMRKExternalEquip is
     }
 
     /**
-     * @notice Used to verify that the given address is ether the owner of the token or approved to manage it.
-     * @param user Address of the account we are checking
-     * @param tokenId ID of the token we are checking
+     * @notice Internal function to check whether the queried user is either:
+     *   1. The root owner of the token associated with `tokenId`.
+     *   2. Is approved for all resources of the current owner via the `setApprovalForAllForResources` function.
+     *   3. Is granted approval for the specific tokenId for resource management via the `approveForResources` function.
+     * @param user Address of the user we are checking for permission
+     * @param tokenId ID of the token to query for permission for a given `user`
+     * @return bool A boolean value indicating whether the user is approved to manage the token or not
      */
     function _isApprovedForResourcesOrOwner(address user, uint256 tokenId)
         internal
@@ -169,12 +173,13 @@ contract RMRKExternalEquip is
     // --------------------------- HANDLING RESOURCES -------------------------
 
     /**
-     * @notice Used to accept a resource from a tokens pending array.
-     * @dev Once the resource is accepted from a pending array, the last resource from the pending array is moved to its
-     *  index. This ensures that there are no gaps in the pending array and is cheaper than shifting all of the members
-     *  of the array by updating all of their indices.
-     * @param tokenId ID of the token to which we are accepting a pending resource
-     * @param index Index of the resource in the given token's pending array
+     * @notice Used to accept a pending resource of a given token.
+     * @dev Accepting is done using the index of a pending resource. The array of pending resources is modified every
+     *  time one is accepted and the last pending resource is moved into its place.
+     * @dev Can only be called by the owner of the token or a user that has been approved to manage the tokens's
+     *  resources.
+     * @param tokenId ID of the token for which we are accepting the resource
+     * @param index Index of the resource to accept in token's pending arry
      */
     function acceptResource(uint256 tokenId, uint256 index)
         public
@@ -185,12 +190,13 @@ contract RMRKExternalEquip is
     }
 
     /**
-     * @notice Used to reject a resource from the pending array of a given token.
-     * @dev Once the resource has been rejected from the pending array, the resource in the last place of the pending
-     *  array takes its place. This ensures that there are no gaps in the pending array and is cheaper than shifting all
-     *  of the members of the array by updating all of their indices.
-     * @param tokenId ID of the token we are rejecting the pending resource from
-     * @param index Index of the resource in the pending array we are rejecting
+     * @notice Used to reject a pending resource of a given token.
+     * @dev Rejecting is done using the index of a pending resource. The array of pending resources is modified every
+     *  time one is rejected and the last pending resource is moved into its place.
+     * @dev Can only be called by the owner of the token or a user that has been approved to manage the tokens's
+     *  resources.
+     * @param tokenId ID of the token for which we are rejecting the resource
+     * @param index Index of the resource to reject in token's pending array
      */
     function rejectResource(uint256 tokenId, uint256 index)
         public
@@ -201,9 +207,11 @@ contract RMRKExternalEquip is
     }
 
     /**
-     * @notice Used to reject all of the resources from the pending array of a given token.
-     * @dev This indiscriminately clears the pending array of the token.
-     * @param tokenId ID of the token of which we are clearing the pending array
+     * @notice Used to reject all pending resources of a given token.
+     * @dev When rejecting all resources, the pending array is indiscriminately cleared.
+     * @dev Can only be called by the owner of the token or a user that has been approved to manage the tokens's
+     *  resources.
+     * @param tokenId ID of the token for which we are clearing the pending array
      */
     function rejectAllResources(uint256 tokenId)
         public
@@ -273,7 +281,7 @@ contract RMRKExternalEquip is
     }
 
     /**
-     * @notice Internal function for granting approvals for a speciific token.
+     * @notice Internal function for granting approvals for a specific token.
      * @param to Address of the account we are granting an approval to
      * @param tokenId ID of the token we are granting the approval for
      */
@@ -311,7 +319,7 @@ contract RMRKExternalEquip is
 
     /**
      * @notice Private function used to equip a child into a token.
-     * @dev Execution will be reverted if the `Slot` already has an item equipped.
+     * @dev If the `Slot` already has an item equipped, the execution will be reverted.
      * @dev If the child can't be used in the given `Slot`, the execution will be reverted.
      * @dev If the base doesn't allow this equip to happen, the execution will be reverted.
      * @dev The `IntakeEquip` stuct contains the following data:
@@ -324,7 +332,7 @@ contract RMRKExternalEquip is
      *  ]
      * @param data An `IntakeEquip` struct specifying the equip data
      */
-     function _equip(IntakeEquip memory data) internal virtual {
+    function _equip(IntakeEquip memory data) internal virtual {
         address baseAddress = getBaseAddressOfResource(data.resourceId);
         uint64 slotPartId = data.slotPartId;
         if (
@@ -387,10 +395,10 @@ contract RMRKExternalEquip is
     }
 
     /**
-     * @notice Private function to check if a given resource contains a given slot or not.
-     * @dev Execution will be reverted if the `Slot` is not found on the resource.
-     * @param resourceId ID of the resource being checked to contain the given `Slot`
-     * @param slotPartId ID of the `Slot` being validated
+     * @notice Private function to check if a given resource accepts a given slot or not.
+     * @dev Execution will be reverted if the `Slot` does not apply for the resource.
+     * @param resourceId ID of the resource
+     * @param slotPartId ID of the `Slot`
      */
     function _checkResourceAcceptsSlot(uint64 resourceId, uint64 slotPartId)
         private
@@ -455,8 +463,7 @@ contract RMRKExternalEquip is
     }
 
     /**
-     * @notice Used to equip a child into a slot that already has a child equipped and unequip the current child at the
-     *  same time.
+     * @notice Used unequip the current child from a slot and equip a new one child into the same slot.
      * @dev This can only be called by the owner of the token or by an account that has been granted permission to
      *  manage the given token by the current owner.
      * @dev The `IntakeEquip` stuct contains the following data:
@@ -480,11 +487,12 @@ contract RMRKExternalEquip is
     }
 
     /**
-     * @notice Used to check whether the given token has a child token equipped.
-     * @param tokenId ID of the parent token
-     * @param childAddress Address of the child token's collection
+     * @notice Used to check whether the token has a given child equipped.
+     * @dev This is used to prevent from unnesting a child that is equipped.
+     * @param tokenId ID of the parent token for which we are querying for
+     * @param childAddress Address of the child token's smart contract
      * @param childTokenId ID of the child token
-     * @return bool Boolean value indicating whether the child is equipped into the given parent
+     * @return bool The boolean value indicating whether the child token is equipped into the given token or not
      */
     function isChildEquipped(
         uint256 tokenId,
@@ -497,9 +505,9 @@ contract RMRKExternalEquip is
     }
 
     /**
-     * @notice Used to get the address of resource's `Base`
-     * @param resourceId ID of the resource we are retrieving the `Base` address from
-     * @return address Address of the resource's `Base`
+     * @notice Used to get the address of the resource's `Base`
+     * @param resourceId ID of the resource for which we are retrieving the address of the `Base`
+     * @return address Address of the `Base` smart contract of the resource
      */
     function getBaseAddressOfResource(uint64 resourceId)
         public
@@ -603,7 +611,7 @@ contract RMRKExternalEquip is
      *      baseAddress,
      *      metadataURI
      *  ]
-     * @param resourceId ID of the resource of which we are retrieving the extended resource struct
+     * @param resourceId ID of the resource of which we are retrieving
      * @return struct The `ExtendedResource` struct associated with the resource
      */
     function getExtendedResource(uint64 resourceId)
@@ -642,7 +650,7 @@ contract RMRKExternalEquip is
 
     /**
      * @notice Used to get IDs of the fixed parts present on a given resource.
-     * @param resourceId ID of the resource of which to get the active fiixed parts
+     * @param resourceId ID of the resource of which to get the active fixed parts
      * @return uint64[] An array of active fixed parts present on resource
      */
     function getFixedPartIds(uint64 resourceId)
@@ -691,7 +699,7 @@ contract RMRKExternalEquip is
      * @dev As the check validates that the owner is not the `0x0` address, the token is marked as non-existent if it
      *  hasn't been minted yet, or if has already been burned.
      * @param tokenId ID of the token we are checking
-     * @return bool A boolean value specifying whether the token exists (`true`) or not (`false`)
+     * @return bool A boolean value specifying whether the token exists
      */
     function _exists(uint256 tokenId) internal view virtual returns (bool) {
         return ownerOf(tokenId) != address(0);
@@ -710,16 +718,52 @@ contract RMRKExternalEquip is
 
     // HOOKS
 
+    /**
+     * @notice A hook to be called before a equipping a resource to the token.
+     * @dev The `IntakeEquip` struct consist of the following data:
+     *  [
+     *      tokenId,
+     *      childIndex,
+     *      resourceId,
+     *      slotPartId,
+     *      childResourceId
+     *  ]
+     * @param data The `IntakeEquip` struct containing data of the resource that is being equipped
+     */
     function _beforeEquip(IntakeEquip memory data) internal virtual {}
 
+    /**
+     * @notice A hook to be called after equipping a resource to the token.
+     * @dev The `IntakeEquip` struct consist of the following data:
+     *  [
+     *      tokenId,
+     *      childIndex,
+     *      resourceId,
+     *      slotPartId,
+     *      childResourceId
+     *  ]
+     * @param data The `IntakeEquip` struct containing data of the resource that was equipped
+     */
     function _afterEquip(IntakeEquip memory data) internal virtual {}
 
+    /**
+     * @notice A hook to be called before unequipping a resource from the token.
+     * @param tokenId ID of the token from which the resource is being unequipped
+     * @param resourceId ID of the resource being unequipped
+     * @param slotPartId ID of the slot from which the resource is being unequipped
+     */
     function _beforeUnequip(
         uint256 tokenId,
         uint64 resourceId,
         uint64 slotPartId
     ) internal virtual {}
 
+    /**
+     * @notice A hook to be called after unequipping a resource from the token.
+     * @param tokenId ID of the token from which the resource was unequipped
+     * @param resourceId ID of the resource that was unequipped
+     * @param slotPartId ID of the slot from which the resource was unequipped
+     */
     function _afterUnequip(
         uint256 tokenId,
         uint64 resourceId,

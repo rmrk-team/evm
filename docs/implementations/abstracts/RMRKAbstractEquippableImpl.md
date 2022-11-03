@@ -50,16 +50,16 @@ Sends an instance of Child from the pending children array at index to children 
 function acceptResource(uint256 tokenId, uint256 index) external nonpayable
 ```
 
-Used to accept a pending resource of a given token.
+Accepts a resource at from the pending array of given token.
 
-*Accepting is done using the index of a pending resource. The array of pending resources is modified every  time one is accepted and the last pending resource is moved into its place.Can only be called by the owner of the token or a user that has been approved to manage all of the owner&#39;s  resources.*
+*Migrates the resource from the token&#39;s pending resource array to the token&#39;s active resource array.Active resources cannot be removed by anyone, but can be replaced by a new resource.Requirements:  - The caller must own the token or be approved to manage the token&#39;s resources  - `tokenId` must exist.  - `index` must be in range of the length of the pending resource array.Emits an {ResourceAccepted} event.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | ID of the token for which we are accepting the resource |
-| index | uint256 | Index of the resource to accept in token&#39;s pending arry |
+| tokenId | uint256 | ID of the token for which to accept the pending resource |
+| index | uint256 | Index of the resource in the pending array to accept |
 
 ### addChild
 
@@ -381,7 +381,7 @@ function getActiveResources(uint256 tokenId) external view returns (uint64[])
 
 Used to retrieve the active resource IDs of a given token.
 
-*Resources data is stored by reference mapping `_resource[resourceId]`.*
+*Resources metadata is stored by reference mapping `_resource[resourceId]`.*
 
 #### Parameters
 
@@ -462,7 +462,7 @@ Used to get the address of the user that is approved to manage the specified tok
 function getBaseAddressOfResource(uint64 resourceId) external view returns (address)
 ```
 
-Used to get the address of resource&#39;s `Base`
+Used to get the address of the resource&#39;s `Base`
 
 
 
@@ -470,13 +470,13 @@ Used to get the address of resource&#39;s `Base`
 
 | Name | Type | Description |
 |---|---|---|
-| resourceId | uint64 | ID of the resource we are retrieving the `Base` address from |
+| resourceId | uint64 | ID of the resource for which we are retrieving the address of the `Base` |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | address | address Address of the resource&#39;s `Base` |
+| _0 | address | address Address of the `Base` smart contract of the resource |
 
 ### getEquipment
 
@@ -516,7 +516,7 @@ Used to get the extended resource struct of the resource associated with given `
 
 | Name | Type | Description |
 |---|---|---|
-| resourceId | uint64 | ID of the resource of which we are retrieving the extended resource struct |
+| resourceId | uint64 | ID of the resource of which we are retrieving |
 
 #### Returns
 
@@ -538,7 +538,7 @@ Used to get IDs of the fixed parts present on a given resource.
 
 | Name | Type | Description |
 |---|---|---|
-| resourceId | uint64 | ID of the resource of which to get the active fiixed parts |
+| resourceId | uint64 | ID of the resource of which to get the active fixed parts |
 
 #### Returns
 
@@ -552,7 +552,7 @@ Used to get IDs of the fixed parts present on a given resource.
 function getLock() external view returns (bool)
 ```
 
-Reenables the operation of functions using `notLocked` modifier.
+Used to retrieve the status of a lockable smart contract.
 
 
 
@@ -561,7 +561,7 @@ Reenables the operation of functions using `notLocked` modifier.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | undefined |
+| _0 | bool | bool A boolean value signifying whether the smart contract has been locked |
 
 ### getPendingResources
 
@@ -571,7 +571,7 @@ function getPendingResources(uint256 tokenId) external view returns (uint64[])
 
 Returns pending resource IDs for a given token
 
-*Pending resources data is stored by reference mapping _pendingResource[resourceId]*
+*Pending resources metadata is stored by reference mapping _pendingResource[resourceId]*
 
 #### Parameters
 
@@ -591,7 +591,7 @@ Returns pending resource IDs for a given token
 function getResourceMeta(uint64 resourceId) external view returns (string)
 ```
 
-Used to fetch the resource data of the specified resource.
+Used to fetch the resource metadata of the specified resource.
 
 *Resources are stored by reference mapping `_resources[resourceId]`.*
 
@@ -613,7 +613,7 @@ Used to fetch the resource data of the specified resource.
 function getResourceMetaForToken(uint256 tokenId, uint64 resourceIndex) external view returns (string)
 ```
 
-Used to fetch the resource data of the specified token&#39;s active resource with the given index.
+Used to fetch the resource metadata of the specified token&#39;s active resource with the given index.
 
 *Resources are stored by reference mapping `_resources[resourceId]`.Can be overriden to implement enumerate, fallback or other custom logic.*
 
@@ -633,7 +633,7 @@ Used to fetch the resource data of the specified token&#39;s active resource wit
 ### getResourceOverwrites
 
 ```solidity
-function getResourceOverwrites(uint256 tokenId, uint64 resourceId) external view returns (uint64)
+function getResourceOverwrites(uint256 tokenId, uint64 newResourceId) external view returns (uint64)
 ```
 
 Used to retrieve the resource ID that will be replaced (if any) if a given resourceID is accepted from  the pending resources array.
@@ -645,13 +645,13 @@ Used to retrieve the resource ID that will be replaced (if any) if a given resou
 | Name | Type | Description |
 |---|---|---|
 | tokenId | uint256 | ID of the token to query |
-| resourceId | uint64 | ID of the pending resource which will be accepted |
+| newResourceId | uint64 | ID of the pending resource which will be accepted |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint64 | uint64 ID of the resource which will be replacted |
+| _0 | uint64 | uint64 ID of the resource which will be replaced |
 
 ### getRoyaltyPercentage
 
@@ -738,22 +738,22 @@ function isApprovedForAll(address owner, address operator) external view returns
 function isApprovedForAllForResources(address owner, address operator) external view returns (bool)
 ```
 
-Used to retrieve the permission of the `operator` to manage the resources on `owner`&#39;s tokens.
+Used to check whether the address has been granted the operator role by a given address or not.
 
-
+*See {setApprovalForAllForResources}.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| owner | address | Address of the owner of the tokens |
-| operator | address | Address of the user being checked for permission to manage `owner`&#39;s tokens&#39; resources |
+| owner | address | Address of the account that we are checking for whether it has granted the operator role |
+| operator | address | Address of the account that we are checking whether it has the operator role or not |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | bool Boolean value indicating whether the `operator` is authorised to manage `owner`&#39;s tokens&#39; resources  (`true`) or not (`false`) |
+| _0 | bool | bool The boolean value indicating wehter the account we are checking has been granted the operator role |
 
 ### isChildEquipped
 
@@ -761,23 +761,23 @@ Used to retrieve the permission of the `operator` to manage the resources on `ow
 function isChildEquipped(uint256 tokenId, address childAddress, uint256 childTokenId) external view returns (bool)
 ```
 
-Used to check whether the given token has a child token equipped.
+Used to check whether the token has a given child equipped.
 
-
+*This is used to prevent from unnesting a child that is equipped.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | ID of the parent token |
-| childAddress | address | Address of the child token&#39;s collection |
+| tokenId | uint256 | ID of the parent token for which we are querying for |
+| childAddress | address | Address of the child token&#39;s smart contract |
 | childTokenId | uint256 | ID of the child token |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | bool Boolean value indicating whether the child is equipped into the given parent |
+| _0 | bool | bool The boolean value indicating whether the child token is equipped into the given token or not |
 
 ### isContributor
 
@@ -793,13 +793,13 @@ Used to check if the address is one of the contributors.
 
 | Name | Type | Description |
 |---|---|---|
-| contributor | address | Address of the contributor whoose status we are checking |
+| contributor | address | Address of the contributor whose status we are checking |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | Boolean value indicating wether the address is a contributor or not |
+| _0 | bool | Boolean value indicating whether the address is a contributor or not |
 
 ### maxSupply
 
@@ -977,15 +977,15 @@ Deletes all pending children.
 function rejectAllResources(uint256 tokenId) external nonpayable
 ```
 
-Used to reject all pending resources of a given token.
+Rejects all resources from the pending array of a given token.
 
-*When rejecting all resources, the pending array is indiscriminately cleared.Can only be called by the owner of the token or a user that has been approved to manage all of the owner&#39;s  resources.*
+*Effecitvely deletes the pending array.Requirements:  - The caller must own the token or be approved to manage the token&#39;s resources  - `tokenId` must exist.Emits a {ResourceRejected} event with resourceId = 0.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | ID of the token for which we are clearing the pending array |
+| tokenId | uint256 | ID of the token of which to clear the pending array |
 
 ### rejectResource
 
@@ -993,16 +993,16 @@ Used to reject all pending resources of a given token.
 function rejectResource(uint256 tokenId, uint256 index) external nonpayable
 ```
 
-Used to reject a pending resource of a given token.
+Rejects a resource from the pending array of given token.
 
-*Rejecting is done using the index of a pending resource. The array of pending resources is modified every  time one is rejected and the last pending resource is moved into its place.Can only be called by the owner of the token or a user that has been approved to manage all of the owner&#39;s  resources.*
+*Removes the resource from the token&#39;s pending resource array.Requirements:  - The caller must own the token or be approved to manage the token&#39;s resources  - `tokenId` must exist.  - `index` must be in range of the length of the pending resource array.Emits a {ResourceRejected} event.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | ID of the token for which we are rejecting the resource |
-| index | uint256 | Index of the resource to reject in token&#39;s pending array |
+| tokenId | uint256 | ID of the token that the resource is being rejected from |
+| index | uint256 | Index of the resource in the pending array to be rejected  |
 
 ### renounceOwnership
 
@@ -1155,16 +1155,16 @@ function setApprovalForAll(address operator, bool approved) external nonpayable
 function setApprovalForAllForResources(address operator, bool approved) external nonpayable
 ```
 
-Used to manage approval to manage own tokens&#39; resources.
+Used to add or remove an operator of resources for the caller.
 
-*Passing the value of `true` for the `approved` argument grants the approval and `false` revokes it.*
+*Operators can call {acceptResource}, {rejectResource}, {rejectAllResources} or {setPriority} for any token  owned by the caller.Requirements:  - The `operator` cannot be the caller.Emits an {ApprovalForAllForResources} event.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| operator | address | Address of the user of which we are managing the approval |
-| approved | bool | Boolean value indicating whether the approval is being granted (`true`) or revoked (`false`) |
+| operator | address | Address of the account to which the operator role is granted or revoked from |
+| approved | bool | The boolean value indicating whether the operator role is being granted (`true`) or revoked  (`false`) |
 
 ### setLock
 
@@ -1183,16 +1183,16 @@ Locks the operation.
 function setPriority(uint256 tokenId, uint16[] priorities) external nonpayable
 ```
 
-Used to set priorities of active resources of a token.
+Sets a new priority array for a given token.
 
-*Priorities define which resource we would rather have shown when displaying the token.The pending resources array length has to match the number of active resources, otherwise setting priorities  will be reverted.*
+*The priority array is a non-sequential list of `uint16`s, where the lowest value is considered highest  priority.Value `0` of a priority is a special case equivalent to unitialized.Requirements:  - The caller must own the token or be approved to manage the token&#39;s resources  - `tokenId` must exist.  - The length of `priorities` must be equal the length of the active resources array.Emits a {ResourcePrioritySet} event.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | ID of the token we are managing the priorities of |
-| priorities | uint16[] | An array of priorities of active resources. The succesion of items in the priorities array  matches that of the succesion of items in the active array |
+| tokenId | uint256 | ID of the token to set the priorities for |
+| priorities | uint16[] | An array of priority values |
 
 ### setValidParentForEquippableGroup
 
@@ -1386,7 +1386,7 @@ function updateRoyaltyRecipient(address newRoyaltyRecipient) external nonpayable
 
 Used to update recipient of royalties.
 
-*Custom access control has to be implemented to ensure that only the intedned actors can update the  beneficiary.*
+*Custom access control has to be implemented to ensure that only the intended actors can update the  beneficiary.*
 
 #### Parameters
 
@@ -1568,7 +1568,7 @@ Used to notify listeners that a child&#39;s resource has been equipped into one 
 event ChildResourceUnequipped(uint256 indexed tokenId, uint64 indexed resourceId, uint64 indexed slotPartId, uint256 childTokenId, address childAddress, uint64 childResourceId)
 ```
 
-Used to notify listeners that a child&#39;s resource has been removed from one of its parent resources.
+Used to notify listeners that a child&#39;s resource has been unequipped from one of its parent resources.
 
 
 
@@ -1783,7 +1783,7 @@ event Transfer(address indexed from, address indexed to, uint256 indexed tokenId
 event ValidParentEquippableGroupIdSet(uint64 indexed equippableGroupId, uint64 indexed slotPartId, address parentAddress)
 ```
 
-Used to notify listeners that the resources belonging to a `equippableGroupId` have beem marked as  equippable into a given slot
+Used to notify listeners that the resources belonging to a `equippableGroupId` have been marked as  equippable into a given slot and parent
 
 
 

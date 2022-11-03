@@ -10,28 +10,28 @@ import "../library/RMRKErrors.sol";
 /**
  * @title AbstractMultiResource
  * @author RMRK team
- * @notice Smart contract of the RMRK Abstract multi resource module.
+ * @notice Abstract Smart contract implementing most of the common logic for contracts implementing IRMRKMultiResource
  */
 abstract contract AbstractMultiResource is Context, IRMRKMultiResource {
     using RMRKLib for uint64[];
 
-    /// Mapping of uint64 Ids to resource object
+    /// Mapping of uint64 Ids to resource metadata
     mapping(uint64 => string) private _resources;
 
     /// Mapping of tokenId to new resource, to resource to be replaced
     mapping(uint256 => mapping(uint64 => uint64)) private _resourceOverwrites;
 
-    /// Mapping of tokenId to all resources
+    /// Mapping of tokenId to an array of active resources
     mapping(uint256 => uint64[]) private _activeResources;
 
-    /// Mapping of tokenId to an array of resource priorities
+    /// Mapping of tokenId to an array of pending resources
+    mapping(uint256 => uint64[]) private _pendingResources;
+
+    /// Mapping of tokenId to an array of priorities for active resources
     mapping(uint256 => uint16[]) private _activeResourcePriorities;
 
-    /// Double mapping of tokenId to active resources
+    /// Mapping of tokenId to resourceId to whether the token has this resource assigned
     mapping(uint256 => mapping(uint64 => bool)) private _tokenResources;
-
-    /// Mapping of tokenId to all resources by priority
-    mapping(uint256 => uint64[]) private _pendingResources;
 
     /// List of all resources
     uint64[] private _allResources;
@@ -41,7 +41,7 @@ abstract contract AbstractMultiResource is Context, IRMRKMultiResource {
         private _operatorApprovalsForResources;
 
     /**
-     * @notice Used to fetch the resource data of the specified resource.
+     * @notice Used to fetch the resource metadata of the specified resource.
      * @dev Resources are stored by reference mapping `_resources[resourceId]`.
      * @param resourceId ID of the resource to query
      * @return string Metadata of the resource
@@ -58,7 +58,7 @@ abstract contract AbstractMultiResource is Context, IRMRKMultiResource {
     }
 
     /**
-     * @notice Used to fetch the resource data of the specified token's active resource with the given index.
+     * @notice Used to fetch the resource metadata of the specified token's active resource with the given index.
      * @dev Resources are stored by reference mapping `_resources[resourceId]`.
      * @dev Can be overriden to implement enumerate, fallback or other custom logic.
      * @param tokenId ID of the token to query
@@ -87,7 +87,7 @@ abstract contract AbstractMultiResource is Context, IRMRKMultiResource {
 
     /**
      * @notice Used to retrieve the active resource IDs of a given token.
-     * @dev Resources data is stored by reference mapping `_resource[resourceId]`.
+     * @dev Resources metadata is stored by reference mapping `_resource[resourceId]`.
      * @param tokenId ID of the token to query
      * @return uint64[] Array of active resource IDs
      */
@@ -102,7 +102,7 @@ abstract contract AbstractMultiResource is Context, IRMRKMultiResource {
 
     /**
      * @notice Returns pending resource IDs for a given token
-     * @dev Pending resources data is stored by reference mapping _pendingResource[resourceId]
+     * @dev Pending resources metadata is stored by reference mapping _pendingResource[resourceId]
      * @param tokenId the token ID to query
      * @return uint64[] pending resource IDs
      */
@@ -135,24 +135,24 @@ abstract contract AbstractMultiResource is Context, IRMRKMultiResource {
      * @notice Used to retrieve the resource ID that will be replaced (if any) if a given resourceID is accepted from
      *  the pending resources array.
      * @param tokenId ID of the token to query
-     * @param resourceId ID of the pending resource which will be accepted
-     * @return uint64 ID of the resource which will be replacted
+     * @param newResourceId ID of the pending resource which will be accepted
+     * @return uint64 ID of the resource which will be replaced
      */
-    function getResourceOverwrites(uint256 tokenId, uint64 resourceId)
+    function getResourceOverwrites(uint256 tokenId, uint64 newResourceId)
         public
         view
         virtual
         returns (uint64)
     {
-        return _resourceOverwrites[tokenId][resourceId];
+        return _resourceOverwrites[tokenId][newResourceId];
     }
 
     /**
-     * @notice Used to retrieve the permission of the `operator` to manage the resources on `owner`'s tokens.
-     * @param owner Address of the owner of the tokens
-     * @param operator Address of the user being checked for permission to manage `owner`'s tokens' resources
-     * @return bool Boolean value indicating whether the `operator` is authorised to manage `owner`'s tokens' resources
-     *  (`true`) or not (`false`)
+     * @notice Used to check whether the address has been granted the operator role by a given address or not.
+     * @dev See {setApprovalForAllForResources}.
+     * @param owner Address of the account that we are checking for whether it has granted the operator role
+     * @param operator Address of the account that we are checking whether it has the operator role or not
+     * @return bool The boolean value indicating wehter the account we are checking has been granted the operator role
      */
     function isApprovedForAllForResources(address owner, address operator)
         public
@@ -164,10 +164,16 @@ abstract contract AbstractMultiResource is Context, IRMRKMultiResource {
     }
 
     /**
-     * @notice Used to manage approval to manage own tokens' resources.
-     * @dev Passing the value of `true` for the `approved` argument grants the approval and `false` revokes it.
-     * @param operator Address of the user of which we are managing the approval
-     * @param approved Boolean value indicating whether the approval is being granted (`true`) or revoked (`false`)
+     * @notice Used to add or remove an operator of resources for the caller.
+     * @dev Operators can call {acceptResource}, {rejectResource}, {rejectAllResources} or {setPriority} for any token
+     *  owned by the caller.
+     * @dev Requirements:
+     *
+     *  - The `operator` cannot be the caller.
+     * @dev Emits an {ApprovalForAllForResources} event.
+     * @param operator Address of the account to which the operator role is granted or revoked from
+     * @param approved The boolean value indicating whether the operator role is being granted (`true`) or revoked
+     *  (`false`)
      */
     function setApprovalForAllForResources(address operator, bool approved)
         public
@@ -248,7 +254,7 @@ abstract contract AbstractMultiResource is Context, IRMRKMultiResource {
 
     /**
      * @notice Used to specify the priorities for a given token's active resources.
-     * @dev If the length of the priorities array doesn't match the length of the active resources array, the executin
+     * @dev If the length of the priorities array doesn't match the length of the active resources array, the execution
      *  will be reverted.
      * @dev The position of the priority value in the array corresponds the position of the resource in the active
      *  resources array it will be applied to.
@@ -296,7 +302,7 @@ abstract contract AbstractMultiResource is Context, IRMRKMultiResource {
      * @notice Used to add a resource to a token.
      * @dev If the given resource is already added to the token, the execution will be reverted.
      * @dev If the resource ID is invalid, the execution will be reverted.
-     * @dev If the token already has more than the maximum amount of pending resources (128), the execution will be
+     * @dev If the token already has the maximum amount of pending resources (128), the execution will be
      *  reverted.
      * @param tokenId ID of the token to add the resource to
      * @param resourceId ID of the resource to add to the token

@@ -69,7 +69,7 @@ contract OwnableLock is Context {
 
     /**
      * @notice Used to retrieve the status of a lockable smart contract.
-     * @return bool A boolean value signifying whether the smart contract has been locked (`true`) or not (`false`)
+     * @return bool A boolean value signifying whether the smart contract has been locked
      */
     function getLock() public view returns (bool) {
         return _lock;
@@ -110,7 +110,7 @@ contract OwnableLock is Context {
      * @notice Adds a contributor to the smart contract.
      * @dev Can only be called by the owner.
      * @param contributor Address of the contributor's account
-    */
+     */
     function addContributor(address contributor) external onlyOwner {
         if (contributor != address(0)) revert RMRKNewContributorIsZeroAddress();
         _contributors[contributor] = 1;
@@ -120,16 +120,16 @@ contract OwnableLock is Context {
      * @notice Removes a contributor from the smart contract.
      * @dev Can only be called by the owner.
      * @param contributor Address of the contributor's account
-    */
+     */
     function revokeContributor(address contributor) external onlyOwner {
         delete _contributors[contributor];
     }
 
     /**
      * @notice Used to check if the address is one of the contributors.
-     * @param contributor Address of the contributor whoose status we are checking
-     * @return Boolean value indicating wether the address is a contributor or not
-    */
+     * @param contributor Address of the contributor whose status we are checking
+     * @return Boolean value indicating whether the address is a contributor or not
+     */
     function isContributor(address contributor) public view returns (bool) {
         return _contributors[contributor] == 1;
     }

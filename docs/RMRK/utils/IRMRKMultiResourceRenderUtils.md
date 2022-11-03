@@ -16,7 +16,7 @@
 function getPendingResourceByIndex(address target, uint256 tokenId, uint256 index) external view returns (string)
 ```
 
-Returns resource meta at `index` of pending resource array on `tokenId` Requirements: - `tokenId` must exist. - `index` must be inside the range of pending resource array
+Returns resource metadata at `index` of pending resource array on `tokenId` Requirements: - `tokenId` must exist. - `index` must be inside the range of pending resource array
 
 
 
@@ -40,7 +40,7 @@ Returns resource meta at `index` of pending resource array on `tokenId` Requirem
 function getResourceByIndex(address target, uint256 tokenId, uint256 index) external view returns (string)
 ```
 
-Returns resource meta at `index` of active resource array on `tokenId` Requirements: - `tokenId` must exist. - `index` must be inside the range of active resource array
+Returns resource metadata at `index` of active resource array on `tokenId` Requirements: - `tokenId` must exist. - `index` must be inside the range of active resource array
 
 
 
@@ -64,7 +64,7 @@ Returns resource meta at `index` of active resource array on `tokenId` Requireme
 function getResourcesById(address target, uint64[] resourceIds) external view returns (string[])
 ```
 
-Returns resource meta strings for the given ids Requirements: - `resourceIds` must exist.
+Returns resource metadata strings for the given ids Requirements: - `resourceIds` must exist.
 
 
 
@@ -87,7 +87,7 @@ Returns resource meta strings for the given ids Requirements: - `resourceIds` mu
 function getTopResourceMetaForToken(address target, uint256 tokenId) external view returns (string)
 ```
 
-Returns the resource meta with the highest priority for the given token
+Returns the resource metadata with the highest priority for the given token
 
 
 

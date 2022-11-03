@@ -11,10 +11,10 @@ import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
  */
 interface IRMRKNestingExternalEquip is IERC165 {
     /**
-     * @notice Ised to notify the listeners that the address of the `Equippable` smart contract has beem set.
+     * @notice sed to notify the listeners that the address of the `Equippable` associated smart contract has been set.
      * @dev When the address is set fot the first time, the `old` value should equal `0x0` address.
      * @param old Address of the previous `Equippable` smart contract
-     * @param new_ Address of the new `Equippable` smart contract 
+     * @param new_ Address of the new `Equippable` smart contract
      */
     event EquippableAddressSet(address old, address new_);
 
@@ -30,7 +30,7 @@ interface IRMRKNestingExternalEquip is IERC165 {
      * @param spender Address of the account we are checking for ownership or approval
      * @param tokenId ID of the token that we are checking
      * @return bool A boolean value indicating whether the specified address is the owner of the given token or approved
-     *  to manage it (`true`) or not (`false`)
+     *  to manage it
      */
     function isApprovedOrOwner(address spender, uint256 tokenId)
         external

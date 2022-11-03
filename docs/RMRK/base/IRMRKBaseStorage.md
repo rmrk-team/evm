@@ -31,7 +31,7 @@ Used to check whether the part is equippable by targetAddress.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | bool The status indicating whether the part with `partId` can be equipped into `targetAddress`or not |
+| _0 | bool | bool The status indicating whether the `targetAddress` can be equipped into `Part` with `partId` or not |
 
 ### checkIsEquippableToAll
 
@@ -53,7 +53,7 @@ Used to check if the part is equippable by all addresses.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | bool The status indicating whether the part with `partId` can be equipped into and address or not |
+| _0 | bool | bool The status indicating whether the part with `partId` can be equipped by any address or not |
 
 ### getMetadataURI
 
@@ -61,7 +61,7 @@ Used to check if the part is equippable by all addresses.
 function getMetadataURI() external view returns (string)
 ```
 
-Used to return the metadata URI of the associated collection.
+Used to return the metadata URI of the associated base.
 
 
 
@@ -70,7 +70,7 @@ Used to return the metadata URI of the associated collection.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | string Base contract metadata URI |
+| _0 | string | string Base metadata URI |
 
 ### getPart
 
@@ -78,7 +78,7 @@ Used to return the metadata URI of the associated collection.
 function getPart(uint64 partId) external view returns (struct IRMRKBaseStorage.Part)
 ```
 
-Used to retrieve a `Part` located at `partId`
+Used to retrieve a `Part` with id `partId`
 
 
 
@@ -191,8 +191,8 @@ Event to announce addition of a new part.
 | Name | Type | Description |
 |---|---|---|
 | partId `indexed` | uint64 | ID of the part that was added |
-| itemType `indexed` | enum IRMRKBaseStorage.ItemType | Enum value specifying wether the part is `None`, `Slot` and `Fixed` |
-| zIndex  | uint8 | An uint specifying the z value of the part. It is used to specify the depth at wich the part should  be rendered at |
+| itemType `indexed` | enum IRMRKBaseStorage.ItemType | Enum value specifying whether the part is `None`, `Slot` and `Fixed` |
+| zIndex  | uint8 | An uint specifying the z value of the part. It is used to specify the depth which the part should  be rendered at |
 | equippableAddresses  | address[] | An array of addresses that can equip this part |
 | metadataURI  | string | The metadata URI of the part |
 

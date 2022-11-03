@@ -52,7 +52,7 @@ function acceptResource(uint256 tokenId, uint256 index) external nonpayable
 
 Accepts a resource at from the pending array of given token.
 
-*Migrates the resource from the token&#39;s pending resource array to the token&#39;s active resource array.Active resources cannot be removed by anyone, but can be replaced by a new resource.Requirements:  - The caller must own the token or be an approved operator.  - `tokenId` must exist.  - `index` must be in range of the length of the pending resource array.Emits an {ResourceAccepted} event.*
+*Migrates the resource from the token&#39;s pending resource array to the token&#39;s active resource array.Active resources cannot be removed by anyone, but can be replaced by a new resource.Requirements:  - The caller must own the token or be approved to manage the token&#39;s resources  - `tokenId` must exist.  - `index` must be in range of the length of the pending resource array.Emits an {ResourceAccepted} event.*
 
 #### Parameters
 
@@ -355,7 +355,7 @@ function getActiveResources(uint256 tokenId) external view returns (uint64[])
 
 Used to retrieve the active resource IDs of a given token.
 
-*Resources data is stored by reference mapping `_resource[resourceId]`.*
+*Resources metadata is stored by reference mapping `_resource[resourceId]`.*
 
 #### Parameters
 
@@ -436,7 +436,7 @@ Used to retrieve the address of the account approved to manage resources of a gi
 function getLock() external view returns (bool)
 ```
 
-Reenables the operation of functions using `notLocked` modifier.
+Used to retrieve the status of a lockable smart contract.
 
 
 
@@ -445,7 +445,7 @@ Reenables the operation of functions using `notLocked` modifier.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | undefined |
+| _0 | bool | bool A boolean value signifying whether the smart contract has been locked |
 
 ### getPendingResources
 
@@ -455,7 +455,7 @@ function getPendingResources(uint256 tokenId) external view returns (uint64[])
 
 Returns pending resource IDs for a given token
 
-*Pending resources data is stored by reference mapping _pendingResource[resourceId]*
+*Pending resources metadata is stored by reference mapping _pendingResource[resourceId]*
 
 #### Parameters
 
@@ -475,7 +475,7 @@ Returns pending resource IDs for a given token
 function getResourceMeta(uint64 resourceId) external view returns (string)
 ```
 
-Used to fetch the resource data of the specified resource.
+Used to fetch the resource metadata of the specified resource.
 
 *Resources are stored by reference mapping `_resources[resourceId]`.*
 
@@ -497,7 +497,7 @@ Used to fetch the resource data of the specified resource.
 function getResourceMetaForToken(uint256 tokenId, uint64 resourceIndex) external view returns (string)
 ```
 
-Used to fetch the resource data of the specified token&#39;s active resource with the given index.
+Used to fetch the resource metadata of the specified token&#39;s active resource with the given index.
 
 *Resources are stored by reference mapping `_resources[resourceId]`.Can be overriden to implement enumerate, fallback or other custom logic.*
 
@@ -517,7 +517,7 @@ Used to fetch the resource data of the specified token&#39;s active resource wit
 ### getResourceOverwrites
 
 ```solidity
-function getResourceOverwrites(uint256 tokenId, uint64 resourceId) external view returns (uint64)
+function getResourceOverwrites(uint256 tokenId, uint64 newResourceId) external view returns (uint64)
 ```
 
 Used to retrieve the resource ID that will be replaced (if any) if a given resourceID is accepted from  the pending resources array.
@@ -529,13 +529,13 @@ Used to retrieve the resource ID that will be replaced (if any) if a given resou
 | Name | Type | Description |
 |---|---|---|
 | tokenId | uint256 | ID of the token to query |
-| resourceId | uint64 | ID of the pending resource which will be accepted |
+| newResourceId | uint64 | ID of the pending resource which will be accepted |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint64 | uint64 ID of the resource which will be replacted |
+| _0 | uint64 | uint64 ID of the resource which will be replaced |
 
 ### getRoyaltyPercentage
 
@@ -600,22 +600,22 @@ function isApprovedForAll(address owner, address operator) external view returns
 function isApprovedForAllForResources(address owner, address operator) external view returns (bool)
 ```
 
-Used to retrieve the permission of the `operator` to manage the resources on `owner`&#39;s tokens.
+Used to check whether the address has been granted the operator role by a given address or not.
 
-
+*See {setApprovalForAllForResources}.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| owner | address | Address of the owner of the tokens |
-| operator | address | Address of the user being checked for permission to manage `owner`&#39;s tokens&#39; resources |
+| owner | address | Address of the account that we are checking for whether it has granted the operator role |
+| operator | address | Address of the account that we are checking whether it has the operator role or not |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | bool Boolean value indicating whether the `operator` is authorised to manage `owner`&#39;s tokens&#39; resources  (`true`) or not (`false`) |
+| _0 | bool | bool The boolean value indicating wehter the account we are checking has been granted the operator role |
 
 ### isContributor
 
@@ -631,13 +631,13 @@ Used to check if the address is one of the contributors.
 
 | Name | Type | Description |
 |---|---|---|
-| contributor | address | Address of the contributor whoose status we are checking |
+| contributor | address | Address of the contributor whose status we are checking |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | Boolean value indicating wether the address is a contributor or not |
+| _0 | bool | Boolean value indicating whether the address is a contributor or not |
 
 ### maxSupply
 
@@ -870,7 +870,7 @@ function rejectAllResources(uint256 tokenId) external nonpayable
 
 Rejects all resources from the pending array of a given token.
 
-*Effecitvely deletes the pending array.Requirements:  - The caller must own the token or be an approved operator.  - `tokenId` must exist.Emits a {ResourceRejected} event with resourceId = 0.*
+*Effecitvely deletes the pending array.Requirements:  - The caller must own the token or be approved to manage the token&#39;s resources  - `tokenId` must exist.Emits a {ResourceRejected} event with resourceId = 0.*
 
 #### Parameters
 
@@ -886,7 +886,7 @@ function rejectResource(uint256 tokenId, uint256 index) external nonpayable
 
 Rejects a resource from the pending array of given token.
 
-*Removes the resource from the token&#39;s pending resource array.Requirements:  - The caller must own the token or be an approved operator.  - `tokenId` must exist.  - `index` must be in range of the length of the pending resource array.Emits a {ResourceRejected} event.*
+*Removes the resource from the token&#39;s pending resource array.Requirements:  - The caller must own the token or be approved to manage the token&#39;s resources  - `tokenId` must exist.  - `index` must be in range of the length of the pending resource array.Emits a {ResourceRejected} event.*
 
 #### Parameters
 
@@ -1030,16 +1030,16 @@ function setApprovalForAll(address operator, bool approved) external nonpayable
 function setApprovalForAllForResources(address operator, bool approved) external nonpayable
 ```
 
-Used to manage approval to manage own tokens&#39; resources.
+Used to add or remove an operator of resources for the caller.
 
-*Passing the value of `true` for the `approved` argument grants the approval and `false` revokes it.*
+*Operators can call {acceptResource}, {rejectResource}, {rejectAllResources} or {setPriority} for any token  owned by the caller.Requirements:  - The `operator` cannot be the caller.Emits an {ApprovalForAllForResources} event.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| operator | address | Address of the user of which we are managing the approval |
-| approved | bool | Boolean value indicating whether the approval is being granted (`true`) or revoked (`false`) |
+| operator | address | Address of the account to which the operator role is granted or revoked from |
+| approved | bool | The boolean value indicating whether the operator role is being granted (`true`) or revoked  (`false`) |
 
 ### setLock
 
@@ -1060,14 +1060,14 @@ function setPriority(uint256 tokenId, uint16[] priorities) external nonpayable
 
 Sets a new priority array for a given token.
 
-*The priority array is a non-sequential list of `uint16`s, where the lowest value is considered highest  priority.Value `0` of a priority is a special case equivalent to unitialized.Requirements:  - The caller must own the token or be an approved operator.  - `tokenId` must exist.  - The length of `priorities` must be equal the length of the active resources array.Emits a {ResourcePrioritySet} event.*
+*The priority array is a non-sequential list of `uint16`s, where the lowest value is considered highest  priority.Value `0` of a priority is a special case equivalent to unitialized.Requirements:  - The caller must own the token or be approved to manage the token&#39;s resources  - `tokenId` must exist.  - The length of `priorities` must be equal the length of the active resources array.Emits a {ResourcePrioritySet} event.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
 | tokenId | uint256 | ID of the token to set the priorities for |
-| priorities | uint16[] | An array of priority values |
+| priorities | uint16[] | An array of priorities of active resources. The succesion of items in the priorities array  matches that of the succesion of items in the active array |
 
 ### supportsInterface
 
@@ -1242,7 +1242,7 @@ function updateRoyaltyRecipient(address newRoyaltyRecipient) external nonpayable
 
 Used to update recipient of royalties.
 
-*Custom access control has to be implemented to ensure that only the intedned actors can update the  beneficiary.*
+*Custom access control has to be implemented to ensure that only the intended actors can update the  beneficiary.*
 
 #### Parameters
 

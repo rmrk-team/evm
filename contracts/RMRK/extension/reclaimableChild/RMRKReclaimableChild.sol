@@ -81,6 +81,7 @@ abstract contract RMRKReclaimableChild is IRMRKReclaimableChild, RMRKNesting {
      *      ID of the child token,
      *      address of the child token's collection smart contract
      *  ]
+     * @dev we use this hook to keep track of children which are in pending, so they cannot be reclaimed from there.
      * @param tokenId ID of the token receiving the child token
      * @param child A `Child` struct containing the data of the child token being added
      */
@@ -100,6 +101,7 @@ abstract contract RMRKReclaimableChild is IRMRKReclaimableChild, RMRKNesting {
      *      ID of the child token,
      *      address of the child token's collection smart contract
      *  ]
+     * @dev we use this hook to keep track of children which are in pending, so they cannot be reclaimed from there.
      * @param tokenId ID of the token accepting the child token
      * @param index Index of the token in the parent token's pending child tokens array
      * @param child A `Child` struct containing the data of the child token being accepted
@@ -120,6 +122,7 @@ abstract contract RMRKReclaimableChild is IRMRKReclaimableChild, RMRKNesting {
      *      ID of the child token,
      *      address of the child token's collection smart contract
      *  ]
+     * @dev we use this hook to keep track of children which are in pending, so they cannot be reclaimed from there.
      * @param tokenId ID of the token unnesting the child token
      * @param index Index of the token in the parent token's child tokens array
      * @param child A `Child` struct containing the data of the child token being unnested

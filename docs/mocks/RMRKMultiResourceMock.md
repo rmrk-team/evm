@@ -33,16 +33,16 @@ Version of the @rmrk-team/evm-contracts package
 function acceptResource(uint256 tokenId, uint256 index) external nonpayable
 ```
 
-Used to accept a resource from the pending array of a given token.
+Accepts a resource at from the pending array of given token.
 
-*When the resource is accepted, the last resource in the pending array is moved to its place.*
+*Migrates the resource from the token&#39;s pending resource array to the token&#39;s active resource array.Active resources cannot be removed by anyone, but can be replaced by a new resource.Requirements:  - The caller must own the token or be approved to manage the token&#39;s resources  - `tokenId` must exist.  - `index` must be in range of the length of the pending resource array.Emits an {ResourceAccepted} event.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | ID of the token for which the resource is being accepted |
-| index | uint256 | Index of the resource in the given token&#39;s penoding resources array to accept |
+| tokenId | uint256 | ID of the token for which to accept the pending resource |
+| index | uint256 | Index of the resource in the pending array to accept |
 
 ### addResourceEntry
 
@@ -102,16 +102,16 @@ function approve(address to, uint256 tokenId) external nonpayable
 function approveForResources(address to, uint256 tokenId) external nonpayable
 ```
 
-Used to grant an approval to an address to manage resources of a given token.
+Used to grant permission to the user to manage token&#39;s resources.
 
-*If the current owner of the token attempts to grant the approval to self, the execution will be reverted.*
+*This differs from transfer approvals, as approvals are not cleared when the approved party accepts or  rejects a resource, or sets resource priorities. This approval is cleared on token transfer.Only a single account can be approved at a time, so approving the `0x0` address clears previous approvals.Requirements:  - The caller must own the token or be an approved operator.  - `tokenId` must exist.Emits an {ApprovalForResources} event.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
 | to | address | Address of the account to grant the approval to |
-| tokenId | uint256 | ID of the token for which the approval is being given |
+| tokenId | uint256 | ID of the token for which the approval to manage the resources is granted |
 
 ### balanceOf
 
@@ -181,7 +181,7 @@ function getActiveResources(uint256 tokenId) external view returns (uint64[])
 
 Used to retrieve the active resource IDs of a given token.
 
-*Resources data is stored by reference mapping `_resource[resourceId]`.*
+*Resources metadata is stored by reference mapping `_resource[resourceId]`.*
 
 #### Parameters
 
@@ -240,21 +240,21 @@ function getApproved(uint256 tokenId) external view returns (address)
 function getApprovedForResources(uint256 tokenId) external view returns (address)
 ```
 
-Used to retrieve the address approved to manage the given token&#39;s resources.
+Used to retrieve the address of the account approved to manage resources of a given token.
 
-*If the specified token isn&#39;t minted, the execution will be reverted.*
+*Requirements:  - `tokenId` must exist.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | ID of the token for which the approved address is being retrieved |
+| tokenId | uint256 | ID of the token for which to retrieve the approved address |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | address | address Address of the account approved to manage the resources of a given token |
+| _0 | address | address Address of the account that is approved to manage the specified token&#39;s resources |
 
 ### getPendingResources
 
@@ -264,7 +264,7 @@ function getPendingResources(uint256 tokenId) external view returns (uint64[])
 
 Returns pending resource IDs for a given token
 
-*Pending resources data is stored by reference mapping _pendingResource[resourceId]*
+*Pending resources metadata is stored by reference mapping _pendingResource[resourceId]*
 
 #### Parameters
 
@@ -284,7 +284,7 @@ Returns pending resource IDs for a given token
 function getResourceMeta(uint64 resourceId) external view returns (string)
 ```
 
-Used to fetch the resource data of the specified resource.
+Used to fetch the resource metadata of the specified resource.
 
 *Resources are stored by reference mapping `_resources[resourceId]`.*
 
@@ -306,7 +306,7 @@ Used to fetch the resource data of the specified resource.
 function getResourceMetaForToken(uint256 tokenId, uint64 resourceIndex) external view returns (string)
 ```
 
-Used to fetch the resource data of the specified token&#39;s active resource with the given index.
+Used to fetch the resource metadata of the specified token&#39;s active resource with the given index.
 
 *Resources are stored by reference mapping `_resources[resourceId]`.Can be overriden to implement enumerate, fallback or other custom logic.*
 
@@ -326,7 +326,7 @@ Used to fetch the resource data of the specified token&#39;s active resource wit
 ### getResourceOverwrites
 
 ```solidity
-function getResourceOverwrites(uint256 tokenId, uint64 resourceId) external view returns (uint64)
+function getResourceOverwrites(uint256 tokenId, uint64 newResourceId) external view returns (uint64)
 ```
 
 Used to retrieve the resource ID that will be replaced (if any) if a given resourceID is accepted from  the pending resources array.
@@ -338,13 +338,13 @@ Used to retrieve the resource ID that will be replaced (if any) if a given resou
 | Name | Type | Description |
 |---|---|---|
 | tokenId | uint256 | ID of the token to query |
-| resourceId | uint64 | ID of the pending resource which will be accepted |
+| newResourceId | uint64 | ID of the pending resource which will be accepted |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint64 | uint64 ID of the resource which will be replacted |
+| _0 | uint64 | uint64 ID of the resource which will be replaced |
 
 ### isApprovedForAll
 
@@ -375,22 +375,22 @@ function isApprovedForAll(address owner, address operator) external view returns
 function isApprovedForAllForResources(address owner, address operator) external view returns (bool)
 ```
 
-Used to retrieve the permission of the `operator` to manage the resources on `owner`&#39;s tokens.
+Used to check whether the address has been granted the operator role by a given address or not.
 
-
+*See {setApprovalForAllForResources}.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| owner | address | Address of the owner of the tokens |
-| operator | address | Address of the user being checked for permission to manage `owner`&#39;s tokens&#39; resources |
+| owner | address | Address of the account that we are checking for whether it has granted the operator role |
+| operator | address | Address of the account that we are checking whether it has the operator role or not |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | bool Boolean value indicating whether the `operator` is authorised to manage `owner`&#39;s tokens&#39; resources  (`true`) or not (`false`) |
+| _0 | bool | bool The boolean value indicating wehter the account we are checking has been granted the operator role |
 
 ### mint
 
@@ -454,15 +454,15 @@ function ownerOf(uint256 tokenId) external view returns (address)
 function rejectAllResources(uint256 tokenId) external nonpayable
 ```
 
-Used to reject all resources from the pending array of a given token.
+Rejects all resources from the pending array of a given token.
 
-
+*Effecitvely deletes the pending array.Requirements:  - The caller must own the token or be approved to manage the token&#39;s resources  - `tokenId` must exist.Emits a {ResourceRejected} event with resourceId = 0.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | ID of the token for which the pending resources array is being cleared |
+| tokenId | uint256 | ID of the token of which to clear the pending array |
 
 ### rejectResource
 
@@ -470,16 +470,16 @@ Used to reject all resources from the pending array of a given token.
 function rejectResource(uint256 tokenId, uint256 index) external nonpayable
 ```
 
-Used to reject a resource from the pending array of a given token.
+Rejects a resource from the pending array of given token.
 
-*When the resource is rejected, the last resource in the pending array is moved to its place.*
+*Removes the resource from the token&#39;s pending resource array.Requirements:  - The caller must own the token or be approved to manage the token&#39;s resources  - `tokenId` must exist.  - `index` must be in range of the length of the pending resource array.Emits a {ResourceRejected} event.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | ID of the token for which the resource is being rejected |
-| index | uint256 | Index of the resource in the given token&#39;s pending resources array to reject |
+| tokenId | uint256 | ID of the token that the resource is being rejected from |
+| index | uint256 | Index of the resource in the pending array to be rejected  |
 
 ### safeMint
 
@@ -576,16 +576,16 @@ function setApprovalForAll(address operator, bool approved) external nonpayable
 function setApprovalForAllForResources(address operator, bool approved) external nonpayable
 ```
 
-Used to manage approval to manage own tokens&#39; resources.
+Used to add or remove an operator of resources for the caller.
 
-*Passing the value of `true` for the `approved` argument grants the approval and `false` revokes it.*
+*Operators can call {acceptResource}, {rejectResource}, {rejectAllResources} or {setPriority} for any token  owned by the caller.Requirements:  - The `operator` cannot be the caller.Emits an {ApprovalForAllForResources} event.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| operator | address | Address of the user of which we are managing the approval |
-| approved | bool | Boolean value indicating whether the approval is being granted (`true`) or revoked (`false`) |
+| operator | address | Address of the account to which the operator role is granted or revoked from |
+| approved | bool | The boolean value indicating whether the operator role is being granted (`true`) or revoked  (`false`) |
 
 ### setPriority
 
@@ -593,16 +593,16 @@ Used to manage approval to manage own tokens&#39; resources.
 function setPriority(uint256 tokenId, uint16[] priorities) external nonpayable
 ```
 
-Used to set the priorities of resources in the given token&#39;s active resources array.
+Sets a new priority array for a given token.
 
-*If the array of priorities in not the same length as the active resources array, the execution will be  reverted.*
+*The priority array is a non-sequential list of `uint16`s, where the lowest value is considered highest  priority.Value `0` of a priority is a special case equivalent to unitialized.Requirements:  - The caller must own the token or be approved to manage the token&#39;s resources  - `tokenId` must exist.  - The length of `priorities` must be equal the length of the active resources array.Emits a {ResourcePrioritySet} event.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | ID of the token for which the prioritied are being set |
-| priorities | uint16[] | Array of priorities to apply to the token&#39;s resources |
+| tokenId | uint256 | ID of the token to set the priorities for |
+| priorities | uint16[] | An array of priorities of active resources. The succesion of items in the priorities array  matches that of the succesion of items in the active array |
 
 ### supportsInterface
 

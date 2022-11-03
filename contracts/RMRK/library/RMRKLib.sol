@@ -10,7 +10,7 @@ pragma solidity ^0.8.16;
 library RMRKLib {
     /**
      * @notice Used to remove an item from the array using the specified value.
-     * @dev The value is removed by replacing it with the last value.
+     * @dev The value is removed by replacing it with the last value and removing the last element.
      * @param array An array of values containing the value to be removed
      * @param value The value of the resource to remove from the array
      */
@@ -30,7 +30,7 @@ library RMRKLib {
 
     /**
      * @notice Used to remove an item from the array using the specified index.
-     * @dev The item is removed by replacing it with the last item.
+     * @dev The item is removed by replacing it with the last item and removing the last element.
      * @param array An array of items containing the item to be removed
      * @param index Index of the item to remove
      */
@@ -48,7 +48,7 @@ library RMRKLib {
      * @param A The array containing the item to be found
      * @param a The value of the item to find the index of
      * @return uint256 The index of the item in the array
-     * @return bool A boolean value specifying whether the item was found (`true`) or not (`false`)
+     * @return bool A boolean value specifying whether the item was found
      */
     function indexOf(uint64[] memory A, uint64 a)
         internal

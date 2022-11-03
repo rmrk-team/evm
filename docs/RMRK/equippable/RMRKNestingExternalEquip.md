@@ -290,7 +290,7 @@ Used to verify that the specified address is either the owner of the given token
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | bool A boolean value indicating whether the specified address is the owner of the given token or approved  to manage it (`true`) or not (`false`) |
+| _0 | bool | bool A boolean value indicating whether the specified address is the owner of the given token or approved  to manage it |
 
 ### name
 
@@ -707,7 +707,7 @@ event ChildUnnested(uint256 indexed tokenId, address indexed childAddress, uint2
 event EquippableAddressSet(address old, address new_)
 ```
 
-Ised to notify the listeners that the address of the `Equippable` smart contract has beem set.
+sed to notify the listeners that the address of the `Equippable` associated smart contract has been set.
 
 
 

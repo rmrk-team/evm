@@ -78,9 +78,9 @@ interface IRMRKMultiResource is IERC165 {
     /**
      * @notice Used to notify listeners that owner has granted an approval to the user to manage the resources of a
      *  given token.
-     * @dev Approvals are cleared on action.
-     * @param owner Address of the account that has granted the approval for all resources
-     * @param approved Address of the account that has been granted approval to manage all resources
+     * @dev Approvals must be cleared on transfer
+     * @param owner Address of the account that has granted the approval for all token's resources
+     * @param approved Address of the account that has been granted approval to manage the token's resources
      * @param tokenId ID of the token on which the approval was granted
      */
     event ApprovalForResources(
@@ -93,7 +93,7 @@ interface IRMRKMultiResource is IERC165 {
      * @notice Used to notify listeners that owner has granted approval to the user to manage resources of all of their
      *  tokens.
      * @param owner Address of the account that has granted the approval for all resources on all of their tokens
-     * @param operator Address of the account that has been granted the approval to manage all resources on all of the
+     * @param operator Address of the account that has been granted the approval to manage the token's resources on all of the
      *  tokens
      * @param approved Boolean value signifying whether the permission has been granted (`true`) or revoked (`false`)
      */
@@ -104,22 +104,12 @@ interface IRMRKMultiResource is IERC165 {
     );
 
     /**
-     * @notice Resource object used by the RMRK NFT protocol.
-     * @return id ID of the resource
-     * @return metadataURI Metadata URI of the resource
-     */
-    struct Resource {
-        uint64 id; //8 bytes
-        string metadataURI; //32+
-    }
-
-    /**
      * @notice Accepts a resource at from the pending array of given token.
      * @dev Migrates the resource from the token's pending resource array to the token's active resource array.
      * @dev Active resources cannot be removed by anyone, but can be replaced by a new resource.
      * @dev Requirements:
      *
-     *  - The caller must own the token or be an approved operator.
+     *  - The caller must own the token or be approved to manage the token's resources
      *  - `tokenId` must exist.
      *  - `index` must be in range of the length of the pending resource array.
      * @dev Emits an {ResourceAccepted} event.
@@ -133,12 +123,12 @@ interface IRMRKMultiResource is IERC165 {
      * @dev Removes the resource from the token's pending resource array.
      * @dev Requirements:
      *
-     *  - The caller must own the token or be an approved operator.
+     *  - The caller must own the token or be approved to manage the token's resources
      *  - `tokenId` must exist.
      *  - `index` must be in range of the length of the pending resource array.
      * @dev Emits a {ResourceRejected} event.
      * @param tokenId ID of the token that the resource is being rejected from
-     * @param index Index of the resource in the pending array to be rejected 
+     * @param index Index of the resource in the pending array to be rejected
      */
     function rejectResource(uint256 tokenId, uint256 index) external;
 
@@ -147,7 +137,7 @@ interface IRMRKMultiResource is IERC165 {
      * @dev Effecitvely deletes the pending array.
      * @dev Requirements:
      *
-     *  - The caller must own the token or be an approved operator.
+     *  - The caller must own the token or be approved to manage the token's resources
      *  - `tokenId` must exist.
      * @dev Emits a {ResourceRejected} event with resourceId = 0.
      * @param tokenId ID of the token of which to clear the pending array
@@ -161,12 +151,13 @@ interface IRMRKMultiResource is IERC165 {
      * @dev Value `0` of a priority is a special case equivalent to unitialized.
      * @dev Requirements:
      *
-     *  - The caller must own the token or be an approved operator.
+     *  - The caller must own the token or be approved to manage the token's resources
      *  - `tokenId` must exist.
      *  - The length of `priorities` must be equal the length of the active resources array.
      * @dev Emits a {ResourcePrioritySet} event.
      * @param tokenId ID of the token to set the priorities for
-     * @param priorities An array of priority values
+     * @param priorities An array of priorities of active resources. The succesion of items in the priorities array
+     *  matches that of the succesion of items in the active array
      */
     function setPriority(uint256 tokenId, uint16[] calldata priorities)
         external;
@@ -197,6 +188,8 @@ interface IRMRKMultiResource is IERC165 {
 
     /**
      * @notice Used to retrieve the priorities of the active resoources of a given token.
+     * @dev Resource priorities are a non-sequential array of uint16 values with an array size equal to active resource
+     *  priorites.
      * @param tokenId ID of the token for which to retrieve the priorities of the active resources
      * @return uint16[] An array of priorities of the active resources of the given token
      */
@@ -211,10 +204,10 @@ interface IRMRKMultiResource is IERC165 {
      * @dev Resource data is stored by reference, in order to access the data corresponding to the ID, call
      *  `getResourceMeta(resourceId)`.
      * @param tokenId ID of the token to check
-     * @param resourceId ID of the resource that would be accepted
-     * @return uint64 ID of the resource that would be overriden
+     * @param newResourceId ID of the pending resource which will be accepted
+     * @return uint64 ID of the resource which will be replaced
      */
-    function getResourceOverwrites(uint256 tokenId, uint64 resourceId)
+    function getResourceOverwrites(uint256 tokenId, uint64 newResourceId)
         external
         view
         returns (uint64);
@@ -230,10 +223,10 @@ interface IRMRKMultiResource is IERC165 {
         returns (string memory);
 
     /**
-     * @notice Used to fetch the resource data for the token's active resource using its index.
+     * @notice Used to fetch the resource metadata of the specified token's active resource with the given index.
      * @dev Resources are stored by reference mapping `_resources[resourceId]`.
      * @dev Can be overriden to implement enumerate, fallback or other custom logic.
-     * @param tokenId ID of the token from which to retrieve the resource data
+     * @param tokenId ID of the token from which to retrieve the resource metadata
      * @param resourceIndex Index of the resource in the active resources array for which to retrieve the metadata
      * @return string The metadata of the resource belonging to the specified index in the token's active resources
      *  array
@@ -287,7 +280,7 @@ interface IRMRKMultiResource is IERC165 {
      *  - The `operator` cannot be the caller.
      * @dev Emits an {ApprovalForAllForResources} event.
      * @param operator Address of the account to which the operator role is granted or revoked from
-     * @param approved The boolean value indicating wether the operator role is being granted (`true`) or revoked
+     * @param approved The boolean value indicating whether the operator role is being granted (`true`) or revoked
      *  (`false`)
      */
     function setApprovalForAllForResources(address operator, bool approved)
@@ -299,7 +292,6 @@ interface IRMRKMultiResource is IERC165 {
      * @param owner Address of the account that we are checking for whether it has granted the operator role
      * @param operator Address of the account that we are checking whether it has the operator role or not
      * @return bool The boolean value indicating wehter the account we are checking has been granted the operator role
-     *  (`true`) or not (`false`)
      */
     function isApprovedForAllForResources(address owner, address operator)
         external

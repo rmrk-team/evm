@@ -98,7 +98,7 @@ function updateRoyaltyRecipient(address newRoyaltyRecipient) external nonpayable
 
 Used to update recipient of royalties.
 
-*Custom access control has to be implemented to ensure that only the intedned actors can update the  beneficiary.*
+*Custom access control has to be implemented to ensure that only the intended actors can update the  beneficiary.*
 
 #### Parameters
 

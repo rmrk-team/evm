@@ -7,4 +7,6 @@ pragma solidity ^0.8.16;
  * @author RMRK team
  * @notice Smart contract of the RMRK Themes module.
  */
-contract RMRKThemes {}
+contract RMRKThemes {
+
+}

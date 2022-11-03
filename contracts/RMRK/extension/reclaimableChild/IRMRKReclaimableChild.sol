@@ -12,9 +12,8 @@ import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 interface IRMRKReclaimableChild is IERC165 {
     /**
      * @notice Used to reclaim an abandoned child token.
-     * @dev Child token is created by unnesting with `to` as the `0x0` address or by rejecting children.
-     * @dev This function will set the child's owner to the `rootOwner` of the caller, allowing the `rootOwner`
-     * management permissions for the child.
+     * @dev Child token is created by unnesting with `to` as the `0x0` address.
+     * @dev This function will set the child's ownership to the `rootOwner` of the caller.
      * @dev Requirements:
      *
      *  - `tokenId` must exist
