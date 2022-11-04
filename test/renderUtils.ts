@@ -66,7 +66,7 @@ describe('Render Utils', async function () {
     );
     await equip.addResourceToToken(tokenId, resId, 0);
     await equip.addResourceToToken(tokenId, resId2, 0);
-    await equip.acceptResource(tokenId, 0);
+    await equip.acceptResource(tokenId, 0, resId);
   });
 
   describe('Render Utils MultiResource', async function () {
@@ -101,8 +101,8 @@ describe('Render Utils', async function () {
       const otherTokenId = await mintFromMock(equip, owner.address);
       await equip.addResourceToToken(otherTokenId, resId, 0);
       await equip.addResourceToToken(otherTokenId, resId2, 0);
-      await equip.acceptResource(otherTokenId, 0);
-      await equip.acceptResource(otherTokenId, 0);
+      await equip.acceptResource(otherTokenId, 0, resId);
+      await equip.acceptResource(otherTokenId, 0, resId2);
       await equip.setPriority(otherTokenId, [1, 0]);
       expect(await renderUtils.getTopResourceMetaForToken(equip.address, otherTokenId)).to.eql(
         'ipfs://res2.jpg',

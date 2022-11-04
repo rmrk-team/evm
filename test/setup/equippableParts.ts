@@ -323,7 +323,9 @@ async function setupContextForParts(
 
     for (let i = 0; i < uniqueNeons; i++) {
       await neonEquip.addResourceToToken(neons[i], neonResIds[i % neonResIds.length], 0);
-      await neonEquip.connect(addrs[i % 3]).acceptResource(neons[i], 0);
+      await neonEquip
+        .connect(addrs[i % 3])
+        .acceptResource(neons[i], 0, neonResIds[i % neonResIds.length]);
     }
   }
 
@@ -430,8 +432,12 @@ async function setupContextForParts(
     for (let i = 0; i < masks.length; i++) {
       await maskEquip.addResourceToToken(masks[i], maskResourcesFull[i % uniqueMasks], 0);
       await maskEquip.addResourceToToken(masks[i], maskResourcesEquip[i % uniqueMasks], 0);
-      await maskEquip.connect(addrs[i % 3]).acceptResource(masks[i], 0);
-      await maskEquip.connect(addrs[i % 3]).acceptResource(masks[i], 0);
+      await maskEquip
+        .connect(addrs[i % 3])
+        .acceptResource(masks[i], 0, maskResourcesFull[i % uniqueMasks]);
+      await maskEquip
+        .connect(addrs[i % 3])
+        .acceptResource(masks[i], 0, maskResourcesEquip[i % uniqueMasks]);
     }
   }
 }

@@ -54,7 +54,7 @@ async function shouldBehaveLikeMultiResource(
         const resId = await addResourceEntryFunc(this.token);
         await expect(addResourceToTokenFunc(this.token, tokenId, resId, 0))
           .to.emit(this.token, 'ResourceAddedToToken')
-          .withArgs(tokenId, resId);
+          .withArgs(tokenId, resId, 0);
       });
 
       it('cannot add non existing resource to token', async function () {
@@ -116,23 +116,20 @@ async function shouldBehaveLikeMultiResource(
         const resId = await addResourceEntryFunc(this.token);
         const resId2 = await addResourceEntryFunc(this.token);
         await addResourceToTokenFunc(this.token, tokenId, resId, 0);
-        await this.token.connect(tokenOwner).acceptResource(tokenId, 0);
+        await this.token.connect(tokenOwner).acceptResource(tokenId, 0, resId);
 
         // Add new resource to overwrite the first, and accept
-        let activeResources = await this.token.getActiveResources(tokenId);
-        await expect(this.token.addResourceToToken(tokenId, resId2, activeResources[0]))
-          .to.emit(this.token, 'ResourceOverwriteProposed')
+        await expect(this.token.addResourceToToken(tokenId, resId2, resId))
+          .to.emit(this.token, 'ResourceAddedToToken')
           .withArgs(tokenId, resId2, resId);
         const pendingResources = await this.token.getPendingResources(tokenId);
 
-        expect(await this.token.getResourceOverwrites(tokenId, pendingResources[0])).to.eql(
-          activeResources[0],
-        );
-        await expect(this.token.connect(tokenOwner).acceptResource(tokenId, 0))
-          .to.emit(this.token, 'ResourceOverwritten')
-          .withArgs(tokenId, resId, resId2);
+        expect(await this.token.getResourceOverwrites(tokenId, pendingResources[0])).to.eql(resId);
+        await expect(this.token.connect(tokenOwner).acceptResource(tokenId, 0, resId2))
+          .to.emit(this.token, 'ResourceAccepted')
+          .withArgs(tokenId, resId2, resId);
 
-        activeResources = await this.token.getActiveResources(tokenId);
+        const activeResources = await this.token.getActiveResources(tokenId);
         expect(
           await this.renderUtils.getResourcesById(this.token.address, activeResources),
         ).to.be.eql([metaURIDefault]);
@@ -144,7 +141,7 @@ async function shouldBehaveLikeMultiResource(
         const resId = await addResourceEntryFunc(this.token);
 
         await addResourceToTokenFunc(this.token, tokenId, resId, 1);
-        await this.token.connect(tokenOwner).acceptResource(tokenId, 0);
+        await this.token.connect(tokenOwner).acceptResource(tokenId, 0, resId);
 
         const activeResources = await this.token.getActiveResources(tokenId);
         expect(
@@ -155,11 +152,11 @@ async function shouldBehaveLikeMultiResource(
       it('can reject resource and overwrites are cleared', async function () {
         const resId = await addResourceEntryFunc(this.token);
         await addResourceToTokenFunc(this.token, tokenId, resId, 0);
-        await this.token.connect(tokenOwner).acceptResource(tokenId, 0);
+        await this.token.connect(tokenOwner).acceptResource(tokenId, 0, resId);
 
         const resId2 = await addResourceEntryFunc(this.token);
         await addResourceToTokenFunc(this.token, tokenId, resId2, resId);
-        await this.token.connect(tokenOwner).rejectResource(tokenId, 0);
+        await this.token.connect(tokenOwner).rejectResource(tokenId, 0, resId2);
 
         expect(await this.token.getResourceOverwrites(tokenId, resId2)).to.eql(bn(0));
       });
@@ -167,11 +164,11 @@ async function shouldBehaveLikeMultiResource(
       it('can reject all resources and overwrites are cleared', async function () {
         const resId = await addResourceEntryFunc(this.token);
         await addResourceToTokenFunc(this.token, tokenId, resId, 0);
-        await this.token.connect(tokenOwner).acceptResource(tokenId, 0);
+        await this.token.connect(tokenOwner).acceptResource(tokenId, 0, resId);
 
         const resId2 = await addResourceEntryFunc(this.token);
         await addResourceToTokenFunc(this.token, tokenId, resId2, resId);
-        await this.token.connect(tokenOwner).rejectAllResources(tokenId);
+        await this.token.connect(tokenOwner).rejectAllResources(tokenId, 1);
 
         expect(await this.token.getResourceOverwrites(tokenId, resId2)).to.eql(bn(0));
       });
@@ -200,9 +197,9 @@ async function shouldBehaveLikeMultiResource(
           await this.renderUtils.getResourcesById(this.token.address, pendingResources),
         ).to.eql([resData1, resData2]);
 
-        await expect(this.token.connect(tokenOwner).acceptResource(tokenId, 0))
+        await expect(this.token.connect(tokenOwner).acceptResource(tokenId, 0, resId1))
           .to.emit(this.token, 'ResourceAccepted')
-          .withArgs(tokenId, resId1);
+          .withArgs(tokenId, resId1, 0);
 
         const activeResources = await this.token.getActiveResources(tokenId);
         expect(await this.renderUtils.getResourcesById(this.token.address, activeResources)).to.eql(
@@ -220,17 +217,13 @@ async function shouldBehaveLikeMultiResource(
         expect(await this.token.getResourceMetaForToken(tokenId, 0)).equal(resData1);
       });
 
-      it('can get all resources', async function () {
-        expect(await this.token.getAllResources()).to.eql([resId1, resId2]);
-      });
-
       it('can accept multiple resources', async function () {
-        await expect(this.token.connect(tokenOwner).acceptResource(tokenId, 1)) // Accepting resId2
+        await expect(this.token.connect(tokenOwner).acceptResource(tokenId, 1, resId2))
           .to.emit(this.token, 'ResourceAccepted')
-          .withArgs(tokenId, resId2);
-        await expect(this.token.connect(tokenOwner).acceptResource(tokenId, 0)) // Accepting resId1
+          .withArgs(tokenId, resId2, 0);
+        await expect(this.token.connect(tokenOwner).acceptResource(tokenId, 0, resId1))
           .to.emit(this.token, 'ResourceAccepted')
-          .withArgs(tokenId, resId1);
+          .withArgs(tokenId, resId1, 0);
 
         expect(await this.token.getPendingResources(tokenId)).to.be.eql([]);
 
@@ -244,7 +237,7 @@ async function shouldBehaveLikeMultiResource(
 
       it('can accept resource if approved', async function () {
         await this.token.connect(tokenOwner).approveForResources(approved.address, tokenId);
-        await this.token.connect(approved).acceptResource(tokenId, 0);
+        await this.token.connect(approved).acceptResource(tokenId, 0, resId1);
 
         const activeResources = await this.token.getActiveResources(tokenId);
         expect(await this.renderUtils.getResourcesById(this.token.address, activeResources)).to.eql(
@@ -254,7 +247,7 @@ async function shouldBehaveLikeMultiResource(
 
       it('can accept resource if approved for all', async function () {
         await this.token.connect(tokenOwner).setApprovalForAllForResources(operator.address, true);
-        await this.token.connect(operator).acceptResource(tokenId, 0);
+        await this.token.connect(operator).acceptResource(tokenId, 0, resId1);
 
         const activeResources = await this.token.getActiveResources(tokenId);
         expect(await this.renderUtils.getResourcesById(this.token.address, activeResources)).to.eql(
@@ -265,22 +258,29 @@ async function shouldBehaveLikeMultiResource(
       it('cannot accept more resources than there are', async function () {
         // Trying to accept over pending size
         await expect(
-          this.token.connect(tokenOwner).acceptResource(tokenId, 3),
+          this.token.connect(tokenOwner).acceptResource(tokenId, 3, resId1),
         ).to.be.revertedWithCustomError(this.token, 'RMRKIndexOutOfRange');
 
         // Accepts 2 pending
-        await this.token.connect(tokenOwner).acceptResource(tokenId, 0);
-        await this.token.connect(tokenOwner).acceptResource(tokenId, 0);
+        await this.token.connect(tokenOwner).acceptResource(tokenId, 0, resId1);
+        await this.token.connect(tokenOwner).acceptResource(tokenId, 0, resId2);
 
         // Nothing more to accept, even on index 0
         await expect(
-          this.token.connect(tokenOwner).acceptResource(tokenId, 0),
+          this.token.connect(tokenOwner).acceptResource(tokenId, 0, resId1),
         ).to.be.revertedWithCustomError(this.token, 'RMRKIndexOutOfRange');
+      });
+
+      it('cannot accept if id does not match', async function () {
+        // It's resId1 which is on index 0
+        await expect(
+          this.token.connect(tokenOwner).acceptResource(tokenId, 0, resId2),
+        ).to.be.revertedWithCustomError(this.token, 'RMRKUnexpectedResourceId');
       });
 
       it('cannot accept resource if not owner or approved', async function () {
         await expect(
-          this.token.connect(notApproved).acceptResource(tokenId, 0),
+          this.token.connect(notApproved).acceptResource(tokenId, 0, resId1),
         ).to.be.revertedWithCustomError(this.token, 'RMRKNotApprovedForResourcesOrOwner');
       });
     });
@@ -292,7 +292,7 @@ async function shouldBehaveLikeMultiResource(
           await this.renderUtils.getResourcesById(this.token.address, pendingResources),
         ).to.eql([resData1, resData2]);
 
-        await expect(this.token.connect(tokenOwner).rejectResource(tokenId, 0))
+        await expect(this.token.connect(tokenOwner).rejectResource(tokenId, 0, resId1))
           .to.emit(this.token, 'ResourceRejected')
           .withArgs(tokenId, resId1);
 
@@ -305,7 +305,7 @@ async function shouldBehaveLikeMultiResource(
 
       it('can reject resource if approved', async function () {
         await this.token.connect(tokenOwner).approveForResources(approved.address, tokenId);
-        await this.token.connect(approved).rejectResource(tokenId, 0);
+        await this.token.connect(approved).rejectResource(tokenId, 0, resId1);
 
         expect(await this.token.getActiveResources(tokenId)).to.be.eql([]);
         const pendingResources = await this.token.getPendingResources(tokenId);
@@ -316,7 +316,7 @@ async function shouldBehaveLikeMultiResource(
 
       it('can reject resource if approved for all', async function () {
         await this.token.connect(tokenOwner).setApprovalForAllForResources(operator.address, true);
-        await this.token.connect(operator).rejectResource(tokenId, 0);
+        await this.token.connect(operator).rejectResource(tokenId, 0, resId1);
 
         expect(await this.token.getActiveResources(tokenId)).to.be.eql([]);
         const pendingResources = await this.token.getPendingResources(tokenId);
@@ -326,7 +326,7 @@ async function shouldBehaveLikeMultiResource(
       });
 
       it('can reject all resources', async function () {
-        await expect(this.token.connect(tokenOwner).rejectAllResources(tokenId))
+        await expect(this.token.connect(tokenOwner).rejectAllResources(tokenId, 2))
           .to.emit(this.token, 'ResourceRejected')
           .withArgs(tokenId, 0);
 
@@ -334,9 +334,9 @@ async function shouldBehaveLikeMultiResource(
         expect(await this.token.getPendingResources(tokenId)).to.eql([]);
       });
 
-      it('can reject allresources if approved', async function () {
+      it('can reject all resources if approved', async function () {
         await this.token.connect(tokenOwner).approveForResources(approved.address, tokenId);
-        await this.token.connect(approved).rejectAllResources(tokenId);
+        await this.token.connect(approved).rejectAllResources(tokenId, 2);
 
         expect(await this.token.getActiveResources(tokenId)).to.be.eql([]);
         expect(await this.token.getPendingResources(tokenId)).to.eql([]);
@@ -344,7 +344,7 @@ async function shouldBehaveLikeMultiResource(
 
       it('can reject all resources if approved for all', async function () {
         await this.token.connect(tokenOwner).setApprovalForAllForResources(operator.address, true);
-        await this.token.connect(operator).rejectAllResources(tokenId);
+        await this.token.connect(operator).rejectAllResources(tokenId, 2);
 
         expect(await this.token.getActiveResources(tokenId)).to.be.eql([]);
         expect(await this.token.getPendingResources(tokenId)).to.eql([]);
@@ -353,33 +353,47 @@ async function shouldBehaveLikeMultiResource(
       it('cannot reject more resources than there are', async function () {
         // Trying to accept over pending size
         await expect(
-          this.token.connect(tokenOwner).rejectResource(tokenId, 3),
+          this.token.connect(tokenOwner).rejectResource(tokenId, 3, resId1),
         ).to.be.revertedWithCustomError(this.token, 'RMRKIndexOutOfRange');
 
         // Rejects 2 pending
-        await this.token.connect(tokenOwner).rejectResource(tokenId, 0);
-        await this.token.connect(tokenOwner).rejectResource(tokenId, 0);
+        await this.token.connect(tokenOwner).rejectResource(tokenId, 0, resId1);
+        await this.token.connect(tokenOwner).rejectResource(tokenId, 0, resId2);
 
         // Nothing more to reject, even on index 0
         await expect(
-          this.token.connect(tokenOwner).rejectResource(tokenId, 0),
+          this.token.connect(tokenOwner).rejectResource(tokenId, 0, resId1),
         ).to.be.revertedWithCustomError(this.token, 'RMRKIndexOutOfRange');
+      });
+
+      it('cannot reject resource if id does not match', async function () {
+        // It's resId1 which is on index 0
+        await expect(
+          this.token.connect(tokenOwner).rejectResource(tokenId, 0, resId2),
+        ).to.be.revertedWithCustomError(this.token, 'RMRKUnexpectedResourceId');
+      });
+
+      it('cannot reject all resources if quantity does not match', async function () {
+        // There are 2 pending resources
+        await expect(
+          this.token.connect(tokenOwner).rejectAllResources(tokenId, 1),
+        ).to.be.revertedWithCustomError(this.token, 'RMRKUnexpectedNumberOfResources');
       });
 
       it('cannot reject resource nor reject all if not owner', async function () {
         await expect(
-          this.token.connect(notApproved).rejectResource(tokenId, 0),
+          this.token.connect(notApproved).rejectResource(tokenId, 0, resId1),
         ).to.be.revertedWithCustomError(this.token, 'RMRKNotApprovedForResourcesOrOwner');
         await expect(
-          this.token.connect(notApproved).rejectAllResources(tokenId),
+          this.token.connect(notApproved).rejectAllResources(tokenId, 1),
         ).to.be.revertedWithCustomError(this.token, 'RMRKNotApprovedForResourcesOrOwner');
       });
     });
 
     describe('With minted token and 2 accepted resources', async function () {
       beforeEach(async function () {
-        await this.token.connect(tokenOwner).acceptResource(tokenId, 0);
-        await this.token.connect(tokenOwner).acceptResource(tokenId, 0);
+        await this.token.connect(tokenOwner).acceptResource(tokenId, 0, resId1);
+        await this.token.connect(tokenOwner).acceptResource(tokenId, 0, resId2);
       });
 
       describe('Priorities', async function () {
