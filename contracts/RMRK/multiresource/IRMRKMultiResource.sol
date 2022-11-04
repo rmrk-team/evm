@@ -21,10 +21,12 @@ interface IRMRKMultiResource is IERC165 {
      *  array.
      * @param tokenId ID of the token that received a new pending resource
      * @param resourceId ID of the resource that has been added to the token's pending resources array
+     * @param overwritesId ID of the resource that would be overwritten
      */
     event ResourceAddedToToken(
         uint256 indexed tokenId,
-        uint64 indexed resourceId
+        uint64 indexed resourceId,
+        uint64 indexed overwritesId
     );
 
     /**
@@ -32,8 +34,13 @@ interface IRMRKMultiResource is IERC165 {
      *  from token's pending resources array to active resources array of the token.
      * @param tokenId ID of the token that had a new resource accepted
      * @param resourceId ID of the resource that was accepted
+     * @param overwritesId ID of the resource that would be overwritten
      */
-    event ResourceAccepted(uint256 indexed tokenId, uint64 indexed resourceId);
+    event ResourceAccepted(
+        uint256 indexed tokenId,
+        uint64 indexed resourceId,
+        uint64 indexed overwritesId
+    );
 
     /**
      * @notice Used to notify listeners that a resource object at `resourceId` is rejected from token and is dropped
@@ -48,32 +55,6 @@ interface IRMRKMultiResource is IERC165 {
      * @param tokenId ID of the token that had the resource priority array updated
      */
     event ResourcePrioritySet(uint256 indexed tokenId);
-
-    /**
-     * @notice Used to notify listeners that a resource object at `resourceId` is proposed to token, and that the
-     *  proposal will initiate an overwrite of the resource with a new one if accepted.
-     * @param tokenId ID of the token that had the resource overwrite proposed
-     * @param resourceId ID of the resource that would overwrite the current resource
-     * @param overwritesId ID of the resource that would be overwritten
-     */
-    event ResourceOverwriteProposed(
-        uint256 indexed tokenId,
-        uint64 indexed resourceId,
-        uint64 indexed overwritesId
-    );
-
-    /**
-     * @notice Used to notify listeners that a pending resource with an overwrite is accepted, overwriting a token's
-     *  resource.
-     * @param tokenId ID of the token that had a resource overwritten
-     * @param oldResourceId ID of the resource that was overwritten
-     * @param newResourceId ID of the resource that overwrote the old resource
-     */
-    event ResourceOverwritten(
-        uint256 indexed tokenId,
-        uint64 indexed oldResourceId,
-        uint64 indexed newResourceId
-    );
 
     /**
      * @notice Used to notify listeners that owner has granted an approval to the user to manage the resources of a
@@ -115,8 +96,13 @@ interface IRMRKMultiResource is IERC165 {
      * @dev Emits an {ResourceAccepted} event.
      * @param tokenId ID of the token for which to accept the pending resource
      * @param index Index of the resource in the pending array to accept
+     * @param resourceId expected to be in the index
      */
-    function acceptResource(uint256 tokenId, uint256 index) external;
+    function acceptResource(
+        uint256 tokenId,
+        uint256 index,
+        uint64 resourceId
+    ) external;
 
     /**
      * @notice Rejects a resource from the pending array of given token.
@@ -129,8 +115,13 @@ interface IRMRKMultiResource is IERC165 {
      * @dev Emits a {ResourceRejected} event.
      * @param tokenId ID of the token that the resource is being rejected from
      * @param index Index of the resource in the pending array to be rejected
+     * @param resourceId expected to be in the index
      */
-    function rejectResource(uint256 tokenId, uint256 index) external;
+    function rejectResource(
+        uint256 tokenId,
+        uint256 index,
+        uint64 resourceId
+    ) external;
 
     /**
      * @notice Rejects all resources from the pending array of a given token.
@@ -141,8 +132,10 @@ interface IRMRKMultiResource is IERC165 {
      *  - `tokenId` must exist.
      * @dev Emits a {ResourceRejected} event with resourceId = 0.
      * @param tokenId ID of the token of which to clear the pending array
+     * @param maxRejections to prevent from rejecting resources which arrive just before this operation.
      */
-    function rejectAllResources(uint256 tokenId) external;
+    function rejectAllResources(uint256 tokenId, uint256 maxRejections)
+        external;
 
     /**
      * @notice Sets a new priority array for a given token.
@@ -235,11 +228,6 @@ interface IRMRKMultiResource is IERC165 {
         external
         view
         returns (string memory);
-
-    /**
-     * @notice Returns the ids of all stored resources
-     */
-    function getAllResources() external view returns (uint64[] memory);
 
     // Approvals
 

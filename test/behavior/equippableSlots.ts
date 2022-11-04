@@ -265,8 +265,12 @@ async function shouldBehaveLikeEquippableWithSlots(
       // Add resources to weapon
       await weaponGemEquip.addResourceToToken(newWeaponGemId, weaponGemResourceFull, 0);
       await weaponGemEquip.addResourceToToken(newWeaponGemId, weaponGemResourceEquip, 0);
-      await weaponGemEquip.connect(soldierOwner).acceptResource(newWeaponGemId, 0);
-      await weaponGemEquip.connect(soldierOwner).acceptResource(newWeaponGemId, 0);
+      await weaponGemEquip
+        .connect(soldierOwner)
+        .acceptResource(newWeaponGemId, 0, weaponGemResourceFull);
+      await weaponGemEquip
+        .connect(soldierOwner)
+        .acceptResource(newWeaponGemId, 0, weaponGemResourceEquip);
 
       // The malicious child indicates it can be equipped into soldier:
       await weaponGemEquip.setValidParentForEquippableGroup(
@@ -746,8 +750,12 @@ async function shouldBehaveLikeEquippableWithSlots(
     // Add resources to weapon
     await weaponEquip.addResourceToToken(newWeaponId, weaponResourcesFull[resourceIndex], 0);
     await weaponEquip.addResourceToToken(newWeaponId, weaponResourcesEquip[resourceIndex], 0);
-    await weaponEquip.connect(soldierOwner).acceptResource(newWeaponId, 0);
-    await weaponEquip.connect(soldierOwner).acceptResource(newWeaponId, 0);
+    await weaponEquip
+      .connect(soldierOwner)
+      .acceptResource(newWeaponId, 0, weaponResourcesFull[resourceIndex]);
+    await weaponEquip
+      .connect(soldierOwner)
+      .acceptResource(newWeaponId, 0, weaponResourcesEquip[resourceIndex]);
 
     return newWeaponId;
   }

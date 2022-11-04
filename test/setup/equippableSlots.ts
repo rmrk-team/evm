@@ -162,7 +162,7 @@ async function setupContextForSlots(
     );
     for (let i = 0; i < uniqueSoldiers; i++) {
       await soldierEquip.addResourceToToken(soldiersIds[i], soldierResId, 0);
-      await soldierEquip.connect(addrs[i % 3]).acceptResource(soldiersIds[i], 0);
+      await soldierEquip.connect(addrs[i % 3]).acceptResource(soldiersIds[i], 0, soldierResId);
     }
   }
 
@@ -214,8 +214,12 @@ async function setupContextForSlots(
         weaponResourcesEquip[i % uniqueWeapons],
         0,
       );
-      await weaponEquip.connect(addrs[i % 3]).acceptResource(weaponsIds[i], 0);
-      await weaponEquip.connect(addrs[i % 3]).acceptResource(weaponsIds[i], 0);
+      await weaponEquip
+        .connect(addrs[i % 3])
+        .acceptResource(weaponsIds[i], 0, weaponResourcesFull[i % uniqueWeapons]);
+      await weaponEquip
+        .connect(addrs[i % 3])
+        .acceptResource(weaponsIds[i], 0, weaponResourcesEquip[i % uniqueWeapons]);
     }
   }
 
@@ -251,8 +255,12 @@ async function setupContextForSlots(
     for (let i = 0; i < uniqueSoldiers; i++) {
       await weaponGemEquip.addResourceToToken(weaponGemsIds[i], weaponGemResourceFull, 0);
       await weaponGemEquip.addResourceToToken(weaponGemsIds[i], weaponGemResourceEquip, 0);
-      await weaponGemEquip.connect(addrs[i % 3]).acceptResource(weaponGemsIds[i], 0);
-      await weaponGemEquip.connect(addrs[i % 3]).acceptResource(weaponGemsIds[i], 0);
+      await weaponGemEquip
+        .connect(addrs[i % 3])
+        .acceptResource(weaponGemsIds[i], 0, weaponGemResourceFull);
+      await weaponGemEquip
+        .connect(addrs[i % 3])
+        .acceptResource(weaponGemsIds[i], 0, weaponGemResourceEquip);
     }
   }
 
@@ -277,7 +285,9 @@ async function setupContextForSlots(
 
     for (let i = 0; i < uniqueSoldiers; i++) {
       await backgroundEquip.addResourceToToken(backgroundsIds[i], backgroundResourceId, 0);
-      await backgroundEquip.connect(addrs[i % 3]).acceptResource(backgroundsIds[i], 0);
+      await backgroundEquip
+        .connect(addrs[i % 3])
+        .acceptResource(backgroundsIds[i], 0, backgroundResourceId);
     }
   }
 }

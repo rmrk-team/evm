@@ -13,19 +13,24 @@ library RMRKLib {
      * @dev The value is removed by replacing it with the last value and removing the last element.
      * @param array An array of values containing the value to be removed
      * @param value The value of the resource to remove from the array
+     * @return bool A boolean value specifying whether the item was found
      */
-    function removeItemByValue(uint64[] storage array, uint64 value) internal {
+    function removeItemByValue(uint64[] storage array, uint64 value)
+        internal
+        returns (bool)
+    {
         uint64[] memory memArr = array; //Copy array to memory, check for gas savings here
         uint256 length = memArr.length; //gas savings
         for (uint256 i; i < length; ) {
             if (memArr[i] == value) {
                 removeItemByIndex(array, i);
-                break;
+                return true;
             }
             unchecked {
                 ++i;
             }
         }
+        return false;
     }
 
     /**

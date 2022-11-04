@@ -190,7 +190,7 @@ async function shouldBehaveLikeEquippableWithParts() {
         [],
       );
       await maskEquipContract.addResourceToToken(masks[0], noBaseResourceId, 0);
-      await maskEquipContract.connect(addrs[0]).acceptResource(masks[0], 0);
+      await maskEquipContract.connect(addrs[0]).acceptResource(masks[0], 0, noBaseResourceId);
       await expect(
         viewContract.composeEquippables(maskEquipContract.address, masks[0], noBaseResourceId),
       ).to.be.revertedWithCustomError(viewContract, 'RMRKNotComposableResource');

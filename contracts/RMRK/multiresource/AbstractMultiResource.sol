@@ -33,9 +33,6 @@ abstract contract AbstractMultiResource is Context, IRMRKMultiResource {
     /// Mapping of tokenId to resourceId to whether the token has this resource assigned
     mapping(uint256 => mapping(uint64 => bool)) private _tokenResources;
 
-    /// List of all resources
-    uint64[] private _allResources;
-
     /// Mapping from owner to operator approvals for resources
     mapping(address => mapping(address => bool))
         private _operatorApprovalsForResources;
@@ -75,14 +72,6 @@ abstract contract AbstractMultiResource is Context, IRMRKMultiResource {
             revert RMRKIndexOutOfRange();
         uint64 resourceId = getActiveResources(tokenId)[resourceIndex];
         return getResourceMeta(resourceId);
-    }
-
-    /**
-     * @notice Used to retrieve an array containing all of the resource IDs.
-     * @return uint64[] Array of all resource IDs.
-     */
-    function getAllResources() public view virtual returns (uint64[] memory) {
-        return _allResources;
     }
 
     /**
@@ -192,23 +181,30 @@ abstract contract AbstractMultiResource is Context, IRMRKMultiResource {
      * @param tokenId ID of the token to accept the resource for
      * @param index Index of the pending resource to accept in the given token's pending resources array
      */
-    function _acceptResource(uint256 tokenId, uint256 index) internal virtual {
+    function _acceptResource(
+        uint256 tokenId,
+        uint256 index,
+        uint64 resourceId
+    ) internal virtual {
         if (index >= _pendingResources[tokenId].length)
             revert RMRKIndexOutOfRange();
-        uint64 resourceId = _pendingResources[tokenId][index];
+        if (resourceId != _pendingResources[tokenId][index])
+            revert RMRKUnexpectedResourceId();
+
         _pendingResources[tokenId].removeItemByIndex(index);
 
         uint64 overwrite = _resourceOverwrites[tokenId][resourceId];
         if (overwrite != uint64(0)) {
-            // We could check here that the resource to overwrite actually exists but it is probably harmless.
-            _activeResources[tokenId].removeItemByValue(overwrite);
-            emit ResourceOverwritten(tokenId, overwrite, resourceId);
+            // It could have been overwritten previously so it's fine if it's not found.
+            // If it's not deleted (not found), we don't want to send it on the event
+            if (!_activeResources[tokenId].removeItemByValue(overwrite))
+                overwrite = uint64(0);
             delete (_resourceOverwrites[tokenId][resourceId]);
         }
         _activeResources[tokenId].push(resourceId);
         //Push 0 value of uint16 to array, e.g., uninitialized
         _activeResourcePriorities[tokenId].push(uint16(0));
-        emit ResourceAccepted(tokenId, resourceId);
+        emit ResourceAccepted(tokenId, resourceId, overwrite);
     }
 
     /**
@@ -217,10 +213,15 @@ abstract contract AbstractMultiResource is Context, IRMRKMultiResource {
      * @param tokenId ID of the token from which to reject the specified pending resource
      * @param index Index of the resource to reject in the pending array of the given token
      */
-    function _rejectResource(uint256 tokenId, uint256 index) internal virtual {
+    function _rejectResource(
+        uint256 tokenId,
+        uint256 index,
+        uint64 resourceId
+    ) internal virtual {
         if (index >= _pendingResources[tokenId].length)
             revert RMRKIndexOutOfRange();
-        uint64 resourceId = _pendingResources[tokenId][index];
+        if (resourceId != _pendingResources[tokenId][index])
+            revert RMRKUnexpectedResourceId();
 
         _beforeRejectResource(tokenId, index, resourceId);
         _pendingResources[tokenId].removeItemByIndex(index);
@@ -235,10 +236,15 @@ abstract contract AbstractMultiResource is Context, IRMRKMultiResource {
      * @notice Used to reject all of the pending resources for the given token.
      * @param tokenId ID of the token to reject all of the pending resources
      */
-    function _rejectAllResources(uint256 tokenId) internal virtual {
+    function _rejectAllResources(uint256 tokenId, uint256 maxRejections)
+        internal
+        virtual
+    {
+        uint256 len = _pendingResources[tokenId].length;
+        if (len > maxRejections) revert RMRKUnexpectedNumberOfResources();
+
         _beforeRejectAllResources(tokenId);
 
-        uint256 len = _pendingResources[tokenId].length;
         for (uint256 i; i < len; ) {
             uint64 resourceId = _pendingResources[tokenId][i];
             delete _resourceOverwrites[tokenId][resourceId];
@@ -292,7 +298,6 @@ abstract contract AbstractMultiResource is Context, IRMRKMultiResource {
 
         _beforeAddResource(id, metadataURI);
         _resources[id] = metadataURI;
-        _allResources.push(id);
 
         emit ResourceSet(id);
         _afterAddResource(id, metadataURI);
@@ -328,10 +333,9 @@ abstract contract AbstractMultiResource is Context, IRMRKMultiResource {
 
         if (overwrites != uint64(0)) {
             _resourceOverwrites[tokenId][resourceId] = overwrites;
-            emit ResourceOverwriteProposed(tokenId, resourceId, overwrites);
         }
 
-        emit ResourceAddedToToken(tokenId, resourceId);
+        emit ResourceAddedToToken(tokenId, resourceId, overwrites);
         _afterAddResourceToToken(tokenId, resourceId, overwrites);
     }
 

@@ -123,5 +123,9 @@ error RMRKTokenCannotBeEquippedWithResourceIntoSlot();
 error RMRKTokenDoesNotHaveActiveResource();
 /// Attempting to determine the resource with the top priority on a token without resources
 error RMRKTokenHasNoResources();
+/// Attempting to reject all resources but more resources than expected are pending
+error RMRKUnexpectedNumberOfResources();
+/// Attempting to accept or reject a resource which does not match the one at the specified index
+error RMRKUnexpectedResourceId();
 /// Attempting not to pass an empty array of equippable addresses when adding or setting the equippable addresses
 error RMRKZeroLengthIdsPassed();

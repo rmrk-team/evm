@@ -510,12 +510,12 @@ contract RMRKMultiResource is
      * @param tokenId ID of the token for which to accept the pending resource
      * @param index Index of the resource in the pending array to accept
      */
-    function acceptResource(uint256 tokenId, uint256 index)
-        public
-        virtual
-        onlyApprovedForResourcesOrOwner(tokenId)
-    {
-        _acceptResource(tokenId, index);
+    function acceptResource(
+        uint256 tokenId,
+        uint256 index,
+        uint64 resourceId
+    ) public virtual onlyApprovedForResourcesOrOwner(tokenId) {
+        _acceptResource(tokenId, index, resourceId);
     }
 
     /**
@@ -530,12 +530,12 @@ contract RMRKMultiResource is
      * @param tokenId ID of the token that the resource is being rejected from
      * @param index Index of the resource in the pending array to be rejected
      */
-    function rejectResource(uint256 tokenId, uint256 index)
-        public
-        virtual
-        onlyApprovedForResourcesOrOwner(tokenId)
-    {
-        _rejectResource(tokenId, index);
+    function rejectResource(
+        uint256 tokenId,
+        uint256 index,
+        uint64 resourceId
+    ) public virtual onlyApprovedForResourcesOrOwner(tokenId) {
+        _rejectResource(tokenId, index, resourceId);
     }
 
     /**
@@ -548,12 +548,12 @@ contract RMRKMultiResource is
      * @dev Emits a {ResourceRejected} event with resourceId = 0.
      * @param tokenId ID of the token of which to clear the pending array
      */
-    function rejectAllResources(uint256 tokenId)
+    function rejectAllResources(uint256 tokenId, uint256 maxRejections)
         public
         virtual
         onlyApprovedForResourcesOrOwner(tokenId)
     {
-        _rejectAllResources(tokenId);
+        _rejectAllResources(tokenId, maxRejections);
     }
 
     /**
