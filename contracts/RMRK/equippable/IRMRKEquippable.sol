@@ -207,7 +207,7 @@ interface IRMRKEquippable is IRMRKMultiResource {
      * @param resourceId ID of the resource of which we are retrieving
      * @return struct The `ExtendedResource` struct associated with the resource
      */
-    function getExtendedResource(uint64 resourceId)
+    function getExtendedResource(uint256 tokenId, uint64 resourceId)
         external
         view
         returns (ExtendedResource memory);

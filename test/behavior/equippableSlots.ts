@@ -632,7 +632,7 @@ async function shouldBehaveLikeEquippableWithSlots(
       const wrongResId = weaponResourcesEquip[1];
       await expect(
         view.composeEquippables(weaponEquip.address, weaponsIds[0], wrongResId),
-      ).to.be.revertedWithCustomError(view, 'RMRKTokenDoesNotHaveActiveResource');
+      ).to.be.revertedWithCustomError(weaponEquip, 'RMRKTokenDoesNotHaveResource');
     });
   });
 

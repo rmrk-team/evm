@@ -14,7 +14,7 @@ interface IRMRKMultiResourceRenderUtils is IERC165 {
      * - `tokenId` must exist.
      * - `index` must be inside the range of active resource array
      */
-    function getResourceByIndex(
+    function getActiveResourceByIndex(
         address target,
         uint256 tokenId,
         uint256 index
@@ -41,10 +41,11 @@ interface IRMRKMultiResourceRenderUtils is IERC165 {
      *
      * - `resourceIds` must exist.
      */
-    function getResourcesById(address target, uint64[] calldata resourceIds)
-        external
-        view
-        returns (string[] memory);
+    function getResourcesById(
+        address target,
+        uint256 tokenId,
+        uint64[] calldata resourceIds
+    ) external view returns (string[] memory);
 
     /**
      * @notice Returns the resource metadata with the highest priority for the given token

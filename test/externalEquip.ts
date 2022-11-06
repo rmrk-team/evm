@@ -255,8 +255,13 @@ describe('ExternalEquippableMock with Slots', async () => {
 });
 
 describe('ExternalEquippableMock Resources', async () => {
+  let nextTokenId = 1;
+  let nesting: Contract;
+  let equip: Contract;
+  let renderUtils: Contract;
+
   beforeEach(async function () {
-    const { nesting, equip, renderUtils } = await loadFixture(resourcesFixture);
+    ({ nesting, equip, renderUtils } = await loadFixture(resourcesFixture));
     this.nesting = nesting;
     this.equip = equip;
     this.renderUtils = renderUtils;
@@ -286,7 +291,15 @@ describe('ExternalEquippableMock Resources', async () => {
     });
   });
 
-  shouldBehaveLikeEquippableResources(mintFromMock);
+  // Mint needs to happen on the nesting contract, but the MR behavior happens on the equip one.
+  async function mintToNesting(token: Contract, to: string): Promise<number> {
+    const tokenId = nextTokenId;
+    nextTokenId++;
+    await nesting['mint(address,uint256)'](to, tokenId);
+    return tokenId;
+  }
+
+  shouldBehaveLikeEquippableResources(mintToNesting);
 });
 
 // --------------- END EQUIPPABLE BEHAVIOR -----------------------

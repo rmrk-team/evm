@@ -87,14 +87,6 @@ describe('MultiResourceImpl Other Behavior', async () => {
         token.connect(owner).mint(owner.address, 1, { value: 0 }),
       ).to.be.revertedWithCustomError(token, 'RMRKMintUnderpriced');
     });
-
-    it('Can autoincrement resources', async function () {
-      await token.connect(owner).addResourceEntry(defaultResource1, []);
-      await token.connect(owner).addResourceEntry(defaultResource2, []);
-
-      expect(await token.getResourceMeta(1)).to.eql(defaultResource1);
-      expect(await token.getResourceMeta(2)).to.eql(defaultResource2);
-    });
   });
 });
 

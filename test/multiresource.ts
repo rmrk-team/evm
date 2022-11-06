@@ -70,11 +70,16 @@ describe('MultiResourceMock Other Behavior', async function () {
         .withArgs(id);
     });
 
-    it('cannot get non existing resource', async function () {
-      const id = bn(9999);
-      await expect(token.getResourceMeta(id)).to.be.revertedWithCustomError(
+    it('cannot get metadata for non existing resource or non existing token', async function () {
+      const tokenId = await mintFromMock(token, tokenOwner.address);
+      const resId = await addResourceEntryFromMock(token, 'metadata');
+      await token.addResourceToToken(tokenId, resId, 0);
+      await expect(
+        token.getResourceMetadata(tokenId, resId.add(bn(1))),
+      ).to.be.revertedWithCustomError(token, 'RMRKTokenDoesNotHaveResource');
+      await expect(token.getResourceMetadata(tokenId + 1, resId)).to.be.revertedWithCustomError(
         token,
-        'RMRKNoResourceMatchingId',
+        'RMRKTokenDoesNotHaveResource',
       );
     });
 
@@ -127,7 +132,7 @@ describe('MultiResourceMock Other Behavior', async function () {
       );
 
       const pendingIds = await token.getPendingResources(tokenId);
-      expect(await renderUtils.getResourcesById(token.address, pendingIds)).to.be.eql([
+      expect(await renderUtils.getResourcesById(token.address, tokenId, pendingIds)).to.be.eql([
         'data1',
         'data2',
       ]);

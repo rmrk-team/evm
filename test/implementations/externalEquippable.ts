@@ -330,14 +330,24 @@ describe('ExternalEquippableImpl with Slots', async () => {
 });
 
 describe('ExternalEquippableImpl Resources', async () => {
+  let nesting: Contract;
+  let equip: Contract;
+  let renderUtils: Contract;
+
   beforeEach(async function () {
-    const { nesting, equip, renderUtils } = await loadFixture(resourcesFixture);
+    ({ nesting, equip, renderUtils } = await loadFixture(resourcesFixture));
     this.nesting = nesting;
     this.equip = equip;
     this.renderUtils = renderUtils;
   });
 
-  shouldBehaveLikeEquippableResources(mintFromImpl);
+  // Mint needs to happen on the nesting contract, but the MR behavior happens on the equip one.
+  async function mintToNesting(token: Contract, to: string): Promise<number> {
+    await nesting.mint(to, 1, { value: ONE_ETH });
+    return await nesting.totalSupply();
+  }
+
+  shouldBehaveLikeEquippableResources(mintToNesting);
 });
 
 // --------------- END EQUIPPABLE BEHAVIOR -----------------------

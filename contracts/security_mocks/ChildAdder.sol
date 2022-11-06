@@ -4,8 +4,6 @@ pragma solidity ^0.8.16;
 
 import "../RMRK/nesting/IRMRKNesting.sol";
 
-import "hardhat/console.sol";
-
 contract ChildAdder {
     function addChild(
         address destContract,

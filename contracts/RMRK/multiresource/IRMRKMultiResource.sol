@@ -156,9 +156,10 @@ interface IRMRKMultiResource is IERC165 {
         external;
 
     /**
-     * @notice Used to retrieve IDs od the active resources of given token.
+     * @notice Used to retrieve IDs of the active resources of given token.
      * @dev Resource data is stored by reference, in order to access the data corresponding to the ID, call
-     *  `getResourceMeta(resourceId)`.
+     *  `getResourceMetadata(tokenId, resourceId)`.
+     * @dev You can safely get 10k
      * @param tokenId ID of the token to retrieve the IDs of the active resources
      * @return uint64[] An array of active resource IDs of the given token
      */
@@ -168,9 +169,9 @@ interface IRMRKMultiResource is IERC165 {
         returns (uint64[] memory);
 
     /**
-     * @notice Used to retrieve IDs od the active resources of given token.
+     * @notice Used to retrieve IDs of the pending resources of given token.
      * @dev Resource data is stored by reference, in order to access the data corresponding to the ID, call
-     *  `getResourceMeta(resourceId)`.
+     *  `getResourceMetadata(tokenId, resourceId)`.
      * @param tokenId ID of the token to retrieve the IDs of the pending resources
      * @return uint64[] An array of pending resource IDs of the given token
      */
@@ -195,7 +196,7 @@ interface IRMRKMultiResource is IERC165 {
      * @notice Used to retrieve the resource that will be overriden if a given resource from the token's pending array
      *  is accepted.
      * @dev Resource data is stored by reference, in order to access the data corresponding to the ID, call
-     *  `getResourceMeta(resourceId)`.
+     *  `getResourceMetadata(tokenId, resourceId)`.
      * @param tokenId ID of the token to check
      * @param newResourceId ID of the pending resource which will be accepted
      * @return uint64 ID of the resource which will be replaced
@@ -206,25 +207,15 @@ interface IRMRKMultiResource is IERC165 {
         returns (uint64);
 
     /**
-     * @notice Used to retrieve the metadata of the resource associated with `resourceId`.
-     * @param resourceId The ID of the resource for which we are trying to retrieve the resource metadata
-     * @return string The metadata of the resource with ID equal to `resourceId`
-     */
-    function getResourceMeta(uint64 resourceId)
-        external
-        view
-        returns (string memory);
-
-    /**
      * @notice Used to fetch the resource metadata of the specified token's active resource with the given index.
      * @dev Resources are stored by reference mapping `_resources[resourceId]`.
      * @dev Can be overriden to implement enumerate, fallback or other custom logic.
      * @param tokenId ID of the token from which to retrieve the resource metadata
-     * @param resourceIndex Index of the resource in the active resources array for which to retrieve the metadata
+     * @param resourceId Resource Id, must be in the active resources array
      * @return string The metadata of the resource belonging to the specified index in the token's active resources
      *  array
      */
-    function getResourceMetaForToken(uint256 tokenId, uint64 resourceIndex)
+    function getResourceMetadata(uint256 tokenId, uint64 resourceId)
         external
         view
         returns (string memory);

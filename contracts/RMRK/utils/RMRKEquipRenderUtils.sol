@@ -5,7 +5,6 @@ import "../equippable/IRMRKEquippable.sol";
 import "../library/RMRKLib.sol";
 import "../library/RMRKErrors.sol";
 import "./IRMRKEquipRenderUtils.sol";
-// import "hardhat/console.sol";
 
 pragma solidity ^0.8.16;
 
@@ -27,14 +26,14 @@ contract RMRKEquipRenderUtils is IRMRKEquipRenderUtils {
             interfaceId == type(IRMRKEquipRenderUtils).interfaceId;
     }
 
-    function getExtendedResourceByIndex(
+    function getActiveExtendedResourceByIndex(
         address target,
         uint256 tokenId,
         uint256 index
     ) external view virtual returns (IRMRKEquippable.ExtendedResource memory) {
         IRMRKEquippable target_ = IRMRKEquippable(target);
         uint64 resourceId = target_.getActiveResources(tokenId)[index];
-        return target_.getExtendedResource(resourceId);
+        return target_.getExtendedResource(tokenId, resourceId);
     }
 
     function getPendingExtendedResourceByIndex(
@@ -44,11 +43,12 @@ contract RMRKEquipRenderUtils is IRMRKEquipRenderUtils {
     ) external view virtual returns (IRMRKEquippable.ExtendedResource memory) {
         IRMRKEquippable target_ = IRMRKEquippable(target);
         uint64 resourceId = target_.getPendingResources(tokenId)[index];
-        return target_.getExtendedResource(resourceId);
+        return target_.getExtendedResource(tokenId, resourceId);
     }
 
     function getExtendedResourcesById(
         address target,
+        uint256 tokenId,
         uint64[] calldata resourceIds
     )
         external
@@ -61,7 +61,7 @@ contract RMRKEquipRenderUtils is IRMRKEquipRenderUtils {
         IRMRKEquippable.ExtendedResource[]
             memory resources = new IRMRKEquippable.ExtendedResource[](len);
         for (uint256 i; i < len; ) {
-            resources[i] = target_.getExtendedResource(resourceIds[i]);
+            resources[i] = target_.getExtendedResource(tokenId, resourceIds[i]);
             unchecked {
                 ++i;
             }
@@ -123,19 +123,13 @@ contract RMRKEquipRenderUtils is IRMRKEquipRenderUtils {
         )
     {
         IRMRKEquippable target_ = IRMRKEquippable(target);
-
-        // We make sure token has that resource. Alternative is to receive index but makes equipping more complex.
-        (, bool found) = target_.getActiveResources(tokenId).indexOf(
-            resourceId
-        );
-        if (!found) revert RMRKTokenDoesNotHaveActiveResource();
-
         address targetBaseAddress = target_.getBaseAddressOfResource(
             resourceId
         );
         if (targetBaseAddress == address(0)) revert RMRKNotComposableResource();
 
-        resource = target_.getExtendedResource(resourceId);
+        // If token does not have the resource, it would fail here.
+        resource = target_.getExtendedResource(tokenId, resourceId);
 
         // Fixed parts:
         uint64[] memory fixedPartIds = target_.getFixedPartIds(resourceId);

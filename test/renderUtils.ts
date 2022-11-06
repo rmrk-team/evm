@@ -79,7 +79,7 @@ describe('Render Utils', async function () {
     });
 
     it('can get active resource by index', async function () {
-      expect(await renderUtils.getResourceByIndex(equip.address, tokenId, 0)).to.eql(
+      expect(await renderUtils.getActiveResourceByIndex(equip.address, tokenId, 0)).to.eql(
         'ipfs://res1.jpg',
       );
     });
@@ -91,7 +91,7 @@ describe('Render Utils', async function () {
     });
 
     it('can get resources by id', async function () {
-      expect(await renderUtils.getResourcesById(equip.address, [resId, resId2])).to.eql([
+      expect(await renderUtils.getResourcesById(equip.address, tokenId, [resId, resId2])).to.eql([
         'ipfs://res1.jpg',
         'ipfs://res2.jpg',
       ]);
@@ -123,12 +123,9 @@ describe('Render Utils', async function () {
     });
 
     it('can get extended active resource by index', async function () {
-      expect(await renderUtilsEquip.getExtendedResourceByIndex(equip.address, tokenId, 0)).to.eql([
-        resId,
-        bn(0),
-        ethers.constants.AddressZero,
-        'ipfs://res1.jpg',
-      ]);
+      expect(
+        await renderUtilsEquip.getActiveExtendedResourceByIndex(equip.address, tokenId, 0),
+      ).to.eql([resId, bn(0), ethers.constants.AddressZero, 'ipfs://res1.jpg']);
     });
 
     it('can get extended pending resource by index', async function () {
@@ -139,7 +136,7 @@ describe('Render Utils', async function () {
 
     it('can get extended resources by id', async function () {
       expect(
-        await renderUtilsEquip.getExtendedResourcesById(equip.address, [resId, resId2]),
+        await renderUtilsEquip.getExtendedResourcesById(equip.address, tokenId, [resId, resId2]),
       ).to.eql([
         [resId, bn(0), ethers.constants.AddressZero, 'ipfs://res1.jpg'],
         [resId2, bn(1), other.address, 'ipfs://res2.jpg'],

@@ -174,7 +174,7 @@ async function shouldBehaveLikeEquippableWithParts() {
       const wrongResId = maskResourcesEquip[1];
       await expect(
         viewContract.composeEquippables(maskEquipContract.address, masks[0], wrongResId),
-      ).to.be.revertedWithCustomError(viewContract, 'RMRKTokenDoesNotHaveActiveResource');
+      ).to.be.revertedWithCustomError(maskEquipContract, 'RMRKTokenDoesNotHaveResource');
     });
 
     it('cannot get composables for mask for resource with no base', async function () {

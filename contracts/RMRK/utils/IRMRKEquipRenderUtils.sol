@@ -14,7 +14,7 @@ interface IRMRKEquipRenderUtils is IERC165 {
      * - `resourceId` must exist.
      *
      */
-    function getExtendedResourceByIndex(
+    function getActiveExtendedResourceByIndex(
         address target,
         uint256 tokenId,
         uint256 index
@@ -43,6 +43,7 @@ interface IRMRKEquipRenderUtils is IERC165 {
      */
     function getExtendedResourcesById(
         address target,
+        uint256 tokenId,
         uint64[] calldata resourceIds
     ) external view returns (IRMRKEquippable.ExtendedResource[] memory);
 

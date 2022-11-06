@@ -2,7 +2,7 @@ import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { BigNumber, Contract } from 'ethers';
-import { bn } from '../utils';
+import { ADDRESS_ZERO, bn } from '../utils';
 import { IERC165, IRMRKEquippable, IOtherInterface } from '../interfaces';
 
 async function shouldBehaveLikeEquippableResources(
@@ -17,7 +17,7 @@ async function shouldBehaveLikeEquippableResources(
 
   const equippableGroupIdDefault = bn(1);
   const metaURIDefault = 'metaURI';
-  const baseAddressDefault = ethers.constants.AddressZero;
+  const baseAddressDefault = ADDRESS_ZERO;
 
   beforeEach(async function () {
     const [signersOwner, ...signersAddr] = await ethers.getSigners();
@@ -62,12 +62,26 @@ async function shouldBehaveLikeEquippableResources(
         .withArgs(id);
     });
 
-    it('cannot get non existing resource', async function () {
-      const id = bn(1);
-      await expect(chunkyEquip.getExtendedResource(id)).to.be.revertedWithCustomError(
-        chunkyEquip,
-        'RMRKNoResourceMatchingId',
+    it('cannot get extended resources for non existing resource or non existing token', async function () {
+      const tokenId = await mint(chunkyEquip, owner.address);
+      const resId = 1;
+      await chunkyEquip.addResourceEntry(
+        {
+          id: resId,
+          equippableGroupId: equippableGroupIdDefault,
+          metadataURI: metaURIDefault,
+          baseAddress: baseAddressDefault,
+        },
+        [],
+        [],
       );
+      await chunkyEquip.addResourceToToken(tokenId, resId, 0);
+      await expect(
+        chunkyEquip.getExtendedResource(tokenId, resId + 1),
+      ).to.be.revertedWithCustomError(chunkyEquip, 'RMRKTokenDoesNotHaveResource');
+      await expect(
+        chunkyEquip.getExtendedResource(tokenId + 1, resId),
+      ).to.be.revertedWithCustomError(chunkyEquip, 'RMRKTokenDoesNotHaveResource');
     });
 
     it('cannot add resource entry with parts and no base', async function () {
@@ -193,9 +207,9 @@ async function shouldBehaveLikeEquippableResources(
       // The merged version does not implement this to save size:
       if (chunkyEquip.getFullPendingExtendedResources === undefined) {
         const pendingResources = await chunkyEquip.getPendingResources(tokenId);
-        expect(await renderUtils.getResourcesById(chunkyEquip.address, pendingResources)).to.be.eql(
-          [metaURIDefault, metaURIDefault],
-        );
+        expect(
+          await renderUtils.getResourcesById(chunkyEquip.address, tokenId, pendingResources),
+        ).to.be.eql([metaURIDefault, metaURIDefault]);
       } else {
         const pending = await chunkyEquip.getFullPendingExtendedResources(tokenId);
         expect(pending).to.be.eql([
@@ -287,9 +301,9 @@ async function shouldBehaveLikeEquippableResources(
       // The merged version does not implement this to save size:
       if (chunkyEquip.getFullExtendedResources === undefined) {
         const activeResources = await chunkyEquip.getActiveResources(tokenId);
-        expect(await renderUtils.getResourcesById(chunkyEquip.address, activeResources)).to.eql([
-          metaURIDefault,
-        ]);
+        expect(
+          await renderUtils.getResourcesById(chunkyEquip.address, tokenId, activeResources),
+        ).to.eql([metaURIDefault]);
       } else {
         expect(await chunkyEquip.getFullExtendedResources(tokenId)).to.eql([
           [resId, equippableGroupIdDefault, baseAddressDefault, metaURIDefault],
@@ -321,10 +335,9 @@ async function shouldBehaveLikeEquippableResources(
       // The merged version does not implement this to save size:
       if (chunkyEquip.getFullExtendedResources === undefined) {
         const activeResources = await chunkyEquip.getActiveResources(tokenId);
-        expect(await renderUtils.getResourcesById(chunkyEquip.address, activeResources)).to.eql([
-          metaURIDefault,
-          metaURIDefault,
-        ]);
+        expect(
+          await renderUtils.getResourcesById(chunkyEquip.address, tokenId, activeResources),
+        ).to.eql([metaURIDefault, metaURIDefault]);
       } else {
         expect(await chunkyEquip.getFullExtendedResources(tokenId)).to.eql([
           [resId2, equippableGroupIdDefault, baseAddressDefault, metaURIDefault],
@@ -410,9 +423,9 @@ async function shouldBehaveLikeEquippableResources(
       // The merged version does not implement this to save size:
       if (chunkyEquip.getFullExtendedResources === undefined) {
         const activeResources = await chunkyEquip.getActiveResources(tokenId);
-        expect(await renderUtils.getResourcesById(chunkyEquip.address, activeResources)).to.be.eql([
-          metaURIDefault,
-        ]);
+        expect(
+          await renderUtils.getResourcesById(chunkyEquip.address, tokenId, activeResources),
+        ).to.be.eql([metaURIDefault]);
       } else {
         expect(await chunkyEquip.getFullExtendedResources(tokenId)).to.be.eql([
           [resId2, equippableGroupIdDefault, baseAddressDefault, metaURIDefault],
@@ -426,15 +439,15 @@ async function shouldBehaveLikeEquippableResources(
       const resId = bn(1);
       const tokenId = await mint(chunky, owner.address);
       await addResources([resId]);
-      await chunkyEquip.addResourceToToken(tokenId, resId, ethers.utils.hexZeroPad('0x1', 8));
+      await chunkyEquip.addResourceToToken(tokenId, resId, 1);
       await chunkyEquip.acceptResource(tokenId, 0, resId);
 
       // The merged version does not implement this to save size:
       if (chunkyEquip.getFullExtendedResources === undefined) {
         const activeResources = await chunkyEquip.getActiveResources(tokenId);
-        expect(await renderUtils.getResourcesById(chunkyEquip.address, activeResources)).to.be.eql([
-          metaURIDefault,
-        ]);
+        expect(
+          await renderUtils.getResourcesById(chunkyEquip.address, tokenId, activeResources),
+        ).to.be.eql([metaURIDefault]);
       } else {
         expect(await chunkyEquip.getFullExtendedResources(tokenId)).to.be.eql([
           [resId, equippableGroupIdDefault, baseAddressDefault, metaURIDefault],
@@ -465,9 +478,9 @@ async function shouldBehaveLikeEquippableResources(
       // The merged version does not implement this to save size:
       if (chunkyEquip.getFullExtendedResources === undefined) {
         const activeResources = await chunkyEquip.getActiveResources(tokenId);
-        expect(await renderUtils.getResourcesById(chunkyEquip.address, activeResources)).to.be.eql(
-          [],
-        );
+        expect(
+          await renderUtils.getResourcesById(chunkyEquip.address, tokenId, activeResources),
+        ).to.be.eql([]);
       } else {
         expect(await chunkyEquip.getFullExtendedResources(tokenId)).to.be.eql([]);
       }
@@ -510,9 +523,9 @@ async function shouldBehaveLikeEquippableResources(
       // The merged version does not implement this to save size:
       if (chunkyEquip.getFullExtendedResources === undefined) {
         const activeResources = await chunkyEquip.getActiveResources(tokenId);
-        expect(await renderUtils.getResourcesById(chunkyEquip.address, activeResources)).to.be.eql(
-          [],
-        );
+        expect(
+          await renderUtils.getResourcesById(chunkyEquip.address, tokenId, activeResources),
+        ).to.be.eql([]);
       } else {
         expect(await chunkyEquip.getFullExtendedResources(tokenId)).to.be.eql([]);
       }
@@ -540,9 +553,9 @@ async function shouldBehaveLikeEquippableResources(
       // The merged version does not implement this to save size:
       if (chunkyEquip.getFullExtendedResources === undefined) {
         const activeResources = await chunkyEquip.getActiveResources(tokenId);
-        expect(await renderUtils.getResourcesById(chunkyEquip.address, activeResources)).to.be.eql(
-          [],
-        );
+        expect(
+          await renderUtils.getResourcesById(chunkyEquip.address, tokenId, activeResources),
+        ).to.be.eql([]);
       } else {
         expect(await chunkyEquip.getFullExtendedResources(tokenId)).to.be.eql([]);
       }
@@ -605,9 +618,9 @@ async function shouldBehaveLikeEquippableResources(
       // The merged version does not implement this to save size:
       if (chunkyEquip.getFullExtendedResources === undefined) {
         const activeResources = await chunkyEquip.getActiveResources(tokenId);
-        expect(await renderUtils.getResourcesById(chunkyEquip.address, activeResources)).to.be.eql(
-          [],
-        );
+        expect(
+          await renderUtils.getResourcesById(chunkyEquip.address, tokenId, activeResources),
+        ).to.be.eql([]);
       } else {
         expect(await chunkyEquip.getFullExtendedResources(tokenId)).to.be.eql([]);
       }
@@ -714,10 +727,8 @@ async function shouldBehaveLikeEquippableResources(
 
       await chunky.connect(tokenOwner).transferFrom(tokenOwner.address, newOwner.address, tokenId);
 
-      expect(await chunky.getApproved(tokenId)).to.eql(ethers.constants.AddressZero);
-      expect(await chunkyEquip.getApprovedForResources(tokenId)).to.eql(
-        ethers.constants.AddressZero,
-      );
+      expect(await chunky.getApproved(tokenId)).to.eql(ADDRESS_ZERO);
+      expect(await chunkyEquip.getApprovedForResources(tokenId)).to.eql(ADDRESS_ZERO);
     });
 
     it('cleans token and resources approvals on burn', async function () {

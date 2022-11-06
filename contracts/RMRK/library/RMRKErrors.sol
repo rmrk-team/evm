@@ -120,7 +120,7 @@ error RMRKTargetResourceCannotReceiveSlot();
 /// Attempting to equip a child into a `Slot` and parent that the child's collection doesn't support
 error RMRKTokenCannotBeEquippedWithResourceIntoSlot();
 /// Attempting to compose a NFT of a token without active resources
-error RMRKTokenDoesNotHaveActiveResource();
+error RMRKTokenDoesNotHaveResource();
 /// Attempting to determine the resource with the top priority on a token without resources
 error RMRKTokenHasNoResources();
 /// Attempting to reject all resources but more resources than expected are pending

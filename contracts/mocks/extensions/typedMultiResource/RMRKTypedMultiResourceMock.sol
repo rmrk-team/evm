@@ -47,7 +47,7 @@ contract RMRKTypedMultiResourceMock is
         uint256 len = priorities.length;
 
         uint16 maxPriority = _LOWEST_POSSIBLE_PRIORITY;
-        uint64 maxPriorityIndex = 0;
+        uint64 maxPriorityResource;
         bytes32 targetTypeEncoded = keccak256(bytes(type_));
         for (uint64 i; i < len; ) {
             uint16 currentPrio = priorities[i];
@@ -59,7 +59,7 @@ contract RMRKTypedMultiResourceMock is
                 currentPrio < maxPriority
             ) {
                 maxPriority = currentPrio;
-                maxPriorityIndex = i;
+                maxPriorityResource = resources[i];
             }
             unchecked {
                 ++i;
@@ -67,6 +67,6 @@ contract RMRKTypedMultiResourceMock is
         }
         if (maxPriority == _LOWEST_POSSIBLE_PRIORITY)
             revert RMRKTokenHasNoResourcesWithType();
-        return getResourceMetaForToken(tokenId, maxPriorityIndex);
+        return getResourceMetadata(tokenId, maxPriorityResource);
     }
 }

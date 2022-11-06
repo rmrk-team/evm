@@ -22,7 +22,9 @@ abstract contract AbstractMultiResource is Context, IRMRKMultiResource {
     mapping(uint256 => mapping(uint64 => uint64)) private _resourceOverwrites;
 
     /// Mapping of tokenId to an array of active resources
-    mapping(uint256 => uint64[]) private _activeResources;
+    /// @dev Active recurses is unbounded, getting all would reach gas limit at around 30k items
+    /// so we leave this as internal in case a custom implementation needs to implement pagination
+    mapping(uint256 => uint64[]) internal _activeResources;
 
     /// Mapping of tokenId to an array of pending resources
     mapping(uint256 => uint64[]) private _pendingResources;
@@ -38,40 +40,22 @@ abstract contract AbstractMultiResource is Context, IRMRKMultiResource {
         private _operatorApprovalsForResources;
 
     /**
-     * @notice Used to fetch the resource metadata of the specified resource.
-     * @dev Resources are stored by reference mapping `_resources[resourceId]`.
-     * @param resourceId ID of the resource to query
-     * @return string Metadata of the resource
-     */
-    function getResourceMeta(uint64 resourceId)
-        public
-        view
-        virtual
-        returns (string memory)
-    {
-        string memory meta = _resources[resourceId];
-        if (bytes(meta).length == 0) revert RMRKNoResourceMatchingId();
-        return meta;
-    }
-
-    /**
-     * @notice Used to fetch the resource metadata of the specified token's active resource with the given index.
+     * @notice Used to fetch the resource metadata of the specified token's for given resource.
      * @dev Resources are stored by reference mapping `_resources[resourceId]`.
      * @dev Can be overriden to implement enumerate, fallback or other custom logic.
      * @param tokenId ID of the token to query
-     * @param resourceIndex Index of the resource to query in the token's active resources
+     * @param resourceId Resource Id, must be in the pending or active resources array
      * @return string Metadata of the resource
      */
-    function getResourceMetaForToken(uint256 tokenId, uint64 resourceIndex)
+    function getResourceMetadata(uint256 tokenId, uint64 resourceId)
         public
         view
         virtual
         returns (string memory)
     {
-        if (resourceIndex >= getActiveResources(tokenId).length)
-            revert RMRKIndexOutOfRange();
-        uint64 resourceId = getActiveResources(tokenId)[resourceIndex];
-        return getResourceMeta(resourceId);
+        if (!_tokenResources[tokenId][resourceId])
+            revert RMRKTokenDoesNotHaveResource();
+        return _resources[resourceId];
     }
 
     /**
@@ -199,6 +183,7 @@ abstract contract AbstractMultiResource is Context, IRMRKMultiResource {
             // If it's not deleted (not found), we don't want to send it on the event
             if (!_activeResources[tokenId].removeItemByValue(overwrite))
                 overwrite = uint64(0);
+            else delete _tokenResources[tokenId][overwrite];
             delete (_resourceOverwrites[tokenId][resourceId]);
         }
         _activeResources[tokenId].push(resourceId);
@@ -225,8 +210,8 @@ abstract contract AbstractMultiResource is Context, IRMRKMultiResource {
 
         _beforeRejectResource(tokenId, index, resourceId);
         _pendingResources[tokenId].removeItemByIndex(index);
-        _tokenResources[tokenId][resourceId] = false;
-        delete (_resourceOverwrites[tokenId][resourceId]);
+        delete _tokenResources[tokenId][resourceId];
+        delete _resourceOverwrites[tokenId][resourceId];
 
         emit ResourceRejected(tokenId, resourceId);
         _afterRejectResource(tokenId, index, resourceId);
