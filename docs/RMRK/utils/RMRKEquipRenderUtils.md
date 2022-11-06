@@ -36,6 +36,30 @@ function composeEquippables(address target, uint256 tokenId, uint64 resourceId) 
 | fixedParts | IRMRKEquippable.FixedPart[] | undefined |
 | slotParts | IRMRKEquippable.SlotPart[] | undefined |
 
+### getActiveExtendedResourceByIndex
+
+```solidity
+function getActiveExtendedResourceByIndex(address target, uint256 tokenId, uint256 index) external view returns (struct IRMRKEquippable.ExtendedResource)
+```
+
+Returns `ExtendedResource` object associated with `resourceId` Requirements: - `resourceId` must exist.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| target | address | undefined |
+| tokenId | uint256 | undefined |
+| index | uint256 | undefined |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | IRMRKEquippable.ExtendedResource | undefined |
+
 ### getEquipped
 
 ```solidity
@@ -61,34 +85,10 @@ function getEquipped(address target, uint64 tokenId, uint64 resourceId) external
 | slotParts | uint64[] | undefined |
 | childrenEquipped | IRMRKEquippable.Equipment[] | undefined |
 
-### getExtendedResourceByIndex
-
-```solidity
-function getExtendedResourceByIndex(address target, uint256 tokenId, uint256 index) external view returns (struct IRMRKEquippable.ExtendedResource)
-```
-
-Returns `ExtendedResource` object associated with `resourceId` Requirements: - `resourceId` must exist.
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| target | address | undefined |
-| tokenId | uint256 | undefined |
-| index | uint256 | undefined |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | IRMRKEquippable.ExtendedResource | undefined |
-
 ### getExtendedResourcesById
 
 ```solidity
-function getExtendedResourcesById(address target, uint64[] resourceIds) external view returns (struct IRMRKEquippable.ExtendedResource[])
+function getExtendedResourcesById(address target, uint256 tokenId, uint64[] resourceIds) external view returns (struct IRMRKEquippable.ExtendedResource[])
 ```
 
 Returns `ExtendedResource` objects for the given ids Requirements: - `resourceIds` must exist.
@@ -100,6 +100,7 @@ Returns `ExtendedResource` objects for the given ids Requirements: - `resourceId
 | Name | Type | Description |
 |---|---|---|
 | target | address | undefined |
+| tokenId | uint256 | undefined |
 | resourceIds | uint64[] | undefined |
 
 #### Returns
@@ -166,17 +167,6 @@ error RMRKNotComposableResource()
 ```
 
 Attempting to compose a resource wihtout having an associated Base
-
-
-
-
-### RMRKTokenDoesNotHaveActiveResource
-
-```solidity
-error RMRKTokenDoesNotHaveActiveResource()
-```
-
-Attempting to compose a NFT of a token without active resources
 
 
 

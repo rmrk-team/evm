@@ -91,7 +91,7 @@ sed to notify the listeners that the address of the `Equippable` associated smar
 | Name | Type | Description |
 |---|---|---|
 | old  | address | Address of the previous `Equippable` smart contract |
-| new_  | address | Address of the new `Equippable` smart contract  |
+| new_  | address | Address of the new `Equippable` smart contract |
 
 
 

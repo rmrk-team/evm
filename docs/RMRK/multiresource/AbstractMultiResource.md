@@ -13,7 +13,7 @@ Abstract Smart contract implementing most of the common logic for contracts impl
 ### acceptResource
 
 ```solidity
-function acceptResource(uint256 tokenId, uint256 index) external nonpayable
+function acceptResource(uint256 tokenId, uint256 index, uint64 resourceId) external nonpayable
 ```
 
 Accepts a resource at from the pending array of given token.
@@ -26,6 +26,7 @@ Accepts a resource at from the pending array of given token.
 |---|---|---|
 | tokenId | uint256 | ID of the token for which to accept the pending resource |
 | index | uint256 | Index of the resource in the pending array to accept |
+| resourceId | uint64 | expected to be in the index |
 
 ### approveForResources
 
@@ -88,23 +89,6 @@ Used to retrieve the active resource IDs of a given token.
 |---|---|---|
 | _0 | uint64[] | uint64[] Array of active resource IDs |
 
-### getAllResources
-
-```solidity
-function getAllResources() external view returns (uint64[])
-```
-
-Used to retrieve an array containing all of the resource IDs.
-
-
-
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | uint64[] | uint64[] Array of all resource IDs. |
-
 ### getApprovedForResources
 
 ```solidity
@@ -149,35 +133,13 @@ Returns pending resource IDs for a given token
 |---|---|---|
 | _0 | uint64[] | uint64[] pending resource IDs |
 
-### getResourceMeta
+### getResourceMetadata
 
 ```solidity
-function getResourceMeta(uint64 resourceId) external view returns (string)
+function getResourceMetadata(uint256 tokenId, uint64 resourceId) external view returns (string)
 ```
 
-Used to fetch the resource metadata of the specified resource.
-
-*Resources are stored by reference mapping `_resources[resourceId]`.*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| resourceId | uint64 | ID of the resource to query |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | string | string Metadata of the resource |
-
-### getResourceMetaForToken
-
-```solidity
-function getResourceMetaForToken(uint256 tokenId, uint64 resourceIndex) external view returns (string)
-```
-
-Used to fetch the resource metadata of the specified token&#39;s active resource with the given index.
+Used to fetch the resource metadata of the specified token&#39;s for given resource.
 
 *Resources are stored by reference mapping `_resources[resourceId]`.Can be overriden to implement enumerate, fallback or other custom logic.*
 
@@ -186,7 +148,7 @@ Used to fetch the resource metadata of the specified token&#39;s active resource
 | Name | Type | Description |
 |---|---|---|
 | tokenId | uint256 | ID of the token to query |
-| resourceIndex | uint64 | Index of the resource to query in the token&#39;s active resources |
+| resourceId | uint64 | Resource Id, must be in the pending or active resources array |
 
 #### Returns
 
@@ -243,7 +205,7 @@ Used to check whether the address has been granted the operator role by a given 
 ### rejectAllResources
 
 ```solidity
-function rejectAllResources(uint256 tokenId) external nonpayable
+function rejectAllResources(uint256 tokenId, uint256 maxRejections) external nonpayable
 ```
 
 Rejects all resources from the pending array of a given token.
@@ -255,11 +217,12 @@ Rejects all resources from the pending array of a given token.
 | Name | Type | Description |
 |---|---|---|
 | tokenId | uint256 | ID of the token of which to clear the pending array |
+| maxRejections | uint256 | to prevent from rejecting resources which arrive just before this operation. |
 
 ### rejectResource
 
 ```solidity
-function rejectResource(uint256 tokenId, uint256 index) external nonpayable
+function rejectResource(uint256 tokenId, uint256 index, uint64 resourceId) external nonpayable
 ```
 
 Rejects a resource from the pending array of given token.
@@ -271,7 +234,8 @@ Rejects a resource from the pending array of given token.
 | Name | Type | Description |
 |---|---|---|
 | tokenId | uint256 | ID of the token that the resource is being rejected from |
-| index | uint256 | Index of the resource in the pending array to be rejected  |
+| index | uint256 | Index of the resource in the pending array to be rejected |
+| resourceId | uint64 | expected to be in the index |
 
 ### setApprovalForAllForResources
 
@@ -372,7 +336,7 @@ Used to notify listeners that owner has granted an approval to the user to manag
 ### ResourceAccepted
 
 ```solidity
-event ResourceAccepted(uint256 indexed tokenId, uint64 indexed resourceId)
+event ResourceAccepted(uint256 indexed tokenId, uint64 indexed resourceId, uint64 indexed overwritesId)
 ```
 
 Used to notify listeners that a resource object at `resourceId` is accepted by the token and migrated  from token&#39;s pending resources array to active resources array of the token.
@@ -385,11 +349,12 @@ Used to notify listeners that a resource object at `resourceId` is accepted by t
 |---|---|---|
 | tokenId `indexed` | uint256 | undefined |
 | resourceId `indexed` | uint64 | undefined |
+| overwritesId `indexed` | uint64 | undefined |
 
 ### ResourceAddedToToken
 
 ```solidity
-event ResourceAddedToToken(uint256 indexed tokenId, uint64 indexed resourceId)
+event ResourceAddedToToken(uint256 indexed tokenId, uint64 indexed resourceId, uint64 indexed overwritesId)
 ```
 
 Used to notify listeners that a resource object at `resourceId` is added to token&#39;s pending resource  array.
@@ -402,42 +367,7 @@ Used to notify listeners that a resource object at `resourceId` is added to toke
 |---|---|---|
 | tokenId `indexed` | uint256 | undefined |
 | resourceId `indexed` | uint64 | undefined |
-
-### ResourceOverwriteProposed
-
-```solidity
-event ResourceOverwriteProposed(uint256 indexed tokenId, uint64 indexed resourceId, uint64 indexed overwritesId)
-```
-
-Used to notify listeners that a resource object at `resourceId` is proposed to token, and that the  proposal will initiate an overwrite of the resource with a new one if accepted.
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| tokenId `indexed` | uint256 | undefined |
-| resourceId `indexed` | uint64 | undefined |
 | overwritesId `indexed` | uint64 | undefined |
-
-### ResourceOverwritten
-
-```solidity
-event ResourceOverwritten(uint256 indexed tokenId, uint64 indexed oldResourceId, uint64 indexed newResourceId)
-```
-
-Used to notify listeners that a pending resource with an overwrite is accepted, overwriting a token&#39;s  resource.
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| tokenId `indexed` | uint256 | undefined |
-| oldResourceId `indexed` | uint64 | undefined |
-| newResourceId `indexed` | uint64 | undefined |
 
 ### ResourcePrioritySet
 
@@ -503,24 +433,13 @@ Attempting to grant approval of resources to their current owner
 
 
 
-### RMRKIndexOutOfRange
+### RMRKTokenDoesNotHaveResource
 
 ```solidity
-error RMRKIndexOutOfRange()
+error RMRKTokenDoesNotHaveResource()
 ```
 
-Attempting to interact with a resource, using index greater than number of resources
-
-
-
-
-### RMRKNoResourceMatchingId
-
-```solidity
-error RMRKNoResourceMatchingId()
-```
-
-Attempting to interact with a resource that can not be found
+Attempting to compose a NFT of a token without active resources
 
 
 

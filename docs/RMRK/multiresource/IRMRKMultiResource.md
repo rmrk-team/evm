@@ -13,7 +13,7 @@ Interface smart contract of the RMRK multi resource module.
 ### acceptResource
 
 ```solidity
-function acceptResource(uint256 tokenId, uint256 index) external nonpayable
+function acceptResource(uint256 tokenId, uint256 index, uint64 resourceId) external nonpayable
 ```
 
 Accepts a resource at from the pending array of given token.
@@ -26,6 +26,7 @@ Accepts a resource at from the pending array of given token.
 |---|---|---|
 | tokenId | uint256 | ID of the token for which to accept the pending resource |
 | index | uint256 | Index of the resource in the pending array to accept |
+| resourceId | uint64 | expected to be in the index |
 
 ### approveForResources
 
@@ -72,9 +73,9 @@ Used to retrieve the priorities of the active resoources of a given token.
 function getActiveResources(uint256 tokenId) external view returns (uint64[])
 ```
 
-Used to retrieve IDs od the active resources of given token.
+Used to retrieve IDs of the active resources of given token.
 
-*Resource data is stored by reference, in order to access the data corresponding to the ID, call  `getResourceMeta(resourceId)`.*
+*Resource data is stored by reference, in order to access the data corresponding to the ID, call  `getResourceMetadata(tokenId, resourceId)`.You can safely get 10k*
 
 #### Parameters
 
@@ -87,23 +88,6 @@ Used to retrieve IDs od the active resources of given token.
 | Name | Type | Description |
 |---|---|---|
 | _0 | uint64[] | uint64[] An array of active resource IDs of the given token |
-
-### getAllResources
-
-```solidity
-function getAllResources() external view returns (uint64[])
-```
-
-Returns the ids of all stored resources
-
-
-
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | uint64[] | undefined |
 
 ### getApprovedForResources
 
@@ -133,9 +117,9 @@ Used to retrieve the address of the account approved to manage resources of a gi
 function getPendingResources(uint256 tokenId) external view returns (uint64[])
 ```
 
-Used to retrieve IDs od the active resources of given token.
+Used to retrieve IDs of the pending resources of given token.
 
-*Resource data is stored by reference, in order to access the data corresponding to the ID, call  `getResourceMeta(resourceId)`.*
+*Resource data is stored by reference, in order to access the data corresponding to the ID, call  `getResourceMetadata(tokenId, resourceId)`.*
 
 #### Parameters
 
@@ -149,32 +133,10 @@ Used to retrieve IDs od the active resources of given token.
 |---|---|---|
 | _0 | uint64[] | uint64[] An array of pending resource IDs of the given token |
 
-### getResourceMeta
+### getResourceMetadata
 
 ```solidity
-function getResourceMeta(uint64 resourceId) external view returns (string)
-```
-
-Used to retrieve the metadata of the resource associated with `resourceId`.
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| resourceId | uint64 | The ID of the resource for which we are trying to retrieve the resource metadata |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | string | string The metadata of the resource with ID equal to `resourceId` |
-
-### getResourceMetaForToken
-
-```solidity
-function getResourceMetaForToken(uint256 tokenId, uint64 resourceIndex) external view returns (string)
+function getResourceMetadata(uint256 tokenId, uint64 resourceId) external view returns (string)
 ```
 
 Used to fetch the resource metadata of the specified token&#39;s active resource with the given index.
@@ -186,7 +148,7 @@ Used to fetch the resource metadata of the specified token&#39;s active resource
 | Name | Type | Description |
 |---|---|---|
 | tokenId | uint256 | ID of the token from which to retrieve the resource metadata |
-| resourceIndex | uint64 | Index of the resource in the active resources array for which to retrieve the metadata |
+| resourceId | uint64 | Resource Id, must be in the active resources array |
 
 #### Returns
 
@@ -202,7 +164,7 @@ function getResourceOverwrites(uint256 tokenId, uint64 newResourceId) external v
 
 Used to retrieve the resource that will be overriden if a given resource from the token&#39;s pending array  is accepted.
 
-*Resource data is stored by reference, in order to access the data corresponding to the ID, call  `getResourceMeta(resourceId)`.*
+*Resource data is stored by reference, in order to access the data corresponding to the ID, call  `getResourceMetadata(tokenId, resourceId)`.*
 
 #### Parameters
 
@@ -243,7 +205,7 @@ Used to check whether the address has been granted the operator role by a given 
 ### rejectAllResources
 
 ```solidity
-function rejectAllResources(uint256 tokenId) external nonpayable
+function rejectAllResources(uint256 tokenId, uint256 maxRejections) external nonpayable
 ```
 
 Rejects all resources from the pending array of a given token.
@@ -255,11 +217,12 @@ Rejects all resources from the pending array of a given token.
 | Name | Type | Description |
 |---|---|---|
 | tokenId | uint256 | ID of the token of which to clear the pending array |
+| maxRejections | uint256 | to prevent from rejecting resources which arrive just before this operation. |
 
 ### rejectResource
 
 ```solidity
-function rejectResource(uint256 tokenId, uint256 index) external nonpayable
+function rejectResource(uint256 tokenId, uint256 index, uint64 resourceId) external nonpayable
 ```
 
 Rejects a resource from the pending array of given token.
@@ -271,7 +234,8 @@ Rejects a resource from the pending array of given token.
 | Name | Type | Description |
 |---|---|---|
 | tokenId | uint256 | ID of the token that the resource is being rejected from |
-| index | uint256 | Index of the resource in the pending array to be rejected  |
+| index | uint256 | Index of the resource in the pending array to be rejected |
+| resourceId | uint64 | expected to be in the index |
 
 ### setApprovalForAllForResources
 
@@ -372,7 +336,7 @@ Used to notify listeners that owner has granted an approval to the user to manag
 ### ResourceAccepted
 
 ```solidity
-event ResourceAccepted(uint256 indexed tokenId, uint64 indexed resourceId)
+event ResourceAccepted(uint256 indexed tokenId, uint64 indexed resourceId, uint64 indexed overwritesId)
 ```
 
 Used to notify listeners that a resource object at `resourceId` is accepted by the token and migrated  from token&#39;s pending resources array to active resources array of the token.
@@ -385,11 +349,12 @@ Used to notify listeners that a resource object at `resourceId` is accepted by t
 |---|---|---|
 | tokenId `indexed` | uint256 | ID of the token that had a new resource accepted |
 | resourceId `indexed` | uint64 | ID of the resource that was accepted |
+| overwritesId `indexed` | uint64 | ID of the resource that would be overwritten |
 
 ### ResourceAddedToToken
 
 ```solidity
-event ResourceAddedToToken(uint256 indexed tokenId, uint64 indexed resourceId)
+event ResourceAddedToToken(uint256 indexed tokenId, uint64 indexed resourceId, uint64 indexed overwritesId)
 ```
 
 Used to notify listeners that a resource object at `resourceId` is added to token&#39;s pending resource  array.
@@ -402,42 +367,7 @@ Used to notify listeners that a resource object at `resourceId` is added to toke
 |---|---|---|
 | tokenId `indexed` | uint256 | ID of the token that received a new pending resource |
 | resourceId `indexed` | uint64 | ID of the resource that has been added to the token&#39;s pending resources array |
-
-### ResourceOverwriteProposed
-
-```solidity
-event ResourceOverwriteProposed(uint256 indexed tokenId, uint64 indexed resourceId, uint64 indexed overwritesId)
-```
-
-Used to notify listeners that a resource object at `resourceId` is proposed to token, and that the  proposal will initiate an overwrite of the resource with a new one if accepted.
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| tokenId `indexed` | uint256 | ID of the token that had the resource overwrite proposed |
-| resourceId `indexed` | uint64 | ID of the resource that would overwrite the current resource |
 | overwritesId `indexed` | uint64 | ID of the resource that would be overwritten |
-
-### ResourceOverwritten
-
-```solidity
-event ResourceOverwritten(uint256 indexed tokenId, uint64 indexed oldResourceId, uint64 indexed newResourceId)
-```
-
-Used to notify listeners that a pending resource with an overwrite is accepted, overwriting a token&#39;s  resource.
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| tokenId `indexed` | uint256 | ID of the token that had a resource overwritten |
-| oldResourceId `indexed` | uint64 | ID of the resource that was overwritten |
-| newResourceId `indexed` | uint64 | ID of the resource that overwrote the old resource |
 
 ### ResourcePrioritySet
 

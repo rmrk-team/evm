@@ -10,6 +10,30 @@
 
 ## Methods
 
+### getActiveResourceByIndex
+
+```solidity
+function getActiveResourceByIndex(address target, uint256 tokenId, uint256 index) external view returns (string)
+```
+
+Returns resource metadata at `index` of active resource array on `tokenId` Requirements: - `tokenId` must exist. - `index` must be inside the range of active resource array
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| target | address | undefined |
+| tokenId | uint256 | undefined |
+| index | uint256 | undefined |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | string | undefined |
+
 ### getPendingResourceByIndex
 
 ```solidity
@@ -34,34 +58,10 @@ Returns resource metadata at `index` of pending resource array on `tokenId` Requ
 |---|---|---|
 | _0 | string | undefined |
 
-### getResourceByIndex
-
-```solidity
-function getResourceByIndex(address target, uint256 tokenId, uint256 index) external view returns (string)
-```
-
-Returns resource metadata at `index` of active resource array on `tokenId` Requirements: - `tokenId` must exist. - `index` must be inside the range of active resource array
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| target | address | undefined |
-| tokenId | uint256 | undefined |
-| index | uint256 | undefined |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | string | undefined |
-
 ### getResourcesById
 
 ```solidity
-function getResourcesById(address target, uint64[] resourceIds) external view returns (string[])
+function getResourcesById(address target, uint256 tokenId, uint64[] resourceIds) external view returns (string[])
 ```
 
 Returns resource metadata strings for the given ids Requirements: - `resourceIds` must exist.
@@ -73,6 +73,7 @@ Returns resource metadata strings for the given ids Requirements: - `resourceIds
 | Name | Type | Description |
 |---|---|---|
 | target | address | undefined |
+| tokenId | uint256 | undefined |
 | resourceIds | uint64[] | undefined |
 
 #### Returns
