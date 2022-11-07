@@ -2,7 +2,7 @@ import { Contract } from 'ethers';
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import { bn, mintFromMock } from './utils';
+import { ADDRESS_ZERO, bn, mintFromMock } from './utils';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 
 // --------------- FIXTURES -----------------------
@@ -26,7 +26,7 @@ async function resourcesFixture() {
 
 describe('Render Utils', async function () {
   let owner: SignerWithAddress;
-  let other: SignerWithAddress;
+  let someBase: SignerWithAddress;
   let equip: Contract;
   let renderUtils: Contract;
   let renderUtilsEquip: Contract;
@@ -34,13 +34,15 @@ describe('Render Utils', async function () {
 
   const resId = bn(1);
   const resId2 = bn(2);
+  const resId3 = bn(3);
+  const resId4 = bn(4);
 
   before(async function () {
     ({ equip, renderUtils, renderUtilsEquip } = await loadFixture(resourcesFixture));
 
     const signers = await ethers.getSigners();
     owner = signers[0];
-    other = signers[1];
+    someBase = signers[1];
 
     tokenId = await mintFromMock(equip, owner.address);
     await equip.addResourceEntry(
@@ -48,7 +50,7 @@ describe('Render Utils', async function () {
         id: resId,
         equippableGroupId: 0,
         metadataURI: 'ipfs://res1.jpg',
-        baseAddress: ethers.constants.AddressZero,
+        baseAddress: ADDRESS_ZERO,
       },
       [],
       [],
@@ -58,44 +60,57 @@ describe('Render Utils', async function () {
         id: resId2,
         equippableGroupId: 1,
         metadataURI: 'ipfs://res2.jpg',
-        baseAddress: other.address,
+        baseAddress: someBase.address,
       },
       [1],
       [3, 4],
     );
+    await equip.addResourceEntry(
+      {
+        id: resId3,
+        equippableGroupId: 0,
+        metadataURI: 'ipfs://res3.jpg',
+        baseAddress: ADDRESS_ZERO,
+      },
+      [],
+      [],
+    );
+    await equip.addResourceEntry(
+      {
+        id: resId4,
+        equippableGroupId: 2,
+        metadataURI: 'ipfs://res4.jpg',
+        baseAddress: someBase.address,
+      },
+      [],
+      [4],
+    );
     await equip.addResourceToToken(tokenId, resId, 0);
     await equip.addResourceToToken(tokenId, resId2, 0);
+    await equip.addResourceToToken(tokenId, resId3, resId);
+    await equip.addResourceToToken(tokenId, resId4, 0);
+
     await equip.acceptResource(tokenId, 0, resId);
+    await equip.acceptResource(tokenId, 1, resId2);
+    await equip.setPriority(tokenId, [10, 5]);
   });
 
   describe('Render Utils MultiResource', async function () {
-    it('can get active resource by index', async function () {
-      expect(await renderUtils.getActiveResourceByIndex(equip.address, tokenId, 0)).to.eql(
-        'ipfs://res1.jpg',
-      );
+    it('can get active resources', async function () {
+      expect(await renderUtils.getActiveResources(equip.address, tokenId)).to.eql([
+        [resId, 10, 'ipfs://res1.jpg'],
+        [resId2, 5, 'ipfs://res2.jpg'],
+      ]);
     });
-
-    it('can get pending resource by index', async function () {
-      expect(await renderUtils.getPendingResourceByIndex(equip.address, tokenId, 0)).to.eql(
-        'ipfs://res2.jpg',
-      );
-    });
-
-    it('can get resources by id', async function () {
-      expect(await renderUtils.getResourcesById(equip.address, tokenId, [resId, resId2])).to.eql([
-        'ipfs://res1.jpg',
-        'ipfs://res2.jpg',
+    it('can get pending resources', async function () {
+      expect(await renderUtils.getPendingResources(equip.address, tokenId)).to.eql([
+        [resId4, bn(0), bn(0), 'ipfs://res4.jpg'],
+        [resId3, bn(1), resId, 'ipfs://res3.jpg'],
       ]);
     });
 
     it('can get top resource by priority', async function () {
-      const otherTokenId = await mintFromMock(equip, owner.address);
-      await equip.addResourceToToken(otherTokenId, resId, 0);
-      await equip.addResourceToToken(otherTokenId, resId2, 0);
-      await equip.acceptResource(otherTokenId, 0, resId);
-      await equip.acceptResource(otherTokenId, 0, resId2);
-      await equip.setPriority(otherTokenId, [1, 0]);
-      expect(await renderUtils.getTopResourceMetaForToken(equip.address, otherTokenId)).to.eql(
+      expect(await renderUtils.getTopResourceMetaForToken(equip.address, tokenId)).to.eql(
         'ipfs://res2.jpg',
       );
     });
@@ -109,24 +124,17 @@ describe('Render Utils', async function () {
   });
 
   describe('Render Utils Equip', async function () {
-    it('can get extended active resource by index', async function () {
-      expect(
-        await renderUtilsEquip.getActiveExtendedResourceByIndex(equip.address, tokenId, 0),
-      ).to.eql([resId, bn(0), ethers.constants.AddressZero, 'ipfs://res1.jpg']);
+    it('can get active resources', async function () {
+      expect(await renderUtilsEquip.getExtendedActiveResources(equip.address, tokenId)).to.eql([
+        [resId, bn(0), 10, ADDRESS_ZERO, 'ipfs://res1.jpg', [], []],
+        [resId2, bn(1), 5, someBase.address, 'ipfs://res2.jpg', [bn(1)], [bn(3), bn(4)]],
+      ]);
     });
 
-    it('can get extended pending resource by index', async function () {
-      expect(
-        await renderUtilsEquip.getPendingExtendedResourceByIndex(equip.address, tokenId, 0),
-      ).to.eql([resId2, bn(1), other.address, 'ipfs://res2.jpg']);
-    });
-
-    it('can get extended resources by id', async function () {
-      expect(
-        await renderUtilsEquip.getExtendedResourcesById(equip.address, tokenId, [resId, resId2]),
-      ).to.eql([
-        [resId, bn(0), ethers.constants.AddressZero, 'ipfs://res1.jpg'],
-        [resId2, bn(1), other.address, 'ipfs://res2.jpg'],
+    it('can get pending resources', async function () {
+      expect(await renderUtilsEquip.getExtendedPendingResources(equip.address, tokenId)).to.eql([
+        [resId4, bn(2), bn(0), bn(0), someBase.address, 'ipfs://res4.jpg', [], [bn(4)]],
+        [resId3, bn(0), bn(1), resId, ADDRESS_ZERO, 'ipfs://res3.jpg', [], []],
       ]);
     });
   });
