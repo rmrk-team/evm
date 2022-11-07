@@ -260,16 +260,17 @@ async function shouldBehaveLikeBase(contractName: string, metadataURI: string, t
       await testBase.setEquippableToAll(partId);
 
       // This should reset it:
-      testBase.addEquippableAddresses(partId, [addrs[1].address]);
+      await testBase.addEquippableAddresses(partId, [addrs[1].address]);
       expect(await testBase.checkIsEquippableToAll(partId)).to.eql(false);
     });
 
     it('can reset equippable addresses', async function () {
       const partId = 1;
       await testBase.addPart({ partId: partId, part: sampleSlotPartData });
-      testBase.addEquippableAddresses(partId, [addrs[1].address, addrs[2].address]);
+      await testBase.addEquippableAddresses(partId, [addrs[1].address, addrs[2].address]);
 
       await testBase.resetEquippableAddresses(partId);
+      expect(await testBase.checkIsEquippable(partId, addrs[1].address)).to.eql(false);
     });
   });
 }
