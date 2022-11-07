@@ -13,24 +13,26 @@
 ### acceptChild
 
 ```solidity
-function acceptChild(uint256 parentTokenId, uint256 index) external nonpayable
+function acceptChild(uint256 parentId, uint256 childIndex, address childAddress, uint256 childId) external nonpayable
 ```
 
+Sends an instance of Child from the pending children array at index to children array for tokenId.
 
 
-*Function called to accept a pending child. Migrates the child at `index` on `parentTokenId` to the accepted children array. Requirements: - `parentTokenId` must exist*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| parentTokenId | uint256 | undefined |
-| index | uint256 | undefined |
+| parentId | uint256 | tokenId of parent token to accept a child on |
+| childIndex | uint256 | index of child in _pendingChildren array to accept. |
+| childAddress | address | address of the child expected to be in the index. |
+| childId | uint256 | token Id of the child expected to be in the index |
 
 ### addChild
 
 ```solidity
-function addChild(uint256 parentTokenId, uint256 childTokenId) external nonpayable
+function addChild(uint256 parentId, uint256 childId) external nonpayable
 ```
 
 
@@ -41,8 +43,8 @@ function addChild(uint256 parentTokenId, uint256 childTokenId) external nonpayab
 
 | Name | Type | Description |
 |---|---|---|
-| parentTokenId | uint256 | undefined |
-| childTokenId | uint256 | undefined |
+| parentId | uint256 | undefined |
+| childId | uint256 | undefined |
 
 ### burn
 
@@ -70,18 +72,18 @@ function burn(uint256 tokenId, uint256 maxRecursiveBurns) external nonpayable re
 ### childOf
 
 ```solidity
-function childOf(uint256 parentTokenId, uint256 index) external view returns (struct IRMRKNesting.Child)
+function childOf(uint256 parentId, uint256 index) external view returns (struct IRMRKNesting.Child)
 ```
 
 
 
-*Returns a single child object existing at `index` on `parentTokenId`.*
+*Returns a single child object existing at `index` on `parentId`.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| parentTokenId | uint256 | undefined |
+| parentId | uint256 | undefined |
 | index | uint256 | undefined |
 
 #### Returns
@@ -93,18 +95,18 @@ function childOf(uint256 parentTokenId, uint256 index) external view returns (st
 ### childrenOf
 
 ```solidity
-function childrenOf(uint256 parentTokenId) external view returns (struct IRMRKNesting.Child[])
+function childrenOf(uint256 parentId) external view returns (struct IRMRKNesting.Child[])
 ```
 
 
 
-*Returns array of child objects existing for `parentTokenId`.*
+*Returns array of child objects existing for `parentId`.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| parentTokenId | uint256 | undefined |
+| parentId | uint256 | undefined |
 
 #### Returns
 
@@ -156,18 +158,18 @@ function ownerOf(uint256 tokenId) external view returns (address owner)
 ### pendingChildOf
 
 ```solidity
-function pendingChildOf(uint256 parentTokenId, uint256 index) external view returns (struct IRMRKNesting.Child)
+function pendingChildOf(uint256 parentId, uint256 index) external view returns (struct IRMRKNesting.Child)
 ```
 
 
 
-*Returns a single pending child object existing at `index` on `parentTokenId`.*
+*Returns a single pending child object existing at `index` on `parentId`.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| parentTokenId | uint256 | undefined |
+| parentId | uint256 | undefined |
 | index | uint256 | undefined |
 
 #### Returns
@@ -179,18 +181,18 @@ function pendingChildOf(uint256 parentTokenId, uint256 index) external view retu
 ### pendingChildrenOf
 
 ```solidity
-function pendingChildrenOf(uint256 parentTokenId) external view returns (struct IRMRKNesting.Child[])
+function pendingChildrenOf(uint256 parentId) external view returns (struct IRMRKNesting.Child[])
 ```
 
 
 
-*Returns array of pending child objects existing for `parentTokenId`.*
+*Returns array of pending child objects existing for `parentId`.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| parentTokenId | uint256 | undefined |
+| parentId | uint256 | undefined |
 
 #### Returns
 
@@ -201,18 +203,18 @@ function pendingChildrenOf(uint256 parentTokenId) external view returns (struct 
 ### rejectAllChildren
 
 ```solidity
-function rejectAllChildren(uint256 parentTokenId) external nonpayable
+function rejectAllChildren(uint256 parentId) external nonpayable
 ```
 
 
 
-*Function called to reject all pending children. Removes the children from the pending array mapping. The children&#39;s ownership structures are not updated. Requirements: - `parentTokenId` must exist*
+*Function called to reject all pending children. Removes the children from the pending array mapping. The children&#39;s ownership structures are not updated. Requirements: - `parentId` must exist*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| parentTokenId | uint256 | undefined |
+| parentId | uint256 | undefined |
 
 ### rmrkOwnerOf
 
@@ -263,21 +265,23 @@ function supportsInterface(bytes4 interfaceId) external view returns (bool)
 ### unnestChild
 
 ```solidity
-function unnestChild(uint256 tokenId, uint256 index, address to, bool isPending) external nonpayable
+function unnestChild(uint256 tokenId, address to, uint256 childIndex, address childAddress, uint256 childId, bool isPending) external nonpayable
 ```
 
+Function to unnest a child from the active token array.
 
 
-*Function called to unnest a child from `tokenId`&#39;s child array. The owner of the token is set to `to`, or is not updated in the event `to` is the zero address Requirements: - `tokenId` must exist*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | undefined |
-| index | uint256 | undefined |
-| to | address | undefined |
-| isPending | bool | undefined |
+| tokenId | uint256 | is the tokenId of the parent token to unnest from. |
+| to | address | is the address to transfer this |
+| childIndex | uint256 | is the index of the child token ID. |
+| childAddress | address | address of the child expected to be in the index. |
+| childId | uint256 | token Id of the child expected to be in the index |
+| isPending | bool | Boolean value indicating whether the token is in the pending array of the parent (`true`) or in  the active array (`false`) |
 
 
 
@@ -302,7 +306,7 @@ event AllChildrenRejected(uint256 indexed tokenId)
 ### ChildAccepted
 
 ```solidity
-event ChildAccepted(uint256 indexed tokenId, address indexed childAddress, uint256 indexed childId, uint256 childIndex)
+event ChildAccepted(uint256 indexed tokenId, uint256 childIndex, address indexed childAddress, uint256 indexed childId)
 ```
 
 
@@ -314,14 +318,14 @@ event ChildAccepted(uint256 indexed tokenId, address indexed childAddress, uint2
 | Name | Type | Description |
 |---|---|---|
 | tokenId `indexed` | uint256 | undefined |
+| childIndex  | uint256 | undefined |
 | childAddress `indexed` | address | undefined |
 | childId `indexed` | uint256 | undefined |
-| childIndex  | uint256 | undefined |
 
 ### ChildProposed
 
 ```solidity
-event ChildProposed(uint256 indexed tokenId, address indexed childAddress, uint256 indexed childId, uint256 childIndex)
+event ChildProposed(uint256 indexed tokenId, uint256 childIndex, address indexed childAddress, uint256 indexed childId)
 ```
 
 
@@ -333,14 +337,14 @@ event ChildProposed(uint256 indexed tokenId, address indexed childAddress, uint2
 | Name | Type | Description |
 |---|---|---|
 | tokenId `indexed` | uint256 | undefined |
+| childIndex  | uint256 | undefined |
 | childAddress `indexed` | address | undefined |
 | childId `indexed` | uint256 | undefined |
-| childIndex  | uint256 | undefined |
 
 ### ChildUnnested
 
 ```solidity
-event ChildUnnested(uint256 indexed tokenId, address indexed childAddress, uint256 indexed childId, uint256 childIndex, bool fromPending)
+event ChildUnnested(uint256 indexed tokenId, uint256 childIndex, address indexed childAddress, uint256 indexed childId, bool fromPending)
 ```
 
 
@@ -352,9 +356,9 @@ event ChildUnnested(uint256 indexed tokenId, address indexed childAddress, uint2
 | Name | Type | Description |
 |---|---|---|
 | tokenId `indexed` | uint256 | undefined |
+| childIndex  | uint256 | undefined |
 | childAddress `indexed` | address | undefined |
 | childId `indexed` | uint256 | undefined |
-| childIndex  | uint256 | undefined |
 | fromPending  | bool | undefined |
 
 ### NestTransfer
