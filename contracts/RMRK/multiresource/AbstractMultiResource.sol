@@ -174,6 +174,7 @@ abstract contract AbstractMultiResource is Context, IRMRKMultiResource {
             revert RMRKIndexOutOfRange();
         if (resourceId != _pendingResources[tokenId][index])
             revert RMRKUnexpectedResourceId();
+        _beforeAcceptResource(tokenId, index, resourceId);
 
         _pendingResources[tokenId].removeItemByIndex(index);
 
@@ -190,6 +191,7 @@ abstract contract AbstractMultiResource is Context, IRMRKMultiResource {
         //Push 0 value of uint16 to array, e.g., uninitialized
         _activeResourcePriorities[tokenId].push(uint16(0));
         emit ResourceAccepted(tokenId, resourceId, overwrite);
+        _afterAcceptResource(tokenId, index, resourceId);
     }
 
     /**
@@ -344,6 +346,18 @@ abstract contract AbstractMultiResource is Context, IRMRKMultiResource {
         uint256 tokenId,
         uint64 resourceId,
         uint64 overwrites
+    ) internal virtual {}
+
+    function _beforeAcceptResource(
+        uint256 tokenId,
+        uint256 index,
+        uint256 resourceId
+    ) internal virtual {}
+
+    function _afterAcceptResource(
+        uint256 tokenId,
+        uint256 index,
+        uint256 resourceId
     ) internal virtual {}
 
     function _beforeRejectResource(
