@@ -14,70 +14,120 @@ pragma solidity ^0.8.16;
 contract RMRKEquipRenderUtils {
     using RMRKLib for uint64[];
 
-    /**
-     * @notice Returns `ExtendedResource` object associated with `resourceId`
-     *
-     * Requirements:
-     *
-     * - `resourceId` must exist.
-     *
-     */
-    function getActiveExtendedResourceByIndex(
-        address target,
-        uint256 tokenId,
-        uint256 index
-    ) external view virtual returns (IRMRKEquippable.ExtendedResource memory) {
-        IRMRKEquippable target_ = IRMRKEquippable(target);
-        uint64 resourceId = target_.getActiveResources(tokenId)[index];
-        return target_.getExtendedResource(tokenId, resourceId);
+    struct ExtendedActiveResource {
+        uint64 id;
+        uint64 equippableGroupId;
+        uint16 priority;
+        address baseAddress;
+        string metadata;
+        uint64[] fixedParts;
+        uint64[] slotParts;
     }
 
-    /**
-     * @notice Returns `ExtendedResource` object at `index` of active resource array on `tokenId`
-     *
-     * Requirements:
-     *
-     * - `tokenId` must exist.
-     * - `index` must be inside the range of active resource array
-     */
-    function getPendingExtendedResourceByIndex(
-        address target,
-        uint256 tokenId,
-        uint256 index
-    ) external view virtual returns (IRMRKEquippable.ExtendedResource memory) {
-        IRMRKEquippable target_ = IRMRKEquippable(target);
-        uint64 resourceId = target_.getPendingResources(tokenId)[index];
-        return target_.getExtendedResource(tokenId, resourceId);
+    struct ExtendedPendingResource {
+        uint64 id;
+        uint64 equippableGroupId;
+        uint128 acceptRejectIndex;
+        uint64 overwritesResourceWithId;
+        address baseAddress;
+        string metadata;
+        uint64[] fixedParts;
+        uint64[] slotParts;
     }
 
-    /**
-     * @notice Returns `ExtendedResource` objects for the given ids
-     *
-     * Requirements:
-     *
-     * - `resourceIds` must exist.
-     */
-    function getExtendedResourcesById(
-        address target,
-        uint256 tokenId,
-        uint64[] calldata resourceIds
-    )
-        external
+    struct EquippedSlotPart {
+        uint64 partId;
+        uint64 childResourceId;
+        uint8 z; //1 byte
+        address childAddress;
+        uint256 childId;
+        string childResourceMetadata; //n bytes 32+
+        string partMetadata; //n bytes 32+
+    }
+
+    function getExtendedActiveResources(address target, uint256 tokenId)
+        public
         view
         virtual
-        returns (IRMRKEquippable.ExtendedResource[] memory)
+        returns (ExtendedActiveResource[] memory)
     {
         IRMRKEquippable target_ = IRMRKEquippable(target);
-        uint256 len = resourceIds.length;
-        IRMRKEquippable.ExtendedResource[]
-            memory resources = new IRMRKEquippable.ExtendedResource[](len);
+
+        uint64[] memory resources = target_.getActiveResources(tokenId);
+        uint16[] memory priorities = target_.getActiveResourcePriorities(
+            tokenId
+        );
+        uint256 len = resources.length;
+        if (len == 0) {
+            revert RMRKTokenHasNoResources();
+        }
+
+        ExtendedActiveResource[]
+            memory activeResources = new ExtendedActiveResource[](len);
+        IRMRKEquippable.ExtendedResource memory extendedResource;
         for (uint256 i; i < len; ) {
-            resources[i] = target_.getExtendedResource(tokenId, resourceIds[i]);
+            extendedResource = target_.getExtendedResource(
+                tokenId,
+                resources[i]
+            );
+            activeResources[i] = ExtendedActiveResource({
+                id: resources[i],
+                equippableGroupId: extendedResource.equippableGroupId,
+                priority: priorities[i],
+                baseAddress: extendedResource.baseAddress,
+                metadata: extendedResource.metadataURI,
+                fixedParts: target_.getFixedPartIds(resources[i]),
+                slotParts: target_.getSlotPartIds(resources[i])
+            });
             unchecked {
                 ++i;
             }
         }
-        return resources;
+        return activeResources;
+    }
+
+    function getExtendedPendingResources(address target, uint256 tokenId)
+        public
+        view
+        virtual
+        returns (ExtendedPendingResource[] memory)
+    {
+        IRMRKEquippable target_ = IRMRKEquippable(target);
+
+        uint64[] memory resources = target_.getPendingResources(tokenId);
+        uint256 len = resources.length;
+        if (len == 0) {
+            revert RMRKTokenHasNoResources();
+        }
+
+        ExtendedPendingResource[]
+            memory pendingResources = new ExtendedPendingResource[](len);
+        IRMRKEquippable.ExtendedResource memory extendedResource;
+        uint64 overwritesResourceWithId;
+        for (uint256 i; i < len; ) {
+            extendedResource = target_.getExtendedResource(
+                tokenId,
+                resources[i]
+            );
+            overwritesResourceWithId = target_.getResourceOverwrites(
+                tokenId,
+                resources[i]
+            );
+            pendingResources[i] = ExtendedPendingResource({
+                id: resources[i],
+                equippableGroupId: extendedResource.equippableGroupId,
+                acceptRejectIndex: uint128(i),
+                overwritesResourceWithId: overwritesResourceWithId,
+                baseAddress: extendedResource.baseAddress,
+                metadata: extendedResource.metadataURI,
+                fixedParts: target_.getFixedPartIds(resources[i]),
+                slotParts: target_.getSlotPartIds(resources[i])
+            });
+            unchecked {
+                ++i;
+            }
+        }
+        return pendingResources;
     }
 
     function getEquipped(
@@ -130,7 +180,7 @@ contract RMRKEquipRenderUtils {
         returns (
             IRMRKEquippable.ExtendedResource memory resource,
             IRMRKEquippable.FixedPart[] memory fixedParts,
-            IRMRKEquippable.SlotPart[] memory slotParts
+            EquippedSlotPart[] memory slotParts
         )
     {
         IRMRKEquippable target_ = IRMRKEquippable(target);
@@ -165,10 +215,11 @@ contract RMRKEquipRenderUtils {
 
         // Slot parts:
         uint64[] memory slotPartIds = target_.getSlotPartIds(resourceId);
-        slotParts = new IRMRKEquippable.SlotPart[](slotPartIds.length);
+        slotParts = new EquippedSlotPart[](slotPartIds.length);
         len = slotPartIds.length;
 
         if (len != 0) {
+            string memory metadata;
             IRMRKBaseStorage.Part[] memory baseSlotParts = IRMRKBaseStorage(
                 targetBaseAddress
             ).getParts(slotPartIds);
@@ -176,22 +227,29 @@ contract RMRKEquipRenderUtils {
                 IRMRKEquippable.Equipment memory equipment = target_
                     .getEquipment(tokenId, targetBaseAddress, slotPartIds[i]);
                 if (equipment.resourceId == resourceId) {
-                    slotParts[i] = IRMRKEquippable.SlotPart({
+                    metadata = IRMRKEquippable(equipment.childEquippableAddress)
+                        .getResourceMetadata(
+                            equipment.childTokenId,
+                            equipment.childResourceId
+                        );
+                    slotParts[i] = EquippedSlotPart({
                         partId: slotPartIds[i],
                         childResourceId: equipment.childResourceId,
                         z: baseSlotParts[i].z,
-                        childTokenId: equipment.childTokenId,
+                        childId: equipment.childTokenId,
                         childAddress: equipment.childEquippableAddress,
-                        metadataURI: baseSlotParts[i].metadataURI
+                        childResourceMetadata: metadata,
+                        partMetadata: baseSlotParts[i].metadataURI
                     });
                 } else {
-                    slotParts[i] = IRMRKEquippable.SlotPart({
+                    slotParts[i] = EquippedSlotPart({
                         partId: slotPartIds[i],
                         childResourceId: uint64(0),
                         z: baseSlotParts[i].z,
-                        childTokenId: uint256(0),
+                        childId: uint256(0),
                         childAddress: address(0),
-                        metadataURI: baseSlotParts[i].metadataURI
+                        childResourceMetadata: "",
+                        partMetadata: baseSlotParts[i].metadataURI
                     });
                 }
                 unchecked {

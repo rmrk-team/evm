@@ -591,18 +591,20 @@ async function shouldBehaveLikeEquippableWithSlots(
           bn(partIdForWeapon), // partId
           bn(weaponResourcesEquip[0]), // childResourceId
           2, // z
-          bn(weaponsIds[0]), // childTokenId
           weaponEquip.address, // childAddress
-          '', // metadataURI
+          bn(weaponsIds[0]), // childTokenId
+          'ipfs:weapon/equip/5', // childResourceMetadata
+          '', // partMetadata
         ],
         [
           // Nothing on equipped on background slot:
           bn(partIdForBackground), // partId
           bn(0), // childResourceId
           0, // z
-          bn(0), // childTokenId
           ethers.constants.AddressZero, // childAddress
-          'noBackground.png', // metadataURI
+          bn(0), // childTokenId
+          '', // childResourceMetadata
+          'noBackground.png', // partMetadata
         ],
       ];
       const allResources = await view.composeEquippables(

@@ -131,15 +131,10 @@ describe('MultiResourceMock Other Behavior', async function () {
         'ResourceAddedToToken',
       );
 
-      const pendingIds = await token.getPendingResources(tokenId);
-      expect(await renderUtils.getResourcesById(token.address, tokenId, pendingIds)).to.be.eql([
-        'data1',
-        'data2',
+      expect(await renderUtils.getPendingResources(token.address, tokenId)).to.eql([
+        [resId, bn(0), bn(0), 'data1'],
+        [resId2, bn(1), bn(0), 'data2'],
       ]);
-
-      expect(await renderUtils.getPendingResourceByIndex(token.address, tokenId, 0)).to.eql(
-        'data1',
-      );
     });
 
     it('cannot add non existing resource to token', async function () {
