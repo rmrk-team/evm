@@ -46,32 +46,41 @@ contract RMRKNestingExternalEquip is IRMRKNestingExternalEquip, RMRKNesting {
      * @notice Used to unnest a child from the parent.
      * @dev The function is overriden, so that additional verification is added, making sure that the child is not
      *  currently equipped when trying to unnest it.
-     * @param tokenId ID of the parent token
-     * @param index Index of a child token being unnested in the array it's located in. This can be either pending or
-     *  active array
-     * @param to Address that should receive the token once unnestedđ
+     * @param tokenId is the tokenId of the parent token to unnest from.
+     * @param to is the address to transfer this
+     * @param childIndex is the index of the child token ID.
+     * @param childAddress address of the child expected to be in the index.
+     * @param childId token Id of the child expected to be in the index
      * @param isPending Boolean value indicating whether the token is in the pending array of the parent (`true`) or in
      *  the active array (`false`)
      */
     function _unnestChild(
         uint256 tokenId,
-        uint256 index,
         address to,
+        uint256 childIndex,
+        address childAddress,
+        uint256 childId,
         bool isPending
     ) internal virtual override {
         if (!isPending) {
             _requireMinted(tokenId);
-            Child memory child = childOf(tokenId, index);
             if (
                 IRMRKEquippable(_equippableAddress).isChildEquipped(
                     tokenId,
-                    child.contractAddress,
-                    child.tokenId
+                    childAddress,
+                    childId
                 )
             ) revert RMRKMustUnequipFirst();
         }
 
-        super._unnestChild(tokenId, index, to, isPending);
+        super._unnestChild(
+            tokenId,
+            to,
+            childIndex,
+            childAddress,
+            childId,
+            isPending
+        );
     }
 
     /**

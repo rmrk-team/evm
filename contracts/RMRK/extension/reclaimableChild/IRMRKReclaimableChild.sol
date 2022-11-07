@@ -19,11 +19,11 @@ interface IRMRKReclaimableChild is IERC165 {
      *  - `tokenId` must exist
      * @param tokenId ID of the last parent token of the child token being recovered
      * @param childAddress Address of the child token's smart contract
-     * @param childTokenId ID of the child token being reclaimed
+     * @param childId ID of the child token being reclaimed
      */
     function reclaimChild(
         uint256 tokenId,
         address childAddress,
-        uint256 childTokenId
+        uint256 childId
     ) external;
 }

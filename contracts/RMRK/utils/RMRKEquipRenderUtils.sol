@@ -169,7 +169,7 @@ contract RMRKEquipRenderUtils is IRMRKEquipRenderUtils {
                         partId: slotPartIds[i],
                         childResourceId: equipment.childResourceId,
                         z: baseSlotParts[i].z,
-                        childTokenId: equipment.childTokenId,
+                        childId: equipment.childId,
                         childAddress: equipment.childEquippableAddress,
                         metadataURI: baseSlotParts[i].metadataURI
                     });
@@ -178,7 +178,7 @@ contract RMRKEquipRenderUtils is IRMRKEquipRenderUtils {
                         partId: slotPartIds[i],
                         childResourceId: uint64(0),
                         z: baseSlotParts[i].z,
-                        childTokenId: uint256(0),
+                        childId: uint256(0),
                         childAddress: address(0),
                         metadataURI: baseSlotParts[i].metadataURI
                     });

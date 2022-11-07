@@ -373,7 +373,7 @@ contract RMRKExternalEquip is
         Equipment memory newEquip = Equipment({
             resourceId: data.resourceId,
             childResourceId: data.childResourceId,
-            childTokenId: child.tokenId,
+            childId: child.tokenId,
             childEquippableAddress: childEquippable
         });
 
@@ -448,14 +448,14 @@ contract RMRKExternalEquip is
             equipment.childEquippableAddress
         ).getNestingAddress();
         _equipCountPerChild[tokenId][childNestingAddress][
-            equipment.childTokenId
+            equipment.childId
         ] -= 1;
 
         emit ChildResourceUnequipped(
             tokenId,
             resourceId,
             slotPartId,
-            equipment.childTokenId,
+            equipment.childId,
             equipment.childEquippableAddress,
             equipment.childResourceId
         );
@@ -491,16 +491,16 @@ contract RMRKExternalEquip is
      * @dev This is used to prevent from unnesting a child that is equipped.
      * @param tokenId ID of the parent token for which we are querying for
      * @param childAddress Address of the child token's smart contract
-     * @param childTokenId ID of the child token
+     * @param childId ID of the child token
      * @return bool The boolean value indicating whether the child token is equipped into the given token or not
      */
     function isChildEquipped(
         uint256 tokenId,
         address childAddress,
-        uint256 childTokenId
+        uint256 childId
     ) public view returns (bool) {
         return
-            _equipCountPerChild[tokenId][childAddress][childTokenId] !=
+            _equipCountPerChild[tokenId][childAddress][childId] !=
             uint8(0);
     }
 
@@ -576,7 +576,7 @@ contract RMRKExternalEquip is
      *  [
      *      resourceId,
      *      childResourceId,
-     *      childTokenId,
+     *      childId,
      *      childEquippableAddress
      *  ]
      * @param resource An `ExtendedResource` struct containing the components of a resource we are adding
@@ -667,7 +667,7 @@ contract RMRKExternalEquip is
      *  [
      *      resourceId,
      *      childResourceId,
-     *      childTokenId,
+     *      childId,
      *      childEquippableAddress
      *  ]
      * @param tokenId ID of the token for which we are retrieving the equipped object

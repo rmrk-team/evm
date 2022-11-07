@@ -260,7 +260,9 @@ async function shouldBehaveLikeEquippableWithSlots(
       const childIndex = 2;
 
       const newWeaponGemId = await nestMint(weaponGem, soldier.address, soldierId);
-      await soldier.connect(soldierOwner).acceptChild(soldierId, 0);
+      await soldier
+        .connect(soldierOwner)
+        .acceptChild(soldierId, 0, weaponGem.address, newWeaponGemId);
 
       // Add resources to weapon
       await weaponGemEquip.addResourceToToken(newWeaponGemId, weaponGemResourceFull, 0);
@@ -545,7 +547,14 @@ async function shouldBehaveLikeEquippableWithSlots(
       await unequipWeaponAndCheckFromAddress(soldierOwner);
       await soldier
         .connect(soldierOwner)
-        .unnestChild(soldiersIds[0], childIndex, soldierOwner.address, false);
+        .unnestChild(
+          soldiersIds[0],
+          soldierOwner.address,
+          childIndex,
+          weapon.address,
+          weaponsIds[0],
+          false,
+        );
     });
 
     it('Unnest fails if child is equipped', async function () {
@@ -560,7 +569,14 @@ async function shouldBehaveLikeEquippableWithSlots(
       await expect(
         soldier
           .connect(soldierOwner)
-          .unnestChild(soldiersIds[0], childIndex, soldierOwner.address, false),
+          .unnestChild(
+            soldiersIds[0],
+            soldierOwner.address,
+            childIndex,
+            weapon.address,
+            weaponsIds[0],
+            false,
+          ),
       ).to.be.revertedWithCustomError(weapon, 'RMRKMustUnequipFirst');
     });
   });
@@ -745,7 +761,7 @@ async function shouldBehaveLikeEquippableWithSlots(
   ): Promise<number> {
     // Mint another weapon to the soldier and accept it
     const newWeaponId = await nestMint(weapon, soldier.address, soldierId);
-    await soldier.connect(soldierOwner).acceptChild(soldierId, 0);
+    await soldier.connect(soldierOwner).acceptChild(soldierId, 0, weapon.address, newWeaponId);
 
     // Add resources to weapon
     await weaponEquip.addResourceToToken(newWeaponId, weaponResourcesFull[resourceIndex], 0);

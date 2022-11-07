@@ -59,11 +59,13 @@ async function shouldBehaveLikeReclaimableChild() {
 
   describe('With active child', async function () {
     beforeEach(async function () {
-      await this.parent.connect(tokenOwner).acceptChild(parentId, 0);
+      await this.parent.connect(tokenOwner).acceptChild(parentId, 0, this.child.address, childId);
     });
 
     it('can reclaim unnested child if unnested to address zero', async function () {
-      await this.parent.connect(tokenOwner).unnestChild(parentId, 0, ADDRESS_ZERO, false);
+      await this.parent
+        .connect(tokenOwner)
+        .unnestChild(parentId, ADDRESS_ZERO, 0, this.child.address, childId, false);
 
       await this.parent.connect(tokenOwner).reclaimChild(parentId, this.child.address, childId);
       expect(await this.child.ownerOf(childId)).to.eql(tokenOwner.address);
@@ -77,7 +79,9 @@ async function shouldBehaveLikeReclaimableChild() {
     });
 
     it('cannot reclaim unnested child if unnested to a non zero address', async function () {
-      await this.parent.connect(tokenOwner).unnestChild(parentId, 0, addrs[2].address, false);
+      await this.parent
+        .connect(tokenOwner)
+        .unnestChild(parentId, addrs[2].address, 0, this.child.address, childId, false);
 
       await expect(
         this.parent.connect(tokenOwner).reclaimChild(parentId, this.child.address, childId),
@@ -85,7 +89,9 @@ async function shouldBehaveLikeReclaimableChild() {
     });
 
     it('cannot reclaim unnested child from different parent token', async function () {
-      await this.parent.connect(tokenOwner).unnestChild(parentId, 0, ADDRESS_ZERO, false);
+      await this.parent
+        .connect(tokenOwner)
+        .unnestChild(parentId, ADDRESS_ZERO, 0, this.child.address, childId, false);
       const otherParentId = await mintFromMock(this.parent, tokenOwner.address);
 
       await expect(
@@ -95,7 +101,9 @@ async function shouldBehaveLikeReclaimableChild() {
 
     it('cannot reclaim unnested child from a non owned parent token', async function () {
       const notParent = addrs[2];
-      await this.parent.connect(tokenOwner).unnestChild(parentId, 0, ADDRESS_ZERO, false);
+      await this.parent
+        .connect(tokenOwner)
+        .unnestChild(parentId, ADDRESS_ZERO, 0, this.child.address, childId, false);
 
       await expect(
         this.parent.connect(notParent).reclaimChild(parentId, this.child.address, childId),
@@ -105,7 +113,9 @@ async function shouldBehaveLikeReclaimableChild() {
 
   describe('With pending child', async function () {
     it('can reclaim unnested child if unnested to address zero', async function () {
-      await this.parent.connect(tokenOwner).unnestChild(parentId, 0, ADDRESS_ZERO, true);
+      await this.parent
+        .connect(tokenOwner)
+        .unnestChild(parentId, ADDRESS_ZERO, 0, this.child.address, childId, true);
 
       await this.parent.connect(tokenOwner).reclaimChild(parentId, this.child.address, childId);
       expect(await this.child.ownerOf(childId)).to.eql(tokenOwner.address);
@@ -119,7 +129,9 @@ async function shouldBehaveLikeReclaimableChild() {
     });
 
     it('cannot reclaim unnested child if unnested to a non zero address', async function () {
-      await this.parent.connect(tokenOwner).unnestChild(parentId, 0, addrs[2].address, true);
+      await this.parent
+        .connect(tokenOwner)
+        .unnestChild(parentId, addrs[2].address, 0, this.child.address, childId, true);
 
       await expect(
         this.parent.connect(tokenOwner).reclaimChild(parentId, this.child.address, childId),
@@ -127,7 +139,9 @@ async function shouldBehaveLikeReclaimableChild() {
     });
 
     it('cannot reclaim unnested child from different parent token', async function () {
-      await this.parent.connect(tokenOwner).unnestChild(parentId, 0, ADDRESS_ZERO, true);
+      await this.parent
+        .connect(tokenOwner)
+        .unnestChild(parentId, ADDRESS_ZERO, 0, this.child.address, childId, true);
       const otherParentId = await mintFromMock(this.parent, tokenOwner.address);
 
       await expect(
@@ -137,7 +151,9 @@ async function shouldBehaveLikeReclaimableChild() {
 
     it('cannot reclaim unnested child from a non owned parent token', async function () {
       const notParent = addrs[2];
-      await this.parent.connect(tokenOwner).unnestChild(parentId, 0, ADDRESS_ZERO, true);
+      await this.parent
+        .connect(tokenOwner)
+        .unnestChild(parentId, ADDRESS_ZERO, 0, this.child.address, childId, true);
 
       await expect(
         this.parent.connect(notParent).reclaimChild(parentId, this.child.address, childId),

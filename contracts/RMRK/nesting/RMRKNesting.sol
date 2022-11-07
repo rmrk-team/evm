@@ -659,9 +659,9 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         virtual
         returns (bool)
     {
-        (address owner, uint256 parentTokenId, ) = rmrkOwnerOf(tokenId);
+        (address owner, uint256 parentId, ) = rmrkOwnerOf(tokenId);
         // When the parent is an NFT, only it can do operations
-        if (parentTokenId != 0) {
+        if (parentId != 0) {
             return (spender == owner);
         }
         // Otherwise, the owner or approved address can
@@ -737,79 +737,82 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
 
     /**
      * @dev Function designed to be used by other instances of RMRK-Core contracts to update children.
-     * param1 parentTokenId is the tokenId of the parent token on (this).
-     * param2 childTokenId is the tokenId of the child instance
+     * param1 parentId is the tokenId of the parent token on (this).
+     * param2 childId is the tokenId of the child instance
      */
 
-    function addChild(uint256 parentTokenId, uint256 childTokenId)
+    function addChild(uint256 parentId, uint256 childId)
         public
         virtual
     {
-        _requireMinted(parentTokenId);
+        _requireMinted(parentId);
 
         address childAddress = _msgSender();
         if (!childAddress.isContract()) revert RMRKIsNotContract();
 
         Child memory child = Child({
             contractAddress: childAddress,
-            tokenId: childTokenId
+            tokenId: childId
         });
 
-        _beforeAddChild(parentTokenId, child);
+        _beforeAddChild(parentId, childAddress, childId);
 
-        uint256 length = pendingChildrenOf(parentTokenId).length;
+        uint256 length = pendingChildrenOf(parentId).length;
 
         if (length < 128) {
-            _pendingChildren[parentTokenId].push(child);
+            _pendingChildren[parentId].push(child);
         } else {
             revert RMRKMaxPendingChildrenReached();
         }
 
         // Previous length matches the index for the new child
-        emit ChildProposed(parentTokenId, childAddress, childTokenId, length);
+        emit ChildProposed(parentId, length, childAddress, childId);
 
-        _afterAddChild(parentTokenId, child);
+        _afterAddChild(parentId, childAddress, childId);
     }
 
     /**
      * @notice Sends an instance of Child from the pending children array at index to children array for tokenId.
-     * @param tokenId tokenId of parent token to accept a child on
-     * @param index index of child in _pendingChildren array to accept.
+     * @param parentId tokenId of parent token to accept a child on
+     * @param childIndex index of child in _pendingChildren array to accept.
+     * @param childAddress address of the child expected to be in the index.
+     * @param childId token Id of the child expected to be in the index
      */
-    function acceptChild(uint256 tokenId, uint256 index)
-        public
-        virtual
-        onlyApprovedOrOwner(tokenId)
-    {
-        _acceptChild(tokenId, index);
+    function acceptChild(
+        uint256 parentId,
+        uint256 childIndex,
+        address childAddress,
+        uint256 childId
+    ) public virtual onlyApprovedOrOwner(parentId) {
+        _acceptChild(parentId, childIndex, childAddress, childId);
     }
 
-    function _acceptChild(uint256 tokenId, uint256 index) internal virtual {
-        if (pendingChildrenOf(tokenId).length <= index)
+    function _acceptChild(
+        uint256 parentId,
+        uint256 childIndex,
+        address childAddress,
+        uint256 childId
+    ) internal virtual {
+        if (pendingChildrenOf(parentId).length <= childIndex)
             revert RMRKPendingChildIndexOutOfRange();
 
-        Child memory child = pendingChildOf(tokenId, index);
-
-        if (_childIsInActive[child.contractAddress][child.tokenId] != 0)
+        Child memory child = pendingChildOf(parentId, childIndex);
+        _checkExpectedChild(child, childAddress, childId);
+        if (_childIsInActive[childAddress][childId] != 0)
             revert RMRKChildAlreadyExists();
 
-        _beforeAcceptChild(tokenId, index, child);
+        _beforeAcceptChild(parentId, childIndex, childAddress, childId);
 
         // Remove from pending:
-        _removeChildByIndex(_pendingChildren[tokenId], index);
+        _removeChildByIndex(_pendingChildren[parentId], childIndex);
 
         // Add to active:
-        _activeChildren[tokenId].push(child);
-        _childIsInActive[child.contractAddress][child.tokenId] = 1; // We use 1 as true
+        _activeChildren[parentId].push(child);
+        _childIsInActive[childAddress][childId] = 1; // We use 1 as true
 
-        emit ChildAccepted(
-            tokenId,
-            child.contractAddress,
-            child.tokenId,
-            index
-        );
+        emit ChildAccepted(parentId, childIndex, childAddress, childId);
 
-        _afterAcceptChild(tokenId, index, child);
+        _afterAcceptChild(parentId, childIndex, childAddress, childId);
     }
 
     /**
@@ -835,52 +838,78 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
     /**
      * @notice Function to unnest a child from the active token array.
      * @param tokenId is the tokenId of the parent token to unnest from.
-     * @param index is the index of the child token ID.
      * @param to is the address to transfer this
-     * @param isPending indicates if the child is pending (active otherwise).
+     * @param childIndex is the index of the child token ID.
+     * @param childAddress address of the child expected to be in the index.
+     * @param childId token Id of the child expected to be in the index
+     * @param isPending Boolean value indicating whether the token is in the pending array of the parent (`true`) or in
+     *  the active array (`false`)
      */
     function unnestChild(
         uint256 tokenId,
-        uint256 index,
         address to,
+        uint256 childIndex,
+        address childAddress,
+        uint256 childId,
         bool isPending
     ) public virtual onlyApprovedOrOwner(tokenId) {
-        _unnestChild(tokenId, index, to, isPending);
+        _unnestChild(tokenId, to, childIndex, childAddress, childId, isPending);
     }
 
     function _unnestChild(
         uint256 tokenId,
-        uint256 index,
         address to,
+        uint256 childIndex,
+        address childAddress,
+        uint256 childId,
         bool isPending
     ) internal virtual {
         Child memory child;
         if (isPending) {
-            child = pendingChildOf(tokenId, index);
-            _removeChildByIndex(_pendingChildren[tokenId], index);
+            child = pendingChildOf(tokenId, childIndex);
         } else {
-            child = childOf(tokenId, index);
-            delete _childIsInActive[child.contractAddress][child.tokenId];
-            _removeChildByIndex(_activeChildren[tokenId], index);
+            child = childOf(tokenId, childIndex);
         }
-        _beforeUnnestChild(tokenId, index, child, isPending);
+        _checkExpectedChild(child, childAddress, childId);
+
+        _beforeUnnestChild(
+            tokenId,
+            childIndex,
+            childAddress,
+            childId,
+            isPending
+        );
+
+        if (isPending) {
+            _removeChildByIndex(_pendingChildren[tokenId], childIndex);
+        } else {
+            delete _childIsInActive[childAddress][childId];
+            _removeChildByIndex(_activeChildren[tokenId], childIndex);
+        }
 
         if (to != address(0)) {
-            IERC721(child.contractAddress).safeTransferFrom(
-                address(this),
-                to,
-                child.tokenId
-            );
+            IERC721(childAddress).safeTransferFrom(address(this), to, childId);
         }
 
         emit ChildUnnested(
             tokenId,
-            child.contractAddress,
-            child.tokenId,
-            index,
+            childIndex,
+            childAddress,
+            childId,
             isPending
         );
-        _afterUnnestChild(tokenId, index, child, isPending);
+        _afterUnnestChild(
+            tokenId,
+            childIndex,
+            childAddress,
+            childId,
+            isPending
+        );
+    }
+
+    function _checkExpectedChild(Child memory child, address expectedAddress, uint256 expectedId) private pure {
+        if (expectedAddress != child.contractAddress || expectedId != child.tokenId)
+            revert RMRKUnexpectedChildId();
     }
 
     ////////////////////////////////////////
@@ -891,13 +920,13 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
      * @notice Returns all confirmed children
      */
 
-    function childrenOf(uint256 parentTokenId)
+    function childrenOf(uint256 parentId)
         public
         view
         virtual
         returns (Child[] memory)
     {
-        Child[] memory children = _activeChildren[parentTokenId];
+        Child[] memory children = _activeChildren[parentId];
         return children;
     }
 
@@ -905,37 +934,37 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
      * @notice Returns all pending children
      */
 
-    function pendingChildrenOf(uint256 parentTokenId)
+    function pendingChildrenOf(uint256 parentId)
         public
         view
         virtual
         returns (Child[] memory)
     {
-        Child[] memory pendingChildren = _pendingChildren[parentTokenId];
+        Child[] memory pendingChildren = _pendingChildren[parentId];
         return pendingChildren;
     }
 
-    function childOf(uint256 parentTokenId, uint256 index)
+    function childOf(uint256 parentId, uint256 index)
         public
         view
         virtual
         returns (Child memory)
     {
-        if (childrenOf(parentTokenId).length <= index)
+        if (childrenOf(parentId).length <= index)
             revert RMRKChildIndexOutOfRange();
-        Child memory child = _activeChildren[parentTokenId][index];
+        Child memory child = _activeChildren[parentId][index];
         return child;
     }
 
-    function pendingChildOf(uint256 parentTokenId, uint256 index)
+    function pendingChildOf(uint256 parentId, uint256 index)
         public
         view
         virtual
         returns (Child memory)
     {
-        if (pendingChildrenOf(parentTokenId).length <= index)
+        if (pendingChildrenOf(parentId).length <= index)
             revert RMRKPendingChildIndexOutOfRange();
-        Child memory child = _pendingChildren[parentTokenId][index];
+        Child memory child = _pendingChildren[parentId][index];
         return child;
     }
 
@@ -966,39 +995,45 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         uint256 tokenId
     ) internal virtual {}
 
-    function _beforeAddChild(uint256 tokenId, Child memory child)
-        internal
-        virtual
-    {}
+    function _beforeAddChild(
+        uint256 tokenId,
+        address childAddress,
+        uint256 childId
+    ) internal virtual {}
 
-    function _afterAddChild(uint256 tokenId, Child memory child)
-        internal
-        virtual
-    {}
+    function _afterAddChild(
+        uint256 tokenId,
+        address childAddress,
+        uint256 childId
+    ) internal virtual {}
 
     function _beforeAcceptChild(
-        uint256 tokenId,
-        uint256 index,
-        Child memory child
+        uint256 parentId,
+        uint256 childIndex,
+        address childAddress,
+        uint256 childId
     ) internal virtual {}
 
     function _afterAcceptChild(
-        uint256 tokenId,
-        uint256 index,
-        Child memory child
+        uint256 parentId,
+        uint256 childIndex,
+        address childAddress,
+        uint256 childId
     ) internal virtual {}
 
     function _beforeUnnestChild(
         uint256 tokenId,
-        uint256 index,
-        Child memory child,
+        uint256 childIndex,
+        address childAddress,
+        uint256 childId,
         bool isPending
     ) internal virtual {}
 
     function _afterUnnestChild(
         uint256 tokenId,
-        uint256 index,
-        Child memory child,
+        uint256 childIndex,
+        address childAddress,
+        uint256 childId,
         bool isPending
     ) internal virtual {}
 

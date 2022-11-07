@@ -42,77 +42,79 @@ abstract contract RMRKReclaimableChild is IRMRKReclaimableChild, RMRKNesting {
      *  - `tokenId` must exist
      * @param tokenId ID of the last parent token of the child token being recovered
      * @param childAddress Address of the child token's smart contract
-     * @param childTokenId ID of the child token being reclaimed
+     * @param childId ID of the child token being reclaimed
      */
     function reclaimChild(
         uint256 tokenId,
         address childAddress,
-        uint256 childTokenId
+        uint256 childId
     ) public virtual onlyApprovedOrOwner(tokenId) {
-        _reclaimChild(tokenId, childAddress, childTokenId);
+        _reclaimChild(tokenId, childAddress, childId);
     }
 
     function _reclaimChild(
         uint256 tokenId,
         address childAddress,
-        uint256 childTokenId
+        uint256 childId
     ) internal virtual {
-        if (childIsInActive(childAddress, childTokenId))
+        if (childIsInActive(childAddress, childId))
             revert RMRKInvalidChildReclaim();
-        if (_childIsInPending[childAddress][childTokenId] != 0)
+        if (_childIsInPending[childAddress][childId] != 0)
             revert RMRKInvalidChildReclaim();
 
         (address owner, uint256 ownerTokenId, bool isNft) = IRMRKNesting(
             childAddress
-        ).rmrkOwnerOf(childTokenId);
+        ).rmrkOwnerOf(childId);
         if (owner != address(this) || ownerTokenId != tokenId || !isNft)
             revert RMRKInvalidChildReclaim();
         IERC721(childAddress).safeTransferFrom(
             address(this),
             _msgSender(),
-            childTokenId
+            childId
         );
     }
 
     /**
      * @notice A hook used to be called before adding a child token.
-     * @dev The `Child` struct contains the following arguments:
-     *  [
-     *      ID of the child token,
-     *      address of the child token's collection smart contract
-     *  ]
      * @dev we use this hook to keep track of children which are in pending, so they cannot be reclaimed from there.
      * @param tokenId ID of the token receiving the child token
-     * @param child A `Child` struct containing the data of the child token being added
+     * @param childAddress address of the child expected to be in the index.
+     * @param childId token Id of the child expected to be in the index
      */
-    function _beforeAddChild(uint256 tokenId, Child memory child)
+    function _beforeAddChild(
+        uint256 tokenId,
+        address childAddress,
+        uint256 childId
+    )
         internal
         virtual
         override
     {
-        super._beforeAddChild(tokenId, child);
-        _childIsInPending[child.contractAddress][child.tokenId] = 1; // We use 1 as true
+        super._beforeAddChild(tokenId, childAddress, childId);
+        _childIsInPending[childAddress][childId] = 1; // We use 1 as true
     }
 
     /**
      * @notice A hook used to be called before accepting a child token.
-     * @dev The `Child` struct contains the following arguments:
-     *  [
-     *      ID of the child token,
-     *      address of the child token's collection smart contract
-     *  ]
      * @dev we use this hook to keep track of children which are in pending, so they cannot be reclaimed from there.
-     * @param tokenId ID of the token accepting the child token
-     * @param index Index of the token in the parent token's pending child tokens array
-     * @param child A `Child` struct containing the data of the child token being accepted
+     * @param parentId tokenId of parent token to accept a child on
+     * @param childIndex index of child in _pendingChildren array to accept.
+     * @param childAddress address of the child expected to be in the index.
+     * @param childId token Id of the child expected to be in the index
      */
     function _beforeAcceptChild(
-        uint256 tokenId,
-        uint256 index,
-        Child memory child
+        uint256 parentId,
+        uint256 childIndex,
+        address childAddress,
+        uint256 childId
     ) internal virtual override {
-        super._beforeAcceptChild(tokenId, index, child);
-        delete _childIsInPending[child.contractAddress][child.tokenId];
+        super._beforeAcceptChild(
+            parentId,
+            childIndex,
+            childAddress,
+            childId
+        );
+        delete _childIsInPending[childAddress][childId];
     }
 
     /**
@@ -124,19 +126,27 @@ abstract contract RMRKReclaimableChild is IRMRKReclaimableChild, RMRKNesting {
      *  ]
      * @dev we use this hook to keep track of children which are in pending, so they cannot be reclaimed from there.
      * @param tokenId ID of the token unnesting the child token
-     * @param index Index of the token in the parent token's child tokens array
-     * @param child A `Child` struct containing the data of the child token being unnested
+     * @param childIndex index of child in _pendingChildren array to accept.
+     * @param childAddress address of the child expected to be in the index.
+     * @param childId token Id of the child expected to be in the index
      * @param isPending A boolean value signifying whether the child token is located in the parent's active or pending
      *  child token array
      */
     function _beforeUnnestChild(
         uint256 tokenId,
-        uint256 index,
-        Child memory child,
+        uint256 childIndex,
+        address childAddress,
+        uint256 childId,
         bool isPending
     ) internal virtual override {
-        super._beforeUnnestChild(tokenId, index, child, isPending);
+        super._beforeUnnestChild(
+            tokenId,
+            childIndex,
+            childAddress,
+            childId,
+            isPending
+        );
         if (isPending)
-            delete _childIsInPending[child.contractAddress][child.tokenId];
+            delete _childIsInPending[childAddress][childId];
     }
 }

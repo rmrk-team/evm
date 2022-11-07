@@ -14,13 +14,13 @@ interface IRMRKEquippable is IRMRKMultiResource {
      * @notice Used to store the core structure of the `Equippable` RMRK lego.
      * @return resourceId The ID of the resource equipping a child
      * @return childResourceId The ID of the resource used as equipment
-     * @return childTokenId The ID of token that is equipped
+     * @return childId The ID of token that is equipped
      * @return childEquippableAddress Address of the collection to which the child resource belongs to
      */
     struct Equipment {
         uint64 resourceId;
         uint64 childResourceId;
-        uint256 childTokenId;
+        uint256 childId;
         address childEquippableAddress;
     }
 
@@ -58,7 +58,7 @@ interface IRMRKEquippable is IRMRKMultiResource {
      * @return partId ID of the part
      * @return childResourceId The ID of resource associated with token equipped into this slot
      * @return z The z value of the resource, specifying how the part should be rendered in a composed NFT
-     * @return childTokenId The ID of the token equipped into this part
+     * @return childId The ID of the token equipped into this part
      * @return childAddress The address of the child token's collection
      * @return metadataURI The metadata URI of the slot part
      */
@@ -66,7 +66,7 @@ interface IRMRKEquippable is IRMRKMultiResource {
         uint64 partId;
         uint64 childResourceId;
         uint8 z; //1 byte
-        uint256 childTokenId;
+        uint256 childId;
         address childAddress;
         string metadataURI; //n bytes 32+
     }
@@ -93,7 +93,7 @@ interface IRMRKEquippable is IRMRKMultiResource {
      * @param tokenId ID of the token that had a resource equipped
      * @param resourceId ID of the resource associated with the token we are equipping into
      * @param slotPartId ID of the slot we are using to equip
-     * @param childTokenId ID of the child token we are equipping into the slot
+     * @param childId ID of the child token we are equipping into the slot
      * @param childAddress Address of the child token's collection
      * @param childResourceId ID of the resource associated with the token we are equipping
      */
@@ -101,7 +101,7 @@ interface IRMRKEquippable is IRMRKMultiResource {
         uint256 indexed tokenId,
         uint64 indexed resourceId,
         uint64 indexed slotPartId,
-        uint256 childTokenId,
+        uint256 childId,
         address childAddress,
         uint64 childResourceId
     );
@@ -111,7 +111,7 @@ interface IRMRKEquippable is IRMRKMultiResource {
      * @param tokenId ID of the token that had a resource unequipped
      * @param resourceId ID of the resource associated with the token we are unequipping out of
      * @param slotPartId ID of the slot we are unequipping from
-     * @param childTokenId ID of the token being unequipped
+     * @param childId ID of the token being unequipped
      * @param childAddress Address of the collection that a token that is being unequipped belongs to
      * @param childResourceId ID of the resource associated with the token we are unequipping
      */
@@ -119,7 +119,7 @@ interface IRMRKEquippable is IRMRKMultiResource {
         uint256 indexed tokenId,
         uint64 indexed resourceId,
         uint64 indexed slotPartId,
-        uint256 childTokenId,
+        uint256 childId,
         address childAddress,
         uint64 childResourceId
     );
@@ -144,13 +144,13 @@ interface IRMRKEquippable is IRMRKMultiResource {
      * @notice Used to check whether the token has a given child equipped.
      * @param tokenId ID of the parent token for which we are querying for
      * @param childAddress Address of the child token's smart contract
-     * @param childTokenId ID of the child token
+     * @param childId ID of the child token
      * @return bool The boolean value indicating whether the child token is equipped into the given token or not
      */
     function isChildEquipped(
         uint256 tokenId,
         address childAddress,
-        uint256 childTokenId
+        uint256 childId
     ) external view returns (bool);
 
     /**
