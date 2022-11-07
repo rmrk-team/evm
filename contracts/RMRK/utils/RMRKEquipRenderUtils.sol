@@ -4,7 +4,6 @@ import "../base/IRMRKBaseStorage.sol";
 import "../equippable/IRMRKEquippable.sol";
 import "../library/RMRKLib.sol";
 import "../library/RMRKErrors.sol";
-import "./IRMRKEquipRenderUtils.sol";
 
 pragma solidity ^0.8.16;
 
@@ -12,20 +11,17 @@ pragma solidity ^0.8.16;
  * @dev Extra utility functions for composing RMRK extended resources.
  */
 
-contract RMRKEquipRenderUtils is IRMRKEquipRenderUtils {
+contract RMRKEquipRenderUtils {
     using RMRKLib for uint64[];
 
-    function supportsInterface(bytes4 interfaceId)
-        external
-        view
-        virtual
-        returns (bool)
-    {
-        return
-            interfaceId == type(IERC165).interfaceId ||
-            interfaceId == type(IRMRKEquipRenderUtils).interfaceId;
-    }
-
+    /**
+     * @notice Returns `ExtendedResource` object associated with `resourceId`
+     *
+     * Requirements:
+     *
+     * - `resourceId` must exist.
+     *
+     */
     function getActiveExtendedResourceByIndex(
         address target,
         uint256 tokenId,
@@ -36,6 +32,14 @@ contract RMRKEquipRenderUtils is IRMRKEquipRenderUtils {
         return target_.getExtendedResource(tokenId, resourceId);
     }
 
+    /**
+     * @notice Returns `ExtendedResource` object at `index` of active resource array on `tokenId`
+     *
+     * Requirements:
+     *
+     * - `tokenId` must exist.
+     * - `index` must be inside the range of active resource array
+     */
     function getPendingExtendedResourceByIndex(
         address target,
         uint256 tokenId,
@@ -46,6 +50,13 @@ contract RMRKEquipRenderUtils is IRMRKEquipRenderUtils {
         return target_.getExtendedResource(tokenId, resourceId);
     }
 
+    /**
+     * @notice Returns `ExtendedResource` objects for the given ids
+     *
+     * Requirements:
+     *
+     * - `resourceIds` must exist.
+     */
     function getExtendedResourcesById(
         address target,
         uint256 tokenId,

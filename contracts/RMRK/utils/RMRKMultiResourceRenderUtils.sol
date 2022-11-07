@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import "contracts/RMRK/multiresource/IRMRKMultiResource.sol";
-import "contracts/RMRK/utils/IRMRKMultiResourceRenderUtils.sol";
 import "../library/RMRKErrors.sol";
 
 pragma solidity ^0.8.16;
@@ -10,20 +9,17 @@ pragma solidity ^0.8.16;
  * @dev Extra utility functions for composing RMRK resources.
  */
 
-contract RMRKMultiResourceRenderUtils is IRMRKMultiResourceRenderUtils {
+contract RMRKMultiResourceRenderUtils {
     uint16 private constant _LOWEST_POSSIBLE_PRIORITY = 2**16 - 1;
 
-    function supportsInterface(bytes4 interfaceId)
-        external
-        view
-        virtual
-        returns (bool)
-    {
-        return
-            interfaceId == type(IERC165).interfaceId ||
-            interfaceId == type(IRMRKMultiResourceRenderUtils).interfaceId;
-    }
-
+    /**
+     * @notice Returns resource metadata at `index` of active resource array on `tokenId`
+     *
+     * Requirements:
+     *
+     * - `tokenId` must exist.
+     * - `index` must be inside the range of active resource array
+     */
     function getActiveResourceByIndex(
         address target,
         uint256 tokenId,
@@ -34,6 +30,14 @@ contract RMRKMultiResourceRenderUtils is IRMRKMultiResourceRenderUtils {
         return target_.getResourceMetadata(tokenId, resourceId);
     }
 
+    /**
+     * @notice Returns resource metadata at `index` of pending resource array on `tokenId`
+     *
+     * Requirements:
+     *
+     * - `tokenId` must exist.
+     * - `index` must be inside the range of pending resource array
+     */
     function getPendingResourceByIndex(
         address target,
         uint256 tokenId,
@@ -44,6 +48,13 @@ contract RMRKMultiResourceRenderUtils is IRMRKMultiResourceRenderUtils {
         return target_.getResourceMetadata(tokenId, resourceId);
     }
 
+    /**
+     * @notice Returns resource metadata strings for the given ids
+     *
+     * Requirements:
+     *
+     * - `resourceIds` must exist.
+     */
     function getResourcesById(
         address target,
         uint256 tokenId,
@@ -61,6 +72,9 @@ contract RMRKMultiResourceRenderUtils is IRMRKMultiResourceRenderUtils {
         return resources;
     }
 
+    /**
+     * @notice Returns the resource metadata with the highest priority for the given token
+     */
     function getTopResourceMetaForToken(address target, uint256 tokenId)
         external
         view
