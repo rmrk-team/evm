@@ -4,15 +4,12 @@ import { ethers } from 'hardhat';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { setupContextForParts } from '../setup/equippableParts';
 import { setupContextForSlots } from '../setup/equippableSlots';
-import shouldBehaveLikeEquippableResources from '../behavior/equippableResources';
-import shouldBehaveLikeEquippableWithParts from '../behavior/equippableParts';
-import shouldBehaveLikeEquippableWithSlots from '../behavior/equippableSlots';
 import shouldBehaveLikeMultiResource from '../behavior/multiresource';
 import shouldControlValidMinting from '../behavior/mintingImpl';
 import shouldHaveMetadata from '../behavior/metadata';
 import shouldHaveRoyalties from '../behavior/royalties';
 import {
-  addResourceEntryEquippables,
+  addResourceEntryEquippablesFromImpl,
   addResourceToToken,
   ADDRESS_ZERO,
   mintFromImpl,
@@ -217,62 +214,6 @@ async function equipFixture() {
 
 // --------------- END FIXTURES -----------------------
 
-// --------------- EQUIPPABLE BEHAVIOR -----------------------
-
-describe('RMRKEquippableImpl with Parts', async () => {
-  beforeEach(async function () {
-    const { base, neon, mask, view } = await loadFixture(partsFixture);
-
-    this.base = base;
-    this.neon = neon;
-    this.neonEquip = neon;
-    this.mask = mask;
-    this.maskEquip = mask;
-    this.view = view;
-  });
-
-  shouldBehaveLikeEquippableWithParts();
-});
-
-describe('RMRKEquippableImpl with Slots', async () => {
-  beforeEach(async function () {
-    const { base, soldier, weapon, weaponGem, background, view } = await loadFixture(slotsFixture);
-
-    this.base = base;
-    this.soldier = soldier;
-    this.soldierEquip = soldier;
-    this.weapon = weapon;
-    this.weaponEquip = weapon;
-    this.weaponGem = weaponGem;
-    this.weaponGemEquip = weaponGem;
-    this.background = background;
-    this.backgroundEquip = background;
-    this.view = view;
-  });
-
-  shouldBehaveLikeEquippableWithSlots(nestMintFromImpl);
-});
-
-describe('RMRKEquippableImpl Resources', async () => {
-  beforeEach(async function () {
-    const { equip, renderUtils } = await loadFixture(resourcesFixture);
-    this.nesting = equip;
-    this.equip = equip;
-    this.renderUtils = renderUtils;
-  });
-
-  describe('Init', async function () {
-    it('can get names and symbols', async function () {
-      expect(await this.equip.name()).to.equal('Chunky');
-      expect(await this.equip.symbol()).to.equal('CHNK');
-    });
-  });
-
-  shouldBehaveLikeEquippableResources(mintFromImpl);
-});
-
-// --------------- END EQUIPPABLE BEHAVIOR -----------------------
-
 // --------------- MULTI RESOURCE BEHAVIOR -----------------------
 
 describe('RMRKEquippableImpl MR behavior', async () => {
@@ -290,15 +231,28 @@ describe('RMRKEquippableImpl MR behavior', async () => {
     return await equip.totalSupply();
   }
 
-  shouldBehaveLikeMultiResource(mintToNesting, addResourceEntryEquippables, addResourceToToken);
+  shouldBehaveLikeMultiResource(
+    mintToNesting,
+    addResourceEntryEquippablesFromImpl,
+    addResourceToToken,
+  );
 });
 
 // --------------- MULTI RESOURCE BEHAVIOR END ------------------------
 
 describe('RMRKEquippableImpl Other', async function () {
+  let equip: Contract;
+
   beforeEach(async function () {
-    const { equip } = await loadFixture(equipFixture);
+    ({ equip } = await loadFixture(equipFixture));
     this.token = equip;
+  });
+
+  describe('Init', async function () {
+    it('can get names and symbols', async function () {
+      expect(await equip.name()).to.equal('equipWithEquippable');
+      expect(await equip.symbol()).to.equal('NWE');
+    });
   });
 
   shouldControlValidMinting();

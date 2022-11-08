@@ -1,18 +1,14 @@
 import { Contract } from 'ethers';
 import { ethers } from 'hardhat';
-import { expect } from 'chai';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { setupContextForParts } from '../setup/equippableParts';
 import { setupContextForSlots } from '../setup/equippableSlots';
-import shouldBehaveLikeEquippableResources from '../behavior/equippableResources';
-import shouldBehaveLikeEquippableWithParts from '../behavior/equippableParts';
-import shouldBehaveLikeEquippableWithSlots from '../behavior/equippableSlots';
 import shouldBehaveLikeMultiResource from '../behavior/multiresource';
 import shouldControlValidMinting from '../behavior/mintingImpl';
 import shouldHaveMetadata from '../behavior/metadata';
 import shouldHaveRoyalties from '../behavior/royalties';
 import {
-  addResourceEntryEquippables,
+  addResourceEntryEquippablesFromImpl,
   addResourceToToken,
   ADDRESS_ZERO,
   mintFromImpl,
@@ -282,76 +278,6 @@ async function equipFixture() {
 
 // --------------- END FIXTURES -----------------------
 
-// --------------- EQUIPPABLE BEHAVIOR -----------------------
-
-describe('ExternalEquippableImpl with Parts', async () => {
-  beforeEach(async function () {
-    const { base, neon, neonEquip, mask, maskEquip, view } = await loadFixture(partsFixture);
-
-    this.base = base;
-    this.neon = neon;
-    this.neonEquip = neonEquip;
-    this.mask = mask;
-    this.maskEquip = maskEquip;
-    this.view = view;
-  });
-
-  shouldBehaveLikeEquippableWithParts();
-});
-
-describe('ExternalEquippableImpl with Slots', async () => {
-  beforeEach(async function () {
-    const {
-      base,
-      soldier,
-      soldierEquip,
-      weapon,
-      weaponEquip,
-      weaponGem,
-      weaponGemEquip,
-      background,
-      backgroundEquip,
-      view,
-    } = await loadFixture(slotsFixture);
-
-    this.base = base;
-    this.soldier = soldier;
-    this.soldierEquip = soldierEquip;
-    this.weapon = weapon;
-    this.weaponEquip = weaponEquip;
-    this.weaponGem = weaponGem;
-    this.weaponGemEquip = weaponGemEquip;
-    this.background = background;
-    this.backgroundEquip = backgroundEquip;
-    this.view = view;
-  });
-
-  shouldBehaveLikeEquippableWithSlots(nestMintFromImpl);
-});
-
-describe('ExternalEquippableImpl Resources', async () => {
-  let nesting: Contract;
-  let equip: Contract;
-  let renderUtils: Contract;
-
-  beforeEach(async function () {
-    ({ nesting, equip, renderUtils } = await loadFixture(resourcesFixture));
-    this.nesting = nesting;
-    this.equip = equip;
-    this.renderUtils = renderUtils;
-  });
-
-  // Mint needs to happen on the nesting contract, but the MR behavior happens on the equip one.
-  async function mintToNesting(token: Contract, to: string): Promise<number> {
-    await nesting.mint(to, 1, { value: ONE_ETH });
-    return await nesting.totalSupply();
-  }
-
-  shouldBehaveLikeEquippableResources(mintToNesting);
-});
-
-// --------------- END EQUIPPABLE BEHAVIOR -----------------------
-
 // --------------- MULTI RESOURCE BEHAVIOR -----------------------
 
 describe('ExternalEquippableImpl MR behavior', async () => {
@@ -371,7 +297,11 @@ describe('ExternalEquippableImpl MR behavior', async () => {
     return await nesting.totalSupply();
   }
 
-  shouldBehaveLikeMultiResource(mintToNesting, addResourceEntryEquippables, addResourceToToken);
+  shouldBehaveLikeMultiResource(
+    mintToNesting,
+    addResourceEntryEquippablesFromImpl,
+    addResourceToToken,
+  );
 });
 
 // --------------- MULTI RESOURCE BEHAVIOR END ------------------------

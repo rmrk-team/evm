@@ -30,11 +30,13 @@ abstract contract RMRKAbstractMultiResourceImpl is
         public
         virtual
         onlyOwnerOrContributor
+        returns (uint256)
     {
         unchecked {
             _totalResources += 1;
         }
         _addResourceEntry(uint64(_totalResources), metadataURI);
+        return _totalResources;
     }
 
     function totalResources() public view virtual returns (uint256) {

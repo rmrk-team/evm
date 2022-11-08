@@ -6,7 +6,7 @@ import {
   addResourceToToken,
   mintFromMock,
   nestMintFromMock,
-  addResourceEntryEquippables,
+  addResourceEntryEquippablesFromMock,
 } from './utils';
 import { setupContextForParts } from './setup/equippableParts';
 import { setupContextForSlots } from './setup/equippableSlots';
@@ -216,7 +216,11 @@ describe('EquippableMock MR behavior', async () => {
     return tokenId;
   }
 
-  shouldBehaveLikeMultiResource(mintToNesting, addResourceEntryEquippables, addResourceToToken);
+  shouldBehaveLikeMultiResource(
+    mintToNesting,
+    addResourceEntryEquippablesFromMock,
+    addResourceToToken,
+  );
 });
 
 // --------------- MULTI RESOURCE BEHAVIOR END ------------------------

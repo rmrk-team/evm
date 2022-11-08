@@ -46,12 +46,15 @@ abstract contract RMRKAbstractNestingMultiResourceImpl is
 
     function addResourceEntry(string memory metadataURI)
         public
+        virtual
         onlyOwnerOrContributor
+        returns (uint256)
     {
         unchecked {
             _totalResources += 1;
         }
         _addResourceEntry(uint64(_totalResources), metadataURI);
+        return _totalResources;
     }
 
     function totalResources() public view returns (uint256) {

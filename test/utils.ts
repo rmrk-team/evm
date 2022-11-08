@@ -111,7 +111,10 @@ async function addResourceEntryFromImpl(token: Contract, data?: string): Promise
   return await token.totalResources();
 }
 
-async function addResourceEntryEquippables(token: Contract, data?: string): Promise<BigNumber> {
+async function addResourceEntryEquippablesFromMock(
+  token: Contract,
+  data?: string,
+): Promise<BigNumber> {
   const resourceId = bn(nextResourceId);
   const equippableGroupId = bn(1);
   nextResourceId++;
@@ -124,6 +127,21 @@ async function addResourceEntryEquippables(token: Contract, data?: string): Prom
     [],
   );
   return resourceId;
+}
+
+async function addResourceEntryEquippablesFromImpl(
+  token: Contract,
+  data?: string,
+): Promise<BigNumber> {
+  const equippableGroupId = bn(1);
+  await token.addResourceEntry(
+    equippableGroupId,
+    ADDRESS_ZERO,
+    data !== undefined ? data : 'metaURI',
+    [],
+    [],
+  );
+  return await token.totalResources();
 }
 
 async function singleFixtureWithArgs(contractName: string, args: any[]): Promise<Contract> {
@@ -149,7 +167,8 @@ async function parentChildFixtureWithArgs(
 }
 
 export {
-  addResourceEntryEquippables,
+  addResourceEntryEquippablesFromImpl,
+  addResourceEntryEquippablesFromMock,
   addResourceEntryFromImpl,
   addResourceEntryFromMock,
   addResourceToToken,
