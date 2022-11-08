@@ -29,11 +29,7 @@ contract RMRKNestingClaimableChildMock is
         uint256 tokenId,
         address childAddress,
         uint256 childId
-    )
-        internal
-        virtual
-        override(RMRKNesting, RMRKReclaimableChild)
-    {
+    ) internal virtual override(RMRKNesting, RMRKReclaimableChild) {
         super._beforeAddChild(tokenId, childAddress, childId);
     }
 
@@ -43,12 +39,7 @@ contract RMRKNestingClaimableChildMock is
         address childAddress,
         uint256 childId
     ) internal virtual override(RMRKNesting, RMRKReclaimableChild) {
-        super._beforeAcceptChild(
-            parentId,
-            childIndex,
-            childAddress,
-            childId
-        );
+        super._beforeAcceptChild(parentId, childIndex, childAddress, childId);
     }
 
     function _beforeUnnestChild(

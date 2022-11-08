@@ -151,12 +151,10 @@ async function setupContextForSlots(
 
   async function addResourcesToSoldier(): Promise<void> {
     await soldierEquip.addResourceEntry(
-      {
-        id: soldierResId,
-        equippableGroupId: 0,
-        metadataURI: 'ipfs:soldier/',
-        baseAddress: base.address,
-      },
+      soldierResId,
+      0,
+      base.address,
+      'ipfs:soldier/',
       [partIdForBody], // Fixed parts
       [partIdForWeapon, partIdForBackground], // Can receive these
     );
@@ -171,24 +169,20 @@ async function setupContextForSlots(
 
     for (let i = 0; i < weaponResourcesFull.length; i++) {
       await weaponEquip.addResourceEntry(
-        {
-          id: weaponResourcesFull[i],
-          equippableGroupId: 0, // Not meant to equip
-          metadataURI: `ipfs:weapon/full/${weaponResourcesFull[i]}`,
-          baseAddress: ethers.constants.AddressZero, // Not meant to equip
-        },
+        weaponResourcesFull[i],
+        0, // Not meant to equip
+        ethers.constants.AddressZero, // Not meant to equip
+        `ipfs:weapon/full/${weaponResourcesFull[i]}`,
         [],
         [],
       );
     }
     for (let i = 0; i < weaponResourcesEquip.length; i++) {
       await weaponEquip.addResourceEntry(
-        {
-          id: weaponResourcesEquip[i],
-          equippableGroupId: equippableGroupId,
-          metadataURI: `ipfs:weapon/equip/${weaponResourcesEquip[i]}`,
-          baseAddress: base.address,
-        },
+        weaponResourcesEquip[i],
+        equippableGroupId,
+        base.address,
+        `ipfs:weapon/equip/${weaponResourcesEquip[i]}`,
         [],
         [partIdForWeaponGem],
       );
@@ -226,22 +220,18 @@ async function setupContextForSlots(
   async function addResourcesToWeaponGem(): Promise<void> {
     const equippableGroupId = 1; // Resources to equip will use this
     await weaponGemEquip.addResourceEntry(
-      {
-        id: weaponGemResourceFull,
-        equippableGroupId: 0, // Not meant to equip
-        metadataURI: 'ipfs:weagponGem/full/',
-        baseAddress: ethers.constants.AddressZero, // Not meant to equip
-      },
+      weaponGemResourceFull,
+      0, // Not meant to equip
+      ethers.constants.AddressZero, // Not meant to equip
+      'ipfs:weagponGem/full/',
       [],
       [],
     );
     await weaponGemEquip.addResourceEntry(
-      {
-        id: weaponGemResourceEquip,
-        equippableGroupId: equippableGroupId,
-        metadataURI: 'ipfs:weagponGem/equip/',
-        baseAddress: base.address,
-      },
+      weaponGemResourceEquip,
+      equippableGroupId,
+      base.address,
+      'ipfs:weagponGem/equip/',
       [],
       [],
     );
@@ -267,12 +257,10 @@ async function setupContextForSlots(
   async function addResourcesToBackground(): Promise<void> {
     const equippableGroupId = 1; // Resources to equip will use this
     await backgroundEquip.addResourceEntry(
-      {
-        id: backgroundResourceId,
-        equippableGroupId: equippableGroupId,
-        metadataURI: 'ipfs:background/',
-        baseAddress: base.address,
-      },
+      backgroundResourceId,
+      equippableGroupId,
+      base.address,
+      'ipfs:background/',
       [],
       [],
     );

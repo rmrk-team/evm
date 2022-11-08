@@ -232,12 +232,10 @@ async function shouldBehaveLikeTypedEquippable(
   it('can add typed resources', async function () {
     const resId = bn(1);
     await this.resources.addTypedResourceEntry(
-      {
-        id: resId,
-        equippableGroupId: 0,
-        metadataURI: 'fallback.json',
-        baseAddress: ethers.constants.AddressZero,
-      },
+      resId,
+      0,
+      ethers.constants.AddressZero,
+      'fallback.json',
       [],
       [],
       'image/jpeg',
@@ -248,12 +246,10 @@ async function shouldBehaveLikeTypedEquippable(
   it('can add typed resources to tokens', async function () {
     const resId = bn(1);
     await this.resources.addTypedResourceEntry(
-      {
-        id: resId,
-        equippableGroupId: 0,
-        metadataURI: 'fallback.json',
-        baseAddress: ethers.constants.AddressZero,
-      },
+      resId,
+      0,
+      ethers.constants.AddressZero,
+      'fallback.json',
       [],
       [],
       'image/jpeg',

@@ -45,46 +45,10 @@ describe('Render Utils', async function () {
     someBase = signers[1];
 
     tokenId = await mintFromMock(equip, owner.address);
-    await equip.addResourceEntry(
-      {
-        id: resId,
-        equippableGroupId: 0,
-        metadataURI: 'ipfs://res1.jpg',
-        baseAddress: ADDRESS_ZERO,
-      },
-      [],
-      [],
-    );
-    await equip.addResourceEntry(
-      {
-        id: resId2,
-        equippableGroupId: 1,
-        metadataURI: 'ipfs://res2.jpg',
-        baseAddress: someBase.address,
-      },
-      [1],
-      [3, 4],
-    );
-    await equip.addResourceEntry(
-      {
-        id: resId3,
-        equippableGroupId: 0,
-        metadataURI: 'ipfs://res3.jpg',
-        baseAddress: ADDRESS_ZERO,
-      },
-      [],
-      [],
-    );
-    await equip.addResourceEntry(
-      {
-        id: resId4,
-        equippableGroupId: 2,
-        metadataURI: 'ipfs://res4.jpg',
-        baseAddress: someBase.address,
-      },
-      [],
-      [4],
-    );
+    await equip.addResourceEntry(resId, 0, ADDRESS_ZERO, 'ipfs://res1.jpg', [], []);
+    await equip.addResourceEntry(resId2, 1, someBase.address, 'ipfs://res2.jpg', [1], [3, 4]);
+    await equip.addResourceEntry(resId3, 0, ADDRESS_ZERO, 'ipfs://res3.jpg', [], []);
+    await equip.addResourceEntry(resId4, 2, someBase.address, 'ipfs://res4.jpg', [], [4]);
     await equip.addResourceToToken(tokenId, resId, 0);
     await equip.addResourceToToken(tokenId, resId2, 0);
     await equip.addResourceToToken(tokenId, resId3, resId);

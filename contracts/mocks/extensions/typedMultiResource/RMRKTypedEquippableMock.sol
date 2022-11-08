@@ -25,12 +25,22 @@ contract RMRKTypedEquippableMock is RMRKEquippableMock, RMRKTypedMultiResource {
     }
 
     function addTypedResourceEntry(
-        ExtendedResource memory resource,
-        uint64[] calldata fixedPartIds,
-        uint64[] calldata slotPartIds,
+        uint64 id,
+        uint64 equippableGroupId,
+        address baseAddress,
+        string memory metadataURI,
+        uint64[] memory fixedPartIds,
+        uint64[] memory slotPartIds,
         string memory type_
     ) external {
-        _addResourceEntry(resource, fixedPartIds, slotPartIds);
-        _setResourceType(resource.id, type_);
+        _addResourceEntry(
+            id,
+            equippableGroupId,
+            baseAddress,
+            metadataURI,
+            fixedPartIds,
+            slotPartIds
+        );
+        _setResourceType(id, type_);
     }
 }
