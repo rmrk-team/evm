@@ -10,13 +10,13 @@
 
 ## Methods
 
-### getActiveResourceByIndex
+### getActiveResources
 
 ```solidity
-function getActiveResourceByIndex(address target, uint256 tokenId, uint256 index) external view returns (string)
+function getActiveResources(address target, uint256 tokenId) external view returns (struct RMRKMultiResourceRenderUtils.ActiveResource[])
 ```
 
-Returns resource metadata at `index` of active resource array on `tokenId` Requirements: - `tokenId` must exist. - `index` must be inside the range of active resource array
+
 
 
 
@@ -26,21 +26,20 @@ Returns resource metadata at `index` of active resource array on `tokenId` Requi
 |---|---|---|
 | target | address | undefined |
 | tokenId | uint256 | undefined |
-| index | uint256 | undefined |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | undefined |
+| _0 | RMRKMultiResourceRenderUtils.ActiveResource[] | undefined |
 
-### getPendingResourceByIndex
+### getPendingResources
 
 ```solidity
-function getPendingResourceByIndex(address target, uint256 tokenId, uint256 index) external view returns (string)
+function getPendingResources(address target, uint256 tokenId) external view returns (struct RMRKMultiResourceRenderUtils.PendingResource[])
 ```
 
-Returns resource metadata at `index` of pending resource array on `tokenId` Requirements: - `tokenId` must exist. - `index` must be inside the range of pending resource array
+
 
 
 
@@ -50,13 +49,12 @@ Returns resource metadata at `index` of pending resource array on `tokenId` Requ
 |---|---|---|
 | target | address | undefined |
 | tokenId | uint256 | undefined |
-| index | uint256 | undefined |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | undefined |
+| _0 | RMRKMultiResourceRenderUtils.PendingResource[] | undefined |
 
 ### getResourcesById
 
@@ -104,28 +102,6 @@ Returns the resource metadata with the highest priority for the given token
 | Name | Type | Description |
 |---|---|---|
 | _0 | string | undefined |
-
-### supportsInterface
-
-```solidity
-function supportsInterface(bytes4 interfaceId) external view returns (bool)
-```
-
-
-
-*Returns true if this contract implements the interface defined by `interfaceId`. See the corresponding https://eips.ethereum.org/EIPS/eip-165#how-interfaces-are-identified[EIP section] to learn more about how these ids are created. This function call must use less than 30 000 gas.*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| interfaceId | bytes4 | undefined |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | bool | undefined |
 
 
 

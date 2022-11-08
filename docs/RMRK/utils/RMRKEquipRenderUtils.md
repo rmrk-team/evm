@@ -13,7 +13,7 @@
 ### composeEquippables
 
 ```solidity
-function composeEquippables(address target, uint256 tokenId, uint64 resourceId) external view returns (struct IRMRKEquippable.ExtendedResource resource, struct IRMRKEquippable.FixedPart[] fixedParts, struct IRMRKEquippable.SlotPart[] slotParts)
+function composeEquippables(address target, uint256 tokenId, uint64 resourceId) external view returns (struct IRMRKEquippable.ExtendedResource resource, struct IRMRKEquippable.FixedPart[] fixedParts, struct RMRKEquipRenderUtils.EquippedSlotPart[] slotParts)
 ```
 
 
@@ -34,31 +34,7 @@ function composeEquippables(address target, uint256 tokenId, uint64 resourceId) 
 |---|---|---|
 | resource | IRMRKEquippable.ExtendedResource | undefined |
 | fixedParts | IRMRKEquippable.FixedPart[] | undefined |
-| slotParts | IRMRKEquippable.SlotPart[] | undefined |
-
-### getActiveExtendedResourceByIndex
-
-```solidity
-function getActiveExtendedResourceByIndex(address target, uint256 tokenId, uint256 index) external view returns (struct IRMRKEquippable.ExtendedResource)
-```
-
-Returns `ExtendedResource` object associated with `resourceId` Requirements: - `resourceId` must exist.
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| target | address | undefined |
-| tokenId | uint256 | undefined |
-| index | uint256 | undefined |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | IRMRKEquippable.ExtendedResource | undefined |
+| slotParts | RMRKEquipRenderUtils.EquippedSlotPart[] | undefined |
 
 ### getEquipped
 
@@ -85,13 +61,13 @@ function getEquipped(address target, uint64 tokenId, uint64 resourceId) external
 | slotParts | uint64[] | undefined |
 | childrenEquipped | IRMRKEquippable.Equipment[] | undefined |
 
-### getExtendedResourcesById
+### getExtendedActiveResources
 
 ```solidity
-function getExtendedResourcesById(address target, uint256 tokenId, uint64[] resourceIds) external view returns (struct IRMRKEquippable.ExtendedResource[])
+function getExtendedActiveResources(address target, uint256 tokenId) external view returns (struct RMRKEquipRenderUtils.ExtendedActiveResource[])
 ```
 
-Returns `ExtendedResource` objects for the given ids Requirements: - `resourceIds` must exist.
+
 
 
 
@@ -101,21 +77,20 @@ Returns `ExtendedResource` objects for the given ids Requirements: - `resourceId
 |---|---|---|
 | target | address | undefined |
 | tokenId | uint256 | undefined |
-| resourceIds | uint64[] | undefined |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IRMRKEquippable.ExtendedResource[] | undefined |
+| _0 | RMRKEquipRenderUtils.ExtendedActiveResource[] | undefined |
 
-### getPendingExtendedResourceByIndex
+### getExtendedPendingResources
 
 ```solidity
-function getPendingExtendedResourceByIndex(address target, uint256 tokenId, uint256 index) external view returns (struct IRMRKEquippable.ExtendedResource)
+function getExtendedPendingResources(address target, uint256 tokenId) external view returns (struct RMRKEquipRenderUtils.ExtendedPendingResource[])
 ```
 
-Returns `ExtendedResource` object at `index` of active resource array on `tokenId` Requirements: - `tokenId` must exist. - `index` must be inside the range of active resource array
+
 
 
 
@@ -125,35 +100,12 @@ Returns `ExtendedResource` object at `index` of active resource array on `tokenI
 |---|---|---|
 | target | address | undefined |
 | tokenId | uint256 | undefined |
-| index | uint256 | undefined |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IRMRKEquippable.ExtendedResource | undefined |
-
-### supportsInterface
-
-```solidity
-function supportsInterface(bytes4 interfaceId) external view returns (bool)
-```
-
-
-
-*Returns true if this contract implements the interface defined by `interfaceId`. See the corresponding https://eips.ethereum.org/EIPS/eip-165#how-interfaces-are-identified[EIP section] to learn more about how these ids are created. This function call must use less than 30 000 gas.*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| interfaceId | bytes4 | undefined |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | bool | undefined |
+| _0 | RMRKEquipRenderUtils.ExtendedPendingResource[] | undefined |
 
 
 
@@ -167,6 +119,17 @@ error RMRKNotComposableResource()
 ```
 
 Attempting to compose a resource wihtout having an associated Base
+
+
+
+
+### RMRKTokenHasNoResources
+
+```solidity
+error RMRKTokenHasNoResources()
+```
+
+Attempting to determine the resource with the top priority on a token without resources
 
 
 
