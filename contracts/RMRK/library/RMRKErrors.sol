@@ -67,7 +67,9 @@ error RMRKMaxPendingChildrenReached();
 ///  128)
 error RMRKMaxPendingResourcesReached();
 /// Attempting to burn a total number of recursive children higher than maximum set
-error RMRKMaxRecursiveBurnsReached(address childContract, uint256 childTokenId);
+/// @param childContract Address of the collection smart contract in which the maximum number of recursive burns was reached
+/// @param childId ID of the child token at which the maximum number of recursive burns was reached
+error RMRKMaxRecursiveBurnsReached(address childContract, uint256 childId);
 /// Attempting to mint a number of tokens that would cause the total supply to be greater than maximum supply
 error RMRKMintOverMax();
 /// Attempting to mint a nested token to a smart contract that doesn't support nesting
@@ -123,6 +125,8 @@ error RMRKTokenCannotBeEquippedWithResourceIntoSlot();
 error RMRKTokenDoesNotHaveResource();
 /// Attempting to determine the resource with the top priority on a token without resources
 error RMRKTokenHasNoResources();
+/// Attempting to accept or unnest a child which does not match the one at the specified index
+error RMRKUnexpectedChildId();
 /// Attempting to reject all resources but more resources than expected are pending
 error RMRKUnexpectedNumberOfResources();
 /// Attempting to accept or reject a resource which does not match the one at the specified index

@@ -30,7 +30,7 @@ Version of the @rmrk-team/evm-contracts package
 ### acceptChild
 
 ```solidity
-function acceptChild(uint256 tokenId, uint256 index) external nonpayable
+function acceptChild(uint256 parentId, uint256 childIndex, address childAddress, uint256 childId) external nonpayable
 ```
 
 Sends an instance of Child from the pending children array at index to children array for tokenId.
@@ -41,8 +41,10 @@ Sends an instance of Child from the pending children array at index to children 
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | tokenId of parent token to accept a child on |
-| index | uint256 | index of child in _pendingChildren array to accept. |
+| parentId | uint256 | tokenId of parent token to accept a child on |
+| childIndex | uint256 | index of child in _pendingChildren array to accept. |
+| childAddress | address | address of the child expected to be in the index. |
+| childId | uint256 | token Id of the child expected to be in the index |
 
 ### acceptResource
 
@@ -65,19 +67,19 @@ Accepts a resource at from the pending array of given token.
 ### addChild
 
 ```solidity
-function addChild(uint256 parentTokenId, uint256 childTokenId) external nonpayable
+function addChild(uint256 parentId, uint256 childId) external nonpayable
 ```
 
 
 
-*Function designed to be used by other instances of RMRK-Core contracts to update children. param1 parentTokenId is the tokenId of the parent token on (this). param2 childTokenId is the tokenId of the child instance*
+*Function designed to be used by other instances of RMRK-Core contracts to update children. param1 parentId is the tokenId of the parent token on (this). param2 childId is the tokenId of the child instance*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| parentTokenId | uint256 | undefined |
-| childTokenId | uint256 | undefined |
+| parentId | uint256 | undefined |
+| childId | uint256 | undefined |
 
 ### addResourceEntry
 
@@ -235,18 +237,18 @@ function childIsInActive(address childAddress, uint256 childId) external view re
 ### childOf
 
 ```solidity
-function childOf(uint256 parentTokenId, uint256 index) external view returns (struct IRMRKNesting.Child)
+function childOf(uint256 parentId, uint256 index) external view returns (struct IRMRKNesting.Child)
 ```
 
 
 
-*Returns a single child object existing at `index` on `parentTokenId`.*
+*Returns a single child object existing at `index` on `parentId`.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| parentTokenId | uint256 | undefined |
+| parentId | uint256 | undefined |
 | index | uint256 | undefined |
 
 #### Returns
@@ -258,7 +260,7 @@ function childOf(uint256 parentTokenId, uint256 index) external view returns (st
 ### childrenOf
 
 ```solidity
-function childrenOf(uint256 parentTokenId) external view returns (struct IRMRKNesting.Child[])
+function childrenOf(uint256 parentId) external view returns (struct IRMRKNesting.Child[])
 ```
 
 Returns all confirmed children
@@ -269,7 +271,7 @@ Returns all confirmed children
 
 | Name | Type | Description |
 |---|---|---|
-| parentTokenId | uint256 | undefined |
+| parentId | uint256 | undefined |
 
 #### Returns
 
@@ -615,18 +617,18 @@ Returns the root owner of the current RMRK NFT.
 ### pendingChildOf
 
 ```solidity
-function pendingChildOf(uint256 parentTokenId, uint256 index) external view returns (struct IRMRKNesting.Child)
+function pendingChildOf(uint256 parentId, uint256 index) external view returns (struct IRMRKNesting.Child)
 ```
 
 
 
-*Returns a single pending child object existing at `index` on `parentTokenId`.*
+*Returns a single pending child object existing at `index` on `parentId`.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| parentTokenId | uint256 | undefined |
+| parentId | uint256 | undefined |
 | index | uint256 | undefined |
 
 #### Returns
@@ -638,7 +640,7 @@ function pendingChildOf(uint256 parentTokenId, uint256 index) external view retu
 ### pendingChildrenOf
 
 ```solidity
-function pendingChildrenOf(uint256 parentTokenId) external view returns (struct IRMRKNesting.Child[])
+function pendingChildrenOf(uint256 parentId) external view returns (struct IRMRKNesting.Child[])
 ```
 
 Returns all pending children
@@ -649,7 +651,7 @@ Returns all pending children
 
 | Name | Type | Description |
 |---|---|---|
-| parentTokenId | uint256 | undefined |
+| parentId | uint256 | undefined |
 
 #### Returns
 
@@ -954,7 +956,7 @@ function transferFrom(address from, address to, uint256 tokenId) external nonpay
 ### unnestChild
 
 ```solidity
-function unnestChild(uint256 tokenId, uint256 index, address to, bool isPending) external nonpayable
+function unnestChild(uint256 tokenId, address to, uint256 childIndex, address childAddress, uint256 childId, bool isPending) external nonpayable
 ```
 
 Function to unnest a child from the active token array.
@@ -966,9 +968,11 @@ Function to unnest a child from the active token array.
 | Name | Type | Description |
 |---|---|---|
 | tokenId | uint256 | is the tokenId of the parent token to unnest from. |
-| index | uint256 | is the index of the child token ID. |
 | to | address | is the address to transfer this |
-| isPending | bool | indicates if the child is pending (active otherwise). |
+| childIndex | uint256 | is the index of the child token ID. |
+| childAddress | address | address of the child expected to be in the index. |
+| childId | uint256 | token Id of the child expected to be in the index |
+| isPending | bool | Boolean value indicating whether the token is in the pending array of the parent (`true`) or in  the active array (`false`) |
 
 
 
@@ -1065,7 +1069,7 @@ Used to notify listeners that owner has granted an approval to the user to manag
 ### ChildAccepted
 
 ```solidity
-event ChildAccepted(uint256 indexed tokenId, address indexed childAddress, uint256 indexed childId, uint256 childIndex)
+event ChildAccepted(uint256 indexed tokenId, uint256 childIndex, address indexed childAddress, uint256 indexed childId)
 ```
 
 
@@ -1077,14 +1081,14 @@ event ChildAccepted(uint256 indexed tokenId, address indexed childAddress, uint2
 | Name | Type | Description |
 |---|---|---|
 | tokenId `indexed` | uint256 | undefined |
+| childIndex  | uint256 | undefined |
 | childAddress `indexed` | address | undefined |
 | childId `indexed` | uint256 | undefined |
-| childIndex  | uint256 | undefined |
 
 ### ChildProposed
 
 ```solidity
-event ChildProposed(uint256 indexed tokenId, address indexed childAddress, uint256 indexed childId, uint256 childIndex)
+event ChildProposed(uint256 indexed tokenId, uint256 childIndex, address indexed childAddress, uint256 indexed childId)
 ```
 
 
@@ -1096,14 +1100,14 @@ event ChildProposed(uint256 indexed tokenId, address indexed childAddress, uint2
 | Name | Type | Description |
 |---|---|---|
 | tokenId `indexed` | uint256 | undefined |
+| childIndex  | uint256 | undefined |
 | childAddress `indexed` | address | undefined |
 | childId `indexed` | uint256 | undefined |
-| childIndex  | uint256 | undefined |
 
 ### ChildUnnested
 
 ```solidity
-event ChildUnnested(uint256 indexed tokenId, address indexed childAddress, uint256 indexed childId, uint256 childIndex, bool fromPending)
+event ChildUnnested(uint256 indexed tokenId, uint256 childIndex, address indexed childAddress, uint256 indexed childId, bool fromPending)
 ```
 
 
@@ -1115,9 +1119,9 @@ event ChildUnnested(uint256 indexed tokenId, address indexed childAddress, uint2
 | Name | Type | Description |
 |---|---|---|
 | tokenId `indexed` | uint256 | undefined |
+| childIndex  | uint256 | undefined |
 | childAddress `indexed` | address | undefined |
 | childId `indexed` | uint256 | undefined |
-| childIndex  | uint256 | undefined |
 | fromPending  | bool | undefined |
 
 ### NestTransfer
@@ -1492,7 +1496,7 @@ Attempting to add a pending resource after the number of pending resources has r
 ### RMRKMaxRecursiveBurnsReached
 
 ```solidity
-error RMRKMaxRecursiveBurnsReached(address childContract, uint256 childTokenId)
+error RMRKMaxRecursiveBurnsReached(address childContract, uint256 childId)
 ```
 
 Attempting to burn a total number of recursive children higher than maximum set
@@ -1503,8 +1507,8 @@ Attempting to burn a total number of recursive children higher than maximum set
 
 | Name | Type | Description |
 |---|---|---|
-| childContract | address | undefined |
-| childTokenId | uint256 | undefined |
+| childContract | address | Address of the collection smart contract in which the maximum number of recursive burns was reached |
+| childId | uint256 | ID of the child token at which the maximum number of recursive burns was reached |
 
 ### RMRKMintToNonRMRKImplementer
 
@@ -1623,6 +1627,17 @@ error RMRKTokenDoesNotHaveResource()
 ```
 
 Attempting to compose a NFT of a token without active resources
+
+
+
+
+### RMRKUnexpectedChildId
+
+```solidity
+error RMRKUnexpectedChildId()
+```
+
+Attempting to accept or unnest a child which does not match the one at the specified index
 
 
 

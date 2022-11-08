@@ -13,7 +13,7 @@ Interface smart contract of the RMRK Reclaimable child module.
 ### reclaimChild
 
 ```solidity
-function reclaimChild(uint256 tokenId, address childAddress, uint256 childTokenId) external nonpayable
+function reclaimChild(uint256 tokenId, address childAddress, uint256 childId) external nonpayable
 ```
 
 Used to reclaim an abandoned child token.
@@ -26,7 +26,7 @@ Used to reclaim an abandoned child token.
 |---|---|---|
 | tokenId | uint256 | ID of the last parent token of the child token being recovered |
 | childAddress | address | Address of the child token&#39;s smart contract |
-| childTokenId | uint256 | ID of the child token being reclaimed |
+| childId | uint256 | ID of the child token being reclaimed |
 
 ### supportsInterface
 

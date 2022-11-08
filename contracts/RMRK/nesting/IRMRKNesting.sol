@@ -30,9 +30,9 @@ interface IRMRKNesting is IERC165 {
      */
     event ChildProposed(
         uint256 indexed tokenId,
+        uint256 childIndex,
         address indexed childAddress,
-        uint256 indexed childId,
-        uint256 childIndex
+        uint256 indexed childId
     );
 
     /**
@@ -40,9 +40,9 @@ interface IRMRKNesting is IERC165 {
      */
     event ChildAccepted(
         uint256 indexed tokenId,
+        uint256 childIndex,
         address indexed childAddress,
-        uint256 indexed childId,
-        uint256 childIndex
+        uint256 indexed childId
     );
 
     /**
@@ -55,9 +55,9 @@ interface IRMRKNesting is IERC165 {
      */
     event ChildUnnested(
         uint256 indexed tokenId,
+        uint256 childIndex,
         address indexed childAddress,
         uint256 indexed childId,
-        uint256 childIndex,
         bool fromPending
     );
 
@@ -103,18 +103,21 @@ interface IRMRKNesting is IERC165 {
      * - `ownerOf` on the child contract must resolve to the called contract.
      * - the pending array of the parent contract must not be full.
      */
-    function addChild(uint256 parentTokenId, uint256 childTokenId) external;
+    function addChild(uint256 parentId, uint256 childId) external;
 
     /**
-     * @dev Function called to accept a pending child. Migrates the child at `index` on `parentTokenId` to
-     * the accepted children array.
-     *
-     * Requirements:
-     *
-     * - `parentTokenId` must exist
-     *
+     * @notice Sends an instance of Child from the pending children array at index to children array for tokenId.
+     * @param parentId tokenId of parent token to accept a child on
+     * @param childIndex index of child in _pendingChildren array to accept.
+     * @param childAddress address of the child expected to be in the index.
+     * @param childId token Id of the child expected to be in the index
      */
-    function acceptChild(uint256 parentTokenId, uint256 index) external;
+    function acceptChild(
+        uint256 parentId,
+        uint256 childIndex,
+        address childAddress,
+        uint256 childId
+    ) external;
 
     /**
      * @dev Function called to reject all pending children. Removes the children from the pending array mapping.
@@ -122,59 +125,62 @@ interface IRMRKNesting is IERC165 {
      *
      * Requirements:
      *
-     * - `parentTokenId` must exist
+     * - `parentId` must exist
      *
      */
-    function rejectAllChildren(uint256 parentTokenId) external;
+    function rejectAllChildren(uint256 parentId) external;
 
     /**
-     * @dev Function called to unnest a child from `tokenId`'s child array. The owner of the token
-     * is set to `to`, or is not updated in the event `to` is the zero address
-     *
-     * Requirements:
-     *
-     * - `tokenId` must exist
-     *
+     * @notice Function to unnest a child from the active token array.
+     * @param tokenId is the tokenId of the parent token to unnest from.
+     * @param to is the address to transfer this
+     * @param childIndex is the index of the child token ID.
+     * @param childAddress address of the child expected to be in the index.
+     * @param childId token Id of the child expected to be in the index
+     * @param isPending Boolean value indicating whether the token is in the pending array of the parent (`true`) or in
+     *  the active array (`false`)
      */
     function unnestChild(
         uint256 tokenId,
-        uint256 index,
         address to,
+        uint256 childIndex,
+        address childAddress,
+        uint256 childId,
         bool isPending
     ) external;
 
     /**
-     * @dev Returns array of child objects existing for `parentTokenId`.
+     * @dev Returns array of child objects existing for `parentId`.
      *
      */
-    function childrenOf(uint256 parentTokenId)
+    function childrenOf(uint256 parentId)
         external
         view
         returns (Child[] memory);
 
     /**
-     * @dev Returns array of pending child objects existing for `parentTokenId`.
+     * @dev Returns array of pending child objects existing for `parentId`.
      *
      */
-    function pendingChildrenOf(uint256 parentTokenId)
+    function pendingChildrenOf(uint256 parentId)
         external
         view
         returns (Child[] memory);
 
     /**
-     * @dev Returns a single child object existing at `index` on `parentTokenId`.
+     * @dev Returns a single child object existing at `index` on `parentId`.
      *
      */
-    function childOf(uint256 parentTokenId, uint256 index)
+    function childOf(uint256 parentId, uint256 index)
         external
         view
         returns (Child memory);
 
     /**
-     * @dev Returns a single pending child object existing at `index` on `parentTokenId`.
+     * @dev Returns a single pending child object existing at `index` on `parentId`.
      *
      */
-    function pendingChildOf(uint256 parentTokenId, uint256 index)
+    function pendingChildOf(uint256 parentId, uint256 index)
         external
         view
         returns (Child memory);

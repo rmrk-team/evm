@@ -200,7 +200,7 @@ contract RMRKEquippable is
      *  [
      *      resourceId,
      *      childResourceId,
-     *      childTokenId,
+     *      childId,
      *      childEquippableAddress
      *  ]
      * @param resource An `ExtendedResource` struct containing the components of a resource we are adding
@@ -311,25 +311,35 @@ contract RMRKEquippable is
      * @notice Used to unnest a given child.
      * @dev The function doesn't contain a check validating that `to` is not a contract. To ensure that a token is not
      *  transferred to an incompatible smart contract, custom validation has to be added when using this function.
-     * @param tokenId ID of the token we are unnesting a child from
-     * @param index Index of a token we are unnesting in the array it belongs to (can be either active array or pending
-     *  array)
-     * @param to End user address to unnest the token to
-     * @param isPending Specifies whether the child being unnested is in the pending array (`true`) or in the active
-     *  array (`false`)
+     * @param tokenId ID of the parent token from which the child token is being unnested
+     * @param to Externally owned address to which to transfer the unnested token to
+     * @param childIndex Index of a token we are unnesting, in the array it belongs to (can be either active array or
+     *  pending array)
+     * @param childAddress Address of the child token's collection smart contract
+     * @param childId ID of the child token being unnested in its own collection smart contract
+     * @param isPending A boolean value indicating whether the child token being unnested is in the pending array of the
+     *  parent token (`true`) or in the active array (`false`)
      */
     function _unnestChild(
         uint256 tokenId,
-        uint256 index,
         address to,
+        uint256 childIndex,
+        address childAddress,
+        uint256 childId,
         bool isPending
     ) internal virtual override {
         if (!isPending) {
-            Child memory child = childOf(tokenId, index);
-            if (isChildEquipped(tokenId, child.contractAddress, child.tokenId))
+            if (isChildEquipped(tokenId, childAddress, childId))
                 revert RMRKMustUnequipFirst();
         }
-        super._unnestChild(tokenId, index, to, isPending);
+        super._unnestChild(
+            tokenId,
+            to,
+            childIndex,
+            childAddress,
+            childId,
+            isPending
+        );
     }
 
     /**
@@ -408,7 +418,7 @@ contract RMRKEquippable is
         Equipment memory newEquip = Equipment({
             resourceId: data.resourceId,
             childResourceId: data.childResourceId,
-            childTokenId: child.tokenId,
+            childId: child.tokenId,
             childEquippableAddress: child.contractAddress
         });
 
@@ -477,14 +487,14 @@ contract RMRKEquippable is
             revert RMRKNotEquipped();
         delete _equipments[tokenId][targetBaseAddress][slotPartId];
         _equipCountPerChild[tokenId][equipment.childEquippableAddress][
-            equipment.childTokenId
+            equipment.childId
         ] -= 1;
 
         emit ChildResourceUnequipped(
             tokenId,
             resourceId,
             slotPartId,
-            equipment.childTokenId,
+            equipment.childId,
             equipment.childEquippableAddress,
             equipment.childResourceId
         );
@@ -519,16 +529,16 @@ contract RMRKEquippable is
      * @dev This is used to prevent from unnesting a child that is equipped.
      * @param tokenId ID of the parent token for which we are querying for
      * @param childAddress Address of the child token's smart contract
-     * @param childTokenId ID of the child token
+     * @param childId ID of the child token
      * @return bool The boolean value indicating whether the child token is equipped into the given token or not
      */
     function isChildEquipped(
         uint256 tokenId,
         address childAddress,
-        uint256 childTokenId
+        uint256 childId
     ) public view virtual returns (bool) {
         return
-            _equipCountPerChild[tokenId][childAddress][childTokenId] !=
+            _equipCountPerChild[tokenId][childAddress][childId] !=
             uint8(0);
     }
 
@@ -663,7 +673,7 @@ contract RMRKEquippable is
      *  [
      *      resourceId,
      *      childResourceId,
-     *      childTokenId,
+     *      childId,
      *      childEquippableAddress
      *  ]
      * @param tokenId ID of the token for which we are retrieving the equipped object

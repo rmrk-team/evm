@@ -265,7 +265,7 @@ async function setupContextForParts(
     for (let i = 0; i < uniqueNeons; i++) {
       const newId = await nestMint(mask, neon.address, neons[i]);
       masks.push(newId);
-      await neon.connect(addrs[i % 3]).acceptChild(neons[i], 0);
+      await neon.connect(addrs[i % 3]).acceptChild(neons[i], 0, mask.address, newId);
     }
   }
 

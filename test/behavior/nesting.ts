@@ -248,37 +248,47 @@ async function shouldBehaveLikeNesting(
     });
 
     it('can accept child', async function () {
-      await expect(parent.connect(tokenOwner).acceptChild(parentId, 0))
+      await expect(parent.connect(tokenOwner).acceptChild(parentId, 0, child.address, childId))
         .to.emit(parent, 'ChildAccepted')
-        .withArgs(parentId, child.address, childId, 0);
+        .withArgs(parentId, 0, child.address, childId);
       await checkChildWasAccepted();
     });
 
     it('can accept child if approved', async function () {
       const approved = addrs[1];
       await parent.connect(tokenOwner).approve(approved.address, parentId);
-      await parent.connect(approved).acceptChild(parentId, 0);
+      await parent.connect(approved).acceptChild(parentId, 0, child.address, childId);
       await checkChildWasAccepted();
     });
 
     it('can accept child if approved for all', async function () {
       const operator = addrs[2];
       await parent.connect(tokenOwner).setApprovalForAll(operator.address, true);
-      await parent.connect(operator).acceptChild(parentId, 0);
+      await parent.connect(operator).acceptChild(parentId, 0, child.address, childId);
       await checkChildWasAccepted();
     });
 
     it('cannot accept not owned child', async function () {
-      const nowOwner = addrs[3];
-      await expect(parent.connect(nowOwner).acceptChild(parentId, 0)).to.be.revertedWithCustomError(
-        parent,
-        'ERC721NotApprovedOrOwner',
-      );
+      const notOwner = addrs[3];
+      await expect(
+        parent.connect(notOwner).acceptChild(parentId, 0, child.address, childId),
+      ).to.be.revertedWithCustomError(parent, 'ERC721NotApprovedOrOwner');
+    });
+
+    it('cannot accept child if address or id do not match', async function () {
+      const otherAddress = addrs[1].address;
+      const otherChildId = 9999;
+      await expect(
+        parent.connect(tokenOwner).acceptChild(parentId, 0, child.address, otherChildId),
+      ).to.be.revertedWithCustomError(parent, 'RMRKUnexpectedChildId');
+      await expect(
+        parent.connect(tokenOwner).acceptChild(parentId, 0, otherAddress, childId),
+      ).to.be.revertedWithCustomError(parent, 'RMRKUnexpectedChildId');
     });
 
     it('cannot accept children for non existing index', async () => {
       await expect(
-        parent.connect(tokenOwner).acceptChild(parentId, 1),
+        parent.connect(tokenOwner).acceptChild(parentId, 1, child.address, childId),
       ).to.be.revertedWithCustomError(parent, 'RMRKPendingChildIndexOutOfRange');
     });
 
@@ -371,8 +381,8 @@ async function shouldBehaveLikeNesting(
     it('can recursively burn nested token', async function () {
       const childId = await nestMint(child, parent.address, parentId);
       const granchildId = await nestMint(child, child.address, childId);
-      await parent.connect(tokenOwner).acceptChild(parentId, 0);
-      await child.connect(tokenOwner).acceptChild(childId, 0);
+      await parent.connect(tokenOwner).acceptChild(parentId, 0, child.address, childId);
+      await child.connect(tokenOwner).acceptChild(childId, 0, child.address, granchildId);
 
       expect(await parent.balanceOf(tokenOwner.address)).to.equal(1);
       expect(await child.balanceOf(parent.address)).to.equal(1);
@@ -429,12 +439,12 @@ async function shouldBehaveLikeNesting(
       const childId2 = await nestMint(child, parent.address, parentId);
       const grandChild1 = await nestMint(child, child.address, childId);
       const grandChild2 = await nestMint(child, child.address, childId);
-      const greatGrandChild2 = await nestMint(child, child.address, grandChild2);
-      await parent.connect(tokenOwner).acceptChild(parentId, 0);
-      await parent.connect(tokenOwner).acceptChild(parentId, 0);
-      await child.connect(tokenOwner).acceptChild(childId, 0);
-      await child.connect(tokenOwner).acceptChild(childId, 0);
-      await child.connect(tokenOwner).acceptChild(grandChild2, 0);
+      const greatGrandChild1 = await nestMint(child, child.address, grandChild2);
+      await parent.connect(tokenOwner).acceptChild(parentId, 0, child.address, childId);
+      await parent.connect(tokenOwner).acceptChild(parentId, 0, child.address, childId2);
+      await child.connect(tokenOwner).acceptChild(childId, 0, child.address, grandChild1);
+      await child.connect(tokenOwner).acceptChild(childId, 0, child.address, grandChild2);
+      await child.connect(tokenOwner).acceptChild(grandChild2, 0, child.address, greatGrandChild1);
 
       // 0 is not enough
       await expect(parent.connect(tokenOwner)['burn(uint256,uint256)'](parentId, 0))
@@ -451,7 +461,7 @@ async function shouldBehaveLikeNesting(
       // 3 is not enough
       await expect(parent.connect(tokenOwner)['burn(uint256,uint256)'](parentId, 3))
         .to.be.revertedWithCustomError(parent, 'RMRKMaxRecursiveBurnsReached')
-        .withArgs(child.address, greatGrandChild2);
+        .withArgs(child.address, greatGrandChild1);
       // 4 is not enough
       await expect(parent.connect(tokenOwner)['burn(uint256,uint256)'](parentId, 4))
         .to.be.revertedWithCustomError(parent, 'RMRKMaxRecursiveBurnsReached')
@@ -476,32 +486,58 @@ async function shouldBehaveLikeNesting(
     beforeEach(async function () {
       parentId = await mint(parent, tokenOwner.address);
       childId = await nestMint(child, parent.address, parentId);
-      await parent.connect(tokenOwner).acceptChild(parentId, 0);
+      await parent.connect(tokenOwner).acceptChild(parentId, 0, child.address, childId);
     });
 
     it('can unnest child with to as root owner', async function () {
-      await expect(parent.connect(tokenOwner).unnestChild(parentId, 0, tokenOwner.address, false))
+      await expect(
+        parent
+          .connect(tokenOwner)
+          .unnestChild(parentId, tokenOwner.address, 0, child.address, childId, false),
+      )
         .to.emit(parent, 'ChildUnnested')
-        .withArgs(parentId, child.address, childId, 0, false);
+        .withArgs(parentId, 0, child.address, childId, false);
 
       await checkChildMovedToRootOwner();
     });
 
     it('can unnest child to another address', async function () {
       const toOwnerAddress = addrs[2].address;
-      await expect(parent.connect(tokenOwner).unnestChild(parentId, 0, toOwnerAddress, false))
+      await expect(
+        parent
+          .connect(tokenOwner)
+          .unnestChild(parentId, toOwnerAddress, 0, child.address, childId, false),
+      )
         .to.emit(parent, 'ChildUnnested')
-        .withArgs(parentId, child.address, childId, 0, false);
+        .withArgs(parentId, 0, child.address, childId, false);
 
       await checkChildMovedToRootOwner(toOwnerAddress);
     });
 
-    it('cannost unnest child out of index', async function () {
+    it('cannot unnest child out of index', async function () {
       const toOwnerAddress = addrs[2].address;
       const badIndex = 2;
       await expect(
-        parent.connect(tokenOwner).unnestChild(parentId, badIndex, toOwnerAddress, false),
+        parent
+          .connect(tokenOwner)
+          .unnestChild(parentId, toOwnerAddress, badIndex, child.address, childId, false),
       ).to.be.revertedWithCustomError(parent, 'RMRKChildIndexOutOfRange');
+    });
+
+    it('cannot unnest child if address or id do not match', async function () {
+      const otherAddress = addrs[1].address;
+      const otherChildId = 9999;
+      const toOwnerAddress = addrs[2].address;
+      await expect(
+        parent
+          .connect(tokenOwner)
+          .unnestChild(parentId, toOwnerAddress, 0, otherAddress, childId, false),
+      ).to.be.revertedWithCustomError(parent, 'RMRKUnexpectedChildId');
+      await expect(
+        parent
+          .connect(tokenOwner)
+          .unnestChild(parentId, toOwnerAddress, 0, child.address, otherChildId, false),
+      ).to.be.revertedWithCustomError(parent, 'RMRKUnexpectedChildId');
     });
 
     it('can unnest child if approved', async function () {
@@ -510,7 +546,9 @@ async function shouldBehaveLikeNesting(
       // Since unnest is child scoped, approval must be on the child contract to child id
       await parent.connect(tokenOwner).approve(unnester.address, parentId);
 
-      await parent.connect(unnester).unnestChild(parentId, 0, toOwner, false);
+      await parent
+        .connect(unnester)
+        .unnestChild(parentId, toOwner, 0, child.address, childId, false);
       await checkChildMovedToRootOwner();
     });
 
@@ -520,7 +558,9 @@ async function shouldBehaveLikeNesting(
       // Since unnest is child scoped, approval must be on the child contract to child id
       await parent.connect(tokenOwner).setApprovalForAll(operator.address, true);
 
-      await parent.connect(operator).unnestChild(parentId, 0, toOwner, false);
+      await parent
+        .connect(operator)
+        .unnestChild(parentId, toOwner, 0, child.address, childId, false);
       await checkChildMovedToRootOwner();
     });
 
@@ -529,7 +569,9 @@ async function shouldBehaveLikeNesting(
       const grandchildId = await nestMint(child, child.address, childId);
 
       // Unnest child from parent.
-      await parent.connect(tokenOwner).unnestChild(parentId, 0, toOwner, false);
+      await parent
+        .connect(tokenOwner)
+        .unnestChild(parentId, toOwner, 0, child.address, childId, false);
 
       // New owner of child
       expect(await child.ownerOf(childId)).to.eql(tokenOwner.address);
@@ -544,15 +586,17 @@ async function shouldBehaveLikeNesting(
       const toOwner = tokenOwner.address;
       const notOwner = addrs[3];
       await expect(
-        parent.connect(notOwner).unnestChild(parentId, 0, toOwner, false),
+        parent.connect(notOwner).unnestChild(parentId, toOwner, 0, child.address, childId, false),
       ).to.be.revertedWithCustomError(child, 'ERC721NotApprovedOrOwner');
     });
 
-    it('cannot unnest not existing child', async function () {
+    it('cannot unnest from not existing parent', async function () {
       const badChildId = 99;
       const toOwner = tokenOwner.address;
       await expect(
-        parent.connect(tokenOwner).unnestChild(badChildId, 0, toOwner, false),
+        parent
+          .connect(tokenOwner)
+          .unnestChild(badChildId, toOwner, 0, child.address, childId, false),
       ).to.be.revertedWithCustomError(child, 'ERC721InvalidTokenId');
     });
 
@@ -579,18 +623,26 @@ async function shouldBehaveLikeNesting(
     });
 
     it('can unnest child with to as root owner', async function () {
-      await expect(parent.connect(tokenOwner).unnestChild(parentId, 0, tokenOwner.address, true))
+      await expect(
+        parent
+          .connect(tokenOwner)
+          .unnestChild(parentId, tokenOwner.address, 0, child.address, childId, true),
+      )
         .to.emit(parent, 'ChildUnnested')
-        .withArgs(parentId, child.address, childId, 0, true);
+        .withArgs(parentId, 0, child.address, childId, true);
 
       await checkChildMovedToRootOwner();
     });
 
     it('can unnest child to another address', async function () {
       const toOwnerAddress = addrs[2].address;
-      await expect(parent.connect(tokenOwner).unnestChild(parentId, 0, toOwnerAddress, true))
+      await expect(
+        parent
+          .connect(tokenOwner)
+          .unnestChild(parentId, toOwnerAddress, 0, child.address, childId, true),
+      )
         .to.emit(parent, 'ChildUnnested')
-        .withArgs(parentId, child.address, childId, 0, true);
+        .withArgs(parentId, 0, child.address, childId, true);
 
       await checkChildMovedToRootOwner(toOwnerAddress);
     });
@@ -599,8 +651,26 @@ async function shouldBehaveLikeNesting(
       const toOwnerAddress = addrs[2].address;
       const badIndex = 2;
       await expect(
-        parent.connect(tokenOwner).unnestChild(parentId, badIndex, toOwnerAddress, true),
+        parent
+          .connect(tokenOwner)
+          .unnestChild(parentId, toOwnerAddress, badIndex, child.address, childId, true),
       ).to.be.revertedWithCustomError(parent, 'RMRKPendingChildIndexOutOfRange');
+    });
+
+    it('cannot unnest child if address or id do not match', async function () {
+      const otherAddress = addrs[1].address;
+      const otherChildId = 9999;
+      const toOwnerAddress = addrs[2].address;
+      await expect(
+        parent
+          .connect(tokenOwner)
+          .unnestChild(parentId, toOwnerAddress, 0, otherAddress, childId, true),
+      ).to.be.revertedWithCustomError(parent, 'RMRKUnexpectedChildId');
+      await expect(
+        parent
+          .connect(tokenOwner)
+          .unnestChild(parentId, toOwnerAddress, 0, child.address, otherChildId, true),
+      ).to.be.revertedWithCustomError(parent, 'RMRKUnexpectedChildId');
     });
 
     it('can unnest child if approved', async function () {
@@ -609,7 +679,9 @@ async function shouldBehaveLikeNesting(
       // Since unnest is child scoped, approval must be on the child contract to child id
       await parent.connect(tokenOwner).approve(unnester.address, parentId);
 
-      await parent.connect(unnester).unnestChild(parentId, 0, toOwner, true);
+      await parent
+        .connect(unnester)
+        .unnestChild(parentId, toOwner, 0, child.address, childId, true);
       await checkChildMovedToRootOwner();
     });
 
@@ -619,7 +691,9 @@ async function shouldBehaveLikeNesting(
       // Since unnest is child scoped, approval must be on the child contract to child id
       await parent.connect(tokenOwner).setApprovalForAll(operator.address, true);
 
-      await parent.connect(operator).unnestChild(parentId, 0, toOwner, true);
+      await parent
+        .connect(operator)
+        .unnestChild(parentId, toOwner, 0, child.address, childId, true);
       await checkChildMovedToRootOwner();
     });
 
@@ -628,7 +702,9 @@ async function shouldBehaveLikeNesting(
       const grandchildId = await nestMint(child, child.address, childId);
 
       // Unnest child from parent.
-      await parent.connect(tokenOwner).unnestChild(parentId, 0, toOwner, true);
+      await parent
+        .connect(tokenOwner)
+        .unnestChild(parentId, toOwner, 0, child.address, childId, true);
 
       // New owner of child
       expect(await child.ownerOf(childId)).to.eql(tokenOwner.address);
@@ -643,15 +719,17 @@ async function shouldBehaveLikeNesting(
       const toOwner = tokenOwner.address;
       const notOwner = addrs[3];
       await expect(
-        parent.connect(notOwner).unnestChild(parentId, 0, toOwner, true),
+        parent.connect(notOwner).unnestChild(parentId, toOwner, 0, child.address, childId, true),
       ).to.be.revertedWithCustomError(child, 'ERC721NotApprovedOrOwner');
     });
 
-    it('cannot unnest not existing child', async function () {
+    it('cannot unnest from not existing parent', async function () {
       const badChildId = 99;
       const toOwner = tokenOwner.address;
       await expect(
-        parent.connect(tokenOwner).unnestChild(badChildId, 0, toOwner, true),
+        parent
+          .connect(tokenOwner)
+          .unnestChild(badChildId, toOwner, 0, child.address, childId, true),
       ).to.be.revertedWithCustomError(child, 'ERC721InvalidTokenId');
     });
 

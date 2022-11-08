@@ -26,16 +26,15 @@ describe('Nesting with ChildAdder', function () {
   });
 
   describe('add children', async function () {
-    it('Cannot add multiple chilren', async function () {
+    it('cannot add multiple children', async function () {
       await parent.connect(owner).mint(owner.address, 1);
       // Propose 10 children with the same params to the parent token
       await adder.addChild(parent.address, 1, 1, 10);
 
-      await parent.connect(owner).acceptChild(1, 0);
-      await expect(parent.connect(owner).acceptChild(1, 0)).to.be.revertedWithCustomError(
-        parent,
-        'RMRKChildAlreadyExists',
-      );
+      await parent.connect(owner).acceptChild(1, 0, adder.address, 1);
+      await expect(
+        parent.connect(owner).acceptChild(1, 0, adder.address, 1),
+      ).to.be.revertedWithCustomError(parent, 'RMRKChildAlreadyExists');
     });
   });
 });

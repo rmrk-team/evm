@@ -123,7 +123,7 @@ async function setupContextForSlots(
     for (let i = 0; i < uniqueSoldiers; i++) {
       const newId = await nestMint(weapon, soldier.address, soldiersIds[i]);
       weaponsIds.push(newId);
-      await soldier.connect(addrs[i % 3]).acceptChild(soldiersIds[i], 0);
+      await soldier.connect(addrs[i % 3]).acceptChild(soldiersIds[i], 0, weapon.address, newId);
     }
   }
 
@@ -134,7 +134,7 @@ async function setupContextForSlots(
     for (let i = 0; i < uniqueSoldiers; i++) {
       const newId = await nestMint(weaponGem, weapon.address, weaponsIds[i]);
       weaponGemsIds.push(newId);
-      await weapon.connect(addrs[i % 3]).acceptChild(weaponsIds[i], 0);
+      await weapon.connect(addrs[i % 3]).acceptChild(weaponsIds[i], 0, weaponGem.address, newId);
     }
   }
 
@@ -145,7 +145,7 @@ async function setupContextForSlots(
     for (let i = 0; i < uniqueSoldiers; i++) {
       const newId = await nestMint(background, soldier.address, soldiersIds[i]);
       backgroundsIds.push(newId);
-      await soldier.connect(addrs[i % 3]).acceptChild(soldiersIds[i], 0);
+      await soldier.connect(addrs[i % 3]).acceptChild(soldiersIds[i], 0, background.address, newId);
     }
   }
 

@@ -229,14 +229,14 @@ contract RMRKEquipRenderUtils {
                 if (equipment.resourceId == resourceId) {
                     metadata = IRMRKEquippable(equipment.childEquippableAddress)
                         .getResourceMetadata(
-                            equipment.childTokenId,
+                            equipment.childId,
                             equipment.childResourceId
                         );
                     slotParts[i] = EquippedSlotPart({
                         partId: slotPartIds[i],
                         childResourceId: equipment.childResourceId,
                         z: baseSlotParts[i].z,
-                        childId: equipment.childTokenId,
+                        childId: equipment.childId,
                         childAddress: equipment.childEquippableAddress,
                         childResourceMetadata: metadata,
                         partMetadata: baseSlotParts[i].metadataURI

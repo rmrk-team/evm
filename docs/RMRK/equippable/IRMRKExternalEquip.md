@@ -360,7 +360,7 @@ Used to check whether the address has been granted the operator role by a given 
 ### isChildEquipped
 
 ```solidity
-function isChildEquipped(uint256 tokenId, address childAddress, uint256 childTokenId) external view returns (bool)
+function isChildEquipped(uint256 tokenId, address childAddress, uint256 childId) external view returns (bool)
 ```
 
 Used to check whether the token has a given child equipped.
@@ -373,7 +373,7 @@ Used to check whether the token has a given child equipped.
 |---|---|---|
 | tokenId | uint256 | ID of the parent token for which we are querying for |
 | childAddress | address | Address of the child token&#39;s smart contract |
-| childTokenId | uint256 | ID of the child token |
+| childId | uint256 | ID of the child token |
 
 #### Returns
 
@@ -515,7 +515,7 @@ Used to notify listeners that owner has granted an approval to the user to manag
 ### ChildResourceEquipped
 
 ```solidity
-event ChildResourceEquipped(uint256 indexed tokenId, uint64 indexed resourceId, uint64 indexed slotPartId, uint256 childTokenId, address childAddress, uint64 childResourceId)
+event ChildResourceEquipped(uint256 indexed tokenId, uint64 indexed resourceId, uint64 indexed slotPartId, uint256 childId, address childAddress, uint64 childResourceId)
 ```
 
 Used to notify listeners that a child&#39;s resource has been equipped into one of its parent resources.
@@ -529,14 +529,14 @@ Used to notify listeners that a child&#39;s resource has been equipped into one 
 | tokenId `indexed` | uint256 | undefined |
 | resourceId `indexed` | uint64 | undefined |
 | slotPartId `indexed` | uint64 | undefined |
-| childTokenId  | uint256 | undefined |
+| childId  | uint256 | undefined |
 | childAddress  | address | undefined |
 | childResourceId  | uint64 | undefined |
 
 ### ChildResourceUnequipped
 
 ```solidity
-event ChildResourceUnequipped(uint256 indexed tokenId, uint64 indexed resourceId, uint64 indexed slotPartId, uint256 childTokenId, address childAddress, uint64 childResourceId)
+event ChildResourceUnequipped(uint256 indexed tokenId, uint64 indexed resourceId, uint64 indexed slotPartId, uint256 childId, address childAddress, uint64 childResourceId)
 ```
 
 Used to notify listeners that a child&#39;s resource has been unequipped from one of its parent resources.
@@ -550,7 +550,7 @@ Used to notify listeners that a child&#39;s resource has been unequipped from on
 | tokenId `indexed` | uint256 | undefined |
 | resourceId `indexed` | uint64 | undefined |
 | slotPartId `indexed` | uint64 | undefined |
-| childTokenId  | uint256 | undefined |
+| childId  | uint256 | undefined |
 | childAddress  | address | undefined |
 | childResourceId  | uint64 | undefined |
 

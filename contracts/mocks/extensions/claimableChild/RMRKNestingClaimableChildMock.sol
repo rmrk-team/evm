@@ -25,29 +25,46 @@ contract RMRKNestingClaimableChildMock is
         return super.supportsInterface(interfaceId);
     }
 
-    function _beforeAddChild(uint256 tokenId, Child memory child)
+    function _beforeAddChild(
+        uint256 tokenId,
+        address childAddress,
+        uint256 childId
+    )
         internal
         virtual
         override(RMRKNesting, RMRKReclaimableChild)
     {
-        super._beforeAddChild(tokenId, child);
+        super._beforeAddChild(tokenId, childAddress, childId);
     }
 
     function _beforeAcceptChild(
-        uint256 tokenId,
-        uint256 index,
-        Child memory child
+        uint256 parentId,
+        uint256 childIndex,
+        address childAddress,
+        uint256 childId
     ) internal virtual override(RMRKNesting, RMRKReclaimableChild) {
-        super._beforeAcceptChild(tokenId, index, child);
+        super._beforeAcceptChild(
+            parentId,
+            childIndex,
+            childAddress,
+            childId
+        );
     }
 
     function _beforeUnnestChild(
         uint256 tokenId,
-        uint256 index,
-        Child memory child,
+        uint256 childIndex,
+        address childAddress,
+        uint256 childId,
         bool isPending
     ) internal virtual override(RMRKNesting, RMRKReclaimableChild) {
-        super._beforeUnnestChild(tokenId, index, child, isPending);
+        super._beforeUnnestChild(
+            tokenId,
+            childIndex,
+            childAddress,
+            childId,
+            isPending
+        );
     }
 
     function _beforeNestedTokenTransfer(
