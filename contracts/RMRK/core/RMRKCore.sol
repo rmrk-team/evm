@@ -12,7 +12,7 @@ import "./IRMRKCore.sol";
  */
 contract RMRKCore is IRMRKCore {
     /// @notice Version of the @rmrk-team/evm-contracts package
-    string public constant VERSION = "0.13.1";
+    string public constant VERSION = "0.14.0";
 
     constructor(string memory name_, string memory symbol_) {
         _name = name_;
