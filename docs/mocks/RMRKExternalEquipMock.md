@@ -31,7 +31,7 @@ Used to accept a pending resource of a given token.
 ### addResourceEntry
 
 ```solidity
-function addResourceEntry(IRMRKEquippable.ExtendedResource resource, uint64[] fixedPartIds, uint64[] slotPartIds) external nonpayable
+function addResourceEntry(uint64 id, uint64 equippableGroupId, address baseAddress, string metadataURI, uint64[] fixedPartIds, uint64[] slotPartIds) external nonpayable
 ```
 
 
@@ -42,7 +42,10 @@ function addResourceEntry(IRMRKEquippable.ExtendedResource resource, uint64[] fi
 
 | Name | Type | Description |
 |---|---|---|
-| resource | IRMRKEquippable.ExtendedResource | undefined |
+| id | uint64 | undefined |
+| equippableGroupId | uint64 | undefined |
+| baseAddress | address | undefined |
+| metadataURI | string | undefined |
 | fixedPartIds | uint64[] | undefined |
 | slotPartIds | uint64[] | undefined |
 
@@ -188,28 +191,6 @@ Used to get the address of the user that is approved to manage the specified tok
 |---|---|---|
 | _0 | address | address Address of the account that is approved to manage the token |
 
-### getBaseAddressOfResource
-
-```solidity
-function getBaseAddressOfResource(uint64 resourceId) external view returns (address)
-```
-
-Used to get the address of the resource&#39;s `Base`
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| resourceId | uint64 | ID of the resource for which we are retrieving the address of the `Base` |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | address | address Address of the `Base` smart contract of the resource |
-
 ### getEquipment
 
 ```solidity
@@ -237,12 +218,12 @@ Used to get the Equipment object equipped into the specified slot of the desired
 ### getExtendedResource
 
 ```solidity
-function getExtendedResource(uint256 tokenId, uint64 resourceId) external view returns (struct IRMRKEquippable.ExtendedResource)
+function getExtendedResource(uint256 tokenId, uint64 resourceId) external view returns (string metadataURI, uint64 equippableGroupId, address baseAddress, uint64[] fixedPartIds, uint64[] slotPartIds)
 ```
 
 Used to get the extended resource struct of the resource associated with given `resourceId`.
 
-*The `ExtendedResource` struct contains the following data:  [      id,      equippableGroupId,      baseAddress,      metadataURI  ]*
+
 
 #### Parameters
 
@@ -255,29 +236,11 @@ Used to get the extended resource struct of the resource associated with given `
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IRMRKEquippable.ExtendedResource | struct The `ExtendedResource` struct associated with the resource |
-
-### getFixedPartIds
-
-```solidity
-function getFixedPartIds(uint64 resourceId) external view returns (uint64[])
-```
-
-Used to get IDs of the fixed parts present on a given resource.
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| resourceId | uint64 | ID of the resource of which to get the active fixed parts |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | uint64[] | uint64[] An array of active fixed parts present on resource |
+| metadataURI | string | undefined |
+| equippableGroupId | uint64 | undefined |
+| baseAddress | address | undefined |
+| fixedPartIds | uint64[] | undefined |
+| slotPartIds | uint64[] | undefined |
 
 ### getNestingAddress
 
@@ -363,28 +326,6 @@ Used to retrieve the resource ID that will be replaced (if any) if a given resou
 | Name | Type | Description |
 |---|---|---|
 | _0 | uint64 | uint64 ID of the resource which will be replaced |
-
-### getSlotPartIds
-
-```solidity
-function getSlotPartIds(uint64 resourceId) external view returns (uint64[])
-```
-
-Used to retrieve the slot part IDs associated with a given resource.
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| resourceId | uint64 | ID of the resource of which we are retrieving the array of slot part IDs |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | uint64[] | uint64[] An array of slot part IDs associated with the given resource |
 
 ### isApprovedForAllForResources
 

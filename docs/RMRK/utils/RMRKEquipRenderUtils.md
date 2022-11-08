@@ -13,7 +13,7 @@
 ### composeEquippables
 
 ```solidity
-function composeEquippables(address target, uint256 tokenId, uint64 resourceId) external view returns (struct IRMRKEquippable.ExtendedResource resource, struct IRMRKEquippable.FixedPart[] fixedParts, struct RMRKEquipRenderUtils.EquippedSlotPart[] slotParts)
+function composeEquippables(address target, uint256 tokenId, uint64 resourceId) external view returns (string metadataURI, uint64 equippableGroupId, address baseAddress, struct IRMRKEquippable.FixedPart[] fixedParts, struct RMRKEquipRenderUtils.EquippedSlotPart[] slotParts)
 ```
 
 
@@ -32,7 +32,9 @@ function composeEquippables(address target, uint256 tokenId, uint64 resourceId) 
 
 | Name | Type | Description |
 |---|---|---|
-| resource | IRMRKEquippable.ExtendedResource | undefined |
+| metadataURI | string | undefined |
+| equippableGroupId | uint64 | undefined |
+| baseAddress | address | undefined |
 | fixedParts | IRMRKEquippable.FixedPart[] | undefined |
 | slotParts | RMRKEquipRenderUtils.EquippedSlotPart[] | undefined |
 
