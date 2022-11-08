@@ -269,9 +269,9 @@ async function shouldBehaveLikeNesting(
     });
 
     it('cannot accept not owned child', async function () {
-      const nowOwner = addrs[3];
+      const notOwner = addrs[3];
       await expect(
-        parent.connect(nowOwner).acceptChild(parentId, 0, child.address, childId),
+        parent.connect(notOwner).acceptChild(parentId, 0, child.address, childId),
       ).to.be.revertedWithCustomError(parent, 'ERC721NotApprovedOrOwner');
     });
 
