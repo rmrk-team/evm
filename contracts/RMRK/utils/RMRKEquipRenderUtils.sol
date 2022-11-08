@@ -64,20 +64,23 @@ contract RMRKEquipRenderUtils {
 
         ExtendedActiveResource[]
             memory activeResources = new ExtendedActiveResource[](len);
-        IRMRKEquippable.ExtendedResource memory extendedResource;
+
         for (uint256 i; i < len; ) {
-            extendedResource = target_.getExtendedResource(
-                tokenId,
-                resources[i]
-            );
+            (
+                string memory metadataURI,
+                uint64 equippableGroupId,
+                address baseAddress,
+                uint64[] memory fixedPartIds,
+                uint64[] memory slotPartIds
+            ) = target_.getExtendedResource(tokenId, resources[i]);
             activeResources[i] = ExtendedActiveResource({
                 id: resources[i],
-                equippableGroupId: extendedResource.equippableGroupId,
+                equippableGroupId: equippableGroupId,
                 priority: priorities[i],
-                baseAddress: extendedResource.baseAddress,
-                metadata: extendedResource.metadataURI,
-                fixedParts: target_.getFixedPartIds(resources[i]),
-                slotParts: target_.getSlotPartIds(resources[i])
+                baseAddress: baseAddress,
+                metadata: metadataURI,
+                fixedParts: fixedPartIds,
+                slotParts: slotPartIds
             });
             unchecked {
                 ++i;
@@ -102,26 +105,28 @@ contract RMRKEquipRenderUtils {
 
         ExtendedPendingResource[]
             memory pendingResources = new ExtendedPendingResource[](len);
-        IRMRKEquippable.ExtendedResource memory extendedResource;
         uint64 overwritesResourceWithId;
         for (uint256 i; i < len; ) {
-            extendedResource = target_.getExtendedResource(
-                tokenId,
-                resources[i]
-            );
+            (
+                string memory metadataURI,
+                uint64 equippableGroupId,
+                address baseAddress,
+                uint64[] memory fixedPartIds,
+                uint64[] memory slotPartIds
+            ) = target_.getExtendedResource(tokenId, resources[i]);
             overwritesResourceWithId = target_.getResourceOverwrites(
                 tokenId,
                 resources[i]
             );
             pendingResources[i] = ExtendedPendingResource({
                 id: resources[i],
-                equippableGroupId: extendedResource.equippableGroupId,
+                equippableGroupId: equippableGroupId,
                 acceptRejectIndex: uint128(i),
                 overwritesResourceWithId: overwritesResourceWithId,
-                baseAddress: extendedResource.baseAddress,
-                metadata: extendedResource.metadataURI,
-                fixedParts: target_.getFixedPartIds(resources[i]),
-                slotParts: target_.getSlotPartIds(resources[i])
+                baseAddress: baseAddress,
+                metadata: metadataURI,
+                fixedParts: fixedPartIds,
+                slotParts: slotPartIds
             });
             unchecked {
                 ++i;
@@ -144,10 +149,8 @@ contract RMRKEquipRenderUtils {
     {
         IRMRKEquippable target_ = IRMRKEquippable(target);
 
-        address targetBaseAddress = target_.getBaseAddressOfResource(
-            resourceId
-        );
-        uint64[] memory slotPartIds = target_.getSlotPartIds(resourceId);
+        (, , address baseAddress, , uint64[] memory slotPartIds) = target_
+            .getExtendedResource(tokenId, resourceId);
 
         // TODO: Clarify on docs: Some children equipped might be empty.
         slotParts = new uint64[](slotPartIds.length);
@@ -158,7 +161,7 @@ contract RMRKEquipRenderUtils {
             slotParts[i] = slotPartIds[i];
             IRMRKEquippable.Equipment memory equipment = target_.getEquipment(
                 tokenId,
-                targetBaseAddress,
+                baseAddress,
                 slotPartIds[i]
             );
             if (equipment.resourceId == resourceId) {
@@ -178,28 +181,34 @@ contract RMRKEquipRenderUtils {
         public
         view
         returns (
-            IRMRKEquippable.ExtendedResource memory resource,
+            string memory metadataURI,
+            uint64 equippableGroupId,
+            address baseAddress,
             IRMRKEquippable.FixedPart[] memory fixedParts,
             EquippedSlotPart[] memory slotParts
         )
     {
         IRMRKEquippable target_ = IRMRKEquippable(target);
-        address targetBaseAddress = target_.getBaseAddressOfResource(
-            resourceId
-        );
-        if (targetBaseAddress == address(0)) revert RMRKNotComposableResource();
+        uint64[] memory fixedPartIds;
+        uint64[] memory slotPartIds;
 
-        // If token does not have the resource, it would fail here.
-        resource = target_.getExtendedResource(tokenId, resourceId);
+        // If token does not huint64[] memory slotPartIdsave the resource, it would fail here.
+        (
+            metadataURI,
+            equippableGroupId,
+            baseAddress,
+            fixedPartIds,
+            slotPartIds
+        ) = target_.getExtendedResource(tokenId, resourceId);
+        if (baseAddress == address(0)) revert RMRKNotComposableResource();
 
         // Fixed parts:
-        uint64[] memory fixedPartIds = target_.getFixedPartIds(resourceId);
         fixedParts = new IRMRKEquippable.FixedPart[](fixedPartIds.length);
 
         uint256 len = fixedPartIds.length;
         if (len != 0) {
             IRMRKBaseStorage.Part[] memory baseFixedParts = IRMRKBaseStorage(
-                targetBaseAddress
+                baseAddress
             ).getParts(fixedPartIds);
             for (uint256 i; i < len; ) {
                 fixedParts[i] = IRMRKEquippable.FixedPart({
@@ -213,19 +222,33 @@ contract RMRKEquipRenderUtils {
             }
         }
 
-        // Slot parts:
-        uint64[] memory slotPartIds = target_.getSlotPartIds(resourceId);
+        slotParts = getEquippedSlotParts(
+            target_,
+            tokenId,
+            resourceId,
+            baseAddress,
+            slotPartIds
+        );
+    }
+
+    function getEquippedSlotParts(
+        IRMRKEquippable target_,
+        uint256 tokenId,
+        uint64 resourceId,
+        address baseAdress,
+        uint64[] memory slotPartIds
+    ) private view returns (EquippedSlotPart[] memory slotParts) {
         slotParts = new EquippedSlotPart[](slotPartIds.length);
-        len = slotPartIds.length;
+        uint256 len = slotPartIds.length;
 
         if (len != 0) {
             string memory metadata;
             IRMRKBaseStorage.Part[] memory baseSlotParts = IRMRKBaseStorage(
-                targetBaseAddress
+                baseAdress
             ).getParts(slotPartIds);
             for (uint256 i; i < len; ) {
                 IRMRKEquippable.Equipment memory equipment = target_
-                    .getEquipment(tokenId, targetBaseAddress, slotPartIds[i]);
+                    .getEquipment(tokenId, baseAdress, slotPartIds[i]);
                 if (equipment.resourceId == resourceId) {
                     metadata = IRMRKEquippable(equipment.childEquippableAddress)
                         .getResourceMetadata(

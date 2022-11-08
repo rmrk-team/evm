@@ -196,32 +196,26 @@ contract RMRKEquippable is
     /**
      * @notice Used to add a resource entry.
      * @dev This internal function warrants custom access control to be implemented when used.
-     * @dev `ExtendedResource` consists of the following parameters:
-     *  [
-     *      resourceId,
-     *      childResourceId,
-     *      childId,
-     *      childEquippableAddress
-     *  ]
-     * @param resource An `ExtendedResource` struct containing the components of a resource we are adding
      * @param fixedPartIds An array of IDs of fixed parts to be included in the resource
      * @param slotPartIds An array of IDs of slot parts to be included in the resource
      */
     function _addResourceEntry(
-        ExtendedResource memory resource,
-        uint64[] calldata fixedPartIds,
-        uint64[] calldata slotPartIds
+        uint64 id,
+        uint64 equippableGroupId,
+        address baseAddress,
+        string memory metadataURI,
+        uint64[] memory fixedPartIds,
+        uint64[] memory slotPartIds
     ) internal virtual {
-        uint64 id = resource.id;
-        _addResourceEntry(id, resource.metadataURI);
+        _addResourceEntry(id, metadataURI);
 
         if (
-            resource.baseAddress == address(0) &&
+            baseAddress == address(0) &&
             (fixedPartIds.length != 0 || slotPartIds.length != 0)
         ) revert RMRKBaseRequiredForParts();
 
-        _baseAddresses[id] = resource.baseAddress;
-        _equippableGroupIds[id] = resource.equippableGroupId;
+        _baseAddresses[id] = baseAddress;
+        _equippableGroupIds[id] = equippableGroupId;
         _fixedPartIds[id] = fixedPartIds;
         _slotPartIds[id] = slotPartIds;
     }
@@ -379,7 +373,7 @@ contract RMRKEquippable is
      * @param data An `IntakeEquip` struct specifying the equip data
      */
     function _equip(IntakeEquip memory data) internal virtual {
-        address baseAddress = getBaseAddressOfResource(data.resourceId);
+        address baseAddress = _baseAddresses[data.resourceId];
         uint64 slotPartId = data.slotPartId;
         if (
             _equipments[data.tokenId][baseAddress][slotPartId]
@@ -537,23 +531,7 @@ contract RMRKEquippable is
         address childAddress,
         uint256 childId
     ) public view virtual returns (bool) {
-        return
-            _equipCountPerChild[tokenId][childAddress][childId] !=
-            uint8(0);
-    }
-
-    /**
-     * @notice Used to get the address of the resource's `Base`
-     * @param resourceId ID of the resource for which we are retrieving the address of the `Base`
-     * @return address Address of the `Base` smart contract of the resource
-     */
-    function getBaseAddressOfResource(uint64 resourceId)
-        public
-        view
-        virtual
-        returns (address)
-    {
-        return _baseAddresses[resourceId];
+        return _equipCountPerChild[tokenId][childAddress][childId] != uint8(0);
     }
 
     // --------------------- ADMIN VALIDATION ---------------------
@@ -608,64 +586,30 @@ contract RMRKEquippable is
 
     /**
      * @notice Used to get the extended resource struct of the resource associated with given `resourceId`.
-     * @dev The `ExtendedResource` struct contains the following data:
-     *  [
-     *      id,
-     *      equippableGroupId,
-     *      baseAddress,
-     *      metadataURI
-     *  ]
      * @param resourceId ID of the resource of which we are retrieving
-     * @return struct The `ExtendedResource` struct associated with the resource
      */
     function getExtendedResource(uint256 tokenId, uint64 resourceId)
         public
         view
         virtual
-        returns (ExtendedResource memory)
+        returns (
+            string memory metadataURI,
+            uint64 equippableGroupId,
+            address baseAddress,
+            uint64[] memory fixedPartIds,
+            uint64[] memory slotPartIds
+        )
     {
-        string memory meta = getResourceMetadata(tokenId, resourceId);
-
-        return
-            ExtendedResource({
-                id: resourceId,
-                equippableGroupId: _equippableGroupIds[resourceId],
-                baseAddress: _baseAddresses[resourceId],
-                metadataURI: meta
-            });
+        metadataURI = getResourceMetadata(tokenId, resourceId);
+        equippableGroupId = _equippableGroupIds[resourceId];
+        baseAddress = _baseAddresses[resourceId];
+        fixedPartIds = _fixedPartIds[resourceId];
+        slotPartIds = _slotPartIds[resourceId];
     }
 
     ////////////////////////////////////////
     //              UTILS
     ////////////////////////////////////////
-
-    /**
-     * @notice Used to retrieve the slot part IDs associated with a given resource.
-     * @param resourceId ID of the resource of which we are retrieving the array of slot part IDs
-     * @return uint64[] An array of slot part IDs associated with the given resource
-     */
-    function getSlotPartIds(uint64 resourceId)
-        public
-        view
-        virtual
-        returns (uint64[] memory)
-    {
-        return _slotPartIds[resourceId];
-    }
-
-    /**
-     * @notice Used to get IDs of the fixed parts present on a given resource.
-     * @param resourceId ID of the resource of which to get the active fixed parts
-     * @return uint64[] An array of active fixed parts present on resource
-     */
-    function getFixedPartIds(uint64 resourceId)
-        public
-        view
-        virtual
-        returns (uint64[] memory)
-    {
-        return _fixedPartIds[resourceId];
-    }
 
     /**
      * @notice Used to get the Equipment object equipped into the specified slot of the desired token.

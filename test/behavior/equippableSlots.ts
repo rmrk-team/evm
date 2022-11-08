@@ -582,19 +582,13 @@ async function shouldBehaveLikeEquippableWithSlots(
   });
 
   describe('Compose', async function () {
-    it('can get composables for soldier', async function () {
+    it('can compose equippables for soldier', async function () {
       const childIndex = 0;
       const weaponResId = weaponResourcesEquip[0]; // This resource is assigned to weapon first weapon
       await soldierEquip
         .connect(addrs[0])
         .equip([soldiersIds[0], childIndex, soldierResId, partIdForWeapon, weaponResId]);
 
-      const expectedResource = [
-        bn(soldierResId), // id
-        bn(0), // equippableGroupId
-        base.address, // baseAddress
-        'ipfs:soldier/', // metadataURI
-      ];
       const expectedFixedParts = [
         [
           bn(partIdForBody), // partId
@@ -628,25 +622,31 @@ async function shouldBehaveLikeEquippableWithSlots(
         soldiersIds[0],
         soldierResId,
       );
-      expect(allResources).to.eql([expectedResource, expectedFixedParts, expectedSlotParts]);
+      expect(allResources).to.eql([
+        'ipfs:soldier/', // metadataURI
+        bn(0), // equippableGroupId
+        base.address, // baseAddress
+        expectedFixedParts,
+        expectedSlotParts,
+      ]);
     });
 
-    it('can get composables for simple resource', async function () {
-      const expectedResource = [
-        bn(backgroundResourceId), // id
-        bn(1), // equippableGroupId
-        base.address, // baseAddress
-        'ipfs:background/', // metadataURI
-      ];
+    it('can compose equippables for simple resource', async function () {
       const allResources = await view.composeEquippables(
         backgroundEquip.address,
         backgroundsIds[0],
         backgroundResourceId,
       );
-      expect(allResources).to.eql([expectedResource, [], []]);
+      expect(allResources).to.eql([
+        'ipfs:background/', // metadataURI
+        bn(1), // equippableGroupId
+        base.address, // baseAddress,
+        [],
+        [],
+      ]);
     });
 
-    it('cannot get composables for soldier with not associated resource', async function () {
+    it('cannot compose equippables for soldier with not associated resource', async function () {
       const wrongResId = weaponResourcesEquip[1];
       await expect(
         view.composeEquippables(weaponEquip.address, weaponsIds[0], wrongResId),

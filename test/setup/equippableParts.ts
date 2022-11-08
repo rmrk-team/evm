@@ -271,52 +271,42 @@ async function setupContextForParts(
 
   async function addResourcesToNeon(): Promise<void> {
     await neonEquip.addResourceEntry(
-      {
-        id: neonResIds[0],
-        equippableGroupId: 0,
-        metadataURI: 'ipfs:neonRes/1',
-        baseAddress: base.address,
-      },
+      neonResIds[0],
+      0,
+      base.address,
+      'ipfs:neonRes/1',
       [partIdForHead1, partIdForBody1, partIdForHair1], // Fixed parts
       [partIdForMask], // Can receive these
     );
     await neonEquip.addResourceEntry(
-      {
-        id: neonResIds[1],
-        equippableGroupId: 0,
-        metadataURI: 'ipfs:neonRes/2',
-        baseAddress: base.address,
-      },
+      neonResIds[1],
+      0,
+      base.address,
+      'ipfs:neonRes/2',
       [partIdForHead2, partIdForBody2, partIdForHair2], // Fixed parts
       [partIdForMask], // Can receive these
     );
     await neonEquip.addResourceEntry(
-      {
-        id: neonResIds[2],
-        equippableGroupId: 0,
-        metadataURI: 'ipfs:neonRes/3',
-        baseAddress: base.address,
-      },
+      neonResIds[2],
+      0,
+      base.address,
+      'ipfs:neonRes/3',
       [partIdForHead3, partIdForBody1, partIdForHair3], // Fixed parts
       [partIdForMask], // Can receive these
     );
     await neonEquip.addResourceEntry(
-      {
-        id: neonResIds[3],
-        equippableGroupId: 0,
-        metadataURI: 'ipfs:neonRes/4',
-        baseAddress: base.address,
-      },
+      neonResIds[3],
+      0,
+      base.address,
+      'ipfs:neonRes/4',
       [partIdForHead1, partIdForBody2, partIdForHair2], // Fixed parts
       [partIdForMask], // Can receive these
     );
     await neonEquip.addResourceEntry(
-      {
-        id: neonResIds[4],
-        equippableGroupId: 0,
-        metadataURI: 'ipfs:neonRes/1',
-        baseAddress: base.address,
-      },
+      neonResIds[4],
+      0,
+      base.address,
+      'ipfs:neonRes/1',
       [partIdForHead2, partIdForBody1, partIdForHair1], // Fixed parts
       [partIdForMask], // Can receive these
     );
@@ -332,90 +322,74 @@ async function setupContextForParts(
   async function addResourcesToMask(): Promise<void> {
     // Resources for full view, composed with fixed parts
     await maskEquip.addResourceEntry(
-      {
-        id: maskResourcesFull[0],
-        equippableGroupId: 0, // Not meant to equip
-        metadataURI: `ipfs:weapon/full/${maskResourcesFull[0]}`,
-        baseAddress: base.address, // Not meant to equip, but base needed for parts
-      },
+      maskResourcesFull[0],
+      0, // Not meant to equip
+      base.address, // Not meant to equip, but base needed for parts
+      `ipfs:weapon/full/${maskResourcesFull[0]}`,
       [partIdForMaskBase1, partIdForHorns1, partIdForEars1],
       [],
     );
     await maskEquip.addResourceEntry(
-      {
-        id: maskResourcesFull[1],
-        equippableGroupId: 0, // Not meant to equip
-        metadataURI: `ipfs:weapon/full/${maskResourcesFull[1]}`,
-        baseAddress: base.address, // Not meant to equip, but base needed for parts
-      },
+      maskResourcesFull[1],
+      0, // Not meant to equip
+      base.address, // Not meant to equip, but base needed for parts
+      `ipfs:weapon/full/${maskResourcesFull[1]}`,
       [partIdForMaskBase2, partIdForHorns2, partIdForEars2],
       [],
     );
     await maskEquip.addResourceEntry(
-      {
-        id: maskResourcesFull[2],
-        equippableGroupId: 0, // Not meant to equip
-        metadataURI: `ipfs:weapon/full/${maskResourcesFull[2]}`,
-        baseAddress: base.address, // Not meant to equip, but base needed for parts
-      },
+      maskResourcesFull[2],
+      0, // Not meant to equip
+      base.address, // Not meant to equip, but base needed for parts
+      `ipfs:weapon/full/${maskResourcesFull[2]}`,
       [partIdForMaskBase3, partIdForHorns1, partIdForEars2],
       [],
     );
     await maskEquip.addResourceEntry(
-      {
-        id: maskResourcesFull[3],
-        equippableGroupId: 0, // Not meant to equip
-        metadataURI: `ipfs:weapon/full/${maskResourcesFull[3]}`,
-        baseAddress: base.address, // Not meant to equip, but base needed for parts
-      },
+      maskResourcesFull[3],
+      0, // Not meant to equip
+      base.address, // Not meant to equip, but base needed for parts
+      `ipfs:weapon/full/${maskResourcesFull[3]}`,
       [partIdForMaskBase2, partIdForHorns2, partIdForEars1],
       [],
     );
 
     // Resources for equipping view, also composed with fixed parts
     await maskEquip.addResourceEntry(
-      {
-        id: maskResourcesEquip[0],
-        equippableGroupId: maskEquippableGroupId,
-        metadataURI: `ipfs:weapon/equip/${maskResourcesEquip[0]}`,
-        baseAddress: base.address,
-      },
+      maskResourcesEquip[0],
+      maskEquippableGroupId,
+      base.address,
+      `ipfs:weapon/equip/${maskResourcesEquip[0]}`,
       [partIdForMaskBase1, partIdForHorns1, partIdForEars1],
       [],
     );
 
     // Resources for equipping view, also composed with fixed parts
     await maskEquip.addResourceEntry(
-      {
-        id: maskResourcesEquip[1],
-        equippableGroupId: maskEquippableGroupId,
-        metadataURI: `ipfs:weapon/equip/${maskResourcesEquip[1]}`,
-        baseAddress: base.address,
-      },
+      maskResourcesEquip[1],
+      maskEquippableGroupId,
+      base.address,
+      `ipfs:weapon/equip/${maskResourcesEquip[1]}`,
       [partIdForMaskBase2, partIdForHorns2, partIdForEars2],
       [],
     );
 
     // Resources for equipping view, also composed with fixed parts
     await maskEquip.addResourceEntry(
-      {
-        id: maskResourcesEquip[2],
-        equippableGroupId: maskEquippableGroupId,
-        metadataURI: `ipfs:weapon/equip/${maskResourcesEquip[2]}`,
-        baseAddress: base.address,
-      },
+      maskResourcesEquip[2],
+      maskEquippableGroupId,
+      base.address,
+      `ipfs:weapon/equip/${maskResourcesEquip[2]}`,
       [partIdForMaskBase3, partIdForHorns1, partIdForEars2],
       [],
     );
 
     // Resources for equipping view, also composed with fixed parts
     await maskEquip.addResourceEntry(
-      {
-        id: maskResourcesEquip[3],
-        equippableGroupId: maskEquippableGroupId,
-        metadataURI: `ipfs:weapon/equip/${maskResourcesEquip[3]}`,
-        baseAddress: base.address,
-      },
+      maskResourcesEquip[3],
+      maskEquippableGroupId,
+      base.address,
+      `ipfs:weapon/equip/${maskResourcesEquip[3]}`,
       [partIdForMaskBase2, partIdForHorns2, partIdForEars1],
       [],
     );

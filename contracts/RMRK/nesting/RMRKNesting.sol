@@ -741,10 +741,7 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
      * param2 childId is the tokenId of the child instance
      */
 
-    function addChild(uint256 parentId, uint256 childId)
-        public
-        virtual
-    {
+    function addChild(uint256 parentId, uint256 childId) public virtual {
         _requireMinted(parentId);
 
         address childAddress = _msgSender();
@@ -907,9 +904,15 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         );
     }
 
-    function _checkExpectedChild(Child memory child, address expectedAddress, uint256 expectedId) private pure {
-        if (expectedAddress != child.contractAddress || expectedId != child.tokenId)
-            revert RMRKUnexpectedChildId();
+    function _checkExpectedChild(
+        Child memory child,
+        address expectedAddress,
+        uint256 expectedId
+    ) private pure {
+        if (
+            expectedAddress != child.contractAddress ||
+            expectedId != child.tokenId
+        ) revert RMRKUnexpectedChildId();
     }
 
     ////////////////////////////////////////

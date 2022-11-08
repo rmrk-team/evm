@@ -48,12 +48,10 @@ async function shouldBehaveLikeEquippableResources(
 
       await expect(
         chunkyEquip.addResourceEntry(
-          {
-            id: id,
-            equippableGroupId: equippableGroupIdDefault,
-            metadataURI: metaURIDefault,
-            baseAddress: baseAddressDefault,
-          },
+          id,
+          equippableGroupIdDefault,
+          baseAddressDefault,
+          metaURIDefault,
           [],
           [],
         ),
@@ -66,12 +64,10 @@ async function shouldBehaveLikeEquippableResources(
       const tokenId = await mint(chunkyEquip, owner.address);
       const resId = 1;
       await chunkyEquip.addResourceEntry(
-        {
-          id: resId,
-          equippableGroupId: equippableGroupIdDefault,
-          metadataURI: metaURIDefault,
-          baseAddress: baseAddressDefault,
-        },
+        resId,
+        equippableGroupIdDefault,
+        baseAddressDefault,
+        metaURIDefault,
         [],
         [],
       );
@@ -88,24 +84,20 @@ async function shouldBehaveLikeEquippableResources(
       const id = bn(1);
       await expect(
         chunkyEquip.addResourceEntry(
-          {
-            id: id,
-            equippableGroupId: equippableGroupIdDefault,
-            metadataURI: metaURIDefault,
-            baseAddress: baseAddressDefault,
-          },
+          id,
+          equippableGroupIdDefault,
+          baseAddressDefault,
+          metaURIDefault,
           [1],
           [],
         ),
       ).to.be.revertedWithCustomError(chunkyEquip, 'RMRKBaseRequiredForParts');
       await expect(
         chunkyEquip.addResourceEntry(
-          {
-            id: id,
-            equippableGroupId: equippableGroupIdDefault,
-            metadataURI: metaURIDefault,
-            baseAddress: baseAddressDefault,
-          },
+          id,
+          equippableGroupIdDefault,
+          baseAddressDefault,
+          metaURIDefault,
           [],
           [1],
         ),
@@ -116,23 +108,19 @@ async function shouldBehaveLikeEquippableResources(
       const id = bn(1);
 
       await chunkyEquip.addResourceEntry(
-        {
-          id: id,
-          equippableGroupId: equippableGroupIdDefault,
-          metadataURI: metaURIDefault,
-          baseAddress: baseAddressDefault,
-        },
+        id,
+        equippableGroupIdDefault,
+        baseAddressDefault,
+        metaURIDefault,
         [],
         [],
       );
       await expect(
         chunkyEquip.addResourceEntry(
-          {
-            id: id,
-            equippableGroupId: equippableGroupIdDefault,
-            metadataURI: metaURIDefault,
-            baseAddress: baseAddressDefault,
-          },
+          id,
+          equippableGroupIdDefault,
+          baseAddressDefault,
+          metaURIDefault,
           [],
           [],
         ),
@@ -144,12 +132,10 @@ async function shouldBehaveLikeEquippableResources(
 
       await expect(
         chunkyEquip.addResourceEntry(
-          {
-            id: id,
-            equippableGroupId: equippableGroupIdDefault,
-            metadataURI: metaURIDefault,
-            baseAddress: baseAddressDefault,
-          },
+          id,
+          equippableGroupIdDefault,
+          baseAddressDefault,
+          metaURIDefault,
           [],
           [],
         ),
@@ -161,12 +147,10 @@ async function shouldBehaveLikeEquippableResources(
 
       await expect(
         chunkyEquip.addResourceEntry(
-          {
-            id: id,
-            equippableGroupId: equippableGroupIdDefault,
-            metadataURI: metaURIDefault,
-            baseAddress: baseAddressDefault,
-          },
+          id,
+          equippableGroupIdDefault,
+          baseAddressDefault,
+          metaURIDefault,
           [],
           [],
         ),
@@ -176,12 +160,10 @@ async function shouldBehaveLikeEquippableResources(
 
       await expect(
         chunkyEquip.addResourceEntry(
-          {
-            id: id,
-            equippableGroupId: equippableGroupIdDefault,
-            metadataURI: metaURIDefault,
-            baseAddress: baseAddressDefault,
-          },
+          id,
+          equippableGroupIdDefault,
+          baseAddressDefault,
+          metaURIDefault,
           [],
           [],
         ),
@@ -757,12 +739,10 @@ async function shouldBehaveLikeEquippableResources(
   async function addResources(ids: BigNumber[]): Promise<void> {
     for (let i = 0; i < ids.length; i++) {
       await chunkyEquip.addResourceEntry(
-        {
-          id: ids[i],
-          equippableGroupId: equippableGroupIdDefault,
-          metadataURI: metaURIDefault,
-          baseAddress: baseAddressDefault,
-        },
+        ids[i],
+        equippableGroupIdDefault,
+        baseAddressDefault,
+        metaURIDefault,
         [],
         [],
       );

@@ -85,11 +85,7 @@ abstract contract RMRKReclaimableChild is IRMRKReclaimableChild, RMRKNesting {
         uint256 tokenId,
         address childAddress,
         uint256 childId
-    )
-        internal
-        virtual
-        override
-    {
+    ) internal virtual override {
         super._beforeAddChild(tokenId, childAddress, childId);
         _childIsInPending[childAddress][childId] = 1; // We use 1 as true
     }
@@ -108,12 +104,7 @@ abstract contract RMRKReclaimableChild is IRMRKReclaimableChild, RMRKNesting {
         address childAddress,
         uint256 childId
     ) internal virtual override {
-        super._beforeAcceptChild(
-            parentId,
-            childIndex,
-            childAddress,
-            childId
-        );
+        super._beforeAcceptChild(parentId, childIndex, childAddress, childId);
         delete _childIsInPending[childAddress][childId];
     }
 
@@ -146,7 +137,6 @@ abstract contract RMRKReclaimableChild is IRMRKReclaimableChild, RMRKNesting {
             childId,
             isPending
         );
-        if (isPending)
-            delete _childIsInPending[childAddress][childId];
+        if (isPending) delete _childIsInPending[childAddress][childId];
     }
 }

@@ -97,12 +97,6 @@ async function shouldBehaveLikeEquippableWithParts() {
         .connect(addrs[0])
         .equip([neons[0], childIndex, neonResIds[0], partIdForMask, weaponResId]);
 
-      const expectedResource = [
-        bn(neonResIds[0]), // id
-        bn(0), // equippableGroupId
-        baseContract.address, // baseAddress
-        'ipfs:neonRes/1', // metadataURI
-      ];
       const expectedFixedParts = [
         [
           bn(partIdForHead1), // partId
@@ -136,16 +130,16 @@ async function shouldBehaveLikeEquippableWithParts() {
         neons[0],
         neonResIds[0],
       );
-      expect(allResources).to.eql([expectedResource, expectedFixedParts, expectedSlotParts]);
+      expect(allResources).to.eql([
+        'ipfs:neonRes/1', // metadataURI
+        bn(0), // equippableGroupId
+        baseContract.address, // baseAddress,
+        expectedFixedParts,
+        expectedSlotParts,
+      ]);
     });
 
     it('can compose all parts for mask', async function () {
-      const expectedResource = [
-        bn(maskResourcesEquip[0]), // id
-        bn(maskEquippableGroupId), // equippableGroupId
-        baseContract.address, // baseAddress
-        `ipfs:weapon/equip/${maskResourcesEquip[0]}`, // metadataURI
-      ];
       const expectedFixedParts = [
         [
           bn(partIdForMaskBase1), // partId
@@ -168,25 +162,29 @@ async function shouldBehaveLikeEquippableWithParts() {
         masks[0],
         maskResourcesEquip[0],
       );
-      expect(allResources).to.eql([expectedResource, expectedFixedParts, []]);
+      expect(allResources).to.eql([
+        `ipfs:weapon/equip/${maskResourcesEquip[0]}`, // metadataURI
+        bn(maskEquippableGroupId), // equippableGroupId
+        baseContract.address, // baseAddress
+        expectedFixedParts,
+        [],
+      ]);
     });
 
-    it('cannot get composables for neon with not associated resource', async function () {
+    it('cannot compose equippables for neon with not associated resource', async function () {
       const wrongResId = maskResourcesEquip[1];
       await expect(
         viewContract.composeEquippables(maskEquipContract.address, masks[0], wrongResId),
       ).to.be.revertedWithCustomError(maskEquipContract, 'RMRKTokenDoesNotHaveResource');
     });
 
-    it('cannot get composables for mask for resource with no base', async function () {
+    it('cannot compose equippables for mask for resource with no base', async function () {
       const noBaseResourceId = 99;
       await maskEquipContract.addResourceEntry(
-        {
-          id: noBaseResourceId,
-          equippableGroupId: 0, // Not meant to equip
-          metadataURI: `ipfs:weapon/full/customResource.png`,
-          baseAddress: ethers.constants.AddressZero, // Not meant to equip
-        },
+        noBaseResourceId,
+        0, // Not meant to equip
+        ethers.constants.AddressZero, // Not meant to equip
+        `ipfs:weapon/full/customResource.png`,
         [],
         [],
       );

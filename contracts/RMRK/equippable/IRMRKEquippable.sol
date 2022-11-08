@@ -25,23 +25,6 @@ interface IRMRKEquippable is IRMRKMultiResource {
     }
 
     /**
-     * @notice Used to provide additional information about the resource.
-     * @dev Only used for input and output, not as storage.
-     * @return id ID of the resource
-     * @return equippableGroupId The equippable group ID is used to group resources meant to be equipped into the same slot,
-     *  this way multiple resources can be classified as equippable to a slot and collection rather to having to do so
-     *  for each resource separately
-     * @return baseAddress The address of the collection to which the resource belongs to
-     * @return metadataURI The metadata URI of the resource
-     */
-    struct ExtendedResource {
-        uint64 id;
-        uint64 equippableGroupId;
-        address baseAddress;
-        string metadataURI;
-    }
-
-    /**
      * @notice Used to provide data about fixed parts.
      * @return partId ID of the part
      * @return z The z value of the resource, specifying how the part should be rendered in a composed NFT
@@ -170,26 +153,6 @@ interface IRMRKEquippable is IRMRKMultiResource {
     ) external view returns (bool);
 
     /**
-     * @notice Used to retrieve the slot part IDs associated with a given resource.
-     * @param resourceId ID of the resource of which we are retrieving the array of slot part IDs
-     * @return uint64[] An array of slot part IDs associated with the given resource
-     */
-    function getSlotPartIds(uint64 resourceId)
-        external
-        view
-        returns (uint64[] memory);
-
-    /**
-     * @notice Used to get IDs of the fixed parts present on a given resource.
-     * @param resourceId ID of the resource of which to get the active fixed parts
-     * @return uint64[] An array of active fixed parts present on resource
-     */
-    function getFixedPartIds(uint64 resourceId)
-        external
-        view
-        returns (uint64[] memory);
-
-    /**
      * @notice Used to get the Equipment object equipped into the specified slot of the desired token.
      * @param tokenId ID of the token for which we are retrieving the equipped object
      * @param targetBaseAddress Address of the `Base` associated with the `Slot` part of the token
@@ -205,20 +168,15 @@ interface IRMRKEquippable is IRMRKMultiResource {
     /**
      * @notice Used to get the extended resource struct of the resource associated with given `resourceId`.
      * @param resourceId ID of the resource of which we are retrieving
-     * @return struct The `ExtendedResource` struct associated with the resource
      */
     function getExtendedResource(uint256 tokenId, uint64 resourceId)
         external
         view
-        returns (ExtendedResource memory);
-
-    /**
-     * @notice Used to get the address of the resource's `Base`
-     * @param resourceId ID of the resource for which we are retrieving the address of the `Base`
-     * @return address Address of the `Base` smart contract of the resource
-     */
-    function getBaseAddressOfResource(uint64 resourceId)
-        external
-        view
-        returns (address);
+        returns (
+            string memory metadataURI,
+            uint64 equippableGroupId,
+            address baseAddress,
+            uint64[] memory fixedPartIds,
+            uint64[] memory slotPartIds
+        );
 }
