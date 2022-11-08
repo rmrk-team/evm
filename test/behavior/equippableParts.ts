@@ -125,9 +125,10 @@ async function shouldBehaveLikeEquippableWithParts() {
           bn(partIdForMask), // partId
           bn(maskResourcesEquip[0]), // childResourceId
           2, // z
-          bn(masks[0]), // childTokenId
           maskEquipContract.address, // childAddress
-          '', // metadataURI
+          bn(masks[0]), // childTokenId
+          'ipfs:weapon/equip/5', // childResourceMetadata
+          '', // partMetadata
         ],
       ];
       const allResources = await viewContract.composeEquippables(

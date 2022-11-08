@@ -8,8 +8,6 @@ const IRMRKMultiResource = '0xb0ecc5ae';
 const IRMRKNesting = '0x60b766e5';
 const IRMRKNestingExternalEquip = '0x8b7f3e99';
 const IRMRKReclaimableChild = '0x2fb59acf';
-const IRMRKRenderUtils = '0xb43c446a';
-const IRMRKRenderUtilsEquip = '0xf2d9f36a';
 const IRMRKSoulboundMultiResource = '0x911ec470';
 const IRMRKTypedMultiResource = '0xb6a3032e';
 
@@ -24,8 +22,6 @@ export {
   IRMRKNesting,
   IRMRKNestingExternalEquip,
   IRMRKReclaimableChild,
-  IRMRKRenderUtils,
-  IRMRKRenderUtilsEquip,
   IRMRKSoulboundMultiResource,
   IRMRKTypedMultiResource,
 };

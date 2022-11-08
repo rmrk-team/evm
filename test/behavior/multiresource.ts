@@ -192,26 +192,21 @@ async function shouldBehaveLikeMultiResource(
 
     describe('Accepting resources', async function () {
       it('can accept resource', async function () {
-        let pendingResources = await this.token.getPendingResources(tokenId);
-        expect(
-          await this.renderUtils.getResourcesById(this.token.address, tokenId, pendingResources),
-        ).to.eql([resData1, resData2]);
+        expect(await this.renderUtils.getPendingResources(this.token.address, tokenId)).to.eql([
+          [resId1, bn(0), bn(0), resData1],
+          [resId2, bn(1), bn(0), resData2],
+        ]);
 
         await expect(this.token.connect(tokenOwner).acceptResource(tokenId, 0, resId1))
           .to.emit(this.token, 'ResourceAccepted')
           .withArgs(tokenId, resId1, 0);
 
-        const activeResources = await this.token.getActiveResources(tokenId);
-        expect(
-          await this.renderUtils.getResourcesById(this.token.address, tokenId, activeResources),
-        ).to.eql([resData1]);
-        pendingResources = await this.token.getPendingResources(tokenId);
-        expect(
-          await this.renderUtils.getResourcesById(this.token.address, tokenId, pendingResources),
-        ).to.eql([resData2]);
-        expect(
-          await this.renderUtils.getActiveResourceByIndex(this.token.address, tokenId, 0),
-        ).to.eql(resData1);
+        expect(await this.renderUtils.getPendingResources(this.token.address, tokenId)).to.eql([
+          [resId2, bn(0), bn(0), resData2],
+        ]);
+        expect(await this.renderUtils.getActiveResources(this.token.address, tokenId)).to.eql([
+          [resId1, 0, resData1],
+        ]);
 
         expect(await this.token.getResourceMetadata(tokenId, resId1)).equal(resData1);
       });
