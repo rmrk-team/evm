@@ -1075,8 +1075,8 @@ Attempting to burn a total number of recursive children higher than maximum set
 
 | Name | Type | Description |
 |---|---|---|
-| childContract | address | undefined |
-| childId | uint256 | undefined |
+| childContract | address | Address of the collection smart contract in which the maximum number of recursive burns was reached |
+| childId | uint256 | ID of the child token at which the maximum number of recursive burns was reached |
 
 ### RMRKMintToNonRMRKImplementer
 
