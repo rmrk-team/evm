@@ -64,7 +64,7 @@ Adds a contributor to the smart contract.
 ### addResourceEntry
 
 ```solidity
-function addResourceEntry(string metadataURI) external nonpayable
+function addResourceEntry(string metadataURI) external nonpayable returns (uint256)
 ```
 
 
@@ -76,6 +76,12 @@ function addResourceEntry(string metadataURI) external nonpayable
 | Name | Type | Description |
 |---|---|---|
 | metadataURI | string | undefined |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint256 | undefined |
 
 ### addResourceToToken
 

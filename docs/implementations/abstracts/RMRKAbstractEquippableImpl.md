@@ -100,7 +100,7 @@ Adds a contributor to the smart contract.
 ### addResourceEntry
 
 ```solidity
-function addResourceEntry(uint64 id, uint64 equippableGroupId, address baseAddress, string metadataURI, uint64[] fixedPartIds, uint64[] slotPartIds) external nonpayable
+function addResourceEntry(uint64 equippableGroupId, address baseAddress, string metadataURI, uint64[] fixedPartIds, uint64[] slotPartIds) external nonpayable returns (uint256)
 ```
 
 
@@ -111,12 +111,17 @@ function addResourceEntry(uint64 id, uint64 equippableGroupId, address baseAddre
 
 | Name | Type | Description |
 |---|---|---|
-| id | uint64 | undefined |
 | equippableGroupId | uint64 | undefined |
 | baseAddress | address | undefined |
 | metadataURI | string | undefined |
 | fixedPartIds | uint64[] | undefined |
 | slotPartIds | uint64[] | undefined |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint256 | undefined |
 
 ### addResourceToToken
 
