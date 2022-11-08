@@ -311,13 +311,14 @@ contract RMRKEquippable is
      * @notice Used to unnest a given child.
      * @dev The function doesn't contain a check validating that `to` is not a contract. To ensure that a token is not
      *  transferred to an incompatible smart contract, custom validation has to be added when using this function.
-     * @param tokenId is the tokenId of the parent token to unnest from.
-     * @param to is the address to transfer this
-     * @param childIndex is the index of the child token ID.
-     * @param childAddress address of the child expected to be in the index.
-     * @param childId token Id of the child expected to be in the index
-     * @param isPending Boolean value indicating whether the token is in the pending array of the parent (`true`) or in
-     *  the active array (`false`)
+     * @param tokenId ID of the parent token from which the child token is being unnested
+     * @param to Externally owned address to which to transfer the unnested token to
+     * @param childIndex Index of a token we are unnesting, in the array it belongs to (can be either active array or
+     *  pending array)
+     * @param childAddress Address of the child token's collection smart contract
+     * @param childId ID of the child token being unnested in its own collection smart contract
+     * @param isPending A boolean value indicating whether the child token being unnested is in the pending array of the
+     *  parent token (`true`) or in the active array (`false`)
      */
     function _unnestChild(
         uint256 tokenId,

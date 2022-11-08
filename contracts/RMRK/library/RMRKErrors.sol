@@ -67,6 +67,8 @@ error RMRKMaxPendingChildrenReached();
 ///  128)
 error RMRKMaxPendingResourcesReached();
 /// Attempting to burn a total number of recursive children higher than maximum set
+/// @param childContract Address of the collection smart contract in which the maximum number of recursive burns was reached
+/// @param childId ID of the child token at which the maximum number of recursive burns was reached
 error RMRKMaxRecursiveBurnsReached(address childContract, uint256 childId);
 /// Attempting to mint a number of tokens that would cause the total supply to be greater than maximum supply
 error RMRKMintOverMax();

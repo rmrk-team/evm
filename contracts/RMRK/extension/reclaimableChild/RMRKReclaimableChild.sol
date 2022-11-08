@@ -78,8 +78,8 @@ abstract contract RMRKReclaimableChild is IRMRKReclaimableChild, RMRKNesting {
      * @notice A hook used to be called before adding a child token.
      * @dev we use this hook to keep track of children which are in pending, so they cannot be reclaimed from there.
      * @param tokenId ID of the token receiving the child token
-     * @param childAddress address of the child expected to be in the index.
-     * @param childId token Id of the child expected to be in the index
+     * @param childAddress Address of the collection smart contract of the token expected to be at the given index
+     * @param childId ID of the token expected to be located at the given index in its collection smart contract
      */
     function _beforeAddChild(
         uint256 tokenId,
@@ -96,11 +96,11 @@ abstract contract RMRKReclaimableChild is IRMRKReclaimableChild, RMRKNesting {
 
     /**
      * @notice A hook used to be called before accepting a child token.
-     * @dev we use this hook to keep track of children which are in pending, so they cannot be reclaimed from there.
-     * @param parentId tokenId of parent token to accept a child on
-     * @param childIndex index of child in _pendingChildren array to accept.
-     * @param childAddress address of the child expected to be in the index.
-     * @param childId token Id of the child expected to be in the index
+     * @dev We use this hook to keep track of children which are in pending, so they cannot be reclaimed from there.
+     * @param parentId ID of the parent token for which the child token is being accepted
+     * @param childIndex Index of the pending child token in the pending children array of a given parent token
+     * @param childAddress Address of the collection smart contract of the pending child token expected to be at the given index
+     * @param childId ID of the pending child token expected to be located at the given index
      */
     function _beforeAcceptChild(
         uint256 parentId,
@@ -126,9 +126,9 @@ abstract contract RMRKReclaimableChild is IRMRKReclaimableChild, RMRKNesting {
      *  ]
      * @dev we use this hook to keep track of children which are in pending, so they cannot be reclaimed from there.
      * @param tokenId ID of the token unnesting the child token
-     * @param childIndex index of child in _pendingChildren array to accept.
-     * @param childAddress address of the child expected to be in the index.
-     * @param childId token Id of the child expected to be in the index
+     * @param childIndex Index of the token in the parent token's child tokens array
+     * @param childAddress Address of the collection smart contract of the child token expected to be at the given index
+     * @param childId ID of the child token expected to be located at the given index
      * @param isPending A boolean value signifying whether the child token is located in the parent's active or pending
      *  child token array
      */

@@ -46,11 +46,11 @@ contract RMRKNestingExternalEquip is IRMRKNestingExternalEquip, RMRKNesting {
      * @notice Used to unnest a child from the parent.
      * @dev The function is overriden, so that additional verification is added, making sure that the child is not
      *  currently equipped when trying to unnest it.
-     * @param tokenId is the tokenId of the parent token to unnest from.
-     * @param to is the address to transfer this
-     * @param childIndex is the index of the child token ID.
-     * @param childAddress address of the child expected to be in the index.
-     * @param childId token Id of the child expected to be in the index
+     * @param tokenId ID of the parent token from which to unnest a given child token
+     * @param to Address that should receive the token once unnested
+     * @param childIndex Index of the child token in the array in which it is located (pending or active children array)
+     * @param childAddress Address of the expected child token's collection smart contract
+     * @param childId Expected ID of the child token being unnested in its own collection smart contract
      * @param isPending Boolean value indicating whether the token is in the pending array of the parent (`true`) or in
      *  the active array (`false`)
      */
