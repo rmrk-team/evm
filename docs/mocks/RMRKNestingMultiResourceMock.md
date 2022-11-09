@@ -33,18 +33,18 @@ Version of the @rmrk-team/evm-contracts package
 function acceptChild(uint256 parentId, uint256 childIndex, address childAddress, uint256 childId) external nonpayable
 ```
 
-Sends an instance of Child from the pending children array at index to children array for tokenId.
+@notice Used to accept a pending child token for a given parent token.
 
-
+*This moves the child token from parent token&#39;s pending child tokens array into the active child tokens  array.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| parentId | uint256 | tokenId of parent token to accept a child on |
-| childIndex | uint256 | index of child in _pendingChildren array to accept. |
-| childAddress | address | address of the child expected to be in the index. |
-| childId | uint256 | token Id of the child expected to be in the index |
+| parentId | uint256 | ID of the parent token for which the child token is being accepted |
+| childIndex | uint256 | Index of a child tokem in the given parent&#39;s pending children array |
+| childAddress | address | Address of the collection smart contract of the child token expected to be located at the  specified index of the given parent token&#39;s pending children array |
+| childId | uint256 | ID of the child token expected to be located at the specified index of the given parent token&#39;s  pending children array |
 
 ### acceptResource
 
@@ -62,7 +62,7 @@ Accepts a resource at from the pending array of given token.
 |---|---|---|
 | tokenId | uint256 | ID of the token for which to accept the pending resource |
 | index | uint256 | Index of the resource in the pending array to accept |
-| resourceId | uint64 | expected to be in the index |
+| resourceId | uint64 | ID of the resource expected to be located at the specified index |
 
 ### addChild
 
@@ -70,16 +70,16 @@ Accepts a resource at from the pending array of given token.
 function addChild(uint256 parentId, uint256 childId) external nonpayable
 ```
 
+Used to add a child token to a given parent token.
 
-
-*Function designed to be used by other instances of RMRK-Core contracts to update children. param1 parentId is the tokenId of the parent token on (this). param2 childId is the tokenId of the child instance*
+*This adds the iichild token into the given parent token&#39;s pending child tokens array.Requirements:  - `ownerOf` on the child contract must resolve to the called contract.  - The pending array of the parent contract must not be full.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| parentId | uint256 | undefined |
-| childId | uint256 | undefined |
+| parentId | uint256 | ID of the parent token to receive the new child token |
+| childId | uint256 | ID of the new proposed child token |
 
 ### addResourceEntry
 
@@ -124,7 +124,7 @@ function approve(address to, uint256 tokenId) external nonpayable
 
 
 
-*See {IERC721-approve}.*
+*Gives permission to `to` to transfer `tokenId` token to another account. The approval is cleared when the token is transferred. Only a single account can be approved at a time, so approving the zero address clears previous approvals. Requirements: - The caller must own the token or be an approved operator. - `tokenId` must exist. Emits an {Approval} event.*
 
 #### Parameters
 
@@ -158,7 +158,7 @@ function balanceOf(address owner) external view returns (uint256)
 
 
 
-*See {IERC721-balanceOf}.*
+*Returns the number of tokens in ``owner``&#39;s account.*
 
 #### Parameters
 
@@ -178,7 +178,7 @@ function balanceOf(address owner) external view returns (uint256)
 function burn(uint256 tokenId) external nonpayable
 ```
 
-
+Used to burn a given token.
 
 
 
@@ -186,7 +186,7 @@ function burn(uint256 tokenId) external nonpayable
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | undefined |
+| tokenId | uint256 | ID of the token to burn |
 
 ### burn
 
@@ -194,22 +194,22 @@ function burn(uint256 tokenId) external nonpayable
 function burn(uint256 tokenId, uint256 maxChildrenBurns) external nonpayable returns (uint256)
 ```
 
+Used to burn a token.
 
-
-*Destroys `tokenId`. The approval is cleared when the token is burned. Requirements: - `tokenId` must exist. Emits a {Transfer} event.*
+*When a token is burned, its children are recursively burned as well.The approvals are cleared when the token is burned.Requirements:  - `tokenId` must exist.Emits a {Transfer} event.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | undefined |
-| maxChildrenBurns | uint256 | undefined |
+| tokenId | uint256 | ID of the token to burn |
+| maxChildrenBurns | uint256 | Maximum children to recursively burn |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | undefined |
+| _0 | uint256 | uint256 The number of recursive burns it took to burn all of the children |
 
 ### childIsInActive
 
@@ -217,7 +217,7 @@ function burn(uint256 tokenId, uint256 maxChildrenBurns) external nonpayable ret
 function childIsInActive(address childAddress, uint256 childId) external view returns (bool)
 ```
 
-
+Used to verify that the given child tokwn is included in an active array of a token.
 
 
 
@@ -225,14 +225,14 @@ function childIsInActive(address childAddress, uint256 childId) external view re
 
 | Name | Type | Description |
 |---|---|---|
-| childAddress | address | undefined |
-| childId | uint256 | undefined |
+| childAddress | address | Address of the given token&#39;s collection smart contract |
+| childId | uint256 | ID of the child token being checked |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | undefined |
+| _0 | bool | bool A boolean value signifying whether the given child token is included in an active child tokens array  of a token (`true`) or not (`false`) |
 
 ### childOf
 
@@ -240,22 +240,22 @@ function childIsInActive(address childAddress, uint256 childId) external view re
 function childOf(uint256 parentId, uint256 index) external view returns (struct IRMRKNesting.Child)
 ```
 
+Used to retrieve a specific active child token for a given parent token.
 
-
-*Returns a single child object existing at `index` on `parentId`.*
+*Returns a single Child struct locating at `index` of parent token&#39;s active child tokens array.The Child struct consists of the following values:  [      tokenId,      contractAddress  ]*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| parentId | uint256 | undefined |
-| index | uint256 | undefined |
+| parentId | uint256 | ID of the parent token for which the child is being retrieved |
+| index | uint256 | Index of the child token in the parent token&#39;s active child tokens array |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IRMRKNesting.Child | undefined |
+| _0 | IRMRKNesting.Child | struct A Child struct containing data about the specified child |
 
 ### childrenOf
 
@@ -263,21 +263,21 @@ function childOf(uint256 parentId, uint256 index) external view returns (struct 
 function childrenOf(uint256 parentId) external view returns (struct IRMRKNesting.Child[])
 ```
 
-Returns all confirmed children
+Used to retrieve the active child tokens of a given parent token.
 
-
+*Returns array of Child structs existing for parent token.The Child struct consists of the following values:  [      tokenId,      contractAddress  ]*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| parentId | uint256 | undefined |
+| parentId | uint256 | ID of the parent token for which to retrieve the active child tokens |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IRMRKNesting.Child[] | undefined |
+| _0 | IRMRKNesting.Child[] | struct[] An array of Child structs containing the parent token&#39;s active child tokens |
 
 ### getActiveResourcePriorities
 
@@ -331,7 +331,7 @@ function getApproved(uint256 tokenId) external view returns (address)
 
 
 
-*See {IERC721-getApproved}.*
+*Returns the account approved for `tokenId` token. Requirements: - `tokenId` must exist.*
 
 #### Parameters
 
@@ -443,7 +443,7 @@ function isApprovedForAll(address owner, address operator) external view returns
 
 
 
-*See {IERC721-isApprovedForAll}.*
+*Returns if the `operator` is allowed to manage all of the assets of `owner`. See {setApprovalForAll}*
 
 #### Parameters
 
@@ -557,18 +557,18 @@ function nestTransfer(address to, uint256 tokenId, uint256 destinationId) extern
 function nestTransferFrom(address from, address to, uint256 tokenId, uint256 destinationId) external nonpayable
 ```
 
+Used to transfer the token into another token.
 
 
-*Function called when calling transferFrom with the target as another NFT via `tokenId` on `to`.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| from | address | undefined |
-| to | address | undefined |
-| tokenId | uint256 | undefined |
-| destinationId | uint256 | undefined |
+| from | address | Address of the collection smart contract of the token to be transferred |
+| to | address | Address of the receiving token&#39;s collection smart contract |
+| tokenId | uint256 | ID of the token being transferred |
+| destinationId | uint256 | ID of the token to receive the token being transferred |
 
 ### ownerOf
 
@@ -576,21 +576,21 @@ function nestTransferFrom(address from, address to, uint256 tokenId, uint256 des
 function ownerOf(uint256 tokenId) external view returns (address)
 ```
 
-Returns the root owner of the current RMRK NFT.
+Used to retrieve the root owner of the given token.
 
-*In the event the NFT is owned by another NFT, it will recursively ask the parent.*
+*Root owner is always the externally owned account.If the given token is owned by another token, it will recursively query the parent tokens until reaching the  root owner.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | undefined |
+| tokenId | uint256 | ID of the token for which the root owner is being retrieved |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | address | undefined |
+| _0 | address | address Address of the root owner of the given token |
 
 ### pendingChildOf
 
@@ -598,22 +598,22 @@ Returns the root owner of the current RMRK NFT.
 function pendingChildOf(uint256 parentId, uint256 index) external view returns (struct IRMRKNesting.Child)
 ```
 
+Used to retrieve a specific pending child token from a given parent token.
 
-
-*Returns a single pending child object existing at `index` on `parentId`.*
+*Returns a single Child struct locating at `index` of parent token&#39;s active child tokens array.The Child struct consists of the following values:  [      tokenId,      contractAddress  ]*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| parentId | uint256 | undefined |
-| index | uint256 | undefined |
+| parentId | uint256 | ID of the parent token for which the pending child token is being retrieved |
+| index | uint256 | Index of the child token in the parent token&#39;s pending child tokens array |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IRMRKNesting.Child | undefined |
+| _0 | IRMRKNesting.Child | struct A Child struct containting data about the specified child |
 
 ### pendingChildrenOf
 
@@ -621,21 +621,21 @@ function pendingChildOf(uint256 parentId, uint256 index) external view returns (
 function pendingChildrenOf(uint256 parentId) external view returns (struct IRMRKNesting.Child[])
 ```
 
-Returns all pending children
+Used to retrieve the pending child tokens of a given parent token.
 
-
+*Returns array of pending Child structs existing for given parent.The Child struct consists of the following values:  [      tokenId,      contractAddress  ]*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| parentId | uint256 | undefined |
+| parentId | uint256 | ID of the parent token for which to retrieve the pending child tokens |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IRMRKNesting.Child[] | undefined |
+| _0 | IRMRKNesting.Child[] | struct[] An array of Child structs containing the parent token&#39;s pending child tokens |
 
 ### rejectAllChildren
 
@@ -643,15 +643,15 @@ Returns all pending children
 function rejectAllChildren(uint256 tokenId) external nonpayable
 ```
 
-Deletes all pending children.
+Used to reject all pending children of a given parent token.
 
-*This does not update the ownership storage data on children. If necessary, ownership can be reclaimed by the rootOwner of the previous parent (this).*
+*Removes the children from the pending array mapping.This does not update the ownership storage data on children. If necessary, ownership can be reclaimed by the  rootOwner of the previous parent.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | undefined |
+| tokenId | uint256 | ID of the parent token for which to reject all of the pending tokens |
 
 ### rejectAllResources
 
@@ -661,14 +661,14 @@ function rejectAllResources(uint256 tokenId, uint256 maxRejections) external non
 
 Rejects all resources from the pending array of a given token.
 
-*Effecitvely deletes the pending array.Requirements:  - The caller must own the token or be approved to manage the token&#39;s resources  - `tokenId` must exist.Emits a {ResourceRejected} event with resourceId = 0.*
+*Effecitvely deletes the pending array.Requirements:  - The caller must own the token or be approved to manage the token&#39;s resources  - `tokenId` must exist.  - If there are more resouces than `maxRejections`, the execution will be revertedEmits a {ResourceRejected} event with resourceId = 0.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
 | tokenId | uint256 | ID of the token of which to clear the pending array |
-| maxRejections | uint256 | to prevent from rejecting resources which arrive just before this operation. |
+| maxRejections | uint256 | The maximum amount of resources to reject |
 
 ### rejectResource
 
@@ -686,7 +686,7 @@ Rejects a resource from the pending array of given token.
 |---|---|---|
 | tokenId | uint256 | ID of the token that the resource is being rejected from |
 | index | uint256 | Index of the resource in the pending array to be rejected |
-| resourceId | uint64 | expected to be in the index |
+| resourceId | uint64 | ID of the resource expected to be located at the specified index |
 
 ### rmrkOwnerOf
 
@@ -694,23 +694,23 @@ Rejects a resource from the pending array of given token.
 function rmrkOwnerOf(uint256 tokenId) external view returns (address, uint256, bool)
 ```
 
-Returns the immediate provenance data of the current RMRK NFT.
+Used to retrieve the immediate owner of the given token.
 
-*In the event the NFT is owned by a wallet, tokenId will be zero and isNft will be false. Otherwise, the returned data is the contract address and tokenID of the owner NFT, as well as its isNft flag.*
+*In the event the NFT is owned by an externally owned account, `tokenId` will be `0` and `isNft` will be  `false`.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | undefined |
+| tokenId | uint256 | ID of the token for which the immediate owner is being retrieved |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | address | undefined |
-| _1 | uint256 | undefined |
-| _2 | bool | undefined |
+| _0 | address | address Address of the immediate owner. If the token is owned by an externally owned account, its address  will be returned. If the token is owned by another token, the parent token&#39;s collection smart contract address  is returned |
+| _1 | uint256 | uint256 Token ID of the immediate owner. If the immediate owner is an externally owned account, the value  should be `0` |
+| _2 | bool | bool A boolean value signifying whether the immediate owner is a token (`true`) or not (`false`) |
 
 ### safeMint
 
@@ -755,7 +755,7 @@ function safeTransferFrom(address from, address to, uint256 tokenId) external no
 
 
 
-*See {IERC721-safeTransferFrom}.*
+*Safely transfers `tokenId` token from `from` to `to`, checking first that contract recipients are aware of the ERC721 protocol to prevent tokens from being forever locked. Requirements: - `from` cannot be the zero address. - `to` cannot be the zero address. - `tokenId` token must exist and be owned by `from`. - If the caller is not `from`, it must be have been allowed to move this token by either {approve} or {setApprovalForAll}. - If `to` refers to a smart contract, it must implement {IERC721Receiver-onERC721Received}, which is called upon a safe transfer. Emits a {Transfer} event.*
 
 #### Parameters
 
@@ -773,7 +773,7 @@ function safeTransferFrom(address from, address to, uint256 tokenId, bytes data)
 
 
 
-*See {IERC721-safeTransferFrom}.*
+*Safely transfers `tokenId` token from `from` to `to`. Requirements: - `from` cannot be the zero address. - `to` cannot be the zero address. - `tokenId` token must exist and be owned by `from`. - If the caller is not `from`, it must be approved to move this token by either {approve} or {setApprovalForAll}. - If `to` refers to a smart contract, it must implement {IERC721Receiver-onERC721Received}, which is called upon a safe transfer. Emits a {Transfer} event.*
 
 #### Parameters
 
@@ -792,7 +792,7 @@ function setApprovalForAll(address operator, bool approved) external nonpayable
 
 
 
-*See {IERC721-setApprovalForAll}.*
+*Approve or remove `operator` as an operator for the caller. Operators can call {transferFrom} or {safeTransferFrom} for any token owned by the caller. Requirements: - The `operator` cannot be the caller. Emits an {ApprovalForAll} event.*
 
 #### Parameters
 
@@ -843,7 +843,7 @@ function supportsInterface(bytes4 interfaceId) external view returns (bool)
 
 
 
-*See {IERC165-supportsInterface}.*
+*Returns true if this contract implements the interface defined by `interfaceId`. See the corresponding https://eips.ethereum.org/EIPS/eip-165#how-interfaces-are-identified[EIP section] to learn more about how these ids are created. This function call must use less than 30 000 gas.*
 
 #### Parameters
 
@@ -921,7 +921,7 @@ function transferFrom(address from, address to, uint256 tokenId) external nonpay
 
 
 
-*See {IERC721-transferFrom}.*
+*Transfers `tokenId` token from `from` to `to`. WARNING: Usage of this method is discouraged, use {safeTransferFrom} whenever possible. Requirements: - `from` cannot be the zero address. - `to` cannot be the zero address. - `tokenId` token must be owned by `from`. - If the caller is not `from`, it must be approved to move this token by either {approve} or {setApprovalForAll}. Emits a {Transfer} event.*
 
 #### Parameters
 
@@ -945,12 +945,12 @@ Function to unnest a child from the active token array.
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | is the tokenId of the parent token to unnest from. |
-| to | address | is the address to transfer this |
-| childIndex | uint256 | is the index of the child token ID. |
-| childAddress | address | address of the child expected to be in the index. |
-| childId | uint256 | token Id of the child expected to be in the index |
-| isPending | bool | Boolean value indicating whether the token is in the pending array of the parent (`true`) or in  the active array (`false`) |
+| tokenId | uint256 | ID of the token from which to unnest a child token |
+| to | address | Address of the new owner of the child token being unnested |
+| childIndex | uint256 | Index of the child token to unnest in the array it is located in |
+| childAddress | address | Address of the collection smart contract of the child token expected to be located at the  specified index of the given parent token&#39;s pending children array |
+| childId | uint256 | ID of the child token expected to be located at the specified index of the given parent token&#39;s  pending children array |
+| isPending | bool | A boolean value signifying whether the child token is being unnested from the pending child  tokens array (`true`) or from the active child tokens array (`false`) |
 
 
 
@@ -962,7 +962,7 @@ Function to unnest a child from the active token array.
 event AllChildrenRejected(uint256 indexed tokenId)
 ```
 
-
+Used to notify listeners that all pending child tokens of a given token have been rejected.
 
 
 
@@ -1050,7 +1050,7 @@ Used to notify listeners that owner has granted an approval to the user to manag
 event ChildAccepted(uint256 indexed tokenId, uint256 childIndex, address indexed childAddress, uint256 indexed childId)
 ```
 
-
+Used to notify listeners that a new child token was accepted by the parent token.
 
 
 
@@ -1069,7 +1069,7 @@ event ChildAccepted(uint256 indexed tokenId, uint256 childIndex, address indexed
 event ChildProposed(uint256 indexed tokenId, uint256 childIndex, address indexed childAddress, uint256 indexed childId)
 ```
 
-
+Used to notify listeners that a new token has been added to a given token&#39;s pending children array.
 
 
 
@@ -1088,7 +1088,7 @@ event ChildProposed(uint256 indexed tokenId, uint256 childIndex, address indexed
 event ChildUnnested(uint256 indexed tokenId, uint256 childIndex, address indexed childAddress, uint256 indexed childId, bool fromPending)
 ```
 
-
+Used to notify listeners a child token has been unnested from parent token.
 
 
 
@@ -1108,7 +1108,7 @@ event ChildUnnested(uint256 indexed tokenId, uint256 childIndex, address indexed
 event NestTransfer(address indexed from, address indexed to, uint256 fromTokenId, uint256 toTokenId, uint256 indexed tokenId)
 ```
 
-
+Used to notify listeners that the token is being transferred.
 
 
 
