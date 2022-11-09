@@ -54,8 +54,8 @@ describe('Render Utils', async function () {
     await equip.addResourceToToken(tokenId, resId3, resId);
     await equip.addResourceToToken(tokenId, resId4, 0);
 
-    await equip.acceptResource(tokenId, 0, resId);
-    await equip.acceptResource(tokenId, 1, resId2);
+    await equip.acceptResource(tokenId, resId);
+    await equip.acceptResource(tokenId, resId2);
     await equip.setPriority(tokenId, [10, 5]);
   });
 

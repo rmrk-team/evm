@@ -129,7 +129,7 @@ error RMRKTokenHasNoResources();
 error RMRKUnexpectedChildId();
 /// Attempting to reject all resources but more resources than expected are pending
 error RMRKUnexpectedNumberOfResources();
-/// Attempting to accept or reject a resource which does not match the one at the specified index
-error RMRKUnexpectedResourceId();
+/// Attempting to accept or reject a resource which is not pending on the token
+error RMRKResourceNotFoundOnTokenPending();
 /// Attempting not to pass an empty array of equippable addresses when adding or setting the equippable addresses
 error RMRKZeroLengthIdsPassed();

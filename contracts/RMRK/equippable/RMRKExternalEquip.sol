@@ -178,15 +178,15 @@ contract RMRKExternalEquip is
      *  time one is accepted and the last pending resource is moved into its place.
      * @dev Can only be called by the owner of the token or a user that has been approved to manage the tokens's
      *  resources.
-     * @param tokenId ID of the token for which we are accepting the resource
-     * @param index Index of the resource to accept in token's pending arry
+     * @param tokenId ID of the token for which to accept the pending resource
+     * @param resourceId ID of the resource being accepted
      */
-    function acceptResource(
-        uint256 tokenId,
-        uint256 index,
-        uint64 resourceId
-    ) public virtual onlyApprovedForResourcesOrOwner(tokenId) {
-        _acceptResource(tokenId, index, resourceId);
+    function acceptResource(uint256 tokenId, uint64 resourceId)
+        public
+        virtual
+        onlyApprovedForResourcesOrOwner(tokenId)
+    {
+        _acceptResource(tokenId, resourceId);
     }
 
     /**
@@ -195,15 +195,15 @@ contract RMRKExternalEquip is
      *  time one is rejected and the last pending resource is moved into its place.
      * @dev Can only be called by the owner of the token or a user that has been approved to manage the tokens's
      *  resources.
-     * @param tokenId ID of the token for which we are rejecting the resource
-     * @param index Index of the resource to reject in token's pending array
+     * @param tokenId ID of the token for which to reject the pending resource
+     * @param resourceId ID of the resource being rejected
      */
-    function rejectResource(
-        uint256 tokenId,
-        uint256 index,
-        uint64 resourceId
-    ) public virtual onlyApprovedForResourcesOrOwner(tokenId) {
-        _rejectResource(tokenId, index, resourceId);
+    function rejectResource(uint256 tokenId, uint64 resourceId)
+        public
+        virtual
+        onlyApprovedForResourcesOrOwner(tokenId)
+    {
+        _rejectResource(tokenId, resourceId);
     }
 
     /**

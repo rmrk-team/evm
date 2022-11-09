@@ -118,17 +118,16 @@ contract RMRKEquippable is
      *
      *  - The caller must own the token or be approved to manage the token's resources
      *  - `tokenId` must exist.
-     *  - `index` must be in range of the length of the pending resource array.
      * @dev Emits an {ResourceAccepted} event.
      * @param tokenId ID of the token for which to accept the pending resource
-     * @param index Index of the resource in the pending array to accept
+     * @param resourceId ID of the resource being accepted
      */
-    function acceptResource(
-        uint256 tokenId,
-        uint256 index,
-        uint64 resourceId
-    ) public virtual onlyApprovedForResourcesOrOwner(tokenId) {
-        _acceptResource(tokenId, index, resourceId);
+    function acceptResource(uint256 tokenId, uint64 resourceId)
+        public
+        virtual
+        onlyApprovedForResourcesOrOwner(tokenId)
+    {
+        _acceptResource(tokenId, resourceId);
     }
 
     /**
@@ -138,17 +137,16 @@ contract RMRKEquippable is
      *
      *  - The caller must own the token or be approved to manage the token's resources
      *  - `tokenId` must exist.
-     *  - `index` must be in range of the length of the pending resource array.
      * @dev Emits a {ResourceRejected} event.
-     * @param tokenId ID of the token that the resource is being rejected from
-     * @param index Index of the resource in the pending array to be rejected
+     * @param tokenId ID of the token for which to reject the pending resource
+     * @param resourceId ID of the resource being rejected
      */
-    function rejectResource(
-        uint256 tokenId,
-        uint256 index,
-        uint64 resourceId
-    ) public virtual onlyApprovedForResourcesOrOwner(tokenId) {
-        _rejectResource(tokenId, index, resourceId);
+    function rejectResource(uint256 tokenId, uint64 resourceId)
+        public
+        virtual
+        onlyApprovedForResourcesOrOwner(tokenId)
+    {
+        _rejectResource(tokenId, resourceId);
     }
 
     /**

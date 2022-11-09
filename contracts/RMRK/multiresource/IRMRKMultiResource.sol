@@ -92,17 +92,11 @@ interface IRMRKMultiResource is IERC165 {
      *
      *  - The caller must own the token or be approved to manage the token's resources
      *  - `tokenId` must exist.
-     *  - `index` must be in range of the length of the pending resource array.
      * @dev Emits an {ResourceAccepted} event.
      * @param tokenId ID of the token for which to accept the pending resource
-     * @param index Index of the resource in the pending array to accept
-     * @param resourceId expected to be in the index
+     * @param resourceId ID of the resource being accepted
      */
-    function acceptResource(
-        uint256 tokenId,
-        uint256 index,
-        uint64 resourceId
-    ) external;
+    function acceptResource(uint256 tokenId, uint64 resourceId) external;
 
     /**
      * @notice Rejects a resource from the pending array of given token.
@@ -111,17 +105,11 @@ interface IRMRKMultiResource is IERC165 {
      *
      *  - The caller must own the token or be approved to manage the token's resources
      *  - `tokenId` must exist.
-     *  - `index` must be in range of the length of the pending resource array.
      * @dev Emits a {ResourceRejected} event.
-     * @param tokenId ID of the token that the resource is being rejected from
-     * @param index Index of the resource in the pending array to be rejected
-     * @param resourceId expected to be in the index
+     * @param tokenId ID of the token for which to reject the pending resource
+     * @param resourceId ID of the resource being rejected
      */
-    function rejectResource(
-        uint256 tokenId,
-        uint256 index,
-        uint64 resourceId
-    ) external;
+    function rejectResource(uint256 tokenId, uint64 resourceId) external;
 
     /**
      * @notice Rejects all resources from the pending array of a given token.

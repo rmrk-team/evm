@@ -160,7 +160,7 @@ async function setupContextForSlots(
     );
     for (let i = 0; i < uniqueSoldiers; i++) {
       await soldierEquip.addResourceToToken(soldiersIds[i], soldierResId, 0);
-      await soldierEquip.connect(addrs[i % 3]).acceptResource(soldiersIds[i], 0, soldierResId);
+      await soldierEquip.connect(addrs[i % 3]).acceptResource(soldiersIds[i], soldierResId);
     }
   }
 
@@ -210,10 +210,10 @@ async function setupContextForSlots(
       );
       await weaponEquip
         .connect(addrs[i % 3])
-        .acceptResource(weaponsIds[i], 0, weaponResourcesFull[i % uniqueWeapons]);
+        .acceptResource(weaponsIds[i], weaponResourcesFull[i % uniqueWeapons]);
       await weaponEquip
         .connect(addrs[i % 3])
-        .acceptResource(weaponsIds[i], 0, weaponResourcesEquip[i % uniqueWeapons]);
+        .acceptResource(weaponsIds[i], weaponResourcesEquip[i % uniqueWeapons]);
     }
   }
 
@@ -247,10 +247,10 @@ async function setupContextForSlots(
       await weaponGemEquip.addResourceToToken(weaponGemsIds[i], weaponGemResourceEquip, 0);
       await weaponGemEquip
         .connect(addrs[i % 3])
-        .acceptResource(weaponGemsIds[i], 0, weaponGemResourceFull);
+        .acceptResource(weaponGemsIds[i], weaponGemResourceFull);
       await weaponGemEquip
         .connect(addrs[i % 3])
-        .acceptResource(weaponGemsIds[i], 0, weaponGemResourceEquip);
+        .acceptResource(weaponGemsIds[i], weaponGemResourceEquip);
     }
   }
 
@@ -275,7 +275,7 @@ async function setupContextForSlots(
       await backgroundEquip.addResourceToToken(backgroundsIds[i], backgroundResourceId, 0);
       await backgroundEquip
         .connect(addrs[i % 3])
-        .acceptResource(backgroundsIds[i], 0, backgroundResourceId);
+        .acceptResource(backgroundsIds[i], backgroundResourceId);
     }
   }
 }

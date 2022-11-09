@@ -269,7 +269,7 @@ async function shouldBehaveLikeEquippableResources(
       const tokenId = await mint(chunky, owner.address);
       await addResources([resId]);
       await chunkyEquip.addResourceToToken(tokenId, resId, 0);
-      await expect(chunkyEquip.acceptResource(tokenId, 0, resId))
+      await expect(chunkyEquip.acceptResource(tokenId, resId))
         .to.emit(chunkyEquip, 'ResourceAccepted')
         .withArgs(tokenId, resId, 0);
 
@@ -300,10 +300,10 @@ async function shouldBehaveLikeEquippableResources(
       await addResources([resId, resId2]);
       await chunkyEquip.addResourceToToken(tokenId, resId, 0);
       await chunkyEquip.addResourceToToken(tokenId, resId2, 0);
-      await expect(chunkyEquip.acceptResource(tokenId, 1, resId2))
+      await expect(chunkyEquip.acceptResource(tokenId, resId2))
         .to.emit(chunkyEquip, 'ResourceAccepted')
         .withArgs(tokenId, resId2, 0);
-      await expect(chunkyEquip.acceptResource(tokenId, 0, resId))
+      await expect(chunkyEquip.acceptResource(tokenId, resId))
         .to.emit(chunkyEquip, 'ResourceAccepted')
         .withArgs(tokenId, resId, 0);
 
@@ -337,7 +337,7 @@ async function shouldBehaveLikeEquippableResources(
       await addResources([resId]);
 
       await chunkyEquip.addResourceToToken(tokenId, resId, 0);
-      await chunkyEquip.connect(approvedAddress).acceptResource(tokenId, 0, resId);
+      await chunkyEquip.connect(approvedAddress).acceptResource(tokenId, resId);
 
       // The merged version does not implement this to save size:
       if (chunkyEquip.getFullPendingExtendedResources === undefined) {
@@ -352,11 +352,11 @@ async function shouldBehaveLikeEquippableResources(
       const tokenId = await mint(chunky, owner.address);
       await addResources([resId]);
       await chunkyEquip.addResourceToToken(tokenId, resId, 0);
-      await chunkyEquip.acceptResource(tokenId, 0, resId);
+      await chunkyEquip.acceptResource(tokenId, resId);
 
-      await expect(chunkyEquip.acceptResource(tokenId, 0, resId)).to.be.revertedWithCustomError(
+      await expect(chunkyEquip.acceptResource(tokenId, resId)).to.be.revertedWithCustomError(
         chunkyEquip,
-        'RMRKIndexOutOfRange',
+        'RMRKResourceNotFoundOnTokenPending',
       );
     });
 
@@ -366,15 +366,15 @@ async function shouldBehaveLikeEquippableResources(
       await addResources([resId]);
       await chunkyEquip.addResourceToToken(tokenId, resId, 0);
       await expect(
-        chunkyEquip.connect(addrs[1]).acceptResource(tokenId, 0, resId),
+        chunkyEquip.connect(addrs[1]).acceptResource(tokenId, resId),
       ).to.be.revertedWithCustomError(chunkyEquip, 'RMRKNotApprovedForResourcesOrOwner');
     });
 
     it('cannot accept non existing resource', async function () {
       const tokenId = await mint(chunky, owner.address);
-      await expect(chunkyEquip.acceptResource(tokenId, 0, 0)).to.be.revertedWithCustomError(
+      await expect(chunkyEquip.acceptResource(tokenId, 10)).to.be.revertedWithCustomError(
         chunkyEquip,
-        'RMRKIndexOutOfRange',
+        'RMRKResourceNotFoundOnTokenPending',
       );
     });
   });
@@ -386,7 +386,7 @@ async function shouldBehaveLikeEquippableResources(
       const tokenId = await mint(chunky, owner.address);
       await addResources([resId, resId2]);
       await chunkyEquip.addResourceToToken(tokenId, resId, 0);
-      await chunkyEquip.acceptResource(tokenId, 0, resId);
+      await chunkyEquip.acceptResource(tokenId, resId);
 
       // Add new resource to overwrite the first, and accept
       const activeResources = await chunkyEquip.getActiveResources(tokenId);
@@ -398,7 +398,7 @@ async function shouldBehaveLikeEquippableResources(
       expect(await chunkyEquip.getResourceOverwrites(tokenId, pendingResources[0])).to.eql(
         activeResources[0],
       );
-      await expect(chunkyEquip.acceptResource(tokenId, 0, resId2))
+      await expect(chunkyEquip.acceptResource(tokenId, resId2))
         .to.emit(chunkyEquip, 'ResourceAccepted')
         .withArgs(tokenId, resId2, resId);
 
@@ -422,7 +422,7 @@ async function shouldBehaveLikeEquippableResources(
       const tokenId = await mint(chunky, owner.address);
       await addResources([resId]);
       await chunkyEquip.addResourceToToken(tokenId, resId, 1);
-      await chunkyEquip.acceptResource(tokenId, 0, resId);
+      await chunkyEquip.acceptResource(tokenId, resId);
 
       // The merged version does not implement this to save size:
       if (chunkyEquip.getFullExtendedResources === undefined) {
@@ -445,7 +445,7 @@ async function shouldBehaveLikeEquippableResources(
       await addResources([resId]);
       await chunkyEquip.addResourceToToken(tokenId, resId, 0);
 
-      await expect(chunkyEquip.rejectResource(tokenId, 0, resId)).to.emit(
+      await expect(chunkyEquip.rejectResource(tokenId, resId)).to.emit(
         chunkyEquip,
         'ResourceRejected',
       );
@@ -474,11 +474,11 @@ async function shouldBehaveLikeEquippableResources(
       const tokenId = await mint(chunky, owner.address);
       await addResources([resId, resId2]);
       await chunkyEquip.addResourceToToken(tokenId, resId, 0);
-      await chunkyEquip.acceptResource(tokenId, 0, resId);
+      await chunkyEquip.acceptResource(tokenId, resId);
 
       // Will try to overwrite but we reject it
       await chunkyEquip.addResourceToToken(tokenId, resId2, resId);
-      await chunkyEquip.rejectResource(tokenId, 0, resId2);
+      await chunkyEquip.rejectResource(tokenId, resId2);
 
       expect(await chunkyEquip.getResourceOverwrites(tokenId, resId2)).to.eql(bn(0));
     });
@@ -491,7 +491,7 @@ async function shouldBehaveLikeEquippableResources(
       await addResources([resId]);
       await chunkyEquip.addResourceToToken(tokenId, resId, 0);
 
-      await expect(chunkyEquip.rejectResource(tokenId, 0, resId)).to.emit(
+      await expect(chunkyEquip.rejectResource(tokenId, resId)).to.emit(
         chunkyEquip,
         'ResourceRejected',
       );
@@ -549,7 +549,7 @@ async function shouldBehaveLikeEquippableResources(
       const tokenId = await mint(chunky, owner.address);
       await addResources([resId, resId2]);
       await chunkyEquip.addResourceToToken(tokenId, resId, 0);
-      await chunkyEquip.acceptResource(tokenId, 0, resId);
+      await chunkyEquip.acceptResource(tokenId, resId);
 
       // Will try to overwrite but we reject all
       await chunkyEquip.addResourceToToken(tokenId, resId2, resId);
@@ -613,11 +613,11 @@ async function shouldBehaveLikeEquippableResources(
       const tokenId = await mint(chunky, owner.address);
       await addResources([resId]);
       await chunkyEquip.addResourceToToken(tokenId, resId, 0);
-      await chunkyEquip.rejectResource(tokenId, 0, resId);
+      await chunkyEquip.rejectResource(tokenId, resId);
 
-      await expect(chunkyEquip.rejectResource(tokenId, 0, resId)).to.be.revertedWithCustomError(
+      await expect(chunkyEquip.rejectResource(tokenId, resId)).to.be.revertedWithCustomError(
         chunkyEquip,
-        'RMRKIndexOutOfRange',
+        'RMRKResourceNotFoundOnTokenPending',
       );
     });
 
@@ -628,7 +628,7 @@ async function shouldBehaveLikeEquippableResources(
       await chunkyEquip.addResourceToToken(tokenId, resId, 0);
 
       await expect(
-        chunkyEquip.connect(addrs[1]).rejectResource(tokenId, 0, resId),
+        chunkyEquip.connect(addrs[1]).rejectResource(tokenId, resId),
       ).to.be.revertedWithCustomError(chunkyEquip, 'RMRKNotApprovedForResourcesOrOwner');
       await expect(
         chunkyEquip.connect(addrs[1]).rejectAllResources(tokenId, 1),
@@ -637,9 +637,9 @@ async function shouldBehaveLikeEquippableResources(
 
     it('cannot reject non existing resource', async function () {
       const tokenId = await mint(chunky, owner.address);
-      await expect(chunkyEquip.rejectResource(tokenId, 0, 0)).to.be.revertedWithCustomError(
+      await expect(chunkyEquip.rejectResource(tokenId, 10)).to.be.revertedWithCustomError(
         chunkyEquip,
-        'RMRKIndexOutOfRange',
+        'RMRKResourceNotFoundOnTokenPending',
       );
     });
   });
@@ -756,8 +756,8 @@ async function shouldBehaveLikeEquippableResources(
     await addResources([resId, resId2]);
     await chunkyEquip.addResourceToToken(tokenId, resId, 0);
     await chunkyEquip.addResourceToToken(tokenId, resId2, 0);
-    await chunkyEquip.acceptResource(tokenId, 0, resId);
-    await chunkyEquip.acceptResource(tokenId, 0, resId2);
+    await chunkyEquip.acceptResource(tokenId, resId);
+    await chunkyEquip.acceptResource(tokenId, resId2);
 
     return tokenId;
   }

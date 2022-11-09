@@ -66,20 +66,20 @@ contract RMRKNestingMultiResource is RMRKNesting, AbstractMultiResource {
 
     // --------------------------- HANDLING RESOURCES -------------------------
 
-    function acceptResource(
-        uint256 tokenId,
-        uint256 index,
-        uint64 resourceId
-    ) public virtual onlyApprovedForResourcesOrOwner(tokenId) {
-        _acceptResource(tokenId, index, resourceId);
+    function acceptResource(uint256 tokenId, uint64 resourceId)
+        public
+        virtual
+        onlyApprovedForResourcesOrOwner(tokenId)
+    {
+        _acceptResource(tokenId, resourceId);
     }
 
-    function rejectResource(
-        uint256 tokenId,
-        uint256 index,
-        uint64 resourceId
-    ) public virtual onlyApprovedForResourcesOrOwner(tokenId) {
-        _rejectResource(tokenId, index, resourceId);
+    function rejectResource(uint256 tokenId, uint64 resourceId)
+        public
+        virtual
+        onlyApprovedForResourcesOrOwner(tokenId)
+    {
+        _rejectResource(tokenId, resourceId);
     }
 
     function rejectAllResources(uint256 tokenId, uint256 maxRejections)

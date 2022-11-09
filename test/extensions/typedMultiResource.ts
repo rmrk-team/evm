@@ -88,11 +88,11 @@ describe('RMRKTypedMultiResourceMock', async function () {
       await typedMultiResource.addTypedResourceEntry(resId2, 'ipfs://res2.pdf', 'application/pdf');
       await typedMultiResource.addTypedResourceEntry(resId3, 'ipfs://res3.jpg', 'image/jpeg');
       await typedMultiResource.addResourceToToken(tokenId, resId, 0);
-      await typedMultiResource.acceptResource(tokenId, 0, resId);
+      await typedMultiResource.acceptResource(tokenId, resId);
       await typedMultiResource.addResourceToToken(tokenId, resId2, 0);
-      await typedMultiResource.acceptResource(tokenId, 0, resId2);
+      await typedMultiResource.acceptResource(tokenId, resId2);
       await typedMultiResource.addResourceToToken(tokenId, resId3, 0);
-      await typedMultiResource.acceptResource(tokenId, 0, resId3);
+      await typedMultiResource.acceptResource(tokenId, resId3);
       await typedMultiResource.setPriority(tokenId, [1, 0, 2]); // Pdf has higher priority but it's the wanted type
 
       expect(
@@ -103,7 +103,7 @@ describe('RMRKTypedMultiResourceMock', async function () {
     it('cannot get top resource for if token has no resources with this type', async function () {
       await typedMultiResource.addTypedResourceEntry(resId, 'ipfs://res1.jpg', 'image/jpeg');
       await typedMultiResource.addResourceToToken(tokenId, resId, 0);
-      await typedMultiResource.acceptResource(tokenId, 0, resId);
+      await typedMultiResource.acceptResource(tokenId, resId);
 
       await expect(
         typedMultiResource.getTopResourceMetaForTokenWithType(tokenId, 'application/pdf'),
