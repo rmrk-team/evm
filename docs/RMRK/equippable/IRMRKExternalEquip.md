@@ -13,20 +13,19 @@ Interface smart contract of the RMRK external equippable module.
 ### acceptResource
 
 ```solidity
-function acceptResource(uint256 tokenId, uint256 index, uint64 resourceId) external nonpayable
+function acceptResource(uint256 tokenId, uint64 resourceId) external nonpayable
 ```
 
 Accepts a resource at from the pending array of given token.
 
-*Migrates the resource from the token&#39;s pending resource array to the token&#39;s active resource array.Active resources cannot be removed by anyone, but can be replaced by a new resource.Requirements:  - The caller must own the token or be approved to manage the token&#39;s resources  - `tokenId` must exist.  - `index` must be in range of the length of the pending resource array.Emits an {ResourceAccepted} event.*
+*Migrates the resource from the token&#39;s pending resource array to the token&#39;s active resource array.Active resources cannot be removed by anyone, but can be replaced by a new resource.Requirements:  - The caller must own the token or be approved to manage the token&#39;s resources  - `tokenId` must exist.Emits an {ResourceAccepted} event.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
 | tokenId | uint256 | ID of the token for which to accept the pending resource |
-| index | uint256 | Index of the resource in the pending array to accept |
-| resourceId | uint64 | expected to be in the index |
+| resourceId | uint64 | ID of the resource being accepted |
 
 ### approveForResources
 
@@ -339,20 +338,19 @@ Rejects all resources from the pending array of a given token.
 ### rejectResource
 
 ```solidity
-function rejectResource(uint256 tokenId, uint256 index, uint64 resourceId) external nonpayable
+function rejectResource(uint256 tokenId, uint64 resourceId) external nonpayable
 ```
 
 Rejects a resource from the pending array of given token.
 
-*Removes the resource from the token&#39;s pending resource array.Requirements:  - The caller must own the token or be approved to manage the token&#39;s resources  - `tokenId` must exist.  - `index` must be in range of the length of the pending resource array.Emits a {ResourceRejected} event.*
+*Removes the resource from the token&#39;s pending resource array.Requirements:  - The caller must own the token or be approved to manage the token&#39;s resources  - `tokenId` must exist.Emits a {ResourceRejected} event.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | ID of the token that the resource is being rejected from |
-| index | uint256 | Index of the resource in the pending array to be rejected |
-| resourceId | uint64 | expected to be in the index |
+| tokenId | uint256 | ID of the token for which to reject the pending resource |
+| resourceId | uint64 | ID of the resource being rejected |
 
 ### setApprovalForAllForResources
 

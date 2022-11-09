@@ -13,7 +13,7 @@
 ### acceptResource
 
 ```solidity
-function acceptResource(uint256 tokenId, uint256 index, uint64 resourceId) external nonpayable
+function acceptResource(uint256 tokenId, uint64 resourceId) external nonpayable
 ```
 
 Used to accept a pending resource of a given token.
@@ -24,9 +24,8 @@ Used to accept a pending resource of a given token.
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | ID of the token for which we are accepting the resource |
-| index | uint256 | Index of the resource to accept in token&#39;s pending arry |
-| resourceId | uint64 | undefined |
+| tokenId | uint256 | ID of the token for which to accept the pending resource |
+| resourceId | uint64 | ID of the resource being accepted |
 
 ### addResourceEntry
 
@@ -394,7 +393,7 @@ Used to reject all pending resources of a given token.
 ### rejectResource
 
 ```solidity
-function rejectResource(uint256 tokenId, uint256 index, uint64 resourceId) external nonpayable
+function rejectResource(uint256 tokenId, uint64 resourceId) external nonpayable
 ```
 
 Used to reject a pending resource of a given token.
@@ -405,9 +404,8 @@ Used to reject a pending resource of a given token.
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | ID of the token for which we are rejecting the resource |
-| index | uint256 | Index of the resource to reject in token&#39;s pending array |
-| resourceId | uint64 | undefined |
+| tokenId | uint256 | ID of the token for which to reject the pending resource |
+| resourceId | uint64 | ID of the resource being rejected |
 
 ### replaceEquipment
 
@@ -827,17 +825,6 @@ Attempting to use ID 0, which is not supported
 *The ID 0 in RMRK suite is reserved for empty values. Guarding against its use ensures the expected operation*
 
 
-### RMRKIndexOutOfRange
-
-```solidity
-error RMRKIndexOutOfRange()
-```
-
-Attempting to interact with a resource, using index greater than number of resources
-
-
-
-
 ### RMRKMaxPendingResourcesReached
 
 ```solidity
@@ -893,6 +880,17 @@ Attempting to add a resource using an ID that has already been used
 
 
 
+### RMRKResourceNotFoundOnTokenPending
+
+```solidity
+error RMRKResourceNotFoundOnTokenPending()
+```
+
+Attempting to accept or reject a resource which is not pending on the token
+
+
+
+
 ### RMRKSlotAlreadyUsed
 
 ```solidity
@@ -944,17 +942,6 @@ error RMRKUnexpectedNumberOfResources()
 ```
 
 Attempting to reject all resources but more resources than expected are pending
-
-
-
-
-### RMRKUnexpectedResourceId
-
-```solidity
-error RMRKUnexpectedResourceId()
-```
-
-Attempting to accept or reject a resource which does not match the one at the specified index
 
 
 

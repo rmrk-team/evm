@@ -30,20 +30,19 @@ Version of the @rmrk-team/evm-contracts package
 ### acceptResource
 
 ```solidity
-function acceptResource(uint256 tokenId, uint256 index, uint64 resourceId) external nonpayable
+function acceptResource(uint256 tokenId, uint64 resourceId) external nonpayable
 ```
 
 Accepts a resource at from the pending array of given token.
 
-*Migrates the resource from the token&#39;s pending resource array to the token&#39;s active resource array.Active resources cannot be removed by anyone, but can be replaced by a new resource.Requirements:  - The caller must own the token or be approved to manage the token&#39;s resources  - `tokenId` must exist.  - `index` must be in range of the length of the pending resource array.Emits an {ResourceAccepted} event.*
+*Migrates the resource from the token&#39;s pending resource array to the token&#39;s active resource array.Active resources cannot be removed by anyone, but can be replaced by a new resource.Requirements:  - The caller must own the token or be approved to manage the token&#39;s resources  - `tokenId` must exist.Emits an {ResourceAccepted} event.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
 | tokenId | uint256 | ID of the token for which to accept the pending resource |
-| index | uint256 | Index of the resource in the pending array to accept |
-| resourceId | uint64 | undefined |
+| resourceId | uint64 | ID of the resource being accepted |
 
 ### addResourceEntry
 
@@ -430,20 +429,19 @@ Rejects all resources from the pending array of a given token.
 ### rejectResource
 
 ```solidity
-function rejectResource(uint256 tokenId, uint256 index, uint64 resourceId) external nonpayable
+function rejectResource(uint256 tokenId, uint64 resourceId) external nonpayable
 ```
 
 Rejects a resource from the pending array of given token.
 
-*Removes the resource from the token&#39;s pending resource array.Requirements:  - The caller must own the token or be approved to manage the token&#39;s resources  - `tokenId` must exist.  - `index` must be in range of the length of the pending resource array.Emits a {ResourceRejected} event.*
+*Removes the resource from the token&#39;s pending resource array.Requirements:  - The caller must own the token or be approved to manage the token&#39;s resources  - `tokenId` must exist.Emits a {ResourceRejected} event.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | ID of the token that the resource is being rejected from |
-| index | uint256 | Index of the resource in the pending array to be rejected |
-| resourceId | uint64 | undefined |
+| tokenId | uint256 | ID of the token for which to reject the pending resource |
+| resourceId | uint64 | ID of the resource being rejected |
 
 ### safeMint
 
@@ -1012,17 +1010,6 @@ Attempting to use ID 0, which is not supported
 *The ID 0 in RMRK suite is reserved for empty values. Guarding against its use ensures the expected operation*
 
 
-### RMRKIndexOutOfRange
-
-```solidity
-error RMRKIndexOutOfRange()
-```
-
-Attempting to interact with a resource, using index greater than number of resources
-
-
-
-
 ### RMRKMaxPendingResourcesReached
 
 ```solidity
@@ -1067,6 +1054,17 @@ Attempting to add a resource using an ID that has already been used
 
 
 
+### RMRKResourceNotFoundOnTokenPending
+
+```solidity
+error RMRKResourceNotFoundOnTokenPending()
+```
+
+Attempting to accept or reject a resource which is not pending on the token
+
+
+
+
 ### RMRKTokenDoesNotHaveResource
 
 ```solidity
@@ -1085,17 +1083,6 @@ error RMRKUnexpectedNumberOfResources()
 ```
 
 Attempting to reject all resources but more resources than expected are pending
-
-
-
-
-### RMRKUnexpectedResourceId
-
-```solidity
-error RMRKUnexpectedResourceId()
-```
-
-Attempting to accept or reject a resource which does not match the one at the specified index
 
 
 
