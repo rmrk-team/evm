@@ -4,7 +4,24 @@ pragma solidity ^0.8.16;
 
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 
+/**
+ * @title IRMRKNesting
+ * @author RMRK team
+ * @notice Interface smart contract of the RMRK nesting module.
+ */
 interface IRMRKNesting is IERC165 {
+    /**
+     * @notice The core struct of RMRK ownership.
+     * @dev The `RMRKOwner` struct is used to store information of the next immediate owner, be it the parent token or
+     *  the externally owned account.
+     * @dev If the token is owned by the externally owned account, the `tokenId` should equal `0`.
+     * @param tokenId ID of the parent token
+     * @param ownerAddress Address of the owner of the token. If the owner is another token, then the address should be
+     *  the one of the parent token's collection smart contract. If the owner is externally owned account, the address
+     *  should be the address of this account
+     * @param isNft A boolean value signifying whether the token is owned by another token (`true`) or by an externally
+     *  owned account (`false`)
+     */
     struct RMRKOwner {
         uint256 tokenId;
         address ownerAddress;
@@ -12,10 +29,13 @@ interface IRMRKNesting is IERC165 {
     }
 
     /**
+     * @notice Used to notify listeners that the token is being transferred.
      * @dev Emitted when `tokenId` token is transferred from `from` to `to`.
-     * from indicates the immediate owner, which is a contract if nested.
-     * If token was nested, `fromTokenId` indicates former parent id.
-     * If destination is an NFT, `toTokenId` indicates the new parent id.
+     * @param from Address of the previous immediate owner, which is a smart contract if the token was nested.
+     * @param to Address of the new immediate owner, which is a smart contract if the token is being nested.
+     * @param fromTokenId ID of the previous parent token. If the token was not nested before, the value should be `0`
+     * @param toTokenId ID of the new parent token. If the token is not being nested, the value should be `0`
+     * @param tokenId ID of the token being transferred
      */
     event NestTransfer(
         address indexed from,
@@ -26,7 +46,12 @@ interface IRMRKNesting is IERC165 {
     );
 
     /**
-     * @dev emitted when a child NFT is added to a token's pending array
+     * @notice Used to notify listeners that a new token has been added to a given token's pending children array.
+     * @dev Emitted when a child NFT is added to a token's pending array.
+     * @param tokenId ID of the token that received a new pending child token
+     * @param childAddress Address of the proposed child token's collection smart contract
+     * @param childId ID of the child token in the child token's collection smart contract
+     * @param childIndex Index of the proposed child token in the parent token's pending children array
      */
     event ChildProposed(
         uint256 indexed tokenId,
@@ -36,7 +61,12 @@ interface IRMRKNesting is IERC165 {
     );
 
     /**
-     * @dev emitted when a child NFT accepts a token from its pending array, migrating it to the active array.
+     * @notice Used to notify listeners that a new child token was accepted by the parent token.
+     * @dev Emitted when a parent token accepts a token from its pending array, migrating it to the active array.
+     * @param tokenId ID of the token that accepted a new child token
+     * @param childAddress Address of the child token's collection smart contract
+     * @param childId ID of the child token in the child token's collection smart contract
+     * @param childIndex Index of the newly accepted child token in the parent token's active children array
      */
     event ChildAccepted(
         uint256 indexed tokenId,
@@ -46,12 +76,21 @@ interface IRMRKNesting is IERC165 {
     );
 
     /**
-     * @dev emitted when a token removes all a child tokens from its pending array.
+     * @notice Used to notify listeners that all pending child tokens of a given token have been rejected.
+     * @dev Emitted when a token removes all a child tokens from its pending array.
+     * @param tokenId ID of the token that rejected all of the pending children
      */
     event AllChildrenRejected(uint256 indexed tokenId);
 
     /**
-     * @dev emitted when a token unnests a child from itself, transferring ownership to the root owner.
+     * @notice Used to notify listeners a child token has been unnested from parent token.
+     * @dev Emitted when a token unnests a child from itself, transferring ownership to the root owner.
+     * @param tokenId ID of the token that unnested a child token
+     * @param childAddress Address of the child token's collection smart contract
+     * @param childId ID of the child token in the child token's collection smart contract
+     * @param childIndex Index of a child in the array from which it is being unnested
+     * @param fromPending A boolean value signifying whether the token was in the pending child tokens array (`true`) or
+     *  not (`false`)
      */
     event ChildUnnested(
         uint256 indexed tokenId,
@@ -62,7 +101,9 @@ interface IRMRKNesting is IERC165 {
     );
 
     /**
-     * @dev Struct used to store child object data.
+     * @notice The core child token struct, holding the information about the child tokens.
+     * @return tokenId ID of the child token in the child token's collection smart contract
+     * @return contractAddress Address of the child token's smart contract
      */
     struct Child {
         uint256 tokenId;
@@ -70,15 +111,22 @@ interface IRMRKNesting is IERC165 {
     }
 
     /**
-     * @dev Returns the 'root' owner of an NFT. If this is a child of another NFT, this will return an EOA
-     * address. Otherwise, it will return the immediate owner.
-     *
+     * @notice Used to retrieve the *root* owner of a given token.
+     * @dev The *root* owner of the token is an externally owned account. If the given token is child of another NFT,
+     *  this will return an EOA address. Otherwise, it will return the immediate owner.
+     * @param tokenId ID of the token for which the *root* owner has been retrieved
+     * @return owner The *root* owner of the token
      */
     function ownerOf(uint256 tokenId) external view returns (address owner);
 
     /**
-     * @dev Returns the immediate owner of an NFT -- if the owner is another RMRK NFT, the uint256 will reflect
-     *
+     * @notice Used to retrieve the immediate owner of the given token.
+     * @dev If the immediate owner is another token, the address returned, should be the one of the parent token's
+     *  collection smart contract.
+     * @param tokenId ID of the token for which the RMRK owner is being retrieved
+     * @return address Address of the given token's owner
+     * @return uint256 The ID of the parent token. Should be `0` if the owner is an externally owned account
+     * @return bool The boolean value signifying whether the owner is an NFT or not
      */
     function rmrkOwnerOf(uint256 tokenId)
         external
@@ -89,28 +137,40 @@ interface IRMRKNesting is IERC165 {
             bool
         );
 
-    //TODO: Docs
+    /**
+     * @notice Used to burn a given token.
+     * @dev When a token is burned, all of its child tokens are recursively burned as well.
+     * @dev When specifying the maximum recursive burns, the execution will be reverted if there are more children to be
+     *  burned.
+     * @param tokenId ID of the token to burn
+     * @param maxRecursiveBurns Maximum number of tokens to recursively burn
+     * @return uint256 Number of recursively burned children
+     */
     function burn(uint256 tokenId, uint256 maxRecursiveBurns)
         external
         returns (uint256);
 
     /**
-     * @dev Function to be called into by other instances of RMRK nesting contracts to update the `child` struct
-     * of the parent.
+     * @notice Used to add a child token to a given parent token.
+     * @dev This adds the iichild token into the given parent token's pending child tokens array.
+     * @dev Requirements:
      *
-     * Requirements:
-     *
-     * - `ownerOf` on the child contract must resolve to the called contract.
-     * - the pending array of the parent contract must not be full.
+     *  - `ownerOf` on the child contract must resolve to the called contract.
+     *  - the pending array of the parent contract must not be full.
+     * @param parentId ID of the parent token to receive the new child token
+     * @param childId ID of the new proposed child token
      */
     function addChild(uint256 parentId, uint256 childId) external;
 
     /**
-     * @notice Sends an instance of Child from the pending children array at index to children array for tokenId.
-     * @param parentId tokenId of parent token to accept a child on
-     * @param childIndex index of child in _pendingChildren array to accept.
-     * @param childAddress address of the child expected to be in the index.
-     * @param childId token Id of the child expected to be in the index
+     * @notice Used to accept a pending child token for a given parent token.
+     * @dev This moves the child token from parent token's pending child tokens array into the active child tokens
+     *  array.
+     * @param parentId ID of the parent token for which the child token is being accepted
+     * @param childIndex Index of the child token to accept in the pending children array of a given token
+     * @param childAddress Address of the collection smart contract of the child token expected to be at the specified
+     *  index
+     * @param childId ID of the child token expected to be located at the specified index
      */
     function acceptChild(
         uint256 parentId,
@@ -120,25 +180,31 @@ interface IRMRKNesting is IERC165 {
     ) external;
 
     /**
-     * @dev Function called to reject all pending children. Removes the children from the pending array mapping.
-     * The children's ownership structures are not updated.
+     * @notice Used to reject all pending children of a given parent token.
+     * @dev Removes the children from the pending array mapping.
+     * @dev The children's ownership structures are not updated.
+     * @dev Requirements:
      *
      * Requirements:
      *
      * - `parentId` must exist
+     * @param parentId ID of the parent token for which to reject all of the pending tokens
      *
      */
     function rejectAllChildren(uint256 parentId) external;
 
     /**
-     * @notice Function to unnest a child from the active token array.
-     * @param tokenId is the tokenId of the parent token to unnest from.
-     * @param to is the address to transfer this
-     * @param childIndex is the index of the child token ID.
-     * @param childAddress address of the child expected to be in the index.
-     * @param childId token Id of the child expected to be in the index
-     * @param isPending Boolean value indicating whether the token is in the pending array of the parent (`true`) or in
-     *  the active array (`false`)
+     * @notice Used to unnest a child token from a given parent token.
+     * @dev When unnesting a child token, the owner of the token is set to `to`, or is not updated in the event of `to`
+     *  being the `0x0` address.
+     * @param tokenId ID of the token from which to unnest a child token
+     * @param to Address of the new owner of the child token being unnested
+     * @param childIndex Index of the child token to unnest in the array it is located in
+     * @param childAddress Address of the collection smart contract of the child token expected to be at the specified
+     *  index
+     * @param childId ID of the child token expected to be located at the specified index
+     * @param isPending A boolean value signifying whether the child token is being unnested from the pending child
+     *  tokens array (`true`) or from the active child tokens array (`false`)
      */
     function unnestChild(
         uint256 tokenId,
@@ -150,8 +216,15 @@ interface IRMRKNesting is IERC165 {
     ) external;
 
     /**
-     * @dev Returns array of child objects existing for `parentId`.
-     *
+     * @notice Used to retrieve the active child tokens of a given parent token.
+     * @dev Returns array of Child structs existing for parent token.
+     * @dev The Child struct consists of the following values:
+     *  [
+     *      tokenId,
+     *      contractAddress
+     *  ]
+     * @param parentId ID of the parent token for which to retrieve the active child tokens
+     * @return struct[] An array of Child structs containing the parent token's active child tokens
      */
     function childrenOf(uint256 parentId)
         external
@@ -159,8 +232,15 @@ interface IRMRKNesting is IERC165 {
         returns (Child[] memory);
 
     /**
-     * @dev Returns array of pending child objects existing for `parentId`.
-     *
+     * @notice Used to retrieve the pending child tokens of a given parent token.
+     * @dev Returns array of pending Child structs existing for given parent.
+     * @dev The Child struct consists of the following values:
+     *  [
+     *      tokenId,
+     *      contractAddress
+     *  ]
+     * @param parentId ID of the parent token for which to retrieve the pending child tokens
+     * @return struct[] An array of Child structs containing the parent token's pending child tokens
      */
     function pendingChildrenOf(uint256 parentId)
         external
@@ -168,8 +248,16 @@ interface IRMRKNesting is IERC165 {
         returns (Child[] memory);
 
     /**
-     * @dev Returns a single child object existing at `index` on `parentId`.
-     *
+     * @notice Used to retrieve a specific active child token for a given parent token.
+     * @dev Returns a single Child struct locating at `index` of parent token's active child tokens array.
+     * @dev The Child struct consists of the following values:
+     *  [
+     *      tokenId,
+     *      contractAddress
+     *  ]
+     * @param parentId ID of the parent token for which the child is being retrieved
+     * @param index Index of the child token in the parent token's active child tokens array
+     * @return struct A Child struct containing data about the specified child
      */
     function childOf(uint256 parentId, uint256 index)
         external
@@ -177,8 +265,16 @@ interface IRMRKNesting is IERC165 {
         returns (Child memory);
 
     /**
-     * @dev Returns a single pending child object existing at `index` on `parentId`.
-     *
+     * @notice Used to retrieve a specific pending child token from a given parent token.
+     * @dev Returns a single Child struct locating at `index` of parent token's active child tokens array.
+     * @dev The Child struct consists of the following values:
+     *  [
+     *      tokenId,
+     *      contractAddress
+     *  ]
+     * @param parentId ID of the parent token for which the pending child token is being retrieved
+     * @param index Index of the child token in the parent token's pending child tokens array
+     * @return struct A Child struct containting data about the specified child
      */
     function pendingChildOf(uint256 parentId, uint256 index)
         external
@@ -186,9 +282,11 @@ interface IRMRKNesting is IERC165 {
         returns (Child memory);
 
     /**
-     * @dev Function called when calling transferFrom with the target as another NFT via `tokenId`
-     * on `to`.
-     *
+     * @notice Used to transfer the token into another token.
+     * @param from Address of the collection smart contract of the token to be transferred
+     * @param to Address of the receiving token's collection smart contract
+     * @param tokenId ID of the token being transferred
+     * @param destinationId ID of the token to receive the token being transferred
      */
     function nestTransferFrom(
         address from,
