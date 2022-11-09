@@ -68,8 +68,8 @@ describe('Render Utils', async function () {
     });
     it('can get pending resources', async function () {
       expect(await renderUtils.getPendingResources(equip.address, tokenId)).to.eql([
-        [resId4, bn(0), bn(0), 'ipfs://res4.jpg'],
-        [resId3, bn(1), resId, 'ipfs://res3.jpg'],
+        [resId4, bn(0), 'ipfs://res4.jpg'],
+        [resId3, resId, 'ipfs://res3.jpg'],
       ]);
     });
 
@@ -97,8 +97,8 @@ describe('Render Utils', async function () {
 
     it('can get pending resources', async function () {
       expect(await renderUtilsEquip.getExtendedPendingResources(equip.address, tokenId)).to.eql([
-        [resId4, bn(2), bn(0), bn(0), someBase.address, 'ipfs://res4.jpg', [], [bn(4)]],
-        [resId3, bn(0), bn(1), resId, ADDRESS_ZERO, 'ipfs://res3.jpg', [], []],
+        [resId4, bn(2), bn(0), someBase.address, 'ipfs://res4.jpg', [], [bn(4)]],
+        [resId3, bn(0), resId, ADDRESS_ZERO, 'ipfs://res3.jpg', [], []],
       ]);
     });
   });

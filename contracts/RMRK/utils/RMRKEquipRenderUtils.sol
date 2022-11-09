@@ -27,7 +27,6 @@ contract RMRKEquipRenderUtils {
     struct ExtendedPendingResource {
         uint64 id;
         uint64 equippableGroupId;
-        uint128 acceptRejectIndex;
         uint64 overwritesResourceWithId;
         address baseAddress;
         string metadata;
@@ -121,7 +120,6 @@ contract RMRKEquipRenderUtils {
             pendingResources[i] = ExtendedPendingResource({
                 id: resources[i],
                 equippableGroupId: equippableGroupId,
-                acceptRejectIndex: uint128(i),
                 overwritesResourceWithId: overwritesResourceWithId,
                 baseAddress: baseAddress,
                 metadata: metadataURI,

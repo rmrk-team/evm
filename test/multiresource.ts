@@ -132,8 +132,8 @@ describe('MultiResourceMock Other Behavior', async function () {
       );
 
       expect(await renderUtils.getPendingResources(token.address, tokenId)).to.eql([
-        [resId, bn(0), bn(0), 'data1'],
-        [resId2, bn(1), bn(0), 'data2'],
+        [resId, bn(0), 'data1'],
+        [resId2, bn(0), 'data2'],
       ]);
     });
 

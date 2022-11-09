@@ -193,8 +193,8 @@ async function shouldBehaveLikeMultiResource(
     describe('Accepting resources', async function () {
       it('can accept resource', async function () {
         expect(await this.renderUtils.getPendingResources(this.token.address, tokenId)).to.eql([
-          [resId1, bn(0), bn(0), resData1],
-          [resId2, bn(1), bn(0), resData2],
+          [resId1, bn(0), resData1],
+          [resId2, bn(0), resData2],
         ]);
 
         await expect(this.token.connect(tokenOwner).acceptResource(tokenId, resId1))
@@ -202,7 +202,7 @@ async function shouldBehaveLikeMultiResource(
           .withArgs(tokenId, resId1, 0);
 
         expect(await this.renderUtils.getPendingResources(this.token.address, tokenId)).to.eql([
-          [resId2, bn(0), bn(0), resData2],
+          [resId2, bn(0), resData2],
         ]);
         expect(await this.renderUtils.getActiveResources(this.token.address, tokenId)).to.eql([
           [resId1, 0, resData1],

@@ -20,7 +20,6 @@ contract RMRKMultiResourceRenderUtils {
 
     struct PendingResource {
         uint64 id;
-        uint128 acceptRejectIndex;
         uint64 overwritesResourceWithId;
         string metadata;
     }
@@ -83,7 +82,6 @@ contract RMRKMultiResourceRenderUtils {
             );
             pendingResources[i] = PendingResource({
                 id: resources[i],
-                acceptRejectIndex: uint128(i),
                 overwritesResourceWithId: overwritesResourceWithId,
                 metadata: metadata
             });
