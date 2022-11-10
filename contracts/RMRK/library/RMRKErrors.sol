@@ -46,8 +46,6 @@ error RMRKBaseRequiredForParts();
 error RMRKCannotTransferSoulbound();
 /// Attempting to accept a child that has already been accepted
 error RMRKChildAlreadyExists();
-/// Attempting to interact with a child, using index that is higher than the number of children
-error RMRKChildIndexOutOfRange();
 /// Attempting to equip a `Part` with a child not approved by the base
 error RMRKEquippableEquipNotAllowedByBase();
 /// Attempting to use ID 0, which is not supported
@@ -111,8 +109,6 @@ error RMRKPartAlreadyExists();
 error RMRKPartDoesNotExist();
 /// Attempting to use a `Part` that is `Fixed` when `Slot` kind of `Part` should be used
 error RMRKPartIsNotSlot();
-/// Attempting to interact with a pending child using an index greater than the size of pending array
-error RMRKPendingChildIndexOutOfRange();
 /// Attempting to add a resource using an ID that has already been used
 error RMRKResourceAlreadyExists();
 /// Attempting to equip an item into a slot that already has an item equipped
@@ -125,8 +121,8 @@ error RMRKTokenCannotBeEquippedWithResourceIntoSlot();
 error RMRKTokenDoesNotHaveResource();
 /// Attempting to determine the resource with the top priority on a token without resources
 error RMRKTokenHasNoResources();
-/// Attempting to accept or unnest a child which does not match the one at the specified index
-error RMRKUnexpectedChildId();
+/// Attempting to accept or unnest a child which is not on the token
+error RMRKChildNotFoundOnToken();
 /// Attempting to reject all resources but more resources than expected are pending
 error RMRKUnexpectedNumberOfResources();
 /// Attempting to accept or reject a resource which does not match the one at the specified index

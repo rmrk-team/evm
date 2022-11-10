@@ -139,12 +139,12 @@ describe('RMRKSoulbound exempt', async function () {
   it('can unnest child if soulbound exempt', async function () {
     const tokenId = await mintFromMock(token, owner.address);
     const otherTokenId = await nestMintFromMock(token, token.address, tokenId);
-    await token.connect(owner).acceptChild(tokenId, 0, token.address, otherTokenId);
+    await token.connect(owner).acceptChild(tokenId, token.address, otherTokenId);
     await token.setSoulboundExempt(otherTokenId);
 
     await token
       .connect(owner)
-      .unnestChild(tokenId, owner.address, 0, token.address, otherTokenId, false);
+      .unnestChild(tokenId, owner.address, token.address, otherTokenId, false);
     expect(await token.rmrkOwnerOf(otherTokenId)).eql([owner.address, bn(0), false]);
   });
 });
@@ -213,11 +213,11 @@ async function shouldBehaveLikeSoulboundNesting() {
 
   it('cannot unnest', async function () {
     const childId = await nestMintFromMock(soulbound, soulbound.address, tokenId);
-    await soulbound.connect(owner).acceptChild(tokenId, 0, soulbound.address, childId);
+    await soulbound.connect(owner).acceptChild(tokenId, soulbound.address, childId);
     expect(
       soulbound
         .connect(owner)
-        .unnestChild(tokenId, owner.address, 0, soulbound.address, childId, false),
+        .unnestChild(tokenId, owner.address, soulbound.address, childId, false),
     ).to.be.revertedWithCustomError(soulbound, 'RMRKCannotTransferSoulbound');
   });
 }

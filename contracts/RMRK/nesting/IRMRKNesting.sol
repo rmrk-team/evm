@@ -108,13 +108,11 @@ interface IRMRKNesting is IERC165 {
     /**
      * @notice Sends an instance of Child from the pending children array at index to children array for tokenId.
      * @param parentId tokenId of parent token to accept a child on
-     * @param childIndex index of child in _pendingChildren array to accept.
-     * @param childAddress address of the child expected to be in the index.
-     * @param childId token Id of the child expected to be in the index
+     * @param childAddress address of the child contract
+     * @param childId token Id of the child
      */
     function acceptChild(
         uint256 parentId,
-        uint256 childIndex,
         address childAddress,
         uint256 childId
     ) external;
@@ -134,7 +132,6 @@ interface IRMRKNesting is IERC165 {
      * @notice Function to unnest a child from the active token array.
      * @param tokenId is the tokenId of the parent token to unnest from.
      * @param to is the address to transfer this
-     * @param childIndex is the index of the child token ID.
      * @param childAddress address of the child expected to be in the index.
      * @param childId token Id of the child expected to be in the index
      * @param isPending Boolean value indicating whether the token is in the pending array of the parent (`true`) or in
@@ -143,7 +140,6 @@ interface IRMRKNesting is IERC165 {
     function unnestChild(
         uint256 tokenId,
         address to,
-        uint256 childIndex,
         address childAddress,
         uint256 childId,
         bool isPending
@@ -166,24 +162,6 @@ interface IRMRKNesting is IERC165 {
         external
         view
         returns (Child[] memory);
-
-    /**
-     * @dev Returns a single child object existing at `index` on `parentId`.
-     *
-     */
-    function childOf(uint256 parentId, uint256 index)
-        external
-        view
-        returns (Child memory);
-
-    /**
-     * @dev Returns a single pending child object existing at `index` on `parentId`.
-     *
-     */
-    function pendingChildOf(uint256 parentId, uint256 index)
-        external
-        view
-        returns (Child memory);
 
     /**
      * @dev Function called when calling transferFrom with the target as another NFT via `tokenId`

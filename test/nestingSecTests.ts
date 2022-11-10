@@ -31,9 +31,12 @@ describe('Nesting with ChildAdder', function () {
       // Propose 10 children with the same params to the parent token
       await adder.addChild(parent.address, 1, 1, 10);
 
-      await parent.connect(owner).acceptChild(1, 0, adder.address, 1);
+      await parent.connect(owner).acceptChild(1, adder.address, 1);
+
+      // Propose 1 more so it keeps tracks of the pending index
+      await adder.addChild(parent.address, 1, 1, 1);
       await expect(
-        parent.connect(owner).acceptChild(1, 0, adder.address, 1),
+        parent.connect(owner).acceptChild(1, adder.address, 1),
       ).to.be.revertedWithCustomError(parent, 'RMRKChildAlreadyExists');
     });
   });

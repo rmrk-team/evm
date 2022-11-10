@@ -307,8 +307,6 @@ contract RMRKEquippable is
      *  transferred to an incompatible smart contract, custom validation has to be added when using this function.
      * @param tokenId ID of the parent token from which the child token is being unnested
      * @param to Externally owned address to which to transfer the unnested token to
-     * @param childIndex Index of a token we are unnesting, in the array it belongs to (can be either active array or
-     *  pending array)
      * @param childAddress Address of the child token's collection smart contract
      * @param childId ID of the child token being unnested in its own collection smart contract
      * @param isPending A boolean value indicating whether the child token being unnested is in the pending array of the
@@ -317,7 +315,6 @@ contract RMRKEquippable is
     function _unnestChild(
         uint256 tokenId,
         address to,
-        uint256 childIndex,
         address childAddress,
         uint256 childId,
         bool isPending
@@ -326,14 +323,7 @@ contract RMRKEquippable is
             if (isChildEquipped(tokenId, childAddress, childId))
                 revert RMRKMustUnequipFirst();
         }
-        super._unnestChild(
-            tokenId,
-            to,
-            childIndex,
-            childAddress,
-            childId,
-            isPending
-        );
+        super._unnestChild(tokenId, to, childAddress, childId, isPending);
     }
 
     /**
@@ -383,10 +373,7 @@ contract RMRKEquippable is
         // Check from parent's resource perspective:
         _checkResourceAcceptsSlot(data.resourceId, slotPartId);
 
-        IRMRKNesting.Child memory child = childOf(
-            data.tokenId,
-            data.childIndex
-        );
+        IRMRKNesting.Child memory child = _activeChildren[data.tokenId][data.childIndex];
 
         // Check from child perspective intention to be used in part
         // We add reentrancy guard because of this call, it happens before updating state

@@ -343,10 +343,7 @@ contract RMRKExternalEquip is
         // Check from parent's resource perspective:
         _checkResourceAcceptsSlot(data.resourceId, slotPartId);
 
-        IRMRKNesting.Child memory child = IRMRKNesting(_nestingAddress).childOf(
-            data.tokenId,
-            data.childIndex
-        );
+        IRMRKNesting.Child memory child = IRMRKNesting(_nestingAddress).childrenOf(data.tokenId)[data.childIndex];
         address childEquippable = IRMRKNestingExternalEquip(
             child.contractAddress
         ).getEquippableAddress();
