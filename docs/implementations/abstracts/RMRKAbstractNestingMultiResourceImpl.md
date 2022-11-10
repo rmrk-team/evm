@@ -30,7 +30,7 @@ Version of the @rmrk-team/evm-contracts package
 ### acceptChild
 
 ```solidity
-function acceptChild(uint256 parentId, uint256 childIndex, address childAddress, uint256 childId) external nonpayable
+function acceptChild(uint256 parentId, address childAddress, uint256 childId) external nonpayable
 ```
 
 Sends an instance of Child from the pending children array at index to children array for tokenId.
@@ -42,9 +42,8 @@ Sends an instance of Child from the pending children array at index to children 
 | Name | Type | Description |
 |---|---|---|
 | parentId | uint256 | tokenId of parent token to accept a child on |
-| childIndex | uint256 | index of child in _pendingChildren array to accept. |
-| childAddress | address | address of the child expected to be in the index. |
-| childId | uint256 | token Id of the child expected to be in the index |
+| childAddress | address | address of the child contract |
+| childId | uint256 | token Id of the child |
 
 ### acceptResource
 
@@ -254,29 +253,6 @@ function childIsInActive(address childAddress, uint256 childId) external view re
 | Name | Type | Description |
 |---|---|---|
 | _0 | bool | undefined |
-
-### childOf
-
-```solidity
-function childOf(uint256 parentId, uint256 index) external view returns (struct IRMRKNesting.Child)
-```
-
-
-
-*Returns a single child object existing at `index` on `parentId`.*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| parentId | uint256 | undefined |
-| index | uint256 | undefined |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | IRMRKNesting.Child | undefined |
 
 ### childrenOf
 
@@ -702,29 +678,6 @@ Returns the root owner of the current RMRK NFT.
 |---|---|---|
 | _0 | address | undefined |
 
-### pendingChildOf
-
-```solidity
-function pendingChildOf(uint256 parentId, uint256 index) external view returns (struct IRMRKNesting.Child)
-```
-
-
-
-*Returns a single pending child object existing at `index` on `parentId`.*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| parentId | uint256 | undefined |
-| index | uint256 | undefined |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | IRMRKNesting.Child | undefined |
-
 ### pendingChildrenOf
 
 ```solidity
@@ -1138,7 +1091,7 @@ Transfers ownership of the contract to a new owner.
 ### unnestChild
 
 ```solidity
-function unnestChild(uint256 tokenId, address to, uint256 childIndex, address childAddress, uint256 childId, bool isPending) external nonpayable
+function unnestChild(uint256 tokenId, address to, address childAddress, uint256 childId, bool isPending) external nonpayable
 ```
 
 Function to unnest a child from the active token array.
@@ -1151,7 +1104,6 @@ Function to unnest a child from the active token array.
 |---|---|---|
 | tokenId | uint256 | is the tokenId of the parent token to unnest from. |
 | to | address | is the address to transfer this |
-| childIndex | uint256 | is the index of the child token ID. |
 | childAddress | address | address of the child expected to be in the index. |
 | childId | uint256 | token Id of the child expected to be in the index |
 | isPending | bool | Boolean value indicating whether the token is in the pending array of the parent (`true`) or in  the active array (`false`) |
@@ -1626,13 +1578,13 @@ Attempting to accept a child that has already been accepted
 
 
 
-### RMRKChildIndexOutOfRange
+### RMRKChildNotFoundOnToken
 
 ```solidity
-error RMRKChildIndexOutOfRange()
+error RMRKChildNotFoundOnToken()
 ```
 
-Attempting to interact with a child, using index that is higher than the number of children
+Attempting to accept or unnest a child which is not on the token
 
 
 
@@ -1830,17 +1782,6 @@ Attempting to interact with a function without being the owner or contributor of
 
 
 
-### RMRKPendingChildIndexOutOfRange
-
-```solidity
-error RMRKPendingChildIndexOutOfRange()
-```
-
-Attempting to interact with a pending child using an index greater than the size of pending array
-
-
-
-
 ### RMRKResourceAlreadyExists
 
 ```solidity
@@ -1859,17 +1800,6 @@ error RMRKTokenDoesNotHaveResource()
 ```
 
 Attempting to compose a NFT of a token without active resources
-
-
-
-
-### RMRKUnexpectedChildId
-
-```solidity
-error RMRKUnexpectedChildId()
-```
-
-Attempting to accept or unnest a child which does not match the one at the specified index
 
 
 

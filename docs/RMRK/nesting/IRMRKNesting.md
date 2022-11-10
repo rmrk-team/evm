@@ -13,7 +13,7 @@
 ### acceptChild
 
 ```solidity
-function acceptChild(uint256 parentId, uint256 childIndex, address childAddress, uint256 childId) external nonpayable
+function acceptChild(uint256 parentId, address childAddress, uint256 childId) external nonpayable
 ```
 
 Sends an instance of Child from the pending children array at index to children array for tokenId.
@@ -25,9 +25,8 @@ Sends an instance of Child from the pending children array at index to children 
 | Name | Type | Description |
 |---|---|---|
 | parentId | uint256 | tokenId of parent token to accept a child on |
-| childIndex | uint256 | index of child in _pendingChildren array to accept. |
-| childAddress | address | address of the child expected to be in the index. |
-| childId | uint256 | token Id of the child expected to be in the index |
+| childAddress | address | address of the child contract |
+| childId | uint256 | token Id of the child |
 
 ### addChild
 
@@ -68,29 +67,6 @@ function burn(uint256 tokenId, uint256 maxRecursiveBurns) external nonpayable re
 | Name | Type | Description |
 |---|---|---|
 | _0 | uint256 | undefined |
-
-### childOf
-
-```solidity
-function childOf(uint256 parentId, uint256 index) external view returns (struct IRMRKNesting.Child)
-```
-
-
-
-*Returns a single child object existing at `index` on `parentId`.*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| parentId | uint256 | undefined |
-| index | uint256 | undefined |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | IRMRKNesting.Child | undefined |
 
 ### childrenOf
 
@@ -154,29 +130,6 @@ function ownerOf(uint256 tokenId) external view returns (address owner)
 | Name | Type | Description |
 |---|---|---|
 | owner | address | undefined |
-
-### pendingChildOf
-
-```solidity
-function pendingChildOf(uint256 parentId, uint256 index) external view returns (struct IRMRKNesting.Child)
-```
-
-
-
-*Returns a single pending child object existing at `index` on `parentId`.*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| parentId | uint256 | undefined |
-| index | uint256 | undefined |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | IRMRKNesting.Child | undefined |
 
 ### pendingChildrenOf
 
@@ -265,7 +218,7 @@ function supportsInterface(bytes4 interfaceId) external view returns (bool)
 ### unnestChild
 
 ```solidity
-function unnestChild(uint256 tokenId, address to, uint256 childIndex, address childAddress, uint256 childId, bool isPending) external nonpayable
+function unnestChild(uint256 tokenId, address to, address childAddress, uint256 childId, bool isPending) external nonpayable
 ```
 
 Function to unnest a child from the active token array.
@@ -278,7 +231,6 @@ Function to unnest a child from the active token array.
 |---|---|---|
 | tokenId | uint256 | is the tokenId of the parent token to unnest from. |
 | to | address | is the address to transfer this |
-| childIndex | uint256 | is the index of the child token ID. |
 | childAddress | address | address of the child expected to be in the index. |
 | childId | uint256 | token Id of the child expected to be in the index |
 | isPending | bool | Boolean value indicating whether the token is in the pending array of the parent (`true`) or in  the active array (`false`) |
