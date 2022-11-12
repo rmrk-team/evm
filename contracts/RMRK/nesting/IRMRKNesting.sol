@@ -90,7 +90,7 @@ interface IRMRKNesting is IERC165 {
      * @param childId ID of the child token in the child token's collection smart contract
      * @param childIndex Index of a child in the array from which it is being unnested
      * @param fromPending A boolean value signifying whether the token was in the pending child tokens array (`true`) or
-     *  not (`false`)
+     *  in the active child tokens array (`false`)
      */
     event ChildUnnested(
         uint256 indexed tokenId,
@@ -112,8 +112,8 @@ interface IRMRKNesting is IERC165 {
 
     /**
      * @notice Used to retrieve the *root* owner of a given token.
-     * @dev The *root* owner of the token is an externally owned account. If the given token is child of another NFT,
-     *  this will return an EOA address. Otherwise, it will return the immediate owner.
+     * @dev The *root* owner of the token is an externally owned account (EOA). If the given token is child of another
+     *  NFT, this will return an EOA address. Otherwise, if the token is owned by an EOA, this EOA wil be returned.
      * @param tokenId ID of the token for which the *root* owner has been retrieved
      * @return owner The *root* owner of the token
      */
@@ -142,6 +142,8 @@ interface IRMRKNesting is IERC165 {
      * @dev When a token is burned, all of its child tokens are recursively burned as well.
      * @dev When specifying the maximum recursive burns, the execution will be reverted if there are more children to be
      *  burned.
+     * @dev Setting the `maxRecursiveBurn` value to 0 will only attempt to burn the specified token and revert if there
+     *  are any child tokens present.
      * @param tokenId ID of the token to burn
      * @param maxRecursiveBurns Maximum number of tokens to recursively burn
      * @return uint256 Number of recursively burned children
@@ -152,10 +154,10 @@ interface IRMRKNesting is IERC165 {
 
     /**
      * @notice Used to add a child token to a given parent token.
-     * @dev This adds the iichild token into the given parent token's pending child tokens array.
+     * @dev This adds the child token into the given parent token's pending child tokens array.
      * @dev Requirements:
      *
-     *  - `ownerOf` on the child contract must resolve to the called contract.
+     *  - `rmrkOwnerOf` on the child contract must resolve to the called contract.
      *  - the pending array of the parent contract must not be full.
      * @param parentId ID of the parent token to receive the new child token
      * @param childId ID of the new proposed child token

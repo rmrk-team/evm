@@ -37,7 +37,7 @@ function addChild(uint256 parentId, uint256 childId) external nonpayable
 
 Used to add a child token to a given parent token.
 
-*This adds the iichild token into the given parent token&#39;s pending child tokens array.Requirements:  - `ownerOf` on the child contract must resolve to the called contract.  - the pending array of the parent contract must not be full.*
+*This adds the child token into the given parent token&#39;s pending child tokens array.Requirements:  - `rmrkOwnerOf` on the child contract must resolve to the called contract.  - the pending array of the parent contract must not be full.*
 
 #### Parameters
 
@@ -54,7 +54,7 @@ function burn(uint256 tokenId, uint256 maxRecursiveBurns) external nonpayable re
 
 Used to burn a given token.
 
-*When a token is burned, all of its child tokens are recursively burned as well.When specifying the maximum recursive burns, the execution will be reverted if there are more children to be  burned.*
+*When a token is burned, all of its child tokens are recursively burned as well.When specifying the maximum recursive burns, the execution will be reverted if there are more children to be  burned.Setting the `maxRecursiveBurn` value to 0 will only attempt to burn the specified token and revert if there  are any child tokens present.*
 
 #### Parameters
 
@@ -141,7 +141,7 @@ function ownerOf(uint256 tokenId) external view returns (address owner)
 
 Used to retrieve the *root* owner of a given token.
 
-*The *root* owner of the token is an externally owned account. If the given token is child of another NFT,  this will return an EOA address. Otherwise, it will return the immediate owner.*
+*The *root* owner of the token is an externally owned account (EOA). If the given token is child of another  NFT, this will return an EOA address. Otherwise, if the token is owned by an EOA, this EOA wil be returned.*
 
 #### Parameters
 
@@ -359,7 +359,7 @@ Used to notify listeners a child token has been unnested from parent token.
 | childIndex  | uint256 | Index of a child in the array from which it is being unnested |
 | childAddress `indexed` | address | Address of the child token&#39;s collection smart contract |
 | childId `indexed` | uint256 | ID of the child token in the child token&#39;s collection smart contract |
-| fromPending  | bool | A boolean value signifying whether the token was in the pending child tokens array (`true`) or  not (`false`) |
+| fromPending  | bool | A boolean value signifying whether the token was in the pending child tokens array (`true`) or  in the active child tokens array (`false`) |
 
 ### NestTransfer
 
