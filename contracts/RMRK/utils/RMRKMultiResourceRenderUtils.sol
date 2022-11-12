@@ -1,23 +1,37 @@
 // SPDX-License-Identifier: Apache-2.0
 
+pragma solidity ^0.8.16;
+
 import "contracts/RMRK/multiresource/IRMRKMultiResource.sol";
 import "../library/RMRKErrors.sol";
 
-pragma solidity ^0.8.16;
-
 /**
- * @dev Extra utility functions for composing RMRK resources.
+ * @title RMRKMultiResourceRenderUtils
+ * @author RMRK team
+ * @notice Interface smart contract of the RMRK Multi resource render utils module.
  */
-
 contract RMRKMultiResourceRenderUtils {
     uint16 private constant _LOWEST_POSSIBLE_PRIORITY = 2**16 - 1;
 
+    /**
+     * @notice The structure used to display information about an active resource.
+     * @return id ID of the resource
+     * @return priority The priority assigned to the resource
+     * @return metadata The metadata URI of the resource
+     */
     struct ActiveResource {
         uint64 id;
         uint16 priority;
         string metadata;
     }
 
+    /**
+     * @notice The structure used to display information about a pending resource.
+     * @return id ID of the resource
+     * @return acceptRejectIndex An index to use in order to accept or reject the given resource
+     * @return overwritesResourceWithId ID of the resource that would be overwritten if this resource gets accepted
+     * @return metadata The metadata URI of the resource
+     */
     struct PendingResource {
         uint64 id;
         uint128 acceptRejectIndex;
@@ -25,6 +39,18 @@ contract RMRKMultiResourceRenderUtils {
         string metadata;
     }
 
+    /**
+     * @notice Used to get the active resources of the given token.
+     * @dev The full `ActiveResource` looks like this:
+     *  [
+     *      id,
+     *      priority,
+     *      metadata
+     *  ]
+     * @param target Address of the smart contract of the given token
+     * @param tokenId ID of the token to retrieve the active resources for
+     * @return struct[] An array of ActiveResources present on the given token
+     */
     function getActiveResources(address target, uint256 tokenId)
         public
         view
@@ -58,6 +84,19 @@ contract RMRKMultiResourceRenderUtils {
         return activeResources;
     }
 
+    /**
+     * @notice Used to get the pending resources of the given token.
+     * @dev The full `PendingResource` looks like this:
+     *  [
+     *      id,
+     *      acceptRejectIndex,
+     *      overwritesResourceWithId,
+     *      metadata
+     *  ]
+     * @param target Address of the smart contract of the given token
+     * @param tokenId ID of the token to retrieve the pending resources for
+     * @return struct[] An array of PendingResources present on the given token
+     */
     function getPendingResources(address target, uint256 tokenId)
         public
         view
@@ -95,11 +134,14 @@ contract RMRKMultiResourceRenderUtils {
     }
 
     /**
-     * @notice Returns resource metadata strings for the given ids
+     * @notice Used to retriece the metadata URI of specified resources in the specified token.
+     * @dev Requirements:
      *
-     * Requirements:
-     *
-     * - `resourceIds` must exist.
+     *  - `resourceIds` must exist.
+     * @param target Address of the smart contract of the given token
+     * @param tokenId ID of the token to retrieve the specified resources for
+     * @param resourceIds[] An array of resource IDs for which to retrieve the metadata URIs
+     * @return string[] An array of metadata URIs belonging to specified resources
      */
     function getResourcesById(
         address target,
@@ -119,7 +161,10 @@ contract RMRKMultiResourceRenderUtils {
     }
 
     /**
-     * @notice Returns the resource metadata with the highest priority for the given token
+     * @notice Used to retrieve the metadata URI of the specified token's resource with the highest priority.
+     * @param target Address of the smart contract of the given token
+     * @param tokenId ID of the token for which to retrieve the metadata URI of the resource with the highest priority
+     * @return string The metadata URI of the resource with the highest priority
      */
     function getTopResourceMetaForToken(address target, uint256 tokenId)
         external

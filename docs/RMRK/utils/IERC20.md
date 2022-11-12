@@ -2,9 +2,9 @@
 
 
 
+> IERC20
 
-
-
+Interface smart contract of the ERC20 smart contract implementation.
 
 
 
@@ -16,7 +16,7 @@
 function allowance(address owner, address spender) external view returns (uint256)
 ```
 
-
+Used to grant permission to an account to spend the tokens of another
 
 
 
@@ -24,14 +24,14 @@ function allowance(address owner, address spender) external view returns (uint25
 
 | Name | Type | Description |
 |---|---|---|
-| owner | address | undefined |
-| spender | address | undefined |
+| owner | address | Address that owns the tokens |
+| spender | address | Address that is being granted the permission to spend the tokens of the `owner` |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | undefined |
+| _0 | uint256 | uint256 Amount of tokens that the `spender` can manage |
 
 ### transferFrom
 
@@ -39,7 +39,7 @@ function allowance(address owner, address spender) external view returns (uint25
 function transferFrom(address from, address to, uint256 amount) external nonpayable returns (bool)
 ```
 
-
+Used to transfer tokens from one address to another.
 
 
 
@@ -47,15 +47,15 @@ function transferFrom(address from, address to, uint256 amount) external nonpaya
 
 | Name | Type | Description |
 |---|---|---|
-| from | address | undefined |
-| to | address | undefined |
-| amount | uint256 | undefined |
+| from | address | Address of the account from which the the tokens are being transferred |
+| to | address | Address of the account to which the tokens are being transferred |
+| amount | uint256 | Amount of tokens that are being transferred |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | undefined |
+| _0 | bool | bool A boolean value signifying whether the transfer was succesfull (`true`) or not (`false`) |
 
 
 

@@ -1,12 +1,12 @@
 # RMRKMultiResourceRenderUtils
 
+*RMRK team*
+
+> RMRKMultiResourceRenderUtils
+
+Interface smart contract of the RMRK Multi resource render utils module.
 
 
-
-
-
-
-*Extra utility functions for composing RMRK resources.*
 
 ## Methods
 
@@ -16,22 +16,22 @@
 function getActiveResources(address target, uint256 tokenId) external view returns (struct RMRKMultiResourceRenderUtils.ActiveResource[])
 ```
 
+Used to get the active resources of the given token.
 
-
-
+*The full `ActiveResource` looks like this:  [      id,      priority,      metadata  ]*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| target | address | undefined |
-| tokenId | uint256 | undefined |
+| target | address | Address of the smart contract of the given token |
+| tokenId | uint256 | ID of the token to retrieve the active resources for |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | RMRKMultiResourceRenderUtils.ActiveResource[] | undefined |
+| _0 | RMRKMultiResourceRenderUtils.ActiveResource[] | struct[] An array of ActiveResources present on the given token |
 
 ### getPendingResources
 
@@ -39,22 +39,22 @@ function getActiveResources(address target, uint256 tokenId) external view retur
 function getPendingResources(address target, uint256 tokenId) external view returns (struct RMRKMultiResourceRenderUtils.PendingResource[])
 ```
 
+Used to get the pending resources of the given token.
 
-
-
+*The full `PendingResource` looks like this:  [      id,      acceptRejectIndex,      overwritesResourceWithId,      metadata  ]*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| target | address | undefined |
-| tokenId | uint256 | undefined |
+| target | address | Address of the smart contract of the given token |
+| tokenId | uint256 | ID of the token to retrieve the pending resources for |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | RMRKMultiResourceRenderUtils.PendingResource[] | undefined |
+| _0 | RMRKMultiResourceRenderUtils.PendingResource[] | struct[] An array of PendingResources present on the given token |
 
 ### getResourcesById
 
@@ -62,23 +62,23 @@ function getPendingResources(address target, uint256 tokenId) external view retu
 function getResourcesById(address target, uint256 tokenId, uint64[] resourceIds) external view returns (string[])
 ```
 
-Returns resource metadata strings for the given ids Requirements: - `resourceIds` must exist.
+Used to retriece the metadata URI of specified resources in the specified token.
 
-
+*Requirements:  - `resourceIds` must exist.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| target | address | undefined |
-| tokenId | uint256 | undefined |
-| resourceIds | uint64[] | undefined |
+| target | address | Address of the smart contract of the given token |
+| tokenId | uint256 | ID of the token to retrieve the specified resources for |
+| resourceIds | uint64[] | [] An array of resource IDs for which to retrieve the metadata URIs |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string[] | undefined |
+| _0 | string[] | string[] An array of metadata URIs belonging to specified resources |
 
 ### getTopResourceMetaForToken
 
@@ -86,7 +86,7 @@ Returns resource metadata strings for the given ids Requirements: - `resourceIds
 function getTopResourceMetaForToken(address target, uint256 tokenId) external view returns (string)
 ```
 
-Returns the resource metadata with the highest priority for the given token
+Used to retrieve the metadata URI of the specified token&#39;s resource with the highest priority.
 
 
 
@@ -94,14 +94,14 @@ Returns the resource metadata with the highest priority for the given token
 
 | Name | Type | Description |
 |---|---|---|
-| target | address | undefined |
-| tokenId | uint256 | undefined |
+| target | address | Address of the smart contract of the given token |
+| tokenId | uint256 | ID of the token for which to retrieve the metadata URI of the resource with the highest priority |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | undefined |
+| _0 | string | string The metadata URI of the resource with the highest priority |
 
 
 
