@@ -6,6 +6,8 @@ pragma solidity ^0.8.16;
 error RentrantCall();
 
 /**
+ * @title ReentrancyGuard
+ * @notice Smart contract used to guard against potential reentrancy exploits.
  * @dev Contract module that helps prevent reentrant calls to a function.
  *
  * Inheriting from `ReentrancyGuard` will make the {nonReentrant} modifier
@@ -38,11 +40,15 @@ abstract contract ReentrancyGuard {
 
     uint256 private _status;
 
+    /**
+     * @dev Initializes the ReentrancyGuard with the `_status` of `_NOT_ENTERED`.
+     */
     constructor() {
         _status = _NOT_ENTERED;
     }
 
     /**
+     * @notice Used to ensure that the function it is applied to cannot be reentered.
      * @dev Prevents a contract from calling itself, directly or indirectly.
      * Calling a `nonReentrant` function from another `nonReentrant`
      * function is not supported. It is possible to prevent this from happening
@@ -57,6 +63,10 @@ abstract contract ReentrancyGuard {
         _status = _NOT_ENTERED;
     }
 
+    /**
+     * @notice Used to ensure that the current call is not a reentrant call.
+     * @dev If reentrant call is detected, the execution will be reverted.
+     */
     function _nonReentrantIn() private {
         // On the first call to nonReentrant, _notEntered will be true
         if (_status == _ENTERED) revert RentrantCall();
