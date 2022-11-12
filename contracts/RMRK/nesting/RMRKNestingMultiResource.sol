@@ -79,7 +79,7 @@ contract RMRKNestingMultiResource is RMRKNesting, AbstractMultiResource {
     // --------------------------- HANDLING RESOURCES -------------------------
 
     /**
-     * @notice Accepts a resource at from the pending array of given token.
+     * @notice Accepts a resource from the pending array of given token.
      * @dev Migrates the resource from the token's pending resource array to the token's active resource array.
      * @dev Active resources cannot be removed by anyone, but can be replaced by a new resource.
      * @dev Requirements:

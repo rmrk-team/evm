@@ -52,7 +52,7 @@ function acceptChild(uint256 parentId, uint256 childIndex, address childAddress,
 function acceptResource(uint256 tokenId, uint256 index, uint64 resourceId) external nonpayable
 ```
 
-Accepts a resource at from the pending array of given token.
+Accepts a resource from the pending array of given token.
 
 *Migrates the resource from the token&#39;s pending resource array to the token&#39;s active resource array.Active resources cannot be removed by anyone, but can be replaced by a new resource.Requirements:  - The caller must own the token or be approved to manage the token&#39;s resources  - `tokenId` must exist.  - `index` must be in range of the length of the pending resource array.Emits an {ResourceAccepted} event.*
 

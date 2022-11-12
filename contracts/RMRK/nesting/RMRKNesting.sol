@@ -806,7 +806,6 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
 
     /**
      * @notice Used to check whether the given token exists.
-     * @dev Tokens can be managed by their owner or approved accounts via {approve} or {setApprovalForAll}.
      * @dev Tokens start existing when they are minted (`_mint`) and stop existing when they are burned (`_burn`).
      * @param tokenId ID of the token being checked
      * @return bool The boolean value signifying whether the token exists
