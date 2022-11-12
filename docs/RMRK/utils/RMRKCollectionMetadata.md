@@ -1,10 +1,10 @@
 # RMRKCollectionMetadata
 
+*RMRK team*
 
+> RMRKCollectionMetadata
 
-
-
-
+Smart contract of the RMRK Collection metadata module.
 
 
 
@@ -16,7 +16,7 @@
 function collectionMetadata() external view returns (string)
 ```
 
-
+Used to retrieve the metadata of the collection.
 
 
 
@@ -25,7 +25,7 @@ function collectionMetadata() external view returns (string)
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | undefined |
+| _0 | string | string The metadata URI of the collection |
 
 
 

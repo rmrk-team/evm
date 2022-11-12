@@ -1,19 +1,31 @@
 // SPDX-License-Identifier: Apache-2.0
 
+pragma solidity ^0.8.16;
+
 import "../base/IRMRKBaseStorage.sol";
 import "../equippable/IRMRKEquippable.sol";
 import "../library/RMRKLib.sol";
 import "../library/RMRKErrors.sol";
 
-pragma solidity ^0.8.16;
-
 /**
+ * @title RMRKEquipRenderUtils
+ * @author RMRK team
+ * @notice Smart contract of the RMRK Equip render utils module.
  * @dev Extra utility functions for composing RMRK extended resources.
  */
-
 contract RMRKEquipRenderUtils {
     using RMRKLib for uint64[];
 
+    /**
+     * @notice The structure used to display a full information of an active resource.
+     * @return id ID of the resource
+     * @return equppableGroupId ID of the equippable group this resource belongs to
+     * @return priority Priority of the resource in the active resources array it belongs to
+     * @return baseAddress Address of the `Base` smart contract this resource belongs to
+     * @return metadata Metadata URI of the resource
+     * @return fixedParts An array of IDs of fixed parts present in the resource
+     * @return slotParts An array of IDs of slot parts present in the resource
+     */
     struct ExtendedActiveResource {
         uint64 id;
         uint64 equippableGroupId;
@@ -24,6 +36,17 @@ contract RMRKEquipRenderUtils {
         uint64[] slotParts;
     }
 
+    /**
+     * @notice The structure used to display a full information of a pending resource.
+     * @return id ID of the resource
+     * @return equppableGroupId ID of the equippable group this resource belongs to
+     * @return acceptRejectIndex The index of the given resource in the pending resources array it belongs to
+     * @return overwritesResourceWithId ID of the resource the given resource will overwrite if accepted
+     * @return baseAddress Address of the `Base` smart contract this resource belongs to
+     * @return metadata Metadata URI of the resource
+     * @return fixedParts An array of IDs of fixed parts present in the resource
+     * @return slotParts An array of IDs of slot parts present in the resource
+     */
     struct ExtendedPendingResource {
         uint64 id;
         uint64 equippableGroupId;
@@ -35,6 +58,16 @@ contract RMRKEquipRenderUtils {
         uint64[] slotParts;
     }
 
+    /**
+     * @notice The structure used to display a full information of an equippend slot part.
+     * @return partId ID of the slot part
+     * @return childResourceId ID of the child resource equipped into the slot part
+     * @return z The z value of the part defining how it should be rendered when presenting the full NFT
+     * @return childAddress Address of the collection smart contract of the child token equipped into the slot
+     * @return childId ID of the child token equipped into the slot
+     * @return childResourceMetadata Metadata URI of the child token equipped into the slot
+     * @return partMetadata Metadata URI of the given slot part
+     */
     struct EquippedSlotPart {
         uint64 partId;
         uint64 childResourceId;
@@ -45,6 +78,30 @@ contract RMRKEquipRenderUtils {
         string partMetadata; //n bytes 32+
     }
 
+    /**
+     * @notice Used to get extended active resources of the given token.
+     * @dev The full `ExtendedActiveResource` looks like this:
+     *  [
+     *      ID,
+     *      equippableGroupId,
+     *      priority,
+     *      baseAddress,
+     *      metadata,
+     *      [
+     *          fixedPartId0,
+     *          fixedPartId1,
+     *          fixedPartId2
+     *      ],
+     *      [
+     *          slotPartId0,
+     *          slotPartId1,
+     *          slotPartId2
+     *      ]
+     *  ]
+     * @param target Address of the smart contract of the given token
+     * @param tokenId ID of the token to retrieve the extended active resources for
+     * @return sturct[] An array of ExtendedActiveResources present on the given token
+     */
     function getExtendedActiveResources(address target, uint256 tokenId)
         public
         view
@@ -89,6 +146,31 @@ contract RMRKEquipRenderUtils {
         return activeResources;
     }
 
+    /**
+     * @notice Used to get the extended pending resources of the given token.
+     * @dev The full `ExtendedPendingResource` looks like this:
+     *  [
+     *      ID,
+     *      equippableGroupId,
+     *      acceptRejectIndex,
+     *      overwritesResourceWithId, 
+     *      baseAddress,
+     *      metadata,
+     *      [
+     *          fixedPartId0,
+     *          fixedPartId1,
+     *          fixedPartId2
+     *      ],
+     *      [
+     *          slotPartId0,
+     *          slotPartId1,
+     *          slotPartId2
+     *      ]
+     *  ]
+     * @param target Address of the smart contract of the given token
+     * @param tokenId ID of the token to retrieve the extended pending resources for
+     * @return sturct[] An array of ExtendedPendingResources present on the given token
+     */
     function getExtendedPendingResources(address target, uint256 tokenId)
         public
         view
@@ -135,6 +217,22 @@ contract RMRKEquipRenderUtils {
         return pendingResources;
     }
 
+    /**
+     * @notice Used to retrieve the equipped parts of the given token.
+     * @dev NOTE: Some of the equipped children might be empty.
+     * @dev The full `Equipment` struct looks like this:
+     *  [
+     *      resourceId,
+     *      childResourceId,
+     *      childId,
+     *      childEquippableAddress
+     *  ]
+     * @param target Address of the smart contract of the given token
+     * @param tokenId ID of the token to retrieve the equipped items in the resource for
+     * @param resourceId ID of the resource being queried for equipped parts
+     * @return slotParts An array of the IDs of the slot parts present in the given resource
+     * @return childrenEquipped An array of `Equipment` structs containing info about the equipped children
+     */
     function getEquipped(
         address target,
         uint64 tokenId,
@@ -152,7 +250,6 @@ contract RMRKEquipRenderUtils {
         (, , address baseAddress, , uint64[] memory slotPartIds) = target_
             .getExtendedResource(tokenId, resourceId);
 
-        // TODO: Clarify on docs: Some children equipped might be empty.
         slotParts = new uint64[](slotPartIds.length);
         childrenEquipped = new IRMRKEquippable.Equipment[](slotPartIds.length);
 
@@ -173,6 +270,33 @@ contract RMRKEquipRenderUtils {
         }
     }
 
+    /**
+     * @notice Used to compose the given equippables.
+     * @dev The full `FixedPart` struct looks like this:
+     *  [
+     *      partId,
+     *      z,
+     *      metadataURI
+     *  ]
+     * @dev The full `EquippedSlotPart` struct looks like this:
+     *  [
+     *      partId,
+     *      childResourceId,
+     *      z,
+     *      childAddress,
+     *      childId,
+     *      childResourceMetadata,
+     *      partMetadata
+     *  ]
+     * @param target Address of the smart contract of the given token
+     * @param tokenId ID of the token to compose the equipped items in the resource for
+     * @param resourceId ID of the resource being queried for equipped parts
+     * @return metadataURI Metadata URI of the resource
+     * @return equippableGroupId Equippable group ID of the resource
+     * @return baseAddress Address of the base to which the resource belongs to
+     * @return fixedParts An array of fixed parts respresented by the `FixedPart` structs present on the resource
+     * @return slotParts An array of slot parts represented by the `EquippedSlotPart` structs present on the resource
+     */
     function composeEquippables(
         address target,
         uint256 tokenId,
@@ -192,7 +316,7 @@ contract RMRKEquipRenderUtils {
         uint64[] memory fixedPartIds;
         uint64[] memory slotPartIds;
 
-        // If token does not huint64[] memory slotPartIdsave the resource, it would fail here.
+        // If token does not have uint64[] memory slotPartId to save the resource, it would fail here.
         (
             metadataURI,
             equippableGroupId,
@@ -231,11 +355,30 @@ contract RMRKEquipRenderUtils {
         );
     }
 
+    /**
+     * @notice Used to retrieve the equipped slot parts.
+     * @dev The full `EquippedSlotPart` struct looks like this:
+     *  [
+     *      partId,
+     *      childResourceId,
+     *      z,
+     *      childAddress,
+     *      childId,
+     *      childResourceMetadata,
+     *      partMetadata
+     *  ]
+     * @param target_ An address of the `IRMRKEquippable` smart contract to retrieve the equipped slot parts from.
+     * @param tokenId ID of the token for which to retrieve the equipped slot parts
+     * @param resourceId ID of the resource on the token to retrieve the equipped slot parts
+     * @param baseAddress The address of the base to which the given resource belongs to
+     * @param slotPartIds An array of slot part IDs in the resource for which to retrieve the equipped slot parts
+     * @return slotParts An array of `EquippedSlotPart` structs representing the equipped slot parts
+     */
     function getEquippedSlotParts(
         IRMRKEquippable target_,
         uint256 tokenId,
         uint64 resourceId,
-        address baseAdress,
+        address baseAddress,
         uint64[] memory slotPartIds
     ) private view returns (EquippedSlotPart[] memory slotParts) {
         slotParts = new EquippedSlotPart[](slotPartIds.length);
@@ -244,11 +387,11 @@ contract RMRKEquipRenderUtils {
         if (len != 0) {
             string memory metadata;
             IRMRKBaseStorage.Part[] memory baseSlotParts = IRMRKBaseStorage(
-                baseAdress
+                baseAddress
             ).getParts(slotPartIds);
             for (uint256 i; i < len; ) {
                 IRMRKEquippable.Equipment memory equipment = target_
-                    .getEquipment(tokenId, baseAdress, slotPartIds[i]);
+                    .getEquipment(tokenId, baseAddress, slotPartIds[i]);
                 if (equipment.resourceId == resourceId) {
                     metadata = IRMRKEquippable(equipment.childEquippableAddress)
                         .getResourceMetadata(
