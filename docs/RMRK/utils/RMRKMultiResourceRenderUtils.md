@@ -4,7 +4,7 @@
 
 > RMRKMultiResourceRenderUtils
 
-Interface smart contract of the RMRK Multi resource render utils module.
+
 
 
 
@@ -62,7 +62,7 @@ Used to get the pending resources of the given token.
 function getResourcesById(address target, uint256 tokenId, uint64[] resourceIds) external view returns (string[])
 ```
 
-Used to retriece the metadata URI of specified resources in the specified token.
+Used to retrieve the metadata URI of specified resources in the specified token.
 
 *Requirements:  - `resourceIds` must exist.*
 

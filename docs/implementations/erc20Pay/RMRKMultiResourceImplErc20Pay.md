@@ -163,7 +163,7 @@ function balanceOf(address owner) external view returns (uint256)
 function collectionMetadata() external view returns (string)
 ```
 
-
+Used to retrieve the metadata of the collection.
 
 
 
@@ -172,7 +172,7 @@ function collectionMetadata() external view returns (string)
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | undefined |
+| _0 | string | string The metadata URI of the collection |
 
 ### erc20TokenAddress
 
@@ -472,7 +472,7 @@ Used to check if the address is one of the contributors.
 function maxSupply() external view returns (uint256)
 ```
 
-
+Used to retrieve the maximum supply of the collection.
 
 
 
@@ -481,7 +481,7 @@ function maxSupply() external view returns (uint256)
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | undefined |
+| _0 | uint256 | uint256 The maximum supply of tokens in the collection |
 
 ### mint
 
@@ -562,7 +562,7 @@ function ownerOf(uint256 tokenId) external view returns (address)
 function pricePerMint() external view returns (uint256)
 ```
 
-
+Used to retrieve the price per mint.
 
 
 
@@ -571,7 +571,7 @@ function pricePerMint() external view returns (uint256)
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | undefined |
+| _0 | uint256 | uint256 The price per mint of a single token expressed in the lowest denomination of a native currency |
 
 ### rejectAllResources
 
@@ -842,7 +842,7 @@ function totalResources() external view returns (uint256)
 function totalSupply() external view returns (uint256)
 ```
 
-
+Used to retrieve the total supply of the tokens in a collection.
 
 
 
@@ -851,7 +851,7 @@ function totalSupply() external view returns (uint256)
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | undefined |
+| _0 | uint256 | uint256 The number of tokens in a collection |
 
 ### transferFrom
 
@@ -909,16 +909,16 @@ Used to update recipient of royalties.
 function withdrawRaised(address to, uint256 amount) external nonpayable
 ```
 
+Used to withdraw the minting proceedings to a specified address.
 
-
-
+*This function can only be called by the owner.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| to | address | undefined |
-| amount | uint256 | undefined |
+| to | address | Address to receive the given amount of minting proceedings |
+| amount | uint256 | The amount to withdraw |
 
 
 
