@@ -8,7 +8,6 @@ import "../library/RMRKErrors.sol";
 /**
  * @title RMRKMultiResourceRenderUtils
  * @author RMRK team
- * @notice Interface smart contract of the RMRK Multi resource render utils module.
  */
 contract RMRKMultiResourceRenderUtils {
     uint16 private constant _LOWEST_POSSIBLE_PRIORITY = 2**16 - 1;
@@ -134,7 +133,7 @@ contract RMRKMultiResourceRenderUtils {
     }
 
     /**
-     * @notice Used to retriece the metadata URI of specified resources in the specified token.
+     * @notice Used to retrieve the metadata URI of specified resources in the specified token.
      * @dev Requirements:
      *
      *  - `resourceIds` must exist.
