@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.16;
 
-import "contracts/RMRK/multiresource/IRMRKMultiResource.sol";
+import "../multiresource/IRMRKMultiResource.sol";
 import "../library/RMRKErrors.sol";
 
 /**
