@@ -10,13 +10,13 @@ WORKFLOW NOTES:
 
 1. Deploy the Multiresource contract.
 2. Admin must add resources on a PER-TOKEN basis. This could be very gas-expensive, so it's recommended that this be done
-in batches.
+   in batches.
 3. Mint the tokens after your preferred method.
 
 ## Nesting (RMRKNesting)
 
 1. Deploy like a regular ERC721. That's it! This contract can recieve and be nested by other instances of RMRKNesting.
-Note that it WILL NOT be compatible with other equippable contracts as a standalone.
+   Note that it WILL NOT be compatible with other equippable contracts as a standalone.
 
 RMRK also offers Nesting + Multiresource (RMRKNestingMultiresource). To deploy, follow instructions after Multiresource.
 
@@ -30,8 +30,8 @@ mutually dependent contracts to allow for more custom logic in each, if necessar
 2. Deploy the RMRKExternalEquippable. This contract contains equippable and resource management logic.
 
 3. Initialize the address of RMRKExternalEquippable on RMRKNestingExternalEquippable via an exposed
-setEquippalbeAddress method. If you're not using a prefab RMRK top-level implementation, you will added
-need to expose this yourself.
+   setEquippalbeAddress method. If you're not using a prefab RMRK top-level implementation, you will added
+   need to expose this yourself.
 
 4. Deploy RMRKBaseStorage. Initialize your base parts (fixed and slot). You will pass the address of RMRKBaseStorage and corresponding base part IDs when initializing your resources on RMRKExternalEquippable.
 

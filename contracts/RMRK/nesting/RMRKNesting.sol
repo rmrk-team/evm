@@ -443,7 +443,7 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
     /**
      * @notice Used to mint a child token into a given parent token.
      * @dev Requirements:
-     * 
+     *
      *  - `to` cannot be the zero address.
      *  - `tokenId` must not exist.
      *  - `tokenId` must not be `0`.

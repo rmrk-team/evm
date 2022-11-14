@@ -153,7 +153,7 @@ contract RMRKEquipRenderUtils {
      *      ID,
      *      equippableGroupId,
      *      acceptRejectIndex,
-     *      overwritesResourceWithId, 
+     *      overwritesResourceWithId,
      *      baseAddress,
      *      metadata,
      *      [

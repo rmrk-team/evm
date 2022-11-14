@@ -224,7 +224,7 @@ contract RMRKNestingMultiResource is RMRKNesting, AbstractMultiResource {
 
     /**
      * @notice Used to remove approvals to manage the resources for a given token.
-     * @param tokenId ID of the token for which to clear the approvals 
+     * @param tokenId ID of the token for which to clear the approvals
      */
     function _cleanApprovals(uint256 tokenId) internal virtual override {
         _approveForResources(address(0), tokenId);
