@@ -29,7 +29,6 @@ const getTheAbi = () => {
           JSON.stringify(json.abi),
         );
       }
-
     });
   } catch (e) {
     console.log(`e`, e);
