@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 
 import "../interfaces/IRMRKMultiResource.sol";
 import "../interfaces/IRMRKNesting.sol";
-import "../interfaces/IRMRKEquippableAyuilosVer.sol";
+import "../interfaces/ILightmEquippable.sol";
 
 library ERC721Storage {
     struct State {
@@ -42,14 +42,14 @@ library MultiResourceStorage {
         mapping(uint256 => uint64[]) _activeResources;
         // Mapping of tokenId to an array of resource priorities
         mapping(uint256 => uint16[]) _activeResourcePriorities;
-        // Double mapping of tokenId to active resources
+        // Mapping of tokenId to resourceId to whether the token has this resource assigned
         mapping(uint256 => mapping(uint64 => bool)) _tokenResources;
-        // Mapping of tokenId to all resources by priority
+        // Mapping of tokenId to an array of pending resources
         mapping(uint256 => uint64[]) _pendingResources;
+        // Mapping of tokenId to resourceID to its position
+        mapping(uint256 => mapping(uint64 => uint256)) _resourcesPosition;
         // Fallback URI
         string _fallbackURI;
-        // List of all resources
-        uint64[] _allResources;
         // Mapping from token ID to approved address for resources
         mapping(uint256 => address) _tokenApprovalsForResources;
         // Mapping from owner to operator approvals for resources
@@ -71,7 +71,7 @@ library NestingStorage {
         // Mapping from token ID to RMRKOwner struct
         mapping(uint256 => IRMRKNesting.RMRKOwner) _RMRKOwners;
         // Mapping of tokenId to array of active children structs
-        mapping(uint256 => IRMRKNesting.Child[]) _children;
+        mapping(uint256 => IRMRKNesting.Child[]) _activeChildren;
         // Mapping of tokenId to array of pending children structs
         mapping(uint256 => IRMRKNesting.Child[]) _pendingChildren;
         // Mapping of childAddress to child tokenId to child position in children array
@@ -90,13 +90,15 @@ library NestingStorage {
 
 library EquippableStorage {
     struct State {
-        mapping(uint64 => IRMRKEquippable.BaseRelatedData) _baseRelatedDatas;
+        mapping(uint64 => ILightmEquippable.BaseRelatedData) _baseRelatedDatas;
         uint64[] _allBaseRelatedResourceIds;
-        // tokenId => baseResourceId[]
-        mapping(uint256 => uint64[]) _activeBaseResources;
-        IRMRKEquippable.SlotEquipment[] _slotEquipments;
+        // tokenId => baseRelatedResourceId[]
+        mapping(uint256 => uint64[]) _activeBaseRelatedResources;
+        // tokenId => baseRelatedResourceId => index
+        mapping(uint256 => mapping(uint64 => uint256)) _activeBaseRelatedResourcesPosition;
+        ILightmEquippable.SlotEquipment[] _slotEquipments;
         // tokenId => baseRelatedResourceId => slotId => EquipmentPointer in _slotEquipments
-        mapping(uint256 => mapping(uint64 => mapping(uint64 => IRMRKEquippable.EquipmentPointer))) _equipmentPointers;
+        mapping(uint256 => mapping(uint64 => mapping(uint64 => ILightmEquippable.EquipmentPointer))) _equipmentPointers;
         // tokenId => baseRelatedResourceId => childContract => childTokenId => bool
         // to make sure that every base instance can only has one slot occupied by one child.
         // For example, you have a hat NFT which have 2 resources: 1st is for wearing on the head of human NFT,
@@ -106,12 +108,12 @@ library EquippableStorage {
         // records which slots are in the equipped state
         mapping(uint256 => mapping(uint64 => uint64[])) _equippedSlots;
         // childContract => childTokenId => childBaseRelatedResourceId => EquipmentPointer in _slotEquipments
-        mapping(address => mapping(uint256 => mapping(uint64 => IRMRKEquippable.EquipmentPointer))) _childEquipmentPointers;
+        mapping(address => mapping(uint256 => mapping(uint64 => ILightmEquippable.EquipmentPointer))) _childEquipmentPointers;
         // records which childBaseRelatedResources are in the equipped state
         mapping(address => mapping(uint256 => uint64[])) _equippedChildBaseRelatedResources;
     }
 
-    bytes32 constant STORAGE_POSITION = keccak256("rmrk.equippable.storage");
+    bytes32 constant STORAGE_POSITION = keccak256("lightm.equippable.storage");
 
     function getState() internal pure returns (State storage s) {
         bytes32 position = STORAGE_POSITION;

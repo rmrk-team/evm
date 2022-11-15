@@ -2,10 +2,10 @@
 
 pragma solidity ^0.8.15;
 
-import "./interfaces/IRMRKEquippableAyuilosVer.sol";
-import "./internalFunctionSet/RMRKEquippableInternal.sol";
+import "./interfaces/ILightmEquippable.sol";
+import "./internalFunctionSet/LightmEquippableInternal.sol";
 
-contract RMRKEquippableFacet is IRMRKEquippable, RMRKEquippableInternal {
+contract LightmEquippableFacet is ILightmEquippable, LightmEquippableInternal {
     using RMRKLib for uint64[];
 
     // ------------------------ MultiResource ------------------------

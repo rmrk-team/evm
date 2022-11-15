@@ -5,9 +5,9 @@ pragma solidity ^0.8.15;
 import "./Diamond.sol";
 import "./DiamondCutFacet.sol";
 import "./DiamondLoupeFacet.sol";
-import "./RMRKEquippableNestingFacet.sol";
-import "./RMRKEquippableMultiResourceFacet.sol";
-import "./RMRKEquippableFacet.sol";
+import "./LightmEquippableNestingFacet.sol";
+import "./LightmEquippableMultiResourceFacet.sol";
+import "./LightmEquippableFacet.sol";
 import "./RMRKCollectionMetadataFacet.sol";
 import "./library/ValidatorLib.sol";
 import "./library/RMRKMultiResourceRenderUtils.sol";
@@ -48,8 +48,13 @@ contract LightmUniversalFactory is ILightmUniversalFactory {
         _implContractAddress = params.implContractAddress;
 
         IDiamondCut.FacetCut[] memory facetCuts = params.cuts;
-        for (uint256 i; i < facetCuts.length; i++) {
+        for (uint256 i; i < facetCuts.length; ) {
             _cuts.push(facetCuts[i]);
+
+            // gas saving
+            unchecked {
+                i++;
+            }
         }
     }
 

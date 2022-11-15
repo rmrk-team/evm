@@ -1,104 +1,29 @@
-# RMRK Solidity
+# Lightm
 
-A set of Solidity contracts for RMRK.app.
+Lightm is a [RMRK EVM](https://github.com/rmrk-team/evm) fork, and it uses the [EIP-2535](https://eips.ethereum.org/EIPS/eip-2535)'s [diamond 2](https://github.com/mudgen/diamond-2-hardhat) implementation to implement [RMRK Spec](https://github.com/rmrk-team/rmrk-spec/tree/master/standards/abstract).
 
-Please note that any implementations which are not marked `//////EXAMPLE//////` will not include any externally accessible functions which may modify the state of a user-owned token without that user's express authorization. Implementers are advised to inherit from these contracts and create a top-level wrapper that defines the logic of these functions as per the needs of their own deployment.
+## Note
+To be added.
 
-## Multiresource
+## Deployment
 
-# Interface
 
-This interface defines the standard for RMRK multi-resource tokens. While this repository will not enforce inheritance from another interface that defines a spec for token provenance or transfer, please note that most practical implementations will do so, the implementation provided in this repository included.
+### Full-automatic on-chain deployment
 
-# Implementation
+Go to [./scripts/deploy](./scripts/deploy_universal_factory.ts) to deploy universal factory and make NFT deployment happening tolly on chain.
 
-Provided are two examples of a RMRK multiresource token -- one which inherits from ERC721, and one which inherits from RMRK nesting, which may be considered a ERC721 compatible replacement.
+### Semi-automatic deployment
 
-## Settings
+Go to [./scripts/deploy_diamond_equippable.ts](./scripts/deploy_diamond_equippable.ts) to deploy your own custom NFT.
 
-> TBD
-
-A storage contract containing values like the RMRK Fungibilization deposit (how many tokens you need to make an NFT into a collection of fungibles) and other governance-settable values.
-
-## Equip
-
-> TBD
-
-Equipping and Base entity.
-
-## Emotable
-
-> TBD
-
-Emotes are useful, but very expensive to store. Some important considerations are documented here: https://github.com/rmrk-team/pallet-emotes and here: https://hackmd.io/JjqT6THTSoqMj-_ucPEJAw?view - needs storage oprimizations considerations vs wasting gas on looping. Benchmarking would be GREAT.
-
-## Fractional
-
-> TBD
-
-Turning NFTs into fractional tokens after a deposit of RMRK.
-The deposit size should be read from Settings.
-
-## Logic
-
-> TBD
-
-JSONlogic for front-end variability based on on-chain values.
-Logic should go into a Logic field of the NFT's body, and is executed exclusively in the client.
-
-## Harberger
-
-> TBD
-
-An extension for the contracts to make them Harberger-taxable by default, integrating the selling and taxing functionality right into the NFT's mint. This does mean the NFT can never not be Harb-taxed, but there can be an on-off flag for this that the _ultimate owner_ (a new owner type?) can flip.
-
----
-
-## Develop
-
-Just run `npx hardhat compile` to check if it works. Refer to the rest below.
-
-This project demonstrates an advanced Hardhat use case, integrating other tools commonly used alongside Hardhat in the ecosystem.
-
-The project comes with a sample contract, a test for that contract, a sample script that deploys that contract, and an example of a task implementation, which simply lists the available accounts. It also comes with a variety of other tools, preconfigured to work with the project code.
-
-Try running some of the following tasks:
-
-```shell
-npx hardhat accounts
-npx hardhat compile
-npx hardhat clean
-npx hardhat test
-npx hardhat node
-npx hardhat help
-REPORT_GAS=true npx hardhat test
-npx hardhat coverage
-npx hardhat run scripts/deploy.ts
-TS_NODE_FILES=true npx ts-node scripts/deploy.ts
-npx eslint '**/*.{js,ts}'
-npx eslint '**/*.{js,ts}' --fix
-npx prettier '**/*.{json,sol,md}' --check
-npx prettier '**/*.{json,sol,md}' --write
-npx solhint 'contracts/**/*.sol'
-npx solhint 'contracts/**/*.sol' --fix
-```
-
-## Etherscan verification
-
-To try out Etherscan verification, you first need to deploy a contract to an Ethereum network that's supported by Etherscan, such as Ropsten.
-
-In this project, copy the .env.example file to a file named .env, and then edit it to fill in the details. Enter your Etherscan API key, your Ropsten node URL (eg from Alchemy), and the private key of the account which will send the deployment transaction. With a valid .env file in place, first deploy your contract:
-
-```shell
-hardhat run --network ropsten scripts/sample-script.ts
-```
-
-Then, copy the deployment address and paste it in to replace `DEPLOYED_CONTRACT_ADDRESS` in this command:
-
-```shell
-npx hardhat verify --network ropsten DEPLOYED_CONTRACT_ADDRESS "Hello, Hardhat!"
-```
-
-# Performance optimizations
-
-For faster runs of your tests and scripts, consider skipping ts-node's type checking by setting the environment variable `TS_NODE_TRANSPILE_ONLY` to `1` in hardhat's environment. For more details see [the documentation](https://hardhat.org/guides/typescript.html#performance-optimizations).
+| Contract                                                                                      | Description                                                         | Can reuse                                |
+| --------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- | ---------------------------------------- |
+| [Create2Deployer](./contracts/RMRK/Create2Deployer.sol)                                       | A create2 contract deployer                                         | yes                                      |
+| [DiamondCutFacet](./contracts/RMRK/DiamondCutFacet.sol)                                       | The diamond raw facet used to add/remove/replace facet of diamond   | yes                                      |
+| [DiamondLoupeFacet](./contracts/RMRK/DiamondLoupeFacet.sol)                                   | The diamond raw facet used to explore facets of diamond             | yes                                      |
+| [LightmEquippableNestingFacet](./contracts/RMRK/LightmEquippableNestingFacet.sol)             | The nesting part of equipment function supported facet              | optional (check the comment in the file) |
+| [LightmEquippableMultiResourceFacet](./contracts/RMRK/LightmEquippableMultiResourceFacet.sol) | The multi-resource part of equipment function supported facet       | yes                                      |
+| [LightmEquippableFacet](./contracts/RMRK/LightmEquippableFacet.sol)                           | The equippable part of equipment function supported facet           | yes                                      |
+| [RMRKCollectionMetadataFacet](./contracts/RMRK/RMRKCollectionMetadataFacet.sol)               | The collection-metadata part of RMRK NFT                            | yes                                      |
+| [Diamond](./contracts/RMRK/Diamond.sol)                                                       | The real contract that store all state                              | no                                       |
+| [LightmInit](./contracts/RMRK/LightmInit.sol)                                                 | The diamond raw facet used to initializes the state of the contract | yes                                      |

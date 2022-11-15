@@ -27,10 +27,11 @@ export async function deployCreate2Deployer() {
   if (await isHardhatChain()) {
     const publicAccount = new ethers.Wallet(PUBLIC_ACCOUNT_PRIVATE_KEY, ethers.provider);
 
-    await publicAccount.sendTransaction({
+    const tx = await publicAccount.sendTransaction({
       to: TRANSACTION_SIGNER_ADDRESS,
       value: ethers.constants.WeiPerEther.mul(20),
     });
+    await tx.wait();
   }
 
   // This pre-signed transaction is signed by 0xFBa50dD46Af71D60721C6E38F40Bce4d2416A34B,
@@ -155,9 +156,9 @@ export async function oneTimeDeploy(
 
   const FacetNames = [
     'DiamondLoupeFacet',
-    'RMRKEquippableMultiResourceFacet',
-    'RMRKEquippableNestingFacet',
-    'RMRKEquippableFacet',
+    'LightmEquippableMultiResourceFacet',
+    'LightmEquippableNestingFacet',
+    'LightmEquippableFacet',
     'RMRKCollectionMetadataFacet',
     'LightmImpl',
   ];
@@ -167,43 +168,43 @@ export async function oneTimeDeploy(
   };
 
   const hashConcat: { [k: string]: string } = {
-    RMRKEquippableMultiResourceFacet: versionSuffix,
-    RMRKEquippableNestingFacet: versionSuffix,
+    LightmEquippableMultiResourceFacet: versionSuffix,
+    LightmEquippableNestingFacet: versionSuffix,
   };
 
   const constructorParams: { [k: string]: [any[], any[]] } = {
-    RMRKEquippableNestingFacet: [
+    LightmEquippableNestingFacet: [
       ['string', 'string'],
       [`LightmNesting${versionSuffix}`, `LN${versionSuffix}`],
     ],
-    RMRKEquippableMultiResourceFacet: [
+    LightmEquippableMultiResourceFacet: [
       ['string', 'string'],
       [`LightmMultiResource${versionSuffix}`, `LMR${versionSuffix}`],
     ],
   };
   const libraryLinking: { [k: string]: any } = {
-    RMRKEquippableNestingFacet: {
+    LightmEquippableNestingFacet: {
       libraries: {
         RMRKMultiResourceRenderUtils: rmrkMultiResourceRenderUtils.address,
       },
     },
-    RMRKEquippableMultiResourceFacet: {
+    LightmEquippableMultiResourceFacet: {
       libraries: {
         RMRKMultiResourceRenderUtils: rmrkMultiResourceRenderUtils.address,
       },
     },
-    RMRKEquippableFacet: {
+    LightmEquippableFacet: {
       libraries: {
         LightmValidatorLib: lightmValidatorLib.address,
       },
     },
   };
   const toBeRemovedFunctions: { [k: string]: string[] } = {
-    RMRKEquippableNestingFacet: [
+    LightmEquippableNestingFacet: [
       // Take them in RMRKMultiResource
       'tokenURI(uint256)',
     ],
-    RMRKEquippableMultiResourceFacet: [
+    LightmEquippableMultiResourceFacet: [
       // Take them in RMRKNesting
       'name()',
       'symbol()',
@@ -241,7 +242,8 @@ export async function oneTimeDeploy(
           ])
         : Facet.bytecode;
       if (!deployed) {
-        await create2Deployer.deploy(0, facetHash, facetByteCode);
+        const tx = await create2Deployer.deploy(0, facetHash, facetByteCode);
+        await tx.wait();
       }
 
       const facetAddress = await create2Deployer['computeAddress(bytes32,bytes32)'](

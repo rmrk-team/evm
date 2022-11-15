@@ -1,26 +1,27 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "../interfaces/IRMRKEquippableAyuilosVer.sol";
+import "../interfaces/ILightmEquippable.sol";
 import "../library/ValidatorLib.sol";
 import "./RMRKNestingMultiResourceInternal.sol";
 import {EquippableStorage} from "./Storage.sol";
 
-error RMRKBaseRelatedResourceDidNotExist();
-error RMRKCurrentBaseInstanceAlreadyEquippedThisChild();
-error RMRKIndexOverLength();
-error RMRKMismatchedEquipmentAndIDLength();
-error RMRKMustRemoveSlotEquipmentFirst();
-error RMRKNotInActiveResources();
-error RMRKNotValidBaseContract();
-error RMRKSlotEquipmentNotExist();
-error RMRKSlotIsOccupied();
+error LightmBaseRelatedResourceDidNotExist();
+error LightmCurrentBaseInstanceAlreadyEquippedThisChild();
+error LightmIndexOverLength();
+error LightmMismatchedEquipmentAndIDLength();
+error LightmMustRemoveSlotEquipmentFirst();
+error LightmNotInActiveResources();
+error LightmNotValidBaseContract();
+error LightmSlotEquipmentNotExist();
+error LightmSlotIsOccupied();
 
-abstract contract RMRKEquippableInternal is
-    IRMRKEquippableEventsAndStruct,
+abstract contract LightmEquippableInternal is
+    ILightmEquippableEventsAndStruct,
     RMRKNestingMultiResourceInternal
 {
     using RMRKLib for uint64[];
+    using Address for address;
 
     function getEquippableState()
         internal
@@ -40,7 +41,7 @@ abstract contract RMRKEquippableInternal is
 
         _baseRelatedDataExist(baseRelatedData);
 
-        string memory resourceMeta = _getResourceMeta(baseRelatedResourceId);
+        string memory resourceMeta = _getResourceMetadata(baseRelatedResourceId);
 
         baseRelatedResource = BaseRelatedResource({
             id: baseRelatedResourceId,
@@ -61,12 +62,16 @@ abstract contract RMRKEquippableInternal is
         BaseRelatedResource[]
             memory baseRelatedResources = new BaseRelatedResource[](len);
 
-        for (uint256 i; i < len; i++) {
+        for (uint256 i; i < len; ) {
             uint64 baseRelatedResourceId = baseRelatedResourceIds[i];
 
             baseRelatedResources[i] = _getBaseRelatedResource(
                 baseRelatedResourceId
             );
+
+            unchecked {
+                ++i;
+            }
         }
 
         return baseRelatedResources;
@@ -78,7 +83,7 @@ abstract contract RMRKEquippableInternal is
         returns (uint64[] memory)
     {
         uint64[] memory activeBaseRelatedResourceIds = getEquippableState()
-            ._activeBaseResources[tokenId];
+            ._activeBaseRelatedResources[tokenId];
 
         return activeBaseRelatedResourceIds;
     }
@@ -116,7 +121,7 @@ abstract contract RMRKEquippableInternal is
             slotEquipment.baseRelatedResourceId != baseRelatedResourceId ||
             slotEquipment.slotId != slotId
         ) {
-            revert RMRKSlotEquipmentNotExist();
+            revert LightmSlotEquipmentNotExist();
         }
     }
 
@@ -141,7 +146,7 @@ abstract contract RMRKEquippableInternal is
             slotEquipment.childBaseRelatedResourceId !=
             childBaseRelatedResourceId
         ) {
-            revert RMRKSlotEquipmentNotExist();
+            revert LightmSlotEquipmentNotExist();
         }
     }
 
@@ -162,12 +167,16 @@ abstract contract RMRKEquippableInternal is
 
         SlotEquipment[] memory slotEquipments = new SlotEquipment[](len);
 
-        for (uint256 i; i < len; ++i) {
+        for (uint256 i; i < len; ) {
             slotEquipments[i] = _getSlotEquipment(
                 tokenId,
                 baseRelatedResourceId,
                 slotIds[i]
             );
+
+            unchecked {
+                ++i;
+            }
         }
 
         return slotEquipments;
@@ -187,12 +196,16 @@ abstract contract RMRKEquippableInternal is
 
         SlotEquipment[] memory slotEquipments = new SlotEquipment[](len);
 
-        for (uint256 i; i < len; ++i) {
+        for (uint256 i; i < len; ) {
             slotEquipments[i] = _getSlotEquipment(
                 childContract,
                 childTokenId,
                 childBaseRelatedResourceIds[i]
             );
+
+            unchecked {
+                ++i;
+            }
         }
 
         return slotEquipments;
@@ -212,7 +225,7 @@ abstract contract RMRKEquippableInternal is
         returns (SlotEquipment memory slotEquipment)
     {
         if (index >= getEquippableState()._slotEquipments.length) {
-            revert RMRKIndexOverLength();
+            revert LightmIndexOverLength();
         }
 
         slotEquipment = getEquippableState()._slotEquipments[index];
@@ -234,12 +247,12 @@ abstract contract RMRKEquippableInternal is
         if (doMoreCheck) {
             uint64[] memory activeResourceIds = _getActiveResources(tokenId);
             (, bool exist) = activeResourceIds.indexOf(baseRelatedResourceId);
-            if (!exist) revert RMRKNotInActiveResources();
+            if (!exist) revert LightmNotInActiveResources();
         }
 
         uint256 len = slotEquipments.length;
 
-        for (uint256 i; i < len; ++i) {
+        for (uint256 i; i < len; ) {
             SlotEquipment memory sE = slotEquipments[i];
             EquippableStorage.State storage es = getEquippableState();
 
@@ -276,7 +289,7 @@ abstract contract RMRKEquippableInternal is
                         existSE.childBaseRelatedResourceId != uint64(0) ||
                         existSE.child.contractAddress != address(0)
                     ) {
-                        revert RMRKSlotIsOccupied();
+                        revert LightmSlotIsOccupied();
                     }
                 }
 
@@ -288,7 +301,7 @@ abstract contract RMRKEquippableInternal is
                         ];
 
                     if (alreadyEquipped) {
-                        revert RMRKCurrentBaseInstanceAlreadyEquippedThisChild();
+                        revert LightmCurrentBaseInstanceAlreadyEquippedThisChild();
                     }
                 }
             }
@@ -331,12 +344,16 @@ abstract contract RMRKEquippableInternal is
             // _equippedChildBaseRelatedResources(recordIndex) and _slotEquipments(equipmentIndex)
             es._childEquipmentPointers[childContract][childTokenId][
                     sE.childBaseRelatedResourceId
-                ] = IRMRKEquippableEventsAndStruct.EquipmentPointer({
+                ] = ILightmEquippableEventsAndStruct.EquipmentPointer({
                 equipmentIndex: sELen,
                 recordIndex: equippedChildBRRsLen
             });
 
             es._slotEquipments.push(sE);
+
+            unchecked {
+                i++;
+            }
         }
 
         emit SlotEquipmentsAdd(tokenId, baseRelatedResourceId, slotEquipments);
@@ -350,13 +367,13 @@ abstract contract RMRKEquippableInternal is
         _requireMinted(tokenId);
 
         (, bool exist) = getEquippableState()
-            ._activeBaseResources[tokenId]
+            ._activeBaseRelatedResources[tokenId]
             .indexOf(baseRelatedResourceId);
-        if (!exist) revert RMRKNotInActiveResources();
+        if (!exist) revert LightmNotInActiveResources();
 
         uint256 len = slotIds.length;
 
-        for (uint256 i; i < len; ++i) {
+        for (uint256 i; i < len; ) {
             uint64 slotId = slotIds[i];
 
             EquippableStorage.State storage es = getEquippableState();
@@ -452,6 +469,10 @@ abstract contract RMRKEquippableInternal is
                 lastEPointer.equipmentIndex = equipmentIndex;
                 lastCEPointer.equipmentIndex = equipmentIndex;
             }
+
+            unchecked {
+                ++i;
+            }
         }
 
         emit SlotEquipmentsRemove(tokenId, baseRelatedResourceId, slotIds);
@@ -469,7 +490,7 @@ abstract contract RMRKEquippableInternal is
         uint64[][] memory slotIds = new uint64[][](len);
         uint256[] memory pointers = new uint256[](len);
 
-        for (uint256 i; i < len; i++) {
+        for (uint256 i; i < len; ) {
             SlotEquipment memory sE = _getSlotEquipment(
                 childContract,
                 childTokenId,
@@ -496,9 +517,13 @@ abstract contract RMRKEquippableInternal is
                 pointers[pointerOfBRRIds] = 1;
                 pointerOfBRRIds++;
             }
+
+            unchecked {
+                ++i;
+            }
         }
 
-        for (uint256 i; i < pointerOfBRRIds; i++) {
+        for (uint256 i; i < pointerOfBRRIds; ) {
             uint64 baseRelatedResourceId = baseRelatedResourceIds[i];
             uint64[] memory slotIdsOfBRR = slotIds[i];
 
@@ -507,6 +532,10 @@ abstract contract RMRKEquippableInternal is
                 baseRelatedResourceId,
                 slotIdsOfBRR
             );
+
+            unchecked {
+                ++i;
+            }
         }
     }
 
@@ -516,87 +545,115 @@ abstract contract RMRKEquippableInternal is
         internal
         view
     {
-        IRMRKEquippable.SlotEquipment[]
+        ILightmEquippable.SlotEquipment[]
             memory slotEquipments = _getSlotEquipments(
                 childContract,
                 childTokenId
             );
 
         if (slotEquipments.length > 0) {
-            revert RMRKMustRemoveSlotEquipmentFirst();
+            revert LightmMustRemoveSlotEquipmentFirst();
         }
     }
 
     function _unnestChild(
         uint256 tokenId,
-        uint256 index,
-        address to
+        address to,
+        address childContractAddress,
+        uint256 childTokenId,
+        bool isPending
     ) internal virtual override {
-        Child memory child = getNestingState()._children[tokenId][index];
-        uint256 childTokenId = child.tokenId;
-
         _childEquipmentCheck(_msgSender(), childTokenId);
 
-        RMRKNestingInternal._unnestChild(tokenId, index, to);
-    }
-
-    function _burnChild(uint256 tokenId, uint256 index)
-        internal
-        virtual
-        override
-    {
-        Child memory child = getNestingState()._children[tokenId][index];
-        address childContract = child.contractAddress;
-        uint256 childTokenId = child.tokenId;
-
-        uint64[] memory childBaseRelatedResourceIds = getEquippableState()
-            ._equippedChildBaseRelatedResources[childContract][childTokenId];
-
-        _removeSlotEquipments(
-            childContract,
+        RMRKNestingInternal._unnestChild(
+            tokenId,
+            to,
+            childContractAddress,
             childTokenId,
-            childBaseRelatedResourceIds
+            isPending
         );
-
-        RMRKNestingInternal._burnChild(tokenId, index);
     }
 
     // ------------------------ MultiResource internal and override ------------------------
 
-    function _acceptResource(uint256 tokenId, uint256 index)
+    function _baseRelatedResourceAccept(uint256 tokenId, uint64 resourceId)
+        internal
+        virtual
+    {
+        EquippableStorage.State storage es = getEquippableState();
+        // If baseRelatedDataExist, add resourceId to `activeBaseResources`
+        if (_baseRelatedDataExist(es._baseRelatedDatas[resourceId])) {
+            MultiResourceStorage.State storage mrs = getMRState();
+
+            uint64[] storage activeBaseRelatedResources = es
+                ._activeBaseRelatedResources[tokenId];
+
+            uint64 overwrites = mrs._resourceOverwrites[tokenId][resourceId];
+
+            if (overwrites != uint64(0)) {
+                uint256 position = es._activeBaseRelatedResourcesPosition[
+                    tokenId
+                ][overwrites];
+                uint64 overwritesId = activeBaseRelatedResources[position];
+
+                if (overwritesId == overwrites) {
+                    // Check if overwrites resource is participating equipment
+                    // If yes, should exit equipment first.
+                    (address directOwner, , ) = _rmrkOwnerOf(tokenId);
+                    if (
+                        directOwner.isContract() &&
+                        IERC165(directOwner).supportsInterface(
+                            type(ILightmEquippable).interfaceId
+                        )
+                    ) {
+                        try
+                            ILightmEquippable(directOwner).getSlotEquipment(
+                                address(this),
+                                tokenId,
+                                overwritesId
+                            )
+                        returns (ILightmEquippable.SlotEquipment memory) {
+                            revert LightmMustRemoveSlotEquipmentFirst();
+                        } catch {}
+                    }
+
+                    activeBaseRelatedResources[position] = resourceId;
+                    es._activeBaseRelatedResourcesPosition[tokenId][
+                        resourceId
+                    ] = position;
+                } else {
+                    overwrites = uint64(0);
+                }
+            }
+
+            if (overwrites == uint64(0)) {
+                activeBaseRelatedResources.push(resourceId);
+                es._activeBaseRelatedResourcesPosition[tokenId][resourceId] =
+                    activeBaseRelatedResources.length -
+                    1;
+            }
+        }
+    }
+
+    function _acceptResourceByIndex(uint256 tokenId, uint256 index)
         internal
         virtual
         override
     {
-        if (index >= getMRState()._pendingResources[tokenId].length)
-            revert RMRKIndexOutOfRange();
         uint64 resourceId = getMRState()._pendingResources[tokenId][index];
-        getMRState()._pendingResources[tokenId].removeItemByIndex(index);
+        _baseRelatedResourceAccept(tokenId, resourceId);
 
-        uint64 overwrite = getMRState()._resourceOverwrites[tokenId][
-            resourceId
-        ];
-        if (overwrite != uint64(0)) {
-            // We could check here that the resource to overwrite actually exists but it is probably harmless.
-            getMRState()._activeResources[tokenId].removeItemByValue(overwrite);
-            getEquippableState()
-                ._activeBaseResources[tokenId]
-                .removeItemByValue(overwrite);
-            emit ResourceOverwritten(tokenId, overwrite, resourceId);
-            delete (getMRState()._resourceOverwrites[tokenId][resourceId]);
-        }
-        getMRState()._activeResources[tokenId].push(resourceId);
-        getMRState()._activeResourcePriorities[tokenId].push(LOWEST_PRIORITY);
+        RMRKMultiResourceInternal._acceptResourceByIndex(tokenId, index);
+    }
 
-        // If baseRelatedDataExist, add resourceId to `activeBaseResources`
-        if (
-            _baseRelatedDataExist(
-                getEquippableState()._baseRelatedDatas[resourceId]
-            )
-        ) {
-            getEquippableState()._activeBaseResources[tokenId].push(resourceId);
-        }
-        emit ResourceAccepted(tokenId, resourceId);
+    function _acceptResource(uint256 tokenId, uint64 resourceId)
+        internal
+        virtual
+        override
+    {
+        _baseRelatedResourceAccept(tokenId, resourceId);
+
+        RMRKMultiResourceInternal._acceptResource(tokenId, resourceId);
     }
 
     function _addBaseRelatedResourceEntry(
@@ -631,40 +688,107 @@ abstract contract RMRKEquippableInternal is
 
     // ------------------------ Function conflicts resolve ------------------------
 
-    function _burn(uint256 tokenId) internal virtual override {
-        (address rmrkOwner, , ) = _rmrkOwnerOf(tokenId);
+    function _burn(uint256 tokenId, uint256 maxChildrenBurns)
+        internal
+        virtual
+        override
+        returns (uint256)
+    {
+        (address immediateOwner, uint256 parentId, ) = _rmrkOwnerOf(tokenId);
         address owner = _ownerOf(tokenId);
 
         _beforeTokenTransfer(owner, address(0), tokenId);
-
-        ERC721Storage.State storage s = getState();
-        NestingStorage.State storage ns = getNestingState();
-        EquippableStorage.State storage es = getEquippableState();
-
-        // remove all corresponding slotEquipments
-        uint64[] memory baseRelatedResourceIds = es._activeBaseResources[
+        _beforeNestedTokenTransfer(
+            immediateOwner,
+            address(0),
+            parentId,
+            0,
             tokenId
-        ];
-        for (uint256 i; i < baseRelatedResourceIds.length; i++) {
-            uint64 baseRelatedResourceId = baseRelatedResourceIds[i];
-            uint64[] memory slotIds = es._equippedSlots[tokenId][
-                baseRelatedResourceId
-            ];
+        );
 
-            _removeSlotEquipments(tokenId, baseRelatedResourceId, slotIds);
+
+        {
+            EquippableStorage.State storage es = getEquippableState();
+            // remove all corresponding slotEquipments
+            uint64[] memory baseRelatedResourceIds = es
+                ._activeBaseRelatedResources[tokenId];
+            for (uint256 i; i < baseRelatedResourceIds.length; ) {
+                uint64 baseRelatedResourceId = baseRelatedResourceIds[i];
+                uint64[] memory slotIds = es._equippedSlots[tokenId][
+                    baseRelatedResourceId
+                ];
+
+                _removeSlotEquipments(tokenId, baseRelatedResourceId, slotIds);
+
+                unchecked {
+                    ++i;
+                }
+            }
+        }
+
+        {
+            ERC721Storage.State storage s = getState();
+            s._balances[immediateOwner] -= 1;
+            delete s._tokenApprovals[tokenId];
         }
 
         _approve(address(0), tokenId);
         _approveForResources(address(0), tokenId);
-        _cleanApprovals(address(0), tokenId);
+        _cleanApprovals(tokenId);
 
-        s._balances[rmrkOwner] -= 1;
-        delete ns._RMRKOwners[tokenId];
+        NestingStorage.State storage ns = getNestingState();
+        Child[] memory children = ns._activeChildren[tokenId];
+
+        delete ns._activeChildren[tokenId];
         delete ns._pendingChildren[tokenId];
-        delete ns._children[tokenId];
-        delete s._tokenApprovals[tokenId];
+
+        uint256 totalChildBurns;
+        {
+            uint256 pendingRecursiveBurns;
+            uint256 length = children.length; //gas savings
+            for (uint256 i; i < length; ) {
+                if (totalChildBurns >= maxChildrenBurns) {
+                    revert RMRKMaxRecursiveBurnsReached(
+                        children[i].contractAddress,
+                        children[i].tokenId
+                    );
+                }
+
+                delete ns._posInChildArray[children[i].contractAddress][
+                    children[i].tokenId
+                ];
+
+                unchecked {
+                    // At this point we know pendingRecursiveBurns must be at least 1
+                    pendingRecursiveBurns = maxChildrenBurns - totalChildBurns;
+                }
+                // We substract one to the next level to count for the token being burned, then add it again on returns
+                // This is to allow the behavior of 0 recursive burns meaning only the current token is deleted.
+                totalChildBurns +=
+                    IRMRKNesting(children[i].contractAddress).burn(
+                        children[i].tokenId,
+                        pendingRecursiveBurns - 1
+                    ) +
+                    1;
+                unchecked {
+                    ++i;
+                }
+            }
+        }
+        // Can't remove before burning child since child will call back to get root owner
+        delete ns._RMRKOwners[tokenId];
 
         _afterTokenTransfer(owner, address(0), tokenId);
+        _afterNestedTokenTransfer(
+            immediateOwner,
+            address(0),
+            parentId,
+            0,
+            tokenId
+        );
         emit Transfer(owner, address(0), tokenId);
+        emit NestTransfer(immediateOwner, address(0), parentId, 0, tokenId);
+
+        return totalChildBurns;
     }
 }

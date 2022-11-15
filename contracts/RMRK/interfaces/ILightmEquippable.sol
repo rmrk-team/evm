@@ -5,7 +5,7 @@ pragma solidity ^0.8.15;
 import "./IRMRKNesting.sol";
 import "./IRMRKMultiResource.sol";
 
-interface IRMRKEquippableEventsAndStruct {
+interface ILightmEquippableEventsAndStruct {
     event BaseRelatedResourceAdd(uint64 indexed id);
 
     event SlotEquipmentsAdd(
@@ -55,7 +55,7 @@ interface IRMRKEquippableEventsAndStruct {
     }
 }
 
-interface IRMRKEquippable is IRMRKEquippableEventsAndStruct {
+interface ILightmEquippable is ILightmEquippableEventsAndStruct {
     function getBaseRelatedResource(uint64 baseRelatedResourceId)
         external
         view

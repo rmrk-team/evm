@@ -5,7 +5,7 @@
 pragma solidity ^0.8.15;
 
 import "./RMRKMultiResourceFacet.sol";
-import "./internalFunctionSet/RMRKEquippableInternal.sol";
+import "./internalFunctionSet/LightmEquippableInternal.sol";
 
 // !!!
 // Before use, make sure you know the description below
@@ -20,26 +20,55 @@ import "./internalFunctionSet/RMRKEquippableInternal.sol";
     `mint` logic in your own implementer.
  */
 
-contract RMRKEquippableMultiResourceFacet is
-    RMRKEquippableInternal,
+contract LightmEquippableMultiResourceFacet is
+    LightmEquippableInternal,
     RMRKMultiResourceFacet
 {
     constructor(string memory name_, string memory symbol_)
         RMRKMultiResourceFacet(name_, symbol_)
     {}
 
-    function _acceptResource(uint256 tokenId, uint256 index)
-        internal
-        override(RMRKMultiResourceInternal, RMRKEquippableInternal)
+    // No need to override `supportsInterface` here,
+    // this contract is only used to be cut by Diamond
+    // and Diamond loupe facet is responsible for IERC165
+
+    function getFullResources(uint256 tokenId)
+        external
+        view
+        virtual
+        returns (Resource[] memory)
     {
-        RMRKEquippableInternal._acceptResource(tokenId, index);
+        return _getFullResources(tokenId);
+    }
+
+    function getFullPendingResources(uint256 tokenId)
+        external
+        view
+        virtual
+        returns (Resource[] memory)
+    {
+        return _getFullPendingResources(tokenId);
+    }
+
+    function _acceptResourceByIndex(uint256 tokenId, uint256 index)
+        internal
+        override(RMRKMultiResourceInternal, LightmEquippableInternal)
+    {
+        LightmEquippableInternal._acceptResourceByIndex(tokenId, index);
+    }
+
+    function _acceptResource(uint256 tokenId, uint64 resourceId)
+        internal
+        override(RMRKMultiResourceInternal, LightmEquippableInternal)
+    {
+        LightmEquippableInternal._acceptResource(tokenId, resourceId);
     }
 
     function _burn(uint256 tokenId)
         internal
-        override(RMRKMultiResourceInternal, RMRKEquippableInternal)
+        override(RMRKMultiResourceInternal, RMRKNestingMultiResourceInternal)
     {
-        RMRKEquippableInternal._burn(tokenId);
+        RMRKNestingMultiResourceInternal._burn(tokenId);
     }
 
     function _exists(uint256 tokenId)

@@ -5,11 +5,11 @@ import {LibDiamond} from "./library/LibDiamond.sol";
 import {IERC165, IERC721, IERC721Metadata} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import {IDiamondLoupe} from "./interfaces/IDiamondLoupe.sol";
 import {IDiamondCut} from "./interfaces/IDiamondCut.sol";
-import {IRMRKNesting} from "./interfaces/IRMRKNesting.sol";
-import {IRMRKMultiResource} from "./interfaces/IRMRKMultiResource.sol";
-import {IRMRKEquippable} from "./interfaces/IRMRKEquippableAyuilosVer.sol";
+import {IRMRKNesting, ILightmNesting} from "./interfaces/ILightmNesting.sol";
+import {IRMRKMultiResource, ILightmMultiResource} from "./interfaces/ILightmMultiResource.sol";
+import {ILightmEquippable} from "./interfaces/ILightmEquippable.sol";
 import {IRMRKCollectionMetadata} from "./interfaces/IRMRKCollectionMetadata.sol";
-import {ERC721Storage, MultiResourceStorage, EquippableStorage, LightmImplStorage} from "./internalFunctionSet/Storage.sol";
+import {ERC721Storage, MultiResourceStorage, EquippableStorage, CollectionMetadataStorage, LightmImplStorage} from "./internalFunctionSet/Storage.sol";
 
 // It is expected that this contract is customized if you want to deploy your diamond
 // with data from a deployment script. Use the init function to initialize state variables
@@ -20,6 +20,7 @@ contract LightmInit {
         string name;
         string symbol;
         string fallbackURI;
+        string collectionMetadataURI;
     }
 
     // You can add parameters to this function in order to pass in
@@ -33,8 +34,10 @@ contract LightmInit {
         ds.supportedInterfaces[type(IERC721).interfaceId] = true;
         ds.supportedInterfaces[type(IERC721Metadata).interfaceId] = true;
         ds.supportedInterfaces[type(IRMRKNesting).interfaceId] = true;
+        ds.supportedInterfaces[type(ILightmNesting).interfaceId] = true;
         ds.supportedInterfaces[type(IRMRKMultiResource).interfaceId] = true;
-        ds.supportedInterfaces[type(IRMRKEquippable).interfaceId] = true;
+        ds.supportedInterfaces[type(ILightmMultiResource).interfaceId] = true;
+        ds.supportedInterfaces[type(ILightmEquippable).interfaceId] = true;
         ds.supportedInterfaces[
             type(IRMRKCollectionMetadata).interfaceId
         ] = true;
@@ -55,5 +58,9 @@ contract LightmInit {
         MultiResourceStorage.State storage mrs = MultiResourceStorage
             .getState();
         mrs._fallbackURI = _initStruct.fallbackURI;
+
+        CollectionMetadataStorage.State storage cms = CollectionMetadataStorage
+            .getState();
+        cms._collectionMetadata = _initStruct.collectionMetadataURI;
     }
 }

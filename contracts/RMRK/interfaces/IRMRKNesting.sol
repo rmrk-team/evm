@@ -20,13 +20,26 @@ interface IRMRKNestingEventsAndStruct {
     }
 
     /**
+     * @dev Emitted when `tokenId` token is transferred from `from` to `to`.
+     * from indicates the immediate owner, which is a contract if nested.
+     * If token was nested, `fromTokenId` indicates former parent id.
+     * If destination is an NFT, `toTokenId` indicates the new parent id.
+     */
+    event NestTransfer(
+        address indexed from,
+        address indexed to,
+        uint256 fromTokenId,
+        uint256 toTokenId,
+        uint256 indexed tokenId
+    );
+
+    /**
      * @dev emitted when a child NFT is added to a token's pending array
      */
     event ChildProposed(
         uint256 indexed tokenId,
         address indexed childAddress,
-        uint256 indexed childId,
-        uint256 childIndex
+        uint256 indexed childId
     );
 
     /**
@@ -35,18 +48,7 @@ interface IRMRKNestingEventsAndStruct {
     event ChildAccepted(
         uint256 indexed tokenId,
         address indexed childAddress,
-        uint256 indexed childId,
-        uint256 childIndex
-    );
-
-    /**
-     * @dev emitted when a token accepts removes a child token from its pending array.
-     */
-    event ChildRejected(
-        uint256 indexed tokenId,
-        address indexed childAddress,
-        uint256 indexed childId,
-        uint256 childIndex
+        uint256 indexed childId
     );
 
     /**
@@ -61,7 +63,7 @@ interface IRMRKNestingEventsAndStruct {
         uint256 indexed tokenId,
         address indexed childAddress,
         uint256 indexed childId,
-        uint256 childIndex
+        bool fromPending
     );
 }
 
@@ -87,10 +89,9 @@ interface IRMRKNesting is IRMRKNestingEventsAndStruct, IERC165 {
         );
 
     //TODO: Docs
-    function burnChild(uint256 tokenId, uint256 childIndex) external;
-
-    //TODO: Docs
-    function burn(uint256 tokenId) external;
+    function burn(uint256 tokenId, uint256 maxRecursiveBurns)
+        external
+        returns (uint256);
 
     /**
      * @dev Function to be called into by other instances of RMRK nesting contracts to update the `child` struct
@@ -112,21 +113,10 @@ interface IRMRKNesting is IRMRKNestingEventsAndStruct, IERC165 {
      * - `parentTokenId` must exist
      *
      */
-    function acceptChild(uint256 parentTokenId, uint256 index) external;
-
-    /**
-     * @dev Function called to reject a pending child. Removes the child from the pending array mapping.
-     * The child's ownership structures are not updated.
-     *
-     * Requirements:
-     *
-     * - `parentTokenId` must exist
-     *
-     */
-    function rejectChild(
+    function acceptChild(
         uint256 parentTokenId,
-        uint256 index,
-        address to
+        address childContractAddress,
+        uint256 childTokenId
     ) external;
 
     /**
@@ -151,24 +141,10 @@ interface IRMRKNesting is IRMRKNestingEventsAndStruct, IERC165 {
      */
     function unnestChild(
         uint256 tokenId,
-        uint256 index,
-        address to
-    ) external;
-
-    /**
-     * @dev Function called to reclaim an abandoned child created by unnesting with `to` as the zero
-     * address. This function will set the child's owner to the rootOwner of the caller, allowing
-     * the rootOwner management permissions for the child.
-     *
-     * Requirements:
-     *
-     * - `tokenId` must exist
-     *
-     */
-    function reclaimChild(
-        uint256 tokenId,
-        address childAddress,
-        uint256 childTokenId
+        address to,
+        address childContractAddress,
+        uint256 childTokenId,
+        bool isPending
     ) external;
 
     /**

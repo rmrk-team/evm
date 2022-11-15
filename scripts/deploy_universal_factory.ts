@@ -50,14 +50,23 @@ async function deploy() {
   );
 
   const lightmInitHash = ethers.utils.id(`LightmInit${versionSuffix}`);
-  await create2Deployer.deploy(0, lightmInitHash, LightmInit__factory.bytecode);
+  let tx = await create2Deployer.deploy(0, lightmInitHash, LightmInit__factory.bytecode);
+  await tx.wait();
 
   const lightmInitAddress = await create2Deployer['computeAddress(bytes32,bytes32)'](
     lightmInitHash,
     ethers.utils.keccak256(LightmInit__factory.bytecode),
   );
 
+  let counters = 0;
+
   const { cut, ...rest } = await oneTimeDeploy(create2DeployerAddress, false, true);
+
+  for (let i = 0; i < cut.length; i++) {
+    const { functionSelectors } = cut[i];
+
+    counters += functionSelectors.length;
+  }
 
   const factoryAddress = await deployUniversalFactory(create2DeployerAddress, {
     validatorLibAddress: rest.lightmValidatorLibAddress,
@@ -72,13 +81,14 @@ async function deploy() {
     initContractAddress: lightmInitAddress,
     cuts: cut,
   });
-  console.log(`UniversalFactory Address: ${factoryAddress}`);
+  console.log(`UniversalFactory Address: ${factoryAddress} with ${counters} function selectors`);
 
   const universalFactory = await ethers.getContractAt('LightmUniversalFactory', factoryAddress);
-  const tx = await universalFactory.deployCollection({
+  tx = await universalFactory.deployCollection({
     name: 'Test',
     symbol: 'TEST',
     fallbackURI: '',
+    collectionMetadataURI: '',
   });
   const txRec = await tx.wait();
   const { events } = txRec;

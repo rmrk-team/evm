@@ -11,48 +11,102 @@ pragma solidity ^0.8.15;
 
 library RMRKMultiResourceRenderUtils {
     error RMRKTokenHasNoResources();
-    uint16 private constant _LOWEST_POSSIBLE_PRIORITY = 2**16 - 1;
+    uint16 private constant _LOWEST_POSSIBLE_PRIORITY = type(uint16).max;
 
-    function supportsInterface(bytes4 interfaceId)
-        external
-        pure
-        returns (bool)
-    {
-        return
-            interfaceId == type(IERC165).interfaceId ||
-            interfaceId == type(IRMRKMultiResourceRenderUtils).interfaceId;
+    struct ActiveResource {
+        uint64 id;
+        uint16 priority;
+        string metadataURI;
     }
 
-    function getResourceByIndex(
-        address target,
-        uint256 tokenId,
-        uint256 index
-    ) external view returns (string memory) {
-        IRMRKMultiResource target_ = IRMRKMultiResource(target);
-        uint64 resourceId = target_.getActiveResources(tokenId)[index];
-        return target_.getResourceMeta(resourceId);
+    struct PendingResource {
+        uint64 id;
+        uint64 overwritesResourceWithId;
+        string metadataURI;
     }
 
-    function getPendingResourceByIndex(
-        address target,
-        uint256 tokenId,
-        uint256 index
-    ) external view returns (string memory) {
-        IRMRKMultiResource target_ = IRMRKMultiResource(target);
-        uint64 resourceId = target_.getPendingResources(tokenId)[index];
-        return target_.getResourceMeta(resourceId);
-    }
-
-    function getResourcesById(address target, uint64[] calldata resourceIds)
+    function getActiveResources(address target, uint256 tokenId)
         public
         view
-        returns (string[] memory)
+        returns (ActiveResource[] memory)
     {
+        IRMRKMultiResource target_ = IRMRKMultiResource(target);
+
+        uint64[] memory resources = target_.getActiveResources(tokenId);
+        uint16[] memory priorities = target_.getActiveResourcePriorities(
+            tokenId
+        );
+        uint256 len = resources.length;
+        if (len == 0) {
+            revert RMRKTokenHasNoResources();
+        }
+
+        ActiveResource[] memory activeResources = new ActiveResource[](len);
+        string memory metadata;
+        for (uint256 i; i < len; ) {
+            metadata = target_.getResourceMetadata(resources[i]);
+            activeResources[i] = ActiveResource({
+                id: resources[i],
+                priority: priorities[i],
+                metadataURI: metadata
+            });
+            unchecked {
+                ++i;
+            }
+        }
+        return activeResources;
+    }
+
+    function getPendingResources(address target, uint256 tokenId)
+        public
+        view
+        returns (PendingResource[] memory)
+    {
+        IRMRKMultiResource target_ = IRMRKMultiResource(target);
+
+        uint64[] memory resources = target_.getPendingResources(tokenId);
+        uint256 len = resources.length;
+        if (len == 0) {
+            revert RMRKTokenHasNoResources();
+        }
+
+        PendingResource[] memory pendingResources = new PendingResource[](len);
+        string memory metadata;
+        uint64 overwritesResourceWithId;
+        for (uint256 i; i < len; ) {
+            metadata = target_.getResourceMetadata(resources[i]);
+            overwritesResourceWithId = target_.getResourceOverwrites(
+                tokenId,
+                resources[i]
+            );
+            pendingResources[i] = PendingResource({
+                id: resources[i],
+                overwritesResourceWithId: overwritesResourceWithId,
+                metadataURI: metadata
+            });
+            unchecked {
+                ++i;
+            }
+        }
+        return pendingResources;
+    }
+
+    /**
+     * @notice Returns resource metadata strings for the given ids
+     *
+     * Requirements:
+     *
+     * - `resourceIds` must exist.
+     */
+    function getResourcesById(
+        address target,
+        uint64[] calldata resourceIds
+    ) public view returns (string[] memory) {
         IRMRKMultiResource target_ = IRMRKMultiResource(target);
         uint256 len = resourceIds.length;
         string[] memory resources = new string[](len);
         for (uint256 i; i < len; ) {
-            resources[i] = target_.getResourceMeta(resourceIds[i]);
+            resources[i] = target_.getResourceMetadata(resourceIds[i]);
             unchecked {
                 ++i;
             }
@@ -60,6 +114,9 @@ library RMRKMultiResourceRenderUtils {
         return resources;
     }
 
+    /**
+     * @notice Returns the resource metadata with the highest priority for the given token
+     */
     function getTopResourceMetaForToken(address target, uint256 tokenId)
         external
         view
@@ -69,23 +126,24 @@ library RMRKMultiResourceRenderUtils {
         uint16[] memory priorities = target_.getActiveResourcePriorities(
             tokenId
         );
+        uint64[] memory resources = target_.getActiveResources(tokenId);
         uint256 len = priorities.length;
         if (len == 0) {
             revert RMRKTokenHasNoResources();
         }
 
         uint16 maxPriority = _LOWEST_POSSIBLE_PRIORITY;
-        uint64 maxPriorityIndex = 0;
+        uint64 maxPriorityResource;
         for (uint64 i; i < len; ) {
             uint16 currentPrio = priorities[i];
             if (currentPrio < maxPriority) {
                 maxPriority = currentPrio;
-                maxPriorityIndex = i;
+                maxPriorityResource = resources[i];
             }
             unchecked {
                 ++i;
             }
         }
-        return target_.getResourceMetaForToken(tokenId, maxPriorityIndex);
+        return target_.getResourceMetadata(maxPriorityResource);
     }
 }

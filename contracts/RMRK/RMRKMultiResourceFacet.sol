@@ -197,20 +197,20 @@ contract RMRKMultiResourceFacet is
 
     // ------------------------ RESOURCES ------------------------
 
-    function acceptResource(uint256 tokenId, uint256 index)
+    function acceptResource(uint256 tokenId, uint64 resourceId)
         external
         virtual
         onlyApprovedForResourcesOrOwner(tokenId)
     {
-        _acceptResource(tokenId, index);
+        _acceptResource(tokenId, resourceId);
     }
 
-    function rejectResource(uint256 tokenId, uint256 index)
+    function rejectResource(uint256 tokenId, uint64 resourceId)
         external
         virtual
         onlyApprovedForResourcesOrOwner(tokenId)
     {
-        _rejectResource(tokenId, index);
+        _rejectResource(tokenId, resourceId);
     }
 
     function rejectAllResources(uint256 tokenId)
@@ -251,22 +251,13 @@ contract RMRKMultiResourceFacet is
         _setApprovalForAllForResources(owner, operator, approved);
     }
 
-    function getResourceMeta(uint64 resourceId)
+    function getResourceMetadata(uint64 resourceId)
         public
         view
         virtual
         returns (string memory)
     {
-        return _getResourceMeta(resourceId);
-    }
-
-    function getResourceMetaForToken(uint256 tokenId, uint64 resourceIndex)
-        public
-        view
-        virtual
-        returns (string memory)
-    {
-        return _getResourceMetaForToken(tokenId, resourceIndex);
+        return _getResourceMetadata(resourceId);
     }
 
     function getActiveResources(uint256 tokenId)
@@ -321,27 +312,5 @@ contract RMRKMultiResourceFacet is
         returns (bool)
     {
         return _isApprovedForAllForResources(owner, operator);
-    }
-
-    function getAllResources() public view virtual returns (uint64[] memory) {
-        return _getAllResources();
-    }
-
-    function getFullResources(uint256 tokenId)
-        external
-        view
-        virtual
-        returns (Resource[] memory)
-    {
-        return _getFullResources(tokenId);
-    }
-
-    function getFullPendingResources(uint256 tokenId)
-        external
-        view
-        virtual
-        returns (Resource[] memory)
-    {
-        return _getFullPendingResources(tokenId);
     }
 }

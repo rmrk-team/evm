@@ -4,6 +4,7 @@ pragma solidity ^0.8.15;
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "./ERC721Internal.sol";
 import "../interfaces/IRMRKMultiResource.sol";
+import "../interfaces/ILightmMultiResource.sol";
 import "../library/RMRKLib.sol";
 import "../library/RMRKMultiResourceRenderUtils.sol";
 
@@ -24,14 +25,15 @@ error RMRKWriteToZero();
 
 abstract contract RMRKMultiResourceInternal is
     ERC721Internal,
-    IRMRKMultiResourceEventsAndStruct
+    IRMRKMultiResourceEventsAndStruct,
+    ILightmMultiResourceEventsAndStruct
 {
     using Strings for uint256;
     using RMRKLib for uint16[];
     using RMRKLib for uint64[];
     using RMRKLib for uint128[];
 
-    uint16 internal constant LOWEST_PRIORITY = 2**16 - 1;
+    uint16 internal constant LOWEST_PRIORITY = type(uint16).max - 1;
 
     function getMRState()
         internal
@@ -118,13 +120,15 @@ abstract contract RMRKMultiResourceInternal is
         if (bytes(state._resources[id]).length > 0)
             revert RMRKResourceAlreadyExists();
 
+        _beforeAddResource(id, metadataURI);
+
         state._resources[id] = metadataURI;
-        state._allResources.push(id);
 
         emit ResourceSet(id);
+        _afterAddResource(id, metadataURI);
     }
 
-    function _getResourceMeta(uint64 resourceId)
+    function _getResourceMetadata(uint64 resourceId)
         internal
         view
         virtual
@@ -143,49 +147,165 @@ abstract contract RMRKMultiResourceInternal is
         returns (string memory)
     {
         uint64 resourceId = _getActiveResources(tokenId)[resourceIndex];
-        return _getResourceMeta(resourceId);
+        return _getResourceMetadata(resourceId);
     }
 
-    function _acceptResource(uint256 tokenId, uint256 index) internal virtual {
-        MultiResourceStorage.State storage s = getMRState();
+    function _acceptResource(
+        MultiResourceStorage.State storage s,
+        uint256 tokenId,
+        uint64 resourceId,
+        uint256 index
+    ) private {
+        _beforeAcceptResource(tokenId, index, resourceId);
 
-        if (index >= s._pendingResources[tokenId].length)
-            revert RMRKIndexOutOfRange();
-        uint64 resourceId = s._pendingResources[tokenId][index];
-        s._pendingResources[tokenId].removeItemByIndex(index);
+        uint64[] storage pendingResources = s._pendingResources[tokenId];
 
-        uint64 overwrite = s._resourceOverwrites[tokenId][resourceId];
-        if (overwrite != uint64(0)) {
-            // We could check here that the resource to overwrite actually exists but it is probably harmless.
-            s._activeResources[tokenId].removeItemByValue(overwrite);
-            emit ResourceOverwritten(tokenId, overwrite, resourceId);
+        delete s._resourcesPosition[tokenId][resourceId];
+
+        pendingResources.removeItemByIndex(index);
+
+        if (pendingResources.length > 0) {
+            uint64 prevLastResourceId = pendingResources[index];
+            // The implementation of `removeItemByIndex` let we need to update the exchanged resource index
+            s._resourcesPosition[tokenId][prevLastResourceId] = index;
+        }
+
+        uint64[] storage activeResources = s._activeResources[tokenId];
+        uint64 overwrites = s._resourceOverwrites[tokenId][resourceId];
+        if (overwrites != uint64(0)) {
+            uint256 position = s._resourcesPosition[tokenId][overwrites];
+            uint64 overwritesId = activeResources[position];
+
+            if (overwritesId == overwrites) {
+                activeResources[position] = resourceId;
+                s._resourcesPosition[tokenId][resourceId] = position;
+                delete (s._tokenResources[tokenId][overwrites]);
+            } else {
+                // No `overwrites` exist, set `overwrites` to 0 to run a normal accept process.
+                overwrites = uint64(0);
+            }
             delete (s._resourceOverwrites[tokenId][resourceId]);
         }
-        s._activeResources[tokenId].push(resourceId);
-        s._activeResourcePriorities[tokenId].push(LOWEST_PRIORITY);
-        emit ResourceAccepted(tokenId, resourceId);
+
+        if (overwrites == uint64(0)) {
+            activeResources.push(resourceId);
+            s._activeResourcePriorities[tokenId].push(LOWEST_PRIORITY);
+            s._resourcesPosition[tokenId][resourceId] =
+                s._activeResources[tokenId].length -
+                1;
+        }
+
+        emit ResourceAccepted(tokenId, resourceId, overwrites);
+
+        _afterAcceptResource(tokenId, index, resourceId);
     }
 
-    function _rejectResource(uint256 tokenId, uint256 index) internal virtual {
+    function _acceptResource(uint256 tokenId, uint64 resourceId)
+        internal
+        virtual
+    {
+        MultiResourceStorage.State storage s = getMRState();
+
+        uint256 index = s._resourcesPosition[tokenId][resourceId];
+        uint64[] storage tokenPendingResources = s._pendingResources[tokenId];
+
+        if (index >= tokenPendingResources.length) {
+            revert RMRKIndexOutOfRange();
+        }
+
+        if (tokenPendingResources[index] != resourceId) {
+            revert RMRKNoResourceMatchingId();
+        }
+
+        _acceptResource(s, tokenId, resourceId, index);
+    }
+
+    function _acceptResourceByIndex(uint256 tokenId, uint256 index)
+        internal
+        virtual
+    {
         MultiResourceStorage.State storage s = getMRState();
 
         if (index >= s._pendingResources[tokenId].length)
             revert RMRKIndexOutOfRange();
         uint64 resourceId = s._pendingResources[tokenId][index];
-        s._pendingResources[tokenId].removeItemByIndex(index);
-        s._tokenResources[tokenId][resourceId] = false;
+
+        _acceptResource(s, tokenId, resourceId, index);
+    }
+
+    function _rejectResource(
+        MultiResourceStorage.State storage s,
+        uint256 tokenId,
+        uint256 index,
+        uint64 resourceId
+    ) private {
+        _beforeRejectResource(tokenId, index, resourceId);
+
+        uint64[] storage pendingResources = s._pendingResources[tokenId];
+
+        delete s._resourcesPosition[tokenId][resourceId];
+
         delete (s._resourceOverwrites[tokenId][resourceId]);
 
+        pendingResources.removeItemByIndex(index);
+
+        if (pendingResources.length > 0) {
+            // Check the implementation of `removeItemByIndex`, the last element will exchange position with element at `index`.
+            // So we should update the index of exchanged element.
+            uint64 prevLastResourceId = pendingResources[index];
+            s._resourcesPosition[tokenId][prevLastResourceId] = index;
+        }
+
+        s._tokenResources[tokenId][resourceId] = false;
+
         emit ResourceRejected(tokenId, resourceId);
+
+        _afterRejectResource(tokenId, index, resourceId);
+    }
+
+    function _rejectResource(uint256 tokenId, uint64 resourceId)
+        internal
+        virtual
+    {
+        MultiResourceStorage.State storage s = getMRState();
+
+        uint256 index = s._resourcesPosition[tokenId][resourceId];
+        uint64[] storage tokenPendingResources = s._pendingResources[tokenId];
+
+        if (index >= tokenPendingResources.length) {
+            revert RMRKIndexOutOfRange();
+        }
+
+        if (tokenPendingResources[index] != resourceId) {
+            revert RMRKNoResourceMatchingId();
+        }
+
+        _rejectResource(s, tokenId, index, resourceId);
+    }
+
+    function _rejectResourceByIndex(uint256 tokenId, uint256 index)
+        internal
+        virtual
+    {
+        MultiResourceStorage.State storage s = getMRState();
+
+        if (index >= s._pendingResources[tokenId].length)
+            revert RMRKIndexOutOfRange();
+        uint64 resourceId = s._pendingResources[tokenId][index];
+
+        _rejectResource(s, tokenId, index, resourceId);
     }
 
     function _rejectAllResources(uint256 tokenId) internal virtual {
+        _beforeRejectAllResources(tokenId);
+
         MultiResourceStorage.State storage s = getMRState();
 
         uint256 len = s._pendingResources[tokenId].length;
         for (uint256 i; i < len; ) {
             uint64 resourceId = s._pendingResources[tokenId][i];
             delete s._resourceOverwrites[tokenId][resourceId];
+
             unchecked {
                 ++i;
             }
@@ -193,36 +313,8 @@ abstract contract RMRKMultiResourceInternal is
 
         delete (s._pendingResources[tokenId]);
         emit ResourceRejected(tokenId, uint64(0));
-    }
 
-    function _removeResource(uint256 tokenId, uint256 index) internal virtual {
-        MultiResourceStorage.State storage s = getMRState();
-
-        if (index >= s._activeResources[tokenId].length)
-            revert RMRKIndexOutOfRange();
-        uint64 resourceId = s._activeResources[tokenId][index];
-
-        s._activeResources[tokenId].removeItemByIndex(index);
-        s._activeResourcePriorities[tokenId].removeItemByIndex(index);
-        delete s._tokenResources[tokenId][resourceId];
-
-        emit ResourceRemoved(tokenId, resourceId);
-    }
-
-    function _removeAllResources(uint256 tokenId) internal virtual {
-        MultiResourceStorage.State storage s = getMRState();
-
-        uint256 len = s._activeResources[tokenId].length;
-
-        for (uint256 i; i < len; i++) {
-            uint64 resourceId = s._activeResources[tokenId][i];
-            delete s._tokenResources[tokenId][resourceId];
-        }
-
-        delete s._activeResources[tokenId];
-        delete s._activeResourcePriorities[tokenId];
-
-        emit ResourceRemoved(tokenId, uint64(0));
+        _afterRejectAllResources(tokenId);
     }
 
     function _setPriority(uint256 tokenId, uint16[] memory priorities)
@@ -234,9 +326,20 @@ abstract contract RMRKMultiResourceInternal is
         uint256 length = priorities.length;
         if (length != s._activeResources[tokenId].length)
             revert RMRKBadPriorityListLength();
+
+        _beforeSetPriority(tokenId, priorities);
+
         s._activeResourcePriorities[tokenId] = priorities;
 
         emit ResourcePrioritySet(tokenId);
+
+        _afterSetPriority(tokenId, priorities);
+    }
+
+    function _setFallbackURI(string memory fallbackURI) internal virtual {
+        MultiResourceStorage.State storage s = getMRState();
+
+        s._fallbackURI = fallbackURI;
     }
 
     function _addResourceToToken(
@@ -254,16 +357,23 @@ abstract contract RMRKMultiResourceInternal is
         if (s._pendingResources[tokenId].length >= 128)
             revert RMRKMaxPendingResourcesReached();
 
+        _beforeAddResourceToToken(tokenId, resourceId, overwrites);
+
         s._tokenResources[tokenId][resourceId] = true;
+
+        s._resourcesPosition[tokenId][resourceId] = s
+            ._pendingResources[tokenId]
+            .length;
 
         s._pendingResources[tokenId].push(resourceId);
 
         if (overwrites != uint64(0)) {
             s._resourceOverwrites[tokenId][resourceId] = overwrites;
-            emit ResourceOverwriteProposed(tokenId, resourceId, overwrites);
         }
 
-        emit ResourceAddedToToken(tokenId, resourceId);
+        emit ResourceAddedToToken(tokenId, resourceId, overwrites);
+
+        _afterAddResourceToToken(tokenId, resourceId, overwrites);
     }
 
     function _getActiveResources(uint256 tokenId)
@@ -339,15 +449,6 @@ abstract contract RMRKMultiResourceInternal is
         emit ApprovalForAllForResources(owner, operator, approved);
     }
 
-    function _getAllResources()
-        internal
-        view
-        virtual
-        returns (uint64[] memory)
-    {
-        return getMRState()._allResources;
-    }
-
     function _getFullResources(uint256 tokenId)
         internal
         view
@@ -380,12 +481,73 @@ abstract contract RMRKMultiResourceInternal is
             uint64 id = resourceIds[i];
             resources[i] = Resource({
                 id: id,
-                metadataURI: _getResourceMeta(id)
+                metadataURI: _getResourceMetadata(id)
             });
+
             unchecked {
                 ++i;
             }
         }
         return resources;
     }
+
+    function _beforeAddResource(uint64 id, string memory metadataURI)
+        internal
+        virtual
+    {}
+
+    function _afterAddResource(uint64 id, string memory metadataURI)
+        internal
+        virtual
+    {}
+
+    function _beforeAddResourceToToken(
+        uint256 tokenId,
+        uint64 resourceId,
+        uint64 overwrites
+    ) internal virtual {}
+
+    function _afterAddResourceToToken(
+        uint256 tokenId,
+        uint64 resourceId,
+        uint64 overwrites
+    ) internal virtual {}
+
+    function _beforeAcceptResource(
+        uint256 tokenId,
+        uint256 index,
+        uint256 resourceId
+    ) internal virtual {}
+
+    function _afterAcceptResource(
+        uint256 tokenId,
+        uint256 index,
+        uint256 resourceId
+    ) internal virtual {}
+
+    function _beforeRejectResource(
+        uint256 tokenId,
+        uint256 index,
+        uint256 resourceId
+    ) internal virtual {}
+
+    function _afterRejectResource(
+        uint256 tokenId,
+        uint256 index,
+        uint256 resourceId
+    ) internal virtual {}
+
+    function _beforeRejectAllResources(uint256 tokenId) internal virtual {}
+
+    function _afterRejectAllResources(uint256 tokenId) internal virtual {}
+
+    function _beforeSetPriority(uint256 tokenId, uint16[] memory priorities)
+        internal
+        virtual
+    {}
+
+    function _afterSetPriority(uint256 tokenId, uint16[] memory priorities)
+        internal
+        virtual
+    {}
 }

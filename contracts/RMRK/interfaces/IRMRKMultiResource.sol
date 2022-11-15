@@ -6,59 +6,58 @@ import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 
 interface IRMRKMultiResourceEventsAndStruct {
     /**
-     * @notice emitted when a resource object is initialized at resourceId
+     * @notice Used to notify listeners that a resource object is initialized at `resourceId`.
+     * @param resourceId ID of the resource that was initialized
      */
     event ResourceSet(uint64 indexed resourceId);
 
     /**
-     * @notice emitted when a resource object at resourceId is added to tokenId's pendingResource array
+     * @notice Used to notify listeners that a resource object at `resourceId` is added to token's pending resource
+     *  array.
+     * @param tokenId ID of the token that received a new pending resource
+     * @param resourceId ID of the resource that has been added to the token's pending resources array
+     * @param overwritesId ID of the resource that would be overwritten
      */
     event ResourceAddedToToken(
-        uint256 indexed tokenId,
-        uint64 indexed resourceId
-    );
-
-    /**
-     * @notice emitted when a resource object at resourceId is removed from tokenId's activeResource array
-     * (Extra added from current fork implementation, in the RMRK origin branch do not support resource remove)
-     */
-    event ResourceRemoved(uint256 indexed tokenId, uint64 indexed resourceId);
-
-    /**
-     * @notice emitted when a resource object at resourceId is accepted by tokenId and migrated from tokenId's pendingResource array to resource array
-     */
-    event ResourceAccepted(uint256 indexed tokenId, uint64 indexed resourceId);
-
-    /**
-     * @notice emitted when a resource object at resourceId is rejected from tokenId and is dropped from the pendingResource array
-     */
-    event ResourceRejected(uint256 indexed tokenId, uint64 indexed resourceId);
-
-    /**
-     * @notice emitted when tokenId's prioritiy array is reordered.
-     */
-    event ResourcePrioritySet(uint256 indexed tokenId);
-
-    /**
-     * @notice emitted when a resource object at resourceId is proposed to tokenId, and that proposal will initiate an overwrite of overwrites with resourceId if accepted.
-     */
-    event ResourceOverwriteProposed(
         uint256 indexed tokenId,
         uint64 indexed resourceId,
         uint64 indexed overwritesId
     );
 
     /**
-     * @notice emitted when a pending resource with an overwrite is accepted, overwriting tokenId's resource overwritten
+     * @notice Used to notify listeners that a resource object at `resourceId` is accepted by the token and migrated
+     *  from token's pending resources array to active resources array of the token.
+     * @param tokenId ID of the token that had a new resource accepted
+     * @param resourceId ID of the resource that was accepted
+     * @param overwritesId ID of the resource that would be overwritten
      */
-    event ResourceOverwritten(
+    event ResourceAccepted(
         uint256 indexed tokenId,
-        uint64 indexed oldResourceId,
-        uint64 indexed newResourceId
+        uint64 indexed resourceId,
+        uint64 indexed overwritesId
     );
 
     /**
-     * @notice emitted when owner approves approved to manage the resources of tokenId. Approvals are cleared on action.
+     * @notice Used to notify listeners that a resource object at `resourceId` is rejected from token and is dropped
+     *  from the pending resources array of the token.
+     * @param tokenId ID of the token that had a resource rejected
+     * @param resourceId ID of the resource that was rejected
+     */
+    event ResourceRejected(uint256 indexed tokenId, uint64 indexed resourceId);
+
+    /**
+     * @notice Used to notify listeners that token's prioritiy array is reordered.
+     * @param tokenId ID of the token that had the resource priority array updated
+     */
+    event ResourcePrioritySet(uint256 indexed tokenId);
+
+    /**
+     * @notice Used to notify listeners that owner has granted an approval to the user to manage the resources of a
+     *  given token.
+     * @dev Approvals must be cleared on transfer
+     * @param owner Address of the account that has granted the approval for all token's resources
+     * @param approved Address of the account that has been granted approval to manage the token's resources
+     * @param tokenId ID of the token on which the approval was granted
      */
     event ApprovalForResources(
         address indexed owner,
@@ -67,26 +66,23 @@ interface IRMRKMultiResourceEventsAndStruct {
     );
 
     /**
-     * @notice emitted when owner approves operator to manage the resources of tokenId. Approvals are not cleared on action.
+     * @notice Used to notify listeners that owner has granted approval to the user to manage resources of all of their
+     *  tokens.
+     * @param owner Address of the account that has granted the approval for all resources on all of their tokens
+     * @param operator Address of the account that has been granted the approval to manage the token's resources on all of the
+     *  tokens
+     * @param approved Boolean value signifying whether the permission has been granted (`true`) or revoked (`false`)
      */
     event ApprovalForAllForResources(
         address indexed owner,
         address indexed operator,
         bool approved
     );
-
-    /**
-     * @dev Resource object used by the RMRK NFT protocol
-     */
-    struct Resource {
-        uint64 id; //8 bytes
-        string metadataURI; //32+
-    }
 }
 
-interface IRMRKMultiResourceAlone is IRMRKMultiResourceEventsAndStruct {
+interface IRMRKMultiResource is IERC165, IRMRKMultiResourceEventsAndStruct {
     /**
-     * @notice Accepts a resource at `index` on pending array of `tokenId`.
+     * @notice Accepts a resource which id is `resourceId` in pending array of `tokenId`.
      * Migrates the resource from the token's pending resource array to the active resource array.
      *
      * Active resources cannot be removed by anyone, but can be replaced by a new resource.
@@ -95,25 +91,25 @@ interface IRMRKMultiResourceAlone is IRMRKMultiResourceEventsAndStruct {
      *
      * - The caller must own the token or be an approved operator.
      * - `tokenId` must exist.
-     * - `index` must be in range of the length of the pending resource array.
+     * - `resourceId` must exist.
      *
      * Emits an {ResourceAccepted} event.
      */
-    function acceptResource(uint256 tokenId, uint256 index) external;
+    function acceptResource(uint256 tokenId, uint64 resourceId) external;
 
     /**
-     * @notice Rejects a resource at `index` on pending array of `tokenId`.
+     * @notice Rejects a resource which id is `resourceId` in pending array of `tokenId`.
      * Removes the resource from the token's pending resource array.
      *
      * Requirements:
      *
      * - The caller must own the token or be an approved operator.
      * - `tokenId` must exist.
-     * - `index` must be in range of the length of the pending resource array.
+     * - `resourceId` must exist.
      *
      * Emits a {ResourceRejected} event.
      */
-    function rejectResource(uint256 tokenId, uint256 index) external;
+    function rejectResource(uint256 tokenId, uint64 resourceId) external;
 
     /**
      * @notice Rejects all resources from the pending array of `tokenId`.
@@ -188,25 +184,10 @@ interface IRMRKMultiResourceAlone is IRMRKMultiResourceEventsAndStruct {
      * Custom data is intended to be stored as generic bytes and decode by various protocols on an as-needed basis
      *
      */
-    function getResourceMeta(uint64 resourceId)
+    function getResourceMetadata(uint64 resourceId)
         external
         view
         returns (string memory);
-
-    /**
-     * @notice Fetches resource data for the token's active resource with the given index.
-     * @dev Resources are stored by reference mapping _resources[resourceId]
-     * @dev Can be overriden to implement enumerate, fallback or other custom logic
-     */
-    function getResourceMetaForToken(uint256 tokenId, uint64 resourceIndex)
-        external
-        view
-        returns (string memory);
-
-    /**
-     * @notice Returns the ids of all stored resources
-     */
-    function getAllResources() external view returns (uint64[] memory);
 
     /**
      * @notice Gives permission to `to` to manage `tokenId` resources.
@@ -259,5 +240,3 @@ interface IRMRKMultiResourceAlone is IRMRKMultiResourceEventsAndStruct {
         view
         returns (bool);
 }
-
-interface IRMRKMultiResource is IERC165, IRMRKMultiResourceAlone {}

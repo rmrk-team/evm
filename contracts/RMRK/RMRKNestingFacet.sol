@@ -170,19 +170,22 @@ contract RMRKNestingFacet is
 
     // ------------------------ BURNING ------------------------
 
-    function burnChild(uint256 tokenId, uint256 index)
-        public
-        onlyApprovedOrDirectOwner(tokenId)
-    {
-        _burnChild(tokenId, index);
-    }
-
     function burn(uint256 tokenId)
         public
         virtual
         onlyApprovedOrDirectOwner(tokenId)
+        returns (uint256)
     {
-        _burn(tokenId);
+        return _burn(tokenId, 0);
+    }
+
+    function burn(uint256 tokenId, uint256 maxRecursiveBurns)
+        public
+        virtual
+        onlyApprovedOrDirectOwner(tokenId)
+        returns (uint256)
+    {
+        return _burn(tokenId, maxRecursiveBurns);
     }
 
     // ------------------------ TRANSFERING ------------------------
@@ -197,14 +200,6 @@ contract RMRKNestingFacet is
         uint256 tokenId
     ) public virtual onlyApprovedOrDirectOwner(tokenId) {
         _transfer(from, to, tokenId);
-    }
-
-    function nestTransfer(
-        address to,
-        uint256 tokenId,
-        uint256 destinationId
-    ) public virtual {
-        nestTransferFrom(_msgSender(), to, tokenId, destinationId);
     }
 
     function nestTransferFrom(
@@ -244,104 +239,18 @@ contract RMRKNestingFacet is
         public
         virtual
     {
-        address childTokenAddress = _msgSender();
-        _isNestingContract(childTokenAddress, 0);
-
-        (bool isDuplicate, , ) = hasChild(
-            parentTokenId,
-            childTokenAddress,
-            childTokenId
-        );
-        if (isDuplicate) revert RMRKDuplicateAdd();
-
-        IRMRKNesting childTokenContract = IRMRKNesting(childTokenAddress);
-        (address _parentContract, uint256 _parentTokenId, ) = childTokenContract
-            .rmrkOwnerOf(childTokenId);
-        if (_parentContract != address(this) || _parentTokenId != parentTokenId)
-            revert RMRKParentChildMismatch();
-
-        uint256 length = getNestingState()
-            ._pendingChildren[parentTokenId]
-            .length;
-
-        Child memory child = Child({
-            contractAddress: childTokenAddress,
-            tokenId: childTokenId
-        });
-
-        _addChildToPending(parentTokenId, child);
-        emit ChildProposed(
-            parentTokenId,
-            child.contractAddress,
-            child.tokenId,
-            length
-        );
+        _addChild(parentTokenId, childTokenId);
     }
 
     /**
      * @dev Sends an instance of Child from the pending children array at index to children array for tokenId.
      */
-    function acceptChild(uint256 tokenId, uint256 index)
-        public
-        virtual
-        onlyApprovedOrOwner(tokenId)
-    {
-        _isOverLength(tokenId, index, true);
-
-        Child memory child = getNestingState()._pendingChildren[tokenId][index];
-
-        _removeItemByIndexAndUpdateLastChildIndex(
-            getNestingState()._pendingChildren[tokenId],
-            index
-        );
-
-        _addChildToChildren(tokenId, child);
-        emit ChildAccepted(
-            tokenId,
-            child.contractAddress,
-            child.tokenId,
-            index
-        );
-    }
-
-    /**
-     * @notice Deletes a single child from the pending array by index.
-     * @param tokenId tokenId whose pending child is to be rejected
-     * @param index index on tokenId pending child array to reject
-     * @param to if an address which is not the zero address is passed, this will attempt to transfer
-     * the child to `to` via a call-in to the child address.
-     * @dev If `to` is the zero address, the child's ownership structures will not be updated, resulting in an
-     * 'orphaned' child. If a call with a populated `to` field fails, call this function with `to` set to the
-     * zero address to orphan the child. Orphaned children can be reclaimed by a call to reclaimChild on this
-     * contract by the root owner.
-     */
-    function rejectChild(
+    function acceptChild(
         uint256 tokenId,
-        uint256 index,
-        address to
+        address childContractAddress,
+        uint256 childTokenId
     ) public virtual onlyApprovedOrOwner(tokenId) {
-        _isOverLength(tokenId, index, true);
-
-        NestingStorage.State storage ns = getNestingState();
-
-        Child storage pendingChild = ns._pendingChildren[tokenId][index];
-        address childContract = pendingChild.contractAddress;
-        uint256 childTokenId = pendingChild.tokenId;
-
-        _removeItemByIndexAndUpdateLastChildIndex(
-            ns._pendingChildren[tokenId],
-            index
-        );
-
-        if (to != address(0)) {
-            IERC721(childContract).safeTransferFrom(
-                address(this),
-                to,
-                childTokenId
-            );
-        }
-
-        emit ChildRejected(tokenId, childContract, childTokenId, index);
+        _acceptChild(tokenId, childContractAddress, childTokenId);
     }
 
     /**
@@ -355,58 +264,35 @@ contract RMRKNestingFacet is
         onlyApprovedOrOwner(tokenId)
     {
         NestingStorage.State storage ns = getNestingState();
-        for (uint256 i; i < ns._pendingChildren[tokenId].length; ++i) {
+        for (uint256 i; i < ns._pendingChildren[tokenId].length; ) {
             Child memory child = ns._pendingChildren[tokenId][i];
             address childContract = child.contractAddress;
             uint256 childTokenId = child.tokenId;
 
             delete ns._posInChildArray[childContract][childTokenId];
+
+            unchecked {
+                ++i;
+            }
         }
         delete getNestingState()._pendingChildren[tokenId];
 
         emit AllChildrenRejected(tokenId);
     }
 
-    /**
-     * @notice Function to unnest a child from the active token array.
-     * @param tokenId is the tokenId of the parent token to unnest from.
-     * @param index is the index of the child token ID.
-     * @param to is the address to transfer this
-     */
     function unnestChild(
         uint256 tokenId,
-        uint256 index,
-        address to
+        address to,
+        address childContractAddress,
+        uint256 childTokenId,
+        bool isPending
     ) public virtual onlyApprovedOrOwner(tokenId) {
-        _unnestChild(tokenId, index, to);
-    }
-
-    function reclaimChild(
-        uint256 tokenId,
-        address childAddress,
-        uint256 childTokenId
-    ) public onlyApprovedOrOwner(tokenId) {
-        (address owner, uint256 ownerTokenId, bool isNft) = IRMRKNesting(
-            childAddress
-        ).rmrkOwnerOf(childTokenId);
-
-        (bool inChildrenOrPending, , ) = hasChild(
+        _unnestChild(
             tokenId,
-            childAddress,
-            childTokenId
-        );
-
-        if (
-            owner != address(this) ||
-            ownerTokenId != tokenId ||
-            !isNft ||
-            inChildrenOrPending
-        ) revert RMRKInvalidChildReclaim();
-
-        IERC721(childAddress).safeTransferFrom(
-            address(this),
-            _msgSender(),
-            childTokenId
+            to,
+            childContractAddress,
+            childTokenId,
+            isPending
         );
     }
 
@@ -450,21 +336,5 @@ contract RMRKNestingFacet is
         returns (Child memory)
     {
         return _pendingChildOf(parentTokenId, index);
-    }
-
-    function hasChild(
-        uint256 tokenId,
-        address childContract,
-        uint256 childTokenId
-    )
-        public
-        view
-        returns (
-            bool found,
-            bool isPending,
-            uint256 index
-        )
-    {
-        return _hasChild(tokenId, childContract, childTokenId);
     }
 }

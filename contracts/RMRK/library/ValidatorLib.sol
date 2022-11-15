@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import "../interfaces/IRMRKNesting.sol";
 import "../interfaces/IRMRKBaseStorage.sol";
 import "../interfaces/IRMRKMultiResource.sol";
-import "../interfaces/IRMRKEquippableAyuilosVer.sol";
+import "../interfaces/ILightmEquippable.sol";
 import "@openzeppelin/contracts/utils/introspection/ERC165.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
@@ -29,12 +29,16 @@ library LightmValidatorLib {
         IRMRKNesting.Child[] memory children
     ) internal pure returns (bool) {
         uint256 len = children.length;
-        for (uint256 i; i < len; ++i) {
+        for (uint256 i; i < len; ) {
             if (
                 child.contractAddress == children[i].contractAddress &&
                 child.tokenId == children[i].tokenId
             ) {
                 return true;
+            }
+
+            unchecked {
+                ++i;
             }
         }
 
@@ -76,7 +80,7 @@ library LightmValidatorLib {
             uint256 len = children.length;
             uint256 j;
 
-            for (uint256 i; i < len; ++i) {
+            for (uint256 i; i < len; ) {
                 IRMRKNesting.Child memory child = children[i];
                 (bool childIsValid, ) = isAValidNestingContract(
                     child.contractAddress
@@ -100,6 +104,10 @@ library LightmValidatorLib {
                         ++j;
                     }
                 }
+
+                unchecked {
+                    ++i;
+                }
             }
         } else {
             revert(reason);
@@ -120,9 +128,9 @@ library LightmValidatorLib {
         public
         view
         validContract(targetContract)
-        returns (IRMRKEquippable.SlotEquipment[] memory)
+        returns (ILightmEquippable.SlotEquipment[] memory)
     {
-        IRMRKEquippable tContract = IRMRKEquippable(targetContract);
+        ILightmEquippable tContract = ILightmEquippable(targetContract);
 
         // avoid `stack too deep` problem
         {
@@ -133,22 +141,22 @@ library LightmValidatorLib {
             );
 
             if (!isValid) {
-                return new IRMRKEquippable.SlotEquipment[](0);
+                return new ILightmEquippable.SlotEquipment[](0);
             }
         }
 
-        IRMRKEquippable.SlotEquipment[] memory slotEquipments = tContract
+        ILightmEquippable.SlotEquipment[] memory slotEquipments = tContract
             .getSlotEquipments(tokenId, baseRelatedResourceId);
 
-        IRMRKEquippable.SlotEquipment[]
-            memory _validSlotEquipments = new IRMRKEquippable.SlotEquipment[](
+        ILightmEquippable.SlotEquipment[]
+            memory _validSlotEquipments = new ILightmEquippable.SlotEquipment[](
                 slotEquipments.length
             );
 
         uint256 j;
 
-        for (uint256 i; i < slotEquipments.length; i++) {
-            IRMRKEquippable.SlotEquipment memory sE = slotEquipments[i];
+        for (uint256 i; i < slotEquipments.length; ) {
+            ILightmEquippable.SlotEquipment memory sE = slotEquipments[i];
 
             (bool isValid, ) = isSlotEquipmentValid(
                 targetContract,
@@ -159,12 +167,18 @@ library LightmValidatorLib {
 
             if (isValid) {
                 _validSlotEquipments[j] = sE;
-                ++j;
+                unchecked {
+                    ++j;
+                }
+            }
+
+            unchecked {
+                ++i;
             }
         }
 
-        IRMRKEquippable.SlotEquipment[]
-            memory validSlotEquipments = new IRMRKEquippable.SlotEquipment[](j);
+        ILightmEquippable.SlotEquipment[]
+            memory validSlotEquipments = new ILightmEquippable.SlotEquipment[](j);
         validSlotEquipments = _validSlotEquipments;
 
         return _validSlotEquipments;
@@ -247,7 +261,7 @@ library LightmValidatorLib {
 
         if (
             !(IERC165(targetContract).supportsInterface(
-                type(IRMRKEquippable).interfaceId
+                type(ILightmEquippable).interfaceId
             ) &&
                 IERC165(targetContract).supportsInterface(
                     type(IRMRKNesting).interfaceId
@@ -279,8 +293,8 @@ library LightmValidatorLib {
             return (false, "RV:NotInActiveResources");
         }
 
-        IRMRKEquippable.BaseRelatedResource
-            memory baseRelatedResource = IRMRKEquippable(targetContract)
+        ILightmEquippable.BaseRelatedResource
+            memory baseRelatedResource = ILightmEquippable(targetContract)
                 .getBaseRelatedResource(baseRelatedResourceId);
 
         address baseStorageContract = baseRelatedResource.baseAddress;
@@ -302,7 +316,7 @@ library LightmValidatorLib {
         address targetContract,
         uint256 tokenId,
         uint64 baseRelatedResourceId,
-        IRMRKEquippable.SlotEquipment memory slotEquipment,
+        ILightmEquippable.SlotEquipment memory slotEquipment,
         bool checkExistingData
     ) public view returns (bool, string memory) {
         (
@@ -354,7 +368,7 @@ library LightmValidatorLib {
                     .childBaseRelatedResourceId;
 
                 uint64[]
-                    memory childActiveBaseRelatedResourceIds = IRMRKEquippable(
+                    memory childActiveBaseRelatedResourceIds = ILightmEquippable(
                         slotEquipment.child.contractAddress
                     ).getActiveBaseRelatedResources(
                             slotEquipment.child.tokenId
@@ -372,19 +386,19 @@ library LightmValidatorLib {
             }
 
             {
-                IRMRKEquippable.BaseRelatedResource
-                    memory baseRelatedResource = IRMRKEquippable(targetContract)
+                ILightmEquippable.BaseRelatedResource
+                    memory baseRelatedResource = ILightmEquippable(targetContract)
                         .getBaseRelatedResource(baseRelatedResourceId);
 
-                IRMRKEquippable.BaseRelatedResource
-                    memory childBaseRelatedResource = IRMRKEquippable(
+                ILightmEquippable.BaseRelatedResource
+                    memory childBaseRelatedResource = ILightmEquippable(
                         slotEquipment.child.contractAddress
                     ).getBaseRelatedResource(
                             slotEquipment.childBaseRelatedResourceId
                         );
 
-                IRMRKEquippable.SlotEquipment
-                    memory realSlotEquipment = IRMRKEquippable(targetContract)
+                ILightmEquippable.SlotEquipment
+                    memory realSlotEquipment = ILightmEquippable(targetContract)
                         .getSlotEquipment(
                             tokenId,
                             baseRelatedResourceId,
@@ -446,7 +460,7 @@ library LightmValidatorLib {
         address targetContract,
         uint256 tokenId,
         uint64 baseRelatedResourceId,
-        IRMRKEquippable.SlotEquipment memory slotEquipment
+        ILightmEquippable.SlotEquipment memory slotEquipment
     ) public view returns (bool, string memory) {
         return
             isSlotEquipmentValid(
