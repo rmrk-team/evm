@@ -4,8 +4,6 @@ pragma solidity ^0.8.16;
 
 import "../RMRK/equippable/RMRKNestingExternalEquip.sol";
 
-// import "hardhat/console.sol";
-
 //Minimal public implementation of IRMRKNesting for testing.
 contract RMRKNestingExternalEquipMock is RMRKNestingExternalEquip {
     constructor(string memory name_, string memory symbol_)

@@ -4,8 +4,6 @@ pragma solidity ^0.8.16;
 
 import "../RMRK/nesting/RMRKNestingMultiResource.sol";
 
-// import "hardhat/console.sol";
-
 //Minimal public implementation of RMRKNestingMultiResource for testing.
 contract RMRKNestingMultiResourceMock is RMRKNestingMultiResource {
     constructor(string memory name, string memory symbol)

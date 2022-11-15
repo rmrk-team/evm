@@ -6,17 +6,13 @@ pragma solidity ^0.8.16;
 
 import "./IRMRKNesting.sol";
 import "../core/RMRKCore.sol";
-import "../library/RMRKLib.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
-import "@openzeppelin/contracts/utils/Strings.sol";
 import "../library/RMRKErrors.sol";
-
-// import "hardhat/console.sol";
 
 /**
  * @title RMRKNesting
@@ -26,9 +22,7 @@ import "../library/RMRKErrors.sol";
  *  gas limits allow it.
  */
 contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
-    using RMRKLib for uint256;
     using Address for address;
-    using Strings for uint256;
 
     uint256 private constant _MAX_LEVELS_TO_CHECK_FOR_INHERITANCE_LOOP = 100;
 

@@ -4,8 +4,6 @@ pragma solidity ^0.8.16;
 
 import "../RMRK/nesting/RMRKNesting.sol";
 
-// import "hardhat/console.sol";
-
 //Minimal public implementation of IRMRKNesting for testing.
 contract RMRKNestingMock is RMRKNesting {
     // This is used to test the usage of hooks

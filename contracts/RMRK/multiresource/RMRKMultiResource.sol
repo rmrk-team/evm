@@ -12,8 +12,6 @@ import "./AbstractMultiResource.sol";
 import "../core/RMRKCore.sol";
 import "../library/RMRKErrors.sol";
 
-// import "hardhat/console.sol";
-
 /**
  * @title RMRKMultiResource
  * @author RMRK team

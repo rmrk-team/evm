@@ -12,8 +12,6 @@ import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 
-// import "hardhat/console.sol";
-
 /**
  * @title RMRKNestingMultiResource
  * @author RMRK team

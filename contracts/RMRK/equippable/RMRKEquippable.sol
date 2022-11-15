@@ -11,8 +11,6 @@ import "../nesting/RMRKNesting.sol";
 import "../security/ReentrancyGuard.sol";
 import "./IRMRKEquippable.sol";
 
-// import "hardhat/console.sol";
-
 /**
  * @title RMRKEquippable
  * @author RMRK team
