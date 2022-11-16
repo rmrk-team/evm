@@ -3,17 +3,17 @@ import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import {
-  addResourceToToken,
+  addAssetToToken,
   mintFromMock,
   nestMintFromMock,
-  addResourceEntryEquippablesFromMock,
+  addAssetEntryEquippablesFromMock,
 } from './utils';
 import { setupContextForParts } from './setup/equippableParts';
 import { setupContextForSlots } from './setup/equippableSlots';
-import shouldBehaveLikeEquippableResources from './behavior/equippableResources';
+import shouldBehaveLikeEquippableAssets from './behavior/equippableAssets';
 import shouldBehaveLikeEquippableWithParts from './behavior/equippableParts';
 import shouldBehaveLikeEquippableWithSlots from './behavior/equippableSlots';
-import shouldBehaveLikeMultiResource from './behavior/multiresource';
+import shouldBehaveLikeMultiAsset from './behavior/multiasset';
 
 // --------------- FIXTURES -----------------------
 
@@ -167,10 +167,10 @@ async function slotsFixture() {
   };
 }
 
-async function resourcesFixture() {
+async function assetsFixture() {
   const Nesting = await ethers.getContractFactory('RMRKNestingExternalEquipMock');
   const Equip = await ethers.getContractFactory('RMRKExternalEquipMock');
-  const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiResourceRenderUtils');
+  const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiAssetRenderUtils');
 
   const nesting = await Nesting.deploy('Chunky', 'CHNK');
   await nesting.deployed();
@@ -186,10 +186,10 @@ async function resourcesFixture() {
   return { nesting, equip, renderUtils };
 }
 
-async function multiResourceFixture() {
+async function multiAssetFixture() {
   const NestingFactory = await ethers.getContractFactory('RMRKNestingExternalEquipMock');
   const EquipFactory = await ethers.getContractFactory('RMRKExternalEquipMock');
-  const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiResourceRenderUtils');
+  const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiAssetRenderUtils');
 
   const nesting = await NestingFactory.deploy('NestingWithEquippable', 'NWE');
   await nesting.deployed();
@@ -254,14 +254,14 @@ describe('ExternalEquippableMock with Slots', async () => {
   shouldBehaveLikeEquippableWithSlots(nestMintFromMock);
 });
 
-describe('ExternalEquippableMock Resources', async () => {
+describe('ExternalEquippableMock Assets', async () => {
   let nextTokenId = 1;
   let nesting: Contract;
   let equip: Contract;
   let renderUtils: Contract;
 
   beforeEach(async function () {
-    ({ nesting, equip, renderUtils } = await loadFixture(resourcesFixture));
+    ({ nesting, equip, renderUtils } = await loadFixture(assetsFixture));
     this.nesting = nesting;
     this.equip = equip;
     this.renderUtils = renderUtils;
@@ -299,12 +299,12 @@ describe('ExternalEquippableMock Resources', async () => {
     return tokenId;
   }
 
-  shouldBehaveLikeEquippableResources(mintToNesting);
+  shouldBehaveLikeEquippableAssets(mintToNesting);
 });
 
 // --------------- END EQUIPPABLE BEHAVIOR -----------------------
 
-// --------------- MULTI RESOURCE BEHAVIOR -----------------------
+// --------------- MULTI ASSET BEHAVIOR -----------------------
 
 describe('ExternalEquippableMock MR behavior', async () => {
   let nextTokenId = 1;
@@ -313,7 +313,7 @@ describe('ExternalEquippableMock MR behavior', async () => {
   let renderUtils: Contract;
 
   beforeEach(async function () {
-    ({ nesting, equip, renderUtils } = await loadFixture(multiResourceFixture));
+    ({ nesting, equip, renderUtils } = await loadFixture(multiAssetFixture));
     this.token = equip;
     this.renderUtils = renderUtils;
   });
@@ -326,11 +326,7 @@ describe('ExternalEquippableMock MR behavior', async () => {
     return tokenId;
   }
 
-  shouldBehaveLikeMultiResource(
-    mintToNesting,
-    addResourceEntryEquippablesFromMock,
-    addResourceToToken,
-  );
+  shouldBehaveLikeMultiAsset(mintToNesting, addAssetEntryEquippablesFromMock, addAssetToToken);
 });
 
-// --------------- MULTI RESOURCE BEHAVIOR END ------------------------
+// --------------- MULTI ASSET BEHAVIOR END ------------------------

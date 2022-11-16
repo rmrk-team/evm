@@ -88,60 +88,60 @@ async function nestTransfer(
   await token.connect(caller)['nestTransfer(address,uint256,uint256)'](to, tokenId, parentId);
 }
 
-async function addResourceToToken(
+async function addAssetToToken(
   token: Contract,
   tokenId: number,
   resId: BigNumber,
   overwrites: BigNumber | number,
 ): Promise<void> {
-  return await token.addResourceToToken(tokenId, resId, overwrites);
+  return await token.addAssetToToken(tokenId, resId, overwrites);
 }
 
-let nextResourceId = 1;
+let nextAssetId = 1;
 
-async function addResourceEntryFromMock(token: Contract, data?: string): Promise<BigNumber> {
-  const resourceId = bn(nextResourceId);
-  nextResourceId++;
-  await token.addResourceEntry(resourceId, data !== undefined ? data : 'metaURI');
-  return resourceId;
+async function addAssetEntryFromMock(token: Contract, data?: string): Promise<BigNumber> {
+  const assetId = bn(nextAssetId);
+  nextAssetId++;
+  await token.addAssetEntry(assetId, data !== undefined ? data : 'metaURI');
+  return assetId;
 }
 
-async function addResourceEntryFromImpl(token: Contract, data?: string): Promise<BigNumber> {
-  await token.addResourceEntry(data !== undefined ? data : 'metaURI');
-  return await token.totalResources();
+async function addAssetEntryFromImpl(token: Contract, data?: string): Promise<BigNumber> {
+  await token.addAssetEntry(data !== undefined ? data : 'metaURI');
+  return await token.totalAssets();
 }
 
-async function addResourceEntryEquippablesFromMock(
+async function addAssetEntryEquippablesFromMock(
   token: Contract,
   data?: string,
 ): Promise<BigNumber> {
-  const resourceId = bn(nextResourceId);
+  const assetId = bn(nextAssetId);
   const equippableGroupId = bn(1);
-  nextResourceId++;
-  await token.addResourceEntry(
-    resourceId,
+  nextAssetId++;
+  await token.addAssetEntry(
+    assetId,
     equippableGroupId,
     ADDRESS_ZERO,
     data !== undefined ? data : 'metaURI',
     [],
     [],
   );
-  return resourceId;
+  return assetId;
 }
 
-async function addResourceEntryEquippablesFromImpl(
+async function addAssetEntryEquippablesFromImpl(
   token: Contract,
   data?: string,
 ): Promise<BigNumber> {
   const equippableGroupId = bn(1);
-  await token.addResourceEntry(
+  await token.addAssetEntry(
     equippableGroupId,
     ADDRESS_ZERO,
     data !== undefined ? data : 'metaURI',
     [],
     [],
   );
-  return await token.totalResources();
+  return await token.totalAssets();
 }
 
 async function singleFixtureWithArgs(contractName: string, args: any[]): Promise<Contract> {
@@ -167,11 +167,11 @@ async function parentChildFixtureWithArgs(
 }
 
 export {
-  addResourceEntryEquippablesFromImpl,
-  addResourceEntryEquippablesFromMock,
-  addResourceEntryFromImpl,
-  addResourceEntryFromMock,
-  addResourceToToken,
+  addAssetEntryEquippablesFromImpl,
+  addAssetEntryEquippablesFromMock,
+  addAssetEntryFromImpl,
+  addAssetEntryFromMock,
+  addAssetToToken,
   ADDRESS_ZERO,
   bn,
   mintFromImpl,

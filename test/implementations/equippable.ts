@@ -4,13 +4,13 @@ import { ethers } from 'hardhat';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { setupContextForParts } from '../setup/equippableParts';
 import { setupContextForSlots } from '../setup/equippableSlots';
-import shouldBehaveLikeMultiResource from '../behavior/multiresource';
+import shouldBehaveLikeMultiAsset from '../behavior/multiasset';
 import shouldControlValidMinting from '../behavior/mintingImpl';
 import shouldHaveMetadata from '../behavior/metadata';
 import shouldHaveRoyalties from '../behavior/royalties';
 import {
-  addResourceEntryEquippablesFromImpl,
-  addResourceToToken,
+  addAssetEntryEquippablesFromImpl,
+  addAssetToToken,
   ADDRESS_ZERO,
   mintFromImpl,
   nestMintFromImpl,
@@ -168,9 +168,9 @@ async function slotsFixture() {
   return { base, soldier, weapon, weaponGem, background, view };
 }
 
-async function resourcesFixture() {
+async function assetsFixture() {
   const equipFactory = await ethers.getContractFactory('RMRKEquippableImpl');
-  const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiResourceRenderUtils');
+  const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiAssetRenderUtils');
 
   const equip = await equipFactory.deploy(
     'Chunky',
@@ -192,7 +192,7 @@ async function resourcesFixture() {
 
 async function equipFixture() {
   const equipFactory = await ethers.getContractFactory('RMRKEquippableImpl');
-  const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiResourceRenderUtils');
+  const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiAssetRenderUtils');
 
   const equip = await equipFactory.deploy(
     'equipWithEquippable',
@@ -214,7 +214,7 @@ async function equipFixture() {
 
 // --------------- END FIXTURES -----------------------
 
-// --------------- MULTI RESOURCE BEHAVIOR -----------------------
+// --------------- MULTI ASSET BEHAVIOR -----------------------
 
 describe('RMRKEquippableImpl MR behavior', async () => {
   let equip: Contract;
@@ -231,14 +231,10 @@ describe('RMRKEquippableImpl MR behavior', async () => {
     return await equip.totalSupply();
   }
 
-  shouldBehaveLikeMultiResource(
-    mintToNesting,
-    addResourceEntryEquippablesFromImpl,
-    addResourceToToken,
-  );
+  shouldBehaveLikeMultiAsset(mintToNesting, addAssetEntryEquippablesFromImpl, addAssetToToken);
 });
 
-// --------------- MULTI RESOURCE BEHAVIOR END ------------------------
+// --------------- MULTI ASSET BEHAVIOR END ------------------------
 
 describe('RMRKEquippableImpl Other', async function () {
   let equip: Contract;

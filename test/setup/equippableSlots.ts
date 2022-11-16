@@ -18,11 +18,11 @@ const weaponGemsIds: number[] = [];
 const backgroundsIds: number[] = [];
 
 const soldierResId = 100;
-const weaponResourcesFull = [1, 2, 3, 4]; // Must match the total of uniqueResources
-const weaponResourcesEquip = [5, 6, 7, 8]; // Must match the total of uniqueResources
-const weaponGemResourceFull = 101;
-const weaponGemResourceEquip = 102;
-const backgroundResourceId = 200;
+const weaponAssetsFull = [1, 2, 3, 4]; // Must match the total of uniqueAssets
+const weaponAssetsEquip = [5, 6, 7, 8]; // Must match the total of uniqueAssets
+const weaponGemAssetFull = 101;
+const weaponGemAssetEquip = 102;
+const backgroundAssetId = 200;
 
 enum ItemType {
   None,
@@ -55,10 +55,10 @@ async function setupContextForSlots(
   await mintWeaponGems();
   await mintBackgrounds();
 
-  await addResourcesToSoldier();
-  await addResourcesToWeapon();
-  await addResourcesToWeaponGem();
-  await addResourcesToBackground();
+  await addAssetsToSoldier();
+  await addAssetsToWeapon();
+  await addAssetsToWeaponGem();
+  await addAssetsToBackground();
 
   return {
     base,
@@ -149,8 +149,8 @@ async function setupContextForSlots(
     }
   }
 
-  async function addResourcesToSoldier(): Promise<void> {
-    await soldierEquip.addResourceEntry(
+  async function addAssetsToSoldier(): Promise<void> {
+    await soldierEquip.addAssetEntry(
       soldierResId,
       0,
       base.address,
@@ -159,30 +159,30 @@ async function setupContextForSlots(
       [partIdForWeapon, partIdForBackground], // Can receive these
     );
     for (let i = 0; i < uniqueSoldiers; i++) {
-      await soldierEquip.addResourceToToken(soldiersIds[i], soldierResId, 0);
-      await soldierEquip.connect(addrs[i % 3]).acceptResource(soldiersIds[i], 0, soldierResId);
+      await soldierEquip.addAssetToToken(soldiersIds[i], soldierResId, 0);
+      await soldierEquip.connect(addrs[i % 3]).acceptAsset(soldiersIds[i], 0, soldierResId);
     }
   }
 
-  async function addResourcesToWeapon(): Promise<void> {
-    const equippableGroupId = 1; // Resources to equip will both use this
+  async function addAssetsToWeapon(): Promise<void> {
+    const equippableGroupId = 1; // Assets to equip will both use this
 
-    for (let i = 0; i < weaponResourcesFull.length; i++) {
-      await weaponEquip.addResourceEntry(
-        weaponResourcesFull[i],
+    for (let i = 0; i < weaponAssetsFull.length; i++) {
+      await weaponEquip.addAssetEntry(
+        weaponAssetsFull[i],
         0, // Not meant to equip
         ethers.constants.AddressZero, // Not meant to equip
-        `ipfs:weapon/full/${weaponResourcesFull[i]}`,
+        `ipfs:weapon/full/${weaponAssetsFull[i]}`,
         [],
         [],
       );
     }
-    for (let i = 0; i < weaponResourcesEquip.length; i++) {
-      await weaponEquip.addResourceEntry(
-        weaponResourcesEquip[i],
+    for (let i = 0; i < weaponAssetsEquip.length; i++) {
+      await weaponEquip.addAssetEntry(
+        weaponAssetsEquip[i],
         equippableGroupId,
         base.address,
-        `ipfs:weapon/equip/${weaponResourcesEquip[i]}`,
+        `ipfs:weapon/equip/${weaponAssetsEquip[i]}`,
         [],
         [partIdForWeaponGem],
       );
@@ -195,40 +195,32 @@ async function setupContextForSlots(
       partIdForWeapon,
     );
 
-    // Add 2 resources to each weapon, one full, one for equip
-    // There are 10 weapon tokens for 4 unique resources so we use %
+    // Add 2 assets to each weapon, one full, one for equip
+    // There are 10 weapon tokens for 4 unique assets so we use %
     for (let i = 0; i < weaponsIds.length; i++) {
-      await weaponEquip.addResourceToToken(
-        weaponsIds[i],
-        weaponResourcesFull[i % uniqueWeapons],
-        0,
-      );
-      await weaponEquip.addResourceToToken(
-        weaponsIds[i],
-        weaponResourcesEquip[i % uniqueWeapons],
-        0,
-      );
+      await weaponEquip.addAssetToToken(weaponsIds[i], weaponAssetsFull[i % uniqueWeapons], 0);
+      await weaponEquip.addAssetToToken(weaponsIds[i], weaponAssetsEquip[i % uniqueWeapons], 0);
       await weaponEquip
         .connect(addrs[i % 3])
-        .acceptResource(weaponsIds[i], 0, weaponResourcesFull[i % uniqueWeapons]);
+        .acceptAsset(weaponsIds[i], 0, weaponAssetsFull[i % uniqueWeapons]);
       await weaponEquip
         .connect(addrs[i % 3])
-        .acceptResource(weaponsIds[i], 0, weaponResourcesEquip[i % uniqueWeapons]);
+        .acceptAsset(weaponsIds[i], 0, weaponAssetsEquip[i % uniqueWeapons]);
     }
   }
 
-  async function addResourcesToWeaponGem(): Promise<void> {
-    const equippableGroupId = 1; // Resources to equip will use this
-    await weaponGemEquip.addResourceEntry(
-      weaponGemResourceFull,
+  async function addAssetsToWeaponGem(): Promise<void> {
+    const equippableGroupId = 1; // Assets to equip will use this
+    await weaponGemEquip.addAssetEntry(
+      weaponGemAssetFull,
       0, // Not meant to equip
       ethers.constants.AddressZero, // Not meant to equip
       'ipfs:weagponGem/full/',
       [],
       [],
     );
-    await weaponGemEquip.addResourceEntry(
-      weaponGemResourceEquip,
+    await weaponGemEquip.addAssetEntry(
+      weaponGemAssetEquip,
       equippableGroupId,
       base.address,
       'ipfs:weagponGem/equip/',
@@ -243,21 +235,21 @@ async function setupContextForSlots(
     );
 
     for (let i = 0; i < uniqueSoldiers; i++) {
-      await weaponGemEquip.addResourceToToken(weaponGemsIds[i], weaponGemResourceFull, 0);
-      await weaponGemEquip.addResourceToToken(weaponGemsIds[i], weaponGemResourceEquip, 0);
+      await weaponGemEquip.addAssetToToken(weaponGemsIds[i], weaponGemAssetFull, 0);
+      await weaponGemEquip.addAssetToToken(weaponGemsIds[i], weaponGemAssetEquip, 0);
       await weaponGemEquip
         .connect(addrs[i % 3])
-        .acceptResource(weaponGemsIds[i], 0, weaponGemResourceFull);
+        .acceptAsset(weaponGemsIds[i], 0, weaponGemAssetFull);
       await weaponGemEquip
         .connect(addrs[i % 3])
-        .acceptResource(weaponGemsIds[i], 0, weaponGemResourceEquip);
+        .acceptAsset(weaponGemsIds[i], 0, weaponGemAssetEquip);
     }
   }
 
-  async function addResourcesToBackground(): Promise<void> {
-    const equippableGroupId = 1; // Resources to equip will use this
-    await backgroundEquip.addResourceEntry(
-      backgroundResourceId,
+  async function addAssetsToBackground(): Promise<void> {
+    const equippableGroupId = 1; // Assets to equip will use this
+    await backgroundEquip.addAssetEntry(
+      backgroundAssetId,
       equippableGroupId,
       base.address,
       'ipfs:background/',
@@ -272,10 +264,10 @@ async function setupContextForSlots(
     );
 
     for (let i = 0; i < uniqueSoldiers; i++) {
-      await backgroundEquip.addResourceToToken(backgroundsIds[i], backgroundResourceId, 0);
+      await backgroundEquip.addAssetToToken(backgroundsIds[i], backgroundAssetId, 0);
       await backgroundEquip
         .connect(addrs[i % 3])
-        .acceptResource(backgroundsIds[i], 0, backgroundResourceId);
+        .acceptAsset(backgroundsIds[i], 0, backgroundAssetId);
     }
   }
 }
@@ -286,11 +278,11 @@ export {
   partIdForWeaponGem,
   partIdForBackground,
   soldierResId,
-  weaponResourcesFull,
-  weaponResourcesEquip,
-  weaponGemResourceFull,
-  weaponGemResourceEquip,
-  backgroundResourceId,
+  weaponAssetsFull,
+  weaponAssetsEquip,
+  weaponGemAssetFull,
+  weaponGemAssetEquip,
+  backgroundAssetId,
   soldiersIds,
   weaponsIds,
   weaponGemsIds,
