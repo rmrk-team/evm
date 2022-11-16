@@ -18,7 +18,7 @@ function checkIsEquippable(uint64 partId, address targetAddress) external view r
 
 Used to check whether the given address is allowed to equip the desired `Part`
 
-*Returns true if a collection may equip resource with `partId`.*
+*Returns true if a collection may equip asset with `partId`.*
 
 #### Parameters
 

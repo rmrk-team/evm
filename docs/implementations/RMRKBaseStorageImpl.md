@@ -6,7 +6,7 @@
 
 
 
-*Contract for storing &#39;base&#39; elements of NFTs to be accessed by instances of RMRKResource implementing contracts. This default implementation includes an OwnableLock dependency, which allows the deployer to freeze the state of the base contract. In addition, this implementation treats the base registry as an append-only ledger, so*
+*Contract for storing &#39;base&#39; elements of NFTs to be accessed by instances of RMRKAsset implementing contracts. This default implementation includes an OwnableLock dependency, which allows the deployer to freeze the state of the base contract. In addition, this implementation treats the base registry as an append-only ledger, so*
 
 ## Methods
 
@@ -83,7 +83,7 @@ function checkIsEquippable(uint64 partId, address targetAddress) external view r
 
 Used to check whether the given address is allowed to equip the desired `Part`
 
-*Returns true if a collection may equip resource with `partId`.*
+*Returns true if a collection may equip asset with `partId`.*
 
 #### Parameters
 

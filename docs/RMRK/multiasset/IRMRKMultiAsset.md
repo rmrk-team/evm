@@ -1,10 +1,10 @@
-# IRMRKEquippable
+# IRMRKMultiAsset
 
 *RMRK team*
 
-> IRMRKEquippable
+> IRMRKMultiAsset
 
-Interface smart contract of the RMRK equippable module.
+Interface smart contract of the RMRK multi asset module.
 
 
 
@@ -44,31 +44,6 @@ Used to grant permission to the user to manage token&#39;s assets.
 |---|---|---|
 | to | address | Address of the account to grant the approval to |
 | tokenId | uint256 | ID of the token for which the approval to manage the assets is granted |
-
-### canTokenBeEquippedWithAssetIntoSlot
-
-```solidity
-function canTokenBeEquippedWithAssetIntoSlot(address parent, uint256 tokenId, uint64 assetId, uint64 slotId) external view returns (bool)
-```
-
-Used to verify whether a token can be equipped into a given parent&#39;s slot.
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| parent | address | Address of the parent token&#39;s smart contract |
-| tokenId | uint256 | ID of the token we want to equip |
-| assetId | uint64 | ID of the asset associated with the token we want to equip |
-| slotId | uint64 | ID of the slot that we want to equip the token into |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | bool | bool The boolean indicating whether the token with the given asset can be equipped into the desired  slot |
 
 ### getActiveAssetPriorities
 
@@ -182,57 +157,6 @@ Used to retrieve the asset that will be overriden if a given asset from the toke
 |---|---|---|
 | _0 | uint64 | uint64 ID of the asset which will be replaced |
 
-### getEquipment
-
-```solidity
-function getEquipment(uint256 tokenId, address targetBaseAddress, uint64 slotPartId) external view returns (struct IRMRKEquippable.Equipment)
-```
-
-Used to get the Equipment object equipped into the specified slot of the desired token.
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| tokenId | uint256 | ID of the token for which we are retrieving the equipped object |
-| targetBaseAddress | address | Address of the `Base` associated with the `Slot` part of the token |
-| slotPartId | uint64 | ID of the `Slot` part that we are checking for equipped objects |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | IRMRKEquippable.Equipment | struct The `Equipment` struct containing data about the equipped object |
-
-### getExtendedAsset
-
-```solidity
-function getExtendedAsset(uint256 tokenId, uint64 assetId) external view returns (string metadataURI, uint64 equippableGroupId, address baseAddress, uint64[] fixedPartIds, uint64[] slotPartIds)
-```
-
-Used to get the extended asset struct of the asset associated with given `assetId`.
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| tokenId | uint256 | undefined |
-| assetId | uint64 | ID of the asset of which we are retrieving |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| metadataURI | string | undefined |
-| equippableGroupId | uint64 | undefined |
-| baseAddress | address | undefined |
-| fixedPartIds | uint64[] | undefined |
-| slotPartIds | uint64[] | undefined |
-
 ### getPendingAssets
 
 ```solidity
@@ -277,30 +201,6 @@ Used to check whether the address has been granted the operator role by a given 
 | Name | Type | Description |
 |---|---|---|
 | _0 | bool | bool The boolean value indicating wehter the account we are checking has been granted the operator role |
-
-### isChildEquipped
-
-```solidity
-function isChildEquipped(uint256 tokenId, address childAddress, uint256 childId) external view returns (bool)
-```
-
-Used to check whether the token has a given child equipped.
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| tokenId | uint256 | ID of the parent token for which we are querying for |
-| childAddress | address | Address of the child token&#39;s smart contract |
-| childId | uint256 | ID of the child token |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | bool | bool The boolean value indicating whether the child token is equipped into the given token or not |
 
 ### rejectAllAssets
 
@@ -411,9 +311,9 @@ Used to notify listeners that owner has granted approval to the user to manage a
 
 | Name | Type | Description |
 |---|---|---|
-| owner `indexed` | address | undefined |
-| operator `indexed` | address | undefined |
-| approved  | bool | undefined |
+| owner `indexed` | address | Address of the account that has granted the approval for all assets on all of their tokens |
+| operator `indexed` | address | Address of the account that has been granted the approval to manage the token&#39;s assets on all of the  tokens |
+| approved  | bool | Boolean value signifying whether the permission has been granted (`true`) or revoked (`false`) |
 
 ### ApprovalForAssets
 
@@ -423,15 +323,15 @@ event ApprovalForAssets(address indexed owner, address indexed approved, uint256
 
 Used to notify listeners that owner has granted an approval to the user to manage the assets of a  given token.
 
-
+*Approvals must be cleared on transfer*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| owner `indexed` | address | undefined |
-| approved `indexed` | address | undefined |
-| tokenId `indexed` | uint256 | undefined |
+| owner `indexed` | address | Address of the account that has granted the approval for all token&#39;s assets |
+| approved `indexed` | address | Address of the account that has been granted approval to manage the token&#39;s assets |
+| tokenId `indexed` | uint256 | ID of the token on which the approval was granted |
 
 ### AssetAccepted
 
@@ -447,9 +347,9 @@ Used to notify listeners that a asset object at `assetId` is accepted by the tok
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId `indexed` | uint256 | undefined |
-| assetId `indexed` | uint64 | undefined |
-| overwritesId `indexed` | uint64 | undefined |
+| tokenId `indexed` | uint256 | ID of the token that had a new asset accepted |
+| assetId `indexed` | uint64 | ID of the asset that was accepted |
+| overwritesId `indexed` | uint64 | ID of the asset that would be overwritten |
 
 ### AssetAddedToToken
 
@@ -465,9 +365,9 @@ Used to notify listeners that a asset object at `assetId` is added to token&#39;
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId `indexed` | uint256 | undefined |
-| assetId `indexed` | uint64 | undefined |
-| overwritesId `indexed` | uint64 | undefined |
+| tokenId `indexed` | uint256 | ID of the token that received a new pending asset |
+| assetId `indexed` | uint64 | ID of the asset that has been added to the token&#39;s pending assets array |
+| overwritesId `indexed` | uint64 | ID of the asset that would be overwritten |
 
 ### AssetPrioritySet
 
@@ -483,7 +383,7 @@ Used to notify listeners that token&#39;s prioritiy array is reordered.
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId `indexed` | uint256 | undefined |
+| tokenId `indexed` | uint256 | ID of the token that had the asset priority array updated |
 
 ### AssetRejected
 
@@ -499,8 +399,8 @@ Used to notify listeners that a asset object at `assetId` is rejected from token
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId `indexed` | uint256 | undefined |
-| assetId `indexed` | uint64 | undefined |
+| tokenId `indexed` | uint256 | ID of the token that had a asset rejected |
+| assetId `indexed` | uint64 | ID of the asset that was rejected |
 
 ### AssetSet
 
@@ -516,67 +416,7 @@ Used to notify listeners that a asset object is initialized at `assetId`.
 
 | Name | Type | Description |
 |---|---|---|
-| assetId `indexed` | uint64 | undefined |
-
-### ChildAssetEquipped
-
-```solidity
-event ChildAssetEquipped(uint256 indexed tokenId, uint64 indexed assetId, uint64 indexed slotPartId, uint256 childId, address childAddress, uint64 childAssetId)
-```
-
-Used to notify listeners that a child&#39;s asset has been equipped into one of its parent assets.
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| tokenId `indexed` | uint256 | ID of the token that had a asset equipped |
-| assetId `indexed` | uint64 | ID of the asset associated with the token we are equipping into |
-| slotPartId `indexed` | uint64 | ID of the slot we are using to equip |
-| childId  | uint256 | ID of the child token we are equipping into the slot |
-| childAddress  | address | Address of the child token&#39;s collection |
-| childAssetId  | uint64 | ID of the asset associated with the token we are equipping |
-
-### ChildAssetUnequipped
-
-```solidity
-event ChildAssetUnequipped(uint256 indexed tokenId, uint64 indexed assetId, uint64 indexed slotPartId, uint256 childId, address childAddress, uint64 childAssetId)
-```
-
-Used to notify listeners that a child&#39;s asset has been unequipped from one of its parent assets.
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| tokenId `indexed` | uint256 | ID of the token that had a asset unequipped |
-| assetId `indexed` | uint64 | ID of the asset associated with the token we are unequipping out of |
-| slotPartId `indexed` | uint64 | ID of the slot we are unequipping from |
-| childId  | uint256 | ID of the token being unequipped |
-| childAddress  | address | Address of the collection that a token that is being unequipped belongs to |
-| childAssetId  | uint64 | ID of the asset associated with the token we are unequipping |
-
-### ValidParentEquippableGroupIdSet
-
-```solidity
-event ValidParentEquippableGroupIdSet(uint64 indexed equippableGroupId, uint64 indexed slotPartId, address parentAddress)
-```
-
-Used to notify listeners that the assets belonging to a `equippableGroupId` have been marked as  equippable into a given slot and parent
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| equippableGroupId `indexed` | uint64 | ID of the equippable group being marked as equippable into the slot associated with  `slotPartId` of the `parentAddress` collection |
-| slotPartId `indexed` | uint64 | ID of the slot part of the base into which the parts belonging to the equippable group  associated with `equippableGroupId` can be equipped |
-| parentAddress  | address | Address of the collection into which the parts belonging to `equippableGroupId` can be  equipped |
+| assetId `indexed` | uint64 | ID of the asset that was initialized |
 
 
 

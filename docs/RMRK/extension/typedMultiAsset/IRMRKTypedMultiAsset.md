@@ -1,22 +1,22 @@
-# IRMRKTypedMultiResource
+# IRMRKTypedMultiAsset
 
 *RMRK team*
 
-> IRMRKTypedMultiResource
+> IRMRKTypedMultiAsset
 
-Interface smart contract of the RMRK typed multi resource module.
+Interface smart contract of the RMRK typed multi asset module.
 
 
 
 ## Methods
 
-### getResourceType
+### getAssetType
 
 ```solidity
-function getResourceType(uint64 resourceId) external view returns (string)
+function getAssetType(uint64 assetId) external view returns (string)
 ```
 
-Used to get the type of the resource.
+Used to get the type of the asset.
 
 
 
@@ -24,13 +24,13 @@ Used to get the type of the resource.
 
 | Name | Type | Description |
 |---|---|---|
-| resourceId | uint64 | ID of the resource to check |
+| assetId | uint64 | ID of the asset to check |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | string The type of the resource |
+| _0 | string | string The type of the asset |
 
 ### supportsInterface
 
