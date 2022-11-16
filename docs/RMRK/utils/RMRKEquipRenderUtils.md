@@ -94,7 +94,7 @@ function getExtendedPendingResources(address target, uint256 tokenId) external v
 
 Used to get the extended pending resources of the given token.
 
-*The full `ExtendedPendingResource` looks like this:  [      ID,      equippableGroupId,      acceptRejectIndex,      overwritesResourceWithId,       baseAddress,      metadata,      [          fixedPartId0,          fixedPartId1,          fixedPartId2      ],      [          slotPartId0,          slotPartId1,          slotPartId2      ]  ]*
+*The full `ExtendedPendingResource` looks like this:  [      ID,      equippableGroupId,      acceptRejectIndex,      overwritesResourceWithId,      baseAddress,      metadata,      [          fixedPartId0,          fixedPartId1,          fixedPartId2      ],      [          slotPartId0,          slotPartId1,          slotPartId2      ]  ]*
 
 #### Parameters
 
