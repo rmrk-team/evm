@@ -338,10 +338,8 @@ contract RMRKExternalEquip is
         // Check from parent's asset perspective:
         _checkAssetAcceptsSlot(data.assetId, slotPartId);
 
-        IRMRKNestable.Child memory child = IRMRKNestable(_nestableAddress).childOf(
-            data.tokenId,
-            data.childIndex
-        );
+        IRMRKNestable.Child memory child = IRMRKNestable(_nestableAddress)
+            .childOf(data.tokenId, data.childIndex);
         address childEquippable = IRMRKNestableExternalEquip(
             child.contractAddress
         ).getEquippableAddress();
