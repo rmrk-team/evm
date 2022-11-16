@@ -3,19 +3,19 @@
 pragma solidity ^0.8.16;
 
 import "../../RMRK/extension/RMRKRoyalties.sol";
-import "../../RMRK/nesting/RMRKNestingMultiResource.sol";
+import "../../RMRK/nesting/RMRKNestingMultiAsset.sol";
 import "../../RMRK/utils/RMRKCollectionMetadata.sol";
 import "../../RMRK/utils/RMRKMintingUtils.sol";
 
 error RMRKMintZero();
 
-abstract contract RMRKAbstractNestingMultiResourceImpl is
+abstract contract RMRKAbstractNestingMultiAssetImpl is
     RMRKMintingUtils,
     RMRKCollectionMetadata,
     RMRKRoyalties,
-    RMRKNestingMultiResource
+    RMRKNestingMultiAsset
 {
-    uint256 private _totalResources;
+    uint256 private _totalAssets;
     string private _tokenURI;
 
     function _preMint(uint256 numToMint) internal returns (uint256, uint256) {
@@ -36,29 +36,29 @@ abstract contract RMRKAbstractNestingMultiResourceImpl is
 
     function _charge(uint256 value) internal virtual;
 
-    function addResourceToToken(
+    function addAssetToToken(
         uint256 tokenId,
-        uint64 resourceId,
+        uint64 assetId,
         uint64 overwrites
     ) public onlyOwnerOrContributor {
-        _addResourceToToken(tokenId, resourceId, overwrites);
+        _addAssetToToken(tokenId, assetId, overwrites);
     }
 
-    function addResourceEntry(string memory metadataURI)
+    function addAssetEntry(string memory metadataURI)
         public
         virtual
         onlyOwnerOrContributor
         returns (uint256)
     {
         unchecked {
-            _totalResources += 1;
+            _totalAssets += 1;
         }
-        _addResourceEntry(uint64(_totalResources), metadataURI);
-        return _totalResources;
+        _addAssetEntry(uint64(_totalAssets), metadataURI);
+        return _totalAssets;
     }
 
-    function totalResources() public view returns (uint256) {
-        return _totalResources;
+    function totalAssets() public view returns (uint256) {
+        return _totalAssets;
     }
 
     function transfer(address to, uint256 tokenId) public virtual {

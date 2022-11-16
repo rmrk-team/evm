@@ -5,7 +5,7 @@ pragma solidity ^0.8.16;
 import "../../../RMRK/extension/reclaimableChild/RMRKReclaimableChild.sol";
 import "../../RMRKNestingMock.sol";
 
-error RMRKTokenHasNoResourcesWithType();
+error RMRKTokenHasNoAssetsWithType();
 
 contract RMRKNestingClaimableChildMock is
     RMRKNestingMock,

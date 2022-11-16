@@ -2,12 +2,12 @@
 
 pragma solidity ^0.8.16;
 
-import "../../../RMRK/extension/typedMultiResource/RMRKTypedMultiResource.sol";
+import "../../../RMRK/extension/typedMultiAsset/RMRKTypedMultiAsset.sol";
 import "../../RMRKEquippableMock.sol";
 
-error RMRKTokenHasNoResourcesWithType();
+error RMRKTokenHasNoAssetsWithType();
 
-contract RMRKTypedEquippableMock is RMRKEquippableMock, RMRKTypedMultiResource {
+contract RMRKTypedEquippableMock is RMRKEquippableMock, RMRKTypedMultiAsset {
     constructor(string memory name, string memory symbol)
         RMRKEquippableMock(name, symbol)
     {}
@@ -16,15 +16,15 @@ contract RMRKTypedEquippableMock is RMRKEquippableMock, RMRKTypedMultiResource {
         public
         view
         virtual
-        override(RMRKEquippable, RMRKTypedMultiResource)
+        override(RMRKEquippable, RMRKTypedMultiAsset)
         returns (bool)
     {
         return
-            RMRKTypedMultiResource.supportsInterface(interfaceId) ||
+            RMRKTypedMultiAsset.supportsInterface(interfaceId) ||
             RMRKEquippable.supportsInterface(interfaceId);
     }
 
-    function addTypedResourceEntry(
+    function addTypedAssetEntry(
         uint64 id,
         uint64 equippableGroupId,
         address baseAddress,
@@ -33,7 +33,7 @@ contract RMRKTypedEquippableMock is RMRKEquippableMock, RMRKTypedMultiResource {
         uint64[] memory slotPartIds,
         string memory type_
     ) external {
-        _addResourceEntry(
+        _addAssetEntry(
             id,
             equippableGroupId,
             baseAddress,
@@ -41,6 +41,6 @@ contract RMRKTypedEquippableMock is RMRKEquippableMock, RMRKTypedMultiResource {
             fixedPartIds,
             slotPartIds
         );
-        _setResourceType(id, type_);
+        _setAssetType(id, type_);
     }
 }

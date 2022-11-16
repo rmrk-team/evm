@@ -6,7 +6,7 @@ pragma solidity ^0.8.16;
 
 import "../base/IRMRKBaseStorage.sol";
 import "../library/RMRKLib.sol";
-import "../multiresource/AbstractMultiResource.sol";
+import "../multiasset/AbstractMultiAsset.sol";
 import "../nesting/RMRKNesting.sol";
 import "../security/ReentrancyGuard.sol";
 import "./IRMRKEquippable.sol";
@@ -19,32 +19,32 @@ import "./IRMRKEquippable.sol";
 contract RMRKEquippable is
     ReentrancyGuard,
     RMRKNesting,
-    AbstractMultiResource,
+    AbstractMultiAsset,
     IRMRKEquippable
 {
     using RMRKLib for uint64[];
 
-    // ------------------- RESOURCES --------------
+    // ------------------- ASSETS --------------
 
-    // ------------------- RESOURCE APPROVALS --------------
+    // ------------------- ASSET APPROVALS --------------
 
     /**
-     * @notice Mapping from token ID to approver address to approved address for resources.
+     * @notice Mapping from token ID to approver address to approved address for assets.
      * @dev The approver is necessary so approvals are invalidated for nested children on transfer.
      * @dev WARNING: If a child NFT returns the original root owner, old permissions would be active again.
      */
     mapping(uint256 => mapping(address => address))
-        private _tokenApprovalsForResources;
+        private _tokenApprovalsForAssets;
 
     // ------------------- EQUIPPABLE --------------
-    /// Mapping of uint64 resource ID to corresponding base address.
+    /// Mapping of uint64 asset ID to corresponding base address.
     mapping(uint64 => address) private _baseAddresses;
-    /// Mapping of uint64 ID to resource object.
+    /// Mapping of uint64 ID to asset object.
     mapping(uint64 => uint64) private _equippableGroupIds;
 
-    /// Mapping of resourceId to fixed base parts applicable to this resource.
+    /// Mapping of assetId to fixed base parts applicable to this asset.
     mapping(uint64 => uint64[]) private _fixedPartIds;
-    /// Mapping of resourceId to slot base parts applicable to this resource.
+    /// Mapping of assetId to slot base parts applicable to this asset.
     mapping(uint64 => uint64[]) private _slotPartIds;
 
     /// Mapping of token ID to base address to slot part ID to equipment information. Used to compose an NFT.
@@ -59,23 +59,23 @@ contract RMRKEquippable is
     mapping(uint64 => mapping(address => uint64)) private _validParentSlots;
 
     /**
-     * @notice Used to verify that the caller is either the owner of the given token or approved to manage the token's resources
+     * @notice Used to verify that the caller is either the owner of the given token or approved to manage the token's assets
      *  of the owner.
      * @param tokenId ID of the token that we are checking
      */
-    function _onlyApprovedForResourcesOrOwner(uint256 tokenId) private view {
-        if (!_isApprovedForResourcesOrOwner(_msgSender(), tokenId))
-            revert RMRKNotApprovedForResourcesOrOwner();
+    function _onlyApprovedForAssetsOrOwner(uint256 tokenId) private view {
+        if (!_isApprovedForAssetsOrOwner(_msgSender(), tokenId))
+            revert RMRKNotApprovedForAssetsOrOwner();
     }
 
     /**
-     * @notice Used to ensure that the caller is either the owner of the given token or approved to manage the token's resources
+     * @notice Used to ensure that the caller is either the owner of the given token or approved to manage the token's assets
      *  of the owner.
      * @dev If that is not the case, the execution of the function will be reverted.
      * @param tokenId ID of the token that we are checking
      */
-    modifier onlyApprovedForResourcesOrOwner(uint256 tokenId) {
-        _onlyApprovedForResourcesOrOwner(tokenId);
+    modifier onlyApprovedForAssetsOrOwner(uint256 tokenId) {
+        _onlyApprovedForAssetsOrOwner(tokenId);
         _;
     }
 
@@ -100,71 +100,71 @@ contract RMRKEquippable is
     {
         return
             RMRKNesting.supportsInterface(interfaceId) ||
-            interfaceId == type(IRMRKMultiResource).interfaceId ||
+            interfaceId == type(IRMRKMultiAsset).interfaceId ||
             interfaceId == type(IRMRKEquippable).interfaceId;
     }
 
-    // ------------------------------- RESOURCES ------------------------------
+    // ------------------------------- ASSETS ------------------------------
 
-    // --------------------------- RESOURCE HANDLERS -------------------------
+    // --------------------------- ASSET HANDLERS -------------------------
 
     /**
-     * @notice Accepts a resource at from the pending array of given token.
-     * @dev Migrates the resource from the token's pending resource array to the token's active resource array.
-     * @dev Active resources cannot be removed by anyone, but can be replaced by a new resource.
+     * @notice Accepts a asset at from the pending array of given token.
+     * @dev Migrates the asset from the token's pending asset array to the token's active asset array.
+     * @dev Active assets cannot be removed by anyone, but can be replaced by a new asset.
      * @dev Requirements:
      *
-     *  - The caller must own the token or be approved to manage the token's resources
+     *  - The caller must own the token or be approved to manage the token's assets
      *  - `tokenId` must exist.
-     *  - `index` must be in range of the length of the pending resource array.
-     * @dev Emits an {ResourceAccepted} event.
-     * @param tokenId ID of the token for which to accept the pending resource
-     * @param index Index of the resource in the pending array to accept
+     *  - `index` must be in range of the length of the pending asset array.
+     * @dev Emits an {AssetAccepted} event.
+     * @param tokenId ID of the token for which to accept the pending asset
+     * @param index Index of the asset in the pending array to accept
      */
-    function acceptResource(
+    function acceptAsset(
         uint256 tokenId,
         uint256 index,
-        uint64 resourceId
-    ) public virtual onlyApprovedForResourcesOrOwner(tokenId) {
-        _acceptResource(tokenId, index, resourceId);
+        uint64 assetId
+    ) public virtual onlyApprovedForAssetsOrOwner(tokenId) {
+        _acceptAsset(tokenId, index, assetId);
     }
 
     /**
-     * @notice Rejects a resource from the pending array of given token.
-     * @dev Removes the resource from the token's pending resource array.
+     * @notice Rejects a asset from the pending array of given token.
+     * @dev Removes the asset from the token's pending asset array.
      * @dev Requirements:
      *
-     *  - The caller must own the token or be approved to manage the token's resources
+     *  - The caller must own the token or be approved to manage the token's assets
      *  - `tokenId` must exist.
-     *  - `index` must be in range of the length of the pending resource array.
-     * @dev Emits a {ResourceRejected} event.
-     * @param tokenId ID of the token that the resource is being rejected from
-     * @param index Index of the resource in the pending array to be rejected
+     *  - `index` must be in range of the length of the pending asset array.
+     * @dev Emits a {AssetRejected} event.
+     * @param tokenId ID of the token that the asset is being rejected from
+     * @param index Index of the asset in the pending array to be rejected
      */
-    function rejectResource(
+    function rejectAsset(
         uint256 tokenId,
         uint256 index,
-        uint64 resourceId
-    ) public virtual onlyApprovedForResourcesOrOwner(tokenId) {
-        _rejectResource(tokenId, index, resourceId);
+        uint64 assetId
+    ) public virtual onlyApprovedForAssetsOrOwner(tokenId) {
+        _rejectAsset(tokenId, index, assetId);
     }
 
     /**
-     * @notice Rejects all resources from the pending array of a given token.
+     * @notice Rejects all assets from the pending array of a given token.
      * @dev Effecitvely deletes the pending array.
      * @dev Requirements:
      *
-     *  - The caller must own the token or be approved to manage the token's resources
+     *  - The caller must own the token or be approved to manage the token's assets
      *  - `tokenId` must exist.
-     * @dev Emits a {ResourceRejected} event with resourceId = 0.
+     * @dev Emits a {AssetRejected} event with assetId = 0.
      * @param tokenId ID of the token of which to clear the pending array
      */
-    function rejectAllResources(uint256 tokenId, uint256 maxRejections)
+    function rejectAllAssets(uint256 tokenId, uint256 maxRejections)
         public
         virtual
-        onlyApprovedForResourcesOrOwner(tokenId)
+        onlyApprovedForAssetsOrOwner(tokenId)
     {
-        _rejectAllResources(tokenId, maxRejections);
+        _rejectAllAssets(tokenId, maxRejections);
     }
 
     /**
@@ -174,30 +174,30 @@ contract RMRKEquippable is
      * @dev Value `0` of a priority is a special case equivalent to unitialized.
      * @dev Requirements:
      *
-     *  - The caller must own the token or be approved to manage the token's resources
+     *  - The caller must own the token or be approved to manage the token's assets
      *  - `tokenId` must exist.
-     *  - The length of `priorities` must be equal the length of the active resources array.
-     * @dev Emits a {ResourcePrioritySet} event.
+     *  - The length of `priorities` must be equal the length of the active assets array.
+     * @dev Emits a {AssetPrioritySet} event.
      * @param tokenId ID of the token to set the priorities for
      * @param priorities An array of priority values
      */
     function setPriority(uint256 tokenId, uint16[] calldata priorities)
         public
         virtual
-        onlyApprovedForResourcesOrOwner(tokenId)
+        onlyApprovedForAssetsOrOwner(tokenId)
     {
         _setPriority(tokenId, priorities);
     }
 
-    // --------------------------- RESOURCE INTERNALS -------------------------
+    // --------------------------- ASSET INTERNALS -------------------------
 
     /**
-     * @notice Used to add a resource entry.
+     * @notice Used to add a asset entry.
      * @dev This internal function warrants custom access control to be implemented when used.
-     * @param fixedPartIds An array of IDs of fixed parts to be included in the resource
-     * @param slotPartIds An array of IDs of slot parts to be included in the resource
+     * @param fixedPartIds An array of IDs of fixed parts to be included in the asset
+     * @param slotPartIds An array of IDs of slot parts to be included in the asset
      */
-    function _addResourceEntry(
+    function _addAssetEntry(
         uint64 id,
         uint64 equippableGroupId,
         address baseAddress,
@@ -205,7 +205,7 @@ contract RMRKEquippable is
         uint64[] memory fixedPartIds,
         uint64[] memory slotPartIds
     ) internal virtual {
-        _addResourceEntry(id, metadataURI);
+        _addAssetEntry(id, metadataURI);
 
         if (
             baseAddress == address(0) &&
@@ -218,24 +218,24 @@ contract RMRKEquippable is
         _slotPartIds[id] = slotPartIds;
     }
 
-    // ----------------------- RESOURCE APPROVALS ------------------------
+    // ----------------------- ASSET APPROVALS ------------------------
 
     /**
      * @notice Used to grant approvals for specific tokens to a specified address.
      * @dev This can only be called by the owner of the token or by an account that has been granted permission to
-     *  manage all of the owner's resources.
+     *  manage all of the owner's assets.
      * @param to Address of the account to receive the approval to the specified token
      * @param tokenId ID of the token for which we are granting the permission
      */
-    function approveForResources(address to, uint256 tokenId) public virtual {
+    function approveForAssets(address to, uint256 tokenId) public virtual {
         address owner = ownerOf(tokenId);
-        if (to == owner) revert RMRKApprovalForResourcesToCurrentOwner();
+        if (to == owner) revert RMRKApprovalForAssetsToCurrentOwner();
 
         if (
             _msgSender() != owner &&
-            !isApprovedForAllForResources(owner, _msgSender())
-        ) revert RMRKApproveForResourcesCallerIsNotOwnerNorApprovedForAll();
-        _approveForResources(to, tokenId);
+            !isApprovedForAllForAssets(owner, _msgSender())
+        ) revert RMRKApproveForAssetsCallerIsNotOwnerNorApprovedForAll();
+        _approveForAssets(to, tokenId);
     }
 
     /**
@@ -244,26 +244,26 @@ contract RMRKEquippable is
      * @param tokenId ID of the token we are checking
      * @return address Address of the account that is approved to manage the token
      */
-    function getApprovedForResources(uint256 tokenId)
+    function getApprovedForAssets(uint256 tokenId)
         public
         view
         virtual
         returns (address)
     {
         _requireMinted(tokenId);
-        return _tokenApprovalsForResources[tokenId][ownerOf(tokenId)];
+        return _tokenApprovalsForAssets[tokenId][ownerOf(tokenId)];
     }
 
     /**
      * @notice Internal function to check whether the queried user is either:
      *   1. The root owner of the token associated with `tokenId`.
-     *   2. Is approved for all resources of the current owner via the `setApprovalForAllForResources` function.
-     *   3. Is granted approval for the specific tokenId for resource management via the `approveForResources` function.
+     *   2. Is approved for all assets of the current owner via the `setApprovalForAllForAssets` function.
+     *   3. Is granted approval for the specific tokenId for asset management via the `approveForAssets` function.
      * @param user Address of the user we are checking for permission
      * @param tokenId ID of the token to query for permission for a given `user`
      * @return bool A boolean value indicating whether the user is approved to manage the token or not
      */
-    function _isApprovedForResourcesOrOwner(address user, uint256 tokenId)
+    function _isApprovedForAssetsOrOwner(address user, uint256 tokenId)
         internal
         view
         virtual
@@ -271,8 +271,8 @@ contract RMRKEquippable is
     {
         address owner = ownerOf(tokenId);
         return (user == owner ||
-            isApprovedForAllForResources(owner, user) ||
-            getApprovedForResources(tokenId) == user);
+            isApprovedForAllForAssets(owner, user) ||
+            getApprovedForAssets(tokenId) == user);
     }
 
     /**
@@ -280,13 +280,10 @@ contract RMRKEquippable is
      * @param to Address of the account we are granting an approval to
      * @param tokenId ID of the token we are granting the approval for
      */
-    function _approveForResources(address to, uint256 tokenId)
-        internal
-        virtual
-    {
+    function _approveForAssets(address to, uint256 tokenId) internal virtual {
         address owner = ownerOf(tokenId);
-        _tokenApprovalsForResources[tokenId][owner] = to;
-        emit ApprovalForResources(owner, to, tokenId);
+        _tokenApprovalsForAssets[tokenId][owner] = to;
+        emit ApprovalForAssets(owner, to, tokenId);
     }
 
     /**
@@ -294,7 +291,7 @@ contract RMRKEquippable is
      * @param tokenId ID of the token we are clearing the approvals of
      */
     function _cleanApprovals(uint256 tokenId) internal virtual override {
-        _approveForResources(address(0), tokenId);
+        _approveForAssets(address(0), tokenId);
     }
 
     // ------------------------------- EQUIPPING ------------------------------
@@ -340,9 +337,9 @@ contract RMRKEquippable is
      *  [
      *      tokenId,
      *      childIndex,
-     *      resourceId,
+     *      assetId,
      *      slotPartId,
-     *      childResourceId
+     *      childAssetId
      *  ]
      * @param data An `IntakeEquip` struct specifying the equip data
      */
@@ -364,22 +361,22 @@ contract RMRKEquippable is
      *  [
      *      tokenId,
      *      childIndex,
-     *      resourceId,
+     *      assetId,
      *      slotPartId,
-     *      childResourceId
+     *      childAssetId
      *  ]
      * @param data An `IntakeEquip` struct specifying the equip data
      */
     function _equip(IntakeEquip memory data) internal virtual {
-        address baseAddress = _baseAddresses[data.resourceId];
+        address baseAddress = _baseAddresses[data.assetId];
         uint64 slotPartId = data.slotPartId;
         if (
             _equipments[data.tokenId][baseAddress][slotPartId]
                 .childEquippableAddress != address(0)
         ) revert RMRKSlotAlreadyUsed();
 
-        // Check from parent's resource perspective:
-        _checkResourceAcceptsSlot(data.resourceId, slotPartId);
+        // Check from parent's asset perspective:
+        _checkAssetAcceptsSlot(data.assetId, slotPartId);
 
         IRMRKNesting.Child memory child = childOf(
             data.tokenId,
@@ -390,13 +387,13 @@ contract RMRKEquippable is
         // We add reentrancy guard because of this call, it happens before updating state
         if (
             !IRMRKEquippable(child.contractAddress)
-                .canTokenBeEquippedWithResourceIntoSlot(
+                .canTokenBeEquippedWithAssetIntoSlot(
                     address(this),
                     child.tokenId,
-                    data.childResourceId,
+                    data.childAssetId,
                     slotPartId
                 )
-        ) revert RMRKTokenCannotBeEquippedWithResourceIntoSlot();
+        ) revert RMRKTokenCannotBeEquippedWithAssetIntoSlot();
 
         // Check from base perspective
         if (
@@ -408,8 +405,8 @@ contract RMRKEquippable is
 
         _beforeEquip(data);
         Equipment memory newEquip = Equipment({
-            resourceId: data.resourceId,
-            childResourceId: data.childResourceId,
+            assetId: data.assetId,
+            childAssetId: data.childAssetId,
             childId: child.tokenId,
             childEquippableAddress: child.contractAddress
         });
@@ -419,29 +416,29 @@ contract RMRKEquippable is
             child.tokenId
         ] += 1;
 
-        emit ChildResourceEquipped(
+        emit ChildAssetEquipped(
             data.tokenId,
-            data.resourceId,
+            data.assetId,
             slotPartId,
             child.tokenId,
             child.contractAddress,
-            data.childResourceId
+            data.childAssetId
         );
         _afterEquip(data);
     }
 
     /**
-     * @notice Private function to check if a given resource accepts a given slot or not.
-     * @dev Execution will be reverted if the `Slot` does not apply for the resource.
-     * @param resourceId ID of the resource
+     * @notice Private function to check if a given asset accepts a given slot or not.
+     * @dev Execution will be reverted if the `Slot` does not apply for the asset.
+     * @param assetId ID of the asset
      * @param slotPartId ID of the `Slot`
      */
-    function _checkResourceAcceptsSlot(uint64 resourceId, uint64 slotPartId)
+    function _checkAssetAcceptsSlot(uint64 assetId, uint64 slotPartId)
         private
         view
     {
-        (, bool found) = _slotPartIds[resourceId].indexOf(slotPartId);
-        if (!found) revert RMRKTargetResourceCannotReceiveSlot();
+        (, bool found) = _slotPartIds[assetId].indexOf(slotPartId);
+        if (!found) revert RMRKTargetAssetCannotReceiveSlot();
     }
 
     /**
@@ -449,29 +446,29 @@ contract RMRKEquippable is
      * @dev This can only be called by the owner of the token or by an account that has been granted permission to
      *  manage the given token by the current owner.
      * @param tokenId ID of the parent from which the child is being unequipped
-     * @param resourceId ID of the parent's resource that contains the `Slot` into which the child is equipped
+     * @param assetId ID of the parent's asset that contains the `Slot` into which the child is equipped
      * @param slotPartId ID of the `Slot` from which to unequip the child
      */
     function unequip(
         uint256 tokenId,
-        uint64 resourceId,
+        uint64 assetId,
         uint64 slotPartId
     ) public virtual onlyApprovedOrOwner(tokenId) {
-        _unequip(tokenId, resourceId, slotPartId);
+        _unequip(tokenId, assetId, slotPartId);
     }
 
     /**
      * @notice Private function used to unequip child from parent token.
      * @param tokenId ID of the parent from which the child is being unequipped
-     * @param resourceId ID of the parent's resource that contains the `Slot` into which the child is equipped
+     * @param assetId ID of the parent's asset that contains the `Slot` into which the child is equipped
      * @param slotPartId ID of the `Slot` from which to unequip the child
      */
     function _unequip(
         uint256 tokenId,
-        uint64 resourceId,
+        uint64 assetId,
         uint64 slotPartId
     ) internal virtual {
-        address targetBaseAddress = _baseAddresses[resourceId];
+        address targetBaseAddress = _baseAddresses[assetId];
         Equipment memory equipment = _equipments[tokenId][targetBaseAddress][
             slotPartId
         ];
@@ -482,13 +479,13 @@ contract RMRKEquippable is
             equipment.childId
         ] -= 1;
 
-        emit ChildResourceUnequipped(
+        emit ChildAssetUnequipped(
             tokenId,
-            resourceId,
+            assetId,
             slotPartId,
             equipment.childId,
             equipment.childEquippableAddress,
-            equipment.childResourceId
+            equipment.childAssetId
         );
     }
 
@@ -500,9 +497,9 @@ contract RMRKEquippable is
      *  [
      *      tokenId,
      *      childIndex,
-     *      resourceId,
+     *      assetId,
      *      slotPartId,
-     *      childResourceId
+     *      childAssetId
      *  ]
      * @param data An `IntakeEquip` struct specifying the equip data
      */
@@ -512,7 +509,7 @@ contract RMRKEquippable is
         onlyApprovedOrOwner(data.tokenId)
         nonReentrant
     {
-        _unequip(data.tokenId, data.resourceId, data.slotPartId);
+        _unequip(data.tokenId, data.assetId, data.slotPartId);
         _equip(data);
     }
 
@@ -535,7 +532,7 @@ contract RMRKEquippable is
     // --------------------- ADMIN VALIDATION ---------------------
 
     /**
-     * @notice Internal function used to declare that the resources belonging to a given `equippableGroupId` are
+     * @notice Internal function used to declare that the assets belonging to a given `equippableGroupId` are
      *  equippable into the `Slot` associated with the `partId` of the collection at the specified `parentAddress`
      * @param equippableGroupId ID of the equippable group
      * @param parentAddress Address of the parent into which the equippable group can be equipped into
@@ -560,33 +557,33 @@ contract RMRKEquippable is
      * @notice Used to verify whether a token can be equipped into a given parent's slot.
      * @param parent Address of the parent token's smart contract
      * @param tokenId ID of the token we want to equip
-     * @param resourceId ID of the resource associated with the token we want to equip
+     * @param assetId ID of the asset associated with the token we want to equip
      * @param slotId ID of the slot that we want to equip the token into
-     * @return bool The boolean indicating whether the token with the given resource can be equipped into the desired
+     * @return bool The boolean indicating whether the token with the given asset can be equipped into the desired
      *  slot
      */
-    function canTokenBeEquippedWithResourceIntoSlot(
+    function canTokenBeEquippedWithAssetIntoSlot(
         address parent,
         uint256 tokenId,
-        uint64 resourceId,
+        uint64 assetId,
         uint64 slotId
     ) public view virtual returns (bool) {
-        uint64 equippableGroupId = _equippableGroupIds[resourceId];
+        uint64 equippableGroupId = _equippableGroupIds[assetId];
         uint64 equippableSlot = _validParentSlots[equippableGroupId][parent];
         if (equippableSlot == slotId) {
-            (, bool found) = getActiveResources(tokenId).indexOf(resourceId);
+            (, bool found) = getActiveAssets(tokenId).indexOf(assetId);
             return found;
         }
         return false;
     }
 
-    // --------------------- Getting Extended Resources ---------------------
+    // --------------------- Getting Extended Assets ---------------------
 
     /**
-     * @notice Used to get the extended resource struct of the resource associated with given `resourceId`.
-     * @param resourceId ID of the resource of which we are retrieving
+     * @notice Used to get the extended asset struct of the asset associated with given `assetId`.
+     * @param assetId ID of the asset of which we are retrieving
      */
-    function getExtendedResource(uint256 tokenId, uint64 resourceId)
+    function getExtendedAsset(uint256 tokenId, uint64 assetId)
         public
         view
         virtual
@@ -598,11 +595,11 @@ contract RMRKEquippable is
             uint64[] memory slotPartIds
         )
     {
-        metadataURI = getResourceMetadata(tokenId, resourceId);
-        equippableGroupId = _equippableGroupIds[resourceId];
-        baseAddress = _baseAddresses[resourceId];
-        fixedPartIds = _fixedPartIds[resourceId];
-        slotPartIds = _slotPartIds[resourceId];
+        metadataURI = getAssetMetadata(tokenId, assetId);
+        equippableGroupId = _equippableGroupIds[assetId];
+        baseAddress = _baseAddresses[assetId];
+        fixedPartIds = _fixedPartIds[assetId];
+        slotPartIds = _slotPartIds[assetId];
     }
 
     ////////////////////////////////////////
@@ -613,8 +610,8 @@ contract RMRKEquippable is
      * @notice Used to get the Equipment object equipped into the specified slot of the desired token.
      * @dev The `Equipment` struct consists of the following data:
      *  [
-     *      resourceId,
-     *      childResourceId,
+     *      assetId,
+     *      childAssetId,
      *      childId,
      *      childEquippableAddress
      *  ]
@@ -634,54 +631,54 @@ contract RMRKEquippable is
     // HOOKS
 
     /**
-     * @notice A hook to be called before a equipping a resource to the token.
+     * @notice A hook to be called before a equipping a asset to the token.
      * @dev The `IntakeEquip` struct consist of the following data:
      *  [
      *      tokenId,
      *      childIndex,
-     *      resourceId,
+     *      assetId,
      *      slotPartId,
-     *      childResourceId
+     *      childAssetId
      *  ]
-     * @param data The `IntakeEquip` struct containing data of the resource that is being equipped
+     * @param data The `IntakeEquip` struct containing data of the asset that is being equipped
      */
     function _beforeEquip(IntakeEquip memory data) internal virtual {}
 
     /**
-     * @notice A hook to be called after equipping a resource to the token.
+     * @notice A hook to be called after equipping a asset to the token.
      * @dev The `IntakeEquip` struct consist of the following data:
      *  [
      *      tokenId,
      *      childIndex,
-     *      resourceId,
+     *      assetId,
      *      slotPartId,
-     *      childResourceId
+     *      childAssetId
      *  ]
-     * @param data The `IntakeEquip` struct containing data of the resource that was equipped
+     * @param data The `IntakeEquip` struct containing data of the asset that was equipped
      */
     function _afterEquip(IntakeEquip memory data) internal virtual {}
 
     /**
-     * @notice A hook to be called before unequipping a resource from the token.
-     * @param tokenId ID of the token from which the resource is being unequipped
-     * @param resourceId ID of the resource being unequipped
-     * @param slotPartId ID of the slot from which the resource is being unequipped
+     * @notice A hook to be called before unequipping a asset from the token.
+     * @param tokenId ID of the token from which the asset is being unequipped
+     * @param assetId ID of the asset being unequipped
+     * @param slotPartId ID of the slot from which the asset is being unequipped
      */
     function _beforeUnequip(
         uint256 tokenId,
-        uint64 resourceId,
+        uint64 assetId,
         uint64 slotPartId
     ) internal virtual {}
 
     /**
-     * @notice A hook to be called after unequipping a resource from the token.
-     * @param tokenId ID of the token from which the resource was unequipped
-     * @param resourceId ID of the resource that was unequipped
-     * @param slotPartId ID of the slot from which the resource was unequipped
+     * @notice A hook to be called after unequipping a asset from the token.
+     * @param tokenId ID of the token from which the asset was unequipped
+     * @param assetId ID of the asset that was unequipped
+     * @param slotPartId ID of the slot from which the asset was unequipped
      */
     function _afterUnequip(
         uint256 tokenId,
-        uint64 resourceId,
+        uint64 assetId,
         uint64 slotPartId
     ) internal virtual {}
 }

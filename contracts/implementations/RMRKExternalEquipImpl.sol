@@ -6,19 +6,19 @@ import "../RMRK/equippable/RMRKExternalEquip.sol";
 import "../RMRK/access/OwnableLock.sol";
 
 contract RMRKExternalEquipImpl is OwnableLock, RMRKExternalEquip {
-    uint256 private _totalResources;
+    uint256 private _totalAssets;
 
     constructor(address nestingAddress) RMRKExternalEquip(nestingAddress) {}
 
-    function addResourceToToken(
+    function addAssetToToken(
         uint256 tokenId,
-        uint64 resourceId,
+        uint64 assetId,
         uint64 overwrites
     ) public virtual onlyOwnerOrContributor {
-        _addResourceToToken(tokenId, resourceId, overwrites);
+        _addAssetToToken(tokenId, assetId, overwrites);
     }
 
-    function addResourceEntry(
+    function addAssetEntry(
         uint64 equippableGroupId,
         address baseAddress,
         string memory metadataURI,
@@ -26,17 +26,17 @@ contract RMRKExternalEquipImpl is OwnableLock, RMRKExternalEquip {
         uint64[] memory slotPartIds
     ) public virtual onlyOwnerOrContributor returns (uint256) {
         unchecked {
-            _totalResources += 1;
+            _totalAssets += 1;
         }
-        _addResourceEntry(
-            uint64(_totalResources),
+        _addAssetEntry(
+            uint64(_totalAssets),
             equippableGroupId,
             baseAddress,
             metadataURI,
             fixedPartIds,
             slotPartIds
         );
-        return _totalResources;
+        return _totalAssets;
     }
 
     function setValidParentForEquippableGroup(
@@ -51,7 +51,7 @@ contract RMRKExternalEquipImpl is OwnableLock, RMRKExternalEquip {
         );
     }
 
-    function totalResources() public view virtual returns (uint256) {
-        return _totalResources;
+    function totalAssets() public view virtual returns (uint256) {
+        return _totalAssets;
     }
 }

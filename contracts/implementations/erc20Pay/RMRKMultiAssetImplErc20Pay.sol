@@ -2,14 +2,14 @@
 
 pragma solidity ^0.8.16;
 
-import "../abstracts/RMRKAbstractMultiResourceImpl.sol";
+import "../abstracts/RMRKAbstractMultiAssetImpl.sol";
 import "../IRMRKInitData.sol";
 import "./RMRKErc20Pay.sol";
 
-contract RMRKMultiResourceImplErc20Pay is
+contract RMRKMultiAssetImplErc20Pay is
     IRMRKInitData,
     RMRKErc20Pay,
-    RMRKAbstractMultiResourceImpl
+    RMRKAbstractMultiAssetImpl
 {
     constructor(
         string memory name,
@@ -22,7 +22,7 @@ contract RMRKMultiResourceImplErc20Pay is
         RMRKCollectionMetadata(collectionMetadata_)
         RMRKRoyalties(data.royaltyRecipient, data.royaltyPercentageBps)
         RMRKErc20Pay(data.erc20TokenAddress)
-        RMRKMultiResource(name, symbol)
+        RMRKMultiAsset(name, symbol)
     {
         _setTokenURI(tokenURI_);
     }

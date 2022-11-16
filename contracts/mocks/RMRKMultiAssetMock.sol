@@ -2,11 +2,11 @@
 
 pragma solidity ^0.8.16;
 
-import "../RMRK/multiresource/RMRKMultiResource.sol";
+import "../RMRK/multiasset/RMRKMultiAsset.sol";
 
-contract RMRKMultiResourceMock is RMRKMultiResource {
+contract RMRKMultiAssetMock is RMRKMultiAsset {
     constructor(string memory name, string memory symbol)
-        RMRKMultiResource(name, symbol)
+        RMRKMultiAsset(name, symbol)
     {}
 
     function mint(address to, uint256 tokenId) external {
@@ -33,15 +33,15 @@ contract RMRKMultiResourceMock is RMRKMultiResource {
         _burn(tokenId);
     }
 
-    function addResourceToToken(
+    function addAssetToToken(
         uint256 tokenId,
-        uint64 resourceId,
+        uint64 assetId,
         uint64 overwrites
     ) external {
-        _addResourceToToken(tokenId, resourceId, overwrites);
+        _addAssetToToken(tokenId, assetId, overwrites);
     }
 
-    function addResourceEntry(uint64 id, string memory metadataURI) external {
-        _addResourceEntry(id, metadataURI);
+    function addAssetEntry(uint64 id, string memory metadataURI) external {
+        _addAssetEntry(id, metadataURI);
     }
 }

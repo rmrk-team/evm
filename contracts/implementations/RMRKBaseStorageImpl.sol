@@ -7,7 +7,7 @@ import "../RMRK/base/RMRKBaseStorage.sol";
 
 /**
  * @dev Contract for storing 'base' elements of NFTs to be accessed
- * by instances of RMRKResource implementing contracts. This default
+ * by instances of RMRKAsset implementing contracts. This default
  * implementation includes an OwnableLock dependency, which allows
  * the deployer to freeze the state of the base contract.
  *
