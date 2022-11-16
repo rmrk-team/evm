@@ -1,4 +1,4 @@
-# RMRKExternalEquipMock
+# RMRKTypedExternalEquippableMock
 
 
 
@@ -66,6 +66,28 @@ function addAssetToToken(uint256 tokenId, uint64 assetId, uint64 overwrites) ext
 | tokenId | uint256 | undefined |
 | assetId | uint64 | undefined |
 | overwrites | uint64 | undefined |
+
+### addTypedAssetEntry
+
+```solidity
+function addTypedAssetEntry(uint64 id, uint64 equippableGroupId, address baseAddress, string metadataURI, uint64[] fixedPartIds, uint64[] slotPartIds, string type_) external nonpayable
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| id | uint64 | undefined |
+| equippableGroupId | uint64 | undefined |
+| baseAddress | address | undefined |
+| metadataURI | string | undefined |
+| fixedPartIds | uint64[] | undefined |
+| slotPartIds | uint64[] | undefined |
+| type_ | string | undefined |
 
 ### approveForAssets
 
@@ -236,6 +258,28 @@ Used to retrieve the asset ID that will be replaced (if any) if a given assetID 
 | Name | Type | Description |
 |---|---|---|
 | _0 | uint64 | uint64 ID of the asset which will be replaced |
+
+### getAssetType
+
+```solidity
+function getAssetType(uint64 assetId) external view returns (string)
+```
+
+Used to get the type of the asset.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| assetId | uint64 | ID of the asset to check |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | string | string The type of the asset |
 
 ### getEquipment
 
@@ -501,7 +545,7 @@ function supportsInterface(bytes4 interfaceId) external view returns (bool)
 
 
 
-*Returns true if this contract implements the interface defined by `interfaceId`. See the corresponding https://eips.ethereum.org/EIPS/eip-165#how-interfaces-are-identified[EIP section] to learn more about how these ids are created. This function call must use less than 30 000 gas.*
+
 
 #### Parameters
 

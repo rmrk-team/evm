@@ -1,10 +1,10 @@
-# IRMRKEquippable
+# AbstractMultiAsset
 
 *RMRK team*
 
-> IRMRKEquippable
+> AbstractMultiAsset
 
-Interface smart contract of the RMRK equippable module.
+Abstract Smart contract implementing most of the common logic for contracts implementing IRMRKMultiAsset
 
 
 
@@ -45,38 +45,13 @@ Used to grant permission to the user to manage token&#39;s assets.
 | to | address | Address of the account to grant the approval to |
 | tokenId | uint256 | ID of the token for which the approval to manage the assets is granted |
 
-### canTokenBeEquippedWithAssetIntoSlot
-
-```solidity
-function canTokenBeEquippedWithAssetIntoSlot(address parent, uint256 tokenId, uint64 assetId, uint64 slotId) external view returns (bool)
-```
-
-Used to verify whether a token can be equipped into a given parent&#39;s slot.
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| parent | address | Address of the parent token&#39;s smart contract |
-| tokenId | uint256 | ID of the token we want to equip |
-| assetId | uint64 | ID of the asset associated with the token we want to equip |
-| slotId | uint64 | ID of the slot that we want to equip the token into |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | bool | bool The boolean indicating whether the token with the given asset can be equipped into the desired  slot |
-
 ### getActiveAssetPriorities
 
 ```solidity
 function getActiveAssetPriorities(uint256 tokenId) external view returns (uint16[])
 ```
 
-Used to retrieve the priorities of the active resoources of a given token.
+Used to retrieve active asset priorities of a given token.
 
 *Asset priorities are a non-sequential array of uint16 values with an array size equal to active asset  priorites.*
 
@@ -84,13 +59,13 @@ Used to retrieve the priorities of the active resoources of a given token.
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | ID of the token for which to retrieve the priorities of the active assets |
+| tokenId | uint256 | ID of the token to query |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint16[] | uint16[] An array of priorities of the active assets of the given token |
+| _0 | uint16[] | uint16[] Array of active asset priorities |
 
 ### getActiveAssets
 
@@ -98,21 +73,21 @@ Used to retrieve the priorities of the active resoources of a given token.
 function getActiveAssets(uint256 tokenId) external view returns (uint64[])
 ```
 
-Used to retrieve IDs of the active assets of given token.
+Used to retrieve the active asset IDs of a given token.
 
-*Asset data is stored by reference, in order to access the data corresponding to the ID, call  `getAssetMetadata(tokenId, assetId)`.You can safely get 10k*
+*Assets metadata is stored by reference mapping `_asset[assetId]`.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | ID of the token to retrieve the IDs of the active assets |
+| tokenId | uint256 | ID of the token to query |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint64[] | uint64[] An array of active asset IDs of the given token |
+| _0 | uint64[] | uint64[] Array of active asset IDs |
 
 ### getApprovedForAssets
 
@@ -142,7 +117,7 @@ Used to retrieve the address of the account approved to manage assets of a given
 function getAssetMetadata(uint256 tokenId, uint64 assetId) external view returns (string)
 ```
 
-Used to fetch the asset metadata of the specified token&#39;s active asset with the given index.
+Used to fetch the asset metadata of the specified token&#39;s for given asset.
 
 *Assets are stored by reference mapping `_assets[assetId]`.Can be overriden to implement enumerate, fallback or other custom logic.*
 
@@ -150,14 +125,14 @@ Used to fetch the asset metadata of the specified token&#39;s active asset with 
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | ID of the token from which to retrieve the asset metadata |
-| assetId | uint64 | Asset Id, must be in the active assets array |
+| tokenId | uint256 | ID of the token to query |
+| assetId | uint64 | Asset Id, must be in the pending or active assets array |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | string The metadata of the asset belonging to the specified index in the token&#39;s active assets  array |
+| _0 | string | string Metadata of the asset |
 
 ### getAssetOverwrites
 
@@ -165,15 +140,15 @@ Used to fetch the asset metadata of the specified token&#39;s active asset with 
 function getAssetOverwrites(uint256 tokenId, uint64 newAssetId) external view returns (uint64)
 ```
 
-Used to retrieve the asset that will be overriden if a given asset from the token&#39;s pending array  is accepted.
+Used to retrieve the asset ID that will be replaced (if any) if a given assetID is accepted from  the pending assets array.
 
-*Asset data is stored by reference, in order to access the data corresponding to the ID, call  `getAssetMetadata(tokenId, assetId)`.*
+
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | ID of the token to check |
+| tokenId | uint256 | ID of the token to query |
 | newAssetId | uint64 | ID of the pending asset which will be accepted |
 
 #### Returns
@@ -182,78 +157,27 @@ Used to retrieve the asset that will be overriden if a given asset from the toke
 |---|---|---|
 | _0 | uint64 | uint64 ID of the asset which will be replaced |
 
-### getEquipment
-
-```solidity
-function getEquipment(uint256 tokenId, address targetBaseAddress, uint64 slotPartId) external view returns (struct IRMRKEquippable.Equipment)
-```
-
-Used to get the Equipment object equipped into the specified slot of the desired token.
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| tokenId | uint256 | ID of the token for which we are retrieving the equipped object |
-| targetBaseAddress | address | Address of the `Base` associated with the `Slot` part of the token |
-| slotPartId | uint64 | ID of the `Slot` part that we are checking for equipped objects |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | IRMRKEquippable.Equipment | struct The `Equipment` struct containing data about the equipped object |
-
-### getExtendedAsset
-
-```solidity
-function getExtendedAsset(uint256 tokenId, uint64 assetId) external view returns (string metadataURI, uint64 equippableGroupId, address baseAddress, uint64[] fixedPartIds, uint64[] slotPartIds)
-```
-
-Used to get the extended asset struct of the asset associated with given `assetId`.
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| tokenId | uint256 | undefined |
-| assetId | uint64 | ID of the asset of which we are retrieving |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| metadataURI | string | undefined |
-| equippableGroupId | uint64 | undefined |
-| baseAddress | address | undefined |
-| fixedPartIds | uint64[] | undefined |
-| slotPartIds | uint64[] | undefined |
-
 ### getPendingAssets
 
 ```solidity
 function getPendingAssets(uint256 tokenId) external view returns (uint64[])
 ```
 
-Used to retrieve IDs of the pending assets of given token.
+Returns pending asset IDs for a given token
 
-*Asset data is stored by reference, in order to access the data corresponding to the ID, call  `getAssetMetadata(tokenId, assetId)`.*
+*Pending assets metadata is stored by reference mapping _pendingAsset[assetId]*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | ID of the token to retrieve the IDs of the pending assets |
+| tokenId | uint256 | the token ID to query |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint64[] | uint64[] An array of pending asset IDs of the given token |
+| _0 | uint64[] | uint64[] pending asset IDs |
 
 ### isApprovedForAllForAssets
 
@@ -277,30 +201,6 @@ Used to check whether the address has been granted the operator role by a given 
 | Name | Type | Description |
 |---|---|---|
 | _0 | bool | bool The boolean value indicating wehter the account we are checking has been granted the operator role |
-
-### isChildEquipped
-
-```solidity
-function isChildEquipped(uint256 tokenId, address childAddress, uint256 childId) external view returns (bool)
-```
-
-Used to check whether the token has a given child equipped.
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| tokenId | uint256 | ID of the parent token for which we are querying for |
-| childAddress | address | Address of the child token&#39;s smart contract |
-| childId | uint256 | ID of the child token |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | bool | bool The boolean value indicating whether the child token is equipped into the given token or not |
 
 ### rejectAllAssets
 
@@ -518,65 +418,30 @@ Used to notify listeners that a asset object is initialized at `assetId`.
 |---|---|---|
 | assetId `indexed` | uint64 | undefined |
 
-### ChildAssetEquipped
+
+
+## Errors
+
+### RMRKApprovalForAssetsToCurrentOwner
 
 ```solidity
-event ChildAssetEquipped(uint256 indexed tokenId, uint64 indexed assetId, uint64 indexed slotPartId, uint256 childId, address childAddress, uint64 childAssetId)
+error RMRKApprovalForAssetsToCurrentOwner()
 ```
 
-Used to notify listeners that a child&#39;s asset has been equipped into one of its parent assets.
+Attempting to grant approval of assets to their current owner
 
 
 
-#### Parameters
 
-| Name | Type | Description |
-|---|---|---|
-| tokenId `indexed` | uint256 | ID of the token that had a asset equipped |
-| assetId `indexed` | uint64 | ID of the asset associated with the token we are equipping into |
-| slotPartId `indexed` | uint64 | ID of the slot we are using to equip |
-| childId  | uint256 | ID of the child token we are equipping into the slot |
-| childAddress  | address | Address of the child token&#39;s collection |
-| childAssetId  | uint64 | ID of the asset associated with the token we are equipping |
-
-### ChildAssetUnequipped
+### RMRKTokenDoesNotHaveAsset
 
 ```solidity
-event ChildAssetUnequipped(uint256 indexed tokenId, uint64 indexed assetId, uint64 indexed slotPartId, uint256 childId, address childAddress, uint64 childAssetId)
+error RMRKTokenDoesNotHaveAsset()
 ```
 
-Used to notify listeners that a child&#39;s asset has been unequipped from one of its parent assets.
+Attempting to compose a NFT of a token without active assets
 
 
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| tokenId `indexed` | uint256 | ID of the token that had a asset unequipped |
-| assetId `indexed` | uint64 | ID of the asset associated with the token we are unequipping out of |
-| slotPartId `indexed` | uint64 | ID of the slot we are unequipping from |
-| childId  | uint256 | ID of the token being unequipped |
-| childAddress  | address | Address of the collection that a token that is being unequipped belongs to |
-| childAssetId  | uint64 | ID of the asset associated with the token we are unequipping |
-
-### ValidParentEquippableGroupIdSet
-
-```solidity
-event ValidParentEquippableGroupIdSet(uint64 indexed equippableGroupId, uint64 indexed slotPartId, address parentAddress)
-```
-
-Used to notify listeners that the assets belonging to a `equippableGroupId` have been marked as  equippable into a given slot and parent
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| equippableGroupId `indexed` | uint64 | ID of the equippable group being marked as equippable into the slot associated with  `slotPartId` of the `parentAddress` collection |
-| slotPartId `indexed` | uint64 | ID of the slot part of the base into which the parts belonging to the equippable group  associated with `equippableGroupId` can be equipped |
-| parentAddress  | address | Address of the collection into which the parts belonging to `equippableGroupId` can be  equipped |
 
 
 
