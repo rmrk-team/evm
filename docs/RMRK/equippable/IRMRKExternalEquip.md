@@ -26,7 +26,7 @@ Accepts a resource at from the pending array of given token.
 |---|---|---|
 | tokenId | uint256 | ID of the token for which to accept the pending resource |
 | index | uint256 | Index of the resource in the pending array to accept |
-| resourceId | uint64 | expected to be in the index |
+| resourceId | uint64 | Id of the resource expected to be in the index |
 
 ### approveForResources
 
@@ -352,7 +352,7 @@ Rejects a resource from the pending array of given token.
 |---|---|---|
 | tokenId | uint256 | ID of the token that the resource is being rejected from |
 | index | uint256 | Index of the resource in the pending array to be rejected |
-| resourceId | uint64 | expected to be in the index |
+| resourceId | uint64 | Id of the resource expected to be in the index |
 
 ### setApprovalForAllForResources
 

@@ -162,21 +162,17 @@ abstract contract AbstractMultiResource is Context, IRMRKMultiResource {
     /**
      * @notice Used to accept a pending resource.
      * @dev The call is reverted if there is no pending resource at a given index.
-     * @param tokenId ID of the token to accept the resource for
-     * @param index Index of the pending resource to accept in the given token's pending resources array
+     * @param tokenId ID of the token for which to accept the pending resource
+     * @param index Index of the resource in the pending array to accept
+     * @param resourceId Id of the resource expected to be in the index
      */
     function _acceptResource(
         uint256 tokenId,
         uint256 index,
         uint64 resourceId
     ) internal virtual {
-        if (index >= _pendingResources[tokenId].length)
-            revert RMRKIndexOutOfRange();
-        if (resourceId != _pendingResources[tokenId][index])
-            revert RMRKUnexpectedResourceId();
+        _validatePendingResourceAtIndex(tokenId, index, resourceId);
         _beforeAcceptResource(tokenId, index, resourceId);
-
-        _pendingResources[tokenId].removeItemByIndex(index);
 
         uint64 overwrite = _resourceOverwrites[tokenId][resourceId];
         if (overwrite != uint64(0)) {
@@ -185,8 +181,9 @@ abstract contract AbstractMultiResource is Context, IRMRKMultiResource {
             if (!_activeResources[tokenId].removeItemByValue(overwrite))
                 overwrite = uint64(0);
             else delete _tokenResources[tokenId][overwrite];
-            delete (_resourceOverwrites[tokenId][resourceId]);
         }
+        _removePendingResource(tokenId, index, resourceId);
+
         _activeResources[tokenId].push(resourceId);
         //Push 0 value of uint16 to array, e.g., uninitialized
         _activeResourcePriorities[tokenId].push(uint16(0));
@@ -197,27 +194,58 @@ abstract contract AbstractMultiResource is Context, IRMRKMultiResource {
     /**
      * @notice Used to reject the specified resource from the pending array.
      * @dev The call is reverted if there is no pending resource at a given index.
-     * @param tokenId ID of the token from which to reject the specified pending resource
-     * @param index Index of the resource to reject in the pending array of the given token
+     * @param tokenId ID of the token that the resource is being rejected from
+     * @param index Index of the resource in the pending array to be rejected
+     * @param resourceId Id of the resource expected to be in the index
      */
     function _rejectResource(
         uint256 tokenId,
         uint256 index,
         uint64 resourceId
     ) internal virtual {
-        if (index >= _pendingResources[tokenId].length)
-            revert RMRKIndexOutOfRange();
-        if (resourceId != _pendingResources[tokenId][index])
-            revert RMRKUnexpectedResourceId();
-
+        _validatePendingResourceAtIndex(tokenId, index, resourceId);
         _beforeRejectResource(tokenId, index, resourceId);
-        _pendingResources[tokenId].removeItemByIndex(index);
+
+        _removePendingResource(tokenId, index, resourceId);
         delete _tokenResources[tokenId][resourceId];
-        delete _resourceOverwrites[tokenId][resourceId];
 
         emit ResourceRejected(tokenId, resourceId);
         _afterRejectResource(tokenId, index, resourceId);
     }
+
+    /**
+     * @notice Used to validate the index on the pending resources array
+     * @dev The call is reverted if the index is out of range or the resource Id is not present at the index.
+     * @param tokenId ID of the token that the resource is validated from
+     * @param index Index of the resource in the pending array
+     * @param resourceId Id of the resource expected to be in the index
+     */
+    function _validatePendingResourceAtIndex(
+        uint256 tokenId,
+        uint256 index,
+        uint64 resourceId
+    ) private view {
+        if (index >= _pendingResources[tokenId].length)
+            revert RMRKIndexOutOfRange();
+        if (resourceId != _pendingResources[tokenId][index])
+            revert RMRKUnexpectedResourceId();
+    }
+
+    /**
+     * @notice Used to remove the resource at the index on the pending resources array
+     * @param tokenId ID of the token that the resource is being removed from
+     * @param index Index of the resource in the pending array
+     * @param resourceId Id of the resource expected to be in the index
+     */
+    function _removePendingResource(
+        uint256 tokenId,
+        uint256 index,
+        uint64 resourceId
+    ) private {
+        _pendingResources[tokenId].removeItemByIndex(index);
+        delete _resourceOverwrites[tokenId][resourceId];
+    }
+
 
     /**
      * @notice Used to reject all of the pending resources for the given token.

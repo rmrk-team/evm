@@ -96,7 +96,7 @@ interface IRMRKMultiResource is IERC165 {
      * @dev Emits an {ResourceAccepted} event.
      * @param tokenId ID of the token for which to accept the pending resource
      * @param index Index of the resource in the pending array to accept
-     * @param resourceId expected to be in the index
+     * @param resourceId Id of the resource expected to be in the index
      */
     function acceptResource(
         uint256 tokenId,
@@ -115,7 +115,7 @@ interface IRMRKMultiResource is IERC165 {
      * @dev Emits a {ResourceRejected} event.
      * @param tokenId ID of the token that the resource is being rejected from
      * @param index Index of the resource in the pending array to be rejected
-     * @param resourceId expected to be in the index
+     * @param resourceId Id of the resource expected to be in the index
      */
     function rejectResource(
         uint256 tokenId,
