@@ -17,7 +17,7 @@ abstract contract RMRKAbstractEquippableImpl is
     RMRKRoyalties,
     RMRKEquippable
 {
-    uint256 private _totalResources;
+    uint256 private _totalAssets;
     string private _tokenURI;
 
     function _preMint(uint256 numToMint) internal returns (uint256, uint256) {
@@ -38,15 +38,15 @@ abstract contract RMRKAbstractEquippableImpl is
 
     function _charge(uint256 value) internal virtual;
 
-    function addResourceToToken(
+    function addAssetToToken(
         uint256 tokenId,
-        uint64 resourceId,
+        uint64 assetId,
         uint64 overwrites
     ) public virtual onlyOwnerOrContributor {
-        _addResourceToToken(tokenId, resourceId, overwrites);
+        _addAssetToToken(tokenId, assetId, overwrites);
     }
 
-    function addResourceEntry(
+    function addAssetEntry(
         uint64 equippableGroupId,
         address baseAddress,
         string memory metadataURI,
@@ -54,17 +54,17 @@ abstract contract RMRKAbstractEquippableImpl is
         uint64[] memory slotPartIds
     ) public virtual onlyOwnerOrContributor returns (uint256) {
         unchecked {
-            _totalResources += 1;
+            _totalAssets += 1;
         }
-        _addResourceEntry(
-            uint64(_totalResources),
+        _addAssetEntry(
+            uint64(_totalAssets),
             equippableGroupId,
             baseAddress,
             metadataURI,
             fixedPartIds,
             slotPartIds
         );
-        return _totalResources;
+        return _totalAssets;
     }
 
     function setValidParentForEquippableGroup(
@@ -79,8 +79,8 @@ abstract contract RMRKAbstractEquippableImpl is
         );
     }
 
-    function totalResources() public view virtual returns (uint256) {
-        return _totalResources;
+    function totalAssets() public view virtual returns (uint256) {
+        return _totalAssets;
     }
 
     function tokenURI(uint256)

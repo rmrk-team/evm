@@ -68,7 +68,7 @@ interface IRMRKBaseStorage is IERC165 {
      * @notice The integral structure of a standard RMRK base item defining it.
      * @dev Requires a minimum of 3 storage slots per base item, equivalent to roughly 60,000 gas as of Berlin hard fork
      *  (April 14, 2021), though 5-7 storage slots is more realistic, given the standard length of an IPFS URI. This
-     *  will result in between 25,000,000 and 35,000,000 gas per 250 resources--the maximum block size of Ethereum
+     *  will result in between 25,000,000 and 35,000,000 gas per 250 assets--the maximum block size of Ethereum
      *  mainnet is 30M at peak usage.
      * @return itemType The item type of the part
      * @return z The z value of the part defining how it should be rendered when presenting the full NFT

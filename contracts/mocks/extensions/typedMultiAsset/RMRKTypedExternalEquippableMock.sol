@@ -2,14 +2,14 @@
 
 pragma solidity ^0.8.16;
 
-import "../../../RMRK/extension/typedMultiResource/RMRKTypedMultiResource.sol";
+import "../../../RMRK/extension/typedMultiAsset/RMRKTypedMultiAsset.sol";
 import "../../RMRKExternalEquipMock.sol";
 
-error RMRKTokenHasNoResourcesWithType();
+error RMRKTokenHasNoAssetsWithType();
 
 contract RMRKTypedExternalEquippableMock is
     RMRKExternalEquipMock,
-    RMRKTypedMultiResource
+    RMRKTypedMultiAsset
 {
     constructor(address nestingAddress) RMRKExternalEquipMock(nestingAddress) {}
 
@@ -17,15 +17,15 @@ contract RMRKTypedExternalEquippableMock is
         public
         view
         virtual
-        override(RMRKExternalEquip, RMRKTypedMultiResource)
+        override(RMRKExternalEquip, RMRKTypedMultiAsset)
         returns (bool)
     {
         return
-            RMRKTypedMultiResource.supportsInterface(interfaceId) ||
+            RMRKTypedMultiAsset.supportsInterface(interfaceId) ||
             RMRKExternalEquip.supportsInterface(interfaceId);
     }
 
-    function addTypedResourceEntry(
+    function addTypedAssetEntry(
         uint64 id,
         uint64 equippableGroupId,
         address baseAddress,
@@ -34,7 +34,7 @@ contract RMRKTypedExternalEquippableMock is
         uint64[] memory slotPartIds,
         string memory type_
     ) external {
-        _addResourceEntry(
+        _addAssetEntry(
             id,
             equippableGroupId,
             baseAddress,
@@ -42,6 +42,6 @@ contract RMRKTypedExternalEquippableMock is
             fixedPartIds,
             slotPartIds
         );
-        _setResourceType(id, type_);
+        _setAssetType(id, type_);
     }
 }

@@ -204,7 +204,7 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
 
     /**
      * @notice Used to check whether the given address is allowed to equip the desired `Part`
-     * @dev Returns true if a collection may equip resource with `partId`.
+     * @dev Returns true if a collection may equip asset with `partId`.
      * @param partId The ID of the part that we are checking
      * @param targetAddress The address that we are checking for whether the part can be equipped into it or not
      * @return bool The status indicating whether the `targetAddress` can be equipped into `Part` with `partId` or not

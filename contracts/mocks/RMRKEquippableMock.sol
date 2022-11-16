@@ -38,15 +38,15 @@ contract RMRKEquippableMock is RMRKEquippable {
         nestTransferFrom(_msgSender(), to, tokenId, destinationId);
     }
 
-    function addResourceToToken(
+    function addAssetToToken(
         uint256 tokenId,
-        uint64 resourceId,
+        uint64 assetId,
         uint64 overwrites
     ) external {
-        _addResourceToToken(tokenId, resourceId, overwrites);
+        _addAssetToToken(tokenId, assetId, overwrites);
     }
 
-    function addResourceEntry(
+    function addAssetEntry(
         uint64 id,
         uint64 equippableGroupId,
         address baseAddress,
@@ -54,7 +54,7 @@ contract RMRKEquippableMock is RMRKEquippable {
         uint64[] memory fixedPartIds,
         uint64[] memory slotPartIds
     ) external {
-        _addResourceEntry(
+        _addAssetEntry(
             id,
             equippableGroupId,
             baseAddress,

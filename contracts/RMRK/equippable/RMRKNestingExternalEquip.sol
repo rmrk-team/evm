@@ -121,7 +121,7 @@ contract RMRKNestingExternalEquip is IRMRKNestingExternalEquip, RMRKNesting {
      * @param tokenId ID of the token for which the approvals should be cleared
      */
     function _cleanApprovals(uint256 tokenId) internal virtual override {
-        IRMRKMultiResource(_equippableAddress).approveForResources(
+        IRMRKMultiAsset(_equippableAddress).approveForAssets(
             address(0),
             tokenId
         );

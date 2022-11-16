@@ -12,7 +12,7 @@ library RMRKLib {
      * @notice Used to remove an item from the array using the specified value.
      * @dev The value is removed by replacing it with the last value and removing the last element.
      * @param array An array of values containing the value to be removed
-     * @param value The value of the resource to remove from the array
+     * @param value The value of the asset to remove from the array
      * @return bool A boolean value specifying whether the item was found
      */
     function removeItemByValue(uint64[] storage array, uint64 value)

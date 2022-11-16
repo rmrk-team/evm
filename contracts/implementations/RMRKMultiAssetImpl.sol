@@ -2,11 +2,11 @@
 
 pragma solidity ^0.8.16;
 
-import "./abstracts/RMRKAbstractMultiResourceImpl.sol";
+import "./abstracts/RMRKAbstractMultiAssetImpl.sol";
 
 error RMRKMintUnderpriced();
 
-contract RMRKMultiResourceImpl is RMRKAbstractMultiResourceImpl {
+contract RMRKMultiAssetImpl is RMRKAbstractMultiAssetImpl {
     constructor(
         string memory name,
         string memory symbol,
@@ -20,7 +20,7 @@ contract RMRKMultiResourceImpl is RMRKAbstractMultiResourceImpl {
         RMRKMintingUtils(maxSupply_, pricePerMint_)
         RMRKCollectionMetadata(collectionMetadata_)
         RMRKRoyalties(royaltyRecipient, royaltyPercentageBps)
-        RMRKMultiResource(name, symbol)
+        RMRKMultiAsset(name, symbol)
     {
         _setTokenURI(tokenURI_);
     }

@@ -2,25 +2,27 @@
 
 pragma solidity ^0.8.16;
 
-import "./abstracts/RMRKAbstractNestingMultiResourceImpl.sol";
+import "../abstracts/RMRKAbstractNestingMultiAssetImpl.sol";
+import "../IRMRKInitData.sol";
+import "./RMRKErc20Pay.sol";
 
-error RMRKMintUnderpriced();
-
-contract RMRKNestingMultiResourceImpl is RMRKAbstractNestingMultiResourceImpl {
+contract RMRKNestingMultiAssetImplErc20Pay is
+    IRMRKInitData,
+    RMRKErc20Pay,
+    RMRKAbstractNestingMultiAssetImpl
+{
     constructor(
-        string memory name,
-        string memory symbol,
-        uint256 maxSupply,
-        uint256 pricePerMint,
+        string memory name_,
+        string memory symbol_,
         string memory collectionMetadata_,
         string memory tokenURI_,
-        address royaltyRecipient,
-        uint256 royaltyPercentageBps //in basis points
+        InitData memory data
     )
-        RMRKMintingUtils(maxSupply, pricePerMint)
+        RMRKMintingUtils(data.maxSupply, data.pricePerMint)
         RMRKCollectionMetadata(collectionMetadata_)
-        RMRKRoyalties(royaltyRecipient, royaltyPercentageBps)
-        RMRKNestingMultiResource(name, symbol)
+        RMRKRoyalties(data.royaltyRecipient, data.royaltyPercentageBps)
+        RMRKErc20Pay(data.erc20TokenAddress)
+        RMRKNestingMultiAsset(name_, symbol_)
     {
         _setTokenURI(tokenURI_);
     }
@@ -57,6 +59,6 @@ contract RMRKNestingMultiResourceImpl is RMRKAbstractNestingMultiResourceImpl {
     }
 
     function _charge(uint256 value) internal virtual override {
-        if (value != msg.value) revert RMRKMintUnderpriced();
+        _chargeFromToken(msg.sender, address(this), value);
     }
 }
