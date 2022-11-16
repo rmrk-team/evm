@@ -12,7 +12,7 @@ import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 interface IRMRKNesting is IERC165 {
     /**
      * @notice The core struct of RMRK ownership.
-     * @dev The `RMRKOwner` struct is used to store information of the next immediate owner, be it the parent token or
+     * @dev The `DirectOwner` struct is used to store information of the next immediate owner, be it the parent token or
      *  the externally owned account.
      * @dev If the token is owned by the externally owned account, the `tokenId` should equal `0`.
      * @param tokenId ID of the parent token
@@ -22,7 +22,7 @@ interface IRMRKNesting is IERC165 {
      * @param isNft A boolean value signifying whether the token is owned by another token (`true`) or by an externally
      *  owned account (`false`)
      */
-    struct RMRKOwner {
+    struct DirectOwner {
         uint256 tokenId;
         address ownerAddress;
         bool isNft;
@@ -128,7 +128,7 @@ interface IRMRKNesting is IERC165 {
      * @return uint256 The ID of the parent token. Should be `0` if the owner is an externally owned account
      * @return bool The boolean value signifying whether the owner is an NFT or not
      */
-    function rmrkOwnerOf(uint256 tokenId)
+    function directOwnerOf(uint256 tokenId)
         external
         view
         returns (
@@ -157,7 +157,7 @@ interface IRMRKNesting is IERC165 {
      * @dev This adds the child token into the given parent token's pending child tokens array.
      * @dev Requirements:
      *
-     *  - `rmrkOwnerOf` on the child contract must resolve to the called contract.
+     *  - `directOwnerOf` on the child contract must resolve to the called contract.
      *  - the pending array of the parent contract must not be full.
      * @param parentId ID of the parent token to receive the new child token
      * @param childId ID of the new proposed child token

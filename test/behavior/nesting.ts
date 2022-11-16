@@ -40,7 +40,7 @@ async function shouldBehaveLikeNesting(
     it('can mint with no destination', async function () {
       const tokenId = await mint(child, tokenOwner.address);
       expect(await child.ownerOf(tokenId)).to.equal(tokenOwner.address);
-      expect(await child.rmrkOwnerOf(tokenId)).to.eql([tokenOwner.address, bn(0), false]);
+      expect(await child.directOwnerOf(tokenId)).to.eql([tokenOwner.address, bn(0), false]);
     });
 
     it('has right owners', async function () {
@@ -121,9 +121,9 @@ async function shouldBehaveLikeNesting(
       const childId = await nestMint(child, parent.address, parentId);
 
       // RMRK owner is an address for the parent
-      expect(await parent.rmrkOwnerOf(parentId)).to.eql([tokenOwner.address, bn(0), false]);
+      expect(await parent.directOwnerOf(parentId)).to.eql([tokenOwner.address, bn(0), false]);
       // RMRK owner is a contract for the child
-      expect(await child.rmrkOwnerOf(childId)).to.eql([parent.address, bn(parentId), true]);
+      expect(await child.directOwnerOf(childId)).to.eql([parent.address, bn(parentId), true]);
     });
 
     it("can mint to contract and parent's children are ok", async function () {
@@ -187,7 +187,7 @@ async function shouldBehaveLikeNesting(
       expect(pendingChildrenOfChunky10).to.eql([[bn(childId), child.address]]);
       expect(pendingChildrenOfMonkey1).to.eql([[bn(granchildId), child.address]]);
 
-      expect(await child.rmrkOwnerOf(granchildId)).to.eql([child.address, bn(childId), true]);
+      expect(await child.directOwnerOf(granchildId)).to.eql([child.address, bn(childId), true]);
 
       expect(await child.ownerOf(granchildId)).to.eql(tokenOwner.address);
     });
@@ -390,7 +390,7 @@ async function shouldBehaveLikeNesting(
 
       expect(await parent.childrenOf(parentId)).to.eql([[bn(childId), child.address]]);
       expect(await child.childrenOf(childId)).to.eql([[bn(granchildId), child.address]]);
-      expect(await child.rmrkOwnerOf(granchildId)).to.eql([child.address, bn(childId), true]);
+      expect(await child.directOwnerOf(granchildId)).to.eql([child.address, bn(childId), true]);
 
       // Sets recursive burns to 2
       await parent.connect(tokenOwner)['burn(uint256,uint256)'](parentId, 2);
@@ -403,7 +403,7 @@ async function shouldBehaveLikeNesting(
         parent,
         'ERC721InvalidTokenId',
       );
-      await expect(parent.rmrkOwnerOf(parentId)).to.be.revertedWithCustomError(
+      await expect(parent.directOwnerOf(parentId)).to.be.revertedWithCustomError(
         parent,
         'ERC721InvalidTokenId',
       );
@@ -412,7 +412,7 @@ async function shouldBehaveLikeNesting(
         child,
         'ERC721InvalidTokenId',
       );
-      await expect(child.rmrkOwnerOf(childId)).to.be.revertedWithCustomError(
+      await expect(child.directOwnerOf(childId)).to.be.revertedWithCustomError(
         child,
         'ERC721InvalidTokenId',
       );
@@ -421,7 +421,7 @@ async function shouldBehaveLikeNesting(
         parent,
         'ERC721InvalidTokenId',
       );
-      await expect(parent.rmrkOwnerOf(granchildId)).to.be.revertedWithCustomError(
+      await expect(parent.directOwnerOf(granchildId)).to.be.revertedWithCustomError(
         parent,
         'ERC721InvalidTokenId',
       );
@@ -575,11 +575,11 @@ async function shouldBehaveLikeNesting(
 
       // New owner of child
       expect(await child.ownerOf(childId)).to.eql(tokenOwner.address);
-      expect(await child.rmrkOwnerOf(childId)).to.eql([tokenOwner.address, bn(0), false]);
+      expect(await child.directOwnerOf(childId)).to.eql([tokenOwner.address, bn(0), false]);
 
       // Grandchild is still owned by child
       expect(await child.ownerOf(grandchildId)).to.eql(tokenOwner.address);
-      expect(await child.rmrkOwnerOf(grandchildId)).to.eql([child.address, bn(childId), true]);
+      expect(await child.directOwnerOf(grandchildId)).to.eql([child.address, bn(childId), true]);
     });
 
     it('cannot unnest if not child root owner', async function () {
@@ -605,7 +605,7 @@ async function shouldBehaveLikeNesting(
         rootOwnerAddress = tokenOwner.address;
       }
       expect(await child.ownerOf(childId)).to.eql(rootOwnerAddress);
-      expect(await child.rmrkOwnerOf(childId)).to.eql([rootOwnerAddress, bn(0), false]);
+      expect(await child.directOwnerOf(childId)).to.eql([rootOwnerAddress, bn(0), false]);
 
       // Unnesting updates balances downstream
       expect(await child.balanceOf(rootOwnerAddress)).to.equal(1);
@@ -708,11 +708,11 @@ async function shouldBehaveLikeNesting(
 
       // New owner of child
       expect(await child.ownerOf(childId)).to.eql(tokenOwner.address);
-      expect(await child.rmrkOwnerOf(childId)).to.eql([tokenOwner.address, bn(0), false]);
+      expect(await child.directOwnerOf(childId)).to.eql([tokenOwner.address, bn(0), false]);
 
       // Grandchild is still owned by child
       expect(await child.ownerOf(grandchildId)).to.eql(tokenOwner.address);
-      expect(await child.rmrkOwnerOf(grandchildId)).to.eql([child.address, bn(childId), true]);
+      expect(await child.directOwnerOf(grandchildId)).to.eql([child.address, bn(childId), true]);
     });
 
     it('cannot unnest if not child root owner', async function () {
@@ -738,7 +738,7 @@ async function shouldBehaveLikeNesting(
         rootOwnerAddress = tokenOwner.address;
       }
       expect(await child.ownerOf(childId)).to.eql(rootOwnerAddress);
-      expect(await child.rmrkOwnerOf(childId)).to.eql([rootOwnerAddress, bn(0), false]);
+      expect(await child.directOwnerOf(childId)).to.eql([rootOwnerAddress, bn(0), false]);
 
       // Unnesting updates balances downstream
       expect(await child.balanceOf(rootOwnerAddress)).to.equal(1);
@@ -801,11 +801,11 @@ async function shouldBehaveLikeNesting(
       expect(await parent.balanceOf(newOwner.address)).to.equal(1);
 
       expect(await parent.ownerOf(parentId)).to.eql(newOwner.address);
-      expect(await parent.rmrkOwnerOf(parentId)).to.eql([newOwner.address, bn(0), false]);
+      expect(await parent.directOwnerOf(parentId)).to.eql([newOwner.address, bn(0), false]);
 
       // New owner of child
       expect(await child.ownerOf(childId)).to.eql(newOwner.address);
-      expect(await child.rmrkOwnerOf(childId)).to.eql([parent.address, bn(parentId), true]);
+      expect(await child.directOwnerOf(childId)).to.eql([parent.address, bn(parentId), true]);
 
       // Parent still has its children
       expect(await parent.pendingChildrenOf(parentId)).to.eql([[bn(childId), child.address]]);
@@ -966,7 +966,7 @@ async function shouldBehaveLikeNesting(
     it('can nest tranfer to IRMRKNesting contract', async function () {
       await nestTransfer(child, firstOwner, parent.address, childId, parentId);
       expect(await child.ownerOf(childId)).to.eql(firstOwner.address);
-      expect(await child.rmrkOwnerOf(childId)).to.eql([parent.address, bn(parentId), true]);
+      expect(await child.directOwnerOf(childId)).to.eql([parent.address, bn(parentId), true]);
     });
 
     it('cannot nest tranfer to non existing parent token', async function () {

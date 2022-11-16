@@ -242,6 +242,30 @@ Used to retrieve the metadata of the collection.
 |---|---|---|
 | _0 | string | string The metadata URI of the collection |
 
+### directOwnerOf
+
+```solidity
+function directOwnerOf(uint256 tokenId) external view returns (address, uint256, bool)
+```
+
+Used to retrieve the immediate owner of the given token.
+
+*In the event the NFT is owned by an externally owned account, `tokenId` will be `0` and `isNft` will be  `false`.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId | uint256 | ID of the token for which the immediate owner is being retrieved |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | address | address Address of the immediate owner. If the token is owned by an externally owned account, its address  will be returned. If the token is owned by another token, the parent token&#39;s collection smart contract address  is returned |
+| _1 | uint256 | uint256 Token ID of the immediate owner. If the immediate owner is an externally owned account, the value  should be `0` |
+| _2 | bool | bool A boolean value signifying whether the immediate owner is a token (`true`) or not (`false`) |
+
 ### getApproved
 
 ```solidity
@@ -609,30 +633,6 @@ Removes a contributor from the smart contract.
 | Name | Type | Description |
 |---|---|---|
 | contributor | address | Address of the contributor&#39;s account |
-
-### rmrkOwnerOf
-
-```solidity
-function rmrkOwnerOf(uint256 tokenId) external view returns (address, uint256, bool)
-```
-
-Used to retrieve the immediate owner of the given token.
-
-*In the event the NFT is owned by an externally owned account, `tokenId` will be `0` and `isNft` will be  `false`.*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| tokenId | uint256 | ID of the token for which the immediate owner is being retrieved |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | address | address Address of the immediate owner. If the token is owned by an externally owned account, its address  will be returned. If the token is owned by another token, the parent token&#39;s collection smart contract address  is returned |
-| _1 | uint256 | uint256 Token ID of the immediate owner. If the immediate owner is an externally owned account, the value  should be `0` |
-| _2 | bool | bool A boolean value signifying whether the immediate owner is a token (`true`) or not (`false`) |
 
 ### royaltyInfo
 

@@ -133,7 +133,7 @@ describe('RMRKSoulbound exempt', async function () {
     await token.setSoulboundExempt(tokenId);
 
     await token.connect(owner).nestTransfer(token.address, tokenId, otherTokenId);
-    expect(await token.rmrkOwnerOf(tokenId)).eql([token.address, bn(otherTokenId), true]);
+    expect(await token.directOwnerOf(tokenId)).eql([token.address, bn(otherTokenId), true]);
   });
 
   it('can unnest child if soulbound exempt', async function () {
@@ -145,7 +145,7 @@ describe('RMRKSoulbound exempt', async function () {
     await token
       .connect(owner)
       .unnestChild(tokenId, owner.address, 0, token.address, otherTokenId, false);
-    expect(await token.rmrkOwnerOf(otherTokenId)).eql([owner.address, bn(0), false]);
+    expect(await token.directOwnerOf(otherTokenId)).eql([owner.address, bn(0), false]);
   });
 });
 

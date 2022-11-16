@@ -37,7 +37,7 @@ function addChild(uint256 parentId, uint256 childId) external nonpayable
 
 Used to add a child token to a given parent token.
 
-*This adds the child token into the given parent token&#39;s pending child tokens array.Requirements:  - `rmrkOwnerOf` on the child contract must resolve to the called contract.  - the pending array of the parent contract must not be full.*
+*This adds the child token into the given parent token&#39;s pending child tokens array.Requirements:  - `directOwnerOf` on the child contract must resolve to the called contract.  - the pending array of the parent contract must not be full.*
 
 #### Parameters
 
@@ -113,6 +113,30 @@ Used to retrieve the active child tokens of a given parent token.
 | Name | Type | Description |
 |---|---|---|
 | _0 | IRMRKNesting.Child[] | struct[] An array of Child structs containing the parent token&#39;s active child tokens |
+
+### directOwnerOf
+
+```solidity
+function directOwnerOf(uint256 tokenId) external view returns (address, uint256, bool)
+```
+
+Used to retrieve the immediate owner of the given token.
+
+*If the immediate owner is another token, the address returned, should be the one of the parent token&#39;s  collection smart contract.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId | uint256 | ID of the token for which the RMRK owner is being retrieved |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | address | address Address of the given token&#39;s owner |
+| _1 | uint256 | uint256 The ID of the parent token. Should be `0` if the owner is an externally owned account |
+| _2 | bool | bool The boolean value signifying whether the owner is an NFT or not |
 
 ### nestTransferFrom
 
@@ -215,30 +239,6 @@ Used to reject all pending children of a given parent token.
 | Name | Type | Description |
 |---|---|---|
 | parentId | uint256 | ID of the parent token for which to reject all of the pending tokens |
-
-### rmrkOwnerOf
-
-```solidity
-function rmrkOwnerOf(uint256 tokenId) external view returns (address, uint256, bool)
-```
-
-Used to retrieve the immediate owner of the given token.
-
-*If the immediate owner is another token, the address returned, should be the one of the parent token&#39;s  collection smart contract.*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| tokenId | uint256 | ID of the token for which the RMRK owner is being retrieved |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | address | address Address of the given token&#39;s owner |
-| _1 | uint256 | uint256 The ID of the parent token. Should be `0` if the owner is an externally owned account |
-| _2 | bool | bool The boolean value signifying whether the owner is an NFT or not |
 
 ### supportsInterface
 

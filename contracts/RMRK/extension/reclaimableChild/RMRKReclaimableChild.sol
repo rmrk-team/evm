@@ -64,7 +64,7 @@ abstract contract RMRKReclaimableChild is IRMRKReclaimableChild, RMRKNesting {
 
         (address owner, uint256 ownerTokenId, bool isNft) = IRMRKNesting(
             childAddress
-        ).rmrkOwnerOf(childId);
+        ).directOwnerOf(childId);
         if (owner != address(this) || ownerTokenId != tokenId || !isNft)
             revert RMRKInvalidChildReclaim();
         IERC721(childAddress).safeTransferFrom(
