@@ -25,12 +25,12 @@ async function multiAssetFixture(): Promise<Contract> {
   ]);
 }
 
-async function nestingFixture(): Promise<Contract> {
+async function nestableFixture(): Promise<Contract> {
   const erc20Factory = await ethers.getContractFactory('ERC20Mock');
   const erc20 = await erc20Factory.deploy();
   await erc20.deployed();
 
-  return await singleFixtureWithArgs('RMRKNestingImplErc20Pay', [
+  return await singleFixtureWithArgs('RMRKNestableImplErc20Pay', [
     'MultiAsset',
     'MR',
     'ipfs://collection-meta',
@@ -39,12 +39,12 @@ async function nestingFixture(): Promise<Contract> {
   ]);
 }
 
-async function nestingMultiAssetFixture(): Promise<Contract> {
+async function nestableMultiAssetFixture(): Promise<Contract> {
   const erc20Factory = await ethers.getContractFactory('ERC20Mock');
   const erc20 = await erc20Factory.deploy();
   await erc20.deployed();
 
-  return await singleFixtureWithArgs('RMRKNestingMultiAssetImplErc20Pay', [
+  return await singleFixtureWithArgs('RMRKNestableMultiAssetImplErc20Pay', [
     'MultiAsset',
     'MR',
     'ipfs://collection-meta',
@@ -75,17 +75,17 @@ describe('MultiAssetImplErc20Pay Minting', async () => {
   shouldControlValidMintingErc20Pay();
 });
 
-describe('NestingImplErc20Pay Minting', async () => {
+describe('NestableImplErc20Pay Minting', async () => {
   beforeEach(async function () {
-    this.token = await loadFixture(nestingFixture);
+    this.token = await loadFixture(nestableFixture);
   });
 
   shouldControlValidMintingErc20Pay();
 });
 
-describe('NestingMultiAssetImplErc20Pay Minting', async () => {
+describe('NestableMultiAssetImplErc20Pay Minting', async () => {
   beforeEach(async function () {
-    this.token = await loadFixture(nestingMultiAssetFixture);
+    this.token = await loadFixture(nestableMultiAssetFixture);
   });
 
   shouldControlValidMintingErc20Pay();
@@ -157,7 +157,7 @@ async function shouldControlValidMintingErc20Pay(): Promise<void> {
   });
 
   it('can nest mint tokens through sale logic', async function () {
-    if (this.token.mintNesting === undefined) {
+    if (this.token.nestMint === undefined) {
       this.skip();
     }
     const parentId = await mintFromImplErc20Pay(this.token, addrs[0].address);

@@ -240,7 +240,7 @@ describe('MultiAssetMock MR behavior', async () => {
   shouldBehaveLikeMultiAsset(mintFromMock, addAssetEntryFromMock, addAssetToToken);
 });
 
-describe('NestingMock ERC721 behavior', function () {
+describe('NestableMock ERC721 behavior', function () {
   beforeEach(async function () {
     const { token } = await loadFixture(singleFixture);
     this.token = token;

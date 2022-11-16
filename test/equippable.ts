@@ -179,7 +179,7 @@ describe('EquippableMock with Slots', async () => {
 describe('EquippableMock Assets', async () => {
   beforeEach(async function () {
     const { equip, renderUtils } = await loadFixture(assetsFixture);
-    this.nesting = equip;
+    this.nestable = equip;
     this.equip = equip;
     this.renderUtils = renderUtils;
   });
@@ -209,14 +209,14 @@ describe('EquippableMock MR behavior', async () => {
     this.renderUtils = renderUtils;
   });
 
-  async function mintToNesting(token: Contract, to: string): Promise<number> {
+  async function mintToNestable(token: Contract, to: string): Promise<number> {
     const tokenId = nextTokenId;
     nextTokenId++;
     await equip['mint(address,uint256)'](to, tokenId);
     return tokenId;
   }
 
-  shouldBehaveLikeMultiAsset(mintToNesting, addAssetEntryEquippablesFromMock, addAssetToToken);
+  shouldBehaveLikeMultiAsset(mintToNestable, addAssetEntryEquippablesFromMock, addAssetToToken);
 });
 
 // --------------- MULTI ASSET BEHAVIOR END ------------------------

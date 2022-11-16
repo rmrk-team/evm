@@ -23,7 +23,7 @@ async function shouldBehaveLikeEquippableAssets(
     const [signersOwner, ...signersAddr] = await ethers.getSigners();
     owner = signersOwner;
     addrs = signersAddr;
-    chunky = this.nesting;
+    chunky = this.nestable;
     chunkyEquip = this.equip;
     renderUtils = this.renderUtils;
   });

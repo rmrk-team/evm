@@ -9,7 +9,7 @@ import {
   IRMRKEquippable,
   IRMRKMultiAsset,
   IRMRKExternalEquip,
-  IRMRKNesting,
+  IRMRKNestable,
   IRMRKTypedMultiAsset,
   IOtherInterface,
 } from '../interfaces';
@@ -24,12 +24,12 @@ async function typeMultiAssetFixture() {
   return { typedMultiAsset };
 }
 
-async function nestingTypedMultiAssetFixture() {
-  const factory = await ethers.getContractFactory('RMRKNestingTypedMultiAssetMock');
-  const typedNestingMultiAsset = await factory.deploy('Chunky', 'CHNK');
-  await typedNestingMultiAsset.deployed();
+async function nestableTypedMultiAssetFixture() {
+  const factory = await ethers.getContractFactory('RMRKNestableTypedMultiAssetMock');
+  const typedNestableMultiAsset = await factory.deploy('Chunky', 'CHNK');
+  await typedNestableMultiAsset.deployed();
 
-  return { typedNestingMultiAsset };
+  return { typedNestableMultiAsset };
 }
 
 async function typedEquippableFixture() {
@@ -41,17 +41,17 @@ async function typedEquippableFixture() {
 }
 
 async function typedExternalEquippableFixture() {
-  const nestingFactory = await ethers.getContractFactory('RMRKNestingExternalEquipMock');
-  const nesting = await nestingFactory.deploy('Chunky', 'CHNK');
-  await nesting.deployed();
+  const nestableFactory = await ethers.getContractFactory('RMRKNestableExternalEquipMock');
+  const nestable = await nestableFactory.deploy('Chunky', 'CHNK');
+  await nestable.deployed();
 
   const equipFactory = await ethers.getContractFactory('RMRKTypedExternalEquippableMock');
-  const typedExternalEquippable = await equipFactory.deploy(nesting.address);
+  const typedExternalEquippable = await equipFactory.deploy(nestable.address);
   await typedExternalEquippable.deployed();
 
-  await nesting.setEquippableAddress(typedExternalEquippable.address);
+  await nestable.setEquippableAddress(typedExternalEquippable.address);
 
-  return { nesting, typedExternalEquippable };
+  return { nestable, typedExternalEquippable };
 }
 
 describe('RMRKTypedMultiAssetMock', async function () {
@@ -112,17 +112,17 @@ describe('RMRKTypedMultiAssetMock', async function () {
   });
 });
 
-describe('RMRKNestingTypedMultiAssetMock', async function () {
-  let typedNestingMultiAsset: Contract;
+describe('RMRKNestableTypedMultiAssetMock', async function () {
+  let typedNestableMultiAsset: Contract;
 
   beforeEach(async function () {
-    ({ typedNestingMultiAsset } = await loadFixture(nestingTypedMultiAssetFixture));
+    ({ typedNestableMultiAsset } = await loadFixture(nestableTypedMultiAssetFixture));
 
-    this.assets = typedNestingMultiAsset;
+    this.assets = typedNestableMultiAsset;
   });
 
-  it('can support INesting', async function () {
-    expect(await this.assets.supportsInterface(IRMRKNesting)).to.equal(true);
+  it('can support INestable', async function () {
+    expect(await this.assets.supportsInterface(IRMRKNestable)).to.equal(true);
   });
 
   shouldBehaveLikeTypedMultiAssetInterface();
@@ -136,7 +136,7 @@ describe('RMRKTypedEquippableMock', async function () {
     ({ typedEquippable } = await loadFixture(typedEquippableFixture));
 
     this.assets = typedEquippable;
-    this.nesting = typedEquippable;
+    this.nestable = typedEquippable;
   });
 
   it('can support IEquippable', async function () {
@@ -149,13 +149,13 @@ describe('RMRKTypedEquippableMock', async function () {
 
 describe('RMRKTypedExternalEquippableMock', async function () {
   let typedExternalEquippable: Contract;
-  let nesting: Contract;
+  let nestable: Contract;
 
   beforeEach(async function () {
-    ({ nesting, typedExternalEquippable } = await loadFixture(typedExternalEquippableFixture));
+    ({ nestable, typedExternalEquippable } = await loadFixture(typedExternalEquippableFixture));
 
     this.assets = typedExternalEquippable;
-    this.nesting = nesting;
+    this.nestable = nestable;
   });
 
   it('can support IEquippable', async function () {
@@ -226,7 +226,7 @@ async function shouldBehaveLikeTypedEquippable(
     const signers = await ethers.getSigners();
     owner = signers[0];
 
-    tokenId = await mint(this.nesting, owner.address);
+    tokenId = await mint(this.nestable, owner.address);
   });
 
   it('can add typed assets', async function () {

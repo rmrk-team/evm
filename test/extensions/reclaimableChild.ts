@@ -3,12 +3,12 @@ import { expect } from 'chai';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { ADDRESS_ZERO, bn, mintFromMock, nestMintFromMock } from '../utils';
-import { IERC165, IOtherInterface, IRMRKNesting, IRMRKReclaimableChild } from '../interfaces';
+import { IERC165, IOtherInterface, IRMRKNestable, IRMRKReclaimableChild } from '../interfaces';
 
 // --------------- FIXTURES -----------------------
 
-async function reclaimableChildNestingFixture() {
-  const factory = await ethers.getContractFactory('RMRKNestingClaimableChildMock');
+async function reclaimableChildNestableFixture() {
+  const factory = await ethers.getContractFactory('RMRKNestableClaimableChildMock');
   const child = await factory.deploy('Chunky', 'CHNK');
   const parent = await factory.deploy('Chunky', 'CHNK');
   await parent.deployed();
@@ -17,9 +17,9 @@ async function reclaimableChildNestingFixture() {
   return { parent, child };
 }
 
-describe('RMRKNestingClaimableChildMock', async function () {
+describe('RMRKNestableClaimableChildMock', async function () {
   beforeEach(async function () {
-    const { parent, child } = await loadFixture(reclaimableChildNestingFixture);
+    const { parent, child } = await loadFixture(reclaimableChildNestableFixture);
     this.parent = parent;
     this.child = child;
   });
@@ -49,8 +49,8 @@ async function shouldBehaveLikeReclaimableChild() {
     expect(await this.parent.supportsInterface(IRMRKReclaimableChild)).to.equal(true);
   });
 
-  it('can support IRMRKNesting', async function () {
-    expect(await this.parent.supportsInterface(IRMRKNesting)).to.equal(true);
+  it('can support IRMRKNestable', async function () {
+    expect(await this.parent.supportsInterface(IRMRKNestable)).to.equal(true);
   });
 
   it('does not support other interfaces', async function () {

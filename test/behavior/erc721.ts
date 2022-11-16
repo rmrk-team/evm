@@ -20,9 +20,7 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
   const secondTokenId = bn(79217);
   const nonExistentTokenId = bn(13);
   const fourthTokenId = bn(4);
-  const baseURI = 'https://api.example.com/v1/';
   const RECEIVER_MAGIC_VALUE = '0x150b7a02';
-  const RECEIVER_MAGIC_VALUE_RMRK_NESTING = '0xb0d59c67';
 
   enum Error {
     None,
@@ -233,7 +231,7 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
 
         context('when the sender is not authorized for the token id', function () {
           it('reverts', async function () {
-            // Standard ERC721 will use the latter. Every Nesting would have it defined and use it instead
+            // Standard ERC721 will use the latter. Every Nestable would have it defined and use it instead
             const error = this.token.interface.errors['RMRKNotApprovedOrDirectOwner()']
               ? 'RMRKNotApprovedOrDirectOwner'
               : 'ERC721NotApprovedOrOwner';
