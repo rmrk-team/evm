@@ -21,7 +21,7 @@ async function multiResourceFixture(): Promise<Contract> {
     'MR',
     'ipfs://collection-meta',
     'ipfs://tokenURI',
-    [erc20.address, 10000, 0, ADDRESS_ZERO, ONE_ETH],
+    [erc20.address, ADDRESS_ZERO, 0, 10000, ONE_ETH],
   ]);
 }
 
@@ -35,7 +35,7 @@ async function nestingFixture(): Promise<Contract> {
     'MR',
     'ipfs://collection-meta',
     'ipfs://tokenURI',
-    [erc20.address, 10000, 0, ADDRESS_ZERO, ONE_ETH],
+    [erc20.address, ADDRESS_ZERO, 0, 10000, ONE_ETH],
   ]);
 }
 
@@ -49,7 +49,7 @@ async function nestingMultiResourceFixture(): Promise<Contract> {
     'MR',
     'ipfs://collection-meta',
     'ipfs://tokenURI',
-    [erc20.address, 10000, 0, ADDRESS_ZERO, ONE_ETH],
+    [erc20.address, ADDRESS_ZERO, 0, 10000, ONE_ETH],
   ]);
 }
 
@@ -63,7 +63,7 @@ async function equippableFixture(): Promise<Contract> {
     'MR',
     'ipfs://collection-meta',
     'ipfs://tokenURI',
-    [erc20.address, 10000, 0, ADDRESS_ZERO, ONE_ETH],
+    [erc20.address, ADDRESS_ZERO, 0, 10000, ONE_ETH],
   ]);
 }
 
