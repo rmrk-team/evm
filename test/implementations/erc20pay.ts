@@ -11,13 +11,13 @@ import {
 import { Contract } from 'ethers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 
-async function multiResourceFixture(): Promise<Contract> {
+async function multiAssetFixture(): Promise<Contract> {
   const erc20Factory = await ethers.getContractFactory('ERC20Mock');
   const erc20 = await erc20Factory.deploy();
   await erc20.deployed();
 
-  return await singleFixtureWithArgs('RMRKMultiResourceImplErc20Pay', [
-    'MultiResource',
+  return await singleFixtureWithArgs('RMRKMultiAssetImplErc20Pay', [
+    'MultiAsset',
     'MR',
     'ipfs://collection-meta',
     'ipfs://tokenURI',
@@ -31,7 +31,7 @@ async function nestingFixture(): Promise<Contract> {
   await erc20.deployed();
 
   return await singleFixtureWithArgs('RMRKNestingImplErc20Pay', [
-    'MultiResource',
+    'MultiAsset',
     'MR',
     'ipfs://collection-meta',
     'ipfs://tokenURI',
@@ -39,13 +39,13 @@ async function nestingFixture(): Promise<Contract> {
   ]);
 }
 
-async function nestingMultiResourceFixture(): Promise<Contract> {
+async function nestingMultiAssetFixture(): Promise<Contract> {
   const erc20Factory = await ethers.getContractFactory('ERC20Mock');
   const erc20 = await erc20Factory.deploy();
   await erc20.deployed();
 
-  return await singleFixtureWithArgs('RMRKNestingMultiResourceImplErc20Pay', [
-    'MultiResource',
+  return await singleFixtureWithArgs('RMRKNestingMultiAssetImplErc20Pay', [
+    'MultiAsset',
     'MR',
     'ipfs://collection-meta',
     'ipfs://tokenURI',
@@ -59,7 +59,7 @@ async function equippableFixture(): Promise<Contract> {
   await erc20.deployed();
 
   return await singleFixtureWithArgs('RMRKEquippableImplErc20Pay', [
-    'MultiResource',
+    'MultiAsset',
     'MR',
     'ipfs://collection-meta',
     'ipfs://tokenURI',
@@ -67,9 +67,9 @@ async function equippableFixture(): Promise<Contract> {
   ]);
 }
 
-describe('MultiResourceImplErc20Pay Minting', async () => {
+describe('MultiAssetImplErc20Pay Minting', async () => {
   beforeEach(async function () {
-    this.token = await loadFixture(multiResourceFixture);
+    this.token = await loadFixture(multiAssetFixture);
   });
 
   shouldControlValidMintingErc20Pay();
@@ -83,9 +83,9 @@ describe('NestingImplErc20Pay Minting', async () => {
   shouldControlValidMintingErc20Pay();
 });
 
-describe('NestingMultiResourceImplErc20Pay Minting', async () => {
+describe('NestingMultiAssetImplErc20Pay Minting', async () => {
   beforeEach(async function () {
-    this.token = await loadFixture(nestingMultiResourceFixture);
+    this.token = await loadFixture(nestingMultiAssetFixture);
   });
 
   shouldControlValidMintingErc20Pay();

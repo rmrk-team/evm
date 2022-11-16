@@ -7,9 +7,9 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 
 // --------------- FIXTURES -----------------------
 
-async function resourcesFixture() {
+async function assetsFixture() {
   const equipFactory = await ethers.getContractFactory('RMRKEquippableMock');
-  const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiResourceRenderUtils');
+  const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiAssetRenderUtils');
   const renderUtilsEquipFactory = await ethers.getContractFactory('RMRKEquipRenderUtils');
 
   const equip = await equipFactory.deploy('Chunky', 'CHNK');
@@ -38,65 +38,65 @@ describe('Render Utils', async function () {
   const resId4 = bn(4);
 
   before(async function () {
-    ({ equip, renderUtils, renderUtilsEquip } = await loadFixture(resourcesFixture));
+    ({ equip, renderUtils, renderUtilsEquip } = await loadFixture(assetsFixture));
 
     const signers = await ethers.getSigners();
     owner = signers[0];
     someBase = signers[1];
 
     tokenId = await mintFromMock(equip, owner.address);
-    await equip.addResourceEntry(resId, 0, ADDRESS_ZERO, 'ipfs://res1.jpg', [], []);
-    await equip.addResourceEntry(resId2, 1, someBase.address, 'ipfs://res2.jpg', [1], [3, 4]);
-    await equip.addResourceEntry(resId3, 0, ADDRESS_ZERO, 'ipfs://res3.jpg', [], []);
-    await equip.addResourceEntry(resId4, 2, someBase.address, 'ipfs://res4.jpg', [], [4]);
-    await equip.addResourceToToken(tokenId, resId, 0);
-    await equip.addResourceToToken(tokenId, resId2, 0);
-    await equip.addResourceToToken(tokenId, resId3, resId);
-    await equip.addResourceToToken(tokenId, resId4, 0);
+    await equip.addAssetEntry(resId, 0, ADDRESS_ZERO, 'ipfs://res1.jpg', [], []);
+    await equip.addAssetEntry(resId2, 1, someBase.address, 'ipfs://res2.jpg', [1], [3, 4]);
+    await equip.addAssetEntry(resId3, 0, ADDRESS_ZERO, 'ipfs://res3.jpg', [], []);
+    await equip.addAssetEntry(resId4, 2, someBase.address, 'ipfs://res4.jpg', [], [4]);
+    await equip.addAssetToToken(tokenId, resId, 0);
+    await equip.addAssetToToken(tokenId, resId2, 0);
+    await equip.addAssetToToken(tokenId, resId3, resId);
+    await equip.addAssetToToken(tokenId, resId4, 0);
 
-    await equip.acceptResource(tokenId, 0, resId);
-    await equip.acceptResource(tokenId, 1, resId2);
+    await equip.acceptAsset(tokenId, 0, resId);
+    await equip.acceptAsset(tokenId, 1, resId2);
     await equip.setPriority(tokenId, [10, 5]);
   });
 
-  describe('Render Utils MultiResource', async function () {
-    it('can get active resources', async function () {
-      expect(await renderUtils.getActiveResources(equip.address, tokenId)).to.eql([
+  describe('Render Utils MultiAsset', async function () {
+    it('can get active assets', async function () {
+      expect(await renderUtils.getActiveAssets(equip.address, tokenId)).to.eql([
         [resId, 10, 'ipfs://res1.jpg'],
         [resId2, 5, 'ipfs://res2.jpg'],
       ]);
     });
-    it('can get pending resources', async function () {
-      expect(await renderUtils.getPendingResources(equip.address, tokenId)).to.eql([
+    it('can get pending assets', async function () {
+      expect(await renderUtils.getPendingAssets(equip.address, tokenId)).to.eql([
         [resId4, bn(0), bn(0), 'ipfs://res4.jpg'],
         [resId3, bn(1), resId, 'ipfs://res3.jpg'],
       ]);
     });
 
-    it('can get top resource by priority', async function () {
-      expect(await renderUtils.getTopResourceMetaForToken(equip.address, tokenId)).to.eql(
+    it('can get top asset by priority', async function () {
+      expect(await renderUtils.getTopAssetMetaForToken(equip.address, tokenId)).to.eql(
         'ipfs://res2.jpg',
       );
     });
 
-    it('cannot get top resource if token has no resources', async function () {
+    it('cannot get top asset if token has no assets', async function () {
       const otherTokenId = await mintFromMock(equip, owner.address);
       await expect(
-        renderUtils.getTopResourceMetaForToken(equip.address, otherTokenId),
-      ).to.be.revertedWithCustomError(renderUtils, 'RMRKTokenHasNoResources');
+        renderUtils.getTopAssetMetaForToken(equip.address, otherTokenId),
+      ).to.be.revertedWithCustomError(renderUtils, 'RMRKTokenHasNoAssets');
     });
   });
 
   describe('Render Utils Equip', async function () {
-    it('can get active resources', async function () {
-      expect(await renderUtilsEquip.getExtendedActiveResources(equip.address, tokenId)).to.eql([
+    it('can get active assets', async function () {
+      expect(await renderUtilsEquip.getExtendedActiveAssets(equip.address, tokenId)).to.eql([
         [resId, bn(0), 10, ADDRESS_ZERO, 'ipfs://res1.jpg', [], []],
         [resId2, bn(1), 5, someBase.address, 'ipfs://res2.jpg', [bn(1)], [bn(3), bn(4)]],
       ]);
     });
 
-    it('can get pending resources', async function () {
-      expect(await renderUtilsEquip.getExtendedPendingResources(equip.address, tokenId)).to.eql([
+    it('can get pending assets', async function () {
+      expect(await renderUtilsEquip.getExtendedPendingAssets(equip.address, tokenId)).to.eql([
         [resId4, bn(2), bn(0), bn(0), someBase.address, 'ipfs://res4.jpg', [], [bn(4)]],
         [resId3, bn(0), bn(1), resId, ADDRESS_ZERO, 'ipfs://res3.jpg', [], []],
       ]);

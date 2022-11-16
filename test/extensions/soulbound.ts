@@ -4,12 +4,12 @@ import { expect } from 'chai';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { bn, mintFromMock, nestMintFromMock } from '../utils';
-import { IERC165, IRMRKSoulboundMultiResource, IOtherInterface } from '../interfaces';
+import { IERC165, IRMRKSoulboundMultiAsset, IOtherInterface } from '../interfaces';
 
 // --------------- FIXTURES -----------------------
 
-async function soulboundMultiResourceFixture() {
-  const factory = await ethers.getContractFactory('RMRKSoulboundMultiResourceMock');
+async function soulboundMultiAssetFixture() {
+  const factory = await ethers.getContractFactory('RMRKSoulboundMultiAssetMock');
   const token = await factory.deploy('Chunky', 'CHNK');
   await token.deployed();
 
@@ -24,8 +24,8 @@ async function soulboundNestingFixture() {
   return { token };
 }
 
-async function soulboundNestingMultiResourceFixture() {
-  const factory = await ethers.getContractFactory('RMRKSoulboundNestingMultiResourceMock');
+async function soulboundNestingMultiAssetFixture() {
+  const factory = await ethers.getContractFactory('RMRKSoulboundNestingMultiAssetMock');
   const token = await factory.deploy('Chunky', 'CHNK');
   await token.deployed();
 
@@ -56,9 +56,9 @@ async function soulboundNestingExternalEquippableFixture() {
   return { nesting, equip };
 }
 
-describe('RMRKSoulboundMultiResourceMock', async function () {
+describe('RMRKSoulboundMultiAssetMock', async function () {
   beforeEach(async function () {
-    const { token } = await loadFixture(soulboundMultiResourceFixture);
+    const { token } = await loadFixture(soulboundMultiAssetFixture);
     this.token = token;
   });
 
@@ -75,9 +75,9 @@ describe('RMRKSoulboundNestingMock', async function () {
   shouldBehaveLikeSoulboundNesting();
 });
 
-describe('RMRKSoulboundNestingMultiResourceMock', async function () {
+describe('RMRKSoulboundNestingMultiAssetMock', async function () {
   beforeEach(async function () {
-    const { token } = await loadFixture(soulboundNestingMultiResourceFixture);
+    const { token } = await loadFixture(soulboundNestingMultiAssetFixture);
     this.token = token;
   });
 
@@ -168,8 +168,8 @@ async function shouldBehaveLikeSoulboundBasic() {
     expect(await soulbound.supportsInterface(IERC165)).to.equal(true);
   });
 
-  it('can support IRMRKSoulboundMultiResource', async function () {
-    expect(await soulbound.supportsInterface(IRMRKSoulboundMultiResource)).to.equal(true);
+  it('can support IRMRKSoulboundMultiAsset', async function () {
+    expect(await soulbound.supportsInterface(IRMRKSoulboundMultiAsset)).to.equal(true);
   });
 
   it('does not support other interfaces', async function () {

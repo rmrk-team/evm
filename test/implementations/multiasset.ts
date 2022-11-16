@@ -3,14 +3,14 @@ import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import shouldBehaveLikeMultiResource from '../behavior/multiresource';
+import shouldBehaveLikeMultiAsset from '../behavior/multiasset';
 import shouldBehaveLikeOwnableLock from '../behavior/ownableLock';
 import shouldControlValidMinting from '../behavior/mintingImpl';
 import shouldHaveMetadata from '../behavior/metadata';
 import shouldHaveRoyalties from '../behavior/royalties';
 import {
-  addResourceEntryFromImpl,
-  addResourceToToken,
+  addAssetEntryFromImpl,
+  addAssetToToken,
   ADDRESS_ZERO,
   mintFromImpl,
   ONE_ETH,
@@ -19,12 +19,12 @@ import {
 import { IERC721 } from '../interfaces';
 
 async function singleFixture(): Promise<{ token: Contract; renderUtils: Contract }> {
-  const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiResourceRenderUtils');
+  const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiAssetRenderUtils');
   const renderUtils = await renderUtilsFactory.deploy();
   await renderUtils.deployed();
 
-  const token = await singleFixtureWithArgs('RMRKMultiResourceImpl', [
-    'MultiResource',
+  const token = await singleFixtureWithArgs('RMRKMultiAssetImpl', [
+    'MultiAsset',
     'MR',
     10000,
     ONE_ETH,
@@ -36,13 +36,13 @@ async function singleFixture(): Promise<{ token: Contract; renderUtils: Contract
   return { token, renderUtils };
 }
 
-describe('MultiResourceImpl Other Behavior', async () => {
+describe('MultiAssetImpl Other Behavior', async () => {
   let token: Contract;
 
   let owner: SignerWithAddress;
 
-  const defaultResource1 = 'default1.ipfs';
-  const defaultResource2 = 'default2.ipfs';
+  const defaultAsset1 = 'default1.ipfs';
+  const defaultAsset2 = 'default2.ipfs';
 
   const isOwnableLockMock = false;
 
@@ -90,17 +90,17 @@ describe('MultiResourceImpl Other Behavior', async () => {
   });
 });
 
-describe('MultiResourceImpl MR behavior', async () => {
+describe('MultiAssetImpl MR behavior', async () => {
   beforeEach(async function () {
     const { token, renderUtils } = await loadFixture(singleFixture);
     this.token = token;
     this.renderUtils = renderUtils;
   });
 
-  shouldBehaveLikeMultiResource(mintFromImpl, addResourceEntryFromImpl, addResourceToToken);
+  shouldBehaveLikeMultiAsset(mintFromImpl, addAssetEntryFromImpl, addAssetToToken);
 });
 
-describe('MultiResourceImpl Other', async function () {
+describe('MultiAssetImpl Other', async function () {
   beforeEach(async function () {
     const { token } = await loadFixture(singleFixture);
     this.token = token;

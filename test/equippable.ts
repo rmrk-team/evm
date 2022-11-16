@@ -3,17 +3,17 @@ import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import {
-  addResourceToToken,
+  addAssetToToken,
   mintFromMock,
   nestMintFromMock,
-  addResourceEntryEquippablesFromMock,
+  addAssetEntryEquippablesFromMock,
 } from './utils';
 import { setupContextForParts } from './setup/equippableParts';
 import { setupContextForSlots } from './setup/equippableSlots';
-import shouldBehaveLikeEquippableResources from './behavior/equippableResources';
+import shouldBehaveLikeEquippableAssets from './behavior/equippableAssets';
 import shouldBehaveLikeEquippableWithParts from './behavior/equippableParts';
 import shouldBehaveLikeEquippableWithSlots from './behavior/equippableSlots';
-import shouldBehaveLikeMultiResource from './behavior/multiresource';
+import shouldBehaveLikeMultiAsset from './behavior/multiasset';
 
 // --------------- FIXTURES -----------------------
 
@@ -112,9 +112,9 @@ async function slotsFixture() {
   return { base, soldier, weapon, weaponGem, background, view };
 }
 
-async function resourcesFixture() {
+async function assetsFixture() {
   const equipFactory = await ethers.getContractFactory('RMRKEquippableMock');
-  const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiResourceRenderUtils');
+  const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiAssetRenderUtils');
 
   const equip = await equipFactory.deploy('Chunky', 'CHNK');
   await equip.deployed();
@@ -125,9 +125,9 @@ async function resourcesFixture() {
   return { equip, renderUtils };
 }
 
-async function multiResourceFixture() {
+async function multiAssetFixture() {
   const equipFactory = await ethers.getContractFactory('RMRKEquippableMock');
-  const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiResourceRenderUtils');
+  const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiAssetRenderUtils');
 
   const equip = await equipFactory.deploy('equipWithEquippable', 'NWE');
   await equip.deployed();
@@ -176,9 +176,9 @@ describe('EquippableMock with Slots', async () => {
   shouldBehaveLikeEquippableWithSlots(nestMintFromMock);
 });
 
-describe('EquippableMock Resources', async () => {
+describe('EquippableMock Assets', async () => {
   beforeEach(async function () {
-    const { equip, renderUtils } = await loadFixture(resourcesFixture);
+    const { equip, renderUtils } = await loadFixture(assetsFixture);
     this.nesting = equip;
     this.equip = equip;
     this.renderUtils = renderUtils;
@@ -191,12 +191,12 @@ describe('EquippableMock Resources', async () => {
     });
   });
 
-  shouldBehaveLikeEquippableResources(mintFromMock);
+  shouldBehaveLikeEquippableAssets(mintFromMock);
 });
 
 // --------------- END EQUIPPABLE BEHAVIOR -----------------------
 
-// --------------- MULTI RESOURCE BEHAVIOR -----------------------
+// --------------- MULTI ASSET BEHAVIOR -----------------------
 
 describe('EquippableMock MR behavior', async () => {
   let nextTokenId = 1;
@@ -204,7 +204,7 @@ describe('EquippableMock MR behavior', async () => {
   let renderUtils: Contract;
 
   beforeEach(async function () {
-    ({ equip, renderUtils } = await loadFixture(multiResourceFixture));
+    ({ equip, renderUtils } = await loadFixture(multiAssetFixture));
     this.token = equip;
     this.renderUtils = renderUtils;
   });
@@ -216,11 +216,7 @@ describe('EquippableMock MR behavior', async () => {
     return tokenId;
   }
 
-  shouldBehaveLikeMultiResource(
-    mintToNesting,
-    addResourceEntryEquippablesFromMock,
-    addResourceToToken,
-  );
+  shouldBehaveLikeMultiAsset(mintToNesting, addAssetEntryEquippablesFromMock, addAssetToToken);
 });
 
-// --------------- MULTI RESOURCE BEHAVIOR END ------------------------
+// --------------- MULTI ASSET BEHAVIOR END ------------------------

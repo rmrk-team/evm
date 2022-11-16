@@ -3,13 +3,13 @@ import { ethers } from 'hardhat';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { setupContextForParts } from '../setup/equippableParts';
 import { setupContextForSlots } from '../setup/equippableSlots';
-import shouldBehaveLikeMultiResource from '../behavior/multiresource';
+import shouldBehaveLikeMultiAsset from '../behavior/multiasset';
 import shouldControlValidMinting from '../behavior/mintingImpl';
 import shouldHaveMetadata from '../behavior/metadata';
 import shouldHaveRoyalties from '../behavior/royalties';
 import {
-  addResourceEntryEquippablesFromImpl,
-  addResourceToToken,
+  addAssetEntryEquippablesFromImpl,
+  addAssetToToken,
   ADDRESS_ZERO,
   mintFromImpl,
   nestMintFromImpl,
@@ -218,10 +218,10 @@ async function slotsFixture() {
   };
 }
 
-async function resourcesFixture() {
+async function assetsFixture() {
   const nestingFactory = await ethers.getContractFactory('RMRKNestingExternalEquipImpl');
   const equipFactory = await ethers.getContractFactory('RMRKExternalEquipImpl');
-  const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiResourceRenderUtils');
+  const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiAssetRenderUtils');
 
   const nesting = await nestingFactory.deploy(
     'Chunky',
@@ -250,7 +250,7 @@ async function resourcesFixture() {
 async function equipFixture() {
   const nestingFactory = await ethers.getContractFactory('RMRKNestingExternalEquipImpl');
   const equipFactory = await ethers.getContractFactory('RMRKExternalEquipImpl');
-  const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiResourceRenderUtils');
+  const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiAssetRenderUtils');
 
   const nesting = await nestingFactory.deploy(
     'NestingWithEquippable',
@@ -278,7 +278,7 @@ async function equipFixture() {
 
 // --------------- END FIXTURES -----------------------
 
-// --------------- MULTI RESOURCE BEHAVIOR -----------------------
+// --------------- MULTI ASSET BEHAVIOR -----------------------
 
 describe('ExternalEquippableImpl MR behavior', async () => {
   let nesting: Contract;
@@ -297,14 +297,10 @@ describe('ExternalEquippableImpl MR behavior', async () => {
     return await nesting.totalSupply();
   }
 
-  shouldBehaveLikeMultiResource(
-    mintToNesting,
-    addResourceEntryEquippablesFromImpl,
-    addResourceToToken,
-  );
+  shouldBehaveLikeMultiAsset(mintToNesting, addAssetEntryEquippablesFromImpl, addAssetToToken);
 });
 
-// --------------- MULTI RESOURCE BEHAVIOR END ------------------------
+// --------------- MULTI ASSET BEHAVIOR END ------------------------
 
 describe('ExternalEquippableImpl Other', async function () {
   beforeEach(async function () {
