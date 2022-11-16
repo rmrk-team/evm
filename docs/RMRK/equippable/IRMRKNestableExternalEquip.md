@@ -1,10 +1,10 @@
-# IRMRKNestingExternalEquip
+# IRMRKNestableExternalEquip
 
 *RMRK team*
 
-> IRMRKNestingExternalEquip
+> IRMRKNestableExternalEquip
 
-Interface smart contract of the RMRK nesting external equippable module.
+Interface smart contract of the RMRK nestable with external equippable module.
 
 
 

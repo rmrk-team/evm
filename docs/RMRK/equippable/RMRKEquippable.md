@@ -227,7 +227,7 @@ Used to verify that the given child tokwn is included in an active array of a to
 ### childOf
 
 ```solidity
-function childOf(uint256 parentId, uint256 index) external view returns (struct IRMRKNesting.Child)
+function childOf(uint256 parentId, uint256 index) external view returns (struct IRMRKNestable.Child)
 ```
 
 Used to retrieve a specific active child token for a given parent token.
@@ -245,12 +245,12 @@ Used to retrieve a specific active child token for a given parent token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IRMRKNesting.Child | struct A Child struct containing data about the specified child |
+| _0 | IRMRKNestable.Child | struct A Child struct containing data about the specified child |
 
 ### childrenOf
 
 ```solidity
-function childrenOf(uint256 parentId) external view returns (struct IRMRKNesting.Child[])
+function childrenOf(uint256 parentId) external view returns (struct IRMRKNestable.Child[])
 ```
 
 Used to retrieve the active child tokens of a given parent token.
@@ -267,7 +267,7 @@ Used to retrieve the active child tokens of a given parent token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IRMRKNesting.Child[] | struct[] An array of Child structs containing the parent token&#39;s active child tokens |
+| _0 | IRMRKNestable.Child[] | struct[] An array of Child structs containing the parent token&#39;s active child tokens |
 
 ### directOwnerOf
 
@@ -647,7 +647,7 @@ Used to retrieve the root owner of the given token.
 ### pendingChildOf
 
 ```solidity
-function pendingChildOf(uint256 parentId, uint256 index) external view returns (struct IRMRKNesting.Child)
+function pendingChildOf(uint256 parentId, uint256 index) external view returns (struct IRMRKNestable.Child)
 ```
 
 Used to retrieve a specific pending child token from a given parent token.
@@ -665,12 +665,12 @@ Used to retrieve a specific pending child token from a given parent token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IRMRKNesting.Child | struct A Child struct containting data about the specified child |
+| _0 | IRMRKNestable.Child | struct A Child struct containting data about the specified child |
 
 ### pendingChildrenOf
 
 ```solidity
-function pendingChildrenOf(uint256 parentId) external view returns (struct IRMRKNesting.Child[])
+function pendingChildrenOf(uint256 parentId) external view returns (struct IRMRKNestable.Child[])
 ```
 
 Used to retrieve the pending child tokens of a given parent token.
@@ -687,7 +687,7 @@ Used to retrieve the pending child tokens of a given parent token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IRMRKNesting.Child[] | struct[] An array of Child structs containing the parent token&#39;s pending child tokens |
+| _0 | IRMRKNestable.Child[] | struct[] An array of Child structs containing the parent token&#39;s pending child tokens |
 
 ### rejectAllAssets
 
@@ -1525,21 +1525,21 @@ Attempting to unnest a child before it is unequipped
 
 
 
-### RMRKNestingTooDeep
+### RMRKNestableTooDeep
 
 ```solidity
-error RMRKNestingTooDeep()
+error RMRKNestableTooDeep()
 ```
 
-Attempting to nest a child over the nesting limit (current limit is 100 levels of nesting)
+Attempting to nest a child over the nestable limit (current limit is 100 levels of nesting)
 
 
 
 
-### RMRKNestingTransferToDescendant
+### RMRKNestableTransferToDescendant
 
 ```solidity
-error RMRKNestingTransferToDescendant()
+error RMRKNestableTransferToDescendant()
 ```
 
 Attempting to nest the token to own descendant, which would create a loop and leave the looped tokens in limbo
@@ -1547,10 +1547,10 @@ Attempting to nest the token to own descendant, which would create a loop and le
 
 
 
-### RMRKNestingTransferToNonRMRKNestingImplementer
+### RMRKNestableTransferToNonRMRKNestableImplementer
 
 ```solidity
-error RMRKNestingTransferToNonRMRKNestingImplementer()
+error RMRKNestableTransferToNonRMRKNestableImplementer()
 ```
 
 Attempting to nest the token to a smart contract that doesn&#39;t support nesting
@@ -1558,10 +1558,10 @@ Attempting to nest the token to a smart contract that doesn&#39;t support nestin
 
 
 
-### RMRKNestingTransferToSelf
+### RMRKNestableTransferToSelf
 
 ```solidity
-error RMRKNestingTransferToSelf()
+error RMRKNestableTransferToSelf()
 ```
 
 Attempting to nest the token into itself

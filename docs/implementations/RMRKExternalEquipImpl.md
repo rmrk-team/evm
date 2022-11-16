@@ -326,13 +326,13 @@ Used to retrieve the status of a lockable smart contract.
 |---|---|---|
 | _0 | bool | bool A boolean value signifying whether the smart contract has been locked |
 
-### getNestingAddress
+### getNestableAddress
 
 ```solidity
-function getNestingAddress() external view returns (address)
+function getNestableAddress() external view returns (address)
 ```
 
-Used to retrieve the address of the `Nesting` smart contract
+Used to retrieve the address of the `Nestable` smart contract
 
 
 
@@ -341,7 +341,7 @@ Used to retrieve the address of the `Nesting` smart contract
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | address | address Address of the `Nesting` smart contract |
+| _0 | address | address Address of the `Nestable` smart contract |
 
 ### getPendingAssets
 
@@ -832,13 +832,13 @@ Used to notify listeners that a child&#39;s asset has been unequipped from one o
 | childAddress  | address | undefined |
 | childAssetId  | uint64 | undefined |
 
-### NestingAddressSet
+### NestableAddressSet
 
 ```solidity
-event NestingAddressSet(address old, address new_)
+event NestableAddressSet(address old, address new_)
 ```
 
-Used to notify listeners of a new `Nesting` associated  smart contract address being set.
+Used to notify listeners of a new `Nestable` associated  smart contract address being set.
 
 
 

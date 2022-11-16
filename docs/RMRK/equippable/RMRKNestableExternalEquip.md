@@ -1,12 +1,12 @@
-# RMRKNestingMock
+# RMRKNestableExternalEquip
 
+*RMRK team*
 
+> RMRKNestableExternalEquip
 
+Smart contract of the RMRK Nestable External Equippable module.
 
-
-
-
-
+*This is a RMRKNestable smart contract with external `Equippable` smart contract for space saving purposes. It is  expected to be deployed along an instance of `RMRKExternalEquip`. To make use of the equippable module with this  contract, the `_setEquippableAddress` function has to be exposed and used to set the corresponding equipment  contract after deployment. Consider using `RMRKOwnableLock` to lock the equippable address after deployment.*
 
 ## Methods
 
@@ -102,29 +102,6 @@ function balanceOf(address owner) external view returns (uint256)
 |---|---|---|
 | _0 | uint256 | undefined |
 
-### balancePerNftOf
-
-```solidity
-function balancePerNftOf(address owner, uint256 parentId) external view returns (uint256)
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| owner | address | undefined |
-| parentId | uint256 | undefined |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | uint256 | undefined |
-
 ### burn
 
 ```solidity
@@ -190,7 +167,7 @@ Used to verify that the given child tokwn is included in an active array of a to
 ### childOf
 
 ```solidity
-function childOf(uint256 parentId, uint256 index) external view returns (struct IRMRKNesting.Child)
+function childOf(uint256 parentId, uint256 index) external view returns (struct IRMRKNestable.Child)
 ```
 
 Used to retrieve a specific active child token for a given parent token.
@@ -208,12 +185,12 @@ Used to retrieve a specific active child token for a given parent token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IRMRKNesting.Child | struct A Child struct containing data about the specified child |
+| _0 | IRMRKNestable.Child | struct A Child struct containing data about the specified child |
 
 ### childrenOf
 
 ```solidity
-function childrenOf(uint256 parentId) external view returns (struct IRMRKNesting.Child[])
+function childrenOf(uint256 parentId) external view returns (struct IRMRKNestable.Child[])
 ```
 
 Used to retrieve the active child tokens of a given parent token.
@@ -230,7 +207,7 @@ Used to retrieve the active child tokens of a given parent token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IRMRKNesting.Child[] | struct[] An array of Child structs containing the parent token&#39;s active child tokens |
+| _0 | IRMRKNestable.Child[] | struct[] An array of Child structs containing the parent token&#39;s active child tokens |
 
 ### directOwnerOf
 
@@ -278,6 +255,23 @@ function getApproved(uint256 tokenId) external view returns (address)
 |---|---|---|
 | _0 | address | undefined |
 
+### getEquippableAddress
+
+```solidity
+function getEquippableAddress() external view returns (address)
+```
+
+Used to retrieve the address of the `Equippable` smart contract.
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | address | address Address of the `Equippable` smart contract |
+
 ### isApprovedForAll
 
 ```solidity
@@ -301,13 +295,13 @@ function isApprovedForAll(address owner, address operator) external view returns
 |---|---|---|
 | _0 | bool | undefined |
 
-### mint
+### isApprovedOrOwner
 
 ```solidity
-function mint(address to, uint256 tokenId) external nonpayable
+function isApprovedOrOwner(address spender, uint256 tokenId) external view returns (bool)
 ```
 
-
+Used to verify that the specified address is either the owner of the given token or approved by the owner  to manage it.
 
 
 
@@ -315,8 +309,14 @@ function mint(address to, uint256 tokenId) external nonpayable
 
 | Name | Type | Description |
 |---|---|---|
-| to | address | undefined |
-| tokenId | uint256 | undefined |
+| spender | address | Address that we are verifying |
+| tokenId | uint256 | ID of the token we are checking |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | bool | bool A boolean value indicating whether the specified address is the owner of the given token or approved  to manage it |
 
 ### name
 
@@ -334,42 +334,6 @@ Used to retrieve the collection name.
 | Name | Type | Description |
 |---|---|---|
 | _0 | string | string Name of the collection |
-
-### nestMint
-
-```solidity
-function nestMint(address to, uint256 tokenId, uint256 destinationId) external nonpayable
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| to | address | undefined |
-| tokenId | uint256 | undefined |
-| destinationId | uint256 | undefined |
-
-### nestTransfer
-
-```solidity
-function nestTransfer(address to, uint256 tokenId, uint256 destinationId) external nonpayable
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| to | address | undefined |
-| tokenId | uint256 | undefined |
-| destinationId | uint256 | undefined |
 
 ### nestTransferFrom
 
@@ -415,7 +379,7 @@ Used to retrieve the root owner of the given token.
 ### pendingChildOf
 
 ```solidity
-function pendingChildOf(uint256 parentId, uint256 index) external view returns (struct IRMRKNesting.Child)
+function pendingChildOf(uint256 parentId, uint256 index) external view returns (struct IRMRKNestable.Child)
 ```
 
 Used to retrieve a specific pending child token from a given parent token.
@@ -433,12 +397,12 @@ Used to retrieve a specific pending child token from a given parent token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IRMRKNesting.Child | struct A Child struct containting data about the specified child |
+| _0 | IRMRKNestable.Child | struct A Child struct containting data about the specified child |
 
 ### pendingChildrenOf
 
 ```solidity
-function pendingChildrenOf(uint256 parentId) external view returns (struct IRMRKNesting.Child[])
+function pendingChildrenOf(uint256 parentId) external view returns (struct IRMRKNestable.Child[])
 ```
 
 Used to retrieve the pending child tokens of a given parent token.
@@ -455,7 +419,7 @@ Used to retrieve the pending child tokens of a given parent token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IRMRKNesting.Child[] | struct[] An array of Child structs containing the parent token&#39;s pending child tokens |
+| _0 | IRMRKNestable.Child[] | struct[] An array of Child structs containing the parent token&#39;s pending child tokens |
 
 ### rejectAllChildren
 
@@ -472,41 +436,6 @@ Used to reject all pending children of a given parent token.
 | Name | Type | Description |
 |---|---|---|
 | tokenId | uint256 | ID of the parent token for which to reject all of the pending tokens |
-
-### safeMint
-
-```solidity
-function safeMint(address to, uint256 tokenId, bytes _data) external nonpayable
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| to | address | undefined |
-| tokenId | uint256 | undefined |
-| _data | bytes | undefined |
-
-### safeMint
-
-```solidity
-function safeMint(address to, uint256 tokenId) external nonpayable
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| to | address | undefined |
-| tokenId | uint256 | undefined |
 
 ### safeTransferFrom
 
@@ -622,23 +551,6 @@ Used to retrieve the metadata URI of a token.
 | Name | Type | Description |
 |---|---|---|
 | _0 | string | string Metadata URI of the specified token |
-
-### transfer
-
-```solidity
-function transfer(address to, uint256 tokenId) external nonpayable
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| to | address | undefined |
-| tokenId | uint256 | undefined |
 
 ### transferFrom
 
@@ -793,6 +705,23 @@ Used to notify listeners a child token has been unnested from parent token.
 | childId `indexed` | uint256 | undefined |
 | fromPending  | bool | undefined |
 
+### EquippableAddressSet
+
+```solidity
+event EquippableAddressSet(address old, address new_)
+```
+
+sed to notify the listeners that the address of the `Equippable` associated smart contract has been set.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| old  | address | undefined |
+| new_  | address | undefined |
+
 ### NestTransfer
 
 ```solidity
@@ -890,17 +819,6 @@ Attempting to use an invalid token ID
 
 
 
-### ERC721MintToTheZeroAddress
-
-```solidity
-error ERC721MintToTheZeroAddress()
-```
-
-Attempting to mint to 0x0 address
-
-
-
-
 ### ERC721NotApprovedOrOwner
 
 ```solidity
@@ -908,17 +826,6 @@ error ERC721NotApprovedOrOwner()
 ```
 
 Attempting to manage a token without being its owner or approved by the owner
-
-
-
-
-### ERC721TokenAlreadyMinted
-
-```solidity
-error ERC721TokenAlreadyMinted()
-```
-
-Attempting to mint an already minted token
 
 
 
@@ -978,17 +885,6 @@ Attempting to interact with a child, using index that is higher than the number 
 
 
 
-### RMRKIdZeroForbidden
-
-```solidity
-error RMRKIdZeroForbidden()
-```
-
-Attempting to use ID 0, which is not supported
-
-*The ID 0 in RMRK suite is reserved for empty values. Guarding against its use ensures the expected operation*
-
-
 ### RMRKIsNotContract
 
 ```solidity
@@ -1028,32 +924,32 @@ Attempting to burn a total number of recursive children higher than maximum set
 | childContract | address | Address of the collection smart contract in which the maximum number of recursive burns was reached |
 | childId | uint256 | ID of the child token at which the maximum number of recursive burns was reached |
 
-### RMRKMintToNonRMRKImplementer
+### RMRKMustUnequipFirst
 
 ```solidity
-error RMRKMintToNonRMRKImplementer()
+error RMRKMustUnequipFirst()
 ```
 
-Attempting to mint a nested token to a smart contract that doesn&#39;t support nesting
+Attempting to unnest a child before it is unequipped
 
 
 
 
-### RMRKNestingTooDeep
+### RMRKNestableTooDeep
 
 ```solidity
-error RMRKNestingTooDeep()
+error RMRKNestableTooDeep()
 ```
 
-Attempting to nest a child over the nesting limit (current limit is 100 levels of nesting)
+Attempting to nest a child over the nestable limit (current limit is 100 levels of nesting)
 
 
 
 
-### RMRKNestingTransferToDescendant
+### RMRKNestableTransferToDescendant
 
 ```solidity
-error RMRKNestingTransferToDescendant()
+error RMRKNestableTransferToDescendant()
 ```
 
 Attempting to nest the token to own descendant, which would create a loop and leave the looped tokens in limbo
@@ -1061,10 +957,10 @@ Attempting to nest the token to own descendant, which would create a loop and le
 
 
 
-### RMRKNestingTransferToNonRMRKNestingImplementer
+### RMRKNestableTransferToNonRMRKNestableImplementer
 
 ```solidity
-error RMRKNestingTransferToNonRMRKNestingImplementer()
+error RMRKNestableTransferToNonRMRKNestableImplementer()
 ```
 
 Attempting to nest the token to a smart contract that doesn&#39;t support nesting
@@ -1072,10 +968,10 @@ Attempting to nest the token to a smart contract that doesn&#39;t support nestin
 
 
 
-### RMRKNestingTransferToSelf
+### RMRKNestableTransferToSelf
 
 ```solidity
-error RMRKNestingTransferToSelf()
+error RMRKNestableTransferToSelf()
 ```
 
 Attempting to nest the token into itself

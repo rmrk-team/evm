@@ -1,4 +1,4 @@
-# RMRKAbstractNestingMultiAssetImpl
+# RMRKNestableMultiAssetMock
 
 
 
@@ -67,7 +67,7 @@ function acceptChild(uint256 parentId, uint256 childIndex, address childAddress,
 ### addAssetEntry
 
 ```solidity
-function addAssetEntry(string metadataURI) external nonpayable returns (uint256)
+function addAssetEntry(uint64 id, string metadataURI) external nonpayable
 ```
 
 
@@ -78,13 +78,8 @@ function addAssetEntry(string metadataURI) external nonpayable returns (uint256)
 
 | Name | Type | Description |
 |---|---|---|
+| id | uint64 | undefined |
 | metadataURI | string | undefined |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | uint256 | undefined |
 
 ### addAssetToToken
 
@@ -120,22 +115,6 @@ Used to add a child token to a given parent token.
 |---|---|---|
 | parentId | uint256 | ID of the parent token to receive the new child token |
 | childId | uint256 | ID of the new proposed child token |
-
-### addContributor
-
-```solidity
-function addContributor(address contributor) external nonpayable
-```
-
-Adds a contributor to the smart contract.
-
-*Can only be called by the owner.*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| contributor | address | Address of the contributor&#39;s account |
 
 ### approve
 
@@ -258,7 +237,7 @@ Used to verify that the given child tokwn is included in an active array of a to
 ### childOf
 
 ```solidity
-function childOf(uint256 parentId, uint256 index) external view returns (struct IRMRKNesting.Child)
+function childOf(uint256 parentId, uint256 index) external view returns (struct IRMRKNestable.Child)
 ```
 
 Used to retrieve a specific active child token for a given parent token.
@@ -276,12 +255,12 @@ Used to retrieve a specific active child token for a given parent token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IRMRKNesting.Child | struct A Child struct containing data about the specified child |
+| _0 | IRMRKNestable.Child | struct A Child struct containing data about the specified child |
 
 ### childrenOf
 
 ```solidity
-function childrenOf(uint256 parentId) external view returns (struct IRMRKNesting.Child[])
+function childrenOf(uint256 parentId) external view returns (struct IRMRKNestable.Child[])
 ```
 
 Used to retrieve the active child tokens of a given parent token.
@@ -298,24 +277,7 @@ Used to retrieve the active child tokens of a given parent token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IRMRKNesting.Child[] | struct[] An array of Child structs containing the parent token&#39;s active child tokens |
-
-### collectionMetadata
-
-```solidity
-function collectionMetadata() external view returns (string)
-```
-
-Used to retrieve the metadata of the collection.
-
-
-
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | string | string The metadata URI of the collection |
+| _0 | IRMRKNestable.Child[] | struct[] An array of Child structs containing the parent token&#39;s active child tokens |
 
 ### directOwnerOf
 
@@ -475,23 +437,6 @@ Used to retrieve the asset ID that will be replaced (if any) if a given assetID 
 |---|---|---|
 | _0 | uint64 | uint64 ID of the asset which will be replaced |
 
-### getLock
-
-```solidity
-function getLock() external view returns (bool)
-```
-
-Used to retrieve the status of a lockable smart contract.
-
-
-
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | bool | bool A boolean value signifying whether the smart contract has been locked |
-
 ### getPendingAssets
 
 ```solidity
@@ -513,40 +458,6 @@ Returns pending asset IDs for a given token
 | Name | Type | Description |
 |---|---|---|
 | _0 | uint64[] | uint64[] pending asset IDs |
-
-### getRoyaltyPercentage
-
-```solidity
-function getRoyaltyPercentage() external view returns (uint256)
-```
-
-Used to retrieve the specified royalty percentage.
-
-
-
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | uint256 | uint256 The royalty percentage expressed in the basis points |
-
-### getRoyaltyRecipient
-
-```solidity
-function getRoyaltyRecipient() external view returns (address)
-```
-
-Used to retrieve the recipient of royalties.
-
-
-
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | address | address Address of the recipient of royalties |
 
 ### isApprovedForAll
 
@@ -594,13 +505,13 @@ Used to check whether the address has been granted the operator role by a given 
 |---|---|---|
 | _0 | bool | bool The boolean value indicating wehter the account we are checking has been granted the operator role |
 
-### isContributor
+### mint
 
 ```solidity
-function isContributor(address contributor) external view returns (bool)
+function mint(address to, uint256 tokenId) external nonpayable
 ```
 
-Used to check if the address is one of the contributors.
+
 
 
 
@@ -608,30 +519,8 @@ Used to check if the address is one of the contributors.
 
 | Name | Type | Description |
 |---|---|---|
-| contributor | address | Address of the contributor whose status we are checking |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | bool | Boolean value indicating whether the address is a contributor or not |
-
-### maxSupply
-
-```solidity
-function maxSupply() external view returns (uint256)
-```
-
-Used to retrieve the maximum supply of the collection.
-
-
-
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | uint256 | uint256 The maximum supply of tokens in the collection |
+| to | address | undefined |
+| tokenId | uint256 | undefined |
 
 ### name
 
@@ -649,6 +538,24 @@ Used to retrieve the collection name.
 | Name | Type | Description |
 |---|---|---|
 | _0 | string | string Name of the collection |
+
+### nestMint
+
+```solidity
+function nestMint(address to, uint256 tokenId, uint256 destId) external nonpayable
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| to | address | undefined |
+| tokenId | uint256 | undefined |
+| destId | uint256 | undefined |
 
 ### nestTransfer
 
@@ -687,23 +594,6 @@ Used to transfer the token into another token.
 | tokenId | uint256 | ID of the token being transferred |
 | destinationId | uint256 | ID of the token to receive the token being transferred |
 
-### owner
-
-```solidity
-function owner() external view returns (address)
-```
-
-Returns the address of the current owner.
-
-
-
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | address | undefined |
-
 ### ownerOf
 
 ```solidity
@@ -729,7 +619,7 @@ Used to retrieve the root owner of the given token.
 ### pendingChildOf
 
 ```solidity
-function pendingChildOf(uint256 parentId, uint256 index) external view returns (struct IRMRKNesting.Child)
+function pendingChildOf(uint256 parentId, uint256 index) external view returns (struct IRMRKNestable.Child)
 ```
 
 Used to retrieve a specific pending child token from a given parent token.
@@ -747,12 +637,12 @@ Used to retrieve a specific pending child token from a given parent token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IRMRKNesting.Child | struct A Child struct containting data about the specified child |
+| _0 | IRMRKNestable.Child | struct A Child struct containting data about the specified child |
 
 ### pendingChildrenOf
 
 ```solidity
-function pendingChildrenOf(uint256 parentId) external view returns (struct IRMRKNesting.Child[])
+function pendingChildrenOf(uint256 parentId) external view returns (struct IRMRKNestable.Child[])
 ```
 
 Used to retrieve the pending child tokens of a given parent token.
@@ -769,24 +659,7 @@ Used to retrieve the pending child tokens of a given parent token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IRMRKNesting.Child[] | struct[] An array of Child structs containing the parent token&#39;s pending child tokens |
-
-### pricePerMint
-
-```solidity
-function pricePerMint() external view returns (uint256)
-```
-
-Used to retrieve the price per mint.
-
-
-
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | uint256 | uint256 The price per mint of a single token expressed in the lowest denomination of a native currency |
+| _0 | IRMRKNestable.Child[] | struct[] An array of Child structs containing the parent token&#39;s pending child tokens |
 
 ### rejectAllAssets
 
@@ -839,40 +712,13 @@ Rejects a asset from the pending array of given token.
 | index | uint256 | Index of the asset in the pending array to be rejected |
 | assetId | uint64 | ID of the asset expected to be located at the specified index |
 
-### renounceOwnership
+### safeMint
 
 ```solidity
-function renounceOwnership() external nonpayable
+function safeMint(address to, uint256 tokenId, bytes _data) external nonpayable
 ```
 
-Leaves the contract without owner. Functions using the `onlyOwner` modifier will be disabled.
 
-*Can only be called by the current owner.Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is  only available to the owner.*
-
-
-### revokeContributor
-
-```solidity
-function revokeContributor(address contributor) external nonpayable
-```
-
-Removes a contributor from the smart contract.
-
-*Can only be called by the owner.*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| contributor | address | Address of the contributor&#39;s account |
-
-### royaltyInfo
-
-```solidity
-function royaltyInfo(uint256 tokenId, uint256 salePrice) external view returns (address receiver, uint256 royaltyAmount)
-```
-
-Used to retrieve the information about who shall receive royalties of a sale of the specified token and  how much they will be.
 
 
 
@@ -880,15 +726,26 @@ Used to retrieve the information about who shall receive royalties of a sale of 
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | ID of the token for which the royalty info is being retrieved |
-| salePrice | uint256 | Price of the token sale |
+| to | address | undefined |
+| tokenId | uint256 | undefined |
+| _data | bytes | undefined |
 
-#### Returns
+### safeMint
+
+```solidity
+function safeMint(address to, uint256 tokenId) external nonpayable
+```
+
+
+
+
+
+#### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| receiver | address | The beneficiary receiving royalties of the sale |
-| royaltyAmount | uint256 | The value of the royalties recieved by the `receiver` from the sale |
+| to | address | undefined |
+| tokenId | uint256 | undefined |
 
 ### safeTransferFrom
 
@@ -961,17 +818,6 @@ Used to add or remove an operator of assets for the caller.
 | operator | address | Address of the account to which the operator role is granted or revoked from |
 | approved | bool | The boolean value indicating whether the operator role is being granted (`true`) or revoked  (`false`) |
 
-### setLock
-
-```solidity
-function setLock() external nonpayable
-```
-
-Locks the operation.
-
-*Once locked, functions using `notLocked` modifier cannot be executed.*
-
-
 ### setPriority
 
 ```solidity
@@ -1031,10 +877,10 @@ Used to retrieve the collection symbol.
 ### tokenURI
 
 ```solidity
-function tokenURI(uint256) external view returns (string)
+function tokenURI(uint256 tokenId) external view returns (string)
 ```
 
-
+Used to retrieve the metadata URI of a token.
 
 
 
@@ -1042,47 +888,13 @@ function tokenURI(uint256) external view returns (string)
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | undefined |
+| tokenId | uint256 | ID of the token to retrieve the metadata URI for |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | undefined |
-
-### totalAssets
-
-```solidity
-function totalAssets() external view returns (uint256)
-```
-
-
-
-
-
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | uint256 | undefined |
-
-### totalSupply
-
-```solidity
-function totalSupply() external view returns (uint256)
-```
-
-Used to retrieve the total supply of the tokens in a collection.
-
-
-
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | uint256 | uint256 The number of tokens in a collection |
+| _0 | string | string Metadata URI of the specified token |
 
 ### transfer
 
@@ -1119,22 +931,6 @@ function transferFrom(address from, address to, uint256 tokenId) external nonpay
 | to | address | undefined |
 | tokenId | uint256 | undefined |
 
-### transferOwnership
-
-```solidity
-function transferOwnership(address newOwner) external nonpayable
-```
-
-Transfers ownership of the contract to a new owner.
-
-*Can only be called by the current owner.*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| newOwner | address | Address of the new owner&#39;s account |
-
 ### unnestChild
 
 ```solidity
@@ -1155,39 +951,6 @@ Function to unnest a child from the active token array.
 | childAddress | address | Address of the collection smart contract of the child token expected to be located at the  specified index of the given parent token&#39;s pending children array |
 | childId | uint256 | ID of the child token expected to be located at the specified index of the given parent token&#39;s  pending children array |
 | isPending | bool | A boolean value signifying whether the child token is being unnested from the pending child  tokens array (`true`) or from the active child tokens array (`false`) |
-
-### updateRoyaltyRecipient
-
-```solidity
-function updateRoyaltyRecipient(address newRoyaltyRecipient) external nonpayable
-```
-
-Used to update recipient of royalties.
-
-*Custom access control has to be implemented to ensure that only the intended actors can update the  beneficiary.*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| newRoyaltyRecipient | address | Address of the new recipient of royalties |
-
-### withdrawRaised
-
-```solidity
-function withdrawRaised(address to, uint256 amount) external nonpayable
-```
-
-Used to withdraw the minting proceedings to a specified address.
-
-*This function can only be called by the owner.*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| to | address | Address to receive the given amount of minting proceedings |
-| amount | uint256 | The amount to withdraw |
 
 
 
@@ -1444,23 +1207,6 @@ Used to notify listeners that the token is being transferred.
 | toTokenId  | uint256 | undefined |
 | tokenId `indexed` | uint256 | undefined |
 
-### OwnershipTransferred
-
-```solidity
-event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| previousOwner `indexed` | address | undefined |
-| newOwner `indexed` | address | undefined |
-
 ### Transfer
 
 ```solidity
@@ -1538,6 +1284,17 @@ Attempting to use an invalid token ID
 
 
 
+### ERC721MintToTheZeroAddress
+
+```solidity
+error ERC721MintToTheZeroAddress()
+```
+
+Attempting to mint to 0x0 address
+
+
+
+
 ### ERC721NotApprovedOrOwner
 
 ```solidity
@@ -1545,6 +1302,17 @@ error ERC721NotApprovedOrOwner()
 ```
 
 Attempting to manage a token without being its owner or approved by the owner
+
+
+
+
+### ERC721TokenAlreadyMinted
+
+```solidity
+error ERC721TokenAlreadyMinted()
+```
+
+Attempting to mint an already minted token
 
 
 
@@ -1720,21 +1488,32 @@ Attempting to burn a total number of recursive children higher than maximum set
 | childContract | address | Address of the collection smart contract in which the maximum number of recursive burns was reached |
 | childId | uint256 | ID of the child token at which the maximum number of recursive burns was reached |
 
-### RMRKNestingTooDeep
+### RMRKMintToNonRMRKNestableImplementer
 
 ```solidity
-error RMRKNestingTooDeep()
+error RMRKMintToNonRMRKNestableImplementer()
 ```
 
-Attempting to nest a child over the nesting limit (current limit is 100 levels of nesting)
+Attempting to mint a nested token to a smart contract that doesn&#39;t support nesting
 
 
 
 
-### RMRKNestingTransferToDescendant
+### RMRKNestableTooDeep
 
 ```solidity
-error RMRKNestingTransferToDescendant()
+error RMRKNestableTooDeep()
+```
+
+Attempting to nest a child over the nestable limit (current limit is 100 levels of nesting)
+
+
+
+
+### RMRKNestableTransferToDescendant
+
+```solidity
+error RMRKNestableTransferToDescendant()
 ```
 
 Attempting to nest the token to own descendant, which would create a loop and leave the looped tokens in limbo
@@ -1742,10 +1521,10 @@ Attempting to nest the token to own descendant, which would create a loop and le
 
 
 
-### RMRKNestingTransferToNonRMRKNestingImplementer
+### RMRKNestableTransferToNonRMRKNestableImplementer
 
 ```solidity
-error RMRKNestingTransferToNonRMRKNestingImplementer()
+error RMRKNestableTransferToNonRMRKNestableImplementer()
 ```
 
 Attempting to nest the token to a smart contract that doesn&#39;t support nesting
@@ -1753,35 +1532,13 @@ Attempting to nest the token to a smart contract that doesn&#39;t support nestin
 
 
 
-### RMRKNestingTransferToSelf
+### RMRKNestableTransferToSelf
 
 ```solidity
-error RMRKNestingTransferToSelf()
+error RMRKNestableTransferToSelf()
 ```
 
 Attempting to nest the token into itself
-
-
-
-
-### RMRKNewContributorIsZeroAddress
-
-```solidity
-error RMRKNewContributorIsZeroAddress()
-```
-
-Attempting to assign a 0x0 address as a contributor
-
-
-
-
-### RMRKNewOwnerIsZeroAddress
-
-```solidity
-error RMRKNewOwnerIsZeroAddress()
-```
-
-Attempting to transfer the ownership to the 0x0 address
 
 
 
@@ -1817,28 +1574,6 @@ error RMRKNotApprovedOrDirectOwner()
 Attempting to interact with a token without being its owner or having been granted permission by the  owner to do so
 
 *When a token is nested, only the direct owner (NFT parent) can mange it. In that case, approved addresses are  not allowed to manage it, in order to ensure the expected behaviour*
-
-
-### RMRKNotOwner
-
-```solidity
-error RMRKNotOwner()
-```
-
-Attempting to interact with a management function without being the smart contract&#39;s owner
-
-
-
-
-### RMRKNotOwnerOrContributor
-
-```solidity
-error RMRKNotOwnerOrContributor()
-```
-
-Attempting to interact with a function without being the owner or contributor of the collection
-
-
 
 
 ### RMRKPendingChildIndexOutOfRange
