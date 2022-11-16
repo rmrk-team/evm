@@ -5,11 +5,11 @@ pragma solidity ^0.8.16;
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 
 /**
- * @title IRMRKNestingExternalEquip
+ * @title IRMRKNestableExternalEquip
  * @author RMRK team
- * @notice Interface smart contract of the RMRK nesting external equippable module.
+ * @notice Interface smart contract of the RMRK nestable with external equippable module.
  */
-interface IRMRKNestingExternalEquip is IERC165 {
+interface IRMRKNestableExternalEquip is IERC165 {
     /**
      * @notice sed to notify the listeners that the address of the `Equippable` associated smart contract has been set.
      * @dev When the address is set fot the first time, the `old` value should equal `0x0` address.

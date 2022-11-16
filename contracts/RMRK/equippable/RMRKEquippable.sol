@@ -7,7 +7,7 @@ pragma solidity ^0.8.16;
 import "../base/IRMRKBaseStorage.sol";
 import "../library/RMRKLib.sol";
 import "../multiasset/AbstractMultiAsset.sol";
-import "../nesting/RMRKNesting.sol";
+import "../nestable/RMRKNestable.sol";
 import "../security/ReentrancyGuard.sol";
 import "./IRMRKEquippable.sol";
 
@@ -18,7 +18,7 @@ import "./IRMRKEquippable.sol";
  */
 contract RMRKEquippable is
     ReentrancyGuard,
-    RMRKNesting,
+    RMRKNestable,
     AbstractMultiAsset,
     IRMRKEquippable
 {
@@ -51,7 +51,7 @@ contract RMRKEquippable is
     mapping(uint256 => mapping(address => mapping(uint64 => Equipment)))
         private _equipments;
 
-    /// Mapping of token ID to child (nesting) address to child ID to count of equipped items. Used to check if equipped.
+    /// Mapping of token ID to child (nestable) address to child ID to count of equipped items. Used to check if equipped.
     mapping(uint256 => mapping(address => mapping(uint256 => uint8)))
         private _equipCountPerChild;
 
@@ -85,7 +85,7 @@ contract RMRKEquippable is
      * @dev Initializes the contract by setting a `name` and a `symbol` of the token collection.
      */
     constructor(string memory name_, string memory symbol_)
-        RMRKNesting(name_, symbol_)
+        RMRKNestable(name_, symbol_)
     {}
 
     /**
@@ -95,11 +95,11 @@ contract RMRKEquippable is
         public
         view
         virtual
-        override(IERC165, RMRKNesting)
+        override(IERC165, RMRKNestable)
         returns (bool)
     {
         return
-            RMRKNesting.supportsInterface(interfaceId) ||
+            RMRKNestable.supportsInterface(interfaceId) ||
             interfaceId == type(IRMRKMultiAsset).interfaceId ||
             interfaceId == type(IRMRKEquippable).interfaceId;
     }
@@ -378,7 +378,7 @@ contract RMRKEquippable is
         // Check from parent's asset perspective:
         _checkAssetAcceptsSlot(data.assetId, slotPartId);
 
-        IRMRKNesting.Child memory child = childOf(
+        IRMRKNestable.Child memory child = childOf(
             data.tokenId,
             data.childIndex
         );

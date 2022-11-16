@@ -4,7 +4,7 @@
 
 pragma solidity ^0.8.16;
 
-import "./IRMRKNesting.sol";
+import "./IRMRKNestable.sol";
 import "../core/RMRKCore.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
@@ -15,13 +15,13 @@ import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import "../library/RMRKErrors.sol";
 
 /**
- * @title RMRKNesting
+ * @title RMRKNestable
  * @author RMRK team
- * @notice Smart contract of the RMRK Nesting module.
+ * @notice Smart contract of the RMRK Nestable module.
  * @dev This contract is hierarchy agnostic and can support an arbitrary number of nested levels up and down, as long as
  *  gas limits allow it.
  */
-contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
+contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
     using Address for address;
 
     uint256 private constant _MAX_LEVELS_TO_CHECK_FOR_INHERITANCE_LOOP = 100;
@@ -37,7 +37,7 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
     // Mapping from owner to operator approvals
     mapping(address => mapping(address => bool)) private _operatorApprovals;
 
-    // ------------------- NESTING --------------
+    // ------------------- NESTABLE --------------
 
     // Mapping from token ID to DirectOwner struct
     mapping(uint256 => DirectOwner) private _RMRKOwners;
@@ -120,7 +120,7 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
             interfaceId == type(IERC165).interfaceId ||
             interfaceId == type(IERC721).interfaceId ||
             interfaceId == type(IERC721Metadata).interfaceId ||
-            interfaceId == type(IRMRKNesting).interfaceId;
+            interfaceId == type(IRMRKNestable).interfaceId;
     }
 
     /**
@@ -268,13 +268,13 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         if (immediateOwner != from) revert ERC721TransferFromIncorrectOwner();
         if (to == address(0)) revert ERC721TransferToTheZeroAddress();
         if (to == address(this) && tokenId == destinationId)
-            revert RMRKNestingTransferToSelf();
+            revert RMRKNestableTransferToSelf();
 
         // Destination contract checks:
         // It seems redundant, but otherwise it would revert with no error
         if (!to.isContract()) revert RMRKIsNotContract();
-        if (!IERC165(to).supportsInterface(type(IRMRKNesting).interfaceId))
-            revert RMRKNestingTransferToNonRMRKNestingImplementer();
+        if (!IERC165(to).supportsInterface(type(IRMRKNestable).interfaceId))
+            revert RMRKNestableTransferToNonRMRKNestableImplementer();
         _checkForInheritanceLoop(tokenId, to, destinationId);
 
         _beforeTokenTransfer(from, to, tokenId);
@@ -311,7 +311,7 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         uint256 destinationId,
         uint256 tokenId
     ) private {
-        IRMRKNesting destContract = IRMRKNesting(to);
+        IRMRKNestable destContract = IRMRKNestable(to);
         destContract.addChild(destinationId, tokenId);
         _afterTokenTransfer(from, to, tokenId);
         _afterNestedTokenTransfer(from, to, parentId, destinationId, tokenId);
@@ -339,14 +339,14 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
                 address nextOwner,
                 uint256 nextOwnerTokenId,
                 bool isNft
-            ) = IRMRKNesting(targetContract).directOwnerOf(targetId);
+            ) = IRMRKNestable(targetContract).directOwnerOf(targetId);
             // If there's a final address, we're good. There's no loop.
             if (!isNft) {
                 return;
             }
             // Ff the current nft is an ancestor at some point, there is an inheritance loop
             if (nextOwner == address(this) && nextOwnerTokenId == currentId) {
-                revert RMRKNestingTransferToDescendant();
+                revert RMRKNestableTransferToDescendant();
             }
             // We reuse the parameters to save some contract size
             targetContract = nextOwner;
@@ -355,7 +355,7 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
                 ++i;
             }
         }
-        revert RMRKNestingTooDeep();
+        revert RMRKNestableTooDeep();
     }
 
     ////////////////////////////////////////
@@ -427,8 +427,8 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
     ) internal virtual {
         // It seems redundant, but otherwise it would revert with no error
         if (!to.isContract()) revert RMRKIsNotContract();
-        if (!IERC165(to).supportsInterface(type(IRMRKNesting).interfaceId))
-            revert RMRKMintToNonRMRKImplementer();
+        if (!IERC165(to).supportsInterface(type(IRMRKNestable).interfaceId))
+            revert RMRKMintToNonRMRKNestableImplementer();
 
         _innerMint(to, tokenId, destinationId);
         _sendToNFT(address(0), to, 0, destinationId, tokenId);
@@ -481,14 +481,14 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         public
         view
         virtual
-        override(IRMRKNesting, IERC721)
+        override(IRMRKNestable, IERC721)
         returns (address)
     {
         (address owner, uint256 ownerTokenId, bool isNft) = directOwnerOf(
             tokenId
         );
         if (isNft) {
-            owner = IRMRKNesting(owner).ownerOf(ownerTokenId);
+            owner = IRMRKNestable(owner).ownerOf(ownerTokenId);
         }
         return owner;
     }
@@ -615,7 +615,7 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
             // We substract one to the next level to count for the token being burned, then add it again on returns
             // This is to allow the behavior of 0 recursive burns meaning only the current token is deleted.
             totalChildBurns +=
-                IRMRKNesting(children[i].contractAddress).burn(
+                IRMRKNestable(children[i].contractAddress).burn(
                     children[i].tokenId,
                     pendingRecursiveBurns - 1
                 ) +

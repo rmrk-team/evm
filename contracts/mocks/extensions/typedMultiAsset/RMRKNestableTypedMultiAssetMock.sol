@@ -3,28 +3,28 @@
 pragma solidity ^0.8.16;
 
 import "../../../RMRK/extension/typedMultiAsset/RMRKTypedMultiAsset.sol";
-import "../../RMRKNestingMultiAssetMock.sol";
+import "../../RMRKNestableMultiAssetMock.sol";
 
 error RMRKTokenHasNoAssetsWithType();
 
-contract RMRKNestingTypedMultiAssetMock is
-    RMRKNestingMultiAssetMock,
+contract RMRKNestableTypedMultiAssetMock is
+    RMRKNestableMultiAssetMock,
     RMRKTypedMultiAsset
 {
     constructor(string memory name, string memory symbol)
-        RMRKNestingMultiAssetMock(name, symbol)
+        RMRKNestableMultiAssetMock(name, symbol)
     {}
 
     function supportsInterface(bytes4 interfaceId)
         public
         view
         virtual
-        override(RMRKNestingMultiAsset, RMRKTypedMultiAsset)
+        override(RMRKNestableMultiAsset, RMRKTypedMultiAsset)
         returns (bool)
     {
         return
             RMRKTypedMultiAsset.supportsInterface(interfaceId) ||
-            RMRKNestingMultiAsset.supportsInterface(interfaceId);
+            RMRKNestableMultiAsset.supportsInterface(interfaceId);
     }
 
     function addTypedAssetEntry(

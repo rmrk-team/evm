@@ -2,13 +2,17 @@
 
 pragma solidity ^0.8.16;
 
-import "../RMRK/equippable/RMRKNestingExternalEquip.sol";
+import "../RMRK/nestable/RMRKNestableMultiAsset.sol";
 
-//Minimal public implementation of IRMRKNesting for testing.
-contract RMRKNestingExternalEquipMock is RMRKNestingExternalEquip {
-    constructor(string memory name_, string memory symbol_)
-        RMRKNestingExternalEquip(name_, symbol_)
+//Minimal public implementation of RMRKNestableMultiAsset for testing.
+contract RMRKNestableMultiAssetMock is RMRKNestableMultiAsset {
+    constructor(string memory name, string memory symbol)
+        RMRKNestableMultiAsset(name, symbol)
     {}
+
+    function mint(address to, uint256 tokenId) external {
+        _mint(to, tokenId);
+    }
 
     function safeMint(address to, uint256 tokenId) public {
         _safeMint(to, tokenId);
@@ -22,10 +26,6 @@ contract RMRKNestingExternalEquipMock is RMRKNestingExternalEquip {
         _safeMint(to, tokenId, _data);
     }
 
-    function mint(address to, uint256 tokenId) external {
-        _mint(to, tokenId);
-    }
-
     function nestMint(
         address to,
         uint256 tokenId,
@@ -34,8 +34,16 @@ contract RMRKNestingExternalEquipMock is RMRKNestingExternalEquip {
         _nestMint(to, tokenId, destId);
     }
 
-    function setEquippableAddress(address equippable) external {
-        _setEquippableAddress(equippable);
+    function addAssetToToken(
+        uint256 tokenId,
+        uint64 assetId,
+        uint64 overwrites
+    ) external {
+        _addAssetToToken(tokenId, assetId, overwrites);
+    }
+
+    function addAssetEntry(uint64 id, string memory metadataURI) external {
+        _addAssetEntry(id, metadataURI);
     }
 
     function transfer(address to, uint256 tokenId) public virtual {

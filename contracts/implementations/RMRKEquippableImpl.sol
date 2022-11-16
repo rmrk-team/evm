@@ -41,7 +41,7 @@ contract RMRKEquippableImpl is RMRKAbstractEquippableImpl {
         }
     }
 
-    function mintNesting(
+    function nestMint(
         address to,
         uint256 numToMint,
         uint256 destinationId

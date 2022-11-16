@@ -38,7 +38,7 @@ contract RMRKEquippableImplErc20Pay is
         }
     }
 
-    function mintNesting(
+    function nestMint(
         address to,
         uint256 numToMint,
         uint256 destinationId

@@ -2,25 +2,25 @@
 
 pragma solidity ^0.8.16;
 
-import "./abstracts/RMRKAbstractNestingImpl.sol";
+import "./abstracts/RMRKAbstractNestableMultiAssetImpl.sol";
 
 error RMRKMintUnderpriced();
 
-contract RMRKNestingImpl is RMRKAbstractNestingImpl {
+contract RMRKNestableMultiAssetImpl is RMRKAbstractNestableMultiAssetImpl {
     constructor(
-        string memory name_,
-        string memory symbol_,
-        uint256 maxSupply_,
-        uint256 pricePerMint_,
+        string memory name,
+        string memory symbol,
+        uint256 maxSupply,
+        uint256 pricePerMint,
         string memory collectionMetadata_,
         string memory tokenURI_,
         address royaltyRecipient,
         uint256 royaltyPercentageBps //in basis points
     )
-        RMRKMintingUtils(maxSupply_, pricePerMint_)
+        RMRKMintingUtils(maxSupply, pricePerMint)
         RMRKCollectionMetadata(collectionMetadata_)
         RMRKRoyalties(royaltyRecipient, royaltyPercentageBps)
-        RMRKNesting(name_, symbol_)
+        RMRKNestableMultiAsset(name, symbol)
     {
         _setTokenURI(tokenURI_);
     }
@@ -41,7 +41,7 @@ contract RMRKNestingImpl is RMRKAbstractNestingImpl {
         }
     }
 
-    function mintNesting(
+    function nestMint(
         address to,
         uint256 numToMint,
         uint256 destinationId

@@ -3,18 +3,18 @@
 pragma solidity ^0.8.16;
 
 import "../../../RMRK/extension/soulbound/RMRKSoulbound.sol";
-import "../../RMRKNestingMock.sol";
+import "../../RMRKNestableMock.sol";
 
-contract RMRKSoulboundNestingMock is RMRKSoulbound, RMRKNestingMock {
+contract RMRKSoulboundNestableMock is RMRKSoulbound, RMRKNestableMock {
     constructor(string memory name, string memory symbol)
-        RMRKNestingMock(name, symbol)
+        RMRKNestableMock(name, symbol)
     {}
 
     function supportsInterface(bytes4 interfaceId)
         public
         view
         virtual
-        override(RMRKSoulbound, RMRKNesting)
+        override(RMRKSoulbound, RMRKNestable)
         returns (bool)
     {
         return

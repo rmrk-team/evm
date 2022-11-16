@@ -10,10 +10,10 @@ pragma solidity ^0.8.16;
 
 import "../base/IRMRKBaseStorage.sol";
 import "../multiasset/AbstractMultiAsset.sol";
-import "../nesting/IRMRKNesting.sol";
+import "../nestable/IRMRKNestable.sol";
 import "../library/RMRKLib.sol";
 import "../security/ReentrancyGuard.sol";
-import "./IRMRKNestingExternalEquip.sol";
+import "./IRMRKNestableExternalEquip.sol";
 import "./IRMRKExternalEquip.sol";
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 
@@ -21,7 +21,7 @@ import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
  * @title RMRKExternalEquip
  * @author RMRK team
  * @notice Smart contract of the RMRK External Equippable module.
- * @dev This smart contract is expected to be paired with an instance of `RMRKNestingExternalEquip`.
+ * @dev This smart contract is expected to be paired with an instance of `RMRKNestableExternalEquip`.
  */
 contract RMRKExternalEquip is
     ReentrancyGuard,
@@ -43,7 +43,7 @@ contract RMRKExternalEquip is
 
     // ------------------- Equippable --------------
 
-    address private _nestingAddress;
+    address private _nestableAddress;
 
     /// Mapping of uint64 asset ID to corresponding base address.
     mapping(uint64 => address) private _baseAddresses;
@@ -59,7 +59,7 @@ contract RMRKExternalEquip is
     mapping(uint256 => mapping(address => mapping(uint64 => Equipment)))
         private _equipments;
 
-    /// Mapping of token ID to child (nesting) address to child Id to count of equips. Used to check if equipped.
+    /// Mapping of token ID to child (nestable) address to child Id to count of equips. Used to check if equipped.
     mapping(uint256 => mapping(address => mapping(uint256 => uint8)))
         private _equipCountPerChild;
 
@@ -73,7 +73,7 @@ contract RMRKExternalEquip is
      */
     function _onlyApprovedOrOwner(uint256 tokenId) internal view {
         if (
-            !IRMRKNestingExternalEquip(_nestingAddress).isApprovedOrOwner(
+            !IRMRKNestableExternalEquip(_nestableAddress).isApprovedOrOwner(
                 _msgSender(),
                 tokenId
             )
@@ -129,8 +129,8 @@ contract RMRKExternalEquip is
         _;
     }
 
-    constructor(address nestingAddress) {
-        _setNestingAddress(nestingAddress);
+    constructor(address nestableAddress) {
+        _setNestableAddress(nestableAddress);
     }
 
     /**
@@ -149,21 +149,21 @@ contract RMRKExternalEquip is
     }
 
     /**
-     * @notice Used to set the address of the `Nesting` smart contract
-     * @param nestingAddress Address of the `Nesting` smart contract
+     * @notice Used to set the address of the `Nestable` smart contract
+     * @param nestableAddress Address of the `Nestable` smart contract
      */
-    function _setNestingAddress(address nestingAddress) internal {
-        address oldAddress = _nestingAddress;
-        _nestingAddress = nestingAddress;
-        emit NestingAddressSet(oldAddress, nestingAddress);
+    function _setNestableAddress(address nestableAddress) internal {
+        address oldAddress = _nestableAddress;
+        _nestableAddress = nestableAddress;
+        emit NestableAddressSet(oldAddress, nestableAddress);
     }
 
     /**
-     * @notice Used to retrieve the address of the `Nesting` smart contract
-     * @return address Address of the `Nesting` smart contract
+     * @notice Used to retrieve the address of the `Nestable` smart contract
+     * @return address Address of the `Nestable` smart contract
      */
-    function getNestingAddress() public view returns (address) {
-        return _nestingAddress;
+    function getNestableAddress() public view returns (address) {
+        return _nestableAddress;
     }
 
     // ------------------------------- ASSETS ------------------------------
@@ -249,13 +249,13 @@ contract RMRKExternalEquip is
         address owner = ownerOf(tokenId);
         if (to == owner) revert RMRKApprovalForAssetsToCurrentOwner();
 
-        // We want to bypass the check if the caller is the linked nesting contract and it's simply removing approvals
-        bool isNestingCallToRemoveApprovals = (_msgSender() ==
-            _nestingAddress &&
+        // We want to bypass the check if the caller is the linked nestable contract and it's simply removing approvals
+        bool isNestableCallToRemoveApprovals = (_msgSender() ==
+            _nestableAddress &&
             to == address(0));
 
         if (
-            !isNestingCallToRemoveApprovals &&
+            !isNestableCallToRemoveApprovals &&
             _msgSender() != owner &&
             !isApprovedForAllForAssets(owner, _msgSender())
         ) revert RMRKApproveForAssetsCallerIsNotOwnerNorApprovedForAll();
@@ -338,11 +338,11 @@ contract RMRKExternalEquip is
         // Check from parent's asset perspective:
         _checkAssetAcceptsSlot(data.assetId, slotPartId);
 
-        IRMRKNesting.Child memory child = IRMRKNesting(_nestingAddress).childOf(
+        IRMRKNestable.Child memory child = IRMRKNestable(_nestableAddress).childOf(
             data.tokenId,
             data.childIndex
         );
-        address childEquippable = IRMRKNestingExternalEquip(
+        address childEquippable = IRMRKNestableExternalEquip(
             child.contractAddress
         ).getEquippableAddress();
 
@@ -439,10 +439,10 @@ contract RMRKExternalEquip is
 
         _beforeUnequip(tokenId, assetId, slotPartId);
         delete _equipments[tokenId][targetBaseAddress][slotPartId];
-        address childNestingAddress = IRMRKExternalEquip(
+        address childNestableAddress = IRMRKExternalEquip(
             equipment.childEquippableAddress
-        ).getNestingAddress();
-        _equipCountPerChild[tokenId][childNestingAddress][
+        ).getNestableAddress();
+        _equipCountPerChild[tokenId][childNestableAddress][
             equipment.childId
         ] -= 1;
 
@@ -655,7 +655,7 @@ contract RMRKExternalEquip is
      * @return address Address of the root owner of the token
      */
     function ownerOf(uint256 tokenId) internal view returns (address) {
-        return IRMRKNesting(_nestingAddress).ownerOf(tokenId);
+        return IRMRKNestable(_nestableAddress).ownerOf(tokenId);
     }
 
     // HOOKS
