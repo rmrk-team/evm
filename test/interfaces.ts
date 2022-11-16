@@ -5,8 +5,8 @@ const IRMRKBaseStorage = '0xd912401f';
 const IRMRKEquippable = '0x7c2b66aa';
 const IRMRKExternalEquip = '0xe5383e6c';
 const IRMRKMultiAsset = '0xfa73a1e2';
-const IRMRKNesting = '0x3457be69';
-const IRMRKNestingExternalEquip = '0x8b7f3e99';
+const IRMRKNestable = '0x3457be69';
+const IRMRKNestableExternalEquip = '0x8b7f3e99';
 const IRMRKReclaimableChild = '0x2fb59acf';
 const IRMRKSoulboundMultiAsset = '0x911ec470';
 const IRMRKTypedMultiAsset = '0x7f7bb665';
@@ -19,8 +19,8 @@ export {
   IRMRKEquippable,
   IRMRKExternalEquip,
   IRMRKMultiAsset,
-  IRMRKNesting,
-  IRMRKNestingExternalEquip,
+  IRMRKNestable,
+  IRMRKNestableExternalEquip,
   IRMRKReclaimableChild,
   IRMRKSoulboundMultiAsset,
   IRMRKTypedMultiAsset,

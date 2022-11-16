@@ -56,7 +56,7 @@ async function nestMintFromImplErc20Pay(
   await erc20.mint(owner.address, ONE_ETH);
   await erc20.approve(token.address, ONE_ETH);
 
-  await token.mintNesting(to, 1, destinationId);
+  await token.nestMint(to, 1, destinationId);
   return await token.totalSupply();
 }
 
@@ -65,7 +65,7 @@ async function nestMintFromImpl(
   to: string,
   destinationId: number,
 ): Promise<number> {
-  await token.mintNesting(to, 1, destinationId, { value: ONE_ETH });
+  await token.nestMint(to, 1, destinationId, { value: ONE_ETH });
   return await token.totalSupply();
 }
 

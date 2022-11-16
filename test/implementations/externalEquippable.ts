@@ -29,7 +29,7 @@ async function partsFixture() {
   const maskSymbol = 'NM';
 
   const baseFactory = await ethers.getContractFactory('RMRKBaseStorageImpl');
-  const nestingFactory = await ethers.getContractFactory('RMRKNestingExternalEquipImpl');
+  const nestableFactory = await ethers.getContractFactory('RMRKNestableExternalEquipImpl');
   const equipFactory = await ethers.getContractFactory('RMRKExternalEquipImpl');
   const viewFactory = await ethers.getContractFactory('RMRKEquipRenderUtils');
 
@@ -42,7 +42,7 @@ async function partsFixture() {
   await base.deployed();
 
   // Neon token
-  const neon = await nestingFactory.deploy(
+  const neon = await nestableFactory.deploy(
     neonName,
     neonSymbol,
     10000,
@@ -56,11 +56,11 @@ async function partsFixture() {
   const neonEquip = await equipFactory.deploy(neon.address);
   await neon.deployed();
   await neonEquip.deployed();
-  // Link nesting and equippable:
+  // Link nestable and equippable:
   neon.setEquippableAddress(neonEquip.address);
 
   // Weapon
-  const mask = await nestingFactory.deploy(
+  const mask = await nestableFactory.deploy(
     maskName,
     maskSymbol,
     10000,
@@ -74,7 +74,7 @@ async function partsFixture() {
   await mask.deployed();
   const maskEquip = await equipFactory.deploy(mask.address);
   await maskEquip.deployed();
-  // Link nesting and equippable:
+  // Link nestable and equippable:
   mask.setEquippableAddress(maskEquip.address);
 
   await setupContextForParts(
@@ -106,7 +106,7 @@ async function slotsFixture() {
   const backgroundSymbol = 'SB';
 
   const baseFactory = await ethers.getContractFactory('RMRKBaseStorageImpl');
-  const nestingFactory = await ethers.getContractFactory('RMRKNestingExternalEquipImpl');
+  const nestableFactory = await ethers.getContractFactory('RMRKNestableExternalEquipImpl');
   const equipFactory = await ethers.getContractFactory('RMRKExternalEquipImpl');
   const viewFactory = await ethers.getContractFactory('RMRKEquipRenderUtils');
 
@@ -119,7 +119,7 @@ async function slotsFixture() {
   await base.deployed();
 
   // Soldier token
-  const soldier = await nestingFactory.deploy(
+  const soldier = await nestableFactory.deploy(
     soldierName,
     soldierSymbol,
     10000,
@@ -133,11 +133,11 @@ async function slotsFixture() {
   await soldier.deployed();
   const soldierEquip = await equipFactory.deploy(soldier.address);
   await soldierEquip.deployed();
-  // Link nesting and equippable:
+  // Link nestable and equippable:
   soldier.setEquippableAddress(soldierEquip.address);
 
   // Weapon
-  const weapon = await nestingFactory.deploy(
+  const weapon = await nestableFactory.deploy(
     weaponName,
     weaponSymbol,
     10000,
@@ -151,11 +151,11 @@ async function slotsFixture() {
   await weapon.deployed();
   const weaponEquip = await equipFactory.deploy(weapon.address);
   await weaponEquip.deployed();
-  // Link nesting and equippable:
+  // Link nestable and equippable:
   weapon.setEquippableAddress(weaponEquip.address);
 
   // Weapon Gem
-  const weaponGem = await nestingFactory.deploy(
+  const weaponGem = await nestableFactory.deploy(
     weaponGemName,
     weaponGemSymbol,
     10000,
@@ -169,11 +169,11 @@ async function slotsFixture() {
   await weaponGem.deployed();
   const weaponGemEquip = await equipFactory.deploy(weaponGem.address);
   await weaponGemEquip.deployed();
-  // Link nesting and equippable:
+  // Link nestable and equippable:
   weaponGem.setEquippableAddress(weaponGemEquip.address);
 
   // Background
-  const background = await nestingFactory.deploy(
+  const background = await nestableFactory.deploy(
     backgroundName,
     backgroundSymbol,
     10000,
@@ -187,7 +187,7 @@ async function slotsFixture() {
   await background.deployed();
   const backgroundEquip = await equipFactory.deploy(background.address);
   await backgroundEquip.deployed();
-  // Link nesting and equippable:
+  // Link nestable and equippable:
   background.setEquippableAddress(backgroundEquip.address);
 
   await setupContextForSlots(
@@ -219,11 +219,11 @@ async function slotsFixture() {
 }
 
 async function assetsFixture() {
-  const nestingFactory = await ethers.getContractFactory('RMRKNestingExternalEquipImpl');
+  const nestableFactory = await ethers.getContractFactory('RMRKNestableExternalEquipImpl');
   const equipFactory = await ethers.getContractFactory('RMRKExternalEquipImpl');
   const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiAssetRenderUtils');
 
-  const nesting = await nestingFactory.deploy(
+  const nestable = await nestableFactory.deploy(
     'Chunky',
     'CHNK',
     10000,
@@ -234,26 +234,26 @@ async function assetsFixture() {
     ADDRESS_ZERO,
     0,
   );
-  await nesting.deployed();
+  await nestable.deployed();
 
-  const equip = await equipFactory.deploy(nesting.address);
+  const equip = await equipFactory.deploy(nestable.address);
   await equip.deployed();
 
   const renderUtils = await renderUtilsFactory.deploy();
   await renderUtils.deployed();
 
-  await nesting.setEquippableAddress(equip.address);
+  await nestable.setEquippableAddress(equip.address);
 
-  return { nesting, equip, renderUtils };
+  return { nestable, equip, renderUtils };
 }
 
 async function equipFixture() {
-  const nestingFactory = await ethers.getContractFactory('RMRKNestingExternalEquipImpl');
+  const nestableFactory = await ethers.getContractFactory('RMRKNestableExternalEquipImpl');
   const equipFactory = await ethers.getContractFactory('RMRKExternalEquipImpl');
   const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiAssetRenderUtils');
 
-  const nesting = await nestingFactory.deploy(
-    'NestingWithEquippable',
+  const nestable = await nestableFactory.deploy(
+    'NestableWithEquippable',
     'NWE',
     10000,
     ONE_ETH,
@@ -263,17 +263,17 @@ async function equipFixture() {
     ADDRESS_ZERO,
     1000, // 10%
   );
-  await nesting.deployed();
+  await nestable.deployed();
 
-  const equip = await equipFactory.deploy(nesting.address);
+  const equip = await equipFactory.deploy(nestable.address);
   await equip.deployed();
 
   const renderUtils = await renderUtilsFactory.deploy();
   await renderUtils.deployed();
 
-  await nesting.setEquippableAddress(equip.address);
+  await nestable.setEquippableAddress(equip.address);
 
-  return { nesting, equip, renderUtils };
+  return { nestable, equip, renderUtils };
 }
 
 // --------------- END FIXTURES -----------------------
@@ -281,31 +281,31 @@ async function equipFixture() {
 // --------------- MULTI ASSET BEHAVIOR -----------------------
 
 describe('ExternalEquippableImpl MR behavior', async () => {
-  let nesting: Contract;
+  let nestable: Contract;
   let equip: Contract;
   let renderUtils: Contract;
 
   beforeEach(async function () {
-    ({ nesting, equip, renderUtils } = await loadFixture(equipFixture));
+    ({ nestable, equip, renderUtils } = await loadFixture(equipFixture));
     this.token = equip;
     this.renderUtils = renderUtils;
   });
 
-  // Mint needs to happen on the nesting contract, but the MR behavior happens on the equip one.
-  async function mintToNesting(token: Contract, to: string): Promise<number> {
-    await nesting.mint(to, 1, { value: ONE_ETH });
-    return await nesting.totalSupply();
+  // Mint needs to happen on the nestable contract, but the MR behavior happens on the equip one.
+  async function mintToNestable(token: Contract, to: string): Promise<number> {
+    await nestable.mint(to, 1, { value: ONE_ETH });
+    return await nestable.totalSupply();
   }
 
-  shouldBehaveLikeMultiAsset(mintToNesting, addAssetEntryEquippablesFromImpl, addAssetToToken);
+  shouldBehaveLikeMultiAsset(mintToNestable, addAssetEntryEquippablesFromImpl, addAssetToToken);
 });
 
 // --------------- MULTI ASSET BEHAVIOR END ------------------------
 
 describe('ExternalEquippableImpl Other', async function () {
   beforeEach(async function () {
-    const { nesting } = await loadFixture(equipFixture);
-    this.token = nesting;
+    const { nestable } = await loadFixture(equipFixture);
+    this.token = nestable;
   });
 
   shouldControlValidMinting();

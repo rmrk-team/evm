@@ -226,12 +226,12 @@ describe('RMRKEquippableImpl MR behavior', async () => {
     this.renderUtils = renderUtils;
   });
 
-  async function mintToNesting(token: Contract, to: string): Promise<number> {
+  async function mintToNestable(token: Contract, to: string): Promise<number> {
     await equip.mint(to, 1, { value: ONE_ETH });
     return await equip.totalSupply();
   }
 
-  shouldBehaveLikeMultiAsset(mintToNesting, addAssetEntryEquippablesFromImpl, addAssetToToken);
+  shouldBehaveLikeMultiAsset(mintToNestable, addAssetEntryEquippablesFromImpl, addAssetToToken);
 });
 
 // --------------- MULTI ASSET BEHAVIOR END ------------------------

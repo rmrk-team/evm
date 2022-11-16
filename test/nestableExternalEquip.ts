@@ -1,20 +1,20 @@
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { mintFromMock, nestMintFromMock, transfer, nestTransfer } from './utils';
-import { IOtherInterface, IRMRKNestingExternalEquip, IRMRKExternalEquip } from './interfaces';
-import shouldBehaveLikeNesting from './behavior/nesting';
+import { IOtherInterface, IRMRKNestableExternalEquip, IRMRKExternalEquip } from './interfaces';
+import shouldBehaveLikeNestable from './behavior/nestable';
 import shouldBehaveLikeERC721 from './behavior/erc721';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 
-describe('NestingWithEquippableMock Nesting Behavior', function () {
+describe('NestableWithEquippableMock Nestable Behavior', function () {
   const name = 'ownerChunky';
   const symbol = 'CHNKY';
 
   const name2 = 'petMonkey';
   const symbol2 = 'MONKE';
 
-  async function nestingFixture() {
-    const CHNKY = await ethers.getContractFactory('RMRKNestingExternalEquipMock');
+  async function nestableFixture() {
+    const CHNKY = await ethers.getContractFactory('RMRKNestableExternalEquipMock');
     const ownerChunky = await CHNKY.deploy(name, symbol);
     await ownerChunky.deployed();
 
@@ -24,7 +24,7 @@ describe('NestingWithEquippableMock Nesting Behavior', function () {
 
     await ownerChunky.setEquippableAddress(chunkyEquippable.address);
 
-    const MONKY = await ethers.getContractFactory('RMRKNestingExternalEquipMock');
+    const MONKY = await ethers.getContractFactory('RMRKNestableExternalEquipMock');
     const petMonkey = await MONKY.deploy(name2, symbol2);
     await petMonkey.deployed();
 
@@ -38,42 +38,43 @@ describe('NestingWithEquippableMock Nesting Behavior', function () {
   }
 
   beforeEach(async function () {
-    const { ownerChunky, petMonkey } = await loadFixture(nestingFixture);
+    const { ownerChunky, petMonkey } = await loadFixture(nestableFixture);
     this.parentToken = ownerChunky;
     this.childToken = petMonkey;
   });
 
-  shouldBehaveLikeNesting(mintFromMock, nestMintFromMock, transfer, nestTransfer);
+  shouldBehaveLikeNestable(mintFromMock, nestMintFromMock, transfer, nestTransfer);
 });
 
-describe('NestingWithEquippableMock ERC721 Behavior', function () {
+describe('NestableWithEquippableMock ERC721 Behavior', function () {
   const name = 'RmrkTest';
   const symbol = 'RMRKTST';
 
-  async function nestingFixture() {
-    const nestingFactory = await ethers.getContractFactory('RMRKNestingExternalEquipMock');
-    const nesting = await nestingFactory.deploy(name, symbol);
-    await nesting.deployed();
+  async function nestableFixture() {
+    const nestableFactory = await ethers.getContractFactory('RMRKNestableExternalEquipMock');
+    const nestable = await nestableFactory.deploy(name, symbol);
+    await nestable.deployed();
 
     const equipFactory = await ethers.getContractFactory('RMRKExternalEquipMock');
-    const equip = await equipFactory.deploy(nesting.address);
+    const equip = await equipFactory.deploy(nestable.address);
     await equip.deployed();
 
-    await nesting.setEquippableAddress(equip.address);
-    return { equip, nesting };
+    await nestable.setEquippableAddress(equip.address);
+    return { equip, nestable };
   }
 
   beforeEach(async function () {
-    const { nesting, equip } = await loadFixture(nestingFixture);
-    this.token = nesting;
+    const { nestable, equip } = await loadFixture(nestableFixture);
+    this.token = nestable;
     this.equip = equip;
     this.ERC721Receiver = await ethers.getContractFactory('ERC721ReceiverMock');
   });
 
   describe('Interface support', function () {
-    it('can support INestingExternalEquip', async function () {
-      expect(await this.token.supportsInterface(IRMRKNestingExternalEquip)).to.equal(true);
+    it('can support INestableExternalEquip', async function () {
+      expect(await this.token.supportsInterface(IRMRKNestableExternalEquip)).to.equal(true);
     });
+
     it('can support IExternalEquip', async function () {
       expect(await this.equip.supportsInterface(IRMRKExternalEquip)).to.equal(true);
     });

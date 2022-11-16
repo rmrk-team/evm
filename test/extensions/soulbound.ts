@@ -16,16 +16,16 @@ async function soulboundMultiAssetFixture() {
   return { token };
 }
 
-async function soulboundNestingFixture() {
-  const factory = await ethers.getContractFactory('RMRKSoulboundNestingMock');
+async function soulboundNestableFixture() {
+  const factory = await ethers.getContractFactory('RMRKSoulboundNestableMock');
   const token = await factory.deploy('Chunky', 'CHNK');
   await token.deployed();
 
   return { token };
 }
 
-async function soulboundNestingMultiAssetFixture() {
-  const factory = await ethers.getContractFactory('RMRKSoulboundNestingMultiAssetMock');
+async function soulboundNestableMultiAssetFixture() {
+  const factory = await ethers.getContractFactory('RMRKSoulboundNestableMultiAssetMock');
   const token = await factory.deploy('Chunky', 'CHNK');
   await token.deployed();
 
@@ -40,20 +40,20 @@ async function soulboundEquippableFixture() {
   return { token };
 }
 
-async function soulboundNestingExternalEquippableFixture() {
-  const nestingFactory = await ethers.getContractFactory(
-    'RMRKSoulboundNestingExternalEquippableMock',
+async function soulboundNestableExternalEquippableFixture() {
+  const nestableFactory = await ethers.getContractFactory(
+    'RMRKSoulboundNestableExternalEquippableMock',
   );
-  const nesting = await nestingFactory.deploy('Chunky', 'CHNK');
-  await nesting.deployed();
+  const nestable = await nestableFactory.deploy('Chunky', 'CHNK');
+  await nestable.deployed();
 
   const equipFactory = await ethers.getContractFactory('RMRKExternalEquipMock');
-  const equip = await equipFactory.deploy(nesting.address);
+  const equip = await equipFactory.deploy(nestable.address);
   await equip.deployed();
 
-  await nesting.setEquippableAddress(equip.address);
+  await nestable.setEquippableAddress(equip.address);
 
-  return { nesting, equip };
+  return { nestable, equip };
 }
 
 describe('RMRKSoulboundMultiAssetMock', async function () {
@@ -65,24 +65,24 @@ describe('RMRKSoulboundMultiAssetMock', async function () {
   shouldBehaveLikeSoulboundBasic();
 });
 
-describe('RMRKSoulboundNestingMock', async function () {
+describe('RMRKSoulboundNestableMock', async function () {
   beforeEach(async function () {
-    const { token } = await loadFixture(soulboundNestingFixture);
+    const { token } = await loadFixture(soulboundNestableFixture);
     this.token = token;
   });
 
   shouldBehaveLikeSoulboundBasic();
-  shouldBehaveLikeSoulboundNesting();
+  shouldBehaveLikeSoulboundNestable();
 });
 
-describe('RMRKSoulboundNestingMultiAssetMock', async function () {
+describe('RMRKSoulboundNestableMultiAssetMock', async function () {
   beforeEach(async function () {
-    const { token } = await loadFixture(soulboundNestingMultiAssetFixture);
+    const { token } = await loadFixture(soulboundNestableMultiAssetFixture);
     this.token = token;
   });
 
   shouldBehaveLikeSoulboundBasic();
-  shouldBehaveLikeSoulboundNesting();
+  shouldBehaveLikeSoulboundNestable();
 });
 
 describe('RMRKSoulboundEquippableMock', async function () {
@@ -92,17 +92,17 @@ describe('RMRKSoulboundEquippableMock', async function () {
   });
 
   shouldBehaveLikeSoulboundBasic();
-  shouldBehaveLikeSoulboundNesting();
+  shouldBehaveLikeSoulboundNestable();
 });
 
-describe('RMRKSoulboundNestingExternalEquippableMock', async function () {
+describe('RMRKSoulboundNestableExternalEquippableMock', async function () {
   beforeEach(async function () {
-    const { nesting } = await loadFixture(soulboundNestingExternalEquippableFixture);
-    this.token = nesting;
+    const { nestable } = await loadFixture(soulboundNestableExternalEquippableFixture);
+    this.token = nestable;
   });
 
   shouldBehaveLikeSoulboundBasic();
-  shouldBehaveLikeSoulboundNesting();
+  shouldBehaveLikeSoulboundNestable();
 });
 
 describe('RMRKSoulbound exempt', async function () {
@@ -114,7 +114,7 @@ describe('RMRKSoulbound exempt', async function () {
     const signers = await ethers.getSigners();
     owner = signers[0];
     otherOwner = signers[1];
-    const factory = await ethers.getContractFactory('RMRKSemiSoulboundNestingMock');
+    const factory = await ethers.getContractFactory('RMRKSemiSoulboundNestableMock');
     token = await factory.deploy('Chunky', 'CHNK');
     await token.deployed();
   });
@@ -191,7 +191,7 @@ async function shouldBehaveLikeSoulboundBasic() {
   });
 }
 
-async function shouldBehaveLikeSoulboundNesting() {
+async function shouldBehaveLikeSoulboundNestable() {
   let soulbound: Contract;
   let owner: SignerWithAddress;
   let tokenId: number;

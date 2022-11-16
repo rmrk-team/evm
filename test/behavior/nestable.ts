@@ -3,9 +3,9 @@ import { ethers } from 'hardhat';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { Contract } from 'ethers';
 import { bn, ADDRESS_ZERO } from '../utils';
-import { IERC165, IERC721, IRMRKNesting, IOtherInterface } from '../interfaces';
+import { IERC165, IERC721, IRMRKNestable, IOtherInterface } from '../interfaces';
 
-async function shouldBehaveLikeNesting(
+async function shouldBehaveLikeNestable(
   mint: (token: Contract, to: string) => Promise<number>,
   nestMint: (token: Contract, to: string, parentId: number) => Promise<number>,
   transfer: (
@@ -76,7 +76,7 @@ async function shouldBehaveLikeNesting(
       );
     });
 
-    it('cannot nest mint to non rmrk nesting receiver', async function () {
+    it('cannot nest mint to non rmrk nestable receiver', async function () {
       const ERC721 = await ethers.getContractFactory('ERC721Mock');
       const nonReceiver = await ERC721.deploy('Non receiver', 'NR');
       await nonReceiver.deployed();
@@ -85,7 +85,7 @@ async function shouldBehaveLikeNesting(
 
       await expect(nestMint(child, nonReceiver.address, parentId)).to.be.revertedWithCustomError(
         child,
-        'RMRKMintToNonRMRKImplementer',
+        'RMRKMintToNonRMRKNestableImplementer',
       );
     });
 
@@ -216,8 +216,8 @@ async function shouldBehaveLikeNesting(
       expect(await parent.supportsInterface(IERC721)).to.equal(true);
     });
 
-    it('can support INesting', async function () {
-      expect(await parent.supportsInterface(IRMRKNesting)).to.equal(true);
+    it('can support INestable', async function () {
+      expect(await parent.supportsInterface(IRMRKNestable)).to.equal(true);
     });
 
     it('cannot support other interfaceId', async function () {
@@ -903,7 +903,7 @@ async function shouldBehaveLikeNesting(
       // We can no longer nest transfer it, even if we are the root owner:
       await expect(
         nestTransfer(child, firstOwner, child.address, childId, childId),
-      ).to.be.revertedWithCustomError(child, 'RMRKNestingTransferToSelf');
+      ).to.be.revertedWithCustomError(child, 'RMRKNestableTransferToSelf');
     });
 
     it('cannot nest tranfer a descendant same NFT', async function () {
@@ -914,11 +914,11 @@ async function shouldBehaveLikeNesting(
       // Cannot send parent to grandChild
       await expect(
         nestTransfer(parent, firstOwner, child.address, parentId, grandChildId),
-      ).to.be.revertedWithCustomError(child, 'RMRKNestingTransferToDescendant');
+      ).to.be.revertedWithCustomError(child, 'RMRKNestableTransferToDescendant');
       // Cannot send parent to child
       await expect(
         nestTransfer(parent, firstOwner, child.address, parentId, childId),
-      ).to.be.revertedWithCustomError(child, 'RMRKNestingTransferToDescendant');
+      ).to.be.revertedWithCustomError(child, 'RMRKNestableTransferToDescendant');
     });
 
     it('cannot nest tranfer if ancestors tree is too deep', async function () {
@@ -931,7 +931,7 @@ async function shouldBehaveLikeNesting(
       // Cannot send parent to lastChild
       await expect(
         nestTransfer(parent, firstOwner, child.address, parentId, lastId),
-      ).to.be.revertedWithCustomError(child, 'RMRKNestingTooDeep');
+      ).to.be.revertedWithCustomError(child, 'RMRKNestableTooDeep');
     });
 
     it('cannot nest tranfer if not owner', async function () {
@@ -954,16 +954,16 @@ async function shouldBehaveLikeNesting(
       ).to.be.revertedWithCustomError(child, 'RMRKIsNotContract');
     });
 
-    it('cannot nest tranfer to contract if it does implement IRMRKNesting', async function () {
+    it('cannot nest tranfer to contract if it does implement IRMRKNestable', async function () {
       const ERC721 = await ethers.getContractFactory('ERC721Mock');
-      const nonNesting = await ERC721.deploy('Non receiver', 'NR');
-      await nonNesting.deployed();
+      const nonNestable = await ERC721.deploy('Non receiver', 'NR');
+      await nonNestable.deployed();
       await expect(
-        nestTransfer(child, firstOwner, nonNesting.address, childId, parentId),
-      ).to.be.revertedWithCustomError(child, 'RMRKNestingTransferToNonRMRKNestingImplementer');
+        nestTransfer(child, firstOwner, nonNestable.address, childId, parentId),
+      ).to.be.revertedWithCustomError(child, 'RMRKNestableTransferToNonRMRKNestableImplementer');
     });
 
-    it('can nest tranfer to IRMRKNesting contract', async function () {
+    it('can nest tranfer to IRMRKNestable contract', async function () {
       await nestTransfer(child, firstOwner, parent.address, childId, parentId);
       expect(await child.ownerOf(childId)).to.eql(firstOwner.address);
       expect(await child.directOwnerOf(childId)).to.eql([parent.address, bn(parentId), true]);
@@ -996,4 +996,4 @@ async function shouldBehaveLikeNesting(
   }
 }
 
-export default shouldBehaveLikeNesting;
+export default shouldBehaveLikeNestable;

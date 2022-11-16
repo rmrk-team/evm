@@ -2,7 +2,7 @@ import { Contract } from 'ethers';
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import shouldBehaveLikeNesting from '../behavior/nesting';
+import shouldBehaveLikeNestable from '../behavior/nestable';
 import shouldControlValidMinting from '../behavior/mintingImpl';
 import shouldHaveMetadata from '../behavior/metadata';
 import shouldHaveRoyalties from '../behavior/royalties';
@@ -18,7 +18,7 @@ import {
 } from '../utils';
 
 async function singleFixture(): Promise<Contract> {
-  return singleFixtureWithArgs('RMRKNestingImpl', [
+  return singleFixtureWithArgs('RMRKNestableImpl', [
     'RMRK Test',
     'RMRKTST',
     10000,
@@ -32,7 +32,7 @@ async function singleFixture(): Promise<Contract> {
 
 async function parentChildFixture(): Promise<{ parent: Contract; child: Contract }> {
   return parentChildFixtureWithArgs(
-    'RMRKNestingImpl',
+    'RMRKNestableImpl',
     [
       'Chunky',
       'CHNK',
@@ -56,17 +56,17 @@ async function parentChildFixture(): Promise<{ parent: Contract; child: Contract
   );
 }
 
-describe('NestingImpl Nesting Behavior', function () {
+describe('NestableImpl Nestable Behavior', function () {
   beforeEach(async function () {
     const { parent, child } = await loadFixture(parentChildFixture);
     this.parentToken = parent;
     this.childToken = child;
   });
 
-  shouldBehaveLikeNesting(mintFromImpl, nestMintFromImpl, transfer, nestTransfer);
+  shouldBehaveLikeNestable(mintFromImpl, nestMintFromImpl, transfer, nestTransfer);
 });
 
-describe('NestingImpl Other', async function () {
+describe('NestableImpl Other', async function () {
   beforeEach(async function () {
     this.token = await loadFixture(singleFixture);
   });

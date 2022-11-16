@@ -12,7 +12,7 @@ import {
   singleFixtureWithArgs,
   parentChildFixtureWithArgs,
 } from './utils';
-import shouldBehaveLikeNesting from './behavior/nesting';
+import shouldBehaveLikeNestable from './behavior/nestable';
 import shouldBehaveLikeERC721 from './behavior/erc721';
 
 const parentName = 'ownerChunky';
@@ -22,18 +22,18 @@ const childName = 'petMonkey';
 const childSymbol = 'MONKE';
 
 async function singleFixture(): Promise<Contract> {
-  return singleFixtureWithArgs('RMRKNestingMock', [parentName, parentSymbol]);
+  return singleFixtureWithArgs('RMRKNestableMock', [parentName, parentSymbol]);
 }
 
 async function parentChildFixture(): Promise<{ parent: Contract; child: Contract }> {
   return parentChildFixtureWithArgs(
-    'RMRKNestingMock',
+    'RMRKNestableMock',
     [parentName, parentSymbol],
     [childName, childSymbol],
   );
 }
 
-describe('NestingMock', function () {
+describe('NestableMock', function () {
   let parent: Contract;
   let child: Contract;
   let owner: SignerWithAddress;
@@ -46,7 +46,7 @@ describe('NestingMock', function () {
     this.childToken = child;
   });
 
-  shouldBehaveLikeNesting(mintFromMock, nestMintFromMock, transfer, nestTransfer);
+  shouldBehaveLikeNestable(mintFromMock, nestMintFromMock, transfer, nestTransfer);
 
   describe('Init', async function () {
     it('Name', async function () {
@@ -103,7 +103,7 @@ describe('NestingMock', function () {
   });
 });
 
-describe('NestingMock ERC721 behavior', function () {
+describe('NestableMock ERC721 behavior', function () {
   let token: Contract;
 
   beforeEach(async function () {
@@ -115,7 +115,7 @@ describe('NestingMock ERC721 behavior', function () {
   shouldBehaveLikeERC721(parentName, parentSymbol);
 });
 
-describe('NestingMock transfer hooks', function () {
+describe('NestableMock transfer hooks', function () {
   let parent: Contract;
   let child: Contract;
   let owner: SignerWithAddress;
