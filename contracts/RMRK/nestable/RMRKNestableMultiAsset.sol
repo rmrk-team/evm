@@ -5,19 +5,19 @@
 pragma solidity ^0.8.16;
 
 import "../multiasset/AbstractMultiAsset.sol";
-import "./IRMRKNesting.sol";
-import "./RMRKNesting.sol";
+import "./IRMRKNestable.sol";
+import "./RMRKNestable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 
 /**
- * @title RMRKNestingMultiAsset
+ * @title RMRKNestableMultiAsset
  * @author RMRK team
- * @notice Smart contract of the joined RMRK Nesting and Multi asset module.
+ * @notice Smart contract of the joined RMRK Nestable and Multi asset module.
  */
-contract RMRKNestingMultiAsset is RMRKNesting, AbstractMultiAsset {
+contract RMRKNestableMultiAsset is RMRKNestable, AbstractMultiAsset {
     // ------------------- ASSETS --------------
 
     // Mapping from token ID to approver address to approved address for assets
@@ -54,7 +54,7 @@ contract RMRKNestingMultiAsset is RMRKNesting, AbstractMultiAsset {
      * @dev Initializes the contract by setting a `name` and a `symbol` of the token collection.
      */
     constructor(string memory name_, string memory symbol_)
-        RMRKNesting(name_, symbol_)
+        RMRKNestable(name_, symbol_)
     {}
 
     /**
@@ -64,11 +64,11 @@ contract RMRKNestingMultiAsset is RMRKNesting, AbstractMultiAsset {
         public
         view
         virtual
-        override(IERC165, RMRKNesting)
+        override(IERC165, RMRKNestable)
         returns (bool)
     {
         return
-            RMRKNesting.supportsInterface(interfaceId) ||
+            RMRKNestable.supportsInterface(interfaceId) ||
             interfaceId == type(IRMRKMultiAsset).interfaceId;
     }
 

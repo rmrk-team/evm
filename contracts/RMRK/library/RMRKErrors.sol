@@ -73,17 +73,17 @@ error RMRKMaxRecursiveBurnsReached(address childContract, uint256 childId);
 /// Attempting to mint a number of tokens that would cause the total supply to be greater than maximum supply
 error RMRKMintOverMax();
 /// Attempting to mint a nested token to a smart contract that doesn't support nesting
-error RMRKMintToNonRMRKImplementer();
+error RMRKMintToNonRMRKNestableImplementer();
 /// Attempting to unnest a child before it is unequipped
 error RMRKMustUnequipFirst();
-/// Attempting to nest a child over the nesting limit (current limit is 100 levels of nesting)
-error RMRKNestingTooDeep();
+/// Attempting to nest a child over the nestable limit (current limit is 100 levels of nesting)
+error RMRKNestableTooDeep();
 /// Attempting to nest the token to own descendant, which would create a loop and leave the looped tokens in limbo
-error RMRKNestingTransferToDescendant();
+error RMRKNestableTransferToDescendant();
 /// Attempting to nest the token to a smart contract that doesn't support nesting
-error RMRKNestingTransferToNonRMRKNestingImplementer();
+error RMRKNestableTransferToNonRMRKNestableImplementer();
 /// Attempting to nest the token into itself
-error RMRKNestingTransferToSelf();
+error RMRKNestableTransferToSelf();
 /// Attempting to interact with a asset that can not be found
 error RMRKNoAssetMatchingId();
 /// Attempting to manage a asset without owning it or having been granted permission by the owner to do so

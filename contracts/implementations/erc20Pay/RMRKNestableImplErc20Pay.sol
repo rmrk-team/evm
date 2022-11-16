@@ -2,14 +2,14 @@
 
 pragma solidity ^0.8.16;
 
-import "../abstracts/RMRKAbstractNestingMultiAssetImpl.sol";
+import "../abstracts/RMRKAbstractNestableImpl.sol";
 import "../IRMRKInitData.sol";
 import "./RMRKErc20Pay.sol";
 
-contract RMRKNestingMultiAssetImplErc20Pay is
+contract RMRKNestableImplErc20Pay is
     IRMRKInitData,
     RMRKErc20Pay,
-    RMRKAbstractNestingMultiAssetImpl
+    RMRKAbstractNestableImpl
 {
     constructor(
         string memory name_,
@@ -22,7 +22,7 @@ contract RMRKNestingMultiAssetImplErc20Pay is
         RMRKCollectionMetadata(collectionMetadata_)
         RMRKRoyalties(data.royaltyRecipient, data.royaltyPercentageBps)
         RMRKErc20Pay(data.erc20TokenAddress)
-        RMRKNestingMultiAsset(name_, symbol_)
+        RMRKNestable(name_, symbol_)
     {
         _setTokenURI(tokenURI_);
     }
@@ -43,7 +43,7 @@ contract RMRKNestingMultiAssetImplErc20Pay is
         }
     }
 
-    function mintNesting(
+    function nestMint(
         address to,
         uint256 numToMint,
         uint256 destinationId

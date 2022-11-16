@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.16;
 
-import "../RMRK/equippable/RMRKNestingExternalEquip.sol";
+import "../RMRK/equippable/RMRKNestableExternalEquip.sol";
 import "../RMRK/extension/RMRKRoyalties.sol";
 import "../RMRK/utils/RMRKCollectionMetadata.sol";
 import "../RMRK/utils/RMRKMintingUtils.sol";
@@ -10,11 +10,11 @@ import "../RMRK/utils/RMRKMintingUtils.sol";
 error RMRKMintUnderpriced();
 error RMRKMintZero();
 
-contract RMRKNestingExternalEquipImpl is
+contract RMRKNestableExternalEquipImpl is
     RMRKMintingUtils,
     RMRKCollectionMetadata,
     RMRKRoyalties,
-    RMRKNestingExternalEquip
+    RMRKNestableExternalEquip
 {
     address private _equippableAddress;
     string private _tokenURI;
@@ -30,7 +30,7 @@ contract RMRKNestingExternalEquipImpl is
         address royaltyRecipient,
         uint256 royaltyPercentageBps //in basis points
     )
-        RMRKNestingExternalEquip(name_, symbol_)
+        RMRKNestableExternalEquip(name_, symbol_)
         RMRKMintingUtils(maxSupply_, pricePerMint_)
         RMRKCollectionMetadata(collectionMetadata_)
         RMRKRoyalties(royaltyRecipient, royaltyPercentageBps)
@@ -57,7 +57,7 @@ contract RMRKNestingExternalEquipImpl is
         }
     }
 
-    function mintNesting(
+    function nestMint(
         address to,
         uint256 numToMint,
         uint256 destinationId
@@ -93,7 +93,7 @@ contract RMRKNestingExternalEquipImpl is
         virtual
         onlyOwnerOrContributor
     {
-        //TODO: should we add a check if passed address supports IRMRKNestingExternalEquip
+        //TODO: should we add a check if passed address supports IRMRKNestableExternalEquip
         _setEquippableAddress(equippable);
     }
 

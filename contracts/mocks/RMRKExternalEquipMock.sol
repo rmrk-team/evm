@@ -6,12 +6,12 @@ import "../RMRK/equippable/RMRKExternalEquip.sol";
 
 /* import "hardhat/console.sol"; */
 
-//Minimal public implementation of RMRKEquippableWithNesting for testing.
+//Minimal public implementation of RMRKEquippableWithNestable for testing.
 contract RMRKExternalEquipMock is RMRKExternalEquip {
-    constructor(address nestingAddress) RMRKExternalEquip(nestingAddress) {}
+    constructor(address nestableAddress) RMRKExternalEquip(nestableAddress) {}
 
-    function setNestingAddress(address nestingAddress) external {
-        _setNestingAddress(nestingAddress);
+    function setNestableAddress(address nestableAddress) external {
+        _setNestableAddress(nestableAddress);
     }
 
     function addAssetToToken(

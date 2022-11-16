@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.16;
 
-import "../../nesting/RMRKNesting.sol";
+import "../../nestable/RMRKNestable.sol";
 import "./IRMRKReclaimableChild.sol";
 
 /**
@@ -10,7 +10,7 @@ import "./IRMRKReclaimableChild.sol";
  * @author RMRK team
  * @notice Smart contract of the RMRK Reclaimable child module.
  */
-abstract contract RMRKReclaimableChild is IRMRKReclaimableChild, RMRKNesting {
+abstract contract RMRKReclaimableChild is IRMRKReclaimableChild, RMRKNestable {
     /**
      * @dev WARNING: This mapping is not updated on burn or reject all, to save gas.
      * @dev This is only used to cheaply forbid reclaiming a child which is pending.
@@ -24,11 +24,11 @@ abstract contract RMRKReclaimableChild is IRMRKReclaimableChild, RMRKNesting {
         public
         view
         virtual
-        override(IERC165, RMRKNesting)
+        override(IERC165, RMRKNestable)
         returns (bool)
     {
         return
-            RMRKNesting.supportsInterface(interfaceId) ||
+            RMRKNestable.supportsInterface(interfaceId) ||
             interfaceId == type(IRMRKReclaimableChild).interfaceId;
     }
 
@@ -62,7 +62,7 @@ abstract contract RMRKReclaimableChild is IRMRKReclaimableChild, RMRKNesting {
         if (_childIsInPending[childAddress][childId] != 0)
             revert RMRKInvalidChildReclaim();
 
-        (address owner, uint256 ownerTokenId, bool isNft) = IRMRKNesting(
+        (address owner, uint256 ownerTokenId, bool isNft) = IRMRKNestable(
             childAddress
         ).directOwnerOf(childId);
         if (owner != address(this) || ownerTokenId != tokenId || !isNft)

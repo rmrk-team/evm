@@ -3,23 +3,23 @@
 pragma solidity ^0.8.16;
 
 import "../../../RMRK/extension/reclaimableChild/RMRKReclaimableChild.sol";
-import "../../RMRKNestingMock.sol";
+import "../../RMRKNestableMock.sol";
 
 error RMRKTokenHasNoAssetsWithType();
 
-contract RMRKNestingClaimableChildMock is
-    RMRKNestingMock,
+contract RMRKNestableClaimableChildMock is
+    RMRKNestableMock,
     RMRKReclaimableChild
 {
     constructor(string memory name, string memory symbol)
-        RMRKNestingMock(name, symbol)
+        RMRKNestableMock(name, symbol)
     {}
 
     function supportsInterface(bytes4 interfaceId)
         public
         view
         virtual
-        override(RMRKNesting, RMRKReclaimableChild)
+        override(RMRKNestable, RMRKReclaimableChild)
         returns (bool)
     {
         return super.supportsInterface(interfaceId);
@@ -29,7 +29,7 @@ contract RMRKNestingClaimableChildMock is
         uint256 tokenId,
         address childAddress,
         uint256 childId
-    ) internal virtual override(RMRKNesting, RMRKReclaimableChild) {
+    ) internal virtual override(RMRKNestable, RMRKReclaimableChild) {
         super._beforeAddChild(tokenId, childAddress, childId);
     }
 
@@ -38,7 +38,7 @@ contract RMRKNestingClaimableChildMock is
         uint256 childIndex,
         address childAddress,
         uint256 childId
-    ) internal virtual override(RMRKNesting, RMRKReclaimableChild) {
+    ) internal virtual override(RMRKNestable, RMRKReclaimableChild) {
         super._beforeAcceptChild(parentId, childIndex, childAddress, childId);
     }
 
@@ -48,7 +48,7 @@ contract RMRKNestingClaimableChildMock is
         address childAddress,
         uint256 childId,
         bool isPending
-    ) internal virtual override(RMRKNesting, RMRKReclaimableChild) {
+    ) internal virtual override(RMRKNestable, RMRKReclaimableChild) {
         super._beforeUnnestChild(
             tokenId,
             childIndex,
@@ -64,7 +64,7 @@ contract RMRKNestingClaimableChildMock is
         uint256 fromTokenId,
         uint256 toTokenId,
         uint256 tokenId
-    ) internal override(RMRKNestingMock, RMRKNesting) {
+    ) internal override(RMRKNestableMock, RMRKNestable) {
         super._beforeNestedTokenTransfer(
             from,
             to,
@@ -80,7 +80,7 @@ contract RMRKNestingClaimableChildMock is
         uint256 fromTokenId,
         uint256 toTokenId,
         uint256 tokenId
-    ) internal override(RMRKNestingMock, RMRKNesting) {
+    ) internal override(RMRKNestableMock, RMRKNestable) {
         super._afterNestedTokenTransfer(
             from,
             to,

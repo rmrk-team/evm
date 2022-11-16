@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.16;
 
-import "../RMRK/nesting/IRMRKNesting.sol";
+import "../RMRK/nestable/IRMRKNestable.sol";
 
 /**
  * @title ChildAdder
@@ -25,7 +25,7 @@ contract ChildAdder {
         uint256 numChildren
     ) external {
         for (uint256 i; i < numChildren; i++) {
-            IRMRKNesting(destContract).addChild(parentId, childId);
+            IRMRKNestable(destContract).addChild(parentId, childId);
         }
     }
 }

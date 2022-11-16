@@ -6,23 +6,23 @@ pragma solidity ^0.8.16;
 
 import "../../RMRK/equippable/IRMRKEquippable.sol";
 import "../../RMRK/equippable/IRMRKExternalEquip.sol";
-import "../../RMRK/equippable/IRMRKNestingExternalEquip.sol";
-import "../../RMRK/nesting/RMRKNesting.sol";
+import "../../RMRK/equippable/IRMRKNestableExternalEquip.sol";
+import "../../RMRK/nestable/RMRKNestable.sol";
 
 /**
- * @title RMRKNestingExternalEquip
+ * @title RMRKNestableExternalEquip
  * @author RMRK team
- * @notice Smart contract of the RMRK Nesting External Equippable module.
- * @dev This is a RMRKNesting smart contract with external `Equippable` smart contract for space saving purposes. It is
+ * @notice Smart contract of the RMRK Nestable External Equippable module.
+ * @dev This is a RMRKNestable smart contract with external `Equippable` smart contract for space saving purposes. It is
  *  expected to be deployed along an instance of `RMRKExternalEquip`. To make use of the equippable module with this
  *  contract, the `_setEquippableAddress` function has to be exposed and used to set the corresponding equipment
  *  contract after deployment. Consider using `RMRKOwnableLock` to lock the equippable address after deployment.
  */
-contract RMRKNestingExternalEquip is IRMRKNestingExternalEquip, RMRKNesting {
+contract RMRKNestableExternalEquip is IRMRKNestableExternalEquip, RMRKNestable {
     address private _equippableAddress;
 
     constructor(string memory name_, string memory symbol_)
-        RMRKNesting(name_, symbol_)
+        RMRKNestable(name_, symbol_)
     {}
 
     /**
@@ -32,11 +32,11 @@ contract RMRKNestingExternalEquip is IRMRKNestingExternalEquip, RMRKNesting {
         public
         view
         virtual
-        override(IERC165, RMRKNesting)
+        override(IERC165, RMRKNestable)
         returns (bool)
     {
         return
-            interfaceId == type(IRMRKNestingExternalEquip).interfaceId ||
+            interfaceId == type(IRMRKNestableExternalEquip).interfaceId ||
             super.supportsInterface(interfaceId);
     }
 

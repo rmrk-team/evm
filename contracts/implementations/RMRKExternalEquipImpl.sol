@@ -8,7 +8,7 @@ import "../RMRK/access/OwnableLock.sol";
 contract RMRKExternalEquipImpl is OwnableLock, RMRKExternalEquip {
     uint256 private _totalAssets;
 
-    constructor(address nestingAddress) RMRKExternalEquip(nestingAddress) {}
+    constructor(address nestableAddress) RMRKExternalEquip(nestableAddress) {}
 
     function addAssetToToken(
         uint256 tokenId,

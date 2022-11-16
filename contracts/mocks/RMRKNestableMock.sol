@@ -2,15 +2,15 @@
 
 pragma solidity ^0.8.16;
 
-import "../RMRK/nesting/RMRKNesting.sol";
+import "../RMRK/nestable/RMRKNestable.sol";
 
-//Minimal public implementation of IRMRKNesting for testing.
-contract RMRKNestingMock is RMRKNesting {
+//Minimal public implementation of IRMRKNestable for testing.
+contract RMRKNestableMock is RMRKNestable {
     // This is used to test the usage of hooks
     mapping(address => mapping(uint256 => uint256)) private _balancesPerNft;
 
     constructor(string memory name_, string memory symbol_)
-        RMRKNesting(name_, symbol_)
+        RMRKNestable(name_, symbol_)
     {}
 
     function safeMint(address to, uint256 tokenId) public {

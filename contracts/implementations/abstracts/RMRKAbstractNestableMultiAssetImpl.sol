@@ -3,25 +3,22 @@
 pragma solidity ^0.8.16;
 
 import "../../RMRK/extension/RMRKRoyalties.sol";
-import "../../RMRK/nesting/RMRKNesting.sol";
+import "../../RMRK/nestable/RMRKNestableMultiAsset.sol";
 import "../../RMRK/utils/RMRKCollectionMetadata.sol";
 import "../../RMRK/utils/RMRKMintingUtils.sol";
 
 error RMRKMintZero();
 
-abstract contract RMRKAbstractNestingImpl is
+abstract contract RMRKAbstractNestableMultiAssetImpl is
     RMRKMintingUtils,
     RMRKCollectionMetadata,
     RMRKRoyalties,
-    RMRKNesting
+    RMRKNestableMultiAsset
 {
+    uint256 private _totalAssets;
     string private _tokenURI;
 
-    function _preMint(uint256 numToMint)
-        internal
-        virtual
-        returns (uint256, uint256)
-    {
+    function _preMint(uint256 numToMint) internal returns (uint256, uint256) {
         if (numToMint == uint256(0)) revert RMRKMintZero();
         if (numToMint + _totalSupply > _maxSupply) revert RMRKMintOverMax();
 
@@ -38,6 +35,31 @@ abstract contract RMRKAbstractNestingImpl is
     }
 
     function _charge(uint256 value) internal virtual;
+
+    function addAssetToToken(
+        uint256 tokenId,
+        uint64 assetId,
+        uint64 overwrites
+    ) public onlyOwnerOrContributor {
+        _addAssetToToken(tokenId, assetId, overwrites);
+    }
+
+    function addAssetEntry(string memory metadataURI)
+        public
+        virtual
+        onlyOwnerOrContributor
+        returns (uint256)
+    {
+        unchecked {
+            _totalAssets += 1;
+        }
+        _addAssetEntry(uint64(_totalAssets), metadataURI);
+        return _totalAssets;
+    }
+
+    function totalAssets() public view returns (uint256) {
+        return _totalAssets;
+    }
 
     function transfer(address to, uint256 tokenId) public virtual {
         transferFrom(_msgSender(), to, tokenId);
@@ -63,14 +85,13 @@ abstract contract RMRKAbstractNestingImpl is
 
     function updateRoyaltyRecipient(address newRoyaltyRecipient)
         public
-        virtual
         override
         onlyOwner
     {
         _setRoyaltyRecipient(newRoyaltyRecipient);
     }
 
-    function _setTokenURI(string memory tokenURI_) internal virtual {
+    function _setTokenURI(string memory tokenURI_) internal {
         _tokenURI = tokenURI_;
     }
 }
