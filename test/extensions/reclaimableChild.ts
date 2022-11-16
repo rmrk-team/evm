@@ -69,7 +69,7 @@ async function shouldBehaveLikeReclaimableChild() {
 
       await this.parent.connect(tokenOwner).reclaimChild(parentId, this.child.address, childId);
       expect(await this.child.ownerOf(childId)).to.eql(tokenOwner.address);
-      expect(await this.child.rmrkOwnerOf(childId)).to.eql([tokenOwner.address, bn(0), false]);
+      expect(await this.child.directOwnerOf(childId)).to.eql([tokenOwner.address, bn(0), false]);
     });
 
     it('cannot reclaim active child', async function () {
@@ -119,7 +119,7 @@ async function shouldBehaveLikeReclaimableChild() {
 
       await this.parent.connect(tokenOwner).reclaimChild(parentId, this.child.address, childId);
       expect(await this.child.ownerOf(childId)).to.eql(tokenOwner.address);
-      expect(await this.child.rmrkOwnerOf(childId)).to.eql([tokenOwner.address, bn(0), false]);
+      expect(await this.child.directOwnerOf(childId)).to.eql([tokenOwner.address, bn(0), false]);
     });
 
     it('cannot reclaim pending child', async function () {

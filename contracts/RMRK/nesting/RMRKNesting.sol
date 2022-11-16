@@ -39,8 +39,8 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
 
     // ------------------- NESTING --------------
 
-    // Mapping from token ID to RMRKOwner struct
-    mapping(uint256 => RMRKOwner) private _RMRKOwners;
+    // Mapping from token ID to DirectOwner struct
+    mapping(uint256 => DirectOwner) private _RMRKOwners;
 
     // Mapping of tokenId to array of active children structs
     mapping(uint256 => Child[]) private _activeChildren;
@@ -77,7 +77,7 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
 
     /**
      * @notice Used to verify that the caller is approved to manage the given token or it its direct owner.
-     * @dev This does not delegate to ownerOf, which returns the root owner, but rater uses an owner from RMRKOwner
+     * @dev This does not delegate to ownerOf, which returns the root owner, but rater uses an owner from DirectOwner
      *  struct.
      * @dev The execution is reverted if the caller is not immediate owner or approved to manage the given token.
      * @dev Used for parent-scoped transfers.
@@ -231,7 +231,7 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         address to,
         uint256 tokenId
     ) internal virtual {
-        (address immediateOwner, uint256 parentId, ) = rmrkOwnerOf(tokenId);
+        (address immediateOwner, uint256 parentId, ) = directOwnerOf(tokenId);
         if (immediateOwner != from) revert ERC721TransferFromIncorrectOwner();
         if (to == address(0)) revert ERC721TransferToTheZeroAddress();
 
@@ -264,7 +264,7 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         uint256 tokenId,
         uint256 destinationId
     ) internal virtual {
-        (address immediateOwner, uint256 parentId, ) = rmrkOwnerOf(tokenId);
+        (address immediateOwner, uint256 parentId, ) = directOwnerOf(tokenId);
         if (immediateOwner != from) revert ERC721TransferFromIncorrectOwner();
         if (to == address(0)) revert ERC721TransferToTheZeroAddress();
         if (to == address(this) && tokenId == destinationId)
@@ -339,7 +339,7 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
                 address nextOwner,
                 uint256 nextOwnerTokenId,
                 bool isNft
-            ) = IRMRKNesting(targetContract).rmrkOwnerOf(targetId);
+            ) = IRMRKNesting(targetContract).directOwnerOf(targetId);
             // If there's a final address, we're good. There's no loop.
             if (!isNft) {
                 return;
@@ -458,7 +458,7 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         _beforeNestedTokenTransfer(address(0), to, 0, destinationId, tokenId);
 
         _balances[to] += 1;
-        _RMRKOwners[tokenId] = RMRKOwner({
+        _RMRKOwners[tokenId] = DirectOwner({
             ownerAddress: to,
             tokenId: destinationId,
             isNft: destinationId != 0
@@ -484,7 +484,7 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         override(IRMRKNesting, IERC721)
         returns (address)
     {
-        (address owner, uint256 ownerTokenId, bool isNft) = rmrkOwnerOf(
+        (address owner, uint256 ownerTokenId, bool isNft) = directOwnerOf(
             tokenId
         );
         if (isNft) {
@@ -505,7 +505,7 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
      *  should be `0`
      * @return bool A boolean value signifying whether the immediate owner is a token (`true`) or not (`false`)
      */
-    function rmrkOwnerOf(uint256 tokenId)
+    function directOwnerOf(uint256 tokenId)
         public
         view
         virtual
@@ -515,7 +515,7 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
             bool
         )
     {
-        RMRKOwner memory owner = _RMRKOwners[tokenId];
+        DirectOwner memory owner = _RMRKOwners[tokenId];
         if (owner.ownerAddress == address(0)) revert ERC721InvalidTokenId();
 
         return (owner.ownerAddress, owner.tokenId, owner.isNft);
@@ -573,7 +573,7 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         onlyApprovedOrDirectOwner(tokenId)
         returns (uint256)
     {
-        (address immediateOwner, uint256 parentId, ) = rmrkOwnerOf(tokenId);
+        (address immediateOwner, uint256 parentId, ) = directOwnerOf(tokenId);
         address owner = ownerOf(tokenId);
         _balances[immediateOwner] -= 1;
 
@@ -720,7 +720,7 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         address to,
         bool isNft
     ) internal {
-        _RMRKOwners[tokenId] = RMRKOwner({
+        _RMRKOwners[tokenId] = DirectOwner({
             ownerAddress: to,
             tokenId: destinationId,
             isNft: isNft
@@ -775,7 +775,7 @@ contract RMRKNesting is Context, IERC165, IERC721, IRMRKNesting, RMRKCore {
         virtual
         returns (bool)
     {
-        (address owner, uint256 parentId, ) = rmrkOwnerOf(tokenId);
+        (address owner, uint256 parentId, ) = directOwnerOf(tokenId);
         // When the parent is an NFT, only it can do operations
         if (parentId != 0) {
             return (spender == owner);
