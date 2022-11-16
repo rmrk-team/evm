@@ -288,13 +288,13 @@ Used to get the extended asset struct of the asset associated with given `assetI
 | fixedPartIds | uint64[] | undefined |
 | slotPartIds | uint64[] | undefined |
 
-### getNestingAddress
+### getNestableAddress
 
 ```solidity
-function getNestingAddress() external view returns (address)
+function getNestableAddress() external view returns (address)
 ```
 
-Used to retrieve the address of the `Nesting` smart contract
+Used to retrieve the address of the `Nestable` smart contract
 
 
 
@@ -303,7 +303,7 @@ Used to retrieve the address of the `Nesting` smart contract
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | address | address Address of the `Nesting` smart contract |
+| _0 | address | address Address of the `Nestable` smart contract |
 
 ### getPendingAssets
 
@@ -442,10 +442,10 @@ Used to add or remove an operator of assets for the caller.
 | operator | address | Address of the account to which the operator role is granted or revoked from |
 | approved | bool | The boolean value indicating whether the operator role is being granted (`true`) or revoked  (`false`) |
 
-### setNestingAddress
+### setNestableAddress
 
 ```solidity
-function setNestingAddress(address nestingAddress) external nonpayable
+function setNestableAddress(address nestableAddress) external nonpayable
 ```
 
 
@@ -456,7 +456,7 @@ function setNestingAddress(address nestingAddress) external nonpayable
 
 | Name | Type | Description |
 |---|---|---|
-| nestingAddress | address | undefined |
+| nestableAddress | address | undefined |
 
 ### setPriority
 
@@ -700,13 +700,13 @@ Used to notify listeners that a child&#39;s asset has been unequipped from one o
 | childAddress  | address | undefined |
 | childAssetId  | uint64 | undefined |
 
-### NestingAddressSet
+### NestableAddressSet
 
 ```solidity
-event NestingAddressSet(address old, address new_)
+event NestableAddressSet(address old, address new_)
 ```
 
-Used to notify listeners of a new `Nesting` associated  smart contract address being set.
+Used to notify listeners of a new `Nestable` associated  smart contract address being set.
 
 
 

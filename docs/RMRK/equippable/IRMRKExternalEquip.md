@@ -233,15 +233,15 @@ Used to get the extended asset struct of the asset associated with given `assetI
 | fixedPartIds | uint64[] | undefined |
 | slotPartIds | uint64[] | undefined |
 
-### getNestingAddress
+### getNestableAddress
 
 ```solidity
-function getNestingAddress() external view returns (address)
+function getNestableAddress() external view returns (address)
 ```
 
 
 
-*Returns the Equippable contract&#39;s corresponding nesting address.*
+*Returns the Equippable contract&#39;s corresponding nestable address.*
 
 
 #### Returns
@@ -577,22 +577,22 @@ Used to notify listeners that a child&#39;s asset has been unequipped from one o
 | childAddress  | address | undefined |
 | childAssetId  | uint64 | undefined |
 
-### NestingAddressSet
+### NestableAddressSet
 
 ```solidity
-event NestingAddressSet(address old, address new_)
+event NestableAddressSet(address old, address new_)
 ```
 
-Used to notify listeners of a new `Nesting` associated  smart contract address being set.
+Used to notify listeners of a new `Nestable` associated  smart contract address being set.
 
-*When initially setting the `Nesting` smart contract address, the `old` value should equal `0x0` address.*
+*When initially setting the `Nestable` smart contract address, the `old` value should equal `0x0` address.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| old  | address | Previous `Nesting` smart contract address |
-| new_  | address | New `Nesting` smart contract address |
+| old  | address | Previous `Nestable` smart contract address |
+| new_  | address | New `Nestable` smart contract address |
 
 ### ValidParentEquippableGroupIdSet
 

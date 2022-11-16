@@ -1,4 +1,4 @@
-# RMRKSoulboundNestingMultiAssetMock
+# RMRKSemiSoulboundNestableMock
 
 
 
@@ -27,24 +27,6 @@ Version of the @rmrk-team/evm-contracts package
 |---|---|---|
 | _0 | string | undefined |
 
-### acceptAsset
-
-```solidity
-function acceptAsset(uint256 tokenId, uint256 index, uint64 assetId) external nonpayable
-```
-
-Accepts a asset from the pending array of given token.
-
-*Migrates the asset from the token&#39;s pending asset array to the token&#39;s active asset array.Active assets cannot be removed by anyone, but can be replaced by a new asset.Requirements:  - The caller must own the token or be approved to manage the token&#39;s assets  - `tokenId` must exist.  - `index` must be in range of the length of the pending asset array.Emits an {AssetAccepted} event.*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| tokenId | uint256 | ID of the token for which to accept the pending asset |
-| index | uint256 | Index of the asset in the pending array to accept |
-| assetId | uint64 | ID of the asset expected to be located at the specified index |
-
 ### acceptChild
 
 ```solidity
@@ -63,41 +45,6 @@ function acceptChild(uint256 parentId, uint256 childIndex, address childAddress,
 | childIndex | uint256 | Index of a child tokem in the given parent&#39;s pending children array |
 | childAddress | address | Address of the collection smart contract of the child token expected to be located at the  specified index of the given parent token&#39;s pending children array |
 | childId | uint256 | ID of the child token expected to be located at the specified index of the given parent token&#39;s  pending children array |
-
-### addAssetEntry
-
-```solidity
-function addAssetEntry(uint64 id, string metadataURI) external nonpayable
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| id | uint64 | undefined |
-| metadataURI | string | undefined |
-
-### addAssetToToken
-
-```solidity
-function addAssetToToken(uint256 tokenId, uint64 assetId, uint64 overwrites) external nonpayable
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| tokenId | uint256 | undefined |
-| assetId | uint64 | undefined |
-| overwrites | uint64 | undefined |
 
 ### addChild
 
@@ -133,23 +80,6 @@ function approve(address to, uint256 tokenId) external nonpayable
 | to | address | undefined |
 | tokenId | uint256 | undefined |
 
-### approveForAssets
-
-```solidity
-function approveForAssets(address to, uint256 tokenId) external nonpayable
-```
-
-Used to grant permission to the user to manage token&#39;s assets.
-
-*This differs from transfer approvals, as approvals are not cleared when the approved party accepts or  rejects a asset, or sets asset priorities. This approval is cleared on token transfer.Only a single account can be approved at a time, so approving the `0x0` address clears previous approvals.Requirements:  - The caller must own the token or be an approved operator.  - `tokenId` must exist.Emits an {ApprovalForAssets} event.*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| to | address | Address of the account to grant the approval to |
-| tokenId | uint256 | ID of the token for which the approval to manage the assets is granted |
-
 ### balanceOf
 
 ```solidity
@@ -165,6 +95,29 @@ function balanceOf(address owner) external view returns (uint256)
 | Name | Type | Description |
 |---|---|---|
 | owner | address | undefined |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint256 | undefined |
+
+### balancePerNftOf
+
+```solidity
+function balancePerNftOf(address owner, uint256 parentId) external view returns (uint256)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| owner | address | undefined |
+| parentId | uint256 | undefined |
 
 #### Returns
 
@@ -237,7 +190,7 @@ Used to verify that the given child tokwn is included in an active array of a to
 ### childOf
 
 ```solidity
-function childOf(uint256 parentId, uint256 index) external view returns (struct IRMRKNesting.Child)
+function childOf(uint256 parentId, uint256 index) external view returns (struct IRMRKNestable.Child)
 ```
 
 Used to retrieve a specific active child token for a given parent token.
@@ -255,12 +208,12 @@ Used to retrieve a specific active child token for a given parent token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IRMRKNesting.Child | struct A Child struct containing data about the specified child |
+| _0 | IRMRKNestable.Child | struct A Child struct containing data about the specified child |
 
 ### childrenOf
 
 ```solidity
-function childrenOf(uint256 parentId) external view returns (struct IRMRKNesting.Child[])
+function childrenOf(uint256 parentId) external view returns (struct IRMRKNestable.Child[])
 ```
 
 Used to retrieve the active child tokens of a given parent token.
@@ -277,7 +230,7 @@ Used to retrieve the active child tokens of a given parent token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IRMRKNesting.Child[] | struct[] An array of Child structs containing the parent token&#39;s active child tokens |
+| _0 | IRMRKNestable.Child[] | struct[] An array of Child structs containing the parent token&#39;s active child tokens |
 
 ### directOwnerOf
 
@@ -303,50 +256,6 @@ Used to retrieve the immediate owner of the given token.
 | _1 | uint256 | uint256 Token ID of the immediate owner. If the immediate owner is an externally owned account, the value  should be `0` |
 | _2 | bool | bool A boolean value signifying whether the immediate owner is a token (`true`) or not (`false`) |
 
-### getActiveAssetPriorities
-
-```solidity
-function getActiveAssetPriorities(uint256 tokenId) external view returns (uint16[])
-```
-
-Used to retrieve active asset priorities of a given token.
-
-*Asset priorities are a non-sequential array of uint16 values with an array size equal to active asset  priorites.*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| tokenId | uint256 | ID of the token to query |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | uint16[] | uint16[] Array of active asset priorities |
-
-### getActiveAssets
-
-```solidity
-function getActiveAssets(uint256 tokenId) external view returns (uint64[])
-```
-
-Used to retrieve the active asset IDs of a given token.
-
-*Assets metadata is stored by reference mapping `_asset[assetId]`.*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| tokenId | uint256 | ID of the token to query |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | uint64[] | uint64[] Array of active asset IDs |
-
 ### getApproved
 
 ```solidity
@@ -368,96 +277,6 @@ function getApproved(uint256 tokenId) external view returns (address)
 | Name | Type | Description |
 |---|---|---|
 | _0 | address | undefined |
-
-### getApprovedForAssets
-
-```solidity
-function getApprovedForAssets(uint256 tokenId) external view returns (address)
-```
-
-Used to retrieve the address of the account approved to manage assets of a given token.
-
-*Requirements:  - `tokenId` must exist.*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| tokenId | uint256 | ID of the token for which to retrieve the approved address |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | address | address Address of the account that is approved to manage the specified token&#39;s assets |
-
-### getAssetMetadata
-
-```solidity
-function getAssetMetadata(uint256 tokenId, uint64 assetId) external view returns (string)
-```
-
-Used to fetch the asset metadata of the specified token&#39;s for given asset.
-
-*Assets are stored by reference mapping `_assets[assetId]`.Can be overriden to implement enumerate, fallback or other custom logic.*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| tokenId | uint256 | ID of the token to query |
-| assetId | uint64 | Asset Id, must be in the pending or active assets array |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | string | string Metadata of the asset |
-
-### getAssetOverwrites
-
-```solidity
-function getAssetOverwrites(uint256 tokenId, uint64 newAssetId) external view returns (uint64)
-```
-
-Used to retrieve the asset ID that will be replaced (if any) if a given assetID is accepted from  the pending assets array.
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| tokenId | uint256 | ID of the token to query |
-| newAssetId | uint64 | ID of the pending asset which will be accepted |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | uint64 | uint64 ID of the asset which will be replaced |
-
-### getPendingAssets
-
-```solidity
-function getPendingAssets(uint256 tokenId) external view returns (uint64[])
-```
-
-Returns pending asset IDs for a given token
-
-*Pending assets metadata is stored by reference mapping _pendingAsset[assetId]*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| tokenId | uint256 | the token ID to query |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | uint64[] | uint64[] pending asset IDs |
 
 ### isApprovedForAll
 
@@ -481,29 +300,6 @@ function isApprovedForAll(address owner, address operator) external view returns
 | Name | Type | Description |
 |---|---|---|
 | _0 | bool | undefined |
-
-### isApprovedForAllForAssets
-
-```solidity
-function isApprovedForAllForAssets(address owner, address operator) external view returns (bool)
-```
-
-Used to check whether the address has been granted the operator role by a given address or not.
-
-*See {setApprovalForAllForAssets}.*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| owner | address | Address of the account that we are checking for whether it has granted the operator role |
-| operator | address | Address of the account that we are checking whether it has the operator role or not |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | bool | bool The boolean value indicating wehter the account we are checking has been granted the operator role |
 
 ### isSoulbound
 
@@ -564,7 +360,7 @@ Used to retrieve the collection name.
 ### nestMint
 
 ```solidity
-function nestMint(address to, uint256 tokenId, uint256 destId) external nonpayable
+function nestMint(address to, uint256 tokenId, uint256 destinationId) external nonpayable
 ```
 
 
@@ -577,7 +373,7 @@ function nestMint(address to, uint256 tokenId, uint256 destId) external nonpayab
 |---|---|---|
 | to | address | undefined |
 | tokenId | uint256 | undefined |
-| destId | uint256 | undefined |
+| destinationId | uint256 | undefined |
 
 ### nestTransfer
 
@@ -641,7 +437,7 @@ Used to retrieve the root owner of the given token.
 ### pendingChildOf
 
 ```solidity
-function pendingChildOf(uint256 parentId, uint256 index) external view returns (struct IRMRKNesting.Child)
+function pendingChildOf(uint256 parentId, uint256 index) external view returns (struct IRMRKNestable.Child)
 ```
 
 Used to retrieve a specific pending child token from a given parent token.
@@ -659,12 +455,12 @@ Used to retrieve a specific pending child token from a given parent token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IRMRKNesting.Child | struct A Child struct containting data about the specified child |
+| _0 | IRMRKNestable.Child | struct A Child struct containting data about the specified child |
 
 ### pendingChildrenOf
 
 ```solidity
-function pendingChildrenOf(uint256 parentId) external view returns (struct IRMRKNesting.Child[])
+function pendingChildrenOf(uint256 parentId) external view returns (struct IRMRKNestable.Child[])
 ```
 
 Used to retrieve the pending child tokens of a given parent token.
@@ -681,24 +477,7 @@ Used to retrieve the pending child tokens of a given parent token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IRMRKNesting.Child[] | struct[] An array of Child structs containing the parent token&#39;s pending child tokens |
-
-### rejectAllAssets
-
-```solidity
-function rejectAllAssets(uint256 tokenId, uint256 maxRejections) external nonpayable
-```
-
-Rejects all assets from the pending array of a given token.
-
-*Effecitvely deletes the pending array.Requirements:  - The caller must own the token or be approved to manage the token&#39;s assets  - `tokenId` must exist.  - If there are more resouces than `maxRejections`, the execution will be revertedEmits a {AssetRejected} event with assetId = 0.*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| tokenId | uint256 | ID of the token of which to clear the pending array |
-| maxRejections | uint256 | The maximum amount of assets to reject |
+| _0 | IRMRKNestable.Child[] | struct[] An array of Child structs containing the parent token&#39;s pending child tokens |
 
 ### rejectAllChildren
 
@@ -715,24 +494,6 @@ Used to reject all pending children of a given parent token.
 | Name | Type | Description |
 |---|---|---|
 | tokenId | uint256 | ID of the parent token for which to reject all of the pending tokens |
-
-### rejectAsset
-
-```solidity
-function rejectAsset(uint256 tokenId, uint256 index, uint64 assetId) external nonpayable
-```
-
-Rejects a asset from the pending array of given token.
-
-*Removes the asset from the token&#39;s pending asset array.Requirements:  - The caller must own the token or be approved to manage the token&#39;s assets  - `tokenId` must exist.  - `index` must be in range of the length of the pending asset array.Emits a {AssetRejected} event.*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| tokenId | uint256 | ID of the token that the asset is being rejected from |
-| index | uint256 | Index of the asset in the pending array to be rejected |
-| assetId | uint64 | ID of the asset expected to be located at the specified index |
 
 ### safeMint
 
@@ -823,39 +584,21 @@ function setApprovalForAll(address operator, bool approved) external nonpayable
 | operator | address | undefined |
 | approved | bool | undefined |
 
-### setApprovalForAllForAssets
+### setSoulboundExempt
 
 ```solidity
-function setApprovalForAllForAssets(address operator, bool approved) external nonpayable
+function setSoulboundExempt(uint256 tokenId) external nonpayable
 ```
 
-Used to add or remove an operator of assets for the caller.
 
-*Operators can call {acceptAsset}, {rejectAsset}, {rejectAllAssets} or {setPriority} for any token  owned by the caller.Requirements:  - The `operator` cannot be the caller.Emits an {ApprovalForAllForAssets} event.*
+
+
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| operator | address | Address of the account to which the operator role is granted or revoked from |
-| approved | bool | The boolean value indicating whether the operator role is being granted (`true`) or revoked  (`false`) |
-
-### setPriority
-
-```solidity
-function setPriority(uint256 tokenId, uint16[] priorities) external nonpayable
-```
-
-Sets a new priority array for a given token.
-
-*The priority array is a non-sequential list of `uint16`s, where the lowest value is considered highest  priority.Value `0` of a priority is a special case equivalent to unitialized.Requirements:  - The caller must own the token or be approved to manage the token&#39;s assets  - `tokenId` must exist.  - The length of `priorities` must be equal the length of the active assets array.Emits a {AssetPrioritySet} event.*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| tokenId | uint256 | ID of the token to set the priorities for |
-| priorities | uint16[] | An array of priorities of active assets. The succesion of items in the priorities array  matches that of the succesion of items in the active array |
+| tokenId | uint256 | undefined |
 
 ### supportsInterface
 
@@ -1029,127 +772,6 @@ event ApprovalForAll(address indexed owner, address indexed operator, bool appro
 | owner `indexed` | address | undefined |
 | operator `indexed` | address | undefined |
 | approved  | bool | undefined |
-
-### ApprovalForAllForAssets
-
-```solidity
-event ApprovalForAllForAssets(address indexed owner, address indexed operator, bool approved)
-```
-
-Used to notify listeners that owner has granted approval to the user to manage assets of all of their  tokens.
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| owner `indexed` | address | undefined |
-| operator `indexed` | address | undefined |
-| approved  | bool | undefined |
-
-### ApprovalForAssets
-
-```solidity
-event ApprovalForAssets(address indexed owner, address indexed approved, uint256 indexed tokenId)
-```
-
-Used to notify listeners that owner has granted an approval to the user to manage the assets of a  given token.
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| owner `indexed` | address | undefined |
-| approved `indexed` | address | undefined |
-| tokenId `indexed` | uint256 | undefined |
-
-### AssetAccepted
-
-```solidity
-event AssetAccepted(uint256 indexed tokenId, uint64 indexed assetId, uint64 indexed overwritesId)
-```
-
-Used to notify listeners that a asset object at `assetId` is accepted by the token and migrated  from token&#39;s pending assets array to active assets array of the token.
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| tokenId `indexed` | uint256 | undefined |
-| assetId `indexed` | uint64 | undefined |
-| overwritesId `indexed` | uint64 | undefined |
-
-### AssetAddedToToken
-
-```solidity
-event AssetAddedToToken(uint256 indexed tokenId, uint64 indexed assetId, uint64 indexed overwritesId)
-```
-
-Used to notify listeners that a asset object at `assetId` is added to token&#39;s pending asset  array.
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| tokenId `indexed` | uint256 | undefined |
-| assetId `indexed` | uint64 | undefined |
-| overwritesId `indexed` | uint64 | undefined |
-
-### AssetPrioritySet
-
-```solidity
-event AssetPrioritySet(uint256 indexed tokenId)
-```
-
-Used to notify listeners that token&#39;s prioritiy array is reordered.
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| tokenId `indexed` | uint256 | undefined |
-
-### AssetRejected
-
-```solidity
-event AssetRejected(uint256 indexed tokenId, uint64 indexed assetId)
-```
-
-Used to notify listeners that a asset object at `assetId` is rejected from token and is dropped  from the pending assets array of the token.
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| tokenId `indexed` | uint256 | undefined |
-| assetId `indexed` | uint64 | undefined |
-
-### AssetSet
-
-```solidity
-event AssetSet(uint64 indexed assetId)
-```
-
-Used to notify listeners that a asset object is initialized at `assetId`.
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| assetId `indexed` | uint64 | undefined |
 
 ### ChildAccepted
 
@@ -1372,50 +994,6 @@ Attempting to transfer the token to a 0x0 address
 
 
 
-### RMRKApprovalForAssetsToCurrentOwner
-
-```solidity
-error RMRKApprovalForAssetsToCurrentOwner()
-```
-
-Attempting to grant approval of assets to their current owner
-
-
-
-
-### RMRKApproveForAssetsCallerIsNotOwnerNorApprovedForAll
-
-```solidity
-error RMRKApproveForAssetsCallerIsNotOwnerNorApprovedForAll()
-```
-
-Attempting to grant approval of assets without being the caller or approved for all
-
-
-
-
-### RMRKAssetAlreadyExists
-
-```solidity
-error RMRKAssetAlreadyExists()
-```
-
-Attempting to add a asset using an ID that has already been used
-
-
-
-
-### RMRKBadPriorityListLength
-
-```solidity
-error RMRKBadPriorityListLength()
-```
-
-Attempting to set the priorities with an array of length that doesn&#39;t match the length of active assets array
-
-
-
-
 ### RMRKCannotTransferSoulbound
 
 ```solidity
@@ -1460,17 +1038,6 @@ Attempting to use ID 0, which is not supported
 *The ID 0 in RMRK suite is reserved for empty values. Guarding against its use ensures the expected operation*
 
 
-### RMRKIndexOutOfRange
-
-```solidity
-error RMRKIndexOutOfRange()
-```
-
-Attempting to interact with a asset, using index greater than number of assets
-
-
-
-
 ### RMRKIsNotContract
 
 ```solidity
@@ -1478,17 +1045,6 @@ error RMRKIsNotContract()
 ```
 
 Attempting to interact with an end-user account when the contract account is expected
-
-
-
-
-### RMRKMaxPendingAssetsReached
-
-```solidity
-error RMRKMaxPendingAssetsReached()
-```
-
-Attempting to add a pending asset after the number of pending assets has reached the limit (default limit is  128)
 
 
 
@@ -1521,10 +1077,10 @@ Attempting to burn a total number of recursive children higher than maximum set
 | childContract | address | Address of the collection smart contract in which the maximum number of recursive burns was reached |
 | childId | uint256 | ID of the child token at which the maximum number of recursive burns was reached |
 
-### RMRKMintToNonRMRKImplementer
+### RMRKMintToNonRMRKNestableImplementer
 
 ```solidity
-error RMRKMintToNonRMRKImplementer()
+error RMRKMintToNonRMRKNestableImplementer()
 ```
 
 Attempting to mint a nested token to a smart contract that doesn&#39;t support nesting
@@ -1532,21 +1088,21 @@ Attempting to mint a nested token to a smart contract that doesn&#39;t support n
 
 
 
-### RMRKNestingTooDeep
+### RMRKNestableTooDeep
 
 ```solidity
-error RMRKNestingTooDeep()
+error RMRKNestableTooDeep()
 ```
 
-Attempting to nest a child over the nesting limit (current limit is 100 levels of nesting)
+Attempting to nest a child over the nestable limit (current limit is 100 levels of nesting)
 
 
 
 
-### RMRKNestingTransferToDescendant
+### RMRKNestableTransferToDescendant
 
 ```solidity
-error RMRKNestingTransferToDescendant()
+error RMRKNestableTransferToDescendant()
 ```
 
 Attempting to nest the token to own descendant, which would create a loop and leave the looped tokens in limbo
@@ -1554,10 +1110,10 @@ Attempting to nest the token to own descendant, which would create a loop and le
 
 
 
-### RMRKNestingTransferToNonRMRKNestingImplementer
+### RMRKNestableTransferToNonRMRKNestableImplementer
 
 ```solidity
-error RMRKNestingTransferToNonRMRKNestingImplementer()
+error RMRKNestableTransferToNonRMRKNestableImplementer()
 ```
 
 Attempting to nest the token to a smart contract that doesn&#39;t support nesting
@@ -1565,35 +1121,13 @@ Attempting to nest the token to a smart contract that doesn&#39;t support nestin
 
 
 
-### RMRKNestingTransferToSelf
+### RMRKNestableTransferToSelf
 
 ```solidity
-error RMRKNestingTransferToSelf()
+error RMRKNestableTransferToSelf()
 ```
 
 Attempting to nest the token into itself
-
-
-
-
-### RMRKNoAssetMatchingId
-
-```solidity
-error RMRKNoAssetMatchingId()
-```
-
-Attempting to interact with a asset that can not be found
-
-
-
-
-### RMRKNotApprovedForAssetsOrOwner
-
-```solidity
-error RMRKNotApprovedForAssetsOrOwner()
-```
-
-Attempting to manage a asset without owning it or having been granted permission by the owner to do so
 
 
 
@@ -1620,28 +1154,6 @@ Attempting to interact with a pending child using an index greater than the size
 
 
 
-### RMRKTokenDoesNotHaveAsset
-
-```solidity
-error RMRKTokenDoesNotHaveAsset()
-```
-
-Attempting to compose a NFT of a token without active assets
-
-
-
-
-### RMRKUnexpectedAssetId
-
-```solidity
-error RMRKUnexpectedAssetId()
-```
-
-Attempting to accept or reject a asset which does not match the one at the specified index
-
-
-
-
 ### RMRKUnexpectedChildId
 
 ```solidity
@@ -1649,17 +1161,6 @@ error RMRKUnexpectedChildId()
 ```
 
 Attempting to accept or unnest a child which does not match the one at the specified index
-
-
-
-
-### RMRKUnexpectedNumberOfAssets
-
-```solidity
-error RMRKUnexpectedNumberOfAssets()
-```
-
-Attempting to reject all assets but more assets than expected are pending
 
 
 

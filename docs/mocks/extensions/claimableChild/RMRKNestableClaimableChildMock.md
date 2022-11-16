@@ -1,4 +1,4 @@
-# RMRKSoulboundNestingExternalEquippableMock
+# RMRKNestableClaimableChildMock
 
 
 
@@ -102,6 +102,29 @@ function balanceOf(address owner) external view returns (uint256)
 |---|---|---|
 | _0 | uint256 | undefined |
 
+### balancePerNftOf
+
+```solidity
+function balancePerNftOf(address owner, uint256 parentId) external view returns (uint256)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| owner | address | undefined |
+| parentId | uint256 | undefined |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint256 | undefined |
+
 ### burn
 
 ```solidity
@@ -167,7 +190,7 @@ Used to verify that the given child tokwn is included in an active array of a to
 ### childOf
 
 ```solidity
-function childOf(uint256 parentId, uint256 index) external view returns (struct IRMRKNesting.Child)
+function childOf(uint256 parentId, uint256 index) external view returns (struct IRMRKNestable.Child)
 ```
 
 Used to retrieve a specific active child token for a given parent token.
@@ -185,12 +208,12 @@ Used to retrieve a specific active child token for a given parent token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IRMRKNesting.Child | struct A Child struct containing data about the specified child |
+| _0 | IRMRKNestable.Child | struct A Child struct containing data about the specified child |
 
 ### childrenOf
 
 ```solidity
-function childrenOf(uint256 parentId) external view returns (struct IRMRKNesting.Child[])
+function childrenOf(uint256 parentId) external view returns (struct IRMRKNestable.Child[])
 ```
 
 Used to retrieve the active child tokens of a given parent token.
@@ -207,7 +230,7 @@ Used to retrieve the active child tokens of a given parent token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IRMRKNesting.Child[] | struct[] An array of Child structs containing the parent token&#39;s active child tokens |
+| _0 | IRMRKNestable.Child[] | struct[] An array of Child structs containing the parent token&#39;s active child tokens |
 
 ### directOwnerOf
 
@@ -255,23 +278,6 @@ function getApproved(uint256 tokenId) external view returns (address)
 |---|---|---|
 | _0 | address | undefined |
 
-### getEquippableAddress
-
-```solidity
-function getEquippableAddress() external view returns (address)
-```
-
-Used to retrieve the address of the `Equippable` smart contract.
-
-
-
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | address | address Address of the `Equippable` smart contract |
-
 ### isApprovedForAll
 
 ```solidity
@@ -294,51 +300,6 @@ function isApprovedForAll(address owner, address operator) external view returns
 | Name | Type | Description |
 |---|---|---|
 | _0 | bool | undefined |
-
-### isApprovedOrOwner
-
-```solidity
-function isApprovedOrOwner(address spender, uint256 tokenId) external view returns (bool)
-```
-
-Used to verify that the specified address is either the owner of the given token or approved by the owner  to manage it.
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| spender | address | Address that we are verifying |
-| tokenId | uint256 | ID of the token we are checking |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | bool | bool A boolean value indicating whether the specified address is the owner of the given token or approved  to manage it |
-
-### isSoulbound
-
-```solidity
-function isSoulbound(uint256 tokenId) external view returns (bool)
-```
-
-Used to verify if the token is soulbound.
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| tokenId | uint256 | ID of the token we are verifying |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | bool | bool Boolean verifying whether the token is soulbound |
 
 ### mint
 
@@ -377,7 +338,7 @@ Used to retrieve the collection name.
 ### nestMint
 
 ```solidity
-function nestMint(address to, uint256 tokenId, uint256 destId) external nonpayable
+function nestMint(address to, uint256 tokenId, uint256 destinationId) external nonpayable
 ```
 
 
@@ -390,7 +351,7 @@ function nestMint(address to, uint256 tokenId, uint256 destId) external nonpayab
 |---|---|---|
 | to | address | undefined |
 | tokenId | uint256 | undefined |
-| destId | uint256 | undefined |
+| destinationId | uint256 | undefined |
 
 ### nestTransfer
 
@@ -454,7 +415,7 @@ Used to retrieve the root owner of the given token.
 ### pendingChildOf
 
 ```solidity
-function pendingChildOf(uint256 parentId, uint256 index) external view returns (struct IRMRKNesting.Child)
+function pendingChildOf(uint256 parentId, uint256 index) external view returns (struct IRMRKNestable.Child)
 ```
 
 Used to retrieve a specific pending child token from a given parent token.
@@ -472,12 +433,12 @@ Used to retrieve a specific pending child token from a given parent token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IRMRKNesting.Child | struct A Child struct containting data about the specified child |
+| _0 | IRMRKNestable.Child | struct A Child struct containting data about the specified child |
 
 ### pendingChildrenOf
 
 ```solidity
-function pendingChildrenOf(uint256 parentId) external view returns (struct IRMRKNesting.Child[])
+function pendingChildrenOf(uint256 parentId) external view returns (struct IRMRKNestable.Child[])
 ```
 
 Used to retrieve the pending child tokens of a given parent token.
@@ -494,7 +455,25 @@ Used to retrieve the pending child tokens of a given parent token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IRMRKNesting.Child[] | struct[] An array of Child structs containing the parent token&#39;s pending child tokens |
+| _0 | IRMRKNestable.Child[] | struct[] An array of Child structs containing the parent token&#39;s pending child tokens |
+
+### reclaimChild
+
+```solidity
+function reclaimChild(uint256 tokenId, address childAddress, uint256 childId) external nonpayable
+```
+
+Used to reclaim an abandoned child token.
+
+*Child token is created by unnesting with `to` as the `0x0` address or by rejecting children.This function will set the child&#39;s owner to the `rootOwner` of the caller, allowing the `rootOwner` management permissions for the child.Requirements:  - `tokenId` must exist*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId | uint256 | ID of the last parent token of the child token being recovered |
+| childAddress | address | Address of the child token&#39;s smart contract |
+| childId | uint256 | ID of the child token being reclaimed |
 
 ### rejectAllChildren
 
@@ -600,22 +579,6 @@ function setApprovalForAll(address operator, bool approved) external nonpayable
 |---|---|---|
 | operator | address | undefined |
 | approved | bool | undefined |
-
-### setEquippableAddress
-
-```solidity
-function setEquippableAddress(address equippable) external nonpayable
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| equippable | address | undefined |
 
 ### supportsInterface
 
@@ -848,23 +811,6 @@ Used to notify listeners a child token has been unnested from parent token.
 | childId `indexed` | uint256 | undefined |
 | fromPending  | bool | undefined |
 
-### EquippableAddressSet
-
-```solidity
-event EquippableAddressSet(address old, address new_)
-```
-
-sed to notify the listeners that the address of the `Equippable` associated smart contract has been set.
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| old  | address | undefined |
-| new_  | address | undefined |
-
 ### NestTransfer
 
 ```solidity
@@ -1028,17 +974,6 @@ Attempting to transfer the token to a 0x0 address
 
 
 
-### RMRKCannotTransferSoulbound
-
-```solidity
-error RMRKCannotTransferSoulbound()
-```
-
-Attempting to transfer a soulbound (non-transferrable) token
-
-
-
-
 ### RMRKChildAlreadyExists
 
 ```solidity
@@ -1070,6 +1005,17 @@ error RMRKIdZeroForbidden()
 Attempting to use ID 0, which is not supported
 
 *The ID 0 in RMRK suite is reserved for empty values. Guarding against its use ensures the expected operation*
+
+
+### RMRKInvalidChildReclaim
+
+```solidity
+error RMRKInvalidChildReclaim()
+```
+
+Attempting to reclaim a child that can&#39;t be reclaimed
+
+
 
 
 ### RMRKIsNotContract
@@ -1111,10 +1057,10 @@ Attempting to burn a total number of recursive children higher than maximum set
 | childContract | address | Address of the collection smart contract in which the maximum number of recursive burns was reached |
 | childId | uint256 | ID of the child token at which the maximum number of recursive burns was reached |
 
-### RMRKMintToNonRMRKImplementer
+### RMRKMintToNonRMRKNestableImplementer
 
 ```solidity
-error RMRKMintToNonRMRKImplementer()
+error RMRKMintToNonRMRKNestableImplementer()
 ```
 
 Attempting to mint a nested token to a smart contract that doesn&#39;t support nesting
@@ -1122,32 +1068,21 @@ Attempting to mint a nested token to a smart contract that doesn&#39;t support n
 
 
 
-### RMRKMustUnequipFirst
+### RMRKNestableTooDeep
 
 ```solidity
-error RMRKMustUnequipFirst()
+error RMRKNestableTooDeep()
 ```
 
-Attempting to unnest a child before it is unequipped
+Attempting to nest a child over the nestable limit (current limit is 100 levels of nesting)
 
 
 
 
-### RMRKNestingTooDeep
-
-```solidity
-error RMRKNestingTooDeep()
-```
-
-Attempting to nest a child over the nesting limit (current limit is 100 levels of nesting)
-
-
-
-
-### RMRKNestingTransferToDescendant
+### RMRKNestableTransferToDescendant
 
 ```solidity
-error RMRKNestingTransferToDescendant()
+error RMRKNestableTransferToDescendant()
 ```
 
 Attempting to nest the token to own descendant, which would create a loop and leave the looped tokens in limbo
@@ -1155,10 +1090,10 @@ Attempting to nest the token to own descendant, which would create a loop and le
 
 
 
-### RMRKNestingTransferToNonRMRKNestingImplementer
+### RMRKNestableTransferToNonRMRKNestableImplementer
 
 ```solidity
-error RMRKNestingTransferToNonRMRKNestingImplementer()
+error RMRKNestableTransferToNonRMRKNestableImplementer()
 ```
 
 Attempting to nest the token to a smart contract that doesn&#39;t support nesting
@@ -1166,10 +1101,10 @@ Attempting to nest the token to a smart contract that doesn&#39;t support nestin
 
 
 
-### RMRKNestingTransferToSelf
+### RMRKNestableTransferToSelf
 
 ```solidity
-error RMRKNestingTransferToSelf()
+error RMRKNestableTransferToSelf()
 ```
 
 Attempting to nest the token into itself
