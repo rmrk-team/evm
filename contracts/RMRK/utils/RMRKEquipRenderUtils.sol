@@ -41,7 +41,7 @@ contract RMRKEquipRenderUtils {
      * @return id ID of the asset
      * @return equppableGroupId ID of the equippable group this asset belongs to
      * @return acceptRejectIndex The index of the given asset in the pending assets array it belongs to
-     * @return overwritesAssetWithId ID of the asset the given asset will overwrite if accepted
+     * @return replacesAssetWithId ID of the asset the given asset will overwrite if accepted
      * @return baseAddress Address of the `Base` smart contract this asset belongs to
      * @return metadata Metadata URI of the asset
      * @return fixedParts An array of IDs of fixed parts present in the asset
@@ -51,7 +51,7 @@ contract RMRKEquipRenderUtils {
         uint64 id;
         uint64 equippableGroupId;
         uint128 acceptRejectIndex;
-        uint64 overwritesAssetWithId;
+        uint64 replacesAssetWithId;
         address baseAddress;
         string metadata;
         uint64[] fixedParts;
@@ -152,7 +152,7 @@ contract RMRKEquipRenderUtils {
      *      ID,
      *      equippableGroupId,
      *      acceptRejectIndex,
-     *      overwritesAssetWithId,
+     *      replacesAssetWithId,
      *      baseAddress,
      *      metadata,
      *      [
@@ -186,7 +186,7 @@ contract RMRKEquipRenderUtils {
 
         ExtendedPendingAsset[]
             memory pendingAssets = new ExtendedPendingAsset[](len);
-        uint64 overwritesAssetWithId;
+        uint64 replacesAssetWithId;
         for (uint256 i; i < len; ) {
             (
                 string memory metadataURI,
@@ -195,7 +195,7 @@ contract RMRKEquipRenderUtils {
                 uint64[] memory fixedPartIds,
                 uint64[] memory slotPartIds
             ) = target_.getExtendedAsset(tokenId, assets[i]);
-            overwritesAssetWithId = target_.getAssetOverwrites(
+            replacesAssetWithId = target_.getAssetOverwrites(
                 tokenId,
                 assets[i]
             );
@@ -203,7 +203,7 @@ contract RMRKEquipRenderUtils {
                 id: assets[i],
                 equippableGroupId: equippableGroupId,
                 acceptRejectIndex: uint128(i),
-                overwritesAssetWithId: overwritesAssetWithId,
+                replacesAssetWithId: replacesAssetWithId,
                 baseAddress: baseAddress,
                 metadata: metadataURI,
                 fixedParts: fixedPartIds,

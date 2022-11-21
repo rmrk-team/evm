@@ -39,9 +39,9 @@ abstract contract RMRKAbstractNestableMultiAssetImpl is
     function addAssetToToken(
         uint256 tokenId,
         uint64 assetId,
-        uint64 overwrites
+        uint64 replacesAssetWithId
     ) public onlyOwnerOrContributor {
-        _addAssetToToken(tokenId, assetId, overwrites);
+        _addAssetToToken(tokenId, assetId, replacesAssetWithId);
     }
 
     function addAssetEntry(string memory metadataURI)

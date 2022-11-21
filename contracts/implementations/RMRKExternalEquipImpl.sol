@@ -13,9 +13,9 @@ contract RMRKExternalEquipImpl is OwnableLock, RMRKExternalEquip {
     function addAssetToToken(
         uint256 tokenId,
         uint64 assetId,
-        uint64 overwrites
+        uint64 replacesAssetWithId
     ) public virtual onlyOwnerOrContributor {
-        _addAssetToToken(tokenId, assetId, overwrites);
+        _addAssetToToken(tokenId, assetId, replacesAssetWithId);
     }
 
     function addAssetEntry(

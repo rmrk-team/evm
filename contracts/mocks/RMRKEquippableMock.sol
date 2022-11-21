@@ -41,9 +41,9 @@ contract RMRKEquippableMock is RMRKEquippable {
     function addAssetToToken(
         uint256 tokenId,
         uint64 assetId,
-        uint64 overwrites
+        uint64 replacesAssetWithId
     ) external {
-        _addAssetToToken(tokenId, assetId, overwrites);
+        _addAssetToToken(tokenId, assetId, replacesAssetWithId);
     }
 
     function addAssetEntry(

@@ -57,7 +57,7 @@ function addAssetEntry(uint64 equippableGroupId, address baseAddress, string met
 ### addAssetToToken
 
 ```solidity
-function addAssetToToken(uint256 tokenId, uint64 assetId, uint64 overwrites) external nonpayable
+function addAssetToToken(uint256 tokenId, uint64 assetId, uint64 replacesAssetWithId) external nonpayable
 ```
 
 
@@ -70,7 +70,7 @@ function addAssetToToken(uint256 tokenId, uint64 assetId, uint64 overwrites) ext
 |---|---|---|
 | tokenId | uint256 | undefined |
 | assetId | uint64 | undefined |
-| overwrites | uint64 | undefined |
+| replacesAssetWithId | uint64 | undefined |
 
 ### addContributor
 

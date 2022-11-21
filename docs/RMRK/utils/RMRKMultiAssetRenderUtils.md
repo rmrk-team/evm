@@ -65,7 +65,7 @@ function getPendingAssets(address target, uint256 tokenId) external view returns
 
 Used to get the pending assets of the given token.
 
-*The full `PendingAsset` looks like this:  [      id,      acceptRejectIndex,      overwritesAssetWithId,      metadata  ]*
+*The full `PendingAsset` looks like this:  [      id,      acceptRejectIndex,      replacesAssetWithId,      metadata  ]*
 
 #### Parameters
 

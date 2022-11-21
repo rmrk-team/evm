@@ -28,13 +28,13 @@ contract RMRKMultiAssetRenderUtils {
      * @notice The structure used to display information about a pending asset.
      * @return id ID of the asset
      * @return acceptRejectIndex An index to use in order to accept or reject the given asset
-     * @return overwritesAssetWithId ID of the asset that would be overwritten if this asset gets accepted
+     * @return replacesAssetWithId ID of the asset that would be overwritten if this asset gets accepted
      * @return metadata The metadata URI of the asset
      */
     struct PendingAsset {
         uint64 id;
         uint128 acceptRejectIndex;
-        uint64 overwritesAssetWithId;
+        uint64 replacesAssetWithId;
         string metadata;
     }
 
@@ -87,7 +87,7 @@ contract RMRKMultiAssetRenderUtils {
      *  [
      *      id,
      *      acceptRejectIndex,
-     *      overwritesAssetWithId,
+     *      replacesAssetWithId,
      *      metadata
      *  ]
      * @param target Address of the smart contract of the given token
@@ -110,17 +110,17 @@ contract RMRKMultiAssetRenderUtils {
 
         PendingAsset[] memory pendingAssets = new PendingAsset[](len);
         string memory metadata;
-        uint64 overwritesAssetWithId;
+        uint64 replacesAssetWithId;
         for (uint256 i; i < len; ) {
             metadata = target_.getAssetMetadata(tokenId, assets[i]);
-            overwritesAssetWithId = target_.getAssetOverwrites(
+            replacesAssetWithId = target_.getAssetOverwrites(
                 tokenId,
                 assets[i]
             );
             pendingAssets[i] = PendingAsset({
                 id: assets[i],
                 acceptRejectIndex: uint128(i),
-                overwritesAssetWithId: overwritesAssetWithId,
+                replacesAssetWithId: replacesAssetWithId,
                 metadata: metadata
             });
             unchecked {

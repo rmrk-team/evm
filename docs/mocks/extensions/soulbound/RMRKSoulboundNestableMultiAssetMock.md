@@ -84,7 +84,7 @@ function addAssetEntry(uint64 id, string metadataURI) external nonpayable
 ### addAssetToToken
 
 ```solidity
-function addAssetToToken(uint256 tokenId, uint64 assetId, uint64 overwrites) external nonpayable
+function addAssetToToken(uint256 tokenId, uint64 assetId, uint64 replacesAssetWithId) external nonpayable
 ```
 
 
@@ -97,7 +97,7 @@ function addAssetToToken(uint256 tokenId, uint64 assetId, uint64 overwrites) ext
 |---|---|---|
 | tokenId | uint256 | undefined |
 | assetId | uint64 | undefined |
-| overwrites | uint64 | undefined |
+| replacesAssetWithId | uint64 | undefined |
 
 ### addChild
 

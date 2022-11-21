@@ -323,12 +323,12 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
      *  reverted.
      * @param tokenId ID of the token to add the asset to
      * @param assetId ID of the asset to add to the token
-     * @param overwrites ID of the asset to overwrite with the asset associated with the `assetId`
+     * @param replacesAssetWithId ID of the asset to replace from the token's list of active assets
      */
     function _addAssetToToken(
         uint256 tokenId,
         uint64 assetId,
-        uint64 overwrites
+        uint64 replacesAssetWithId
     ) internal virtual {
         if (_tokenAssets[tokenId][assetId]) revert RMRKAssetAlreadyExists();
 
@@ -337,16 +337,16 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
         if (_pendingAssets[tokenId].length >= 128)
             revert RMRKMaxPendingAssetsReached();
 
-        _beforeAddAssetToToken(tokenId, assetId, overwrites);
+        _beforeAddAssetToToken(tokenId, assetId, replacesAssetWithId);
         _tokenAssets[tokenId][assetId] = true;
         _pendingAssets[tokenId].push(assetId);
 
-        if (overwrites != uint64(0)) {
-            _assetOverwrites[tokenId][assetId] = overwrites;
+        if (replacesAssetWithId != uint64(0)) {
+            _assetOverwrites[tokenId][assetId] = replacesAssetWithId;
         }
 
-        emit AssetAddedToToken(tokenId, assetId, overwrites);
-        _afterAddAssetToToken(tokenId, assetId, overwrites);
+        emit AssetAddedToToken(tokenId, assetId, replacesAssetWithId);
+        _afterAddAssetToToken(tokenId, assetId, replacesAssetWithId);
     }
 
     function _beforeAddAsset(uint64 id, string memory metadataURI)
@@ -362,13 +362,13 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
     function _beforeAddAssetToToken(
         uint256 tokenId,
         uint64 assetId,
-        uint64 overwrites
+        uint64 replacesAssetWithId
     ) internal virtual {}
 
     function _afterAddAssetToToken(
         uint256 tokenId,
         uint64 assetId,
-        uint64 overwrites
+        uint64 replacesAssetWithId
     ) internal virtual {}
 
     function _beforeAcceptAsset(

@@ -94,7 +94,7 @@ function getExtendedPendingAssets(address target, uint256 tokenId) external view
 
 Used to get the extended pending assets of the given token.
 
-*The full `ExtendedPendingAsset` looks like this:  [      ID,      equippableGroupId,      acceptRejectIndex,      overwritesAssetWithId,      baseAddress,      metadata,      [          fixedPartId0,          fixedPartId1,          fixedPartId2      ],      [          slotPartId0,          slotPartId1,          slotPartId2      ]  ]*
+*The full `ExtendedPendingAsset` looks like this:  [      ID,      equippableGroupId,      acceptRejectIndex,      replacesAssetWithId,      baseAddress,      metadata,      [          fixedPartId0,          fixedPartId1,          fixedPartId2      ],      [          slotPartId0,          slotPartId1,          slotPartId2      ]  ]*
 
 #### Parameters
 
