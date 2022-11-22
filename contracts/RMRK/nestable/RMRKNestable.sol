@@ -869,12 +869,13 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
      *  - The pending array of the parent contract must not be full.
      * @param parentId ID of the parent token to receive the new child token
      * @param childId ID of the new proposed child token
+     * @param data Additional data with no specified format
      */
 
     function addChild(
         uint256 parentId,
         uint256 childId,
-        bytes memory
+        bytes memory data
     ) public virtual {
         _requireMinted(parentId);
 
