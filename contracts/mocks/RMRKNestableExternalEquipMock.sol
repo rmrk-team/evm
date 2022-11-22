@@ -29,9 +29,9 @@ contract RMRKNestableExternalEquipMock is RMRKNestableExternalEquip {
     function nestMint(
         address to,
         uint256 tokenId,
-        uint256 destId
+        uint256 destinationId
     ) external {
-        _nestMint(to, tokenId, destId);
+        _nestMint(to, tokenId, destinationId, "");
     }
 
     function setEquippableAddress(address equippable) external {
@@ -47,6 +47,6 @@ contract RMRKNestableExternalEquipMock is RMRKNestableExternalEquip {
         uint256 tokenId,
         uint256 destinationId
     ) public virtual {
-        nestTransferFrom(_msgSender(), to, tokenId, destinationId);
+        nestTransferFrom(_msgSender(), to, tokenId, destinationId, "");
     }
 }
