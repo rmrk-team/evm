@@ -27,10 +27,10 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
     mapping(uint256 => uint64[]) internal _activeAssets;
 
     /// Mapping of tokenId to an array of pending assets
-    mapping(uint256 => uint64[]) private _pendingAssets;
+    mapping(uint256 => uint64[]) internal _pendingAssets;
 
     /// Mapping of tokenId to an array of priorities for active assets
-    mapping(uint256 => uint16[]) private _activeAssetPriorities;
+    mapping(uint256 => uint16[]) internal _activeAssetPriorities;
 
     /// Mapping of tokenId to assetId to whether the token has this asset assigned
     mapping(uint256 => mapping(uint64 => bool)) private _tokenAssets;
