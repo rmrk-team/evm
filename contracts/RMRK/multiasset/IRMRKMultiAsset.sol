@@ -131,8 +131,9 @@ interface IRMRKMultiAsset is IERC165 {
      *  - The caller must own the token or be approved to manage the token's assets
      *  - `tokenId` must exist.
      * @dev Emits a {AssetRejected} event with assetId = 0.
-     * @param tokenId ID of the token of which to clear the pending array
-     * @param maxRejections to prevent from rejecting assets which arrive just before this operation.
+     * @param tokenId ID of the token of which to clear the pending array.
+     * @param maxRejections Maximum number of expected assets to reject, used to prevent from
+     *  rejecting assets which arrive just before this operation.
      */
     function rejectAllAssets(uint256 tokenId, uint256 maxRejections) external;
 

@@ -247,7 +247,9 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
 
     /**
      * @notice Used to reject all of the pending assets for the given token.
-     * @param tokenId ID of the token to reject all of the pending assets
+     * @param tokenId ID of the token to reject all of the pending assets.
+     * @param maxRejections Maximum number of expected assets to reject, used to prevent from
+     *  rejecting assets which arrive just before this operation.
      */
     function _rejectAllAssets(uint256 tokenId, uint256 maxRejections)
         internal

@@ -209,7 +209,9 @@ contract RMRKExternalEquip is
      * @dev When rejecting all assets, the pending array is indiscriminately cleared.
      * @dev Can only be called by the owner of the token or a user that has been approved to manage the tokens's
      *  assets.
-     * @param tokenId ID of the token for which we are clearing the pending array
+     * @param tokenId ID of the token for which we are clearing the pending array.
+     * @param maxRejections Maximum number of expected assets to reject, used to prevent from
+     *  rejecting assets which arrive just before this operation.
      */
     function rejectAllAssets(uint256 tokenId, uint256 maxRejections)
         public

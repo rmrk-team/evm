@@ -127,7 +127,7 @@ error RMRKTokenDoesNotHaveAsset();
 error RMRKTokenHasNoAssets();
 /// Attempting to accept or unnest a child which does not match the one at the specified index
 error RMRKUnexpectedChildId();
-/// Attempting to reject all assets but more assets than expected are pending
+/// Attempting to reject all pending assets but more assets than expected are pending
 error RMRKUnexpectedNumberOfAssets();
 /// Attempting to accept or reject a asset which does not match the one at the specified index
 error RMRKUnexpectedAssetId();
