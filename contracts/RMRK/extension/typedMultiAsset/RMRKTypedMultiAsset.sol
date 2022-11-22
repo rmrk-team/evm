@@ -3,7 +3,6 @@
 pragma solidity ^0.8.16;
 
 import "./IRMRKTypedMultiAsset.sol";
-import "hardhat/console.sol";
 
 /**
  * @title RMRKTypedMultiAsset
@@ -22,7 +21,6 @@ contract RMRKTypedMultiAsset is IRMRKTypedMultiAsset {
         virtual
         returns (bool)
     {
-        console.logBytes4(type(IRMRKTypedMultiAsset).interfaceId);
         return interfaceId == type(IRMRKTypedMultiAsset).interfaceId;
     }
 
