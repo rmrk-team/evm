@@ -1098,7 +1098,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
                 IRMRKNestable(child.contractAddress).nestTransferFrom(
                     address(this),
                     to,
-                    tokenId,
+                    child.tokenId,
                     destinationId,
                     data
                 );

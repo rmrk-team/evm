@@ -514,6 +514,31 @@ async function shouldBehaveLikeNestable(
       await checkChildMovedToRootOwner(toOwnerAddress);
     });
 
+    it('can transfer child to another NFT', async function () {
+      const newOwnerAddress = addrs[2].address;
+      const newParentId = await mint(parent, newOwnerAddress);
+      await expect(
+        parent
+          .connect(tokenOwner)
+          .transferChild(
+            parentId,
+            parent.address,
+            newParentId,
+            0,
+            child.address,
+            childId,
+            false,
+            '0x',
+          ),
+      )
+        .to.emit(parent, 'ChildTransferred')
+        .withArgs(parentId, 0, child.address, childId, false);
+
+      expect(await child.ownerOf(childId)).to.eql(newOwnerAddress);
+      expect(await child.directOwnerOf(childId)).to.eql([parent.address, bn(newParentId), true]);
+      expect(await parent.pendingChildrenOf(newParentId)).to.eql([[bn(childId), child.address]]);
+    });
+
     it('cannot transfer child out of index', async function () {
       const toOwnerAddress = addrs[2].address;
       const badIndex = 2;
@@ -656,6 +681,31 @@ async function shouldBehaveLikeNestable(
         .withArgs(parentId, 0, child.address, childId, true);
 
       await checkChildMovedToRootOwner(toOwnerAddress);
+    });
+
+    it('can transfer child to another NFT', async function () {
+      const newOwnerAddress = addrs[2].address;
+      const newParentId = await mint(parent, newOwnerAddress);
+      await expect(
+        parent
+          .connect(tokenOwner)
+          .transferChild(
+            parentId,
+            parent.address,
+            newParentId,
+            0,
+            child.address,
+            childId,
+            true,
+            '0x',
+          ),
+      )
+        .to.emit(parent, 'ChildTransferred')
+        .withArgs(parentId, 0, child.address, childId, true);
+
+      expect(await child.ownerOf(childId)).to.eql(newOwnerAddress);
+      expect(await child.directOwnerOf(childId)).to.eql([parent.address, bn(newParentId), true]);
+      expect(await parent.pendingChildrenOf(newParentId)).to.eql([[bn(childId), child.address]]);
     });
 
     it('cannot transfer child out of index', async function () {
