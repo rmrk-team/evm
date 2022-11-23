@@ -518,7 +518,7 @@ async function shouldBehaveLikeEquippableWithSlots(
   });
 
   describe('Transfer equipped', async function () {
-    it('Can unequip and unnest', async function () {
+    it('Can unequip and transfer child', async function () {
       // Weapon is child on index 0, background on index 1
       const soldierOwner = addrs[0];
       const childIndex = 0;
@@ -531,17 +531,19 @@ async function shouldBehaveLikeEquippableWithSlots(
       await unequipWeaponAndCheckFromAddress(soldierOwner);
       await soldier
         .connect(soldierOwner)
-        .unnestChild(
+        .transferChild(
           soldiersIds[0],
           soldierOwner.address,
+          0,
           childIndex,
           weapon.address,
           weaponsIds[0],
           false,
+          '0x',
         );
     });
 
-    it('Unnest fails if child is equipped', async function () {
+    it('child transfer fails if child is equipped', async function () {
       const soldierOwner = addrs[0];
       // Weapon is child on index 0
       const childIndex = 0;
@@ -553,13 +555,15 @@ async function shouldBehaveLikeEquippableWithSlots(
       await expect(
         soldier
           .connect(soldierOwner)
-          .unnestChild(
+          .transferChild(
             soldiersIds[0],
             soldierOwner.address,
+            0,
             childIndex,
             weapon.address,
             weaponsIds[0],
             false,
+            '0x',
           ),
       ).to.be.revertedWithCustomError(weapon, 'RMRKMustUnequipFirst');
     });

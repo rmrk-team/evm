@@ -138,14 +138,23 @@ describe('NestableMock transfer hooks', function () {
     expect(await parent.balancePerNftOf(owner.address, 0)).to.eql(bn(1));
     expect(await child.balancePerNftOf(parent.address, parentId)).to.eql(bn(1));
 
-    await parent.unnestChild(parentId, otherOwner.address, 0, child.address, childId, true);
+    await parent.transferChild(
+      parentId,
+      otherOwner.address,
+      0,
+      0,
+      child.address,
+      childId,
+      true,
+      '0x',
+    );
     expect(await child.balancePerNftOf(parent.address, parentId)).to.eql(bn(0));
     expect(await child.balancePerNftOf(otherOwner.address, 0)).to.eql(bn(1));
 
     // Nest again
     await child
       .connect(otherOwner)
-      .nestTransferFrom(otherOwner.address, parent.address, childId, parentId);
+      .nestTransferFrom(otherOwner.address, parent.address, childId, parentId, '0x');
 
     expect(await child.balancePerNftOf(parent.address, parentId)).to.eql(bn(1));
     expect(await child.balancePerNftOf(otherOwner.address, 0)).to.eql(bn(0));

@@ -483,7 +483,7 @@ contract RMRKExternalEquip is
 
     /**
      * @notice Used to check whether the token has a given child equipped.
-     * @dev This is used to prevent from unnesting a child that is equipped.
+     * @dev This is used to prevent from transferring a child that is equipped.
      * @param tokenId ID of the parent token for which we are querying for
      * @param childAddress Address of the child token's smart contract
      * @param childId ID of the child token

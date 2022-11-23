@@ -21,7 +21,7 @@ contract RMRKEquippableMock is RMRKEquippable {
         uint256 tokenId,
         uint256 destinationId
     ) external {
-        _nestMint(to, tokenId, destinationId);
+        _nestMint(to, tokenId, destinationId, "");
     }
 
     // Utility transfers:
@@ -35,7 +35,7 @@ contract RMRKEquippableMock is RMRKEquippable {
         uint256 tokenId,
         uint256 destinationId
     ) public virtual {
-        nestTransferFrom(_msgSender(), to, tokenId, destinationId);
+        nestTransferFrom(_msgSender(), to, tokenId, destinationId, "");
     }
 
     function addAssetToToken(

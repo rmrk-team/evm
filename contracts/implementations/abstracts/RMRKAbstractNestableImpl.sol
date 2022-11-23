@@ -48,7 +48,7 @@ abstract contract RMRKAbstractNestableImpl is
         uint256 tokenId,
         uint256 destinationId
     ) public virtual {
-        nestTransferFrom(_msgSender(), to, tokenId, destinationId);
+        nestTransferFrom(_msgSender(), to, tokenId, destinationId, "");
     }
 
     function tokenURI(uint256)

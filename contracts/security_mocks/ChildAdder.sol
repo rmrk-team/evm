@@ -25,7 +25,7 @@ contract ChildAdder {
         uint256 numChildren
     ) external {
         for (uint256 i; i < numChildren; i++) {
-            IRMRKNestable(destContract).addChild(parentId, childId);
+            IRMRKNestable(destContract).addChild(parentId, childId, "");
         }
     }
 }
