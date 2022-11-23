@@ -331,7 +331,7 @@ async function shouldBehaveLikeEquippableAssets(
     });
   });
 
-  describe('Overwriting assets', async function () {
+  describe('Replacing assets', async function () {
     it('can add asset to token replacing an existing one', async function () {
       const resId = bn(1);
       const resId2 = bn(2);
@@ -351,6 +351,7 @@ async function shouldBehaveLikeEquippableAssets(
         .withArgs(tokenId, resId2, resId);
 
       expect(await chunkyEquip.getActiveAssets(tokenId)).to.be.eql([resId2]);
+      expect(await chunkyEquip.getActiveAssetPriorities(tokenId)).to.be.eql([0]);
 
       // Replacements should be gone
       expect(await chunkyEquip.getAssetReplacements(tokenId, resId2)).to.eql(bn(0));

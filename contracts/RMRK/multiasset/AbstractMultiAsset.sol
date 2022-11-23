@@ -173,20 +173,27 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
         _validatePendingAssetAtIndex(tokenId, index, assetId);
         _beforeAcceptAsset(tokenId, index, assetId);
 
-        uint64 replaces = _assetReplacements[tokenId][assetId];
-        if (replaces != uint64(0)) {
-            // It could have been replaced previously so it's fine if it's not found.
-            // If it's not deleted (not found), we don't want to send it on the event
-            if (!_activeAssets[tokenId].removeItemByValue(replaces))
-                replaces = uint64(0);
-            else delete _tokenAssets[tokenId][replaces];
+        uint64 replacesId = _assetReplacements[tokenId][assetId];
+        uint256 replaceIndex;
+        bool replacefound;
+        if (replacesId != uint64(0))
+            (replaceIndex, replacefound) = _activeAssets[tokenId].indexOf(
+                replacesId
+            );
+
+        if (replacefound) {
+            // We don't want to remove and then push a new asset.
+            // This way we also keep the priority of the originalresource
+            _activeAssets[tokenId][index] = assetId;
+            delete _tokenAssets[tokenId][replacesId];
+        } else {
+            _activeAssetPriorities[tokenId].push(uint16(0));
+            _activeAssets[tokenId].push(assetId);
+            replacesId = uint64(0);
         }
         _removePendingAsset(tokenId, index, assetId);
 
-        _activeAssets[tokenId].push(assetId);
-        //Push 0 value of uint16 to array, e.g., uninitialized
-        _activeAssetPriorities[tokenId].push(uint16(0));
-        emit AssetAccepted(tokenId, assetId, replaces);
+        emit AssetAccepted(tokenId, assetId, replacesId);
         _afterAcceptAsset(tokenId, index, assetId);
     }
 

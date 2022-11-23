@@ -111,7 +111,7 @@ async function shouldBehaveLikeMultiAsset(
       });
     });
 
-    describe('Overwriting assets', async function () {
+    describe('Replacing assets', async function () {
       it('can add asset to token replacing an existing one', async function () {
         const resId = await addAssetEntryFunc(this.token);
         const resId2 = await addAssetEntryFunc(this.token);
@@ -129,8 +129,9 @@ async function shouldBehaveLikeMultiAsset(
           .withArgs(tokenId, resId2, resId);
 
         expect(await this.token.getActiveAssets(tokenId)).to.be.eql([resId2]);
-        // Replacements should be gone
+        expect(await this.token.getActiveAssetPriorities(tokenId)).to.be.eql([0]);
 
+        // Replacements should be gone
         expect(await this.token.getAssetReplacements(tokenId, resId2)).to.eql(bn(0));
       });
 
@@ -141,6 +142,7 @@ async function shouldBehaveLikeMultiAsset(
         await this.token.connect(tokenOwner).acceptAsset(tokenId, 0, resId);
 
         expect(await this.token.getActiveAssets(tokenId)).to.be.eql([resId]);
+        expect(await this.token.getActiveAssetPriorities(tokenId)).to.be.eql([0]);
       });
 
       it('can reject asset and replacements are cleared', async function () {
