@@ -1287,6 +1287,17 @@ Attempting to interact with an end-user account when the contract account is exp
 
 
 
+### RMRKLocked
+
+```solidity
+error RMRKLocked()
+```
+
+Attempting to interact with a contract that had its operation locked
+
+
+
+
 ### RMRKMaxPendingChildrenReached
 
 ```solidity

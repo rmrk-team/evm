@@ -29,6 +29,7 @@ contract RMRKNestableMultiAssetImpl is RMRKAbstractNestableMultiAssetImpl {
         public
         payable
         virtual
+        notLocked
         saleIsOpen
     {
         (uint256 nextToken, uint256 totalSupplyOffset) = _preMint(numToMint);
@@ -45,7 +46,7 @@ contract RMRKNestableMultiAssetImpl is RMRKAbstractNestableMultiAssetImpl {
         address to,
         uint256 numToMint,
         uint256 destinationId
-    ) public payable virtual saleIsOpen {
+    ) public payable virtual notLocked saleIsOpen {
         (uint256 nextToken, uint256 totalSupplyOffset) = _preMint(numToMint);
 
         for (uint256 i = nextToken; i < totalSupplyOffset; ) {

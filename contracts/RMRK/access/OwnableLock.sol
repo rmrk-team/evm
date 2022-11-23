@@ -12,7 +12,7 @@ import "../library/RMRKErrors.sol";
  * @dev This smart contract is based on "openzeppelin's access/Ownable.sol".
  */
 contract OwnableLock is Context {
-    bool private _lock;
+    uint256 private _lock;
     address private _owner;
     mapping(address => uint256) private _contributors;
 
@@ -64,7 +64,7 @@ contract OwnableLock is Context {
      * @dev Once locked, functions using `notLocked` modifier cannot be executed.
      */
     function setLock() external onlyOwner {
-        _lock = true;
+        _lock = 1;
     }
 
     /**
@@ -72,7 +72,7 @@ contract OwnableLock is Context {
      * @return bool A boolean value signifying whether the smart contract has been locked
      */
     function getLock() public view returns (bool) {
-        return _lock;
+        return _lock == 1;
     }
 
     /**

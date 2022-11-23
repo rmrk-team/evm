@@ -32,7 +32,7 @@ contract RMRKMintingUtils is OwnableLock {
      * @dev If the maximum supply is reached, the execution will be reverted.
      */
     modifier saleIsOpen() {
-        if (_totalSupply >= _maxSupply) revert RMRKMintOverMax();
+        _checkSaleIsOpen();
         _;
     }
 
@@ -78,5 +78,9 @@ contract RMRKMintingUtils is OwnableLock {
     function _withdraw(address _address, uint256 _amount) private {
         (bool success, ) = _address.call{value: _amount}("");
         require(success, "Transfer failed.");
+    }
+
+    function _checkSaleIsOpen() private view {
+        if (_totalSupply >= _maxSupply) revert RMRKMintOverMax();
     }
 }
