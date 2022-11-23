@@ -12,7 +12,7 @@ async function shouldBehaveLikeMultiAsset(
     token: Contract,
     tokenId: number,
     resId: BigNumber,
-    overwrites: BigNumber | number,
+    replaces: BigNumber | number,
   ) => Promise<void>,
 ) {
   let tokenId: number;
@@ -112,19 +112,19 @@ async function shouldBehaveLikeMultiAsset(
     });
 
     describe('Overwriting assets', async function () {
-      it('can add asset to token overwritting an existing one', async function () {
+      it('can add asset to token replacing an existing one', async function () {
         const resId = await addAssetEntryFunc(this.token);
         const resId2 = await addAssetEntryFunc(this.token);
         await addAssetToTokenFunc(this.token, tokenId, resId, 0);
         await this.token.connect(tokenOwner).acceptAsset(tokenId, 0, resId);
 
-        // Add new asset to overwrite the first, and accept
+        // Add new asset to replace the first, and accept
         await expect(this.token.addAssetToToken(tokenId, resId2, resId))
           .to.emit(this.token, 'AssetAddedToToken')
           .withArgs(tokenId, resId2, resId);
         const pendingAssets = await this.token.getPendingAssets(tokenId);
 
-        expect(await this.token.getAssetOverwrites(tokenId, pendingAssets[0])).to.eql(resId);
+        expect(await this.token.getAssetReplacements(tokenId, pendingAssets[0])).to.eql(resId);
         await expect(this.token.connect(tokenOwner).acceptAsset(tokenId, 0, resId2))
           .to.emit(this.token, 'AssetAccepted')
           .withArgs(tokenId, resId2, resId);
@@ -133,11 +133,11 @@ async function shouldBehaveLikeMultiAsset(
         expect(
           await this.renderUtils.getAssetsById(this.token.address, tokenId, activeAssets),
         ).to.be.eql([metaURIDefault]);
-        // Overwrite should be gone
-        expect(await this.token.getAssetOverwrites(tokenId, pendingAssets[0])).to.eql(bn(0));
+        // Replacements should be gone
+        expect(await this.token.getAssetReplacements(tokenId, pendingAssets[0])).to.eql(bn(0));
       });
 
-      it('can overwrite non existing asset to token, it could have been deleted', async function () {
+      it('can replace non existing asset to token, it could have been deleted', async function () {
         const resId = await addAssetEntryFunc(this.token);
 
         await addAssetToTokenFunc(this.token, tokenId, resId, 1);
@@ -149,7 +149,7 @@ async function shouldBehaveLikeMultiAsset(
         ).to.be.eql([metaURIDefault]);
       });
 
-      it('can reject asset and overwrites are cleared', async function () {
+      it('can reject asset and replacements are cleared', async function () {
         const resId = await addAssetEntryFunc(this.token);
         await addAssetToTokenFunc(this.token, tokenId, resId, 0);
         await this.token.connect(tokenOwner).acceptAsset(tokenId, 0, resId);
@@ -158,10 +158,10 @@ async function shouldBehaveLikeMultiAsset(
         await addAssetToTokenFunc(this.token, tokenId, resId2, resId);
         await this.token.connect(tokenOwner).rejectAsset(tokenId, 0, resId2);
 
-        expect(await this.token.getAssetOverwrites(tokenId, resId2)).to.eql(bn(0));
+        expect(await this.token.getAssetReplacements(tokenId, resId2)).to.eql(bn(0));
       });
 
-      it('can reject all assets and overwrites are cleared', async function () {
+      it('can reject all assets and replacements are cleared', async function () {
         const resId = await addAssetEntryFunc(this.token);
         await addAssetToTokenFunc(this.token, tokenId, resId, 0);
         await this.token.connect(tokenOwner).acceptAsset(tokenId, 0, resId);
@@ -170,7 +170,7 @@ async function shouldBehaveLikeMultiAsset(
         await addAssetToTokenFunc(this.token, tokenId, resId2, resId);
         await this.token.connect(tokenOwner).rejectAllAssets(tokenId, 1);
 
-        expect(await this.token.getAssetOverwrites(tokenId, resId2)).to.eql(bn(0));
+        expect(await this.token.getAssetReplacements(tokenId, resId2)).to.eql(bn(0));
       });
     });
   });

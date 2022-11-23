@@ -383,7 +383,7 @@ async function shouldBehaveLikeEquippableAssets(
   });
 
   describe('Overwriting assets', async function () {
-    it('can add asset to token overwritting an existing one', async function () {
+    it('can add asset to token replacing an existing one', async function () {
       const resId = bn(1);
       const resId2 = bn(2);
       const tokenId = await mint(chunky, owner.address);
@@ -391,14 +391,14 @@ async function shouldBehaveLikeEquippableAssets(
       await chunkyEquip.addAssetToToken(tokenId, resId, 0);
       await chunkyEquip.acceptAsset(tokenId, 0, resId);
 
-      // Add new asset to overwrite the first, and accept
+      // Add new asset to replace the first, and accept
       const activeAssets = await chunkyEquip.getActiveAssets(tokenId);
       await expect(chunkyEquip.addAssetToToken(tokenId, resId2, activeAssets[0]))
         .to.emit(chunkyEquip, 'AssetAddedToToken')
         .withArgs(tokenId, resId2, resId);
       const pendingAssets = await chunkyEquip.getPendingAssets(tokenId);
 
-      expect(await chunkyEquip.getAssetOverwrites(tokenId, pendingAssets[0])).to.eql(
+      expect(await chunkyEquip.getAssetReplacements(tokenId, pendingAssets[0])).to.eql(
         activeAssets[0],
       );
       await expect(chunkyEquip.acceptAsset(tokenId, 0, resId2))
@@ -416,11 +416,11 @@ async function shouldBehaveLikeEquippableAssets(
           [resId2, equippableGroupIdDefault, baseAddressDefault, metaURIDefault],
         ]);
       }
-      // Overwrite should be gone
-      expect(await chunkyEquip.getAssetOverwrites(tokenId, pendingAssets[0])).to.eql(bn(0));
+      // Replacements should be gone
+      expect(await chunkyEquip.getAssetReplacements(tokenId, pendingAssets[0])).to.eql(bn(0));
     });
 
-    it('can overwrite non existing asset to token, it could have been deleted', async function () {
+    it('can replace non existing asset to token, it could have been deleted', async function () {
       const resId = bn(1);
       const tokenId = await mint(chunky, owner.address);
       await addAssets([resId]);
@@ -471,7 +471,7 @@ async function shouldBehaveLikeEquippableAssets(
       }
     });
 
-    it('can reject asset and overwrites are cleared', async function () {
+    it('can reject asset and replacements are cleared', async function () {
       const resId = bn(1);
       const resId2 = bn(2);
       const tokenId = await mint(chunky, owner.address);
@@ -479,11 +479,11 @@ async function shouldBehaveLikeEquippableAssets(
       await chunkyEquip.addAssetToToken(tokenId, resId, 0);
       await chunkyEquip.acceptAsset(tokenId, 0, resId);
 
-      // Will try to overwrite but we reject it
+      // Will try to replace but we reject it
       await chunkyEquip.addAssetToToken(tokenId, resId2, resId);
       await chunkyEquip.rejectAsset(tokenId, 0, resId2);
 
-      expect(await chunkyEquip.getAssetOverwrites(tokenId, resId2)).to.eql(bn(0));
+      expect(await chunkyEquip.getAssetReplacements(tokenId, resId2)).to.eql(bn(0));
     });
 
     it('can reject asset if approved', async function () {
@@ -543,7 +543,7 @@ async function shouldBehaveLikeEquippableAssets(
       }
     });
 
-    it('can reject all assets and overwrites are cleared', async function () {
+    it('can reject all assets and replacements are cleared', async function () {
       const resId = bn(1);
       const resId2 = bn(2);
       const tokenId = await mint(chunky, owner.address);
@@ -551,11 +551,11 @@ async function shouldBehaveLikeEquippableAssets(
       await chunkyEquip.addAssetToToken(tokenId, resId, 0);
       await chunkyEquip.acceptAsset(tokenId, 0, resId);
 
-      // Will try to overwrite but we reject all
+      // Will try to replace but we reject all
       await chunkyEquip.addAssetToToken(tokenId, resId2, resId);
       await chunkyEquip.rejectAllAssets(tokenId, 1);
 
-      expect(await chunkyEquip.getAssetOverwrites(tokenId, resId2)).to.eql(bn(0));
+      expect(await chunkyEquip.getAssetReplacements(tokenId, resId2)).to.eql(bn(0));
     });
 
     it('can reject all pending assets at max capacity', async function () {
@@ -572,7 +572,7 @@ async function shouldBehaveLikeEquippableAssets(
       }
       await chunkyEquip.rejectAllAssets(tokenId, 128);
 
-      expect(await chunkyEquip.getAssetOverwrites(1, 2)).to.eql(bn(0));
+      expect(await chunkyEquip.getAssetReplacements(1, 2)).to.eql(bn(0));
     });
 
     it('can reject all assets if approved', async function () {

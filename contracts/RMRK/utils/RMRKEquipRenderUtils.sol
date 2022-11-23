@@ -41,7 +41,7 @@ contract RMRKEquipRenderUtils {
      * @return id ID of the asset
      * @return equppableGroupId ID of the equippable group this asset belongs to
      * @return acceptRejectIndex The index of the given asset in the pending assets array it belongs to
-     * @return replacesAssetWithId ID of the asset the given asset will overwrite if accepted
+     * @return replacesAssetWithId ID of the asset the given asset will replace if accepted
      * @return baseAddress Address of the `Base` smart contract this asset belongs to
      * @return metadata Metadata URI of the asset
      * @return fixedParts An array of IDs of fixed parts present in the asset
@@ -195,7 +195,7 @@ contract RMRKEquipRenderUtils {
                 uint64[] memory fixedPartIds,
                 uint64[] memory slotPartIds
             ) = target_.getExtendedAsset(tokenId, assets[i]);
-            replacesAssetWithId = target_.getAssetOverwrites(
+            replacesAssetWithId = target_.getAssetReplacements(
                 tokenId,
                 assets[i]
             );

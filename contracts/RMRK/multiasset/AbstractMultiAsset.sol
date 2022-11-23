@@ -19,7 +19,7 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
     mapping(uint64 => string) private _assets;
 
     /// Mapping of tokenId to new asset, to asset to be replaced
-    mapping(uint256 => mapping(uint64 => uint64)) private _assetOverwrites;
+    mapping(uint256 => mapping(uint64 => uint64)) private _assetReplacements;
 
     /// Mapping of tokenId to an array of active assets
     /// @dev Active recurses is unbounded, getting all would reach gas limit at around 30k items
@@ -110,13 +110,13 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
      * @param newAssetId ID of the pending asset which will be accepted
      * @return uint64 ID of the asset which will be replaced
      */
-    function getAssetOverwrites(uint256 tokenId, uint64 newAssetId)
+    function getAssetReplacements(uint256 tokenId, uint64 newAssetId)
         public
         view
         virtual
         returns (uint64)
     {
-        return _assetOverwrites[tokenId][newAssetId];
+        return _assetReplacements[tokenId][newAssetId];
     }
 
     /**
@@ -173,20 +173,20 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
         _validatePendingAssetAtIndex(tokenId, index, assetId);
         _beforeAcceptAsset(tokenId, index, assetId);
 
-        uint64 overwrite = _assetOverwrites[tokenId][assetId];
-        if (overwrite != uint64(0)) {
-            // It could have been overwritten previously so it's fine if it's not found.
+        uint64 replaces = _assetReplacements[tokenId][assetId];
+        if (replaces != uint64(0)) {
+            // It could have been replaced previously so it's fine if it's not found.
             // If it's not deleted (not found), we don't want to send it on the event
-            if (!_activeAssets[tokenId].removeItemByValue(overwrite))
-                overwrite = uint64(0);
-            else delete _tokenAssets[tokenId][overwrite];
+            if (!_activeAssets[tokenId].removeItemByValue(replaces))
+                replaces = uint64(0);
+            else delete _tokenAssets[tokenId][replaces];
         }
         _removePendingAsset(tokenId, index, assetId);
 
         _activeAssets[tokenId].push(assetId);
         //Push 0 value of uint16 to array, e.g., uninitialized
         _activeAssetPriorities[tokenId].push(uint16(0));
-        emit AssetAccepted(tokenId, assetId, overwrite);
+        emit AssetAccepted(tokenId, assetId, replaces);
         _afterAcceptAsset(tokenId, index, assetId);
     }
 
@@ -242,7 +242,7 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
         uint64 assetId
     ) private {
         _pendingAssets[tokenId].removeItemByIndex(index);
-        delete _assetOverwrites[tokenId][assetId];
+        delete _assetReplacements[tokenId][assetId];
     }
 
     /**
@@ -262,7 +262,7 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
 
         for (uint256 i; i < len; ) {
             uint64 assetId = _pendingAssets[tokenId][i];
-            delete _assetOverwrites[tokenId][assetId];
+            delete _assetReplacements[tokenId][assetId];
             unchecked {
                 ++i;
             }
@@ -344,7 +344,7 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
         _pendingAssets[tokenId].push(assetId);
 
         if (replacesAssetWithId != uint64(0)) {
-            _assetOverwrites[tokenId][assetId] = replacesAssetWithId;
+            _assetReplacements[tokenId][assetId] = replacesAssetWithId;
         }
 
         emit AssetAddedToToken(tokenId, assetId, replacesAssetWithId);
