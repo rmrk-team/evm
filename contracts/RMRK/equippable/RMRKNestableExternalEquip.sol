@@ -41,24 +41,29 @@ contract RMRKNestableExternalEquip is IRMRKNestableExternalEquip, RMRKNestable {
     }
 
     /**
-     * @notice Used to unnest a child from the parent.
-     * @dev The function is overriden, so that additional verification is added, making sure that the child is not
-     *  currently equipped when trying to unnest it.
-     * @param tokenId ID of the parent token from which to unnest a given child token
-     * @param to Address that should receive the token once unnested
-     * @param childIndex Index of the child token in the array in which it is located (pending or active children array)
-     * @param childAddress Address of the expected child token's collection smart contract
-     * @param childId Expected ID of the child token being unnested in its own collection smart contract
-     * @param isPending Boolean value indicating whether the token is in the pending array of the parent (`true`) or in
-     *  the active array (`false`)
+     * @notice Used to transfer a given child from the parent
+     * @dev The function doesn't contain a check validating on `to`. To ensure that a token is not
+     *  transferred to an incompatible smart contract, custom validation has to be added when usin
+     * @param tokenId ID of the parent token from which the child token is being transferred
+     * @param to Address to which to transfer the token to.
+     * @param destinationId ID of the token to receive the token being transferred, 0 if destination is not a Nestable NFT.
+     * @param childIndex Index of a token we are transfering, in the array it belongs to (can be either active array or
+     *  pending array).
+     * @param childAddress Address of the child token's collection smart contract.
+     * @param childId ID of the child token in its own collection smart contract.
+     * @param isPending A boolean value indicating whether the child token being transferred is in the pending array of the
+     *  parent token (`true`) or in the active array (`false`)
+     * @param data Additional data with no specified format, sent in call to `_to`
      */
-    function _unnestChild(
+    function _transferChild(
         uint256 tokenId,
         address to,
+        uint256 destinationId,
         uint256 childIndex,
         address childAddress,
         uint256 childId,
-        bool isPending
+        bool isPending,
+        bytes memory data
     ) internal virtual override {
         if (!isPending) {
             _requireMinted(tokenId);
@@ -71,13 +76,15 @@ contract RMRKNestableExternalEquip is IRMRKNestableExternalEquip, RMRKNestable {
             ) revert RMRKMustUnequipFirst();
         }
 
-        super._unnestChild(
+        super._transferChild(
             tokenId,
             to,
+            destinationId,
             childIndex,
             childAddress,
             childId,
-            isPending
+            isPending,
+            data
         );
     }
 

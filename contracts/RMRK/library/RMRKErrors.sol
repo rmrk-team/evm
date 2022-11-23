@@ -74,7 +74,7 @@ error RMRKMaxRecursiveBurnsReached(address childContract, uint256 childId);
 error RMRKMintOverMax();
 /// Attempting to mint a nested token to a smart contract that doesn't support nesting
 error RMRKMintToNonRMRKNestableImplementer();
-/// Attempting to unnest a child before it is unequipped
+/// Attempting to transfer a child before it is unequipped
 error RMRKMustUnequipFirst();
 /// Attempting to nest a child over the nestable limit (current limit is 100 levels of nesting)
 error RMRKNestableTooDeep();
@@ -125,7 +125,7 @@ error RMRKTokenCannotBeEquippedWithAssetIntoSlot();
 error RMRKTokenDoesNotHaveAsset();
 /// Attempting to determine the asset with the top priority on a token without assets
 error RMRKTokenHasNoAssets();
-/// Attempting to accept or unnest a child which does not match the one at the specified index
+/// Attempting to accept or transfer a child which does not match the one at the specified index
 error RMRKUnexpectedChildId();
 /// Attempting to reject all pending assets but more assets than expected are pending
 error RMRKUnexpectedNumberOfAssets();

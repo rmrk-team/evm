@@ -17,13 +17,14 @@ import {
   singleFixtureWithArgs,
 } from '../utils';
 import { IERC721 } from '../interfaces';
+import { RMRKMultiAssetImpl } from '../../typechain-types';
 
-async function singleFixture(): Promise<{ token: Contract; renderUtils: Contract }> {
+async function singleFixture(): Promise<{ token: RMRKMultiAssetImpl; renderUtils: Contract }> {
   const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiAssetRenderUtils');
   const renderUtils = await renderUtilsFactory.deploy();
   await renderUtils.deployed();
 
-  const token = await singleFixtureWithArgs('RMRKMultiAssetImpl', [
+  const token = <RMRKMultiAssetImpl>await singleFixtureWithArgs('RMRKMultiAssetImpl', [
     'MultiAsset',
     'MR',
     10000,
@@ -37,12 +38,8 @@ async function singleFixture(): Promise<{ token: Contract; renderUtils: Contract
 }
 
 describe('MultiAssetImpl Other Behavior', async () => {
-  let token: Contract;
-
+  let token: RMRKMultiAssetImpl;
   let owner: SignerWithAddress;
-
-  const defaultAsset1 = 'default1.ipfs';
-  const defaultAsset2 = 'default2.ipfs';
 
   const isOwnableLockMock = false;
 
@@ -86,6 +83,17 @@ describe('MultiAssetImpl Other Behavior', async () => {
       await expect(
         token.connect(owner).mint(owner.address, 1, { value: 0 }),
       ).to.be.revertedWithCustomError(token, 'RMRKMintUnderpriced');
+    });
+
+    it('auto accepts resource if send is token owner', async function () {
+      await token.connect(owner).mint(owner.address, 1, { value: ONE_ETH.mul(1) });
+      await token.connect(owner).addAssetEntry('ipfs://test');
+      const assetId = await token.totalAssets();
+      const tokenId = await token.totalSupply();
+      await token.connect(owner).addAssetToToken(tokenId, assetId, 0);
+
+      expect(await token.getPendingAssets(tokenId)).to.be.eql([]);
+      expect(await token.getActiveAssets(tokenId)).to.be.eql([assetId]);
     });
   });
 });

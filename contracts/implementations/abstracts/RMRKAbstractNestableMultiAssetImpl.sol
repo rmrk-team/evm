@@ -42,6 +42,9 @@ abstract contract RMRKAbstractNestableMultiAssetImpl is
         uint64 replacesAssetWithId
     ) public onlyOwnerOrContributor {
         _addAssetToToken(tokenId, assetId, replacesAssetWithId);
+        if (_msgSender() == ownerOf(tokenId)) {
+            _acceptAsset(tokenId, _pendingAssets[tokenId].length - 1, assetId);
+        }
     }
 
     function addAssetEntry(string memory metadataURI)
@@ -70,7 +73,7 @@ abstract contract RMRKAbstractNestableMultiAssetImpl is
         uint256 tokenId,
         uint256 destinationId
     ) public virtual {
-        nestTransferFrom(_msgSender(), to, tokenId, destinationId);
+        nestTransferFrom(_msgSender(), to, tokenId, destinationId, "");
     }
 
     function tokenURI(uint256)

@@ -34,7 +34,7 @@ abstract contract RMRKReclaimableChild is IRMRKReclaimableChild, RMRKNestable {
 
     /**
      * @notice Used to reclaim an abandoned child token.
-     * @dev Child token is created by unnesting with `to` as the `0x0` address or by rejecting children.
+     * @dev Child token was abandoned by transferring it with `to` as the `0x0` address.
      * @dev This function will set the child's owner to the `rootOwner` of the caller, allowing the `rootOwner`
      * management permissions for the child.
      * @dev Requirements:
@@ -109,28 +109,28 @@ abstract contract RMRKReclaimableChild is IRMRKReclaimableChild, RMRKNestable {
     }
 
     /**
-     * @notice A hook used to be called before unnesting a child token.
+     * @notice A hook used to be called before transferring a child token.
      * @dev The `Child` struct contains the following arguments:
      *  [
      *      ID of the child token,
      *      address of the child token's collection smart contract
      *  ]
      * @dev we use this hook to keep track of children which are in pending, so they cannot be reclaimed from there.
-     * @param tokenId ID of the token unnesting the child token
+     * @param tokenId ID of the token transferring the child token
      * @param childIndex Index of the token in the parent token's child tokens array
      * @param childAddress Address of the collection smart contract of the child token expected to be at the given index
      * @param childId ID of the child token expected to be located at the given index
      * @param isPending A boolean value signifying whether the child token is located in the parent's active or pending
      *  child token array
      */
-    function _beforeUnnestChild(
+    function _beforeTransferChild(
         uint256 tokenId,
         uint256 childIndex,
         address childAddress,
         uint256 childId,
         bool isPending
     ) internal virtual override {
-        super._beforeUnnestChild(
+        super._beforeTransferChild(
             tokenId,
             childIndex,
             childAddress,

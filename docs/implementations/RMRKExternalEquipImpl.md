@@ -396,7 +396,7 @@ function isChildEquipped(uint256 tokenId, address childAddress, uint256 childId)
 
 Used to check whether the token has a given child equipped.
 
-*This is used to prevent from unnesting a child that is equipped.*
+*This is used to prevent from transferring a child that is equipped.*
 
 #### Parameters
 
