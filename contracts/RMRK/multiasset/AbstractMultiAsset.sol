@@ -187,7 +187,10 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
             _activeAssets[tokenId][index] = assetId;
             delete _tokenAssets[tokenId][replacesId];
         } else {
-            _activeAssetPriorities[tokenId].push(uint16(0));
+            // We use the current size as next priority, by default priorities would be [0,1,2...]
+            _activeAssetPriorities[tokenId].push(
+                uint16(_activeAssets[tokenId].length)
+            );
             _activeAssets[tokenId].push(assetId);
             replacesId = uint64(0);
         }

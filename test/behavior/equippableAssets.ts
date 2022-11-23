@@ -522,11 +522,11 @@ async function shouldBehaveLikeEquippableAssets(
     it('can set and get priorities', async function () {
       const tokenId = await addAssetsToToken();
 
-      expect(await chunkyEquip.getActiveAssetPriorities(tokenId)).to.be.eql([0, 0]);
-      await expect(chunkyEquip.setPriority(tokenId, [2, 1]))
+      expect(await chunkyEquip.getActiveAssetPriorities(tokenId)).to.be.eql([0, 1]);
+      await expect(chunkyEquip.setPriority(tokenId, [1, 0]))
         .to.emit(chunkyEquip, 'AssetPrioritySet')
         .withArgs(tokenId);
-      expect(await chunkyEquip.getActiveAssetPriorities(tokenId)).to.be.eql([2, 1]);
+      expect(await chunkyEquip.getActiveAssetPriorities(tokenId)).to.be.eql([1, 0]);
     });
 
     it('can set and get priorities if approved', async function () {
@@ -535,17 +535,17 @@ async function shouldBehaveLikeEquippableAssets(
 
       await chunkyEquip.approveForAssets(approvedAddress.address, tokenId);
 
-      expect(await chunkyEquip.getActiveAssetPriorities(tokenId)).to.be.eql([0, 0]);
-      await expect(chunkyEquip.connect(approvedAddress).setPriority(tokenId, [2, 1]))
+      expect(await chunkyEquip.getActiveAssetPriorities(tokenId)).to.be.eql([0, 1]);
+      await expect(chunkyEquip.connect(approvedAddress).setPriority(tokenId, [1, 0]))
         .to.emit(chunkyEquip, 'AssetPrioritySet')
         .withArgs(tokenId);
-      expect(await chunkyEquip.getActiveAssetPriorities(tokenId)).to.be.eql([2, 1]);
+      expect(await chunkyEquip.getActiveAssetPriorities(tokenId)).to.be.eql([1, 0]);
     });
 
     it('cannot set priorities for non owned token', async function () {
       const tokenId = await addAssetsToToken();
       await expect(
-        chunkyEquip.connect(addrs[1]).setPriority(tokenId, [2, 1]),
+        chunkyEquip.connect(addrs[1]).setPriority(tokenId, [1, 0]),
       ).to.be.revertedWithCustomError(chunkyEquip, 'RMRKNotApprovedForAssetsOrOwner');
     });
 
@@ -555,7 +555,7 @@ async function shouldBehaveLikeEquippableAssets(
         chunkyEquip,
         'RMRKBadPriorityListLength',
       );
-      await expect(chunkyEquip.setPriority(tokenId, [2, 1, 3])).to.be.revertedWithCustomError(
+      await expect(chunkyEquip.setPriority(tokenId, [1, 0, 2])).to.be.revertedWithCustomError(
         chunkyEquip,
         'RMRKBadPriorityListLength',
       );
