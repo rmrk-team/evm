@@ -299,37 +299,43 @@ contract RMRKEquippable is
     // ------------------------------- EQUIPPING ------------------------------
 
     /**
-     * @notice Used to unnest a given child.
-     * @dev The function doesn't contain a check validating that `to` is not a contract. To ensure that a token is not
+     * @notice Used to transfer a given child from the parent
+     * @dev The function doesn't contain a check validating on `to`. To ensure that a token is not
      *  transferred to an incompatible smart contract, custom validation has to be added when using this function.
-     * @param tokenId ID of the parent token from which the child token is being unnested
-     * @param to Externally owned address to which to transfer the unnested token to
-     * @param childIndex Index of a token we are unnesting, in the array it belongs to (can be either active array or
-     *  pending array)
-     * @param childAddress Address of the child token's collection smart contract
-     * @param childId ID of the child token being unnested in its own collection smart contract
-     * @param isPending A boolean value indicating whether the child token being unnested is in the pending array of the
+     * @param tokenId ID of the parent token from which the child token is being transferred
+     * @param to Address to which to transfer the token to.
+     * @param destinationId ID of the token to receive the token being transferred, 0 if destination is not a Nestable NFT.
+     * @param childIndex Index of a token we are transfering, in the array it belongs to (can be either active array or
+     *  pending array).
+     * @param childAddress Address of the child token's collection smart contract.
+     * @param childId ID of the child token in its own collection smart contract.
+     * @param isPending A boolean value indicating whether the child token being transferred is in the pending array of the
      *  parent token (`true`) or in the active array (`false`)
+     * @param data Additional data with no specified format, sent in call to `_to`
      */
-    function _unnestChild(
+    function _transferChild(
         uint256 tokenId,
         address to,
+        uint256 destinationId,
         uint256 childIndex,
         address childAddress,
         uint256 childId,
-        bool isPending
+        bool isPending,
+        bytes memory data
     ) internal virtual override {
         if (!isPending) {
             if (isChildEquipped(tokenId, childAddress, childId))
                 revert RMRKMustUnequipFirst();
         }
-        super._unnestChild(
+        super._transferChild(
             tokenId,
             to,
+            destinationId,
             childIndex,
             childAddress,
             childId,
-            isPending
+            isPending,
+            data
         );
     }
 
@@ -517,7 +523,7 @@ contract RMRKEquippable is
 
     /**
      * @notice Used to check whether the token has a given child equipped.
-     * @dev This is used to prevent from unnesting a child that is equipped.
+     * @dev This is used to prevent from transferring a child that is equipped.
      * @param tokenId ID of the parent token for which we are querying for
      * @param childAddress Address of the child token's smart contract
      * @param childId ID of the child token

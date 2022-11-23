@@ -32,7 +32,7 @@ Used to accept a pending child token for a given parent token.
 ### addChild
 
 ```solidity
-function addChild(uint256 parentId, uint256 childId) external nonpayable
+function addChild(uint256 parentId, uint256 childId, bytes data) external nonpayable
 ```
 
 Used to add a child token to a given parent token.
@@ -45,6 +45,7 @@ Used to add a child token to a given parent token.
 |---|---|---|
 | parentId | uint256 | ID of the parent token to receive the new child token |
 | childId | uint256 | ID of the new proposed child token |
+| data | bytes | Additional data with no specified format |
 
 ### burn
 
@@ -141,7 +142,7 @@ Used to retrieve the immediate owner of the given token.
 ### nestTransferFrom
 
 ```solidity
-function nestTransferFrom(address from, address to, uint256 tokenId, uint256 destinationId) external nonpayable
+function nestTransferFrom(address from, address to, uint256 tokenId, uint256 destinationId, bytes data) external nonpayable
 ```
 
 Used to transfer the token into another token.
@@ -156,6 +157,7 @@ Used to transfer the token into another token.
 | to | address | Address of the receiving token&#39;s collection smart contract |
 | tokenId | uint256 | ID of the token being transferred |
 | destinationId | uint256 | ID of the token to receive the token being transferred |
+| data | bytes | Additional data with no specified format, sent in the addChild call |
 
 ### ownerOf
 
@@ -227,7 +229,7 @@ Used to retrieve the pending child tokens of a given parent token.
 ### rejectAllChildren
 
 ```solidity
-function rejectAllChildren(uint256 parentId) external nonpayable
+function rejectAllChildren(uint256 parentId, uint256 maxRejections) external nonpayable
 ```
 
 Used to reject all pending children of a given parent token.
@@ -238,7 +240,8 @@ Used to reject all pending children of a given parent token.
 
 | Name | Type | Description |
 |---|---|---|
-| parentId | uint256 | ID of the parent token for which to reject all of the pending tokens |
+| parentId | uint256 | ID of the parent token for which to reject all of the pending tokens. |
+| maxRejections | uint256 | Maximum number of expected children to reject, used to prevent from  rejecting children which arrive just before this operation. |
 
 ### supportsInterface
 
@@ -262,26 +265,28 @@ function supportsInterface(bytes4 interfaceId) external view returns (bool)
 |---|---|---|
 | _0 | bool | undefined |
 
-### unnestChild
+### transferChild
 
 ```solidity
-function unnestChild(uint256 tokenId, address to, uint256 childIndex, address childAddress, uint256 childId, bool isPending) external nonpayable
+function transferChild(uint256 tokenId, address to, uint256 destinationId, uint256 childIndex, address childAddress, uint256 childId, bool isPending, bytes data) external nonpayable
 ```
 
-Used to unnest a child token from a given parent token.
+Used to transfer a child token from a given parent token.
 
-*When unnesting a child token, the owner of the token is set to `to`, or is not updated in the event of `to`  being the `0x0` address.*
+*When transferring a child token, the owner of the token is set to `to`, or is not updated in the event of `to`  being the `0x0` address.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | ID of the token from which to unnest a child token |
-| to | address | Address of the new owner of the child token being unnested |
-| childIndex | uint256 | Index of the child token to unnest in the array it is located in |
-| childAddress | address | Address of the collection smart contract of the child token expected to be at the specified  index |
-| childId | uint256 | ID of the child token expected to be located at the specified index |
-| isPending | bool | A boolean value signifying whether the child token is being unnested from the pending child  tokens array (`true`) or from the active child tokens array (`false`) |
+| tokenId | uint256 | ID of the parent token from which the child token is being transferred |
+| to | address | Address to which to transfer the token to. |
+| destinationId | uint256 | ID of the token to receive the token being transferred, 0 if destination is not a Nestable NFT. |
+| childIndex | uint256 | Index of a token we are transfering, in the array it belongs to (can be either active array or  pending array). |
+| childAddress | address | Address of the child token&#39;s collection smart contract. |
+| childId | uint256 | ID of the child token in its own collection smart contract. |
+| isPending | bool | A boolean value indicating whether the child token being transferred is in the pending array of the  parent token (`true`) or in the active array (`false`) |
+| data | bytes | Additional data with no specified format, sent in call to `_to` |
 
 
 
@@ -341,22 +346,22 @@ Used to notify listeners that a new token has been added to a given token&#39;s 
 | childAddress `indexed` | address | Address of the proposed child token&#39;s collection smart contract |
 | childId `indexed` | uint256 | ID of the child token in the child token&#39;s collection smart contract |
 
-### ChildUnnested
+### ChildTransferred
 
 ```solidity
-event ChildUnnested(uint256 indexed tokenId, uint256 childIndex, address indexed childAddress, uint256 indexed childId, bool fromPending)
+event ChildTransferred(uint256 indexed tokenId, uint256 childIndex, address indexed childAddress, uint256 indexed childId, bool fromPending)
 ```
 
-Used to notify listeners a child token has been unnested from parent token.
+Used to notify listeners a child token has been transferred from parent token.
 
-*Emitted when a token unnests a child from itself, transferring ownership to the root owner.*
+*Emitted when a token transfers a child from itself, transferring ownership to the root owner.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId `indexed` | uint256 | ID of the token that unnested a child token |
-| childIndex  | uint256 | Index of a child in the array from which it is being unnested |
+| tokenId `indexed` | uint256 | ID of the token that transferred a child token |
+| childIndex  | uint256 | Index of a child in the array from which it is being transferred |
 | childAddress `indexed` | address | Address of the child token&#39;s collection smart contract |
 | childId `indexed` | uint256 | ID of the child token in the child token&#39;s collection smart contract |
 | fromPending  | bool | A boolean value signifying whether the token was in the pending child tokens array (`true`) or  in the active child tokens array (`false`) |

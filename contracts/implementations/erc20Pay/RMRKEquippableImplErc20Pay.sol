@@ -46,7 +46,7 @@ contract RMRKEquippableImplErc20Pay is
         (uint256 nextToken, uint256 totalSupplyOffset) = _preMint(numToMint);
 
         for (uint256 i = nextToken; i < totalSupplyOffset; ) {
-            _nestMint(to, i, destinationId);
+            _nestMint(to, i, destinationId, "");
             unchecked {
                 ++i;
             }

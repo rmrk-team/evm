@@ -42,14 +42,14 @@ contract RMRKNestableClaimableChildMock is
         super._beforeAcceptChild(parentId, childIndex, childAddress, childId);
     }
 
-    function _beforeUnnestChild(
+    function _beforeTransferChild(
         uint256 tokenId,
         uint256 childIndex,
         address childAddress,
         uint256 childId,
         bool isPending
     ) internal virtual override(RMRKNestable, RMRKReclaimableChild) {
-        super._beforeUnnestChild(
+        super._beforeTransferChild(
             tokenId,
             childIndex,
             childAddress,
