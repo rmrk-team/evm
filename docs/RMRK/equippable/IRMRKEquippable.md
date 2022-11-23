@@ -159,13 +159,13 @@ Used to fetch the asset metadata of the specified token&#39;s active asset with 
 |---|---|---|
 | _0 | string | string The metadata of the asset belonging to the specified index in the token&#39;s active assets  array |
 
-### getAssetOverwrites
+### getAssetReplacements
 
 ```solidity
-function getAssetOverwrites(uint256 tokenId, uint64 newAssetId) external view returns (uint64)
+function getAssetReplacements(uint256 tokenId, uint64 newAssetId) external view returns (uint64)
 ```
 
-Used to retrieve the asset that will be overriden if a given asset from the token&#39;s pending array  is accepted.
+Used to retrieve the asset that will be replaced if a given asset from the token&#39;s pending array  is accepted.
 
 *Asset data is stored by reference, in order to access the data corresponding to the ID, call  `getAssetMetadata(tokenId, assetId)`.*
 
@@ -436,7 +436,7 @@ Used to notify listeners that owner has granted an approval to the user to manag
 ### AssetAccepted
 
 ```solidity
-event AssetAccepted(uint256 indexed tokenId, uint64 indexed assetId, uint64 indexed overwritesId)
+event AssetAccepted(uint256 indexed tokenId, uint64 indexed assetId, uint64 indexed replacesId)
 ```
 
 Used to notify listeners that a asset object at `assetId` is accepted by the token and migrated  from token&#39;s pending assets array to active assets array of the token.
@@ -449,12 +449,12 @@ Used to notify listeners that a asset object at `assetId` is accepted by the tok
 |---|---|---|
 | tokenId `indexed` | uint256 | undefined |
 | assetId `indexed` | uint64 | undefined |
-| overwritesId `indexed` | uint64 | undefined |
+| replacesId `indexed` | uint64 | undefined |
 
 ### AssetAddedToToken
 
 ```solidity
-event AssetAddedToToken(uint256 indexed tokenId, uint64 indexed assetId, uint64 indexed overwritesId)
+event AssetAddedToToken(uint256 indexed tokenId, uint64 indexed assetId, uint64 indexed replacesId)
 ```
 
 Used to notify listeners that a asset object at `assetId` is added to token&#39;s pending asset  array.
@@ -467,7 +467,7 @@ Used to notify listeners that a asset object at `assetId` is added to token&#39;
 |---|---|---|
 | tokenId `indexed` | uint256 | undefined |
 | assetId `indexed` | uint64 | undefined |
-| overwritesId `indexed` | uint64 | undefined |
+| replacesId `indexed` | uint64 | undefined |
 
 ### AssetPrioritySet
 

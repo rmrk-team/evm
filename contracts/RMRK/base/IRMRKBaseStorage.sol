@@ -41,8 +41,8 @@ interface IRMRKBaseStorage is IERC165 {
 
     /**
      * @notice Event to announce the overriding of equippable addresses of the part.
-     * @dev It is emitted the existing list of addresses marked as equippable for `partId` is overwritten by a new one.
-     * @param partId ID of the part that the list of equippable addresses overwritten
+     * @dev It is emitted when the existing list of addresses marked as equippable for `partId` is overwritten by a new one.
+     * @param partId ID of the part whose list of equippable addresses was overwritten
      * @param equippableAddresses The new, full, list of addresses that can equip this part
      */
     event SetEquippables(uint64 indexed partId, address[] equippableAddresses);

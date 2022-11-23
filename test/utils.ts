@@ -92,9 +92,9 @@ async function addAssetToToken(
   token: Contract,
   tokenId: number,
   resId: BigNumber,
-  overwrites: BigNumber | number,
+  replaces: BigNumber | number,
 ): Promise<void> {
-  return await token.addAssetToToken(tokenId, resId, overwrites);
+  return await token.addAssetToToken(tokenId, resId, replaces);
 }
 
 let nextAssetId = 1;

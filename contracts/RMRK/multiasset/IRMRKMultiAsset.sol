@@ -21,12 +21,12 @@ interface IRMRKMultiAsset is IERC165 {
      *  array.
      * @param tokenId ID of the token that received a new pending asset
      * @param assetId ID of the asset that has been added to the token's pending assets array
-     * @param overwritesId ID of the asset that would be overwritten
+     * @param replacesId ID of the asset that would be replaced
      */
     event AssetAddedToToken(
         uint256 indexed tokenId,
         uint64 indexed assetId,
-        uint64 indexed overwritesId
+        uint64 indexed replacesId
     );
 
     /**
@@ -34,12 +34,12 @@ interface IRMRKMultiAsset is IERC165 {
      *  from token's pending assets array to active assets array of the token.
      * @param tokenId ID of the token that had a new asset accepted
      * @param assetId ID of the asset that was accepted
-     * @param overwritesId ID of the asset that would be overwritten
+     * @param replacesId ID of the asset that was replaced
      */
     event AssetAccepted(
         uint256 indexed tokenId,
         uint64 indexed assetId,
-        uint64 indexed overwritesId
+        uint64 indexed replacesId
     );
 
     /**
@@ -193,7 +193,7 @@ interface IRMRKMultiAsset is IERC165 {
         returns (uint16[] memory);
 
     /**
-     * @notice Used to retrieve the asset that will be overriden if a given asset from the token's pending array
+     * @notice Used to retrieve the asset that will be replaced if a given asset from the token's pending array
      *  is accepted.
      * @dev Asset data is stored by reference, in order to access the data corresponding to the ID, call
      *  `getAssetMetadata(tokenId, assetId)`.
@@ -201,7 +201,7 @@ interface IRMRKMultiAsset is IERC165 {
      * @param newAssetId ID of the pending asset which will be accepted
      * @return uint64 ID of the asset which will be replaced
      */
-    function getAssetOverwrites(uint256 tokenId, uint64 newAssetId)
+    function getAssetReplacements(uint256 tokenId, uint64 newAssetId)
         external
         view
         returns (uint64);
