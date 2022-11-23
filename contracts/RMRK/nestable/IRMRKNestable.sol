@@ -199,7 +199,8 @@ interface IRMRKNestable is IERC165 {
      * @param maxRejections Maximum number of expected children to reject, used to prevent from
      *  rejecting children which arrive just before this operation.
      */
-    function rejectAllChildren(uint256 parentId, uint256 maxRejections) external;
+    function rejectAllChildren(uint256 parentId, uint256 maxRejections)
+        external;
 
     /**
      * @notice Used to transfer a child token from a given parent token.

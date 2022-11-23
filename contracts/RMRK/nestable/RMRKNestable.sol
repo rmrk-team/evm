@@ -995,8 +995,12 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
      * @param maxRejections Maximum number of expected children to reject, used to prevent from
      *  rejecting children which arrive just before this operation.
      */
-    function _rejectAllChildren(uint256 tokenId, uint256 maxRejections) internal virtual {
-        if (_pendingChildren[tokenId].length > maxRejections) revert RMRKUnexpectedNumberOfChildren();
+    function _rejectAllChildren(uint256 tokenId, uint256 maxRejections)
+        internal
+        virtual
+    {
+        if (_pendingChildren[tokenId].length > maxRejections)
+            revert RMRKUnexpectedNumberOfChildren();
 
         _beforeRejectAllChildren(tokenId);
         delete _pendingChildren[tokenId];

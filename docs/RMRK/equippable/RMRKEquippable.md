@@ -1695,7 +1695,6 @@ Attempting to reject all pending assets but more assets than expected are pendin
 
 
 
-
 ### RMRKUnexpectedNumberOfChildren
 
 ```solidity
@@ -1703,7 +1702,6 @@ error RMRKUnexpectedNumberOfChildren()
 ```
 
 Attempting to reject all pending children but children assets than expected are pending
-
 
 
 
