@@ -432,8 +432,8 @@ Used to reject all pending assets of a given token.
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | ID of the token for which we are clearing the pending array |
-| maxRejections | uint256 | undefined |
+| tokenId | uint256 | ID of the token for which we are clearing the pending array. |
+| maxRejections | uint256 | Maximum number of expected assets to reject, used to prevent from  rejecting assets which arrive just before this operation. |
 
 ### rejectAsset
 
@@ -998,7 +998,7 @@ Attempting to accept or reject a asset which does not match the one at the speci
 error RMRKUnexpectedNumberOfAssets()
 ```
 
-Attempting to reject all assets but more assets than expected are pending
+Attempting to reject all pending assets but more assets than expected are pending
 
 
 

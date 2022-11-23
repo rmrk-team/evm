@@ -311,13 +311,23 @@ async function shouldBehaveLikeNestable(
       await nestMint(child, parent.address, parentId);
       await nestMint(child, parent.address, parentId);
 
-      await expect(parent.connect(tokenOwner).rejectAllChildren(parentId))
+      await expect(parent.connect(tokenOwner).rejectAllChildren(parentId, 3))
         .to.emit(parent, 'AllChildrenRejected')
         .withArgs(parentId);
       await checkNoChildrenNorPending(parentId);
 
       // They are still on the child
       expect(await child.balanceOf(parent.address)).to.equal(3);
+    });
+
+    it('cannot reject all pending children if there are more than expected', async function () {
+      // Mint a couple of more children
+      await nestMint(child, parent.address, parentId);
+      await nestMint(child, parent.address, parentId);
+
+      await expect(
+        parent.connect(tokenOwner).rejectAllChildren(parentId, 1),
+      ).to.be.revertedWithCustomError(parent, 'RMRKUnexpectedNumberOfChildren');
     });
 
     it('can reject all pending children if approved', async function () {
@@ -327,7 +337,7 @@ async function shouldBehaveLikeNestable(
 
       const rejecter = addrs[1];
       await parent.connect(tokenOwner).approve(rejecter.address, parentId);
-      await parent.connect(rejecter).rejectAllChildren(parentId);
+      await parent.connect(rejecter).rejectAllChildren(parentId, 3);
       await checkNoChildrenNorPending(parentId);
     });
 
@@ -338,7 +348,7 @@ async function shouldBehaveLikeNestable(
 
       const operator = addrs[2];
       await parent.connect(tokenOwner).setApprovalForAll(operator.address, true);
-      await parent.connect(operator).rejectAllChildren(parentId);
+      await parent.connect(operator).rejectAllChildren(parentId, 3);
       await checkNoChildrenNorPending(parentId);
     });
 
@@ -346,7 +356,7 @@ async function shouldBehaveLikeNestable(
       const notOwner = addrs[3];
 
       await expect(
-        parent.connect(notOwner).rejectAllChildren(parentId),
+        parent.connect(notOwner).rejectAllChildren(parentId, 2),
       ).to.be.revertedWithCustomError(parent, 'ERC721NotApprovedOrOwner');
     });
   });

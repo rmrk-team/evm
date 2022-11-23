@@ -971,14 +971,16 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
      * @dev Removes the children from the pending array mapping.
      * @dev This does not update the ownership storage data on children. If necessary, ownership can be reclaimed by the
      *  rootOwner of the previous parent.
-     * @param tokenId ID of the parent token for which to reject all of the pending tokens
+     * @param tokenId ID of the parent token for which to reject all of the pending tokens.
+     * @param maxRejections Maximum number of expected children to reject, used to prevent from
+     *  rejecting children which arrive just before this operation.
      */
-    function rejectAllChildren(uint256 tokenId)
+    function rejectAllChildren(uint256 tokenId, uint256 maxRejections)
         public
         virtual
         onlyApprovedOrOwner(tokenId)
     {
-        _rejectAllChildren(tokenId);
+        _rejectAllChildren(tokenId, maxRejections);
     }
 
     /**
@@ -989,9 +991,13 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
      * @dev Requirements:
      *
      *  - `tokenId` must exist
-     * @param tokenId ID of the parent token for which to reject all of the pending tokens
+     * @param tokenId ID of the parent token for which to reject all of the pending tokens.
+     * @param maxRejections Maximum number of expected children to reject, used to prevent from
+     *  rejecting children which arrive just before this operation.
      */
-    function _rejectAllChildren(uint256 tokenId) internal virtual {
+    function _rejectAllChildren(uint256 tokenId, uint256 maxRejections) internal virtual {
+        if (_pendingChildren[tokenId].length > maxRejections) revert RMRKUnexpectedNumberOfChildren();
+
         _beforeRejectAllChildren(tokenId);
         delete _pendingChildren[tokenId];
         emit AllChildrenRejected(tokenId);

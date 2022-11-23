@@ -229,7 +229,7 @@ Used to retrieve the pending child tokens of a given parent token.
 ### rejectAllChildren
 
 ```solidity
-function rejectAllChildren(uint256 parentId) external nonpayable
+function rejectAllChildren(uint256 parentId, uint256 maxRejections) external nonpayable
 ```
 
 Used to reject all pending children of a given parent token.
@@ -240,7 +240,8 @@ Used to reject all pending children of a given parent token.
 
 | Name | Type | Description |
 |---|---|---|
-| parentId | uint256 | ID of the parent token for which to reject all of the pending tokens |
+| parentId | uint256 | ID of the parent token for which to reject all of the pending tokens. |
+| maxRejections | uint256 | Maximum number of expected children to reject, used to prevent from  rejecting children which arrive just before this operation. |
 
 ### supportsInterface
 

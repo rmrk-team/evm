@@ -316,8 +316,8 @@ Rejects all assets from the pending array of a given token.
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | ID of the token of which to clear the pending array |
-| maxRejections | uint256 | to prevent from rejecting assets which arrive just before this operation. |
+| tokenId | uint256 | ID of the token of which to clear the pending array. |
+| maxRejections | uint256 | Maximum number of expected assets to reject, used to prevent from  rejecting assets which arrive just before this operation. |
 
 ### rejectAsset
 

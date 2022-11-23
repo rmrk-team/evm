@@ -941,13 +941,13 @@ Rejects all assets from the pending array of a given token.
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | ID of the token of which to clear the pending array |
-| maxRejections | uint256 | undefined |
+| tokenId | uint256 | ID of the token of which to clear the pending array. |
+| maxRejections | uint256 | Maximum number of expected assets to reject, used to prevent from  rejecting assets which arrive just before this operation. |
 
 ### rejectAllChildren
 
 ```solidity
-function rejectAllChildren(uint256 tokenId) external nonpayable
+function rejectAllChildren(uint256 tokenId, uint256 maxRejections) external nonpayable
 ```
 
 Used to reject all pending children of a given parent token.
@@ -958,7 +958,8 @@ Used to reject all pending children of a given parent token.
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | ID of the parent token for which to reject all of the pending tokens |
+| tokenId | uint256 | ID of the parent token for which to reject all of the pending tokens. |
+| maxRejections | uint256 | Maximum number of expected children to reject, used to prevent from  rejecting children which arrive just before this operation. |
 
 ### rejectAsset
 
@@ -2270,7 +2271,18 @@ Attempting to accept or transfer a child which does not match the one at the spe
 error RMRKUnexpectedNumberOfAssets()
 ```
 
-Attempting to reject all assets but more assets than expected are pending
+Attempting to reject all pending assets but more assets than expected are pending
+
+
+
+
+### RMRKUnexpectedNumberOfChildren
+
+```solidity
+error RMRKUnexpectedNumberOfChildren()
+```
+
+Attempting to reject all pending children but children assets than expected are pending
 
 
 

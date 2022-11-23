@@ -128,8 +128,9 @@ contract RMRKNestableMultiAsset is RMRKNestable, AbstractMultiAsset {
      *  - `tokenId` must exist.
      *  - If there are more resouces than `maxRejections`, the execution will be reverted
      * @dev Emits a {AssetRejected} event with assetId = 0.
-     * @param tokenId ID of the token of which to clear the pending array
-     * @param maxRejections The maximum amount of assets to reject
+     * @param tokenId ID of the token of which to clear the pending array.
+     * @param maxRejections Maximum number of expected assets to reject, used to prevent from
+     *  rejecting assets which arrive just before this operation.
      */
     function rejectAllAssets(uint256 tokenId, uint256 maxRejections)
         public

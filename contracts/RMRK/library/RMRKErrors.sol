@@ -129,6 +129,8 @@ error RMRKTokenHasNoAssets();
 error RMRKUnexpectedChildId();
 /// Attempting to reject all pending assets but more assets than expected are pending
 error RMRKUnexpectedNumberOfAssets();
+/// Attempting to reject all pending children but children assets than expected are pending
+error RMRKUnexpectedNumberOfChildren();
 /// Attempting to accept or reject a asset which does not match the one at the specified index
 error RMRKUnexpectedAssetId();
 /// Attempting not to pass an empty array of equippable addresses when adding or setting the equippable addresses

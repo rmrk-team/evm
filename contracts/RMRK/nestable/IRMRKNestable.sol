@@ -195,10 +195,11 @@ interface IRMRKNestable is IERC165 {
      * Requirements:
      *
      * - `parentId` must exist
-     * @param parentId ID of the parent token for which to reject all of the pending tokens
-     *
+     * @param parentId ID of the parent token for which to reject all of the pending tokens.
+     * @param maxRejections Maximum number of expected children to reject, used to prevent from
+     *  rejecting children which arrive just before this operation.
      */
-    function rejectAllChildren(uint256 parentId) external;
+    function rejectAllChildren(uint256 parentId, uint256 maxRejections) external;
 
     /**
      * @notice Used to transfer a child token from a given parent token.
