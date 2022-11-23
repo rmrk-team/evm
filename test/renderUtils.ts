@@ -66,6 +66,14 @@ describe('Render Utils', async function () {
         [resId2, 5, 'ipfs://res2.jpg'],
       ]);
     });
+
+    it('can get assets by id', async function () {
+      expect(await renderUtils.getAssetsById(equip.address, tokenId, [resId, resId2])).to.eql([
+        'ipfs://res1.jpg',
+        'ipfs://res2.jpg',
+      ]);
+    });
+
     it('can get pending assets', async function () {
       expect(await renderUtils.getPendingAssets(equip.address, tokenId)).to.eql([
         [resId4, bn(0), bn(0), 'ipfs://res4.jpg'],

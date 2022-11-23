@@ -188,19 +188,7 @@ async function shouldBehaveLikeEquippableAssets(
         'AssetAddedToToken',
       );
 
-      // The merged version does not implement this to save size:
-      if (chunkyEquip.getFullPendingExtendedAssets === undefined) {
-        const pendingAssets = await chunkyEquip.getPendingAssets(tokenId);
-        expect(
-          await renderUtils.getAssetsById(chunkyEquip.address, tokenId, pendingAssets),
-        ).to.be.eql([metaURIDefault, metaURIDefault]);
-      } else {
-        const pending = await chunkyEquip.getFullPendingExtendedAssets(tokenId);
-        expect(pending).to.be.eql([
-          [resId, equippableGroupIdDefault, baseAddressDefault, metaURIDefault],
-          [resId2, equippableGroupIdDefault, baseAddressDefault, metaURIDefault],
-        ]);
-      }
+      expect(await chunkyEquip.getPendingAssets(tokenId)).to.eql([resId, resId2]);
     });
 
     it('cannot add non existing asset to token', async function () {
@@ -275,24 +263,8 @@ async function shouldBehaveLikeEquippableAssets(
         .to.emit(chunkyEquip, 'AssetAccepted')
         .withArgs(tokenId, resId, 0);
 
-      // The merged version does not implement this to save size:
-      if (chunkyEquip.getFullPendingExtendedAssets === undefined) {
-        expect(await chunkyEquip.getPendingAssets(tokenId)).to.be.eql([]);
-      } else {
-        expect(await chunkyEquip.getFullPendingExtendedAssets(tokenId)).to.be.eql([]);
-      }
-
-      // The merged version does not implement this to save size:
-      if (chunkyEquip.getFullExtendedAssets === undefined) {
-        const activeAssets = await chunkyEquip.getActiveAssets(tokenId);
-        expect(await renderUtils.getAssetsById(chunkyEquip.address, tokenId, activeAssets)).to.eql([
-          metaURIDefault,
-        ]);
-      } else {
-        expect(await chunkyEquip.getFullExtendedAssets(tokenId)).to.eql([
-          [resId, equippableGroupIdDefault, baseAddressDefault, metaURIDefault],
-        ]);
-      }
+      expect(await chunkyEquip.getPendingAssets(tokenId)).to.be.eql([]);
+      expect(await chunkyEquip.getActiveAssets(tokenId)).to.be.eql([resId]);
     });
 
     it('can accept multiple assets', async function () {
@@ -309,26 +281,8 @@ async function shouldBehaveLikeEquippableAssets(
         .to.emit(chunkyEquip, 'AssetAccepted')
         .withArgs(tokenId, resId, 0);
 
-      // The merged version does not implement this to save size:
-      if (chunkyEquip.getFullPendingExtendedAssets === undefined) {
-        expect(await chunkyEquip.getPendingAssets(tokenId)).to.be.eql([]);
-      } else {
-        expect(await chunkyEquip.getFullPendingExtendedAssets(tokenId)).to.be.eql([]);
-      }
-
-      // The merged version does not implement this to save size:
-      if (chunkyEquip.getFullExtendedAssets === undefined) {
-        const activeAssets = await chunkyEquip.getActiveAssets(tokenId);
-        expect(await renderUtils.getAssetsById(chunkyEquip.address, tokenId, activeAssets)).to.eql([
-          metaURIDefault,
-          metaURIDefault,
-        ]);
-      } else {
-        expect(await chunkyEquip.getFullExtendedAssets(tokenId)).to.eql([
-          [resId2, equippableGroupIdDefault, baseAddressDefault, metaURIDefault],
-          [resId, equippableGroupIdDefault, baseAddressDefault, metaURIDefault],
-        ]);
-      }
+      expect(await chunkyEquip.getPendingAssets(tokenId)).to.be.eql([]);
+      expect(await chunkyEquip.getActiveAssets(tokenId)).to.be.eql([resId2, resId]);
     });
 
     // approved not implemented yet
@@ -342,12 +296,7 @@ async function shouldBehaveLikeEquippableAssets(
       await chunkyEquip.addAssetToToken(tokenId, resId, 0);
       await chunkyEquip.connect(approvedAddress).acceptAsset(tokenId, 0, resId);
 
-      // The merged version does not implement this to save size:
-      if (chunkyEquip.getFullPendingExtendedAssets === undefined) {
-        expect(await chunkyEquip.getPendingAssets(tokenId)).to.be.eql([]);
-      } else {
-        expect(await chunkyEquip.getFullPendingExtendedAssets(tokenId)).to.be.eql([]);
-      }
+      expect(await chunkyEquip.getPendingAssets(tokenId)).to.be.eql([]);
     });
 
     it('cannot accept asset twice', async function () {
@@ -392,32 +341,19 @@ async function shouldBehaveLikeEquippableAssets(
       await chunkyEquip.acceptAsset(tokenId, 0, resId);
 
       // Add new asset to replace the first, and accept
-      const activeAssets = await chunkyEquip.getActiveAssets(tokenId);
-      await expect(chunkyEquip.addAssetToToken(tokenId, resId2, activeAssets[0]))
+      await expect(chunkyEquip.addAssetToToken(tokenId, resId2, resId))
         .to.emit(chunkyEquip, 'AssetAddedToToken')
         .withArgs(tokenId, resId2, resId);
-      const pendingAssets = await chunkyEquip.getPendingAssets(tokenId);
 
-      expect(await chunkyEquip.getAssetReplacements(tokenId, pendingAssets[0])).to.eql(
-        activeAssets[0],
-      );
+      expect(await chunkyEquip.getAssetReplacements(tokenId, resId2)).to.eql(resId);
       await expect(chunkyEquip.acceptAsset(tokenId, 0, resId2))
         .to.emit(chunkyEquip, 'AssetAccepted')
         .withArgs(tokenId, resId2, resId);
 
-      // The merged version does not implement this to save size:
-      if (chunkyEquip.getFullExtendedAssets === undefined) {
-        const activeAssets = await chunkyEquip.getActiveAssets(tokenId);
-        expect(
-          await renderUtils.getAssetsById(chunkyEquip.address, tokenId, activeAssets),
-        ).to.be.eql([metaURIDefault]);
-      } else {
-        expect(await chunkyEquip.getFullExtendedAssets(tokenId)).to.be.eql([
-          [resId2, equippableGroupIdDefault, baseAddressDefault, metaURIDefault],
-        ]);
-      }
+      expect(await chunkyEquip.getActiveAssets(tokenId)).to.be.eql([resId2]);
+
       // Replacements should be gone
-      expect(await chunkyEquip.getAssetReplacements(tokenId, pendingAssets[0])).to.eql(bn(0));
+      expect(await chunkyEquip.getAssetReplacements(tokenId, resId2)).to.eql(bn(0));
     });
 
     it('can replace non existing asset to token, it could have been deleted', async function () {
@@ -427,17 +363,8 @@ async function shouldBehaveLikeEquippableAssets(
       await chunkyEquip.addAssetToToken(tokenId, resId, 1);
       await chunkyEquip.acceptAsset(tokenId, 0, resId);
 
-      // The merged version does not implement this to save size:
-      if (chunkyEquip.getFullExtendedAssets === undefined) {
-        const activeAssets = await chunkyEquip.getActiveAssets(tokenId);
-        expect(
-          await renderUtils.getAssetsById(chunkyEquip.address, tokenId, activeAssets),
-        ).to.be.eql([metaURIDefault]);
-      } else {
-        expect(await chunkyEquip.getFullExtendedAssets(tokenId)).to.be.eql([
-          [resId, equippableGroupIdDefault, baseAddressDefault, metaURIDefault],
-        ]);
-      }
+      expect(await chunkyEquip.getActiveAssets(tokenId)).to.be.eql([resId]);
+      expect(await chunkyEquip.getActiveAssetPriorities(tokenId)).to.eql([0]);
     });
   });
 
@@ -453,22 +380,8 @@ async function shouldBehaveLikeEquippableAssets(
         'AssetRejected',
       );
 
-      // The merged version does not implement this to save size:
-      if (chunkyEquip.getFullPendingExtendedAssets === undefined) {
-        expect(await chunkyEquip.getPendingAssets(tokenId)).to.be.eql([]);
-      } else {
-        expect(await chunkyEquip.getFullPendingExtendedAssets(tokenId)).to.be.eql([]);
-      }
-
-      // The merged version does not implement this to save size:
-      if (chunkyEquip.getFullExtendedAssets === undefined) {
-        const activeAssets = await chunkyEquip.getActiveAssets(tokenId);
-        expect(
-          await renderUtils.getAssetsById(chunkyEquip.address, tokenId, activeAssets),
-        ).to.be.eql([]);
-      } else {
-        expect(await chunkyEquip.getFullExtendedAssets(tokenId)).to.be.eql([]);
-      }
+      expect(await chunkyEquip.getPendingAssets(tokenId)).to.be.eql([]);
+      expect(await chunkyEquip.getActiveAssets(tokenId)).to.be.eql([]);
     });
 
     it('can reject asset and replacements are cleared', async function () {
@@ -498,22 +411,8 @@ async function shouldBehaveLikeEquippableAssets(
         chunkyEquip,
         'AssetRejected',
       );
-
-      // The merged version does not implement this to save size:
-      if (chunkyEquip.getFullPendingExtendedAssets === undefined) {
-        expect(await chunkyEquip.getPendingAssets(tokenId)).to.be.eql([]);
-      } else {
-        expect(await chunkyEquip.getFullPendingExtendedAssets(tokenId)).to.be.eql([]);
-      }
-      // The merged version does not implement this to save size:
-      if (chunkyEquip.getFullExtendedAssets === undefined) {
-        const activeAssets = await chunkyEquip.getActiveAssets(tokenId);
-        expect(
-          await renderUtils.getAssetsById(chunkyEquip.address, tokenId, activeAssets),
-        ).to.be.eql([]);
-      } else {
-        expect(await chunkyEquip.getFullExtendedAssets(tokenId)).to.be.eql([]);
-      }
+      expect(await chunkyEquip.getPendingAssets(tokenId)).to.be.eql([]);
+      expect(await chunkyEquip.getActiveAssets(tokenId)).to.be.eql([]);
     });
 
     it('can reject all assets', async function () {
@@ -526,21 +425,8 @@ async function shouldBehaveLikeEquippableAssets(
 
       await expect(chunkyEquip.rejectAllAssets(tokenId, 2)).to.emit(chunkyEquip, 'AssetRejected');
 
-      // The merged version does not implement this to save size:
-      if (chunkyEquip.getFullPendingExtendedAssets === undefined) {
-        expect(await chunkyEquip.getPendingAssets(tokenId)).to.be.eql([]);
-      } else {
-        expect(await chunkyEquip.getFullPendingExtendedAssets(tokenId)).to.be.eql([]);
-      }
-      // The merged version does not implement this to save size:
-      if (chunkyEquip.getFullExtendedAssets === undefined) {
-        const activeAssets = await chunkyEquip.getActiveAssets(tokenId);
-        expect(
-          await renderUtils.getAssetsById(chunkyEquip.address, tokenId, activeAssets),
-        ).to.be.eql([]);
-      } else {
-        expect(await chunkyEquip.getFullExtendedAssets(tokenId)).to.be.eql([]);
-      }
+      expect(await chunkyEquip.getPendingAssets(tokenId)).to.be.eql([]);
+      expect(await chunkyEquip.getActiveAssets(tokenId)).to.be.eql([]);
     });
 
     it('can reject all assets and replacements are cleared', async function () {
@@ -591,21 +477,8 @@ async function shouldBehaveLikeEquippableAssets(
         'AssetRejected',
       );
 
-      // The merged version does not implement this to save size:
-      if (chunkyEquip.getFullPendingExtendedAssets === undefined) {
-        expect(await chunkyEquip.getPendingAssets(tokenId)).to.be.eql([]);
-      } else {
-        expect(await chunkyEquip.getFullPendingExtendedAssets(tokenId)).to.be.eql([]);
-      }
-      // The merged version does not implement this to save size:
-      if (chunkyEquip.getFullExtendedAssets === undefined) {
-        const activeAssets = await chunkyEquip.getActiveAssets(tokenId);
-        expect(
-          await renderUtils.getAssetsById(chunkyEquip.address, tokenId, activeAssets),
-        ).to.be.eql([]);
-      } else {
-        expect(await chunkyEquip.getFullExtendedAssets(tokenId)).to.be.eql([]);
-      }
+      expect(await chunkyEquip.getPendingAssets(tokenId)).to.be.eql([]);
+      expect(await chunkyEquip.getActiveAssets(tokenId)).to.be.eql([]);
     });
 
     it('cannot reject asset twice', async function () {

@@ -122,19 +122,16 @@ async function shouldBehaveLikeMultiAsset(
         await expect(this.token.addAssetToToken(tokenId, resId2, resId))
           .to.emit(this.token, 'AssetAddedToToken')
           .withArgs(tokenId, resId2, resId);
-        const pendingAssets = await this.token.getPendingAssets(tokenId);
 
-        expect(await this.token.getAssetReplacements(tokenId, pendingAssets[0])).to.eql(resId);
+        expect(await this.token.getAssetReplacements(tokenId, resId2)).to.eql(resId);
         await expect(this.token.connect(tokenOwner).acceptAsset(tokenId, 0, resId2))
           .to.emit(this.token, 'AssetAccepted')
           .withArgs(tokenId, resId2, resId);
 
-        const activeAssets = await this.token.getActiveAssets(tokenId);
-        expect(
-          await this.renderUtils.getAssetsById(this.token.address, tokenId, activeAssets),
-        ).to.be.eql([metaURIDefault]);
+        expect(await this.token.getActiveAssets(tokenId)).to.be.eql([resId2]);
         // Replacements should be gone
-        expect(await this.token.getAssetReplacements(tokenId, pendingAssets[0])).to.eql(bn(0));
+
+        expect(await this.token.getAssetReplacements(tokenId, resId2)).to.eql(bn(0));
       });
 
       it('can replace non existing asset to token, it could have been deleted', async function () {
@@ -143,10 +140,7 @@ async function shouldBehaveLikeMultiAsset(
         await addAssetToTokenFunc(this.token, tokenId, resId, 1);
         await this.token.connect(tokenOwner).acceptAsset(tokenId, 0, resId);
 
-        const activeAssets = await this.token.getActiveAssets(tokenId);
-        expect(
-          await this.renderUtils.getAssetsById(this.token.address, tokenId, activeAssets),
-        ).to.be.eql([metaURIDefault]);
+        expect(await this.token.getActiveAssets(tokenId)).to.be.eql([resId]);
       });
 
       it('can reject asset and replacements are cleared', async function () {
@@ -204,10 +198,7 @@ async function shouldBehaveLikeMultiAsset(
         expect(await this.renderUtils.getPendingAssets(this.token.address, tokenId)).to.eql([
           [resId2, bn(0), bn(0), resData2],
         ]);
-        expect(await this.renderUtils.getActiveAssets(this.token.address, tokenId)).to.eql([
-          [resId1, 0, resData1],
-        ]);
-
+        expect(await this.token.getActiveAssets(tokenId)).to.be.eql([resId1]);
         expect(await this.token.getAssetMetadata(tokenId, resId1)).equal(resData1);
       });
 
@@ -220,34 +211,21 @@ async function shouldBehaveLikeMultiAsset(
           .withArgs(tokenId, resId1, 0);
 
         expect(await this.token.getPendingAssets(tokenId)).to.be.eql([]);
-
-        const activeAssets = await this.token.getActiveAssets(tokenId);
-        const accepted = await this.renderUtils.getAssetsById(
-          this.token.address,
-          tokenId,
-          activeAssets,
-        );
-        expect(accepted).to.eql([resData2, resData1]);
+        expect(await this.token.getActiveAssets(tokenId)).to.be.eql([resId2, resId1]);
       });
 
       it('can accept asset if approved', async function () {
         await this.token.connect(tokenOwner).approveForAssets(approved.address, tokenId);
         await this.token.connect(approved).acceptAsset(tokenId, 0, resId1);
 
-        const activeAssets = await this.token.getActiveAssets(tokenId);
-        expect(
-          await this.renderUtils.getAssetsById(this.token.address, tokenId, activeAssets),
-        ).to.eql([resData1]);
+        expect(await this.token.getActiveAssets(tokenId)).to.be.eql([resId1]);
       });
 
       it('can accept asset if approved for all', async function () {
         await this.token.connect(tokenOwner).setApprovalForAllForAssets(operator.address, true);
         await this.token.connect(operator).acceptAsset(tokenId, 0, resId1);
 
-        const activeAssets = await this.token.getActiveAssets(tokenId);
-        expect(
-          await this.renderUtils.getAssetsById(this.token.address, tokenId, activeAssets),
-        ).to.eql([resData1]);
+        expect(await this.token.getActiveAssets(tokenId)).to.be.eql([resId1]);
       });
 
       it('cannot accept more assets than there are', async function () {
@@ -282,20 +260,13 @@ async function shouldBehaveLikeMultiAsset(
 
     describe('Rejecting assets', async function () {
       it('can reject asset', async function () {
-        let pendingAssets = await this.token.getPendingAssets(tokenId);
-        expect(
-          await this.renderUtils.getAssetsById(this.token.address, tokenId, pendingAssets),
-        ).to.eql([resData1, resData2]);
-
+        expect(await this.token.getPendingAssets(tokenId)).to.eql([resId1, resId2]);
         await expect(this.token.connect(tokenOwner).rejectAsset(tokenId, 0, resId1))
           .to.emit(this.token, 'AssetRejected')
           .withArgs(tokenId, resId1);
 
         expect(await this.token.getActiveAssets(tokenId)).to.be.eql([]);
-        pendingAssets = await this.token.getPendingAssets(tokenId);
-        expect(
-          await this.renderUtils.getAssetsById(this.token.address, tokenId, pendingAssets),
-        ).to.eql([resData2]);
+        expect(await this.token.getPendingAssets(tokenId)).to.eql([resId2]);
       });
 
       it('can reject asset if approved', async function () {
@@ -303,10 +274,7 @@ async function shouldBehaveLikeMultiAsset(
         await this.token.connect(approved).rejectAsset(tokenId, 0, resId1);
 
         expect(await this.token.getActiveAssets(tokenId)).to.be.eql([]);
-        const pendingAssets = await this.token.getPendingAssets(tokenId);
-        expect(
-          await this.renderUtils.getAssetsById(this.token.address, tokenId, pendingAssets),
-        ).to.eql([resData2]);
+        expect(await this.token.getPendingAssets(tokenId)).to.eql([resId2]);
       });
 
       it('can reject asset if approved for all', async function () {
@@ -314,10 +282,7 @@ async function shouldBehaveLikeMultiAsset(
         await this.token.connect(operator).rejectAsset(tokenId, 0, resId1);
 
         expect(await this.token.getActiveAssets(tokenId)).to.be.eql([]);
-        const pendingAssets = await this.token.getPendingAssets(tokenId);
-        expect(
-          await this.renderUtils.getAssetsById(this.token.address, tokenId, pendingAssets),
-        ).to.eql([resData2]);
+        expect(await this.token.getPendingAssets(tokenId)).to.eql([resId2]);
       });
 
       it('can reject all assets', async function () {
