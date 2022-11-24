@@ -8,7 +8,6 @@ pragma solidity ^0.8.16;
  * @notice RMRK library smart contract.
  */
 library RMRKLib {
-
     /**
      * @notice Used to remove an item from the array using the specified index.
      * @dev The item is removed by replacing it with the last item and removing the last element.

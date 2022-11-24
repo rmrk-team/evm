@@ -51,16 +51,14 @@ contract RMRKEquippableMock is RMRKEquippable {
         uint64 equippableGroupId,
         address baseAddress,
         string memory metadataURI,
-        uint64[] memory fixedPartIds,
-        uint64[] memory slotPartIds
+        uint64[] memory partIds
     ) external {
         _addAssetEntry(
             id,
             equippableGroupId,
             baseAddress,
             metadataURI,
-            fixedPartIds,
-            slotPartIds
+            partIds
         );
     }
 

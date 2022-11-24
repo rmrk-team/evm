@@ -248,7 +248,7 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
      * @param partIds An array of part IDs that we want to retrieve
      * @return struct An array of `Part` structs associated with given `partIds`
      */
-    function getParts(uint64[] calldata partIds)
+    function getParts(uint64[] memory partIds)
         public
         view
         returns (Part[] memory)

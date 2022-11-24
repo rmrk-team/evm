@@ -150,14 +150,11 @@ async function setupContextForSlots(
   }
 
   async function addAssetsToSoldier(): Promise<void> {
-    await soldierEquip.addAssetEntry(
-      soldierResId,
-      0,
-      base.address,
-      'ipfs:soldier/',
-      [partIdForBody], // Fixed parts
-      [partIdForWeapon, partIdForBackground], // Can receive these
-    );
+    await soldierEquip.addAssetEntry(soldierResId, 0, base.address, 'ipfs:soldier/', [
+      partIdForBody,
+      partIdForWeapon,
+      partIdForBackground,
+    ]);
     for (let i = 0; i < uniqueSoldiers; i++) {
       await soldierEquip.addAssetToToken(soldiersIds[i], soldierResId, 0);
       await soldierEquip.connect(addrs[i % 3]).acceptAsset(soldiersIds[i], 0, soldierResId);
@@ -174,7 +171,6 @@ async function setupContextForSlots(
         ethers.constants.AddressZero, // Not meant to equip
         `ipfs:weapon/full/${weaponAssetsFull[i]}`,
         [],
-        [],
       );
     }
     for (let i = 0; i < weaponAssetsEquip.length; i++) {
@@ -183,7 +179,6 @@ async function setupContextForSlots(
         equippableGroupId,
         base.address,
         `ipfs:weapon/equip/${weaponAssetsEquip[i]}`,
-        [],
         [partIdForWeaponGem],
       );
     }
@@ -217,14 +212,12 @@ async function setupContextForSlots(
       ethers.constants.AddressZero, // Not meant to equip
       'ipfs:weagponGem/full/',
       [],
-      [],
     );
     await weaponGemEquip.addAssetEntry(
       weaponGemAssetEquip,
       equippableGroupId,
       base.address,
       'ipfs:weagponGem/equip/',
-      [],
       [],
     );
     // Can be equipped into weapons
@@ -253,7 +246,6 @@ async function setupContextForSlots(
       equippableGroupId,
       base.address,
       'ipfs:background/',
-      [],
       [],
     );
     // Can be equipped into soldiers

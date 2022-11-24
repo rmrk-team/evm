@@ -146,7 +146,6 @@ interface IRMRKEquippable is IRMRKMultiAsset {
             string memory metadataURI,
             uint64 equippableGroupId,
             address baseAddress,
-            uint64[] memory fixedPartIds,
-            uint64[] memory slotPartIds
+            uint64[] memory partIds
         );
 }

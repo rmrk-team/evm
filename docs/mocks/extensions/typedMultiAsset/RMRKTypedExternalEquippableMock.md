@@ -31,7 +31,7 @@ Used to accept a pending asset of a given token.
 ### addAssetEntry
 
 ```solidity
-function addAssetEntry(uint64 id, uint64 equippableGroupId, address baseAddress, string metadataURI, uint64[] fixedPartIds, uint64[] slotPartIds) external nonpayable
+function addAssetEntry(uint64 id, uint64 equippableGroupId, address baseAddress, string metadataURI, uint64[] partIds) external nonpayable
 ```
 
 
@@ -46,8 +46,7 @@ function addAssetEntry(uint64 id, uint64 equippableGroupId, address baseAddress,
 | equippableGroupId | uint64 | undefined |
 | baseAddress | address | undefined |
 | metadataURI | string | undefined |
-| fixedPartIds | uint64[] | undefined |
-| slotPartIds | uint64[] | undefined |
+| partIds | uint64[] | undefined |
 
 ### addAssetToToken
 
@@ -70,7 +69,7 @@ function addAssetToToken(uint256 tokenId, uint64 assetId, uint64 replacesAssetWi
 ### addTypedAssetEntry
 
 ```solidity
-function addTypedAssetEntry(uint64 id, uint64 equippableGroupId, address baseAddress, string metadataURI, uint64[] fixedPartIds, uint64[] slotPartIds, string type_) external nonpayable
+function addTypedAssetEntry(uint64 id, uint64 equippableGroupId, address baseAddress, string metadataURI, uint64[] partIds, string type_) external nonpayable
 ```
 
 
@@ -85,8 +84,7 @@ function addTypedAssetEntry(uint64 id, uint64 equippableGroupId, address baseAdd
 | equippableGroupId | uint64 | undefined |
 | baseAddress | address | undefined |
 | metadataURI | string | undefined |
-| fixedPartIds | uint64[] | undefined |
-| slotPartIds | uint64[] | undefined |
+| partIds | uint64[] | undefined |
 | type_ | string | undefined |
 
 ### approveForAssets
@@ -216,7 +214,7 @@ Used to get the address of the user that is approved to manage the specified tok
 ### getAssetAndEquippableData
 
 ```solidity
-function getAssetAndEquippableData(uint256 tokenId, uint64 assetId) external view returns (string, uint64, address, uint64[], uint64[])
+function getAssetAndEquippableData(uint256 tokenId, uint64 assetId) external view returns (string, uint64, address, uint64[])
 ```
 
 Used to get all the equippable information of the asset associated with given `assetId`.
@@ -238,7 +236,6 @@ Used to get all the equippable information of the asset associated with given `a
 | _1 | uint64 | undefined |
 | _2 | address | undefined |
 | _3 | uint64[] | undefined |
-| _4 | uint64[] | undefined |
 
 ### getAssetMetadata
 

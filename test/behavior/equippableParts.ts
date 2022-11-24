@@ -186,7 +186,6 @@ async function shouldBehaveLikeEquippableWithParts() {
         ethers.constants.AddressZero, // Not meant to equip
         `ipfs:weapon/full/customAsset.png`,
         [],
-        [],
       );
       await maskEquipContract.addAssetToToken(masks[0], noBaseAssetId, 0);
       await maskEquipContract.connect(addrs[0]).acceptAsset(masks[0], 0, noBaseAssetId);

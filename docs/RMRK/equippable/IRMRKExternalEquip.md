@@ -139,7 +139,7 @@ Used to retrieve the address of the account approved to manage assets of a given
 ### getAssetAndEquippableData
 
 ```solidity
-function getAssetAndEquippableData(uint256 tokenId, uint64 assetId) external view returns (string metadataURI, uint64 equippableGroupId, address baseAddress, uint64[] fixedPartIds, uint64[] slotPartIds)
+function getAssetAndEquippableData(uint256 tokenId, uint64 assetId) external view returns (string metadataURI, uint64 equippableGroupId, address baseAddress, uint64[] partIds)
 ```
 
 Used to get the asset and equippable data associated with given `assetId`.
@@ -160,8 +160,7 @@ Used to get the asset and equippable data associated with given `assetId`.
 | metadataURI | string | undefined |
 | equippableGroupId | uint64 | undefined |
 | baseAddress | address | undefined |
-| fixedPartIds | uint64[] | undefined |
-| slotPartIds | uint64[] | undefined |
+| partIds | uint64[] | undefined |
 
 ### getAssetMetadata
 
