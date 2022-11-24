@@ -11,7 +11,7 @@ contract RMRKNestableExternalEquipMock is RMRKNestableExternalEquip {
     {}
 
     function safeMint(address to, uint256 tokenId) public {
-        _safeMint(to, tokenId);
+        _safeMint(to, tokenId, "");
     }
 
     function safeMint(

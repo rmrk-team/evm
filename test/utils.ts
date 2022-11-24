@@ -75,7 +75,7 @@ async function transfer(
   to: string,
   tokenId: number,
 ): Promise<void> {
-  await token.connect(caller)['transfer(address,uint256)'](to, tokenId);
+  await token.connect(caller)['transferFrom(address,address,uint256)'](caller.address, to, tokenId);
 }
 
 async function nestTransfer(
@@ -85,7 +85,7 @@ async function nestTransfer(
   tokenId: number,
   parentId: number,
 ): Promise<void> {
-  await token.connect(caller)['nestTransfer(address,uint256,uint256)'](to, tokenId, parentId);
+  await token.connect(caller).nestTransferFrom(caller.address, to, tokenId, parentId, '0x');
 }
 
 async function addAssetToToken(

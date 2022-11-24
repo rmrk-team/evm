@@ -45,7 +45,7 @@ contract RMRKMultiAssetImpl is RMRKAbstractMultiAssetImpl {
         uint256 totalSupplyOffset = _totalSupply + 1;
 
         for (uint256 i = nextToken; i < totalSupplyOffset; ) {
-            _safeMint(to, i);
+            _safeMint(to, i, "");
             unchecked {
                 ++i;
             }

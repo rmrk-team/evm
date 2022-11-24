@@ -369,20 +369,6 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
     ////////////////////////////////////////
 
     /**
-     * @notice Used to safely mint a token to a specified address.
-     * @dev Requirements:
-     *
-     *  - `tokenId` must not exist.
-     *  - If `to` refers to a smart contract, it must implement {IERC721Receiver-onERC721Received}, which is called upon a safe transfer.
-     * @dev Emits a {Transfer} event.
-     * @param to Address to which to safely mint the gven token
-     * @param tokenId ID of the token to mint to the specified address
-     */
-    function _safeMint(address to, uint256 tokenId) internal virtual {
-        _safeMint(to, tokenId, "");
-    }
-
-    /**
      * @notice Used to safely mint the token to the specified address while passing the additional data to contract
      *  recipients.
      * @param to Address to which to mint the token

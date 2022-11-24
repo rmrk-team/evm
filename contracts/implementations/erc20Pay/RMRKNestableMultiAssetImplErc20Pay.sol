@@ -36,7 +36,7 @@ contract RMRKNestableMultiAssetImplErc20Pay is
         (uint256 nextToken, uint256 totalSupplyOffset) = _preMint(numToMint);
 
         for (uint256 i = nextToken; i < totalSupplyOffset; ) {
-            _safeMint(to, i);
+            _safeMint(to, i, "");
             unchecked {
                 ++i;
             }

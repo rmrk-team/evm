@@ -14,7 +14,7 @@ contract RMRKNestableMock is RMRKNestable {
     {}
 
     function safeMint(address to, uint256 tokenId) public {
-        _safeMint(to, tokenId);
+        _safeMint(to, tokenId, "");
     }
 
     function safeMint(

@@ -14,7 +14,7 @@ contract RMRKMultiAssetMock is RMRKMultiAsset {
     }
 
     function safeMint(address to, uint256 tokenId) external {
-        _safeMint(to, tokenId);
+        _safeMint(to, tokenId, "");
     }
 
     function safeMint(
