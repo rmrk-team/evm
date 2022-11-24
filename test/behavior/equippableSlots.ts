@@ -434,89 +434,6 @@ async function shouldBehaveLikeEquippableWithSlots(
     });
   });
 
-  describe('Replace equip', async function () {
-    it('can replace equip', async function () {
-      // Weapon is child on index 0, background on index 1
-      const soldierOwner = addrs[0];
-      const childIndex = 0;
-      const weaponResId = weaponAssetsEquip[0]; // This asset is assigned to weapon first weapon
-      await soldierEquip
-        .connect(soldierOwner)
-        .equip([soldiersIds[0], childIndex, soldierResId, partIdForWeapon, weaponResId]);
-
-      await replaceWeaponAndCheckFromAddress(soldierOwner);
-    });
-
-    it('can replace equip if approved', async function () {
-      // Weapon is child on index 0, background on index 1
-      const soldierOwner = addrs[0];
-      const childIndex = 0;
-      const weaponResId = weaponAssetsEquip[0]; // This asset is assigned to weapon first weapon
-      await soldierEquip
-        .connect(soldierOwner)
-        .equip([soldiersIds[0], childIndex, soldierResId, partIdForWeapon, weaponResId]);
-
-      const approved = addrs[1];
-      await soldier.connect(soldierOwner).approve(approved.address, soldiersIds[0]);
-      await replaceWeaponAndCheckFromAddress(approved);
-    });
-
-    it('can replace equip if approved for all', async function () {
-      // Weapon is child on index 0, background on index 1
-      const soldierOwner = addrs[0];
-      const childIndex = 0;
-      const weaponResId = weaponAssetsEquip[0]; // This asset is assigned to weapon first weapon
-      await soldierEquip
-        .connect(soldierOwner)
-        .equip([soldiersIds[0], childIndex, soldierResId, partIdForWeapon, weaponResId]);
-
-      const approved = addrs[1];
-      await soldier.connect(soldierOwner).setApprovalForAll(approved.address, true);
-      await replaceWeaponAndCheckFromAddress(approved);
-    });
-
-    it('cannot replace equip if not equipped', async function () {
-      const childIndex = 0;
-      const weaponResId = weaponAssetsEquip[0]; // This asset is assigned to weapon first weapon
-      await expect(
-        soldierEquip
-          .connect(addrs[0])
-          .replaceEquipment([
-            soldiersIds[0],
-            childIndex,
-            soldierResId,
-            partIdForWeapon,
-            weaponResId,
-          ]),
-      ).to.be.revertedWithCustomError(soldierEquip, 'RMRKNotEquipped');
-    });
-
-    it('cannot replace equip if not owner', async function () {
-      const childIndex = 0;
-      const weaponResId = weaponAssetsEquip[0]; // This asset is assigned to weapon first weapon
-      await soldierEquip
-        .connect(addrs[0])
-        .equip([soldiersIds[0], childIndex, soldierResId, partIdForWeapon, weaponResId]);
-
-      const weaponAssetIndex = 3;
-      await mintWeaponToSoldier(addrs[0], soldiersIds[0], weaponAssetIndex);
-
-      const newWeaponChildIndex = 2;
-      const newWeaponResId = weaponAssetsEquip[weaponAssetIndex];
-      await expect(
-        soldierEquip
-          .connect(addrs[1])
-          .replaceEquipment([
-            soldiersIds[0],
-            newWeaponChildIndex,
-            soldierResId,
-            partIdForWeapon,
-            newWeaponResId,
-          ]),
-      ).to.be.revertedWithCustomError(soldierEquip, 'ERC721NotApprovedOrOwner');
-    });
-  });
-
   describe('Transfer equipped', async function () {
     it('Can unequip and transfer child', async function () {
       // Weapon is child on index 0, background on index 1
@@ -706,42 +623,6 @@ async function shouldBehaveLikeEquippableWithSlots(
     expect(
       await soldierEquip.isChildEquipped(soldiersIds[0], weapon.address, weaponsIds[0]),
     ).to.eql(false);
-  }
-
-  async function replaceWeaponAndCheckFromAddress(from: SignerWithAddress): Promise<void> {
-    const weaponAssetIndex = 3;
-    const newWeaponId = await mintWeaponToSoldier(addrs[0], soldiersIds[0], weaponAssetIndex);
-
-    const newWeaponChildIndex = 2;
-    const newWeaponResId = weaponAssetsEquip[weaponAssetIndex];
-    await soldierEquip
-      .connect(from)
-      .replaceEquipment([
-        soldiersIds[0],
-        newWeaponChildIndex,
-        soldierResId,
-        partIdForWeapon,
-        newWeaponResId,
-      ]);
-
-    const expectedSlots = [bn(partIdForWeapon), bn(partIdForBackground)];
-    // If a slot has nothing equipped, it returns an empty equip:
-    const expectedEquips = [
-      [bn(soldierResId), bn(newWeaponResId), bn(newWeaponId), weaponEquip.address],
-      [bn(0), bn(0), bn(0), ethers.constants.AddressZero],
-    ];
-    expect(await view.getEquipped(soldierEquip.address, soldiersIds[0], soldierResId)).to.eql([
-      expectedSlots,
-      expectedEquips,
-    ]);
-
-    // Child is marked as equipped:
-    expect(
-      await soldierEquip.isChildEquipped(soldiersIds[0], weapon.address, weaponsIds[0]),
-    ).to.eql(false);
-    expect(await soldierEquip.isChildEquipped(soldiersIds[0], weapon.address, newWeaponId)).to.eql(
-      true,
-    );
   }
 
   async function mintWeaponToSoldier(

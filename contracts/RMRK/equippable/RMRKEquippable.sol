@@ -498,30 +498,6 @@ contract RMRKEquippable is
     }
 
     /**
-     * @notice Used unequip the current child from a slot and equip a new one child into the same slot.
-     * @dev This can only be called by the owner of the token or by an account that has been granted permission to
-     *  manage the given token by the current owner.
-     * @dev The `IntakeEquip` stuct contains the following data:
-     *  [
-     *      tokenId,
-     *      childIndex,
-     *      assetId,
-     *      slotPartId,
-     *      childAssetId
-     *  ]
-     * @param data An `IntakeEquip` struct specifying the equip data
-     */
-    function replaceEquipment(IntakeEquip memory data)
-        public
-        virtual
-        onlyApprovedOrOwner(data.tokenId)
-        nonReentrant
-    {
-        _unequip(data.tokenId, data.assetId, data.slotPartId);
-        _equip(data);
-    }
-
-    /**
      * @notice Used to check whether the token has a given child equipped.
      * @dev This is used to prevent from transferring a child that is equipped.
      * @param tokenId ID of the parent token for which we are querying for
