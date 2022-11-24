@@ -8,30 +8,6 @@ pragma solidity ^0.8.16;
  * @notice RMRK library smart contract.
  */
 library RMRKLib {
-    /**
-     * @notice Used to remove an item from the array using the specified value.
-     * @dev The value is removed by replacing it with the last value and removing the last element.
-     * @param array An array of values containing the value to be removed
-     * @param value The value of the asset to remove from the array
-     * @return bool A boolean value specifying whether the item was found
-     */
-    function removeItemByValue(uint64[] storage array, uint64 value)
-        internal
-        returns (bool)
-    {
-        uint64[] memory memArr = array; //Copy array to memory, check for gas savings here
-        uint256 length = memArr.length; //gas savings
-        for (uint256 i; i < length; ) {
-            if (memArr[i] == value) {
-                removeItemByIndex(array, i);
-                return true;
-            }
-            unchecked {
-                ++i;
-            }
-        }
-        return false;
-    }
 
     /**
      * @notice Used to remove an item from the array using the specified index.
