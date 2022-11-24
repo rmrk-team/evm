@@ -25,36 +25,6 @@ interface IRMRKEquippable is IRMRKMultiAsset {
     }
 
     /**
-     * @notice Used to provide data about fixed parts.
-     * @return partId ID of the part
-     * @return z The z value of the asset, specifying how the part should be rendered in a composed NFT
-     * @return matadataURI The metadata URI of the fixed part
-     */
-    struct FixedPart {
-        uint64 partId;
-        uint8 z; //1 byte
-        string metadataURI; //n bytes 32+
-    }
-
-    /**
-     * @notice Used to provide data about slot parts.
-     * @return partId ID of the part
-     * @return childAssetId The ID of asset associated with token equipped into this slot
-     * @return z The z value of the asset, specifying how the part should be rendered in a composed NFT
-     * @return childId The ID of the token equipped into this part
-     * @return childAddress The address of the child token's collection
-     * @return metadataURI The metadata URI of the slot part
-     */
-    struct SlotPart {
-        uint64 partId;
-        uint64 childAssetId;
-        uint8 z; //1 byte
-        uint256 childId;
-        address childAddress;
-        string metadataURI; //n bytes 32+
-    }
-
-    /**
      * @notice Used to provide a struct for inputing equip data.
      * @dev Only used for input and not storage of data.
      * @return tokenId ID of the token we are managing

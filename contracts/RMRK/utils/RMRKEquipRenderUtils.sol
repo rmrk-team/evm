@@ -79,6 +79,18 @@ contract RMRKEquipRenderUtils {
     }
 
     /**
+     * @notice Used to provide data about fixed parts.
+     * @return partId ID of the part
+     * @return z The z value of the asset, specifying how the part should be rendered in a composed NFT
+     * @return matadataURI The metadata URI of the fixed part
+     */
+    struct FixedPart {
+        uint64 partId;
+        uint8 z; //1 byte
+        string metadataURI; //n bytes 32+
+    }
+
+    /**
      * @notice Used to get extended active assets of the given token.
      * @dev The full `ExtendedActiveAsset` looks like this:
      *  [
@@ -307,7 +319,7 @@ contract RMRKEquipRenderUtils {
             string memory metadataURI,
             uint64 equippableGroupId,
             address baseAddress,
-            IRMRKEquippable.FixedPart[] memory fixedParts,
+            FixedPart[] memory fixedParts,
             EquippedSlotPart[] memory slotParts
         )
     {
@@ -326,7 +338,7 @@ contract RMRKEquipRenderUtils {
         if (baseAddress == address(0)) revert RMRKNotComposableAsset();
 
         // Fixed parts:
-        fixedParts = new IRMRKEquippable.FixedPart[](fixedPartIds.length);
+        fixedParts = new FixedPart[](fixedPartIds.length);
 
         uint256 len = fixedPartIds.length;
         if (len != 0) {
@@ -334,7 +346,7 @@ contract RMRKEquipRenderUtils {
                 baseAddress
             ).getParts(fixedPartIds);
             for (uint256 i; i < len; ) {
-                fixedParts[i] = IRMRKEquippable.FixedPart({
+                fixedParts[i] = FixedPart({
                     partId: fixedPartIds[i],
                     z: baseFixedParts[i].z,
                     metadataURI: baseFixedParts[i].metadataURI

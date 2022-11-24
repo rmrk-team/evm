@@ -13,7 +13,7 @@ Smart contract of the RMRK Equip render utils module.
 ### composeEquippables
 
 ```solidity
-function composeEquippables(address target, uint256 tokenId, uint64 assetId) external view returns (string metadataURI, uint64 equippableGroupId, address baseAddress, struct IRMRKEquippable.FixedPart[] fixedParts, struct RMRKEquipRenderUtils.EquippedSlotPart[] slotParts)
+function composeEquippables(address target, uint256 tokenId, uint64 assetId) external view returns (string metadataURI, uint64 equippableGroupId, address baseAddress, struct RMRKEquipRenderUtils.FixedPart[] fixedParts, struct RMRKEquipRenderUtils.EquippedSlotPart[] slotParts)
 ```
 
 Used to compose the given equippables.
@@ -35,7 +35,7 @@ Used to compose the given equippables.
 | metadataURI | string | Metadata URI of the asset |
 | equippableGroupId | uint64 | Equippable group ID of the asset |
 | baseAddress | address | Address of the base to which the asset belongs to |
-| fixedParts | IRMRKEquippable.FixedPart[] | An array of fixed parts respresented by the `FixedPart` structs present on the asset |
+| fixedParts | RMRKEquipRenderUtils.FixedPart[] | An array of fixed parts respresented by the `FixedPart` structs present on the asset |
 | slotParts | RMRKEquipRenderUtils.EquippedSlotPart[] | An array of slot parts represented by the `EquippedSlotPart` structs present on the asset |
 
 ### getEquipped
