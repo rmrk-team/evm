@@ -49,12 +49,9 @@ describe('NestableMock', function () {
   shouldBehaveLikeNestable(mintFromMock, nestMintFromMock, transfer, nestTransfer);
 
   describe('Init', async function () {
-    it('Name', async function () {
+    it('can get name and symbol', async function () {
       expect(await parent.name()).to.equal(parentName);
       expect(await child.name()).to.equal(childName);
-    });
-
-    it('Symbol', async function () {
       expect(await parent.symbol()).to.equal(parentSymbol);
       expect(await child.symbol()).to.equal(childSymbol);
     });

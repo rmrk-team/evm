@@ -59,7 +59,7 @@ describe('MultiAssetImpl Other Behavior', async () => {
 
     shouldBehaveLikeOwnableLock(isOwnableLockMock);
 
-    it('Can mint tokens through sale logic', async function () {
+    it('can mint tokens through sale logic', async function () {
       await mintFromImpl(token, owner.address);
       expect(await token.ownerOf(1)).to.equal(owner.address);
       expect(await token.totalSupply()).to.equal(1);
@@ -73,7 +73,7 @@ describe('MultiAssetImpl Other Behavior', async () => {
       ).to.be.revertedWithCustomError(token, 'RMRKMintUnderpriced');
     });
 
-    it('Can mint multiple tokens through sale logic', async function () {
+    it('can mint multiple tokens through sale logic', async function () {
       await token.connect(owner).mint(owner.address, 10, { value: ONE_ETH.mul(10) });
       expect(await token.totalSupply()).to.equal(10);
       expect(await token.balanceOf(owner.address)).to.equal(10);

@@ -25,12 +25,12 @@ describe('Minting Utils', async () => {
   });
 
   describe('Test', async function () {
-    it('Test getters', async function () {
+    it('can get total supply, max supply and price', async function () {
       expect(await mintingUtils.totalSupply()).to.equal(0);
       expect(await mintingUtils.maxSupply()).to.equal(10);
       expect(await mintingUtils.pricePerMint()).to.equal(100);
     });
-    it('Test saleIsOpen', async function () {
+    it('fails if sale is not open', async function () {
       expect(await mintingUtils.testSaleIsOpen()).to.equal(true);
       await mintingUtils.connect(owner).setupTestSaleIsOpen();
       await expect(mintingUtils.connect(owner).testSaleIsOpen()).to.be.revertedWithCustomError(

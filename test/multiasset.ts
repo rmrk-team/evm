@@ -38,11 +38,8 @@ describe('MultiAssetMock Other Behavior', async function () {
   });
 
   describe('Init', async function () {
-    it('Name', async function () {
+    it('can get name and symbol', async function () {
       expect(await token.name()).to.equal(name);
-    });
-
-    it('Symbol', async function () {
       expect(await token.symbol()).to.equal(symbol);
     });
 

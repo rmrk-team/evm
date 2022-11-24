@@ -18,11 +18,11 @@ async function shouldBehaveOwnableLock(ismock: boolean) {
   });
 
   describe('Init', async function () {
-    it('Owner', async function () {
+    it('can get owner', async function () {
       expect(await ownableLock.owner()).to.equal(owner.address);
     });
 
-    it('Lock getter', async function () {
+    it('can get lock', async function () {
       expect(await ownableLock.getLock()).to.equal(false);
       await ownableLock.connect(owner).setLock();
       expect(await ownableLock.getLock()).to.equal(true);
@@ -31,7 +31,7 @@ async function shouldBehaveOwnableLock(ismock: boolean) {
       expect(await ownableLock.getLock()).to.equal(true);
     });
 
-    it('Reverts if setLock caller is not owner', async function () {
+    it('reverts if setLock caller is not owner', async function () {
       await expect(ownableLock.connect(addrs[0]).setLock()).to.be.revertedWithCustomError(
         ownableLock,
         'RMRKNotOwner',
@@ -39,7 +39,7 @@ async function shouldBehaveOwnableLock(ismock: boolean) {
     });
 
     if (ismock) {
-      it('Modifier', async function () {
+      it('fail when locked', async function () {
         expect(await ownableLock.testLock()).to.equal(true);
         await ownableLock.connect(owner).setLock();
         await expect(ownableLock.connect(owner).testLock()).to.be.revertedWithCustomError(

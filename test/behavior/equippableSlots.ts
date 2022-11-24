@@ -435,7 +435,7 @@ async function shouldBehaveLikeEquippableWithSlots(
   });
 
   describe('Transfer equipped', async function () {
-    it('Can unequip and transfer child', async function () {
+    it('can unequip and transfer child', async function () {
       // Weapon is child on index 0, background on index 1
       const soldierOwner = addrs[0];
       const childIndex = 0;
