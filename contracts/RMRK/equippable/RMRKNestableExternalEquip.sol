@@ -41,14 +41,14 @@ contract RMRKNestableExternalEquip is IRMRKNestableExternalEquip, RMRKNestable {
     }
 
     /**
-     * @notice Used to transfer a given child from the parent
-     * @dev The function doesn't contain a check validating on `to`. To ensure that a token is not
+     * @notice Used to transfer a child from the given parent.
+     * @dev The function doesn't contain a check validating `to`. To ensure that a token is not
      *  transferred to an incompatible smart contract, custom validation has to be added when usin
      * @param tokenId ID of the parent token from which the child token is being transferred
-     * @param to Address to which to transfer the token to.
-     * @param destinationId ID of the token to receive the token being transferred, 0 if destination is not a Nestable NFT.
+     * @param to Address to which to transfer the token to
+     * @param destinationId ID of the token to receive this child token (MUST be 0 if the destination is not a token)
      * @param childIndex Index of a token we are transfering, in the array it belongs to (can be either active array or
-     *  pending array).
+     *  pending array)
      * @param childAddress Address of the child token's collection smart contract.
      * @param childId ID of the child token in its own collection smart contract.
      * @param isPending A boolean value indicating whether the child token being transferred is in the pending array of the

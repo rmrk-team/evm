@@ -997,10 +997,10 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
     /**
      * @notice Used to transfer a child token from a given parent token.
      * @param tokenId ID of the parent token from which the child token is being transferred
-     * @param to Address to which to transfer the token to.
-     * @param destinationId ID of the token to receive the token being transferred, 0 if destination is not a Nestable NFT.
+     * @param to Address to which to transfer the token to
+     * @param destinationId ID of the token to receive this child token (MUST be 0 if the destination is not a token)
      * @param childIndex Index of a token we are transfering, in the array it belongs to (can be either active array or
-     *  pending array).
+     *  pending array)
      * @param childAddress Address of the child token's collection smart contract.
      * @param childId ID of the child token in its own collection smart contract.
      * @param isPending A boolean value indicating whether the child token being transferred is in the pending array of the
@@ -1038,10 +1038,10 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
      *  - `tokenId` must exist.
      * @dev Emits {ChildTransferred} event.
      * @param tokenId ID of the parent token from which the child token is being transferred
-     * @param to Address to which to transfer the token to.
-     * @param destinationId ID of the token to receive the token being transferred, 0 if destination is not a Nestable NFT.
+     * @param to Address to which to transfer the token to
+     * @param destinationId ID of the token to receive this child token (MUST be 0 if the destination is not a token)
      * @param childIndex Index of a token we are transfering, in the array it belongs to (can be either active array or
-     *  pending array).
+     *  pending array)
      * @param childAddress Address of the child token's collection smart contract.
      * @param childId ID of the child token in its own collection smart contract.
      * @param isPending A boolean value indicating whether the child token being transferred is in the pending array of the

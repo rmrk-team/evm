@@ -907,9 +907,9 @@ Used to transfer a child token from a given parent token.
 | Name | Type | Description |
 |---|---|---|
 | tokenId | uint256 | ID of the parent token from which the child token is being transferred |
-| to | address | Address to which to transfer the token to. |
-| destinationId | uint256 | ID of the token to receive the token being transferred, 0 if destination is not a Nestable NFT. |
-| childIndex | uint256 | Index of a token we are transfering, in the array it belongs to (can be either active array or  pending array). |
+| to | address | Address to which to transfer the token to |
+| destinationId | uint256 | ID of the token to receive this child token (MUST be 0 if the destination is not a token) |
+| childIndex | uint256 | Index of a token we are transfering, in the array it belongs to (can be either active array or  pending array) |
 | childAddress | address | Address of the child token&#39;s collection smart contract. |
 | childId | uint256 | ID of the child token in its own collection smart contract. |
 | isPending | bool | A boolean value indicating whether the child token being transferred is in the pending array of the  parent token (`true`) or in the active array (`false`) |
