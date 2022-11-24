@@ -308,7 +308,7 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
     }
 
     /**
-     * @notice Used to add a asset entry.
+     * @notice Used to add an asset entry.
      * @dev If the specified ID is already used by another asset, the execution will be reverted.
      * @param id ID of the asset to assign to the new asset
      * @param metadataURI Metadata URI of the asset
@@ -328,7 +328,7 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
     }
 
     /**
-     * @notice Used to add a asset to a token.
+     * @notice Used to add an asset to a token.
      * @dev If the given asset is already added to the token, the execution will be reverted.
      * @dev If the asset ID is invalid, the execution will be reverted.
      * @dev If the token already has the maximum amount of pending assets (128), the execution will be

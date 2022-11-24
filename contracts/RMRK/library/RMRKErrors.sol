@@ -40,7 +40,7 @@ error RMRKApproveForAssetsCallerIsNotOwnerNorApprovedForAll();
 error RMRKBadConfig();
 /// Attempting to set the priorities with an array of length that doesn't match the length of active assets array
 error RMRKBadPriorityListLength();
-/// Attempting to add a asset entry with `Part`s, without setting the `Base` address
+/// Attempting to add an asset entry with `Part`s, without setting the `Base` address
 error RMRKBaseRequiredForParts();
 /// Attempting to transfer a soulbound (non-transferrable) token
 error RMRKCannotTransferSoulbound();
@@ -53,7 +53,7 @@ error RMRKEquippableEquipNotAllowedByBase();
 /// Attempting to use ID 0, which is not supported
 /// @dev The ID 0 in RMRK suite is reserved for empty values. Guarding against its use ensures the expected operation
 error RMRKIdZeroForbidden();
-/// Attempting to interact with a asset, using index greater than number of assets
+/// Attempting to interact with an asset, using index greater than number of assets
 error RMRKIndexOutOfRange();
 /// Attempting to reclaim a child that can't be reclaimed
 error RMRKInvalidChildReclaim();
@@ -84,16 +84,16 @@ error RMRKNestableTransferToDescendant();
 error RMRKNestableTransferToNonRMRKNestableImplementer();
 /// Attempting to nest the token into itself
 error RMRKNestableTransferToSelf();
-/// Attempting to interact with a asset that can not be found
+/// Attempting to interact with an asset that can not be found
 error RMRKNoAssetMatchingId();
-/// Attempting to manage a asset without owning it or having been granted permission by the owner to do so
+/// Attempting to manage an asset without owning it or having been granted permission by the owner to do so
 error RMRKNotApprovedForAssetsOrOwner();
 /// Attempting to interact with a token without being its owner or having been granted permission by the
 ///  owner to do so
 /// @dev When a token is nested, only the direct owner (NFT parent) can mange it. In that case, approved addresses are
 ///  not allowed to manage it, in order to ensure the expected behaviour
 error RMRKNotApprovedOrDirectOwner();
-/// Attempting to compose a asset wihtout having an associated Base
+/// Attempting to compose an asset wihtout having an associated Base
 error RMRKNotComposableAsset();
 /// Attempting to unequip an item that isn't equipped
 error RMRKNotEquipped();
@@ -113,7 +113,7 @@ error RMRKPartDoesNotExist();
 error RMRKPartIsNotSlot();
 /// Attempting to interact with a pending child using an index greater than the size of pending array
 error RMRKPendingChildIndexOutOfRange();
-/// Attempting to add a asset using an ID that has already been used
+/// Attempting to add an asset using an ID that has already been used
 error RMRKAssetAlreadyExists();
 /// Attempting to equip an item into a slot that already has an item equipped
 error RMRKSlotAlreadyUsed();
@@ -131,7 +131,7 @@ error RMRKUnexpectedChildId();
 error RMRKUnexpectedNumberOfAssets();
 /// Attempting to reject all pending children but children assets than expected are pending
 error RMRKUnexpectedNumberOfChildren();
-/// Attempting to accept or reject a asset which does not match the one at the specified index
+/// Attempting to accept or reject an asset which does not match the one at the specified index
 error RMRKUnexpectedAssetId();
 /// Attempting not to pass an empty array of equippable addresses when adding or setting the equippable addresses
 error RMRKZeroLengthIdsPassed();

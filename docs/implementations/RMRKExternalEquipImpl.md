@@ -695,7 +695,7 @@ Used to notify listeners that owner has granted an approval to the user to manag
 event AssetAccepted(uint256 indexed tokenId, uint64 indexed assetId, uint64 indexed replacesId)
 ```
 
-Used to notify listeners that a asset object at `assetId` is accepted by the token and migrated  from token&#39;s pending assets array to active assets array of the token.
+Used to notify listeners that an asset object at `assetId` is accepted by the token and migrated  from token&#39;s pending assets array to active assets array of the token.
 
 
 
@@ -713,7 +713,7 @@ Used to notify listeners that a asset object at `assetId` is accepted by the tok
 event AssetAddedToToken(uint256 indexed tokenId, uint64 indexed assetId, uint64 indexed replacesId)
 ```
 
-Used to notify listeners that a asset object at `assetId` is added to token&#39;s pending asset  array.
+Used to notify listeners that an asset object at `assetId` is added to token&#39;s pending asset  array.
 
 
 
@@ -747,7 +747,7 @@ Used to notify listeners that token&#39;s prioritiy array is reordered.
 event AssetRejected(uint256 indexed tokenId, uint64 indexed assetId)
 ```
 
-Used to notify listeners that a asset object at `assetId` is rejected from token and is dropped  from the pending assets array of the token.
+Used to notify listeners that an asset object at `assetId` is rejected from token and is dropped  from the pending assets array of the token.
 
 
 
@@ -764,7 +764,7 @@ Used to notify listeners that a asset object at `assetId` is rejected from token
 event AssetSet(uint64 indexed assetId)
 ```
 
-Used to notify listeners that a asset object is initialized at `assetId`.
+Used to notify listeners that an asset object is initialized at `assetId`.
 
 
 
@@ -922,7 +922,7 @@ Attempting to grant approval of assets without being the caller or approved for 
 error RMRKAssetAlreadyExists()
 ```
 
-Attempting to add a asset using an ID that has already been used
+Attempting to add an asset using an ID that has already been used
 
 
 
@@ -944,7 +944,7 @@ Attempting to set the priorities with an array of length that doesn&#39;t match 
 error RMRKBaseRequiredForParts()
 ```
 
-Attempting to add a asset entry with `Part`s, without setting the `Base` address
+Attempting to add an asset entry with `Part`s, without setting the `Base` address
 
 
 
@@ -977,7 +977,7 @@ Attempting to use ID 0, which is not supported
 error RMRKIndexOutOfRange()
 ```
 
-Attempting to interact with a asset, using index greater than number of assets
+Attempting to interact with an asset, using index greater than number of assets
 
 
 
@@ -1021,7 +1021,7 @@ Attempting to transfer the ownership to the 0x0 address
 error RMRKNoAssetMatchingId()
 ```
 
-Attempting to interact with a asset that can not be found
+Attempting to interact with an asset that can not be found
 
 
 
@@ -1032,7 +1032,7 @@ Attempting to interact with a asset that can not be found
 error RMRKNotApprovedForAssetsOrOwner()
 ```
 
-Attempting to manage a asset without owning it or having been granted permission by the owner to do so
+Attempting to manage an asset without owning it or having been granted permission by the owner to do so
 
 
 
@@ -1120,7 +1120,7 @@ Attempting to compose a NFT of a token without active assets
 error RMRKUnexpectedAssetId()
 ```
 
-Attempting to accept or reject a asset which does not match the one at the specified index
+Attempting to accept or reject an asset which does not match the one at the specified index
 
 
 

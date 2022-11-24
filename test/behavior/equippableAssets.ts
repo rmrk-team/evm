@@ -104,7 +104,7 @@ async function shouldBehaveLikeEquippableAssets(
       ).to.be.revertedWithCustomError(chunkyEquip, 'RMRKBaseRequiredForParts');
     });
 
-    it('cannot add a asset with an existing ID', async function () {
+    it('cannot add an asset with an existing ID', async function () {
       const id = bn(1);
 
       await chunkyEquip.addAssetEntry(

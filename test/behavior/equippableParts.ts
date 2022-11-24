@@ -21,7 +21,7 @@ import { bn } from '../utils';
 // The general idea is having these tokens: Neon and Mask
 // Masks can be equipped into Neons.
 // All use a single base.
-// Neon will use a asset per token, which uses fixed parts to compose the body
+// Neon will use an asset per token, which uses fixed parts to compose the body
 // Mask will have 2 assets per weapon, one for full view, one for equipping. Both are composed using fixed parts
 async function shouldBehaveLikeEquippableWithParts() {
   let baseContract: Contract;

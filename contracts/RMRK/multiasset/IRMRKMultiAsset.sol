@@ -11,13 +11,13 @@ import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
  */
 interface IRMRKMultiAsset is IERC165 {
     /**
-     * @notice Used to notify listeners that a asset object is initialized at `assetId`.
+     * @notice Used to notify listeners that an asset object is initialized at `assetId`.
      * @param assetId ID of the asset that was initialized
      */
     event AssetSet(uint64 indexed assetId);
 
     /**
-     * @notice Used to notify listeners that a asset object at `assetId` is added to token's pending asset
+     * @notice Used to notify listeners that an asset object at `assetId` is added to token's pending asset
      *  array.
      * @param tokenId ID of the token that received a new pending asset
      * @param assetId ID of the asset that has been added to the token's pending assets array
@@ -30,7 +30,7 @@ interface IRMRKMultiAsset is IERC165 {
     );
 
     /**
-     * @notice Used to notify listeners that a asset object at `assetId` is accepted by the token and migrated
+     * @notice Used to notify listeners that an asset object at `assetId` is accepted by the token and migrated
      *  from token's pending assets array to active assets array of the token.
      * @param tokenId ID of the token that had a new asset accepted
      * @param assetId ID of the asset that was accepted
@@ -43,9 +43,9 @@ interface IRMRKMultiAsset is IERC165 {
     );
 
     /**
-     * @notice Used to notify listeners that a asset object at `assetId` is rejected from token and is dropped
+     * @notice Used to notify listeners that an asset object at `assetId` is rejected from token and is dropped
      *  from the pending assets array of the token.
-     * @param tokenId ID of the token that had a asset rejected
+     * @param tokenId ID of the token that had an asset rejected
      * @param assetId ID of the asset that was rejected
      */
     event AssetRejected(uint256 indexed tokenId, uint64 indexed assetId);
@@ -85,7 +85,7 @@ interface IRMRKMultiAsset is IERC165 {
     );
 
     /**
-     * @notice Accepts a asset at from the pending array of given token.
+     * @notice Accepts an asset at from the pending array of given token.
      * @dev Migrates the asset from the token's pending asset array to the token's active asset array.
      * @dev Active assets cannot be removed by anyone, but can be replaced by a new asset.
      * @dev Requirements:
@@ -105,7 +105,7 @@ interface IRMRKMultiAsset is IERC165 {
     ) external;
 
     /**
-     * @notice Rejects a asset from the pending array of given token.
+     * @notice Rejects an asset from the pending array of given token.
      * @dev Removes the asset from the token's pending asset array.
      * @dev Requirements:
      *
@@ -225,7 +225,7 @@ interface IRMRKMultiAsset is IERC165 {
     /**
      * @notice Used to grant permission to the user to manage token's assets.
      * @dev This differs from transfer approvals, as approvals are not cleared when the approved party accepts or
-     *  rejects a asset, or sets asset priorities. This approval is cleared on token transfer.
+     *  rejects an asset, or sets asset priorities. This approval is cleared on token transfer.
      * @dev Only a single account can be approved at a time, so approving the `0x0` address clears previous approvals.
      * @dev Requirements:
      *

@@ -33,7 +33,7 @@ Version of the @rmrk-team/evm-contracts package
 function acceptAsset(uint256 tokenId, uint256 index, uint64 assetId) external nonpayable
 ```
 
-Accepts a asset at from the pending array of given token.
+Accepts an asset at from the pending array of given token.
 
 *Migrates the asset from the token&#39;s pending asset array to the token&#39;s active asset array.Active assets cannot be removed by anyone, but can be replaced by a new asset.Requirements:  - The caller must own the token or be approved to manage the token&#39;s assets  - `tokenId` must exist.  - `index` must be in range of the length of the pending asset array.Emits an {AssetAccepted} event.*
 
@@ -105,7 +105,7 @@ function approveForAssets(address to, uint256 tokenId) external nonpayable
 
 Used to grant permission to the user to manage token&#39;s assets.
 
-*This differs from transfer approvals, as approvals are not cleared when the approved party accepts or  rejects a asset, or sets asset priorities. This approval is cleared on token transfer.Only a single account can be approved at a time, so approving the `0x0` address clears previous approvals.Requirements:  - The caller must own the token or be an approved operator.  - `tokenId` must exist.Emits an {ApprovalForAssets} event.*
+*This differs from transfer approvals, as approvals are not cleared when the approved party accepts or  rejects an asset, or sets asset priorities. This approval is cleared on token transfer.Only a single account can be approved at a time, so approving the `0x0` address clears previous approvals.Requirements:  - The caller must own the token or be an approved operator.  - `tokenId` must exist.Emits an {ApprovalForAssets} event.*
 
 #### Parameters
 
@@ -433,7 +433,7 @@ Rejects all assets from the pending array of a given token.
 function rejectAsset(uint256 tokenId, uint256 index, uint64 assetId) external nonpayable
 ```
 
-Rejects a asset from the pending array of given token.
+Rejects an asset from the pending array of given token.
 
 *Removes the asset from the token&#39;s pending asset array.Requirements:  - The caller must own the token or be approved to manage the token&#39;s assets  - `tokenId` must exist.  - `index` must be in range of the length of the pending asset array.Emits a {AssetRejected} event.*
 
@@ -746,7 +746,7 @@ Used to notify listeners that owner has granted an approval to the user to manag
 event AssetAccepted(uint256 indexed tokenId, uint64 indexed assetId, uint64 indexed replacesId)
 ```
 
-Used to notify listeners that a asset object at `assetId` is accepted by the token and migrated  from token&#39;s pending assets array to active assets array of the token.
+Used to notify listeners that an asset object at `assetId` is accepted by the token and migrated  from token&#39;s pending assets array to active assets array of the token.
 
 
 
@@ -764,7 +764,7 @@ Used to notify listeners that a asset object at `assetId` is accepted by the tok
 event AssetAddedToToken(uint256 indexed tokenId, uint64 indexed assetId, uint64 indexed replacesId)
 ```
 
-Used to notify listeners that a asset object at `assetId` is added to token&#39;s pending asset  array.
+Used to notify listeners that an asset object at `assetId` is added to token&#39;s pending asset  array.
 
 
 
@@ -798,7 +798,7 @@ Used to notify listeners that token&#39;s prioritiy array is reordered.
 event AssetRejected(uint256 indexed tokenId, uint64 indexed assetId)
 ```
 
-Used to notify listeners that a asset object at `assetId` is rejected from token and is dropped  from the pending assets array of the token.
+Used to notify listeners that an asset object at `assetId` is rejected from token and is dropped  from the pending assets array of the token.
 
 
 
@@ -815,7 +815,7 @@ Used to notify listeners that a asset object at `assetId` is rejected from token
 event AssetSet(uint64 indexed assetId)
 ```
 
-Used to notify listeners that a asset object is initialized at `assetId`.
+Used to notify listeners that an asset object is initialized at `assetId`.
 
 
 
@@ -996,7 +996,7 @@ Attempting to grant approval of assets without being the caller or approved for 
 error RMRKAssetAlreadyExists()
 ```
 
-Attempting to add a asset using an ID that has already been used
+Attempting to add an asset using an ID that has already been used
 
 
 
@@ -1029,7 +1029,7 @@ Attempting to use ID 0, which is not supported
 error RMRKIndexOutOfRange()
 ```
 
-Attempting to interact with a asset, using index greater than number of assets
+Attempting to interact with an asset, using index greater than number of assets
 
 
 
@@ -1051,7 +1051,7 @@ Attempting to add a pending asset after the number of pending assets has reached
 error RMRKNoAssetMatchingId()
 ```
 
-Attempting to interact with a asset that can not be found
+Attempting to interact with an asset that can not be found
 
 
 
@@ -1062,7 +1062,7 @@ Attempting to interact with a asset that can not be found
 error RMRKNotApprovedForAssetsOrOwner()
 ```
 
-Attempting to manage a asset without owning it or having been granted permission by the owner to do so
+Attempting to manage an asset without owning it or having been granted permission by the owner to do so
 
 
 
@@ -1084,7 +1084,7 @@ Attempting to compose a NFT of a token without active assets
 error RMRKUnexpectedAssetId()
 ```
 
-Attempting to accept or reject a asset which does not match the one at the specified index
+Attempting to accept or reject an asset which does not match the one at the specified index
 
 
 

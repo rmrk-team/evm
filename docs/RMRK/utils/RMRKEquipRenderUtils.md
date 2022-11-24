@@ -120,7 +120,7 @@ Used to get the extended pending assets of the given token.
 error RMRKNotComposableAsset()
 ```
 
-Attempting to compose a asset wihtout having an associated Base
+Attempting to compose an asset wihtout having an associated Base
 
 
 

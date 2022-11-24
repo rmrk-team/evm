@@ -16,7 +16,7 @@ Interface smart contract of the RMRK equippable module.
 function acceptAsset(uint256 tokenId, uint256 index, uint64 assetId) external nonpayable
 ```
 
-Accepts a asset at from the pending array of given token.
+Accepts an asset at from the pending array of given token.
 
 *Migrates the asset from the token&#39;s pending asset array to the token&#39;s active asset array.Active assets cannot be removed by anyone, but can be replaced by a new asset.Requirements:  - The caller must own the token or be approved to manage the token&#39;s assets  - `tokenId` must exist.  - `index` must be in range of the length of the pending asset array.Emits an {AssetAccepted} event.*
 
@@ -36,7 +36,7 @@ function approveForAssets(address to, uint256 tokenId) external nonpayable
 
 Used to grant permission to the user to manage token&#39;s assets.
 
-*This differs from transfer approvals, as approvals are not cleared when the approved party accepts or  rejects a asset, or sets asset priorities. This approval is cleared on token transfer.Only a single account can be approved at a time, so approving the `0x0` address clears previous approvals.Requirements:  - The caller must own the token or be an approved operator.  - `tokenId` must exist.Emits an {ApprovalForAssets} event.*
+*This differs from transfer approvals, as approvals are not cleared when the approved party accepts or  rejects an asset, or sets asset priorities. This approval is cleared on token transfer.Only a single account can be approved at a time, so approving the `0x0` address clears previous approvals.Requirements:  - The caller must own the token or be an approved operator.  - `tokenId` must exist.Emits an {ApprovalForAssets} event.*
 
 #### Parameters
 
@@ -325,7 +325,7 @@ Rejects all assets from the pending array of a given token.
 function rejectAsset(uint256 tokenId, uint256 index, uint64 assetId) external nonpayable
 ```
 
-Rejects a asset from the pending array of given token.
+Rejects an asset from the pending array of given token.
 
 *Removes the asset from the token&#39;s pending asset array.Requirements:  - The caller must own the token or be approved to manage the token&#39;s assets  - `tokenId` must exist.  - `index` must be in range of the length of the pending asset array.Emits a {AssetRejected} event.*
 
@@ -439,7 +439,7 @@ Used to notify listeners that owner has granted an approval to the user to manag
 event AssetAccepted(uint256 indexed tokenId, uint64 indexed assetId, uint64 indexed replacesId)
 ```
 
-Used to notify listeners that a asset object at `assetId` is accepted by the token and migrated  from token&#39;s pending assets array to active assets array of the token.
+Used to notify listeners that an asset object at `assetId` is accepted by the token and migrated  from token&#39;s pending assets array to active assets array of the token.
 
 
 
@@ -457,7 +457,7 @@ Used to notify listeners that a asset object at `assetId` is accepted by the tok
 event AssetAddedToToken(uint256 indexed tokenId, uint64 indexed assetId, uint64 indexed replacesId)
 ```
 
-Used to notify listeners that a asset object at `assetId` is added to token&#39;s pending asset  array.
+Used to notify listeners that an asset object at `assetId` is added to token&#39;s pending asset  array.
 
 
 
@@ -491,7 +491,7 @@ Used to notify listeners that token&#39;s prioritiy array is reordered.
 event AssetRejected(uint256 indexed tokenId, uint64 indexed assetId)
 ```
 
-Used to notify listeners that a asset object at `assetId` is rejected from token and is dropped  from the pending assets array of the token.
+Used to notify listeners that an asset object at `assetId` is rejected from token and is dropped  from the pending assets array of the token.
 
 
 
@@ -508,7 +508,7 @@ Used to notify listeners that a asset object at `assetId` is rejected from token
 event AssetSet(uint64 indexed assetId)
 ```
 
-Used to notify listeners that a asset object is initialized at `assetId`.
+Used to notify listeners that an asset object is initialized at `assetId`.
 
 
 
@@ -532,7 +532,7 @@ Used to notify listeners that a child&#39;s asset has been equipped into one of 
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId `indexed` | uint256 | ID of the token that had a asset equipped |
+| tokenId `indexed` | uint256 | ID of the token that had an asset equipped |
 | assetId `indexed` | uint64 | ID of the asset associated with the token we are equipping into |
 | slotPartId `indexed` | uint64 | ID of the slot we are using to equip |
 | childId  | uint256 | ID of the child token we are equipping into the slot |
@@ -553,7 +553,7 @@ Used to notify listeners that a child&#39;s asset has been unequipped from one o
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId `indexed` | uint256 | ID of the token that had a asset unequipped |
+| tokenId `indexed` | uint256 | ID of the token that had an asset unequipped |
 | assetId `indexed` | uint64 | ID of the asset associated with the token we are unequipping out of |
 | slotPartId `indexed` | uint64 | ID of the slot we are unequipping from |
 | childId  | uint256 | ID of the token being unequipped |

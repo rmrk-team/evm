@@ -43,7 +43,7 @@ interface IRMRKEquippable is IRMRKMultiAsset {
 
     /**
      * @notice Used to notify listeners that a child's asset has been equipped into one of its parent assets.
-     * @param tokenId ID of the token that had a asset equipped
+     * @param tokenId ID of the token that had an asset equipped
      * @param assetId ID of the asset associated with the token we are equipping into
      * @param slotPartId ID of the slot we are using to equip
      * @param childId ID of the child token we are equipping into the slot
@@ -61,7 +61,7 @@ interface IRMRKEquippable is IRMRKMultiAsset {
 
     /**
      * @notice Used to notify listeners that a child's asset has been unequipped from one of its parent assets.
-     * @param tokenId ID of the token that had a asset unequipped
+     * @param tokenId ID of the token that had an asset unequipped
      * @param assetId ID of the asset associated with the token we are unequipping out of
      * @param slotPartId ID of the slot we are unequipping from
      * @param childId ID of the token being unequipped

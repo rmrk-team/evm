@@ -77,7 +77,7 @@ contract RMRKNestableMultiAsset is RMRKNestable, AbstractMultiAsset {
     // --------------------------- HANDLING ASSETS -------------------------
 
     /**
-     * @notice Accepts a asset from the pending array of given token.
+     * @notice Accepts an asset from the pending array of given token.
      * @dev Migrates the asset from the token's pending asset array to the token's active asset array.
      * @dev Active assets cannot be removed by anyone, but can be replaced by a new asset.
      * @dev Requirements:
@@ -99,7 +99,7 @@ contract RMRKNestableMultiAsset is RMRKNestable, AbstractMultiAsset {
     }
 
     /**
-     * @notice Rejects a asset from the pending array of given token.
+     * @notice Rejects an asset from the pending array of given token.
      * @dev Removes the asset from the token's pending asset array.
      * @dev Requirements:
      *
@@ -168,7 +168,7 @@ contract RMRKNestableMultiAsset is RMRKNestable, AbstractMultiAsset {
     /**
      * @notice Used to grant permission to the user to manage token's assets.
      * @dev This differs from transfer approvals, as approvals are not cleared when the approved party accepts or
-     *  rejects a asset, or sets asset priorities. This approval is cleared on token transfer.
+     *  rejects an asset, or sets asset priorities. This approval is cleared on token transfer.
      * @dev Only a single account can be approved at a time, so approving the `0x0` address clears previous approvals.
      * @dev Requirements:
      *
