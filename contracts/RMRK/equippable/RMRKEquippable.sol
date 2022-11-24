@@ -41,11 +41,8 @@ contract RMRKEquippable is
     mapping(uint64 => address) private _baseAddresses;
     /// Mapping of uint64 ID to asset object.
     mapping(uint64 => uint64) private _equippableGroupIds;
-
-    /// Mapping of assetId to fixed base parts applicable to this asset.
-    mapping(uint64 => uint64[]) private _fixedPartIds;
-    /// Mapping of assetId to slot base parts applicable to this asset.
-    mapping(uint64 => uint64[]) private _slotPartIds;
+    /// Mapping of assetId to base parts applicable to this asset, both fixed and slot
+    mapping(uint64 => uint64[]) private _partIds;
 
     /// Mapping of token ID to base address to slot part ID to equipment information. Used to compose an NFT.
     mapping(uint256 => mapping(address => mapping(uint64 => Equipment)))
@@ -196,28 +193,23 @@ contract RMRKEquippable is
     /**
      * @notice Used to add a asset entry.
      * @dev This internal function warrants custom access control to be implemented when used.
-     * @param fixedPartIds An array of IDs of fixed parts to be included in the asset
-     * @param slotPartIds An array of IDs of slot parts to be included in the asset
+     * @param partIds An array of IDs of fixed and slot parts to be included in the asset
      */
     function _addAssetEntry(
         uint64 id,
         uint64 equippableGroupId,
         address baseAddress,
         string memory metadataURI,
-        uint64[] memory fixedPartIds,
-        uint64[] memory slotPartIds
+        uint64[] memory partIds
     ) internal virtual {
         _addAssetEntry(id, metadataURI);
 
-        if (
-            baseAddress == address(0) &&
-            (fixedPartIds.length != 0 || slotPartIds.length != 0)
-        ) revert RMRKBaseRequiredForParts();
+        if (baseAddress == address(0) && partIds.length != 0)
+            revert RMRKBaseRequiredForParts();
 
         _baseAddresses[id] = baseAddress;
         _equippableGroupIds[id] = equippableGroupId;
-        _fixedPartIds[id] = fixedPartIds;
-        _slotPartIds[id] = slotPartIds;
+        _partIds[id] = partIds;
     }
 
     // ----------------------- ASSET APPROVALS ------------------------
@@ -445,7 +437,7 @@ contract RMRKEquippable is
         private
         view
     {
-        (, bool found) = _slotPartIds[assetId].indexOf(slotPartId);
+        (, bool found) = _partIds[assetId].indexOf(slotPartId);
         if (!found) revert RMRKTargetAssetCannotReceiveSlot();
     }
 
@@ -575,7 +567,6 @@ contract RMRKEquippable is
             string memory,
             uint64,
             address,
-            uint64[] memory,
             uint64[] memory
         )
     {
@@ -583,8 +574,7 @@ contract RMRKEquippable is
             getAssetMetadata(tokenId, assetId),
             _equippableGroupIds[assetId],
             _baseAddresses[assetId],
-            _fixedPartIds[assetId],
-            _slotPartIds[assetId]
+            _partIds[assetId]
         );
     }
 

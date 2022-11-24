@@ -401,7 +401,7 @@ Used to get the address of the user that is approved to manage the specified tok
 ### getAssetAndEquippableData
 
 ```solidity
-function getAssetAndEquippableData(uint256 tokenId, uint64 assetId) external view returns (string, uint64, address, uint64[], uint64[])
+function getAssetAndEquippableData(uint256 tokenId, uint64 assetId) external view returns (string, uint64, address, uint64[])
 ```
 
 Used to get the asset and equippable data associated with given `assetId`.
@@ -423,7 +423,6 @@ Used to get the asset and equippable data associated with given `assetId`.
 | _1 | uint64 | undefined |
 | _2 | address | undefined |
 | _3 | uint64[] | undefined |
-| _4 | uint64[] | undefined |
 
 ### getAssetMetadata
 

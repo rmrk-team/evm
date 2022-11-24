@@ -237,7 +237,6 @@ async function shouldBehaveLikeTypedEquippable(
       ethers.constants.AddressZero,
       'fallback.json',
       [],
-      [],
       'image/jpeg',
     );
     expect(await this.assets.getAssetType(resId)).to.eql('image/jpeg');
@@ -250,7 +249,6 @@ async function shouldBehaveLikeTypedEquippable(
       0,
       ethers.constants.AddressZero,
       'fallback.json',
-      [],
       [],
       'image/jpeg',
     );

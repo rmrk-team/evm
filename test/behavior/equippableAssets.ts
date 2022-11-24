@@ -51,7 +51,6 @@ async function shouldBehaveLikeEquippableAssets(
           baseAddressDefault,
           metaURIDefault,
           [],
-          [],
         ),
       )
         .to.emit(chunkyEquip, 'AssetSet')
@@ -67,17 +66,14 @@ async function shouldBehaveLikeEquippableAssets(
         baseAddressDefault,
         metaURIDefault,
         [],
-        [],
       );
       await chunkyEquip.addAssetToToken(tokenId, resId, 0);
-      await expect(chunkyEquip.getAssetAndEquippableData(tokenId, resId + 1)).to.be.revertedWithCustomError(
-        chunkyEquip,
-        'RMRKTokenDoesNotHaveAsset',
-      );
-      await expect(chunkyEquip.getAssetAndEquippableData(tokenId + 1, resId)).to.be.revertedWithCustomError(
-        chunkyEquip,
-        'RMRKTokenDoesNotHaveAsset',
-      );
+      await expect(
+        chunkyEquip.getAssetAndEquippableData(tokenId, resId + 1),
+      ).to.be.revertedWithCustomError(chunkyEquip, 'RMRKTokenDoesNotHaveAsset');
+      await expect(
+        chunkyEquip.getAssetAndEquippableData(tokenId + 1, resId),
+      ).to.be.revertedWithCustomError(chunkyEquip, 'RMRKTokenDoesNotHaveAsset');
     });
 
     it('cannot add asset entry with parts and no base', async function () {
@@ -89,7 +85,6 @@ async function shouldBehaveLikeEquippableAssets(
           baseAddressDefault,
           metaURIDefault,
           [1],
-          [],
         ),
       ).to.be.revertedWithCustomError(chunkyEquip, 'RMRKBaseRequiredForParts');
       await expect(
@@ -98,7 +93,6 @@ async function shouldBehaveLikeEquippableAssets(
           equippableGroupIdDefault,
           baseAddressDefault,
           metaURIDefault,
-          [],
           [1],
         ),
       ).to.be.revertedWithCustomError(chunkyEquip, 'RMRKBaseRequiredForParts');
@@ -113,7 +107,6 @@ async function shouldBehaveLikeEquippableAssets(
         baseAddressDefault,
         metaURIDefault,
         [],
-        [],
       );
       await expect(
         chunkyEquip.addAssetEntry(
@@ -121,7 +114,6 @@ async function shouldBehaveLikeEquippableAssets(
           equippableGroupIdDefault,
           baseAddressDefault,
           metaURIDefault,
-          [],
           [],
         ),
       ).to.be.revertedWithCustomError(chunkyEquip, 'RMRKAssetAlreadyExists');
@@ -137,7 +129,6 @@ async function shouldBehaveLikeEquippableAssets(
           baseAddressDefault,
           metaURIDefault,
           [],
-          [],
         ),
       ).to.be.revertedWithCustomError(chunkyEquip, 'RMRKIdZeroForbidden');
     });
@@ -152,7 +143,6 @@ async function shouldBehaveLikeEquippableAssets(
           baseAddressDefault,
           metaURIDefault,
           [],
-          [],
         ),
       )
         .to.emit(chunkyEquip, 'AssetSet')
@@ -164,7 +154,6 @@ async function shouldBehaveLikeEquippableAssets(
           equippableGroupIdDefault,
           baseAddressDefault,
           metaURIDefault,
-          [],
           [],
         ),
       ).to.be.revertedWithCustomError(chunkyEquip, 'RMRKAssetAlreadyExists');
@@ -615,7 +604,6 @@ async function shouldBehaveLikeEquippableAssets(
         equippableGroupIdDefault,
         baseAddressDefault,
         metaURIDefault,
-        [],
         [],
       );
     }

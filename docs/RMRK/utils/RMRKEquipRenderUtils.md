@@ -41,7 +41,7 @@ Used to compose the given equippables.
 ### getEquipped
 
 ```solidity
-function getEquipped(address target, uint64 tokenId, uint64 assetId) external view returns (uint64[] slotParts, struct IRMRKEquippable.Equipment[] childrenEquipped)
+function getEquipped(address target, uint64 tokenId, uint64 assetId) external view returns (uint64[] slotPartIds, struct IRMRKEquippable.Equipment[] childrenEquipped)
 ```
 
 Used to retrieve the equipped parts of the given token.
@@ -60,7 +60,7 @@ Used to retrieve the equipped parts of the given token.
 
 | Name | Type | Description |
 |---|---|---|
-| slotParts | uint64[] | An array of the IDs of the slot parts present in the given asset |
+| slotPartIds | uint64[] | An array of the IDs of the slot parts present in the given asset |
 | childrenEquipped | IRMRKEquippable.Equipment[] | An array of `Equipment` structs containing info about the equipped children |
 
 ### getExtendedActiveAssets
@@ -71,7 +71,7 @@ function getExtendedActiveAssets(address target, uint256 tokenId) external view 
 
 Used to get extended active assets of the given token.
 
-*The full `ExtendedActiveAsset` looks like this:  [      ID,      equippableGroupId,      priority,      baseAddress,      metadata,      [          fixedPartId0,          fixedPartId1,          fixedPartId2      ],      [          slotPartId0,          slotPartId1,          slotPartId2      ]  ]*
+*The full `ExtendedActiveAsset` looks like this:  [      ID,      equippableGroupId,      priority,      baseAddress,      metadata,      [          fixedPartId0,          fixedPartId1,          fixedPartId2,          slotPartId0,          slotPartId1,          slotPartId2      ]  ]*
 
 #### Parameters
 
@@ -94,7 +94,7 @@ function getExtendedPendingAssets(address target, uint256 tokenId) external view
 
 Used to get the extended pending assets of the given token.
 
-*The full `ExtendedPendingAsset` looks like this:  [      ID,      equippableGroupId,      acceptRejectIndex,      replacesAssetWithId,      baseAddress,      metadata,      [          fixedPartId0,          fixedPartId1,          fixedPartId2      ],      [          slotPartId0,          slotPartId1,          slotPartId2      ]  ]*
+*The full `ExtendedPendingAsset` looks like this:  [      ID,      equippableGroupId,      acceptRejectIndex,      replacesAssetWithId,      baseAddress,      metadata,      [          fixedPartId0,          fixedPartId1,          fixedPartId2,          slotPartId0,          slotPartId1,          slotPartId2      ]  ]*
 
 #### Parameters
 
@@ -108,6 +108,30 @@ Used to get the extended pending assets of the given token.
 | Name | Type | Description |
 |---|---|---|
 | _0 | RMRKEquipRenderUtils.ExtendedPendingAsset[] | sturct[] An array of ExtendedPendingAssets present on the given token |
+
+### splitSlotAndFixedParts
+
+```solidity
+function splitSlotAndFixedParts(uint64[] allPartIds, address baseAddress) external view returns (uint64[] slotPartIds, uint64[] fixedPartIds)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| allPartIds | uint64[] | undefined |
+| baseAddress | address | undefined |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| slotPartIds | uint64[] | undefined |
+| fixedPartIds | uint64[] | undefined |
 
 
 

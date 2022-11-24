@@ -67,7 +67,7 @@ function acceptChild(uint256 parentId, uint256 childIndex, address childAddress,
 ### addAssetEntry
 
 ```solidity
-function addAssetEntry(uint64 equippableGroupId, address baseAddress, string metadataURI, uint64[] fixedPartIds, uint64[] slotPartIds) external nonpayable returns (uint256)
+function addAssetEntry(uint64 equippableGroupId, address baseAddress, string metadataURI, uint64[] partIds) external nonpayable returns (uint256)
 ```
 
 
@@ -81,8 +81,7 @@ function addAssetEntry(uint64 equippableGroupId, address baseAddress, string met
 | equippableGroupId | uint64 | undefined |
 | baseAddress | address | undefined |
 | metadataURI | string | undefined |
-| fixedPartIds | uint64[] | undefined |
-| slotPartIds | uint64[] | undefined |
+| partIds | uint64[] | undefined |
 
 #### Returns
 
@@ -478,7 +477,7 @@ Used to get the address of the user that is approved to manage the specified tok
 ### getAssetAndEquippableData
 
 ```solidity
-function getAssetAndEquippableData(uint256 tokenId, uint64 assetId) external view returns (string, uint64, address, uint64[], uint64[])
+function getAssetAndEquippableData(uint256 tokenId, uint64 assetId) external view returns (string, uint64, address, uint64[])
 ```
 
 Used to get the asset and equippable data associated with given `assetId`.
@@ -500,7 +499,6 @@ Used to get the asset and equippable data associated with given `assetId`.
 | _1 | uint64 | undefined |
 | _2 | address | undefined |
 | _3 | uint64[] | undefined |
-| _4 | uint64[] | undefined |
 
 ### getAssetMetadata
 

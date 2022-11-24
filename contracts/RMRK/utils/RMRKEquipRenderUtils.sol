@@ -32,8 +32,7 @@ contract RMRKEquipRenderUtils {
         uint16 priority;
         address baseAddress;
         string metadata;
-        uint64[] fixedParts;
-        uint64[] slotParts;
+        uint64[] partIds;
     }
 
     /**
@@ -54,8 +53,7 @@ contract RMRKEquipRenderUtils {
         uint64 replacesAssetWithId;
         address baseAddress;
         string metadata;
-        uint64[] fixedParts;
-        uint64[] slotParts;
+        uint64[] partIds;
     }
 
     /**
@@ -102,9 +100,7 @@ contract RMRKEquipRenderUtils {
      *      [
      *          fixedPartId0,
      *          fixedPartId1,
-     *          fixedPartId2
-     *      ],
-     *      [
+     *          fixedPartId2,
      *          slotPartId0,
      *          slotPartId1,
      *          slotPartId2
@@ -138,8 +134,7 @@ contract RMRKEquipRenderUtils {
                 string memory metadataURI,
                 uint64 equippableGroupId,
                 address baseAddress,
-                uint64[] memory fixedPartIds,
-                uint64[] memory slotPartIds
+                uint64[] memory partIds
             ) = target_.getAssetAndEquippableData(tokenId, assets[i]);
             activeAssets[i] = ExtendedActiveAsset({
                 id: assets[i],
@@ -147,8 +142,7 @@ contract RMRKEquipRenderUtils {
                 priority: priorities[i],
                 baseAddress: baseAddress,
                 metadata: metadataURI,
-                fixedParts: fixedPartIds,
-                slotParts: slotPartIds
+                partIds: partIds
             });
             unchecked {
                 ++i;
@@ -170,9 +164,7 @@ contract RMRKEquipRenderUtils {
      *      [
      *          fixedPartId0,
      *          fixedPartId1,
-     *          fixedPartId2
-     *      ],
-     *      [
+     *          fixedPartId2,
      *          slotPartId0,
      *          slotPartId1,
      *          slotPartId2
@@ -204,8 +196,7 @@ contract RMRKEquipRenderUtils {
                 string memory metadataURI,
                 uint64 equippableGroupId,
                 address baseAddress,
-                uint64[] memory fixedPartIds,
-                uint64[] memory slotPartIds
+                uint64[] memory partIds
             ) = target_.getAssetAndEquippableData(tokenId, assets[i]);
             replacesAssetWithId = target_.getAssetReplacements(
                 tokenId,
@@ -218,8 +209,7 @@ contract RMRKEquipRenderUtils {
                 replacesAssetWithId: replacesAssetWithId,
                 baseAddress: baseAddress,
                 metadata: metadataURI,
-                fixedParts: fixedPartIds,
-                slotParts: slotPartIds
+                partIds: partIds
             });
             unchecked {
                 ++i;
@@ -241,7 +231,7 @@ contract RMRKEquipRenderUtils {
      * @param target Address of the smart contract of the given token
      * @param tokenId ID of the token to retrieve the equipped items in the asset for
      * @param assetId ID of the asset being queried for equipped parts
-     * @return slotParts An array of the IDs of the slot parts present in the given asset
+     * @return slotPartIds An array of the IDs of the slot parts present in the given asset
      * @return childrenEquipped An array of `Equipment` structs containing info about the equipped children
      */
     function getEquipped(
@@ -252,21 +242,20 @@ contract RMRKEquipRenderUtils {
         public
         view
         returns (
-            uint64[] memory slotParts,
+            uint64[] memory slotPartIds,
             IRMRKEquippable.Equipment[] memory childrenEquipped
         )
     {
         IRMRKEquippable target_ = IRMRKEquippable(target);
 
-        (, , address baseAddress, , uint64[] memory slotPartIds) = target_
+        (, , address baseAddress, uint64[] memory partIds) = target_
             .getAssetAndEquippableData(tokenId, assetId);
 
-        slotParts = new uint64[](slotPartIds.length);
+        (slotPartIds, ) = splitSlotAndFixedParts(partIds, baseAddress);
         childrenEquipped = new IRMRKEquippable.Equipment[](slotPartIds.length);
 
         uint256 len = slotPartIds.length;
         for (uint256 i; i < len; ) {
-            slotParts[i] = slotPartIds[i];
             IRMRKEquippable.Equipment memory equipment = target_.getEquipment(
                 tokenId,
                 baseAddress,
@@ -324,18 +313,17 @@ contract RMRKEquipRenderUtils {
         )
     {
         IRMRKEquippable target_ = IRMRKEquippable(target);
-        uint64[] memory fixedPartIds;
-        uint64[] memory slotPartIds;
+        uint64[] memory partIds;
 
         // If token does not have uint64[] memory slotPartId to save the asset, it would fail here.
-        (
-            metadataURI,
-            equippableGroupId,
-            baseAddress,
-            fixedPartIds,
-            slotPartIds
-        ) = target_.getAssetAndEquippableData(tokenId, assetId);
+        (metadataURI, equippableGroupId, baseAddress, partIds) = target_
+            .getAssetAndEquippableData(tokenId, assetId);
         if (baseAddress == address(0)) revert RMRKNotComposableAsset();
+
+        (
+            uint64[] memory slotPartIds,
+            uint64[] memory fixedPartIds
+        ) = splitSlotAndFixedParts(partIds, baseAddress);
 
         // Fixed parts:
         fixedParts = new FixedPart[](fixedPartIds.length);
@@ -432,6 +420,52 @@ contract RMRKEquipRenderUtils {
                 unchecked {
                     ++i;
                 }
+            }
+        }
+    }
+
+    function splitSlotAndFixedParts(
+        uint64[] memory allPartIds,
+        address baseAddress
+    )
+        public
+        view
+        returns (uint64[] memory slotPartIds, uint64[] memory fixedPartIds)
+    {
+        IRMRKBaseStorage.Part[] memory allParts = IRMRKBaseStorage(baseAddress)
+            .getParts(allPartIds);
+        uint256 numFixedParts;
+        uint256 numSlotParts;
+
+        uint256 numParts = allPartIds.length;
+        // This for loop is just to discover the right size of the split arrays, since we can't create them dynamically
+        for (uint256 i; i < numParts; ) {
+            if (allParts[i].itemType == IRMRKBaseStorage.ItemType.Fixed)
+                numFixedParts += 1;
+                // We could just take the numParts - numFixedParts, but it doesn't hurt to double check it's not an uninitialized part:
+            else if (allParts[i].itemType == IRMRKBaseStorage.ItemType.Slot)
+                numSlotParts += 1;
+            unchecked {
+                ++i;
+            }
+        }
+
+        slotPartIds = new uint64[](numSlotParts);
+        fixedPartIds = new uint64[](numFixedParts);
+        uint256 slotPartsIndex;
+        uint256 fixedPartsIndex;
+
+        // This for loop is to actually fill the split arrays
+        for (uint256 i; i < numParts; ) {
+            if (allParts[i].itemType == IRMRKBaseStorage.ItemType.Fixed) {
+                fixedPartIds[fixedPartsIndex] = allPartIds[i];
+                fixedPartsIndex += 1;
+            } else if (allParts[i].itemType == IRMRKBaseStorage.ItemType.Slot) {
+                slotPartIds[slotPartsIndex] = allPartIds[i];
+                slotPartsIndex += 1;
+            }
+            unchecked {
+                ++i;
             }
         }
     }

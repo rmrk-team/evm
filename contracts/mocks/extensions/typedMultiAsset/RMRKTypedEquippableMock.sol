@@ -29,8 +29,7 @@ contract RMRKTypedEquippableMock is RMRKEquippableMock, RMRKTypedMultiAsset {
         uint64 equippableGroupId,
         address baseAddress,
         string memory metadataURI,
-        uint64[] memory fixedPartIds,
-        uint64[] memory slotPartIds,
+        uint64[] memory partIds,
         string memory type_
     ) external {
         _addAssetEntry(
@@ -38,8 +37,7 @@ contract RMRKTypedEquippableMock is RMRKEquippableMock, RMRKTypedMultiAsset {
             equippableGroupId,
             baseAddress,
             metadataURI,
-            fixedPartIds,
-            slotPartIds
+            partIds
         );
         _setAssetType(id, type_);
     }

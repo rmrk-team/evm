@@ -53,8 +53,7 @@ abstract contract RMRKAbstractEquippableImpl is
         uint64 equippableGroupId,
         address baseAddress,
         string memory metadataURI,
-        uint64[] memory fixedPartIds,
-        uint64[] memory slotPartIds
+        uint64[] memory partIds
     ) public virtual onlyOwnerOrContributor returns (uint256) {
         unchecked {
             _totalAssets += 1;
@@ -64,8 +63,7 @@ abstract contract RMRKAbstractEquippableImpl is
             equippableGroupId,
             baseAddress,
             metadataURI,
-            fixedPartIds,
-            slotPartIds
+            partIds
         );
         return _totalAssets;
     }
