@@ -743,22 +743,6 @@ Rejects a asset from the pending array of given token.
 | index | uint256 | Index of the asset in the pending array to be rejected |
 | assetId | uint64 | undefined |
 
-### replaceEquipment
-
-```solidity
-function replaceEquipment(IRMRKEquippable.IntakeEquip data) external nonpayable
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| data | IRMRKEquippable.IntakeEquip | undefined |
-
 ### safeTransferFrom
 
 ```solidity

@@ -651,24 +651,6 @@ Used to retrieve the collection name.
 |---|---|---|
 | _0 | string | string Name of the collection |
 
-### nestTransfer
-
-```solidity
-function nestTransfer(address to, uint256 tokenId, uint256 destinationId) external nonpayable
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| to | address | undefined |
-| tokenId | uint256 | undefined |
-| destinationId | uint256 | undefined |
-
 ### nestTransferFrom
 
 ```solidity
@@ -1086,23 +1068,6 @@ Used to retrieve the total supply of the tokens in a collection.
 | Name | Type | Description |
 |---|---|---|
 | _0 | uint256 | uint256 The number of tokens in a collection |
-
-### transfer
-
-```solidity
-function transfer(address to, uint256 tokenId) external nonpayable
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| to | address | undefined |
-| tokenId | uint256 | undefined |
 
 ### transferChild
 

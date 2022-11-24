@@ -990,22 +990,6 @@ Leaves the contract without owner. Functions using the `onlyOwner` modifier will
 *Can only be called by the current owner.Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is  only available to the owner.*
 
 
-### replaceEquipment
-
-```solidity
-function replaceEquipment(IRMRKEquippable.IntakeEquip data) external nonpayable
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| data | IRMRKEquippable.IntakeEquip | undefined |
-
 ### revokeContributor
 
 ```solidity

@@ -370,22 +370,6 @@ Used to reject a pending asset of a given token.
 | index | uint256 | Index of the asset to reject in token&#39;s pending array |
 | assetId | uint64 | undefined |
 
-### replaceEquipment
-
-```solidity
-function replaceEquipment(IRMRKEquippable.IntakeEquip data) external nonpayable
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| data | IRMRKEquippable.IntakeEquip | undefined |
-
 ### setApprovalForAllForAssets
 
 ```solidity
