@@ -930,9 +930,6 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
         address childAddress,
         uint256 childId
     ) internal virtual {
-        if (pendingChildrenOf(parentId).length <= childIndex)
-            revert RMRKPendingChildIndexOutOfRange();
-
         Child memory child = pendingChildOf(parentId, childIndex);
         _checkExpectedChild(child, childAddress, childId);
         if (_childIsInActive[childAddress][childId] != 0)
