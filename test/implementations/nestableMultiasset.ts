@@ -111,7 +111,7 @@ describe('NestableMultiAssetImpl Other Behavior', function () {
 
       await token
         .connect(tokenOwner)
-        ['transferFrom(address,address,uint256)'](newOwner.address, tokenId);
+        ['transferFrom(address,address,uint256)'](tokenOwner.address, newOwner.address, tokenId);
 
       expect(await token.getApproved(tokenId)).to.eql(ethers.constants.AddressZero);
       expect(await token.getApprovedForAssets(tokenId)).to.eql(ethers.constants.AddressZero);

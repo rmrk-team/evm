@@ -10,7 +10,6 @@ async function shouldBehaveLikeEquippableAssets(
 ) {
   let chunky: Contract;
   let chunkyEquip: Contract;
-  let renderUtils: Contract;
 
   let owner: SignerWithAddress;
   let addrs: SignerWithAddress[];
@@ -25,7 +24,6 @@ async function shouldBehaveLikeEquippableAssets(
     addrs = signersAddr;
     chunky = this.nestable;
     chunkyEquip = this.equip;
-    renderUtils = this.renderUtils;
   });
 
   describe('Interface support', async function () {
@@ -72,11 +70,11 @@ async function shouldBehaveLikeEquippableAssets(
         [],
       );
       await chunkyEquip.addAssetToToken(tokenId, resId, 0);
-      await expect(chunkyEquip.getExtendedAsset(tokenId, resId + 1)).to.be.revertedWithCustomError(
+      await expect(chunkyEquip.getAssetAndEquippableData(tokenId, resId + 1)).to.be.revertedWithCustomError(
         chunkyEquip,
         'RMRKTokenDoesNotHaveAsset',
       );
-      await expect(chunkyEquip.getExtendedAsset(tokenId + 1, resId)).to.be.revertedWithCustomError(
+      await expect(chunkyEquip.getAssetAndEquippableData(tokenId + 1, resId)).to.be.revertedWithCustomError(
         chunkyEquip,
         'RMRKTokenDoesNotHaveAsset',
       );

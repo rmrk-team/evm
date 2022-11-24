@@ -140,7 +140,7 @@ contract RMRKEquipRenderUtils {
                 address baseAddress,
                 uint64[] memory fixedPartIds,
                 uint64[] memory slotPartIds
-            ) = target_.getExtendedAsset(tokenId, assets[i]);
+            ) = target_.getAssetAndEquippableData(tokenId, assets[i]);
             activeAssets[i] = ExtendedActiveAsset({
                 id: assets[i],
                 equippableGroupId: equippableGroupId,
@@ -206,7 +206,7 @@ contract RMRKEquipRenderUtils {
                 address baseAddress,
                 uint64[] memory fixedPartIds,
                 uint64[] memory slotPartIds
-            ) = target_.getExtendedAsset(tokenId, assets[i]);
+            ) = target_.getAssetAndEquippableData(tokenId, assets[i]);
             replacesAssetWithId = target_.getAssetReplacements(
                 tokenId,
                 assets[i]
@@ -259,7 +259,7 @@ contract RMRKEquipRenderUtils {
         IRMRKEquippable target_ = IRMRKEquippable(target);
 
         (, , address baseAddress, , uint64[] memory slotPartIds) = target_
-            .getExtendedAsset(tokenId, assetId);
+            .getAssetAndEquippableData(tokenId, assetId);
 
         slotParts = new uint64[](slotPartIds.length);
         childrenEquipped = new IRMRKEquippable.Equipment[](slotPartIds.length);
@@ -334,7 +334,7 @@ contract RMRKEquipRenderUtils {
             baseAddress,
             fixedPartIds,
             slotPartIds
-        ) = target_.getExtendedAsset(tokenId, assetId);
+        ) = target_.getAssetAndEquippableData(tokenId, assetId);
         if (baseAddress == address(0)) revert RMRKNotComposableAsset();
 
         // Fixed parts:

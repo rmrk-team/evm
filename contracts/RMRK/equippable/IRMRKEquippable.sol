@@ -136,10 +136,10 @@ interface IRMRKEquippable is IRMRKMultiAsset {
     ) external view returns (Equipment memory);
 
     /**
-     * @notice Used to get the extended asset struct of the asset associated with given `assetId`.
+     * @notice Used to get the asset and equippable data associated with given `assetId`.
      * @param assetId ID of the asset of which we are retrieving
      */
-    function getExtendedAsset(uint256 tokenId, uint64 assetId)
+    function getAssetAndEquippableData(uint256 tokenId, uint64 assetId)
         external
         view
         returns (

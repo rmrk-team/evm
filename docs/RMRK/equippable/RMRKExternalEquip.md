@@ -152,6 +152,33 @@ Used to get the address of the user that is approved to manage the specified tok
 |---|---|---|
 | _0 | address | address Address of the account that is approved to manage the token |
 
+### getAssetAndEquippableData
+
+```solidity
+function getAssetAndEquippableData(uint256 tokenId, uint64 assetId) external view returns (string, uint64, address, uint64[], uint64[])
+```
+
+Used to get all the equippable information of the asset associated with given `assetId`.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId | uint256 | undefined |
+| assetId | uint64 | ID of the asset of which we are retrieving |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | string | undefined |
+| _1 | uint64 | undefined |
+| _2 | address | undefined |
+| _3 | uint64[] | undefined |
+| _4 | uint64[] | undefined |
+
 ### getAssetMetadata
 
 ```solidity
@@ -221,33 +248,6 @@ Used to get the Equipment object equipped into the specified slot of the desired
 | Name | Type | Description |
 |---|---|---|
 | _0 | IRMRKEquippable.Equipment | struct The `Equipment` struct containing data about the equipped object |
-
-### getExtendedAsset
-
-```solidity
-function getExtendedAsset(uint256 tokenId, uint64 assetId) external view returns (string metadataURI, uint64 equippableGroupId, address baseAddress, uint64[] fixedPartIds, uint64[] slotPartIds)
-```
-
-Used to get the extended asset struct of the asset associated with given `assetId`.
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| tokenId | uint256 | undefined |
-| assetId | uint64 | ID of the asset of which we are retrieving |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| metadataURI | string | undefined |
-| equippableGroupId | uint64 | undefined |
-| baseAddress | address | undefined |
-| fixedPartIds | uint64[] | undefined |
-| slotPartIds | uint64[] | undefined |
 
 ### getNestableAddress
 

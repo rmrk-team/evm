@@ -564,26 +564,28 @@ contract RMRKEquippable is
     // --------------------- Getting Extended Assets ---------------------
 
     /**
-     * @notice Used to get the extended asset struct of the asset associated with given `assetId`.
+     * @notice Used to get the asset and equippable data associated with given `assetId`.
      * @param assetId ID of the asset of which we are retrieving
      */
-    function getExtendedAsset(uint256 tokenId, uint64 assetId)
+    function getAssetAndEquippableData(uint256 tokenId, uint64 assetId)
         public
         view
         virtual
         returns (
-            string memory metadataURI,
-            uint64 equippableGroupId,
-            address baseAddress,
-            uint64[] memory fixedPartIds,
-            uint64[] memory slotPartIds
+            string memory,
+            uint64,
+            address,
+            uint64[] memory,
+            uint64[] memory
         )
     {
-        metadataURI = getAssetMetadata(tokenId, assetId);
-        equippableGroupId = _equippableGroupIds[assetId];
-        baseAddress = _baseAddresses[assetId];
-        fixedPartIds = _fixedPartIds[assetId];
-        slotPartIds = _slotPartIds[assetId];
+        return (
+            getAssetMetadata(tokenId, assetId),
+            _equippableGroupIds[assetId],
+            _baseAddresses[assetId],
+            _fixedPartIds[assetId],
+            _slotPartIds[assetId]
+        );
     }
 
     ////////////////////////////////////////
