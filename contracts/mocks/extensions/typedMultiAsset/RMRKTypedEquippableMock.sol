@@ -29,7 +29,7 @@ contract RMRKTypedEquippableMock is RMRKEquippableMock, RMRKTypedMultiAsset {
         uint64 equippableGroupId,
         address baseAddress,
         string memory metadataURI,
-        uint64[] memory partIds,
+        uint64[] calldata partIds,
         string memory type_
     ) external {
         _addAssetEntry(

@@ -533,7 +533,7 @@ contract RMRKExternalEquip is
         uint64 equippableGroupId,
         address baseAddress,
         string memory metadataURI,
-        uint64[] memory partIds
+        uint64[] calldata partIds
     ) internal {
         _addAssetEntry(id, metadataURI);
 

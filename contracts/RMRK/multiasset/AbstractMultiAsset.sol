@@ -292,7 +292,7 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
      * @param tokenId ID of the token for which the priorities are being set
      * @param priorities Array of priorities for the assets
      */
-    function _setPriority(uint256 tokenId, uint16[] memory priorities)
+    function _setPriority(uint256 tokenId, uint16[] calldata priorities)
         internal
         virtual
     {
@@ -411,12 +411,12 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
 
     function _afterRejectAllAssets(uint256 tokenId) internal virtual {}
 
-    function _beforeSetPriority(uint256 tokenId, uint16[] memory priorities)
+    function _beforeSetPriority(uint256 tokenId, uint16[] calldata priorities)
         internal
         virtual
     {}
 
-    function _afterSetPriority(uint256 tokenId, uint16[] memory priorities)
+    function _afterSetPriority(uint256 tokenId, uint16[] calldata priorities)
         internal
         virtual
     {}

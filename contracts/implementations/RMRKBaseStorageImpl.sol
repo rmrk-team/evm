@@ -40,14 +40,14 @@ contract RMRKBaseStorageImpl is OwnableLock, RMRKBaseStorage {
 
     function addEquippableAddresses(
         uint64 partId,
-        address[] memory equippableAddresses
+        address[] calldata equippableAddresses
     ) public virtual onlyOwnerOrContributor {
         _addEquippableAddresses(partId, equippableAddresses);
     }
 
     function setEquippableAddresses(
         uint64 partId,
-        address[] memory equippableAddresses
+        address[] calldata equippableAddresses
     ) public virtual onlyOwnerOrContributor {
         _setEquippableAddresses(partId, equippableAddresses);
     }

@@ -19,14 +19,14 @@ contract RMRKBaseStorageMock is RMRKBaseStorage {
 
     function addEquippableAddresses(
         uint64 partId,
-        address[] memory equippableAddresses
+        address[] calldata equippableAddresses
     ) external {
         _addEquippableAddresses(partId, equippableAddresses);
     }
 
     function setEquippableAddresses(
         uint64 partId,
-        address[] memory equippableAddresses
+        address[] calldata equippableAddresses
     ) external {
         _setEquippableAddresses(partId, equippableAddresses);
     }

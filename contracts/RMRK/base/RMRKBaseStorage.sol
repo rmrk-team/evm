@@ -132,7 +132,7 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
      */
     function _addEquippableAddresses(
         uint64 partId,
-        address[] memory equippableAddresses
+        address[] calldata equippableAddresses
     ) internal onlySlot(partId) {
         if (equippableAddresses.length <= 0) revert RMRKZeroLengthIdsPassed();
 
@@ -157,7 +157,7 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
      */
     function _setEquippableAddresses(
         uint64 partId,
-        address[] memory equippableAddresses
+        address[] calldata equippableAddresses
     ) internal onlySlot(partId) {
         if (equippableAddresses.length <= 0) revert RMRKZeroLengthIdsPassed();
         _parts[partId].equippable = equippableAddresses;
@@ -248,7 +248,7 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
      * @param partIds An array of part IDs that we want to retrieve
      * @return struct An array of `Part` structs associated with given `partIds`
      */
-    function getParts(uint64[] memory partIds)
+    function getParts(uint64[] calldata partIds)
         public
         view
         returns (Part[] memory)

@@ -200,7 +200,7 @@ contract RMRKEquippable is
         uint64 equippableGroupId,
         address baseAddress,
         string memory metadataURI,
-        uint64[] memory partIds
+        uint64[] calldata partIds
     ) internal virtual {
         _addAssetEntry(id, metadataURI);
 
