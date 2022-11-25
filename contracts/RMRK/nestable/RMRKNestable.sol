@@ -564,7 +564,6 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
     function _burn(uint256 tokenId, uint256 maxChildrenBurns)
         internal
         virtual
-        onlyApprovedOrDirectOwner(tokenId)
         returns (uint256)
     {
         (address immediateOwner, uint256 parentId, ) = directOwnerOf(tokenId);
@@ -996,7 +995,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
      * @param tokenId ID of the parent token from which the child token is being transferred
      * @param to Address to which to transfer the token to
      * @param destinationId ID of the token to receive this child token (MUST be 0 if the destination is not a token)
-     * @param childIndex Index of a token we are transfering, in the array it belongs to (can be either active array or
+     * @param childIndex Index of a token we are transferring, in the array it belongs to (can be either active array or
      *  pending array)
      * @param childAddress Address of the child token's collection smart contract.
      * @param childId ID of the child token in its own collection smart contract.
@@ -1037,7 +1036,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
      * @param tokenId ID of the parent token from which the child token is being transferred
      * @param to Address to which to transfer the token to
      * @param destinationId ID of the token to receive this child token (MUST be 0 if the destination is not a token)
-     * @param childIndex Index of a token we are transfering, in the array it belongs to (can be either active array or
+     * @param childIndex Index of a token we are transferring, in the array it belongs to (can be either active array or
      *  pending array)
      * @param childAddress Address of the child token's collection smart contract.
      * @param childId ID of the child token in its own collection smart contract.

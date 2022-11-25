@@ -587,7 +587,6 @@ async function shouldBehaveLikeNestable(
     it('can transfer child if approved', async function () {
       const transferer = addrs[1];
       const toOwner = tokenOwner.address;
-      // Since transfer is child scoped, approval must be on the child contract to child id
       await parent.connect(tokenOwner).approve(transferer.address, parentId);
 
       await parent
@@ -599,7 +598,6 @@ async function shouldBehaveLikeNestable(
     it('can transfer child if approved for all', async function () {
       const operator = addrs[2];
       const toOwner = tokenOwner.address;
-      // Since transfer is child scoped, approval must be on the child contract to child id
       await parent.connect(tokenOwner).setApprovalForAll(operator.address, true);
 
       await parent
@@ -747,7 +745,6 @@ async function shouldBehaveLikeNestable(
     it('can transfer child if approved', async function () {
       const transferer = addrs[1];
       const toOwner = tokenOwner.address;
-      // Since transfer child is child scoped, approval must be on the child contract to child id
       await parent.connect(tokenOwner).approve(transferer.address, parentId);
 
       await parent
@@ -759,7 +756,6 @@ async function shouldBehaveLikeNestable(
     it('can transfer child if approved for all', async function () {
       const operator = addrs[2];
       const toOwner = tokenOwner.address;
-      // Since transfer child is child scoped, approval must be on the child contract to child id
       await parent.connect(tokenOwner).setApprovalForAll(operator.address, true);
 
       await parent
@@ -813,7 +809,7 @@ async function shouldBehaveLikeNestable(
       expect(await child.ownerOf(childId)).to.eql(rootOwnerAddress);
       expect(await child.directOwnerOf(childId)).to.eql([rootOwnerAddress, bn(0), false]);
 
-      // Transfering updates balances downstream
+      // transferring updates balances downstream
       expect(await child.balanceOf(rootOwnerAddress)).to.equal(1);
       expect(await parent.balanceOf(tokenOwner.address)).to.equal(1);
     }
