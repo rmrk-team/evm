@@ -26,7 +26,7 @@ contract RMRKNestableMock is RMRKNestable {
     }
 
     function mint(address to, uint256 tokenId) external {
-        _mint(to, tokenId);
+        _mint(to, tokenId, "");
     }
 
     function nestMint(
@@ -56,14 +56,16 @@ contract RMRKNestableMock is RMRKNestable {
         address to,
         uint256 fromTokenId,
         uint256 toTokenId,
-        uint256 tokenId
+        uint256 tokenId,
+        bytes memory data
     ) internal virtual override {
         super._beforeNestedTokenTransfer(
             from,
             to,
             fromTokenId,
             toTokenId,
-            tokenId
+            tokenId,
+            data
         );
         if (from != address(0)) _balancesPerNft[from][fromTokenId] -= 1;
     }
@@ -73,14 +75,16 @@ contract RMRKNestableMock is RMRKNestable {
         address to,
         uint256 fromTokenId,
         uint256 toTokenId,
-        uint256 tokenId
+        uint256 tokenId,
+        bytes memory data
     ) internal virtual override {
         super._afterNestedTokenTransfer(
             from,
             to,
             fromTokenId,
             toTokenId,
-            tokenId
+            tokenId,
+            data
         );
         if (to != address(0)) _balancesPerNft[to][toTokenId] += 1;
     }
