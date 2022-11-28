@@ -143,7 +143,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
         address to,
         uint256 tokenId
     ) public virtual onlyApprovedOrDirectOwner(tokenId) {
-        _transfer(from, to, tokenId);
+        _transfer(from, to, tokenId, "");
     }
 
     /**
@@ -211,7 +211,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
         uint256 tokenId,
         bytes memory data
     ) internal virtual {
-        _transfer(from, to, tokenId);
+        _transfer(from, to, tokenId, data);
         if (!_checkOnERC721Received(from, to, tokenId, data))
             revert ERC721TransferToNonReceiverImplementer();
     }
@@ -231,14 +231,15 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
     function _transfer(
         address from,
         address to,
-        uint256 tokenId
+        uint256 tokenId,
+        bytes memory data
     ) internal virtual {
         (address immediateOwner, uint256 parentId, ) = directOwnerOf(tokenId);
         if (immediateOwner != from) revert ERC721TransferFromIncorrectOwner();
         if (to == address(0)) revert ERC721TransferToTheZeroAddress();
 
         _beforeTokenTransfer(from, to, tokenId);
-        _beforeNestedTokenTransfer(immediateOwner, to, parentId, 0, tokenId);
+        _beforeNestedTokenTransfer(immediateOwner, to, parentId, 0, tokenId, data);
 
         _balances[from] -= 1;
         _updateOwnerAndClearApprovals(tokenId, 0, to, false);
@@ -248,7 +249,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
         emit NestTransfer(immediateOwner, to, parentId, 0, tokenId);
 
         _afterTokenTransfer(from, to, tokenId);
-        _afterNestedTokenTransfer(immediateOwner, to, parentId, 0, tokenId);
+        _afterNestedTokenTransfer(immediateOwner, to, parentId, 0, tokenId, data);
     }
 
     /**
@@ -287,7 +288,8 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
             to,
             parentId,
             destinationId,
-            tokenId
+            tokenId,
+            data
         );
         _balances[from] -= 1;
         _updateOwnerAndClearApprovals(tokenId, destinationId, to, true);
@@ -320,7 +322,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
         IRMRKNestable destContract = IRMRKNestable(to);
         destContract.addChild(destinationId, tokenId, data);
         _afterTokenTransfer(from, to, tokenId);
-        _afterNestedTokenTransfer(from, to, parentId, destinationId, tokenId);
+        _afterNestedTokenTransfer(from, to, parentId, destinationId, tokenId, data);
 
         emit Transfer(from, to, tokenId);
         emit NestTransfer(from, to, parentId, destinationId, tokenId);
@@ -380,7 +382,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
         uint256 tokenId,
         bytes memory data
     ) internal virtual {
-        _mint(to, tokenId);
+        _mint(to, tokenId, data);
         if (!_checkOnERC721Received(address(0), to, tokenId, data))
             revert ERC721TransferToNonReceiverImplementer();
     }
@@ -396,14 +398,14 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
      * @param to Address to mint the token to
      * @param tokenId ID of the token to mint
      */
-    function _mint(address to, uint256 tokenId) internal virtual {
-        _innerMint(to, tokenId, 0);
+    function _mint(address to, uint256 tokenId, bytes memory data) internal virtual {
+        _innerMint(to, tokenId, 0, data);
 
         emit Transfer(address(0), to, tokenId);
         emit NestTransfer(address(0), to, 0, 0, tokenId);
 
         _afterTokenTransfer(address(0), to, tokenId);
-        _afterNestedTokenTransfer(address(0), to, 0, 0, tokenId);
+        _afterNestedTokenTransfer(address(0), to, 0, 0, tokenId, data);
     }
 
     /**
@@ -424,7 +426,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
         if (!IERC165(to).supportsInterface(type(IRMRKNestable).interfaceId))
             revert RMRKMintToNonRMRKNestableImplementer();
 
-        _innerMint(to, tokenId, destinationId);
+        _innerMint(to, tokenId, destinationId, data);
         _sendToNFT(address(0), to, 0, destinationId, tokenId, data);
     }
 
@@ -442,14 +444,15 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
     function _innerMint(
         address to,
         uint256 tokenId,
-        uint256 destinationId
+        uint256 destinationId,
+        bytes memory data
     ) private {
         if (to == address(0)) revert ERC721MintToTheZeroAddress();
         if (_exists(tokenId)) revert ERC721TokenAlreadyMinted();
         if (tokenId == 0) revert RMRKIdZeroForbidden();
 
         _beforeTokenTransfer(address(0), to, tokenId);
-        _beforeNestedTokenTransfer(address(0), to, 0, destinationId, tokenId);
+        _beforeNestedTokenTransfer(address(0), to, 0, destinationId, tokenId, data);
 
         _balances[to] += 1;
         _RMRKOwners[tokenId] = DirectOwner({
@@ -576,7 +579,8 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
             address(0),
             parentId,
             0,
-            tokenId
+            tokenId,
+            ""
         );
 
         _approve(address(0), tokenId);
@@ -626,7 +630,8 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
             address(0),
             parentId,
             0,
-            tokenId
+            tokenId,
+            ""
         );
         emit Transfer(owner, address(0), tokenId);
         emit NestTransfer(immediateOwner, address(0), parentId, 0, tokenId);
@@ -872,7 +877,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
             tokenId: childId
         });
 
-        _beforeAddChild(parentId, childAddress, childId);
+        _beforeAddChild(parentId, childAddress, childId, data);
 
         uint256 length = pendingChildrenOf(parentId).length;
 
@@ -885,7 +890,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
         // Previous length matches the index for the new child
         emit ChildProposed(parentId, length, childAddress, childId);
 
-        _afterAddChild(parentId, childAddress, childId);
+        _afterAddChild(parentId, childAddress, childId, data);
     }
 
     /**
@@ -1067,7 +1072,8 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
             childIndex,
             childAddress,
             childId,
-            isPending
+            isPending,
+            data
         );
 
         if (isPending) {
@@ -1109,7 +1115,8 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
             childIndex,
             childAddress,
             childId,
-            isPending
+            isPending,
+            data
         );
     }
 
@@ -1246,13 +1253,15 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
      * @param fromTokenId ID of the token from which the given token is being transferred
      * @param toTokenId ID of the token to which the given token is being transferred
      * @param tokenId ID of the token being transferred
+     * @param data Additional data with no specified format, sent in the addChild call
      */
     function _beforeNestedTokenTransfer(
         address from,
         address to,
         uint256 fromTokenId,
         uint256 toTokenId,
-        uint256 tokenId
+        uint256 tokenId,
+        bytes memory data
     ) internal virtual {}
 
     /**
@@ -1263,13 +1272,15 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
      * @param fromTokenId ID of the token from which the given token was transferred
      * @param toTokenId ID of the token to which the given token was transferred
      * @param tokenId ID of the token that was transferred
+     * @param data Additional data with no specified format, sent in the addChild call
      */
     function _afterNestedTokenTransfer(
         address from,
         address to,
         uint256 fromTokenId,
         uint256 toTokenId,
-        uint256 tokenId
+        uint256 tokenId,
+        bytes memory data
     ) internal virtual {}
 
     /**
@@ -1285,11 +1296,13 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
      *  specified index of the given parent token's pending children array
      * @param childId ID of the child token expected to be located at the specified index of the given parent token's
      *  pending children array
+     * @param data Additional data with no specified format
      */
     function _beforeAddChild(
         uint256 tokenId,
         address childAddress,
-        uint256 childId
+        uint256 childId,
+        bytes memory data
     ) internal virtual {}
 
     /**
@@ -1305,11 +1318,13 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
      *  specified index of the given parent token's pending children array
      * @param childId ID of the child token expected to be located at the specified index of the given parent token's
      *  pending children array
+     * @param data Additional data with no specified format
      */
     function _afterAddChild(
         uint256 tokenId,
         address childAddress,
-        uint256 childId
+        uint256 childId,
+        bytes memory data
     ) internal virtual {}
 
     /**
@@ -1372,13 +1387,15 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
      *  token's children array
      * @param isPending A boolean value signifying whether the child token is being transferred from the pending child
      *  tokens array (`true`) or from the active child tokens array (`false`)
+     * @param data Additional data with no specified format, sent in the addChild call
      */
     function _beforeTransferChild(
         uint256 tokenId,
         uint256 childIndex,
         address childAddress,
         uint256 childId,
-        bool isPending
+        bool isPending,
+        bytes memory data
     ) internal virtual {}
 
     /**
@@ -1397,13 +1414,15 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
      *  token's children array
      * @param isPending A boolean value signifying whether the child token was transferred from the pending child tokens
      *  array (`true`) or from the active child tokens array (`false`)
+     * @param data Additional data with no specified format, sent in the addChild call
      */
     function _afterTransferChild(
         uint256 tokenId,
         uint256 childIndex,
         address childAddress,
         uint256 childId,
-        bool isPending
+        bool isPending,
+        bytes memory data
     ) internal virtual {}
 
     /**

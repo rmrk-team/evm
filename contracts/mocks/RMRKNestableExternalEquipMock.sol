@@ -23,7 +23,7 @@ contract RMRKNestableExternalEquipMock is RMRKNestableExternalEquip {
     }
 
     function mint(address to, uint256 tokenId) external {
-        _mint(to, tokenId);
+        _mint(to, tokenId, "");
     }
 
     function nestMint(

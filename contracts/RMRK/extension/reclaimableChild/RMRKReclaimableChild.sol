@@ -84,9 +84,10 @@ abstract contract RMRKReclaimableChild is IRMRKReclaimableChild, RMRKNestable {
     function _beforeAddChild(
         uint256 tokenId,
         address childAddress,
-        uint256 childId
+        uint256 childId,
+        bytes memory data
     ) internal virtual override {
-        super._beforeAddChild(tokenId, childAddress, childId);
+        super._beforeAddChild(tokenId, childAddress, childId, data);
         _childIsInPending[childAddress][childId] = 1; // We use 1 as true
     }
 
@@ -122,20 +123,23 @@ abstract contract RMRKReclaimableChild is IRMRKReclaimableChild, RMRKNestable {
      * @param childId ID of the child token expected to be located at the given index
      * @param isPending A boolean value signifying whether the child token is located in the parent's active or pending
      *  child token array
+     * @param data Additional data with no specified format, sent in the addChild call
      */
     function _beforeTransferChild(
         uint256 tokenId,
         uint256 childIndex,
         address childAddress,
         uint256 childId,
-        bool isPending
+        bool isPending,
+        bytes memory data
     ) internal virtual override {
         super._beforeTransferChild(
             tokenId,
             childIndex,
             childAddress,
             childId,
-            isPending
+            isPending,
+            data
         );
         if (isPending) delete _childIsInPending[childAddress][childId];
     }

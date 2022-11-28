@@ -28,9 +28,10 @@ contract RMRKNestableClaimableChildMock is
     function _beforeAddChild(
         uint256 tokenId,
         address childAddress,
-        uint256 childId
+        uint256 childId,
+        bytes memory data
     ) internal virtual override(RMRKNestable, RMRKReclaimableChild) {
-        super._beforeAddChild(tokenId, childAddress, childId);
+        super._beforeAddChild(tokenId, childAddress, childId, data);
     }
 
     function _beforeAcceptChild(
@@ -47,14 +48,16 @@ contract RMRKNestableClaimableChildMock is
         uint256 childIndex,
         address childAddress,
         uint256 childId,
-        bool isPending
+        bool isPending,
+        bytes memory data
     ) internal virtual override(RMRKNestable, RMRKReclaimableChild) {
         super._beforeTransferChild(
             tokenId,
             childIndex,
             childAddress,
             childId,
-            isPending
+            isPending,
+            data
         );
     }
 
@@ -63,14 +66,16 @@ contract RMRKNestableClaimableChildMock is
         address to,
         uint256 fromTokenId,
         uint256 toTokenId,
-        uint256 tokenId
+        uint256 tokenId,
+        bytes memory data
     ) internal override(RMRKNestableMock, RMRKNestable) {
         super._beforeNestedTokenTransfer(
             from,
             to,
             fromTokenId,
             toTokenId,
-            tokenId
+            tokenId,
+            data
         );
     }
 
@@ -79,14 +84,16 @@ contract RMRKNestableClaimableChildMock is
         address to,
         uint256 fromTokenId,
         uint256 toTokenId,
-        uint256 tokenId
+        uint256 tokenId,
+        bytes memory data
     ) internal override(RMRKNestableMock, RMRKNestable) {
         super._afterNestedTokenTransfer(
             from,
             to,
             fromTokenId,
             toTokenId,
-            tokenId
+            tokenId,
+            data
         );
     }
 }
