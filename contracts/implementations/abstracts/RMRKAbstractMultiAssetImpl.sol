@@ -18,11 +18,7 @@ abstract contract RMRKAbstractMultiAssetImpl is
     uint256 private _totalAssets;
     string private _tokenURI;
 
-    function burn(uint256 tokenId)
-        public
-        virtual
-        onlyApprovedOrOwner(tokenId)
-    {
+    function burn(uint256 tokenId) public virtual onlyApprovedOrOwner(tokenId) {
         _burn(tokenId);
     }
 

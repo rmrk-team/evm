@@ -239,7 +239,14 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
         if (to == address(0)) revert ERC721TransferToTheZeroAddress();
 
         _beforeTokenTransfer(from, to, tokenId);
-        _beforeNestedTokenTransfer(immediateOwner, to, parentId, 0, tokenId, data);
+        _beforeNestedTokenTransfer(
+            immediateOwner,
+            to,
+            parentId,
+            0,
+            tokenId,
+            data
+        );
 
         _balances[from] -= 1;
         _updateOwnerAndClearApprovals(tokenId, 0, to, false);
@@ -249,7 +256,14 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
         emit NestTransfer(immediateOwner, to, parentId, 0, tokenId);
 
         _afterTokenTransfer(from, to, tokenId);
-        _afterNestedTokenTransfer(immediateOwner, to, parentId, 0, tokenId, data);
+        _afterNestedTokenTransfer(
+            immediateOwner,
+            to,
+            parentId,
+            0,
+            tokenId,
+            data
+        );
     }
 
     /**
@@ -322,7 +336,14 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
         IRMRKNestable destContract = IRMRKNestable(to);
         destContract.addChild(destinationId, tokenId, data);
         _afterTokenTransfer(from, to, tokenId);
-        _afterNestedTokenTransfer(from, to, parentId, destinationId, tokenId, data);
+        _afterNestedTokenTransfer(
+            from,
+            to,
+            parentId,
+            destinationId,
+            tokenId,
+            data
+        );
 
         emit Transfer(from, to, tokenId);
         emit NestTransfer(from, to, parentId, destinationId, tokenId);
@@ -398,7 +419,11 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
      * @param to Address to mint the token to
      * @param tokenId ID of the token to mint
      */
-    function _mint(address to, uint256 tokenId, bytes memory data) internal virtual {
+    function _mint(
+        address to,
+        uint256 tokenId,
+        bytes memory data
+    ) internal virtual {
         _innerMint(to, tokenId, 0, data);
 
         emit Transfer(address(0), to, tokenId);
@@ -452,7 +477,14 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
         if (tokenId == 0) revert RMRKIdZeroForbidden();
 
         _beforeTokenTransfer(address(0), to, tokenId);
-        _beforeNestedTokenTransfer(address(0), to, 0, destinationId, tokenId, data);
+        _beforeNestedTokenTransfer(
+            address(0),
+            to,
+            0,
+            destinationId,
+            tokenId,
+            data
+        );
 
         _balances[to] += 1;
         _RMRKOwners[tokenId] = DirectOwner({
