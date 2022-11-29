@@ -1,12 +1,12 @@
-# OwnableLock
+# Ownable
 
 *RMRK team*
 
-> OwnableLock
+> Ownable
 
-A minimal ownable lock smart contract.
+A minimal ownable smart contractf or owner and contributors.
 
-
+*This smart contract is based on &quot;openzeppelin&#39;s access/Ownable.sol&quot;.*
 
 ## Methods
 
@@ -25,23 +25,6 @@ Adds a contributor to the smart contract.
 | Name | Type | Description |
 |---|---|---|
 | contributor | address | Address of the contributor&#39;s account |
-
-### getLock
-
-```solidity
-function getLock() external view returns (bool)
-```
-
-Used to retrieve the status of a lockable smart contract.
-
-
-
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | bool | bool A boolean value signifying whether the smart contract has been locked |
 
 ### isContributor
 
@@ -108,17 +91,6 @@ Removes a contributor from the smart contract.
 | Name | Type | Description |
 |---|---|---|
 | contributor | address | Address of the contributor&#39;s account |
-
-### setLock
-
-```solidity
-function setLock() external nonpayable
-```
-
-Locks the operation.
-
-*Once locked, functions using `notLocked` modifier cannot be executed.*
-
 
 ### transferOwnership
 
