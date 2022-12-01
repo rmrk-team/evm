@@ -1,10 +1,10 @@
 # RMRKAbstractNestableImpl
 
+*RMRK team*
 
+> RMRKAbstractNestableImpl
 
-
-
-
+Abstract implementation of RMRK nestable module.
 
 
 
@@ -715,10 +715,10 @@ Used to retrieve the collection symbol.
 ### tokenURI
 
 ```solidity
-function tokenURI(uint256) external view returns (string)
+function tokenURI(uint256 tokenId) external view returns (string)
 ```
 
-
+Used to retrieve the metadata URI of a token.
 
 
 
@@ -726,13 +726,13 @@ function tokenURI(uint256) external view returns (string)
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | undefined |
+| tokenId | uint256 | ID of the token to retrieve the metadata URI for |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | undefined |
+| _0 | string | string Metadata URI of the specified token |
 
 ### totalSupply
 

@@ -1,10 +1,10 @@
 # RMRKEquippableImpl
 
+*RMRK team*
 
+> RMRKEquippableImpl
 
-
-
-
+Implementation of RMRK equippable module.
 
 
 
@@ -70,24 +70,24 @@ function acceptChild(uint256 parentId, uint256 childIndex, address childAddress,
 function addAssetEntry(uint64 equippableGroupId, address baseAddress, string metadataURI, uint64[] partIds) external nonpayable returns (uint256)
 ```
 
+Used to add a asset entry.
 
-
-
+*The ID of the asset is automatically assigned to be the next available asset ID.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| equippableGroupId | uint64 | undefined |
-| baseAddress | address | undefined |
-| metadataURI | string | undefined |
-| partIds | uint64[] | undefined |
+| equippableGroupId | uint64 | ID of the equippable group |
+| baseAddress | address | Address of the `Base` smart contract this asset belongs to |
+| metadataURI | string | Metadata URI of the asset |
+| partIds | uint64[] | An array of IDs of fixed and slot parts to be included in the asset |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | undefined |
+| _0 | uint256 | uint256 The total number of assets after this asset has been added |
 
 ### addAssetToToken
 
@@ -95,17 +95,17 @@ function addAssetEntry(uint64 equippableGroupId, address baseAddress, string met
 function addAssetToToken(uint256 tokenId, uint64 assetId, uint64 replacesAssetWithId) external nonpayable
 ```
 
+Used to add an asset to a token.
 
-
-
+*If the given asset is already added to the token, the execution will be reverted.If the asset ID is invalid, the execution will be reverted.If the token already has the maximum amount of pending assets (128), the execution will be  reverted.If the asset is being added by the current root owner of the token, the asset will be automatically  accepted.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | undefined |
-| assetId | uint64 | undefined |
-| replacesAssetWithId | uint64 | undefined |
+| tokenId | uint256 | ID of the token to add the asset to |
+| assetId | uint64 | ID of the asset to add to the token |
+| replacesAssetWithId | uint64 | ID of the asset to replace from the token&#39;s list of active assets |
 
 ### addChild
 
@@ -758,16 +758,16 @@ Used to retrieve the maximum supply of the collection.
 function mint(address to, uint256 numToMint) external payable
 ```
 
+Used to mint the desired number of tokens to the specified address.
 
-
-
+*The `data` value of the `_safeMint` method is set to an empty value.Can only be called while the open sale is open.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| to | address | undefined |
-| numToMint | uint256 | undefined |
+| to | address | Address to which to mint the token |
+| numToMint | uint256 | Number of tokens to mint |
 
 ### name
 
@@ -792,17 +792,17 @@ Used to retrieve the collection name.
 function nestMint(address to, uint256 numToMint, uint256 destinationId) external payable
 ```
 
+Used to mint a desired number of child tokens to a given parent token.
 
-
-
+*The `data` value of the `_safeMint` method is set to an empty value.Can only be called while the open sale is open.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| to | address | undefined |
-| numToMint | uint256 | undefined |
-| destinationId | uint256 | undefined |
+| to | address | Address of the collection smart contract of the token into which to mint the child token |
+| numToMint | uint256 | Number of tokens to mint |
+| destinationId | uint256 | ID of the token into which to mint the new child token |
 
 ### nestTransferFrom
 
@@ -1133,7 +1133,7 @@ Sets a new priority array for a given token.
 function setValidParentForEquippableGroup(uint64 equippableGroupId, address parentAddress, uint64 partId) external nonpayable
 ```
 
-
+Used to declare that the assets belonging to a given `equippableGroupId` are equippable into the `Slot`  associated with the `partId` of the collection at the specified `parentAddress`
 
 
 
@@ -1141,9 +1141,9 @@ function setValidParentForEquippableGroup(uint64 equippableGroupId, address pare
 
 | Name | Type | Description |
 |---|---|---|
-| equippableGroupId | uint64 | undefined |
-| parentAddress | address | undefined |
-| partId | uint64 | undefined |
+| equippableGroupId | uint64 | ID of the equippable group |
+| parentAddress | address | Address of the parent into which the equippable group can be equipped into |
+| partId | uint64 | ID of the `Slot` that the items belonging to the equippable group can be equipped into |
 
 ### supportsInterface
 
@@ -1187,10 +1187,10 @@ Used to retrieve the collection symbol.
 ### tokenURI
 
 ```solidity
-function tokenURI(uint256) external view returns (string)
+function tokenURI(uint256 tokenId) external view returns (string)
 ```
 
-
+Used to retrieve the metadata URI of a token.
 
 
 
@@ -1198,13 +1198,13 @@ function tokenURI(uint256) external view returns (string)
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | undefined |
+| tokenId | uint256 | ID of the token to retrieve the metadata URI for |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | undefined |
+| _0 | string | string Metadata URI of the specified token |
 
 ### totalAssets
 
@@ -1212,7 +1212,7 @@ function tokenURI(uint256) external view returns (string)
 function totalAssets() external view returns (uint256)
 ```
 
-
+Used to retrieve the total number of assets.
 
 
 
@@ -1221,7 +1221,7 @@ function totalAssets() external view returns (uint256)
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | undefined |
+| _0 | uint256 | uint256 The total number of assets |
 
 ### totalSupply
 
