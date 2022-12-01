@@ -9,8 +9,13 @@ import "../../RMRK/utils/RMRKMintingUtils.sol";
 
 error RMRKMintZero();
 
-// Abstract implementations to reduce duplication amont implementations: RMRKEquippableImpl and RMRKEquippableImplErc20Pay
-// Having RMRKEquippableImplErc20Pay inherit and override RMRKEquippableImpl was discarded since it added a lot of size to the contract
+/**
+ * @title RMRKAbstractEquippableImpl
+ * @author RMRK team
+ * @notice Abstract implementation of RMRK equippable module.
+ * @dev This is an abstract implementation to combine the common functionality of `RMRKEquippableImpl` and
+ * `RMRKEquippableImplErc20Pay`.
+ */
 abstract contract RMRKAbstractEquippableImpl is
     RMRKMintingUtils,
     RMRKCollectionMetadata,
@@ -20,6 +25,12 @@ abstract contract RMRKAbstractEquippableImpl is
     uint256 private _totalAssets;
     string private _tokenURI;
 
+    /**
+     * @notice Used to calculate the token IDs of tokens to be minted.
+     * @param numToMint Amount of tokens to be minted
+     * @return uint256 The ID of the first token to be minted in the current minting cycle
+     * @return uint256 The ID of the last token to be minted in the current minting cycle
+     */
     function _preMint(uint256 numToMint) internal returns (uint256, uint256) {
         if (numToMint == uint256(0)) revert RMRKMintZero();
         if (numToMint + _totalSupply > _maxSupply) revert RMRKMintOverMax();
@@ -36,8 +47,24 @@ abstract contract RMRKAbstractEquippableImpl is
         return (nextToken, totalSupplyOffset);
     }
 
+    /**
+     * @notice Used to verify that the amount of native currency accompanying the transaction equals the expected value.
+     * @param value The expected amount of native currency to accompany the transaction
+     */
     function _charge(uint256 value) internal virtual;
 
+    /**
+     * @notice Used to add an asset to a token.
+     * @dev If the given asset is already added to the token, the execution will be reverted.
+     * @dev If the asset ID is invalid, the execution will be reverted.
+     * @dev If the token already has the maximum amount of pending assets (128), the execution will be
+     *  reverted.
+     * @dev If the asset is being added by the current root owner of the token, the asset will be automatically
+     *  accepted.
+     * @param tokenId ID of the token to add the asset to
+     * @param assetId ID of the asset to add to the token
+     * @param replacesAssetWithId ID of the asset to replace from the token's list of active assets
+     */
     function addAssetToToken(
         uint256 tokenId,
         uint64 assetId,
@@ -49,6 +76,15 @@ abstract contract RMRKAbstractEquippableImpl is
         }
     }
 
+    /**
+     * @notice Used to add a asset entry.
+     * @dev The ID of the asset is automatically assigned to be the next available asset ID.
+     * @param equippableGroupId ID of the equippable group
+     * @param baseAddress Address of the `Base` smart contract this asset belongs to
+     * @param metadataURI Metadata URI of the asset
+     * @param partIds An array of IDs of fixed and slot parts to be included in the asset
+     * @return uint256 The total number of assets after this asset has been added
+     */
     function addAssetEntry(
         uint64 equippableGroupId,
         address baseAddress,
@@ -68,6 +104,13 @@ abstract contract RMRKAbstractEquippableImpl is
         return _totalAssets;
     }
 
+    /**
+     * @notice Used to declare that the assets belonging to a given `equippableGroupId` are equippable into the `Slot`
+     *  associated with the `partId` of the collection at the specified `parentAddress`
+     * @param equippableGroupId ID of the equippable group
+     * @param parentAddress Address of the parent into which the equippable group can be equipped into
+     * @param partId ID of the `Slot` that the items belonging to the equippable group can be equipped into
+     */
     function setValidParentForEquippableGroup(
         uint64 equippableGroupId,
         address parentAddress,
@@ -80,11 +123,20 @@ abstract contract RMRKAbstractEquippableImpl is
         );
     }
 
+    /**
+     * @notice Used to retrieve the total number of assets.
+     * @return uint256 The total number of assets
+     */
     function totalAssets() public view virtual returns (uint256) {
         return _totalAssets;
     }
 
-    function tokenURI(uint256)
+    /**
+     * @notice Used to retrieve the metadata URI of a token.
+     * @param tokenId ID of the token to retrieve the metadata URI for
+     * @return string Metadata URI of the specified token
+     */
+    function tokenURI(uint256 tokenId)
         public
         view
         virtual
@@ -94,6 +146,9 @@ abstract contract RMRKAbstractEquippableImpl is
         return _tokenURI;
     }
 
+    /**
+     * @inheritdoc RMRKRoyalties
+     */
     function updateRoyaltyRecipient(address newRoyaltyRecipient)
         public
         virtual
@@ -103,6 +158,10 @@ abstract contract RMRKAbstractEquippableImpl is
         _setRoyaltyRecipient(newRoyaltyRecipient);
     }
 
+    /**
+     * @notice Used to set the base token URI.
+     * @param tokenURI_ The base metadata URI of the token
+     */
     function _setTokenURI(string memory tokenURI_) internal virtual {
         _tokenURI = tokenURI_;
     }

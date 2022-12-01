@@ -6,6 +6,11 @@ import "./abstracts/RMRKAbstractNestableMultiAssetImpl.sol";
 
 error RMRKMintUnderpriced();
 
+/**
+ * @title RMRKNestableMultiAssetImpl
+ * @author RMRK team
+ * @notice Implementation of RMRK nestable multi asset module.
+ */
 contract RMRKNestableMultiAssetImpl is RMRKAbstractNestableMultiAssetImpl {
     constructor(
         string memory name,
@@ -25,6 +30,13 @@ contract RMRKNestableMultiAssetImpl is RMRKAbstractNestableMultiAssetImpl {
         _setTokenURI(tokenURI_);
     }
 
+    /**
+     * @notice Used to mint the desired number of tokens to the specified address.
+     * @dev The `data` value of the `_safeMint` method is set to an empty value.
+     * @dev Can only be called while the open sale is open.
+     * @param to Address to which to mint the token
+     * @param numToMint Number of tokens to mint
+     */
     function mint(address to, uint256 numToMint)
         public
         payable
@@ -42,6 +54,14 @@ contract RMRKNestableMultiAssetImpl is RMRKAbstractNestableMultiAssetImpl {
         }
     }
 
+    /**
+     * @notice Used to mint a desired number of child tokens to a given parent token.
+     * @dev The `data` value of the `_safeMint` method is set to an empty value.
+     * @dev Can only be called while the open sale is open.
+     * @param to Address of the collection smart contract of the token into which to mint the child token
+     * @param numToMint Number of tokens to mint
+     * @param destinationId ID of the token into which to mint the new child token
+     */
     function nestMint(
         address to,
         uint256 numToMint,
@@ -57,6 +77,10 @@ contract RMRKNestableMultiAssetImpl is RMRKAbstractNestableMultiAssetImpl {
         }
     }
 
+    /**
+     * @notice Used to verify that the amount of native currency accompanying the transaction equals the expected value.
+     * @param value The expected amount of native currency to accompany the transaction
+     */
     function _charge(uint256 value) internal virtual override {
         if (value != msg.value) revert RMRKMintUnderpriced();
     }

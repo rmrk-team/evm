@@ -1,10 +1,10 @@
 # RMRKNestableExternalEquipImpl
 
+*RMRK team*
 
+> RMRKNestableExternalEquipImpl
 
-
-
-
+Implementation of RMRK nestable external equip module.
 
 
 
@@ -448,16 +448,16 @@ Used to retrieve the maximum supply of the collection.
 function mint(address to, uint256 numToMint) external payable
 ```
 
+Used to mint the desired number of tokens to the specified address.
 
-
-
+*The `data` value of the `_safeMint` method is set to an empty value.Can only be called while the open sale is open.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| to | address | undefined |
-| numToMint | uint256 | undefined |
+| to | address | Address to which to mint the token |
+| numToMint | uint256 | Number of tokens to mint |
 
 ### name
 
@@ -482,17 +482,17 @@ Used to retrieve the collection name.
 function nestMint(address to, uint256 numToMint, uint256 destinationId) external payable
 ```
 
+Used to mint a desired number of child tokens to a given parent token.
 
-
-
+*The `data` value of the `_safeMint` method is set to an empty value.Can only be called while the open sale is open.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| to | address | undefined |
-| numToMint | uint256 | undefined |
-| destinationId | uint256 | undefined |
+| to | address | Address of the collection smart contract of the token into which to mint the child token |
+| numToMint | uint256 | Number of tokens to mint |
+| destinationId | uint256 | ID of the token into which to mint the new child token |
 
 ### nestTransferFrom
 
@@ -743,7 +743,7 @@ function setApprovalForAll(address operator, bool approved) external nonpayable
 function setEquippableAddress(address equippable) external nonpayable
 ```
 
-
+Used to set the address of the `Equippable` smart contract.
 
 
 
@@ -751,7 +751,7 @@ function setEquippableAddress(address equippable) external nonpayable
 
 | Name | Type | Description |
 |---|---|---|
-| equippable | address | undefined |
+| equippable | address | Address of the `Equippable` smart contract |
 
 ### setLock
 
@@ -806,10 +806,10 @@ Used to retrieve the collection symbol.
 ### tokenURI
 
 ```solidity
-function tokenURI(uint256) external view returns (string)
+function tokenURI(uint256 tokenId) external view returns (string)
 ```
 
-
+Used to retrieve the metadata URI of a token.
 
 
 
@@ -817,13 +817,13 @@ function tokenURI(uint256) external view returns (string)
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | undefined |
+| tokenId | uint256 | ID of the token to retrieve the metadata URI for |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | undefined |
+| _0 | string | string Metadata URI of the specified token |
 
 ### totalSupply
 
@@ -1052,7 +1052,7 @@ Used to notify listeners a child token has been transferred from parent token.
 event EquippableAddressSet(address old, address new_)
 ```
 
-sed to notify the listeners that the address of the `Equippable` associated smart contract has been set.
+used to notify the listeners that the address of the `Equippable` associated smart contract has been set.
 
 
 

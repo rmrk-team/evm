@@ -9,6 +9,11 @@ import "../../RMRK/utils/RMRKMintingUtils.sol";
 
 error RMRKMintZero();
 
+/**
+ * @title RMRKAbstractMultiAssetImpl
+ * @author RMRK team
+ * @notice Abstract implementation of RMRK multi asset module.
+ */
 abstract contract RMRKAbstractMultiAssetImpl is
     RMRKMintingUtils,
     RMRKCollectionMetadata,
@@ -18,10 +23,30 @@ abstract contract RMRKAbstractMultiAssetImpl is
     uint256 private _totalAssets;
     string private _tokenURI;
 
+    /**
+     * @notice Used to destroy the specified token.
+     * @dev The approval is cleared when the token is burned.
+     * @dev Requirements:
+     *
+     *  - `tokenId` must exist.
+     * @param tokenId ID of the token to burn
+     */
     function burn(uint256 tokenId) public virtual onlyApprovedOrOwner(tokenId) {
         _burn(tokenId);
     }
 
+    /**
+     * @notice Used to add an asset to a token.
+     * @dev If the given asset is already added to the token, the execution will be reverted.
+     * @dev If the asset ID is invalid, the execution will be reverted.
+     * @dev If the token already has the maximum amount of pending assets (128), the execution will be
+     *  reverted.
+     * @dev If the asset is being added by the current root owner of the token, the asset will be automatically
+     *  accepted.
+     * @param tokenId ID of the token to add the asset to
+     * @param assetId ID of the asset to add to the token
+     * @param replacesAssetWithId ID of the asset to replace from the token's list of active assets
+     */
     function addAssetToToken(
         uint256 tokenId,
         uint64 assetId,
@@ -33,6 +58,11 @@ abstract contract RMRKAbstractMultiAssetImpl is
         }
     }
 
+    /**
+     * @notice Used to add a asset entry.
+     * @dev The ID of the asset is automatically assigned to be the next available asset ID.
+     * @param metadataURI Metadata URI of the asset
+     */
     function addAssetEntry(string memory metadataURI)
         public
         virtual
@@ -46,11 +76,20 @@ abstract contract RMRKAbstractMultiAssetImpl is
         return _totalAssets;
     }
 
+    /**
+     * @notice Used to retrieve the total number of assets.
+     * @return uint256 The total number of assets
+     */
     function totalAssets() public view virtual returns (uint256) {
         return _totalAssets;
     }
 
-    function tokenURI(uint256)
+    /**
+     * @notice Used to retrieve the metadata URI of a token.
+     * @param tokenId ID of the token to retrieve the metadata URI for
+     * @return string Metadata URI of the specified token
+     */
+    function tokenURI(uint256 tokenId)
         public
         view
         virtual
@@ -60,6 +99,9 @@ abstract contract RMRKAbstractMultiAssetImpl is
         return _tokenURI;
     }
 
+    /**
+     * @inheritdoc RMRKRoyalties
+     */
     function updateRoyaltyRecipient(address newRoyaltyRecipient)
         public
         virtual
@@ -69,6 +111,10 @@ abstract contract RMRKAbstractMultiAssetImpl is
         _setRoyaltyRecipient(newRoyaltyRecipient);
     }
 
+    /**
+     * @notice Used to set the base token URI.
+     * @param tokenURI_ The base metadata URI of the token
+     */
     function _setTokenURI(string memory tokenURI_) internal virtual {
         _tokenURI = tokenURI_;
     }
