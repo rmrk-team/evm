@@ -6,6 +6,11 @@ import "./abstracts/RMRKAbstractMultiAssetImpl.sol";
 
 error RMRKMintUnderpriced();
 
+/**
+ * @title RMRKMultiAssetImpl
+ * @author RMRK team
+ * @notice Implementation of RMRK multi asset module.
+ */
 contract RMRKMultiAssetImpl is RMRKAbstractMultiAssetImpl {
     constructor(
         string memory name,
@@ -25,6 +30,13 @@ contract RMRKMultiAssetImpl is RMRKAbstractMultiAssetImpl {
         _setTokenURI(tokenURI_);
     }
 
+    /**
+     * @notice Used to mint the desired number of tokens to the specified address.
+     * @dev The `data` value of the `_safeMint` method is set to an empty value.
+     * @dev Can only be called while the open sale is open.
+     * @param to Address to which to mint the token
+     * @param numToMint Number of tokens to mint
+     */
     function mint(address to, uint256 numToMint)
         public
         payable

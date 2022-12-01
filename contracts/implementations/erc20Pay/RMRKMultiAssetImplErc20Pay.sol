@@ -6,6 +6,11 @@ import "../abstracts/RMRKAbstractMultiAssetImpl.sol";
 import "../IRMRKInitData.sol";
 import "./RMRKErc20Pay.sol";
 
+/**
+ * @title RMRKMultiAssetImplErc20Pay
+ * @author RMRK team
+ * @notice Implementation of RMRK multi asset module with ERC20 pay.
+ */
 contract RMRKMultiAssetImplErc20Pay is
     IRMRKInitData,
     RMRKErc20Pay,
@@ -27,6 +32,13 @@ contract RMRKMultiAssetImplErc20Pay is
         _setTokenURI(tokenURI_);
     }
 
+    /**
+     * @notice Used to mint the desired number of tokens to the specified address.
+     * @dev The `data` value of the `_safeMint` method is set to an empty value.
+     * @dev Can only be called while the open sale is open.
+     * @param to Address to which to mint the token
+     * @param numToMint Number of tokens to mint
+     */
     function mint(address to, uint256 numToMint)
         public
         virtual

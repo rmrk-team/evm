@@ -1,12 +1,12 @@
 # RMRKBaseStorageImpl
 
+*RMRK team*
 
+> IRMRKInitData
 
+Interface represenataion of RMRK initialization data.
 
-
-
-
-*Contract for storing &#39;base&#39; elements of NFTs to be accessed by instances of RMRKAsset implementing contracts. This default implementation includes an OwnableLock dependency, which allows the deployer to freeze the state of the base contract. In addition, this implementation treats the base registry as an append-only ledger, so*
+*This interface provides a struct sed to pack data to avoid stack too deep error for too many arguments.*
 
 ## Methods
 
@@ -32,16 +32,16 @@ Adds a contributor to the smart contract.
 function addEquippableAddresses(uint64 partId, address[] equippableAddresses) external nonpayable
 ```
 
+Used to add multiple `equippableAddresses` to a single base entry.
 
-
-
+*Can only be called on `Slot` type of `Part`s.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| partId | uint64 | undefined |
-| equippableAddresses | address[] | undefined |
+| partId | uint64 | ID of the `Part` that we are adding the equippable addresses to |
+| equippableAddresses | address[] | An array of addresses that can be equipped into the `Part` associated with the `partId` |
 
 ### addPart
 
@@ -271,15 +271,15 @@ Leaves the contract without owner. Functions using the `onlyOwner` modifier will
 function resetEquippableAddresses(uint64 partId) external nonpayable
 ```
 
+Used to remove all of the `equippableAddresses` for a `Part` associated with the `partId`.
 
-
-
+*Can only be called on `Slot` type of `Part`s.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| partId | uint64 | undefined |
+| partId | uint64 | ID of the part that we are clearing the `equippableAddresses` from |
 
 ### revokeContributor
 
@@ -303,16 +303,16 @@ Removes a contributor from the smart contract.
 function setEquippableAddresses(uint64 partId, address[] equippableAddresses) external nonpayable
 ```
 
+Function used to set the new list of `equippableAddresses`.
 
-
-
+*Overwrites existing `equippableAddresses`.Can only be called on `Slot` type of `Part`s.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| partId | uint64 | undefined |
-| equippableAddresses | address[] | undefined |
+| partId | uint64 | ID of the `Part`s that we are overwiting the `equippableAddresses` for |
+| equippableAddresses | address[] | A full array of addresses that can be equipped into this `Part` |
 
 ### setEquippableToAll
 
@@ -320,15 +320,15 @@ function setEquippableAddresses(uint64 partId, address[] equippableAddresses) ex
 function setEquippableToAll(uint64 partId) external nonpayable
 ```
 
+Sets the isEquippableToAll flag to true, meaning that any collection may be equipped into the `Part` with  this `partId`.
 
-
-
+*Can only be called on `Slot` type of `Part`s.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| partId | uint64 | undefined |
+| partId | uint64 | ID of the `Part` that we are setting as equippable by any address |
 
 ### setLock
 
