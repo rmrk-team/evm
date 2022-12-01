@@ -13,7 +13,7 @@ error RMRKMintZero();
  * @title RMRKAbstractEquippableImpl
  * @author RMRK team
  * @notice Abstract implementation of RMRK equippable module.
- * @dev This is an abstract implementation to reduce amount of implementations: `RMRKEquippableImpl` and
+ * @dev This is an abstract implementation to combine the common functionality of `RMRKEquippableImpl` and
  * `RMRKEquippableImplErc20Pay`.
  */
 abstract contract RMRKAbstractEquippableImpl is
@@ -26,7 +26,7 @@ abstract contract RMRKAbstractEquippableImpl is
     string private _tokenURI;
 
     /**
-     * @notice A hook to be called prior to minting tokens.
+     * @notice Used to calculate the token IDs of tokens to be minted.
      * @param numToMint Amount of tokens to be minted
      * @return uint256 The ID of the first token to be minted in the current minting cycle
      * @return uint256 The ID of the last token to be minted in the current minting cycle

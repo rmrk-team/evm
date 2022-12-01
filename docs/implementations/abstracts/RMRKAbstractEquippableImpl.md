@@ -6,7 +6,7 @@
 
 Abstract implementation of RMRK equippable module.
 
-*This is an abstract implementation to reduce amount of implementations: `RMRKEquippableImpl` and `RMRKEquippableImplErc20Pay`.*
+*This is an abstract implementation to combine the common functionality of `RMRKEquippableImpl` and `RMRKEquippableImplErc20Pay`.*
 
 ## Methods
 

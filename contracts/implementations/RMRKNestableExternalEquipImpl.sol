@@ -13,7 +13,7 @@ error RMRKMintZero();
 /**
  * @title RMRKNestableExternalEquipImpl
  * @author RMRK team
- * @notice Implementation of RMRK nestable multi asset module.
+ * @notice Implementation of RMRK nestable external equip module.
  */
 contract RMRKNestableExternalEquipImpl is
     RMRKMintingUtils,
@@ -94,7 +94,7 @@ contract RMRKNestableExternalEquipImpl is
     }
 
     /**
-     * @notice A hook to be called prior to minting tokens.
+     * @notice Used to calculate the token IDs of tokens to be minted.
      * @param numToMint Amount of tokens to be minted
      * @return uint256 The ID of the first token to be minted in the current minting cycle
      * @return uint256 The ID of the last token to be minted in the current minting cycle

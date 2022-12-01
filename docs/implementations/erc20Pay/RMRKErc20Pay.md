@@ -6,7 +6,7 @@
 
 Smart contract of the RMRK Nestable module.
 
-*This contract is hierarchy agnostic and can support an arbitrary number of nested levels up and down, as long as  gas limits allow it.*
+
 
 ## Methods
 
