@@ -11,7 +11,7 @@ import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
  */
 interface IRMRKNestableExternalEquip is IERC165 {
     /**
-     * @notice sed to notify the listeners that the address of the `Equippable` associated smart contract has been set.
+     * @notice used to notify the listeners that the address of the `Equippable` associated smart contract has been set.
      * @dev When the address is set fot the first time, the `old` value should equal `0x0` address.
      * @param old Address of the previous `Equippable` smart contract
      * @param new_ Address of the new `Equippable` smart contract

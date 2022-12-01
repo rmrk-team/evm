@@ -5,8 +5,8 @@ pragma solidity ^0.8.16;
 /**
  * @title IRMRKInitData
  * @author RMRK team
- * @notice Interface represenataion of RMRK initialization data.
- * @dev This interface provides a struct sed to pack data to avoid stack too deep error for too many arguments.
+ * @notice Interface representation of RMRK initialization data.
+ * @dev This interface provides a struct used to pack data to avoid stack too deep error for too many arguments.
  */
 interface IRMRKInitData {
     /**
