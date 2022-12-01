@@ -4,7 +4,7 @@
 
 > RMRKNestableExternalEquipImpl
 
-Implementation of RMRK nestable multi asset module.
+Implementation of RMRK nestable external equip module.
 
 
 
@@ -1052,7 +1052,7 @@ Used to notify listeners a child token has been transferred from parent token.
 event EquippableAddressSet(address old, address new_)
 ```
 
-sed to notify the listeners that the address of the `Equippable` associated smart contract has been set.
+used to notify the listeners that the address of the `Equippable` associated smart contract has been set.
 
 
 

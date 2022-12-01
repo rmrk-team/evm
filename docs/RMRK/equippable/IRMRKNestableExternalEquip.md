@@ -82,7 +82,7 @@ function supportsInterface(bytes4 interfaceId) external view returns (bool)
 event EquippableAddressSet(address old, address new_)
 ```
 
-sed to notify the listeners that the address of the `Equippable` associated smart contract has been set.
+used to notify the listeners that the address of the `Equippable` associated smart contract has been set.
 
 *When the address is set fot the first time, the `old` value should equal `0x0` address.*
 

@@ -2,11 +2,11 @@
 
 *RMRK team*
 
-> IRMRKInitData
+> RMRKBaseStorageImpl
 
-Interface represenataion of RMRK initialization data.
+Implementation of RMRK base storage.
 
-*This interface provides a struct sed to pack data to avoid stack too deep error for too many arguments.*
+*Contract for storing &#39;base&#39; elements of NFTs to be accessed by instances of RMRKAsset implementing contracts.  This default implementation includes an OwnableLock dependency, which allows the deployer to freeze the state of the  base contract.*
 
 ## Methods
 
@@ -34,7 +34,7 @@ function addEquippableAddresses(uint64 partId, address[] equippableAddresses) ex
 
 Used to add multiple `equippableAddresses` to a single base entry.
 
-*Can only be called on `Slot` type of `Part`s.*
+*Can only be called on `Part`s of `Slot` type.*
 
 #### Parameters
 
@@ -273,7 +273,7 @@ function resetEquippableAddresses(uint64 partId) external nonpayable
 
 Used to remove all of the `equippableAddresses` for a `Part` associated with the `partId`.
 
-*Can only be called on `Slot` type of `Part`s.*
+*Can only be called on `Part`s of `Slot` type.*
 
 #### Parameters
 
@@ -305,7 +305,7 @@ function setEquippableAddresses(uint64 partId, address[] equippableAddresses) ex
 
 Function used to set the new list of `equippableAddresses`.
 
-*Overwrites existing `equippableAddresses`.Can only be called on `Slot` type of `Part`s.*
+*Overwrites existing `equippableAddresses`.Can only be called on `Part`s of `Slot` type.*
 
 #### Parameters
 
@@ -322,7 +322,7 @@ function setEquippableToAll(uint64 partId) external nonpayable
 
 Sets the isEquippableToAll flag to true, meaning that any collection may be equipped into the `Part` with  this `partId`.
 
-*Can only be called on `Slot` type of `Part`s.*
+*Can only be called on `Part`s of `Slot` type.*
 
 #### Parameters
 

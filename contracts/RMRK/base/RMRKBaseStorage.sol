@@ -126,7 +126,7 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
 
     /**
      * @dev Internal function used to add multiple `equippableAddresses` to a single base entry.
-     * @dev Can only be called on `Slot` type of `Part`s.
+     * @dev Can only be called on `Part`s of `Slot` type.
      * @param partId ID of the `Part` that we are adding the equippable addresses to
      * @param equippableAddresses An array of addresses that can be equipped into the `Part` associated with the `partId`
      */
@@ -151,7 +151,7 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
     /**
      * @dev Internal function used to set the new list of `equippableAddresses`.
      * @dev Overwrites existing `equippableAddresses`.
-     * @dev Can only be called on `Slot` type of `Part`s.
+     * @dev Can only be called on `Part`s of `Slot` type.
      * @param partId ID of the `Part`s that we are overwiting the `equippableAddresses` for
      * @param equippableAddresses A full array of addresses that can be equipped into this `Part`
      */
@@ -168,7 +168,7 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
 
     /**
      * @dev Internal function used to remove all of the `equippableAddresses` for a `Part` associated with the `partId`.
-     * @dev Can only be called on `Slot` type of `Part`s.
+     * @dev Can only be called on `Part`s of `Slot` type.
      * @param partId ID of the part that we are clearing the `equippableAddresses` from
      */
     function _resetEquippableAddresses(uint64 partId)
@@ -184,7 +184,7 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
     /**
      * @dev Sets the isEquippableToAll flag to true, meaning that any collection may be equipped into the `Part` with this
      *  `partId`.
-     * @dev Can only be called on `Slot` type of `Part`s.
+     * @dev Can only be called on `Part`s of `Slot` type.
      * @param partId ID of the `Part` that we are setting as equippable by any address
      */
     function _setEquippableToAll(uint64 partId) internal onlySlot(partId) {

@@ -11,8 +11,6 @@ error RMRKNotEnoughAllowance();
  * @title RMRKNestable
  * @author RMRK team
  * @notice Smart contract of the RMRK Nestable module.
- * @dev This contract is hierarchy agnostic and can support an arbitrary number of nested levels up and down, as long as
- *  gas limits allow it.
  */
 abstract contract RMRKErc20Pay is IRMRKErc20Pay {
     address private immutable _erc20TokenAddress;

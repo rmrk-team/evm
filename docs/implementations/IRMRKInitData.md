@@ -4,9 +4,9 @@
 
 > IRMRKInitData
 
-Interface represenataion of RMRK initialization data.
+Interface representation of RMRK initialization data.
 
-*This interface provides a struct sed to pack data to avoid stack too deep error for too many arguments.*
+*This interface provides a struct used to pack data to avoid stack too deep error for too many arguments.*
 
 
 
