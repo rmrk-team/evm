@@ -14,7 +14,7 @@ import shouldBehaveLikeEquippableAssets from './behavior/equippableAssets';
 import shouldBehaveLikeEquippableWithParts from './behavior/equippableParts';
 import shouldBehaveLikeEquippableWithSlots from './behavior/equippableSlots';
 import shouldBehaveLikeMultiAsset from './behavior/multiasset';
-
+import { RMRKBaseStorageMock, RMRKEquippableMock, RMRKEquipRenderUtils, RMRKMultiAssetRenderUtils} from '../typechain-types';
 // --------------- FIXTURES -----------------------
 
 async function partsFixture() {
@@ -32,19 +32,19 @@ async function partsFixture() {
   const viewFactory = await ethers.getContractFactory('RMRKEquipRenderUtils');
 
   // Base
-  const base = await baseFactory.deploy(baseSymbol, baseType);
+  const base = <RMRKBaseStorageMock>(await baseFactory.deploy(baseSymbol, baseType));
   await base.deployed();
 
   // Neon token
-  const neon = await equipFactory.deploy(neonName, neonSymbol);
+  const neon = <RMRKEquippableMock>(await equipFactory.deploy(neonName, neonSymbol));
   await neon.deployed();
 
   // Weapon
-  const mask = await equipFactory.deploy(maskName, maskSymbol);
+  const mask = <RMRKEquippableMock>(await equipFactory.deploy(maskName, maskSymbol));
   await mask.deployed();
 
   // View
-  const view = await viewFactory.deploy();
+  const view = <RMRKEquipRenderUtils>(await viewFactory.deploy());
   await view.deployed();
 
   await setupContextForParts(base, neon, neon, mask, mask, mintFromMock, nestMintFromMock);
@@ -72,27 +72,27 @@ async function slotsFixture() {
   const viewFactory = await ethers.getContractFactory('RMRKEquipRenderUtils');
 
   // View
-  const view = await viewFactory.deploy();
+  const view = <RMRKEquipRenderUtils> await viewFactory.deploy();
   await view.deployed();
 
   // Base
-  const base = await baseFactory.deploy(baseSymbol, baseType);
+  const base = <RMRKBaseStorageMock> await baseFactory.deploy(baseSymbol, baseType);
   await base.deployed();
 
   // Soldier token
-  const soldier = await equipFactory.deploy(soldierName, soldierSymbol);
+  const soldier = <RMRKEquippableMock> await equipFactory.deploy(soldierName, soldierSymbol);
   await soldier.deployed();
 
   // Weapon
-  const weapon = await equipFactory.deploy(weaponName, weaponSymbol);
+  const weapon = <RMRKEquippableMock> await equipFactory.deploy(weaponName, weaponSymbol);
   await weapon.deployed();
 
   // Weapon Gem
-  const weaponGem = await equipFactory.deploy(weaponGemName, weaponGemSymbol);
+  const weaponGem = <RMRKEquippableMock> await equipFactory.deploy(weaponGemName, weaponGemSymbol);
   await weaponGem.deployed();
 
   // Background
-  const background = await equipFactory.deploy(backgroundName, backgroundSymbol);
+  const background = <RMRKEquippableMock> await equipFactory.deploy(backgroundName, backgroundSymbol);
   await background.deployed();
 
   await setupContextForSlots(
@@ -113,13 +113,13 @@ async function slotsFixture() {
 }
 
 async function assetsFixture() {
-  const equipFactory = await ethers.getContractFactory('RMRKEquippableMock');
+  const equipFactory =  await ethers.getContractFactory('RMRKEquippableMock');
   const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiAssetRenderUtils');
 
-  const equip = await equipFactory.deploy('Chunky', 'CHNK');
+  const equip = <RMRKEquippableMock> await equipFactory.deploy('Chunky', 'CHNK');
   await equip.deployed();
 
-  const renderUtils = await renderUtilsFactory.deploy();
+  const renderUtils = <RMRKMultiAssetRenderUtils> await renderUtilsFactory.deploy();
   await renderUtils.deployed();
 
   return { equip, renderUtils };
@@ -129,10 +129,10 @@ async function multiAssetFixture() {
   const equipFactory = await ethers.getContractFactory('RMRKEquippableMock');
   const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiAssetRenderUtils');
 
-  const equip = await equipFactory.deploy('equipWithEquippable', 'NWE');
+  const equip =<RMRKEquippableMock> await equipFactory.deploy('equipWithEquippable', 'NWE');
   await equip.deployed();
 
-  const renderUtils = await renderUtilsFactory.deploy();
+  const renderUtils = <RMRKMultiAssetRenderUtils> await renderUtilsFactory.deploy();
   await renderUtils.deployed();
 
   return { equip, renderUtils };
@@ -200,8 +200,8 @@ describe('EquippableMock Assets', async () => {
 
 describe('EquippableMock MR behavior', async () => {
   let nextTokenId = 1;
-  let equip: Contract;
-  let renderUtils: Contract;
+  let equip: RMRKEquippableMock;
+  let renderUtils: RMRKMultiAssetRenderUtils;
 
   beforeEach(async function () {
     ({ equip, renderUtils } = await loadFixture(multiAssetFixture));
@@ -212,7 +212,7 @@ describe('EquippableMock MR behavior', async () => {
   async function mintToNestable(token: Contract, to: string): Promise<number> {
     const tokenId = nextTokenId;
     nextTokenId++;
-    await equip['mint(address,uint256)'](to, tokenId);
+    await equip.mint(to,tokenId);
     return tokenId;
   }
 

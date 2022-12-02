@@ -10,10 +10,11 @@ import {
 } from '../utils';
 import { Contract } from 'ethers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
+import { ERC20Mock } from "../../typechain-types";
 
 async function multiAssetFixture(): Promise<Contract> {
   const erc20Factory = await ethers.getContractFactory('ERC20Mock');
-  const erc20 = await erc20Factory.deploy();
+  const erc20 = <ERC20Mock> await erc20Factory.deploy();
   await erc20.deployed();
 
   return await singleFixtureWithArgs('RMRKMultiAssetImplErc20Pay', [
@@ -27,7 +28,7 @@ async function multiAssetFixture(): Promise<Contract> {
 
 async function nestableFixture(): Promise<Contract> {
   const erc20Factory = await ethers.getContractFactory('ERC20Mock');
-  const erc20 = await erc20Factory.deploy();
+  const erc20 = <ERC20Mock> await erc20Factory.deploy();
   await erc20.deployed();
 
   return await singleFixtureWithArgs('RMRKNestableImplErc20Pay', [
@@ -41,7 +42,7 @@ async function nestableFixture(): Promise<Contract> {
 
 async function nestableMultiAssetFixture(): Promise<Contract> {
   const erc20Factory = await ethers.getContractFactory('ERC20Mock');
-  const erc20 = await erc20Factory.deploy();
+  const erc20 = <ERC20Mock> await erc20Factory.deploy();
   await erc20.deployed();
 
   return await singleFixtureWithArgs('RMRKNestableMultiAssetImplErc20Pay', [
@@ -101,14 +102,14 @@ describe('EquippableImplErc20Pay Minting', async () => {
 
 async function shouldControlValidMintingErc20Pay(): Promise<void> {
   let addrs: SignerWithAddress[];
-  let erc20: Contract;
+  let erc20: ERC20Mock;
 
   beforeEach(async function () {
     const [, ...signersAddr] = await ethers.getSigners();
     addrs = signersAddr;
     const erc20Address = this.token.erc20TokenAddress();
     const erc20Factory = await ethers.getContractFactory('ERC20Mock');
-    erc20 = erc20Factory.attach(erc20Address);
+    erc20 = <ERC20Mock> erc20Factory.attach(erc20Address);
   });
 
   it('cannot mint under price', async function () {
