@@ -5,9 +5,10 @@ pragma solidity ^0.8.16;
 import "../RMRK/multiasset/RMRKMultiAsset.sol";
 
 contract RMRKMultiAssetMock is RMRKMultiAsset {
-    constructor(string memory name, string memory symbol)
-        RMRKMultiAsset(name, symbol)
-    {}
+    constructor(
+        string memory name,
+        string memory symbol
+    ) RMRKMultiAsset(name, symbol) {}
 
     function mint(address to, uint256 tokenId) external {
         _mint(to, tokenId);
@@ -17,11 +18,7 @@ contract RMRKMultiAssetMock is RMRKMultiAsset {
         _safeMint(to, tokenId, "");
     }
 
-    function safeMint(
-        address to,
-        uint256 tokenId,
-        bytes memory data
-    ) external {
+    function safeMint(address to, uint256 tokenId, bytes memory data) external {
         _safeMint(to, tokenId, data);
     }
 

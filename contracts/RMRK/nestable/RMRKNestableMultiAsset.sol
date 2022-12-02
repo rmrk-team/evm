@@ -53,20 +53,17 @@ contract RMRKNestableMultiAsset is RMRKNestable, AbstractMultiAsset {
     /**
      * @dev Initializes the contract by setting a `name` and a `symbol` of the token collection.
      */
-    constructor(string memory name_, string memory symbol_)
-        RMRKNestable(name_, symbol_)
-    {}
+    constructor(
+        string memory name_,
+        string memory symbol_
+    ) RMRKNestable(name_, symbol_) {}
 
     /**
      * @inheritdoc IERC165
      */
-    function supportsInterface(bytes4 interfaceId)
-        public
-        view
-        virtual
-        override(IERC165, RMRKNestable)
-        returns (bool)
-    {
+    function supportsInterface(
+        bytes4 interfaceId
+    ) public view virtual override(IERC165, RMRKNestable) returns (bool) {
         return
             RMRKNestable.supportsInterface(interfaceId) ||
             interfaceId == type(IRMRKMultiAsset).interfaceId;
@@ -132,11 +129,10 @@ contract RMRKNestableMultiAsset is RMRKNestable, AbstractMultiAsset {
      * @param maxRejections Maximum number of expected assets to reject, used to prevent from
      *  rejecting assets which arrive just before this operation.
      */
-    function rejectAllAssets(uint256 tokenId, uint256 maxRejections)
-        public
-        virtual
-        onlyApprovedForAssetsOrOwner(tokenId)
-    {
+    function rejectAllAssets(
+        uint256 tokenId,
+        uint256 maxRejections
+    ) public virtual onlyApprovedForAssetsOrOwner(tokenId) {
         _rejectAllAssets(tokenId, maxRejections);
     }
 
@@ -155,11 +151,10 @@ contract RMRKNestableMultiAsset is RMRKNestable, AbstractMultiAsset {
      * @param priorities An array of priorities of active assets. The succesion of items in the priorities array
      *  matches that of the succesion of items in the active array
      */
-    function setPriority(uint256 tokenId, uint16[] calldata priorities)
-        public
-        virtual
-        onlyApprovedForAssetsOrOwner(tokenId)
-    {
+    function setPriority(
+        uint256 tokenId,
+        uint16[] calldata priorities
+    ) public virtual onlyApprovedForAssetsOrOwner(tokenId) {
         _setPriority(tokenId, priorities);
     }
 
@@ -197,12 +192,9 @@ contract RMRKNestableMultiAsset is RMRKNestable, AbstractMultiAsset {
      * @param tokenId ID of the token for which to retrieve the approved address
      * @return address Address of the account that is approved to manage the specified token's assets
      */
-    function getApprovedForAssets(uint256 tokenId)
-        public
-        view
-        virtual
-        returns (address)
-    {
+    function getApprovedForAssets(
+        uint256 tokenId
+    ) public view virtual returns (address) {
         _requireMinted(tokenId);
         return _tokenApprovalsForAssets[tokenId][ownerOf(tokenId)];
     }
@@ -239,12 +231,10 @@ contract RMRKNestableMultiAsset is RMRKNestable, AbstractMultiAsset {
      * @param tokenId ID of the token to query for permission for a given `user`
      * @return bool A boolean value indicating whether the user is approved to manage the token or not
      */
-    function _isApprovedForAssetsOrOwner(address user, uint256 tokenId)
-        internal
-        view
-        virtual
-        returns (bool)
-    {
+    function _isApprovedForAssetsOrOwner(
+        address user,
+        uint256 tokenId
+    ) internal view virtual returns (bool) {
         address owner = ownerOf(tokenId);
         return (user == owner ||
             isApprovedForAllForAssets(owner, user) ||

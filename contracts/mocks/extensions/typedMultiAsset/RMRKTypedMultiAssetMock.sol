@@ -8,13 +8,16 @@ import "../../RMRKMultiAssetMock.sol";
 error RMRKTokenHasNoAssetsWithType();
 
 contract RMRKTypedMultiAssetMock is RMRKMultiAssetMock, RMRKTypedMultiAsset {
-    uint16 private constant _LOWEST_POSSIBLE_PRIORITY = 2**16 - 1;
+    uint16 private constant _LOWEST_POSSIBLE_PRIORITY = 2 ** 16 - 1;
 
-    constructor(string memory name, string memory symbol)
-        RMRKMultiAssetMock(name, symbol)
-    {}
+    constructor(
+        string memory name,
+        string memory symbol
+    ) RMRKMultiAssetMock(name, symbol) {}
 
-    function supportsInterface(bytes4 interfaceId)
+    function supportsInterface(
+        bytes4 interfaceId
+    )
         public
         view
         virtual

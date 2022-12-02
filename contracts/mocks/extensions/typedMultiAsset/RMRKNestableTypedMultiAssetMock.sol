@@ -11,11 +11,14 @@ contract RMRKNestableTypedMultiAssetMock is
     RMRKNestableMultiAssetMock,
     RMRKTypedMultiAsset
 {
-    constructor(string memory name, string memory symbol)
-        RMRKNestableMultiAssetMock(name, symbol)
-    {}
+    constructor(
+        string memory name,
+        string memory symbol
+    ) RMRKNestableMultiAssetMock(name, symbol) {}
 
-    function supportsInterface(bytes4 interfaceId)
+    function supportsInterface(
+        bytes4 interfaceId
+    )
         public
         view
         virtual

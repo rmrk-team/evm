@@ -30,11 +30,10 @@ library RMRKLib {
      * @return uint256 The index of the item in the array
      * @return bool A boolean value specifying whether the item was found
      */
-    function indexOf(uint64[] memory A, uint64 a)
-        internal
-        pure
-        returns (uint256, bool)
-    {
+    function indexOf(
+        uint64[] memory A,
+        uint64 a
+    ) internal pure returns (uint256, bool) {
         uint256 length = A.length;
         for (uint256 i; i < length; ) {
             if (A[i] == a) {

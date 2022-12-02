@@ -6,11 +6,14 @@ import "../../../RMRK/extension/soulbound/RMRKSoulbound.sol";
 import "../../RMRKMultiAssetMock.sol";
 
 contract RMRKSoulboundMultiAssetMock is RMRKSoulbound, RMRKMultiAssetMock {
-    constructor(string memory name, string memory symbol)
-        RMRKMultiAssetMock(name, symbol)
-    {}
+    constructor(
+        string memory name,
+        string memory symbol
+    ) RMRKMultiAssetMock(name, symbol) {}
 
-    function supportsInterface(bytes4 interfaceId)
+    function supportsInterface(
+        bytes4 interfaceId
+    )
         public
         view
         virtual

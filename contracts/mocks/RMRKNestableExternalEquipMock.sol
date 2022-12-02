@@ -6,19 +6,16 @@ import "../RMRK/equippable/RMRKNestableExternalEquip.sol";
 
 //Minimal public implementation of IRMRKNestable for testing.
 contract RMRKNestableExternalEquipMock is RMRKNestableExternalEquip {
-    constructor(string memory name_, string memory symbol_)
-        RMRKNestableExternalEquip(name_, symbol_)
-    {}
+    constructor(
+        string memory name_,
+        string memory symbol_
+    ) RMRKNestableExternalEquip(name_, symbol_) {}
 
     function safeMint(address to, uint256 tokenId) public {
         _safeMint(to, tokenId, "");
     }
 
-    function safeMint(
-        address to,
-        uint256 tokenId,
-        bytes memory _data
-    ) public {
+    function safeMint(address to, uint256 tokenId, bytes memory _data) public {
         _safeMint(to, tokenId, _data);
     }
 

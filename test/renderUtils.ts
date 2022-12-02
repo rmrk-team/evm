@@ -3,7 +3,11 @@ import { expect } from 'chai';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { ADDRESS_ZERO, bn, mintFromMock } from './utils';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { RMRKEquippableMock, RMRKEquipRenderUtils, RMRKMultiAssetRenderUtils } from "../typechain-types";
+import {
+  RMRKEquippableMock,
+  RMRKEquipRenderUtils,
+  RMRKMultiAssetRenderUtils,
+} from '../typechain-types';
 
 // --------------- FIXTURES -----------------------
 
@@ -12,13 +16,13 @@ async function assetsFixture() {
   const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiAssetRenderUtils');
   const renderUtilsEquipFactory = await ethers.getContractFactory('RMRKEquipRenderUtils');
 
-  const equip = <RMRKEquippableMock> await equipFactory.deploy('Chunky', 'CHNK');
+  const equip = <RMRKEquippableMock>await equipFactory.deploy('Chunky', 'CHNK');
   await equip.deployed();
 
-  const renderUtils = <RMRKMultiAssetRenderUtils> await renderUtilsFactory.deploy();
+  const renderUtils = <RMRKMultiAssetRenderUtils>await renderUtilsFactory.deploy();
   await renderUtils.deployed();
 
-  const renderUtilsEquip = <RMRKEquipRenderUtils> await renderUtilsEquipFactory.deploy();
+  const renderUtilsEquip = <RMRKEquipRenderUtils>await renderUtilsEquipFactory.deploy();
   await renderUtilsEquip.deployed();
 
   return { equip, renderUtils, renderUtilsEquip };

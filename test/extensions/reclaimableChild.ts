@@ -4,14 +4,14 @@ import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { ADDRESS_ZERO, bn, mintFromMock, nestMintFromMock } from '../utils';
 import { IERC165, IOtherInterface, IRMRKNestable, IRMRKReclaimableChild } from '../interfaces';
-import { RMRKNestableClaimableChildMock } from "../../typechain-types";
+import { RMRKNestableClaimableChildMock } from '../../typechain-types';
 
 // --------------- FIXTURES -----------------------
 
 async function reclaimableChildNestableFixture() {
   const factory = await ethers.getContractFactory('RMRKNestableClaimableChildMock');
-  const child = <RMRKNestableClaimableChildMock> await factory.deploy('Chunky', 'CHNK');
-  const parent = <RMRKNestableClaimableChildMock> await factory.deploy('Chunky', 'CHNK');
+  const child = <RMRKNestableClaimableChildMock>await factory.deploy('Chunky', 'CHNK');
+  const parent = <RMRKNestableClaimableChildMock>await factory.deploy('Chunky', 'CHNK');
   await parent.deployed();
   await child.deployed();
 

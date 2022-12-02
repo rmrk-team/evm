@@ -46,13 +46,9 @@ contract RMRKCore is IRMRKCore {
      * @param tokenId ID of the token to retrieve the metadata URI for
      * @return string Metadata URI of the specified token
      */
-    function tokenURI(uint256 tokenId)
-        public
-        view
-        virtual
-        override
-        returns (string memory)
-    {
+    function tokenURI(
+        uint256 tokenId
+    ) public view virtual override returns (string memory) {
         return "";
     }
 

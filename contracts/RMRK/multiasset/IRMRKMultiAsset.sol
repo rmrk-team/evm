@@ -152,8 +152,10 @@ interface IRMRKMultiAsset is IERC165 {
      * @param priorities An array of priorities of active assets. The succesion of items in the priorities array
      *  matches that of the succesion of items in the active array
      */
-    function setPriority(uint256 tokenId, uint16[] calldata priorities)
-        external;
+    function setPriority(
+        uint256 tokenId,
+        uint16[] calldata priorities
+    ) external;
 
     /**
      * @notice Used to retrieve IDs of the active assets of given token.
@@ -163,10 +165,9 @@ interface IRMRKMultiAsset is IERC165 {
      * @param tokenId ID of the token to retrieve the IDs of the active assets
      * @return uint64[] An array of active asset IDs of the given token
      */
-    function getActiveAssets(uint256 tokenId)
-        external
-        view
-        returns (uint64[] memory);
+    function getActiveAssets(
+        uint256 tokenId
+    ) external view returns (uint64[] memory);
 
     /**
      * @notice Used to retrieve IDs of the pending assets of given token.
@@ -175,10 +176,9 @@ interface IRMRKMultiAsset is IERC165 {
      * @param tokenId ID of the token to retrieve the IDs of the pending assets
      * @return uint64[] An array of pending asset IDs of the given token
      */
-    function getPendingAssets(uint256 tokenId)
-        external
-        view
-        returns (uint64[] memory);
+    function getPendingAssets(
+        uint256 tokenId
+    ) external view returns (uint64[] memory);
 
     /**
      * @notice Used to retrieve the priorities of the active resoources of a given token.
@@ -187,10 +187,9 @@ interface IRMRKMultiAsset is IERC165 {
      * @param tokenId ID of the token for which to retrieve the priorities of the active assets
      * @return uint16[] An array of priorities of the active assets of the given token
      */
-    function getActiveAssetPriorities(uint256 tokenId)
-        external
-        view
-        returns (uint16[] memory);
+    function getActiveAssetPriorities(
+        uint256 tokenId
+    ) external view returns (uint16[] memory);
 
     /**
      * @notice Used to retrieve the asset that will be replaced if a given asset from the token's pending array
@@ -201,10 +200,10 @@ interface IRMRKMultiAsset is IERC165 {
      * @param newAssetId ID of the pending asset which will be accepted
      * @return uint64 ID of the asset which will be replaced
      */
-    function getAssetReplacements(uint256 tokenId, uint64 newAssetId)
-        external
-        view
-        returns (uint64);
+    function getAssetReplacements(
+        uint256 tokenId,
+        uint64 newAssetId
+    ) external view returns (uint64);
 
     /**
      * @notice Used to fetch the asset metadata of the specified token's active asset with the given index.
@@ -215,10 +214,10 @@ interface IRMRKMultiAsset is IERC165 {
      * @return string The metadata of the asset belonging to the specified index in the token's active assets
      *  array
      */
-    function getAssetMetadata(uint256 tokenId, uint64 assetId)
-        external
-        view
-        returns (string memory);
+    function getAssetMetadata(
+        uint256 tokenId,
+        uint64 assetId
+    ) external view returns (string memory);
 
     // Approvals
 
@@ -245,10 +244,9 @@ interface IRMRKMultiAsset is IERC165 {
      * @param tokenId ID of the token for which to retrieve the approved address
      * @return address Address of the account that is approved to manage the specified token's assets
      */
-    function getApprovedForAssets(uint256 tokenId)
-        external
-        view
-        returns (address);
+    function getApprovedForAssets(
+        uint256 tokenId
+    ) external view returns (address);
 
     /**
      * @notice Used to add or remove an operator of assets for the caller.
@@ -262,8 +260,10 @@ interface IRMRKMultiAsset is IERC165 {
      * @param approved The boolean value indicating whether the operator role is being granted (`true`) or revoked
      *  (`false`)
      */
-    function setApprovalForAllForAssets(address operator, bool approved)
-        external;
+    function setApprovalForAllForAssets(
+        address operator,
+        bool approved
+    ) external;
 
     /**
      * @notice Used to check whether the address has been granted the operator role by a given address or not.
@@ -272,8 +272,8 @@ interface IRMRKMultiAsset is IERC165 {
      * @param operator Address of the account that we are checking whether it has the operator role or not
      * @return bool The boolean value indicating wehter the account we are checking has been granted the operator role
      */
-    function isApprovedForAllForAssets(address owner, address operator)
-        external
-        view
-        returns (bool);
+    function isApprovedForAllForAssets(
+        address owner,
+        address operator
+    ) external view returns (bool);
 }

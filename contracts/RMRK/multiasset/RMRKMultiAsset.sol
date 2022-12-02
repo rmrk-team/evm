@@ -69,12 +69,10 @@ contract RMRKMultiAsset is IERC165, IERC721, AbstractMultiAsset, RMRKCore {
      * @param tokenId ID of the token to query for permission for a given `user`
      * @return bool A boolean value indicating whether the user is approved to manage the token or not
      */
-    function _isApprovedForAssetsOrOwner(address user, uint256 tokenId)
-        internal
-        view
-        virtual
-        returns (bool)
-    {
+    function _isApprovedForAssetsOrOwner(
+        address user,
+        uint256 tokenId
+    ) internal view virtual returns (bool) {
         address owner = ownerOf(tokenId);
         return (user == owner ||
             isApprovedForAllForAssets(owner, user) ||
@@ -110,20 +108,18 @@ contract RMRKMultiAsset is IERC165, IERC721, AbstractMultiAsset, RMRKCore {
      * @param name_ Name of the token collection
      * @param symbol_ Symbol of the token collection
      */
-    constructor(string memory name_, string memory symbol_)
-        RMRKCore(name_, symbol_)
-    {}
+    constructor(
+        string memory name_,
+        string memory symbol_
+    ) RMRKCore(name_, symbol_) {}
 
     // ------------------------------- ERC721 ---------------------------------
     /**
      * @inheritdoc IERC165
      */
-    function supportsInterface(bytes4 interfaceId)
-        public
-        view
-        virtual
-        returns (bool)
-    {
+    function supportsInterface(
+        bytes4 interfaceId
+    ) public view virtual returns (bool) {
         return
             interfaceId == type(IERC165).interfaceId ||
             interfaceId == type(IERC721).interfaceId ||
@@ -164,12 +160,9 @@ contract RMRKMultiAsset is IERC165, IERC721, AbstractMultiAsset, RMRKCore {
     /**
      * @inheritdoc IERC721
      */
-    function getApproved(uint256 tokenId)
-        public
-        view
-        virtual
-        returns (address)
-    {
+    function getApproved(
+        uint256 tokenId
+    ) public view virtual returns (address) {
         _requireMinted(tokenId);
 
         return _tokenApprovals[tokenId];
@@ -185,12 +178,10 @@ contract RMRKMultiAsset is IERC165, IERC721, AbstractMultiAsset, RMRKCore {
     /**
      * @inheritdoc IERC721
      */
-    function isApprovedForAll(address owner, address operator)
-        public
-        view
-        virtual
-        returns (bool)
-    {
+    function isApprovedForAll(
+        address owner,
+        address operator
+    ) public view virtual returns (bool) {
         return _operatorApprovals[owner][operator];
     }
 
@@ -278,12 +269,10 @@ contract RMRKMultiAsset is IERC165, IERC721, AbstractMultiAsset, RMRKCore {
      * @param tokenId ID of the token being checked
      * @return bool The boolean value indicating whether the `spender` is approved to manage the given token
      */
-    function _isApprovedOrOwner(address spender, uint256 tokenId)
-        internal
-        view
-        virtual
-        returns (bool)
-    {
+    function _isApprovedOrOwner(
+        address spender,
+        uint256 tokenId
+    ) internal view virtual returns (bool) {
         address owner = ownerOf(tokenId);
         return (spender == owner ||
             isApprovedForAll(owner, spender) ||
@@ -529,11 +518,10 @@ contract RMRKMultiAsset is IERC165, IERC721, AbstractMultiAsset, RMRKCore {
      * @param maxRejections Maximum number of expected assets to reject, used to prevent from
      *  rejecting assets which arrive just before this operation.
      */
-    function rejectAllAssets(uint256 tokenId, uint256 maxRejections)
-        public
-        virtual
-        onlyApprovedForAssetsOrOwner(tokenId)
-    {
+    function rejectAllAssets(
+        uint256 tokenId,
+        uint256 maxRejections
+    ) public virtual onlyApprovedForAssetsOrOwner(tokenId) {
         _rejectAllAssets(tokenId, maxRejections);
     }
 
@@ -552,11 +540,10 @@ contract RMRKMultiAsset is IERC165, IERC721, AbstractMultiAsset, RMRKCore {
      * @param priorities An array of priorities of active assets. The succesion of items in the priorities array
      *  matches that of the succesion of items in the active array
      */
-    function setPriority(uint256 tokenId, uint16[] calldata priorities)
-        public
-        virtual
-        onlyApprovedForAssetsOrOwner(tokenId)
-    {
+    function setPriority(
+        uint256 tokenId,
+        uint16[] calldata priorities
+    ) public virtual onlyApprovedForAssetsOrOwner(tokenId) {
         _setPriority(tokenId, priorities);
     }
 
@@ -604,12 +591,9 @@ contract RMRKMultiAsset is IERC165, IERC721, AbstractMultiAsset, RMRKCore {
      * @param tokenId ID of the token for which to retrieve the approved address
      * @return address Address of the account that is approved to manage the specified token's assets
      */
-    function getApprovedForAssets(uint256 tokenId)
-        public
-        view
-        virtual
-        returns (address)
-    {
+    function getApprovedForAssets(
+        uint256 tokenId
+    ) public view virtual returns (address) {
         _requireMinted(tokenId);
         return _tokenApprovalsForAssets[tokenId];
     }

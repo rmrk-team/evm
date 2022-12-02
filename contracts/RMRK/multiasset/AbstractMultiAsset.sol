@@ -47,12 +47,10 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
      * @param assetId Asset Id, must be in the pending or active assets array
      * @return string Metadata of the asset
      */
-    function getAssetMetadata(uint256 tokenId, uint64 assetId)
-        public
-        view
-        virtual
-        returns (string memory)
-    {
+    function getAssetMetadata(
+        uint256 tokenId,
+        uint64 assetId
+    ) public view virtual returns (string memory) {
         if (!_tokenAssets[tokenId][assetId]) revert RMRKTokenDoesNotHaveAsset();
         return _assets[assetId];
     }
@@ -63,12 +61,9 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
      * @param tokenId ID of the token to query
      * @return uint64[] Array of active asset IDs
      */
-    function getActiveAssets(uint256 tokenId)
-        public
-        view
-        virtual
-        returns (uint64[] memory)
-    {
+    function getActiveAssets(
+        uint256 tokenId
+    ) public view virtual returns (uint64[] memory) {
         return _activeAssets[tokenId];
     }
 
@@ -78,12 +73,9 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
      * @param tokenId the token ID to query
      * @return uint64[] pending asset IDs
      */
-    function getPendingAssets(uint256 tokenId)
-        public
-        view
-        virtual
-        returns (uint64[] memory)
-    {
+    function getPendingAssets(
+        uint256 tokenId
+    ) public view virtual returns (uint64[] memory) {
         return _pendingAssets[tokenId];
     }
 
@@ -94,12 +86,9 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
      * @param tokenId ID of the token to query
      * @return uint16[] Array of active asset priorities
      */
-    function getActiveAssetPriorities(uint256 tokenId)
-        public
-        view
-        virtual
-        returns (uint16[] memory)
-    {
+    function getActiveAssetPriorities(
+        uint256 tokenId
+    ) public view virtual returns (uint16[] memory) {
         return _activeAssetPriorities[tokenId];
     }
 
@@ -110,12 +99,10 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
      * @param newAssetId ID of the pending asset which will be accepted
      * @return uint64 ID of the asset which will be replaced
      */
-    function getAssetReplacements(uint256 tokenId, uint64 newAssetId)
-        public
-        view
-        virtual
-        returns (uint64)
-    {
+    function getAssetReplacements(
+        uint256 tokenId,
+        uint64 newAssetId
+    ) public view virtual returns (uint64) {
         return _assetReplacements[tokenId][newAssetId];
     }
 
@@ -126,12 +113,10 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
      * @param operator Address of the account that we are checking whether it has the operator role or not
      * @return bool The boolean value indicating wehter the account we are checking has been granted the operator role
      */
-    function isApprovedForAllForAssets(address owner, address operator)
-        public
-        view
-        virtual
-        returns (bool)
-    {
+    function isApprovedForAllForAssets(
+        address owner,
+        address operator
+    ) public view virtual returns (bool) {
         return _operatorApprovalsForAssets[owner][operator];
     }
 
@@ -147,10 +132,10 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
      * @param approved The boolean value indicating whether the operator role is being granted (`true`) or revoked
      *  (`false`)
      */
-    function setApprovalForAllForAssets(address operator, bool approved)
-        public
-        virtual
-    {
+    function setApprovalForAllForAssets(
+        address operator,
+        bool approved
+    ) public virtual {
         address owner = _msgSender();
         if (owner == operator) revert RMRKApprovalForAssetsToCurrentOwner();
 
@@ -261,10 +246,10 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
      * @param maxRejections Maximum number of expected assets to reject, used to prevent from
      *  rejecting assets which arrive just before this operation.
      */
-    function _rejectAllAssets(uint256 tokenId, uint256 maxRejections)
-        internal
-        virtual
-    {
+    function _rejectAllAssets(
+        uint256 tokenId,
+        uint256 maxRejections
+    ) internal virtual {
         uint256 len = _pendingAssets[tokenId].length;
         if (len > maxRejections) revert RMRKUnexpectedNumberOfAssets();
 
@@ -292,10 +277,10 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
      * @param tokenId ID of the token for which the priorities are being set
      * @param priorities Array of priorities for the assets
      */
-    function _setPriority(uint256 tokenId, uint16[] calldata priorities)
-        internal
-        virtual
-    {
+    function _setPriority(
+        uint256 tokenId,
+        uint16[] calldata priorities
+    ) internal virtual {
         uint256 length = priorities.length;
         if (length != _activeAssets[tokenId].length)
             revert RMRKBadPriorityListLength();
@@ -313,10 +298,10 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
      * @param id ID of the asset to assign to the new asset
      * @param metadataURI Metadata URI of the asset
      */
-    function _addAssetEntry(uint64 id, string memory metadataURI)
-        internal
-        virtual
-    {
+    function _addAssetEntry(
+        uint64 id,
+        string memory metadataURI
+    ) internal virtual {
         if (id == uint64(0)) revert RMRKIdZeroForbidden();
         if (bytes(_assets[id]).length > 0) revert RMRKAssetAlreadyExists();
 
@@ -361,15 +346,15 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
         _afterAddAssetToToken(tokenId, assetId, replacesAssetWithId);
     }
 
-    function _beforeAddAsset(uint64 id, string memory metadataURI)
-        internal
-        virtual
-    {}
+    function _beforeAddAsset(
+        uint64 id,
+        string memory metadataURI
+    ) internal virtual {}
 
-    function _afterAddAsset(uint64 id, string memory metadataURI)
-        internal
-        virtual
-    {}
+    function _afterAddAsset(
+        uint64 id,
+        string memory metadataURI
+    ) internal virtual {}
 
     function _beforeAddAssetToToken(
         uint256 tokenId,
@@ -411,13 +396,13 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
 
     function _afterRejectAllAssets(uint256 tokenId) internal virtual {}
 
-    function _beforeSetPriority(uint256 tokenId, uint16[] calldata priorities)
-        internal
-        virtual
-    {}
+    function _beforeSetPriority(
+        uint256 tokenId,
+        uint16[] calldata priorities
+    ) internal virtual {}
 
-    function _afterSetPriority(uint256 tokenId, uint16[] calldata priorities)
-        internal
-        virtual
-    {}
+    function _afterSetPriority(
+        uint256 tokenId,
+        uint16[] calldata priorities
+    ) internal virtual {}
 }

@@ -35,9 +35,9 @@ abstract contract RMRKRoyalties is IERC2981 {
      *  beneficiary.
      * @param newRoyaltyRecipient Address of the new recipient of royalties
      */
-    function updateRoyaltyRecipient(address newRoyaltyRecipient)
-        external
-        virtual;
+    function updateRoyaltyRecipient(
+        address newRoyaltyRecipient
+    ) external virtual;
 
     /**
      * @notice Used to update the royalty recipient.
@@ -71,7 +71,10 @@ abstract contract RMRKRoyalties is IERC2981 {
      * @return receiver The beneficiary receiving royalties of the sale
      * @return royaltyAmount The value of the royalties recieved by the `receiver` from the sale
      */
-    function royaltyInfo(uint256 tokenId, uint256 salePrice)
+    function royaltyInfo(
+        uint256 tokenId,
+        uint256 salePrice
+    )
         external
         view
         virtual

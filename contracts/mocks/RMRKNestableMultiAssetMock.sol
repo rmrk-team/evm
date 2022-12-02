@@ -6,9 +6,10 @@ import "../RMRK/nestable/RMRKNestableMultiAsset.sol";
 
 //Minimal public implementation of RMRKNestableMultiAsset for testing.
 contract RMRKNestableMultiAssetMock is RMRKNestableMultiAsset {
-    constructor(string memory name, string memory symbol)
-        RMRKNestableMultiAsset(name, symbol)
-    {}
+    constructor(
+        string memory name,
+        string memory symbol
+    ) RMRKNestableMultiAsset(name, symbol) {}
 
     function mint(address to, uint256 tokenId) external {
         _mint(to, tokenId, "");
@@ -18,11 +19,7 @@ contract RMRKNestableMultiAssetMock is RMRKNestableMultiAsset {
         _safeMint(to, tokenId, "");
     }
 
-    function safeMint(
-        address to,
-        uint256 tokenId,
-        bytes memory _data
-    ) public {
+    function safeMint(address to, uint256 tokenId, bytes memory _data) public {
         _safeMint(to, tokenId, _data);
     }
 

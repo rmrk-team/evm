@@ -14,7 +14,7 @@ import {
   mintFromImpl,
   ONE_ETH,
 } from '../utils';
-import { RMRKEquippableImpl, RMRKMultiAssetRenderUtils } from "../../typechain-types";
+import { RMRKEquippableImpl, RMRKMultiAssetRenderUtils } from '../../typechain-types';
 
 // --------------- FIXTURES -----------------------
 
@@ -22,7 +22,7 @@ async function equipFixture() {
   const equipFactory = await ethers.getContractFactory('RMRKEquippableImpl');
   const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiAssetRenderUtils');
 
-  const equip = <RMRKEquippableImpl> await equipFactory.deploy(
+  const equip = <RMRKEquippableImpl>await equipFactory.deploy(
     'equipWithEquippable',
     'NWE',
     10000,
@@ -34,7 +34,7 @@ async function equipFixture() {
   );
   await equip.deployed();
 
-  const renderUtils = <RMRKMultiAssetRenderUtils> await renderUtilsFactory.deploy();
+  const renderUtils = <RMRKMultiAssetRenderUtils>await renderUtilsFactory.deploy();
   await renderUtils.deployed();
 
   return { equip, renderUtils };

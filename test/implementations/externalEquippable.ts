@@ -14,7 +14,7 @@ import {
   mintFromImpl,
   ONE_ETH,
 } from '../utils';
-import { RMRKExternalEquipImpl, RMRKNestableExternalEquipImpl } from "../../typechain-types";
+import { RMRKExternalEquipImpl, RMRKNestableExternalEquipImpl } from '../../typechain-types';
 
 // --------------- FIXTURES -----------------------
 
@@ -23,7 +23,7 @@ async function equipFixture() {
   const equipFactory = await ethers.getContractFactory('RMRKExternalEquipImpl');
   const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiAssetRenderUtils');
 
-  const nestable = <RMRKNestableExternalEquipImpl> await nestableFactory.deploy(
+  const nestable = <RMRKNestableExternalEquipImpl>await nestableFactory.deploy(
     'NestableWithEquippable',
     'NWE',
     10000,
@@ -36,7 +36,7 @@ async function equipFixture() {
   );
   await nestable.deployed();
 
-  const equip = <RMRKExternalEquipImpl> await equipFactory.deploy(nestable.address);
+  const equip = <RMRKExternalEquipImpl>await equipFactory.deploy(nestable.address);
   await equip.deployed();
 
   const renderUtils = await renderUtilsFactory.deploy();

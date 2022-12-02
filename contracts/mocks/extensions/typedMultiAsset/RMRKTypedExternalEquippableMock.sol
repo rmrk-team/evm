@@ -11,11 +11,13 @@ contract RMRKTypedExternalEquippableMock is
     RMRKExternalEquipMock,
     RMRKTypedMultiAsset
 {
-    constructor(address nestableAddress)
-        RMRKExternalEquipMock(nestableAddress)
-    {}
+    constructor(
+        address nestableAddress
+    ) RMRKExternalEquipMock(nestableAddress) {}
 
-    function supportsInterface(bytes4 interfaceId)
+    function supportsInterface(
+        bytes4 interfaceId
+    )
         public
         view
         virtual

@@ -11,11 +11,14 @@ contract RMRKNestableClaimableChildMock is
     RMRKNestableMock,
     RMRKReclaimableChild
 {
-    constructor(string memory name, string memory symbol)
-        RMRKNestableMock(name, symbol)
-    {}
+    constructor(
+        string memory name,
+        string memory symbol
+    ) RMRKNestableMock(name, symbol) {}
 
-    function supportsInterface(bytes4 interfaceId)
+    function supportsInterface(
+        bytes4 interfaceId
+    )
         public
         view
         virtual

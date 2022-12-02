@@ -21,20 +21,17 @@ import "../../RMRK/nestable/RMRKNestable.sol";
 contract RMRKNestableExternalEquip is IRMRKNestableExternalEquip, RMRKNestable {
     address private _equippableAddress;
 
-    constructor(string memory name_, string memory symbol_)
-        RMRKNestable(name_, symbol_)
-    {}
+    constructor(
+        string memory name_,
+        string memory symbol_
+    ) RMRKNestable(name_, symbol_) {}
 
     /**
      * @inheritdoc IERC165
      */
-    function supportsInterface(bytes4 interfaceId)
-        public
-        view
-        virtual
-        override(IERC165, RMRKNestable)
-        returns (bool)
-    {
+    function supportsInterface(
+        bytes4 interfaceId
+    ) public view virtual override(IERC165, RMRKNestable) returns (bool) {
         return
             interfaceId == type(IRMRKNestableExternalEquip).interfaceId ||
             super.supportsInterface(interfaceId);
@@ -114,12 +111,10 @@ contract RMRKNestableExternalEquip is IRMRKNestableExternalEquip, RMRKNestable {
      * @return bool A boolean value indicating whether the specified address is the owner of the given token or approved
      *  to manage it
      */
-    function isApprovedOrOwner(address spender, uint256 tokenId)
-        external
-        view
-        virtual
-        returns (bool)
-    {
+    function isApprovedOrOwner(
+        address spender,
+        uint256 tokenId
+    ) external view virtual returns (bool) {
         return _isApprovedOrOwner(spender, tokenId);
     }
 

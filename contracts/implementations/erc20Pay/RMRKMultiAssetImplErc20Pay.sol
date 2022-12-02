@@ -39,12 +39,10 @@ contract RMRKMultiAssetImplErc20Pay is
      * @param to Address to which to mint the token
      * @param numToMint Number of tokens to mint
      */
-    function mint(address to, uint256 numToMint)
-        public
-        virtual
-        saleIsOpen
-        notLocked
-    {
+    function mint(
+        address to,
+        uint256 numToMint
+    ) public virtual saleIsOpen notLocked {
         if (numToMint == uint256(0)) revert RMRKMintZero();
         if (numToMint + _totalSupply > _maxSupply) revert RMRKMintOverMax();
 

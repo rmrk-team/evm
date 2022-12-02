@@ -8,11 +8,14 @@ import "../../RMRKEquippableMock.sol";
 error RMRKTokenHasNoAssetsWithType();
 
 contract RMRKTypedEquippableMock is RMRKEquippableMock, RMRKTypedMultiAsset {
-    constructor(string memory name, string memory symbol)
-        RMRKEquippableMock(name, symbol)
-    {}
+    constructor(
+        string memory name,
+        string memory symbol
+    ) RMRKEquippableMock(name, symbol) {}
 
-    function supportsInterface(bytes4 interfaceId)
+    function supportsInterface(
+        bytes4 interfaceId
+    )
         public
         view
         virtual

@@ -11,7 +11,7 @@ pragma solidity ^0.8.16;
 interface IRMRKInitData {
     /**
      * @notice Used to provide initialization data without running into stack too deep errors.
-     * @return erc20TokenAddress Address of the ERC20 token to be used when initializing a smart contract that supports 
+     * @return erc20TokenAddress Address of the ERC20 token to be used when initializing a smart contract that supports
      *  ERC20 pay module
      * @return royaltyRecipient Recipient of resale royalties
      * @return royaltyPercentageBps The percentage to be paid from the sale of the token expressed in basis points

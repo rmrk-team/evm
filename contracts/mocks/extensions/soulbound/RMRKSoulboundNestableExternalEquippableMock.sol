@@ -9,11 +9,14 @@ contract RMRKSoulboundNestableExternalEquippableMock is
     RMRKSoulbound,
     RMRKNestableExternalEquipMock
 {
-    constructor(string memory name, string memory symbol)
-        RMRKNestableExternalEquipMock(name, symbol)
-    {}
+    constructor(
+        string memory name,
+        string memory symbol
+    ) RMRKNestableExternalEquipMock(name, symbol) {}
 
-    function supportsInterface(bytes4 interfaceId)
+    function supportsInterface(
+        bytes4 interfaceId
+    )
         public
         view
         virtual

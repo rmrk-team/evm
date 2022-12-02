@@ -2,11 +2,11 @@ import { expect } from 'chai';
 import { ethers } from 'hardhat';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import {RMRKNestableMock, ChildAdder} from '../typechain-types';
+import { RMRKNestableMock, ChildAdder } from '../typechain-types';
 
 async function nestableFixture() {
   const NestableFactory = await ethers.getContractFactory('RMRKNestableMock');
-  const parent = <RMRKNestableMock> await NestableFactory.deploy('Test', 'TST');
+  const parent = <RMRKNestableMock>await NestableFactory.deploy('Test', 'TST');
   await parent.deployed();
 
   return parent;
@@ -21,7 +21,7 @@ describe('Nestable with ChildAdder', function () {
     owner = (await ethers.getSigners())[0];
     parent = await loadFixture(nestableFixture);
     const Childadder = await ethers.getContractFactory('ChildAdder');
-    adder = <ChildAdder> await Childadder.deploy();
+    adder = <ChildAdder>await Childadder.deploy();
     await adder.deployed();
   });
 

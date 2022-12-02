@@ -32,8 +32,8 @@ interface IRMRKNestableExternalEquip is IERC165 {
      * @return bool A boolean value indicating whether the specified address is the owner of the given token or approved
      *  to manage it
      */
-    function isApprovedOrOwner(address spender, uint256 tokenId)
-        external
-        view
-        returns (bool);
+    function isApprovedOrOwner(
+        address spender,
+        uint256 tokenId
+    ) external view returns (bool);
 }

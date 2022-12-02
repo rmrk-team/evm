@@ -20,13 +20,9 @@ abstract contract RMRKReclaimableChild is IRMRKReclaimableChild, RMRKNestable {
     /**
      * @inheritdoc IERC165
      */
-    function supportsInterface(bytes4 interfaceId)
-        public
-        view
-        virtual
-        override(IERC165, RMRKNestable)
-        returns (bool)
-    {
+    function supportsInterface(
+        bytes4 interfaceId
+    ) public view virtual override(IERC165, RMRKNestable) returns (bool) {
         return
             RMRKNestable.supportsInterface(interfaceId) ||
             interfaceId == type(IRMRKReclaimableChild).interfaceId;

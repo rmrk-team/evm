@@ -53,13 +53,10 @@ contract RMRKNestableExternalEquipImpl is
      * @param to Address to which to mint the token
      * @param numToMint Number of tokens to mint
      */
-    function mint(address to, uint256 numToMint)
-        public
-        payable
-        virtual
-        notLocked
-        saleIsOpen
-    {
+    function mint(
+        address to,
+        uint256 numToMint
+    ) public payable virtual notLocked saleIsOpen {
         (uint256 nextToken, uint256 totalSupplyOffset) = _preMint(numToMint);
 
         for (uint256 i = nextToken; i < totalSupplyOffset; ) {
@@ -119,11 +116,9 @@ contract RMRKNestableExternalEquipImpl is
      * @notice Used to set the address of the `Equippable` smart contract.
      * @param equippable Address of the `Equippable` smart contract
      */
-    function setEquippableAddress(address equippable)
-        public
-        virtual
-        onlyOwnerOrContributor
-    {
+    function setEquippableAddress(
+        address equippable
+    ) public virtual onlyOwnerOrContributor {
         //TODO: should we add a check if passed address supports IRMRKNestableExternalEquip
         _setEquippableAddress(equippable);
     }
@@ -133,25 +128,18 @@ contract RMRKNestableExternalEquipImpl is
      * @param tokenId ID of the token to retrieve the metadata URI for
      * @return string Metadata URI of the specified token
      */
-    function tokenURI(uint256 tokenId)
-        public
-        view
-        virtual
-        override
-        returns (string memory)
-    {
+    function tokenURI(
+        uint256 tokenId
+    ) public view virtual override returns (string memory) {
         return _tokenURI;
     }
 
     /**
      * @inheritdoc RMRKRoyalties
      */
-    function updateRoyaltyRecipient(address newRoyaltyRecipient)
-        public
-        virtual
-        override
-        onlyOwner
-    {
+    function updateRoyaltyRecipient(
+        address newRoyaltyRecipient
+    ) public virtual override onlyOwner {
         _setRoyaltyRecipient(newRoyaltyRecipient);
     }
 }

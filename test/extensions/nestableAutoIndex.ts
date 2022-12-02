@@ -4,7 +4,7 @@ import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { bn } from '../utils';
 import { IERC165, IRMRKNestable, IRMRKNestableAutoIndex, IOtherInterface } from '../interfaces';
-import { RMRKNestableAutoIndexMock } from "../../typechain-types";
+import { RMRKNestableAutoIndexMock } from '../../typechain-types';
 
 // --------------- FIXTURES -----------------------
 
