@@ -16,13 +16,14 @@ import {
 import shouldBehaveLikeNestable from './behavior/nestable';
 import shouldBehaveLikeMultiAsset from './behavior/multiasset';
 import shouldBehaveLikeERC721 from './behavior/erc721';
+import { RMRKMultiAssetRenderUtils, RMRKNestableMultiAssetMock } from "../typechain-types";
 
-async function singleFixture(): Promise<{ token: Contract; renderUtils: Contract }> {
+async function singleFixture(): Promise<{ token: RMRKNestableMultiAssetMock; renderUtils: RMRKMultiAssetRenderUtils }> {
   const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiAssetRenderUtils');
-  const renderUtils = await renderUtilsFactory.deploy();
+  const renderUtils = <RMRKMultiAssetRenderUtils> await renderUtilsFactory.deploy();
   await renderUtils.deployed();
 
-  const token = await singleFixtureWithArgs('RMRKNestableMultiAssetMock', [
+  const token = <RMRKNestableMultiAssetMock> await singleFixtureWithArgs('RMRKNestableMultiAssetMock', [
     'NestableMultiAsset',
     'NMR',
   ]);
@@ -58,7 +59,7 @@ describe('NestableMultiAssetMock MR behavior', async () => {
 });
 
 describe('NestableMultiAssetMock ERC721 behavior', function () {
-  let token: Contract;
+  let token: RMRKNestableMultiAssetMock;
 
   beforeEach(async function () {
     ({ token } = await loadFixture(singleFixture));
@@ -71,7 +72,7 @@ describe('NestableMultiAssetMock ERC721 behavior', function () {
 
 describe('NestableMultiAssetMock Other Behavior', function () {
   let addrs: SignerWithAddress[];
-  let token: Contract;
+  let token: RMRKNestableMultiAssetMock;
 
   beforeEach(async function () {
     const [, ...signersAddr] = await ethers.getSigners();
@@ -87,7 +88,7 @@ describe('NestableMultiAssetMock Other Behavior', function () {
       const tokenOwner = addrs[1];
       const newOwner = addrs[2];
       const approved = addrs[3];
-      await token['mint(address,uint256)'](tokenOwner.address, tokenId);
+      await token.mint(tokenOwner.address, tokenId);
       await token.connect(tokenOwner).approve(approved.address, tokenId);
       await token.connect(tokenOwner).approveForAssets(approved.address, tokenId);
 
@@ -104,7 +105,7 @@ describe('NestableMultiAssetMock Other Behavior', function () {
       const tokenId = 1;
       const tokenOwner = addrs[1];
       const approved = addrs[3];
-      await token['mint(address,uint256)'](tokenOwner.address, tokenId);
+      await token.mint(tokenOwner.address, tokenId);
       await token.connect(tokenOwner).approve(approved.address, tokenId);
       await token.connect(tokenOwner).approveForAssets(approved.address, tokenId);
 
