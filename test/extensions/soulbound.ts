@@ -5,6 +5,7 @@ import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { bn, mintFromMock, nestMintFromMock } from '../utils';
 import { IERC165, IRMRKSoulboundMultiAsset, IOtherInterface } from '../interfaces';
+import { RMRKSemiSoulboundNestableMock } from "../../typechain-types";
 
 // --------------- FIXTURES -----------------------
 
@@ -106,7 +107,7 @@ describe('RMRKSoulboundNestableExternalEquippableMock', async function () {
 });
 
 describe('RMRKSoulbound exempt', async function () {
-  let token: Contract;
+  let token: RMRKSemiSoulboundNestableMock;
   let owner: SignerWithAddress;
   let otherOwner: SignerWithAddress;
 
@@ -115,7 +116,7 @@ describe('RMRKSoulbound exempt', async function () {
     owner = signers[0];
     otherOwner = signers[1];
     const factory = await ethers.getContractFactory('RMRKSemiSoulboundNestableMock');
-    token = await factory.deploy('Chunky', 'CHNK');
+    token = <RMRKSemiSoulboundNestableMock> await factory.deploy('Chunky', 'CHNK');
     await token.deployed();
   });
 

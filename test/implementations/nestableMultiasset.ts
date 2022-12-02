@@ -20,13 +20,14 @@ import {
   singleFixtureWithArgs,
   transfer,
 } from '../utils';
+import { RMRKMultiAssetRenderUtils, RMRKNestableMultiAssetImpl } from "../../typechain-types";
 
-async function singleFixture(): Promise<{ token: Contract; renderUtils: Contract }> {
+async function singleFixture(): Promise<{ token: RMRKNestableMultiAssetImpl; renderUtils: Contract }> {
   const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiAssetRenderUtils');
-  const renderUtils = await renderUtilsFactory.deploy();
+  const renderUtils = <RMRKMultiAssetRenderUtils> await renderUtilsFactory.deploy();
   await renderUtils.deployed();
 
-  const token = await singleFixtureWithArgs('RMRKNestableMultiAssetImpl', [
+  const token = <RMRKNestableMultiAssetImpl> await singleFixtureWithArgs('RMRKNestableMultiAssetImpl', [
     'NestableMultiAsset',
     'NMR',
     10000,
@@ -87,7 +88,7 @@ describe('NestableMultiAssetImpl MR behavior', async () => {
 
 describe('NestableMultiAssetImpl Other Behavior', function () {
   let addrs: SignerWithAddress[];
-  let token: Contract;
+  let token: RMRKNestableMultiAssetImpl;
 
   beforeEach(async function () {
     const [, ...signersAddr] = await ethers.getSigners();
@@ -109,9 +110,7 @@ describe('NestableMultiAssetImpl Other Behavior', function () {
       expect(await token.getApproved(tokenId)).to.eql(approved.address);
       expect(await token.getApprovedForAssets(tokenId)).to.eql(approved.address);
 
-      await token
-        .connect(tokenOwner)
-        ['transferFrom(address,address,uint256)'](tokenOwner.address, newOwner.address, tokenId);
+      await token.connect(tokenOwner).transferFrom(tokenOwner.address, newOwner.address, tokenId);
 
       expect(await token.getApproved(tokenId)).to.eql(ethers.constants.AddressZero);
       expect(await token.getApprovedForAssets(tokenId)).to.eql(ethers.constants.AddressZero);
@@ -142,7 +141,7 @@ describe('NestableMultiAssetImpl Other Behavior', function () {
 });
 
 describe('NestableMultiAssetImpl Other', async function () {
-  let nesting: Contract;
+  let nesting: RMRKNestableMultiAssetImpl;
   let owner: SignerWithAddress;
 
   beforeEach(async function () {

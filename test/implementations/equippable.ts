@@ -14,6 +14,7 @@ import {
   mintFromImpl,
   ONE_ETH,
 } from '../utils';
+import { RMRKEquippableImpl, RMRKMultiAssetRenderUtils } from "../../typechain-types";
 
 // --------------- FIXTURES -----------------------
 
@@ -21,7 +22,7 @@ async function equipFixture() {
   const equipFactory = await ethers.getContractFactory('RMRKEquippableImpl');
   const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiAssetRenderUtils');
 
-  const equip = await equipFactory.deploy(
+  const equip = <RMRKEquippableImpl> await equipFactory.deploy(
     'equipWithEquippable',
     'NWE',
     10000,
@@ -33,7 +34,7 @@ async function equipFixture() {
   );
   await equip.deployed();
 
-  const renderUtils = await renderUtilsFactory.deploy();
+  const renderUtils = <RMRKMultiAssetRenderUtils> await renderUtilsFactory.deploy();
   await renderUtils.deployed();
 
   return { equip, renderUtils };
@@ -44,8 +45,8 @@ async function equipFixture() {
 // --------------- MULTI ASSET BEHAVIOR -----------------------
 
 describe('RMRKEquippableImpl MR behavior', async () => {
-  let equip: Contract;
-  let renderUtils: Contract;
+  let equip: RMRKEquippableImpl;
+  let renderUtils: RMRKMultiAssetRenderUtils;
 
   beforeEach(async function () {
     ({ equip, renderUtils } = await loadFixture(equipFixture));
@@ -55,7 +56,7 @@ describe('RMRKEquippableImpl MR behavior', async () => {
 
   async function mintToNestable(token: Contract, to: string): Promise<number> {
     await equip.mint(to, 1, { value: ONE_ETH });
-    return await equip.totalSupply();
+    return (await equip.totalSupply()).toNumber();
   }
 
   shouldBehaveLikeMultiAsset(mintToNestable, addAssetEntryEquippablesFromImpl, addAssetToToken);
@@ -64,7 +65,7 @@ describe('RMRKEquippableImpl MR behavior', async () => {
 // --------------- MULTI ASSET BEHAVIOR END ------------------------
 
 describe('RMRKEquippableImpl Other', async function () {
-  let equip: Contract;
+  let equip: RMRKEquippableImpl;
   let owner: SignerWithAddress;
 
   beforeEach(async function () {

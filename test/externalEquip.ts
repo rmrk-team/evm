@@ -1,65 +1,71 @@
-import { Contract } from 'ethers';
-import { ethers } from 'hardhat';
-import { expect } from 'chai';
-import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
+import { Contract } from "ethers";
+import { ethers } from "hardhat";
+import { expect } from "chai";
+import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import {
   addAssetToToken,
   mintFromMock,
   nestMintFromMock,
-  addAssetEntryEquippablesFromMock,
-} from './utils';
-import { setupContextForParts } from './setup/equippableParts';
-import { setupContextForSlots } from './setup/equippableSlots';
-import shouldBehaveLikeEquippableAssets from './behavior/equippableAssets';
-import shouldBehaveLikeEquippableWithParts from './behavior/equippableParts';
-import shouldBehaveLikeEquippableWithSlots from './behavior/equippableSlots';
-import shouldBehaveLikeMultiAsset from './behavior/multiasset';
+  addAssetEntryEquippablesFromMock
+} from "./utils";
+import { setupContextForParts } from "./setup/equippableParts";
+import { setupContextForSlots } from "./setup/equippableSlots";
+import shouldBehaveLikeEquippableAssets from "./behavior/equippableAssets";
+import shouldBehaveLikeEquippableWithParts from "./behavior/equippableParts";
+import shouldBehaveLikeEquippableWithSlots from "./behavior/equippableSlots";
+import shouldBehaveLikeMultiAsset from "./behavior/multiasset";
+import {
+  RMRKBaseStorageMock,
+  RMRKEquipRenderUtils,
+  RMRKExternalEquipMock, RMRKMultiAssetRenderUtils,
+  RMRKNestableExternalEquipMock
+} from "../typechain-types";
 
 // --------------- FIXTURES -----------------------
 
 async function partsFixture() {
-  const baseSymbol = 'NCB';
-  const baseType = 'mixed';
+  const baseSymbol = "NCB";
+  const baseType = "mixed";
 
-  const neonName = 'NeonCrisis';
-  const neonSymbol = 'NC';
+  const neonName = "NeonCrisis";
+  const neonSymbol = "NC";
 
-  const maskName = 'NeonMask';
-  const maskSymbol = 'NM';
+  const maskName = "NeonMask";
+  const maskSymbol = "NM";
 
-  const baseFactory = await ethers.getContractFactory('RMRKBaseStorageMock');
-  const nestableFactory = await ethers.getContractFactory('RMRKNestableExternalEquipMock');
-  const equipFactory = await ethers.getContractFactory('RMRKExternalEquipMock');
-  const viewFactory = await ethers.getContractFactory('RMRKEquipRenderUtils');
+  const baseFactory = await ethers.getContractFactory("RMRKBaseStorageMock");
+  const nestableFactory = await ethers.getContractFactory("RMRKNestableExternalEquipMock");
+  const equipFactory = await ethers.getContractFactory("RMRKExternalEquipMock");
+  const viewFactory = await ethers.getContractFactory("RMRKEquipRenderUtils");
 
   // Base
-  const base = await baseFactory.deploy(baseSymbol, baseType);
+  const base = <RMRKBaseStorageMock>await baseFactory.deploy(baseSymbol, baseType);
   await base.deployed();
 
   // Neon token
-  const neon = await nestableFactory.deploy(neonName, neonSymbol);
+  const neon = <RMRKNestableExternalEquipMock>await nestableFactory.deploy(neonName, neonSymbol);
   await neon.deployed();
 
   // Neon Equip
 
-  const neonEquip = await equipFactory.deploy(neon.address);
+  const neonEquip = <RMRKExternalEquipMock>await equipFactory.deploy(neon.address);
   await neonEquip.deployed();
 
   // View contract
-  const view = await viewFactory.deploy();
+  const view = <RMRKEquipRenderUtils>await viewFactory.deploy();
   await view.deployed();
 
   // Link nestable and equippable:
-  neonEquip.setNestableAddress(neon.address);
-  neon.setEquippableAddress(neonEquip.address);
+  await neonEquip.setNestableAddress(neon.address);
+  await neon.setEquippableAddress(neonEquip.address);
   // Weapon
   const mask = await nestableFactory.deploy(maskName, maskSymbol);
   await mask.deployed();
   const maskEquip = await equipFactory.deploy(mask.address);
   await maskEquip.deployed();
   // Link nestable and equippable:
-  maskEquip.setNestableAddress(mask.address);
-  mask.setEquippableAddress(maskEquip.address);
+  await maskEquip.setNestableAddress(mask.address);
+  await mask.setEquippableAddress(maskEquip.address);
 
   await setupContextForParts(
     base,
@@ -68,49 +74,49 @@ async function partsFixture() {
     mask,
     maskEquip,
     mintFromMock,
-    nestMintFromMock,
+    nestMintFromMock
   );
   return { base, neon, neonEquip, mask, maskEquip, view };
 }
 
 async function slotsFixture() {
-  const baseSymbol = 'SSB';
-  const baseType = 'mixed';
+  const baseSymbol = "SSB";
+  const baseType = "mixed";
 
-  const soldierName = 'SnakeSoldier';
-  const soldierSymbol = 'SS';
+  const soldierName = "SnakeSoldier";
+  const soldierSymbol = "SS";
 
-  const weaponName = 'SnakeWeapon';
-  const weaponSymbol = 'SW';
+  const weaponName = "SnakeWeapon";
+  const weaponSymbol = "SW";
 
-  const weaponGemName = 'SnakeWeaponGem';
-  const weaponGemSymbol = 'SWG';
+  const weaponGemName = "SnakeWeaponGem";
+  const weaponGemSymbol = "SWG";
 
-  const backgroundName = 'SnakeBackground';
-  const backgroundSymbol = 'SB';
+  const backgroundName = "SnakeBackground";
+  const backgroundSymbol = "SB";
 
-  const baseFactory = await ethers.getContractFactory('RMRKBaseStorageMock');
-  const nestableFactory = await ethers.getContractFactory('RMRKNestableExternalEquipMock');
-  const equipFactory = await ethers.getContractFactory('RMRKExternalEquipMock');
-  const viewFactory = await ethers.getContractFactory('RMRKEquipRenderUtils');
+  const baseFactory = await ethers.getContractFactory("RMRKBaseStorageMock");
+  const nestableFactory = await ethers.getContractFactory("RMRKNestableExternalEquipMock");
+  const equipFactory = await ethers.getContractFactory("RMRKExternalEquipMock");
+  const viewFactory = await ethers.getContractFactory("RMRKEquipRenderUtils");
 
   // View
   const view = await viewFactory.deploy();
   await view.deployed();
 
   // Base
-  const base = await baseFactory.deploy(baseSymbol, baseType);
+  const base = <RMRKBaseStorageMock>await baseFactory.deploy(baseSymbol, baseType);
   await base.deployed();
 
   // Soldier token
-  const soldier = await nestableFactory.deploy(soldierName, soldierSymbol);
+  const soldier = <RMRKNestableExternalEquipMock>await nestableFactory.deploy(soldierName, soldierSymbol);
   await soldier.deployed();
-  const soldierEquip = await equipFactory.deploy(soldier.address);
+  const soldierEquip = <RMRKExternalEquipMock>await equipFactory.deploy(soldier.address);
   await soldierEquip.deployed();
 
   // Link nestable and equippable:
-  soldierEquip.setNestableAddress(soldier.address);
-  soldier.setEquippableAddress(soldierEquip.address);
+  await soldierEquip.setNestableAddress(soldier.address);
+  await soldier.setEquippableAddress(soldierEquip.address);
 
   // Weapon
   const weapon = await nestableFactory.deploy(weaponName, weaponSymbol);
@@ -118,8 +124,8 @@ async function slotsFixture() {
   const weaponEquip = await equipFactory.deploy(weapon.address);
   await weaponEquip.deployed();
   // Link nestable and equippable:
-  weaponEquip.setNestableAddress(weapon.address);
-  weapon.setEquippableAddress(weaponEquip.address);
+  await weaponEquip.setNestableAddress(weapon.address);
+  await weapon.setEquippableAddress(weaponEquip.address);
 
   // Weapon Gem
   const weaponGem = await nestableFactory.deploy(weaponGemName, weaponGemSymbol);
@@ -127,8 +133,8 @@ async function slotsFixture() {
   const weaponGemEquip = await equipFactory.deploy(weaponGem.address);
   await weaponGemEquip.deployed();
   // Link nestable and equippable:
-  weaponGemEquip.setNestableAddress(weaponGem.address);
-  weaponGem.setEquippableAddress(weaponGemEquip.address);
+  await weaponGemEquip.setNestableAddress(weaponGem.address);
+  await weaponGem.setEquippableAddress(weaponGemEquip.address);
 
   // Background
   const background = await nestableFactory.deploy(backgroundName, backgroundSymbol);
@@ -136,8 +142,8 @@ async function slotsFixture() {
   const backgroundEquip = await equipFactory.deploy(background.address);
   await backgroundEquip.deployed();
   // Link nestable and equippable:
-  backgroundEquip.setNestableAddress(background.address);
-  background.setEquippableAddress(backgroundEquip.address);
+  await backgroundEquip.setNestableAddress(background.address);
+  await background.setEquippableAddress(backgroundEquip.address);
 
   await setupContextForSlots(
     base,
@@ -150,7 +156,7 @@ async function slotsFixture() {
     background,
     backgroundEquip,
     mintFromMock,
-    nestMintFromMock,
+    nestMintFromMock
   );
 
   return {
@@ -163,16 +169,16 @@ async function slotsFixture() {
     weaponGemEquip,
     background,
     backgroundEquip,
-    view,
+    view
   };
 }
 
 async function assetsFixture() {
-  const Nestable = await ethers.getContractFactory('RMRKNestableExternalEquipMock');
-  const Equip = await ethers.getContractFactory('RMRKExternalEquipMock');
-  const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiAssetRenderUtils');
+  const Nestable = await ethers.getContractFactory("RMRKNestableExternalEquipMock");
+  const Equip = await ethers.getContractFactory("RMRKExternalEquipMock");
+  const renderUtilsFactory = await ethers.getContractFactory("RMRKMultiAssetRenderUtils");
 
-  const nestable = await Nestable.deploy('Chunky', 'CHNK');
+  const nestable = await Nestable.deploy("Chunky", "CHNK");
   await nestable.deployed();
 
   const equip = await Equip.deploy(nestable.address);
@@ -187,17 +193,17 @@ async function assetsFixture() {
 }
 
 async function multiAssetFixture() {
-  const NestableFactory = await ethers.getContractFactory('RMRKNestableExternalEquipMock');
-  const EquipFactory = await ethers.getContractFactory('RMRKExternalEquipMock');
-  const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiAssetRenderUtils');
+  const NestableFactory = await ethers.getContractFactory("RMRKNestableExternalEquipMock");
+  const EquipFactory = await ethers.getContractFactory("RMRKExternalEquipMock");
+  const renderUtilsFactory = await ethers.getContractFactory("RMRKMultiAssetRenderUtils");
 
-  const nestable = await NestableFactory.deploy('NestableWithEquippable', 'NWE');
+  const nestable = <RMRKNestableExternalEquipMock>await NestableFactory.deploy("NestableWithEquippable", "NWE");
   await nestable.deployed();
 
-  const equip = await EquipFactory.deploy(nestable.address);
+  const equip = <RMRKExternalEquipMock>await EquipFactory.deploy(nestable.address);
   await equip.deployed();
 
-  const renderUtils = await renderUtilsFactory.deploy();
+  const renderUtils = <RMRKMultiAssetRenderUtils>await renderUtilsFactory.deploy();
   await renderUtils.deployed();
 
   await nestable.setEquippableAddress(equip.address);
@@ -209,8 +215,8 @@ async function multiAssetFixture() {
 
 // --------------- EQUIPPABLE BEHAVIOR -----------------------
 
-describe('ExternalEquippableMock with Parts', async () => {
-  beforeEach(async function () {
+describe("ExternalEquippableMock with Parts", async () => {
+  beforeEach(async function() {
     const { base, neon, neonEquip, mask, maskEquip, view } = await loadFixture(partsFixture);
 
     this.base = base;
@@ -224,8 +230,8 @@ describe('ExternalEquippableMock with Parts', async () => {
   shouldBehaveLikeEquippableWithParts();
 });
 
-describe('ExternalEquippableMock with Slots', async () => {
-  beforeEach(async function () {
+describe("ExternalEquippableMock with Slots", async () => {
+  beforeEach(async function() {
     const {
       base,
       soldier,
@@ -236,7 +242,7 @@ describe('ExternalEquippableMock with Slots', async () => {
       weaponGemEquip,
       background,
       backgroundEquip,
-      view,
+      view
     } = await loadFixture(slotsFixture);
 
     this.base = base;
@@ -254,38 +260,38 @@ describe('ExternalEquippableMock with Slots', async () => {
   shouldBehaveLikeEquippableWithSlots(nestMintFromMock);
 });
 
-describe('ExternalEquippableMock Assets', async () => {
+describe("ExternalEquippableMock Assets", async () => {
   let nextTokenId = 1;
-  let nestable: Contract;
-  let equip: Contract;
-  let renderUtils: Contract;
+  let nestable: RMRKNestableExternalEquipMock;
+  let equip: RMRKExternalEquipMock;
+  let renderUtils: RMRKMultiAssetRenderUtils;
 
-  beforeEach(async function () {
+  beforeEach(async function() {
     ({ nestable, equip, renderUtils } = await loadFixture(assetsFixture));
     this.nestable = nestable;
     this.equip = equip;
     this.renderUtils = renderUtils;
   });
 
-  describe('Init', async function () {
-    it('can get names and symbols', async function () {
-      expect(await this.nestable.name()).to.equal('Chunky');
-      expect(await this.nestable.symbol()).to.equal('CHNK');
+  describe("Init", async function() {
+    it("can get names and symbols", async function() {
+      expect(await this.nestable.name()).to.equal("Chunky");
+      expect(await this.nestable.symbol()).to.equal("CHNK");
     });
   });
 
-  describe('Linking', async function () {
-    it('can set nestable/equippable addresses', async function () {
+  describe("Linking", async function() {
+    it("can set nestable/equippable addresses", async function() {
       expect(await this.nestable.setEquippableAddress(ethers.constants.AddressZero))
-        .to.emit(this.nestable, 'EquippableAddressSet')
+        .to.emit(this.nestable, "EquippableAddressSet")
         .withArgs(this.equip.address, ethers.constants.AddressZero);
 
       expect(await this.equip.setNestableAddress(ethers.constants.AddressZero))
-        .to.emit(this.equip, 'EquippableAddressSet')
+        .to.emit(this.equip, "EquippableAddressSet")
         .withArgs(this.nestable.address, ethers.constants.AddressZero);
     });
 
-    it('can get nestable address', async function () {
+    it("can get nestable address", async function() {
       expect(await this.equip.getNestableAddress()).to.eql(this.nestable.address);
       expect(await this.nestable.getEquippableAddress()).to.eql(this.equip.address);
     });
@@ -295,7 +301,7 @@ describe('ExternalEquippableMock Assets', async () => {
   async function mintToNestable(token: Contract, to: string): Promise<number> {
     const tokenId = nextTokenId;
     nextTokenId++;
-    await nestable['mint(address,uint256)'](to, tokenId);
+    await nestable.mint(to, tokenId);
     return tokenId;
   }
 
@@ -306,13 +312,13 @@ describe('ExternalEquippableMock Assets', async () => {
 
 // --------------- MULTI ASSET BEHAVIOR -----------------------
 
-describe('ExternalEquippableMock MR behavior', async () => {
+describe("ExternalEquippableMock MR behavior", async () => {
   let nextTokenId = 1;
-  let nestable: Contract;
-  let equip: Contract;
-  let renderUtils: Contract;
+  let nestable: RMRKNestableExternalEquipMock;
+  let equip: RMRKExternalEquipMock;
+  let renderUtils: RMRKMultiAssetRenderUtils;
 
-  beforeEach(async function () {
+  beforeEach(async function() {
     ({ nestable, equip, renderUtils } = await loadFixture(multiAssetFixture));
     this.token = equip;
     this.renderUtils = renderUtils;
@@ -322,7 +328,7 @@ describe('ExternalEquippableMock MR behavior', async () => {
   async function mintToNestable(token: Contract, to: string): Promise<number> {
     const tokenId = nextTokenId;
     nextTokenId++;
-    await nestable['mint(address,uint256)'](to, tokenId);
+    await nestable.mint(to, tokenId);
     return tokenId;
   }
 

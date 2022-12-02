@@ -17,11 +17,11 @@ import {
   singleFixtureWithArgs,
 } from '../utils';
 import { IERC721 } from '../interfaces';
-import { RMRKMultiAssetImpl } from '../../typechain-types';
+import { RMRKMultiAssetImpl, RMRKMultiAssetRenderUtils } from "../../typechain-types";
 
 async function singleFixture(): Promise<{ token: RMRKMultiAssetImpl; renderUtils: Contract }> {
   const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiAssetRenderUtils');
-  const renderUtils = await renderUtilsFactory.deploy();
+  const renderUtils = <RMRKMultiAssetRenderUtils> await renderUtilsFactory.deploy();
   await renderUtils.deployed();
 
   const token = <RMRKMultiAssetImpl>await singleFixtureWithArgs('RMRKMultiAssetImpl', [

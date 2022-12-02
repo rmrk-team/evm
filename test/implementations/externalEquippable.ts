@@ -14,6 +14,7 @@ import {
   mintFromImpl,
   ONE_ETH,
 } from '../utils';
+import { RMRKExternalEquipImpl, RMRKNestableExternalEquipImpl } from "../../typechain-types";
 
 // --------------- FIXTURES -----------------------
 
@@ -22,7 +23,7 @@ async function equipFixture() {
   const equipFactory = await ethers.getContractFactory('RMRKExternalEquipImpl');
   const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiAssetRenderUtils');
 
-  const nestable = await nestableFactory.deploy(
+  const nestable = <RMRKNestableExternalEquipImpl> await nestableFactory.deploy(
     'NestableWithEquippable',
     'NWE',
     10000,
@@ -35,7 +36,7 @@ async function equipFixture() {
   );
   await nestable.deployed();
 
-  const equip = await equipFactory.deploy(nestable.address);
+  const equip = <RMRKExternalEquipImpl> await equipFactory.deploy(nestable.address);
   await equip.deployed();
 
   const renderUtils = await renderUtilsFactory.deploy();
@@ -51,8 +52,8 @@ async function equipFixture() {
 // --------------- MULTI ASSET BEHAVIOR -----------------------
 
 describe('ExternalEquippableImpl MR behavior', async () => {
-  let nestable: Contract;
-  let equip: Contract;
+  let nestable: RMRKNestableExternalEquipImpl;
+  let equip: RMRKExternalEquipImpl;
   let renderUtils: Contract;
 
   beforeEach(async function () {
@@ -64,7 +65,7 @@ describe('ExternalEquippableImpl MR behavior', async () => {
   // Mint needs to happen on the nestable contract, but the MR behavior happens on the equip one.
   async function mintToNestable(token: Contract, to: string): Promise<number> {
     await nestable.mint(to, 1, { value: ONE_ETH });
-    return await nestable.totalSupply();
+    return (await nestable.totalSupply()).toNumber();
   }
 
   shouldBehaveLikeMultiAsset(mintToNestable, addAssetEntryEquippablesFromImpl, addAssetToToken);
@@ -73,8 +74,8 @@ describe('ExternalEquippableImpl MR behavior', async () => {
 // --------------- MULTI ASSET BEHAVIOR END ------------------------
 
 describe('ExternalEquippableImpl Other', async function () {
-  let nestable: Contract;
-  let equip: Contract;
+  let nestable: RMRKNestableExternalEquipImpl;
+  let equip: RMRKExternalEquipImpl;
   let owner: SignerWithAddress;
 
   beforeEach(async function () {

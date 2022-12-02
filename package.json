@@ -11,6 +11,9 @@
     "typechain": "hardhat typechain",
     "prettier": "prettier --write ."
   },
+  "engines": {
+    "node": ">=16.0.0"
+  },
   "dependencies": {
     "@openzeppelin/contracts": "^4.6.0"
   },
@@ -34,7 +37,7 @@
     "eslint-config-prettier": "^8.5.0",
     "eslint-config-standard": "^17.0.0",
     "eslint-plugin-import": "^2.26.0",
-    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-n": "^15.5.1",
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-promise": "^6.1.1",
     "ethers": "^5.7.2",
