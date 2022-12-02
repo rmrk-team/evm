@@ -139,7 +139,10 @@ interface IRMRKEquippable is IRMRKMultiAsset {
      * @notice Used to get the asset and equippable data associated with given `assetId`.
      * @param assetId ID of the asset of which we are retrieving
      */
-    function getAssetAndEquippableData(uint256 tokenId, uint64 assetId)
+    function getAssetAndEquippableData(
+        uint256 tokenId,
+        uint64 assetId
+    )
         external
         view
         returns (

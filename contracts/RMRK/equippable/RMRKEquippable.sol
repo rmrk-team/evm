@@ -81,20 +81,17 @@ contract RMRKEquippable is
     /**
      * @dev Initializes the contract by setting a `name` and a `symbol` of the token collection.
      */
-    constructor(string memory name_, string memory symbol_)
-        RMRKNestable(name_, symbol_)
-    {}
+    constructor(
+        string memory name_,
+        string memory symbol_
+    ) RMRKNestable(name_, symbol_) {}
 
     /**
      * @inheritdoc IERC165
      */
-    function supportsInterface(bytes4 interfaceId)
-        public
-        view
-        virtual
-        override(IERC165, RMRKNestable)
-        returns (bool)
-    {
+    function supportsInterface(
+        bytes4 interfaceId
+    ) public view virtual override(IERC165, RMRKNestable) returns (bool) {
         return
             RMRKNestable.supportsInterface(interfaceId) ||
             interfaceId == type(IRMRKMultiAsset).interfaceId ||
@@ -158,11 +155,10 @@ contract RMRKEquippable is
      * @param maxRejections Maximum number of expected assets to reject, used to prevent from
      *  rejecting assets which arrive just before this operation.
      */
-    function rejectAllAssets(uint256 tokenId, uint256 maxRejections)
-        public
-        virtual
-        onlyApprovedForAssetsOrOwner(tokenId)
-    {
+    function rejectAllAssets(
+        uint256 tokenId,
+        uint256 maxRejections
+    ) public virtual onlyApprovedForAssetsOrOwner(tokenId) {
         _rejectAllAssets(tokenId, maxRejections);
     }
 
@@ -180,11 +176,10 @@ contract RMRKEquippable is
      * @param tokenId ID of the token to set the priorities for
      * @param priorities An array of priority values
      */
-    function setPriority(uint256 tokenId, uint16[] calldata priorities)
-        public
-        virtual
-        onlyApprovedForAssetsOrOwner(tokenId)
-    {
+    function setPriority(
+        uint256 tokenId,
+        uint16[] calldata priorities
+    ) public virtual onlyApprovedForAssetsOrOwner(tokenId) {
         _setPriority(tokenId, priorities);
     }
 
@@ -238,12 +233,9 @@ contract RMRKEquippable is
      * @param tokenId ID of the token we are checking
      * @return address Address of the account that is approved to manage the token
      */
-    function getApprovedForAssets(uint256 tokenId)
-        public
-        view
-        virtual
-        returns (address)
-    {
+    function getApprovedForAssets(
+        uint256 tokenId
+    ) public view virtual returns (address) {
         _requireMinted(tokenId);
         return _tokenApprovalsForAssets[tokenId][ownerOf(tokenId)];
     }
@@ -257,12 +249,10 @@ contract RMRKEquippable is
      * @param tokenId ID of the token to query for permission for a given `user`
      * @return bool A boolean value indicating whether the user is approved to manage the token or not
      */
-    function _isApprovedForAssetsOrOwner(address user, uint256 tokenId)
-        internal
-        view
-        virtual
-        returns (bool)
-    {
+    function _isApprovedForAssetsOrOwner(
+        address user,
+        uint256 tokenId
+    ) internal view virtual returns (bool) {
         address owner = ownerOf(tokenId);
         return (user == owner ||
             isApprovedForAllForAssets(owner, user) ||
@@ -343,12 +333,9 @@ contract RMRKEquippable is
      *  ]
      * @param data An `IntakeEquip` struct specifying the equip data
      */
-    function equip(IntakeEquip memory data)
-        public
-        virtual
-        onlyApprovedOrOwner(data.tokenId)
-        nonReentrant
-    {
+    function equip(
+        IntakeEquip memory data
+    ) public virtual onlyApprovedOrOwner(data.tokenId) nonReentrant {
         _equip(data);
     }
 
@@ -433,10 +420,10 @@ contract RMRKEquippable is
      * @param assetId ID of the asset
      * @param slotPartId ID of the `Slot`
      */
-    function _checkAssetAcceptsSlot(uint64 assetId, uint64 slotPartId)
-        private
-        view
-    {
+    function _checkAssetAcceptsSlot(
+        uint64 assetId,
+        uint64 slotPartId
+    ) private view {
         (, bool found) = _partIds[assetId].indexOf(slotPartId);
         if (!found) revert RMRKTargetAssetCannotReceiveSlot();
     }
@@ -559,16 +546,14 @@ contract RMRKEquippable is
      * @notice Used to get the asset and equippable data associated with given `assetId`.
      * @param assetId ID of the asset of which we are retrieving
      */
-    function getAssetAndEquippableData(uint256 tokenId, uint64 assetId)
+    function getAssetAndEquippableData(
+        uint256 tokenId,
+        uint64 assetId
+    )
         public
         view
         virtual
-        returns (
-            string memory,
-            uint64,
-            address,
-            uint64[] memory
-        )
+        returns (string memory, uint64, address, uint64[] memory)
     {
         return (
             getAssetMetadata(tokenId, assetId),

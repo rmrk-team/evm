@@ -96,12 +96,10 @@ contract RMRKExternalEquip is
      * @param tokenId ID of the token to query for permission for a given `user`
      * @return bool A boolean value indicating whether the user is approved to manage the token or not
      */
-    function _isApprovedForAssetsOrOwner(address user, uint256 tokenId)
-        internal
-        view
-        virtual
-        returns (bool)
-    {
+    function _isApprovedForAssetsOrOwner(
+        address user,
+        uint256 tokenId
+    ) internal view virtual returns (bool) {
         address owner = ownerOf(tokenId);
         return (user == owner ||
             isApprovedForAllForAssets(owner, user) ||
@@ -134,12 +132,9 @@ contract RMRKExternalEquip is
     /**
      * @inheritdoc IERC165
      */
-    function supportsInterface(bytes4 interfaceId)
-        public
-        view
-        virtual
-        returns (bool)
-    {
+    function supportsInterface(
+        bytes4 interfaceId
+    ) public view virtual returns (bool) {
         return (interfaceId == type(IRMRKExternalEquip).interfaceId ||
             interfaceId == type(IRMRKEquippable).interfaceId ||
             interfaceId == type(IRMRKMultiAsset).interfaceId ||
@@ -211,11 +206,10 @@ contract RMRKExternalEquip is
      * @param maxRejections Maximum number of expected assets to reject, used to prevent from
      *  rejecting assets which arrive just before this operation.
      */
-    function rejectAllAssets(uint256 tokenId, uint256 maxRejections)
-        public
-        virtual
-        onlyApprovedForAssetsOrOwner(tokenId)
-    {
+    function rejectAllAssets(
+        uint256 tokenId,
+        uint256 maxRejections
+    ) public virtual onlyApprovedForAssetsOrOwner(tokenId) {
         _rejectAllAssets(tokenId, maxRejections);
     }
 
@@ -228,11 +222,10 @@ contract RMRKExternalEquip is
      * @param priorities An array of priorities of active assets. The succesion of items in the priorities array
      *  matches that of the succesion of items in the active array
      */
-    function setPriority(uint256 tokenId, uint16[] calldata priorities)
-        public
-        virtual
-        onlyApprovedForAssetsOrOwner(tokenId)
-    {
+    function setPriority(
+        uint256 tokenId,
+        uint16[] calldata priorities
+    ) public virtual onlyApprovedForAssetsOrOwner(tokenId) {
         _setPriority(tokenId, priorities);
     }
 
@@ -268,12 +261,9 @@ contract RMRKExternalEquip is
      * @param tokenId ID of the token we are checking
      * @return address Address of the account that is approved to manage the token
      */
-    function getApprovedForAssets(uint256 tokenId)
-        public
-        view
-        virtual
-        returns (address)
-    {
+    function getApprovedForAssets(
+        uint256 tokenId
+    ) public view virtual returns (address) {
         _requireMinted(tokenId);
         return _tokenApprovalsForAssets[tokenId][ownerOf(tokenId)];
     }
@@ -303,12 +293,9 @@ contract RMRKExternalEquip is
      *  ]
      * @param data An `IntakeEquip` struct specifying the equip data
      */
-    function equip(IntakeEquip memory data)
-        public
-        virtual
-        onlyApprovedOrOwner(data.tokenId)
-        nonReentrant
-    {
+    function equip(
+        IntakeEquip memory data
+    ) public virtual onlyApprovedOrOwner(data.tokenId) nonReentrant {
         _equip(data);
     }
 
@@ -393,10 +380,10 @@ contract RMRKExternalEquip is
      * @param assetId ID of the asset
      * @param slotPartId ID of the `Slot`
      */
-    function _checkAssetAcceptsSlot(uint64 assetId, uint64 slotPartId)
-        private
-        view
-    {
+    function _checkAssetAcceptsSlot(
+        uint64 assetId,
+        uint64 slotPartId
+    ) private view {
         (, bool found) = _partIds[assetId].indexOf(slotPartId);
         if (!found) revert RMRKTargetAssetCannotReceiveSlot();
     }
@@ -549,16 +536,14 @@ contract RMRKExternalEquip is
      * @notice Used to get all the equippable information of the asset associated with given `assetId`.
      * @param assetId ID of the asset of which we are retrieving
      */
-    function getAssetAndEquippableData(uint256 tokenId, uint64 assetId)
+    function getAssetAndEquippableData(
+        uint256 tokenId,
+        uint64 assetId
+    )
         public
         view
         virtual
-        returns (
-            string memory,
-            uint64,
-            address,
-            uint64[] memory
-        )
+        returns (string memory, uint64, address, uint64[] memory)
     {
         return (
             getAssetMetadata(tokenId, assetId),

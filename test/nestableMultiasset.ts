@@ -16,17 +16,19 @@ import {
 import shouldBehaveLikeNestable from './behavior/nestable';
 import shouldBehaveLikeMultiAsset from './behavior/multiasset';
 import shouldBehaveLikeERC721 from './behavior/erc721';
-import { RMRKMultiAssetRenderUtils, RMRKNestableMultiAssetMock } from "../typechain-types";
+import { RMRKMultiAssetRenderUtils, RMRKNestableMultiAssetMock } from '../typechain-types';
 
-async function singleFixture(): Promise<{ token: RMRKNestableMultiAssetMock; renderUtils: RMRKMultiAssetRenderUtils }> {
+async function singleFixture(): Promise<{
+  token: RMRKNestableMultiAssetMock;
+  renderUtils: RMRKMultiAssetRenderUtils;
+}> {
   const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiAssetRenderUtils');
-  const renderUtils = <RMRKMultiAssetRenderUtils> await renderUtilsFactory.deploy();
+  const renderUtils = <RMRKMultiAssetRenderUtils>await renderUtilsFactory.deploy();
   await renderUtils.deployed();
 
-  const token = <RMRKNestableMultiAssetMock> await singleFixtureWithArgs('RMRKNestableMultiAssetMock', [
-    'NestableMultiAsset',
-    'NMR',
-  ]);
+  const token = <RMRKNestableMultiAssetMock>(
+    await singleFixtureWithArgs('RMRKNestableMultiAssetMock', ['NestableMultiAsset', 'NMR'])
+  );
   return { token, renderUtils };
 }
 

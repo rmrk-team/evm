@@ -14,9 +14,10 @@ import "../RMRK/base/RMRKBaseStorage.sol";
  *  base contract.
  */
 contract RMRKBaseStorageImpl is OwnableLock, RMRKBaseStorage {
-    constructor(string memory metadataURI, string memory type_)
-        RMRKBaseStorage(metadataURI, type_)
-    {}
+    constructor(
+        string memory metadataURI,
+        string memory type_
+    ) RMRKBaseStorage(metadataURI, type_) {}
 
     /**
      * @notice Used to add a single `Part` to storage.
@@ -36,12 +37,9 @@ contract RMRKBaseStorageImpl is OwnableLock, RMRKBaseStorage {
      *   ]
      * @param intakeStruct `IntakeStruct` struct consisting of `partId` and a nested `Part` struct
      */
-    function addPart(IntakeStruct calldata intakeStruct)
-        public
-        virtual
-        onlyOwnerOrContributor
-        notLocked
-    {
+    function addPart(
+        IntakeStruct calldata intakeStruct
+    ) public virtual onlyOwnerOrContributor notLocked {
         _addPart(intakeStruct);
     }
 
@@ -63,12 +61,9 @@ contract RMRKBaseStorageImpl is OwnableLock, RMRKBaseStorage {
      *   ]
      * @param intakeStructs[] An array of `IntakeStruct` structs consisting of `partId` and a nested `Part` struct
      */
-    function addPartList(IntakeStruct[] calldata intakeStructs)
-        public
-        virtual
-        onlyOwnerOrContributor
-        notLocked
-    {
+    function addPartList(
+        IntakeStruct[] calldata intakeStructs
+    ) public virtual onlyOwnerOrContributor notLocked {
         _addPartList(intakeStructs);
     }
 
@@ -105,11 +100,9 @@ contract RMRKBaseStorageImpl is OwnableLock, RMRKBaseStorage {
      * @dev Can only be called on `Part`s of `Slot` type.
      * @param partId ID of the `Part` that we are setting as equippable by any address
      */
-    function setEquippableToAll(uint64 partId)
-        public
-        virtual
-        onlyOwnerOrContributor
-    {
+    function setEquippableToAll(
+        uint64 partId
+    ) public virtual onlyOwnerOrContributor {
         _setEquippableToAll(partId);
     }
 
@@ -118,11 +111,9 @@ contract RMRKBaseStorageImpl is OwnableLock, RMRKBaseStorage {
      * @dev Can only be called on `Part`s of `Slot` type.
      * @param partId ID of the part that we are clearing the `equippableAddresses` from
      */
-    function resetEquippableAddresses(uint64 partId)
-        public
-        virtual
-        onlyOwnerOrContributor
-    {
+    function resetEquippableAddresses(
+        uint64 partId
+    ) public virtual onlyOwnerOrContributor {
         _resetEquippableAddresses(partId);
     }
 }

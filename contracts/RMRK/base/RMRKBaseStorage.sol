@@ -54,12 +54,9 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
     /**
      * @inheritdoc IERC165
      */
-    function supportsInterface(bytes4 interfaceId)
-        public
-        view
-        virtual
-        returns (bool)
-    {
+    function supportsInterface(
+        bytes4 interfaceId
+    ) public view virtual returns (bool) {
         return
             interfaceId == type(IERC165).interfaceId ||
             interfaceId == type(IRMRKBaseStorage).interfaceId;
@@ -171,10 +168,9 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
      * @dev Can only be called on `Part`s of `Slot` type.
      * @param partId ID of the part that we are clearing the `equippableAddresses` from
      */
-    function _resetEquippableAddresses(uint64 partId)
-        internal
-        onlySlot(partId)
-    {
+    function _resetEquippableAddresses(
+        uint64 partId
+    ) internal onlySlot(partId) {
         delete _parts[partId].equippable;
         delete _isEquippableToAll[partId];
 
@@ -209,11 +205,10 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
      * @param targetAddress The address that we are checking for whether the part can be equipped into it or not
      * @return bool The status indicating whether the `targetAddress` can be equipped into `Part` with `partId` or not
      */
-    function checkIsEquippable(uint64 partId, address targetAddress)
-        public
-        view
-        returns (bool)
-    {
+    function checkIsEquippable(
+        uint64 partId,
+        address targetAddress
+    ) public view returns (bool) {
         // If this is equippable to all, we're good
         bool isEquippable = _isEquippableToAll[partId];
 
@@ -248,11 +243,9 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
      * @param partIds An array of part IDs that we want to retrieve
      * @return struct An array of `Part` structs associated with given `partIds`
      */
-    function getParts(uint64[] calldata partIds)
-        public
-        view
-        returns (Part[] memory)
-    {
+    function getParts(
+        uint64[] calldata partIds
+    ) public view returns (Part[] memory) {
         uint256 numParts = partIds.length;
         Part[] memory parts = new Part[](numParts);
 

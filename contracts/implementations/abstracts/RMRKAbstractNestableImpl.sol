@@ -28,11 +28,9 @@ abstract contract RMRKAbstractNestableImpl is
      * @return uint256 The ID of the first token to be minted in the current minting cycle
      * @return uint256 The ID of the last token to be minted in the current minting cycle
      */
-    function _preMint(uint256 numToMint)
-        internal
-        virtual
-        returns (uint256, uint256)
-    {
+    function _preMint(
+        uint256 numToMint
+    ) internal virtual returns (uint256, uint256) {
         if (numToMint == uint256(0)) revert RMRKMintZero();
         if (numToMint + _totalSupply > _maxSupply) revert RMRKMintOverMax();
 
@@ -59,25 +57,18 @@ abstract contract RMRKAbstractNestableImpl is
      * @param tokenId ID of the token to retrieve the metadata URI for
      * @return string Metadata URI of the specified token
      */
-    function tokenURI(uint256 tokenId)
-        public
-        view
-        virtual
-        override
-        returns (string memory)
-    {
+    function tokenURI(
+        uint256 tokenId
+    ) public view virtual override returns (string memory) {
         return _tokenURI;
     }
 
     /**
      * @inheritdoc RMRKRoyalties
      */
-    function updateRoyaltyRecipient(address newRoyaltyRecipient)
-        public
-        virtual
-        override
-        onlyOwner
-    {
+    function updateRoyaltyRecipient(
+        address newRoyaltyRecipient
+    ) public virtual override onlyOwner {
         _setRoyaltyRecipient(newRoyaltyRecipient);
     }
 

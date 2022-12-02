@@ -79,12 +79,9 @@ abstract contract RMRKAbstractNestableMultiAssetImpl is
      * @dev The ID of the asset is automatically assigned to be the next available asset ID.
      * @param metadataURI Metadata URI of the asset
      */
-    function addAssetEntry(string memory metadataURI)
-        public
-        virtual
-        onlyOwnerOrContributor
-        returns (uint256)
-    {
+    function addAssetEntry(
+        string memory metadataURI
+    ) public virtual onlyOwnerOrContributor returns (uint256) {
         unchecked {
             _totalAssets += 1;
         }
@@ -105,24 +102,18 @@ abstract contract RMRKAbstractNestableMultiAssetImpl is
      * @param tokenId ID of the token to retrieve the metadata URI for
      * @return string Metadata URI of the specified token
      */
-    function tokenURI(uint256 tokenId)
-        public
-        view
-        virtual
-        override
-        returns (string memory)
-    {
+    function tokenURI(
+        uint256 tokenId
+    ) public view virtual override returns (string memory) {
         return _tokenURI;
     }
 
     /**
      * @inheritdoc RMRKRoyalties
      */
-    function updateRoyaltyRecipient(address newRoyaltyRecipient)
-        public
-        override
-        onlyOwner
-    {
+    function updateRoyaltyRecipient(
+        address newRoyaltyRecipient
+    ) public override onlyOwner {
         _setRoyaltyRecipient(newRoyaltyRecipient);
     }
 

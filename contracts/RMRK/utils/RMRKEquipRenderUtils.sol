@@ -110,12 +110,10 @@ contract RMRKEquipRenderUtils {
      * @param tokenId ID of the token to retrieve the extended active assets for
      * @return sturct[] An array of ExtendedActiveAssets present on the given token
      */
-    function getExtendedActiveAssets(address target, uint256 tokenId)
-        public
-        view
-        virtual
-        returns (ExtendedActiveAsset[] memory)
-    {
+    function getExtendedActiveAssets(
+        address target,
+        uint256 tokenId
+    ) public view virtual returns (ExtendedActiveAsset[] memory) {
         IRMRKEquippable target_ = IRMRKEquippable(target);
 
         uint64[] memory assets = target_.getActiveAssets(tokenId);
@@ -174,12 +172,10 @@ contract RMRKEquipRenderUtils {
      * @param tokenId ID of the token to retrieve the extended pending assets for
      * @return sturct[] An array of ExtendedPendingAssets present on the given token
      */
-    function getExtendedPendingAssets(address target, uint256 tokenId)
-        public
-        view
-        virtual
-        returns (ExtendedPendingAsset[] memory)
-    {
+    function getExtendedPendingAssets(
+        address target,
+        uint256 tokenId
+    ) public view virtual returns (ExtendedPendingAsset[] memory) {
         IRMRKEquippable target_ = IRMRKEquippable(target);
 
         uint64[] memory assets = target_.getPendingAssets(tokenId);

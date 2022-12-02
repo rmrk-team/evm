@@ -20,7 +20,7 @@ abstract contract RMRKErc20Pay is IRMRKErc20Pay {
     }
 
     /**
-     * @notice Used to charge an ERC20 token for a specified value. 
+     * @notice Used to charge an ERC20 token for a specified value.
      * @param from Address from which to transfer the tokens
      * @param to Address to which to transfer the tokens
      * @param value The amount of tokens to transfer

@@ -136,25 +136,18 @@ abstract contract RMRKAbstractEquippableImpl is
      * @param tokenId ID of the token to retrieve the metadata URI for
      * @return string Metadata URI of the specified token
      */
-    function tokenURI(uint256 tokenId)
-        public
-        view
-        virtual
-        override
-        returns (string memory)
-    {
+    function tokenURI(
+        uint256 tokenId
+    ) public view virtual override returns (string memory) {
         return _tokenURI;
     }
 
     /**
      * @inheritdoc RMRKRoyalties
      */
-    function updateRoyaltyRecipient(address newRoyaltyRecipient)
-        public
-        virtual
-        override
-        onlyOwner
-    {
+    function updateRoyaltyRecipient(
+        address newRoyaltyRecipient
+    ) public virtual override onlyOwner {
         _setRoyaltyRecipient(newRoyaltyRecipient);
     }
 

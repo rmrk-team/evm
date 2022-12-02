@@ -7,11 +7,14 @@ import "../../../RMRK/extension/soulbound/RMRKSoulbound.sol";
 import "../../RMRKEquippableMock.sol";
 
 contract RMRKSoulboundEquippableMock is RMRKSoulbound, RMRKEquippableMock {
-    constructor(string memory name, string memory symbol)
-        RMRKEquippableMock(name, symbol)
-    {}
+    constructor(
+        string memory name,
+        string memory symbol
+    ) RMRKEquippableMock(name, symbol) {}
 
-    function supportsInterface(bytes4 interfaceId)
+    function supportsInterface(
+        bytes4 interfaceId
+    )
         public
         view
         virtual

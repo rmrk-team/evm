@@ -8,17 +8,14 @@ import "../../RMRKNestableMock.sol";
 contract RMRKSemiSoulboundNestableMock is RMRKSoulbound, RMRKNestableMock {
     mapping(uint256 => bool) soulboundExempt;
 
-    constructor(string memory name, string memory symbol)
-        RMRKNestableMock(name, symbol)
-    {}
+    constructor(
+        string memory name,
+        string memory symbol
+    ) RMRKNestableMock(name, symbol) {}
 
-    function supportsInterface(bytes4 interfaceId)
-        public
-        view
-        virtual
-        override(RMRKSoulbound, RMRKNestable)
-        returns (bool)
-    {
+    function supportsInterface(
+        bytes4 interfaceId
+    ) public view virtual override(RMRKSoulbound, RMRKNestable) returns (bool) {
         return
             RMRKSoulbound.supportsInterface(interfaceId) ||
             super.supportsInterface(interfaceId);

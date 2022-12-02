@@ -46,12 +46,9 @@ abstract contract RMRKSoulbound is IRMRKSoulbound, RMRKCore {
     /**
      * @inheritdoc IERC165
      */
-    function supportsInterface(bytes4 interfaceId)
-        public
-        view
-        virtual
-        returns (bool)
-    {
+    function supportsInterface(
+        bytes4 interfaceId
+    ) public view virtual returns (bool) {
         return interfaceId == type(IRMRKSoulbound).interfaceId;
     }
 }

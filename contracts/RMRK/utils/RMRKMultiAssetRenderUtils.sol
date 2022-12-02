@@ -10,7 +10,7 @@ import "../library/RMRKErrors.sol";
  * @author RMRK team
  */
 contract RMRKMultiAssetRenderUtils {
-    uint16 private constant _LOWEST_POSSIBLE_PRIORITY = 2**16 - 1;
+    uint16 private constant _LOWEST_POSSIBLE_PRIORITY = 2 ** 16 - 1;
 
     /**
      * @notice The structure used to display information about an active asset.
@@ -50,12 +50,10 @@ contract RMRKMultiAssetRenderUtils {
      * @param tokenId ID of the token to retrieve the active assets for
      * @return struct[] An array of ActiveAssets present on the given token
      */
-    function getActiveAssets(address target, uint256 tokenId)
-        public
-        view
-        virtual
-        returns (ActiveAsset[] memory)
-    {
+    function getActiveAssets(
+        address target,
+        uint256 tokenId
+    ) public view virtual returns (ActiveAsset[] memory) {
         IRMRKMultiAsset target_ = IRMRKMultiAsset(target);
 
         uint64[] memory assets = target_.getActiveAssets(tokenId);
@@ -94,12 +92,10 @@ contract RMRKMultiAssetRenderUtils {
      * @param tokenId ID of the token to retrieve the pending assets for
      * @return struct[] An array of PendingAssets present on the given token
      */
-    function getPendingAssets(address target, uint256 tokenId)
-        public
-        view
-        virtual
-        returns (PendingAsset[] memory)
-    {
+    function getPendingAssets(
+        address target,
+        uint256 tokenId
+    ) public view virtual returns (PendingAsset[] memory) {
         IRMRKMultiAsset target_ = IRMRKMultiAsset(target);
 
         uint64[] memory assets = target_.getPendingAssets(tokenId);
@@ -163,11 +159,10 @@ contract RMRKMultiAssetRenderUtils {
      * @param tokenId ID of the token for which to retrieve the metadata URI of the asset with the highest priority
      * @return string The metadata URI of the asset with the highest priority
      */
-    function getTopAssetMetaForToken(address target, uint256 tokenId)
-        external
-        view
-        returns (string memory)
-    {
+    function getTopAssetMetaForToken(
+        address target,
+        uint256 tokenId
+    ) external view returns (string memory) {
         IRMRKMultiAsset target_ = IRMRKMultiAsset(target);
         uint16[] memory priorities = target_.getActiveAssetPriorities(tokenId);
         uint64[] memory assets = target_.getActiveAssets(tokenId);

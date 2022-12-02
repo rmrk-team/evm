@@ -15,12 +15,9 @@ contract RMRKTypedMultiAsset is IRMRKTypedMultiAsset {
     /**
      * @inheritdoc IERC165
      */
-    function supportsInterface(bytes4 interfaceId)
-        public
-        view
-        virtual
-        returns (bool)
-    {
+    function supportsInterface(
+        bytes4 interfaceId
+    ) public view virtual returns (bool) {
         return interfaceId == type(IRMRKTypedMultiAsset).interfaceId;
     }
 

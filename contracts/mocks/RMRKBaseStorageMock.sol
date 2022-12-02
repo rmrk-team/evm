@@ -5,9 +5,10 @@ pragma solidity ^0.8.16;
 import "../RMRK/base/RMRKBaseStorage.sol";
 
 contract RMRKBaseStorageMock is RMRKBaseStorage {
-    constructor(string memory metadataURI, string memory type_)
-        RMRKBaseStorage(metadataURI, type_)
-    {}
+    constructor(
+        string memory metadataURI,
+        string memory type_
+    ) RMRKBaseStorage(metadataURI, type_) {}
 
     function addPart(IntakeStruct calldata intakeStruct) external {
         _addPart(intakeStruct);

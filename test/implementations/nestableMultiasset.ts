@@ -20,23 +20,28 @@ import {
   singleFixtureWithArgs,
   transfer,
 } from '../utils';
-import { RMRKMultiAssetRenderUtils, RMRKNestableMultiAssetImpl } from "../../typechain-types";
+import { RMRKMultiAssetRenderUtils, RMRKNestableMultiAssetImpl } from '../../typechain-types';
 
-async function singleFixture(): Promise<{ token: RMRKNestableMultiAssetImpl; renderUtils: Contract }> {
+async function singleFixture(): Promise<{
+  token: RMRKNestableMultiAssetImpl;
+  renderUtils: Contract;
+}> {
   const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiAssetRenderUtils');
-  const renderUtils = <RMRKMultiAssetRenderUtils> await renderUtilsFactory.deploy();
+  const renderUtils = <RMRKMultiAssetRenderUtils>await renderUtilsFactory.deploy();
   await renderUtils.deployed();
 
-  const token = <RMRKNestableMultiAssetImpl> await singleFixtureWithArgs('RMRKNestableMultiAssetImpl', [
-    'NestableMultiAsset',
-    'NMR',
-    10000,
-    ONE_ETH,
-    'ipfs://collection-meta',
-    'ipfs://tokenURI',
-    ADDRESS_ZERO,
-    1000, // 10%
-  ]);
+  const token = <RMRKNestableMultiAssetImpl>(
+    await singleFixtureWithArgs('RMRKNestableMultiAssetImpl', [
+      'NestableMultiAsset',
+      'NMR',
+      10000,
+      ONE_ETH,
+      'ipfs://collection-meta',
+      'ipfs://tokenURI',
+      ADDRESS_ZERO,
+      1000, // 10%
+    ])
+  );
   return { token, renderUtils };
 }
 

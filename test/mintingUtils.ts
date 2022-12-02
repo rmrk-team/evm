@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { ethers } from 'hardhat';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import { MintingUtilsMock } from "../typechain-types";
+import { MintingUtilsMock } from '../typechain-types';
 
 describe('Minting Utils', async () => {
   let mintingUtils: MintingUtilsMock;
@@ -12,7 +12,7 @@ describe('Minting Utils', async () => {
   async function deployMintingUtilsFixture() {
     const [signersOwner, ...signersAddr] = await ethers.getSigners();
     const MINT = await ethers.getContractFactory('MintingUtilsMock');
-    const mintingUtilsContract = <MintingUtilsMock> await MINT.deploy(10, 100);
+    const mintingUtilsContract = <MintingUtilsMock>await MINT.deploy(10, 100);
     await mintingUtilsContract.deployed();
 
     return { mintingUtilsContract, signersOwner, signersAddr };

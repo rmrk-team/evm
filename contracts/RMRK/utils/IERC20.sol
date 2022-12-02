@@ -26,8 +26,8 @@ interface IERC20 {
      * @param spender Address that is being granted the permission to spend the tokens of the `owner`
      * @return uint256 Amount of tokens that the `spender` can manage
      */
-    function allowance(address owner, address spender)
-        external
-        view
-        returns (uint256);
+    function allowance(
+        address owner,
+        address spender
+    ) external view returns (uint256);
 }
