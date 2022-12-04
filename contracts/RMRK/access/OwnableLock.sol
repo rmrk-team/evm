@@ -14,7 +14,7 @@ contract OwnableLock is Ownable {
     uint256 private _lock;
 
     /**
-     * @dev Reverts if the lock flag is set to true.
+     * @notice Reverts if the lock flag is set to true.
      */
     modifier notLocked() {
         _onlyNotLocked();
@@ -37,6 +37,10 @@ contract OwnableLock is Ownable {
         return _lock == 1;
     }
 
+    /**
+     * @notice Used to verify that the operation of the smart contract is not locked.
+     * @dev If the operation of the smart contract is locked, the execution will be reverted.
+     */
     function _onlyNotLocked() private view {
         if (getLock()) revert RMRKLocked();
     }

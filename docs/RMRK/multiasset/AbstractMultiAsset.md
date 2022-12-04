@@ -26,7 +26,7 @@ Accepts an asset at from the pending array of given token.
 |---|---|---|
 | tokenId | uint256 | ID of the token for which to accept the pending asset |
 | index | uint256 | Index of the asset in the pending array to accept |
-| assetId | uint64 | Id of the asset expected to be in the index |
+| assetId | uint64 | ID of the asset expected to be in the index |
 
 ### approveForAssets
 
@@ -51,7 +51,7 @@ Used to grant permission to the user to manage token&#39;s assets.
 function getActiveAssetPriorities(uint256 tokenId) external view returns (uint16[])
 ```
 
-Used to retrieve active asset priorities of a given token.
+Used to retrieve the priorities of the active resoources of a given token.
 
 *Asset priorities are a non-sequential array of uint16 values with an array size equal to active asset  priorites.*
 
@@ -59,13 +59,13 @@ Used to retrieve active asset priorities of a given token.
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | ID of the token to query |
+| tokenId | uint256 | ID of the token for which to retrieve the priorities of the active assets |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint16[] | uint16[] Array of active asset priorities |
+| _0 | uint16[] | uint16[] An array of priorities of the active assets of the given token |
 
 ### getActiveAssets
 
@@ -73,21 +73,21 @@ Used to retrieve active asset priorities of a given token.
 function getActiveAssets(uint256 tokenId) external view returns (uint64[])
 ```
 
-Used to retrieve the active asset IDs of a given token.
+Used to retrieve IDs of the active assets of given token.
 
-*Assets metadata is stored by reference mapping `_asset[assetId]`.*
+*Asset data is stored by reference, in order to access the data corresponding to the ID, call  `getAssetMetadata(tokenId, assetId)`.You can safely get 10k*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | ID of the token to query |
+| tokenId | uint256 | ID of the token to retrieve the IDs of the active assets |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint64[] | uint64[] Array of active asset IDs |
+| _0 | uint64[] | uint64[] An array of active asset IDs of the given token |
 
 ### getApprovedForAssets
 
@@ -117,7 +117,7 @@ Used to retrieve the address of the account approved to manage assets of a given
 function getAssetMetadata(uint256 tokenId, uint64 assetId) external view returns (string)
 ```
 
-Used to fetch the asset metadata of the specified token&#39;s for given asset.
+Used to fetch the asset metadata of the specified token&#39;s active asset with the given index.
 
 *Assets are stored by reference mapping `_assets[assetId]`.Can be overriden to implement enumerate, fallback or other custom logic.*
 
@@ -125,14 +125,14 @@ Used to fetch the asset metadata of the specified token&#39;s for given asset.
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | ID of the token to query |
-| assetId | uint64 | Asset Id, must be in the pending or active assets array |
+| tokenId | uint256 | ID of the token from which to retrieve the asset metadata |
+| assetId | uint64 | Asset Id, must be in the active assets array |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | string Metadata of the asset |
+| _0 | string | string The metadata of the asset belonging to the specified index in the token&#39;s active assets  array |
 
 ### getAssetReplacements
 
@@ -140,15 +140,15 @@ Used to fetch the asset metadata of the specified token&#39;s for given asset.
 function getAssetReplacements(uint256 tokenId, uint64 newAssetId) external view returns (uint64)
 ```
 
-Used to retrieve the asset ID that will be replaced (if any) if a given assetID is accepted from  the pending assets array.
+Used to retrieve the asset that will be replaced if a given asset from the token&#39;s pending array  is accepted.
 
-
+*Asset data is stored by reference, in order to access the data corresponding to the ID, call  `getAssetMetadata(tokenId, assetId)`.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | ID of the token to query |
+| tokenId | uint256 | ID of the token to check |
 | newAssetId | uint64 | ID of the pending asset which will be accepted |
 
 #### Returns
@@ -163,21 +163,21 @@ Used to retrieve the asset ID that will be replaced (if any) if a given assetID 
 function getPendingAssets(uint256 tokenId) external view returns (uint64[])
 ```
 
-Returns pending asset IDs for a given token
+Used to retrieve IDs of the pending assets of given token.
 
-*Pending assets metadata is stored by reference mapping _pendingAsset[assetId]*
+*Asset data is stored by reference, in order to access the data corresponding to the ID, call  `getAssetMetadata(tokenId, assetId)`.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | the token ID to query |
+| tokenId | uint256 | ID of the token to retrieve the IDs of the pending assets |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint64[] | uint64[] pending asset IDs |
+| _0 | uint64[] | uint64[] An array of pending asset IDs of the given token |
 
 ### isApprovedForAllForAssets
 
@@ -217,7 +217,7 @@ Rejects all assets from the pending array of a given token.
 | Name | Type | Description |
 |---|---|---|
 | tokenId | uint256 | ID of the token of which to clear the pending array. |
-| maxRejections | uint256 | Maximum number of expected assets to reject, used to prevent from  rejecting assets which arrive just before this operation. |
+| maxRejections | uint256 | Maximum number of expected assets to reject, used to prevent from rejecting assets which  arrive just before this operation. |
 
 ### rejectAsset
 
@@ -235,7 +235,7 @@ Rejects an asset from the pending array of given token.
 |---|---|---|
 | tokenId | uint256 | ID of the token that the asset is being rejected from |
 | index | uint256 | Index of the asset in the pending array to be rejected |
-| assetId | uint64 | Id of the asset expected to be in the index |
+| assetId | uint64 | ID of the asset expected to be in the index |
 
 ### setApprovalForAllForAssets
 

@@ -14,6 +14,11 @@ import "../RMRK/base/RMRKBaseStorage.sol";
  *  base contract.
  */
 contract RMRKBaseStorageImpl is OwnableLock, RMRKBaseStorage {
+    /**
+     * @notice Used to initialize the smart contract.
+     * @param metadataURI Base metadata URI of the contract
+     * @param type_ The type of the base
+     */
     constructor(
         string memory metadataURI,
         string memory type_

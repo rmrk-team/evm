@@ -14,6 +14,11 @@ contract RMRKCore is IRMRKCore {
     /// @notice Version of the @rmrk-team/evm-contracts package
     string public constant VERSION = "0.19.3";
 
+    /**
+     * @notice Used to initialize the smart contract.
+     * @param name_ Name of the token collection
+     * @param symbol_ Symbol of the token collection
+     */
     constructor(string memory name_, string memory symbol_) {
         _name = name_;
         _symbol = symbol_;

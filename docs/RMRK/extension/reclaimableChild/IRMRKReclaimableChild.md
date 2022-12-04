@@ -18,7 +18,7 @@ function reclaimChild(uint256 tokenId, address childAddress, uint256 childId) ex
 
 Used to reclaim an abandoned child token.
 
-*Child token was abandoned by transferring it with `to` as the `0x0` address.This function will set the child&#39;s ownership to the `rootOwner` of the caller.Requirements:  - `tokenId` must exist*
+*Child token was abandoned by transferring it with `to` as the `0x0` address.This function will set the child&#39;s owner to the `rootOwner` of the caller, allowing the `rootOwner`  management permissions for the child.Requirements:  - `tokenId` must exist*
 
 #### Parameters
 

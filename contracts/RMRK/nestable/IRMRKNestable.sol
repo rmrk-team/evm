@@ -139,6 +139,11 @@ interface IRMRKNestable is IERC165 {
      *  burned.
      * @dev Setting the `maxRecursiveBurn` value to 0 will only attempt to burn the specified token and revert if there
      *  are any child tokens present.
+     * @dev The approvals are cleared when the token is burned.
+     * @dev Requirements:
+     *
+     *  - `tokenId` must exist.
+     * @dev Emits a {Transfer} event.
      * @param tokenId ID of the token to burn
      * @param maxRecursiveBurns Maximum number of tokens to recursively burn
      * @return uint256 Number of recursively burned children
@@ -170,10 +175,11 @@ interface IRMRKNestable is IERC165 {
      * @dev This moves the child token from parent token's pending child tokens array into the active child tokens
      *  array.
      * @param parentId ID of the parent token for which the child token is being accepted
-     * @param childIndex Index of the child token to accept in the pending children array of a given token
-     * @param childAddress Address of the collection smart contract of the child token expected to be at the specified
-     *  index
-     * @param childId ID of the child token expected to be located at the specified index
+     * @param childIndex Index of a child tokem in the given parent's pending children array
+     * @param childAddress Address of the collection smart contract of the child token expected to be located at the
+     *  specified index of the given parent token's pending children array
+     * @param childId ID of the child token expected to be located at the specified index of the given parent token's
+     *  pending children array
      */
     function acceptChild(
         uint256 parentId,
@@ -185,7 +191,8 @@ interface IRMRKNestable is IERC165 {
     /**
      * @notice Used to reject all pending children of a given parent token.
      * @dev Removes the children from the pending array mapping.
-     * @dev The children's ownership structures are not updated.
+     * @dev This does not update the ownership storage data on children. If necessary, ownership can be reclaimed by the
+     *  rootOwner of the previous parent.
      * @dev Requirements:
      *
      * Requirements:
@@ -202,8 +209,8 @@ interface IRMRKNestable is IERC165 {
 
     /**
      * @notice Used to transfer a child token from a given parent token.
-     * @dev When transferring a child token, the owner of the token is set to `to`, or is not updated in the event of `to`
-     *  being the `0x0` address.
+     * @dev When transferring a child token, the owner of the token is set to `to`, or is not updated in the event of
+     *  `to` being the `0x0` address.
      * @param tokenId ID of the parent token from which the child token is being transferred
      * @param to Address to which to transfer the token to
      * @param destinationId ID of the token to receive this child token (MUST be 0 if the destination is not a token)
@@ -211,8 +218,8 @@ interface IRMRKNestable is IERC165 {
      *  pending array)
      * @param childAddress Address of the child token's collection smart contract.
      * @param childId ID of the child token in its own collection smart contract.
-     * @param isPending A boolean value indicating whether the child token being transferred is in the pending array of the
-     *  parent token (`true`) or in the active array (`false`)
+     * @param isPending A boolean value indicating whether the child token being transferred is in the pending array of
+     *  the parent token (`true`) or in the active array (`false`)
      * @param data Additional data with no specified format, sent in call to `_to`
      */
     function transferChild(

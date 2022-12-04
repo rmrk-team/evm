@@ -24,6 +24,19 @@ contract RMRKNestableExternalEquipImpl is
     address private _equippableAddress;
     string private _tokenURI;
 
+    /**
+     * @notice Used to initialize the smart contract.
+     * @param name_ Name of the token collection
+     * @param symbol_ Symbol of the token collection
+     * @param maxSupply_ Maximum supply of tokens in the collection
+     * @param pricePerMint_ Minting price of a token represented in the smallest denomination of the native currency
+     * @param equippableAddress_ Address of the `Equippable` module of the external equip composite
+     * @param collectionMetadata_ The collection metadata URI
+     * @param tokenURI_ The base URI of the token metadata
+     * @param royaltyRecipient The recipient of resale royalties
+     * @param royaltyPercentageBps The percentage of resale value to be allocated to the `royaltyRecipient` expressed in
+     *  the basis points
+     */
     constructor(
         string memory name_,
         string memory symbol_,

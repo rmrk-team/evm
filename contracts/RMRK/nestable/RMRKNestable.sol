@@ -100,7 +100,9 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
     // ----------------------------- CONSTRUCTOR ------------------------------
 
     /**
-     * @dev Initializes the contract by setting a `name` and a `symbol` to the token collection.
+     * @notice Initializes the contract by setting a `name` and a `symbol` to the token collection.
+     * @param name_ Name of the token collection
+     * @param symbol_ Symbol of the token collection
      */
     constructor(
         string memory name_,
@@ -168,12 +170,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
     }
 
     /**
-     * @notice Used to transfer the token into another token.
-     * @param from Address of the collection smart contract of the token to be transferred
-     * @param to Address of the receiving token's collection smart contract
-     * @param tokenId ID of the token being transferred
-     * @param destinationId ID of the token to receive the token being transferred
-     * @param data Additional data with no specified format, sent in the addChild call
+     * @inheritdoc IRMRKNestable
      */
     function nestTransferFrom(
         address from,
@@ -225,6 +222,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
      * @param from Address of the account currently owning the given token
      * @param to Address to transfer the token to
      * @param tokenId ID of the token to transfer
+     * @param data Additional data with no specified format, sent in call to `to`
      */
     function _transfer(
         address from,
@@ -416,6 +414,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
      * @dev Emits a {Transfer} event.
      * @param to Address to mint the token to
      * @param tokenId ID of the token to mint
+     * @param data Additional data with no specified format, sent in call to `to`
      */
     function _mint(
         address to,
@@ -463,6 +462,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
      * @param to Address of the collection smart contract of the token into which to mint the child token
      * @param tokenId ID of the token to mint
      * @param destinationId ID of the token into which to mint the new token
+     * @param data Additional data with no specified format, sent in call to `to`
      */
     function _innerMint(
         address to,
@@ -497,12 +497,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
     ////////////////////////////////////////
 
     /**
-     * @notice Used to retrieve the root owner of the given token.
-     * @dev Root owner is always the externally owned account.
-     * @dev If the given token is owned by another token, it will recursively query the parent tokens until reaching the
-     *  root owner.
-     * @param tokenId ID of the token for which the root owner is being retrieved
-     * @return address Address of the root owner of the given token
+     * @inheritdoc IRMRKNestable
      */
     function ownerOf(
         uint256 tokenId
@@ -517,16 +512,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
     }
 
     /**
-     * @notice Used to retrieve the immediate owner of the given token.
-     * @dev In the event the NFT is owned by an externally owned account, `tokenId` will be `0` and `isNft` will be
-     *  `false`.
-     * @param tokenId ID of the token for which the immediate owner is being retrieved
-     * @return address Address of the immediate owner. If the token is owned by an externally owned account, its address
-     *  will be returned. If the token is owned by another token, the parent token's collection smart contract address
-     *  is returned
-     * @return uint256 Token ID of the immediate owner. If the immediate owner is an externally owned account, the value
-     *  should be `0`
-     * @return bool A boolean value signifying whether the immediate owner is a token (`true`) or not (`false`)
+     * @inheritdoc IRMRKNestable
      */
     function directOwnerOf(
         uint256 tokenId
@@ -543,6 +529,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
 
     /**
      * @notice Used to burn a given token.
+     * @dev In case the token has any child tokens, the execution will be reverted.
      * @param tokenId ID of the token to burn
      */
     function burn(uint256 tokenId) public virtual {
@@ -550,16 +537,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
     }
 
     /**
-     * @notice Used to burn a token.
-     * @dev When a token is burned, its children are recursively burned as well.
-     * @dev The approvals are cleared when the token is burned.
-     * @dev Requirements:
-     *
-     *  - `tokenId` must exist.
-     * @dev Emits a {Transfer} event.
-     * @param tokenId ID of the token to burn
-     * @param maxChildrenBurns Maximum children to recursively burn
-     * @return uint256 The number of recursive burns it took to burn all of the children
+     * @inheritdoc IRMRKNestable
      */
     function burn(
         uint256 tokenId,
@@ -858,17 +836,8 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
     ////////////////////////////////////////
 
     /**
-     * @notice Used to add a child token to a given parent token.
-     * @dev This adds the iichild token into the given parent token's pending child tokens array.
-     * @dev Requirements:
-     *
-     *  - `ownerOf` on the child contract must resolve to the called contract.
-     *  - The pending array of the parent contract must not be full.
-     * @param parentId ID of the parent token to receive the new child token
-     * @param childId ID of the new proposed child token
-     * @param data Additional data with no specified format
+     * @inheritdoc IRMRKNestable
      */
-
     function addChild(
         uint256 parentId,
         uint256 childId,
@@ -901,15 +870,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
     }
 
     /**
-     * @notice @notice Used to accept a pending child token for a given parent token.
-     * @dev This moves the child token from parent token's pending child tokens array into the active child tokens
-     *  array.
-     * @param parentId ID of the parent token for which the child token is being accepted
-     * @param childIndex Index of a child tokem in the given parent's pending children array
-     * @param childAddress Address of the collection smart contract of the child token expected to be located at the
-     *  specified index of the given parent token's pending children array
-     * @param childId ID of the child token expected to be located at the specified index of the given parent token's
-     *  pending children array
+     * @inheritdoc IRMRKNestable
      */
     function acceptChild(
         uint256 parentId,
@@ -961,13 +922,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
     }
 
     /**
-     * @notice Used to reject all pending children of a given parent token.
-     * @dev Removes the children from the pending array mapping.
-     * @dev This does not update the ownership storage data on children. If necessary, ownership can be reclaimed by the
-     *  rootOwner of the previous parent.
-     * @param tokenId ID of the parent token for which to reject all of the pending tokens.
-     * @param maxRejections Maximum number of expected children to reject, used to prevent from
-     *  rejecting children which arrive just before this operation.
+     * @inheritdoc IRMRKNestable
      */
     function rejectAllChildren(
         uint256 tokenId,
@@ -1002,17 +957,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
     }
 
     /**
-     * @notice Used to transfer a child token from a given parent token.
-     * @param tokenId ID of the parent token from which the child token is being transferred
-     * @param to Address to which to transfer the token to
-     * @param destinationId ID of the token to receive this child token (MUST be 0 if the destination is not a token)
-     * @param childIndex Index of a token we are transferring, in the array it belongs to (can be either active array or
-     *  pending array)
-     * @param childAddress Address of the child token's collection smart contract.
-     * @param childId ID of the child token in its own collection smart contract.
-     * @param isPending A boolean value indicating whether the child token being transferred is in the pending array of the
-     *  parent token (`true`) or in the active array (`false`)
-     * @param data Additional data with no specified format, sent in call to `_to`
+     * @inheritdoc IRMRKNestable
      */
     function transferChild(
         uint256 tokenId,
@@ -1038,8 +983,8 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
 
     /**
      * @notice Used to transfer a child token from a given parent token.
-     * @dev When transferring a child token, the owner of the token is set to `to`, or is not updated in the event of `to`
-     *  being the `0x0` address.
+     * @dev When transferring a child token, the owner of the token is set to `to`, or is not updated in the event of
+     *  `to` being the `0x0` address.
      * @dev Requirements:
      *
      *  - `tokenId` must exist.
@@ -1051,8 +996,8 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
      *  pending array)
      * @param childAddress Address of the child token's collection smart contract.
      * @param childId ID of the child token in its own collection smart contract.
-     * @param isPending A boolean value indicating whether the child token being transferred is in the pending array of the
-     *  parent token (`true`) or in the active array (`false`)
+     * @param isPending A boolean value indicating whether the child token being transferred is in the pending array of
+     *  the parent token (`true`) or in the active array (`false`)
      * @param data Additional data with no specified format, sent in call to `_to`
      */
     function _transferChild(
@@ -1126,6 +1071,17 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
         );
     }
 
+    /**
+     * @notice Used to verify that the child being accessed is the intended child.
+     * @dev The Child struct consists of the following values:
+     *  [
+     *      tokenId,
+     *      contractAddress
+     *  ]
+     * @param child A Child struct of a child being accessed
+     * @param expectedAddress The address expected to be the one of the child
+     * @param expectedId The token ID expected to be the one of the child
+     */
     function _checkExpectedChild(
         Child memory child,
         address expectedAddress,
@@ -1142,15 +1098,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
     ////////////////////////////////////////
 
     /**
-     * @notice Used to retrieve the active child tokens of a given parent token.
-     * @dev Returns array of Child structs existing for parent token.
-     * @dev The Child struct consists of the following values:
-     *  [
-     *      tokenId,
-     *      contractAddress
-     *  ]
-     * @param parentId ID of the parent token for which to retrieve the active child tokens
-     * @return struct[] An array of Child structs containing the parent token's active child tokens
+     * @inheritdoc IRMRKNestable
      */
 
     function childrenOf(
@@ -1161,15 +1109,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
     }
 
     /**
-     * @notice Used to retrieve the pending child tokens of a given parent token.
-     * @dev Returns array of pending Child structs existing for given parent.
-     * @dev The Child struct consists of the following values:
-     *  [
-     *      tokenId,
-     *      contractAddress
-     *  ]
-     * @param parentId ID of the parent token for which to retrieve the pending child tokens
-     * @return struct[] An array of Child structs containing the parent token's pending child tokens
+     * @inheritdoc IRMRKNestable
      */
 
     function pendingChildrenOf(
@@ -1180,16 +1120,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
     }
 
     /**
-     * @notice Used to retrieve a specific active child token for a given parent token.
-     * @dev Returns a single Child struct locating at `index` of parent token's active child tokens array.
-     * @dev The Child struct consists of the following values:
-     *  [
-     *      tokenId,
-     *      contractAddress
-     *  ]
-     * @param parentId ID of the parent token for which the child is being retrieved
-     * @param index Index of the child token in the parent token's active child tokens array
-     * @return struct A Child struct containing data about the specified child
+     * @inheritdoc IRMRKNestable
      */
     function childOf(
         uint256 parentId,
@@ -1202,16 +1133,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
     }
 
     /**
-     * @notice Used to retrieve a specific pending child token from a given parent token.
-     * @dev Returns a single Child struct locating at `index` of parent token's active child tokens array.
-     * @dev The Child struct consists of the following values:
-     *  [
-     *      tokenId,
-     *      contractAddress
-     *  ]
-     * @param parentId ID of the parent token for which the pending child token is being retrieved
-     * @param index Index of the child token in the parent token's pending child tokens array
-     * @return struct A Child struct containting data about the specified child
+     * @inheritdoc IRMRKNestable
      */
     function pendingChildOf(
         uint256 parentId,

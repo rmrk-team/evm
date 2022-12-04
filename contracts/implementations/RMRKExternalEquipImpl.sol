@@ -13,6 +13,10 @@ import "../RMRK/access/OwnableLock.sol";
 contract RMRKExternalEquipImpl is OwnableLock, RMRKExternalEquip {
     uint256 private _totalAssets;
 
+    /**
+     * @notice Used to initialize the smart contract.
+     * @param nestableAddress Address of the Nestable module of the external equip composite
+     */
     constructor(address nestableAddress) RMRKExternalEquip(nestableAddress) {}
 
     /**

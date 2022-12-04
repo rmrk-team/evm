@@ -16,6 +16,22 @@ contract RMRKMultiAssetImplErc20Pay is
     RMRKErc20Pay,
     RMRKAbstractMultiAssetImpl
 {
+    /**
+     * @notice Used to initialize the smart contract.
+     * @dev The full `InitData` looks like this:
+     *  [
+     *      erc20TokenAddress,
+     *      royaltyRecipient,
+     *      royaltyPercentageBps,
+     *      maxSupply,
+     *      pricePerMint
+     *  ]
+     * @param name Name of the token collection
+     * @param symbol Symbol of the token collection
+     * @param collectionMetadata_ The collection metadata URI
+     * @param tokenURI_ The base URI of the token metadata
+     * @param data The `InitData` struct containing additional initialization data
+     */
     constructor(
         string memory name,
         string memory symbol,

@@ -22,9 +22,7 @@ contract RMRKTypedMultiAsset is IRMRKTypedMultiAsset {
     }
 
     /**
-     * @notice Used to get the type of the asset.
-     * @param assetId ID of the asset to check
-     * @return string The type of the asset
+     * @inheritdoc IRMRKTypedMultiAsset
      */
     function getAssetType(uint64 assetId) public view returns (string memory) {
         return _assetTypes[assetId];

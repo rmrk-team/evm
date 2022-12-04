@@ -51,7 +51,9 @@ contract RMRKNestableMultiAsset is RMRKNestable, AbstractMultiAsset {
     // ----------------------------- CONSTRUCTOR ------------------------------
 
     /**
-     * @dev Initializes the contract by setting a `name` and a `symbol` of the token collection.
+     * @notice Initializes the contract by setting a `name` and a `symbol` of the token collection.
+     * @param name_ Name of the token collection
+     * @param symbol_ Symbol of the token collection
      */
     constructor(
         string memory name_,
@@ -74,18 +76,7 @@ contract RMRKNestableMultiAsset is RMRKNestable, AbstractMultiAsset {
     // --------------------------- HANDLING ASSETS -------------------------
 
     /**
-     * @notice Accepts an asset from the pending array of given token.
-     * @dev Migrates the asset from the token's pending asset array to the token's active asset array.
-     * @dev Active assets cannot be removed by anyone, but can be replaced by a new asset.
-     * @dev Requirements:
-     *
-     *  - The caller must own the token or be approved to manage the token's assets
-     *  - `tokenId` must exist.
-     *  - `index` must be in range of the length of the pending asset array.
-     * @dev Emits an {AssetAccepted} event.
-     * @param tokenId ID of the token for which to accept the pending asset
-     * @param index Index of the asset in the pending array to accept
-     * @param assetId ID of the asset expected to be located at the specified index
+     * @inheritdoc IRMRKMultiAsset
      */
     function acceptAsset(
         uint256 tokenId,
@@ -96,17 +87,7 @@ contract RMRKNestableMultiAsset is RMRKNestable, AbstractMultiAsset {
     }
 
     /**
-     * @notice Rejects an asset from the pending array of given token.
-     * @dev Removes the asset from the token's pending asset array.
-     * @dev Requirements:
-     *
-     *  - The caller must own the token or be approved to manage the token's assets
-     *  - `tokenId` must exist.
-     *  - `index` must be in range of the length of the pending asset array.
-     * @dev Emits a {AssetRejected} event.
-     * @param tokenId ID of the token that the asset is being rejected from
-     * @param index Index of the asset in the pending array to be rejected
-     * @param assetId ID of the asset expected to be located at the specified index
+     * @inheritdoc IRMRKMultiAsset
      */
     function rejectAsset(
         uint256 tokenId,
@@ -117,17 +98,7 @@ contract RMRKNestableMultiAsset is RMRKNestable, AbstractMultiAsset {
     }
 
     /**
-     * @notice Rejects all assets from the pending array of a given token.
-     * @dev Effecitvely deletes the pending array.
-     * @dev Requirements:
-     *
-     *  - The caller must own the token or be approved to manage the token's assets
-     *  - `tokenId` must exist.
-     *  - If there are more resouces than `maxRejections`, the execution will be reverted
-     * @dev Emits a {AssetRejected} event with assetId = 0.
-     * @param tokenId ID of the token of which to clear the pending array.
-     * @param maxRejections Maximum number of expected assets to reject, used to prevent from
-     *  rejecting assets which arrive just before this operation.
+     * @inheritdoc IRMRKMultiAsset
      */
     function rejectAllAssets(
         uint256 tokenId,
@@ -137,19 +108,7 @@ contract RMRKNestableMultiAsset is RMRKNestable, AbstractMultiAsset {
     }
 
     /**
-     * @notice Sets a new priority array for a given token.
-     * @dev The priority array is a non-sequential list of `uint16`s, where the lowest value is considered highest
-     *  priority.
-     * @dev Value `0` of a priority is a special case equivalent to unitialized.
-     * @dev Requirements:
-     *
-     *  - The caller must own the token or be approved to manage the token's assets
-     *  - `tokenId` must exist.
-     *  - The length of `priorities` must be equal the length of the active assets array.
-     * @dev Emits a {AssetPrioritySet} event.
-     * @param tokenId ID of the token to set the priorities for
-     * @param priorities An array of priorities of active assets. The succesion of items in the priorities array
-     *  matches that of the succesion of items in the active array
+     * @inheritdoc IRMRKMultiAsset
      */
     function setPriority(
         uint256 tokenId,
@@ -161,17 +120,7 @@ contract RMRKNestableMultiAsset is RMRKNestable, AbstractMultiAsset {
     // ----------------------- APPROVALS FOR ASSETS ------------------------
 
     /**
-     * @notice Used to grant permission to the user to manage token's assets.
-     * @dev This differs from transfer approvals, as approvals are not cleared when the approved party accepts or
-     *  rejects an asset, or sets asset priorities. This approval is cleared on token transfer.
-     * @dev Only a single account can be approved at a time, so approving the `0x0` address clears previous approvals.
-     * @dev Requirements:
-     *
-     *  - The caller must own the token or be an approved operator.
-     *  - `tokenId` must exist.
-     * @dev Emits an {ApprovalForAssets} event.
-     * @param to Address of the account to grant the approval to
-     * @param tokenId ID of the token for which the approval to manage the assets is granted
+     * @inheritdoc IRMRKMultiAsset
      */
     function approveForAssets(address to, uint256 tokenId) public virtual {
         address owner = ownerOf(tokenId);
@@ -185,12 +134,7 @@ contract RMRKNestableMultiAsset is RMRKNestable, AbstractMultiAsset {
     }
 
     /**
-     * @notice Used to retrieve the address of the account approved to manage assets of a given token.
-     * @dev Requirements:
-     *
-     *  - `tokenId` must exist.
-     * @param tokenId ID of the token for which to retrieve the approved address
-     * @return address Address of the account that is approved to manage the specified token's assets
+     * @inheritdoc IRMRKMultiAsset
      */
     function getApprovedForAssets(
         uint256 tokenId

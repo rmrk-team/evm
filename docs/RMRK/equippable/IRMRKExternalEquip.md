@@ -26,7 +26,7 @@ Accepts an asset at from the pending array of given token.
 |---|---|---|
 | tokenId | uint256 | ID of the token for which to accept the pending asset |
 | index | uint256 | Index of the asset in the pending array to accept |
-| assetId | uint64 | Id of the asset expected to be in the index |
+| assetId | uint64 | ID of the asset expected to be in the index |
 
 ### approveForAssets
 
@@ -150,17 +150,17 @@ Used to get the asset and equippable data associated with given `assetId`.
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | undefined |
+| tokenId | uint256 | ID of the token for which to retrieve the asset |
 | assetId | uint64 | ID of the asset of which we are retrieving |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| metadataURI | string | undefined |
-| equippableGroupId | uint64 | undefined |
-| baseAddress | address | undefined |
-| partIds | uint64[] | undefined |
+| metadataURI | string | The metadata URI of the asset |
+| equippableGroupId | uint64 | ID of the equippable group this asset belongs to |
+| baseAddress | address | The address of the base the part belongs to |
+| partIds | uint64[] | An array of IDs of parts included in the asset |
 
 ### getAssetMetadata
 
@@ -216,7 +216,7 @@ function getEquipment(uint256 tokenId, address targetBaseAddress, uint64 slotPar
 
 Used to get the Equipment object equipped into the specified slot of the desired token.
 
-
+*The `Equipment` struct consists of the following data:  [      assetId,      childAssetId,      childId,      childEquippableAddress  ]*
 
 #### Parameters
 
@@ -238,16 +238,16 @@ Used to get the Equipment object equipped into the specified slot of the desired
 function getNestableAddress() external view returns (address)
 ```
 
+Returns the Equippable contract&#39;s corresponding nestable address.
 
 
-*Returns the Equippable contract&#39;s corresponding nestable address.*
 
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | address | undefined |
+| _0 | address | address Address of the Nestable module of the external equip composite |
 
 ### getPendingAssets
 
@@ -302,7 +302,7 @@ function isChildEquipped(uint256 tokenId, address childAddress, uint256 childId)
 
 Used to check whether the token has a given child equipped.
 
-
+*This is used to prevent from transferring a child that is equipped.*
 
 #### Parameters
 
@@ -333,7 +333,7 @@ Rejects all assets from the pending array of a given token.
 | Name | Type | Description |
 |---|---|---|
 | tokenId | uint256 | ID of the token of which to clear the pending array. |
-| maxRejections | uint256 | Maximum number of expected assets to reject, used to prevent from  rejecting assets which arrive just before this operation. |
+| maxRejections | uint256 | Maximum number of expected assets to reject, used to prevent from rejecting assets which  arrive just before this operation. |
 
 ### rejectAsset
 
@@ -351,7 +351,7 @@ Rejects an asset from the pending array of given token.
 |---|---|---|
 | tokenId | uint256 | ID of the token that the asset is being rejected from |
 | index | uint256 | Index of the asset in the pending array to be rejected |
-| assetId | uint64 | Id of the asset expected to be in the index |
+| assetId | uint64 | ID of the asset expected to be in the index |
 
 ### setApprovalForAllForAssets
 

@@ -74,8 +74,8 @@ interface IRMRKMultiAsset is IERC165 {
      * @notice Used to notify listeners that owner has granted approval to the user to manage assets of all of their
      *  tokens.
      * @param owner Address of the account that has granted the approval for all assets on all of their tokens
-     * @param operator Address of the account that has been granted the approval to manage the token's assets on all of the
-     *  tokens
+     * @param operator Address of the account that has been granted the approval to manage the token's assets on all of
+     *  the tokens
      * @param approved Boolean value signifying whether the permission has been granted (`true`) or revoked (`false`)
      */
     event ApprovalForAllForAssets(
@@ -96,7 +96,7 @@ interface IRMRKMultiAsset is IERC165 {
      * @dev Emits an {AssetAccepted} event.
      * @param tokenId ID of the token for which to accept the pending asset
      * @param index Index of the asset in the pending array to accept
-     * @param assetId Id of the asset expected to be in the index
+     * @param assetId ID of the asset expected to be in the index
      */
     function acceptAsset(
         uint256 tokenId,
@@ -115,7 +115,7 @@ interface IRMRKMultiAsset is IERC165 {
      * @dev Emits a {AssetRejected} event.
      * @param tokenId ID of the token that the asset is being rejected from
      * @param index Index of the asset in the pending array to be rejected
-     * @param assetId Id of the asset expected to be in the index
+     * @param assetId ID of the asset expected to be in the index
      */
     function rejectAsset(
         uint256 tokenId,
@@ -132,8 +132,8 @@ interface IRMRKMultiAsset is IERC165 {
      *  - `tokenId` must exist.
      * @dev Emits a {AssetRejected} event with assetId = 0.
      * @param tokenId ID of the token of which to clear the pending array.
-     * @param maxRejections Maximum number of expected assets to reject, used to prevent from
-     *  rejecting assets which arrive just before this operation.
+     * @param maxRejections Maximum number of expected assets to reject, used to prevent from rejecting assets which
+     *  arrive just before this operation.
      */
     function rejectAllAssets(uint256 tokenId, uint256 maxRejections) external;
 
