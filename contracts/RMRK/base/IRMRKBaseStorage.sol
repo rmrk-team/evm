@@ -82,7 +82,6 @@ interface IRMRKBaseStorage is IERC165 {
         string metadataURI; //n bytes 32+
     }
 
-    //TODO: Doc this struct, put JSON intake format in comments here
     /**
      * @notice The structure used to add a new `Part`.
      * @dev The part is added with specified ID, so you have to make sure that you are using an unused `partId`,
@@ -122,7 +121,8 @@ interface IRMRKBaseStorage is IERC165 {
     function getType() external view returns (string memory);
 
     /**
-     * @notice Used to check whether the part is equippable by targetAddress.
+     * @notice Used to check whether the given address is allowed to equip the desired `Part`.
+     * @dev Returns true if a collection may equip asset with `partId`.
      * @param partId The ID of the part that we are checking
      * @param targetAddress The address that we are checking for whether the part can be equipped into it or not
      * @return bool The status indicating whether the `targetAddress` can be equipped into `Part` with `partId` or not
@@ -134,6 +134,7 @@ interface IRMRKBaseStorage is IERC165 {
 
     /**
      * @notice Used to check if the part is equippable by all addresses.
+     * @dev Returns true if part is equippable to all.
      * @param partId ID of the part that we are checking
      * @return bool The status indicating whether the part with `partId` can be equipped by any address or not
      */

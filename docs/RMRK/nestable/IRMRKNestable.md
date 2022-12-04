@@ -25,9 +25,9 @@ Used to accept a pending child token for a given parent token.
 | Name | Type | Description |
 |---|---|---|
 | parentId | uint256 | ID of the parent token for which the child token is being accepted |
-| childIndex | uint256 | Index of the child token to accept in the pending children array of a given token |
-| childAddress | address | Address of the collection smart contract of the child token expected to be at the specified  index |
-| childId | uint256 | ID of the child token expected to be located at the specified index |
+| childIndex | uint256 | Index of a child tokem in the given parent&#39;s pending children array |
+| childAddress | address | Address of the collection smart contract of the child token expected to be located at the  specified index of the given parent token&#39;s pending children array |
+| childId | uint256 | ID of the child token expected to be located at the specified index of the given parent token&#39;s  pending children array |
 
 ### addChild
 
@@ -55,7 +55,7 @@ function burn(uint256 tokenId, uint256 maxRecursiveBurns) external nonpayable re
 
 Used to burn a given token.
 
-*When a token is burned, all of its child tokens are recursively burned as well.When specifying the maximum recursive burns, the execution will be reverted if there are more children to be  burned.Setting the `maxRecursiveBurn` value to 0 will only attempt to burn the specified token and revert if there  are any child tokens present.*
+*When a token is burned, all of its child tokens are recursively burned as well.When specifying the maximum recursive burns, the execution will be reverted if there are more children to be  burned.Setting the `maxRecursiveBurn` value to 0 will only attempt to burn the specified token and revert if there  are any child tokens present.The approvals are cleared when the token is burned.Requirements:  - `tokenId` must exist.Emits a {Transfer} event.*
 
 #### Parameters
 
@@ -234,7 +234,7 @@ function rejectAllChildren(uint256 parentId, uint256 maxRejections) external non
 
 Used to reject all pending children of a given parent token.
 
-*Removes the children from the pending array mapping.The children&#39;s ownership structures are not updated.Requirements: Requirements: - `parentId` must exist*
+*Removes the children from the pending array mapping.This does not update the ownership storage data on children. If necessary, ownership can be reclaimed by the  rootOwner of the previous parent.Requirements: Requirements: - `parentId` must exist*
 
 #### Parameters
 
@@ -273,7 +273,7 @@ function transferChild(uint256 tokenId, address to, uint256 destinationId, uint2
 
 Used to transfer a child token from a given parent token.
 
-*When transferring a child token, the owner of the token is set to `to`, or is not updated in the event of `to`  being the `0x0` address.*
+*When transferring a child token, the owner of the token is set to `to`, or is not updated in the event of  `to` being the `0x0` address.*
 
 #### Parameters
 
@@ -285,7 +285,7 @@ Used to transfer a child token from a given parent token.
 | childIndex | uint256 | Index of a token we are transferring, in the array it belongs to (can be either active array or  pending array) |
 | childAddress | address | Address of the child token&#39;s collection smart contract. |
 | childId | uint256 | ID of the child token in its own collection smart contract. |
-| isPending | bool | A boolean value indicating whether the child token being transferred is in the pending array of the  parent token (`true`) or in the active array (`false`) |
+| isPending | bool | A boolean value indicating whether the child token being transferred is in the pending array of  the parent token (`true`) or in the active array (`false`) |
 | data | bytes | Additional data with no specified format, sent in call to `_to` |
 
 

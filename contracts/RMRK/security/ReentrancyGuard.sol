@@ -41,7 +41,7 @@ abstract contract ReentrancyGuard {
     uint256 private _status;
 
     /**
-     * @dev Initializes the ReentrancyGuard with the `_status` of `_NOT_ENTERED`.
+     * @notice Initializes the ReentrancyGuard with the `_status` of `_NOT_ENTERED`.
      */
     constructor() {
         _status = _NOT_ENTERED;

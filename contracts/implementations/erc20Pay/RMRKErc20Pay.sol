@@ -15,6 +15,10 @@ error RMRKNotEnoughAllowance();
 abstract contract RMRKErc20Pay is IRMRKErc20Pay {
     address private immutable _erc20TokenAddress;
 
+    /**
+     * @notice Used to initialize the smart contract.
+     * @param erc20TokenAddress_ Address of the ERC20 token supported by this smart contract
+     */
     constructor(address erc20TokenAddress_) {
         _erc20TokenAddress = erc20TokenAddress_;
     }

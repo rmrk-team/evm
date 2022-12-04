@@ -16,9 +16,9 @@ An interface Base storage for RMRK equippable module.
 function checkIsEquippable(uint64 partId, address targetAddress) external view returns (bool)
 ```
 
-Used to check whether the part is equippable by targetAddress.
+Used to check whether the given address is allowed to equip the desired `Part`.
 
-
+*Returns true if a collection may equip asset with `partId`.*
 
 #### Parameters
 
@@ -41,7 +41,7 @@ function checkIsEquippableToAll(uint64 partId) external view returns (bool)
 
 Used to check if the part is equippable by all addresses.
 
-
+*Returns true if part is equippable to all.*
 
 #### Parameters
 

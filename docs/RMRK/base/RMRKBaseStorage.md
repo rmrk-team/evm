@@ -16,7 +16,7 @@ Base storage contract for RMRK equippable module.
 function checkIsEquippable(uint64 partId, address targetAddress) external view returns (bool)
 ```
 
-Used to check whether the given address is allowed to equip the desired `Part`
+Used to check whether the given address is allowed to equip the desired `Part`.
 
 *Returns true if a collection may equip asset with `partId`.*
 

@@ -17,7 +17,7 @@ contract RMRKMintingUtils is OwnableLock {
     uint256 internal immutable _pricePerMint;
 
     /**
-     * @dev Initializes the smart contract with a given maximum supply and minting price.
+     * @notice Initializes the smart contract with a given maximum supply and minting price.
      * @param maxSupply_ The maximum supply of tokens to initialize the smart contract with
      * @param pricePerMint_ The minting price to initialize the smart contract with, expressed in the smallest
      *  denomination of the native currency of the chain to which the smart contract is deployed to
@@ -80,6 +80,10 @@ contract RMRKMintingUtils is OwnableLock {
         require(success, "Transfer failed.");
     }
 
+    /**
+     * @notice Used to verify that the sale is still open.
+     * @dev In case the maximum supply of the collection is reached, the execution is reverted.
+     */
     function _checkSaleIsOpen() private view {
         if (_totalSupply >= _maxSupply) revert RMRKMintOverMax();
     }

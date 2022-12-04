@@ -79,7 +79,9 @@ contract RMRKEquippable is
     // ----------------------------- CONSTRUCTOR ------------------------------
 
     /**
-     * @dev Initializes the contract by setting a `name` and a `symbol` of the token collection.
+     * @notice Initializes the contract by setting a `name` and a `symbol` of the token collection.
+     * @param name_ Name of the token collection
+     * @param symbol_ Symbol of the token collection
      */
     constructor(
         string memory name_,
@@ -152,8 +154,8 @@ contract RMRKEquippable is
      *  - `tokenId` must exist.
      * @dev Emits a {AssetRejected} event with assetId = 0.
      * @param tokenId ID of the token of which to clear the pending array.
-     * @param maxRejections Maximum number of expected assets to reject, used to prevent from
-     *  rejecting assets which arrive just before this operation.
+     * @param maxRejections Maximum number of expected assets to reject, used to prevent from rejecting assets which
+     *  arrive just before this operation.
      */
     function rejectAllAssets(
         uint256 tokenId,
@@ -188,6 +190,11 @@ contract RMRKEquippable is
     /**
      * @notice Used to add a asset entry.
      * @dev This internal function warrants custom access control to be implemented when used.
+     * @param id ID of the asset being added
+     * @param equippableGroupId ID of the equippable group being marked as equippable into the slot associated with
+     *  `Parts` of the `Slot` type
+     * @param baseAddress Address of the `Base` associated with the asset
+     * @param metadataURI The metadata URI of the asset
      * @param partIds An array of IDs of fixed and slot parts to be included in the asset
      */
     function _addAssetEntry(
@@ -281,19 +288,7 @@ contract RMRKEquippable is
     // ------------------------------- EQUIPPING ------------------------------
 
     /**
-     * @notice Used to transfer a child from the given parent.
-     * @dev The function doesn't contain a check validating `to`. To ensure that a token is not
-     *  transferred to an incompatible smart contract, custom validation has to be added when using this function.
-     * @param tokenId ID of the parent token from which the child token is being transferred
-     * @param to Address to which to transfer the token to
-     * @param destinationId ID of the token to receive this child token (MUST be 0 if the destination is not a token)
-     * @param childIndex Index of a token we are transferring, in the array it belongs to (can be either active array or
-     *  pending array)
-     * @param childAddress Address of the child token's collection smart contract.
-     * @param childId ID of the child token in its own collection smart contract.
-     * @param isPending A boolean value indicating whether the child token being transferred is in the pending array of the
-     *  parent token (`true`) or in the active array (`false`)
-     * @param data Additional data with no specified format, sent in call to `_to`
+     * @inheritdoc RMRKNestable
      */
     function _transferChild(
         uint256 tokenId,
@@ -477,12 +472,7 @@ contract RMRKEquippable is
     }
 
     /**
-     * @notice Used to check whether the token has a given child equipped.
-     * @dev This is used to prevent from transferring a child that is equipped.
-     * @param tokenId ID of the parent token for which we are querying for
-     * @param childAddress Address of the child token's smart contract
-     * @param childId ID of the child token
-     * @return bool The boolean value indicating whether the child token is equipped into the given token or not
+     * @inheritdoc IRMRKEquippable
      */
     function isChildEquipped(
         uint256 tokenId,
@@ -517,13 +507,7 @@ contract RMRKEquippable is
     }
 
     /**
-     * @notice Used to verify whether a token can be equipped into a given parent's slot.
-     * @param parent Address of the parent token's smart contract
-     * @param tokenId ID of the token we want to equip
-     * @param assetId ID of the asset associated with the token we want to equip
-     * @param slotId ID of the slot that we want to equip the token into
-     * @return bool The boolean indicating whether the token with the given asset can be equipped into the desired
-     *  slot
+     * @inheritdoc IRMRKEquippable
      */
     function canTokenBeEquippedWithAssetIntoSlot(
         address parent,
@@ -543,8 +527,7 @@ contract RMRKEquippable is
     // --------------------- Getting Extended Assets ---------------------
 
     /**
-     * @notice Used to get the asset and equippable data associated with given `assetId`.
-     * @param assetId ID of the asset of which we are retrieving
+     * @inheritdoc IRMRKEquippable
      */
     function getAssetAndEquippableData(
         uint256 tokenId,
@@ -568,18 +551,7 @@ contract RMRKEquippable is
     ////////////////////////////////////////
 
     /**
-     * @notice Used to get the Equipment object equipped into the specified slot of the desired token.
-     * @dev The `Equipment` struct consists of the following data:
-     *  [
-     *      assetId,
-     *      childAssetId,
-     *      childId,
-     *      childEquippableAddress
-     *  ]
-     * @param tokenId ID of the token for which we are retrieving the equipped object
-     * @param targetBaseAddress Address of the `Base` associated with the `Slot` part of the token
-     * @param slotPartId ID of the `Slot` part that we are checking for equipped objects
-     * @return struct The `Equipment` struct containing data about the equipped object
+     * @inheritdoc IRMRKEquippable
      */
     function getEquipment(
         uint256 tokenId,

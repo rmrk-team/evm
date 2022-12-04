@@ -33,7 +33,7 @@ Version of the @rmrk-team/evm-contracts package
 function isSoulbound(uint256 tokenId) external view returns (bool)
 ```
 
-Used to verify if the token is soulbound.
+Used to check whether the given token is soulbound or not.
 
 
 
@@ -41,13 +41,13 @@ Used to verify if the token is soulbound.
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | ID of the token we are verifying |
+| tokenId | uint256 | ID of the token being checked |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | bool Boolean verifying whether the token is soulbound |
+| _0 | bool | bool Boolean value indicating whether the given token is soulbound |
 
 ### name
 
