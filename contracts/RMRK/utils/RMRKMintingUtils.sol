@@ -13,7 +13,7 @@ import "../library/RMRKErrors.sol";
  */
 contract RMRKMintingUtils is OwnableLock {
     uint256 internal _totalSupply;
-    uint256 internal immutable _maxSupply;
+    uint256 internal _maxSupply;
     uint256 internal immutable _pricePerMint;
 
     /**
@@ -34,6 +34,14 @@ contract RMRKMintingUtils is OwnableLock {
     modifier saleIsOpen() {
         _checkSaleIsOpen();
         _;
+    }
+
+    /**
+     * @inheritdoc OwnableLock
+     */
+    function setLock() public virtual override onlyOwner {
+        super.setLock();
+        _maxSupply = _totalSupply;
     }
 
     /**

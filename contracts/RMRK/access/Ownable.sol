@@ -66,7 +66,7 @@ contract Ownable is Context {
      * @param newOwner Address of the new owner's account
      */
     function transferOwnership(address newOwner) public virtual onlyOwner {
-        if (owner() == address(0)) revert RMRKNewOwnerIsZeroAddress();
+        if (newOwner == address(0)) revert RMRKNewOwnerIsZeroAddress();
         _transferOwnership(newOwner);
     }
 
@@ -87,7 +87,7 @@ contract Ownable is Context {
      * @param contributor Address of the contributor's account
      */
     function addContributor(address contributor) external onlyOwner {
-        if (contributor != address(0)) revert RMRKNewContributorIsZeroAddress();
+        if (contributor == address(0)) revert RMRKNewContributorIsZeroAddress();
         _contributors[contributor] = 1;
     }
 
