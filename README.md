@@ -2,7 +2,7 @@
 
 A set of Solidity contracts for RMRK.app.
 
-For each of the MultiAsset, nestable and Equippable combinations, we provide samples of simple and advance usage in [this repo](https://github.com/rmrk-team/evm-sample-contracts).
+For each of the MultiAsset, Nestable and Equippable combinations, we provide samples of simple and advance usage in [this repo](https://github.com/rmrk-team/evm-sample-contracts).
 
 ## MultiAsset (RMRKMultiAsset)
 
