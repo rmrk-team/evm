@@ -23,8 +23,7 @@ contract RMRKEquipRenderUtils {
      * @return priority Priority of the asset in the active assets array it belongs to
      * @return baseAddress Address of the `Base` smart contract this asset belongs to
      * @return metadata Metadata URI of the asset
-     * @return fixedParts An array of IDs of fixed parts present in the asset
-     * @return slotParts An array of IDs of slot parts present in the asset
+     * @return partIds[] An array of IDs of fixed and slot parts present in the asset
      */
     struct ExtendedActiveAsset {
         uint64 id;
@@ -43,8 +42,7 @@ contract RMRKEquipRenderUtils {
      * @return replacesAssetWithId ID of the asset the given asset will replace if accepted
      * @return baseAddress Address of the `Base` smart contract this asset belongs to
      * @return metadata Metadata URI of the asset
-     * @return fixedParts An array of IDs of fixed parts present in the asset
-     * @return slotParts An array of IDs of slot parts present in the asset
+     * @return partIds[] An array of IDs of fixed and slot parts present in the asset
      */
     struct ExtendedPendingAsset {
         uint64 id;
@@ -420,6 +418,13 @@ contract RMRKEquipRenderUtils {
         }
     }
 
+    /**
+     * @notice Used to split slot and fixed parts.
+     * @param allPartIds[] An array of `Part` IDs containing both, `Slot` and `Fixed` parts
+     * @param baseAddress An address of the base to which the given `Part`s belong to
+     * @return slotPartIds An array of IDs of the `Slot` parts included in the `allPartIds`
+     * @return fixedPartIds An array of IDs of the `Fixed` parts included in the `allPartIds`
+     */
     function splitSlotAndFixedParts(
         uint64[] memory allPartIds,
         address baseAddress

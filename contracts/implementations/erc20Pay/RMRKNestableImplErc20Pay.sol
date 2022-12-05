@@ -16,6 +16,22 @@ contract RMRKNestableImplErc20Pay is
     RMRKErc20Pay,
     RMRKAbstractNestableImpl
 {
+    /**
+     * @notice Used to initialize the smart contract.
+     * @dev The full `InitData` looks like this:
+     *  [
+     *      erc20TokenAddress,
+     *      royaltyRecipient,
+     *      royaltyPercentageBps,
+     *      maxSupply,
+     *      pricePerMint
+     *  ]
+     * @param name_ Name of the token collection
+     * @param symbol_ Symbol of the token collection
+     * @param collectionMetadata_ The collection metadata URI
+     * @param tokenURI_ The base URI of the token metadata
+     * @param data The `InitData` struct containing additional initialization data
+     */
     constructor(
         string memory name_,
         string memory symbol_,

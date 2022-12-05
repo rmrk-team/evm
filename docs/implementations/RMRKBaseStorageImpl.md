@@ -81,7 +81,7 @@ function addPartList(IRMRKBaseStorage.IntakeStruct[] intakeStructs) external non
 function checkIsEquippable(uint64 partId, address targetAddress) external view returns (bool)
 ```
 
-Used to check whether the given address is allowed to equip the desired `Part`
+Used to check whether the given address is allowed to equip the desired `Part`.
 
 *Returns true if a collection may equip asset with `partId`.*
 
@@ -235,7 +235,7 @@ Used to check if the address is one of the contributors.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | Boolean value indicating whether the address is a contributor or not |
+| _0 | bool | bool Boolean value indicating whether the address is a contributor or not |
 
 ### owner
 

@@ -95,6 +95,7 @@ interface IRMRKEquippable is IRMRKMultiAsset {
 
     /**
      * @notice Used to check whether the token has a given child equipped.
+     * @dev This is used to prevent from transferring a child that is equipped.
      * @param tokenId ID of the parent token for which we are querying for
      * @param childAddress Address of the child token's smart contract
      * @param childId ID of the child token
@@ -124,6 +125,13 @@ interface IRMRKEquippable is IRMRKMultiAsset {
 
     /**
      * @notice Used to get the Equipment object equipped into the specified slot of the desired token.
+     * @dev The `Equipment` struct consists of the following data:
+     *  [
+     *      assetId,
+     *      childAssetId,
+     *      childId,
+     *      childEquippableAddress
+     *  ]
      * @param tokenId ID of the token for which we are retrieving the equipped object
      * @param targetBaseAddress Address of the `Base` associated with the `Slot` part of the token
      * @param slotPartId ID of the `Slot` part that we are checking for equipped objects
@@ -137,7 +145,12 @@ interface IRMRKEquippable is IRMRKMultiAsset {
 
     /**
      * @notice Used to get the asset and equippable data associated with given `assetId`.
+     * @param tokenId ID of the token for which to retrieve the asset
      * @param assetId ID of the asset of which we are retrieving
+     * @return metadataURI The metadata URI of the asset
+     * @return equippableGroupId ID of the equippable group this asset belongs to
+     * @return baseAddress The address of the base the part belongs to
+     * @return partIds An array of IDs of parts included in the asset
      */
     function getAssetAndEquippableData(
         uint256 tokenId,

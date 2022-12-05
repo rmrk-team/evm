@@ -1,7 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
 
-//Generally all interactions should propagate downstream
-
 pragma solidity ^0.8.16;
 
 import "../../RMRK/equippable/IRMRKEquippable.sol";
@@ -21,6 +19,11 @@ import "../../RMRK/nestable/RMRKNestable.sol";
 contract RMRKNestableExternalEquip is IRMRKNestableExternalEquip, RMRKNestable {
     address private _equippableAddress;
 
+    /**
+     * @notice Used to initialize the smart contract.
+     * @param name_ Name of the token collection
+     * @param symbol_ Symbol of the token collection
+     */
     constructor(
         string memory name_,
         string memory symbol_
@@ -38,19 +41,7 @@ contract RMRKNestableExternalEquip is IRMRKNestableExternalEquip, RMRKNestable {
     }
 
     /**
-     * @notice Used to transfer a child from the given parent.
-     * @dev The function doesn't contain a check validating `to`. To ensure that a token is not
-     *  transferred to an incompatible smart contract, custom validation has to be added when usin
-     * @param tokenId ID of the parent token from which the child token is being transferred
-     * @param to Address to which to transfer the token to
-     * @param destinationId ID of the token to receive this child token (MUST be 0 if the destination is not a token)
-     * @param childIndex Index of a token we are transferring, in the array it belongs to (can be either active array or
-     *  pending array)
-     * @param childAddress Address of the child token's collection smart contract.
-     * @param childId ID of the child token in its own collection smart contract.
-     * @param isPending A boolean value indicating whether the child token being transferred is in the pending array of the
-     *  parent token (`true`) or in the active array (`false`)
-     * @param data Additional data with no specified format, sent in call to `_to`
+     * @inheritdoc RMRKNestable
      */
     function _transferChild(
         uint256 tokenId,
@@ -96,20 +87,14 @@ contract RMRKNestableExternalEquip is IRMRKNestableExternalEquip, RMRKNestable {
     }
 
     /**
-     * @notice Used to retrieve the address of the `Equippable` smart contract.
-     * @return address Address of the `Equippable` smart contract
+     * @inheritdoc IRMRKNestableExternalEquip
      */
     function getEquippableAddress() external view virtual returns (address) {
         return _equippableAddress;
     }
 
     /**
-     * @notice Used to verify that the specified address is either the owner of the given token or approved by the owner
-     *  to manage it.
-     * @param spender Address that we are verifying
-     * @param tokenId ID of the token we are checking
-     * @return bool A boolean value indicating whether the specified address is the owner of the given token or approved
-     *  to manage it
+     * @inheritdoc IRMRKNestableExternalEquip
      */
     function isApprovedOrOwner(
         address spender,
@@ -119,8 +104,7 @@ contract RMRKNestableExternalEquip is IRMRKNestableExternalEquip, RMRKNestable {
     }
 
     /**
-     * @notice Used to clear approvals for the given token.
-     * @param tokenId ID of the token for which the approvals should be cleared
+     * @inheritdoc RMRKNestable
      */
     function _cleanApprovals(uint256 tokenId) internal virtual override {
         IRMRKMultiAsset(_equippableAddress).approveForAssets(

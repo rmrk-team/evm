@@ -33,7 +33,7 @@ Version of the @rmrk-team/evm-contracts package
 function acceptAsset(uint256 tokenId, uint256 index, uint64 assetId) external nonpayable
 ```
 
-Accepts an asset from the pending array of given token.
+Accepts an asset at from the pending array of given token.
 
 *Migrates the asset from the token&#39;s pending asset array to the token&#39;s active asset array.Active assets cannot be removed by anyone, but can be replaced by a new asset.Requirements:  - The caller must own the token or be approved to manage the token&#39;s assets  - `tokenId` must exist.  - `index` must be in range of the length of the pending asset array.Emits an {AssetAccepted} event.*
 
@@ -43,7 +43,7 @@ Accepts an asset from the pending array of given token.
 |---|---|---|
 | tokenId | uint256 | ID of the token for which to accept the pending asset |
 | index | uint256 | Index of the asset in the pending array to accept |
-| assetId | uint64 | ID of the asset expected to be located at the specified index |
+| assetId | uint64 | ID of the asset expected to be in the index |
 
 ### acceptChild
 
@@ -51,7 +51,7 @@ Accepts an asset from the pending array of given token.
 function acceptChild(uint256 parentId, uint256 childIndex, address childAddress, uint256 childId) external nonpayable
 ```
 
-@notice Used to accept a pending child token for a given parent token.
+Used to accept a pending child token for a given parent token.
 
 *This moves the child token from parent token&#39;s pending child tokens array into the active child tokens  array.*
 
@@ -72,7 +72,7 @@ function addChild(uint256 parentId, uint256 childId, bytes data) external nonpay
 
 Used to add a child token to a given parent token.
 
-*This adds the iichild token into the given parent token&#39;s pending child tokens array.Requirements:  - `ownerOf` on the child contract must resolve to the called contract.  - The pending array of the parent contract must not be full.*
+*This adds the child token into the given parent token&#39;s pending child tokens array.Requirements:  - `directOwnerOf` on the child contract must resolve to the called contract.  - the pending array of the parent contract must not be full.*
 
 #### Parameters
 
@@ -146,7 +146,7 @@ function burn(uint256 tokenId) external nonpayable
 
 Used to burn a given token.
 
-
+*In case the token has any child tokens, the execution will be reverted.*
 
 #### Parameters
 
@@ -160,22 +160,22 @@ Used to burn a given token.
 function burn(uint256 tokenId, uint256 maxChildrenBurns) external nonpayable returns (uint256)
 ```
 
-Used to burn a token.
+Used to burn a given token.
 
-*When a token is burned, its children are recursively burned as well.The approvals are cleared when the token is burned.Requirements:  - `tokenId` must exist.Emits a {Transfer} event.*
+*When a token is burned, all of its child tokens are recursively burned as well.When specifying the maximum recursive burns, the execution will be reverted if there are more children to be  burned.Setting the `maxRecursiveBurn` value to 0 will only attempt to burn the specified token and revert if there  are any child tokens present.The approvals are cleared when the token is burned.Requirements:  - `tokenId` must exist.Emits a {Transfer} event.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
 | tokenId | uint256 | ID of the token to burn |
-| maxChildrenBurns | uint256 | Maximum children to recursively burn |
+| maxChildrenBurns | uint256 | undefined |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | uint256 The number of recursive burns it took to burn all of the children |
+| _0 | uint256 | uint256 Number of recursively burned children |
 
 ### childIsInActive
 
@@ -253,21 +253,21 @@ function directOwnerOf(uint256 tokenId) external view returns (address, uint256,
 
 Used to retrieve the immediate owner of the given token.
 
-*In the event the NFT is owned by an externally owned account, `tokenId` will be `0` and `isNft` will be  `false`.*
+*If the immediate owner is another token, the address returned, should be the one of the parent token&#39;s  collection smart contract.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | ID of the token for which the immediate owner is being retrieved |
+| tokenId | uint256 | ID of the token for which the RMRK owner is being retrieved |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | address | address Address of the immediate owner. If the token is owned by an externally owned account, its address  will be returned. If the token is owned by another token, the parent token&#39;s collection smart contract address  is returned |
-| _1 | uint256 | uint256 Token ID of the immediate owner. If the immediate owner is an externally owned account, the value  should be `0` |
-| _2 | bool | bool A boolean value signifying whether the immediate owner is a token (`true`) or not (`false`) |
+| _0 | address | address Address of the given token&#39;s owner |
+| _1 | uint256 | uint256 The ID of the parent token. Should be `0` if the owner is an externally owned account |
+| _2 | bool | bool The boolean value signifying whether the owner is an NFT or not |
 
 ### getActiveAssetPriorities
 
@@ -275,7 +275,7 @@ Used to retrieve the immediate owner of the given token.
 function getActiveAssetPriorities(uint256 tokenId) external view returns (uint16[])
 ```
 
-Used to retrieve active asset priorities of a given token.
+Used to retrieve the priorities of the active resoources of a given token.
 
 *Asset priorities are a non-sequential array of uint16 values with an array size equal to active asset  priorites.*
 
@@ -283,13 +283,13 @@ Used to retrieve active asset priorities of a given token.
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | ID of the token to query |
+| tokenId | uint256 | ID of the token for which to retrieve the priorities of the active assets |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint16[] | uint16[] Array of active asset priorities |
+| _0 | uint16[] | uint16[] An array of priorities of the active assets of the given token |
 
 ### getActiveAssets
 
@@ -297,21 +297,21 @@ Used to retrieve active asset priorities of a given token.
 function getActiveAssets(uint256 tokenId) external view returns (uint64[])
 ```
 
-Used to retrieve the active asset IDs of a given token.
+Used to retrieve IDs of the active assets of given token.
 
-*Assets metadata is stored by reference mapping `_asset[assetId]`.*
+*Asset data is stored by reference, in order to access the data corresponding to the ID, call  `getAssetMetadata(tokenId, assetId)`.You can safely get 10k*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | ID of the token to query |
+| tokenId | uint256 | ID of the token to retrieve the IDs of the active assets |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint64[] | uint64[] Array of active asset IDs |
+| _0 | uint64[] | uint64[] An array of active asset IDs of the given token |
 
 ### getApproved
 
@@ -363,7 +363,7 @@ Used to retrieve the address of the account approved to manage assets of a given
 function getAssetMetadata(uint256 tokenId, uint64 assetId) external view returns (string)
 ```
 
-Used to fetch the asset metadata of the specified token&#39;s for given asset.
+Used to fetch the asset metadata of the specified token&#39;s active asset with the given index.
 
 *Assets are stored by reference mapping `_assets[assetId]`.Can be overriden to implement enumerate, fallback or other custom logic.*
 
@@ -371,14 +371,14 @@ Used to fetch the asset metadata of the specified token&#39;s for given asset.
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | ID of the token to query |
-| assetId | uint64 | Asset Id, must be in the pending or active assets array |
+| tokenId | uint256 | ID of the token from which to retrieve the asset metadata |
+| assetId | uint64 | Asset Id, must be in the active assets array |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | string Metadata of the asset |
+| _0 | string | string The metadata of the asset belonging to the specified index in the token&#39;s active assets  array |
 
 ### getAssetReplacements
 
@@ -386,15 +386,15 @@ Used to fetch the asset metadata of the specified token&#39;s for given asset.
 function getAssetReplacements(uint256 tokenId, uint64 newAssetId) external view returns (uint64)
 ```
 
-Used to retrieve the asset ID that will be replaced (if any) if a given assetID is accepted from  the pending assets array.
+Used to retrieve the asset that will be replaced if a given asset from the token&#39;s pending array  is accepted.
 
-
+*Asset data is stored by reference, in order to access the data corresponding to the ID, call  `getAssetMetadata(tokenId, assetId)`.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | ID of the token to query |
+| tokenId | uint256 | ID of the token to check |
 | newAssetId | uint64 | ID of the pending asset which will be accepted |
 
 #### Returns
@@ -409,21 +409,21 @@ Used to retrieve the asset ID that will be replaced (if any) if a given assetID 
 function getPendingAssets(uint256 tokenId) external view returns (uint64[])
 ```
 
-Returns pending asset IDs for a given token
+Used to retrieve IDs of the pending assets of given token.
 
-*Pending assets metadata is stored by reference mapping _pendingAsset[assetId]*
+*Asset data is stored by reference, in order to access the data corresponding to the ID, call  `getAssetMetadata(tokenId, assetId)`.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | the token ID to query |
+| tokenId | uint256 | ID of the token to retrieve the IDs of the pending assets |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint64[] | uint64[] pending asset IDs |
+| _0 | uint64[] | uint64[] An array of pending asset IDs of the given token |
 
 ### isApprovedForAll
 
@@ -514,21 +514,21 @@ Used to transfer the token into another token.
 function ownerOf(uint256 tokenId) external view returns (address)
 ```
 
-Used to retrieve the root owner of the given token.
+Used to retrieve the *root* owner of a given token.
 
-*Root owner is always the externally owned account.If the given token is owned by another token, it will recursively query the parent tokens until reaching the  root owner.*
+*The *root* owner of the token is an externally owned account (EOA). If the given token is child of another  NFT, this will return an EOA address. Otherwise, if the token is owned by an EOA, this EOA wil be returned.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | ID of the token for which the root owner is being retrieved |
+| tokenId | uint256 | ID of the token for which the *root* owner has been retrieved |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | address | address Address of the root owner of the given token |
+| _0 | address | The *root* owner of the token |
 
 ### pendingChildOf
 
@@ -583,14 +583,14 @@ function rejectAllAssets(uint256 tokenId, uint256 maxRejections) external nonpay
 
 Rejects all assets from the pending array of a given token.
 
-*Effecitvely deletes the pending array.Requirements:  - The caller must own the token or be approved to manage the token&#39;s assets  - `tokenId` must exist.  - If there are more resouces than `maxRejections`, the execution will be revertedEmits a {AssetRejected} event with assetId = 0.*
+*Effecitvely deletes the pending array.Requirements:  - The caller must own the token or be approved to manage the token&#39;s assets  - `tokenId` must exist.Emits a {AssetRejected} event with assetId = 0.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
 | tokenId | uint256 | ID of the token of which to clear the pending array. |
-| maxRejections | uint256 | Maximum number of expected assets to reject, used to prevent from  rejecting assets which arrive just before this operation. |
+| maxRejections | uint256 | Maximum number of expected assets to reject, used to prevent from rejecting assets which  arrive just before this operation. |
 
 ### rejectAllChildren
 
@@ -600,13 +600,13 @@ function rejectAllChildren(uint256 tokenId, uint256 maxRejections) external nonp
 
 Used to reject all pending children of a given parent token.
 
-*Removes the children from the pending array mapping.This does not update the ownership storage data on children. If necessary, ownership can be reclaimed by the  rootOwner of the previous parent.*
+*Removes the children from the pending array mapping.This does not update the ownership storage data on children. If necessary, ownership can be reclaimed by the  rootOwner of the previous parent.Requirements: Requirements: - `parentId` must exist*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | ID of the parent token for which to reject all of the pending tokens. |
+| tokenId | uint256 | undefined |
 | maxRejections | uint256 | Maximum number of expected children to reject, used to prevent from  rejecting children which arrive just before this operation. |
 
 ### rejectAsset
@@ -625,7 +625,7 @@ Rejects an asset from the pending array of given token.
 |---|---|---|
 | tokenId | uint256 | ID of the token that the asset is being rejected from |
 | index | uint256 | Index of the asset in the pending array to be rejected |
-| assetId | uint64 | ID of the asset expected to be located at the specified index |
+| assetId | uint64 | ID of the asset expected to be in the index |
 
 ### safeTransferFrom
 
@@ -635,7 +635,7 @@ function safeTransferFrom(address from, address to, uint256 tokenId) external no
 
 
 
-*Safely transfers `tokenId` token from `from` to `to`, checking first that contract recipients are aware of the ERC721 protocol to prevent tokens from being forever locked. Requirements: - `from` cannot be the zero address. - `to` cannot be the zero address. - `tokenId` token must exist and be owned by `from`. - If the caller is not `from`, it must have been allowed to move this token by either {approve} or {setApprovalForAll}. - If `to` refers to a smart contract, it must implement {IERC721Receiver-onERC721Received}, which is called upon a safe transfer. Emits a {Transfer} event.*
+*Safely transfers `tokenId` token from `from` to `to`, checking first that contract recipients are aware of the ERC721 protocol to prevent tokens from being forever locked. Requirements: - `from` cannot be the zero address. - `to` cannot be the zero address. - `tokenId` token must exist and be owned by `from`. - If the caller is not `from`, it must be have been allowed to move this token by either {approve} or {setApprovalForAll}. - If `to` refers to a smart contract, it must implement {IERC721Receiver-onERC721Received}, which is called upon a safe transfer. Emits a {Transfer} event.*
 
 #### Parameters
 
@@ -784,7 +784,7 @@ function transferChild(uint256 tokenId, address to, uint256 destinationId, uint2
 
 Used to transfer a child token from a given parent token.
 
-
+*When transferring a child token, the owner of the token is set to `to`, or is not updated in the event of  `to` being the `0x0` address.*
 
 #### Parameters
 
@@ -796,7 +796,7 @@ Used to transfer a child token from a given parent token.
 | childIndex | uint256 | Index of a token we are transferring, in the array it belongs to (can be either active array or  pending array) |
 | childAddress | address | Address of the child token&#39;s collection smart contract. |
 | childId | uint256 | ID of the child token in its own collection smart contract. |
-| isPending | bool | A boolean value indicating whether the child token being transferred is in the pending array of the  parent token (`true`) or in the active array (`false`) |
+| isPending | bool | A boolean value indicating whether the child token being transferred is in the pending array of  the parent token (`true`) or in the active array (`false`) |
 | data | bytes | Additional data with no specified format, sent in call to `_to` |
 
 ### transferFrom
@@ -807,7 +807,7 @@ function transferFrom(address from, address to, uint256 tokenId) external nonpay
 
 
 
-*Transfers `tokenId` token from `from` to `to`. WARNING: Note that the caller is responsible to confirm that the recipient is capable of receiving ERC721 or else they may be permanently lost. Usage of {safeTransferFrom} prevents loss, though the caller must understand this adds an external call which potentially creates a reentrancy vulnerability. Requirements: - `from` cannot be the zero address. - `to` cannot be the zero address. - `tokenId` token must be owned by `from`. - If the caller is not `from`, it must be approved to move this token by either {approve} or {setApprovalForAll}. Emits a {Transfer} event.*
+*Transfers `tokenId` token from `from` to `to`. WARNING: Usage of this method is discouraged, use {safeTransferFrom} whenever possible. Requirements: - `from` cannot be the zero address. - `to` cannot be the zero address. - `tokenId` token must be owned by `from`. - If the caller is not `from`, it must be approved to move this token by either {approve} or {setApprovalForAll}. Emits a {Transfer} event.*
 
 #### Parameters
 

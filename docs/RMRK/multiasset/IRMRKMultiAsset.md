@@ -26,7 +26,7 @@ Accepts an asset at from the pending array of given token.
 |---|---|---|
 | tokenId | uint256 | ID of the token for which to accept the pending asset |
 | index | uint256 | Index of the asset in the pending array to accept |
-| assetId | uint64 | Id of the asset expected to be in the index |
+| assetId | uint64 | ID of the asset expected to be in the index |
 
 ### approveForAssets
 
@@ -217,7 +217,7 @@ Rejects all assets from the pending array of a given token.
 | Name | Type | Description |
 |---|---|---|
 | tokenId | uint256 | ID of the token of which to clear the pending array. |
-| maxRejections | uint256 | Maximum number of expected assets to reject, used to prevent from  rejecting assets which arrive just before this operation. |
+| maxRejections | uint256 | Maximum number of expected assets to reject, used to prevent from rejecting assets which  arrive just before this operation. |
 
 ### rejectAsset
 
@@ -235,7 +235,7 @@ Rejects an asset from the pending array of given token.
 |---|---|---|
 | tokenId | uint256 | ID of the token that the asset is being rejected from |
 | index | uint256 | Index of the asset in the pending array to be rejected |
-| assetId | uint64 | Id of the asset expected to be in the index |
+| assetId | uint64 | ID of the asset expected to be in the index |
 
 ### setApprovalForAllForAssets
 
@@ -312,7 +312,7 @@ Used to notify listeners that owner has granted approval to the user to manage a
 | Name | Type | Description |
 |---|---|---|
 | owner `indexed` | address | Address of the account that has granted the approval for all assets on all of their tokens |
-| operator `indexed` | address | Address of the account that has been granted the approval to manage the token&#39;s assets on all of the  tokens |
+| operator `indexed` | address | Address of the account that has been granted the approval to manage the token&#39;s assets on all of  the tokens |
 | approved  | bool | Boolean value signifying whether the permission has been granted (`true`) or revoked (`false`) |
 
 ### ApprovalForAssets

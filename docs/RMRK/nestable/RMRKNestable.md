@@ -33,7 +33,7 @@ Version of the @rmrk-team/evm-contracts package
 function acceptChild(uint256 parentId, uint256 childIndex, address childAddress, uint256 childId) external nonpayable
 ```
 
-@notice Used to accept a pending child token for a given parent token.
+Used to accept a pending child token for a given parent token.
 
 *This moves the child token from parent token&#39;s pending child tokens array into the active child tokens  array.*
 
@@ -54,7 +54,7 @@ function addChild(uint256 parentId, uint256 childId, bytes data) external nonpay
 
 Used to add a child token to a given parent token.
 
-*This adds the iichild token into the given parent token&#39;s pending child tokens array.Requirements:  - `ownerOf` on the child contract must resolve to the called contract.  - The pending array of the parent contract must not be full.*
+*This adds the child token into the given parent token&#39;s pending child tokens array.Requirements:  - `directOwnerOf` on the child contract must resolve to the called contract.  - the pending array of the parent contract must not be full.*
 
 #### Parameters
 
@@ -111,7 +111,7 @@ function burn(uint256 tokenId) external nonpayable
 
 Used to burn a given token.
 
-
+*In case the token has any child tokens, the execution will be reverted.*
 
 #### Parameters
 
@@ -125,22 +125,22 @@ Used to burn a given token.
 function burn(uint256 tokenId, uint256 maxChildrenBurns) external nonpayable returns (uint256)
 ```
 
-Used to burn a token.
+Used to burn a given token.
 
-*When a token is burned, its children are recursively burned as well.The approvals are cleared when the token is burned.Requirements:  - `tokenId` must exist.Emits a {Transfer} event.*
+*When a token is burned, all of its child tokens are recursively burned as well.When specifying the maximum recursive burns, the execution will be reverted if there are more children to be  burned.Setting the `maxRecursiveBurn` value to 0 will only attempt to burn the specified token and revert if there  are any child tokens present.The approvals are cleared when the token is burned.Requirements:  - `tokenId` must exist.Emits a {Transfer} event.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
 | tokenId | uint256 | ID of the token to burn |
-| maxChildrenBurns | uint256 | Maximum children to recursively burn |
+| maxChildrenBurns | uint256 | undefined |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | uint256 The number of recursive burns it took to burn all of the children |
+| _0 | uint256 | uint256 Number of recursively burned children |
 
 ### childIsInActive
 
@@ -218,21 +218,21 @@ function directOwnerOf(uint256 tokenId) external view returns (address, uint256,
 
 Used to retrieve the immediate owner of the given token.
 
-*In the event the NFT is owned by an externally owned account, `tokenId` will be `0` and `isNft` will be  `false`.*
+*If the immediate owner is another token, the address returned, should be the one of the parent token&#39;s  collection smart contract.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | ID of the token for which the immediate owner is being retrieved |
+| tokenId | uint256 | ID of the token for which the RMRK owner is being retrieved |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | address | address Address of the immediate owner. If the token is owned by an externally owned account, its address  will be returned. If the token is owned by another token, the parent token&#39;s collection smart contract address  is returned |
-| _1 | uint256 | uint256 Token ID of the immediate owner. If the immediate owner is an externally owned account, the value  should be `0` |
-| _2 | bool | bool A boolean value signifying whether the immediate owner is a token (`true`) or not (`false`) |
+| _0 | address | address Address of the given token&#39;s owner |
+| _1 | uint256 | uint256 The ID of the parent token. Should be `0` if the owner is an externally owned account |
+| _2 | bool | bool The boolean value signifying whether the owner is an NFT or not |
 
 ### getApproved
 
@@ -322,21 +322,21 @@ Used to transfer the token into another token.
 function ownerOf(uint256 tokenId) external view returns (address)
 ```
 
-Used to retrieve the root owner of the given token.
+Used to retrieve the *root* owner of a given token.
 
-*Root owner is always the externally owned account.If the given token is owned by another token, it will recursively query the parent tokens until reaching the  root owner.*
+*The *root* owner of the token is an externally owned account (EOA). If the given token is child of another  NFT, this will return an EOA address. Otherwise, if the token is owned by an EOA, this EOA wil be returned.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | ID of the token for which the root owner is being retrieved |
+| tokenId | uint256 | ID of the token for which the *root* owner has been retrieved |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | address | address Address of the root owner of the given token |
+| _0 | address | The *root* owner of the token |
 
 ### pendingChildOf
 
@@ -391,13 +391,13 @@ function rejectAllChildren(uint256 tokenId, uint256 maxRejections) external nonp
 
 Used to reject all pending children of a given parent token.
 
-*Removes the children from the pending array mapping.This does not update the ownership storage data on children. If necessary, ownership can be reclaimed by the  rootOwner of the previous parent.*
+*Removes the children from the pending array mapping.This does not update the ownership storage data on children. If necessary, ownership can be reclaimed by the  rootOwner of the previous parent.Requirements: Requirements: - `parentId` must exist*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | ID of the parent token for which to reject all of the pending tokens. |
+| tokenId | uint256 | undefined |
 | maxRejections | uint256 | Maximum number of expected children to reject, used to prevent from  rejecting children which arrive just before this operation. |
 
 ### safeTransferFrom
@@ -408,7 +408,7 @@ function safeTransferFrom(address from, address to, uint256 tokenId) external no
 
 
 
-*Safely transfers `tokenId` token from `from` to `to`, checking first that contract recipients are aware of the ERC721 protocol to prevent tokens from being forever locked. Requirements: - `from` cannot be the zero address. - `to` cannot be the zero address. - `tokenId` token must exist and be owned by `from`. - If the caller is not `from`, it must have been allowed to move this token by either {approve} or {setApprovalForAll}. - If `to` refers to a smart contract, it must implement {IERC721Receiver-onERC721Received}, which is called upon a safe transfer. Emits a {Transfer} event.*
+*Safely transfers `tokenId` token from `from` to `to`, checking first that contract recipients are aware of the ERC721 protocol to prevent tokens from being forever locked. Requirements: - `from` cannot be the zero address. - `to` cannot be the zero address. - `tokenId` token must exist and be owned by `from`. - If the caller is not `from`, it must be have been allowed to move this token by either {approve} or {setApprovalForAll}. - If `to` refers to a smart contract, it must implement {IERC721Receiver-onERC721Received}, which is called upon a safe transfer. Emits a {Transfer} event.*
 
 #### Parameters
 
@@ -523,7 +523,7 @@ function transferChild(uint256 tokenId, address to, uint256 destinationId, uint2
 
 Used to transfer a child token from a given parent token.
 
-
+*When transferring a child token, the owner of the token is set to `to`, or is not updated in the event of  `to` being the `0x0` address.*
 
 #### Parameters
 
@@ -535,7 +535,7 @@ Used to transfer a child token from a given parent token.
 | childIndex | uint256 | Index of a token we are transferring, in the array it belongs to (can be either active array or  pending array) |
 | childAddress | address | Address of the child token&#39;s collection smart contract. |
 | childId | uint256 | ID of the child token in its own collection smart contract. |
-| isPending | bool | A boolean value indicating whether the child token being transferred is in the pending array of the  parent token (`true`) or in the active array (`false`) |
+| isPending | bool | A boolean value indicating whether the child token being transferred is in the pending array of  the parent token (`true`) or in the active array (`false`) |
 | data | bytes | Additional data with no specified format, sent in call to `_to` |
 
 ### transferFrom
@@ -546,7 +546,7 @@ function transferFrom(address from, address to, uint256 tokenId) external nonpay
 
 
 
-*Transfers `tokenId` token from `from` to `to`. WARNING: Note that the caller is responsible to confirm that the recipient is capable of receiving ERC721 or else they may be permanently lost. Usage of {safeTransferFrom} prevents loss, though the caller must understand this adds an external call which potentially creates a reentrancy vulnerability. Requirements: - `from` cannot be the zero address. - `to` cannot be the zero address. - `tokenId` token must be owned by `from`. - If the caller is not `from`, it must be approved to move this token by either {approve} or {setApprovalForAll}. Emits a {Transfer} event.*
+*Transfers `tokenId` token from `from` to `to`. WARNING: Usage of this method is discouraged, use {safeTransferFrom} whenever possible. Requirements: - `from` cannot be the zero address. - `to` cannot be the zero address. - `tokenId` token must be owned by `from`. - If the caller is not `from`, it must be approved to move this token by either {approve} or {setApprovalForAll}. Emits a {Transfer} event.*
 
 #### Parameters
 

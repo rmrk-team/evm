@@ -115,7 +115,7 @@ Used to get the extended pending assets of the given token.
 function splitSlotAndFixedParts(uint64[] allPartIds, address baseAddress) external view returns (uint64[] slotPartIds, uint64[] fixedPartIds)
 ```
 
-
+Used to split slot and fixed parts.
 
 
 
@@ -123,15 +123,15 @@ function splitSlotAndFixedParts(uint64[] allPartIds, address baseAddress) extern
 
 | Name | Type | Description |
 |---|---|---|
-| allPartIds | uint64[] | undefined |
-| baseAddress | address | undefined |
+| allPartIds | uint64[] | [] An array of `Part` IDs sontaining both, `Slot` and `Fixed` parts |
+| baseAddress | address | An address of the base to which the given `Part`s belong to |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| slotPartIds | uint64[] | undefined |
-| fixedPartIds | uint64[] | undefined |
+| slotPartIds | uint64[] | An array of IDs of the `Slot` parts included in the `allPartIds` |
+| fixedPartIds | uint64[] | An array of IDs of the `Fixed` parts included in the `allPartIds` |
 
 
 

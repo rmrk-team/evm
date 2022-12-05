@@ -25,8 +25,8 @@ Used to accept a pending asset of a given token.
 | Name | Type | Description |
 |---|---|---|
 | tokenId | uint256 | ID of the token for which we are accepting the asset |
-| index | uint256 | Index of the asset to accept in token&#39;s pending arry |
-| assetId | uint64 | undefined |
+| index | uint256 | Index of the asset to accept in token&#39;s pending array |
+| assetId | uint64 | ID of the asset expected to be located at the specified index |
 
 ### approveForAssets
 
@@ -92,7 +92,7 @@ function equip(IRMRKEquippable.IntakeEquip data) external nonpayable
 function getActiveAssetPriorities(uint256 tokenId) external view returns (uint16[])
 ```
 
-Used to retrieve active asset priorities of a given token.
+Used to retrieve the priorities of the active resoources of a given token.
 
 *Asset priorities are a non-sequential array of uint16 values with an array size equal to active asset  priorites.*
 
@@ -100,13 +100,13 @@ Used to retrieve active asset priorities of a given token.
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | ID of the token to query |
+| tokenId | uint256 | ID of the token for which to retrieve the priorities of the active assets |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint16[] | uint16[] Array of active asset priorities |
+| _0 | uint16[] | uint16[] An array of priorities of the active assets of the given token |
 
 ### getActiveAssets
 
@@ -114,21 +114,21 @@ Used to retrieve active asset priorities of a given token.
 function getActiveAssets(uint256 tokenId) external view returns (uint64[])
 ```
 
-Used to retrieve the active asset IDs of a given token.
+Used to retrieve IDs of the active assets of given token.
 
-*Assets metadata is stored by reference mapping `_asset[assetId]`.*
+*Asset data is stored by reference, in order to access the data corresponding to the ID, call  `getAssetMetadata(tokenId, assetId)`.You can safely get 10k*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | ID of the token to query |
+| tokenId | uint256 | ID of the token to retrieve the IDs of the active assets |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint64[] | uint64[] Array of active asset IDs |
+| _0 | uint64[] | uint64[] An array of active asset IDs of the given token |
 
 ### getApprovedForAssets
 
@@ -158,7 +158,7 @@ Used to get the address of the user that is approved to manage the specified tok
 function getAssetAndEquippableData(uint256 tokenId, uint64 assetId) external view returns (string, uint64, address, uint64[])
 ```
 
-Used to get all the equippable information of the asset associated with given `assetId`.
+Used to get the asset and equippable data associated with given `assetId`.
 
 
 
@@ -166,17 +166,17 @@ Used to get all the equippable information of the asset associated with given `a
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | undefined |
+| tokenId | uint256 | ID of the token for which to retrieve the asset |
 | assetId | uint64 | ID of the asset of which we are retrieving |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | undefined |
-| _1 | uint64 | undefined |
-| _2 | address | undefined |
-| _3 | uint64[] | undefined |
+| _0 | string | The metadata URI of the asset |
+| _1 | uint64 | ID of the equippable group this asset belongs to |
+| _2 | address | The address of the base the part belongs to |
+| _3 | uint64[] | An array of IDs of parts included in the asset |
 
 ### getAssetMetadata
 
@@ -184,7 +184,7 @@ Used to get all the equippable information of the asset associated with given `a
 function getAssetMetadata(uint256 tokenId, uint64 assetId) external view returns (string)
 ```
 
-Used to fetch the asset metadata of the specified token&#39;s for given asset.
+Used to fetch the asset metadata of the specified token&#39;s active asset with the given index.
 
 *Assets are stored by reference mapping `_assets[assetId]`.Can be overriden to implement enumerate, fallback or other custom logic.*
 
@@ -192,14 +192,14 @@ Used to fetch the asset metadata of the specified token&#39;s for given asset.
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | ID of the token to query |
-| assetId | uint64 | Asset Id, must be in the pending or active assets array |
+| tokenId | uint256 | ID of the token from which to retrieve the asset metadata |
+| assetId | uint64 | Asset Id, must be in the active assets array |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | string Metadata of the asset |
+| _0 | string | string The metadata of the asset belonging to the specified index in the token&#39;s active assets  array |
 
 ### getAssetReplacements
 
@@ -207,15 +207,15 @@ Used to fetch the asset metadata of the specified token&#39;s for given asset.
 function getAssetReplacements(uint256 tokenId, uint64 newAssetId) external view returns (uint64)
 ```
 
-Used to retrieve the asset ID that will be replaced (if any) if a given assetID is accepted from  the pending assets array.
+Used to retrieve the asset that will be replaced if a given asset from the token&#39;s pending array  is accepted.
 
-
+*Asset data is stored by reference, in order to access the data corresponding to the ID, call  `getAssetMetadata(tokenId, assetId)`.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | ID of the token to query |
+| tokenId | uint256 | ID of the token to check |
 | newAssetId | uint64 | ID of the pending asset which will be accepted |
 
 #### Returns
@@ -254,7 +254,7 @@ Used to get the Equipment object equipped into the specified slot of the desired
 function getNestableAddress() external view returns (address)
 ```
 
-Used to retrieve the address of the `Nestable` smart contract
+Returns the Equippable contract&#39;s corresponding nestable address.
 
 
 
@@ -263,7 +263,7 @@ Used to retrieve the address of the `Nestable` smart contract
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | address | address Address of the `Nestable` smart contract |
+| _0 | address | address Address of the Nestable module of the external equip composite |
 
 ### getPendingAssets
 
@@ -271,21 +271,21 @@ Used to retrieve the address of the `Nestable` smart contract
 function getPendingAssets(uint256 tokenId) external view returns (uint64[])
 ```
 
-Returns pending asset IDs for a given token
+Used to retrieve IDs of the pending assets of given token.
 
-*Pending assets metadata is stored by reference mapping _pendingAsset[assetId]*
+*Asset data is stored by reference, in order to access the data corresponding to the ID, call  `getAssetMetadata(tokenId, assetId)`.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | the token ID to query |
+| tokenId | uint256 | ID of the token to retrieve the IDs of the pending assets |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint64[] | uint64[] pending asset IDs |
+| _0 | uint64[] | uint64[] An array of pending asset IDs of the given token |
 
 ### isApprovedForAllForAssets
 
@@ -342,7 +342,7 @@ function rejectAllAssets(uint256 tokenId, uint256 maxRejections) external nonpay
 
 Used to reject all pending assets of a given token.
 
-*When rejecting all assets, the pending array is indiscriminately cleared.Can only be called by the owner of the token or a user that has been approved to manage the tokens&#39;s  assets.*
+*When rejecting all assets, the pending array is indiscriminately cleared.Can only be called by the owner of the token or a user that has been approved to manage the tokens&#39;s  assets.If the number of pending assets is greater than the value of `maxRejections`, the exectuion will be  reverted.*
 
 #### Parameters
 
@@ -367,7 +367,7 @@ Used to reject a pending asset of a given token.
 |---|---|---|
 | tokenId | uint256 | ID of the token for which we are rejecting the asset |
 | index | uint256 | Index of the asset to reject in token&#39;s pending array |
-| assetId | uint64 | undefined |
+| assetId | uint64 | ID of the asset expected to be located at the specified index |
 
 ### setApprovalForAllForAssets
 

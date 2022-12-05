@@ -40,12 +40,7 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
         private _operatorApprovalsForAssets;
 
     /**
-     * @notice Used to fetch the asset metadata of the specified token's for given asset.
-     * @dev Assets are stored by reference mapping `_assets[assetId]`.
-     * @dev Can be overriden to implement enumerate, fallback or other custom logic.
-     * @param tokenId ID of the token to query
-     * @param assetId Asset Id, must be in the pending or active assets array
-     * @return string Metadata of the asset
+     * @inheritdoc IRMRKMultiAsset
      */
     function getAssetMetadata(
         uint256 tokenId,
@@ -56,10 +51,7 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
     }
 
     /**
-     * @notice Used to retrieve the active asset IDs of a given token.
-     * @dev Assets metadata is stored by reference mapping `_asset[assetId]`.
-     * @param tokenId ID of the token to query
-     * @return uint64[] Array of active asset IDs
+     * @inheritdoc IRMRKMultiAsset
      */
     function getActiveAssets(
         uint256 tokenId
@@ -68,10 +60,7 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
     }
 
     /**
-     * @notice Returns pending asset IDs for a given token
-     * @dev Pending assets metadata is stored by reference mapping _pendingAsset[assetId]
-     * @param tokenId the token ID to query
-     * @return uint64[] pending asset IDs
+     * @inheritdoc IRMRKMultiAsset
      */
     function getPendingAssets(
         uint256 tokenId
@@ -80,11 +69,7 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
     }
 
     /**
-     * @notice Used to retrieve active asset priorities of a given token.
-     * @dev Asset priorities are a non-sequential array of uint16 values with an array size equal to active asset
-     *  priorites.
-     * @param tokenId ID of the token to query
-     * @return uint16[] Array of active asset priorities
+     * @inheritdoc IRMRKMultiAsset
      */
     function getActiveAssetPriorities(
         uint256 tokenId
@@ -93,11 +78,7 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
     }
 
     /**
-     * @notice Used to retrieve the asset ID that will be replaced (if any) if a given assetID is accepted from
-     *  the pending assets array.
-     * @param tokenId ID of the token to query
-     * @param newAssetId ID of the pending asset which will be accepted
-     * @return uint64 ID of the asset which will be replaced
+     * @inheritdoc IRMRKMultiAsset
      */
     function getAssetReplacements(
         uint256 tokenId,
@@ -107,11 +88,7 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
     }
 
     /**
-     * @notice Used to check whether the address has been granted the operator role by a given address or not.
-     * @dev See {setApprovalForAllForAssets}.
-     * @param owner Address of the account that we are checking for whether it has granted the operator role
-     * @param operator Address of the account that we are checking whether it has the operator role or not
-     * @return bool The boolean value indicating wehter the account we are checking has been granted the operator role
+     * @inheritdoc IRMRKMultiAsset
      */
     function isApprovedForAllForAssets(
         address owner,
@@ -121,16 +98,7 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
     }
 
     /**
-     * @notice Used to add or remove an operator of assets for the caller.
-     * @dev Operators can call {acceptAsset}, {rejectAsset}, {rejectAllAssets} or {setPriority} for any token
-     *  owned by the caller.
-     * @dev Requirements:
-     *
-     *  - The `operator` cannot be the caller.
-     * @dev Emits an {ApprovalForAllForAssets} event.
-     * @param operator Address of the account to which the operator role is granted or revoked from
-     * @param approved The boolean value indicating whether the operator role is being granted (`true`) or revoked
-     *  (`false`)
+     * @inheritdoc IRMRKMultiAsset
      */
     function setApprovalForAllForAssets(
         address operator,
@@ -148,7 +116,7 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
      * @dev The call is reverted if there is no pending asset at a given index.
      * @param tokenId ID of the token for which to accept the pending asset
      * @param index Index of the asset in the pending array to accept
-     * @param assetId Id of the asset expected to be in the index
+     * @param assetId ID of the asset to accept in token's pending array
      */
     function _acceptAsset(
         uint256 tokenId,
@@ -190,7 +158,7 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
      * @dev The call is reverted if there is no pending asset at a given index.
      * @param tokenId ID of the token that the asset is being rejected from
      * @param index Index of the asset in the pending array to be rejected
-     * @param assetId Id of the asset expected to be in the index
+     * @param assetId ID of the asset expected to be in the index
      */
     function _rejectAsset(
         uint256 tokenId,
@@ -242,6 +210,9 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
 
     /**
      * @notice Used to reject all of the pending assets for the given token.
+     * @dev When rejecting all assets, the pending array is indiscriminately cleared.
+     * @dev If the number of pending assets is greater than the value of `maxRejections`, the exectuion will be
+     *  reverted.
      * @param tokenId ID of the token to reject all of the pending assets.
      * @param maxRejections Maximum number of expected assets to reject, used to prevent from
      *  rejecting assets which arrive just before this operation.
@@ -295,6 +266,7 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
     /**
      * @notice Used to add an asset entry.
      * @dev If the specified ID is already used by another asset, the execution will be reverted.
+     * @dev This internal function warrants custom access control to be implemented when used.
      * @param id ID of the asset to assign to the new asset
      * @param metadataURI Metadata URI of the asset
      */
@@ -346,61 +318,127 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
         _afterAddAssetToToken(tokenId, assetId, replacesAssetWithId);
     }
 
+    /**
+     * @notice Hook that is called before an asset is added.
+     * @param id ID of the asset
+     * @param metadataURI Metadata URI of the asset
+     */
     function _beforeAddAsset(
         uint64 id,
         string memory metadataURI
     ) internal virtual {}
 
+    /**
+     * @notice Hook that is called after an asset is added.
+     * @param id ID of the asset
+     * @param metadataURI Metadata URI of the asset
+     */
     function _afterAddAsset(
         uint64 id,
         string memory metadataURI
     ) internal virtual {}
 
+    /**
+     * @notice Hook that is called before adding an asset to a token's pending assets array.
+     * @dev If the asset doesn't intend to replace another asset, the `replacesAssetWithId` value should be `0`.
+     * @param tokenId ID of the token to which the asset is being added
+     * @param assetId ID of the asset that is being added
+     * @param replacesAssetWithId ID of the asset that this asset is attempting to replace
+     */
     function _beforeAddAssetToToken(
         uint256 tokenId,
         uint64 assetId,
         uint64 replacesAssetWithId
     ) internal virtual {}
 
+    /**
+     * @notice Hook that is called after an asset has been added to a token's pending assets array.
+     * @dev If the asset doesn't intend to replace another asset, the `replacesAssetWithId` value should be `0`.
+     * @param tokenId ID of the token to which the asset is has been added
+     * @param assetId ID of the asset that is has been added
+     * @param replacesAssetWithId ID of the asset that this asset is attempting to replace
+     */
     function _afterAddAssetToToken(
         uint256 tokenId,
         uint64 assetId,
         uint64 replacesAssetWithId
     ) internal virtual {}
 
+    /**
+     * @notice Hook that is called before an asset is accepted to a token's active assets array.
+     * @param tokenId ID of the token for which the asset is being accepted
+     * @param index Index of the asset in the token's pending assets array
+     * @param assetId ID of the asset expected to be located at the specified `index`
+     */
     function _beforeAcceptAsset(
         uint256 tokenId,
         uint256 index,
         uint256 assetId
     ) internal virtual {}
 
+    /**
+     * @notice Hook that is called after an asset is accepted to a token's active assets array.
+     * @param tokenId ID of the token for which the asset has been accepted
+     * @param index Index of the asset in the token's pending assets array
+     * @param assetId ID of the asset expected to have been located at the specified `index`
+     */
     function _afterAcceptAsset(
         uint256 tokenId,
         uint256 index,
         uint256 assetId
     ) internal virtual {}
 
+    /**
+     * @notice Hook that is called before rejecting an asset.
+     * @param tokenId ID of the token from which the asset is being rejected
+     * @param index Index of the asset in the token's pending assets array
+     * @param assetId ID of the asset expected to be located at the specified `index`
+     */
     function _beforeRejectAsset(
         uint256 tokenId,
         uint256 index,
         uint256 assetId
     ) internal virtual {}
 
+    /**
+     * @notice Hook that is called after rejecting an asset.
+     * @param tokenId ID of the token from which the asset has been rejected
+     * @param index Index of the asset in the token's pending assets array
+     * @param assetId ID of the asset expected to have been located at the specified `index`
+     */
     function _afterRejectAsset(
         uint256 tokenId,
         uint256 index,
         uint256 assetId
     ) internal virtual {}
 
+    /**
+     * @notice Hook that is called before rejecting all assets of a token.
+     * @param tokenId ID of the token from which all of the assets are being rejected
+     */
     function _beforeRejectAllAssets(uint256 tokenId) internal virtual {}
 
+    /**
+     * @notice Hook that is called after rejecting all assets of a token.
+     * @param tokenId ID of the token from which all of the assets have been rejected
+     */
     function _afterRejectAllAssets(uint256 tokenId) internal virtual {}
 
+    /**
+     * @notice Hook that is called before the priorities for token's assets is set.
+     * @param tokenId ID of the token for which the asset priorities are being set
+     * @param priorities[] An array of priorities for token's active resources
+     */
     function _beforeSetPriority(
         uint256 tokenId,
         uint16[] calldata priorities
     ) internal virtual {}
 
+    /**
+     * @notice Hook that is called after the priorities for token's assets is set.
+     * @param tokenId ID of the token for which the asset priorities have been set
+     * @param priorities[] An array of priorities for token's active resources
+     */
     function _afterSetPriority(
         uint256 tokenId,
         uint16[] calldata priorities

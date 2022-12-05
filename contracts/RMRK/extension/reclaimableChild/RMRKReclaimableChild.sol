@@ -12,7 +12,7 @@ import "./IRMRKReclaimableChild.sol";
  */
 abstract contract RMRKReclaimableChild is IRMRKReclaimableChild, RMRKNestable {
     /**
-     * @dev WARNING: This mapping is not updated on burn or reject all, to save gas.
+     * @notice WARNING: This mapping is not updated on burn or reject all, to save gas.
      * @dev This is only used to cheaply forbid reclaiming a child which is pending.
      */
     mapping(address => mapping(uint256 => uint256)) private _childIsInPending;
@@ -29,16 +29,7 @@ abstract contract RMRKReclaimableChild is IRMRKReclaimableChild, RMRKNestable {
     }
 
     /**
-     * @notice Used to reclaim an abandoned child token.
-     * @dev Child token was abandoned by transferring it with `to` as the `0x0` address.
-     * @dev This function will set the child's owner to the `rootOwner` of the caller, allowing the `rootOwner`
-     * management permissions for the child.
-     * @dev Requirements:
-     *
-     *  - `tokenId` must exist
-     * @param tokenId ID of the last parent token of the child token being recovered
-     * @param childAddress Address of the child token's smart contract
-     * @param childId ID of the child token being reclaimed
+     * @inheritdoc IRMRKReclaimableChild
      */
     function reclaimChild(
         uint256 tokenId,
@@ -48,6 +39,18 @@ abstract contract RMRKReclaimableChild is IRMRKReclaimableChild, RMRKNestable {
         _reclaimChild(tokenId, childAddress, childId);
     }
 
+    /**
+     * @notice Used to reclaim an abandoned child token.
+     * @dev Child token was abandoned by transferring it with `to` as the `0x0` address.
+     * @dev This function will set the child's owner to the `rootOwner` of the caller, allowing the `rootOwner`
+     *  management permissions for the child.
+     * @dev Requirements:
+     *
+     *  - `tokenId` must exist
+     * @param tokenId ID of the last parent token of the child token being recovered
+     * @param childAddress Address of the child token's smart contract
+     * @param childId ID of the child token being reclaimed
+     */
     function _reclaimChild(
         uint256 tokenId,
         address childAddress,
@@ -76,6 +79,7 @@ abstract contract RMRKReclaimableChild is IRMRKReclaimableChild, RMRKNestable {
      * @param tokenId ID of the token receiving the child token
      * @param childAddress Address of the collection smart contract of the token expected to be at the given index
      * @param childId ID of the token expected to be located at the given index in its collection smart contract
+     * @param data Additional data of unspecified format to be passed along the transaction
      */
     function _beforeAddChild(
         uint256 tokenId,
@@ -119,7 +123,7 @@ abstract contract RMRKReclaimableChild is IRMRKReclaimableChild, RMRKNestable {
      * @param childId ID of the child token expected to be located at the given index
      * @param isPending A boolean value signifying whether the child token is located in the parent's active or pending
      *  child token array
-     * @param data Additional data with no specified format, sent in the addChild call
+     * @param data Additional data of unspecified format to be passed along the transaction
      */
     function _beforeTransferChild(
         uint256 tokenId,

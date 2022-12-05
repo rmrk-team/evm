@@ -15,12 +15,12 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
     using Address for address;
 
     /**
-     * @dev Mapping of uint64 `partId` to IRMRKBaseStorage `Part` struct
+     * @notice Mapping of uint64 `partId` to IRMRKBaseStorage `Part` struct
      */
     mapping(uint64 => Part) private _parts;
 
     /**
-     * @dev Mapping of uint64 `partId` to boolean flag, indicating that a given `Part` can be equippable by any address
+     * @notice Mapping of uint64 `partId` to boolean flag, indicating that a given `Part` can be equippable by any address
      */
     mapping(uint64 => bool) private _isEquippableToAll;
 
@@ -29,6 +29,11 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
     string private _metadataURI;
     string private _type;
 
+    /**
+     * @notice Used to initialize the base storage.
+     * @param metadataURI Base metadata URI of the base
+     * @param type_ Type of base
+     */
     constructor(string memory metadataURI, string memory type_) {
         _metadataURI = metadataURI;
         _type = type_;
@@ -63,23 +68,21 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
     }
 
     /**
-     * @notice Used to return the metadata URI of the associated base.
-     * @return string Base metadata URI
+     * @inheritdoc IRMRKBaseStorage
      */
     function getMetadataURI() external view returns (string memory) {
         return _metadataURI;
     }
 
     /**
-     * @notice Used to return the `itemType` of the associated base
-     * @return string `itemType` of the associated base
+     * @inheritdoc IRMRKBaseStorage
      */
     function getType() external view returns (string memory) {
         return _type;
     }
 
     /**
-     * @dev Internal helper function that adds `Part` entries to storage.
+     * @notice Internal helper function that adds `Part` entries to storage.
      * @dev Delegates to { _addPart } below.
      * @param partIntake An array of `IntakeStruct` structs, consisting of `partId` and a nested `Part` struct
      */
@@ -94,7 +97,7 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
     }
 
     /**
-     * @dev Internal function that adds a single `Part` to storage.
+     * @notice Internal function that adds a single `Part` to storage.
      * @param partIntake `IntakeStruct` struct consisting of `partId` and a nested `Part` struct
      *
      */
@@ -122,7 +125,7 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
     }
 
     /**
-     * @dev Internal function used to add multiple `equippableAddresses` to a single base entry.
+     * @notice Internal function used to add multiple `equippableAddresses` to a single base entry.
      * @dev Can only be called on `Part`s of `Slot` type.
      * @param partId ID of the `Part` that we are adding the equippable addresses to
      * @param equippableAddresses An array of addresses that can be equipped into the `Part` associated with the `partId`
@@ -146,7 +149,7 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
     }
 
     /**
-     * @dev Internal function used to set the new list of `equippableAddresses`.
+     * @notice Internal function used to set the new list of `equippableAddresses`.
      * @dev Overwrites existing `equippableAddresses`.
      * @dev Can only be called on `Part`s of `Slot` type.
      * @param partId ID of the `Part`s that we are overwiting the `equippableAddresses` for
@@ -164,7 +167,7 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
     }
 
     /**
-     * @dev Internal function used to remove all of the `equippableAddresses` for a `Part` associated with the `partId`.
+     * @notice Internal function used to remove all of the `equippableAddresses` for a `Part` associated with the `partId`.
      * @dev Can only be called on `Part`s of `Slot` type.
      * @param partId ID of the part that we are clearing the `equippableAddresses` from
      */
@@ -178,7 +181,7 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
     }
 
     /**
-     * @dev Sets the isEquippableToAll flag to true, meaning that any collection may be equipped into the `Part` with this
+     * @notice Sets the isEquippableToAll flag to true, meaning that any collection may be equipped into the `Part` with this
      *  `partId`.
      * @dev Can only be called on `Part`s of `Slot` type.
      * @param partId ID of the `Part` that we are setting as equippable by any address
@@ -189,21 +192,14 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
     }
 
     /**
-     * @notice Used to check if the part is equippable by all addresses.
-     * @dev Returns true if part is equippable to all.
-     * @param partId ID of the part that we are checking
-     * @return bool The status indicating whether the part with `partId` can be equipped by any address or not
+     * @inheritdoc IRMRKBaseStorage
      */
     function checkIsEquippableToAll(uint64 partId) public view returns (bool) {
         return _isEquippableToAll[partId];
     }
 
     /**
-     * @notice Used to check whether the given address is allowed to equip the desired `Part`
-     * @dev Returns true if a collection may equip asset with `partId`.
-     * @param partId The ID of the part that we are checking
-     * @param targetAddress The address that we are checking for whether the part can be equipped into it or not
-     * @return bool The status indicating whether the `targetAddress` can be equipped into `Part` with `partId` or not
+     * @inheritdoc IRMRKBaseStorage
      */
     function checkIsEquippable(
         uint64 partId,
@@ -230,18 +226,14 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
     }
 
     /**
-     * @notice Used to retrieve a `Part` with id `partId`
-     * @param partId ID of the part that we are retrieving
-     * @return struct The `Part` struct associated with given `partId`
+     * @inheritdoc IRMRKBaseStorage
      */
     function getPart(uint64 partId) public view returns (Part memory) {
         return (_parts[partId]);
     }
 
     /**
-     * @notice Used to retrieve multiple parts at the same time.
-     * @param partIds An array of part IDs that we want to retrieve
-     * @return struct An array of `Part` structs associated with given `partIds`
+     * @inheritdoc IRMRKBaseStorage
      */
     function getParts(
         uint64[] calldata partIds

@@ -11,7 +11,7 @@ contract RMRKCollectionMetadata {
     string private _collectionMetadata;
 
     /**
-     * @dev Used to initialize the contract with the given metadata.
+     * @notice Used to initialize the contract with the given metadata.
      * @param collectionMetadata_ The collection metadata with which to initialize the smart contract
      */
     constructor(string memory collectionMetadata_) {

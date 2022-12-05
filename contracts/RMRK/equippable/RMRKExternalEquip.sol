@@ -125,6 +125,10 @@ contract RMRKExternalEquip is
         _;
     }
 
+    /**
+     * @notice Used to initialize the smart contract.
+     * @param nestableAddress Address of the Nestable module of external equip composite
+     */
     constructor(address nestableAddress) {
         _setNestableAddress(nestableAddress);
     }
@@ -152,8 +156,7 @@ contract RMRKExternalEquip is
     }
 
     /**
-     * @notice Used to retrieve the address of the `Nestable` smart contract
-     * @return address Address of the `Nestable` smart contract
+     * @inheritdoc IRMRKExternalEquip
      */
     function getNestableAddress() public view returns (address) {
         return _nestableAddress;
@@ -170,7 +173,8 @@ contract RMRKExternalEquip is
      * @dev Can only be called by the owner of the token or a user that has been approved to manage the tokens's
      *  assets.
      * @param tokenId ID of the token for which we are accepting the asset
-     * @param index Index of the asset to accept in token's pending arry
+     * @param index Index of the asset to accept in token's pending array
+     * @param assetId ID of the asset expected to be located at the specified index
      */
     function acceptAsset(
         uint256 tokenId,
@@ -188,6 +192,7 @@ contract RMRKExternalEquip is
      *  assets.
      * @param tokenId ID of the token for which we are rejecting the asset
      * @param index Index of the asset to reject in token's pending array
+     * @param assetId ID of the asset expected to be located at the specified index
      */
     function rejectAsset(
         uint256 tokenId,
@@ -202,6 +207,8 @@ contract RMRKExternalEquip is
      * @dev When rejecting all assets, the pending array is indiscriminately cleared.
      * @dev Can only be called by the owner of the token or a user that has been approved to manage the tokens's
      *  assets.
+     * @dev If the number of pending assets is greater than the value of `maxRejections`, the exectuion will be
+     *  reverted.
      * @param tokenId ID of the token for which we are clearing the pending array.
      * @param maxRejections Maximum number of expected assets to reject, used to prevent from
      *  rejecting assets which arrive just before this operation.
@@ -483,13 +490,7 @@ contract RMRKExternalEquip is
     }
 
     /**
-     * @notice Used to verify whether a token can be equipped into a given parent's slot.
-     * @param parent Address of the parent token's smart contract
-     * @param tokenId ID of the token we want to equip
-     * @param assetId ID of the asset associated with the token we want to equip
-     * @param slotId ID of the slot that we want to equip the token into
-     * @return bool The boolean indicating whether the token with the given asset can be equipped into the desired
-     *  slot
+     * @inheritdoc IRMRKEquippable
      */
     function canTokenBeEquippedWithAssetIntoSlot(
         address parent,
@@ -513,6 +514,10 @@ contract RMRKExternalEquip is
     /**
      * @notice Used to add a asset entry.
      * @dev This internal function warrants custom access control to be implemented when used.
+     * @param id ID to be assigned to asset
+     * @param equippableGroupId ID of the equippable group this asset belongs to
+     * @param baseAddress Address of the Base this asset should be associated with
+     * @param metadataURI Metadata URI of the asset
      * @param partIds An array of IDs of fixed and slot parts to be included in the asset
      */
     function _addAssetEntry(
@@ -533,8 +538,7 @@ contract RMRKExternalEquip is
     }
 
     /**
-     * @notice Used to get all the equippable information of the asset associated with given `assetId`.
-     * @param assetId ID of the asset of which we are retrieving
+     * @inheritdoc IRMRKEquippable
      */
     function getAssetAndEquippableData(
         uint256 tokenId,
@@ -558,18 +562,7 @@ contract RMRKExternalEquip is
     ////////////////////////////////////////
 
     /**
-     * @notice Used to get the Equipment object equipped into the specified slot of the desired token.
-     * @dev The `Equipment` struct consists of the following data:
-     *  [
-     *      assetId,
-     *      childAssetId,
-     *      childId,
-     *      childEquippableAddress
-     *  ]
-     * @param tokenId ID of the token for which we are retrieving the equipped object
-     * @param targetBaseAddress Address of the `Base` associated with the `Slot` part of the token
-     * @param slotPartId ID of the `Slot` part that we are checking for equipped objects
-     * @return struct The `Equipment` struct containing data about the equipped object
+     * @inheritdoc IRMRKEquippable
      */
     function getEquipment(
         uint256 tokenId,

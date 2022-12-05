@@ -35,9 +35,7 @@ abstract contract RMRKSoulbound is IRMRKSoulbound, RMRKCore {
     }
 
     /**
-     * @notice Used to verify if the token is soulbound.
-     * @param tokenId ID of the token we are verifying
-     * @return bool Boolean verifying whether the token is soulbound
+     * @inheritdoc IRMRKSoulbound
      */
     function isSoulbound(uint256 tokenId) public view virtual returns (bool) {
         return true;

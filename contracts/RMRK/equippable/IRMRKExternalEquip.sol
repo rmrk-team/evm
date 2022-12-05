@@ -19,7 +19,8 @@ interface IRMRKExternalEquip is IRMRKEquippable {
     event NestableAddressSet(address old, address new_);
 
     /**
-     * @dev Returns the Equippable contract's corresponding nestable address.
+     * @notice Returns the Equippable contract's corresponding nestable address.
+     * @return address Address of the Nestable module of the external equip composite
      */
     function getNestableAddress() external view returns (address);
 }
