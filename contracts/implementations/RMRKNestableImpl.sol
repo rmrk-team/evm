@@ -22,7 +22,7 @@ contract RMRKNestableImpl is RMRKAbstractNestableImpl {
      * @param tokenURI_ The base URI of the token metadata
      * @param royaltyRecipient The recipient of resale royalties
      * @param royaltyPercentageBps The percentage of resale value to be allocated to the `royaltyRecipient` expressed in
-     *  the basis points
+     *  basis points
      */
     constructor(
         string memory name_,

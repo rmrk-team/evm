@@ -103,17 +103,25 @@ contract Ownable is Context {
     /**
      * @notice Used to check if the address is one of the contributors.
      * @param contributor Address of the contributor whose status we are checking
-     * @return Boolean value indicating whether the address is a contributor or not
+     * @return bool Boolean value indicating whether the address is a contributor or not
      */
     function isContributor(address contributor) public view returns (bool) {
         return _contributors[contributor] == 1;
     }
 
+    /**
+     * @notice Used to verify that the caller is either the owner or a contributor.
+     * @dev If the caller is not the owner or a contributor, the execution will be reverted.
+     */
     function _onlyOwnerOrContributor() private view {
         if (owner() != _msgSender() && isContributor(_msgSender()))
             revert RMRKNotOwnerOrContributor();
     }
 
+    /**
+     * @notice Used to verify that the caller is the owner.
+     * @dev If the caller is not the owner, the execution will be reverted.
+     */
     function _onlyOwner() private view {
         if (owner() != _msgSender()) revert RMRKNotOwner();
     }
