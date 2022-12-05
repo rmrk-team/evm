@@ -116,7 +116,7 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
      * @dev The call is reverted if there is no pending asset at a given index.
      * @param tokenId ID of the token for which to accept the pending asset
      * @param index Index of the asset in the pending array to accept
-     * @param assetId dex of the asset to accept in token's pending array
+     * @param assetId ID of the asset to accept in token's pending array
      */
     function _acceptAsset(
         uint256 tokenId,
