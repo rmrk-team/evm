@@ -2,42 +2,46 @@
 
 A set of Solidity contracts for RMRK.app.
 
-For each of the Multiresource, Nesting and Equippable combinations, we provide samples of simple and advance usage in [this repo](https://github.com/rmrk-team/evm-sample-contracts).
+For each of the MultiAsset, Nestable and Equippable combinations, we provide samples of simple and advance usage in [this repo](https://github.com/rmrk-team/evm-sample-contracts).
 
-## Multiresource (RMRKMultiresource)
+## MultiAsset (RMRKMultiAsset)
 
 WORKFLOW NOTES:
 
-1. Deploy the Multiresource contract.
-2. Admin must add resources on a PER-TOKEN basis. This could be very gas-expensive, so it's recommended that this be done
+1. Deploy the MultiAsset contract.
+2. Admin must add assets on a PER-TOKEN basis. This could be very gas-expensive, so it's recommended that this be done
    in batches.
-3. Mint the tokens after your preferred method.
+3. Mint the tokens using your preferred method.
 
-## Nesting (RMRKNesting)
+## Nestable (RMRKNestable)
 
-1. Deploy like a regular ERC721. That's it! This contract can recieve and be nested by other instances of RMRKNesting.
+1. Deploy like a regular ERC721. That's it! This contract can recieve and be nested by other instances of RMRKNestable.
    Note that it WILL NOT be compatible with other equippable contracts as a standalone.
 
-RMRK also offers Nesting + Multiresource (RMRKNestingMultiresource). To deploy, follow instructions after Multiresource.
+RMRK also offers Nestable + MultiAsset (RMRKNestableMultiAsset). To deploy, follow instructions after MultiAsset.
 
 ## Equippable
 
-RMRK Equippable comes in two flavors: RMRKEquippable and RMRKNestingExternalEquippable. The former is a single contract designed to handle the full implementation of multiresource, nesting, and equippable. The latter separates Nesting and Equippable into two
-mutually dependent contracts to allow for more custom logic in each, if necessary.
+RMRK Equippable comes in two flavors: RMRKEquippable and RMRKNestableExternalEquippable. The former is a single contract
+designed to handle the full implementation of multiasset, nestable, and equippable. The latter separates Nestable and
+Equippable into two mutually dependent contracts to allow for more custom logic in each, if necessary.
 
-1. Deploy the RMRKNestingExternalEquippable. This contract contains core transfer and minting logic.
+1. Deploy the RMRKNestableExternalEquippable. This contract contains core transfer and minting logic.
 
-2. Deploy the RMRKExternalEquippable. This contract contains equippable and resource management logic.
+2. Deploy the RMRKExternalEquippable. This contract contains equippable and asset management logic.
 
-3. Initialize the address of RMRKExternalEquippable on RMRKNestingExternalEquippable via an exposed
-   setEquippalbeAddress method. If you're not using a prefab RMRK top-level implementation, you will added
-   need to expose this yourself.
+3. Initialize the address of RMRKExternalEquippable on RMRKNestableExternalEquippable via an exposed
+   `setEquippalbeAddress` method. If you're not using a prefab RMRK top-level implementation, you will need to expose
+   this yourself.
 
-4. Deploy RMRKBaseStorage. Initialize your base parts (fixed and slot). You will pass the address of RMRKBaseStorage and corresponding base part IDs when initializing your resources on RMRKExternalEquippable.
+4. Deploy RMRKBaseStorage. Initialize your base parts (fixed and slot). You will pass the address of RMRKBaseStorage and
+   corresponding base part IDs when initializing your assets on RMRKExternalEquippable.
 
-5. Assign token resources on RMRKExternalEquippable as you would the above Multiresource, with the added ExtendedResource params, equippableRefId and baseAddress.
+5. Assign token assets on RMRKExternalEquippable as you would the above MultiAsset, with the added ExtendedAsset params,
+   equippableRefId and baseAddress.
 
-DEV NOTE: Please be aware that RMRKEquippable is likely very close to the maximum contract deployment size allowed for most EVM environments. If you need more space, consider RMRKNestingExternalEquippable.
+**NOTE: Please be aware that RMRKEquippable is likely very close to the maximum contract deployment size allowed by most
+EVM environments. If you need more space, consider RMRKNestingExternalEquippable.**
 
 ## Emotable
 
@@ -114,16 +118,16 @@ npx solhint 'contracts/**/*.sol' --fix
 
 To try out Etherscan verification, you first need to deploy a contract to an Ethereum network that's supported by Etherscan, such as Ropsten.
 
-In this project, copy the .env.example file to a file named .env, and then edit it to fill in the details. Enter your Etherscan API key, your Ropsten node URL (eg from Alchemy), and the private key of the account which will send the deployment transaction. With a valid .env file in place, first deploy your contract:
+In this project, copy the .env.example file to a file named .env, and then edit it to fill in the details. Enter your Etherscan API key, your Görli node URL (e.g. from Alchemy), and the private key of the account which will send the deployment transaction. With a valid .env file in place, first deploy your contract:
 
 ```shell
-hardhat run --network ropsten scripts/sample-script.ts
+hardhat run --network goerli scripts/sample-script.ts
 ```
 
 Then, copy the deployment address and paste it in to replace `DEPLOYED_CONTRACT_ADDRESS` in this command:
 
 ```shell
-npx hardhat verify --network ropsten DEPLOYED_CONTRACT_ADDRESS "Hello, Hardhat!"
+npx hardhat verify --network goerli DEPLOYED_CONTRACT_ADDRESS "Hello, Hardhat!"
 ```
 
 # Performance optimizations
