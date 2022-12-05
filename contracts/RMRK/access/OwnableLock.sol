@@ -25,7 +25,7 @@ contract OwnableLock is Ownable {
      * @notice Locks the operation.
      * @dev Once locked, functions using `notLocked` modifier cannot be executed.
      */
-    function setLock() external onlyOwner {
+    function setLock() public virtual onlyOwner {
         _lock = 1;
     }
 

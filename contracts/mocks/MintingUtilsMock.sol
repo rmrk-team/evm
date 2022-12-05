@@ -17,4 +17,8 @@ contract MintingUtilsMock is RMRKMintingUtils {
     function testSaleIsOpen() external view saleIsOpen returns (bool) {
         return true;
     }
+
+    function mockMint(uint256 total) external payable {
+        _totalSupply += total;
+    }
 }
