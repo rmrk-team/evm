@@ -136,8 +136,8 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
 
         if (replacefound) {
             // We don't want to remove and then push a new asset.
-            // This way we also keep the priority of the originalresource
-            _activeAssets[tokenId][index] = assetId;
+            // This way we also keep the priority of the original asset
+            _activeAssets[tokenId][replaceIndex] = assetId;
             delete _tokenAssets[tokenId][replacesId];
         } else {
             // We use the current size as next priority, by default priorities would be [0,1,2...]
