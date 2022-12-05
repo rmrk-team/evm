@@ -420,7 +420,7 @@ contract RMRKEquipRenderUtils {
 
     /**
      * @notice Used to split slot and fixed parts.
-     * @param allPartIds[] An array of `Part` IDs sontaining both, `Slot` and `Fixed` parts
+     * @param allPartIds[] An array of `Part` IDs containing both, `Slot` and `Fixed` parts
      * @param baseAddress An address of the base to which the given `Part`s belong to
      * @return slotPartIds An array of IDs of the `Slot` parts included in the `allPartIds`
      * @return fixedPartIds An array of IDs of the `Fixed` parts included in the `allPartIds`
