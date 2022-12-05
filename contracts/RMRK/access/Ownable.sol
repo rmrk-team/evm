@@ -103,7 +103,7 @@ contract Ownable is Context {
     /**
      * @notice Used to check if the address is one of the contributors.
      * @param contributor Address of the contributor whose status we are checking
-     * @return bool Boolean value indicating whether the address is a contributor or not
+     * @return Boolean value indicating whether the address is a contributor or not
      */
     function isContributor(address contributor) public view returns (bool) {
         return _contributors[contributor] == 1;

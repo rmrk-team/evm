@@ -430,7 +430,7 @@ contract RMRKMultiAsset is IERC165, IERC721, AbstractMultiAsset, RMRKCore {
      * @param to Yarget address that will receive the tokens
      * @param tokenId ID of the token to be transferred
      * @param data Optional data to send along with the call
-     * @return bool Boolean value signifying whether the call correctly returned the expected magic value
+     * @return Boolean value signifying whether the call correctly returned the expected magic value
      */
     function _checkOnERC721Received(
         address from,

@@ -123,7 +123,7 @@ Used to split slot and fixed parts.
 
 | Name | Type | Description |
 |---|---|---|
-| allPartIds | uint64[] | [] An array of `Part` IDs sontaining both, `Slot` and `Fixed` parts |
+| allPartIds | uint64[] | [] An array of `Part` IDs containing both, `Slot` and `Fixed` parts |
 | baseAddress | address | An address of the base to which the given `Part`s belong to |
 
 #### Returns
