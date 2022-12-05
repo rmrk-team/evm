@@ -12,7 +12,7 @@ import "./IRMRKCore.sol";
  */
 contract RMRKCore is IRMRKCore {
     /// @notice Version of the @rmrk-team/evm-contracts package
-    string public constant VERSION = "0.19.3";
+    string public constant VERSION = "0.19.4";
 
     /**
      * @notice Used to initialize the smart contract.
