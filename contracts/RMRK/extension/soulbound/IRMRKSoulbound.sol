@@ -13,7 +13,7 @@ interface IRMRKSoulbound is IERC165 {
     /**
      * @notice Used to check whether the given token is soulbound or not.
      * @param tokenId ID of the token being checked
-     * @return bool Boolean value indicating whether the given token is soulbound
+     * @return Boolean value indicating whether the given token is soulbound
      */
     function isSoulbound(uint256 tokenId) external view returns (bool);
 }

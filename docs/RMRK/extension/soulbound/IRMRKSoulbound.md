@@ -30,7 +30,7 @@ Used to check whether the given token is soulbound or not.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | bool Boolean value indicating whether the given token is soulbound |
+| _0 | bool | Boolean value indicating whether the given token is soulbound |
 
 ### supportsInterface
 

@@ -430,7 +430,7 @@ Used to check if the address is one of the contributors.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | bool Boolean value indicating whether the address is a contributor or not |
+| _0 | bool | Boolean value indicating whether the address is a contributor or not |
 
 ### owner
 
