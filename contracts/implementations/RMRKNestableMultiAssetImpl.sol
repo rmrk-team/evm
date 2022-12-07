@@ -3,6 +3,7 @@
 pragma solidity ^0.8.16;
 
 import "./abstracts/RMRKAbstractNestableMultiAssetImpl.sol";
+import "./IRMRKInitData.sol";
 
 error RMRKMintUnderpriced();
 
@@ -11,36 +12,37 @@ error RMRKMintUnderpriced();
  * @author RMRK team
  * @notice Implementation of RMRK nestable multi asset module.
  */
-contract RMRKNestableMultiAssetImpl is RMRKAbstractNestableMultiAssetImpl {
+contract RMRKNestableMultiAssetImpl is IRMRKInitData, RMRKAbstractNestableMultiAssetImpl {
     /**
      * @notice Used to initialize the smart contract.
-     * @param name Name of the token collection
-     * @param symbol Symbol of the token collection
-     * @param maxSupply Maximum supply of tokens in the collection
-     * @param pricePerMint Minting price of a token represented in the smallest denomination of the native currency
+     * @dev The full `InitData` looks like this:
+     *  [
+     *      erc20TokenAddress,
+     *      tokenUriIsEnumerable,
+     *      royaltyRecipient,
+     *      royaltyPercentageBps,
+     *      maxSupply,
+     *      pricePerMint
+     *  ]
+     * @param name_ Name of the token collection
+     * @param symbol_ Symbol of the token collection
      * @param collectionMetadata_ The collection metadata URI
      * @param tokenURI_ The base URI of the token metadata
-     * @param royaltyRecipient The recipient of resale royalties
-     * @param royaltyPercentageBps The percentage of resale value to be allocated to the `royaltyRecipient` expressed in
-     *  the basis points
+     * @param data The `InitData` struct containing additional initialization data
      */
     constructor(
-        string memory name,
-        string memory symbol,
-        uint256 maxSupply,
-        uint256 pricePerMint,
+        string memory name_,
+        string memory symbol_,
         string memory collectionMetadata_,
         string memory tokenURI_,
-        address royaltyRecipient,
-        uint256 royaltyPercentageBps //in basis points
+        InitData memory data
     )
-        RMRKMintingUtils(maxSupply, pricePerMint)
+        RMRKMintingUtils(data.maxSupply, data.pricePerMint)
         RMRKCollectionMetadata(collectionMetadata_)
-        RMRKRoyalties(royaltyRecipient, royaltyPercentageBps)
-        RMRKNestableMultiAsset(name, symbol)
-    {
-        _setTokenURI(tokenURI_);
-    }
+        RMRKRoyalties(data.royaltyRecipient, data.royaltyPercentageBps)
+        RMRKTokenURI(tokenURI_, data.tokenUriIsEnumerable)
+        RMRKNestableMultiAsset(name_, symbol_)
+    { }
 
     /**
      * @notice Used to mint the desired number of tokens to the specified address.

@@ -21,6 +21,7 @@ contract RMRKNestableMultiAssetImplErc20Pay is
      * @dev The full `InitData` looks like this:
      *  [
      *      erc20TokenAddress,
+     *      tokenUriIsEnumerable,
      *      royaltyRecipient,
      *      royaltyPercentageBps,
      *      maxSupply,
@@ -42,11 +43,10 @@ contract RMRKNestableMultiAssetImplErc20Pay is
         RMRKMintingUtils(data.maxSupply, data.pricePerMint)
         RMRKCollectionMetadata(collectionMetadata_)
         RMRKRoyalties(data.royaltyRecipient, data.royaltyPercentageBps)
+        RMRKTokenURI(tokenURI_, data.tokenUriIsEnumerable)
         RMRKErc20Pay(data.erc20TokenAddress)
         RMRKNestableMultiAsset(name_, symbol_)
-    {
-        _setTokenURI(tokenURI_);
-    }
+    { }
 
     /**
      * @notice Used to mint the desired number of tokens to the specified address.
