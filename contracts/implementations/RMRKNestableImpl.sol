@@ -3,6 +3,7 @@
 pragma solidity ^0.8.16;
 
 import "./abstracts/RMRKAbstractNestableImpl.sol";
+import "./IRMRKInitData.sol";
 
 error RMRKMintUnderpriced();
 
@@ -11,36 +12,37 @@ error RMRKMintUnderpriced();
  * @author RMRK team
  * @notice Implementation of RMRK nestable module.
  */
-contract RMRKNestableImpl is RMRKAbstractNestableImpl {
+contract RMRKNestableImpl is IRMRKInitData, RMRKAbstractNestableImpl {
     /**
      * @notice Used to initialize the smart contract.
+     * @dev The full `InitData` looks like this:
+     *  [
+     *      erc20TokenAddress,
+     *      tokenUriIsEnumerable,
+     *      royaltyRecipient,
+     *      royaltyPercentageBps,
+     *      maxSupply,
+     *      pricePerMint
+     *  ]
      * @param name_ Name of the token collection
      * @param symbol_ Symbol of the token collection
-     * @param maxSupply_ Maximum supply of tokens in the collection
-     * @param pricePerMint_ Minting price of a token represented in the smallest denomination of the native currency
      * @param collectionMetadata_ The collection metadata URI
      * @param tokenURI_ The base URI of the token metadata
-     * @param royaltyRecipient The recipient of resale royalties
-     * @param royaltyPercentageBps The percentage of resale value to be allocated to the `royaltyRecipient` expressed in
-     *  basis points
+     * @param data The `InitData` struct containing additional initialization data
      */
     constructor(
         string memory name_,
         string memory symbol_,
-        uint256 maxSupply_,
-        uint256 pricePerMint_,
         string memory collectionMetadata_,
         string memory tokenURI_,
-        address royaltyRecipient,
-        uint256 royaltyPercentageBps //in basis points
+        InitData memory data
     )
-        RMRKMintingUtils(maxSupply_, pricePerMint_)
+        RMRKMintingUtils(data.maxSupply, data.pricePerMint)
         RMRKCollectionMetadata(collectionMetadata_)
-        RMRKRoyalties(royaltyRecipient, royaltyPercentageBps)
+        RMRKRoyalties(data.royaltyRecipient, data.royaltyPercentageBps)
+        RMRKTokenURI(tokenURI_, data.tokenUriIsEnumerable)
         RMRKNestable(name_, symbol_)
-    {
-        _setTokenURI(tokenURI_);
-    }
+    { }
 
     /**
      * @notice Used to mint the desired number of tokens to the specified address.

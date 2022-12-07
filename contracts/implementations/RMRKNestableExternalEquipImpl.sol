@@ -6,6 +6,8 @@ import "../RMRK/equippable/RMRKNestableExternalEquip.sol";
 import "../RMRK/extension/RMRKRoyalties.sol";
 import "../RMRK/utils/RMRKCollectionMetadata.sol";
 import "../RMRK/utils/RMRKMintingUtils.sol";
+import "../RMRK/utils/RMRKTokenURI.sol";
+import "./IRMRKInitData.sol";
 
 error RMRKMintUnderpriced();
 error RMRKMintZero();
@@ -16,47 +18,49 @@ error RMRKMintZero();
  * @notice Implementation of RMRK nestable external equip module.
  */
 contract RMRKNestableExternalEquipImpl is
+    IRMRKInitData,
     RMRKMintingUtils,
     RMRKCollectionMetadata,
     RMRKRoyalties,
+    RMRKTokenURI,
     RMRKNestableExternalEquip
 {
     address private _equippableAddress;
-    string private _tokenURI;
 
     /**
      * @notice Used to initialize the smart contract.
+     * @dev The full `InitData` looks like this:
+     *  [
+     *      erc20TokenAddress,
+     *      tokenUriIsEnumerable,
+     *      royaltyRecipient,
+     *      royaltyPercentageBps,
+     *      maxSupply,
+     *      pricePerMint
+     *  ]
      * @param name_ Name of the token collection
      * @param symbol_ Symbol of the token collection
-     * @param maxSupply_ Maximum supply of tokens in the collection
-     * @param pricePerMint_ Minting price of a token represented in the smallest denomination of the native currency
-     * @param equippableAddress_ Address of the `Equippable` module of the external equip composite
      * @param collectionMetadata_ The collection metadata URI
      * @param tokenURI_ The base URI of the token metadata
-     * @param royaltyRecipient The recipient of resale royalties
-     * @param royaltyPercentageBps The percentage of resale value to be allocated to the `royaltyRecipient` expressed in
-     *  the basis points
+     * @param data The `InitData` struct containing additional initialization data
      */
     constructor(
+        address equippableAddress_,
         string memory name_,
         string memory symbol_,
-        uint256 maxSupply_,
-        uint256 pricePerMint_,
-        address equippableAddress_,
         string memory collectionMetadata_,
         string memory tokenURI_,
-        address royaltyRecipient,
-        uint256 royaltyPercentageBps //in basis points
+        InitData memory data
     )
-        RMRKNestableExternalEquip(name_, symbol_)
-        RMRKMintingUtils(maxSupply_, pricePerMint_)
+        RMRKMintingUtils(data.maxSupply, data.pricePerMint)
         RMRKCollectionMetadata(collectionMetadata_)
-        RMRKRoyalties(royaltyRecipient, royaltyPercentageBps)
+        RMRKRoyalties(data.royaltyRecipient, data.royaltyPercentageBps)
+        RMRKTokenURI(tokenURI_, data.tokenUriIsEnumerable)
+        RMRKNestableExternalEquip(name_, symbol_)
     {
         // Can't add an equippable deployment here due to contract size, for factory
         // pattern can use OZ clone
         _equippableAddress = equippableAddress_;
-        _tokenURI = tokenURI_;
     }
 
     /**
@@ -137,22 +141,30 @@ contract RMRKNestableExternalEquipImpl is
     }
 
     /**
-     * @notice Used to retrieve the metadata URI of a token.
-     * @param tokenId ID of the token to retrieve the metadata URI for
-     * @return string Metadata URI of the specified token
-     */
-    function tokenURI(
-        uint256 tokenId
-    ) public view virtual override returns (string memory) {
-        return _tokenURI;
-    }
-
-    /**
      * @inheritdoc RMRKRoyalties
      */
     function updateRoyaltyRecipient(
         address newRoyaltyRecipient
     ) public virtual override onlyOwner {
         _setRoyaltyRecipient(newRoyaltyRecipient);
+    }
+
+    /**
+     * @notice Used to update the tokenURI and define it as enumerable or not
+     * @param tokenURI_ Metadata URI to apply to all tokens, either as base or as full URI for every token
+     * @param isEnumerable Whether to treat the tokenURI as enumerable or not. If true, the tokenID will be appended to the base when getting the tokenURI
+     */
+    function updateTokenURI(
+        string memory tokenURI_,
+        bool isEnumerable
+    ) public virtual onlyOwner {
+        _setTokenURI(tokenURI_, isEnumerable);
+    }
+
+    /**
+     * @notice Prevents from ever modifying the token URI again
+     */
+    function freezeTokenURI() public virtual onlyOwner {
+        _freezeTokenURI();
     }
 }
