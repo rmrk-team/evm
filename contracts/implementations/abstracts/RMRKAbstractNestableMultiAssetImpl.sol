@@ -6,6 +6,7 @@ import "../../RMRK/extension/RMRKRoyalties.sol";
 import "../../RMRK/nestable/RMRKNestableMultiAsset.sol";
 import "../../RMRK/utils/RMRKCollectionMetadata.sol";
 import "../../RMRK/utils/RMRKMintingUtils.sol";
+import "../../RMRK/utils/RMRKTokenURI.sol";
 
 error RMRKMintZero();
 
@@ -18,6 +19,7 @@ abstract contract RMRKAbstractNestableMultiAssetImpl is
     RMRKMintingUtils,
     RMRKCollectionMetadata,
     RMRKRoyalties,
+    RMRKTokenURI,
     RMRKNestableMultiAsset
 {
     uint256 private _totalAssets;
@@ -98,17 +100,6 @@ abstract contract RMRKAbstractNestableMultiAssetImpl is
     }
 
     /**
-     * @notice Used to retrieve the metadata URI of a token.
-     * @param tokenId ID of the token to retrieve the metadata URI for
-     * @return string Metadata URI of the specified token
-     */
-    function tokenURI(
-        uint256 tokenId
-    ) public view virtual override returns (string memory) {
-        return _tokenURI;
-    }
-
-    /**
      * @inheritdoc RMRKRoyalties
      */
     function updateRoyaltyRecipient(
@@ -118,10 +109,21 @@ abstract contract RMRKAbstractNestableMultiAssetImpl is
     }
 
     /**
-     * @notice Used to set the base token URI.
-     * @param tokenURI_ The base metadata URI of the token
+     * @notice Used to update the tokenURI and define it as enumerable or not
+     * @param tokenURI_ Metadata URI to apply to all tokens, either as base or as full URI for every token
+     * @param isEnumerable Whether to treat the tokenURI as enumerable or not. If true, the tokenID will be appended to the base when getting the tokenURI
      */
-    function _setTokenURI(string memory tokenURI_) internal {
-        _tokenURI = tokenURI_;
+    function updateTokenURI(
+        string memory tokenURI_,
+        bool isEnumerable
+    ) public virtual onlyOwner {
+        _setTokenURI(tokenURI_, isEnumerable);
+    }
+
+    /**
+     * @notice Prevents from ever modifying the token URI again
+     */
+    function freezeTokenURI() public virtual onlyOwner {
+        _freezeTokenURI();
     }
 }

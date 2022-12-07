@@ -20,10 +20,4 @@ interface IRMRKCore {
      */
     function symbol() external view returns (string memory);
 
-    /**
-     * @notice Used to retrieve the metadata URI of a token.
-     * @param tokenId ID of the token to retrieve the metadata URI for
-     * @return string Metadata URI of the specified token
-     */
-    function tokenURI(uint256 tokenId) external view returns (string memory);
 }

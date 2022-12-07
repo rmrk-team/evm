@@ -47,17 +47,6 @@ contract RMRKCore is IRMRKCore {
     }
 
     /**
-     * @notice Used to retrieve the metadata URI of a token.
-     * @param tokenId ID of the token to retrieve the metadata URI for
-     * @return string Metadata URI of the specified token
-     */
-    function tokenURI(
-        uint256 tokenId
-    ) public view virtual override returns (string memory) {
-        return "";
-    }
-
-    /**
      * @notice Hook that is called before any token transfer. This includes minting and burning.
      * @dev Calling conditions:
      *

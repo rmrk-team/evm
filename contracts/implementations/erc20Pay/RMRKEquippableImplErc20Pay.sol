@@ -21,20 +21,21 @@ contract RMRKEquippableImplErc20Pay is
      * @dev The full `InitData` looks like this:
      *  [
      *      erc20TokenAddress,
+     *      tokenUriIsEnumerable,
      *      royaltyRecipient,
      *      royaltyPercentageBps,
      *      maxSupply,
      *      pricePerMint
      *  ]
-     * @param name Name of the token collection
-     * @param symbol Symbol of the token collection
+     * @param name_ Name of the token collection
+     * @param symbol_ Symbol of the token collection
      * @param collectionMetadata_ The collection metadata URI
      * @param tokenURI_ The base URI of the token metadata
      * @param data The `InitData` struct containing additional initialization data
      */
     constructor(
-        string memory name,
-        string memory symbol,
+        string memory name_,
+        string memory symbol_,
         string memory collectionMetadata_,
         string memory tokenURI_,
         InitData memory data
@@ -42,11 +43,10 @@ contract RMRKEquippableImplErc20Pay is
         RMRKMintingUtils(data.maxSupply, data.pricePerMint)
         RMRKCollectionMetadata(collectionMetadata_)
         RMRKRoyalties(data.royaltyRecipient, data.royaltyPercentageBps)
+        RMRKTokenURI(tokenURI_, data.tokenUriIsEnumerable)
         RMRKErc20Pay(data.erc20TokenAddress)
-        RMRKEquippable(name, symbol)
-    {
-        _setTokenURI(tokenURI_);
-    }
+        RMRKEquippable(name_, symbol_)
+    { }
 
     /**
      * @notice Used to mint the desired number of tokens to the specified address.
