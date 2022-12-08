@@ -31,7 +31,7 @@ async function singleFixture(): Promise<{ token: RMRKMultiAssetImpl; renderUtils
       'MultiAsset',
       'MR',
       'ipfs://collection-meta',
-      'ipfs://tokenURI',
+      'ipfs://tokenURI/',
       [ADDRESS_ZERO, isTokenUriEnumerated, ADDRESS_ZERO, 1000, 10000, ONE_ETH],
     ])
   );
