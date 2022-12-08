@@ -11,9 +11,18 @@ import "./IRMRKTokenProperties.sol";
  */
 contract RMRKTokenProperties is IRMRKTokenProperties {
 
-    mapping(uint256 => mapping(string => string)) private _stringProperties;
-    mapping(uint256 => mapping(string => address)) private _addressProperties;
-    mapping(uint256 => mapping(string => bytes)) private _bytesProperties;
+    uint256 private totalStringProperties;
+    mapping(uint256 => string) stringProperties;
+    mapping(uint256 => mapping(string => uint256)) private _stringProperties;
+
+    uint256 private totalAddressProperties;
+    mapping(uint256 => address) addressProperties;
+    mapping(uint256 => mapping(string => uint256)) private _addressProperties;
+
+    uint256 private totalBytesProperties;
+    mapping(uint256 => bytes) bytesProperties;
+    mapping(uint256 => mapping(string => uint)) private _bytesProperties;
+
     mapping(uint256 => mapping(string => uint256)) private _uintProperties;
     mapping(uint256 => mapping(string => bool)) private _boolProperties;
 
@@ -24,7 +33,7 @@ contract RMRKTokenProperties is IRMRKTokenProperties {
      * @return string The value of the string property
      */
     function getStringTokenProperty(uint256 tokenId, string memory key) external view returns (string memory) {
-        return _stringProperties[tokenId][key];
+        return stringProperties[_stringProperties[tokenId][key]];
     }
 
     /**
@@ -54,7 +63,7 @@ contract RMRKTokenProperties is IRMRKTokenProperties {
      * @return address The value of the address property
      */
     function getAddressTokenProperty(uint256 tokenId, string memory key) external view returns (address) {
-        return _addressProperties[tokenId][key];
+        return addressProperties[_addressProperties[tokenId][key]];
     }
 
     /**
@@ -64,7 +73,7 @@ contract RMRKTokenProperties is IRMRKTokenProperties {
      * @return bytes The value of the bytes property
      */
     function getBytesTokenProperty(uint256 tokenId, string memory key) external view returns (bytes memory) {
-        return _bytesProperties[tokenId][key];
+        return bytesProperties[_bytesProperties[tokenId][key]];
     }
 
     /**
@@ -84,7 +93,9 @@ contract RMRKTokenProperties is IRMRKTokenProperties {
     * @param value The property value
     */
     function setStringProperty(uint256 tokenId, string memory key, string memory value) external {
-        _stringProperties[tokenId][key] = value;
+        _stringProperties[tokenId][key] = totalStringProperties;
+        stringProperties[totalStringProperties] = value;
+        totalStringProperties++;
     }
 
     /**
@@ -104,7 +115,9 @@ contract RMRKTokenProperties is IRMRKTokenProperties {
      * @param value The property value
      */
     function setBytesProperty(uint256 tokenId, string memory key, bytes memory value) external {
-        _bytesProperties[tokenId][key] = value;
+        _bytesProperties[tokenId][key] = totalBytesProperties;
+        bytesProperties[totalBytesProperties] = value;
+        totalBytesProperties++;
     }
 
     /**
@@ -114,7 +127,9 @@ contract RMRKTokenProperties is IRMRKTokenProperties {
      * @param value The property value
      */
     function setAddressProperty(uint256 tokenId, string memory key, address value) external {
-        _addressProperties[tokenId][key] = value;
+        _addressProperties[tokenId][key] = totalAddressProperties;
+        addressProperties[totalAddressProperties] = value;
+        totalAddressProperties++;
     }
 
     /**
@@ -123,7 +138,7 @@ contract RMRKTokenProperties is IRMRKTokenProperties {
     function supportsInterface(
         bytes4 interfaceId
     ) public view virtual returns (bool) {
-        return interfaceId == type(IRMRKTokenProperties).interfaceId;
+        return interfaceId == type(IRMRKTokenProperties).interfaceId || interfaceId == type(IERC165).interfaceId;
     }
 
 }

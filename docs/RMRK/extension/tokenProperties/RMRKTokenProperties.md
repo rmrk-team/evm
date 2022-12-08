@@ -13,10 +13,10 @@ Smart contract of the RMRK Token properties module.
 ### getAddressTokenProperty
 
 ```solidity
-function getAddressTokenProperty(uint256 tokenId, uint256 index) external view returns (address)
+function getAddressTokenProperty(uint256 tokenId, string key) external view returns (address)
 ```
 
-Used to retrieve the token properties.
+Used to retrieve the address type token properties.
 
 
 
@@ -25,7 +25,7 @@ Used to retrieve the token properties.
 | Name | Type | Description |
 |---|---|---|
 | tokenId | uint256 | The token ID |
-| index | uint256 | The index of the property |
+| key | string | The key of the property |
 
 #### Returns
 
@@ -36,10 +36,10 @@ Used to retrieve the token properties.
 ### getBoolTokenProperty
 
 ```solidity
-function getBoolTokenProperty(uint256 tokenId, uint256 index) external view returns (bool)
+function getBoolTokenProperty(uint256 tokenId, string key) external view returns (bool)
 ```
 
-Used to retrieve the token properties.
+Used to retrieve the bool type token properties.
 
 
 
@@ -48,7 +48,7 @@ Used to retrieve the token properties.
 | Name | Type | Description |
 |---|---|---|
 | tokenId | uint256 | The token ID |
-| index | uint256 | The index of the property |
+| key | string | The key of the property |
 
 #### Returns
 
@@ -59,10 +59,10 @@ Used to retrieve the token properties.
 ### getBytesTokenProperty
 
 ```solidity
-function getBytesTokenProperty(uint256 tokenId, uint256 index) external view returns (bytes)
+function getBytesTokenProperty(uint256 tokenId, string key) external view returns (bytes)
 ```
 
-Used to retrieve the token properties.
+Used to retrieve the bytes type token properties.
 
 
 
@@ -71,7 +71,7 @@ Used to retrieve the token properties.
 | Name | Type | Description |
 |---|---|---|
 | tokenId | uint256 | The token ID |
-| index | uint256 | The index of the property |
+| key | string | The key of the property |
 
 #### Returns
 
@@ -82,10 +82,10 @@ Used to retrieve the token properties.
 ### getStringTokenProperty
 
 ```solidity
-function getStringTokenProperty(uint256 tokenId, uint256 index) external view returns (string)
+function getStringTokenProperty(uint256 tokenId, string key) external view returns (string)
 ```
 
-Used to retrieve the token properties.
+Used to retrieve the string type token properties.
 
 
 
@@ -94,7 +94,7 @@ Used to retrieve the token properties.
 | Name | Type | Description |
 |---|---|---|
 | tokenId | uint256 | The token ID |
-| index | uint256 | The index of the property |
+| key | string | The key of the property |
 
 #### Returns
 
@@ -105,10 +105,10 @@ Used to retrieve the token properties.
 ### getUintTokenProperty
 
 ```solidity
-function getUintTokenProperty(uint256 tokenId, uint256 index) external view returns (uint256)
+function getUintTokenProperty(uint256 tokenId, string key) external view returns (uint256)
 ```
 
-Used to retrieve the token properties.
+Used to retrieve the uint type token properties.
 
 
 
@@ -117,7 +117,7 @@ Used to retrieve the token properties.
 | Name | Type | Description |
 |---|---|---|
 | tokenId | uint256 | The token ID |
-| index | uint256 | The index of the property |
+| key | string | The key of the property |
 
 #### Returns
 
@@ -128,7 +128,7 @@ Used to retrieve the token properties.
 ### setAddressProperty
 
 ```solidity
-function setAddressProperty(uint256 tokenId, uint256 index, address value) external nonpayable
+function setAddressProperty(uint256 tokenId, string key, address value) external nonpayable
 ```
 
 Used to set an address property.
@@ -140,13 +140,13 @@ Used to set an address property.
 | Name | Type | Description |
 |---|---|---|
 | tokenId | uint256 | The token ID |
-| index | uint256 | The property index |
+| key | string | The property key |
 | value | address | The property value |
 
 ### setBoolProperty
 
 ```solidity
-function setBoolProperty(uint256 tokenId, uint256 index, bool value) external nonpayable
+function setBoolProperty(uint256 tokenId, string key, bool value) external nonpayable
 ```
 
 Used to set a boolean property.
@@ -158,13 +158,13 @@ Used to set a boolean property.
 | Name | Type | Description |
 |---|---|---|
 | tokenId | uint256 | The token ID |
-| index | uint256 | The property index |
+| key | string | The property key |
 | value | bool | The property value |
 
 ### setBytesProperty
 
 ```solidity
-function setBytesProperty(uint256 tokenId, uint256 index, bytes value) external nonpayable
+function setBytesProperty(uint256 tokenId, string key, bytes value) external nonpayable
 ```
 
 Used to set an bytes property.
@@ -176,31 +176,13 @@ Used to set an bytes property.
 | Name | Type | Description |
 |---|---|---|
 | tokenId | uint256 | The token ID |
-| index | uint256 | The property index |
+| key | string | The property key |
 | value | bytes | The property value |
-
-### setIntProperty
-
-```solidity
-function setIntProperty(uint256 tokenId, uint256 index, uint256 value) external nonpayable
-```
-
-Used to set a number property.
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| tokenId | uint256 | The token ID |
-| index | uint256 | The property index |
-| value | uint256 | The property value |
 
 ### setStringProperty
 
 ```solidity
-function setStringProperty(uint256 tokenId, uint256 index, string value) external nonpayable
+function setStringProperty(uint256 tokenId, string key, string value) external nonpayable
 ```
 
 Used to set a string property.
@@ -212,8 +194,48 @@ Used to set a string property.
 | Name | Type | Description |
 |---|---|---|
 | tokenId | uint256 | The token ID |
-| index | uint256 | The property index |
+| key | string | The property key |
 | value | string | The property value |
+
+### setUintProperty
+
+```solidity
+function setUintProperty(uint256 tokenId, string key, uint256 value) external nonpayable
+```
+
+Used to set a number property.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId | uint256 | The token ID |
+| key | string | The property key |
+| value | uint256 | The property value |
+
+### supportsInterface
+
+```solidity
+function supportsInterface(bytes4 interfaceId) external view returns (bool)
+```
+
+
+
+*Returns true if this contract implements the interface defined by `interfaceId`. See the corresponding https://eips.ethereum.org/EIPS/eip-165#how-interfaces-are-identified[EIP section] to learn more about how these ids are created. This function call must use less than 30 000 gas.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| interfaceId | bytes4 | undefined |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | bool | undefined |
 
 
 
