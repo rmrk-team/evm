@@ -22,7 +22,7 @@ async function multiAssetFixture(): Promise<Contract> {
     'MR',
     'ipfs://collection-meta',
     'ipfs://tokenURI',
-    [erc20.address, ADDRESS_ZERO, 0, 10000, ONE_ETH],
+    [erc20.address, false, ADDRESS_ZERO, 0, 10000, ONE_ETH],
   ]);
 }
 
@@ -36,7 +36,7 @@ async function nestableFixture(): Promise<Contract> {
     'MR',
     'ipfs://collection-meta',
     'ipfs://tokenURI',
-    [erc20.address, ADDRESS_ZERO, 0, 10000, ONE_ETH],
+    [erc20.address, false, ADDRESS_ZERO, 0, 10000, ONE_ETH],
   ]);
 }
 
@@ -50,7 +50,7 @@ async function nestableMultiAssetFixture(): Promise<Contract> {
     'MR',
     'ipfs://collection-meta',
     'ipfs://tokenURI',
-    [erc20.address, ADDRESS_ZERO, 0, 10000, ONE_ETH],
+    [erc20.address, false, ADDRESS_ZERO, 0, 10000, ONE_ETH],
   ]);
 }
 
@@ -64,7 +64,7 @@ async function equippableFixture(): Promise<Contract> {
     'MR',
     'ipfs://collection-meta',
     'ipfs://tokenURI',
-    [erc20.address, ADDRESS_ZERO, 0, 10000, ONE_ETH],
+    [erc20.address, false, ADDRESS_ZERO, 0, 10000, ONE_ETH],
   ]);
 }
 
