@@ -4,7 +4,7 @@
 
 > RMRKTokenURI
 
-TODO
+Implementation of token URI with option to be enumerable.
 
 
 

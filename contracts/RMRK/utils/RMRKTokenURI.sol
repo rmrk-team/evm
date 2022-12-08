@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 /**
  * @title RMRKTokenURI
  * @author RMRK team
- * @notice TODO
+ * @notice Implementation of token URI with option to be enumerable.
  */
 contract RMRKTokenURI {
     using Strings for uint256;
