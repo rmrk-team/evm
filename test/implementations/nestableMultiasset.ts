@@ -34,12 +34,9 @@ async function singleFixture(): Promise<{
     await singleFixtureWithArgs('RMRKNestableMultiAssetImpl', [
       'NestableMultiAsset',
       'NMR',
-      10000,
-      ONE_ETH,
       'ipfs://collection-meta',
       'ipfs://tokenURI',
-      ADDRESS_ZERO,
-      1000, // 10%
+      [ADDRESS_ZERO, false, ADDRESS_ZERO, 1000, 10000, ONE_ETH],
     ])
   );
   return { token, renderUtils };
@@ -51,22 +48,16 @@ async function parentChildFixture(): Promise<{ parent: Contract; child: Contract
     [
       'Chunky',
       'CHNK',
-      10000,
-      ONE_ETH,
       'ipfs://collection-meta',
       'ipfs://tokenURI',
-      ADDRESS_ZERO,
-      0,
+      [ADDRESS_ZERO, false, ADDRESS_ZERO, 1000, 10000, ONE_ETH],
     ],
     [
       'Monkey',
       'MONK',
-      10000,
-      ONE_ETH,
       'ipfs://collection-meta',
       'ipfs://tokenURI',
-      ADDRESS_ZERO,
-      0,
+      [ADDRESS_ZERO, false, ADDRESS_ZERO, 1000, 10000, ONE_ETH],
     ],
   );
 }
