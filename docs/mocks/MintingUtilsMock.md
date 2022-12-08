@@ -82,6 +82,22 @@ Used to retrieve the maximum supply of the collection.
 |---|---|---|
 | _0 | uint256 | uint256 The maximum supply of tokens in the collection |
 
+### mockMint
+
+```solidity
+function mockMint(uint256 total) external payable
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| total | uint256 | undefined |
+
 ### owner
 
 ```solidity

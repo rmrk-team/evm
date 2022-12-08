@@ -26,13 +26,15 @@ async function singleFixture(): Promise<{ token: RMRKMultiAssetImpl; renderUtils
   const renderUtils = <RMRKMultiAssetRenderUtils>await renderUtilsFactory.deploy();
   await renderUtils.deployed();
 
-  const token = <RMRKMultiAssetImpl>await singleFixtureWithArgs('RMRKMultiAssetImpl', [
-    'MultiAsset',
-    'MR',
-    'ipfs://collection-meta',
-    'ipfs://tokenURI',
-    [ADDRESS_ZERO, isTokenUriEnumerated, ADDRESS_ZERO, 1000, 10000, ONE_ETH],
-  ]);
+  const token = <RMRKMultiAssetImpl>(
+    await singleFixtureWithArgs('RMRKMultiAssetImpl', [
+      'MultiAsset',
+      'MR',
+      'ipfs://collection-meta',
+      'ipfs://tokenURI',
+      [ADDRESS_ZERO, isTokenUriEnumerated, ADDRESS_ZERO, 1000, 10000, ONE_ETH],
+    ])
+  );
   return { token, renderUtils };
 }
 
