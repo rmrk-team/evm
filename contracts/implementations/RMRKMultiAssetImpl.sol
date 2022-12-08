@@ -42,7 +42,7 @@ contract RMRKMultiAssetImpl is IRMRKInitData, RMRKAbstractMultiAssetImpl {
         RMRKRoyalties(data.royaltyRecipient, data.royaltyPercentageBps)
         RMRKTokenURI(tokenURI_, data.tokenUriIsEnumerable)
         RMRKMultiAsset(name_, symbol_)
-    { }
+    {}
 
     /**
      * @notice Used to mint the desired number of tokens to the specified address.

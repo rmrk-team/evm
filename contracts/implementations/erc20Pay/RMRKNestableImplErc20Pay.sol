@@ -46,7 +46,7 @@ contract RMRKNestableImplErc20Pay is
         RMRKErc20Pay(data.erc20TokenAddress)
         RMRKNestable(name_, symbol_)
         RMRKTokenURI(tokenURI_, data.tokenUriIsEnumerable)
-    { }
+    {}
 
     /**
      * @notice Used to mint the desired number of tokens to the specified address.

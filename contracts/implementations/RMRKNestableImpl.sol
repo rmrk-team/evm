@@ -42,7 +42,7 @@ contract RMRKNestableImpl is IRMRKInitData, RMRKAbstractNestableImpl {
         RMRKRoyalties(data.royaltyRecipient, data.royaltyPercentageBps)
         RMRKTokenURI(tokenURI_, data.tokenUriIsEnumerable)
         RMRKNestable(name_, symbol_)
-    { }
+    {}
 
     /**
      * @notice Used to mint the desired number of tokens to the specified address.
