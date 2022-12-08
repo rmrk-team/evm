@@ -17,13 +17,15 @@ import {
   transfer,
 } from '../utils';
 
+const isTokenUriEnumerated = true;
+
 async function singleFixture(): Promise<Contract> {
   return singleFixtureWithArgs('RMRKNestableImpl', [
     'RMRK Test',
     'RMRKTST',
     'ipfs://collection-meta',
     'ipfs://tokenURI',
-    [ADDRESS_ZERO, false, ADDRESS_ZERO, 1000, 10000, ONE_ETH],
+    [ADDRESS_ZERO, isTokenUriEnumerated, ADDRESS_ZERO, 1000, 10000, ONE_ETH],
   ]);
 }
 
@@ -64,5 +66,5 @@ describe('NestableImpl Other', async function () {
 
   shouldControlValidMinting();
   shouldHaveRoyalties(mintFromImpl);
-  shouldHaveMetadata(mintFromImpl);
+  shouldHaveMetadata(mintFromImpl, isTokenUriEnumerated);
 });
