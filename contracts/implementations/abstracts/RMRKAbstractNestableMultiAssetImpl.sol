@@ -23,7 +23,6 @@ abstract contract RMRKAbstractNestableMultiAssetImpl is
     RMRKNestableMultiAsset
 {
     uint256 private _totalAssets;
-    string private _tokenURI;
 
     /**
      * @notice Used to calculate the token IDs of tokens to be minted.
