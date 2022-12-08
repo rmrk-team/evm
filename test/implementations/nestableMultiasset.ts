@@ -23,6 +23,7 @@ import {
 import { RMRKMultiAssetRenderUtils, RMRKNestableMultiAssetImpl } from '../../typechain-types';
 
 const isTokenUriEnumerated = false;
+const lazyMintingEnabled = true;
 
 async function singleFixture(): Promise<{
   token: RMRKNestableMultiAssetImpl;
@@ -38,7 +39,7 @@ async function singleFixture(): Promise<{
       'NMR',
       'ipfs://collection-meta',
       'ipfs://tokenURI',
-      [ADDRESS_ZERO, isTokenUriEnumerated, ADDRESS_ZERO, 1000, 10000, ONE_ETH],
+      [ADDRESS_ZERO, isTokenUriEnumerated, lazyMintingEnabled, ADDRESS_ZERO, 1000, 10000, ONE_ETH],
     ])
   );
   return { token, renderUtils };
@@ -52,14 +53,14 @@ async function parentChildFixture(): Promise<{ parent: Contract; child: Contract
       'CHNK',
       'ipfs://collection-meta',
       'ipfs://tokenURI',
-      [ADDRESS_ZERO, false, ADDRESS_ZERO, 1000, 10000, ONE_ETH],
+      [ADDRESS_ZERO, isTokenUriEnumerated, lazyMintingEnabled, ADDRESS_ZERO, 1000, 10000, ONE_ETH],
     ],
     [
       'Monkey',
       'MONK',
       'ipfs://collection-meta',
       'ipfs://tokenURI',
-      [ADDRESS_ZERO, false, ADDRESS_ZERO, 1000, 10000, ONE_ETH],
+      [ADDRESS_ZERO, isTokenUriEnumerated, lazyMintingEnabled, ADDRESS_ZERO, 1000, 10000, ONE_ETH],
     ],
   );
 }

@@ -15,16 +15,23 @@ contract RMRKMintingUtils is OwnableLock {
     uint256 internal _totalSupply;
     uint256 internal _maxSupply;
     uint256 internal immutable _pricePerMint;
+    uint256 internal immutable _lazyMintingEnabled;
 
     /**
      * @notice Initializes the smart contract with a given maximum supply and minting price.
      * @param maxSupply_ The maximum supply of tokens to initialize the smart contract with
      * @param pricePerMint_ The minting price to initialize the smart contract with, expressed in the smallest
      *  denomination of the native currency of the chain to which the smart contract is deployed to
+     * @param lazyMintingEnabled_ Whether the token minting is lazy or not. If not, only the owner can mint
      */
-    constructor(uint256 maxSupply_, uint256 pricePerMint_) {
+    constructor(
+        uint256 maxSupply_,
+        uint256 pricePerMint_,
+        bool lazyMintingEnabled_
+    ) {
         _maxSupply = maxSupply_;
         _pricePerMint = pricePerMint_;
+        _lazyMintingEnabled = lazyMintingEnabled_ ? 1 : 0;
     }
 
     /**
@@ -61,6 +68,14 @@ contract RMRKMintingUtils is OwnableLock {
     }
 
     /**
+     * @notice Used to retrieve if lazy minting is enabled.
+     * @return Boolean value indicating if lazy minting is enabled. If not, only contract owner can mint
+     */
+    function lazyMintingEnabled() public view returns (bool) {
+        return _lazyMintingEnabled == 1;
+    }
+
+    /**
      * @notice Used to retrieve the price per mint.
      * @return uint256 The price per mint of a single token expressed in the lowest denomination of a native currency
      */
@@ -94,5 +109,14 @@ contract RMRKMintingUtils is OwnableLock {
      */
     function _checkSaleIsOpen() private view {
         if (_totalSupply >= _maxSupply) revert RMRKMintOverMax();
+    }
+
+    /**
+     * @notice Used to verify that that only the owner can mint tokens if lazy minting is not enabled.
+     * @dev In case lazy minting is not enable and msg sender is not the contract owner, the execution is reverted.
+     */
+    function _checkLazyMinting() internal view {
+        if (_lazyMintingEnabled == 0 && _msgSender() != owner())
+            revert RMRKMintOnlyAllowedByOwner();
     }
 }

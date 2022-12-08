@@ -33,6 +33,7 @@ contract RMRKNestableExternalEquipImpl is
      *  [
      *      erc20TokenAddress,
      *      tokenUriIsEnumerable,
+     *      lazyMintingEnabled,
      *      royaltyRecipient,
      *      royaltyPercentageBps,
      *      maxSupply,
@@ -52,7 +53,11 @@ contract RMRKNestableExternalEquipImpl is
         string memory tokenURI_,
         InitData memory data
     )
-        RMRKMintingUtils(data.maxSupply, data.pricePerMint)
+        RMRKMintingUtils(
+            data.maxSupply,
+            data.pricePerMint,
+            data.lazyMintingEnabled
+        )
         RMRKCollectionMetadata(collectionMetadata_)
         RMRKRoyalties(data.royaltyRecipient, data.royaltyPercentageBps)
         RMRKTokenURI(tokenURI_, data.tokenUriIsEnumerable)
@@ -116,6 +121,7 @@ contract RMRKNestableExternalEquipImpl is
     function _preMint(uint256 numToMint) private returns (uint256, uint256) {
         if (numToMint == uint256(0)) revert RMRKMintZero();
         if (numToMint + _totalSupply > _maxSupply) revert RMRKMintOverMax();
+        _checkLazyMinting();
 
         uint256 mintPriceRequired = numToMint * _pricePerMint;
         if (mintPriceRequired != msg.value) revert RMRKMintUnderpriced();

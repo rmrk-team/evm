@@ -735,6 +735,23 @@ Used to check if the address is one of the contributors.
 |---|---|---|
 | _0 | bool | Boolean value indicating whether the address is a contributor or not |
 
+### lazyMintingEnabled
+
+```solidity
+function lazyMintingEnabled() external view returns (bool)
+```
+
+Used to retrieve if lazy minting is enabled.
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | bool | Boolean value indicating if lazy minting is enabled. If not, only contract owner can mint |
+
 ### maxSupply
 
 ```solidity
@@ -1993,6 +2010,17 @@ Attempting to burn a total number of recursive children higher than maximum set
 |---|---|---|
 | childContract | address | Address of the collection smart contract in which the maximum number of recursive burns was reached |
 | childId | uint256 | ID of the child token at which the maximum number of recursive burns was reached |
+
+### RMRKMintOnlyAllowedByOwner
+
+```solidity
+error RMRKMintOnlyAllowedByOwner()
+```
+
+Attempting to mint a token on a contract not using lazy minting.
+
+
+
 
 ### RMRKMintOverMax
 

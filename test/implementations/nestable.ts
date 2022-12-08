@@ -18,6 +18,7 @@ import {
 } from '../utils';
 
 const isTokenUriEnumerated = true;
+const lazyMintingEnabled = true;
 
 async function singleFixture(): Promise<Contract> {
   return singleFixtureWithArgs('RMRKNestableImpl', [
@@ -25,7 +26,7 @@ async function singleFixture(): Promise<Contract> {
     'RMRKTST',
     'ipfs://collection-meta',
     'ipfs://tokenURI/',
-    [ADDRESS_ZERO, isTokenUriEnumerated, ADDRESS_ZERO, 1000, 10000, ONE_ETH],
+    [ADDRESS_ZERO, isTokenUriEnumerated, lazyMintingEnabled, ADDRESS_ZERO, 1000, 10000, ONE_ETH],
   ]);
 }
 
@@ -37,14 +38,14 @@ async function parentChildFixture(): Promise<{ parent: Contract; child: Contract
       'CHNK',
       'ipfs://collection-meta',
       'ipfs://tokenURI',
-      [ADDRESS_ZERO, false, ADDRESS_ZERO, 1000, 10000, ONE_ETH],
+      [ADDRESS_ZERO, isTokenUriEnumerated, lazyMintingEnabled, ADDRESS_ZERO, 1000, 10000, ONE_ETH],
     ],
     [
       'Monkey',
       'MONK',
       'ipfs://collection-meta',
       'ipfs://tokenURI',
-      [ADDRESS_ZERO, false, ADDRESS_ZERO, 1000, 10000, ONE_ETH],
+      [ADDRESS_ZERO, isTokenUriEnumerated, lazyMintingEnabled, ADDRESS_ZERO, 1000, 10000, ONE_ETH],
     ],
   );
 }

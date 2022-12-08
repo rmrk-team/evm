@@ -16,7 +16,7 @@ describe('Minting Utils', async () => {
   async function deployMintingUtilsFixture() {
     const [signersOwner, ...signersAddrs] = await ethers.getSigners();
     const MINT = await ethers.getContractFactory('MintingUtilsMock');
-    const mintingUtilsContract = <MintingUtilsMock>await MINT.deploy(10, 100);
+    const mintingUtilsContract = <MintingUtilsMock>await MINT.deploy(10, 100, true);
     await mintingUtilsContract.deployed();
 
     return { mintingUtilsContract, signersOwner, signersAddrs };
@@ -32,10 +32,11 @@ describe('Minting Utils', async () => {
   });
 
   describe('MintingUtilsMock', async function () {
-    it('can get total supply, max supply and price', async function () {
+    it('can get total supply, max supply, price and lazy minting enabled', async function () {
       expect(await mintingUtils.totalSupply()).to.equal(0);
       expect(await mintingUtils.maxSupply()).to.equal(10);
       expect(await mintingUtils.pricePerMint()).to.equal(100);
+      expect(await mintingUtils.lazyMintingEnabled()).to.equal(true);
     });
 
     it('fails if sale is not open', async function () {

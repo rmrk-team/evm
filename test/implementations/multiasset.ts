@@ -20,6 +20,7 @@ import { IERC721 } from '../interfaces';
 import { RMRKMultiAssetImpl, RMRKMultiAssetRenderUtils } from '../../typechain-types';
 
 const isTokenUriEnumerated = true;
+const lazyMintingEnabled = true;
 
 async function singleFixture(): Promise<{ token: RMRKMultiAssetImpl; renderUtils: Contract }> {
   const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiAssetRenderUtils');
@@ -32,7 +33,7 @@ async function singleFixture(): Promise<{ token: RMRKMultiAssetImpl; renderUtils
       'MR',
       'ipfs://collection-meta',
       'ipfs://tokenURI/',
-      [ADDRESS_ZERO, isTokenUriEnumerated, ADDRESS_ZERO, 1000, 10000, ONE_ETH],
+      [ADDRESS_ZERO, isTokenUriEnumerated, lazyMintingEnabled, ADDRESS_ZERO, 1000, 10000, ONE_ETH],
     ])
   );
   return { token, renderUtils };

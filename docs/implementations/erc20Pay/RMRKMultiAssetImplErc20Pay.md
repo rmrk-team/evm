@@ -482,6 +482,23 @@ Used to check if the address is one of the contributors.
 |---|---|---|
 | _0 | bool | Boolean value indicating whether the address is a contributor or not |
 
+### lazyMintingEnabled
+
+```solidity
+function lazyMintingEnabled() external view returns (bool)
+```
+
+Used to retrieve if lazy minting is enabled.
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | bool | Boolean value indicating if lazy minting is enabled. If not, only contract owner can mint |
+
 ### maxSupply
 
 ```solidity
@@ -1341,6 +1358,17 @@ error RMRKMaxPendingAssetsReached()
 ```
 
 Attempting to add a pending asset after the number of pending assets has reached the limit (default limit is  128)
+
+
+
+
+### RMRKMintOnlyAllowedByOwner
+
+```solidity
+error RMRKMintOnlyAllowedByOwner()
+```
+
+Attempting to mint a token on a contract not using lazy minting.
 
 
 

@@ -617,6 +617,23 @@ Used to check if the address is one of the contributors.
 |---|---|---|
 | _0 | bool | Boolean value indicating whether the address is a contributor or not |
 
+### lazyMintingEnabled
+
+```solidity
+function lazyMintingEnabled() external view returns (bool)
+```
+
+Used to retrieve if lazy minting is enabled.
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | bool | Boolean value indicating if lazy minting is enabled. If not, only contract owner can mint |
+
 ### maxSupply
 
 ```solidity

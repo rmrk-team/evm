@@ -19,6 +19,7 @@ contract RMRKNestableImpl is IRMRKInitData, RMRKAbstractNestableImpl {
      *  [
      *      erc20TokenAddress,
      *      tokenUriIsEnumerable,
+     *      lazyMintingEnabled,
      *      royaltyRecipient,
      *      royaltyPercentageBps,
      *      maxSupply,
@@ -37,7 +38,11 @@ contract RMRKNestableImpl is IRMRKInitData, RMRKAbstractNestableImpl {
         string memory tokenURI_,
         InitData memory data
     )
-        RMRKMintingUtils(data.maxSupply, data.pricePerMint)
+        RMRKMintingUtils(
+            data.maxSupply,
+            data.pricePerMint,
+            data.lazyMintingEnabled
+        )
         RMRKCollectionMetadata(collectionMetadata_)
         RMRKRoyalties(data.royaltyRecipient, data.royaltyPercentageBps)
         RMRKTokenURI(tokenURI_, data.tokenUriIsEnumerable)

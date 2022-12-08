@@ -35,6 +35,7 @@ abstract contract RMRKAbstractEquippableImpl is
     function _preMint(uint256 numToMint) internal returns (uint256, uint256) {
         if (numToMint == uint256(0)) revert RMRKMintZero();
         if (numToMint + _totalSupply > _maxSupply) revert RMRKMintOverMax();
+        _checkLazyMinting();
 
         uint256 mintPriceRequired = numToMint * _pricePerMint;
         _charge(mintPriceRequired);

@@ -19,6 +19,7 @@ contract RMRKMultiAssetImpl is IRMRKInitData, RMRKAbstractMultiAssetImpl {
      *  [
      *      erc20TokenAddress,
      *      tokenUriIsEnumerable,
+     *      lazyMintingEnabled,
      *      royaltyRecipient,
      *      royaltyPercentageBps,
      *      maxSupply,
@@ -37,7 +38,11 @@ contract RMRKMultiAssetImpl is IRMRKInitData, RMRKAbstractMultiAssetImpl {
         string memory tokenURI_,
         InitData memory data
     )
-        RMRKMintingUtils(data.maxSupply, data.pricePerMint)
+        RMRKMintingUtils(
+            data.maxSupply,
+            data.pricePerMint,
+            data.lazyMintingEnabled
+        )
         RMRKCollectionMetadata(collectionMetadata_)
         RMRKRoyalties(data.royaltyRecipient, data.royaltyPercentageBps)
         RMRKTokenURI(tokenURI_, data.tokenUriIsEnumerable)
@@ -57,6 +62,7 @@ contract RMRKMultiAssetImpl is IRMRKInitData, RMRKAbstractMultiAssetImpl {
     ) public payable virtual saleIsOpen notLocked {
         if (numToMint == uint256(0)) revert RMRKMintZero();
         if (numToMint + _totalSupply > _maxSupply) revert RMRKMintOverMax();
+        _checkLazyMinting();
 
         uint256 mintPriceRequired = numToMint * _pricePerMint;
         if (mintPriceRequired != msg.value) revert RMRKMintUnderpriced();

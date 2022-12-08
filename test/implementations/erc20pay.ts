@@ -10,7 +10,10 @@ import {
 } from '../utils';
 import { Contract } from 'ethers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import { ERC20Mock } from '../../typechain-types';
+import { ERC20Mock, RMRKMultiAssetImplErc20Pay } from '../../typechain-types';
+
+const isTokenUriEnumerated = false;
+const lazyMintingEnabled = true;
 
 async function multiAssetFixture(): Promise<Contract> {
   const erc20Factory = await ethers.getContractFactory('ERC20Mock');
@@ -22,7 +25,7 @@ async function multiAssetFixture(): Promise<Contract> {
     'MR',
     'ipfs://collection-meta',
     'ipfs://tokenURI',
-    [erc20.address, false, ADDRESS_ZERO, 0, 10000, ONE_ETH],
+    [erc20.address, isTokenUriEnumerated, lazyMintingEnabled, ADDRESS_ZERO, 0, 10000, ONE_ETH],
   ]);
 }
 
@@ -36,7 +39,7 @@ async function nestableFixture(): Promise<Contract> {
     'MR',
     'ipfs://collection-meta',
     'ipfs://tokenURI',
-    [erc20.address, false, ADDRESS_ZERO, 0, 10000, ONE_ETH],
+    [erc20.address, isTokenUriEnumerated, lazyMintingEnabled, ADDRESS_ZERO, 0, 10000, ONE_ETH],
   ]);
 }
 
@@ -50,7 +53,7 @@ async function nestableMultiAssetFixture(): Promise<Contract> {
     'MR',
     'ipfs://collection-meta',
     'ipfs://tokenURI',
-    [erc20.address, false, ADDRESS_ZERO, 0, 10000, ONE_ETH],
+    [erc20.address, isTokenUriEnumerated, lazyMintingEnabled, ADDRESS_ZERO, 0, 10000, ONE_ETH],
   ]);
 }
 
@@ -64,8 +67,29 @@ async function equippableFixture(): Promise<Contract> {
     'MR',
     'ipfs://collection-meta',
     'ipfs://tokenURI',
-    [erc20.address, false, ADDRESS_ZERO, 0, 10000, ONE_ETH],
+    [erc20.address, isTokenUriEnumerated, lazyMintingEnabled, ADDRESS_ZERO, 0, 10000, ONE_ETH],
   ]);
+}
+
+async function lazyMintingDisabledFixture(): Promise<{
+  token: RMRKMultiAssetImplErc20Pay;
+  erc20: ERC20Mock;
+}> {
+  const erc20Factory = await ethers.getContractFactory('ERC20Mock');
+  const erc20 = <ERC20Mock>await erc20Factory.deploy();
+  await erc20.deployed();
+
+  const lazyMintingEnabled = false; // Shadows module lazyMintingEnabled
+  const token = <RMRKMultiAssetImplErc20Pay>(
+    await singleFixtureWithArgs('RMRKMultiAssetImplErc20Pay', [
+      'MultiAsset',
+      'MR',
+      'ipfs://collection-meta',
+      'ipfs://tokenURI',
+      [erc20.address, isTokenUriEnumerated, lazyMintingEnabled, ADDRESS_ZERO, 0, 10000, ONE_ETH],
+    ])
+  );
+  return { token, erc20 };
 }
 
 describe('MultiAssetImplErc20Pay Minting', async () => {
@@ -98,6 +122,40 @@ describe('EquippableImplErc20Pay Minting', async () => {
   });
 
   shouldControlValidMintingErc20Pay();
+});
+
+describe('Lazy Minting Disabled', async () => {
+  let owner: SignerWithAddress;
+  let addrs: SignerWithAddress[];
+  let erc20: ERC20Mock;
+  let token: RMRKMultiAssetImplErc20Pay;
+
+  beforeEach(async function () {
+    [owner, ...addrs] = await ethers.getSigners();
+    ({ token, erc20 } = await loadFixture(lazyMintingDisabledFixture));
+  });
+
+  it('can get lazy minting enabled value', async function () {
+    expect(await token.lazyMintingEnabled()).to.equal(false);
+  });
+
+  it('cannot mint if not owner', async function () {
+    const notOwner = addrs[0];
+    await erc20.mint(notOwner.address, ONE_ETH);
+    await erc20.approve(token.address, ONE_ETH);
+    await expect(token.connect(notOwner).mint(notOwner.address, 1)).to.be.revertedWithCustomError(
+      token,
+      'RMRKMintOnlyAllowedByOwner',
+    );
+  });
+
+  it('can mint if owner', async function () {
+    await erc20.mint(owner.address, ONE_ETH);
+    await erc20.approve(token.address, ONE_ETH);
+    await expect(token.connect(owner).mint(owner.address, 1))
+      .to.emit(token, 'Transfer')
+      .withArgs(ADDRESS_ZERO, owner.address, 1);
+  });
 });
 
 async function shouldControlValidMintingErc20Pay(): Promise<void> {

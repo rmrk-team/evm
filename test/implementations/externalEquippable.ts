@@ -17,6 +17,7 @@ import {
 import { RMRKExternalEquipImpl, RMRKNestableExternalEquipImpl } from '../../typechain-types';
 
 const isTokenUriEnumerated = false;
+const lazyMintingEnabled = true;
 
 // --------------- FIXTURES -----------------------
 
@@ -32,7 +33,7 @@ async function equipFixture() {
       'NWE',
       'ipfs://collection-meta',
       'ipfs://tokenURI',
-      [ADDRESS_ZERO, isTokenUriEnumerated, ADDRESS_ZERO, 1000, 10000, ONE_ETH],
+      [ADDRESS_ZERO, isTokenUriEnumerated, lazyMintingEnabled, ADDRESS_ZERO, 1000, 10000, ONE_ETH],
     )
   );
   await nestable.deployed();

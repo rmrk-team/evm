@@ -22,6 +22,7 @@ contract RMRKNestableMultiAssetImplErc20Pay is
      *  [
      *      erc20TokenAddress,
      *      tokenUriIsEnumerable,
+     *      lazyMintingEnabled,
      *      royaltyRecipient,
      *      royaltyPercentageBps,
      *      maxSupply,
@@ -40,7 +41,11 @@ contract RMRKNestableMultiAssetImplErc20Pay is
         string memory tokenURI_,
         InitData memory data
     )
-        RMRKMintingUtils(data.maxSupply, data.pricePerMint)
+        RMRKMintingUtils(
+            data.maxSupply,
+            data.pricePerMint,
+            data.lazyMintingEnabled
+        )
         RMRKCollectionMetadata(collectionMetadata_)
         RMRKRoyalties(data.royaltyRecipient, data.royaltyPercentageBps)
         RMRKTokenURI(tokenURI_, data.tokenUriIsEnumerable)
