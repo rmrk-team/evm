@@ -16,6 +16,8 @@ import {
 } from '../utils';
 import { RMRKEquippableImpl, RMRKMultiAssetRenderUtils } from '../../typechain-types';
 
+const isTokenUriEnumerated = false;
+
 // --------------- FIXTURES -----------------------
 
 async function equipFixture() {
@@ -27,7 +29,7 @@ async function equipFixture() {
     'NWE',
     'ipfs://collection-meta',
     'ipfs://tokenURI',
-    [ADDRESS_ZERO, false, ADDRESS_ZERO, 1000, 10000, ONE_ETH],
+    [ADDRESS_ZERO, isTokenUriEnumerated, ADDRESS_ZERO, 1000, 10000, ONE_ETH],
   );
   await equip.deployed();
 
@@ -91,5 +93,5 @@ describe('RMRKEquippableImpl Other', async function () {
 
   shouldControlValidMinting();
   shouldHaveRoyalties(mintFromImpl);
-  shouldHaveMetadata(mintFromImpl);
+  shouldHaveMetadata(mintFromImpl, isTokenUriEnumerated);
 });
