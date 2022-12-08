@@ -24,7 +24,7 @@ async function singleFixture(): Promise<Contract> {
     'RMRK Test',
     'RMRKTST',
     'ipfs://collection-meta',
-    'ipfs://tokenURI',
+    'ipfs://tokenURI/',
     [ADDRESS_ZERO, isTokenUriEnumerated, ADDRESS_ZERO, 1000, 10000, ONE_ETH],
   ]);
 }
