@@ -25,12 +25,9 @@ async function equipFixture() {
   const equip = <RMRKEquippableImpl>await equipFactory.deploy(
     'equipWithEquippable',
     'NWE',
-    10000,
-    ONE_ETH,
     'ipfs://collection-meta',
     'ipfs://tokenURI',
-    ADDRESS_ZERO,
-    1000, // 10%
+    [ADDRESS_ZERO, false, ADDRESS_ZERO, 1000, 10000, ONE_ETH],
   );
   await equip.deployed();
 
