@@ -12,7 +12,10 @@ error RMRKMintUnderpriced();
  * @author RMRK team
  * @notice Implementation of RMRK nestable multi asset module.
  */
-contract RMRKNestableMultiAssetImpl is IRMRKInitData, RMRKAbstractNestableMultiAssetImpl {
+contract RMRKNestableMultiAssetImpl is
+    IRMRKInitData,
+    RMRKAbstractNestableMultiAssetImpl
+{
     /**
      * @notice Used to initialize the smart contract.
      * @dev The full `InitData` looks like this:
@@ -42,7 +45,7 @@ contract RMRKNestableMultiAssetImpl is IRMRKInitData, RMRKAbstractNestableMultiA
         RMRKRoyalties(data.royaltyRecipient, data.royaltyPercentageBps)
         RMRKTokenURI(tokenURI_, data.tokenUriIsEnumerable)
         RMRKNestableMultiAsset(name_, symbol_)
-    { }
+    {}
 
     /**
      * @notice Used to mint the desired number of tokens to the specified address.

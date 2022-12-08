@@ -19,5 +19,4 @@ interface IRMRKCore {
      * @return string Symbol of the collection
      */
     function symbol() external view returns (string memory);
-
 }

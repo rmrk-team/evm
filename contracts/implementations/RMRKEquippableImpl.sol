@@ -42,7 +42,7 @@ contract RMRKEquippableImpl is IRMRKInitData, RMRKAbstractEquippableImpl {
         RMRKRoyalties(data.royaltyRecipient, data.royaltyPercentageBps)
         RMRKTokenURI(tokenURI_, data.tokenUriIsEnumerable)
         RMRKEquippable(name_, symbol_)
-    { }
+    {}
 
     /**
      * @notice Used to mint the desired number of tokens to the specified address.
