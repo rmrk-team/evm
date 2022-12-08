@@ -114,7 +114,7 @@ contract Ownable is Context {
      * @dev If the caller is not the owner or a contributor, the execution will be reverted.
      */
     function _onlyOwnerOrContributor() private view {
-        if (owner() != _msgSender() && isContributor(_msgSender()))
+        if (owner() != _msgSender() && !isContributor(_msgSender()))
             revert RMRKNotOwnerOrContributor();
     }
 
