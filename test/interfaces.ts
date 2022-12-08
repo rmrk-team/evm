@@ -11,6 +11,7 @@ const IRMRKNestableExternalEquip = '0x8b7f3e99';
 const IRMRKReclaimableChild = '0x2fb59acf';
 const IRMRKSoulboundMultiAsset = '0x911ec470';
 const IRMRKTypedMultiAsset = '0x7f7bb665';
+const IRMRKTokenProperties = '0x6dbb26fc';
 
 export {
   IERC165,
@@ -26,4 +27,5 @@ export {
   IRMRKReclaimableChild,
   IRMRKSoulboundMultiAsset,
   IRMRKTypedMultiAsset,
+  IRMRKTokenProperties,
 };
