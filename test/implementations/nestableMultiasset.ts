@@ -22,6 +22,8 @@ import {
 } from '../utils';
 import { RMRKMultiAssetRenderUtils, RMRKNestableMultiAssetImpl } from '../../typechain-types';
 
+const isTokenUriEnumerated = false;
+
 async function singleFixture(): Promise<{
   token: RMRKNestableMultiAssetImpl;
   renderUtils: Contract;
@@ -36,7 +38,7 @@ async function singleFixture(): Promise<{
       'NMR',
       'ipfs://collection-meta',
       'ipfs://tokenURI',
-      [ADDRESS_ZERO, false, ADDRESS_ZERO, 1000, 10000, ONE_ETH],
+      [ADDRESS_ZERO, isTokenUriEnumerated, ADDRESS_ZERO, 1000, 10000, ONE_ETH],
     ])
   );
   return { token, renderUtils };
@@ -159,5 +161,5 @@ describe('NestableMultiAssetImpl Other', async function () {
 
   shouldControlValidMinting();
   shouldHaveRoyalties(mintFromImpl);
-  shouldHaveMetadata(mintFromImpl);
+  shouldHaveMetadata(mintFromImpl, isTokenUriEnumerated);
 });
