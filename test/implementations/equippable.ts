@@ -24,12 +24,14 @@ async function equipFixture() {
   const equipFactory = await ethers.getContractFactory('RMRKEquippableImpl');
   const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiAssetRenderUtils');
 
-  const equip = <RMRKEquippableImpl>await equipFactory.deploy(
-    'equipWithEquippable',
-    'NWE',
-    'ipfs://collection-meta',
-    'ipfs://tokenURI',
-    [ADDRESS_ZERO, isTokenUriEnumerated, ADDRESS_ZERO, 1000, 10000, ONE_ETH],
+  const equip = <RMRKEquippableImpl>(
+    await equipFactory.deploy(
+      'equipWithEquippable',
+      'NWE',
+      'ipfs://collection-meta',
+      'ipfs://tokenURI',
+      [ADDRESS_ZERO, isTokenUriEnumerated, ADDRESS_ZERO, 1000, 10000, ONE_ETH],
+    )
   );
   await equip.deployed();
 

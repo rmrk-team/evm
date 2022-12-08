@@ -25,13 +25,15 @@ async function equipFixture() {
   const equipFactory = await ethers.getContractFactory('RMRKExternalEquipImpl');
   const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiAssetRenderUtils');
 
-  const nestable = <RMRKNestableExternalEquipImpl>await nestableFactory.deploy(
-    ADDRESS_ZERO,
-    'NestableWithEquippable',
-    'NWE',
-    'ipfs://collection-meta',
-    'ipfs://tokenURI',
-    [ADDRESS_ZERO, isTokenUriEnumerated, ADDRESS_ZERO, 1000, 10000, ONE_ETH],
+  const nestable = <RMRKNestableExternalEquipImpl>(
+    await nestableFactory.deploy(
+      ADDRESS_ZERO,
+      'NestableWithEquippable',
+      'NWE',
+      'ipfs://collection-meta',
+      'ipfs://tokenURI',
+      [ADDRESS_ZERO, isTokenUriEnumerated, ADDRESS_ZERO, 1000, 10000, ONE_ETH],
+    )
   );
   await nestable.deployed();
 
