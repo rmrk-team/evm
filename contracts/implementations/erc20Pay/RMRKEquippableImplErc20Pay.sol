@@ -46,7 +46,7 @@ contract RMRKEquippableImplErc20Pay is
         RMRKTokenURI(tokenURI_, data.tokenUriIsEnumerable)
         RMRKErc20Pay(data.erc20TokenAddress)
         RMRKEquippable(name_, symbol_)
-    { }
+    {}
 
     /**
      * @notice Used to mint the desired number of tokens to the specified address.

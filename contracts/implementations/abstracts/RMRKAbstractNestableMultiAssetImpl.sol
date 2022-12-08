@@ -107,23 +107,4 @@ abstract contract RMRKAbstractNestableMultiAssetImpl is
     ) public override onlyOwner {
         _setRoyaltyRecipient(newRoyaltyRecipient);
     }
-
-    /**
-     * @notice Used to update the tokenURI and define it as enumerable or not
-     * @param tokenURI_ Metadata URI to apply to all tokens, either as base or as full URI for every token
-     * @param isEnumerable Whether to treat the tokenURI as enumerable or not. If true, the tokenID will be appended to the base when getting the tokenURI
-     */
-    function updateTokenURI(
-        string memory tokenURI_,
-        bool isEnumerable
-    ) public virtual onlyOwner {
-        _setTokenURI(tokenURI_, isEnumerable);
-    }
-
-    /**
-     * @notice Prevents from ever modifying the token URI again
-     */
-    function freezeTokenURI() public virtual onlyOwner {
-        _freezeTokenURI();
-    }
 }
