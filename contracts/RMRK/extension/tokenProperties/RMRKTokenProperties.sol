@@ -9,17 +9,17 @@ import "./IRMRKTokenProperties.sol";
  * @author RMRK team
  * @notice Smart contract of the RMRK Token properties module.
  */
-contract RMRKTokenProperties is IRMRKTokenProperties {
+contract RMRKTokenPropertiesMock is IRMRKTokenProperties {
 
-    uint256 private totalStringProperties;
+    uint256 private _totalStringProperties;
     mapping(uint256 => string) stringProperties;
     mapping(uint256 => mapping(string => uint256)) private _stringProperties;
 
-    uint256 private totalAddressProperties;
+    uint256 private _totalAddressProperties;
     mapping(uint256 => address) addressProperties;
     mapping(uint256 => mapping(string => uint256)) private _addressProperties;
 
-    uint256 private totalBytesProperties;
+    uint256 private _totalBytesProperties;
     mapping(uint256 => bytes) bytesProperties;
     mapping(uint256 => mapping(string => uint)) private _bytesProperties;
 
@@ -93,9 +93,9 @@ contract RMRKTokenProperties is IRMRKTokenProperties {
     * @param value The property value
     */
     function setStringProperty(uint256 tokenId, string memory key, string memory value) external {
-        _stringProperties[tokenId][key] = totalStringProperties;
-        stringProperties[totalStringProperties] = value;
-        totalStringProperties++;
+        _stringProperties[tokenId][key] = _totalStringProperties;
+        stringProperties[_totalStringProperties] = value;
+        _totalStringProperties++;
     }
 
     /**
@@ -115,9 +115,9 @@ contract RMRKTokenProperties is IRMRKTokenProperties {
      * @param value The property value
      */
     function setBytesProperty(uint256 tokenId, string memory key, bytes memory value) external {
-        _bytesProperties[tokenId][key] = totalBytesProperties;
-        bytesProperties[totalBytesProperties] = value;
-        totalBytesProperties++;
+        _bytesProperties[tokenId][key] = _totalBytesProperties;
+        bytesProperties[_totalBytesProperties] = value;
+        _totalBytesProperties++;
     }
 
     /**
@@ -127,9 +127,9 @@ contract RMRKTokenProperties is IRMRKTokenProperties {
      * @param value The property value
      */
     function setAddressProperty(uint256 tokenId, string memory key, address value) external {
-        _addressProperties[tokenId][key] = totalAddressProperties;
-        addressProperties[totalAddressProperties] = value;
-        totalAddressProperties++;
+        _addressProperties[tokenId][key] = _totalAddressProperties;
+        addressProperties[_totalAddressProperties] = value;
+        _totalAddressProperties++;
     }
 
     /**
