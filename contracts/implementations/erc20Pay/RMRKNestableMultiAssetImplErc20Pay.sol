@@ -91,8 +91,8 @@ contract RMRKNestableMultiAssetImplErc20Pay is
     }
 
     /**
-     * @notice Used to verify that the amount of native currency accompanying the transaction equals the expected value.
-     * @param value The expected amount of native currency to accompany the transaction
+     * @notice Used to verify and/or receive the payment for the mint.
+     * @param value The expected amount to be received for the mint
      */
     function _charge(uint256 value) internal virtual override {
         _chargeFromToken(msg.sender, address(this), value);
