@@ -56,7 +56,7 @@ contract RMRKMultiAssetImplErc20Pay is
     function mint(
         address to,
         uint256 numToMint
-    ) public virtual saleIsOpen notLocked {
+    ) public virtual notLocked saleIsOpen notLocked {
         if (numToMint == uint256(0)) revert RMRKMintZero();
         if (numToMint + _totalSupply > _maxSupply) revert RMRKMintOverMax();
 
