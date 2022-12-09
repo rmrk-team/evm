@@ -3,7 +3,6 @@
 pragma solidity ^0.8.16;
 
 import "../abstracts/RMRKAbstractEquippableImpl.sol";
-import "../IRMRKInitData.sol";
 import "./RMRKErc20Pay.sol";
 
 /**
@@ -12,7 +11,6 @@ import "./RMRKErc20Pay.sol";
  * @notice Implementation of RMRK equippable module with ERC20 pay.
  */
 contract RMRKEquippableImplErc20Pay is
-    IRMRKInitData,
     RMRKErc20Pay,
     RMRKAbstractEquippableImpl
 {

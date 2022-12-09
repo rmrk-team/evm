@@ -7,6 +7,7 @@ import "../../RMRK/multiasset/RMRKMultiAsset.sol";
 import "../../RMRK/utils/RMRKCollectionMetadata.sol";
 import "../../RMRK/utils/RMRKMintingUtils.sol";
 import "../../RMRK/utils/RMRKTokenURI.sol";
+import "../IRMRKInitData.sol";
 
 error RMRKMintZero();
 
@@ -16,6 +17,7 @@ error RMRKMintZero();
  * @notice Abstract implementation of RMRK multi asset module.
  */
 abstract contract RMRKAbstractMultiAssetImpl is
+    IRMRKInitData,
     RMRKMintingUtils,
     RMRKCollectionMetadata,
     RMRKRoyalties,
