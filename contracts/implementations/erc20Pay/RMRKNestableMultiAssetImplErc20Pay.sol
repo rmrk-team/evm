@@ -53,10 +53,7 @@ contract RMRKNestableMultiAssetImplErc20Pay is
      * @param to Address to which to mint the token
      * @param numToMint Number of tokens to mint
      */
-    function mint(
-        address to,
-        uint256 numToMint
-    ) public virtual notLocked {
+    function mint(address to, uint256 numToMint) public virtual notLocked {
         (uint256 nextToken, uint256 totalSupplyOffset) = _preMint(numToMint);
 
         for (uint256 i = nextToken; i < totalSupplyOffset; ) {

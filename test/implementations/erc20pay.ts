@@ -137,6 +137,14 @@ async function shouldControlValidMintingErc20Pay(): Promise<void> {
     );
   });
 
+  it('cannot mint if locked', async function () {
+    await this.token.setLock();
+    await expect(this.token.mint(addrs[0].address, 99999)).to.be.revertedWithCustomError(
+      this.token,
+      'RMRKLocked',
+    );
+  });
+
   it('can mint tokens through sale logic', async function () {
     await mintFromImplErc20Pay(this.token, addrs[0].address);
     expect(await this.token.ownerOf(1)).to.equal(addrs[0].address);
@@ -157,13 +165,35 @@ async function shouldControlValidMintingErc20Pay(): Promise<void> {
     ).to.be.revertedWithCustomError(this.token, 'RMRKNotEnoughAllowance');
   });
 
-  it('can nest mint tokens through sale logic', async function () {
-    if (this.token.nestMint === undefined) {
-      this.skip();
-    }
-    const parentId = await mintFromImplErc20Pay(this.token, addrs[0].address);
-    const childId = await nestMintFromImplErc20Pay(this.token, this.token.address, parentId);
-    expect(await this.token.ownerOf(childId)).to.equal(addrs[0].address);
-    expect(await this.token.totalSupply()).to.equal(2);
+  describe('Nest minting', async () => {
+    let parentId: number;
+
+    beforeEach(async function () {
+      if (this.token.nestMint === undefined) {
+        this.skip();
+      }
+      parentId = await mintFromImplErc20Pay(this.token, addrs[0].address);
+    });
+
+    it('can nest mint tokens through sale logic', async function () {
+      const childId = await nestMintFromImplErc20Pay(this.token, this.token.address, parentId);
+      expect(await this.token.ownerOf(childId)).to.equal(addrs[0].address);
+      expect(await this.token.totalSupply()).to.equal(2);
+    });
+
+    it('cannot nest mint over max supply', async function () {
+      await expect(this.token.nestMint(this.token.address, 99999, 1)).to.be.revertedWithCustomError(
+        this.token,
+        'RMRKMintOverMax',
+      );
+    });
+
+    it('cannot nest mint if locked', async function () {
+      await this.token.setLock();
+      await expect(this.token.nestMint(this.token.address, 99999, 1)).to.be.revertedWithCustomError(
+        this.token,
+        'RMRKLocked',
+      );
+    });
   });
 }
