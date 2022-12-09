@@ -1,10 +1,10 @@
-# RMRKNestableImplErc20Pay
+# RMRKNestableImplPreMint
 
 *RMRK team*
 
-> RMRKNestableImplErc20Pay
+> RMRKNestableImplPreMint
 
-Implementation of RMRK nestable module with ERC20 pay.
+Implementation of RMRK nestable module with pre minting by collection owner.
 
 
 
@@ -266,23 +266,6 @@ Used to retrieve the immediate owner of the given token.
 | _0 | address | address Address of the given token&#39;s owner |
 | _1 | uint256 | uint256 The ID of the parent token. Should be `0` if the owner is an externally owned account |
 | _2 | bool | bool The boolean value signifying whether the owner is an NFT or not |
-
-### erc20TokenAddress
-
-```solidity
-function erc20TokenAddress() external view returns (address)
-```
-
-Used to retrieve the address of the ERC20 token this smart contract supports.
-
-
-
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | address | address Address of the ERC20 token&#39;s smart contract |
 
 ### getApproved
 
@@ -1378,17 +1361,6 @@ error RMRKNotApprovedOrDirectOwner()
 Attempting to interact with a token without being its owner or having been granted permission by the  owner to do so
 
 *When a token is nested, only the direct owner (NFT parent) can mange it. In that case, approved addresses are  not allowed to manage it, in order to ensure the expected behaviour*
-
-
-### RMRKNotEnoughAllowance
-
-```solidity
-error RMRKNotEnoughAllowance()
-```
-
-
-
-
 
 
 ### RMRKNotOwner
