@@ -53,7 +53,7 @@ contract RMRKNestableMultiAssetImplPreMint is
     function mint(
         address to,
         uint256 numToMint
-    ) public payable virtual notLocked saleIsOpen onlyOwner {
+    ) public payable virtual notLocked onlyOwner {
         (uint256 nextToken, uint256 totalSupplyOffset) = _preMint(numToMint);
 
         for (uint256 i = nextToken; i < totalSupplyOffset; ) {
@@ -76,7 +76,7 @@ contract RMRKNestableMultiAssetImplPreMint is
         address to,
         uint256 numToMint,
         uint256 destinationId
-    ) public payable virtual notLocked saleIsOpen onlyOwner {
+    ) public payable virtual notLocked onlyOwner {
         (uint256 nextToken, uint256 totalSupplyOffset) = _preMint(numToMint);
 
         for (uint256 i = nextToken; i < totalSupplyOffset; ) {

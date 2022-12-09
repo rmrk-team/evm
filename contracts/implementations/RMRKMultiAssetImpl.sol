@@ -53,7 +53,7 @@ contract RMRKMultiAssetImpl is RMRKAbstractMultiAssetImpl {
     function mint(
         address to,
         uint256 numToMint
-    ) public payable virtual saleIsOpen notLocked {
+    ) public payable virtual notLocked {
         if (numToMint == uint256(0)) revert RMRKMintZero();
         if (numToMint + _totalSupply > _maxSupply) revert RMRKMintOverMax();
 

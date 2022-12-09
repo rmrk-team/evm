@@ -51,7 +51,7 @@ contract RMRKMultiAssetImplPreMint is RMRKAbstractMultiAssetImpl {
     function mint(
         address to,
         uint256 numToMint
-    ) public virtual notLocked saleIsOpen onlyOwner {
+    ) public virtual notLocked onlyOwner {
         if (numToMint == uint256(0)) revert RMRKMintZero();
         if (numToMint + _totalSupply > _maxSupply) revert RMRKMintOverMax();
 
