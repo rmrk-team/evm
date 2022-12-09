@@ -94,10 +94,9 @@ async function shouldControlValidPreMinting(): Promise<void> {
 
   it('cannot mint if not owner', async function () {
     const notOwner = addrs[0];
-    await expect(this.token.connect(notOwner).mint(notOwner.address, 1)).to.be.revertedWithCustomError(
-      this.token,
-      'RMRKNotOwner',
-    );
+    await expect(
+      this.token.connect(notOwner).mint(notOwner.address, 1),
+    ).to.be.revertedWithCustomError(this.token, 'RMRKNotOwner');
   });
 
   it('can mint if owner', async function () {
@@ -108,55 +107,49 @@ async function shouldControlValidPreMinting(): Promise<void> {
   });
 
   it('cannot mint over max supply', async function () {
-    await expect(this.token.connect(owner).mint(addrs[0].address, 99999)).to.be.revertedWithCustomError(
-      this.token,
-      'RMRKMintOverMax',
-    );
+    await expect(
+      this.token.connect(owner).mint(addrs[0].address, 99999),
+    ).to.be.revertedWithCustomError(this.token, 'RMRKMintOverMax');
   });
 
   it('cannot mint if locked', async function () {
     await this.token.connect(owner).setLock();
-    await expect(this.token.connect(owner).mint(addrs[0].address, 99999)).to.be.revertedWithCustomError(
-      this.token,
-      'RMRKLocked',
-    );
+    await expect(
+      this.token.connect(owner).mint(addrs[0].address, 99999),
+    ).to.be.revertedWithCustomError(this.token, 'RMRKLocked');
   });
 
   describe('Nest minting', async () => {
-
     beforeEach(async function () {
       if (this.token.nestMint === undefined) {
         this.skip();
       }
-      this.token.connect(owner).mint(addrs[0].address, 1)
+      this.token.connect(owner).mint(addrs[0].address, 1);
     });
 
     it('cannot nest mint if not owner', async function () {
       const notOwner = addrs[0];
-      await expect(this.token.connect(notOwner).nestMint(this.token.address, 1, 1)).to.be.revertedWithCustomError(
-        this.token,
-        'RMRKNotOwner',
-      );
+      await expect(
+        this.token.connect(notOwner).nestMint(this.token.address, 1, 1),
+      ).to.be.revertedWithCustomError(this.token, 'RMRKNotOwner');
     });
 
     it('can nest mint if owner', async function () {
-      this.token.connect(owner).mint(addrs[0].address, 1)
+      this.token.connect(owner).mint(addrs[0].address, 1);
       await this.token.connect(owner).nestMint(this.token.address, 1, 1);
     });
 
     it('cannot nest mint over max supply', async function () {
-      await expect(this.token.connect(owner).nestMint(this.token.address, 99999, 1)).to.be.revertedWithCustomError(
-        this.token,
-        'RMRKMintOverMax',
-      );
+      await expect(
+        this.token.connect(owner).nestMint(this.token.address, 99999, 1),
+      ).to.be.revertedWithCustomError(this.token, 'RMRKMintOverMax');
     });
 
     it('cannot mint if locked', async function () {
       await this.token.connect(owner).setLock();
-      await expect(this.token.connect(owner).nestMint(this.token.address, 99999, 1)).to.be.revertedWithCustomError(
-        this.token,
-        'RMRKLocked',
-      );
+      await expect(
+        this.token.connect(owner).nestMint(this.token.address, 99999, 1),
+      ).to.be.revertedWithCustomError(this.token, 'RMRKLocked');
     });
   });
 }
