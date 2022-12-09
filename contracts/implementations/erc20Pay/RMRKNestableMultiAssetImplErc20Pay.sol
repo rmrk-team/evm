@@ -56,7 +56,7 @@ contract RMRKNestableMultiAssetImplErc20Pay is
     function mint(
         address to,
         uint256 numToMint
-    ) public payable virtual saleIsOpen {
+    ) public virtual notLocked saleIsOpen {
         (uint256 nextToken, uint256 totalSupplyOffset) = _preMint(numToMint);
 
         for (uint256 i = nextToken; i < totalSupplyOffset; ) {
@@ -79,7 +79,7 @@ contract RMRKNestableMultiAssetImplErc20Pay is
         address to,
         uint256 numToMint,
         uint256 destinationId
-    ) public payable virtual saleIsOpen {
+    ) public virtual notLocked saleIsOpen {
         (uint256 nextToken, uint256 totalSupplyOffset) = _preMint(numToMint);
 
         for (uint256 i = nextToken; i < totalSupplyOffset; ) {
