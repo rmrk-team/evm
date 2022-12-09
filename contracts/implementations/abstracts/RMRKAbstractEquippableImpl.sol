@@ -7,6 +7,7 @@ import "../../RMRK/extension/RMRKRoyalties.sol";
 import "../../RMRK/utils/RMRKCollectionMetadata.sol";
 import "../../RMRK/utils/RMRKMintingUtils.sol";
 import "../../RMRK/utils/RMRKTokenURI.sol";
+import "../IRMRKInitData.sol";
 
 error RMRKMintZero();
 
@@ -18,6 +19,7 @@ error RMRKMintZero();
  * `RMRKEquippableImplErc20Pay`.
  */
 abstract contract RMRKAbstractEquippableImpl is
+    IRMRKInitData,
     RMRKMintingUtils,
     RMRKCollectionMetadata,
     RMRKRoyalties,

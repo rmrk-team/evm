@@ -3,7 +3,6 @@
 pragma solidity ^0.8.16;
 
 import "../abstracts/RMRKAbstractNestableMultiAssetImpl.sol";
-import "../IRMRKInitData.sol";
 import "./RMRKErc20Pay.sol";
 
 /**
@@ -12,7 +11,6 @@ import "./RMRKErc20Pay.sol";
  * @notice Implementation of RMRK nestable multi asset module with ERC20 pay.
  */
 contract RMRKNestableMultiAssetImplErc20Pay is
-    IRMRKInitData,
     RMRKErc20Pay,
     RMRKAbstractNestableMultiAssetImpl
 {

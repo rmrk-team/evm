@@ -3,7 +3,6 @@
 pragma solidity ^0.8.16;
 
 import "../abstracts/RMRKAbstractNestableImpl.sol";
-import "../IRMRKInitData.sol";
 import "./RMRKErc20Pay.sol";
 
 /**
@@ -11,11 +10,7 @@ import "./RMRKErc20Pay.sol";
  * @author RMRK team
  * @notice Implementation of RMRK nestable module with ERC20 pay.
  */
-contract RMRKNestableImplErc20Pay is
-    IRMRKInitData,
-    RMRKErc20Pay,
-    RMRKAbstractNestableImpl
-{
+contract RMRKNestableImplErc20Pay is RMRKErc20Pay, RMRKAbstractNestableImpl {
     /**
      * @notice Used to initialize the smart contract.
      * @dev The full `InitData` looks like this:
