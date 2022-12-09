@@ -3,7 +3,6 @@
 pragma solidity ^0.8.16;
 
 import "./abstracts/RMRKAbstractEquippableImpl.sol";
-import "./IRMRKInitData.sol";
 
 error RMRKMintUnderpriced();
 
@@ -12,7 +11,7 @@ error RMRKMintUnderpriced();
  * @author RMRK team
  * @notice Implementation of RMRK equippable module.
  */
-contract RMRKEquippableImpl is IRMRKInitData, RMRKAbstractEquippableImpl {
+contract RMRKEquippableImpl is RMRKAbstractEquippableImpl {
     /**
      * @notice Used to initialize the smart contract.
      * @dev The full `InitData` looks like this:

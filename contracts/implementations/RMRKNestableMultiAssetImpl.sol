@@ -3,7 +3,6 @@
 pragma solidity ^0.8.16;
 
 import "./abstracts/RMRKAbstractNestableMultiAssetImpl.sol";
-import "./IRMRKInitData.sol";
 
 error RMRKMintUnderpriced();
 
@@ -12,10 +11,7 @@ error RMRKMintUnderpriced();
  * @author RMRK team
  * @notice Implementation of RMRK nestable multi asset module.
  */
-contract RMRKNestableMultiAssetImpl is
-    IRMRKInitData,
-    RMRKAbstractNestableMultiAssetImpl
-{
+contract RMRKNestableMultiAssetImpl is RMRKAbstractNestableMultiAssetImpl {
     /**
      * @notice Used to initialize the smart contract.
      * @dev The full `InitData` looks like this:

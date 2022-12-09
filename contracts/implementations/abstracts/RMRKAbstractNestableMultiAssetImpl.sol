@@ -7,6 +7,7 @@ import "../../RMRK/nestable/RMRKNestableMultiAsset.sol";
 import "../../RMRK/utils/RMRKCollectionMetadata.sol";
 import "../../RMRK/utils/RMRKMintingUtils.sol";
 import "../../RMRK/utils/RMRKTokenURI.sol";
+import "../IRMRKInitData.sol";
 
 error RMRKMintZero();
 
@@ -16,6 +17,7 @@ error RMRKMintZero();
  * @notice Abstract implementation of RMRK nestable multi asset module.
  */
 abstract contract RMRKAbstractNestableMultiAssetImpl is
+    IRMRKInitData,
     RMRKMintingUtils,
     RMRKCollectionMetadata,
     RMRKRoyalties,
