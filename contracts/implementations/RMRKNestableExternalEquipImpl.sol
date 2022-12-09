@@ -73,7 +73,7 @@ contract RMRKNestableExternalEquipImpl is
     function mint(
         address to,
         uint256 numToMint
-    ) public payable virtual notLocked saleIsOpen {
+    ) public payable virtual notLocked {
         (uint256 nextToken, uint256 totalSupplyOffset) = _preMint(numToMint);
 
         for (uint256 i = nextToken; i < totalSupplyOffset; ) {
@@ -96,7 +96,7 @@ contract RMRKNestableExternalEquipImpl is
         address to,
         uint256 numToMint,
         uint256 destinationId
-    ) public payable virtual notLocked saleIsOpen {
+    ) public payable virtual notLocked {
         (uint256 nextToken, uint256 totalSupplyOffset) = _preMint(numToMint);
 
         for (uint256 i = nextToken; i < totalSupplyOffset; ) {

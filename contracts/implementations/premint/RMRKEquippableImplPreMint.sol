@@ -51,7 +51,7 @@ contract RMRKEquippableImplPreMint is RMRKAbstractEquippableImpl {
     function mint(
         address to,
         uint256 numToMint
-    ) public virtual notLocked saleIsOpen onlyOwner {
+    ) public virtual notLocked onlyOwner {
         (uint256 nextToken, uint256 totalSupplyOffset) = _preMint(numToMint);
 
         for (uint256 i = nextToken; i < totalSupplyOffset; ) {
@@ -74,7 +74,7 @@ contract RMRKEquippableImplPreMint is RMRKAbstractEquippableImpl {
         address to,
         uint256 numToMint,
         uint256 destinationId
-    ) public virtual notLocked saleIsOpen onlyOwner {
+    ) public virtual notLocked onlyOwner {
         (uint256 nextToken, uint256 totalSupplyOffset) = _preMint(numToMint);
 
         for (uint256 i = nextToken; i < totalSupplyOffset; ) {
