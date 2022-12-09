@@ -42,6 +42,6 @@ contract OwnableLock is Ownable {
      * @dev If the operation of the smart contract is locked, the execution will be reverted.
      */
     function _onlyNotLocked() private view {
-        if (getLock()) revert RMRKLocked();
+        if (_lock == 1) revert RMRKLocked();
     }
 }
