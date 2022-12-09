@@ -1,10 +1,10 @@
-# RMRKNestableImplErc20Pay
+# RMRKEquippableImplPreMint
 
 *RMRK team*
 
-> RMRKNestableImplErc20Pay
+> RMRKEquippableImplPreMint
 
-Implementation of RMRK nestable module with ERC20 pay.
+Implementation of RMRK equippable module with pre minting by collection owner.
 
 
 
@@ -27,6 +27,24 @@ Version of the @rmrk-team/evm-contracts package
 |---|---|---|
 | _0 | string | undefined |
 
+### acceptAsset
+
+```solidity
+function acceptAsset(uint256 tokenId, uint256 index, uint64 assetId) external nonpayable
+```
+
+Accepts a asset at from the pending array of given token.
+
+*Migrates the asset from the token&#39;s pending asset array to the token&#39;s active asset array.Active assets cannot be removed by anyone, but can be replaced by a new asset.Requirements:  - The caller must own the token or be approved to manage the token&#39;s assets  - `tokenId` must exist.  - `index` must be in range of the length of the pending asset array.Emits an {AssetAccepted} event.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId | uint256 | ID of the token for which to accept the pending asset |
+| index | uint256 | Index of the asset in the pending array to accept |
+| assetId | uint64 | undefined |
+
 ### acceptChild
 
 ```solidity
@@ -45,6 +63,49 @@ Used to accept a pending child token for a given parent token.
 | childIndex | uint256 | Index of a child tokem in the given parent&#39;s pending children array |
 | childAddress | address | Address of the collection smart contract of the child token expected to be located at the  specified index of the given parent token&#39;s pending children array |
 | childId | uint256 | ID of the child token expected to be located at the specified index of the given parent token&#39;s  pending children array |
+
+### addAssetEntry
+
+```solidity
+function addAssetEntry(uint64 equippableGroupId, address baseAddress, string metadataURI, uint64[] partIds) external nonpayable returns (uint256)
+```
+
+Used to add a asset entry.
+
+*The ID of the asset is automatically assigned to be the next available asset ID.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| equippableGroupId | uint64 | ID of the equippable group |
+| baseAddress | address | Address of the `Base` smart contract this asset belongs to |
+| metadataURI | string | Metadata URI of the asset |
+| partIds | uint64[] | An array of IDs of fixed and slot parts to be included in the asset |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint256 | uint256 The total number of assets after this asset has been added |
+
+### addAssetToToken
+
+```solidity
+function addAssetToToken(uint256 tokenId, uint64 assetId, uint64 replacesAssetWithId) external nonpayable
+```
+
+Used to add an asset to a token.
+
+*If the given asset is already added to the token, the execution will be reverted.If the asset ID is invalid, the execution will be reverted.If the token already has the maximum amount of pending assets (128), the execution will be  reverted.If the asset is being added by the current root owner of the token, the asset will be automatically  accepted.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId | uint256 | ID of the token to add the asset to |
+| assetId | uint64 | ID of the asset to add to the token |
+| replacesAssetWithId | uint64 | ID of the asset to replace from the token&#39;s list of active assets |
 
 ### addChild
 
@@ -96,6 +157,23 @@ function approve(address to, uint256 tokenId) external nonpayable
 |---|---|---|
 | to | address | undefined |
 | tokenId | uint256 | undefined |
+
+### approveForAssets
+
+```solidity
+function approveForAssets(address to, uint256 tokenId) external nonpayable
+```
+
+Used to grant approvals for specific tokens to a specified address.
+
+*This can only be called by the owner of the token or by an account that has been granted permission to  manage all of the owner&#39;s assets.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| to | address | Address of the account to receive the approval to the specified token |
+| tokenId | uint256 | ID of the token for which we are granting the permission |
 
 ### balanceOf
 
@@ -157,6 +235,31 @@ Used to burn a given token.
 | Name | Type | Description |
 |---|---|---|
 | _0 | uint256 | uint256 Number of recursively burned children |
+
+### canTokenBeEquippedWithAssetIntoSlot
+
+```solidity
+function canTokenBeEquippedWithAssetIntoSlot(address parent, uint256 tokenId, uint64 assetId, uint64 slotId) external view returns (bool)
+```
+
+Used to verify whether a token can be equipped into a given parent&#39;s slot.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| parent | address | Address of the parent token&#39;s smart contract |
+| tokenId | uint256 | ID of the token we want to equip |
+| assetId | uint64 | ID of the asset associated with the token we want to equip |
+| slotId | uint64 | ID of the slot that we want to equip the token into |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | bool | bool The boolean indicating whether the token with the given asset can be equipped into the desired  slot |
 
 ### childIsInActive
 
@@ -267,22 +370,65 @@ Used to retrieve the immediate owner of the given token.
 | _1 | uint256 | uint256 The ID of the parent token. Should be `0` if the owner is an externally owned account |
 | _2 | bool | bool The boolean value signifying whether the owner is an NFT or not |
 
-### erc20TokenAddress
+### equip
 
 ```solidity
-function erc20TokenAddress() external view returns (address)
+function equip(IRMRKEquippable.IntakeEquip data) external nonpayable
 ```
 
-Used to retrieve the address of the ERC20 token this smart contract supports.
 
 
 
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| data | IRMRKEquippable.IntakeEquip | undefined |
+
+### getActiveAssetPriorities
+
+```solidity
+function getActiveAssetPriorities(uint256 tokenId) external view returns (uint16[])
+```
+
+Used to retrieve the priorities of the active resoources of a given token.
+
+*Asset priorities are a non-sequential array of uint16 values with an array size equal to active asset  priorites.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId | uint256 | ID of the token for which to retrieve the priorities of the active assets |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | address | address Address of the ERC20 token&#39;s smart contract |
+| _0 | uint16[] | uint16[] An array of priorities of the active assets of the given token |
+
+### getActiveAssets
+
+```solidity
+function getActiveAssets(uint256 tokenId) external view returns (uint64[])
+```
+
+Used to retrieve IDs of the active assets of given token.
+
+*Asset data is stored by reference, in order to access the data corresponding to the ID, call  `getAssetMetadata(tokenId, assetId)`.You can safely get 10k*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId | uint256 | ID of the token to retrieve the IDs of the active assets |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint64[] | uint64[] An array of active asset IDs of the given token |
 
 ### getApproved
 
@@ -306,6 +452,124 @@ function getApproved(uint256 tokenId) external view returns (address)
 |---|---|---|
 | _0 | address | undefined |
 
+### getApprovedForAssets
+
+```solidity
+function getApprovedForAssets(uint256 tokenId) external view returns (address)
+```
+
+Used to get the address of the user that is approved to manage the specified token from the current  owner.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId | uint256 | ID of the token we are checking |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | address | address Address of the account that is approved to manage the token |
+
+### getAssetAndEquippableData
+
+```solidity
+function getAssetAndEquippableData(uint256 tokenId, uint64 assetId) external view returns (string, uint64, address, uint64[])
+```
+
+Used to get the asset and equippable data associated with given `assetId`.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId | uint256 | ID of the token for which to retrieve the asset |
+| assetId | uint64 | ID of the asset of which we are retrieving |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | string | The metadata URI of the asset |
+| _1 | uint64 | ID of the equippable group this asset belongs to |
+| _2 | address | The address of the base the part belongs to |
+| _3 | uint64[] | An array of IDs of parts included in the asset |
+
+### getAssetMetadata
+
+```solidity
+function getAssetMetadata(uint256 tokenId, uint64 assetId) external view returns (string)
+```
+
+Used to fetch the asset metadata of the specified token&#39;s active asset with the given index.
+
+*Assets are stored by reference mapping `_assets[assetId]`.Can be overriden to implement enumerate, fallback or other custom logic.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId | uint256 | ID of the token from which to retrieve the asset metadata |
+| assetId | uint64 | Asset Id, must be in the active assets array |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | string | string The metadata of the asset belonging to the specified index in the token&#39;s active assets  array |
+
+### getAssetReplacements
+
+```solidity
+function getAssetReplacements(uint256 tokenId, uint64 newAssetId) external view returns (uint64)
+```
+
+Used to retrieve the asset that will be replaced if a given asset from the token&#39;s pending array  is accepted.
+
+*Asset data is stored by reference, in order to access the data corresponding to the ID, call  `getAssetMetadata(tokenId, assetId)`.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId | uint256 | ID of the token to check |
+| newAssetId | uint64 | ID of the pending asset which will be accepted |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint64 | uint64 ID of the asset which will be replaced |
+
+### getEquipment
+
+```solidity
+function getEquipment(uint256 tokenId, address targetBaseAddress, uint64 slotPartId) external view returns (struct IRMRKEquippable.Equipment)
+```
+
+Used to get the Equipment object equipped into the specified slot of the desired token.
+
+*The `Equipment` struct consists of the following data:  [      assetId,      childAssetId,      childId,      childEquippableAddress  ]*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId | uint256 | ID of the token for which we are retrieving the equipped object |
+| targetBaseAddress | address | Address of the `Base` associated with the `Slot` part of the token |
+| slotPartId | uint64 | ID of the `Slot` part that we are checking for equipped objects |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | IRMRKEquippable.Equipment | struct The `Equipment` struct containing data about the equipped object |
+
 ### getLock
 
 ```solidity
@@ -322,6 +586,28 @@ Used to retrieve the status of a lockable smart contract.
 | Name | Type | Description |
 |---|---|---|
 | _0 | bool | bool A boolean value signifying whether the smart contract has been locked |
+
+### getPendingAssets
+
+```solidity
+function getPendingAssets(uint256 tokenId) external view returns (uint64[])
+```
+
+Used to retrieve IDs of the pending assets of given token.
+
+*Asset data is stored by reference, in order to access the data corresponding to the ID, call  `getAssetMetadata(tokenId, assetId)`.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId | uint256 | ID of the token to retrieve the IDs of the pending assets |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint64[] | uint64[] An array of pending asset IDs of the given token |
 
 ### getRoyaltyPercentage
 
@@ -380,6 +666,53 @@ function isApprovedForAll(address owner, address operator) external view returns
 |---|---|---|
 | _0 | bool | undefined |
 
+### isApprovedForAllForAssets
+
+```solidity
+function isApprovedForAllForAssets(address owner, address operator) external view returns (bool)
+```
+
+Used to check whether the address has been granted the operator role by a given address or not.
+
+*See {setApprovalForAllForAssets}.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| owner | address | Address of the account that we are checking for whether it has granted the operator role |
+| operator | address | Address of the account that we are checking whether it has the operator role or not |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | bool | bool The boolean value indicating wehter the account we are checking has been granted the operator role |
+
+### isChildEquipped
+
+```solidity
+function isChildEquipped(uint256 tokenId, address childAddress, uint256 childId) external view returns (bool)
+```
+
+Used to check whether the token has a given child equipped.
+
+*This is used to prevent from transferring a child that is equipped.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId | uint256 | ID of the parent token for which we are querying for |
+| childAddress | address | Address of the child token&#39;s smart contract |
+| childId | uint256 | ID of the child token |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | bool | bool The boolean value indicating whether the child token is equipped into the given token or not |
+
 ### isContributor
 
 ```solidity
@@ -422,7 +755,7 @@ Used to retrieve the maximum supply of the collection.
 ### mint
 
 ```solidity
-function mint(address to, uint256 numToMint) external payable
+function mint(address to, uint256 numToMint) external nonpayable
 ```
 
 Used to mint the desired number of tokens to the specified address.
@@ -456,7 +789,7 @@ Used to retrieve the collection name.
 ### nestMint
 
 ```solidity
-function nestMint(address to, uint256 numToMint, uint256 destinationId) external payable
+function nestMint(address to, uint256 numToMint, uint256 destinationId) external nonpayable
 ```
 
 Used to mint a desired number of child tokens to a given parent token.
@@ -592,6 +925,23 @@ Used to retrieve the price per mint.
 |---|---|---|
 | _0 | uint256 | uint256 The price per mint of a single token expressed in the lowest denomination of a native currency |
 
+### rejectAllAssets
+
+```solidity
+function rejectAllAssets(uint256 tokenId, uint256 maxRejections) external nonpayable
+```
+
+Rejects all assets from the pending array of a given token.
+
+*Effecitvely deletes the pending array.Requirements:  - The caller must own the token or be approved to manage the token&#39;s assets  - `tokenId` must exist.Emits a {AssetRejected} event with assetId = 0.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId | uint256 | ID of the token of which to clear the pending array. |
+| maxRejections | uint256 | Maximum number of expected assets to reject, used to prevent from rejecting assets which  arrive just before this operation. |
+
 ### rejectAllChildren
 
 ```solidity
@@ -608,6 +958,24 @@ Used to reject all pending children of a given parent token.
 |---|---|---|
 | tokenId | uint256 | undefined |
 | maxRejections | uint256 | Maximum number of expected children to reject, used to prevent from  rejecting children which arrive just before this operation. |
+
+### rejectAsset
+
+```solidity
+function rejectAsset(uint256 tokenId, uint256 index, uint64 assetId) external nonpayable
+```
+
+Rejects a asset from the pending array of given token.
+
+*Removes the asset from the token&#39;s pending asset array.Requirements:  - The caller must own the token or be approved to manage the token&#39;s assets  - `tokenId` must exist.  - `index` must be in range of the length of the pending asset array.Emits a {AssetRejected} event.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId | uint256 | ID of the token that the asset is being rejected from |
+| index | uint256 | Index of the asset in the pending array to be rejected |
+| assetId | uint64 | undefined |
 
 ### renounceOwnership
 
@@ -714,6 +1082,23 @@ function setApprovalForAll(address operator, bool approved) external nonpayable
 | operator | address | undefined |
 | approved | bool | undefined |
 
+### setApprovalForAllForAssets
+
+```solidity
+function setApprovalForAllForAssets(address operator, bool approved) external nonpayable
+```
+
+Used to add or remove an operator of assets for the caller.
+
+*Operators can call {acceptAsset}, {rejectAsset}, {rejectAllAssets} or {setPriority} for any token  owned by the caller.Requirements:  - The `operator` cannot be the caller.Emits an {ApprovalForAllForAssets} event.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| operator | address | Address of the account to which the operator role is granted or revoked from |
+| approved | bool | The boolean value indicating whether the operator role is being granted (`true`) or revoked  (`false`) |
+
 ### setLock
 
 ```solidity
@@ -724,6 +1109,41 @@ Locks the operation.
 
 *Once locked, functions using `notLocked` modifier cannot be executed.*
 
+
+### setPriority
+
+```solidity
+function setPriority(uint256 tokenId, uint16[] priorities) external nonpayable
+```
+
+Sets a new priority array for a given token.
+
+*The priority array is a non-sequential list of `uint16`s, where the lowest value is considered highest  priority.Value `0` of a priority is a special case equivalent to unitialized.Requirements:  - The caller must own the token or be approved to manage the token&#39;s assets  - `tokenId` must exist.  - The length of `priorities` must be equal the length of the active assets array.Emits a {AssetPrioritySet} event.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId | uint256 | ID of the token to set the priorities for |
+| priorities | uint16[] | An array of priority values |
+
+### setValidParentForEquippableGroup
+
+```solidity
+function setValidParentForEquippableGroup(uint64 equippableGroupId, address parentAddress, uint64 partId) external nonpayable
+```
+
+Used to declare that the assets belonging to a given `equippableGroupId` are equippable into the `Slot`  associated with the `partId` of the collection at the specified `parentAddress`
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| equippableGroupId | uint64 | ID of the equippable group |
+| parentAddress | address | Address of the parent into which the equippable group can be equipped into |
+| partId | uint64 | ID of the `Slot` that the items belonging to the equippable group can be equipped into |
 
 ### supportsInterface
 
@@ -785,6 +1205,23 @@ Used to retrieve the metadata URI of a token.
 | Name | Type | Description |
 |---|---|---|
 | _0 | string | string Metadata URI of the specified token |
+
+### totalAssets
+
+```solidity
+function totalAssets() external view returns (uint256)
+```
+
+Used to retrieve the total number of assets.
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint256 | uint256 The total number of assets |
 
 ### totalSupply
 
@@ -859,6 +1296,24 @@ Transfers ownership of the contract to a new owner.
 | Name | Type | Description |
 |---|---|---|
 | newOwner | address | Address of the new owner&#39;s account |
+
+### unequip
+
+```solidity
+function unequip(uint256 tokenId, uint64 assetId, uint64 slotPartId) external nonpayable
+```
+
+Used to unequip child from parent token.
+
+*This can only be called by the owner of the token or by an account that has been granted permission to  manage the given token by the current owner.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId | uint256 | ID of the parent from which the child is being unequipped |
+| assetId | uint64 | ID of the parent&#39;s asset that contains the `Slot` into which the child is equipped |
+| slotPartId | uint64 | ID of the `Slot` from which to unequip the child |
 
 ### updateRoyaltyRecipient
 
@@ -949,6 +1404,127 @@ event ApprovalForAll(address indexed owner, address indexed operator, bool appro
 | operator `indexed` | address | undefined |
 | approved  | bool | undefined |
 
+### ApprovalForAllForAssets
+
+```solidity
+event ApprovalForAllForAssets(address indexed owner, address indexed operator, bool approved)
+```
+
+Used to notify listeners that owner has granted approval to the user to manage assets of all of their  tokens.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| owner `indexed` | address | undefined |
+| operator `indexed` | address | undefined |
+| approved  | bool | undefined |
+
+### ApprovalForAssets
+
+```solidity
+event ApprovalForAssets(address indexed owner, address indexed approved, uint256 indexed tokenId)
+```
+
+Used to notify listeners that owner has granted an approval to the user to manage the assets of a  given token.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| owner `indexed` | address | undefined |
+| approved `indexed` | address | undefined |
+| tokenId `indexed` | uint256 | undefined |
+
+### AssetAccepted
+
+```solidity
+event AssetAccepted(uint256 indexed tokenId, uint64 indexed assetId, uint64 indexed replacesId)
+```
+
+Used to notify listeners that an asset object at `assetId` is accepted by the token and migrated  from token&#39;s pending assets array to active assets array of the token.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId `indexed` | uint256 | undefined |
+| assetId `indexed` | uint64 | undefined |
+| replacesId `indexed` | uint64 | undefined |
+
+### AssetAddedToToken
+
+```solidity
+event AssetAddedToToken(uint256 indexed tokenId, uint64 indexed assetId, uint64 indexed replacesId)
+```
+
+Used to notify listeners that an asset object at `assetId` is added to token&#39;s pending asset  array.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId `indexed` | uint256 | undefined |
+| assetId `indexed` | uint64 | undefined |
+| replacesId `indexed` | uint64 | undefined |
+
+### AssetPrioritySet
+
+```solidity
+event AssetPrioritySet(uint256 indexed tokenId)
+```
+
+Used to notify listeners that token&#39;s prioritiy array is reordered.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId `indexed` | uint256 | undefined |
+
+### AssetRejected
+
+```solidity
+event AssetRejected(uint256 indexed tokenId, uint64 indexed assetId)
+```
+
+Used to notify listeners that an asset object at `assetId` is rejected from token and is dropped  from the pending assets array of the token.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId `indexed` | uint256 | undefined |
+| assetId `indexed` | uint64 | undefined |
+
+### AssetSet
+
+```solidity
+event AssetSet(uint64 indexed assetId)
+```
+
+Used to notify listeners that an asset object is initialized at `assetId`.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| assetId `indexed` | uint64 | undefined |
+
 ### ChildAccepted
 
 ```solidity
@@ -967,6 +1543,48 @@ Used to notify listeners that a new child token was accepted by the parent token
 | childIndex  | uint256 | undefined |
 | childAddress `indexed` | address | undefined |
 | childId `indexed` | uint256 | undefined |
+
+### ChildAssetEquipped
+
+```solidity
+event ChildAssetEquipped(uint256 indexed tokenId, uint64 indexed assetId, uint64 indexed slotPartId, uint256 childId, address childAddress, uint64 childAssetId)
+```
+
+Used to notify listeners that a child&#39;s asset has been equipped into one of its parent assets.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId `indexed` | uint256 | undefined |
+| assetId `indexed` | uint64 | undefined |
+| slotPartId `indexed` | uint64 | undefined |
+| childId  | uint256 | undefined |
+| childAddress  | address | undefined |
+| childAssetId  | uint64 | undefined |
+
+### ChildAssetUnequipped
+
+```solidity
+event ChildAssetUnequipped(uint256 indexed tokenId, uint64 indexed assetId, uint64 indexed slotPartId, uint256 childId, address childAddress, uint64 childAssetId)
+```
+
+Used to notify listeners that a child&#39;s asset has been unequipped from one of its parent assets.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId `indexed` | uint256 | undefined |
+| assetId `indexed` | uint64 | undefined |
+| slotPartId `indexed` | uint64 | undefined |
+| childId  | uint256 | undefined |
+| childAddress  | address | undefined |
+| childAssetId  | uint64 | undefined |
 
 ### ChildProposed
 
@@ -1061,6 +1679,24 @@ event Transfer(address indexed from, address indexed to, uint256 indexed tokenId
 | from `indexed` | address | undefined |
 | to `indexed` | address | undefined |
 | tokenId `indexed` | uint256 | undefined |
+
+### ValidParentEquippableGroupIdSet
+
+```solidity
+event ValidParentEquippableGroupIdSet(uint64 indexed equippableGroupId, uint64 indexed slotPartId, address parentAddress)
+```
+
+Used to notify listeners that the assets belonging to a `equippableGroupId` have been marked as  equippable into a given slot and parent
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| equippableGroupId `indexed` | uint64 | undefined |
+| slotPartId `indexed` | uint64 | undefined |
+| parentAddress  | address | undefined |
 
 
 
@@ -1187,6 +1823,61 @@ Attempting to transfer the token to a 0x0 address
 
 
 
+### RMRKApprovalForAssetsToCurrentOwner
+
+```solidity
+error RMRKApprovalForAssetsToCurrentOwner()
+```
+
+Attempting to grant approval of assets to their current owner
+
+
+
+
+### RMRKApproveForAssetsCallerIsNotOwnerNorApprovedForAll
+
+```solidity
+error RMRKApproveForAssetsCallerIsNotOwnerNorApprovedForAll()
+```
+
+Attempting to grant approval of assets without being the caller or approved for all
+
+
+
+
+### RMRKAssetAlreadyExists
+
+```solidity
+error RMRKAssetAlreadyExists()
+```
+
+Attempting to add an asset using an ID that has already been used
+
+
+
+
+### RMRKBadPriorityListLength
+
+```solidity
+error RMRKBadPriorityListLength()
+```
+
+Attempting to set the priorities with an array of length that doesn&#39;t match the length of active assets array
+
+
+
+
+### RMRKBaseRequiredForParts
+
+```solidity
+error RMRKBaseRequiredForParts()
+```
+
+Attempting to add an asset entry with `Part`s, without setting the `Base` address
+
+
+
+
 ### RMRKChildAlreadyExists
 
 ```solidity
@@ -1209,6 +1900,17 @@ Attempting to interact with a child, using index that is higher than the number 
 
 
 
+### RMRKEquippableEquipNotAllowedByBase
+
+```solidity
+error RMRKEquippableEquipNotAllowedByBase()
+```
+
+Attempting to equip a `Part` with a child not approved by the base
+
+
+
+
 ### RMRKIdZeroForbidden
 
 ```solidity
@@ -1218,6 +1920,17 @@ error RMRKIdZeroForbidden()
 Attempting to use ID 0, which is not supported
 
 *The ID 0 in RMRK suite is reserved for empty values. Guarding against its use ensures the expected operation*
+
+
+### RMRKIndexOutOfRange
+
+```solidity
+error RMRKIndexOutOfRange()
+```
+
+Attempting to interact with an asset, using index greater than number of assets
+
+
 
 
 ### RMRKIsNotContract
@@ -1238,6 +1951,17 @@ error RMRKLocked()
 ```
 
 Attempting to interact with a contract that had its operation locked
+
+
+
+
+### RMRKMaxPendingAssetsReached
+
+```solidity
+error RMRKMaxPendingAssetsReached()
+```
+
+Attempting to add a pending asset after the number of pending assets has reached the limit (default limit is  128)
 
 
 
@@ -1299,6 +2023,17 @@ error RMRKMintZero()
 ```
 
 
+
+
+
+
+### RMRKMustUnequipFirst
+
+```solidity
+error RMRKMustUnequipFirst()
+```
+
+Attempting to transfer a child before it is unequipped
 
 
 
@@ -1369,6 +2104,28 @@ Attempting to transfer the ownership to the 0x0 address
 
 
 
+### RMRKNoAssetMatchingId
+
+```solidity
+error RMRKNoAssetMatchingId()
+```
+
+Attempting to interact with an asset that can not be found
+
+
+
+
+### RMRKNotApprovedForAssetsOrOwner
+
+```solidity
+error RMRKNotApprovedForAssetsOrOwner()
+```
+
+Attempting to manage an asset without owning it or having been granted permission by the owner to do so
+
+
+
+
 ### RMRKNotApprovedOrDirectOwner
 
 ```solidity
@@ -1380,13 +2137,13 @@ Attempting to interact with a token without being its owner or having been grant
 *When a token is nested, only the direct owner (NFT parent) can mange it. In that case, approved addresses are  not allowed to manage it, in order to ensure the expected behaviour*
 
 
-### RMRKNotEnoughAllowance
+### RMRKNotEquipped
 
 ```solidity
-error RMRKNotEnoughAllowance()
+error RMRKNotEquipped()
 ```
 
-
+Attempting to unequip an item that isn&#39;t equipped
 
 
 
@@ -1402,6 +2159,17 @@ Attempting to interact with a management function without being the smart contra
 
 
 
+### RMRKNotOwnerOrContributor
+
+```solidity
+error RMRKNotOwnerOrContributor()
+```
+
+Attempting to interact with a function without being the owner or contributor of the collection
+
+
+
+
 ### RMRKPendingChildIndexOutOfRange
 
 ```solidity
@@ -1409,6 +2177,61 @@ error RMRKPendingChildIndexOutOfRange()
 ```
 
 Attempting to interact with a pending child using an index greater than the size of pending array
+
+
+
+
+### RMRKSlotAlreadyUsed
+
+```solidity
+error RMRKSlotAlreadyUsed()
+```
+
+Attempting to equip an item into a slot that already has an item equipped
+
+
+
+
+### RMRKTargetAssetCannotReceiveSlot
+
+```solidity
+error RMRKTargetAssetCannotReceiveSlot()
+```
+
+Attempting to equip an item into a `Slot` that the target asset does not implement
+
+
+
+
+### RMRKTokenCannotBeEquippedWithAssetIntoSlot
+
+```solidity
+error RMRKTokenCannotBeEquippedWithAssetIntoSlot()
+```
+
+Attempting to equip a child into a `Slot` and parent that the child&#39;s collection doesn&#39;t support
+
+
+
+
+### RMRKTokenDoesNotHaveAsset
+
+```solidity
+error RMRKTokenDoesNotHaveAsset()
+```
+
+Attempting to compose a NFT of a token without active assets
+
+
+
+
+### RMRKUnexpectedAssetId
+
+```solidity
+error RMRKUnexpectedAssetId()
+```
+
+Attempting to accept or reject an asset which does not match the one at the specified index
 
 
 
@@ -1424,6 +2247,17 @@ Attempting to accept or transfer a child which does not match the one at the spe
 
 
 
+### RMRKUnexpectedNumberOfAssets
+
+```solidity
+error RMRKUnexpectedNumberOfAssets()
+```
+
+Attempting to reject all pending assets but more assets than expected are pending
+
+
+
+
 ### RMRKUnexpectedNumberOfChildren
 
 ```solidity
@@ -1431,6 +2265,17 @@ error RMRKUnexpectedNumberOfChildren()
 ```
 
 Attempting to reject all pending children but children assets than expected are pending
+
+
+
+
+### RentrantCall
+
+```solidity
+error RentrantCall()
+```
+
+
 
 
 

@@ -654,7 +654,7 @@ Used to retrieve the maximum supply of the collection.
 ### mint
 
 ```solidity
-function mint(address to, uint256 numToMint) external payable
+function mint(address to, uint256 numToMint) external nonpayable
 ```
 
 Used to mint the desired number of tokens to the specified address.
@@ -688,7 +688,7 @@ Used to retrieve the collection name.
 ### nestMint
 
 ```solidity
-function nestMint(address to, uint256 numToMint, uint256 destinationId) external payable
+function nestMint(address to, uint256 numToMint, uint256 destinationId) external nonpayable
 ```
 
 Used to mint a desired number of child tokens to a given parent token.
@@ -1721,6 +1721,17 @@ error RMRKIsNotContract()
 ```
 
 Attempting to interact with an end-user account when the contract account is expected
+
+
+
+
+### RMRKLocked
+
+```solidity
+error RMRKLocked()
+```
+
+Attempting to interact with a contract that had its operation locked
 
 
 
