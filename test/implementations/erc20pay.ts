@@ -19,7 +19,7 @@ async function multiAssetFixture(): Promise<Contract> {
 
   return await singleFixtureWithArgs('RMRKMultiAssetImplErc20Pay', [
     'MultiAsset',
-    'MR',
+    'MA',
     'ipfs://collection-meta',
     'ipfs://tokenURI',
     [erc20.address, false, ADDRESS_ZERO, 0, 10000, ONE_ETH],
@@ -33,7 +33,7 @@ async function nestableFixture(): Promise<Contract> {
 
   return await singleFixtureWithArgs('RMRKNestableImplErc20Pay', [
     'MultiAsset',
-    'MR',
+    'MA',
     'ipfs://collection-meta',
     'ipfs://tokenURI',
     [erc20.address, false, ADDRESS_ZERO, 0, 10000, ONE_ETH],
@@ -47,7 +47,7 @@ async function nestableMultiAssetFixture(): Promise<Contract> {
 
   return await singleFixtureWithArgs('RMRKNestableMultiAssetImplErc20Pay', [
     'MultiAsset',
-    'MR',
+    'MA',
     'ipfs://collection-meta',
     'ipfs://tokenURI',
     [erc20.address, false, ADDRESS_ZERO, 0, 10000, ONE_ETH],
@@ -61,7 +61,7 @@ async function equippableFixture(): Promise<Contract> {
 
   return await singleFixtureWithArgs('RMRKEquippableImplErc20Pay', [
     'MultiAsset',
-    'MR',
+    'MA',
     'ipfs://collection-meta',
     'ipfs://tokenURI',
     [erc20.address, false, ADDRESS_ZERO, 0, 10000, ONE_ETH],
