@@ -131,7 +131,7 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
         uint64 partId,
         address[] calldata equippableAddresses
     ) internal onlySlot(partId) {
-        if (equippableAddresses.length <= 0) revert RMRKZeroLengthIdsPassed();
+        if (equippableAddresses.length == 0) revert RMRKZeroLengthIdsPassed();
 
         uint256 len = equippableAddresses.length;
         for (uint256 i; i < len; ) {
@@ -156,7 +156,7 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
         uint64 partId,
         address[] calldata equippableAddresses
     ) internal onlySlot(partId) {
-        if (equippableAddresses.length <= 0) revert RMRKZeroLengthIdsPassed();
+        if (equippableAddresses.length == 0) revert RMRKZeroLengthIdsPassed();
         _parts[partId].equippable = equippableAddresses;
         delete _isEquippableToAll[partId];
 
