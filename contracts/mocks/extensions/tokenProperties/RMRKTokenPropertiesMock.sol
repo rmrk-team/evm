@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.16;
 
-import "./IRMRKTokenProperties.sol";
+import "../../../RMRK/extension/tokenProperties/IRMRKTokenProperties.sol";
 
 /**
  * @title RMRKTokenProperties
@@ -12,16 +12,17 @@ import "./IRMRKTokenProperties.sol";
 contract RMRKTokenPropertiesMock is IRMRKTokenProperties {
 
     uint256 private _totalStringProperties;
-    mapping(uint256 => string) stringProperties;
-    mapping(uint256 => mapping(string => uint256)) private _stringProperties;
+    mapping(string => uint256) private _stringKeysToIds;
+    mapping(string => uint256) private _stringValuesToIds;
+    mapping(uint256 => mapping(uint256 => string)) private _stringValues;
 
     uint256 private _totalAddressProperties;
-    mapping(uint256 => address) addressProperties;
-    mapping(uint256 => mapping(string => uint256)) private _addressProperties;
+    mapping(string => uint256) private _addressKeysToIds;
+    mapping(uint256 => mapping(uint256 => address)) private _addressValues;
 
     uint256 private _totalBytesProperties;
-    mapping(uint256 => bytes) bytesProperties;
-    mapping(uint256 => mapping(string => uint)) private _bytesProperties;
+    mapping(string => uint256) private _bytesKeysToIds;
+    mapping(uint256 => mapping(uint256 => bytes)) private _bytesValues;
 
     mapping(uint256 => mapping(string => uint256)) private _uintProperties;
     mapping(uint256 => mapping(string => bool)) private _boolProperties;
@@ -33,7 +34,7 @@ contract RMRKTokenPropertiesMock is IRMRKTokenProperties {
      * @return string The value of the string property
      */
     function getStringTokenProperty(uint256 tokenId, string memory key) external view returns (string memory) {
-        return stringProperties[_stringProperties[tokenId][key]];
+        return _stringValues[tokenId][_stringKeysToIds[key]];
     }
 
     /**
@@ -63,7 +64,7 @@ contract RMRKTokenPropertiesMock is IRMRKTokenProperties {
      * @return address The value of the address property
      */
     function getAddressTokenProperty(uint256 tokenId, string memory key) external view returns (address) {
-        return addressProperties[_addressProperties[tokenId][key]];
+        return _addressValues[tokenId][_addressKeysToIds[key]];
     }
 
     /**
@@ -73,7 +74,7 @@ contract RMRKTokenPropertiesMock is IRMRKTokenProperties {
      * @return bytes The value of the bytes property
      */
     function getBytesTokenProperty(uint256 tokenId, string memory key) external view returns (bytes memory) {
-        return bytesProperties[_bytesProperties[tokenId][key]];
+        return _bytesValues[tokenId][_bytesKeysToIds[key]];
     }
 
     /**
@@ -93,9 +94,22 @@ contract RMRKTokenPropertiesMock is IRMRKTokenProperties {
     * @param value The property value
     */
     function setStringProperty(uint256 tokenId, string memory key, string memory value) external {
-        _stringProperties[tokenId][key] = _totalStringProperties;
-        stringProperties[_totalStringProperties] = value;
-        _totalStringProperties++;
+
+        if (_stringValuesToIds[value] == 0 && _stringKeysToIds[key] == 0) {
+            _stringKeysToIds[key] = _totalStringProperties;
+            _stringValues[tokenId][_stringKeysToIds[key]] = value;
+            _stringValuesToIds[value] = _totalStringProperties;
+            _totalStringProperties++;
+        }
+        else {
+            //prevents storing duplicate string values and keys
+            if (_stringValuesToIds[value] > 0 && _stringKeysToIds[key] == 0) {
+                _stringKeysToIds[key] = _stringValuesToIds[value];
+            }
+            else {
+                _stringValuesToIds[value] = _stringKeysToIds[key];
+            }
+        }
     }
 
     /**
@@ -115,8 +129,8 @@ contract RMRKTokenPropertiesMock is IRMRKTokenProperties {
      * @param value The property value
      */
     function setBytesProperty(uint256 tokenId, string memory key, bytes memory value) external {
-        _bytesProperties[tokenId][key] = _totalBytesProperties;
-        bytesProperties[_totalBytesProperties] = value;
+        _bytesKeysToIds[key] = _totalBytesProperties;
+        _bytesValues[tokenId][_bytesKeysToIds[key]] = value;
         _totalBytesProperties++;
     }
 
@@ -127,8 +141,8 @@ contract RMRKTokenPropertiesMock is IRMRKTokenProperties {
      * @param value The property value
      */
     function setAddressProperty(uint256 tokenId, string memory key, address value) external {
-        _addressProperties[tokenId][key] = _totalAddressProperties;
-        addressProperties[_totalAddressProperties] = value;
+        _addressKeysToIds[key] = _totalAddressProperties;
+        _addressValues[tokenId][_addressKeysToIds[key]] = value;
         _totalAddressProperties++;
     }
 
