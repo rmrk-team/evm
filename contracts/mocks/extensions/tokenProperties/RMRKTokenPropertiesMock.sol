@@ -12,7 +12,7 @@ import "../../../RMRK/extension/tokenProperties/IRMRKTokenProperties.sol";
 contract RMRKTokenPropertiesMock is IRMRKTokenProperties {
 
     mapping(string => uint256) private _keysToIds;
-    uint256 private _totalProperties;
+    uint256 private _totalProperties = 0;
 
     mapping(string => uint256) private _stringValuesToIds;
     mapping(uint256 => mapping(uint256 => string)) private _stringValues;
@@ -79,9 +79,7 @@ contract RMRKTokenPropertiesMock is IRMRKTokenProperties {
      * @param value The property value
      */
     function setUintProperty(uint256 tokenId, string memory key, uint256 value) external {
-        _keysToIds[key] = _totalProperties;
-        _uintValues[tokenId][_keysToIds[key]] = value;
-        _totalProperties++;
+        _uintValues[tokenId][_getIdForKey(key)] = value;
     }
 
     /**
@@ -116,9 +114,7 @@ contract RMRKTokenPropertiesMock is IRMRKTokenProperties {
      * @param value The property value
      */
     function setBoolProperty(uint256 tokenId, string memory key, bool value) external {
-        _keysToIds[key] = _totalProperties;
-        _boolValues[tokenId][_keysToIds[key]] = value;
-        _totalProperties++;
+        _boolValues[tokenId][_getIdForKey(key)] = value;
     }
 
     /**
@@ -128,9 +124,7 @@ contract RMRKTokenPropertiesMock is IRMRKTokenProperties {
      * @param value The property value
      */
     function setBytesProperty(uint256 tokenId, string memory key, bytes memory value) external {
-        _keysToIds[key] = _totalProperties;
-        _bytesValues[tokenId][_keysToIds[key]] = value;
-        _totalProperties++;
+        _bytesValues[tokenId][_getIdForKey(key)] = value;
     }
 
     /**
@@ -140,9 +134,18 @@ contract RMRKTokenPropertiesMock is IRMRKTokenProperties {
      * @param value The property value
      */
     function setAddressProperty(uint256 tokenId, string memory key, address value) external {
-        _keysToIds[key] = _totalProperties;
-        _addressValues[tokenId][_keysToIds[key]] = value;
-        _totalProperties++;
+        _addressValues[tokenId][_getIdForKey(key)] = value;
+    }
+
+    function _getIdForKey(string memory key) internal returns (uint256) {
+        if (_keysToIds[key] == 0) {
+            _totalProperties++;
+            _keysToIds[key] = _totalProperties;
+            return _totalProperties;
+        }
+        else {
+            return _keysToIds[key];
+        }
     }
 
     /**
