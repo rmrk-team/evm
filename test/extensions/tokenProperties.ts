@@ -47,14 +47,20 @@ describe.only("RMRKTokenPropertiesMock", async function() {
       await tokenProperties.setStringProperty(tokenId, "description1", "test description");
       await tokenProperties.setBoolProperty(tokenId, "rare", true);
       await tokenProperties.setAddressProperty(tokenId, "owner", owner.address);
+      await tokenProperties.setUintProperty(tokenId, "atk", bn(100));
       await tokenProperties.setUintProperty(tokenId, "health", bn(100));
+      await tokenProperties.setUintProperty(tokenId, "health", bn(95));
+      await tokenProperties.setUintProperty(tokenId, "health", bn(80));
       await tokenProperties.setBytesProperty(tokenId, "data", "0x1234");
+
+      console.log(await tokenProperties.getUintTokenProperty(tokenId,"health"));
 
       expect(await tokenProperties.getStringTokenProperty(tokenId, "description")).to.eql("test description");
       expect(await tokenProperties.getStringTokenProperty(tokenId, "description1")).to.eql("test description");
       expect(await tokenProperties.getBoolTokenProperty(tokenId, "rare")).to.eql(true);
       expect(await tokenProperties.getAddressTokenProperty(tokenId, "owner")).to.eql(owner.address);
-      expect(await tokenProperties.getUintTokenProperty(tokenId, "health")).to.eql(bn(100));
+      expect(await tokenProperties.getUintTokenProperty(tokenId, "atk")).to.eql(bn(100));
+      expect(await tokenProperties.getUintTokenProperty(tokenId, "health")).to.eql(bn(80));
       expect(await tokenProperties.getBytesTokenProperty(tokenId, "data")).to.eql("0x1234");
 
       await tokenProperties.setStringProperty(tokenId, "description", "test description update");
