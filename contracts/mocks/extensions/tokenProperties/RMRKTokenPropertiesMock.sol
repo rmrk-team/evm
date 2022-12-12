@@ -11,21 +11,16 @@ import "../../../RMRK/extension/tokenProperties/IRMRKTokenProperties.sol";
  */
 contract RMRKTokenPropertiesMock is IRMRKTokenProperties {
 
-    uint256 private _totalStringProperties;
-    mapping(string => uint256) private _stringKeysToIds;
+    mapping(string => uint256) private _keysToIds;
+    uint256 private _totalProperties;
+
     mapping(string => uint256) private _stringValuesToIds;
     mapping(uint256 => mapping(uint256 => string)) private _stringValues;
 
-    uint256 private _totalAddressProperties;
-    mapping(string => uint256) private _addressKeysToIds;
     mapping(uint256 => mapping(uint256 => address)) private _addressValues;
-
-    uint256 private _totalBytesProperties;
-    mapping(string => uint256) private _bytesKeysToIds;
     mapping(uint256 => mapping(uint256 => bytes)) private _bytesValues;
-
-    mapping(uint256 => mapping(string => uint256)) private _uintProperties;
-    mapping(uint256 => mapping(string => bool)) private _boolProperties;
+    mapping(uint256 => mapping(uint256 => uint256)) private _uintValues;
+    mapping(uint256 => mapping(uint256 => bool)) private _boolValues;
 
     /**
     * @notice Used to retrieve the string type token properties.
@@ -34,7 +29,7 @@ contract RMRKTokenPropertiesMock is IRMRKTokenProperties {
      * @return string The value of the string property
      */
     function getStringTokenProperty(uint256 tokenId, string memory key) external view returns (string memory) {
-        return _stringValues[tokenId][_stringKeysToIds[key]];
+        return _stringValues[tokenId][_keysToIds[key]];
     }
 
     /**
@@ -44,7 +39,7 @@ contract RMRKTokenPropertiesMock is IRMRKTokenProperties {
      * @return uint256 The value of the uint property
      */
     function getUintTokenProperty(uint256 tokenId, string memory key) external view returns (uint256) {
-        return _uintProperties[tokenId][key];
+        return _uintValues[tokenId][_keysToIds[key]];
     }
 
     /**
@@ -54,7 +49,7 @@ contract RMRKTokenPropertiesMock is IRMRKTokenProperties {
      * @return bool The value of the bool property
      */
     function getBoolTokenProperty(uint256 tokenId, string memory key) external view returns (bool) {
-        return _boolProperties[tokenId][key];
+        return _boolValues[tokenId][_keysToIds[key]];
     }
 
     /**
@@ -64,7 +59,7 @@ contract RMRKTokenPropertiesMock is IRMRKTokenProperties {
      * @return address The value of the address property
      */
     function getAddressTokenProperty(uint256 tokenId, string memory key) external view returns (address) {
-        return _addressValues[tokenId][_addressKeysToIds[key]];
+        return _addressValues[tokenId][_keysToIds[key]];
     }
 
     /**
@@ -74,7 +69,7 @@ contract RMRKTokenPropertiesMock is IRMRKTokenProperties {
      * @return bytes The value of the bytes property
      */
     function getBytesTokenProperty(uint256 tokenId, string memory key) external view returns (bytes memory) {
-        return _bytesValues[tokenId][_bytesKeysToIds[key]];
+        return _bytesValues[tokenId][_keysToIds[key]];
     }
 
     /**
@@ -84,7 +79,9 @@ contract RMRKTokenPropertiesMock is IRMRKTokenProperties {
      * @param value The property value
      */
     function setUintProperty(uint256 tokenId, string memory key, uint256 value) external {
-        _uintProperties[tokenId][key] = value;
+        _keysToIds[key] = _totalProperties;
+        _uintValues[tokenId][_keysToIds[key]] = value;
+        _totalProperties++;
     }
 
     /**
@@ -95,19 +92,19 @@ contract RMRKTokenPropertiesMock is IRMRKTokenProperties {
     */
     function setStringProperty(uint256 tokenId, string memory key, string memory value) external {
 
-        if (_stringValuesToIds[value] == 0 && _stringKeysToIds[key] == 0) {
-            _stringKeysToIds[key] = _totalStringProperties;
-            _stringValues[tokenId][_stringKeysToIds[key]] = value;
-            _stringValuesToIds[value] = _totalStringProperties;
-            _totalStringProperties++;
+        if (_stringValuesToIds[value] == 0 && _keysToIds[key] == 0) {
+            _keysToIds[key] = _totalProperties;
+            _stringValues[tokenId][_keysToIds[key]] = value;
+            _stringValuesToIds[value] = _totalProperties;
+            _totalProperties++;
         }
         else {
             //prevents storing duplicate string values and keys
-            if (_stringValuesToIds[value] > 0 && _stringKeysToIds[key] == 0) {
-                _stringKeysToIds[key] = _stringValuesToIds[value];
+            if (_stringValuesToIds[value] > 0 && _keysToIds[key] == 0) {
+                _keysToIds[key] = _stringValuesToIds[value];
             }
             else {
-                _stringValuesToIds[value] = _stringKeysToIds[key];
+                _stringValuesToIds[value] = _keysToIds[key];
             }
         }
     }
@@ -119,7 +116,9 @@ contract RMRKTokenPropertiesMock is IRMRKTokenProperties {
      * @param value The property value
      */
     function setBoolProperty(uint256 tokenId, string memory key, bool value) external {
-        _boolProperties[tokenId][key] = value;
+        _keysToIds[key] = _totalProperties;
+        _boolValues[tokenId][_keysToIds[key]] = value;
+        _totalProperties++;
     }
 
     /**
@@ -129,9 +128,9 @@ contract RMRKTokenPropertiesMock is IRMRKTokenProperties {
      * @param value The property value
      */
     function setBytesProperty(uint256 tokenId, string memory key, bytes memory value) external {
-        _bytesKeysToIds[key] = _totalBytesProperties;
-        _bytesValues[tokenId][_bytesKeysToIds[key]] = value;
-        _totalBytesProperties++;
+        _keysToIds[key] = _totalProperties;
+        _bytesValues[tokenId][_keysToIds[key]] = value;
+        _totalProperties++;
     }
 
     /**
@@ -141,9 +140,9 @@ contract RMRKTokenPropertiesMock is IRMRKTokenProperties {
      * @param value The property value
      */
     function setAddressProperty(uint256 tokenId, string memory key, address value) external {
-        _addressKeysToIds[key] = _totalAddressProperties;
-        _addressValues[tokenId][_addressKeysToIds[key]] = value;
-        _totalAddressProperties++;
+        _keysToIds[key] = _totalProperties;
+        _addressValues[tokenId][_keysToIds[key]] = value;
+        _totalProperties++;
     }
 
     /**
