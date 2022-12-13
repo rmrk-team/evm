@@ -180,7 +180,7 @@ async function shouldBehaveLikeEquippableWithParts() {
 
     it('cannot compose equippables for mask for asset with no base', async function () {
       const noBaseAssetId = 99;
-      await maskEquipContract.addAssetEntry(
+      await maskEquipContract.addEquippableAssetEntry(
         noBaseAssetId,
         0, // Not meant to equip
         ethers.constants.AddressZero, // Not meant to equip

@@ -150,7 +150,7 @@ async function setupContextForSlots(
   }
 
   async function addAssetsToSoldier(): Promise<void> {
-    await soldierEquip.addAssetEntry(soldierResId, 0, base.address, 'ipfs:soldier/', [
+    await soldierEquip.addEquippableAssetEntry(soldierResId, 0, base.address, 'ipfs:soldier/', [
       partIdForBody,
       partIdForWeapon,
       partIdForBackground,
@@ -165,7 +165,7 @@ async function setupContextForSlots(
     const equippableGroupId = 1; // Assets to equip will both use this
 
     for (let i = 0; i < weaponAssetsFull.length; i++) {
-      await weaponEquip.addAssetEntry(
+      await weaponEquip.addEquippableAssetEntry(
         weaponAssetsFull[i],
         0, // Not meant to equip
         ethers.constants.AddressZero, // Not meant to equip
@@ -174,7 +174,7 @@ async function setupContextForSlots(
       );
     }
     for (let i = 0; i < weaponAssetsEquip.length; i++) {
-      await weaponEquip.addAssetEntry(
+      await weaponEquip.addEquippableAssetEntry(
         weaponAssetsEquip[i],
         equippableGroupId,
         base.address,
@@ -206,14 +206,14 @@ async function setupContextForSlots(
 
   async function addAssetsToWeaponGem(): Promise<void> {
     const equippableGroupId = 1; // Assets to equip will use this
-    await weaponGemEquip.addAssetEntry(
+    await weaponGemEquip.addEquippableAssetEntry(
       weaponGemAssetFull,
       0, // Not meant to equip
       ethers.constants.AddressZero, // Not meant to equip
       'ipfs:weagponGem/full/',
       [],
     );
-    await weaponGemEquip.addAssetEntry(
+    await weaponGemEquip.addEquippableAssetEntry(
       weaponGemAssetEquip,
       equippableGroupId,
       base.address,
@@ -241,7 +241,7 @@ async function setupContextForSlots(
 
   async function addAssetsToBackground(): Promise<void> {
     const equippableGroupId = 1; // Assets to equip will use this
-    await backgroundEquip.addAssetEntry(
+    await backgroundEquip.addEquippableAssetEntry(
       backgroundAssetId,
       equippableGroupId,
       base.address,

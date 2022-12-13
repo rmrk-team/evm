@@ -67,7 +67,7 @@ Used to accept a pending child token for a given parent token.
 ### addAssetEntry
 
 ```solidity
-function addAssetEntry(uint64 equippableGroupId, address baseAddress, string metadataURI, uint64[] partIds) external nonpayable returns (uint256)
+function addAssetEntry(string metadataURI) external nonpayable returns (uint256)
 ```
 
 Used to add a asset entry.
@@ -78,16 +78,13 @@ Used to add a asset entry.
 
 | Name | Type | Description |
 |---|---|---|
-| equippableGroupId | uint64 | ID of the equippable group |
-| baseAddress | address | Address of the `Base` smart contract this asset belongs to |
 | metadataURI | string | Metadata URI of the asset |
-| partIds | uint64[] | An array of IDs of fixed and slot parts to be included in the asset |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | uint256 The total number of assets after this asset has been added |
+| _0 | uint256 | undefined |
 
 ### addAssetToToken
 
@@ -140,6 +137,31 @@ Adds a contributor to the smart contract.
 | Name | Type | Description |
 |---|---|---|
 | contributor | address | Address of the contributor&#39;s account |
+
+### addEquippableAssetEntry
+
+```solidity
+function addEquippableAssetEntry(uint64 equippableGroupId, address baseAddress, string metadataURI, uint64[] partIds) external nonpayable returns (uint256)
+```
+
+Used to add an equippable asset entry.
+
+*The ID of the asset is automatically assigned to be the next available asset ID.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| equippableGroupId | uint64 | ID of the equippable group |
+| baseAddress | address | Address of the `Base` smart contract this asset belongs to |
+| metadataURI | string | Metadata URI of the asset |
+| partIds | uint64[] | An array of IDs of fixed and slot parts to be included in the asset |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint256 | uint256 The total number of assets after this asset has been added |
 
 ### approve
 
