@@ -45,7 +45,7 @@ async function shouldBehaveLikeEquippableAssets(
       const id = bn(1);
 
       await expect(
-        chunkyEquip.addAssetEntry(
+        chunkyEquip.addEquippableAssetEntry(
           id,
           equippableGroupIdDefault,
           baseAddressDefault,
@@ -60,7 +60,7 @@ async function shouldBehaveLikeEquippableAssets(
     it('cannot get extended assets for non existing asset or non existing token', async function () {
       const tokenId = await mint(chunkyEquip, owner.address);
       const resId = 1;
-      await chunkyEquip.addAssetEntry(
+      await chunkyEquip.addEquippableAssetEntry(
         resId,
         equippableGroupIdDefault,
         baseAddressDefault,
@@ -79,7 +79,7 @@ async function shouldBehaveLikeEquippableAssets(
     it('cannot add asset entry with parts and no base', async function () {
       const id = bn(1);
       await expect(
-        chunkyEquip.addAssetEntry(
+        chunkyEquip.addEquippableAssetEntry(
           id,
           equippableGroupIdDefault,
           baseAddressDefault,
@@ -88,7 +88,7 @@ async function shouldBehaveLikeEquippableAssets(
         ),
       ).to.be.revertedWithCustomError(chunkyEquip, 'RMRKBaseRequiredForParts');
       await expect(
-        chunkyEquip.addAssetEntry(
+        chunkyEquip.addEquippableAssetEntry(
           id,
           equippableGroupIdDefault,
           baseAddressDefault,
@@ -101,7 +101,7 @@ async function shouldBehaveLikeEquippableAssets(
     it('cannot add an asset with an existing ID', async function () {
       const id = bn(1);
 
-      await chunkyEquip.addAssetEntry(
+      await chunkyEquip.addEquippableAssetEntry(
         id,
         equippableGroupIdDefault,
         baseAddressDefault,
@@ -109,7 +109,7 @@ async function shouldBehaveLikeEquippableAssets(
         [],
       );
       await expect(
-        chunkyEquip.addAssetEntry(
+        chunkyEquip.addEquippableAssetEntry(
           id,
           equippableGroupIdDefault,
           baseAddressDefault,
@@ -123,7 +123,7 @@ async function shouldBehaveLikeEquippableAssets(
       const id = 0;
 
       await expect(
-        chunkyEquip.addAssetEntry(
+        chunkyEquip.addEquippableAssetEntry(
           id,
           equippableGroupIdDefault,
           baseAddressDefault,
@@ -137,7 +137,7 @@ async function shouldBehaveLikeEquippableAssets(
       const id = bn(1);
 
       await expect(
-        chunkyEquip.addAssetEntry(
+        chunkyEquip.addEquippableAssetEntry(
           id,
           equippableGroupIdDefault,
           baseAddressDefault,
@@ -149,7 +149,7 @@ async function shouldBehaveLikeEquippableAssets(
         .withArgs(id);
 
       await expect(
-        chunkyEquip.addAssetEntry(
+        chunkyEquip.addEquippableAssetEntry(
           id,
           equippableGroupIdDefault,
           baseAddressDefault,
@@ -599,7 +599,7 @@ async function shouldBehaveLikeEquippableAssets(
 
   async function addAssets(ids: BigNumber[]): Promise<void> {
     for (let i = 0; i < ids.length; i++) {
-      await chunkyEquip.addAssetEntry(
+      await chunkyEquip.addEquippableAssetEntry(
         ids[i],
         equippableGroupIdDefault,
         baseAddressDefault,

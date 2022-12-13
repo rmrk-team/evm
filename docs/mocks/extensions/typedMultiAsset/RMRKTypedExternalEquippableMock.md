@@ -31,7 +31,7 @@ Used to accept a pending asset of a given token.
 ### addAssetEntry
 
 ```solidity
-function addAssetEntry(uint64 id, uint64 equippableGroupId, address baseAddress, string metadataURI, uint64[] partIds) external nonpayable
+function addAssetEntry(uint64 id, string metadataURI) external nonpayable
 ```
 
 
@@ -43,10 +43,7 @@ function addAssetEntry(uint64 id, uint64 equippableGroupId, address baseAddress,
 | Name | Type | Description |
 |---|---|---|
 | id | uint64 | undefined |
-| equippableGroupId | uint64 | undefined |
-| baseAddress | address | undefined |
 | metadataURI | string | undefined |
-| partIds | uint64[] | undefined |
 
 ### addAssetToToken
 
@@ -65,6 +62,26 @@ function addAssetToToken(uint256 tokenId, uint64 assetId, uint64 replacesAssetWi
 | tokenId | uint256 | undefined |
 | assetId | uint64 | undefined |
 | replacesAssetWithId | uint64 | undefined |
+
+### addEquippableAssetEntry
+
+```solidity
+function addEquippableAssetEntry(uint64 id, uint64 equippableGroupId, address baseAddress, string metadataURI, uint64[] partIds) external nonpayable
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| id | uint64 | undefined |
+| equippableGroupId | uint64 | undefined |
+| baseAddress | address | undefined |
+| metadataURI | string | undefined |
+| partIds | uint64[] | undefined |
 
 ### addTypedAssetEntry
 

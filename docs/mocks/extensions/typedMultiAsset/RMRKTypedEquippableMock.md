@@ -64,26 +64,6 @@ Used to accept a pending child token for a given parent token.
 | childAddress | address | Address of the collection smart contract of the child token expected to be located at the  specified index of the given parent token&#39;s pending children array |
 | childId | uint256 | ID of the child token expected to be located at the specified index of the given parent token&#39;s  pending children array |
 
-### addAssetEntry
-
-```solidity
-function addAssetEntry(uint64 id, uint64 equippableGroupId, address baseAddress, string metadataURI, uint64[] partIds) external nonpayable
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| id | uint64 | undefined |
-| equippableGroupId | uint64 | undefined |
-| baseAddress | address | undefined |
-| metadataURI | string | undefined |
-| partIds | uint64[] | undefined |
-
 ### addAssetToToken
 
 ```solidity
@@ -119,6 +99,26 @@ Used to add a child token to a given parent token.
 | parentId | uint256 | ID of the parent token to receive the new child token |
 | childId | uint256 | ID of the new proposed child token |
 | data | bytes | Additional data with no specified format |
+
+### addEquippableAssetEntry
+
+```solidity
+function addEquippableAssetEntry(uint64 id, uint64 equippableGroupId, address baseAddress, string metadataURI, uint64[] partIds) external nonpayable
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| id | uint64 | undefined |
+| equippableGroupId | uint64 | undefined |
+| baseAddress | address | undefined |
+| metadataURI | string | undefined |
+| partIds | uint64[] | undefined |
 
 ### addTypedAssetEntry
 

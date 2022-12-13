@@ -47,7 +47,7 @@ contract RMRKEquippableMock is RMRKEquippable {
         _addAssetToToken(tokenId, assetId, replacesAssetWithId);
     }
 
-    function addAssetEntry(
+    function addEquippableAssetEntry(
         uint64 id,
         uint64 equippableGroupId,
         address baseAddress,
