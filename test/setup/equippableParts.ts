@@ -270,31 +270,31 @@ async function setupContextForParts(
   }
 
   async function addAssetsToNeon(): Promise<void> {
-    await neonEquip.addAssetEntry(neonResIds[0], 0, base.address, 'ipfs:neonRes/1', [
+    await neonEquip.addEquippableAssetEntry(neonResIds[0], 0, base.address, 'ipfs:neonRes/1', [
       partIdForHead1,
       partIdForBody1,
       partIdForHair1,
       partIdForMask,
     ]);
-    await neonEquip.addAssetEntry(neonResIds[1], 0, base.address, 'ipfs:neonRes/2', [
+    await neonEquip.addEquippableAssetEntry(neonResIds[1], 0, base.address, 'ipfs:neonRes/2', [
       partIdForHead2,
       partIdForBody2,
       partIdForHair2,
       partIdForMask,
     ]);
-    await neonEquip.addAssetEntry(neonResIds[2], 0, base.address, 'ipfs:neonRes/3', [
+    await neonEquip.addEquippableAssetEntry(neonResIds[2], 0, base.address, 'ipfs:neonRes/3', [
       partIdForHead3,
       partIdForBody1,
       partIdForHair3,
       partIdForMask,
     ]);
-    await neonEquip.addAssetEntry(neonResIds[3], 0, base.address, 'ipfs:neonRes/4', [
+    await neonEquip.addEquippableAssetEntry(neonResIds[3], 0, base.address, 'ipfs:neonRes/4', [
       partIdForHead1,
       partIdForBody2,
       partIdForHair2,
       partIdForMask,
     ]);
-    await neonEquip.addAssetEntry(neonResIds[4], 0, base.address, 'ipfs:neonRes/1', [
+    await neonEquip.addEquippableAssetEntry(neonResIds[4], 0, base.address, 'ipfs:neonRes/1', [
       partIdForHead2,
       partIdForBody1,
       partIdForHair1,
@@ -311,28 +311,28 @@ async function setupContextForParts(
 
   async function addAssetsToMask(): Promise<void> {
     // Assets for full view, composed with fixed parts
-    await maskEquip.addAssetEntry(
+    await maskEquip.addEquippableAssetEntry(
       maskAssetsFull[0],
       0, // Not meant to equip
       base.address, // Not meant to equip, but base needed for parts
       `ipfs:weapon/full/${maskAssetsFull[0]}`,
       [partIdForMaskBase1, partIdForHorns1, partIdForEars1],
     );
-    await maskEquip.addAssetEntry(
+    await maskEquip.addEquippableAssetEntry(
       maskAssetsFull[1],
       0, // Not meant to equip
       base.address, // Not meant to equip, but base needed for parts
       `ipfs:weapon/full/${maskAssetsFull[1]}`,
       [partIdForMaskBase2, partIdForHorns2, partIdForEars2],
     );
-    await maskEquip.addAssetEntry(
+    await maskEquip.addEquippableAssetEntry(
       maskAssetsFull[2],
       0, // Not meant to equip
       base.address, // Not meant to equip, but base needed for parts
       `ipfs:weapon/full/${maskAssetsFull[2]}`,
       [partIdForMaskBase3, partIdForHorns1, partIdForEars2],
     );
-    await maskEquip.addAssetEntry(
+    await maskEquip.addEquippableAssetEntry(
       maskAssetsFull[3],
       0, // Not meant to equip
       base.address, // Not meant to equip, but base needed for parts
@@ -341,7 +341,7 @@ async function setupContextForParts(
     );
 
     // Assets for equipping view, also composed with fixed parts
-    await maskEquip.addAssetEntry(
+    await maskEquip.addEquippableAssetEntry(
       maskAssetsEquip[0],
       maskEquippableGroupId,
       base.address,
@@ -350,7 +350,7 @@ async function setupContextForParts(
     );
 
     // Assets for equipping view, also composed with fixed parts
-    await maskEquip.addAssetEntry(
+    await maskEquip.addEquippableAssetEntry(
       maskAssetsEquip[1],
       maskEquippableGroupId,
       base.address,
@@ -359,7 +359,7 @@ async function setupContextForParts(
     );
 
     // Assets for equipping view, also composed with fixed parts
-    await maskEquip.addAssetEntry(
+    await maskEquip.addEquippableAssetEntry(
       maskAssetsEquip[2],
       maskEquippableGroupId,
       base.address,
@@ -368,7 +368,7 @@ async function setupContextForParts(
     );
 
     // Assets for equipping view, also composed with fixed parts
-    await maskEquip.addAssetEntry(
+    await maskEquip.addEquippableAssetEntry(
       maskAssetsEquip[3],
       maskEquippableGroupId,
       base.address,

@@ -80,7 +80,7 @@ abstract contract RMRKAbstractEquippableImpl is
     }
 
     /**
-     * @notice Used to add a asset entry.
+     * @notice Used to add an equippable asset entry.
      * @dev The ID of the asset is automatically assigned to be the next available asset ID.
      * @param equippableGroupId ID of the equippable group
      * @param baseAddress Address of the `Base` smart contract this asset belongs to
@@ -88,7 +88,7 @@ abstract contract RMRKAbstractEquippableImpl is
      * @param partIds An array of IDs of fixed and slot parts to be included in the asset
      * @return uint256 The total number of assets after this asset has been added
      */
-    function addAssetEntry(
+    function addEquippableAssetEntry(
         uint64 equippableGroupId,
         address baseAddress,
         string memory metadataURI,
@@ -104,6 +104,21 @@ abstract contract RMRKAbstractEquippableImpl is
             metadataURI,
             partIds
         );
+        return _totalAssets;
+    }
+
+    /**
+     * @notice Used to add a asset entry.
+     * @dev The ID of the asset is automatically assigned to be the next available asset ID.
+     * @param metadataURI Metadata URI of the asset
+     */
+    function addAssetEntry(
+        string memory metadataURI
+    ) public virtual onlyOwnerOrContributor returns (uint256) {
+        unchecked {
+            _totalAssets += 1;
+        }
+        _addAssetEntry(uint64(_totalAssets), metadataURI);
         return _totalAssets;
     }
 

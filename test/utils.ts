@@ -118,7 +118,7 @@ async function addAssetEntryEquippablesFromMock(
   const assetId = bn(nextAssetId);
   const equippableGroupId = bn(1);
   nextAssetId++;
-  await token.addAssetEntry(
+  await token.addEquippableAssetEntry(
     assetId,
     equippableGroupId,
     ADDRESS_ZERO,
@@ -134,7 +134,7 @@ async function addAssetEntryEquippablesFromImpl(
   data?: string,
 ): Promise<BigNumber> {
   const equippableGroupId = bn(1);
-  await token.addAssetEntry(
+  await token.addEquippableAssetEntry(
     equippableGroupId,
     ADDRESS_ZERO,
     data !== undefined ? data : 'metaURI',

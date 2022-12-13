@@ -49,10 +49,10 @@ describe('Render Utils', async function () {
     someBase = signers[1];
 
     tokenId = await mintFromMock(equip, owner.address);
-    await equip.addAssetEntry(resId, 0, ADDRESS_ZERO, 'ipfs://res1.jpg', []);
-    await equip.addAssetEntry(resId2, 1, someBase.address, 'ipfs://res2.jpg', [1, 3, 4]);
-    await equip.addAssetEntry(resId3, 0, ADDRESS_ZERO, 'ipfs://res3.jpg', []);
-    await equip.addAssetEntry(resId4, 2, someBase.address, 'ipfs://res4.jpg', [4]);
+    await equip.addEquippableAssetEntry(resId, 0, ADDRESS_ZERO, 'ipfs://res1.jpg', []);
+    await equip.addEquippableAssetEntry(resId2, 1, someBase.address, 'ipfs://res2.jpg', [1, 3, 4]);
+    await equip.addEquippableAssetEntry(resId3, 0, ADDRESS_ZERO, 'ipfs://res3.jpg', []);
+    await equip.addEquippableAssetEntry(resId4, 2, someBase.address, 'ipfs://res4.jpg', [4]);
     await equip.addAssetToToken(tokenId, resId, 0);
     await equip.addAssetToToken(tokenId, resId2, 0);
     await equip.addAssetToToken(tokenId, resId3, resId);
