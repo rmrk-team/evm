@@ -18,7 +18,7 @@ async function tokenPropertiesFixture() {
 
 // --------------- TESTS -----------------------
 
-describe.only('RMRKTokenPropertiesMock', async function () {
+describe('RMRKTokenPropertiesMock', async function () {
   let tokenProperties: RMRKTokenPropertiesMock;
 
   beforeEach(async function () {
