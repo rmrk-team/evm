@@ -10,8 +10,8 @@ const IRMRKNestableAutoIndex = '0x1884d52d';
 const IRMRKNestableExternalEquip = '0x8b7f3e99';
 const IRMRKReclaimableChild = '0x2fb59acf';
 const IRMRKSoulboundMultiAsset = '0x911ec470';
+const IRMRKTokenProperties = '0x6a49fd01';
 const IRMRKTypedMultiAsset = '0x7f7bb665';
-const IRMRKTokenProperties = '0x6dbb26fc';
 
 export {
   IERC165,
