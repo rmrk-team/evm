@@ -363,7 +363,7 @@ Used to transfer the token into another token.
 
 | Name | Type | Description |
 |---|---|---|
-| from | address | Address of the collection smart contract of the token to be transferred |
+| from | address | Address of the direct owner of the token to be transferred |
 | to | address | Address of the receiving token&#39;s collection smart contract |
 | tokenId | uint256 | ID of the token being transferred |
 | destinationId | uint256 | ID of the token to receive the token being transferred |

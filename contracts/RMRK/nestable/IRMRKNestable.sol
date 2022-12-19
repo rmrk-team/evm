@@ -299,7 +299,7 @@ interface IRMRKNestable is IERC165 {
 
     /**
      * @notice Used to transfer the token into another token.
-     * @param from Address of the collection smart contract of the token to be transferred
+     * @param from Address of the direct owner of the token to be transferred
      * @param to Address of the receiving token's collection smart contract
      * @param tokenId ID of the token being transferred
      * @param destinationId ID of the token to receive the token being transferred
