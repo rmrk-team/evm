@@ -9,7 +9,8 @@
   "scripts": {
     "test": "yarn typechain && hardhat test",
     "typechain": "hardhat typechain",
-    "prettier": "prettier --write ."
+    "prettier": "prettier --write .",
+    "prepare": "hardhat dodoc && prettier --write ."
   },
   "engines": {
     "node": ">=16.0.0"
