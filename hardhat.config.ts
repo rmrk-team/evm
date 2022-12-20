@@ -63,7 +63,7 @@ const config: HardhatUserConfig = {
     },
   },
   dodoc: {
-    runOnCompile: true,
+    runOnCompile: false,
   },
 };
 
