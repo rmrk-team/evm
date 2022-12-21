@@ -62,6 +62,9 @@ const config: HardhatUserConfig = {
       goerli: process.env.ETHERSCAN_API_KEY || '', // Goerli Etherscan API Key
     },
   },
+  dodoc: {
+    runOnCompile: false,
+  },
 };
 
 export default config;
