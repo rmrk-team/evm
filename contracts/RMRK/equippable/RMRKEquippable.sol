@@ -456,6 +456,8 @@ contract RMRKEquippable is
         ];
         if (equipment.childEquippableAddress == address(0))
             revert RMRKNotEquipped();
+        _beforeUnequip(tokenId, assetId, slotPartId);
+
         delete _equipments[tokenId][targetBaseAddress][slotPartId];
         _equipCountPerChild[tokenId][equipment.childEquippableAddress][
             equipment.childId
@@ -469,6 +471,7 @@ contract RMRKEquippable is
             equipment.childEquippableAddress,
             equipment.childAssetId
         );
+        _afterUnequip(tokenId, assetId, slotPartId);
     }
 
     /**
