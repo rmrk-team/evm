@@ -2,16 +2,31 @@
 
 pragma solidity ^0.8.16;
 
-import "./abstracts/RMRKAbstractNestableMultiAssetImpl.sol";
+import "../../RMRK/equippable/RMRKNestableExternalEquip.sol";
+import "../../RMRK/extension/RMRKRoyalties.sol";
+import "../../RMRK/utils/RMRKCollectionMetadata.sol";
+import "../../RMRK/utils/RMRKMintingUtils.sol";
+import "../../RMRK/utils/RMRKTokenURI.sol";
+import "../IRMRKInitData.sol";
 
 error RMRKMintUnderpriced();
+error RMRKMintZero();
 
 /**
- * @title RMRKNestableMultiAssetImpl
+ * @title RMRKNestableExternalEquipImpl
  * @author RMRK team
- * @notice Implementation of RMRK nestable multi asset module.
+ * @notice Implementation of RMRK nestable external equip module.
  */
-contract RMRKNestableMultiAssetImpl is RMRKAbstractNestableMultiAssetImpl {
+contract RMRKNestableExternalEquipImpl is
+    IRMRKInitData,
+    RMRKMintingUtils,
+    RMRKCollectionMetadata,
+    RMRKRoyalties,
+    RMRKTokenURI,
+    RMRKNestableExternalEquip
+{
+    address private _equippableAddress;
+
     /**
      * @notice Used to initialize the smart contract.
      * @dev The full `InitData` looks like this:
@@ -30,6 +45,7 @@ contract RMRKNestableMultiAssetImpl is RMRKAbstractNestableMultiAssetImpl {
      * @param data The `InitData` struct containing additional initialization data
      */
     constructor(
+        address equippableAddress_,
         string memory name_,
         string memory symbol_,
         string memory collectionMetadata_,
@@ -40,8 +56,12 @@ contract RMRKNestableMultiAssetImpl is RMRKAbstractNestableMultiAssetImpl {
         RMRKCollectionMetadata(collectionMetadata_)
         RMRKRoyalties(data.royaltyRecipient, data.royaltyPercentageBps)
         RMRKTokenURI(tokenURI_, data.tokenUriIsEnumerable)
-        RMRKNestableMultiAsset(name_, symbol_)
-    {}
+        RMRKNestableExternalEquip(name_, symbol_)
+    {
+        // Can't add an equippable deployment here due to contract size, for factory
+        // pattern can use OZ clone
+        _equippableAddress = equippableAddress_;
+    }
 
     /**
      * @notice Used to mint the desired number of tokens to the specified address.
@@ -88,10 +108,42 @@ contract RMRKNestableMultiAssetImpl is RMRKAbstractNestableMultiAssetImpl {
     }
 
     /**
-     * @notice Used to verify and/or receive the payment for the mint.
-     * @param value The expected amount to be received for the mint
+     * @notice Used to calculate the token IDs of tokens to be minted.
+     * @param numToMint Amount of tokens to be minted
+     * @return uint256 The ID of the first token to be minted in the current minting cycle
+     * @return uint256 The ID of the last token to be minted in the current minting cycle
      */
-    function _charge(uint256 value) internal virtual override {
-        if (value != msg.value) revert RMRKMintUnderpriced();
+    function _preMint(uint256 numToMint) private returns (uint256, uint256) {
+        if (numToMint == uint256(0)) revert RMRKMintZero();
+        if (numToMint + _totalSupply > _maxSupply) revert RMRKMintOverMax();
+
+        uint256 mintPriceRequired = numToMint * _pricePerMint;
+        if (mintPriceRequired != msg.value) revert RMRKMintUnderpriced();
+
+        uint256 nextToken = _totalSupply + 1;
+        unchecked {
+            _totalSupply += numToMint;
+        }
+        uint256 totalSupplyOffset = _totalSupply + 1;
+
+        return (nextToken, totalSupplyOffset);
+    }
+
+    /**
+     * @notice Used to set the address of the `Equippable` smart contract.
+     * @param equippable Address of the `Equippable` smart contract
+     */
+    function setEquippableAddress(address equippable) public virtual onlyOwner {
+        //TODO: should we add a check if passed address supports IRMRKNestableExternalEquip
+        _setEquippableAddress(equippable);
+    }
+
+    /**
+     * @inheritdoc RMRKRoyalties
+     */
+    function updateRoyaltyRecipient(
+        address newRoyaltyRecipient
+    ) public virtual override onlyOwner {
+        _setRoyaltyRecipient(newRoyaltyRecipient);
     }
 }
