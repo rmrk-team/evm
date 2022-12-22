@@ -11,7 +11,7 @@ import {
   addAssetEntryEquippablesFromImpl,
   addAssetToToken,
   ADDRESS_ZERO,
-  mintFromImpl,
+  mintFromImplNativeToken,
   ONE_ETH,
 } from '../utils';
 import { RMRKExternalEquipImpl, RMRKNestableExternalEquipImpl } from '../../typechain-types';
@@ -96,7 +96,18 @@ describe('ExternalEquippableImpl Other', async function () {
     expect(await equip.getActiveAssets(tokenId)).to.be.eql([assetId]);
   });
 
+  it('cannot set equippable address if not owner', async function () {
+    const [, notOwner, otherAddress] = await ethers.getSigners();
+    await expect(
+      nestable.connect(notOwner).setEquippableAddress(otherAddress.address),
+    ).to.be.revertedWithCustomError(nestable, 'RMRKNotOwner');
+
+    await expect(
+      equip.connect(notOwner).setNestableAddress(otherAddress.address),
+    ).to.be.revertedWithCustomError(nestable, 'RMRKNotOwner');
+  });
+
   shouldControlValidMinting();
-  shouldHaveRoyalties(mintFromImpl);
-  shouldHaveMetadata(mintFromImpl, isTokenUriEnumerated);
+  shouldHaveRoyalties(mintFromImplNativeToken);
+  shouldHaveMetadata(mintFromImplNativeToken, isTokenUriEnumerated);
 });

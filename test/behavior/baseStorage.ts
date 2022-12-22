@@ -2,7 +2,7 @@ import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { Contract } from 'ethers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { IOtherInterface, IRMRKBaseStorage } from '../interfaces';
+import { IOtherInterface, IERC165, IRMRKBaseStorage } from '../interfaces';
 
 async function shouldBehaveLikeBase(contractName: string, metadataURI: string, type: string) {
   let testBase: Contract;
@@ -16,6 +16,13 @@ async function shouldBehaveLikeBase(contractName: string, metadataURI: string, t
 
   const sampleSlotPartData = {
     itemType: slotType,
+    z: 0,
+    equippable: [],
+    metadataURI: metadataUriDefault,
+  };
+
+  const sampleFixedPartData = {
+    itemType: fixedType,
     z: 0,
     equippable: [],
     metadataURI: metadataUriDefault,
@@ -39,8 +46,12 @@ async function shouldBehaveLikeBase(contractName: string, metadataURI: string, t
       expect(await testBase.getType()).to.equal(type);
     });
 
-    it('supports interface', async function () {
+    it('supports base interface', async function () {
       expect(await testBase.supportsInterface(IRMRKBaseStorage)).to.equal(true);
+    });
+
+    it('supports IERC165 interface', async function () {
+      expect(await testBase.supportsInterface(IERC165)).to.equal(true);
     });
 
     it('does not support other interfaces', async function () {
@@ -51,14 +62,8 @@ async function shouldBehaveLikeBase(contractName: string, metadataURI: string, t
   describe('add base entries', async function () {
     it('can add fixed part', async function () {
       const partId = 1;
-      const partData = {
-        itemType: fixedType,
-        z: 0,
-        equippable: [],
-        metadataURI: metadataUriDefault,
-      };
 
-      await testBase.addPart({ partId: partId, part: partData });
+      await testBase.addPart({ partId: partId, part: sampleFixedPartData });
       expect(await testBase.getPart(partId)).to.eql([2, 0, [], metadataUriDefault]);
     });
 
@@ -217,13 +222,7 @@ async function shouldBehaveLikeBase(contractName: string, metadataURI: string, t
 
     it('cannot add nor set equippable addresses to non slot part', async function () {
       const fixedPartId = 1;
-      const partData = {
-        itemType: fixedType, // This is what we're testing
-        z: 0,
-        equippable: [],
-        metadataURI: metadataUriDefault,
-      };
-      await testBase.addPart({ partId: fixedPartId, part: partData });
+      await testBase.addPart({ partId: fixedPartId, part: sampleFixedPartData });
       await expect(
         testBase.addEquippableAddresses(fixedPartId, [addrs[1].address]),
       ).to.be.revertedWithCustomError(testBase, 'RMRKPartIsNotSlot');
@@ -271,6 +270,15 @@ async function shouldBehaveLikeBase(contractName: string, metadataURI: string, t
 
       await testBase.resetEquippableAddresses(partId);
       expect(await testBase.checkIsEquippable(partId, addrs[1].address)).to.eql(false);
+    });
+
+    it('cannot reset equippable for fixed part', async function () {
+      const partId = 1;
+      await testBase.addPart({ partId: partId, part: sampleFixedPartData });
+      await expect(testBase.resetEquippableAddresses(partId)).to.be.revertedWithCustomError(
+        testBase,
+        'RMRKPartIsNotSlot',
+      );
     });
   });
 }

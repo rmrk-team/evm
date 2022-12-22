@@ -12,7 +12,7 @@ import {
   addAssetEntryFromImpl,
   addAssetToToken,
   ADDRESS_ZERO,
-  mintFromImpl,
+  mintFromImplNativeToken,
   ONE_ETH,
   singleFixtureWithArgs,
 } from '../utils';
@@ -61,7 +61,7 @@ describe('MultiAssetImpl Other Behavior', async () => {
     shouldBehaveLikeOwnableLock(isOwnableLockMock);
 
     it('can mint tokens through sale logic', async function () {
-      await mintFromImpl(token, owner.address);
+      await mintFromImplNativeToken(token, owner.address);
       expect(await token.ownerOf(1)).to.equal(owner.address);
       expect(await token.totalSupply()).to.equal(1);
       expect(await token.balanceOf(owner.address)).to.equal(1);
@@ -106,7 +106,7 @@ describe('MultiAssetImpl MR behavior', async () => {
     this.renderUtils = renderUtils;
   });
 
-  shouldBehaveLikeMultiAsset(mintFromImpl, addAssetEntryFromImpl, addAssetToToken);
+  shouldBehaveLikeMultiAsset(mintFromImplNativeToken, addAssetEntryFromImpl, addAssetToToken);
 });
 
 describe('MultiAssetImpl Other', async function () {
@@ -116,6 +116,6 @@ describe('MultiAssetImpl Other', async function () {
   });
 
   shouldControlValidMinting();
-  shouldHaveRoyalties(mintFromImpl);
-  shouldHaveMetadata(mintFromImpl, isTokenUriEnumerated);
+  shouldHaveRoyalties(mintFromImplNativeToken);
+  shouldHaveMetadata(mintFromImplNativeToken, isTokenUriEnumerated);
 });

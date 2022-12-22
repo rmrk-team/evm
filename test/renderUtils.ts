@@ -41,7 +41,7 @@ describe('Render Utils', async function () {
   const resId3 = bn(3);
   const resId4 = bn(4);
 
-  before(async function () {
+  beforeEach(async function () {
     ({ equip, renderUtils, renderUtilsEquip } = await loadFixture(assetsFixture));
 
     const signers = await ethers.getSigners();
@@ -89,6 +89,31 @@ describe('Render Utils', async function () {
       expect(await renderUtils.getTopAssetMetaForToken(equip.address, tokenId)).to.eql(
         'ipfs://res2.jpg',
       );
+
+      await equip.setPriority(tokenId, [0, 1]);
+      expect(await renderUtils.getTopAssetMetaForToken(equip.address, tokenId)).to.eql(
+        'ipfs://res1.jpg',
+      );
+    });
+
+    it('cannot get active assets if token has no assets', async function () {
+      const otherTokenId = await mintFromMock(equip, owner.address);
+      await expect(
+        renderUtils.getActiveAssets(equip.address, otherTokenId),
+      ).to.be.revertedWithCustomError(renderUtils, 'RMRKTokenHasNoAssets');
+      await expect(
+        renderUtilsEquip.getExtendedActiveAssets(equip.address, otherTokenId),
+      ).to.be.revertedWithCustomError(renderUtils, 'RMRKTokenHasNoAssets');
+    });
+
+    it('cannot get pending assets if token has no assets', async function () {
+      const otherTokenId = await mintFromMock(equip, owner.address);
+      await expect(
+        renderUtils.getPendingAssets(equip.address, otherTokenId),
+      ).to.be.revertedWithCustomError(renderUtils, 'RMRKTokenHasNoAssets');
+      await expect(
+        renderUtilsEquip.getExtendedPendingAssets(equip.address, otherTokenId),
+      ).to.be.revertedWithCustomError(renderUtils, 'RMRKTokenHasNoAssets');
     });
 
     it('cannot get top asset if token has no assets', async function () {

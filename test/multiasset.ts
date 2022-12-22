@@ -10,7 +10,7 @@ import {
   mintFromMock,
   singleFixtureWithArgs,
 } from './utils';
-import { IERC721 } from './interfaces';
+import { IERC721, IERC721Metadata } from './interfaces';
 import shouldBehaveLikeMultiAsset from './behavior/multiasset';
 import shouldBehaveLikeERC721 from './behavior/erc721';
 
@@ -45,6 +45,14 @@ describe('MultiAssetMock Other Behavior', async function () {
 
     it('can support IERC721', async function () {
       expect(await token.supportsInterface(IERC721)).to.equal(true);
+    });
+
+    it('can support IERC721', async function () {
+      expect(await token.supportsInterface(IERC721)).to.equal(true);
+    });
+
+    it('can support IERC721Metadata', async function () {
+      expect(await token.supportsInterface(IERC721Metadata)).to.equal(true);
     });
   });
 
