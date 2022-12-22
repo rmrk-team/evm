@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.16;
 
-import "./abstracts/RMRKAbstractEquippableImpl.sol";
+import "../abstracts/RMRKAbstractEquippableImpl.sol";
 
 error RMRKMintUnderpriced();
 

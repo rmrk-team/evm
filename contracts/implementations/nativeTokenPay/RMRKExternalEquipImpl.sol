@@ -2,8 +2,8 @@
 
 pragma solidity ^0.8.16;
 
-import "../RMRK/equippable/RMRKExternalEquip.sol";
-import "../RMRK/access/OwnableLock.sol";
+import "../../RMRK/equippable/RMRKExternalEquip.sol";
+import "../../RMRK/access/OwnableLock.sol";
 
 /**
  * @title RMRKExternalEquipImpl
@@ -18,6 +18,14 @@ contract RMRKExternalEquipImpl is OwnableLock, RMRKExternalEquip {
      * @param nestableAddress Address of the Nestable module of the external equip composite
      */
     constructor(address nestableAddress) RMRKExternalEquip(nestableAddress) {}
+
+    /**
+     * @notice Used to set the address of the `Nestable` smart contract.
+     * @param nestableAddress Address of the `Nestable` smart contract
+     */
+    function setNestableAddress(address nestableAddress) external onlyOwner {
+        _setNestableAddress(nestableAddress);
+    }
 
     /**
      * @notice Used to add an asset to a token.

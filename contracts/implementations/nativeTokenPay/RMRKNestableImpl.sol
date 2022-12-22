@@ -2,16 +2,16 @@
 
 pragma solidity ^0.8.16;
 
-import "./abstracts/RMRKAbstractMultiAssetImpl.sol";
+import "../abstracts/RMRKAbstractNestableImpl.sol";
 
 error RMRKMintUnderpriced();
 
 /**
- * @title RMRKMultiAssetImpl
+ * @title RMRKNestableImpl
  * @author RMRK team
- * @notice Implementation of RMRK multi asset module.
+ * @notice Implementation of RMRK nestable module.
  */
-contract RMRKMultiAssetImpl is RMRKAbstractMultiAssetImpl {
+contract RMRKNestableImpl is RMRKAbstractNestableImpl {
     /**
      * @notice Used to initialize the smart contract.
      * @dev The full `InitData` looks like this:
@@ -40,7 +40,7 @@ contract RMRKMultiAssetImpl is RMRKAbstractMultiAssetImpl {
         RMRKCollectionMetadata(collectionMetadata_)
         RMRKRoyalties(data.royaltyRecipient, data.royaltyPercentageBps)
         RMRKTokenURI(tokenURI_, data.tokenUriIsEnumerable)
-        RMRKMultiAsset(name_, symbol_)
+        RMRKNestable(name_, symbol_)
     {}
 
     /**
@@ -54,17 +54,7 @@ contract RMRKMultiAssetImpl is RMRKAbstractMultiAssetImpl {
         address to,
         uint256 numToMint
     ) public payable virtual notLocked {
-        if (numToMint == uint256(0)) revert RMRKMintZero();
-        if (numToMint + _totalSupply > _maxSupply) revert RMRKMintOverMax();
-
-        uint256 mintPriceRequired = numToMint * _pricePerMint;
-        if (mintPriceRequired != msg.value) revert RMRKMintUnderpriced();
-
-        uint256 nextToken = _totalSupply + 1;
-        unchecked {
-            _totalSupply += numToMint;
-        }
-        uint256 totalSupplyOffset = _totalSupply + 1;
+        (uint256 nextToken, uint256 totalSupplyOffset) = _preMint(numToMint);
 
         for (uint256 i = nextToken; i < totalSupplyOffset; ) {
             _safeMint(to, i, "");
@@ -72,5 +62,36 @@ contract RMRKMultiAssetImpl is RMRKAbstractMultiAssetImpl {
                 ++i;
             }
         }
+    }
+
+    /**
+     * @notice Used to mint a desired number of child tokens to a given parent token.
+     * @dev The `data` value of the `_safeMint` method is set to an empty value.
+     * @dev Can only be called while the open sale is open.
+     * @param to Address of the collection smart contract of the token into which to mint the child token
+     * @param numToMint Number of tokens to mint
+     * @param destinationId ID of the token into which to mint the new child token
+     */
+    function nestMint(
+        address to,
+        uint256 numToMint,
+        uint256 destinationId
+    ) public payable virtual notLocked {
+        (uint256 nextToken, uint256 totalSupplyOffset) = _preMint(numToMint);
+
+        for (uint256 i = nextToken; i < totalSupplyOffset; ) {
+            _nestMint(to, i, destinationId, "");
+            unchecked {
+                ++i;
+            }
+        }
+    }
+
+    /**
+     * @notice Used to verify and/or receive the payment for the mint.
+     * @param value The expected amount to be received for the mint
+     */
+    function _charge(uint256 value) internal virtual override {
+        if (value != msg.value) revert RMRKMintUnderpriced();
     }
 }

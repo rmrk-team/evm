@@ -28,23 +28,6 @@ Used to accept a pending asset of a given token.
 | index | uint256 | Index of the asset to accept in token&#39;s pending array |
 | assetId | uint64 | ID of the asset expected to be located at the specified index |
 
-### addAssetEntry
-
-```solidity
-function addAssetEntry(uint64 id, string metadataURI) external nonpayable
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| id | uint64 | undefined |
-| metadataURI | string | undefined |
-
 ### addAssetToToken
 
 ```solidity

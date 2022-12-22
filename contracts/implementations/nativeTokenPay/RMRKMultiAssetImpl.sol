@@ -2,18 +2,16 @@
 
 pragma solidity ^0.8.16;
 
-import "../abstracts/RMRKAbstractMultiAssetImpl.sol";
-import "./RMRKErc20Pay.sol";
+import "./../abstracts/RMRKAbstractMultiAssetImpl.sol";
+
+error RMRKMintUnderpriced();
 
 /**
- * @title RMRKMultiAssetImplErc20Pay
+ * @title RMRKMultiAssetImpl
  * @author RMRK team
- * @notice Implementation of RMRK multi asset module with ERC20 pay.
+ * @notice Implementation of RMRK multi asset module.
  */
-contract RMRKMultiAssetImplErc20Pay is
-    RMRKErc20Pay,
-    RMRKAbstractMultiAssetImpl
-{
+contract RMRKMultiAssetImpl is RMRKAbstractMultiAssetImpl {
     /**
      * @notice Used to initialize the smart contract.
      * @dev The full `InitData` looks like this:
@@ -42,7 +40,6 @@ contract RMRKMultiAssetImplErc20Pay is
         RMRKCollectionMetadata(collectionMetadata_)
         RMRKRoyalties(data.royaltyRecipient, data.royaltyPercentageBps)
         RMRKTokenURI(tokenURI_, data.tokenUriIsEnumerable)
-        RMRKErc20Pay(data.erc20TokenAddress)
         RMRKMultiAsset(name_, symbol_)
     {}
 
@@ -53,12 +50,16 @@ contract RMRKMultiAssetImplErc20Pay is
      * @param to Address to which to mint the token
      * @param numToMint Number of tokens to mint
      */
-    function mint(address to, uint256 numToMint) public virtual notLocked {
+    function mint(
+        address to,
+        uint256 numToMint
+    ) public payable virtual notLocked {
         if (numToMint == uint256(0)) revert RMRKMintZero();
         if (numToMint + _totalSupply > _maxSupply) revert RMRKMintOverMax();
 
         uint256 mintPriceRequired = numToMint * _pricePerMint;
-        _chargeFromToken(msg.sender, address(this), mintPriceRequired);
+        if (mintPriceRequired != msg.value) revert RMRKMintUnderpriced();
+
         uint256 nextToken = _totalSupply + 1;
         unchecked {
             _totalSupply += numToMint;
