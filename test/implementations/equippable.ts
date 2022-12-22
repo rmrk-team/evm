@@ -11,7 +11,7 @@ import {
   addAssetEntryEquippablesFromImpl,
   addAssetToToken,
   ADDRESS_ZERO,
-  mintFromImpl,
+  mintFromImplNativeToken,
   ONE_ETH,
 } from '../utils';
 import { RMRKEquippableImpl, RMRKMultiAssetRenderUtils } from '../../typechain-types';
@@ -94,6 +94,6 @@ describe('RMRKEquippableImpl Other', async function () {
   });
 
   shouldControlValidMinting();
-  shouldHaveRoyalties(mintFromImpl);
-  shouldHaveMetadata(mintFromImpl, isTokenUriEnumerated);
+  shouldHaveRoyalties(mintFromImplNativeToken);
+  shouldHaveMetadata(mintFromImplNativeToken, isTokenUriEnumerated);
 });

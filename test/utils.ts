@@ -38,7 +38,7 @@ async function mintFromImplErc20Pay(token: Contract, to: string): Promise<number
   return await token.totalSupply();
 }
 
-async function mintFromImpl(token: Contract, to: string): Promise<number> {
+async function mintFromImplNativeToken(token: Contract, to: string): Promise<number> {
   await token.mint(to, 1, { value: ONE_ETH });
   return await token.totalSupply();
 }
@@ -60,7 +60,7 @@ async function nestMintFromImplErc20Pay(
   return await token.totalSupply();
 }
 
-async function nestMintFromImpl(
+async function nestMintFromImplNativeToken(
   token: Contract,
   to: string,
   destinationId: number,
@@ -174,10 +174,10 @@ export {
   addAssetToToken,
   ADDRESS_ZERO,
   bn,
-  mintFromImpl,
+  mintFromImplNativeToken,
   mintFromImplErc20Pay,
   mintFromMock,
-  nestMintFromImpl,
+  nestMintFromImplNativeToken,
   nestMintFromImplErc20Pay,
   nestMintFromMock,
   nestTransfer,

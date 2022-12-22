@@ -1,16 +1,9 @@
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import {
-  ADDRESS_ZERO,
-  mintFromImplErc20Pay,
-  nestMintFromImplErc20Pay,
-  ONE_ETH,
-  singleFixtureWithArgs,
-} from '../utils';
+import { ADDRESS_ZERO, ONE_ETH, singleFixtureWithArgs } from '../utils';
 import { Contract } from 'ethers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import { ERC20Mock } from '../../typechain-types';
 
 async function multiAssetFixture(): Promise<Contract> {
   return await singleFixtureWithArgs('RMRKMultiAssetImplPreMint', [
@@ -103,6 +96,13 @@ async function shouldControlValidPreMinting(): Promise<void> {
     await expect(this.token.connect(owner).mint(addrs[0].address, 1)).to.be.emit(
       this.token,
       'Transfer',
+    );
+  });
+
+  it('cannot mint 0 units', async function () {
+    await expect(this.token.mint(addrs[0].address, 0)).to.be.revertedWithCustomError(
+      this.token,
+      'RMRKMintZero',
     );
   });
 

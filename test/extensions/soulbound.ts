@@ -4,7 +4,7 @@ import { expect } from 'chai';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { bn, mintFromMock, nestMintFromMock } from '../utils';
-import { IERC165, IRMRKSoulboundMultiAsset, IOtherInterface } from '../interfaces';
+import { IERC165, IRMRKSoulbound, IOtherInterface } from '../interfaces';
 import { RMRKSemiSoulboundNestableMock } from '../../typechain-types';
 
 // --------------- FIXTURES -----------------------
@@ -120,6 +120,10 @@ describe('RMRKSoulbound exempt', async function () {
     await token.deployed();
   });
 
+  it('can support IRMRKSoulbound', async function () {
+    expect(await token.supportsInterface(IRMRKSoulbound)).to.equal(true);
+  });
+
   it('can transfer if soulbound exempt', async function () {
     const tokenId = await mintFromMock(token, owner.address);
     await token.setSoulboundExempt(tokenId);
@@ -169,8 +173,8 @@ async function shouldBehaveLikeSoulboundBasic() {
     expect(await soulbound.supportsInterface(IERC165)).to.equal(true);
   });
 
-  it('can support IRMRKSoulboundMultiAsset', async function () {
-    expect(await soulbound.supportsInterface(IRMRKSoulboundMultiAsset)).to.equal(true);
+  it('can support IRMRKSoulbound', async function () {
+    expect(await soulbound.supportsInterface(IRMRKSoulbound)).to.equal(true);
   });
 
   it('does not support other interfaces', async function () {

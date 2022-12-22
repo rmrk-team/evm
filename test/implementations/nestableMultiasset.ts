@@ -12,8 +12,8 @@ import {
   addAssetEntryFromImpl,
   addAssetToToken,
   ADDRESS_ZERO,
-  mintFromImpl,
-  nestMintFromImpl,
+  mintFromImplNativeToken,
+  nestMintFromImplNativeToken,
   nestTransfer,
   ONE_ETH,
   parentChildFixtureWithArgs,
@@ -71,7 +71,12 @@ describe('NestableMultiAssetImpl Nestable Behavior', function () {
     this.childToken = child;
   });
 
-  shouldBehaveLikeNestable(mintFromImpl, nestMintFromImpl, transfer, nestTransfer);
+  shouldBehaveLikeNestable(
+    mintFromImplNativeToken,
+    nestMintFromImplNativeToken,
+    transfer,
+    nestTransfer,
+  );
 });
 
 describe('NestableMultiAssetImpl MR behavior', async () => {
@@ -81,7 +86,7 @@ describe('NestableMultiAssetImpl MR behavior', async () => {
     this.renderUtils = renderUtils;
   });
 
-  shouldBehaveLikeMultiAsset(mintFromImpl, addAssetEntryFromImpl, addAssetToToken);
+  shouldBehaveLikeMultiAsset(mintFromImplNativeToken, addAssetEntryFromImpl, addAssetToToken);
 });
 
 describe('NestableMultiAssetImpl Other Behavior', function () {
@@ -101,7 +106,7 @@ describe('NestableMultiAssetImpl Other Behavior', function () {
       const tokenOwner = addrs[1];
       const newOwner = addrs[2];
       const approved = addrs[3];
-      const tokenId = await mintFromImpl(token, tokenOwner.address);
+      const tokenId = await mintFromImplNativeToken(token, tokenOwner.address);
       await token.connect(tokenOwner).approve(approved.address, tokenId);
       await token.connect(tokenOwner).approveForAssets(approved.address, tokenId);
 
@@ -117,7 +122,7 @@ describe('NestableMultiAssetImpl Other Behavior', function () {
     it('cleans token and assets approvals on burn', async function () {
       const tokenOwner = addrs[1];
       const approved = addrs[3];
-      const tokenId = await mintFromImpl(token, tokenOwner.address);
+      const tokenId = await mintFromImplNativeToken(token, tokenOwner.address);
       await token.connect(tokenOwner).approve(approved.address, tokenId);
       await token.connect(tokenOwner).approveForAssets(approved.address, tokenId);
 
@@ -160,6 +165,6 @@ describe('NestableMultiAssetImpl Other', async function () {
   });
 
   shouldControlValidMinting();
-  shouldHaveRoyalties(mintFromImpl);
-  shouldHaveMetadata(mintFromImpl, isTokenUriEnumerated);
+  shouldHaveRoyalties(mintFromImplNativeToken);
+  shouldHaveMetadata(mintFromImplNativeToken, isTokenUriEnumerated);
 });

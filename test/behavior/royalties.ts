@@ -23,6 +23,13 @@ async function shouldHaveRoyalties(
     await this.token.updateRoyaltyRecipient(newRecipient.address);
     expect(await this.token.getRoyaltyRecipient()).to.eql(newRecipient.address);
   });
+
+  it('cannot update royalty receipient if not owner', async function () {
+    const newRecipient = (await ethers.getSigners())[5];
+    await expect(
+      this.token.connect(newRecipient).updateRoyaltyRecipient(newRecipient.address),
+    ).to.be.revertedWithCustomError(this.token, 'RMRKNotOwner');
+  });
 }
 
 export default shouldHaveRoyalties;

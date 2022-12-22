@@ -8,8 +8,8 @@ import shouldHaveMetadata from '../behavior/metadata';
 import shouldHaveRoyalties from '../behavior/royalties';
 import {
   ADDRESS_ZERO,
-  mintFromImpl,
-  nestMintFromImpl,
+  mintFromImplNativeToken,
+  nestMintFromImplNativeToken,
   nestTransfer,
   ONE_ETH,
   parentChildFixtureWithArgs,
@@ -56,7 +56,12 @@ describe('NestableImpl Nestable Behavior', function () {
     this.childToken = child;
   });
 
-  shouldBehaveLikeNestable(mintFromImpl, nestMintFromImpl, transfer, nestTransfer);
+  shouldBehaveLikeNestable(
+    mintFromImplNativeToken,
+    nestMintFromImplNativeToken,
+    transfer,
+    nestTransfer,
+  );
 });
 
 describe('NestableImpl Other', async function () {
@@ -65,6 +70,6 @@ describe('NestableImpl Other', async function () {
   });
 
   shouldControlValidMinting();
-  shouldHaveRoyalties(mintFromImpl);
-  shouldHaveMetadata(mintFromImpl, isTokenUriEnumerated);
+  shouldHaveRoyalties(mintFromImplNativeToken);
+  shouldHaveMetadata(mintFromImplNativeToken, isTokenUriEnumerated);
 });

@@ -20,7 +20,6 @@ async function shouldBehaveLikeMultiAsset(
   let approved: SignerWithAddress;
   let operator: SignerWithAddress;
   let notApproved: SignerWithAddress;
-  const metaURIDefault = 'metaURI';
 
   before(async () => {
     const [, ...signersAddr] = await ethers.getSigners();

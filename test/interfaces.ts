@@ -1,5 +1,6 @@
 const IERC165 = '0x01ffc9a7';
 const IERC721 = '0x80ac58cd';
+const IERC721Metadata = '0x5b5e139f';
 const IOtherInterface = '0xffffffff';
 const IRMRKBaseStorage = '0xd912401f';
 const IRMRKEquippable = '0xd239c420';
@@ -9,13 +10,14 @@ const IRMRKNestable = '0x42b0e56f';
 const IRMRKNestableAutoIndex = '0x1884d52d';
 const IRMRKNestableExternalEquip = '0x8b7f3e99';
 const IRMRKReclaimableChild = '0x2fb59acf';
-const IRMRKSoulboundMultiAsset = '0x911ec470';
+const IRMRKSoulbound = '0x911ec470';
 const IRMRKTokenProperties = '0x6a49fd01';
 const IRMRKTypedMultiAsset = '0x7f7bb665';
 
 export {
   IERC165,
   IERC721,
+  IERC721Metadata,
   IOtherInterface,
   IRMRKBaseStorage,
   IRMRKEquippable,
@@ -25,7 +27,7 @@ export {
   IRMRKNestableAutoIndex,
   IRMRKNestableExternalEquip,
   IRMRKReclaimableChild,
-  IRMRKSoulboundMultiAsset,
+  IRMRKSoulbound,
   IRMRKTypedMultiAsset,
   IRMRKTokenProperties,
 };

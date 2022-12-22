@@ -72,6 +72,12 @@ describe('Minting Utils', async () => {
       expect(await mintingUtils.connect(owner).isContributor(contributor.address)).to.eql(false);
     });
 
+    it('cannot add zero address as contributor', async function () {
+      await expect(
+        mintingUtils.connect(owner).addContributor(ethers.constants.AddressZero),
+      ).to.be.revertedWithCustomError(mintingUtils, 'RMRKNewContributorIsZeroAddress');
+    });
+
     it('cannot do owner operations if not owner', async function () {
       const notOwner = addrs[1];
       const otherUser = addrs[2];
