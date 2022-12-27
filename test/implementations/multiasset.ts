@@ -115,6 +115,18 @@ describe('MultiAssetImpl Other', async function () {
     this.token = token;
   });
 
+  it('can only burn if owner', async function () {
+    const [owner, notOwner] = await ethers.getSigners();
+    const tokenId = await mintFromImplNativeToken(this.token, owner.address);
+    await expect(this.token.connect(notOwner).burn(tokenId)).to.be.revertedWithCustomError(
+      this.token,
+      'ERC721NotApprovedOrOwner',
+    );
+    await expect(this.token.connect(owner).burn(tokenId))
+      .to.emit(this.token, 'Transfer')
+      .withArgs(owner.address, ADDRESS_ZERO, tokenId);
+  });
+
   shouldControlValidMinting();
   shouldHaveRoyalties(mintFromImplNativeToken);
   shouldHaveMetadata(mintFromImplNativeToken, isTokenUriEnumerated);
