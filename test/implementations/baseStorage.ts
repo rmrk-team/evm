@@ -35,10 +35,42 @@ describe('BaseStorageImpl', async () => {
       base = await loadFixture(baseFixture);
     });
 
-    it('cannot add part if not owner or contributor', async function () {
+    it('cannot do admin operations if not owner or contributor', async function () {
       await expect(
         base.connect(other).addPart({ partId: partId, part: partData }),
       ).to.be.revertedWithCustomError(base, 'RMRKNotOwnerOrContributor');
+
+      await expect(
+        base.connect(other).addPartList([{ partId: partId, part: partData }]),
+      ).to.be.revertedWithCustomError(base, 'RMRKNotOwnerOrContributor');
+
+      await expect(
+        base.connect(other).addEquippableAddresses(partId, [other.address]),
+      ).to.be.revertedWithCustomError(base, 'RMRKNotOwnerOrContributor');
+
+      await expect(
+        base.connect(other).setEquippableAddresses(partId, [other.address]),
+      ).to.be.revertedWithCustomError(base, 'RMRKNotOwnerOrContributor');
+
+      await expect(base.connect(other).setEquippableToAll(partId)).to.be.revertedWithCustomError(
+        base,
+        'RMRKNotOwnerOrContributor',
+      );
+
+      await expect(
+        base.connect(other).resetEquippableAddresses(partId),
+      ).to.be.revertedWithCustomError(base, 'RMRKNotOwnerOrContributor');
+    });
+
+    it('cannot add parts if locked', async function () {
+      await base.setLock();
+      await expect(
+        base.connect(owner).addPart({ partId: partId, part: partData }),
+      ).to.be.revertedWithCustomError(base, 'RMRKLocked');
+
+      await expect(
+        base.connect(owner).addPartList([{ partId: partId, part: partData }]),
+      ).to.be.revertedWithCustomError(base, 'RMRKLocked');
     });
 
     it('can add part if owner', async function () {

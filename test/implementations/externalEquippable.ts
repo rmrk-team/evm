@@ -78,11 +78,14 @@ describe('ExternalEquippableImpl Other', async function () {
   let nestable: RMRKNestableExternalEquipImpl;
   let equip: RMRKExternalEquipImpl;
   let owner: SignerWithAddress;
+  let contributor: SignerWithAddress;
+  let addrs: SignerWithAddress[];
 
   beforeEach(async function () {
     ({ nestable, equip } = await loadFixture(equipFixture));
     this.token = nestable;
-    owner = (await ethers.getSigners())[0];
+    [owner, contributor, ...addrs] = await ethers.getSigners();
+    await equip.addContributor(contributor.address);
   });
 
   it('auto accepts resource if send is token owner', async function () {
@@ -96,7 +99,7 @@ describe('ExternalEquippableImpl Other', async function () {
     expect(await equip.getActiveAssets(tokenId)).to.be.eql([assetId]);
   });
 
-  it('cannot set equippable address if not owner', async function () {
+  it('cannot set equippable or nestable address if not owner', async function () {
     const [, notOwner, otherAddress] = await ethers.getSigners();
     await expect(
       nestable.connect(notOwner).setEquippableAddress(otherAddress.address),
@@ -105,6 +108,57 @@ describe('ExternalEquippableImpl Other', async function () {
     await expect(
       equip.connect(notOwner).setNestableAddress(otherAddress.address),
     ).to.be.revertedWithCustomError(nestable, 'RMRKNotOwner');
+  });
+
+  it('can set equippable or nestable address if owner', async function () {
+    const [, newContract] = await ethers.getSigners();
+    await expect(nestable.connect(owner).setEquippableAddress(newContract.address)).to.emit(
+      nestable,
+      'EquippableAddressSet',
+    );
+
+    await expect(equip.connect(owner).setNestableAddress(newContract.address)).to.emit(
+      equip,
+      'NestableAddressSet',
+    );
+  });
+
+  it('can add asset entry if owner or contributor', async function () {
+    await expect(equip.connect(owner).addAssetEntry('ipfs://test')).to.emit(equip, 'AssetSet');
+    await expect(equip.connect(contributor).addAssetEntry('ipfs://test2')).to.emit(
+      equip,
+      'AssetSet',
+    );
+  });
+
+  it('can set valid parent for equippable group if owner or contributor', async function () {
+    await expect(
+      equip.connect(owner).setValidParentForEquippableGroup(1, addrs[0].address, 1),
+    ).to.emit(equip, 'ValidParentEquippableGroupIdSet');
+    await expect(
+      equip.connect(contributor).setValidParentForEquippableGroup(1, addrs[0].address, 1),
+    ).to.emit(equip, 'ValidParentEquippableGroupIdSet');
+  });
+
+  it('cannot do admin functions if not owner or contributor', async function () {
+    const otherSigner = addrs[0];
+    await nestable.mint(owner.address, 1, { value: ONE_ETH.mul(1) });
+    await equip.addAssetEntry('ipfs://test');
+    const assetId = await equip.totalAssets();
+    const tokenId = await nestable.totalSupply();
+
+    await expect(
+      equip.connect(otherSigner).addAssetToToken(tokenId, assetId, 0),
+    ).to.be.revertedWithCustomError(equip, 'RMRKNotOwnerOrContributor');
+    await expect(
+      equip.connect(otherSigner).addAssetEntry('ipfs://test'),
+    ).to.be.revertedWithCustomError(equip, 'RMRKNotOwnerOrContributor');
+    await expect(
+      equip.connect(otherSigner).addEquippableAssetEntry(0, ADDRESS_ZERO, 'ipfs://test', []),
+    ).to.be.revertedWithCustomError(equip, 'RMRKNotOwnerOrContributor');
+    await expect(
+      equip.connect(otherSigner).setValidParentForEquippableGroup(1, addrs[1].address, 1),
+    ).to.be.revertedWithCustomError(equip, 'RMRKNotOwnerOrContributor');
   });
 
   shouldControlValidMinting();
