@@ -15,7 +15,7 @@ import shouldBehaveLikeEquippableWithParts from './behavior/equippableParts';
 import shouldBehaveLikeEquippableWithSlots from './behavior/equippableSlots';
 import shouldBehaveLikeMultiAsset from './behavior/multiasset';
 import {
-  RMRKBaseStorageMock,
+  RMRKCatalogMock,
   RMRKEquipRenderUtils,
   RMRKExternalEquipMock,
   RMRKMultiAssetRenderUtils,
@@ -25,8 +25,8 @@ import {
 // --------------- FIXTURES -----------------------
 
 async function partsFixture() {
-  const baseSymbol = 'NCB';
-  const baseType = 'mixed';
+  const catalogSymbol = 'NCB';
+  const catalogType = 'mixed';
 
   const neonName = 'NeonCrisis';
   const neonSymbol = 'NC';
@@ -34,14 +34,14 @@ async function partsFixture() {
   const maskName = 'NeonMask';
   const maskSymbol = 'NM';
 
-  const baseFactory = await ethers.getContractFactory('RMRKBaseStorageMock');
+  const catalogFactory = await ethers.getContractFactory('RMRKCatalogMock');
   const nestableFactory = await ethers.getContractFactory('RMRKNestableExternalEquipMock');
   const equipFactory = await ethers.getContractFactory('RMRKExternalEquipMock');
   const viewFactory = await ethers.getContractFactory('RMRKEquipRenderUtils');
 
-  // Base
-  const base = <RMRKBaseStorageMock>await baseFactory.deploy(baseSymbol, baseType);
-  await base.deployed();
+  // Catalog
+  const catalog = <RMRKCatalogMock>await catalogFactory.deploy(catalogSymbol, catalogType);
+  await catalog.deployed();
 
   // Neon token
   const neon = <RMRKNestableExternalEquipMock>await nestableFactory.deploy(neonName, neonSymbol);
@@ -69,7 +69,7 @@ async function partsFixture() {
   await mask.setEquippableAddress(maskEquip.address);
 
   await setupContextForParts(
-    base,
+    catalog,
     neon,
     neonEquip,
     mask,
@@ -77,12 +77,12 @@ async function partsFixture() {
     mintFromMock,
     nestMintFromMock,
   );
-  return { base, neon, neonEquip, mask, maskEquip, view };
+  return { catalog, neon, neonEquip, mask, maskEquip, view };
 }
 
 async function slotsFixture() {
-  const baseSymbol = 'SSB';
-  const baseType = 'mixed';
+  const catalogSymbol = 'SSB';
+  const catalogType = 'mixed';
 
   const soldierName = 'SnakeSoldier';
   const soldierSymbol = 'SS';
@@ -96,7 +96,7 @@ async function slotsFixture() {
   const backgroundName = 'SnakeBackground';
   const backgroundSymbol = 'SB';
 
-  const baseFactory = await ethers.getContractFactory('RMRKBaseStorageMock');
+  const catalogFactory = await ethers.getContractFactory('RMRKCatalogMock');
   const nestableFactory = await ethers.getContractFactory('RMRKNestableExternalEquipMock');
   const equipFactory = await ethers.getContractFactory('RMRKExternalEquipMock');
   const viewFactory = await ethers.getContractFactory('RMRKEquipRenderUtils');
@@ -105,9 +105,9 @@ async function slotsFixture() {
   const view = await viewFactory.deploy();
   await view.deployed();
 
-  // Base
-  const base = <RMRKBaseStorageMock>await baseFactory.deploy(baseSymbol, baseType);
-  await base.deployed();
+  // catalog
+  const catalog = <RMRKCatalogMock>await catalogFactory.deploy(catalogSymbol, catalogType);
+  await catalog.deployed();
 
   // Soldier token
   const soldier = <RMRKNestableExternalEquipMock>(
@@ -149,7 +149,7 @@ async function slotsFixture() {
   await background.setEquippableAddress(backgroundEquip.address);
 
   await setupContextForSlots(
-    base,
+    catalog,
     soldier,
     soldierEquip,
     weapon,
@@ -163,7 +163,7 @@ async function slotsFixture() {
   );
 
   return {
-    base,
+    catalog,
     soldier,
     soldierEquip,
     weapon,
@@ -222,9 +222,9 @@ async function multiAssetFixture() {
 
 describe('ExternalEquippableMock with Parts', async () => {
   beforeEach(async function () {
-    const { base, neon, neonEquip, mask, maskEquip, view } = await loadFixture(partsFixture);
+    const { catalog, neon, neonEquip, mask, maskEquip, view } = await loadFixture(partsFixture);
 
-    this.base = base;
+    this.catalog = catalog;
     this.neon = neon;
     this.neonEquip = neonEquip;
     this.mask = mask;
@@ -238,7 +238,7 @@ describe('ExternalEquippableMock with Parts', async () => {
 describe('ExternalEquippableMock with Slots', async () => {
   beforeEach(async function () {
     const {
-      base,
+      catalog,
       soldier,
       soldierEquip,
       weapon,
@@ -250,7 +250,7 @@ describe('ExternalEquippableMock with Slots', async () => {
       view,
     } = await loadFixture(slotsFixture);
 
-    this.base = base;
+    this.catalog = catalog;
     this.soldier = soldier;
     this.soldierEquip = soldierEquip;
     this.weapon = weapon;

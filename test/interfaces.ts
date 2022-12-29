@@ -2,7 +2,7 @@ const IERC165 = '0x01ffc9a7';
 const IERC721 = '0x80ac58cd';
 const IERC721Metadata = '0x5b5e139f';
 const IOtherInterface = '0xffffffff';
-const IRMRKBaseStorage = '0xd912401f';
+const IRMRKCatalog = '0xd912401f';
 const IRMRKEquippable = '0xd239c420';
 const IRMRKExternalEquip = '0x289dfee5';
 const IRMRKMultiAsset = '0xd1526708';
@@ -19,7 +19,7 @@ export {
   IERC721,
   IERC721Metadata,
   IOtherInterface,
-  IRMRKBaseStorage,
+  IRMRKCatalog,
   IRMRKEquippable,
   IRMRKExternalEquip,
   IRMRKMultiAsset,

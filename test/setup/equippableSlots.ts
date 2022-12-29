@@ -33,7 +33,7 @@ enum ItemType {
 let addrs: SignerWithAddress[];
 
 async function setupContextForSlots(
-  base: Contract,
+  catalog: Contract,
   soldier: Contract,
   soldierEquip: Contract,
   weapon: Contract,
@@ -48,7 +48,7 @@ async function setupContextForSlots(
   const [, ...signersAddr] = await ethers.getSigners();
   addrs = signersAddr;
 
-  await setupBase();
+  await setupCatalog();
 
   await mintSoldiers();
   await mintWeapons();
@@ -61,7 +61,7 @@ async function setupContextForSlots(
   await addAssetsToBackground();
 
   return {
-    base,
+    catalog,
     soldier,
     soldierEquip,
     weapon,
@@ -72,7 +72,7 @@ async function setupContextForSlots(
     backgroundEquip,
   };
 
-  async function setupBase(): Promise<void> {
+  async function setupCatalog(): Promise<void> {
     const partForBody = {
       itemType: ItemType.Fixed,
       z: 1,
@@ -98,7 +98,7 @@ async function setupContextForSlots(
       metadataURI: 'noBackground.png',
     };
 
-    await base.addPartList([
+    await catalog.addPartList([
       { partId: partIdForBody, part: partForBody },
       { partId: partIdForWeapon, part: partForWeapon },
       { partId: partIdForWeaponGem, part: partForWeaponGem },
@@ -150,7 +150,7 @@ async function setupContextForSlots(
   }
 
   async function addAssetsToSoldier(): Promise<void> {
-    await soldierEquip.addEquippableAssetEntry(soldierResId, 0, base.address, 'ipfs:soldier/', [
+    await soldierEquip.addEquippableAssetEntry(soldierResId, 0, catalog.address, 'ipfs:soldier/', [
       partIdForBody,
       partIdForWeapon,
       partIdForBackground,
@@ -177,7 +177,7 @@ async function setupContextForSlots(
       await weaponEquip.addEquippableAssetEntry(
         weaponAssetsEquip[i],
         equippableGroupId,
-        base.address,
+        catalog.address,
         `ipfs:weapon/equip/${weaponAssetsEquip[i]}`,
         [partIdForWeaponGem],
       );
@@ -216,7 +216,7 @@ async function setupContextForSlots(
     await weaponGemEquip.addEquippableAssetEntry(
       weaponGemAssetEquip,
       equippableGroupId,
-      base.address,
+      catalog.address,
       'ipfs:weagponGem/equip/',
       [],
     );
@@ -244,7 +244,7 @@ async function setupContextForSlots(
     await backgroundEquip.addEquippableAssetEntry(
       backgroundAssetId,
       equippableGroupId,
-      base.address,
+      catalog.address,
       'ipfs:background/',
       [],
     );
