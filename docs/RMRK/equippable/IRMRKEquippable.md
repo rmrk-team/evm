@@ -139,7 +139,7 @@ Used to retrieve the address of the account approved to manage assets of a given
 ### getAssetAndEquippableData
 
 ```solidity
-function getAssetAndEquippableData(uint256 tokenId, uint64 assetId) external view returns (string metadataURI, uint64 equippableGroupId, address baseAddress, uint64[] partIds)
+function getAssetAndEquippableData(uint256 tokenId, uint64 assetId) external view returns (string metadataURI, uint64 equippableGroupId, address catalogAddress, uint64[] partIds)
 ```
 
 Used to get the asset and equippable data associated with given `assetId`.
@@ -159,7 +159,7 @@ Used to get the asset and equippable data associated with given `assetId`.
 |---|---|---|
 | metadataURI | string | The metadata URI of the asset |
 | equippableGroupId | uint64 | ID of the equippable group this asset belongs to |
-| baseAddress | address | The address of the base the part belongs to |
+| catalogAddress | address | The address of the catalog the part belongs to |
 | partIds | uint64[] | An array of IDs of parts included in the asset |
 
 ### getAssetMetadata
@@ -211,7 +211,7 @@ Used to retrieve the asset that will be replaced if a given asset from the token
 ### getEquipment
 
 ```solidity
-function getEquipment(uint256 tokenId, address targetBaseAddress, uint64 slotPartId) external view returns (struct IRMRKEquippable.Equipment)
+function getEquipment(uint256 tokenId, address targetcatalogAddress, uint64 slotPartId) external view returns (struct IRMRKEquippable.Equipment)
 ```
 
 Used to get the Equipment object equipped into the specified slot of the desired token.
@@ -223,7 +223,7 @@ Used to get the Equipment object equipped into the specified slot of the desired
 | Name | Type | Description |
 |---|---|---|
 | tokenId | uint256 | ID of the token for which we are retrieving the equipped object |
-| targetBaseAddress | address | Address of the `Base` associated with the `Slot` part of the token |
+| targetcatalogAddress | address | Address of the `Catalog` associated with the `Slot` part of the token |
 | slotPartId | uint64 | ID of the `Slot` part that we are checking for equipped objects |
 
 #### Returns
@@ -574,7 +574,7 @@ Used to notify listeners that the assets belonging to a `equippableGroupId` have
 | Name | Type | Description |
 |---|---|---|
 | equippableGroupId `indexed` | uint64 | ID of the equippable group being marked as equippable into the slot associated with  `slotPartId` of the `parentAddress` collection |
-| slotPartId `indexed` | uint64 | ID of the slot part of the base into which the parts belonging to the equippable group  associated with `equippableGroupId` can be equipped |
+| slotPartId `indexed` | uint64 | ID of the slot part of the catalog into which the parts belonging to the equippable group  associated with `equippableGroupId` can be equipped |
 | parentAddress  | address | Address of the collection into which the parts belonging to `equippableGroupId` can be  equipped |
 
 

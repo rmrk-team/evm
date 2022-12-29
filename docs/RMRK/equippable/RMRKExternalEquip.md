@@ -175,7 +175,7 @@ Used to get the asset and equippable data associated with given `assetId`.
 |---|---|---|
 | _0 | string | The metadata URI of the asset |
 | _1 | uint64 | ID of the equippable group this asset belongs to |
-| _2 | address | The address of the base the part belongs to |
+| _2 | address | The address of the catalog the part belongs to |
 | _3 | uint64[] | An array of IDs of parts included in the asset |
 
 ### getAssetMetadata
@@ -227,7 +227,7 @@ Used to retrieve the asset that will be replaced if a given asset from the token
 ### getEquipment
 
 ```solidity
-function getEquipment(uint256 tokenId, address targetBaseAddress, uint64 slotPartId) external view returns (struct IRMRKEquippable.Equipment)
+function getEquipment(uint256 tokenId, address targetcatalogAddress, uint64 slotPartId) external view returns (struct IRMRKEquippable.Equipment)
 ```
 
 Used to get the Equipment object equipped into the specified slot of the desired token.
@@ -239,7 +239,7 @@ Used to get the Equipment object equipped into the specified slot of the desired
 | Name | Type | Description |
 |---|---|---|
 | tokenId | uint256 | ID of the token for which we are retrieving the equipped object |
-| targetBaseAddress | address | Address of the `Base` associated with the `Slot` part of the token |
+| targetcatalogAddress | address | Address of the `Catalog` associated with the `Slot` part of the token |
 | slotPartId | uint64 | ID of the `Slot` part that we are checking for equipped objects |
 
 #### Returns
@@ -704,13 +704,13 @@ Attempting to set the priorities with an array of length that doesn&#39;t match 
 
 
 
-### RMRKEquippableEquipNotAllowedByBase
+### RMRKEquippableEquipNotAllowedByCatalog
 
 ```solidity
-error RMRKEquippableEquipNotAllowedByBase()
+error RMRKEquippableEquipNotAllowedByCatalog()
 ```
 
-Attempting to equip a `Part` with a child not approved by the base
+Attempting to equip a `Part` with a child not approved by the Catalog
 
 
 

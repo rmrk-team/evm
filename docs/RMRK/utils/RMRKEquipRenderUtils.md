@@ -13,7 +13,7 @@ Smart contract of the RMRK Equip render utils module.
 ### composeEquippables
 
 ```solidity
-function composeEquippables(address target, uint256 tokenId, uint64 assetId) external view returns (string metadataURI, uint64 equippableGroupId, address baseAddress, struct RMRKEquipRenderUtils.FixedPart[] fixedParts, struct RMRKEquipRenderUtils.EquippedSlotPart[] slotParts)
+function composeEquippables(address target, uint256 tokenId, uint64 assetId) external view returns (string metadataURI, uint64 equippableGroupId, address catalogAddress, struct RMRKEquipRenderUtils.FixedPart[] fixedParts, struct RMRKEquipRenderUtils.EquippedSlotPart[] slotParts)
 ```
 
 Used to compose the given equippables.
@@ -34,7 +34,7 @@ Used to compose the given equippables.
 |---|---|---|
 | metadataURI | string | Metadata URI of the asset |
 | equippableGroupId | uint64 | Equippable group ID of the asset |
-| baseAddress | address | Address of the base to which the asset belongs to |
+| catalogAddress | address | Address of the catalog to which the asset belongs to |
 | fixedParts | RMRKEquipRenderUtils.FixedPart[] | An array of fixed parts respresented by the `FixedPart` structs present on the asset |
 | slotParts | RMRKEquipRenderUtils.EquippedSlotPart[] | An array of slot parts represented by the `EquippedSlotPart` structs present on the asset |
 
@@ -71,7 +71,7 @@ function getExtendedActiveAssets(address target, uint256 tokenId) external view 
 
 Used to get extended active assets of the given token.
 
-*The full `ExtendedActiveAsset` looks like this:  [      ID,      equippableGroupId,      priority,      baseAddress,      metadata,      [          fixedPartId0,          fixedPartId1,          fixedPartId2,          slotPartId0,          slotPartId1,          slotPartId2      ]  ]*
+*The full `ExtendedActiveAsset` looks like this:  [      ID,      equippableGroupId,      priority,      catalogAddress,      metadata,      [          fixedPartId0,          fixedPartId1,          fixedPartId2,          slotPartId0,          slotPartId1,          slotPartId2      ]  ]*
 
 #### Parameters
 
@@ -94,7 +94,7 @@ function getExtendedPendingAssets(address target, uint256 tokenId) external view
 
 Used to get the extended pending assets of the given token.
 
-*The full `ExtendedPendingAsset` looks like this:  [      ID,      equippableGroupId,      acceptRejectIndex,      replacesAssetWithId,      baseAddress,      metadata,      [          fixedPartId0,          fixedPartId1,          fixedPartId2,          slotPartId0,          slotPartId1,          slotPartId2      ]  ]*
+*The full `ExtendedPendingAsset` looks like this:  [      ID,      equippableGroupId,      acceptRejectIndex,      replacesAssetWithId,      catalogAddress,      metadata,      [          fixedPartId0,          fixedPartId1,          fixedPartId2,          slotPartId0,          slotPartId1,          slotPartId2      ]  ]*
 
 #### Parameters
 
@@ -112,7 +112,7 @@ Used to get the extended pending assets of the given token.
 ### splitSlotAndFixedParts
 
 ```solidity
-function splitSlotAndFixedParts(uint64[] allPartIds, address baseAddress) external view returns (uint64[] slotPartIds, uint64[] fixedPartIds)
+function splitSlotAndFixedParts(uint64[] allPartIds, address catalogAddress) external view returns (uint64[] slotPartIds, uint64[] fixedPartIds)
 ```
 
 Used to split slot and fixed parts.
@@ -124,7 +124,7 @@ Used to split slot and fixed parts.
 | Name | Type | Description |
 |---|---|---|
 | allPartIds | uint64[] | [] An array of `Part` IDs containing both, `Slot` and `Fixed` parts |
-| baseAddress | address | An address of the base to which the given `Part`s belong to |
+| catalogAddress | address | An address of the catalog to which the given `Part`s belong to |
 
 #### Returns
 
@@ -144,7 +144,7 @@ Used to split slot and fixed parts.
 error RMRKNotComposableAsset()
 ```
 
-Attempting to compose an asset wihtout having an associated Base
+Attempting to compose an asset wihtout having an associated Catalog
 
 
 
