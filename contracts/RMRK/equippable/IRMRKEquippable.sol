@@ -133,13 +133,13 @@ interface IRMRKEquippable is IRMRKMultiAsset {
      *      childEquippableAddress
      *  ]
      * @param tokenId ID of the token for which we are retrieving the equipped object
-     * @param targetcatalogAddress Address of the `Catalog` associated with the `Slot` part of the token
+     * @param targetCatalogAddress Address of the `Catalog` associated with the `Slot` part of the token
      * @param slotPartId ID of the `Slot` part that we are checking for equipped objects
      * @return struct The `Equipment` struct containing data about the equipped object
      */
     function getEquipment(
         uint256 tokenId,
-        address targetcatalogAddress,
+        address targetCatalogAddress,
         uint64 slotPartId
     ) external view returns (Equipment memory);
 

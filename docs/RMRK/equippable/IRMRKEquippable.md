@@ -211,7 +211,7 @@ Used to retrieve the asset that will be replaced if a given asset from the token
 ### getEquipment
 
 ```solidity
-function getEquipment(uint256 tokenId, address targetcatalogAddress, uint64 slotPartId) external view returns (struct IRMRKEquippable.Equipment)
+function getEquipment(uint256 tokenId, address targetCatalogAddress, uint64 slotPartId) external view returns (struct IRMRKEquippable.Equipment)
 ```
 
 Used to get the Equipment object equipped into the specified slot of the desired token.
@@ -223,7 +223,7 @@ Used to get the Equipment object equipped into the specified slot of the desired
 | Name | Type | Description |
 |---|---|---|
 | tokenId | uint256 | ID of the token for which we are retrieving the equipped object |
-| targetcatalogAddress | address | Address of the `Catalog` associated with the `Slot` part of the token |
+| targetCatalogAddress | address | Address of the `Catalog` associated with the `Slot` part of the token |
 | slotPartId | uint64 | ID of the `Slot` part that we are checking for equipped objects |
 
 #### Returns

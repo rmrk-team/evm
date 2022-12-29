@@ -422,15 +422,15 @@ contract RMRKExternalEquip is
         uint64 assetId,
         uint64 slotPartId
     ) internal virtual {
-        address targetcatalogAddress = _catalogAddresses[assetId];
-        Equipment memory equipment = _equipments[tokenId][targetcatalogAddress][
+        address targetCatalogAddress = _catalogAddresses[assetId];
+        Equipment memory equipment = _equipments[tokenId][targetCatalogAddress][
             slotPartId
         ];
         if (equipment.childEquippableAddress == address(0))
             revert RMRKNotEquipped();
 
         _beforeUnequip(tokenId, assetId, slotPartId);
-        delete _equipments[tokenId][targetcatalogAddress][slotPartId];
+        delete _equipments[tokenId][targetCatalogAddress][slotPartId];
         address childNestableAddress = IRMRKExternalEquip(
             equipment.childEquippableAddress
         ).getNestableAddress();
@@ -566,10 +566,10 @@ contract RMRKExternalEquip is
      */
     function getEquipment(
         uint256 tokenId,
-        address targetcatalogAddress,
+        address targetCatalogAddress,
         uint64 slotPartId
     ) public view returns (Equipment memory) {
-        return _equipments[tokenId][targetcatalogAddress][slotPartId];
+        return _equipments[tokenId][targetCatalogAddress][slotPartId];
     }
 
     /**
