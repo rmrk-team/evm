@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { RMRKCatalogImpl } from '../../typechain-types';
-import shouldBehaveLikeCatalog from '../behavior/Catalog';
+import shouldBehaveLikeCatalog from '../behavior/catalog';
 
 async function catalogFixture(): Promise<RMRKCatalogImpl> {
   const factory = await ethers.getContractFactory('RMRKCatalogImpl');
