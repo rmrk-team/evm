@@ -8,7 +8,7 @@
 
 pragma solidity ^0.8.16;
 
-import "../base/IRMRKBaseStorage.sol";
+import "../catalog/IRMRKCatalog.sol";
 import "../multiasset/AbstractMultiAsset.sol";
 import "../nestable/IRMRKNestable.sol";
 import "../library/RMRKLib.sol";
@@ -45,15 +45,15 @@ contract RMRKExternalEquip is
 
     address private _nestableAddress;
 
-    /// Mapping of uint64 asset ID to corresponding base address.
-    mapping(uint64 => address) private _baseAddresses;
+    /// Mapping of uint64 asset ID to corresponding catalog address.
+    mapping(uint64 => address) private _catalogAddresses;
     /// Mapping of uint64 ID to asset object.
     mapping(uint64 => uint64) private _equippableGroupIds;
 
-    /// Mapping of assetId to base parts applicable to this asset, both fixed and slot
+    /// Mapping of assetId to catalog parts applicable to this asset, both fixed and slot
     mapping(uint64 => uint64[]) private _partIds;
 
-    /// Mapping of token ID to base address to slot part Id to equipped information. Used to compose an NFT.
+    /// Mapping of token ID to catalog address to slot part Id to equipped information. Used to compose an NFT.
     mapping(uint256 => mapping(address => mapping(uint64 => Equipment)))
         private _equipments;
 
@@ -310,7 +310,7 @@ contract RMRKExternalEquip is
      * @notice Private function used to equip a child into a token.
      * @dev If the `Slot` already has an item equipped, the execution will be reverted.
      * @dev If the child can't be used in the given `Slot`, the execution will be reverted.
-     * @dev If the base doesn't allow this equip to happen, the execution will be reverted.
+     * @dev If the catalog doesn't allow this equip to happen, the execution will be reverted.
      * @dev The `IntakeEquip` stuct contains the following data:
      *  [
      *      tokenId,
@@ -322,10 +322,10 @@ contract RMRKExternalEquip is
      * @param data An `IntakeEquip` struct specifying the equip data
      */
     function _equip(IntakeEquip memory data) internal virtual {
-        address baseAddress = _baseAddresses[data.assetId];
+        address catalogAddress = _catalogAddresses[data.assetId];
         uint64 slotPartId = data.slotPartId;
         if (
-            _equipments[data.tokenId][baseAddress][slotPartId]
+            _equipments[data.tokenId][catalogAddress][slotPartId]
                 .childEquippableAddress != address(0)
         ) revert RMRKSlotAlreadyUsed();
 
@@ -349,13 +349,13 @@ contract RMRKExternalEquip is
                 )
         ) revert RMRKTokenCannotBeEquippedWithAssetIntoSlot();
 
-        // Check from base perspective
+        // Check from catalog perspective
         if (
-            !IRMRKBaseStorage(baseAddress).checkIsEquippable(
+            !IRMRKCatalog(catalogAddress).checkIsEquippable(
                 slotPartId,
                 childEquippable
             )
-        ) revert RMRKEquippableEquipNotAllowedByBase();
+        ) revert RMRKEquippableEquipNotAllowedByCatalog();
 
         Equipment memory newEquip = Equipment({
             assetId: data.assetId,
@@ -365,7 +365,7 @@ contract RMRKExternalEquip is
         });
 
         _beforeEquip(data);
-        _equipments[data.tokenId][baseAddress][slotPartId] = newEquip;
+        _equipments[data.tokenId][catalogAddress][slotPartId] = newEquip;
         _equipCountPerChild[data.tokenId][child.contractAddress][
             child.tokenId
         ] += 1;
@@ -422,15 +422,15 @@ contract RMRKExternalEquip is
         uint64 assetId,
         uint64 slotPartId
     ) internal virtual {
-        address targetBaseAddress = _baseAddresses[assetId];
-        Equipment memory equipment = _equipments[tokenId][targetBaseAddress][
+        address targetcatalogAddress = _catalogAddresses[assetId];
+        Equipment memory equipment = _equipments[tokenId][targetcatalogAddress][
             slotPartId
         ];
         if (equipment.childEquippableAddress == address(0))
             revert RMRKNotEquipped();
 
         _beforeUnequip(tokenId, assetId, slotPartId);
-        delete _equipments[tokenId][targetBaseAddress][slotPartId];
+        delete _equipments[tokenId][targetcatalogAddress][slotPartId];
         address childNestableAddress = IRMRKExternalEquip(
             equipment.childEquippableAddress
         ).getNestableAddress();
@@ -516,23 +516,23 @@ contract RMRKExternalEquip is
      * @dev This internal function warrants custom access control to be implemented when used.
      * @param id ID to be assigned to asset
      * @param equippableGroupId ID of the equippable group this asset belongs to
-     * @param baseAddress Address of the Base this asset should be associated with
+     * @param catalogAddress Address of the Catalog this asset should be associated with
      * @param metadataURI Metadata URI of the asset
      * @param partIds An array of IDs of fixed and slot parts to be included in the asset
      */
     function _addAssetEntry(
         uint64 id,
         uint64 equippableGroupId,
-        address baseAddress,
+        address catalogAddress,
         string memory metadataURI,
         uint64[] calldata partIds
     ) internal {
         _addAssetEntry(id, metadataURI);
 
-        if (baseAddress == address(0) && partIds.length != 0)
-            revert RMRKBaseRequiredForParts();
+        if (catalogAddress == address(0) && partIds.length != 0)
+            revert RMRKCatalogRequiredForParts();
 
-        _baseAddresses[id] = baseAddress;
+        _catalogAddresses[id] = catalogAddress;
         _equippableGroupIds[id] = equippableGroupId;
         _partIds[id] = partIds;
     }
@@ -552,7 +552,7 @@ contract RMRKExternalEquip is
         return (
             getAssetMetadata(tokenId, assetId),
             _equippableGroupIds[assetId],
-            _baseAddresses[assetId],
+            _catalogAddresses[assetId],
             _partIds[assetId]
         );
     }
@@ -566,10 +566,10 @@ contract RMRKExternalEquip is
      */
     function getEquipment(
         uint256 tokenId,
-        address targetBaseAddress,
+        address targetcatalogAddress,
         uint64 slotPartId
     ) public view returns (Equipment memory) {
-        return _equipments[tokenId][targetBaseAddress][slotPartId];
+        return _equipments[tokenId][targetcatalogAddress][slotPartId];
     }
 
     /**

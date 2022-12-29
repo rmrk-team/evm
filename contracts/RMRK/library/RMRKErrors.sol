@@ -36,20 +36,20 @@ error ERC721TransferToTheZeroAddress();
 error RMRKApprovalForAssetsToCurrentOwner();
 /// Attempting to grant approval of assets without being the caller or approved for all
 error RMRKApproveForAssetsCallerIsNotOwnerNorApprovedForAll();
-/// Attempting to incorrectly configue a Base item
+/// Attempting to incorrectly configue a Catalog item
 error RMRKBadConfig();
 /// Attempting to set the priorities with an array of length that doesn't match the length of active assets array
 error RMRKBadPriorityListLength();
-/// Attempting to add an asset entry with `Part`s, without setting the `Base` address
-error RMRKBaseRequiredForParts();
+/// Attempting to add an asset entry with `Part`s, without setting the `Catalog` address
+error RMRKCatalogRequiredForParts();
 /// Attempting to transfer a soulbound (non-transferrable) token
 error RMRKCannotTransferSoulbound();
 /// Attempting to accept a child that has already been accepted
 error RMRKChildAlreadyExists();
 /// Attempting to interact with a child, using index that is higher than the number of children
 error RMRKChildIndexOutOfRange();
-/// Attempting to equip a `Part` with a child not approved by the base
-error RMRKEquippableEquipNotAllowedByBase();
+/// Attempting to equip a `Part` with a child not approved by the Catalog
+error RMRKEquippableEquipNotAllowedByCatalog();
 /// Attempting to use ID 0, which is not supported
 /// @dev The ID 0 in RMRK suite is reserved for empty values. Guarding against its use ensures the expected operation
 error RMRKIdZeroForbidden();
@@ -93,7 +93,7 @@ error RMRKNotApprovedForAssetsOrOwner();
 /// @dev When a token is nested, only the direct owner (NFT parent) can mange it. In that case, approved addresses are
 ///  not allowed to manage it, in order to ensure the expected behaviour
 error RMRKNotApprovedOrDirectOwner();
-/// Attempting to compose an asset wihtout having an associated Base
+/// Attempting to compose an asset wihtout having an associated Catalog
 error RMRKNotComposableAsset();
 /// Attempting to unequip an item that isn't equipped
 error RMRKNotEquipped();

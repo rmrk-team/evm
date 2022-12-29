@@ -2,13 +2,13 @@
 
 pragma solidity ^0.8.16;
 
-import "../RMRK/base/RMRKBaseStorage.sol";
+import "../RMRK/catalog/RMRKCatalog.sol";
 
-contract RMRKBaseStorageMock is RMRKBaseStorage {
+contract RMRKCatalogMock is RMRKCatalog {
     constructor(
         string memory metadataURI,
         string memory type_
-    ) RMRKBaseStorage(metadataURI, type_) {}
+    ) RMRKCatalog(metadataURI, type_) {}
 
     function addPart(IntakeStruct calldata intakeStruct) external {
         _addPart(intakeStruct);

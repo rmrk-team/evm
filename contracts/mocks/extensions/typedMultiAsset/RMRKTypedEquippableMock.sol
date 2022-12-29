@@ -30,7 +30,7 @@ contract RMRKTypedEquippableMock is RMRKEquippableMock, RMRKTypedMultiAsset {
     function addTypedAssetEntry(
         uint64 id,
         uint64 equippableGroupId,
-        address baseAddress,
+        address catalogAddress,
         string memory metadataURI,
         uint64[] calldata partIds,
         string memory type_
@@ -38,7 +38,7 @@ contract RMRKTypedEquippableMock is RMRKEquippableMock, RMRKTypedMultiAsset {
         _addAssetEntry(
             id,
             equippableGroupId,
-            baseAddress,
+            catalogAddress,
             metadataURI,
             partIds
         );

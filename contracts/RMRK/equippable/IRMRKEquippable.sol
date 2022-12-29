@@ -82,7 +82,7 @@ interface IRMRKEquippable is IRMRKMultiAsset {
      *  equippable into a given slot and parent
      * @param equippableGroupId ID of the equippable group being marked as equippable into the slot associated with
      *  `slotPartId` of the `parentAddress` collection
-     * @param slotPartId ID of the slot part of the base into which the parts belonging to the equippable group
+     * @param slotPartId ID of the slot part of the catalog into which the parts belonging to the equippable group
      *  associated with `equippableGroupId` can be equipped
      * @param parentAddress Address of the collection into which the parts belonging to `equippableGroupId` can be
      *  equipped
@@ -133,13 +133,13 @@ interface IRMRKEquippable is IRMRKMultiAsset {
      *      childEquippableAddress
      *  ]
      * @param tokenId ID of the token for which we are retrieving the equipped object
-     * @param targetBaseAddress Address of the `Base` associated with the `Slot` part of the token
+     * @param targetcatalogAddress Address of the `Catalog` associated with the `Slot` part of the token
      * @param slotPartId ID of the `Slot` part that we are checking for equipped objects
      * @return struct The `Equipment` struct containing data about the equipped object
      */
     function getEquipment(
         uint256 tokenId,
-        address targetBaseAddress,
+        address targetcatalogAddress,
         uint64 slotPartId
     ) external view returns (Equipment memory);
 
@@ -149,7 +149,7 @@ interface IRMRKEquippable is IRMRKMultiAsset {
      * @param assetId ID of the asset of which we are retrieving
      * @return metadataURI The metadata URI of the asset
      * @return equippableGroupId ID of the equippable group this asset belongs to
-     * @return baseAddress The address of the base the part belongs to
+     * @return catalogAddress The address of the catalog the part belongs to
      * @return partIds An array of IDs of parts included in the asset
      */
     function getAssetAndEquippableData(
@@ -161,7 +161,7 @@ interface IRMRKEquippable is IRMRKMultiAsset {
         returns (
             string memory metadataURI,
             uint64 equippableGroupId,
-            address baseAddress,
+            address catalogAddress,
             uint64[] calldata partIds
         );
 }
