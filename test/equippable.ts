@@ -15,7 +15,7 @@ import shouldBehaveLikeEquippableWithParts from './behavior/equippableParts';
 import shouldBehaveLikeEquippableWithSlots from './behavior/equippableSlots';
 import shouldBehaveLikeMultiAsset from './behavior/multiasset';
 import {
-  RMRKBaseStorageMock,
+  RMRKCatalogMock,
   RMRKEquippableMock,
   RMRKEquipRenderUtils,
   RMRKMultiAssetRenderUtils,
@@ -23,8 +23,8 @@ import {
 // --------------- FIXTURES -----------------------
 
 async function partsFixture() {
-  const baseSymbol = 'NCB';
-  const baseType = 'mixed';
+  const catalogSymbol = 'NCB';
+  const catalogType = 'mixed';
 
   const neonName = 'NeonCrisis';
   const neonSymbol = 'NC';
@@ -32,13 +32,13 @@ async function partsFixture() {
   const maskName = 'NeonMask';
   const maskSymbol = 'NM';
 
-  const baseFactory = await ethers.getContractFactory('RMRKBaseStorageMock');
+  const catalogFactory = await ethers.getContractFactory('RMRKCatalogMock');
   const equipFactory = await ethers.getContractFactory('RMRKEquippableMock');
   const viewFactory = await ethers.getContractFactory('RMRKEquipRenderUtils');
 
-  // Base
-  const base = <RMRKBaseStorageMock>await baseFactory.deploy(baseSymbol, baseType);
-  await base.deployed();
+  // Catalog
+  const catalog = <RMRKCatalogMock>await catalogFactory.deploy(catalogSymbol, catalogType);
+  await catalog.deployed();
 
   // Neon token
   const neon = <RMRKEquippableMock>await equipFactory.deploy(neonName, neonSymbol);
@@ -52,13 +52,13 @@ async function partsFixture() {
   const view = <RMRKEquipRenderUtils>await viewFactory.deploy();
   await view.deployed();
 
-  await setupContextForParts(base, neon, neon, mask, mask, mintFromMock, nestMintFromMock);
-  return { base, neon, mask, view };
+  await setupContextForParts(catalog, neon, neon, mask, mask, mintFromMock, nestMintFromMock);
+  return { catalog, neon, mask, view };
 }
 
 async function slotsFixture() {
-  const baseSymbol = 'SSB';
-  const baseType = 'mixed';
+  const catalogSymbol = 'SSB';
+  const catalogType = 'mixed';
 
   const soldierName = 'SnakeSoldier';
   const soldierSymbol = 'SS';
@@ -72,7 +72,7 @@ async function slotsFixture() {
   const backgroundName = 'SnakeBackground';
   const backgroundSymbol = 'SB';
 
-  const baseFactory = await ethers.getContractFactory('RMRKBaseStorageMock');
+  const catalogFactory = await ethers.getContractFactory('RMRKCatalogMock');
   const equipFactory = await ethers.getContractFactory('RMRKEquippableMock');
   const viewFactory = await ethers.getContractFactory('RMRKEquipRenderUtils');
 
@@ -80,9 +80,9 @@ async function slotsFixture() {
   const view = <RMRKEquipRenderUtils>await viewFactory.deploy();
   await view.deployed();
 
-  // Base
-  const base = <RMRKBaseStorageMock>await baseFactory.deploy(baseSymbol, baseType);
-  await base.deployed();
+  // catalog
+  const catalog = <RMRKCatalogMock>await catalogFactory.deploy(catalogSymbol, catalogType);
+  await catalog.deployed();
 
   // Soldier token
   const soldier = <RMRKEquippableMock>await equipFactory.deploy(soldierName, soldierSymbol);
@@ -103,7 +103,7 @@ async function slotsFixture() {
   await background.deployed();
 
   await setupContextForSlots(
-    base,
+    catalog,
     soldier,
     soldier,
     weapon,
@@ -116,7 +116,7 @@ async function slotsFixture() {
     nestMintFromMock,
   );
 
-  return { base, soldier, weapon, weaponGem, background, view };
+  return { catalog, soldier, weapon, weaponGem, background, view };
 }
 
 async function assetsFixture() {
@@ -151,9 +151,9 @@ async function multiAssetFixture() {
 
 describe('EquippableMock with Parts', async () => {
   beforeEach(async function () {
-    const { base, neon, mask, view } = await loadFixture(partsFixture);
+    const { catalog, neon, mask, view } = await loadFixture(partsFixture);
 
-    this.base = base;
+    this.catalog = catalog;
     this.neon = neon;
     this.neonEquip = neon;
     this.mask = mask;
@@ -166,9 +166,11 @@ describe('EquippableMock with Parts', async () => {
 
 describe('EquippableMock with Slots', async () => {
   beforeEach(async function () {
-    const { base, soldier, weapon, weaponGem, background, view } = await loadFixture(slotsFixture);
+    const { catalog, soldier, weapon, weaponGem, background, view } = await loadFixture(
+      slotsFixture,
+    );
 
-    this.base = base;
+    this.catalog = catalog;
     this.soldier = soldier;
     this.soldierEquip = soldier;
     this.weapon = weapon;

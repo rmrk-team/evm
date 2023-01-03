@@ -18,7 +18,8 @@ contract RMRKTokenURI {
     /**
      * @notice Used to initiate the smart contract.
      * @param tokenURI_ Metadata URI to apply to all tokens, either as base or as full URI for every token
-     * @param isEnumerable Whether to treat the tokenURI as enumerable or not. If true, the tokenID will be appended to the base when getting the tokenURI
+     * @param isEnumerable Whether to treat the tokenURI as enumerable or not. If true, the tokenID will be appended to
+     *  the base when getting the tokenURI
      */
     constructor(string memory tokenURI_, bool isEnumerable) {
         _setTokenURI(tokenURI_, isEnumerable);
@@ -41,7 +42,8 @@ contract RMRKTokenURI {
     /**
      * @notice Used to set the token URI configuration.
      * @param tokenURI_ Metadata URI to apply to all tokens, either as base or as full URI for every token
-     * @param isEnumerable Whether to treat the tokenURI as enumerable or not. If true, the tokenID will be appended to the base when getting the tokenURI
+     * @param isEnumerable Whether to treat the tokenURI as enumerable or not. If true, the tokenID will be appended to
+     *  the base when getting the tokenURI
      */
     function _setTokenURI(
         string memory tokenURI_,

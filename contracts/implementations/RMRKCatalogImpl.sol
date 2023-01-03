@@ -3,26 +3,26 @@
 pragma solidity ^0.8.16;
 
 import "../RMRK/access/OwnableLock.sol";
-import "../RMRK/base/RMRKBaseStorage.sol";
+import "../RMRK/catalog/RMRKCatalog.sol";
 
 /**
- * @title RMRKBaseStorageImpl
+ * @title RMRKCatalogImpl
  * @author RMRK team
- * @notice Implementation of RMRK base storage.
- * @dev Contract for storing 'base' elements of NFTs to be accessed by instances of RMRKAsset implementing contracts.
+ * @notice Implementation of RMRK catalog.
+ * @dev Contract for storing 'catalog' elements of NFTs to be accessed by instances of RMRKAsset implementing contracts.
  *  This default implementation includes an OwnableLock dependency, which allows the deployer to freeze the state of the
- *  base contract.
+ *  catalog contract.
  */
-contract RMRKBaseStorageImpl is OwnableLock, RMRKBaseStorage {
+contract RMRKCatalogImpl is OwnableLock, RMRKCatalog {
     /**
      * @notice Used to initialize the smart contract.
      * @param metadataURI Base metadata URI of the contract
-     * @param type_ The type of the base
+     * @param type_ The type of the catalog
      */
     constructor(
         string memory metadataURI,
         string memory type_
-    ) RMRKBaseStorage(metadataURI, type_) {}
+    ) RMRKCatalog(metadataURI, type_) {}
 
     /**
      * @notice Used to add a single `Part` to storage.
@@ -73,7 +73,7 @@ contract RMRKBaseStorageImpl is OwnableLock, RMRKBaseStorage {
     }
 
     /**
-     * @notice Used to add multiple `equippableAddresses` to a single base entry.
+     * @notice Used to add multiple `equippableAddresses` to a single catalog entry.
      * @dev Can only be called on `Part`s of `Slot` type.
      * @param partId ID of the `Part` that we are adding the equippable addresses to
      * @param equippableAddresses An array of addresses that can be equipped into the `Part` associated with the `partId`

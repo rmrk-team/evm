@@ -87,7 +87,7 @@ Adds a contributor to the smart contract.
 ### addEquippableAssetEntry
 
 ```solidity
-function addEquippableAssetEntry(uint64 equippableGroupId, address baseAddress, string metadataURI, uint64[] partIds) external nonpayable returns (uint256)
+function addEquippableAssetEntry(uint64 equippableGroupId, address catalogAddress, string metadataURI, uint64[] partIds) external nonpayable returns (uint256)
 ```
 
 Used to add an equippable asset entry.
@@ -99,7 +99,7 @@ Used to add an equippable asset entry.
 | Name | Type | Description |
 |---|---|---|
 | equippableGroupId | uint64 | ID of the equippable group |
-| baseAddress | address | Address of the `Base` smart contract this asset belongs to |
+| catalogAddress | address | Address of the `Catalog` smart contract this asset belongs to |
 | metadataURI | string | Metadata URI of the asset |
 | partIds | uint64[] | An array of IDs of fixed and slot parts to be included in the asset |
 
@@ -256,7 +256,7 @@ Used to get the asset and equippable data associated with given `assetId`.
 |---|---|---|
 | _0 | string | The metadata URI of the asset |
 | _1 | uint64 | ID of the equippable group this asset belongs to |
-| _2 | address | The address of the base the part belongs to |
+| _2 | address | The address of the catalog the part belongs to |
 | _3 | uint64[] | An array of IDs of parts included in the asset |
 
 ### getAssetMetadata
@@ -308,7 +308,7 @@ Used to retrieve the asset that will be replaced if a given asset from the token
 ### getEquipment
 
 ```solidity
-function getEquipment(uint256 tokenId, address targetBaseAddress, uint64 slotPartId) external view returns (struct IRMRKEquippable.Equipment)
+function getEquipment(uint256 tokenId, address targetCatalogAddress, uint64 slotPartId) external view returns (struct IRMRKEquippable.Equipment)
 ```
 
 Used to get the Equipment object equipped into the specified slot of the desired token.
@@ -320,7 +320,7 @@ Used to get the Equipment object equipped into the specified slot of the desired
 | Name | Type | Description |
 |---|---|---|
 | tokenId | uint256 | ID of the token for which we are retrieving the equipped object |
-| targetBaseAddress | address | Address of the `Base` associated with the `Slot` part of the token |
+| targetCatalogAddress | address | Address of the `Catalog` associated with the `Slot` part of the token |
 | slotPartId | uint64 | ID of the `Slot` part that we are checking for equipped objects |
 
 #### Returns
@@ -560,6 +560,22 @@ Locks the operation.
 
 *Once locked, functions using `notLocked` modifier cannot be executed.*
 
+
+### setNestableAddress
+
+```solidity
+function setNestableAddress(address nestableAddress) external nonpayable
+```
+
+Used to set the address of the `Nestable` smart contract.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| nestableAddress | address | Address of the `Nestable` smart contract |
 
 ### setPriority
 
@@ -958,24 +974,24 @@ Attempting to set the priorities with an array of length that doesn&#39;t match 
 
 
 
-### RMRKBaseRequiredForParts
+### RMRKCatalogRequiredForParts
 
 ```solidity
-error RMRKBaseRequiredForParts()
+error RMRKCatalogRequiredForParts()
 ```
 
-Attempting to add an asset entry with `Part`s, without setting the `Base` address
+Attempting to add an asset entry with `Part`s, without setting the `Catalog` address
 
 
 
 
-### RMRKEquippableEquipNotAllowedByBase
+### RMRKEquippableEquipNotAllowedByCatalog
 
 ```solidity
-error RMRKEquippableEquipNotAllowedByBase()
+error RMRKEquippableEquipNotAllowedByCatalog()
 ```
 
-Attempting to equip a `Part` with a child not approved by the base
+Attempting to equip a `Part` with a child not approved by the Catalog
 
 
 

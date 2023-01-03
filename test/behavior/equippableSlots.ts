@@ -22,7 +22,7 @@ import { bn } from '../utils';
 
 // The general idea is having these tokens: Soldier, Weapon, WeaponGem and Background.
 // Weapon and Background can be equipped into Soldier. WeaponGem can be equipped into Weapon
-// All use a single base.
+// All use a single catalog.
 // Soldier will use a single enumerated fixed asset for simplicity
 // Weapon will have 2 assets per weapon, one for full view, one for equipping
 // Background will have a single asset for each, it can be used as full view and to equip
@@ -30,7 +30,7 @@ import { bn } from '../utils';
 async function shouldBehaveLikeEquippableWithSlots(
   nestMint: (token: Contract, to: string, parentId: number) => Promise<number>,
 ) {
-  let base: Contract;
+  let catalog: Contract;
   let soldier: Contract;
   let soldierEquip: Contract;
   let weapon: Contract;
@@ -47,7 +47,7 @@ async function shouldBehaveLikeEquippableWithSlots(
     const [, ...signersAddr] = await ethers.getSigners();
     addrs = signersAddr;
 
-    base = this.base;
+    catalog = this.catalog;
     soldier = this.soldier;
     soldierEquip = this.soldierEquip;
     weapon = this.weapon;
@@ -355,18 +355,18 @@ async function shouldBehaveLikeEquippableWithSlots(
       ).to.be.revertedWithCustomError(soldierEquip, 'RMRKSlotAlreadyUsed');
     });
 
-    it('cannot equip if not intented on base', async function () {
+    it('cannot equip if not intented on catalog', async function () {
       // Weapon is child on index 0, background on index 1
       const childIndex = 0;
       const weaponResId = weaponAssetsEquip[0]; // This asset is assigned to weapon first weapon
 
       // Remove equippable addresses for part.
-      await base.resetEquippableAddresses(partIdForWeapon);
+      await catalog.resetEquippableAddresses(partIdForWeapon);
       await expect(
         soldierEquip
           .connect(addrs[0]) // Owner is addrs[0]
           .equip([soldiersIds[0], childIndex, soldierResId, partIdForWeapon, weaponResId]),
-      ).to.be.revertedWithCustomError(soldierEquip, 'RMRKEquippableEquipNotAllowedByBase');
+      ).to.be.revertedWithCustomError(soldierEquip, 'RMRKEquippableEquipNotAllowedByCatalog');
     });
   });
 
@@ -530,7 +530,7 @@ async function shouldBehaveLikeEquippableWithSlots(
       expect(allAssets).to.eql([
         'ipfs:soldier/', // metadataURI
         bn(0), // equippableGroupId
-        base.address, // baseAddress
+        catalog.address, // catalogAddress
         expectedFixedParts,
         expectedSlotParts,
       ]);
@@ -545,7 +545,7 @@ async function shouldBehaveLikeEquippableWithSlots(
       expect(allAssets).to.eql([
         'ipfs:background/', // metadataURI
         bn(1), // equippableGroupId
-        base.address, // baseAddress,
+        catalog.address, // catalogAddress,
         [],
         [],
       ]);

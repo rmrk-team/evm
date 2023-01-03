@@ -1,12 +1,12 @@
-# RMRKBaseStorageImpl
+# RMRKCatalogImpl
 
 *RMRK team*
 
-> RMRKBaseStorageImpl
+> RMRKCatalogImpl
 
-Implementation of RMRK base storage.
+Implementation of RMRK catalog.
 
-*Contract for storing &#39;base&#39; elements of NFTs to be accessed by instances of RMRKAsset implementing contracts.  This default implementation includes an OwnableLock dependency, which allows the deployer to freeze the state of the  base contract.*
+*Contract for storing &#39;catalog&#39; elements of NFTs to be accessed by instances of RMRKAsset implementing contracts.  This default implementation includes an OwnableLock dependency, which allows the deployer to freeze the state of the  catalog contract.*
 
 ## Methods
 
@@ -32,7 +32,7 @@ Adds a contributor to the smart contract.
 function addEquippableAddresses(uint64 partId, address[] equippableAddresses) external nonpayable
 ```
 
-Used to add multiple `equippableAddresses` to a single base entry.
+Used to add multiple `equippableAddresses` to a single catalog entry.
 
 *Can only be called on `Part`s of `Slot` type.*
 
@@ -46,7 +46,7 @@ Used to add multiple `equippableAddresses` to a single base entry.
 ### addPart
 
 ```solidity
-function addPart(IRMRKBaseStorage.IntakeStruct intakeStruct) external nonpayable
+function addPart(IRMRKCatalog.IntakeStruct intakeStruct) external nonpayable
 ```
 
 
@@ -57,12 +57,12 @@ function addPart(IRMRKBaseStorage.IntakeStruct intakeStruct) external nonpayable
 
 | Name | Type | Description |
 |---|---|---|
-| intakeStruct | IRMRKBaseStorage.IntakeStruct | undefined |
+| intakeStruct | IRMRKCatalog.IntakeStruct | undefined |
 
 ### addPartList
 
 ```solidity
-function addPartList(IRMRKBaseStorage.IntakeStruct[] intakeStructs) external nonpayable
+function addPartList(IRMRKCatalog.IntakeStruct[] intakeStructs) external nonpayable
 ```
 
 
@@ -73,7 +73,7 @@ function addPartList(IRMRKBaseStorage.IntakeStruct[] intakeStructs) external non
 
 | Name | Type | Description |
 |---|---|---|
-| intakeStructs | IRMRKBaseStorage.IntakeStruct[] | undefined |
+| intakeStructs | IRMRKCatalog.IntakeStruct[] | undefined |
 
 ### checkIsEquippable
 
@@ -143,7 +143,7 @@ Used to retrieve the status of a lockable smart contract.
 function getMetadataURI() external view returns (string)
 ```
 
-Used to return the metadata URI of the associated base.
+Used to return the metadata URI of the associated Catalog.
 
 
 
@@ -152,12 +152,12 @@ Used to return the metadata URI of the associated base.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | string Base metadata URI |
+| _0 | string | string Case metadata URI |
 
 ### getPart
 
 ```solidity
-function getPart(uint64 partId) external view returns (struct IRMRKBaseStorage.Part)
+function getPart(uint64 partId) external view returns (struct IRMRKCatalog.Part)
 ```
 
 Used to retrieve a `Part` with id `partId`
@@ -174,12 +174,12 @@ Used to retrieve a `Part` with id `partId`
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IRMRKBaseStorage.Part | struct The `Part` struct associated with given `partId` |
+| _0 | IRMRKCatalog.Part | struct The `Part` struct associated with given `partId` |
 
 ### getParts
 
 ```solidity
-function getParts(uint64[] partIds) external view returns (struct IRMRKBaseStorage.Part[])
+function getParts(uint64[] partIds) external view returns (struct IRMRKCatalog.Part[])
 ```
 
 Used to retrieve multiple parts at the same time.
@@ -196,7 +196,7 @@ Used to retrieve multiple parts at the same time.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IRMRKBaseStorage.Part[] | struct An array of `Part` structs associated with given `partIds` |
+| _0 | IRMRKCatalog.Part[] | struct An array of `Part` structs associated with given `partIds` |
 
 ### getType
 
@@ -204,7 +204,7 @@ Used to retrieve multiple parts at the same time.
 function getType() external view returns (string)
 ```
 
-Used to return the `itemType` of the associated base
+Used to return the `itemType` of the associated Catalog
 
 
 
@@ -213,7 +213,7 @@ Used to return the `itemType` of the associated base
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | string `itemType` of the associated base |
+| _0 | string | string `itemType` of the associated Catalog |
 
 ### isContributor
 
@@ -403,7 +403,7 @@ Event to announce new equippables to the part.
 ### AddedPart
 
 ```solidity
-event AddedPart(uint64 indexed partId, enum IRMRKBaseStorage.ItemType indexed itemType, uint8 zIndex, address[] equippableAddresses, string metadataURI)
+event AddedPart(uint64 indexed partId, enum IRMRKCatalog.ItemType indexed itemType, uint8 zIndex, address[] equippableAddresses, string metadataURI)
 ```
 
 Event to announce addition of a new part.
@@ -415,7 +415,7 @@ Event to announce addition of a new part.
 | Name | Type | Description |
 |---|---|---|
 | partId `indexed` | uint64 | undefined |
-| itemType `indexed` | enum IRMRKBaseStorage.ItemType | undefined |
+| itemType `indexed` | enum IRMRKCatalog.ItemType | undefined |
 | zIndex  | uint8 | undefined |
 | equippableAddresses  | address[] | undefined |
 | metadataURI  | string | undefined |
@@ -480,7 +480,7 @@ Event to announce the overriding of equippable addresses of the part.
 error RMRKBadConfig()
 ```
 
-Attempting to incorrectly configue a Base item
+Attempting to incorrectly configue a Catalog item
 
 
 

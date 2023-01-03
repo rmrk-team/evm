@@ -103,7 +103,7 @@ Used to add a child token to a given parent token.
 ### addEquippableAssetEntry
 
 ```solidity
-function addEquippableAssetEntry(uint64 id, uint64 equippableGroupId, address baseAddress, string metadataURI, uint64[] partIds) external nonpayable
+function addEquippableAssetEntry(uint64 id, uint64 equippableGroupId, address catalogAddress, string metadataURI, uint64[] partIds) external nonpayable
 ```
 
 
@@ -116,14 +116,14 @@ function addEquippableAssetEntry(uint64 id, uint64 equippableGroupId, address ba
 |---|---|---|
 | id | uint64 | undefined |
 | equippableGroupId | uint64 | undefined |
-| baseAddress | address | undefined |
+| catalogAddress | address | undefined |
 | metadataURI | string | undefined |
 | partIds | uint64[] | undefined |
 
 ### addTypedAssetEntry
 
 ```solidity
-function addTypedAssetEntry(uint64 id, uint64 equippableGroupId, address baseAddress, string metadataURI, uint64[] partIds, string type_) external nonpayable
+function addTypedAssetEntry(uint64 id, uint64 equippableGroupId, address catalogAddress, string metadataURI, uint64[] partIds, string type_) external nonpayable
 ```
 
 
@@ -136,7 +136,7 @@ function addTypedAssetEntry(uint64 id, uint64 equippableGroupId, address baseAdd
 |---|---|---|
 | id | uint64 | undefined |
 | equippableGroupId | uint64 | undefined |
-| baseAddress | address | undefined |
+| catalogAddress | address | undefined |
 | metadataURI | string | undefined |
 | partIds | uint64[] | undefined |
 | type_ | string | undefined |
@@ -480,7 +480,7 @@ Used to get the asset and equippable data associated with given `assetId`.
 |---|---|---|
 | _0 | string | The metadata URI of the asset |
 | _1 | uint64 | ID of the equippable group this asset belongs to |
-| _2 | address | The address of the base the part belongs to |
+| _2 | address | The address of the catalog the part belongs to |
 | _3 | uint64[] | An array of IDs of parts included in the asset |
 
 ### getAssetMetadata
@@ -554,7 +554,7 @@ Used to get the type of the asset.
 ### getEquipment
 
 ```solidity
-function getEquipment(uint256 tokenId, address targetBaseAddress, uint64 slotPartId) external view returns (struct IRMRKEquippable.Equipment)
+function getEquipment(uint256 tokenId, address targetCatalogAddress, uint64 slotPartId) external view returns (struct IRMRKEquippable.Equipment)
 ```
 
 Used to get the Equipment object equipped into the specified slot of the desired token.
@@ -566,7 +566,7 @@ Used to get the Equipment object equipped into the specified slot of the desired
 | Name | Type | Description |
 |---|---|---|
 | tokenId | uint256 | ID of the token for which we are retrieving the equipped object |
-| targetBaseAddress | address | Address of the `Base` associated with the `Slot` part of the token |
+| targetCatalogAddress | address | Address of the `Catalog` associated with the `Slot` part of the token |
 | slotPartId | uint64 | ID of the `Slot` part that we are checking for equipped objects |
 
 #### Returns
@@ -884,7 +884,7 @@ function safeTransferFrom(address from, address to, uint256 tokenId) external no
 
 
 
-*Safely transfers `tokenId` token from `from` to `to`, checking first that contract recipients are aware of the ERC721 protocol to prevent tokens from being forever locked. Requirements: - `from` cannot be the zero address. - `to` cannot be the zero address. - `tokenId` token must exist and be owned by `from`. - If the caller is not `from`, it must have been allowed to move this token by either {approve} or {setApprovalForAll}. - If `to` refers to a smart contract, it must implement {IERC721Receiver-onERC721Received}, which is called upon a safe transfer. Emits a {Transfer} event.*
+*Safely transfers `tokenId` token from `from` to `to`, checking first that contract recipients are aware of the ERC721 protocol to prevent tokens from being forever locked. Requirements: - `from` cannot be the zero address. - `to` cannot be the zero address. - `tokenId` token must exist and be owned by `from`. - If the caller is not `from`, it must be have been allowed to move this token by either {approve} or {setApprovalForAll}. - If `to` refers to a smart contract, it must implement {IERC721Receiver-onERC721Received}, which is called upon a safe transfer. Emits a {Transfer} event.*
 
 #### Parameters
 
@@ -1069,7 +1069,7 @@ function transferFrom(address from, address to, uint256 tokenId) external nonpay
 
 
 
-*Transfers `tokenId` token from `from` to `to`. WARNING: Note that the caller is responsible to confirm that the recipient is capable of receiving ERC721 or else they may be permanently lost. Usage of {safeTransferFrom} prevents loss, though the caller must understand this adds an external call which potentially creates a reentrancy vulnerability. Requirements: - `from` cannot be the zero address. - `to` cannot be the zero address. - `tokenId` token must be owned by `from`. - If the caller is not `from`, it must be approved to move this token by either {approve} or {setApprovalForAll}. Emits a {Transfer} event.*
+*Transfers `tokenId` token from `from` to `to`. WARNING: Usage of this method is discouraged, use {safeTransferFrom} whenever possible. Requirements: - `from` cannot be the zero address. - `to` cannot be the zero address. - `tokenId` token must be owned by `from`. - If the caller is not `from`, it must be approved to move this token by either {approve} or {setApprovalForAll}. Emits a {Transfer} event.*
 
 #### Parameters
 
@@ -1599,13 +1599,13 @@ Attempting to set the priorities with an array of length that doesn&#39;t match 
 
 
 
-### RMRKBaseRequiredForParts
+### RMRKCatalogRequiredForParts
 
 ```solidity
-error RMRKBaseRequiredForParts()
+error RMRKCatalogRequiredForParts()
 ```
 
-Attempting to add an asset entry with `Part`s, without setting the `Base` address
+Attempting to add an asset entry with `Part`s, without setting the `Catalog` address
 
 
 
@@ -1632,13 +1632,13 @@ Attempting to interact with a child, using index that is higher than the number 
 
 
 
-### RMRKEquippableEquipNotAllowedByBase
+### RMRKEquippableEquipNotAllowedByCatalog
 
 ```solidity
-error RMRKEquippableEquipNotAllowedByBase()
+error RMRKEquippableEquipNotAllowedByCatalog()
 ```
 
-Attempting to equip a `Part` with a child not approved by the base
+Attempting to equip a `Part` with a child not approved by the Catalog
 
 
 

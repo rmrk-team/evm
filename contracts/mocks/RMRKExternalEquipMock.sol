@@ -25,14 +25,14 @@ contract RMRKExternalEquipMock is RMRKExternalEquip {
     function addEquippableAssetEntry(
         uint64 id,
         uint64 equippableGroupId,
-        address baseAddress,
+        address catalogAddress,
         string memory metadataURI,
         uint64[] calldata partIds
     ) external {
         _addAssetEntry(
             id,
             equippableGroupId,
-            baseAddress,
+            catalogAddress,
             metadataURI,
             partIds
         );

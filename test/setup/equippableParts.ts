@@ -12,17 +12,17 @@ const partIdForBody2 = 5;
 const partIdForHair1 = 6;
 const partIdForHair2 = 7;
 const partIdForHair3 = 8;
-const partIdForMaskBase1 = 9;
-const partIdForMaskBase2 = 10;
-const partIdForMaskBase3 = 11;
+const partIdForMaskCatalog1 = 9;
+const partIdForMaskCatalog2 = 10;
+const partIdForMaskCatalog3 = 11;
 const partIdForEars1 = 12;
 const partIdForEars2 = 13;
 const partIdForHorns1 = 14;
 const partIdForHorns2 = 15;
 const partIdForHorns3 = 16;
-const partIdForMaskBaseEquipped1 = 17;
-const partIdForMaskBaseEquipped2 = 18;
-const partIdForMaskBaseEquipped3 = 19;
+const partIdForMaskCatalogEquipped1 = 17;
+const partIdForMaskCatalogEquipped2 = 18;
+const partIdForMaskCatalogEquipped3 = 19;
 const partIdForEarsEquipped1 = 20;
 const partIdForEarsEquipped2 = 21;
 const partIdForHornsEquipped1 = 22;
@@ -48,7 +48,7 @@ enum ItemType {
 }
 
 async function setupContextForParts(
-  base: Contract,
+  catalog: Contract,
   neon: Contract,
   neonEquip: Contract,
   mask: Contract,
@@ -59,7 +59,7 @@ async function setupContextForParts(
   const [, ...signersAddr] = await ethers.getSigners();
   addrs = signersAddr;
 
-  await setupBase();
+  await setupCatalog();
 
   await mintNeons();
   await mintMasks();
@@ -67,7 +67,7 @@ async function setupContextForParts(
   await addAssetsToNeon();
   await addAssetsToMask();
 
-  async function setupBase(): Promise<void> {
+  async function setupCatalog(): Promise<void> {
     const partForHead1 = {
       itemType: ItemType.Fixed,
       z: 1,
@@ -116,23 +116,23 @@ async function setupContextForParts(
       equippable: [],
       metadataURI: 'ipfs://hair3.png',
     };
-    const partForMaskBase1 = {
+    const partForMaskCatalog1 = {
       itemType: ItemType.Fixed,
       z: 3,
       equippable: [],
-      metadataURI: 'ipfs://maskBase1.png',
+      metadataURI: 'ipfs://maskCatalog1.png',
     };
-    const partForMaskBase2 = {
+    const partForMaskCatalog2 = {
       itemType: ItemType.Fixed,
       z: 3,
       equippable: [],
-      metadataURI: 'ipfs://maskBase2.png',
+      metadataURI: 'ipfs://maskCatalog2.png',
     };
-    const partForMaskBase3 = {
+    const partForMaskCatalog3 = {
       itemType: ItemType.Fixed,
       z: 3,
       equippable: [],
-      metadataURI: 'ipfs://maskBase3.png',
+      metadataURI: 'ipfs://maskCatalog3.png',
     };
     const partForEars1 = {
       itemType: ItemType.Fixed,
@@ -164,23 +164,23 @@ async function setupContextForParts(
       equippable: [],
       metadataURI: 'ipfs://horn3.png',
     };
-    const partForMaskBaseEquipped1 = {
+    const partForMaskCatalogEquipped1 = {
       itemType: ItemType.Fixed,
       z: 3,
       equippable: [],
-      metadataURI: 'ipfs://maskBaseEquipped1.png',
+      metadataURI: 'ipfs://maskCatalogEquipped1.png',
     };
-    const partForMaskBaseEquipped2 = {
+    const partForMaskCatalogEquipped2 = {
       itemType: ItemType.Fixed,
       z: 3,
       equippable: [],
-      metadataURI: 'ipfs://maskBaseEquipped2.png',
+      metadataURI: 'ipfs://maskCatalogEquipped2.png',
     };
-    const partForMaskBaseEquipped3 = {
+    const partForMaskCatalogEquipped3 = {
       itemType: ItemType.Fixed,
       z: 3,
       equippable: [],
-      metadataURI: 'ipfs://maskBaseEquipped3.png',
+      metadataURI: 'ipfs://maskCatalogEquipped3.png',
     };
     const partForEarsEquipped1 = {
       itemType: ItemType.Fixed,
@@ -219,7 +219,7 @@ async function setupContextForParts(
       metadataURI: '',
     };
 
-    await base.addPartList([
+    await catalog.addPartList([
       { partId: partIdForHead1, part: partForHead1 },
       { partId: partIdForHead2, part: partForHead2 },
       { partId: partIdForHead3, part: partForHead3 },
@@ -228,17 +228,17 @@ async function setupContextForParts(
       { partId: partIdForHair1, part: partForHair1 },
       { partId: partIdForHair2, part: partForHair2 },
       { partId: partIdForHair3, part: partForHair3 },
-      { partId: partIdForMaskBase1, part: partForMaskBase1 },
-      { partId: partIdForMaskBase2, part: partForMaskBase2 },
-      { partId: partIdForMaskBase3, part: partForMaskBase3 },
+      { partId: partIdForMaskCatalog1, part: partForMaskCatalog1 },
+      { partId: partIdForMaskCatalog2, part: partForMaskCatalog2 },
+      { partId: partIdForMaskCatalog3, part: partForMaskCatalog3 },
       { partId: partIdForEars1, part: partForEars1 },
       { partId: partIdForEars2, part: partForEars2 },
       { partId: partIdForHorns1, part: partForHorns1 },
       { partId: partIdForHorns2, part: partForHorns2 },
       { partId: partIdForHorns3, part: partForHorns3 },
-      { partId: partIdForMaskBaseEquipped1, part: partForMaskBaseEquipped1 },
-      { partId: partIdForMaskBaseEquipped2, part: partForMaskBaseEquipped2 },
-      { partId: partIdForMaskBaseEquipped3, part: partForMaskBaseEquipped3 },
+      { partId: partIdForMaskCatalogEquipped1, part: partForMaskCatalogEquipped1 },
+      { partId: partIdForMaskCatalogEquipped2, part: partForMaskCatalogEquipped2 },
+      { partId: partIdForMaskCatalogEquipped3, part: partForMaskCatalogEquipped3 },
       { partId: partIdForEarsEquipped1, part: partForEarsEquipped1 },
       { partId: partIdForEarsEquipped2, part: partForEarsEquipped2 },
       { partId: partIdForHornsEquipped1, part: partForHornsEquipped1 },
@@ -270,31 +270,31 @@ async function setupContextForParts(
   }
 
   async function addAssetsToNeon(): Promise<void> {
-    await neonEquip.addEquippableAssetEntry(neonResIds[0], 0, base.address, 'ipfs:neonRes/1', [
+    await neonEquip.addEquippableAssetEntry(neonResIds[0], 0, catalog.address, 'ipfs:neonRes/1', [
       partIdForHead1,
       partIdForBody1,
       partIdForHair1,
       partIdForMask,
     ]);
-    await neonEquip.addEquippableAssetEntry(neonResIds[1], 0, base.address, 'ipfs:neonRes/2', [
+    await neonEquip.addEquippableAssetEntry(neonResIds[1], 0, catalog.address, 'ipfs:neonRes/2', [
       partIdForHead2,
       partIdForBody2,
       partIdForHair2,
       partIdForMask,
     ]);
-    await neonEquip.addEquippableAssetEntry(neonResIds[2], 0, base.address, 'ipfs:neonRes/3', [
+    await neonEquip.addEquippableAssetEntry(neonResIds[2], 0, catalog.address, 'ipfs:neonRes/3', [
       partIdForHead3,
       partIdForBody1,
       partIdForHair3,
       partIdForMask,
     ]);
-    await neonEquip.addEquippableAssetEntry(neonResIds[3], 0, base.address, 'ipfs:neonRes/4', [
+    await neonEquip.addEquippableAssetEntry(neonResIds[3], 0, catalog.address, 'ipfs:neonRes/4', [
       partIdForHead1,
       partIdForBody2,
       partIdForHair2,
       partIdForMask,
     ]);
-    await neonEquip.addEquippableAssetEntry(neonResIds[4], 0, base.address, 'ipfs:neonRes/1', [
+    await neonEquip.addEquippableAssetEntry(neonResIds[4], 0, catalog.address, 'ipfs:neonRes/1', [
       partIdForHead2,
       partIdForBody1,
       partIdForHair1,
@@ -314,66 +314,66 @@ async function setupContextForParts(
     await maskEquip.addEquippableAssetEntry(
       maskAssetsFull[0],
       0, // Not meant to equip
-      base.address, // Not meant to equip, but base needed for parts
+      catalog.address, // Not meant to equip, but catalog needed for parts
       `ipfs:weapon/full/${maskAssetsFull[0]}`,
-      [partIdForMaskBase1, partIdForHorns1, partIdForEars1],
+      [partIdForMaskCatalog1, partIdForHorns1, partIdForEars1],
     );
     await maskEquip.addEquippableAssetEntry(
       maskAssetsFull[1],
       0, // Not meant to equip
-      base.address, // Not meant to equip, but base needed for parts
+      catalog.address, // Not meant to equip, but catalog needed for parts
       `ipfs:weapon/full/${maskAssetsFull[1]}`,
-      [partIdForMaskBase2, partIdForHorns2, partIdForEars2],
+      [partIdForMaskCatalog2, partIdForHorns2, partIdForEars2],
     );
     await maskEquip.addEquippableAssetEntry(
       maskAssetsFull[2],
       0, // Not meant to equip
-      base.address, // Not meant to equip, but base needed for parts
+      catalog.address, // Not meant to equip, but catalog needed for parts
       `ipfs:weapon/full/${maskAssetsFull[2]}`,
-      [partIdForMaskBase3, partIdForHorns1, partIdForEars2],
+      [partIdForMaskCatalog3, partIdForHorns1, partIdForEars2],
     );
     await maskEquip.addEquippableAssetEntry(
       maskAssetsFull[3],
       0, // Not meant to equip
-      base.address, // Not meant to equip, but base needed for parts
+      catalog.address, // Not meant to equip, but catalog needed for parts
       `ipfs:weapon/full/${maskAssetsFull[3]}`,
-      [partIdForMaskBase2, partIdForHorns2, partIdForEars1],
+      [partIdForMaskCatalog2, partIdForHorns2, partIdForEars1],
     );
 
     // Assets for equipping view, also composed with fixed parts
     await maskEquip.addEquippableAssetEntry(
       maskAssetsEquip[0],
       maskEquippableGroupId,
-      base.address,
+      catalog.address,
       `ipfs:weapon/equip/${maskAssetsEquip[0]}`,
-      [partIdForMaskBase1, partIdForHorns1, partIdForEars1],
+      [partIdForMaskCatalog1, partIdForHorns1, partIdForEars1],
     );
 
     // Assets for equipping view, also composed with fixed parts
     await maskEquip.addEquippableAssetEntry(
       maskAssetsEquip[1],
       maskEquippableGroupId,
-      base.address,
+      catalog.address,
       `ipfs:weapon/equip/${maskAssetsEquip[1]}`,
-      [partIdForMaskBase2, partIdForHorns2, partIdForEars2],
+      [partIdForMaskCatalog2, partIdForHorns2, partIdForEars2],
     );
 
     // Assets for equipping view, also composed with fixed parts
     await maskEquip.addEquippableAssetEntry(
       maskAssetsEquip[2],
       maskEquippableGroupId,
-      base.address,
+      catalog.address,
       `ipfs:weapon/equip/${maskAssetsEquip[2]}`,
-      [partIdForMaskBase3, partIdForHorns1, partIdForEars2],
+      [partIdForMaskCatalog3, partIdForHorns1, partIdForEars2],
     );
 
     // Assets for equipping view, also composed with fixed parts
     await maskEquip.addEquippableAssetEntry(
       maskAssetsEquip[3],
       maskEquippableGroupId,
-      base.address,
+      catalog.address,
       `ipfs:weapon/equip/${maskAssetsEquip[3]}`,
-      [partIdForMaskBase2, partIdForHorns2, partIdForEars1],
+      [partIdForMaskCatalog2, partIdForHorns2, partIdForEars1],
     );
 
     // Can be equipped into neons
@@ -407,17 +407,17 @@ export {
   partIdForHair1,
   partIdForHair2,
   partIdForHair3,
-  partIdForMaskBase1,
-  partIdForMaskBase2,
-  partIdForMaskBase3,
+  partIdForMaskCatalog1,
+  partIdForMaskCatalog2,
+  partIdForMaskCatalog3,
   partIdForEars1,
   partIdForEars2,
   partIdForHorns1,
   partIdForHorns2,
   partIdForHorns3,
-  partIdForMaskBaseEquipped1,
-  partIdForMaskBaseEquipped2,
-  partIdForMaskBaseEquipped3,
+  partIdForMaskCatalogEquipped1,
+  partIdForMaskCatalogEquipped2,
+  partIdForMaskCatalogEquipped3,
   partIdForEarsEquipped1,
   partIdForEarsEquipped2,
   partIdForHornsEquipped1,

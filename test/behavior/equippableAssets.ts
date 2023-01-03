@@ -16,7 +16,7 @@ async function shouldBehaveLikeEquippableAssets(
 
   const equippableGroupIdDefault = bn(1);
   const metaURIDefault = 'metaURI';
-  const baseAddressDefault = ADDRESS_ZERO;
+  const catalogAddressDefault = ADDRESS_ZERO;
 
   beforeEach(async function () {
     const [signersOwner, ...signersAddr] = await ethers.getSigners();
@@ -48,7 +48,7 @@ async function shouldBehaveLikeEquippableAssets(
         chunkyEquip.addEquippableAssetEntry(
           id,
           equippableGroupIdDefault,
-          baseAddressDefault,
+          catalogAddressDefault,
           metaURIDefault,
           [],
         ),
@@ -63,7 +63,7 @@ async function shouldBehaveLikeEquippableAssets(
       await chunkyEquip.addEquippableAssetEntry(
         resId,
         equippableGroupIdDefault,
-        baseAddressDefault,
+        catalogAddressDefault,
         metaURIDefault,
         [],
       );
@@ -76,26 +76,26 @@ async function shouldBehaveLikeEquippableAssets(
       ).to.be.revertedWithCustomError(chunkyEquip, 'RMRKTokenDoesNotHaveAsset');
     });
 
-    it('cannot add asset entry with parts and no base', async function () {
+    it('cannot add asset entry with parts and no catalog', async function () {
       const id = bn(1);
       await expect(
         chunkyEquip.addEquippableAssetEntry(
           id,
           equippableGroupIdDefault,
-          baseAddressDefault,
+          catalogAddressDefault,
           metaURIDefault,
           [1],
         ),
-      ).to.be.revertedWithCustomError(chunkyEquip, 'RMRKBaseRequiredForParts');
+      ).to.be.revertedWithCustomError(chunkyEquip, 'RMRKCatalogRequiredForParts');
       await expect(
         chunkyEquip.addEquippableAssetEntry(
           id,
           equippableGroupIdDefault,
-          baseAddressDefault,
+          catalogAddressDefault,
           metaURIDefault,
           [1],
         ),
-      ).to.be.revertedWithCustomError(chunkyEquip, 'RMRKBaseRequiredForParts');
+      ).to.be.revertedWithCustomError(chunkyEquip, 'RMRKCatalogRequiredForParts');
     });
 
     it('cannot add an asset with an existing ID', async function () {
@@ -104,7 +104,7 @@ async function shouldBehaveLikeEquippableAssets(
       await chunkyEquip.addEquippableAssetEntry(
         id,
         equippableGroupIdDefault,
-        baseAddressDefault,
+        catalogAddressDefault,
         metaURIDefault,
         [],
       );
@@ -112,7 +112,7 @@ async function shouldBehaveLikeEquippableAssets(
         chunkyEquip.addEquippableAssetEntry(
           id,
           equippableGroupIdDefault,
-          baseAddressDefault,
+          catalogAddressDefault,
           metaURIDefault,
           [],
         ),
@@ -126,7 +126,7 @@ async function shouldBehaveLikeEquippableAssets(
         chunkyEquip.addEquippableAssetEntry(
           id,
           equippableGroupIdDefault,
-          baseAddressDefault,
+          catalogAddressDefault,
           metaURIDefault,
           [],
         ),
@@ -140,7 +140,7 @@ async function shouldBehaveLikeEquippableAssets(
         chunkyEquip.addEquippableAssetEntry(
           id,
           equippableGroupIdDefault,
-          baseAddressDefault,
+          catalogAddressDefault,
           metaURIDefault,
           [],
         ),
@@ -152,7 +152,7 @@ async function shouldBehaveLikeEquippableAssets(
         chunkyEquip.addEquippableAssetEntry(
           id,
           equippableGroupIdDefault,
-          baseAddressDefault,
+          catalogAddressDefault,
           metaURIDefault,
           [],
         ),
@@ -602,7 +602,7 @@ async function shouldBehaveLikeEquippableAssets(
       await chunkyEquip.addEquippableAssetEntry(
         ids[i],
         equippableGroupIdDefault,
-        baseAddressDefault,
+        catalogAddressDefault,
         metaURIDefault,
         [],
       );

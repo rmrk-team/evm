@@ -34,11 +34,11 @@ Equippable into two mutually dependent contracts to allow for more custom logic 
    `setEquippalbeAddress` method. If you're not using a prefab RMRK top-level implementation, you will need to expose
    this yourself.
 
-4. Deploy RMRKBaseStorage. Initialize your base parts (fixed and slot). You will pass the address of RMRKBaseStorage and
-   corresponding base part IDs when initializing your assets on RMRKExternalEquippable.
+4. Deploy RMRKCatalog. Initialize your catalog parts (fixed and slot). You will pass the address of RMRKCatalog and
+   corresponding catalog part IDs when initializing your assets on RMRKExternalEquippable.
 
 5. Assign token assets on RMRKExternalEquippable as you would the above MultiAsset, with the added ExtendedAsset params,
-   equippableRefId and baseAddress.
+   equippableRefId and catalogAddress.
 
 **NOTE: Please be aware that RMRKEquippable is likely very close to the maximum contract deployment size allowed by most
 EVM environments. If you need more space, consider RMRKNestingExternalEquippable.**

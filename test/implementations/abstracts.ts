@@ -135,30 +135,34 @@ async function shouldControlValidEquippablesManagement(): Promise<void> {
   let notOwner: SignerWithAddress;
   let contributor: SignerWithAddress;
   let tokenOwner: SignerWithAddress;
-  let base: SignerWithAddress;
+  let catalog: SignerWithAddress;
   let parent: SignerWithAddress;
 
   beforeEach(async function () {
-    [owner, notOwner, contributor, tokenOwner, base, parent] = await ethers.getSigners();
+    [owner, notOwner, contributor, tokenOwner, catalog, parent] = await ethers.getSigners();
     await this.token.connect(owner).mint(tokenOwner.address, 1);
     await this.token.connect(owner).addContributor(contributor.address);
   });
 
   it('cannot add asset if not owner or contributor', async function () {
     await expect(
-      this.token.connect(notOwner).addEquippableAssetEntry(0, base.address, 'ipfs://someMeta', []),
+      this.token
+        .connect(notOwner)
+        .addEquippableAssetEntry(0, catalog.address, 'ipfs://someMeta', []),
     ).to.be.revertedWithCustomError(this.token, 'RMRKNotOwnerOrContributor');
   });
 
   it('can add asset if owner', async function () {
-    await this.token.connect(owner).addEquippableAssetEntry(0, base.address, 'ipfs://someMeta', []);
+    await this.token
+      .connect(owner)
+      .addEquippableAssetEntry(0, catalog.address, 'ipfs://someMeta', []);
     expect(await this.token.ownerOf(1)).to.eql(tokenOwner.address);
   });
 
   it('can add asset if contributor', async function () {
     await this.token
       .connect(contributor)
-      .addEquippableAssetEntry(0, base.address, 'ipfs://someMeta', []);
+      .addEquippableAssetEntry(0, catalog.address, 'ipfs://someMeta', []);
     expect(await this.token.ownerOf(1)).to.eql(tokenOwner.address);
   });
 

@@ -2,20 +2,20 @@
 
 pragma solidity ^0.8.16;
 
-import "./IRMRKBaseStorage.sol";
+import "./IRMRKCatalog.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "../library/RMRKErrors.sol";
 
 /**
- * @title RMRKBaseStorage
+ * @title RMRKCatalog
  * @author RMRK team
- * @notice Base storage contract for RMRK equippable module.
+ * @notice Catalog contract for RMRK equippable module.
  */
-contract RMRKBaseStorage is IRMRKBaseStorage {
+contract RMRKCatalog is IRMRKCatalog {
     using Address for address;
 
     /**
-     * @notice Mapping of uint64 `partId` to IRMRKBaseStorage `Part` struct
+     * @notice Mapping of uint64 `partId` to IRMRKCatalog `Part` struct
      */
     mapping(uint64 => Part) private _parts;
 
@@ -30,9 +30,9 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
     string private _type;
 
     /**
-     * @notice Used to initialize the base storage.
-     * @param metadataURI Base metadata URI of the base
-     * @param type_ Type of base
+     * @notice Used to initialize the Catalog.
+     * @param metadataURI Base metadata URI of the Catalog
+     * @param type_ Type of Catalog
      */
     constructor(string memory metadataURI, string memory type_) {
         _metadataURI = metadataURI;
@@ -64,18 +64,18 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
     ) public view virtual returns (bool) {
         return
             interfaceId == type(IERC165).interfaceId ||
-            interfaceId == type(IRMRKBaseStorage).interfaceId;
+            interfaceId == type(IRMRKCatalog).interfaceId;
     }
 
     /**
-     * @inheritdoc IRMRKBaseStorage
+     * @inheritdoc IRMRKCatalog
      */
     function getMetadataURI() external view returns (string memory) {
         return _metadataURI;
     }
 
     /**
-     * @inheritdoc IRMRKBaseStorage
+     * @inheritdoc IRMRKCatalog
      */
     function getType() external view returns (string memory) {
         return _type;
@@ -125,7 +125,7 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
     }
 
     /**
-     * @notice Internal function used to add multiple `equippableAddresses` to a single base entry.
+     * @notice Internal function used to add multiple `equippableAddresses` to a single catalog entry.
      * @dev Can only be called on `Part`s of `Slot` type.
      * @param partId ID of the `Part` that we are adding the equippable addresses to
      * @param equippableAddresses An array of addresses that can be equipped into the `Part` associated with the `partId`
@@ -192,14 +192,14 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
     }
 
     /**
-     * @inheritdoc IRMRKBaseStorage
+     * @inheritdoc IRMRKCatalog
      */
     function checkIsEquippableToAll(uint64 partId) public view returns (bool) {
         return _isEquippableToAll[partId];
     }
 
     /**
-     * @inheritdoc IRMRKBaseStorage
+     * @inheritdoc IRMRKCatalog
      */
     function checkIsEquippable(
         uint64 partId,
@@ -226,14 +226,14 @@ contract RMRKBaseStorage is IRMRKBaseStorage {
     }
 
     /**
-     * @inheritdoc IRMRKBaseStorage
+     * @inheritdoc IRMRKCatalog
      */
     function getPart(uint64 partId) public view returns (Part memory) {
         return (_parts[partId]);
     }
 
     /**
-     * @inheritdoc IRMRKBaseStorage
+     * @inheritdoc IRMRKCatalog
      */
     function getParts(
         uint64[] calldata partIds

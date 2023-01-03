@@ -1,10 +1,10 @@
-# IRMRKBaseStorage
+# IRMRKCatalog
 
 *RMRK team*
 
-> IRMRKBaseStorage
+> IRMRKCatalog
 
-An interface Base storage for RMRK equippable module.
+An interface Catalog for RMRK equippable module.
 
 
 
@@ -61,7 +61,7 @@ Used to check if the part is equippable by all addresses.
 function getMetadataURI() external view returns (string)
 ```
 
-Used to return the metadata URI of the associated base.
+Used to return the metadata URI of the associated Catalog.
 
 
 
@@ -70,12 +70,12 @@ Used to return the metadata URI of the associated base.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | string Base metadata URI |
+| _0 | string | string Case metadata URI |
 
 ### getPart
 
 ```solidity
-function getPart(uint64 partId) external view returns (struct IRMRKBaseStorage.Part)
+function getPart(uint64 partId) external view returns (struct IRMRKCatalog.Part)
 ```
 
 Used to retrieve a `Part` with id `partId`
@@ -92,12 +92,12 @@ Used to retrieve a `Part` with id `partId`
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IRMRKBaseStorage.Part | struct The `Part` struct associated with given `partId` |
+| _0 | IRMRKCatalog.Part | struct The `Part` struct associated with given `partId` |
 
 ### getParts
 
 ```solidity
-function getParts(uint64[] partIds) external view returns (struct IRMRKBaseStorage.Part[])
+function getParts(uint64[] partIds) external view returns (struct IRMRKCatalog.Part[])
 ```
 
 Used to retrieve multiple parts at the same time.
@@ -114,7 +114,7 @@ Used to retrieve multiple parts at the same time.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IRMRKBaseStorage.Part[] | struct An array of `Part` structs associated with given `partIds` |
+| _0 | IRMRKCatalog.Part[] | struct An array of `Part` structs associated with given `partIds` |
 
 ### getType
 
@@ -122,7 +122,7 @@ Used to retrieve multiple parts at the same time.
 function getType() external view returns (string)
 ```
 
-Used to return the `itemType` of the associated base
+Used to return the `itemType` of the associated Catalog
 
 
 
@@ -131,7 +131,7 @@ Used to return the `itemType` of the associated base
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | string `itemType` of the associated base |
+| _0 | string | string `itemType` of the associated Catalog |
 
 ### supportsInterface
 
@@ -179,7 +179,7 @@ Event to announce new equippables to the part.
 ### AddedPart
 
 ```solidity
-event AddedPart(uint64 indexed partId, enum IRMRKBaseStorage.ItemType indexed itemType, uint8 zIndex, address[] equippableAddresses, string metadataURI)
+event AddedPart(uint64 indexed partId, enum IRMRKCatalog.ItemType indexed itemType, uint8 zIndex, address[] equippableAddresses, string metadataURI)
 ```
 
 Event to announce addition of a new part.
@@ -191,7 +191,7 @@ Event to announce addition of a new part.
 | Name | Type | Description |
 |---|---|---|
 | partId `indexed` | uint64 | ID of the part that was added |
-| itemType `indexed` | enum IRMRKBaseStorage.ItemType | Enum value specifying whether the part is `None`, `Slot` and `Fixed` |
+| itemType `indexed` | enum IRMRKCatalog.ItemType | Enum value specifying whether the part is `None`, `Slot` and `Fixed` |
 | zIndex  | uint8 | An uint specifying the z value of the part. It is used to specify the depth which the part should  be rendered at |
 | equippableAddresses  | address[] | An array of addresses that can equip this part |
 | metadataURI  | string | The metadata URI of the part |
