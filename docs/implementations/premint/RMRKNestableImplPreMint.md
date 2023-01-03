@@ -1374,6 +1374,17 @@ Attempting to interact with a management function without being the smart contra
 
 
 
+### RMRKNotOwnerOrContributor
+
+```solidity
+error RMRKNotOwnerOrContributor()
+```
+
+Attempting to interact with a function without being the owner or contributor of the collection
+
+
+
+
 ### RMRKPendingChildIndexOutOfRange
 
 ```solidity
