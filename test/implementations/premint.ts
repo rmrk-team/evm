@@ -89,7 +89,7 @@ async function shouldControlValidPreMinting(): Promise<void> {
     const notOwner = addrs[0];
     await expect(
       this.token.connect(notOwner).mint(notOwner.address, 1),
-    ).to.be.revertedWithCustomError(this.token, 'RMRKNotOwner');
+    ).to.be.revertedWithCustomError(this.token, 'RMRKNotOwnerOrContributor');
   });
 
   it('can mint if owner', async function () {

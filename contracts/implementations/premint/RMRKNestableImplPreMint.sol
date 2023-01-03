@@ -51,7 +51,7 @@ contract RMRKNestableImplPreMint is RMRKAbstractNestableImpl {
     function mint(
         address to,
         uint256 numToMint
-    ) public payable virtual notLocked onlyOwner {
+    ) public payable virtual notLocked onlyOwnerOrContributor {
         (uint256 nextToken, uint256 totalSupplyOffset) = _preMint(numToMint);
 
         for (uint256 i = nextToken; i < totalSupplyOffset; ) {
