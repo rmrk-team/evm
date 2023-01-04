@@ -11,10 +11,7 @@ import "../../../RMRK/extension/tokenProperties/RMRKTokenProperties.sol";
  */
 contract RMRKTokenPropertiesMock is RMRKTokenProperties {
     /**
-     * @notice Used to set a number property.
-     * @param tokenId The token ID
-     * @param key The property key
-     * @param value The property value
+     * @inheritdoc IRMRKTokenProperties
      */
     function setUintProperty(
         uint256 tokenId,
@@ -25,10 +22,7 @@ contract RMRKTokenPropertiesMock is RMRKTokenProperties {
     }
 
     /**
-     * @notice Used to set a string property.
-     * @param tokenId The token ID
-     * @param key The property key
-     * @param value The property value
+     * @inheritdoc IRMRKTokenProperties
      */
     function setStringProperty(
         uint256 tokenId,
@@ -39,10 +33,7 @@ contract RMRKTokenPropertiesMock is RMRKTokenProperties {
     }
 
     /**
-     * @notice Used to set a boolean property.
-     * @param tokenId The token ID
-     * @param key The property key
-     * @param value The property value
+     * @inheritdoc IRMRKTokenProperties
      */
     function setBoolProperty(
         uint256 tokenId,
@@ -53,10 +44,7 @@ contract RMRKTokenPropertiesMock is RMRKTokenProperties {
     }
 
     /**
-     * @notice Used to set an bytes property.
-     * @param tokenId The token ID
-     * @param key The property key
-     * @param value The property value
+     * @inheritdoc IRMRKTokenProperties
      */
     function setBytesProperty(
         uint256 tokenId,
@@ -67,10 +55,7 @@ contract RMRKTokenPropertiesMock is RMRKTokenProperties {
     }
 
     /**
-     * @notice Used to set an address property.
-     * @param tokenId The token ID
-     * @param key The property key
-     * @param value The property value
+     * @inheritdoc IRMRKTokenProperties
      */
     function setAddressProperty(
         uint256 tokenId,
