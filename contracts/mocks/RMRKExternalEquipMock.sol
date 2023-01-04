@@ -38,6 +38,10 @@ contract RMRKExternalEquipMock is RMRKExternalEquip {
         );
     }
 
+    function addAssetEntry(uint64 id, string memory metadataURI) external {
+        _addAssetEntry(id, metadataURI);
+    }
+
     function setValidParentForEquippableGroup(
         uint64 equippableGroupId,
         address parentAddress,
