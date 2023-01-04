@@ -13,7 +13,6 @@ const IRMRKReclaimableChild = '0x2fb59acf';
 const IRMRKSoulbound = '0x911ec470';
 const IRMRKTokenProperties = '0x6a49fd01';
 const IRMRKTypedMultiAsset = '0x7f7bb665';
-const IRMRKTokenProperties = '0x6dbb26fc';
 
 export {
   IERC165,
