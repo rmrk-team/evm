@@ -3,6 +3,7 @@ const IERC721 = '0x80ac58cd';
 const IERC721Metadata = '0x5b5e139f';
 const IOtherInterface = '0xffffffff';
 const IRMRKCatalog = '0xd912401f';
+const IRMRKEmotable = '0xf8d6854d';
 const IRMRKEquippable = '0x28bc9ae4';
 const IRMRKExternalEquip = '0x289dfee5';
 const IRMRKMultiAsset = '0xd1526708';
@@ -20,6 +21,7 @@ export {
   IERC721Metadata,
   IOtherInterface,
   IRMRKCatalog,
+  IRMRKEmotable,
   IRMRKEquippable,
   IRMRKExternalEquip,
   IRMRKMultiAsset,
