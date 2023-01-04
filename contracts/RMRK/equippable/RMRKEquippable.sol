@@ -317,16 +317,7 @@ contract RMRKEquippable is
     }
 
     /**
-     * @notice Used to equip a child into a token.
-     * @dev The `IntakeEquip` stuct contains the following data:
-     *  [
-     *      tokenId,
-     *      childIndex,
-     *      assetId,
-     *      slotPartId,
-     *      childAssetId
-     *  ]
-     * @param data An `IntakeEquip` struct specifying the equip data
+     * @inheritdoc IRMRKEquippable
      */
     function equip(
         IntakeEquip memory data
@@ -424,12 +415,7 @@ contract RMRKEquippable is
     }
 
     /**
-     * @notice Used to unequip child from parent token.
-     * @dev This can only be called by the owner of the token or by an account that has been granted permission to
-     *  manage the given token by the current owner.
-     * @param tokenId ID of the parent from which the child is being unequipped
-     * @param assetId ID of the parent's asset that contains the `Slot` into which the child is equipped
-     * @param slotPartId ID of the `Slot` from which to unequip the child
+     * @inheritdoc IRMRKEquippable
      */
     function unequip(
         uint256 tokenId,
