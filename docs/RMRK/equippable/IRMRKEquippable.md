@@ -70,6 +70,22 @@ Used to verify whether a token can be equipped into a given parent&#39;s slot.
 |---|---|---|
 | _0 | bool | bool The boolean indicating whether the token with the given asset can be equipped into the desired  slot |
 
+### equip
+
+```solidity
+function equip(IRMRKEquippable.IntakeEquip data) external nonpayable
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| data | IRMRKEquippable.IntakeEquip | undefined |
+
 ### getActiveAssetPriorities
 
 ```solidity
@@ -391,6 +407,24 @@ function supportsInterface(bytes4 interfaceId) external view returns (bool)
 | Name | Type | Description |
 |---|---|---|
 | _0 | bool | undefined |
+
+### unequip
+
+```solidity
+function unequip(uint256 tokenId, uint64 assetId, uint64 slotPartId) external nonpayable
+```
+
+Used to unequip child from parent token.
+
+*This can only be called by the owner of the token or by an account that has been granted permission to  manage the given token by the current owner.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId | uint256 | ID of the parent from which the child is being unequipped |
+| assetId | uint64 | ID of the parent&#39;s asset that contains the `Slot` into which the child is equipped |
+| slotPartId | uint64 | ID of the `Slot` from which to unequip the child |
 
 
 
