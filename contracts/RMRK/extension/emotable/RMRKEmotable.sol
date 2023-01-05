@@ -36,7 +36,7 @@ abstract contract RMRKEmotable is IRMRKEmotable {
      * @notice Used to emote or undo an emote on a token.
      * @param tokenId ID of the token being emoted
      * @param emoji Unicode identifier of the emoji
-     * @param state whether to turn emote or undo. True for emote, false for undo
+     * @param state Boolean value signifying whether to emote (`true`) or undo (`false`) emote
      */
     function _emote(
         uint256 tokenId,
@@ -60,7 +60,7 @@ abstract contract RMRKEmotable is IRMRKEmotable {
      * @notice Hook that is called before emote is added or removed.
      * @param tokenId ID of the token being emoted
      * @param emoji Unicode identifier of the emoji
-     * @param state whether to turn emote or undo. True for emote, false for undo
+     * @param state Boolean value signifying whether to emote (`true`) or undo (`false`) emote
      */
     function _beforeEmote(
         uint256 tokenId,
