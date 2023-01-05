@@ -23,6 +23,7 @@ interface IRMRKEmotable is IERC165 {
 
     /**
      * @notice Used to emote or undo an emote on a token.
+     * @dev Does nothing if attempting to set a pre-existent state
      * @param tokenId ID of the token being emoted
      * @param emoji Unicode identifier of the emoji
      * @param state Boolean value signifying whether to emote (`true`) or undo (`false`) emote
