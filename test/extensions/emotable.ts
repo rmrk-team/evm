@@ -50,11 +50,15 @@ describe('RMRKMultiAssetEmotableMock', async function () {
       await token.mint(owner.address, tokenId);
     });
 
-    it('can emote and undo emote', async function () {
+    it('can emote', async function () {
       await expect(token.emote(tokenId, emoji1, true))
         .to.emit(token, 'Emoted')
         .withArgs(owner.address, tokenId.toNumber(), emoji1, true);
       expect(await token.getEmoteCount(tokenId, emoji1)).to.equal(bn(1));
+    });
+
+    it('can undo emote', async function () {
+      await token.emote(tokenId, emoji1, true);
 
       await expect(token.emote(tokenId, emoji1, false))
         .to.emit(token, 'Emoted')
