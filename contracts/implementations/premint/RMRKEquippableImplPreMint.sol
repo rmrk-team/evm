@@ -74,7 +74,7 @@ contract RMRKEquippableImplPreMint is RMRKAbstractEquippableImpl {
         address to,
         uint256 numToMint,
         uint256 destinationId
-    ) public virtual notLocked onlyOwner {
+    ) public virtual notLocked onlyOwnerOrContributor {
         (uint256 nextToken, uint256 totalSupplyOffset) = _preMint(numToMint);
 
         for (uint256 i = nextToken; i < totalSupplyOffset; ) {
