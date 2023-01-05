@@ -131,7 +131,7 @@ async function shouldControlValidPreMinting(): Promise<void> {
       const notOwner = addrs[0];
       await expect(
         this.token.connect(notOwner).nestMint(this.token.address, 1, 1),
-      ).to.be.revertedWithCustomError(this.token, 'RMRKNotOwner');
+      ).to.be.revertedWithCustomError(this.token, 'RMRKNotOwnerOrContributor');
     });
 
     it('can nest mint if owner', async function () {
