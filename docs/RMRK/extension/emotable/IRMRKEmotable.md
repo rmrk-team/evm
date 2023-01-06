@@ -18,7 +18,7 @@ function emote(uint256 tokenId, bytes4 emoji, bool state) external nonpayable
 
 Used to emote or undo an emote on a token.
 
-
+*Does nothing if attempting to set a pre-existent state*
 
 #### Parameters
 
@@ -26,7 +26,7 @@ Used to emote or undo an emote on a token.
 |---|---|---|
 | tokenId | uint256 | ID of the token being emoted |
 | emoji | bytes4 | Unicode identifier of the emoji |
-| state | bool | whether to turn emote or undo. True for emote, false for undo |
+| state | bool | Boolean value signifying whether to emote (`true`) or undo (`false`) emote |
 
 ### getEmoteCount
 

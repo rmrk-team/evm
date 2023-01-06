@@ -13,4 +13,8 @@ contract ERC721Mock is ERC721 {
         string memory name,
         string memory symbol
     ) ERC721(name, symbol) {}
+
+    function mint(address to, uint256 tokenId) public {
+        _mint(to, tokenId);
+    }
 }
