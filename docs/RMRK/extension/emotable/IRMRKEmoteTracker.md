@@ -1,10 +1,10 @@
-# RMRKEmotable
+# IRMRKEmoteTracker
 
 *RMRK team*
 
-> RMRKEmotable
+> IRMRKEmoteTracker
 
-Smart contract of the RMRK Emotable module.
+Interface smart contract of the RMRK emote tracker module.
 
 
 
@@ -13,7 +13,7 @@ Smart contract of the RMRK Emotable module.
 ### emote
 
 ```solidity
-function emote(uint256 tokenId, bytes4 emoji, bool state) external nonpayable
+function emote(address collection, uint256 tokenId, bytes4 emoji, bool state) external nonpayable
 ```
 
 Used to emote or undo an emote on a token.
@@ -24,6 +24,7 @@ Used to emote or undo an emote on a token.
 
 | Name | Type | Description |
 |---|---|---|
+| collection | address | Address of the collection with the token being emoted |
 | tokenId | uint256 | ID of the token being emoted |
 | emoji | bytes4 | Unicode identifier of the emoji |
 | state | bool | Boolean value signifying whether to emote (`true`) or undo (`false`) emote |
@@ -31,7 +32,7 @@ Used to emote or undo an emote on a token.
 ### getEmoteCount
 
 ```solidity
-function getEmoteCount(uint256 tokenId, bytes4 emoji) external view returns (uint256)
+function getEmoteCount(address collection, uint256 tokenId, bytes4 emoji) external view returns (uint256)
 ```
 
 Used to get the number of emotes for a specific emoji on a token.
@@ -42,6 +43,7 @@ Used to get the number of emotes for a specific emoji on a token.
 
 | Name | Type | Description |
 |---|---|---|
+| collection | address | Address of the collection with the token to check for emoji count |
 | tokenId | uint256 | ID of the token to check for emoji count |
 | emoji | bytes4 | Unicode identifier of the emoji |
 
@@ -73,28 +75,6 @@ function supportsInterface(bytes4 interfaceId) external view returns (bool)
 |---|---|---|
 | _0 | bool | undefined |
 
-
-
-## Events
-
-### Emoted
-
-```solidity
-event Emoted(address indexed emoter, uint256 indexed tokenId, bytes4 emoji, bool on)
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| emoter `indexed` | address | undefined |
-| tokenId `indexed` | uint256 | undefined |
-| emoji  | bytes4 | undefined |
-| on  | bool | undefined |
 
 
 

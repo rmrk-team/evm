@@ -3,8 +3,18 @@ import { expect } from 'chai';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { bn } from '../utils';
-import { IERC165, IRMRKMultiAsset, IRMRKEmotable, IOtherInterface } from '../interfaces';
-import { RMRKMultiAssetEmotableMock } from '../../typechain-types';
+import {
+  IERC165,
+  IRMRKMultiAsset,
+  IRMRKEmotable,
+  IRMRKEmoteTracker,
+  IOtherInterface,
+} from '../interfaces';
+import {
+  RMRKMultiAssetEmotableMock,
+  ERC721Mock,
+  RMRKEmoteTrackerMock,
+} from '../../typechain-types';
 
 // --------------- FIXTURES -----------------------
 
@@ -14,6 +24,19 @@ async function multiAssetEmotableFixture() {
   await token.deployed();
 
   return token;
+}
+
+async function emoteTrackerFixture() {
+  const factory = await ethers.getContractFactory('RMRKEmoteTrackerMock');
+  const erc721Factory = await ethers.getContractFactory('ERC721Mock');
+  const emoteTracker = await factory.deploy();
+  const tokenA = await erc721Factory.deploy('Token A', 'TKA');
+  const tokenB = await erc721Factory.deploy('Token B', 'TKB');
+  await emoteTracker.deployed();
+  await tokenA.deployed();
+  await tokenB.deployed();
+
+  return { emoteTracker, tokenA, tokenB };
 }
 
 describe('RMRKMultiAssetEmotableMock', async function () {
@@ -88,6 +111,75 @@ describe('RMRKMultiAssetEmotableMock', async function () {
         token,
         'ERC721InvalidTokenId',
       );
+    });
+  });
+});
+
+describe('RMRKEmoteTrackerMock', async function () {
+  let emoteTracker: RMRKEmoteTrackerMock;
+  let tokenA: ERC721Mock;
+  let tokenB: ERC721Mock;
+  let owner: SignerWithAddress;
+  let addrs: SignerWithAddress[];
+  const tokenId = bn(1);
+  const emoji1 = Buffer.from('😎');
+  const emoji2 = Buffer.from('😁');
+
+  beforeEach(async function () {
+    [owner, ...addrs] = await ethers.getSigners();
+    ({ emoteTracker, tokenA, tokenB } = await loadFixture(emoteTrackerFixture));
+  });
+
+  it('can support IERC165', async function () {
+    expect(await emoteTracker.supportsInterface(IERC165)).to.equal(true);
+  });
+  it('can support IRMRKEmoteTracker', async function () {
+    expect(await emoteTracker.supportsInterface(IRMRKEmoteTracker)).to.equal(true);
+  });
+
+  it('does not support other interfaces', async function () {
+    expect(await emoteTracker.supportsInterface(IOtherInterface)).to.equal(false);
+  });
+
+  describe('With minted tokens', async function () {
+    beforeEach(async function () {
+      await tokenA.mint(owner.address, 1);
+      await tokenA.mint(owner.address, 2);
+      await tokenB.mint(owner.address, 1);
+      await tokenB.mint(owner.address, 2);
+    });
+
+    it('can emote', async function () {
+      await expect(emoteTracker.emote(tokenA.address, tokenId, emoji1, true))
+        .to.emit(emoteTracker, 'Emoted')
+        .withArgs(owner.address, tokenA.address, tokenId.toNumber(), emoji1, true);
+      expect(await emoteTracker.getEmoteCount(tokenA.address, tokenId, emoji1)).to.equal(bn(1));
+    });
+
+    it('can undo emote', async function () {
+      await emoteTracker.emote(tokenA.address, tokenId, emoji1, true);
+
+      await expect(emoteTracker.emote(tokenA.address, tokenId, emoji1, false))
+        .to.emit(emoteTracker, 'Emoted')
+        .withArgs(owner.address, tokenA.address, tokenId.toNumber(), emoji1, false);
+      expect(await emoteTracker.getEmoteCount(tokenA.address, tokenId, emoji1)).to.equal(bn(0));
+    });
+
+    it('can be emoted from different accounts', async function () {
+      await emoteTracker.connect(addrs[0]).emote(tokenA.address, tokenId, emoji1, true);
+      await emoteTracker.connect(addrs[1]).emote(tokenA.address, tokenId, emoji1, true);
+      await emoteTracker.connect(addrs[2]).emote(tokenA.address, tokenId, emoji2, true);
+      expect(await emoteTracker.getEmoteCount(tokenA.address, tokenId, emoji1)).to.equal(bn(2));
+      expect(await emoteTracker.getEmoteCount(tokenA.address, tokenId, emoji2)).to.equal(bn(1));
+    });
+
+    it('does nothing if new state is the same as old state', async function () {
+      await emoteTracker.emote(tokenA.address, tokenId, emoji1, true);
+      await emoteTracker.emote(tokenA.address, tokenId, emoji1, true);
+      expect(await emoteTracker.getEmoteCount(tokenA.address, tokenId, emoji1)).to.equal(bn(1));
+
+      await emoteTracker.emote(tokenA.address, tokenId, emoji2, false);
+      expect(await emoteTracker.getEmoteCount(tokenA.address, tokenId, emoji2)).to.equal(bn(0));
     });
   });
 });

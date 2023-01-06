@@ -1,10 +1,10 @@
-# RMRKEmotable
+# RMRKEmoteTrackerMock
 
-*RMRK team*
 
-> RMRKEmotable
 
-Smart contract of the RMRK Emotable module.
+
+
+
 
 
 
@@ -13,25 +13,26 @@ Smart contract of the RMRK Emotable module.
 ### emote
 
 ```solidity
-function emote(uint256 tokenId, bytes4 emoji, bool state) external nonpayable
+function emote(address collection, uint256 tokenId, bytes4 emoji, bool on) external nonpayable
 ```
 
-Used to emote or undo an emote on a token.
 
-*Does nothing if attempting to set a pre-existent state*
+
+
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | ID of the token being emoted |
-| emoji | bytes4 | Unicode identifier of the emoji |
-| state | bool | Boolean value signifying whether to emote (`true`) or undo (`false`) emote |
+| collection | address | undefined |
+| tokenId | uint256 | undefined |
+| emoji | bytes4 | undefined |
+| on | bool | undefined |
 
 ### getEmoteCount
 
 ```solidity
-function getEmoteCount(uint256 tokenId, bytes4 emoji) external view returns (uint256)
+function getEmoteCount(address collection, uint256 tokenId, bytes4 emoji) external view returns (uint256)
 ```
 
 Used to get the number of emotes for a specific emoji on a token.
@@ -42,6 +43,7 @@ Used to get the number of emotes for a specific emoji on a token.
 
 | Name | Type | Description |
 |---|---|---|
+| collection | address | Address of the collection with the token to check for emoji count |
 | tokenId | uint256 | ID of the token to check for emoji count |
 | emoji | bytes4 | Unicode identifier of the emoji |
 
@@ -80,7 +82,7 @@ function supportsInterface(bytes4 interfaceId) external view returns (bool)
 ### Emoted
 
 ```solidity
-event Emoted(address indexed emoter, uint256 indexed tokenId, bytes4 emoji, bool on)
+event Emoted(address indexed emoter, address indexed collection, uint256 indexed tokenId, bytes4 emoji, bool on)
 ```
 
 
@@ -92,6 +94,7 @@ event Emoted(address indexed emoter, uint256 indexed tokenId, bytes4 emoji, bool
 | Name | Type | Description |
 |---|---|---|
 | emoter `indexed` | address | undefined |
+| collection `indexed` | address | undefined |
 | tokenId `indexed` | uint256 | undefined |
 | emoji  | bytes4 | undefined |
 | on  | bool | undefined |
