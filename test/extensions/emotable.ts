@@ -97,6 +97,13 @@ describe('RMRKMultiAssetEmotableMock', async function () {
       expect(await token.getEmoteCount(tokenId, emoji2)).to.equal(bn(1));
     });
 
+    it('can add multiple emojis to same NFT', async function () {
+      await token.emote(tokenId, emoji1, true);
+      await token.emote(tokenId, emoji2, true);
+      expect(await token.getEmoteCount(tokenId, emoji1)).to.equal(bn(1));
+      expect(await token.getEmoteCount(tokenId, emoji2)).to.equal(bn(1));
+    });
+
     it('does nothing if new state is the same as old state', async function () {
       await token.emote(tokenId, emoji1, true);
       await token.emote(tokenId, emoji1, true);
@@ -170,6 +177,13 @@ describe('RMRKEmoteTrackerMock', async function () {
       await emoteTracker.connect(addrs[1]).emote(tokenA.address, tokenId, emoji1, true);
       await emoteTracker.connect(addrs[2]).emote(tokenA.address, tokenId, emoji2, true);
       expect(await emoteTracker.getEmoteCount(tokenA.address, tokenId, emoji1)).to.equal(bn(2));
+      expect(await emoteTracker.getEmoteCount(tokenA.address, tokenId, emoji2)).to.equal(bn(1));
+    });
+
+    it('can add multiple emojis to same NFT', async function () {
+      await emoteTracker.emote(tokenA.address, tokenId, emoji1, true);
+      await emoteTracker.emote(tokenA.address, tokenId, emoji2, true);
+      expect(await emoteTracker.getEmoteCount(tokenA.address, tokenId, emoji1)).to.equal(bn(1));
       expect(await emoteTracker.getEmoteCount(tokenA.address, tokenId, emoji2)).to.equal(bn(1));
     });
 
