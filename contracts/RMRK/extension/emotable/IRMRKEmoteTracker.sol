@@ -12,7 +12,7 @@ import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 interface IRMRKEmoteTracker is IERC165 {
     /**
      * @notice Used to get the number of emotes for a specific emoji on a token.
-     * @param collection Address of the collection with the token to check for emoji count
+     * @param collection Address of the collection containing the token being checked for emoji count
      * @param tokenId ID of the token to check for emoji count
      * @param emoji Unicode identifier of the emoji
      * @return Number of emotes with the emoji on the token

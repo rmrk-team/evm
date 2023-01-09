@@ -11,7 +11,7 @@ import "./IRMRKEmoteTracker.sol";
  */
 abstract contract RMRKEmoteTracker is IRMRKEmoteTracker {
     // Used to avoid double emoting and control undoing
-    // emoter address => collection => tokenId => emoji => state (1 for emoted, 0 for not.)
+    // emoter address => collection => tokenId => emoji => state (1 for emoted, 0 for not)
     mapping(address => mapping(address => mapping(uint256 => mapping(bytes4 => uint256))))
         private _emotesPerAddress; // Cheaper than using a bool
     // collection => tokenId => emoji => count
@@ -39,7 +39,7 @@ abstract contract RMRKEmoteTracker is IRMRKEmoteTracker {
 
     /**
      * @notice Used to emote or undo an emote on a token.
-     * @param collection Address of the collection with the token being emoted
+     * @param collection Address of the collection containing the token being emoted
      * @param tokenId ID of the token being emoted
      * @param emoji Unicode identifier of the emoji
      * @param state Boolean value signifying whether to emote (`true`) or undo (`false`) emote
@@ -69,7 +69,7 @@ abstract contract RMRKEmoteTracker is IRMRKEmoteTracker {
 
     /**
      * @notice Hook that is called before emote is added or removed.
-     * @param collection Address of the collection with the token being emoted
+     * @param collection Address of the collection containing the token being emoted
      * @param tokenId ID of the token being emoted
      * @param emoji Unicode identifier of the emoji
      * @param state Boolean value signifying whether to emote (`true`) or undo (`false`) emote
