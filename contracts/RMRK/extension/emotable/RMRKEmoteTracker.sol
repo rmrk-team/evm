@@ -3,7 +3,6 @@
 pragma solidity ^0.8.16;
 
 import "./IRMRKEmoteTracker.sol";
-import "hardhat/console.sol";
 
 /**
  * @title RMRKEmotable
@@ -88,7 +87,6 @@ abstract contract RMRKEmoteTracker is IRMRKEmoteTracker {
     function supportsInterface(
         bytes4 interfaceId
     ) public view virtual returns (bool) {
-        console.logBytes4(type(IRMRKEmoteTracker).interfaceId);
         return
             interfaceId == type(IRMRKEmoteTracker).interfaceId ||
             interfaceId == type(IERC165).interfaceId;
