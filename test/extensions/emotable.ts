@@ -178,7 +178,7 @@ describe('RMRKEmoteTrackerMock', async function () {
       await emoteTracker.connect(addrs[1]).emote(tokenB.address, tokenId, emoji1, true);
       await emoteTracker.connect(addrs[2]).emote(tokenB.address, tokenId, emoji1, true);
       expect(await emoteTracker.getEmoteCount(tokenA.address, tokenId, emoji1)).to.equal(bn(1));
-      expect(await emoteTracker.getEmoteCount(tokenA.address, tokenId, emoji2)).to.equal(bn(2));
+      expect(await emoteTracker.getEmoteCount(tokenB.address, tokenId, emoji1)).to.equal(bn(2));
     });
 
     it('does nothing if new state is the same as old state', async function () {
