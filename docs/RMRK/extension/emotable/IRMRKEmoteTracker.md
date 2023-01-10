@@ -24,7 +24,7 @@ Used to emote or undo an emote on a token.
 
 | Name | Type | Description |
 |---|---|---|
-| collection | address | Address of the collection with the token being emoted |
+| collection | address | Address of the collection containing the token being checked for emoji count |
 | tokenId | uint256 | ID of the token being emoted |
 | emoji | bytes4 | Unicode identifier of the emoji |
 | state | bool | Boolean value signifying whether to emote (`true`) or undo (`false`) emote |
@@ -43,7 +43,7 @@ Used to get the number of emotes for a specific emoji on a token.
 
 | Name | Type | Description |
 |---|---|---|
-| collection | address | Address of the collection with the token to check for emoji count |
+| collection | address | Address of the collection containing the token being checked for emoji count |
 | tokenId | uint256 | ID of the token to check for emoji count |
 | emoji | bytes4 | Unicode identifier of the emoji |
 
