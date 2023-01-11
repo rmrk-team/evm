@@ -41,7 +41,7 @@ Used to compose the given equippables.
 ### getEquipped
 
 ```solidity
-function getEquipped(address target, uint64 tokenId, uint64 assetId) external view returns (uint64[] slotPartIds, struct IRMRKEquippable.Equipment[] childrenEquipped)
+function getEquipped(address target, uint64 tokenId, uint64 assetId) external view returns (uint64[] slotPartIds, struct IRMRKEquippable.Equipment[] childrenEquipped, string[] childrenAssetMetadata)
 ```
 
 Used to retrieve the equipped parts of the given token.
@@ -62,6 +62,7 @@ Used to retrieve the equipped parts of the given token.
 |---|---|---|
 | slotPartIds | uint64[] | An array of the IDs of the slot parts present in the given asset |
 | childrenEquipped | IRMRKEquippable.Equipment[] | An array of `Equipment` structs containing info about the equipped children |
+| childrenAssetMetadata | string[] | An array of strings corresponding to asset metadata of the equipped children |
 
 ### getExtendedActiveAssets
 

@@ -199,9 +199,11 @@ async function shouldBehaveLikeEquippableWithSlots(
         [bn(soldierResId), bn(weaponResId), bn(weaponsIds[0]), weaponEquip.address],
         [bn(soldierResId), bn(backgroundAssetId), bn(backgroundsIds[0]), backgroundEquip.address],
       ];
+      const expectedMetadata = ['ipfs:weapon/equip/5', 'ipfs:background/'];
       expect(await view.getEquipped(soldierEquip.address, soldiersIds[0], soldierResId)).to.eql([
         expectedSlots,
         expectedEquips,
+        expectedMetadata,
       ]);
 
       // Children are marked as equipped:
@@ -585,9 +587,11 @@ async function shouldBehaveLikeEquippableWithSlots(
       [bn(soldierResId), bn(weaponResId), bn(weaponsIds[0]), weaponEquip.address],
       [bn(0), bn(0), bn(0), ethers.constants.AddressZero],
     ];
+    const expectedMetadata = ['ipfs:weapon/equip/5', ''];
     expect(await view.getEquipped(soldierEquip.address, soldiersIds[0], soldierResId)).to.eql([
       expectedSlots,
       expectedEquips,
+      expectedMetadata,
     ]);
 
     // Child is marked as equipped:
@@ -614,9 +618,11 @@ async function shouldBehaveLikeEquippableWithSlots(
       [bn(0), bn(0), bn(0), ethers.constants.AddressZero],
       [bn(0), bn(0), bn(0), ethers.constants.AddressZero],
     ];
+    const expectedMetadata = ['', ''];
     expect(await view.getEquipped(soldierEquip.address, soldiersIds[0], soldierResId)).to.eql([
       expectedSlots,
       expectedEquips,
+      expectedMetadata,
     ]);
 
     // Child is marked as not equipped:

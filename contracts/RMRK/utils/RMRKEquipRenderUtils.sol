@@ -227,6 +227,7 @@ contract RMRKEquipRenderUtils {
      * @param assetId ID of the asset being queried for equipped parts
      * @return slotPartIds An array of the IDs of the slot parts present in the given asset
      * @return childrenEquipped An array of `Equipment` structs containing info about the equipped children
+     * @return childrenAssetMetadata An array of strings corresponding to asset metadata of the equipped children
      */
     function getEquipped(
         address target,
@@ -237,7 +238,8 @@ contract RMRKEquipRenderUtils {
         view
         returns (
             uint64[] memory slotPartIds,
-            IRMRKEquippable.Equipment[] memory childrenEquipped
+            IRMRKEquippable.Equipment[] memory childrenEquipped,
+            string[] memory childrenAssetMetadata
         )
     {
         IRMRKEquippable target_ = IRMRKEquippable(target);
@@ -246,20 +248,27 @@ contract RMRKEquipRenderUtils {
             .getAssetAndEquippableData(tokenId, assetId);
 
         (slotPartIds, ) = splitSlotAndFixedParts(partIds, catalogAddress);
-        childrenEquipped = new IRMRKEquippable.Equipment[](slotPartIds.length);
-
         uint256 len = slotPartIds.length;
-        for (uint256 i; i < len; ) {
-            IRMRKEquippable.Equipment memory equipment = target_.getEquipment(
-                tokenId,
-                catalogAddress,
-                slotPartIds[i]
-            );
-            if (equipment.assetId == assetId) {
-                childrenEquipped[i] = equipment;
-            }
-            unchecked {
-                ++i;
+
+        if (len != 0) {
+            childrenEquipped = new IRMRKEquippable.Equipment[](len);
+            childrenAssetMetadata = new string[](len);
+
+            for (uint256 i; i < len; ) {
+                IRMRKEquippable.Equipment memory equipment = target_
+                    .getEquipment(tokenId, catalogAddress, slotPartIds[i]);
+                if (equipment.assetId == assetId) {
+                    childrenEquipped[i] = equipment;
+                    childrenAssetMetadata[i] = IRMRKEquippable(
+                        equipment.childEquippableAddress
+                    ).getAssetMetadata(
+                            equipment.childId,
+                            equipment.childAssetId
+                        );
+                }
+                unchecked {
+                    ++i;
+                }
             }
         }
     }
@@ -377,6 +386,7 @@ contract RMRKEquipRenderUtils {
         slotParts = new EquippedSlotPart[](slotPartIds.length);
         uint256 len = slotPartIds.length;
 
+        // TODO: is this check really needed?
         if (len != 0) {
             string memory metadata;
             IRMRKCatalog.Part[] memory catalogSlotParts = IRMRKCatalog(
