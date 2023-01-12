@@ -852,6 +852,23 @@ Used to notify listeners that a child&#39;s asset has been unequipped from one o
 | childAddress  | address | undefined |
 | childAssetId  | uint64 | undefined |
 
+### ContributorUpdate
+
+```solidity
+event ContributorUpdate(address indexed contributor, bool isContributor)
+```
+
+Event that signifies that an address was granted contributor role or that the permission has been  revoked.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| contributor `indexed` | address | undefined |
+| isContributor  | bool | undefined |
+
 ### NestableAddressSet
 
 ```solidity
@@ -875,7 +892,7 @@ Used to notify listeners of a new `Nestable` associated  smart contract address 
 event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)
 ```
 
-
+Used to anounce the transfer of ownership.
 
 
 
