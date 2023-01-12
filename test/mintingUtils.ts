@@ -53,6 +53,13 @@ describe('Minting Utils', async () => {
       expect(await mintingUtils.owner()).to.eql(newOwner.address);
     });
 
+    it('emits OwnershipTransferred event when transferring ownership', async function () {
+      const newOwner = addrs[1];
+      await expect(mintingUtils.connect(owner).transferOwnership(newOwner.address))
+        .to.emit(mintingUtils, 'OwnershipTransferred')
+        .withArgs(owner.address, newOwner.address);
+    });
+
     it('cannot transfer ownership to address 0', async function () {
       await expect(
         mintingUtils.connect(owner).transferOwnership(ethers.constants.AddressZero),
@@ -70,6 +77,21 @@ describe('Minting Utils', async () => {
       expect(await mintingUtils.connect(owner).isContributor(contributor.address)).to.eql(true);
       await mintingUtils.connect(owner).revokeContributor(contributor.address);
       expect(await mintingUtils.connect(owner).isContributor(contributor.address)).to.eql(false);
+    });
+
+    it('emits ContributorUpdate when adding a contributor', async function () {
+      const contributor = addrs[1];
+      await expect(mintingUtils.connect(owner).addContributor(contributor.address))
+        .to.emit(mintingUtils, 'ContributorUpdate')
+        .withArgs(contributor.address, true);
+    });
+
+    it('emits ContributorUpdate when removing a contributor', async function () {
+      const contributor = addrs[1];
+      await mintingUtils.connect(owner).addContributor(contributor.address);
+      await expect(mintingUtils.connect(owner).revokeContributor(contributor.address))
+        .to.emit(mintingUtils, 'ContributorUpdate')
+        .withArgs(contributor.address, false);
     });
 
     it('cannot add zero address as contributor', async function () {
