@@ -112,13 +112,30 @@ Transfers ownership of the contract to a new owner.
 
 ## Events
 
+### ContributorUpdate
+
+```solidity
+event ContributorUpdate(address indexed contributor, bool isContributor)
+```
+
+Event that signifies that an address was granted contributor role or that the permission has been  revoked.
+
+*This can only be triggered by a current owner, so there is no need to include that information in the event.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| contributor `indexed` | address | Address of the account that had contributor role status updated |
+| isContributor  | bool | A boolean value signifying whether the role has been granted (`true`) or revoked (`false`) |
+
 ### OwnershipTransferred
 
 ```solidity
 event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)
 ```
 
-
+Used to anounce the transfer of ownership.
 
 
 
@@ -126,8 +143,8 @@ event OwnershipTransferred(address indexed previousOwner, address indexed newOwn
 
 | Name | Type | Description |
 |---|---|---|
-| previousOwner `indexed` | address | undefined |
-| newOwner `indexed` | address | undefined |
+| previousOwner `indexed` | address | Address of the account that transferred their ownership role |
+| newOwner `indexed` | address | Address of the account receiving the ownership role |
 
 
 

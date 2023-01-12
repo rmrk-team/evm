@@ -955,6 +955,23 @@ Used to notify listeners a child token has been transferred from parent token.
 | childId `indexed` | uint256 | undefined |
 | fromPending  | bool | undefined |
 
+### ContributorUpdate
+
+```solidity
+event ContributorUpdate(address indexed contributor, bool isContributor)
+```
+
+Event that signifies that an address was granted contributor role or that the permission has been  revoked.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| contributor `indexed` | address | undefined |
+| isContributor  | bool | undefined |
+
 ### NestTransfer
 
 ```solidity
@@ -981,7 +998,7 @@ Used to notify listeners that the token is being transferred.
 event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)
 ```
 
-
+Used to anounce the transfer of ownership.
 
 
 
