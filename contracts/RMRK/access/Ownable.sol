@@ -59,6 +59,7 @@ contract Ownable is Context {
 
     /**
      * @notice Returns the address of the current owner.
+     * @return Address of the current owner
      */
     function owner() public view virtual returns (address) {
         return _owner;

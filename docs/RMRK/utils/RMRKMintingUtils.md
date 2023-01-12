@@ -97,7 +97,7 @@ Returns the address of the current owner.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | address | undefined |
+| _0 | address | Address of the current owner |
 
 ### pricePerMint
 
