@@ -10,6 +10,30 @@ Smart contract of the RMRK Equip render utils module.
 
 ## Methods
 
+### _splitSlotAndFixedParts
+
+```solidity
+function _splitSlotAndFixedParts(uint64[] allPartIds, address catalogAddress) external view returns (uint64[] slotPartIds, uint64[] fixedPartIds)
+```
+
+Used to split slot and fixed parts.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| allPartIds | uint64[] | [] An array of `Part` IDs containing both, `Slot` and `Fixed` parts |
+| catalogAddress | address | An address of the catalog to which the given `Part`s belong to |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| slotPartIds | uint64[] | An array of IDs of the `Slot` parts included in the `allPartIds` |
+| fixedPartIds | uint64[] | An array of IDs of the `Fixed` parts included in the `allPartIds` |
+
 ### composeEquippables
 
 ```solidity
@@ -37,6 +61,101 @@ Used to compose the given equippables.
 | catalogAddress | address | Address of the catalog to which the asset belongs to |
 | fixedParts | RMRKEquipRenderUtils.FixedPart[] | An array of fixed parts respresented by the `FixedPart` structs present on the asset |
 | slotParts | RMRKEquipRenderUtils.EquippedSlotPart[] | An array of slot parts represented by the `EquippedSlotPart` structs present on the asset |
+
+### getActiveAssets
+
+```solidity
+function getActiveAssets(address target, uint256 tokenId) external view returns (struct RMRKMultiAssetRenderUtils.ActiveAsset[])
+```
+
+Used to get the active assets of the given token.
+
+*The full `ActiveAsset` looks like this:  [      id,      priority,      metadata  ]*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| target | address | Address of the smart contract of the given token |
+| tokenId | uint256 | ID of the token to retrieve the active assets for |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | RMRKMultiAssetRenderUtils.ActiveAsset[] | struct[] An array of ActiveAssets present on the given token |
+
+### getAssetIdWithTopPriority
+
+```solidity
+function getAssetIdWithTopPriority(address target, uint256 tokenId) external view returns (uint64, uint16)
+```
+
+Used to retrieve the ID of the specified token&#39;s asset with the highest priority.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| target | address | Address of the smart contract of the given token |
+| tokenId | uint256 | ID of the token for which to retrieve the ID of the asset with the highest priority |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint64 | string The ID of the asset with the highest priority |
+| _1 | uint16 | undefined |
+
+### getAssetsById
+
+```solidity
+function getAssetsById(address target, uint256 tokenId, uint64[] assetIds) external view returns (string[])
+```
+
+Used to retrieve the metadata URI of specified assets in the specified token.
+
+*Requirements:  - `assetIds` must exist.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| target | address | Address of the smart contract of the given token |
+| tokenId | uint256 | ID of the token to retrieve the specified assets for |
+| assetIds | uint64[] | [] An array of asset IDs for which to retrieve the metadata URIs |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | string[] | string[] An array of metadata URIs belonging to specified assets |
+
+### getEquippableSlotsFromParent
+
+```solidity
+function getEquippableSlotsFromParent(address target, uint256 tokenId, uint64 parentAssetId) external view returns (struct RMRKEquipRenderUtils.AssetWithSlot[] assetsWithSlots)
+```
+
+Used to get the child&#39;s assets and slot parts pairs, for which the child asset can be equipped into parent&#39;s slot part.
+
+*The full `AssetWithSlot` struct looks like this:  [      assetId,      slotPartId  ]*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| target | address | Address of the smart contract of the given token |
+| tokenId | uint256 | ID of the child token whose assets will be matched against parent&#39;s slot parts |
+| parentAssetId | uint64 | ID of the target parent asset to use to equip the child |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| assetsWithSlots | RMRKEquipRenderUtils.AssetWithSlot[] | An array of `AssetWithSlot` structs containing info about the equippable child assets and their corresponding slot parts |
 
 ### getEquipped
 
@@ -85,7 +204,7 @@ Used to get extended active assets of the given token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | RMRKEquipRenderUtils.ExtendedActiveAsset[] | sturct[] An array of ExtendedActiveAssets present on the given token |
+| _0 | RMRKEquipRenderUtils.ExtendedActiveAsset[] | ExtendedActiveAssets[] An array of ExtendedActiveAssets present on the given token |
 
 ### getExtendedPendingAssets
 
@@ -108,15 +227,38 @@ Used to get the extended pending assets of the given token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | RMRKEquipRenderUtils.ExtendedPendingAsset[] | sturct[] An array of ExtendedPendingAssets present on the given token |
+| _0 | RMRKEquipRenderUtils.ExtendedPendingAsset[] | ExtendedPendingAssets[] An array of ExtendedPendingAssets present on the given token |
 
-### splitSlotAndFixedParts
+### getPendingAssets
 
 ```solidity
-function splitSlotAndFixedParts(uint64[] allPartIds, address catalogAddress) external view returns (uint64[] slotPartIds, uint64[] fixedPartIds)
+function getPendingAssets(address target, uint256 tokenId) external view returns (struct RMRKMultiAssetRenderUtils.PendingAsset[])
 ```
 
-Used to split slot and fixed parts.
+Used to get the pending assets of the given token.
+
+*The full `PendingAsset` looks like this:  [      id,      acceptRejectIndex,      replacesAssetWithId,      metadata  ]*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| target | address | Address of the smart contract of the given token |
+| tokenId | uint256 | ID of the token to retrieve the pending assets for |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | RMRKMultiAssetRenderUtils.PendingAsset[] | struct[] An array of PendingAssets present on the given token |
+
+### getTopAssetAndEquippableDataForToken
+
+```solidity
+function getTopAssetAndEquippableDataForToken(address target, uint256 tokenId) external view returns (struct RMRKEquipRenderUtils.ExtendedActiveAsset topAsset)
+```
+
+Used to retrieve the equippable data of the specified token&#39;s asset with the highest priority.
 
 
 
@@ -124,15 +266,37 @@ Used to split slot and fixed parts.
 
 | Name | Type | Description |
 |---|---|---|
-| allPartIds | uint64[] | [] An array of `Part` IDs containing both, `Slot` and `Fixed` parts |
-| catalogAddress | address | An address of the catalog to which the given `Part`s belong to |
+| target | address | Address of the smart contract of the given token |
+| tokenId | uint256 | ID of the token for which to retrieve the equippable data of the asset with the highest priority |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| slotPartIds | uint64[] | An array of IDs of the `Slot` parts included in the `allPartIds` |
-| fixedPartIds | uint64[] | An array of IDs of the `Fixed` parts included in the `allPartIds` |
+| topAsset | RMRKEquipRenderUtils.ExtendedActiveAsset | ExtendedActiveAsset struct with the equippable data for the the asset with the highest priority |
+
+### getTopAssetMetaForToken
+
+```solidity
+function getTopAssetMetaForToken(address target, uint256 tokenId) external view returns (string)
+```
+
+Used to retrieve the metadata URI of the specified token&#39;s asset with the highest priority.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| target | address | Address of the smart contract of the given token |
+| tokenId | uint256 | ID of the token for which to retrieve the metadata URI of the asset with the highest priority |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | string | string The metadata URI of the asset with the highest priority |
 
 
 
@@ -146,6 +310,17 @@ error RMRKNotComposableAsset()
 ```
 
 Attempting to compose an asset wihtout having an associated Catalog
+
+
+
+
+### RMRKParentIsNotNFT
+
+```solidity
+error RMRKParentIsNotNFT()
+```
+
+Attempting do an operation assuming a token is nested, while it is not
 
 
 

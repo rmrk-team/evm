@@ -105,6 +105,8 @@ error RMRKNotOwnerOrContributor();
 error RMRKNewOwnerIsZeroAddress();
 /// Attempting to assign a 0x0 address as a contributor
 error RMRKNewContributorIsZeroAddress();
+/// Attempting do an operation assuming a token is nested, while it is not
+error RMRKParentIsNotNFT();
 /// Attempting to add a `Part` with an ID that is already used
 error RMRKPartAlreadyExists();
 /// Attempting to use a `Part` that doesn't exist

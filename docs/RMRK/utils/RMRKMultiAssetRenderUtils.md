@@ -33,6 +33,30 @@ Used to get the active assets of the given token.
 |---|---|---|
 | _0 | RMRKMultiAssetRenderUtils.ActiveAsset[] | struct[] An array of ActiveAssets present on the given token |
 
+### getAssetIdWithTopPriority
+
+```solidity
+function getAssetIdWithTopPriority(address target, uint256 tokenId) external view returns (uint64, uint16)
+```
+
+Used to retrieve the ID of the specified token&#39;s asset with the highest priority.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| target | address | Address of the smart contract of the given token |
+| tokenId | uint256 | ID of the token for which to retrieve the ID of the asset with the highest priority |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint64 | string The ID of the asset with the highest priority |
+| _1 | uint16 | undefined |
+
 ### getAssetsById
 
 ```solidity

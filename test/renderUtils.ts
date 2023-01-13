@@ -1,9 +1,10 @@
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import { ADDRESS_ZERO, bn, mintFromMock } from './utils';
+import { ADDRESS_ZERO, bn, mintFromMock, nestMintFromMock } from './utils';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import {
+  RMRKCatalogMock,
   RMRKEquippableMock,
   RMRKEquipRenderUtils,
   RMRKMultiAssetRenderUtils,
@@ -12,9 +13,13 @@ import {
 // --------------- FIXTURES -----------------------
 
 async function assetsFixture() {
+  const catalogFactory = await ethers.getContractFactory('RMRKCatalogMock');
   const equipFactory = await ethers.getContractFactory('RMRKEquippableMock');
   const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiAssetRenderUtils');
   const renderUtilsEquipFactory = await ethers.getContractFactory('RMRKEquipRenderUtils');
+
+  const catalog = <RMRKCatalogMock>await catalogFactory.deploy('ipfs://catalog.json', 'misc');
+  await catalog.deployed();
 
   const equip = <RMRKEquippableMock>await equipFactory.deploy('Chunky', 'CHNK');
   await equip.deployed();
@@ -25,12 +30,31 @@ async function assetsFixture() {
   const renderUtilsEquip = <RMRKEquipRenderUtils>await renderUtilsEquipFactory.deploy();
   await renderUtilsEquip.deployed();
 
-  return { equip, renderUtils, renderUtilsEquip };
+  return { catalog, equip, renderUtils, renderUtilsEquip };
+}
+
+async function advancedAssetsFixture() {
+  const catalogFactory = await ethers.getContractFactory('RMRKCatalogMock');
+  const equipFactory = await ethers.getContractFactory('RMRKEquippableMock');
+  const renderUtilsEquipFactory = await ethers.getContractFactory('RMRKEquipRenderUtils');
+
+  const catalog = <RMRKCatalogMock>await catalogFactory.deploy('ipfs://catalog.json', 'misc');
+
+  const kanaria = <RMRKEquippableMock>await equipFactory.deploy('Kanaria', 'KAN');
+  kanaria.deployed();
+
+  const gem = <RMRKEquippableMock>await equipFactory.deploy('Kanaria Gem', 'KGEM');
+  gem.deployed();
+
+  const renderUtilsEquip = <RMRKEquipRenderUtils>await renderUtilsEquipFactory.deploy();
+  await renderUtilsEquip.deployed();
+
+  return { catalog, kanaria, gem, renderUtilsEquip };
 }
 
 describe('Render Utils', async function () {
   let owner: SignerWithAddress;
-  let someCatalog: SignerWithAddress;
+  let catalog: RMRKCatalogMock;
   let equip: RMRKEquippableMock;
   let renderUtils: RMRKMultiAssetRenderUtils;
   let renderUtilsEquip: RMRKEquipRenderUtils;
@@ -42,23 +66,16 @@ describe('Render Utils', async function () {
   const resId4 = bn(4);
 
   beforeEach(async function () {
-    ({ equip, renderUtils, renderUtilsEquip } = await loadFixture(assetsFixture));
+    ({ catalog, equip, renderUtils, renderUtilsEquip } = await loadFixture(assetsFixture));
 
     const signers = await ethers.getSigners();
     owner = signers[0];
-    someCatalog = signers[1];
 
     tokenId = await mintFromMock(equip, owner.address);
     await equip.addEquippableAssetEntry(resId, 0, ADDRESS_ZERO, 'ipfs://res1.jpg', []);
-    await equip.addEquippableAssetEntry(
-      resId2,
-      1,
-      someCatalog.address,
-      'ipfs://res2.jpg',
-      [1, 3, 4],
-    );
+    await equip.addEquippableAssetEntry(resId2, 1, catalog.address, 'ipfs://res2.jpg', [1, 3, 4]);
     await equip.addEquippableAssetEntry(resId3, 0, ADDRESS_ZERO, 'ipfs://res3.jpg', []);
-    await equip.addEquippableAssetEntry(resId4, 2, someCatalog.address, 'ipfs://res4.jpg', [4]);
+    await equip.addEquippableAssetEntry(resId4, 2, catalog.address, 'ipfs://res4.jpg', [4]);
     await equip.addAssetToToken(tokenId, resId, 0);
     await equip.addAssetToToken(tokenId, resId2, 0);
     await equip.addAssetToToken(tokenId, resId3, resId);
@@ -134,15 +151,280 @@ describe('Render Utils', async function () {
     it('can get active assets', async function () {
       expect(await renderUtilsEquip.getExtendedActiveAssets(equip.address, tokenId)).to.eql([
         [resId, bn(0), 10, ADDRESS_ZERO, 'ipfs://res1.jpg', []],
-        [resId2, bn(1), 5, someCatalog.address, 'ipfs://res2.jpg', [bn(1), bn(3), bn(4)]],
+        [resId2, bn(1), 5, catalog.address, 'ipfs://res2.jpg', [bn(1), bn(3), bn(4)]],
       ]);
     });
 
     it('can get pending assets', async function () {
       expect(await renderUtilsEquip.getExtendedPendingAssets(equip.address, tokenId)).to.eql([
-        [resId4, bn(2), bn(0), bn(0), someCatalog.address, 'ipfs://res4.jpg', [bn(4)]],
+        [resId4, bn(2), bn(0), bn(0), catalog.address, 'ipfs://res4.jpg', [bn(4)]],
         [resId3, bn(0), bn(1), resId, ADDRESS_ZERO, 'ipfs://res3.jpg', []],
       ]);
     });
+
+    it('can get top equippable data for asset by priority', async function () {
+      expect(
+        await renderUtilsEquip.getTopAssetAndEquippableDataForToken(equip.address, tokenId),
+      ).to.eql([resId2, bn(1), 5, catalog.address, 'ipfs://res2.jpg', [bn(1), bn(3), bn(4)]]);
+    });
+
+    it('cannot get equippable slots from parent if parent is not an NFT', async function () {
+      await expect(
+        renderUtilsEquip.getEquippableSlotsFromParent(equip.address, tokenId, 1),
+      ).to.be.revertedWithCustomError(renderUtilsEquip, 'RMRKParentIsNotNFT');
+    });
   });
 });
+
+// These refIds are used from the child's perspective, to group assets that can be equipped into a parent
+// With it, we avoid the need to do set it asset by asset
+const noEquippableGroup = 0;
+const equippableRefIdLeftGem = 1;
+const equippableRefIdMidGem = 2;
+const equippableRefIdRightGem = 3;
+
+const assetForGemAFull = 1;
+const assetForGemALeft = 2;
+const assetForGemAMid = 3;
+const assetForGemARight = 4;
+const assetForGemBFull = 5;
+const assetForGemBLeft = 6;
+const assetForGemBMid = 7;
+const assetForGemBRight = 8;
+const assetForKanariaFull = 9;
+
+const slotIdGemLeft = 1;
+const slotIdGemMid = 2;
+const slotIdGemRight = 3;
+
+describe('Advanced Equip Render Utils', async function () {
+  let owner: SignerWithAddress;
+  let catalog: RMRKCatalogMock;
+  let kanaria: RMRKEquippableMock;
+  let gem: RMRKEquippableMock;
+  let renderUtilsEquip: RMRKEquipRenderUtils;
+  let kanariaId: number;
+  let gemId1: number;
+  let gemId2: number;
+  let gemId3: number;
+
+  beforeEach(async function () {
+    ({ catalog, kanaria, gem, renderUtilsEquip } = await loadFixture(advancedAssetsFixture));
+    [owner] = await ethers.getSigners();
+
+    kanariaId = await mintFromMock(kanaria, owner.address);
+    gemId1 = await nestMintFromMock(gem, kanaria.address, kanariaId);
+    gemId2 = await nestMintFromMock(gem, kanaria.address, kanariaId);
+    gemId3 = await nestMintFromMock(gem, kanaria.address, kanariaId);
+  });
+
+  it('can get equippable slots from parent', async function () {
+    await setUpCatalog(catalog, gem.address);
+    await setUpKanariaAsset(kanaria, kanariaId, catalog.address);
+    await setUpGemAssets(gem, gemId1, gemId2, gemId3, kanaria.address, catalog.address);
+
+    expect(
+      await renderUtilsEquip.getEquippableSlotsFromParent(gem.address, gemId1, assetForKanariaFull),
+    ).to.eql([
+      [bn(slotIdGemRight), bn(assetForGemARight)],
+      [bn(slotIdGemMid), bn(assetForGemAMid)],
+      [bn(slotIdGemLeft), bn(assetForGemALeft)],
+    ]);
+    expect(
+      await renderUtilsEquip.getEquippableSlotsFromParent(gem.address, gemId2, assetForKanariaFull),
+    ).to.eql([
+      [bn(slotIdGemRight), bn(assetForGemARight)],
+      [bn(slotIdGemMid), bn(assetForGemAMid)],
+      [bn(slotIdGemLeft), bn(assetForGemALeft)],
+    ]);
+    expect(
+      await renderUtilsEquip.getEquippableSlotsFromParent(gem.address, gemId3, assetForKanariaFull),
+    ).to.eql([
+      [bn(slotIdGemRight), bn(assetForGemBRight)],
+      [bn(slotIdGemMid), bn(assetForGemBMid)],
+      [bn(slotIdGemLeft), bn(assetForGemBLeft)],
+    ]);
+  });
+
+  it('cannot get equippable slots from parent if the asset id is not composable', async function () {
+    const assetForKanariaNotEquippable = 10;
+    await setUpCatalog(catalog, gem.address);
+    await setUpKanariaAsset(kanaria, kanariaId, catalog.address);
+    await setUpGemAssets(gem, gemId1, gemId2, gemId3, kanaria.address, catalog.address);
+
+    await kanaria.addEquippableAssetEntry(
+      assetForKanariaNotEquippable,
+      0,
+      ADDRESS_ZERO,
+      'ipfs://kanaria.jpg',
+      [],
+    );
+    await kanaria.addAssetToToken(kanariaId, assetForKanariaNotEquippable, 0);
+    await kanaria.acceptAsset(kanariaId, 0, assetForKanariaNotEquippable);
+    await expect(
+      renderUtilsEquip.getEquippableSlotsFromParent(
+        gem.address,
+        gemId1,
+        assetForKanariaNotEquippable,
+      ),
+    ).to.be.revertedWithCustomError(renderUtilsEquip, 'RMRKNotComposableAsset');
+  });
+});
+
+async function setUpCatalog(catalog: RMRKCatalogMock, gemAddress: string): Promise<void> {
+  await catalog.addPartList([
+    {
+      // Gems slot 1
+      partId: slotIdGemLeft,
+      part: {
+        itemType: 1, // Slot
+        z: 4,
+        equippable: [gemAddress], // Only gems tokens can be equipped here
+        metadataURI: '',
+      },
+    },
+    {
+      // Gems slot 2
+      partId: slotIdGemMid,
+      part: {
+        itemType: 1, // Slot
+        z: 4,
+        equippable: [gemAddress], // Only gems tokens can be equipped here
+        metadataURI: '',
+      },
+    },
+    {
+      // Gems slot 3
+      partId: slotIdGemRight,
+      part: {
+        itemType: 1, // Slot
+        z: 4,
+        equippable: [gemAddress], // Only gems tokens can be equipped here
+        metadataURI: '',
+      },
+    },
+  ]);
+}
+
+async function setUpKanariaAsset(
+  kanaria: RMRKEquippableMock,
+  kanariaId: number,
+  catalogAddress: string,
+): Promise<void> {
+  await kanaria.addEquippableAssetEntry(
+    assetForKanariaFull,
+    noEquippableGroup,
+    catalogAddress,
+    `ipfs://kanaria/full.svg`,
+    [slotIdGemLeft, slotIdGemMid, slotIdGemRight],
+  );
+  await kanaria.addAssetToToken(kanariaId, assetForKanariaFull, 0);
+  await kanaria.acceptAsset(kanariaId, 0, assetForKanariaFull);
+}
+
+async function setUpGemAssets(
+  gem: RMRKEquippableMock,
+  gemId1: number,
+  gemId2: number,
+  gemId3: number,
+  kanariaAddress: string,
+  catalogAddress: string,
+): Promise<void> {
+  const [owner] = await ethers.getSigners();
+  // We'll add 4 assets for each gem, a full version and 3 versions matching each slot.
+  // We will have only 2 types of gems -> 4x2: 8 assets.
+  // This is not composed by others, so fixed and slot parts are never used.
+  await gem.addEquippableAssetEntry(
+    assetForGemAFull,
+    noEquippableGroup,
+    catalogAddress,
+    `ipfs://gems/typeA/full.svg`,
+    [],
+  );
+  await gem.addEquippableAssetEntry(
+    assetForGemALeft,
+    equippableRefIdLeftGem,
+    catalogAddress,
+    `ipfs://gems/typeA/left.svg`,
+    [],
+  );
+  await gem.addEquippableAssetEntry(
+    assetForGemAMid,
+    equippableRefIdMidGem,
+    catalogAddress,
+    `ipfs://gems/typeA/mid.svg`,
+    [],
+  );
+  await gem.addEquippableAssetEntry(
+    assetForGemARight,
+    equippableRefIdRightGem,
+    catalogAddress,
+    `ipfs://gems/typeA/right.svg`,
+    [],
+  );
+  await gem.addEquippableAssetEntry(
+    assetForGemBFull,
+    noEquippableGroup,
+    catalogAddress,
+    `ipfs://gems/typeB/full.svg`,
+    [],
+  );
+  await gem.addEquippableAssetEntry(
+    assetForGemBLeft,
+    equippableRefIdLeftGem,
+    catalogAddress,
+    `ipfs://gems/typeB/left.svg`,
+    [],
+  );
+  await gem.addEquippableAssetEntry(
+    assetForGemBMid,
+    equippableRefIdMidGem,
+    catalogAddress,
+    `ipfs://gems/typeB/mid.svg`,
+    [],
+  );
+  await gem.addEquippableAssetEntry(
+    assetForGemBRight,
+    equippableRefIdRightGem,
+    catalogAddress,
+    `ipfs://gems/typeB/right.svg`,
+    [],
+  );
+
+  await gem.setValidParentForEquippableGroup(equippableRefIdLeftGem, kanariaAddress, slotIdGemLeft);
+  await gem.setValidParentForEquippableGroup(equippableRefIdMidGem, kanariaAddress, slotIdGemMid);
+  await gem.setValidParentForEquippableGroup(
+    equippableRefIdRightGem,
+    kanariaAddress,
+    slotIdGemRight,
+  );
+
+  // We add assets of type A to gem 1 and 2, and type Bto gem 3. Both are nested into the first kanaria
+  // This means gems 1 and 2 will have the same asset, which is totally valid.
+  await gem.addAssetToToken(gemId1, assetForGemAFull, 0);
+  await gem.addAssetToToken(gemId1, assetForGemALeft, 0);
+  await gem.addAssetToToken(gemId1, assetForGemAMid, 0);
+  await gem.addAssetToToken(gemId1, assetForGemARight, 0);
+  await gem.addAssetToToken(gemId2, assetForGemAFull, 0);
+  await gem.addAssetToToken(gemId2, assetForGemALeft, 0);
+  await gem.addAssetToToken(gemId2, assetForGemAMid, 0);
+  await gem.addAssetToToken(gemId2, assetForGemARight, 0);
+  await gem.addAssetToToken(gemId3, assetForGemBFull, 0);
+  await gem.addAssetToToken(gemId3, assetForGemBLeft, 0);
+  await gem.addAssetToToken(gemId3, assetForGemBMid, 0);
+  await gem.addAssetToToken(gemId3, assetForGemBRight, 0);
+
+  // We accept them backwards to easily know the right indices
+  await gem.acceptAsset(gemId1, 3, assetForGemARight);
+  await gem.acceptAsset(gemId1, 2, assetForGemAMid);
+  await gem.acceptAsset(gemId1, 1, assetForGemALeft);
+  await gem.acceptAsset(gemId1, 0, assetForGemAFull);
+  await gem.acceptAsset(gemId2, 3, assetForGemARight);
+  await gem.acceptAsset(gemId2, 2, assetForGemAMid);
+  await gem.acceptAsset(gemId2, 1, assetForGemALeft);
+  await gem.acceptAsset(gemId2, 0, assetForGemAFull);
+  await gem.acceptAsset(gemId3, 3, assetForGemBRight);
+  await gem.acceptAsset(gemId3, 2, assetForGemBMid);
+  await gem.acceptAsset(gemId3, 1, assetForGemBLeft);
+  await gem.acceptAsset(gemId3, 0, assetForGemBFull);
+}
