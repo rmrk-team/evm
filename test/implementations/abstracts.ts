@@ -88,7 +88,7 @@ async function shouldControlValidAssetsManagement(): Promise<void> {
   beforeEach(async function () {
     [owner, notOwner, contributor, tokenOwner] = await ethers.getSigners();
     await this.token.connect(owner).mint(tokenOwner.address, 1);
-    await this.token.connect(owner).addContributor(contributor.address);
+    await this.token.connect(owner).manageContributor(contributor.address, true);
   });
 
   it('cannot add asset if not owner or contributor', async function () {
@@ -141,7 +141,7 @@ async function shouldControlValidEquippablesManagement(): Promise<void> {
   beforeEach(async function () {
     [owner, notOwner, contributor, tokenOwner, catalog, parent] = await ethers.getSigners();
     await this.token.connect(owner).mint(tokenOwner.address, 1);
-    await this.token.connect(owner).addContributor(contributor.address);
+    await this.token.connect(owner).manageContributor(contributor.address, true);
   });
 
   it('cannot add asset if not owner or contributor', async function () {
