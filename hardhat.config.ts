@@ -67,8 +67,8 @@ const config: HardhatUserConfig = {
   //   runOnCompile: false,
   // },
   docgen: {
-    pages: 'files'
-  }
+    pages: 'files',
+  },
 };
 
 export default config;
