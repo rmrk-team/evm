@@ -122,22 +122,6 @@ Used to add a child token to a given parent token.
 | childId | uint256 | ID of the new proposed child token |
 | data | bytes | Additional data with no specified format |
 
-### addContributor
-
-```solidity
-function addContributor(address contributor) external nonpayable
-```
-
-Adds a contributor to the smart contract.
-
-*Can only be called by the owner.*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| contributor | address | Address of the contributor&#39;s account |
-
 ### addEquippableAssetEntry
 
 ```solidity
@@ -774,6 +758,23 @@ Used to check if the address is one of the contributors.
 |---|---|---|
 | _0 | bool | Boolean value indicating whether the address is a contributor or not |
 
+### manageContributor
+
+```solidity
+function manageContributor(address contributor, bool grantRole) external nonpayable
+```
+
+Adds or removes a contributor to the smart contract.
+
+*Can only be called by the owner.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| contributor | address | Address of the contributor&#39;s account |
+| grantRole | bool | A boolean value signifying whether the contributor role is being granted (`true`) or revoked  (`false`) |
+
 ### maxSupply
 
 ```solidity
@@ -1026,22 +1027,6 @@ Leaves the contract without owner. Functions using the `onlyOwner` modifier will
 
 *Can only be called by the current owner.Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is  only available to the owner.*
 
-
-### revokeContributor
-
-```solidity
-function revokeContributor(address contributor) external nonpayable
-```
-
-Removes a contributor from the smart contract.
-
-*Can only be called by the owner.*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| contributor | address | Address of the contributor&#39;s account |
 
 ### royaltyInfo
 

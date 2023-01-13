@@ -97,24 +97,21 @@ contract Ownable is Context {
     }
 
     /**
-     * @notice Adds a contributor to the smart contract.
+     * @notice Adds or removes a contributor to the smart contract.
      * @dev Can only be called by the owner.
      * @param contributor Address of the contributor's account
+     * @param grantRole A boolean value signifying whether the contributor role is being granted (`true`) or revoked
+     *  (`false`)
      */
-    function addContributor(address contributor) external onlyOwner {
+    function manageContributor(
+        address contributor,
+        bool grantRole
+    ) external onlyOwner {
         if (contributor == address(0)) revert RMRKNewContributorIsZeroAddress();
-        _contributors[contributor] = 1;
-        emit ContributorUpdate(contributor, true);
-    }
-
-    /**
-     * @notice Removes a contributor from the smart contract.
-     * @dev Can only be called by the owner.
-     * @param contributor Address of the contributor's account
-     */
-    function revokeContributor(address contributor) external onlyOwner {
-        delete _contributors[contributor];
-        emit ContributorUpdate(contributor, false);
+        grantRole
+            ? _contributors[contributor] = 1
+            : _contributors[contributor] = 0;
+        emit ContributorUpdate(contributor, grantRole);
     }
 
     /**
