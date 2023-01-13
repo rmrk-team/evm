@@ -1,110 +1,58 @@
-# RMRKSoulbound
+# Solidity API
 
-*RMRK team*
-
-> RMRKSoulbound
+## RMRKSoulbound
 
 Smart contract of the RMRK Soulbound module.
 
-
-
-## Methods
-
-### VERSION
+### _beforeTokenTransfer
 
 ```solidity
-function VERSION() external view returns (string)
+function _beforeTokenTransfer(address from, address to, uint256 tokenId) internal virtual
 ```
 
-Version of the @rmrk-team/evm-contracts package
+Hook that is called before any token transfer. This includes minting and burning.
 
+_This is a hook ensuring that all transfers of tokens are reverted if the token is soulbound.
+The only exception of transfers being allowed is when the tokens are minted or when they are being burned._
 
-
-
-#### Returns
+#### Parameters
 
 | Name | Type | Description |
-|---|---|---|
-| _0 | string | undefined |
+| ---- | ---- | ----------- |
+| from | address | Address from which the token is originating (current owner of the token) |
+| to | address | Address to which the token would be sent |
+| tokenId | uint256 | ID of the token that would be transferred |
 
 ### isSoulbound
 
 ```solidity
-function isSoulbound(uint256 tokenId) external view returns (bool)
+function isSoulbound(uint256 tokenId) public view virtual returns (bool)
 ```
 
 Used to check whether the given token is soulbound or not.
 
-
-
 #### Parameters
 
 | Name | Type | Description |
-|---|---|---|
+| ---- | ---- | ----------- |
 | tokenId | uint256 | ID of the token being checked |
 
-#### Returns
+#### Return Values
 
 | Name | Type | Description |
-|---|---|---|
-| _0 | bool | Boolean value indicating whether the given token is soulbound |
-
-### name
-
-```solidity
-function name() external view returns (string)
-```
-
-Used to retrieve the collection name.
-
-
-
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | string | string Name of the collection |
+| ---- | ---- | ----------- |
+| [0] | bool | Boolean value indicating whether the given token is soulbound |
 
 ### supportsInterface
 
 ```solidity
-function supportsInterface(bytes4 interfaceId) external view returns (bool)
+function supportsInterface(bytes4 interfaceId) public view virtual returns (bool)
 ```
 
+_Returns true if this contract implements the interface defined by
+`interfaceId`. See the corresponding
+https://eips.ethereum.org/EIPS/eip-165#how-interfaces-are-identified[EIP section]
+to learn more about how these ids are created.
 
-
-*Returns true if this contract implements the interface defined by `interfaceId`. See the corresponding https://eips.ethereum.org/EIPS/eip-165#how-interfaces-are-identified[EIP section] to learn more about how these ids are created. This function call must use less than 30 000 gas.*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| interfaceId | bytes4 | undefined |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | bool | undefined |
-
-### symbol
-
-```solidity
-function symbol() external view returns (string)
-```
-
-Used to retrieve the collection symbol.
-
-
-
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | string | string Symbol of the collection |
-
-
-
+This function call must use less than 30 000 gas._
 

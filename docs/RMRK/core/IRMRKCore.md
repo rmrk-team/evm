@@ -1,14 +1,8 @@
-# IRMRKCore
+# Solidity API
 
-*RMRK team*
-
-> IRMRKCore
+## IRMRKCore
 
 Interface smart contract for RMRK core module.
-
-
-
-## Methods
 
 ### name
 
@@ -18,14 +12,11 @@ function name() external view returns (string)
 
 Used to retrieve the collection name.
 
-
-
-
-#### Returns
+#### Return Values
 
 | Name | Type | Description |
-|---|---|---|
-| _0 | string | string Name of the collection |
+| ---- | ---- | ----------- |
+| [0] | string | string Name of the collection |
 
 ### symbol
 
@@ -35,15 +26,9 @@ function symbol() external view returns (string)
 
 Used to retrieve the collection symbol.
 
-
-
-
-#### Returns
+#### Return Values
 
 | Name | Type | Description |
-|---|---|---|
-| _0 | string | string Symbol of the collection |
-
-
-
+| ---- | ---- | ----------- |
+| [0] | string | string Symbol of the collection |
 

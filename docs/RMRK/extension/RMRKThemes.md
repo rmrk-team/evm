@@ -1,12 +1,6 @@
-# RMRKThemes
+# Solidity API
 
-*RMRK team*
-
-> RMRKThemes
+## RMRKThemes
 
 Smart contract of the RMRK Themes module.
-
-
-
-
 

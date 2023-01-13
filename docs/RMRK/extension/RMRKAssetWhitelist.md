@@ -1,12 +1,6 @@
-# RMRKAssetWhitelist
+# Solidity API
 
-*RMRK team*
-
-> RMRKAssetWhitelist
+## RMRKAssetWhitelist
 
 Smart contract of the RMRK Asset whitelist module.
-
-
-
-
 

@@ -1,267 +1,121 @@
-# RMRKMintingUtils
+# Solidity API
 
-*RMRK team*
-
-> RMRKMintingUtils
+## RMRKMintingUtils
 
 Smart contract of the RMRK minting utils module.
 
-*This smart contract includes the top-level utilities for managing minting and implements OwnableLock by default.Max supply-related and pricing variables are immutable after deployment.*
+_This smart contract includes the top-level utilities for managing minting and implements OwnableLock by default.
+Max supply-related and pricing variables are immutable after deployment._
 
-## Methods
-
-### getLock
-
-```solidity
-function getLock() external view returns (bool)
-```
-
-Used to retrieve the status of a lockable smart contract.
-
-
-
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | bool | bool A boolean value signifying whether the smart contract has been locked |
-
-### isContributor
+### _totalSupply
 
 ```solidity
-function isContributor(address contributor) external view returns (bool)
+uint256 _totalSupply
 ```
 
-Used to check if the address is one of the contributors.
+### _maxSupply
 
+```solidity
+uint256 _maxSupply
+```
 
+### _pricePerMint
+
+```solidity
+uint256 _pricePerMint
+```
+
+### constructor
+
+```solidity
+constructor(uint256 maxSupply_, uint256 pricePerMint_) public
+```
+
+Initializes the smart contract with a given maximum supply and minting price.
 
 #### Parameters
 
 | Name | Type | Description |
-|---|---|---|
-| contributor | address | Address of the contributor whose status we are checking |
+| ---- | ---- | ----------- |
+| maxSupply_ | uint256 | The maximum supply of tokens to initialize the smart contract with |
+| pricePerMint_ | uint256 | The minting price to initialize the smart contract with, expressed in the smallest  denomination of the native currency of the chain to which the smart contract is deployed to |
 
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | bool | Boolean value indicating whether the address is a contributor or not |
-
-### manageContributor
+### saleIsOpen
 
 ```solidity
-function manageContributor(address contributor, bool grantRole) external nonpayable
+modifier saleIsOpen()
 ```
 
-Adds or removes a contributor to the smart contract.
+Used to verify that the sale of the given token is still available.
 
-*Can only be called by the owner.*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| contributor | address | Address of the contributor&#39;s account |
-| grantRole | bool | A boolean value signifying whether the contributor role is being granted (`true`) or revoked  (`false`) |
-
-### maxSupply
-
-```solidity
-function maxSupply() external view returns (uint256)
-```
-
-Used to retrieve the maximum supply of the collection.
-
-
-
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | uint256 | uint256 The maximum supply of tokens in the collection |
-
-### owner
-
-```solidity
-function owner() external view returns (address)
-```
-
-Returns the address of the current owner.
-
-
-
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | address | Address of the current owner |
-
-### pricePerMint
-
-```solidity
-function pricePerMint() external view returns (uint256)
-```
-
-Used to retrieve the price per mint.
-
-
-
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | uint256 | uint256 The price per mint of a single token expressed in the lowest denomination of a native currency |
-
-### renounceOwnership
-
-```solidity
-function renounceOwnership() external nonpayable
-```
-
-Leaves the contract without owner. Functions using the `onlyOwner` modifier will be disabled.
-
-*Can only be called by the current owner.Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is  only available to the owner.*
-
+_If the maximum supply is reached, the execution will be reverted._
 
 ### setLock
 
 ```solidity
-function setLock() external nonpayable
+function setLock() public virtual
 ```
 
 Locks the operation.
 
-*Once locked, functions using `notLocked` modifier cannot be executed.*
-
+_Once locked, functions using `notLocked` modifier cannot be executed._
 
 ### totalSupply
 
 ```solidity
-function totalSupply() external view returns (uint256)
+function totalSupply() public view returns (uint256)
 ```
 
 Used to retrieve the total supply of the tokens in a collection.
 
-
-
-
-#### Returns
+#### Return Values
 
 | Name | Type | Description |
-|---|---|---|
-| _0 | uint256 | uint256 The number of tokens in a collection |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 The number of tokens in a collection |
 
-### transferOwnership
+### maxSupply
 
 ```solidity
-function transferOwnership(address newOwner) external nonpayable
+function maxSupply() public view returns (uint256)
 ```
 
-Transfers ownership of the contract to a new owner.
+Used to retrieve the maximum supply of the collection.
 
-*Can only be called by the current owner.*
-
-#### Parameters
+#### Return Values
 
 | Name | Type | Description |
-|---|---|---|
-| newOwner | address | Address of the new owner&#39;s account |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 The maximum supply of tokens in the collection |
+
+### pricePerMint
+
+```solidity
+function pricePerMint() public view returns (uint256)
+```
+
+Used to retrieve the price per mint.
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 The price per mint of a single token expressed in the lowest denomination of a native currency |
 
 ### withdrawRaised
 
 ```solidity
-function withdrawRaised(address to, uint256 amount) external nonpayable
+function withdrawRaised(address to, uint256 amount) external
 ```
 
 Used to withdraw the minting proceedings to a specified address.
 
-*This function can only be called by the owner.*
+_This function can only be called by the owner._
 
 #### Parameters
 
 | Name | Type | Description |
-|---|---|---|
+| ---- | ---- | ----------- |
 | to | address | Address to receive the given amount of minting proceedings |
 | amount | uint256 | The amount to withdraw |
-
-
-
-## Events
-
-### ContributorUpdate
-
-```solidity
-event ContributorUpdate(address indexed contributor, bool isContributor)
-```
-
-Event that signifies that an address was granted contributor role or that the permission has been  revoked.
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| contributor `indexed` | address | undefined |
-| isContributor  | bool | undefined |
-
-### OwnershipTransferred
-
-```solidity
-event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)
-```
-
-Used to anounce the transfer of ownership.
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| previousOwner `indexed` | address | undefined |
-| newOwner `indexed` | address | undefined |
-
-
-
-## Errors
-
-### RMRKNewContributorIsZeroAddress
-
-```solidity
-error RMRKNewContributorIsZeroAddress()
-```
-
-Attempting to assign a 0x0 address as a contributor
-
-
-
-
-### RMRKNewOwnerIsZeroAddress
-
-```solidity
-error RMRKNewOwnerIsZeroAddress()
-```
-
-Attempting to transfer the ownership to the 0x0 address
-
-
-
-
-### RMRKNotOwner
-
-```solidity
-error RMRKNotOwner()
-```
-
-Attempting to interact with a management function without being the smart contract&#39;s owner
-
-
-
-
 

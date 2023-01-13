@@ -11,7 +11,9 @@ import "./IRMRKCore.sol";
  * @dev This is currently just a passthrough contract which allows for granular editing of base-level ERC721 functions.
  */
 contract RMRKCore is IRMRKCore {
-    /// @notice Version of the @rmrk-team/evm-contracts package
+    /**
+     * @notice Version of the @rmrk-team/evm-contracts package
+     */
     string public constant VERSION = "0.23.0";
 
     /**

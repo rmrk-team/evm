@@ -1,171 +1,160 @@
-# Ownable
+# Solidity API
 
-*RMRK team*
-
-> Ownable
+## Ownable
 
 A minimal ownable smart contractf or owner and contributors.
 
-*This smart contract is based on &quot;openzeppelin&#39;s access/Ownable.sol&quot;.*
-
-## Methods
-
-### isContributor
-
-```solidity
-function isContributor(address contributor) external view returns (bool)
-```
-
-Used to check if the address is one of the contributors.
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| contributor | address | Address of the contributor whose status we are checking |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | bool | Boolean value indicating whether the address is a contributor or not |
-
-### manageContributor
-
-```solidity
-function manageContributor(address contributor, bool grantRole) external nonpayable
-```
-
-Adds or removes a contributor to the smart contract.
-
-*Can only be called by the owner.*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| contributor | address | Address of the contributor&#39;s account |
-| grantRole | bool | A boolean value signifying whether the contributor role is being granted (`true`) or revoked  (`false`) |
-
-### owner
-
-```solidity
-function owner() external view returns (address)
-```
-
-Returns the address of the current owner.
-
-
-
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | address | Address of the current owner |
-
-### renounceOwnership
-
-```solidity
-function renounceOwnership() external nonpayable
-```
-
-Leaves the contract without owner. Functions using the `onlyOwner` modifier will be disabled.
-
-*Can only be called by the current owner.Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is  only available to the owner.*
-
-
-### transferOwnership
-
-```solidity
-function transferOwnership(address newOwner) external nonpayable
-```
-
-Transfers ownership of the contract to a new owner.
-
-*Can only be called by the current owner.*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| newOwner | address | Address of the new owner&#39;s account |
-
-
-
-## Events
-
-### ContributorUpdate
-
-```solidity
-event ContributorUpdate(address indexed contributor, bool isContributor)
-```
-
-Event that signifies that an address was granted contributor role or that the permission has been  revoked.
-
-*This can only be triggered by a current owner, so there is no need to include that information in the event.*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| contributor `indexed` | address | Address of the account that had contributor role status updated |
-| isContributor  | bool | A boolean value signifying whether the role has been granted (`true`) or revoked (`false`) |
+_This smart contract is based on "openzeppelin's access/Ownable.sol"._
 
 ### OwnershipTransferred
 
 ```solidity
-event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)
+event OwnershipTransferred(address previousOwner, address newOwner)
 ```
 
 Used to anounce the transfer of ownership.
 
+#### Parameters
 
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| previousOwner | address | Address of the account that transferred their ownership role |
+| newOwner | address | Address of the account receiving the ownership role |
+
+### ContributorUpdate
+
+```solidity
+event ContributorUpdate(address contributor, bool isContributor)
+```
+
+Event that signifies that an address was granted contributor role or that the permission has been
+ revoked.
+
+_This can only be triggered by a current owner, so there is no need to include that information in the event._
 
 #### Parameters
 
 | Name | Type | Description |
-|---|---|---|
-| previousOwner `indexed` | address | Address of the account that transferred their ownership role |
-| newOwner `indexed` | address | Address of the account receiving the ownership role |
+| ---- | ---- | ----------- |
+| contributor | address | Address of the account that had contributor role status updated |
+| isContributor | bool | A boolean value signifying whether the role has been granted (`true`) or revoked (`false`) |
 
-
-
-## Errors
-
-### RMRKNewContributorIsZeroAddress
+### onlyOwnerOrContributor
 
 ```solidity
-error RMRKNewContributorIsZeroAddress()
+modifier onlyOwnerOrContributor()
 ```
 
-Attempting to assign a 0x0 address as a contributor
+_Reverts if called by any account other than the owner or an approved contributor._
 
-
-
-
-### RMRKNewOwnerIsZeroAddress
+### onlyOwner
 
 ```solidity
-error RMRKNewOwnerIsZeroAddress()
+modifier onlyOwner()
 ```
 
-Attempting to transfer the ownership to the 0x0 address
+_Reverts if called by any account other than the owner._
 
-
-
-
-### RMRKNotOwner
+### constructor
 
 ```solidity
-error RMRKNotOwner()
+constructor() public
 ```
 
-Attempting to interact with a management function without being the smart contract&#39;s owner
+_Initializes the contract by setting the deployer as the initial owner._
 
+### owner
 
+```solidity
+function owner() public view virtual returns (address)
+```
 
+Returns the address of the current owner.
 
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | address | Address of the current owner |
+
+### renounceOwnership
+
+```solidity
+function renounceOwnership() public virtual
+```
+
+Leaves the contract without owner. Functions using the `onlyOwner` modifier will be disabled.
+
+_Can only be called by the current owner.
+Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is
+ only available to the owner._
+
+### transferOwnership
+
+```solidity
+function transferOwnership(address newOwner) public virtual
+```
+
+Transfers ownership of the contract to a new owner.
+
+_Can only be called by the current owner._
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| newOwner | address | Address of the new owner's account |
+
+### _transferOwnership
+
+```solidity
+function _transferOwnership(address newOwner) internal virtual
+```
+
+Transfers ownership of the contract to a new owner.
+
+_Internal function without access restriction._
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| newOwner | address | Address of the new owner's account |
+
+### manageContributor
+
+```solidity
+function manageContributor(address contributor, bool grantRole) external
+```
+
+Adds or removes a contributor to the smart contract.
+
+_Can only be called by the owner._
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| contributor | address | Address of the contributor's account |
+| grantRole | bool | A boolean value signifying whether the contributor role is being granted (`true`) or revoked  (`false`) |
+
+### isContributor
+
+```solidity
+function isContributor(address contributor) public view returns (bool)
+```
+
+Used to check if the address is one of the contributors.
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| contributor | address | Address of the contributor whose status we are checking |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | Boolean value indicating whether the address is a contributor or not |
 

@@ -1,83 +1,8 @@
-# IRMRKTokenProperties
+# Solidity API
 
-*RMRK team*
-
-> IRMRKTokenProperties
+## IRMRKTokenProperties
 
 Interface smart contract of the RMRK token properties extension.
-
-
-
-## Methods
-
-### getAddressTokenProperty
-
-```solidity
-function getAddressTokenProperty(uint256 tokenId, string key) external view returns (address)
-```
-
-Used to retrieve the address type token properties.
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| tokenId | uint256 | The token ID |
-| key | string | The key of the property |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | address | address The value of the address property |
-
-### getBoolTokenProperty
-
-```solidity
-function getBoolTokenProperty(uint256 tokenId, string key) external view returns (bool)
-```
-
-Used to retrieve the bool type token properties.
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| tokenId | uint256 | The token ID |
-| key | string | The key of the property |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | bool | bool The value of the bool property |
-
-### getBytesTokenProperty
-
-```solidity
-function getBytesTokenProperty(uint256 tokenId, string key) external view returns (bytes)
-```
-
-Used to retrieve the bytes type token properties.
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| tokenId | uint256 | The token ID |
-| key | string | The key of the property |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | bytes | bytes The value of the bytes property |
 
 ### getStringTokenProperty
 
@@ -87,20 +12,18 @@ function getStringTokenProperty(uint256 tokenId, string key) external view retur
 
 Used to retrieve the string type token properties.
 
-
-
 #### Parameters
 
 | Name | Type | Description |
-|---|---|---|
+| ---- | ---- | ----------- |
 | tokenId | uint256 | The token ID |
 | key | string | The key of the property |
 
-#### Returns
+#### Return Values
 
 | Name | Type | Description |
-|---|---|---|
-| _0 | string | string The value of the string property |
+| ---- | ---- | ----------- |
+| [0] | string | string The value of the string property |
 
 ### getUintTokenProperty
 
@@ -110,43 +33,79 @@ function getUintTokenProperty(uint256 tokenId, string key) external view returns
 
 Used to retrieve the uint type token properties.
 
-
-
 #### Parameters
 
 | Name | Type | Description |
-|---|---|---|
+| ---- | ---- | ----------- |
 | tokenId | uint256 | The token ID |
 | key | string | The key of the property |
 
-#### Returns
+#### Return Values
 
 | Name | Type | Description |
-|---|---|---|
-| _0 | uint256 | uint256 The value of the uint property |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 The value of the uint property |
 
-### supportsInterface
+### getBoolTokenProperty
 
 ```solidity
-function supportsInterface(bytes4 interfaceId) external view returns (bool)
+function getBoolTokenProperty(uint256 tokenId, string key) external view returns (bool)
 ```
 
-
-
-*Returns true if this contract implements the interface defined by `interfaceId`. See the corresponding https://eips.ethereum.org/EIPS/eip-165#how-interfaces-are-identified[EIP section] to learn more about how these ids are created. This function call must use less than 30 000 gas.*
+Used to retrieve the bool type token properties.
 
 #### Parameters
 
 | Name | Type | Description |
-|---|---|---|
-| interfaceId | bytes4 | undefined |
+| ---- | ---- | ----------- |
+| tokenId | uint256 | The token ID |
+| key | string | The key of the property |
 
-#### Returns
+#### Return Values
 
 | Name | Type | Description |
-|---|---|---|
-| _0 | bool | undefined |
+| ---- | ---- | ----------- |
+| [0] | bool | bool The value of the bool property |
 
+### getAddressTokenProperty
 
+```solidity
+function getAddressTokenProperty(uint256 tokenId, string key) external view returns (address)
+```
 
+Used to retrieve the address type token properties.
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| tokenId | uint256 | The token ID |
+| key | string | The key of the property |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | address | address The value of the address property |
+
+### getBytesTokenProperty
+
+```solidity
+function getBytesTokenProperty(uint256 tokenId, string key) external view returns (bytes)
+```
+
+Used to retrieve the bytes type token properties.
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| tokenId | uint256 | The token ID |
+| key | string | The key of the property |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bytes | bytes The value of the bytes property |
 

@@ -1,12 +1,6 @@
-# RMRKCustomData
+# Solidity API
 
-*RMRK team*
-
-> RMRKCustomData
+## RMRKCustomData
 
 Smart contract of the RMRK Custom data module.
-
-
-
-
 

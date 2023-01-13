@@ -1,447 +1,499 @@
-# AbstractMultiAsset
+# Solidity API
 
-*RMRK team*
-
-> AbstractMultiAsset
+## AbstractMultiAsset
 
 Abstract Smart contract implementing most of the common logic for contracts implementing IRMRKMultiAsset
 
-
-
-## Methods
-
-### acceptAsset
+### _activeAssets
 
 ```solidity
-function acceptAsset(uint256 tokenId, uint256 index, uint64 assetId) external nonpayable
+mapping(uint256 => uint64[]) _activeAssets
 ```
 
-Accepts an asset at from the pending array of given token.
+Mapping of tokenId to an array of active assets
 
-*Migrates the asset from the token&#39;s pending asset array to the token&#39;s active asset array.Active assets cannot be removed by anyone, but can be replaced by a new asset.Requirements:  - The caller must own the token or be approved to manage the token&#39;s assets  - `tokenId` must exist.  - `index` must be in range of the length of the pending asset array.Emits an {AssetAccepted} event.*
+_Active recurses is unbounded, getting all would reach gas limit at around 30k items
+so we leave this as internal in case a custom implementation needs to implement pagination_
 
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| tokenId | uint256 | ID of the token for which to accept the pending asset |
-| index | uint256 | Index of the asset in the pending array to accept |
-| assetId | uint64 | ID of the asset expected to be in the index |
-
-### approveForAssets
+### _pendingAssets
 
 ```solidity
-function approveForAssets(address to, uint256 tokenId) external nonpayable
+mapping(uint256 => uint64[]) _pendingAssets
 ```
 
-Used to grant permission to the user to manage token&#39;s assets.
+Mapping of tokenId to an array of pending assets
 
-*This differs from transfer approvals, as approvals are not cleared when the approved party accepts or  rejects an asset, or sets asset priorities. This approval is cleared on token transfer.Only a single account can be approved at a time, so approving the `0x0` address clears previous approvals.Requirements:  - The caller must own the token or be an approved operator.  - `tokenId` must exist.Emits an {ApprovalForAssets} event.*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| to | address | Address of the account to grant the approval to |
-| tokenId | uint256 | ID of the token for which the approval to manage the assets is granted |
-
-### getActiveAssetPriorities
+### _activeAssetPriorities
 
 ```solidity
-function getActiveAssetPriorities(uint256 tokenId) external view returns (uint16[])
+mapping(uint256 => uint16[]) _activeAssetPriorities
 ```
 
-Used to retrieve the priorities of the active resoources of a given token.
-
-*Asset priorities are a non-sequential array of uint16 values with an array size equal to active asset  priorites.*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| tokenId | uint256 | ID of the token for which to retrieve the priorities of the active assets |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | uint16[] | uint16[] An array of priorities of the active assets of the given token |
-
-### getActiveAssets
-
-```solidity
-function getActiveAssets(uint256 tokenId) external view returns (uint64[])
-```
-
-Used to retrieve IDs of the active assets of given token.
-
-*Asset data is stored by reference, in order to access the data corresponding to the ID, call  `getAssetMetadata(tokenId, assetId)`.You can safely get 10k*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| tokenId | uint256 | ID of the token to retrieve the IDs of the active assets |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | uint64[] | uint64[] An array of active asset IDs of the given token |
-
-### getApprovedForAssets
-
-```solidity
-function getApprovedForAssets(uint256 tokenId) external view returns (address)
-```
-
-Used to retrieve the address of the account approved to manage assets of a given token.
-
-*Requirements:  - `tokenId` must exist.*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| tokenId | uint256 | ID of the token for which to retrieve the approved address |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | address | address Address of the account that is approved to manage the specified token&#39;s assets |
+Mapping of tokenId to an array of priorities for active assets
 
 ### getAssetMetadata
 
 ```solidity
-function getAssetMetadata(uint256 tokenId, uint64 assetId) external view returns (string)
+function getAssetMetadata(uint256 tokenId, uint64 assetId) public view virtual returns (string)
 ```
 
-Used to fetch the asset metadata of the specified token&#39;s active asset with the given index.
+Used to fetch the asset metadata of the specified token's active asset with the given index.
 
-*Assets are stored by reference mapping `_assets[assetId]`.Can be overriden to implement enumerate, fallback or other custom logic.*
+_Assets are stored by reference mapping `_assets[assetId]`.
+Can be overriden to implement enumerate, fallback or other custom logic._
 
 #### Parameters
 
 | Name | Type | Description |
-|---|---|---|
+| ---- | ---- | ----------- |
 | tokenId | uint256 | ID of the token from which to retrieve the asset metadata |
 | assetId | uint64 | Asset Id, must be in the active assets array |
 
-#### Returns
+#### Return Values
 
 | Name | Type | Description |
-|---|---|---|
-| _0 | string | string The metadata of the asset belonging to the specified index in the token&#39;s active assets  array |
+| ---- | ---- | ----------- |
+| [0] | string | string The metadata of the asset belonging to the specified index in the token's active assets  array |
 
-### getAssetReplacements
+### getActiveAssets
 
 ```solidity
-function getAssetReplacements(uint256 tokenId, uint64 newAssetId) external view returns (uint64)
+function getActiveAssets(uint256 tokenId) public view virtual returns (uint64[])
 ```
 
-Used to retrieve the asset that will be replaced if a given asset from the token&#39;s pending array  is accepted.
+Used to retrieve IDs of the active assets of given token.
 
-*Asset data is stored by reference, in order to access the data corresponding to the ID, call  `getAssetMetadata(tokenId, assetId)`.*
+_Asset data is stored by reference, in order to access the data corresponding to the ID, call
+ `getAssetMetadata(tokenId, assetId)`.
+You can safely get 10k_
 
 #### Parameters
 
 | Name | Type | Description |
-|---|---|---|
-| tokenId | uint256 | ID of the token to check |
-| newAssetId | uint64 | ID of the pending asset which will be accepted |
+| ---- | ---- | ----------- |
+| tokenId | uint256 | ID of the token to retrieve the IDs of the active assets |
 
-#### Returns
+#### Return Values
 
 | Name | Type | Description |
-|---|---|---|
-| _0 | uint64 | uint64 ID of the asset which will be replaced |
+| ---- | ---- | ----------- |
+| [0] | uint64[] | uint64[] An array of active asset IDs of the given token |
 
 ### getPendingAssets
 
 ```solidity
-function getPendingAssets(uint256 tokenId) external view returns (uint64[])
+function getPendingAssets(uint256 tokenId) public view virtual returns (uint64[])
 ```
 
 Used to retrieve IDs of the pending assets of given token.
 
-*Asset data is stored by reference, in order to access the data corresponding to the ID, call  `getAssetMetadata(tokenId, assetId)`.*
+_Asset data is stored by reference, in order to access the data corresponding to the ID, call
+ `getAssetMetadata(tokenId, assetId)`._
 
 #### Parameters
 
 | Name | Type | Description |
-|---|---|---|
+| ---- | ---- | ----------- |
 | tokenId | uint256 | ID of the token to retrieve the IDs of the pending assets |
 
-#### Returns
+#### Return Values
 
 | Name | Type | Description |
-|---|---|---|
-| _0 | uint64[] | uint64[] An array of pending asset IDs of the given token |
+| ---- | ---- | ----------- |
+| [0] | uint64[] | uint64[] An array of pending asset IDs of the given token |
+
+### getActiveAssetPriorities
+
+```solidity
+function getActiveAssetPriorities(uint256 tokenId) public view virtual returns (uint16[])
+```
+
+Used to retrieve the priorities of the active resoources of a given token.
+
+_Asset priorities are a non-sequential array of uint16 values with an array size equal to active asset
+ priorites._
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| tokenId | uint256 | ID of the token for which to retrieve the priorities of the active assets |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint16[] | uint16[] An array of priorities of the active assets of the given token |
+
+### getAssetReplacements
+
+```solidity
+function getAssetReplacements(uint256 tokenId, uint64 newAssetId) public view virtual returns (uint64)
+```
+
+Used to retrieve the asset that will be replaced if a given asset from the token's pending array
+ is accepted.
+
+_Asset data is stored by reference, in order to access the data corresponding to the ID, call
+ `getAssetMetadata(tokenId, assetId)`._
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| tokenId | uint256 | ID of the token to check |
+| newAssetId | uint64 | ID of the pending asset which will be accepted |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint64 | uint64 ID of the asset which will be replaced |
 
 ### isApprovedForAllForAssets
 
 ```solidity
-function isApprovedForAllForAssets(address owner, address operator) external view returns (bool)
+function isApprovedForAllForAssets(address owner, address operator) public view virtual returns (bool)
 ```
 
 Used to check whether the address has been granted the operator role by a given address or not.
 
-*See {setApprovalForAllForAssets}.*
+_See {setApprovalForAllForAssets}._
 
 #### Parameters
 
 | Name | Type | Description |
-|---|---|---|
+| ---- | ---- | ----------- |
 | owner | address | Address of the account that we are checking for whether it has granted the operator role |
 | operator | address | Address of the account that we are checking whether it has the operator role or not |
 
-#### Returns
+#### Return Values
 
 | Name | Type | Description |
-|---|---|---|
-| _0 | bool | bool The boolean value indicating wehter the account we are checking has been granted the operator role |
-
-### rejectAllAssets
-
-```solidity
-function rejectAllAssets(uint256 tokenId, uint256 maxRejections) external nonpayable
-```
-
-Rejects all assets from the pending array of a given token.
-
-*Effecitvely deletes the pending array.Requirements:  - The caller must own the token or be approved to manage the token&#39;s assets  - `tokenId` must exist.Emits a {AssetRejected} event with assetId = 0.*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| tokenId | uint256 | ID of the token of which to clear the pending array. |
-| maxRejections | uint256 | Maximum number of expected assets to reject, used to prevent from rejecting assets which  arrive just before this operation. |
-
-### rejectAsset
-
-```solidity
-function rejectAsset(uint256 tokenId, uint256 index, uint64 assetId) external nonpayable
-```
-
-Rejects an asset from the pending array of given token.
-
-*Removes the asset from the token&#39;s pending asset array.Requirements:  - The caller must own the token or be approved to manage the token&#39;s assets  - `tokenId` must exist.  - `index` must be in range of the length of the pending asset array.Emits a {AssetRejected} event.*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| tokenId | uint256 | ID of the token that the asset is being rejected from |
-| index | uint256 | Index of the asset in the pending array to be rejected |
-| assetId | uint64 | ID of the asset expected to be in the index |
+| ---- | ---- | ----------- |
+| [0] | bool | bool The boolean value indicating wehter the account we are checking has been granted the operator role |
 
 ### setApprovalForAllForAssets
 
 ```solidity
-function setApprovalForAllForAssets(address operator, bool approved) external nonpayable
+function setApprovalForAllForAssets(address operator, bool approved) public virtual
 ```
 
 Used to add or remove an operator of assets for the caller.
 
-*Operators can call {acceptAsset}, {rejectAsset}, {rejectAllAssets} or {setPriority} for any token  owned by the caller.Requirements:  - The `operator` cannot be the caller.Emits an {ApprovalForAllForAssets} event.*
+_Operators can call {acceptAsset}, {rejectAsset}, {rejectAllAssets} or {setPriority} for any token
+ owned by the caller.
+Requirements:
+
+ - The `operator` cannot be the caller.
+Emits an {ApprovalForAllForAssets} event._
 
 #### Parameters
 
 | Name | Type | Description |
-|---|---|---|
+| ---- | ---- | ----------- |
 | operator | address | Address of the account to which the operator role is granted or revoked from |
 | approved | bool | The boolean value indicating whether the operator role is being granted (`true`) or revoked  (`false`) |
 
-### setPriority
+### _acceptAsset
 
 ```solidity
-function setPriority(uint256 tokenId, uint16[] priorities) external nonpayable
+function _acceptAsset(uint256 tokenId, uint256 index, uint64 assetId) internal virtual
 ```
 
-Sets a new priority array for a given token.
+Used to accept a pending asset.
 
-*The priority array is a non-sequential list of `uint16`s, where the lowest value is considered highest  priority.Value `0` of a priority is a special case equivalent to unitialized.Requirements:  - The caller must own the token or be approved to manage the token&#39;s assets  - `tokenId` must exist.  - The length of `priorities` must be equal the length of the active assets array.Emits a {AssetPrioritySet} event.*
+_The call is reverted if there is no pending asset at a given index._
 
 #### Parameters
 
 | Name | Type | Description |
-|---|---|---|
-| tokenId | uint256 | ID of the token to set the priorities for |
-| priorities | uint16[] | An array of priorities of active assets. The succesion of items in the priorities array  matches that of the succesion of items in the active array |
+| ---- | ---- | ----------- |
+| tokenId | uint256 | ID of the token for which to accept the pending asset |
+| index | uint256 | Index of the asset in the pending array to accept |
+| assetId | uint64 | ID of the asset to accept in token's pending array |
 
-### supportsInterface
+### _rejectAsset
 
 ```solidity
-function supportsInterface(bytes4 interfaceId) external view returns (bool)
+function _rejectAsset(uint256 tokenId, uint256 index, uint64 assetId) internal virtual
 ```
 
+Used to reject the specified asset from the pending array.
 
-
-*Returns true if this contract implements the interface defined by `interfaceId`. See the corresponding https://eips.ethereum.org/EIPS/eip-165#how-interfaces-are-identified[EIP section] to learn more about how these ids are created. This function call must use less than 30 000 gas.*
+_The call is reverted if there is no pending asset at a given index._
 
 #### Parameters
 
 | Name | Type | Description |
-|---|---|---|
-| interfaceId | bytes4 | undefined |
+| ---- | ---- | ----------- |
+| tokenId | uint256 | ID of the token that the asset is being rejected from |
+| index | uint256 | Index of the asset in the pending array to be rejected |
+| assetId | uint64 | ID of the asset expected to be in the index |
 
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | bool | undefined |
-
-
-
-## Events
-
-### ApprovalForAllForAssets
+### _rejectAllAssets
 
 ```solidity
-event ApprovalForAllForAssets(address indexed owner, address indexed operator, bool approved)
+function _rejectAllAssets(uint256 tokenId, uint256 maxRejections) internal virtual
 ```
 
-Used to notify listeners that owner has granted approval to the user to manage assets of all of their  tokens.
+Used to reject all of the pending assets for the given token.
 
-
+_When rejecting all assets, the pending array is indiscriminately cleared.
+If the number of pending assets is greater than the value of `maxRejections`, the exectuion will be
+ reverted._
 
 #### Parameters
 
 | Name | Type | Description |
-|---|---|---|
-| owner `indexed` | address | undefined |
-| operator `indexed` | address | undefined |
-| approved  | bool | undefined |
+| ---- | ---- | ----------- |
+| tokenId | uint256 | ID of the token to reject all of the pending assets. |
+| maxRejections | uint256 | Maximum number of expected assets to reject, used to prevent from  rejecting assets which arrive just before this operation. |
 
-### ApprovalForAssets
+### _setPriority
 
 ```solidity
-event ApprovalForAssets(address indexed owner, address indexed approved, uint256 indexed tokenId)
+function _setPriority(uint256 tokenId, uint16[] priorities) internal virtual
 ```
 
-Used to notify listeners that owner has granted an approval to the user to manage the assets of a  given token.
+Used to specify the priorities for a given token's active assets.
 
-
+_If the length of the priorities array doesn't match the length of the active assets array, the execution
+ will be reverted.
+The position of the priority value in the array corresponds the position of the asset in the active
+ assets array it will be applied to._
 
 #### Parameters
 
 | Name | Type | Description |
-|---|---|---|
-| owner `indexed` | address | undefined |
-| approved `indexed` | address | undefined |
-| tokenId `indexed` | uint256 | undefined |
+| ---- | ---- | ----------- |
+| tokenId | uint256 | ID of the token for which the priorities are being set |
+| priorities | uint16[] | Array of priorities for the assets |
 
-### AssetAccepted
+### _addAssetEntry
 
 ```solidity
-event AssetAccepted(uint256 indexed tokenId, uint64 indexed assetId, uint64 indexed replacesId)
+function _addAssetEntry(uint64 id, string metadataURI) internal virtual
 ```
 
-Used to notify listeners that an asset object at `assetId` is accepted by the token and migrated  from token&#39;s pending assets array to active assets array of the token.
+Used to add an asset entry.
 
-
+_If the specified ID is already used by another asset, the execution will be reverted.
+This internal function warrants custom access control to be implemented when used._
 
 #### Parameters
 
 | Name | Type | Description |
-|---|---|---|
-| tokenId `indexed` | uint256 | undefined |
-| assetId `indexed` | uint64 | undefined |
-| replacesId `indexed` | uint64 | undefined |
+| ---- | ---- | ----------- |
+| id | uint64 | ID of the asset to assign to the new asset |
+| metadataURI | string | Metadata URI of the asset |
 
-### AssetAddedToToken
+### _addAssetToToken
 
 ```solidity
-event AssetAddedToToken(uint256 indexed tokenId, uint64 indexed assetId, uint64 indexed replacesId)
+function _addAssetToToken(uint256 tokenId, uint64 assetId, uint64 replacesAssetWithId) internal virtual
 ```
 
-Used to notify listeners that an asset object at `assetId` is added to token&#39;s pending asset  array.
+Used to add an asset to a token.
 
-
+_If the given asset is already added to the token, the execution will be reverted.
+If the asset ID is invalid, the execution will be reverted.
+If the token already has the maximum amount of pending assets (128), the execution will be
+ reverted._
 
 #### Parameters
 
 | Name | Type | Description |
-|---|---|---|
-| tokenId `indexed` | uint256 | undefined |
-| assetId `indexed` | uint64 | undefined |
-| replacesId `indexed` | uint64 | undefined |
+| ---- | ---- | ----------- |
+| tokenId | uint256 | ID of the token to add the asset to |
+| assetId | uint64 | ID of the asset to add to the token |
+| replacesAssetWithId | uint64 | ID of the asset to replace from the token's list of active assets |
 
-### AssetPrioritySet
+### _beforeAddAsset
 
 ```solidity
-event AssetPrioritySet(uint256 indexed tokenId)
+function _beforeAddAsset(uint64 id, string metadataURI) internal virtual
 ```
 
-Used to notify listeners that token&#39;s prioritiy array is reordered.
-
-
+Hook that is called before an asset is added.
 
 #### Parameters
 
 | Name | Type | Description |
-|---|---|---|
-| tokenId `indexed` | uint256 | undefined |
+| ---- | ---- | ----------- |
+| id | uint64 | ID of the asset |
+| metadataURI | string | Metadata URI of the asset |
 
-### AssetRejected
+### _afterAddAsset
 
 ```solidity
-event AssetRejected(uint256 indexed tokenId, uint64 indexed assetId)
+function _afterAddAsset(uint64 id, string metadataURI) internal virtual
 ```
 
-Used to notify listeners that an asset object at `assetId` is rejected from token and is dropped  from the pending assets array of the token.
-
-
+Hook that is called after an asset is added.
 
 #### Parameters
 
 | Name | Type | Description |
-|---|---|---|
-| tokenId `indexed` | uint256 | undefined |
-| assetId `indexed` | uint64 | undefined |
+| ---- | ---- | ----------- |
+| id | uint64 | ID of the asset |
+| metadataURI | string | Metadata URI of the asset |
 
-### AssetSet
+### _beforeAddAssetToToken
 
 ```solidity
-event AssetSet(uint64 indexed assetId)
+function _beforeAddAssetToToken(uint256 tokenId, uint64 assetId, uint64 replacesAssetWithId) internal virtual
 ```
 
-Used to notify listeners that an asset object is initialized at `assetId`.
+Hook that is called before adding an asset to a token's pending assets array.
 
-
+_If the asset doesn't intend to replace another asset, the `replacesAssetWithId` value should be `0`._
 
 #### Parameters
 
 | Name | Type | Description |
-|---|---|---|
-| assetId `indexed` | uint64 | undefined |
+| ---- | ---- | ----------- |
+| tokenId | uint256 | ID of the token to which the asset is being added |
+| assetId | uint64 | ID of the asset that is being added |
+| replacesAssetWithId | uint64 | ID of the asset that this asset is attempting to replace |
 
-
-
-## Errors
-
-### RMRKApprovalForAssetsToCurrentOwner
+### _afterAddAssetToToken
 
 ```solidity
-error RMRKApprovalForAssetsToCurrentOwner()
+function _afterAddAssetToToken(uint256 tokenId, uint64 assetId, uint64 replacesAssetWithId) internal virtual
 ```
 
-Attempting to grant approval of assets to their current owner
+Hook that is called after an asset has been added to a token's pending assets array.
 
+_If the asset doesn't intend to replace another asset, the `replacesAssetWithId` value should be `0`._
 
+#### Parameters
 
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| tokenId | uint256 | ID of the token to which the asset is has been added |
+| assetId | uint64 | ID of the asset that is has been added |
+| replacesAssetWithId | uint64 | ID of the asset that this asset is attempting to replace |
 
-### RMRKTokenDoesNotHaveAsset
+### _beforeAcceptAsset
 
 ```solidity
-error RMRKTokenDoesNotHaveAsset()
+function _beforeAcceptAsset(uint256 tokenId, uint256 index, uint256 assetId) internal virtual
 ```
 
-Attempting to compose a NFT of a token without active assets
+Hook that is called before an asset is accepted to a token's active assets array.
 
+#### Parameters
 
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| tokenId | uint256 | ID of the token for which the asset is being accepted |
+| index | uint256 | Index of the asset in the token's pending assets array |
+| assetId | uint256 | ID of the asset expected to be located at the specified `index` |
 
+### _afterAcceptAsset
 
+```solidity
+function _afterAcceptAsset(uint256 tokenId, uint256 index, uint256 assetId) internal virtual
+```
+
+Hook that is called after an asset is accepted to a token's active assets array.
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| tokenId | uint256 | ID of the token for which the asset has been accepted |
+| index | uint256 | Index of the asset in the token's pending assets array |
+| assetId | uint256 | ID of the asset expected to have been located at the specified `index` |
+
+### _beforeRejectAsset
+
+```solidity
+function _beforeRejectAsset(uint256 tokenId, uint256 index, uint256 assetId) internal virtual
+```
+
+Hook that is called before rejecting an asset.
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| tokenId | uint256 | ID of the token from which the asset is being rejected |
+| index | uint256 | Index of the asset in the token's pending assets array |
+| assetId | uint256 | ID of the asset expected to be located at the specified `index` |
+
+### _afterRejectAsset
+
+```solidity
+function _afterRejectAsset(uint256 tokenId, uint256 index, uint256 assetId) internal virtual
+```
+
+Hook that is called after rejecting an asset.
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| tokenId | uint256 | ID of the token from which the asset has been rejected |
+| index | uint256 | Index of the asset in the token's pending assets array |
+| assetId | uint256 | ID of the asset expected to have been located at the specified `index` |
+
+### _beforeRejectAllAssets
+
+```solidity
+function _beforeRejectAllAssets(uint256 tokenId) internal virtual
+```
+
+Hook that is called before rejecting all assets of a token.
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| tokenId | uint256 | ID of the token from which all of the assets are being rejected |
+
+### _afterRejectAllAssets
+
+```solidity
+function _afterRejectAllAssets(uint256 tokenId) internal virtual
+```
+
+Hook that is called after rejecting all assets of a token.
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| tokenId | uint256 | ID of the token from which all of the assets have been rejected |
+
+### _beforeSetPriority
+
+```solidity
+function _beforeSetPriority(uint256 tokenId, uint16[] priorities) internal virtual
+```
+
+Hook that is called before the priorities for token's assets is set.
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| tokenId | uint256 | ID of the token for which the asset priorities are being set |
+| priorities | uint16[] |  |
+
+### _afterSetPriority
+
+```solidity
+function _afterSetPriority(uint256 tokenId, uint16[] priorities) internal virtual
+```
+
+Hook that is called after the priorities for token's assets is set.
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| tokenId | uint256 | ID of the token for which the asset priorities have been set |
+| priorities | uint16[] |  |
 

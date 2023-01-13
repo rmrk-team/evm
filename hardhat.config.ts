@@ -7,7 +7,8 @@ import '@typechain/hardhat';
 import 'hardhat-gas-reporter';
 import 'solidity-coverage';
 import 'hardhat-contract-sizer';
-import '@primitivefi/hardhat-dodoc';
+import 'solidity-docgen';
+// import '@primitivefi/hardhat-dodoc';
 
 dotenv.config();
 
@@ -62,9 +63,12 @@ const config: HardhatUserConfig = {
       goerli: process.env.ETHERSCAN_API_KEY || '', // Goerli Etherscan API Key
     },
   },
-  dodoc: {
-    runOnCompile: false,
-  },
+  // dodoc: {
+  //   runOnCompile: false,
+  // },
+  docgen: {
+    pages: 'files'
+  }
 };
 
 export default config;

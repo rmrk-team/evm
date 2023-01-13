@@ -1,14 +1,8 @@
-# IRMRKErc20Pay
+# Solidity API
 
-*RMRK team*
-
-> IRMRKErc20Pay
+## IRMRKErc20Pay
 
 Interface implementation of RMRK ERC20 pay module.
-
-
-
-## Methods
 
 ### erc20TokenAddress
 
@@ -18,15 +12,9 @@ function erc20TokenAddress() external view returns (address)
 
 Used to retrieve the address of the ERC20 token this smart contract supports.
 
-
-
-
-#### Returns
+#### Return Values
 
 | Name | Type | Description |
-|---|---|---|
-| _0 | address | address Address of the ERC20 token&#39;s smart contract |
-
-
-
+| ---- | ---- | ----------- |
+| [0] | address | address Address of the ERC20 token's smart contract |
 

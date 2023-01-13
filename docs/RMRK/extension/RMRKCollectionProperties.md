@@ -1,12 +1,6 @@
-# RMRKCollectionProperties
+# Solidity API
 
-*RMRK team*
-
-> RMRKCollectionProperties
+## RMRKCollectionProperties
 
 Smart contract of the RMRK Collection properties module.
-
-
-
-
 
