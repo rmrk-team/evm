@@ -79,7 +79,7 @@ describe('CatalogImpl', async () => {
     });
 
     it('can add part if contributor', async function () {
-      await catalog.connect(owner).addContributor(contributor.address);
+      await catalog.connect(owner).manageContributor(contributor.address, true);
       await catalog.connect(contributor).addPart({ partId: partId, part: partData });
       expect(await catalog.getPart(partId)).to.eql([fixedType, 0, [], 'ipfs://metadata']);
     });
