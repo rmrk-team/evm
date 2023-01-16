@@ -566,6 +566,17 @@ async function shouldBehaveLikeEquippableWithSlots(
     childIndex: number,
     weaponResId: number,
   ): Promise<void> {
+    // It's ok if nothing equipped
+    const expectedSlots = [bn(partIdForWeapon), bn(partIdForBackground)];
+    expect(await view.getEquipped(soldierEquip.address, soldiersIds[0], soldierResId)).to.eql([
+      expectedSlots,
+      [
+        [bn(0), bn(0), bn(0), ethers.constants.AddressZero],
+        [bn(0), bn(0), bn(0), ethers.constants.AddressZero],
+      ],
+      ['', ''],
+    ]);
+
     await expect(
       soldierEquip
         .connect(from)
@@ -581,7 +592,6 @@ async function shouldBehaveLikeEquippableWithSlots(
         weaponAssetsEquip[0],
       );
     // All part slots are included on the response:
-    const expectedSlots = [bn(partIdForWeapon), bn(partIdForBackground)];
     // If a slot has nothing equipped, it returns an empty equip:
     const expectedEquips = [
       [bn(soldierResId), bn(weaponResId), bn(weaponsIds[0]), weaponEquip.address],

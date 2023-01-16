@@ -10,29 +10,6 @@
 
 ## Methods
 
-### getActiveAssets
-
-```solidity
-function getActiveAssets(address target, uint256 tokenId) external view returns (struct RMRKMultiAssetRenderUtils.ActiveAsset[])
-```
-
-Used to get the active assets of the given token.
-
-*The full `ActiveAsset` looks like this:  [      id,      priority,      metadata  ]*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| target | address | Address of the smart contract of the given token |
-| tokenId | uint256 | ID of the token to retrieve the active assets for |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | RMRKMultiAssetRenderUtils.ActiveAsset[] | struct[] An array of ActiveAssets present on the given token |
-
 ### getAssetIdWithTopPriority
 
 ```solidity
@@ -80,6 +57,29 @@ Used to retrieve the metadata URI of specified assets in the specified token.
 | Name | Type | Description |
 |---|---|---|
 | _0 | string[] | string[] An array of metadata URIs belonging to specified assets |
+
+### getExtendedActiveAssets
+
+```solidity
+function getExtendedActiveAssets(address target, uint256 tokenId) external view returns (struct RMRKMultiAssetRenderUtils.ExtendedActiveAsset[])
+```
+
+Used to get the active assets of the given token.
+
+*The full `ExtendedActiveAsset` looks like this:  [      id,      priority,      metadata  ]*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| target | address | Address of the smart contract of the given token |
+| tokenId | uint256 | ID of the token to retrieve the active assets for |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | RMRKMultiAssetRenderUtils.ExtendedActiveAsset[] | struct[] An array of ActiveAssets present on the given token |
 
 ### getPendingAssets
 

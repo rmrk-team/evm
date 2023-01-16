@@ -2,6 +2,7 @@
 
 pragma solidity ^0.8.16;
 
+import "./RMRKRenderUtils.sol";
 import "./RMRKMultiAssetRenderUtils.sol";
 import "../catalog/IRMRKCatalog.sol";
 import "../equippable/IRMRKEquippable.sol";
@@ -15,7 +16,7 @@ import "../library/RMRKErrors.sol";
  * @notice Smart contract of the RMRK Equip render utils module.
  * @dev Extra utility functions for composing RMRK extended assets.
  */
-contract RMRKEquipRenderUtils is RMRKMultiAssetRenderUtils {
+contract RMRKEquipRenderUtils is RMRKRenderUtils, RMRKMultiAssetRenderUtils {
     using RMRKLib for uint64[];
 
     /**
@@ -27,7 +28,7 @@ contract RMRKEquipRenderUtils is RMRKMultiAssetRenderUtils {
      * @return metadata Metadata URI of the asset
      * @return partIds[] An array of IDs of fixed and slot parts present in the asset
      */
-    struct ExtendedActiveAsset {
+    struct ExtendedEquippableActiveAsset {
         uint64 id;
         uint64 equippableGroupId;
         uint16 priority;
@@ -95,7 +96,7 @@ contract RMRKEquipRenderUtils is RMRKMultiAssetRenderUtils {
 
     /**
      * @notice Used to get extended active assets of the given token.
-     * @dev The full `ExtendedActiveAsset` looks like this:
+     * @dev The full `ExtendedEquippableActiveAsset` looks like this:
      *  [
      *      ID,
      *      equippableGroupId,
@@ -115,10 +116,10 @@ contract RMRKEquipRenderUtils is RMRKMultiAssetRenderUtils {
      * @param tokenId ID of the token to retrieve the extended active assets for
      * @return ExtendedActiveAssets[] An array of ExtendedActiveAssets present on the given token
      */
-    function getExtendedActiveAssets(
+    function getExtendedEquippableActiveAssets(
         address target,
         uint256 tokenId
-    ) public view virtual returns (ExtendedActiveAsset[] memory) {
+    ) public view virtual returns (ExtendedEquippableActiveAsset[] memory) {
         IRMRKEquippable target_ = IRMRKEquippable(target);
 
         uint64[] memory assets = target_.getActiveAssets(tokenId);
@@ -128,9 +129,8 @@ contract RMRKEquipRenderUtils is RMRKMultiAssetRenderUtils {
             revert RMRKTokenHasNoAssets();
         }
 
-        ExtendedActiveAsset[] memory activeAssets = new ExtendedActiveAsset[](
-            len
-        );
+        ExtendedEquippableActiveAsset[]
+            memory activeAssets = new ExtendedEquippableActiveAsset[](len);
 
         for (uint256 i; i < len; ) {
             (
@@ -139,7 +139,7 @@ contract RMRKEquipRenderUtils is RMRKMultiAssetRenderUtils {
                 address catalogAddress,
                 uint64[] memory partIds
             ) = target_.getAssetAndEquippableData(tokenId, assets[i]);
-            activeAssets[i] = ExtendedActiveAsset({
+            activeAssets[i] = ExtendedEquippableActiveAsset({
                 id: assets[i],
                 equippableGroupId: equippableGroupId,
                 priority: priorities[i],
@@ -257,25 +257,23 @@ contract RMRKEquipRenderUtils is RMRKMultiAssetRenderUtils {
         (slotPartIds, ) = _splitSlotAndFixedParts(partIds, catalogAddress);
         uint256 len = slotPartIds.length;
 
-        if (len != 0) {
-            childrenEquipped = new IRMRKEquippable.Equipment[](len);
-            childrenAssetMetadata = new string[](len);
+        childrenEquipped = new IRMRKEquippable.Equipment[](len);
+        childrenAssetMetadata = new string[](len);
 
-            for (uint256 i; i < len; ) {
-                IRMRKEquippable.Equipment memory equipment = target_
-                    .getEquipment(tokenId, catalogAddress, slotPartIds[i]);
-                if (equipment.assetId == assetId) {
-                    childrenEquipped[i] = equipment;
-                    childrenAssetMetadata[i] = IRMRKEquippable(
-                        equipment.childEquippableAddress
-                    ).getAssetMetadata(
-                            equipment.childId,
-                            equipment.childAssetId
-                        );
-                }
-                unchecked {
-                    ++i;
-                }
+        for (uint256 i; i < len; ) {
+            IRMRKEquippable.Equipment memory equipment = target_.getEquipment(
+                tokenId,
+                catalogAddress,
+                slotPartIds[i]
+            );
+            if (equipment.assetId == assetId) {
+                childrenEquipped[i] = equipment;
+                childrenAssetMetadata[i] = IRMRKEquippable(
+                    equipment.childEquippableAddress
+                ).getAssetMetadata(equipment.childId, equipment.childAssetId);
+            }
+            unchecked {
+                ++i;
             }
         }
     }
@@ -437,12 +435,12 @@ contract RMRKEquipRenderUtils is RMRKMultiAssetRenderUtils {
      * @notice Used to retrieve the equippable data of the specified token's asset with the highest priority.
      * @param target Address of the smart contract of the given token
      * @param tokenId ID of the token for which to retrieve the equippable data of the asset with the highest priority
-     * @return topAsset ExtendedActiveAsset struct with the equippable data for the the asset with the highest priority
+     * @return topAsset ExtendedEquippableActiveAsset struct with the equippable data for the the asset with the highest priority
      */
     function getTopAssetAndEquippableDataForToken(
         address target,
         uint256 tokenId
-    ) public view returns (ExtendedActiveAsset memory topAsset) {
+    ) public view returns (ExtendedEquippableActiveAsset memory topAsset) {
         (uint64 topAssetId, uint16 topPriority) = getAssetIdWithTopPriority(
             target,
             tokenId
@@ -456,7 +454,7 @@ contract RMRKEquipRenderUtils is RMRKMultiAssetRenderUtils {
                 tokenId,
                 topAssetId
             );
-        topAsset = ExtendedActiveAsset({
+        topAsset = ExtendedEquippableActiveAsset({
             id: topAssetId,
             equippableGroupId: equippableGroupId,
             priority: topPriority,

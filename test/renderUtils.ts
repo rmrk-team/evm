@@ -4,6 +4,7 @@ import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { ADDRESS_ZERO, bn, mintFromMock, nestMintFromMock } from './utils';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import {
+  RMRKRenderUtils,
   RMRKCatalogMock,
   RMRKEquippableMock,
   RMRKEquipRenderUtils,
@@ -12,7 +13,7 @@ import {
 
 // --------------- FIXTURES -----------------------
 
-async function assetsFixture() {
+async function multiAsetAndEquipRenderUtilsFixture() {
   const catalogFactory = await ethers.getContractFactory('RMRKCatalogMock');
   const equipFactory = await ethers.getContractFactory('RMRKEquippableMock');
   const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiAssetRenderUtils');
@@ -33,7 +34,7 @@ async function assetsFixture() {
   return { catalog, equip, renderUtils, renderUtilsEquip };
 }
 
-async function advancedAssetsFixture() {
+async function advancedEquipRenderUtilsFixture() {
   const catalogFactory = await ethers.getContractFactory('RMRKCatalogMock');
   const equipFactory = await ethers.getContractFactory('RMRKEquippableMock');
   const renderUtilsEquipFactory = await ethers.getContractFactory('RMRKEquipRenderUtils');
@@ -52,7 +53,20 @@ async function advancedAssetsFixture() {
   return { catalog, kanaria, gem, renderUtilsEquip };
 }
 
-describe('Render Utils', async function () {
+async function simpleRenderUtilsFixture() {
+  const equipFactory = await ethers.getContractFactory('RMRKEquippableMock');
+  const renderUtilsFactory = await ethers.getContractFactory('RMRKRenderUtils');
+
+  const token = <RMRKEquippableMock>await equipFactory.deploy('Kanaria', 'KAN');
+  token.deployed();
+
+  const renderUtils = <RMRKEquipRenderUtils>await renderUtilsFactory.deploy();
+  await renderUtils.deployed();
+
+  return { token, renderUtils };
+}
+
+describe('MultiAsset and Equip Render Utils', async function () {
   let owner: SignerWithAddress;
   let catalog: RMRKCatalogMock;
   let equip: RMRKEquippableMock;
@@ -66,7 +80,9 @@ describe('Render Utils', async function () {
   const resId4 = bn(4);
 
   beforeEach(async function () {
-    ({ catalog, equip, renderUtils, renderUtilsEquip } = await loadFixture(assetsFixture));
+    ({ catalog, equip, renderUtils, renderUtilsEquip } = await loadFixture(
+      multiAsetAndEquipRenderUtilsFixture,
+    ));
 
     const signers = await ethers.getSigners();
     owner = signers[0];
@@ -88,7 +104,7 @@ describe('Render Utils', async function () {
 
   describe('Render Utils MultiAsset', async function () {
     it('can get active assets', async function () {
-      expect(await renderUtils.getActiveAssets(equip.address, tokenId)).to.eql([
+      expect(await renderUtils.getExtendedActiveAssets(equip.address, tokenId)).to.eql([
         [resId, 10, 'ipfs://res1.jpg'],
         [resId2, 5, 'ipfs://res2.jpg'],
       ]);
@@ -122,10 +138,10 @@ describe('Render Utils', async function () {
     it('cannot get active assets if token has no assets', async function () {
       const otherTokenId = await mintFromMock(equip, owner.address);
       await expect(
-        renderUtils.getActiveAssets(equip.address, otherTokenId),
+        renderUtils.getExtendedActiveAssets(equip.address, otherTokenId),
       ).to.be.revertedWithCustomError(renderUtils, 'RMRKTokenHasNoAssets');
       await expect(
-        renderUtilsEquip.getExtendedActiveAssets(equip.address, otherTokenId),
+        renderUtilsEquip.getExtendedEquippableActiveAssets(equip.address, otherTokenId),
       ).to.be.revertedWithCustomError(renderUtils, 'RMRKTokenHasNoAssets');
     });
 
@@ -149,7 +165,9 @@ describe('Render Utils', async function () {
 
   describe('Render Utils Equip', async function () {
     it('can get active assets', async function () {
-      expect(await renderUtilsEquip.getExtendedActiveAssets(equip.address, tokenId)).to.eql([
+      expect(
+        await renderUtilsEquip.getExtendedEquippableActiveAssets(equip.address, tokenId),
+      ).to.eql([
         [resId, bn(0), 10, ADDRESS_ZERO, 'ipfs://res1.jpg', []],
         [resId2, bn(1), 5, catalog.address, 'ipfs://res2.jpg', [bn(1), bn(3), bn(4)]],
       ]);
@@ -209,7 +227,9 @@ describe('Advanced Equip Render Utils', async function () {
   let gemId3: number;
 
   beforeEach(async function () {
-    ({ catalog, kanaria, gem, renderUtilsEquip } = await loadFixture(advancedAssetsFixture));
+    ({ catalog, kanaria, gem, renderUtilsEquip } = await loadFixture(
+      advancedEquipRenderUtilsFixture,
+    ));
     [owner] = await ethers.getSigners();
 
     kanariaId = await mintFromMock(kanaria, owner.address);
@@ -428,3 +448,37 @@ async function setUpGemAssets(
   await gem.acceptAsset(gemId3, 1, assetForGemBLeft);
   await gem.acceptAsset(gemId3, 0, assetForGemBFull);
 }
+
+describe('Render Utils', async function () {
+  let owner: SignerWithAddress;
+  let token: RMRKEquippableMock;
+  let renderUtils: RMRKRenderUtils;
+
+  beforeEach(async function () {
+    ({ token, renderUtils } = await loadFixture(simpleRenderUtilsFixture));
+
+    const signers = await ethers.getSigners();
+    owner = signers[0];
+  });
+
+  it('can get pages of available ids', async function () {
+    for (let i = 0; i < 9; i++) {
+      await token.mint(owner.address, i + 1);
+    }
+
+    await token['burn(uint256)'](3);
+    await token['burn(uint256)'](8);
+
+    expect(await renderUtils.getPaginatedMintedIds(token.address, 1, 5)).to.eql([
+      bn(1),
+      bn(2),
+      bn(4),
+      bn(5),
+    ]);
+    expect(await renderUtils.getPaginatedMintedIds(token.address, 6, 10)).to.eql([
+      bn(6),
+      bn(7),
+      bn(9),
+    ]);
+  });
+});

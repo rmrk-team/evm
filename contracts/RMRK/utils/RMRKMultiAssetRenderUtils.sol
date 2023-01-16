@@ -18,7 +18,7 @@ contract RMRKMultiAssetRenderUtils {
      * @return priority The priority assigned to the asset
      * @return metadata The metadata URI of the asset
      */
-    struct ActiveAsset {
+    struct ExtendedActiveAsset {
         uint64 id;
         uint16 priority;
         string metadata;
@@ -40,7 +40,7 @@ contract RMRKMultiAssetRenderUtils {
 
     /**
      * @notice Used to get the active assets of the given token.
-     * @dev The full `ActiveAsset` looks like this:
+     * @dev The full `ExtendedActiveAsset` looks like this:
      *  [
      *      id,
      *      priority,
@@ -50,10 +50,10 @@ contract RMRKMultiAssetRenderUtils {
      * @param tokenId ID of the token to retrieve the active assets for
      * @return struct[] An array of ActiveAssets present on the given token
      */
-    function getActiveAssets(
+    function getExtendedActiveAssets(
         address target,
         uint256 tokenId
-    ) public view virtual returns (ActiveAsset[] memory) {
+    ) public view virtual returns (ExtendedActiveAsset[] memory) {
         IRMRKMultiAsset target_ = IRMRKMultiAsset(target);
 
         uint64[] memory assets = target_.getActiveAssets(tokenId);
@@ -63,11 +63,13 @@ contract RMRKMultiAssetRenderUtils {
             revert RMRKTokenHasNoAssets();
         }
 
-        ActiveAsset[] memory activeAssets = new ActiveAsset[](len);
+        ExtendedActiveAsset[] memory activeAssets = new ExtendedActiveAsset[](
+            len
+        );
         string memory metadata;
         for (uint256 i; i < len; ) {
             metadata = target_.getAssetMetadata(tokenId, assets[i]);
-            activeAssets[i] = ActiveAsset({
+            activeAssets[i] = ExtendedActiveAsset({
                 id: assets[i],
                 priority: priorities[i],
                 metadata: metadata

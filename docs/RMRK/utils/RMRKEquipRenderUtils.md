@@ -62,29 +62,6 @@ Used to compose the given equippables.
 | fixedParts | RMRKEquipRenderUtils.FixedPart[] | An array of fixed parts respresented by the `FixedPart` structs present on the asset |
 | slotParts | RMRKEquipRenderUtils.EquippedSlotPart[] | An array of slot parts represented by the `EquippedSlotPart` structs present on the asset |
 
-### getActiveAssets
-
-```solidity
-function getActiveAssets(address target, uint256 tokenId) external view returns (struct RMRKMultiAssetRenderUtils.ActiveAsset[])
-```
-
-Used to get the active assets of the given token.
-
-*The full `ActiveAsset` looks like this:  [      id,      priority,      metadata  ]*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| target | address | Address of the smart contract of the given token |
-| tokenId | uint256 | ID of the token to retrieve the active assets for |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | RMRKMultiAssetRenderUtils.ActiveAsset[] | struct[] An array of ActiveAssets present on the given token |
-
 ### getAssetIdWithTopPriority
 
 ```solidity
@@ -186,12 +163,35 @@ Used to retrieve the equipped parts of the given token.
 ### getExtendedActiveAssets
 
 ```solidity
-function getExtendedActiveAssets(address target, uint256 tokenId) external view returns (struct RMRKEquipRenderUtils.ExtendedActiveAsset[])
+function getExtendedActiveAssets(address target, uint256 tokenId) external view returns (struct RMRKMultiAssetRenderUtils.ExtendedActiveAsset[])
+```
+
+Used to get the active assets of the given token.
+
+*The full `ExtendedActiveAsset` looks like this:  [      id,      priority,      metadata  ]*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| target | address | Address of the smart contract of the given token |
+| tokenId | uint256 | ID of the token to retrieve the active assets for |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | RMRKMultiAssetRenderUtils.ExtendedActiveAsset[] | struct[] An array of ActiveAssets present on the given token |
+
+### getExtendedEquippableActiveAssets
+
+```solidity
+function getExtendedEquippableActiveAssets(address target, uint256 tokenId) external view returns (struct RMRKEquipRenderUtils.ExtendedEquippableActiveAsset[])
 ```
 
 Used to get extended active assets of the given token.
 
-*The full `ExtendedActiveAsset` looks like this:  [      ID,      equippableGroupId,      priority,      catalogAddress,      metadata,      [          fixedPartId0,          fixedPartId1,          fixedPartId2,          slotPartId0,          slotPartId1,          slotPartId2      ]  ]*
+*The full `ExtendedEquippableActiveAsset` looks like this:  [      ID,      equippableGroupId,      priority,      catalogAddress,      metadata,      [          fixedPartId0,          fixedPartId1,          fixedPartId2,          slotPartId0,          slotPartId1,          slotPartId2      ]  ]*
 
 #### Parameters
 
@@ -204,7 +204,7 @@ Used to get extended active assets of the given token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | RMRKEquipRenderUtils.ExtendedActiveAsset[] | ExtendedActiveAssets[] An array of ExtendedActiveAssets present on the given token |
+| _0 | RMRKEquipRenderUtils.ExtendedEquippableActiveAsset[] | ExtendedActiveAssets[] An array of ExtendedActiveAssets present on the given token |
 
 ### getExtendedPendingAssets
 
@@ -228,6 +228,30 @@ Used to get the extended pending assets of the given token.
 | Name | Type | Description |
 |---|---|---|
 | _0 | RMRKEquipRenderUtils.ExtendedPendingAsset[] | ExtendedPendingAssets[] An array of ExtendedPendingAssets present on the given token |
+
+### getPaginatedMintedIds
+
+```solidity
+function getPaginatedMintedIds(address target, uint256 pageStart, uint256 pageSize) external view returns (uint256[] page)
+```
+
+Used to get a list of existing token Ids in the range given by pageStart and pageSize
+
+*It does not optimize to avoid checking Ids out of max supply nor total supply.The resulting array might be smaller than the given pageSize since not existing Ids are not included.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| target | address | Address of the smart contract of the given token |
+| pageStart | uint256 | The first Id to check |
+| pageSize | uint256 | The number of Ids to check |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| page | uint256[] | An array of existing token Ids |
 
 ### getPendingAssets
 
@@ -255,7 +279,7 @@ Used to get the pending assets of the given token.
 ### getTopAssetAndEquippableDataForToken
 
 ```solidity
-function getTopAssetAndEquippableDataForToken(address target, uint256 tokenId) external view returns (struct RMRKEquipRenderUtils.ExtendedActiveAsset topAsset)
+function getTopAssetAndEquippableDataForToken(address target, uint256 tokenId) external view returns (struct RMRKEquipRenderUtils.ExtendedEquippableActiveAsset topAsset)
 ```
 
 Used to retrieve the equippable data of the specified token&#39;s asset with the highest priority.
@@ -273,7 +297,7 @@ Used to retrieve the equippable data of the specified token&#39;s asset with the
 
 | Name | Type | Description |
 |---|---|---|
-| topAsset | RMRKEquipRenderUtils.ExtendedActiveAsset | ExtendedActiveAsset struct with the equippable data for the the asset with the highest priority |
+| topAsset | RMRKEquipRenderUtils.ExtendedEquippableActiveAsset | ExtendedEquippableActiveAsset struct with the equippable data for the the asset with the highest priority |
 
 ### getTopAssetMetaForToken
 
