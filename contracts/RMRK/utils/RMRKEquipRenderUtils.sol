@@ -114,7 +114,7 @@ contract RMRKEquipRenderUtils is RMRKRenderUtils, RMRKMultiAssetRenderUtils {
      *  ]
      * @param target Address of the smart contract of the given token
      * @param tokenId ID of the token to retrieve the extended active assets for
-     * @return ExtendedActiveAssets[] An array of ExtendedActiveAssets present on the given token
+     * @return ExtendedEquippableActiveAsset[] An array of ExtendedEquippableActiveAssets present on the given token
      */
     function getExtendedEquippableActiveAssets(
         address target,
@@ -363,7 +363,7 @@ contract RMRKEquipRenderUtils is RMRKRenderUtils, RMRKMultiAssetRenderUtils {
     }
 
     /**
-     * @notice Used to get the child's assets and slot parts pairs, for which the child asset can be equipped into parent's slot part.
+     * @notice Used to get the child's assets and slot parts pairs, identifying parts the said assets can be equipped into.
      * @dev The full `AssetWithSlot` struct looks like this:
      *  [
      *      assetId,
@@ -433,9 +433,9 @@ contract RMRKEquipRenderUtils is RMRKRenderUtils, RMRKMultiAssetRenderUtils {
 
     /**
      * @notice Used to retrieve the equippable data of the specified token's asset with the highest priority.
-     * @param target Address of the smart contract of the given token
+     * @param target Address of the collection smart contract of the specified token
      * @param tokenId ID of the token for which to retrieve the equippable data of the asset with the highest priority
-     * @return topAsset ExtendedEquippableActiveAsset struct with the equippable data for the the asset with the highest priority
+     * @return topAsset `ExtendedEquippableActiveAsset` struct with the equippable data containing the asset with the highest priority
      */
     function getTopAssetAndEquippableDataForToken(
         address target,
@@ -465,12 +465,12 @@ contract RMRKEquipRenderUtils is RMRKRenderUtils, RMRKMultiAssetRenderUtils {
     }
 
     /**
-     * @notice Used to retrieve the parent address and is slot part ids for a given target child.
-     * @param target Address of the smart contract of the given token
+     * @notice Used to retrieve the parent address and its slot part IDs for a given target child.
+     * @param target Address of the collection smart contract of the given token
      * @param tokenId ID of the child token
      * @param parentAssetId ID of the parent asset from which to get the slot parts
      * @return parentAddress Address of the parent token owning the target child
-     * @return parentSlotPartIds Array of slot part ids of the parent asset
+     * @return parentSlotPartIds Array of slot part IDs of the parent token's asset
      * @dev Reverts if the parent is not an NFT or if the parent asset is not composable.
      */
     function _getParentAndSlotParts(

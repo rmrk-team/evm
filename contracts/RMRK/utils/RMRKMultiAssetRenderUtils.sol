@@ -180,7 +180,8 @@ contract RMRKMultiAssetRenderUtils {
      * @notice Used to retrieve the ID of the specified token's asset with the highest priority.
      * @param target Address of the smart contract of the given token
      * @param tokenId ID of the token for which to retrieve the ID of the asset with the highest priority
-     * @return string The ID of the asset with the highest priority
+     * @return The ID of the asset with the highest priority
+     * @return The priority value of the asset with the highest priority
      */
     function getAssetIdWithTopPriority(
         address target,

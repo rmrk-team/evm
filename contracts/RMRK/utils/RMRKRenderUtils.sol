@@ -14,13 +14,13 @@ import "../library/RMRKErrors.sol";
  */
 contract RMRKRenderUtils {
     /**
-     * @notice Used to get a list of existing token Ids in the range given by pageStart and pageSize
-     * @dev It does not optimize to avoid checking Ids out of max supply nor total supply.
-     * @dev The resulting array might be smaller than the given pageSize since not existing Ids are not included.
-     * @param target Address of the smart contract of the given token
-     * @param pageStart The first Id to check
-     * @param pageSize The number of Ids to check
-     * @return page An array of existing token Ids
+     * @notice Used to get a list of existing token IDs in the range between `pageStart` and `pageSize`.
+     * @dev It is not optimized to avoid checking IDs out of max supply nor total supply, since this is not meant to be used during transaction execution; it is only meant to be used as a getter.
+     * @dev The resulting array might be smaller than the given `pageSize` since no-existent IDs are not included.
+     * @param target Address of the collection smart contract of the given token
+     * @param pageStart The first ID to check
+     * @param pageSize The number of IDs to check
+     * @return page An array of IDs of the existing tokens
      */
     function getPaginatedMintedIds(
         address target,
