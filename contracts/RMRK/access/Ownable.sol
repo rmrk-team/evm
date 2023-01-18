@@ -15,10 +15,24 @@ contract Ownable is Context {
     address private _owner;
     mapping(address => uint256) private _contributors;
 
+    /**
+     * @notice Used to anounce the transfer of ownership.
+     * @param previousOwner Address of the account that transferred their ownership role
+     * @param newOwner Address of the account receiving the ownership role
+     */
     event OwnershipTransferred(
         address indexed previousOwner,
         address indexed newOwner
     );
+
+    /**
+     * @notice Event that signifies that an address was granted contributor role or that the permission has been
+     *  revoked.
+     * @dev This can only be triggered by a current owner, so there is no need to include that information in the event.
+     * @param contributor Address of the account that had contributor role status updated
+     * @param isContributor A boolean value signifying whether the role has been granted (`true`) or revoked (`false`)
+     */
+    event ContributorUpdate(address indexed contributor, bool isContributor);
 
     /**
      * @dev Reverts if called by any account other than the owner or an approved contributor.
@@ -45,6 +59,7 @@ contract Ownable is Context {
 
     /**
      * @notice Returns the address of the current owner.
+     * @return Address of the current owner
      */
     function owner() public view virtual returns (address) {
         return _owner;
@@ -82,22 +97,21 @@ contract Ownable is Context {
     }
 
     /**
-     * @notice Adds a contributor to the smart contract.
+     * @notice Adds or removes a contributor to the smart contract.
      * @dev Can only be called by the owner.
      * @param contributor Address of the contributor's account
+     * @param grantRole A boolean value signifying whether the contributor role is being granted (`true`) or revoked
+     *  (`false`)
      */
-    function addContributor(address contributor) external onlyOwner {
+    function manageContributor(
+        address contributor,
+        bool grantRole
+    ) external onlyOwner {
         if (contributor == address(0)) revert RMRKNewContributorIsZeroAddress();
-        _contributors[contributor] = 1;
-    }
-
-    /**
-     * @notice Removes a contributor from the smart contract.
-     * @dev Can only be called by the owner.
-     * @param contributor Address of the contributor's account
-     */
-    function revokeContributor(address contributor) external onlyOwner {
-        delete _contributors[contributor];
+        grantRole
+            ? _contributors[contributor] = 1
+            : _contributors[contributor] = 0;
+        emit ContributorUpdate(contributor, grantRole);
     }
 
     /**
