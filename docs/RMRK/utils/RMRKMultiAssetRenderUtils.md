@@ -31,8 +31,8 @@ Used to retrieve the ID of the specified token&#39;s asset with the highest prio
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint64 | string The ID of the asset with the highest priority |
-| _1 | uint16 | undefined |
+| _0 | uint64 | The ID of the asset with the highest priority |
+| _1 | uint16 | The priority value of the asset with the highest priority |
 
 ### getAssetsById
 

@@ -89,6 +89,11 @@ contract RMRKEquipRenderUtils is RMRKRenderUtils, RMRKMultiAssetRenderUtils {
         string metadataURI; //n bytes 32+
     }
 
+    /**
+     * @notice The structure used to represent an asset with a Slot.
+     * @return slotPartId ID of the Slot part
+     * @return assetId ID of the asset
+     */
     struct AssetWithSlot {
         uint64 slotPartId;
         uint64 assetId;
@@ -369,23 +374,23 @@ contract RMRKEquipRenderUtils is RMRKRenderUtils, RMRKMultiAssetRenderUtils {
      *      assetId,
      *      slotPartId
      *  ]
-     * @param target Address of the smart contract of the given token
-     * @param tokenId ID of the child token whose assets will be matched against parent's slot parts
+     * @param targetChild Address of the smart contract of the given token
+     * @param childId ID of the child token whose assets will be matched against parent's slot parts
      * @param parentAssetId ID of the target parent asset to use to equip the child
      * @return assetsWithSlots An array of `AssetWithSlot` structs containing info about the equippable child assets and their corresponding slot parts
      */
     function getEquippableSlotsFromParent(
-        address target,
-        uint256 tokenId,
+        address targetChild,
+        uint256 childId,
         uint64 parentAssetId
     ) public view returns (AssetWithSlot[] memory assetsWithSlots) {
         (
             address parentAddress,
             uint64[] memory parentSlotPartIds
-        ) = _getParentAndSlotParts(target, tokenId, parentAssetId);
+        ) = _getParentAndSlotParts(targetChild, childId, parentAssetId);
 
-        IRMRKEquippable targetChild = IRMRKEquippable(target);
-        uint64[] memory childAssets = targetChild.getActiveAssets(tokenId);
+        IRMRKEquippable targetChild_ = IRMRKEquippable(targetChild);
+        uint64[] memory childAssets = targetChild_.getActiveAssets(childId);
         uint256 totalChildAssets = childAssets.length;
         uint256 totalParentSlots = parentSlotPartIds.length;
         // There can be at most min(totalChildAssets, totalParentSlots) resulting matches, we just pick one of them.
@@ -397,9 +402,9 @@ contract RMRKEquipRenderUtils is RMRKRenderUtils, RMRKMultiAssetRenderUtils {
         for (uint256 i; i < totalChildAssets; ) {
             for (uint256 j; j < totalParentSlots; ) {
                 if (
-                    targetChild.canTokenBeEquippedWithAssetIntoSlot(
+                    targetChild_.canTokenBeEquippedWithAssetIntoSlot(
                         parentAddress,
-                        tokenId,
+                        childId,
                         childAssets[i],
                         parentSlotPartIds[j]
                     )
@@ -466,12 +471,12 @@ contract RMRKEquipRenderUtils is RMRKRenderUtils, RMRKMultiAssetRenderUtils {
 
     /**
      * @notice Used to retrieve the parent address and its slot part IDs for a given target child.
+     * @dev Reverts if the parent is not an NFT or if the parent asset is not composable.
      * @param target Address of the collection smart contract of the given token
      * @param tokenId ID of the child token
      * @param parentAssetId ID of the parent asset from which to get the slot parts
      * @return parentAddress Address of the parent token owning the target child
      * @return parentSlotPartIds Array of slot part IDs of the parent token's asset
-     * @dev Reverts if the parent is not an NFT or if the parent asset is not composable.
      */
     function _getParentAndSlotParts(
         address target,

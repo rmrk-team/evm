@@ -83,8 +83,8 @@ Used to retrieve the ID of the specified token&#39;s asset with the highest prio
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint64 | string The ID of the asset with the highest priority |
-| _1 | uint16 | undefined |
+| _0 | uint64 | The ID of the asset with the highest priority |
+| _1 | uint16 | The priority value of the asset with the highest priority |
 
 ### getAssetsById
 
@@ -113,10 +113,10 @@ Used to retrieve the metadata URI of specified assets in the specified token.
 ### getEquippableSlotsFromParent
 
 ```solidity
-function getEquippableSlotsFromParent(address target, uint256 tokenId, uint64 parentAssetId) external view returns (struct RMRKEquipRenderUtils.AssetWithSlot[] assetsWithSlots)
+function getEquippableSlotsFromParent(address targetChild, uint256 childId, uint64 parentAssetId) external view returns (struct RMRKEquipRenderUtils.AssetWithSlot[] assetsWithSlots)
 ```
 
-Used to get the child&#39;s assets and slot parts pairs, for which the child asset can be equipped into parent&#39;s slot part.
+Used to get the child&#39;s assets and slot parts pairs, identifying parts the said assets can be equipped into.
 
 *The full `AssetWithSlot` struct looks like this:  [      assetId,      slotPartId  ]*
 
@@ -124,8 +124,8 @@ Used to get the child&#39;s assets and slot parts pairs, for which the child ass
 
 | Name | Type | Description |
 |---|---|---|
-| target | address | Address of the smart contract of the given token |
-| tokenId | uint256 | ID of the child token whose assets will be matched against parent&#39;s slot parts |
+| targetChild | address | Address of the smart contract of the given token |
+| childId | uint256 | ID of the child token whose assets will be matched against parent&#39;s slot parts |
 | parentAssetId | uint64 | ID of the target parent asset to use to equip the child |
 
 #### Returns
@@ -204,7 +204,7 @@ Used to get extended active assets of the given token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | RMRKEquipRenderUtils.ExtendedEquippableActiveAsset[] | ExtendedActiveAssets[] An array of ExtendedActiveAssets present on the given token |
+| _0 | RMRKEquipRenderUtils.ExtendedEquippableActiveAsset[] | ExtendedEquippableActiveAsset[] An array of ExtendedEquippableActiveAssets present on the given token |
 
 ### getExtendedPendingAssets
 
@@ -235,23 +235,23 @@ Used to get the extended pending assets of the given token.
 function getPaginatedMintedIds(address target, uint256 pageStart, uint256 pageSize) external view returns (uint256[] page)
 ```
 
-Used to get a list of existing token Ids in the range given by pageStart and pageSize
+Used to get a list of existing token IDs in the range between `pageStart` and `pageSize`.
 
-*It does not optimize to avoid checking Ids out of max supply nor total supply.The resulting array might be smaller than the given pageSize since not existing Ids are not included.*
+*It is not optimized to avoid checking IDs out of max supply nor total supply, since this is not meant to be used during transaction execution; it is only meant to be used as a getter.The resulting array might be smaller than the given `pageSize` since no-existent IDs are not included.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| target | address | Address of the smart contract of the given token |
-| pageStart | uint256 | The first Id to check |
-| pageSize | uint256 | The number of Ids to check |
+| target | address | Address of the collection smart contract of the given token |
+| pageStart | uint256 | The first ID to check |
+| pageSize | uint256 | The number of IDs to check |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| page | uint256[] | An array of existing token Ids |
+| page | uint256[] | An array of IDs of the existing tokens |
 
 ### getPendingAssets
 
@@ -290,14 +290,14 @@ Used to retrieve the equippable data of the specified token&#39;s asset with the
 
 | Name | Type | Description |
 |---|---|---|
-| target | address | Address of the smart contract of the given token |
+| target | address | Address of the collection smart contract of the specified token |
 | tokenId | uint256 | ID of the token for which to retrieve the equippable data of the asset with the highest priority |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| topAsset | RMRKEquipRenderUtils.ExtendedEquippableActiveAsset | ExtendedEquippableActiveAsset struct with the equippable data for the the asset with the highest priority |
+| topAsset | RMRKEquipRenderUtils.ExtendedEquippableActiveAsset | `ExtendedEquippableActiveAsset` struct with the equippable data containing the asset with the highest priority |
 
 ### getTopAssetMetaForToken
 
@@ -344,7 +344,7 @@ Attempting to compose an asset wihtout having an associated Catalog
 error RMRKParentIsNotNFT()
 ```
 
-Attempting do an operation assuming a token is nested, while it is not
+Attempting an operation requiring the token being nested, while it is not
 
 
 
