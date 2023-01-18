@@ -4,6 +4,7 @@ pragma solidity ^0.8.16;
 
 import "./RMRKRenderUtils.sol";
 import "./RMRKMultiAssetRenderUtils.sol";
+import "./RMRKNestableRenderUtils.sol";
 import "../catalog/IRMRKCatalog.sol";
 import "../equippable/IRMRKEquippable.sol";
 import "../nestable/IRMRKNestable.sol";
@@ -16,7 +17,11 @@ import "../library/RMRKErrors.sol";
  * @notice Smart contract of the RMRK Equip render utils module.
  * @dev Extra utility functions for composing RMRK extended assets.
  */
-contract RMRKEquipRenderUtils is RMRKRenderUtils, RMRKMultiAssetRenderUtils {
+contract RMRKEquipRenderUtils is
+    RMRKRenderUtils,
+    RMRKMultiAssetRenderUtils,
+    RMRKNestableRenderUtils
+{
     using RMRKLib for uint64[];
 
     /**
@@ -93,10 +98,12 @@ contract RMRKEquipRenderUtils is RMRKRenderUtils, RMRKMultiAssetRenderUtils {
      * @notice The structure used to represent an asset with a Slot.
      * @return slotPartId ID of the Slot part
      * @return assetId ID of the asset
+     * @return priority Priority of the asset on the active assets list
      */
     struct AssetWithSlot {
         uint64 slotPartId;
         uint64 assetId;
+        uint16 priority;
     }
 
     /**
@@ -369,62 +376,54 @@ contract RMRKEquipRenderUtils is RMRKRenderUtils, RMRKMultiAssetRenderUtils {
 
     /**
      * @notice Used to get the child's assets and slot parts pairs, identifying parts the said assets can be equipped into.
+     * @dev Reverts if child token is not owned by an NFT.
+     * @dev Reverts if child token is not owned by the expected parent.
      * @dev The full `AssetWithSlot` struct looks like this:
      *  [
      *      assetId,
-     *      slotPartId
+     *      slotPartId,
+     *      priority,
      *  ]
      * @param targetChild Address of the smart contract of the given token
      * @param childId ID of the child token whose assets will be matched against parent's slot parts
      * @param parentAssetId ID of the target parent asset to use to equip the child
+     * @return childIndex Index of the child in the parent's list of active children
      * @return assetsWithSlots An array of `AssetWithSlot` structs containing info about the equippable child assets and their corresponding slot parts
      */
     function getEquippableSlotsFromParent(
         address targetChild,
         uint256 childId,
+        address expectedParent,
+        uint256 expectedParentId,
         uint64 parentAssetId
-    ) public view returns (AssetWithSlot[] memory assetsWithSlots) {
-        (
-            address parentAddress,
-            uint64[] memory parentSlotPartIds
-        ) = _getParentAndSlotParts(targetChild, childId, parentAssetId);
-
-        IRMRKEquippable targetChild_ = IRMRKEquippable(targetChild);
-        uint64[] memory childAssets = targetChild_.getActiveAssets(childId);
-        uint256 totalChildAssets = childAssets.length;
-        uint256 totalParentSlots = parentSlotPartIds.length;
-        // There can be at most min(totalChildAssets, totalParentSlots) resulting matches, we just pick one of them.
-        AssetWithSlot[] memory tempAssetsWithSlots = new AssetWithSlot[](
-            totalParentSlots
+    )
+        public
+        view
+        returns (uint256 childIndex, AssetWithSlot[] memory assetsWithSlots)
+    {
+        uint64[] memory parentSlotPartIds = _getParentAndSlotParts(
+            targetChild,
+            childId,
+            expectedParent,
+            expectedParentId,
+            parentAssetId
         );
-        uint256 totalMatches;
+        childIndex = getChildIndex(
+            expectedParent,
+            expectedParentId,
+            targetChild,
+            childId
+        );
 
-        for (uint256 i; i < totalChildAssets; ) {
-            for (uint256 j; j < totalParentSlots; ) {
-                if (
-                    targetChild_.canTokenBeEquippedWithAssetIntoSlot(
-                        parentAddress,
-                        childId,
-                        childAssets[i],
-                        parentSlotPartIds[j]
-                    )
-                ) {
-                    tempAssetsWithSlots[totalMatches] = AssetWithSlot({
-                        assetId: childAssets[i],
-                        slotPartId: parentSlotPartIds[j]
-                    });
-                    unchecked {
-                        ++totalMatches;
-                    }
-                }
-                unchecked {
-                    ++j;
-                }
-            }
-            unchecked {
-                ++i;
-            }
-        }
+        (
+            AssetWithSlot[] memory tempAssetsWithSlots,
+            uint256 totalMatches
+        ) = _matchAllAssetsWithSlots(
+                IRMRKEquippable(targetChild),
+                childId,
+                parentSlotPartIds,
+                expectedParent
+            );
 
         // Finally, we copy the matches into the final array which has the right lenght according to results
         assetsWithSlots = new AssetWithSlot[](totalMatches);
@@ -470,37 +469,105 @@ contract RMRKEquipRenderUtils is RMRKRenderUtils, RMRKMultiAssetRenderUtils {
     }
 
     /**
-     * @notice Used to retrieve the parent address and its slot part IDs for a given target child.
-     * @dev Reverts if the parent is not an NFT or if the parent asset is not composable.
-     * @param target Address of the collection smart contract of the given token
-     * @param tokenId ID of the child token
-     * @param parentAssetId ID of the parent asset from which to get the slot parts
-     * @return parentAddress Address of the parent token owning the target child
-     * @return parentSlotPartIds Array of slot part IDs of the parent token's asset
+     * @notice Matches all child's assets with the corresponding slot parts of the parent, if they apply.
+     * @dev The full `AssetWithSlot` struct looks like this:
+     *  [
+     *      assetId,
+     *      slotPartId,
+     *      priority,
+     *  ]
+     * @dev The size of the returning array is equal to the total of available parent slots, even if there's not a match for each one.
+     * @dev The valid matches are located at the beginning of the array, and the rest of the slots are filled with empty structs. Use totalMatches to know how many valid matches there are.
+     * @param childContract IRMRKEquippable instance of the child smart contract
+     * @param childId ID of the child token whose assets will be matched against parent's slot parts
+     * @param parentSlotPartIds Array of slot part IDs of the parent token's asset
+     * @param parentAddress Address of the parent smart contract
+     * @return allAssetsWithSlots An array of `AssetWithSlot` structs containing info about the equippable child assets and their corresponding slot parts
+     * @return totalMatches Total of valid matches found
      */
-    function _getParentAndSlotParts(
-        address target,
-        uint256 tokenId,
-        uint64 parentAssetId
+    function _matchAllAssetsWithSlots(
+        IRMRKEquippable childContract,
+        uint256 childId,
+        uint64[] memory parentSlotPartIds,
+        address parentAddress
     )
         private
         view
-        returns (address parentAddress, uint64[] memory parentSlotPartIds)
+        returns (
+            AssetWithSlot[] memory allAssetsWithSlots,
+            uint256 totalMatches
+        )
     {
-        uint256 parentId;
-        bool isNFT;
-        (parentAddress, parentId, isNFT) = IRMRKNestable(target).directOwnerOf(
-            tokenId
+        uint64[] memory childAssets = childContract.getActiveAssets(childId);
+        uint16[] memory priorities = childContract.getActiveAssetPriorities(
+            childId
         );
-        if (!isNFT) revert RMRKParentIsNotNFT();
 
+        uint256 totalChildAssets = childAssets.length;
+        uint256 totalParentSlots = parentSlotPartIds.length;
+
+        // There can be at most min(totalChildAssets, totalParentSlots) resulting matches, we just pick one of them.
+        allAssetsWithSlots = new AssetWithSlot[](totalParentSlots);
+
+        for (uint256 i; i < totalChildAssets; ) {
+            for (uint256 j; j < totalParentSlots; ) {
+                if (
+                    childContract.canTokenBeEquippedWithAssetIntoSlot(
+                        parentAddress,
+                        childId,
+                        childAssets[i],
+                        parentSlotPartIds[j]
+                    )
+                ) {
+                    allAssetsWithSlots[totalMatches] = AssetWithSlot({
+                        assetId: childAssets[i],
+                        slotPartId: parentSlotPartIds[j],
+                        priority: priorities[i]
+                    });
+                    unchecked {
+                        ++totalMatches;
+                    }
+                }
+                unchecked {
+                    ++j;
+                }
+            }
+            unchecked {
+                ++i;
+            }
+        }
+    }
+
+    /**
+     * @notice Used to retrieve the parent address and its slot part IDs for a given target child.
+     * @dev Reverts if the parent is not an NFT or if the parent asset is not composable.
+     * @param targetChild Address of the collection smart contract of the given token
+     * @param childId ID of the child token
+     * @param parentAssetId ID of the parent asset from which to get the slot parts
+     * @param expectedParent ID of the parent asset from which to get the slot parts
+     * @param expectedParentId ID of the parent asset from which to get the slot parts
+     * @return parentSlotPartIds Array of slot part IDs of the parent token's asset
+     */
+    function _getParentAndSlotParts(
+        address targetChild,
+        uint256 childId,
+        address expectedParent,
+        uint256 expectedParentId,
+        uint64 parentAssetId
+    ) private view returns (uint64[] memory parentSlotPartIds) {
+        checkExpectedParent(
+            targetChild,
+            childId,
+            expectedParent,
+            expectedParentId
+        );
         (
             ,
             ,
             address catalogAddress,
             uint64[] memory parentPartIds
-        ) = IRMRKEquippable(parentAddress).getAssetAndEquippableData(
-                parentId,
+        ) = IRMRKEquippable(expectedParent).getAssetAndEquippableData(
+                expectedParentId,
                 parentAssetId
             );
         if (catalogAddress == address(0)) revert RMRKNotComposableAsset();

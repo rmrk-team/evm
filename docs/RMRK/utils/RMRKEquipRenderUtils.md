@@ -34,6 +34,25 @@ Used to split slot and fixed parts.
 | slotPartIds | uint64[] | An array of IDs of the `Slot` parts included in the `allPartIds` |
 | fixedPartIds | uint64[] | An array of IDs of the `Fixed` parts included in the `allPartIds` |
 
+### checkExpectedParent
+
+```solidity
+function checkExpectedParent(address childAddress, uint256 childId, address expectedParent, uint256 expectedParentId) external view
+```
+
+Check if the child is owned by the expected parent.
+
+*Reverts if child token is not owned by an NFT.Reverts if child token is not owned by the expected parent.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| childAddress | address | Address of the child contract. |
+| childId | uint256 | ID of the child token. |
+| expectedParent | address | Address of the expected parent contract. |
+| expectedParentId | uint256 | ID of the expected parent token. |
+
 ### composeEquippables
 
 ```solidity
@@ -110,15 +129,40 @@ Used to retrieve the metadata URI of specified assets in the specified token.
 |---|---|---|
 | _0 | string[] | string[] An array of metadata URIs belonging to specified assets |
 
+### getChildIndex
+
+```solidity
+function getChildIndex(address parentAddress, uint256 parentId, address childAddress, uint256 childId) external view returns (uint256)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| parentAddress | address | undefined |
+| parentId | uint256 | undefined |
+| childAddress | address | undefined |
+| childId | uint256 | undefined |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint256 | undefined |
+
 ### getEquippableSlotsFromParent
 
 ```solidity
-function getEquippableSlotsFromParent(address targetChild, uint256 childId, uint64 parentAssetId) external view returns (struct RMRKEquipRenderUtils.AssetWithSlot[] assetsWithSlots)
+function getEquippableSlotsFromParent(address targetChild, uint256 childId, address expectedParent, uint256 expectedParentId, uint64 parentAssetId) external view returns (uint256 childIndex, struct RMRKEquipRenderUtils.AssetWithSlot[] assetsWithSlots)
 ```
 
 Used to get the child&#39;s assets and slot parts pairs, identifying parts the said assets can be equipped into.
 
-*The full `AssetWithSlot` struct looks like this:  [      assetId,      slotPartId  ]*
+*Reverts if child token is not owned by an NFT.Reverts if child token is not owned by the expected parent.The full `AssetWithSlot` struct looks like this:  [      assetId,      slotPartId,      priority,  ]*
 
 #### Parameters
 
@@ -126,12 +170,15 @@ Used to get the child&#39;s assets and slot parts pairs, identifying parts the s
 |---|---|---|
 | targetChild | address | Address of the smart contract of the given token |
 | childId | uint256 | ID of the child token whose assets will be matched against parent&#39;s slot parts |
+| expectedParent | address | undefined |
+| expectedParentId | uint256 | undefined |
 | parentAssetId | uint64 | ID of the target parent asset to use to equip the child |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
+| childIndex | uint256 | Index of the child in the parent&#39;s list of active children |
 | assetsWithSlots | RMRKEquipRenderUtils.AssetWithSlot[] | An array of `AssetWithSlot` structs containing info about the equippable child assets and their corresponding slot parts |
 
 ### getEquipped
@@ -327,6 +374,17 @@ Used to retrieve the metadata URI of the specified token&#39;s asset with the hi
 
 ## Errors
 
+### RMRKChildNotFoundInParent
+
+```solidity
+error RMRKChildNotFoundInParent()
+```
+
+Attempting to find the index of a child token on a parent which does not own it.
+
+
+
+
 ### RMRKNotComposableAsset
 
 ```solidity
@@ -356,6 +414,17 @@ error RMRKTokenHasNoAssets()
 ```
 
 Attempting to determine the asset with the top priority on a token without assets
+
+
+
+
+### RMRKUnexpectedParent
+
+```solidity
+error RMRKUnexpectedParent()
+```
+
+Attempting an operation expecting a parent to the token which is not the actual one
 
 
 

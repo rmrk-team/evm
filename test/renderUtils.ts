@@ -188,7 +188,7 @@ describe('MultiAsset and Equip Render Utils', async function () {
 
     it('cannot get equippable slots from parent if parent is not an NFT', async function () {
       await expect(
-        renderUtilsEquip.getEquippableSlotsFromParent(equip.address, tokenId, 1),
+        renderUtilsEquip.getEquippableSlotsFromParent(equip.address, tokenId, equip.address, 1, 1),
       ).to.be.revertedWithCustomError(renderUtilsEquip, 'RMRKParentIsNotNFT');
     });
   });
@@ -236,6 +236,9 @@ describe('Advanced Equip Render Utils', async function () {
     gemId1 = await nestMintFromMock(gem, kanaria.address, kanariaId);
     gemId2 = await nestMintFromMock(gem, kanaria.address, kanariaId);
     gemId3 = await nestMintFromMock(gem, kanaria.address, kanariaId);
+    await kanaria.acceptChild(kanariaId, 0, gem.address, gemId1);
+    await kanaria.acceptChild(kanariaId, 1, gem.address, gemId2);
+    await kanaria.acceptChild(kanariaId, 0, gem.address, gemId3);
   });
 
   it('can get equippable slots from parent', async function () {
@@ -244,25 +247,55 @@ describe('Advanced Equip Render Utils', async function () {
     await setUpGemAssets(gem, gemId1, gemId2, gemId3, kanaria.address, catalog.address);
 
     expect(
-      await renderUtilsEquip.getEquippableSlotsFromParent(gem.address, gemId1, assetForKanariaFull),
+      await renderUtilsEquip.getEquippableSlotsFromParent(
+        gem.address,
+        gemId1,
+        kanaria.address,
+        kanariaId,
+        assetForKanariaFull,
+      ),
     ).to.eql([
-      [bn(slotIdGemRight), bn(assetForGemARight)],
-      [bn(slotIdGemMid), bn(assetForGemAMid)],
-      [bn(slotIdGemLeft), bn(assetForGemALeft)],
+      bn(0), // child Index
+      [
+        // [Slot Id, asset Id, Asset priority]
+        [bn(slotIdGemRight), bn(assetForGemARight), 0],
+        [bn(slotIdGemMid), bn(assetForGemAMid), 1],
+        [bn(slotIdGemLeft), bn(assetForGemALeft), 2],
+      ],
     ]);
     expect(
-      await renderUtilsEquip.getEquippableSlotsFromParent(gem.address, gemId2, assetForKanariaFull),
+      await renderUtilsEquip.getEquippableSlotsFromParent(
+        gem.address,
+        gemId2,
+        kanaria.address,
+        kanariaId,
+        assetForKanariaFull,
+      ),
     ).to.eql([
-      [bn(slotIdGemRight), bn(assetForGemARight)],
-      [bn(slotIdGemMid), bn(assetForGemAMid)],
-      [bn(slotIdGemLeft), bn(assetForGemALeft)],
+      bn(1), // child Index
+      [
+        // [Slot Id, asset Id, Asset priority]
+        [bn(slotIdGemRight), bn(assetForGemARight), 0],
+        [bn(slotIdGemMid), bn(assetForGemAMid), 1],
+        [bn(slotIdGemLeft), bn(assetForGemALeft), 2],
+      ],
     ]);
     expect(
-      await renderUtilsEquip.getEquippableSlotsFromParent(gem.address, gemId3, assetForKanariaFull),
+      await renderUtilsEquip.getEquippableSlotsFromParent(
+        gem.address,
+        gemId3,
+        kanaria.address,
+        kanariaId,
+        assetForKanariaFull,
+      ),
     ).to.eql([
-      [bn(slotIdGemRight), bn(assetForGemBRight)],
-      [bn(slotIdGemMid), bn(assetForGemBMid)],
-      [bn(slotIdGemLeft), bn(assetForGemBLeft)],
+      bn(2), // child Index
+      [
+        // [Slot Id, asset Id, Asset priority]
+        [bn(slotIdGemRight), bn(assetForGemBRight), 0],
+        [bn(slotIdGemMid), bn(assetForGemBMid), 1],
+        [bn(slotIdGemLeft), bn(assetForGemBLeft), 2],
+      ],
     ]);
   });
 
@@ -285,9 +318,32 @@ describe('Advanced Equip Render Utils', async function () {
       renderUtilsEquip.getEquippableSlotsFromParent(
         gem.address,
         gemId1,
+        kanaria.address,
+        kanariaId,
         assetForKanariaNotEquippable,
       ),
     ).to.be.revertedWithCustomError(renderUtilsEquip, 'RMRKNotComposableAsset');
+  });
+
+  it('cannot get equippable slots from parent if parent is not the expected one', async function () {
+    await expect(
+      renderUtilsEquip.getEquippableSlotsFromParent(
+        gem.address,
+        gemId1,
+        gem.address, // Wrong parent address
+        kanariaId,
+        assetForKanariaFull,
+      ),
+    ).to.be.revertedWithCustomError(renderUtilsEquip, 'RMRKUnexpectedParent');
+    await expect(
+      renderUtilsEquip.getEquippableSlotsFromParent(
+        gem.address,
+        gemId1,
+        kanaria.address,
+        2, // Wrong parent id
+        assetForKanariaFull,
+      ),
+    ).to.be.revertedWithCustomError(renderUtilsEquip, 'RMRKUnexpectedParent');
   });
 });
 
