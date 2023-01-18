@@ -53,6 +53,13 @@ describe('Minting Utils', async () => {
       expect(await mintingUtils.owner()).to.eql(newOwner.address);
     });
 
+    it('emits OwnershipTransferred event when transferring ownership', async function () {
+      const newOwner = addrs[1];
+      await expect(mintingUtils.connect(owner).transferOwnership(newOwner.address))
+        .to.emit(mintingUtils, 'OwnershipTransferred')
+        .withArgs(owner.address, newOwner.address);
+    });
+
     it('cannot transfer ownership to address 0', async function () {
       await expect(
         mintingUtils.connect(owner).transferOwnership(ethers.constants.AddressZero),
@@ -66,15 +73,30 @@ describe('Minting Utils', async () => {
 
     it('can add and revoke contributor', async function () {
       const contributor = addrs[1];
-      await mintingUtils.connect(owner).addContributor(contributor.address);
+      await mintingUtils.connect(owner).manageContributor(contributor.address, true);
       expect(await mintingUtils.connect(owner).isContributor(contributor.address)).to.eql(true);
-      await mintingUtils.connect(owner).revokeContributor(contributor.address);
+      await mintingUtils.connect(owner).manageContributor(contributor.address, false);
       expect(await mintingUtils.connect(owner).isContributor(contributor.address)).to.eql(false);
+    });
+
+    it('emits ContributorUpdate when adding a contributor', async function () {
+      const contributor = addrs[1];
+      await expect(mintingUtils.connect(owner).manageContributor(contributor.address, true))
+        .to.emit(mintingUtils, 'ContributorUpdate')
+        .withArgs(contributor.address, true);
+    });
+
+    it('emits ContributorUpdate when removing a contributor', async function () {
+      const contributor = addrs[1];
+      await mintingUtils.connect(owner).manageContributor(contributor.address, true);
+      await expect(mintingUtils.connect(owner).manageContributor(contributor.address, false))
+        .to.emit(mintingUtils, 'ContributorUpdate')
+        .withArgs(contributor.address, false);
     });
 
     it('cannot add zero address as contributor', async function () {
       await expect(
-        mintingUtils.connect(owner).addContributor(ethers.constants.AddressZero),
+        mintingUtils.connect(owner).manageContributor(ethers.constants.AddressZero, true),
       ).to.be.revertedWithCustomError(mintingUtils, 'RMRKNewContributorIsZeroAddress');
     });
 
@@ -88,10 +110,10 @@ describe('Minting Utils', async () => {
         mintingUtils.connect(notOwner).renounceOwnership(),
       ).to.be.revertedWithCustomError(mintingUtils, 'RMRKNotOwner');
       await expect(
-        mintingUtils.connect(notOwner).addContributor(otherUser.address),
+        mintingUtils.connect(notOwner).manageContributor(otherUser.address, true),
       ).to.be.revertedWithCustomError(mintingUtils, 'RMRKNotOwner');
       await expect(
-        mintingUtils.connect(notOwner).revokeContributor(otherUser.address),
+        mintingUtils.connect(notOwner).manageContributor(otherUser.address, false),
       ).to.be.revertedWithCustomError(mintingUtils, 'RMRKNotOwner');
     });
 

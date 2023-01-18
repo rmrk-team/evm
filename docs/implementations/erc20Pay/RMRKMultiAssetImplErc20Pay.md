@@ -85,22 +85,6 @@ Used to add an asset to a token.
 | assetId | uint64 | ID of the asset to add to the token |
 | replacesAssetWithId | uint64 | ID of the asset to replace from the token&#39;s list of active assets |
 
-### addContributor
-
-```solidity
-function addContributor(address contributor) external nonpayable
-```
-
-Adds a contributor to the smart contract.
-
-*Can only be called by the owner.*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| contributor | address | Address of the contributor&#39;s account |
-
 ### approve
 
 ```solidity
@@ -482,6 +466,23 @@ Used to check if the address is one of the contributors.
 |---|---|---|
 | _0 | bool | Boolean value indicating whether the address is a contributor or not |
 
+### manageContributor
+
+```solidity
+function manageContributor(address contributor, bool grantRole) external nonpayable
+```
+
+Adds or removes a contributor to the smart contract.
+
+*Can only be called by the owner.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| contributor | address | Address of the contributor&#39;s account |
+| grantRole | bool | A boolean value signifying whether the contributor role is being granted (`true`) or revoked  (`false`) |
+
 ### maxSupply
 
 ```solidity
@@ -548,7 +549,7 @@ Returns the address of the current owner.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | address | undefined |
+| _0 | address | Address of the current owner |
 
 ### ownerOf
 
@@ -634,22 +635,6 @@ Leaves the contract without owner. Functions using the `onlyOwner` modifier will
 
 *Can only be called by the current owner.Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is  only available to the owner.*
 
-
-### revokeContributor
-
-```solidity
-function revokeContributor(address contributor) external nonpayable
-```
-
-Removes a contributor from the smart contract.
-
-*Can only be called by the owner.*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| contributor | address | Address of the contributor&#39;s account |
 
 ### royaltyInfo
 
@@ -1097,13 +1082,30 @@ Used to notify listeners that an asset object is initialized at `assetId`.
 |---|---|---|
 | assetId `indexed` | uint64 | undefined |
 
+### ContributorUpdate
+
+```solidity
+event ContributorUpdate(address indexed contributor, bool isContributor)
+```
+
+Event that signifies that an address was granted contributor role or that the permission has been  revoked.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| contributor `indexed` | address | undefined |
+| isContributor  | bool | undefined |
+
 ### OwnershipTransferred
 
 ```solidity
 event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)
 ```
 
-
+Used to anounce the transfer of ownership.
 
 
 

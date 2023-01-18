@@ -85,7 +85,7 @@ describe('ExternalEquippableImpl Other', async function () {
     ({ nestable, equip } = await loadFixture(equipFixture));
     this.token = nestable;
     [owner, contributor, ...addrs] = await ethers.getSigners();
-    await equip.addContributor(contributor.address);
+    await equip.manageContributor(contributor.address, true);
   });
 
   it('auto accepts resource if send is token owner', async function () {
