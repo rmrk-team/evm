@@ -48,10 +48,10 @@ Check if the child is owned by the expected parent.
 
 | Name | Type | Description |
 |---|---|---|
-| childAddress | address | Address of the child contract. |
-| childId | uint256 | ID of the child token. |
-| expectedParent | address | Address of the expected parent contract. |
-| expectedParentId | uint256 | ID of the expected parent token. |
+| childAddress | address | Address of the child contract |
+| childId | uint256 | ID of the child token |
+| expectedParent | address | Address of the expected parent contract |
+| expectedParentId | uint256 | ID of the expected parent token |
 
 ### composeEquippables
 
