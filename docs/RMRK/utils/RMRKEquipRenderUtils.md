@@ -170,8 +170,8 @@ Used to get the child&#39;s assets and slot parts pairs, identifying parts the s
 |---|---|---|
 | targetChild | address | Address of the smart contract of the given token |
 | childId | uint256 | ID of the child token whose assets will be matched against parent&#39;s slot parts |
-| expectedParent | address | undefined |
-| expectedParentId | uint256 | undefined |
+| expectedParent | address | Address of the collection smart contract of the expected parent token |
+| expectedParentId | uint256 | ID of the expected parent token |
 | parentAssetId | uint64 | ID of the target parent asset to use to equip the child |
 
 #### Returns
