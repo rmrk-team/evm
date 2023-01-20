@@ -386,6 +386,8 @@ contract RMRKEquipRenderUtils is
      *  ]
      * @param targetChild Address of the smart contract of the given token
      * @param childId ID of the child token whose assets will be matched against parent's slot parts
+     * @param expectedParent Address of the collection smart contract of the expected parent token
+     * @param expectedParentId ID of the expected parent token
      * @param parentAssetId ID of the target parent asset to use to equip the child
      * @return childIndex Index of the child in the parent's list of active children
      * @return assetsWithSlots An array of `AssetWithSlot` structs containing info about the equippable child assets and their corresponding slot parts
@@ -544,8 +546,8 @@ contract RMRKEquipRenderUtils is
      * @param targetChild Address of the collection smart contract of the given token
      * @param childId ID of the child token
      * @param parentAssetId ID of the parent asset from which to get the slot parts
-     * @param expectedParent ID of the parent asset from which to get the slot parts
-     * @param expectedParentId ID of the parent asset from which to get the slot parts
+     * @param expectedParent Address of the collection smart contract of the expected parent token
+     * @param expectedParentId ID of the expected parent token
      * @return parentSlotPartIds Array of slot part IDs of the parent token's asset
      */
     function _getParentAndSlotParts(
