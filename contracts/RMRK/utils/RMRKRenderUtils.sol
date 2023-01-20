@@ -3,10 +3,13 @@
 pragma solidity ^0.8.16;
 
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
+import "../access/Ownable.sol";
 import "../equippable/RMRKEquippable.sol";
 import "../extension/soulbound/RMRKSoulbound.sol";
 import "../library/RMRKLib.sol";
 import "../library/RMRKErrors.sol";
+import "./RMRKMintingUtils.sol";
 import "./RMRKTokenURI.sol";
 
 /**
@@ -18,12 +21,16 @@ import "./RMRKTokenURI.sol";
 contract RMRKRenderUtils {
     /**
      * @notice Structure used to represent the extended NFT.
+     * @return tokenMetadataUri Metadata URI of the specified token
      * @return directOwner Address of the direct owner of the token (smart contract if the token is nested, otherwise
      *  EOA)
      * @return rootOwner Address of the root owner
      * @return activeAssetCount Number of active assets present on the token
      * @return pendingAssetcount Number of pending assets on the token
      * @return priorities The array of priorities of the active asset
+     * @return maxSupply The maximum supply of the collection the specified token belongs to
+     * @return totalSupply The total supply of the collection the specified token belongs to
+     * @return issuer Address of the issuer of the token's collection
      * @return name Name of the collection the token belongs to
      * @return symbol Symbol of the collection the token belongs to
      * @return activeChildrenNumber Number of active child tokens of the given token (only account for direct child
@@ -34,11 +41,15 @@ contract RMRKRenderUtils {
      * @return hasEquippableInterface Boolean value signifying whether the toke supports Equippable interface
      */
     struct ExtendedNft {
+        string tokenMetadataUri;
         address directOwner;
         address rootOwner;
         uint256 activeAssetCount;
         uint256 pendingAssetCount;
         uint16[] priorities;
+        uint256 maxSupply;
+        uint256 totalSupply;
+        address issuer;
         string name;
         string symbol;
         uint256 activeChildrenNumber;
@@ -96,11 +107,15 @@ contract RMRKRenderUtils {
      * @notice Used to get extended information about a specified token.
      * @dev The full `ExtendedNft` struct looks like this:
      *  [
+     *      tokenMetadataUri,
      *      directOwner,
      *      rootOwner,
      *      activeAssetCount,
      *      pendingAssetCount
      *      priorities,
+     *      maxSupply,
+     *      totalSupply,
+     *      issuer,
      *      name,
      *      symbol,
      *      activeChildrenNumber,
@@ -146,6 +161,32 @@ contract RMRKRenderUtils {
             data.directOwner = data.rootOwner;
         }
         data.name = target.name();
+        try IERC721Metadata(targetCollection).tokenURI(tokenId) returns (
+            string memory metadataUri_
+        ) {
+            data.tokenMetadataUri = metadataUri_;
+        } catch {
+            // Retain default value
+        }
+        try RMRKMintingUtils(targetCollection).totalSupply() returns (
+            uint256 totalSupplly_
+        ) {
+            data.totalSupply = totalSupplly_;
+        } catch {
+            // Retain default value
+        }
+        try RMRKMintingUtils(targetCollection).maxSupply() returns (
+            uint256 maxSupplly_
+        ) {
+            data.maxSupply = maxSupplly_;
+        } catch {
+            // Retain default value
+        }
+        try Ownable(targetCollection).owner() returns (address issuer_) {
+            data.issuer = issuer_;
+        } catch {
+            // Retain default value
+        }
         data.symbol = target.symbol();
     }
 }

@@ -9,12 +9,14 @@ import {
   RMRKEquippableMock,
   RMRKEquipRenderUtils,
   RMRKMultiAssetRenderUtils,
+  RMRKMultiAssetImplPreMint__factory,
 } from '../typechain-types';
 import { RMRKMultiAssetMock } from '../typechain-types';
 import { RMRKNestableMock } from '../typechain-types';
 import { RMRKNestableMultiAssetMock } from '../typechain-types';
 import { RMRKSoulboundNestableMock } from '../typechain-types';
 import { connect } from 'http2';
+import { RMRKMultiAssetImplPreMint } from '../typechain-types';
 
 // --------------- FIXTURES -----------------------
 
@@ -73,6 +75,7 @@ async function simpleRenderUtilsFixture() {
 
 async function extendedNftRenderUtilsFixture() {
   const multiAssetFactory = await ethers.getContractFactory('RMRKMultiAssetMock');
+  const multiAssetPremintFactory = await ethers.getContractFactory('RMRKMultiAssetImplPreMint');
   const nestableFactory = await ethers.getContractFactory('RMRKNestableMock');
   const nestableSoulboundFactory = await ethers.getContractFactory('RMRKSoulboundNestableMock');
   const nestableMultiAssetFactory = await ethers.getContractFactory('RMRKNestableMultiAssetMock');
@@ -82,6 +85,17 @@ async function extendedNftRenderUtilsFixture() {
 
   const multiAsset = <RMRKMultiAssetMock>await multiAssetFactory.deploy('MultiAsset', 'MA');
   await multiAsset.deployed();
+
+  const multiAssetPremint = <RMRKMultiAssetImplPreMint>(
+    await multiAssetPremintFactory.deploy(
+      'MultiAssetPreMint',
+      'MApM',
+      'ipfs://collection/collection',
+      'ipfs://collection/token',
+      [ethers.constants.AddressZero, false, ethers.constants.AddressZero, 0, 10_000, 1_000_000_000],
+    )
+  );
+  await multiAssetPremint.deployed;
 
   const nestable = <RMRKNestableMock>await nestableFactory.deploy('Nestable', 'Ne');
   await nestable.deployed();
@@ -107,6 +121,7 @@ async function extendedNftRenderUtilsFixture() {
 
   return {
     multiAsset,
+    multiAssetPremint,
     nestable,
     nestableSoulbound,
     nestableMultiAsset,
@@ -401,6 +416,7 @@ describe('Extended NFT render utils', function () {
   let issuer: SignerWithAddress;
   let rootOwner: SignerWithAddress;
   let multiAsset: RMRKMultiAssetMock;
+  let multiAssetPremint: RMRKMultiAssetImplPreMint;
   let nestable: RMRKNestableMock;
   let nestableSoulbound: RMRKSoulboundNestableMock;
   let nestableMultiAsset: RMRKNestableMultiAssetMock;
@@ -412,8 +428,16 @@ describe('Extended NFT render utils', function () {
   const supply = bn(10000);
 
   beforeEach(async function () {
-    ({ multiAsset, nestable, nestableSoulbound, nestableMultiAsset, catalog, equip, renderUtils } =
-      await loadFixture(extendedNftRenderUtilsFixture));
+    ({
+      multiAsset,
+      multiAssetPremint,
+      nestable,
+      nestableSoulbound,
+      nestableMultiAsset,
+      catalog,
+      equip,
+      renderUtils,
+    } = await loadFixture(extendedNftRenderUtilsFixture));
 
     [issuer, rootOwner] = await ethers.getSigners();
   });
@@ -434,13 +458,51 @@ describe('Extended NFT render utils', function () {
 
     const data = await renderUtils.getExtendedNft(tokenId, multiAsset.address);
 
+    expect(data.tokenMetadataUri).to.eql('');
     expect(data.directOwner).to.eql(rootOwner.address);
     expect(data.rootOwner).to.eql(rootOwner.address);
     expect(data.activeAssetCount).to.eql(bn(2));
     expect(data.pendingAssetCount).to.eql(bn(2));
     expect(data.priorities).to.eql([10, 42]);
+    expect(data.maxSupply).to.eql(bn(0));
+    expect(data.totalSupply).to.eql(bn(0));
+    expect(data.issuer).to.eql(ethers.constants.AddressZero);
     expect(data.name).to.eql('MultiAsset');
     expect(data.symbol).to.eql('MA');
+    expect(data.activeChildrenNumber).to.eql(bn(0));
+    expect(data.isSoulbound).to.be.false;
+    expect(data.hasMultiAssetInterface).to.be.true;
+    expect(data.hasNestingInterface).to.be.false;
+    expect(data.hasEquippableInterface).to.be.false;
+  });
+
+  it('renders correct data for MultiAsset premint', async function () {
+    const tokenId = await mintFromMock(multiAssetPremint, rootOwner.address);
+    await multiAssetPremint.addAssetEntry(metaURI);
+    await multiAssetPremint.addAssetEntry(metaURI);
+    await multiAssetPremint.addAssetEntry(metaURI);
+    await multiAssetPremint.addAssetEntry(metaURI);
+    await multiAssetPremint.addAssetToToken(tokenId, 1, 0);
+    await multiAssetPremint.addAssetToToken(tokenId, 2, 0);
+    await multiAssetPremint.addAssetToToken(tokenId, 3, 0);
+    await multiAssetPremint.addAssetToToken(tokenId, 4, 0);
+    await multiAssetPremint.connect(rootOwner).acceptAsset(tokenId, 0, 1);
+    await multiAssetPremint.connect(rootOwner).acceptAsset(tokenId, 1, 2);
+    await multiAssetPremint.connect(rootOwner).setPriority(tokenId, [10, 42]);
+
+    const data = await renderUtils.getExtendedNft(tokenId, multiAssetPremint.address);
+
+    expect(data.tokenMetadataUri).to.eql('ipfs://collection/token');
+    expect(data.directOwner).to.eql(rootOwner.address);
+    expect(data.rootOwner).to.eql(rootOwner.address);
+    expect(data.activeAssetCount).to.eql(bn(2));
+    expect(data.pendingAssetCount).to.eql(bn(2));
+    expect(data.priorities).to.eql([10, 42]);
+    expect(data.maxSupply).to.eql(bn(10000));
+    expect(data.totalSupply).to.eql(bn(tokenId));
+    expect(data.issuer).to.eql(issuer.address);
+    expect(data.name).to.eql('MultiAssetPreMint');
+    expect(data.symbol).to.eql('MApM');
     expect(data.activeChildrenNumber).to.eql(bn(0));
     expect(data.isSoulbound).to.be.false;
     expect(data.hasMultiAssetInterface).to.be.true;
@@ -463,11 +525,15 @@ describe('Extended NFT render utils', function () {
 
     const data = await renderUtils.getExtendedNft(tokenId, nestable.address);
 
+    expect(data.tokenMetadataUri).to.eql('');
     expect(data.directOwner).to.eql(nestable.address);
     expect(data.rootOwner).to.eql(rootOwner.address);
     expect(data.activeAssetCount).to.eql(bn(0));
     expect(data.pendingAssetCount).to.eql(bn(0));
     expect(data.priorities).to.eql([]);
+    expect(data.maxSupply).to.eql(bn(0));
+    expect(data.totalSupply).to.eql(bn(0));
+    expect(data.issuer).to.eql(ethers.constants.AddressZero);
     expect(data.name).to.eql('Nestable');
     expect(data.symbol).to.eql('Ne');
     expect(data.activeChildrenNumber).to.eql(bn(2));
@@ -491,11 +557,15 @@ describe('Extended NFT render utils', function () {
 
     const data = await renderUtils.getExtendedNft(tokenId, nestableSoulbound.address);
 
+    expect(data.tokenMetadataUri).to.eql('');
     expect(data.directOwner).to.eql(rootOwner.address);
     expect(data.rootOwner).to.eql(rootOwner.address);
     expect(data.activeAssetCount).to.eql(bn(0));
     expect(data.pendingAssetCount).to.eql(bn(0));
     expect(data.priorities).to.eql([]);
+    expect(data.maxSupply).to.eql(bn(0));
+    expect(data.totalSupply).to.eql(bn(0));
+    expect(data.issuer).to.eql(ethers.constants.AddressZero);
     expect(data.name).to.eql('NestableSoulbound');
     expect(data.symbol).to.eql('NS');
     expect(data.activeChildrenNumber).to.eql(bn(2));
@@ -537,11 +607,15 @@ describe('Extended NFT render utils', function () {
 
     const data = await renderUtils.getExtendedNft(tokenId, nestableMultiAsset.address);
 
+    expect(data.tokenMetadataUri).to.eql('');
     expect(data.directOwner).to.eql(nestableMultiAsset.address);
     expect(data.rootOwner).to.eql(rootOwner.address);
     expect(data.activeAssetCount).to.eql(bn(2));
     expect(data.pendingAssetCount).to.eql(bn(2));
     expect(data.priorities).to.eql([10, 42]);
+    expect(data.maxSupply).to.eql(bn(0));
+    expect(data.totalSupply).to.eql(bn(0));
+    expect(data.issuer).to.eql(ethers.constants.AddressZero);
     expect(data.name).to.eql('NestableMultiAsset');
     expect(data.symbol).to.eql('NMA');
     expect(data.activeChildrenNumber).to.eql(bn(2));
@@ -577,11 +651,15 @@ describe('Extended NFT render utils', function () {
 
     const data = await renderUtils.getExtendedNft(tokenId, equip.address);
 
+    expect(data.tokenMetadataUri).to.eql('');
     expect(data.directOwner).to.eql(equip.address);
     expect(data.rootOwner).to.eql(rootOwner.address);
     expect(data.activeAssetCount).to.eql(bn(2));
     expect(data.pendingAssetCount).to.eql(bn(2));
     expect(data.priorities).to.eql([10, 42]);
+    expect(data.maxSupply).to.eql(bn(0));
+    expect(data.totalSupply).to.eql(bn(0));
+    expect(data.issuer).to.eql(ethers.constants.AddressZero);
     expect(data.name).to.eql('Equippable');
     expect(data.symbol).to.eql('EQ');
     expect(data.activeChildrenNumber).to.eql(bn(2));
