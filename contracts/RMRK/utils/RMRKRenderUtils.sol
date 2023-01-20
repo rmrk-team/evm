@@ -3,8 +3,11 @@
 pragma solidity ^0.8.16;
 
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "../equippable/RMRKEquippable.sol";
+import "../extension/soulbound/RMRKSoulbound.sol";
 import "../library/RMRKLib.sol";
 import "../library/RMRKErrors.sol";
+import "./RMRKTokenURI.sol";
 
 /**
  * @title RMRKRenderUtils
@@ -13,6 +16,38 @@ import "../library/RMRKErrors.sol";
  * @dev Extra utility functions for RMRK contracts.
  */
 contract RMRKRenderUtils {
+    /**
+     * @notice Structure used to represent the extended NFT.
+     * @return directOwner Address of the direct owner of the token (smart contract if the token is nested, otherwise
+     *  EOA)
+     * @return rootOwner Address of the root owner
+     * @return activeAssetCount Number of active assets present on the token
+     * @return pendingAssetcount Number of pending assets on the token
+     * @return priorities The array of priorities of the active asset
+     * @return name Name of the collection the token belongs to
+     * @return symbol Symbol of the collection the token belongs to
+     * @return activeChildrenNumber Number of active child tokens of the given token (only account for direct child
+     *  tokens)
+     * @return isSoulbound Boolean value signifying whether the token is soulbound or not
+     * @return hasMultiAssetInterface Boolean value signifying whether the toke supports MultiAsset interface
+     * @return hasNestingInterface Boolean value signifying whether the toke supports Nestable interface
+     * @return hasEquippableInterface Boolean value signifying whether the toke supports Equippable interface
+     */
+    struct ExtendedNft {
+        address directOwner;
+        address rootOwner;
+        uint256 activeAssetCount;
+        uint256 pendingAssetCount;
+        uint16[] priorities;
+        string name;
+        string symbol;
+        uint256 activeChildrenNumber;
+        bool isSoulbound;
+        bool hasMultiAssetInterface;
+        bool hasNestingInterface;
+        bool hasEquippableInterface;
+    }
+
     /**
      * @notice Used to get a list of existing token IDs in the range between `pageStart` and `pageSize`.
      * @dev It is not optimized to avoid checking IDs out of max supply nor total supply, since this is not meant to be used during transaction execution; it is only meant to be used as a getter.
@@ -55,5 +90,62 @@ contract RMRKRenderUtils {
                 ++i;
             }
         }
+    }
+
+    /**
+     * @notice Used to get extended information about a specified token.
+     * @dev The full `ExtendedNft` struct looks like this:
+     *  [
+     *      directOwner,
+     *      rootOwner,
+     *      activeAssetCount,
+     *      pendingAssetCount
+     *      priorities,
+     *      name,
+     *      symbol,
+     *      activeChildrenNumber,
+     *      isSoulbound,
+     *      hasMultiAssetInterface,
+     *      hasNestingInterface,
+     *      hasEquippableInterface
+     *  ]
+     * @param tokenId ID of the token for which to retireve the `ExtendedNft` struct
+     * @param targetCollection Address of the collection to which the specified token belongs to
+     * @return data The `ExtendedNft` struct containing the specified token's data
+     */
+    function getExtendedNft(
+        uint256 tokenId,
+        address targetCollection
+    ) public view returns (ExtendedNft memory data) {
+        RMRKEquippable target = RMRKEquippable(targetCollection);
+        data.hasMultiAssetInterface = target.supportsInterface(
+            type(IRMRKMultiAsset).interfaceId
+        );
+        data.hasNestingInterface = target.supportsInterface(
+            type(IRMRKNestable).interfaceId
+        );
+        data.hasEquippableInterface = target.supportsInterface(
+            type(IRMRKEquippable).interfaceId
+        );
+        if (data.hasNestingInterface) {
+            (data.directOwner, , ) = target.directOwnerOf(tokenId);
+            data.activeChildrenNumber = target.childrenOf(tokenId).length;
+        }
+        if (data.hasMultiAssetInterface) {
+            data.activeAssetCount = target.getActiveAssets(tokenId).length;
+            data.pendingAssetCount = target.getPendingAssets(tokenId).length;
+            data.priorities = target.getActiveAssetPriorities(tokenId);
+        }
+        if (target.supportsInterface(type(IRMRKSoulbound).interfaceId)) {
+            data.isSoulbound = IRMRKSoulbound(targetCollection).isSoulbound(
+                tokenId
+            );
+        }
+        data.rootOwner = target.ownerOf(tokenId);
+        if (data.directOwner == address(0x0)) {
+            data.directOwner = data.rootOwner;
+        }
+        data.name = target.name();
+        data.symbol = target.symbol();
     }
 }

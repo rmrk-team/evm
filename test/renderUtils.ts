@@ -10,6 +10,11 @@ import {
   RMRKEquipRenderUtils,
   RMRKMultiAssetRenderUtils,
 } from '../typechain-types';
+import { RMRKMultiAssetMock } from '../typechain-types';
+import { RMRKNestableMock } from '../typechain-types';
+import { RMRKNestableMultiAssetMock } from '../typechain-types';
+import { RMRKSoulboundNestableMock } from '../typechain-types';
+import { connect } from 'http2';
 
 // --------------- FIXTURES -----------------------
 
@@ -64,6 +69,51 @@ async function simpleRenderUtilsFixture() {
   await renderUtils.deployed();
 
   return { token, renderUtils };
+}
+
+async function extendedNftRenderUtilsFixture() {
+  const multiAssetFactory = await ethers.getContractFactory('RMRKMultiAssetMock');
+  const nestableFactory = await ethers.getContractFactory('RMRKNestableMock');
+  const nestableSoulboundFactory = await ethers.getContractFactory('RMRKSoulboundNestableMock');
+  const nestableMultiAssetFactory = await ethers.getContractFactory('RMRKNestableMultiAssetMock');
+  const catalogFactory = await ethers.getContractFactory('RMRKCatalogMock');
+  const equipFactory = await ethers.getContractFactory('RMRKEquippableMock');
+  const renderUtilsFactory = await ethers.getContractFactory('RMRKRenderUtils');
+
+  const multiAsset = <RMRKMultiAssetMock>await multiAssetFactory.deploy('MultiAsset', 'MA');
+  await multiAsset.deployed();
+
+  const nestable = <RMRKNestableMock>await nestableFactory.deploy('Nestable', 'Ne');
+  await nestable.deployed();
+
+  const nestableSoulbound = <RMRKSoulboundNestableMock>(
+    await nestableSoulboundFactory.deploy('NestableSoulbound', 'NS')
+  );
+  await nestableSoulbound.deployed();
+
+  const nestableMultiAsset = <RMRKNestableMultiAssetMock>(
+    await nestableMultiAssetFactory.deploy('NestableMultiAsset', 'NMA')
+  );
+  await nestableMultiAsset.deployed();
+
+  const catalog = <RMRKCatalogMock>await catalogFactory.deploy('ipfs://catalog.json', 'misc');
+  await catalog.deployed();
+
+  const equip = <RMRKEquippableMock>await equipFactory.deploy('Equippable', 'EQ');
+  await equip.deployed();
+
+  const renderUtils = <RMRKMultiAssetRenderUtils>await renderUtilsFactory.deploy();
+  await renderUtils.deployed();
+
+  return {
+    multiAsset,
+    nestable,
+    nestableSoulbound,
+    nestableMultiAsset,
+    catalog,
+    equip,
+    renderUtils,
+  };
 }
 
 describe('MultiAsset and Equip Render Utils', async function () {
@@ -344,6 +394,201 @@ describe('Advanced Equip Render Utils', async function () {
         assetForKanariaFull,
       ),
     ).to.be.revertedWithCustomError(renderUtilsEquip, 'RMRKUnexpectedParent');
+  });
+});
+
+describe('Extended NFT render utils', function () {
+  let issuer: SignerWithAddress;
+  let rootOwner: SignerWithAddress;
+  let multiAsset: RMRKMultiAssetMock;
+  let nestable: RMRKNestableMock;
+  let nestableSoulbound: RMRKSoulboundNestableMock;
+  let nestableMultiAsset: RMRKNestableMultiAssetMock;
+  let catalog: RMRKCatalogMock;
+  let equip: RMRKEquippableMock;
+  let renderUtils: RMRKRenderUtils;
+
+  const metaURI = 'ipfs://meta';
+  const supply = bn(10000);
+
+  beforeEach(async function () {
+    ({ multiAsset, nestable, nestableSoulbound, nestableMultiAsset, catalog, equip, renderUtils } =
+      await loadFixture(extendedNftRenderUtilsFixture));
+
+    [issuer, rootOwner] = await ethers.getSigners();
+  });
+
+  it('renders correct data for MultiAsset', async function () {
+    const tokenId = await mintFromMock(multiAsset, rootOwner.address);
+    await multiAsset.addAssetEntry(1, metaURI);
+    await multiAsset.addAssetEntry(2, metaURI);
+    await multiAsset.addAssetEntry(3, metaURI);
+    await multiAsset.addAssetEntry(4, metaURI);
+    await multiAsset.addAssetToToken(tokenId, 1, 0);
+    await multiAsset.addAssetToToken(tokenId, 2, 0);
+    await multiAsset.addAssetToToken(tokenId, 3, 0);
+    await multiAsset.addAssetToToken(tokenId, 4, 0);
+    await multiAsset.connect(rootOwner).acceptAsset(tokenId, 0, 1);
+    await multiAsset.connect(rootOwner).acceptAsset(tokenId, 1, 2);
+    await multiAsset.connect(rootOwner).setPriority(tokenId, [10, 42]);
+
+    const data = await renderUtils.getExtendedNft(tokenId, multiAsset.address);
+
+    expect(data.directOwner).to.eql(rootOwner.address);
+    expect(data.rootOwner).to.eql(rootOwner.address);
+    expect(data.activeAssetCount).to.eql(bn(2));
+    expect(data.pendingAssetCount).to.eql(bn(2));
+    expect(data.priorities).to.eql([10, 42]);
+    expect(data.name).to.eql('MultiAsset');
+    expect(data.symbol).to.eql('MA');
+    expect(data.activeChildrenNumber).to.eql(bn(0));
+    expect(data.isSoulbound).to.be.false;
+    expect(data.hasMultiAssetInterface).to.be.true;
+    expect(data.hasNestingInterface).to.be.false;
+    expect(data.hasEquippableInterface).to.be.false;
+  });
+
+  it('renders correct data for Nestable', async function () {
+    const parentId = await mintFromMock(nestable, rootOwner.address);
+    const tokenId = await mintFromMock(nestable, rootOwner.address);
+    const child1 = await nestMintFromMock(nestable, nestable.address, tokenId);
+    await nestMintFromMock(nestable, nestable.address, tokenId);
+    const child3 = await nestMintFromMock(nestable, nestable.address, tokenId);
+    await nestable.connect(rootOwner).acceptChild(tokenId, 0, nestable.address, child1);
+    await nestable.connect(rootOwner).acceptChild(tokenId, 0, nestable.address, child3);
+    await nestable
+      .connect(rootOwner)
+      .nestTransferFrom(rootOwner.address, nestable.address, tokenId, parentId, '0x');
+    await nestable.connect(rootOwner).acceptChild(parentId, 0, nestable.address, tokenId);
+
+    const data = await renderUtils.getExtendedNft(tokenId, nestable.address);
+
+    expect(data.directOwner).to.eql(nestable.address);
+    expect(data.rootOwner).to.eql(rootOwner.address);
+    expect(data.activeAssetCount).to.eql(bn(0));
+    expect(data.pendingAssetCount).to.eql(bn(0));
+    expect(data.priorities).to.eql([]);
+    expect(data.name).to.eql('Nestable');
+    expect(data.symbol).to.eql('Ne');
+    expect(data.activeChildrenNumber).to.eql(bn(2));
+    expect(data.isSoulbound).to.be.false;
+    expect(data.hasMultiAssetInterface).to.be.false;
+    expect(data.hasNestingInterface).to.be.true;
+    expect(data.hasEquippableInterface).to.be.false;
+  });
+
+  it('renders correct data for soulbound Nestable', async function () {
+    const tokenId = await mintFromMock(nestableSoulbound, rootOwner.address);
+    const child1 = await nestMintFromMock(nestableSoulbound, nestableSoulbound.address, tokenId);
+    await nestMintFromMock(nestableSoulbound, nestableSoulbound.address, tokenId);
+    const child3 = await nestMintFromMock(nestableSoulbound, nestableSoulbound.address, tokenId);
+    await nestableSoulbound
+      .connect(rootOwner)
+      .acceptChild(tokenId, 0, nestableSoulbound.address, child1);
+    await nestableSoulbound
+      .connect(rootOwner)
+      .acceptChild(tokenId, 0, nestableSoulbound.address, child3);
+
+    const data = await renderUtils.getExtendedNft(tokenId, nestableSoulbound.address);
+
+    expect(data.directOwner).to.eql(rootOwner.address);
+    expect(data.rootOwner).to.eql(rootOwner.address);
+    expect(data.activeAssetCount).to.eql(bn(0));
+    expect(data.pendingAssetCount).to.eql(bn(0));
+    expect(data.priorities).to.eql([]);
+    expect(data.name).to.eql('NestableSoulbound');
+    expect(data.symbol).to.eql('NS');
+    expect(data.activeChildrenNumber).to.eql(bn(2));
+    expect(data.isSoulbound).to.be.true;
+    expect(data.hasMultiAssetInterface).to.be.false;
+    expect(data.hasNestingInterface).to.be.true;
+    expect(data.hasEquippableInterface).to.be.false;
+  });
+
+  it('renders correct data for Nestable with MultiAsset', async function () {
+    const parentId = await mintFromMock(nestableMultiAsset, rootOwner.address);
+    const tokenId = await mintFromMock(nestableMultiAsset, rootOwner.address);
+    await nestableMultiAsset.addAssetEntry(1, metaURI);
+    await nestableMultiAsset.addAssetEntry(2, metaURI);
+    await nestableMultiAsset.addAssetEntry(3, metaURI);
+    await nestableMultiAsset.addAssetEntry(4, metaURI);
+    await nestableMultiAsset.addAssetToToken(tokenId, 1, 0);
+    await nestableMultiAsset.addAssetToToken(tokenId, 2, 0);
+    await nestableMultiAsset.addAssetToToken(tokenId, 3, 0);
+    await nestableMultiAsset.addAssetToToken(tokenId, 4, 0);
+    await nestableMultiAsset.connect(rootOwner).acceptAsset(tokenId, 0, 1);
+    await nestableMultiAsset.connect(rootOwner).acceptAsset(tokenId, 1, 2);
+    await nestableMultiAsset.connect(rootOwner).setPriority(tokenId, [10, 42]);
+    const child1 = await nestMintFromMock(nestableMultiAsset, nestableMultiAsset.address, tokenId);
+    await nestMintFromMock(nestableMultiAsset, nestableMultiAsset.address, tokenId);
+    const child3 = await nestMintFromMock(nestableMultiAsset, nestableMultiAsset.address, tokenId);
+    await nestableMultiAsset
+      .connect(rootOwner)
+      .acceptChild(tokenId, 0, nestableMultiAsset.address, child1);
+    await nestableMultiAsset
+      .connect(rootOwner)
+      .acceptChild(tokenId, 0, nestableMultiAsset.address, child3);
+    await nestableMultiAsset
+      .connect(rootOwner)
+      .nestTransferFrom(rootOwner.address, nestableMultiAsset.address, tokenId, parentId, '0x');
+    await nestableMultiAsset
+      .connect(rootOwner)
+      .acceptChild(parentId, 0, nestableMultiAsset.address, tokenId);
+
+    const data = await renderUtils.getExtendedNft(tokenId, nestableMultiAsset.address);
+
+    expect(data.directOwner).to.eql(nestableMultiAsset.address);
+    expect(data.rootOwner).to.eql(rootOwner.address);
+    expect(data.activeAssetCount).to.eql(bn(2));
+    expect(data.pendingAssetCount).to.eql(bn(2));
+    expect(data.priorities).to.eql([10, 42]);
+    expect(data.name).to.eql('NestableMultiAsset');
+    expect(data.symbol).to.eql('NMA');
+    expect(data.activeChildrenNumber).to.eql(bn(2));
+    expect(data.isSoulbound).to.be.false;
+    expect(data.hasMultiAssetInterface).to.be.true;
+    expect(data.hasNestingInterface).to.be.true;
+    expect(data.hasEquippableInterface).to.be.false;
+  });
+
+  it('renders correct data for Equippable', async function () {
+    const parentId = await mintFromMock(equip, rootOwner.address);
+    const tokenId = await mintFromMock(equip, rootOwner.address);
+    await equip.addEquippableAssetEntry(1, 0, ADDRESS_ZERO, 'ipfs://res1.jpg', []);
+    await equip.addEquippableAssetEntry(2, 1, catalog.address, 'ipfs://res2.jpg', [1, 3, 4]);
+    await equip.addEquippableAssetEntry(3, 0, ADDRESS_ZERO, 'ipfs://res3.jpg', []);
+    await equip.addEquippableAssetEntry(4, 2, catalog.address, 'ipfs://res4.jpg', [4]);
+    await equip.addAssetToToken(tokenId, 1, 0);
+    await equip.addAssetToToken(tokenId, 2, 0);
+    await equip.addAssetToToken(tokenId, 3, 1);
+    await equip.addAssetToToken(tokenId, 4, 0);
+    await equip.connect(rootOwner).acceptAsset(tokenId, 0, 1);
+    await equip.connect(rootOwner).acceptAsset(tokenId, 1, 2);
+    await equip.connect(rootOwner).setPriority(tokenId, [10, 42]);
+    const child1 = await nestMintFromMock(equip, equip.address, tokenId);
+    await nestMintFromMock(equip, equip.address, tokenId);
+    const child3 = await nestMintFromMock(equip, equip.address, tokenId);
+    await equip.connect(rootOwner).acceptChild(tokenId, 0, equip.address, child1);
+    await equip.connect(rootOwner).acceptChild(tokenId, 0, equip.address, child3);
+    await equip
+      .connect(rootOwner)
+      .nestTransferFrom(rootOwner.address, equip.address, tokenId, parentId, '0x');
+    await equip.connect(rootOwner).acceptChild(parentId, 0, equip.address, tokenId);
+
+    const data = await renderUtils.getExtendedNft(tokenId, equip.address);
+
+    expect(data.directOwner).to.eql(equip.address);
+    expect(data.rootOwner).to.eql(rootOwner.address);
+    expect(data.activeAssetCount).to.eql(bn(2));
+    expect(data.pendingAssetCount).to.eql(bn(2));
+    expect(data.priorities).to.eql([10, 42]);
+    expect(data.name).to.eql('Equippable');
+    expect(data.symbol).to.eql('EQ');
+    expect(data.activeChildrenNumber).to.eql(bn(2));
+    expect(data.isSoulbound).to.be.false;
+    expect(data.hasMultiAssetInterface).to.be.true;
+    expect(data.hasNestingInterface).to.be.true;
+    expect(data.hasEquippableInterface).to.be.true;
   });
 });
 
