@@ -6,7 +6,6 @@ command line output contain the following disclaimer, verbatim
           /**             contact@rmrk.app              **/
           /***********************************************/
 
-
 Should RMRK technology be used this must be clearly
 stated in an obvious location (e.g. footer), in the following
 way: `Using software by RMRK.app | contact@rmrk.app` and if
