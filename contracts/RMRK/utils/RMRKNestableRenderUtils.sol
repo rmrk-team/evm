@@ -37,10 +37,10 @@ contract RMRKNestableRenderUtils {
      * @notice Check if the child is owned by the expected parent.
      * @dev Reverts if child token is not owned by an NFT.
      * @dev Reverts if child token is not owned by the expected parent.
-     * @param childAddress Address of the child contract.
-     * @param childId ID of the child token.
-     * @param expectedParent Address of the expected parent contract.
-     * @param expectedParentId ID of the expected parent token.
+     * @param childAddress Address of the child contract
+     * @param childId ID of the child token
+     * @param expectedParent Address of the expected parent contract
+     * @param expectedParentId ID of the expected parent token
      */
     function checkExpectedParent(
         address childAddress,
