@@ -48,6 +48,8 @@ error RMRKCannotTransferSoulbound();
 error RMRKChildAlreadyExists();
 /// Attempting to interact with a child, using index that is higher than the number of children
 error RMRKChildIndexOutOfRange();
+/// Attempting to find the index of a child token on a parent which does not own it.
+error RMRKChildNotFoundInParent();
 /// Attempting to equip a `Part` with a child not approved by the Catalog
 error RMRKEquippableEquipNotAllowedByCatalog();
 /// Attempting to use ID 0, which is not supported
@@ -105,6 +107,8 @@ error RMRKNotOwnerOrContributor();
 error RMRKNewOwnerIsZeroAddress();
 /// Attempting to assign a 0x0 address as a contributor
 error RMRKNewContributorIsZeroAddress();
+/// Attempting an operation requiring the token being nested, while it is not
+error RMRKParentIsNotNFT();
 /// Attempting to add a `Part` with an ID that is already used
 error RMRKPartAlreadyExists();
 /// Attempting to use a `Part` that doesn't exist
@@ -133,5 +137,7 @@ error RMRKUnexpectedNumberOfAssets();
 error RMRKUnexpectedNumberOfChildren();
 /// Attempting to accept or reject an asset which does not match the one at the specified index
 error RMRKUnexpectedAssetId();
+/// Attempting an operation expecting a parent to the token which is not the actual one
+error RMRKUnexpectedParent();
 /// Attempting not to pass an empty array of equippable addresses when adding or setting the equippable addresses
 error RMRKZeroLengthIdsPassed();

@@ -67,9 +67,10 @@ async function shouldBehaveLikeEquippableWithParts() {
       const expectedEquips = [
         [bn(neonResIds[0]), bn(weaponResId), bn(masks[0]), maskEquipContract.address],
       ];
+      const expectedMetadata = ['ipfs:weapon/equip/5'];
       expect(
         await viewContract.getEquipped(neonEquipContract.address, neons[0], neonResIds[0]),
-      ).to.eql([expectedSlots, expectedEquips]);
+      ).to.eql([expectedSlots, expectedEquips, expectedMetadata]);
 
       // Child is marked as equipped:
       expect(

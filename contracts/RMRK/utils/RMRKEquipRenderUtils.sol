@@ -2,8 +2,12 @@
 
 pragma solidity ^0.8.16;
 
+import "./RMRKRenderUtils.sol";
+import "./RMRKMultiAssetRenderUtils.sol";
+import "./RMRKNestableRenderUtils.sol";
 import "../catalog/IRMRKCatalog.sol";
 import "../equippable/IRMRKEquippable.sol";
+import "../nestable/IRMRKNestable.sol";
 import "../library/RMRKLib.sol";
 import "../library/RMRKErrors.sol";
 
@@ -13,7 +17,11 @@ import "../library/RMRKErrors.sol";
  * @notice Smart contract of the RMRK Equip render utils module.
  * @dev Extra utility functions for composing RMRK extended assets.
  */
-contract RMRKEquipRenderUtils {
+contract RMRKEquipRenderUtils is
+    RMRKRenderUtils,
+    RMRKMultiAssetRenderUtils,
+    RMRKNestableRenderUtils
+{
     using RMRKLib for uint64[];
 
     /**
@@ -25,7 +33,7 @@ contract RMRKEquipRenderUtils {
      * @return metadata Metadata URI of the asset
      * @return partIds[] An array of IDs of fixed and slot parts present in the asset
      */
-    struct ExtendedActiveAsset {
+    struct ExtendedEquippableActiveAsset {
         uint64 id;
         uint64 equippableGroupId;
         uint16 priority;
@@ -87,8 +95,20 @@ contract RMRKEquipRenderUtils {
     }
 
     /**
+     * @notice The structure used to represent an asset with a Slot.
+     * @return slotPartId ID of the Slot part
+     * @return assetId ID of the asset
+     * @return priority Priority of the asset on the active assets list
+     */
+    struct AssetWithSlot {
+        uint64 slotPartId;
+        uint64 assetId;
+        uint16 priority;
+    }
+
+    /**
      * @notice Used to get extended active assets of the given token.
-     * @dev The full `ExtendedActiveAsset` looks like this:
+     * @dev The full `ExtendedEquippableActiveAsset` looks like this:
      *  [
      *      ID,
      *      equippableGroupId,
@@ -106,12 +126,12 @@ contract RMRKEquipRenderUtils {
      *  ]
      * @param target Address of the smart contract of the given token
      * @param tokenId ID of the token to retrieve the extended active assets for
-     * @return sturct[] An array of ExtendedActiveAssets present on the given token
+     * @return ExtendedEquippableActiveAsset[] An array of ExtendedEquippableActiveAssets present on the given token
      */
-    function getExtendedActiveAssets(
+    function getExtendedEquippableActiveAssets(
         address target,
         uint256 tokenId
-    ) public view virtual returns (ExtendedActiveAsset[] memory) {
+    ) public view virtual returns (ExtendedEquippableActiveAsset[] memory) {
         IRMRKEquippable target_ = IRMRKEquippable(target);
 
         uint64[] memory assets = target_.getActiveAssets(tokenId);
@@ -121,9 +141,8 @@ contract RMRKEquipRenderUtils {
             revert RMRKTokenHasNoAssets();
         }
 
-        ExtendedActiveAsset[] memory activeAssets = new ExtendedActiveAsset[](
-            len
-        );
+        ExtendedEquippableActiveAsset[]
+            memory activeAssets = new ExtendedEquippableActiveAsset[](len);
 
         for (uint256 i; i < len; ) {
             (
@@ -132,7 +151,7 @@ contract RMRKEquipRenderUtils {
                 address catalogAddress,
                 uint64[] memory partIds
             ) = target_.getAssetAndEquippableData(tokenId, assets[i]);
-            activeAssets[i] = ExtendedActiveAsset({
+            activeAssets[i] = ExtendedEquippableActiveAsset({
                 id: assets[i],
                 equippableGroupId: equippableGroupId,
                 priority: priorities[i],
@@ -168,7 +187,7 @@ contract RMRKEquipRenderUtils {
      *  ]
      * @param target Address of the smart contract of the given token
      * @param tokenId ID of the token to retrieve the extended pending assets for
-     * @return sturct[] An array of ExtendedPendingAssets present on the given token
+     * @return ExtendedPendingAssets[] An array of ExtendedPendingAssets present on the given token
      */
     function getExtendedPendingAssets(
         address target,
@@ -227,6 +246,7 @@ contract RMRKEquipRenderUtils {
      * @param assetId ID of the asset being queried for equipped parts
      * @return slotPartIds An array of the IDs of the slot parts present in the given asset
      * @return childrenEquipped An array of `Equipment` structs containing info about the equipped children
+     * @return childrenAssetMetadata An array of strings corresponding to asset metadata of the equipped children
      */
     function getEquipped(
         address target,
@@ -237,7 +257,8 @@ contract RMRKEquipRenderUtils {
         view
         returns (
             uint64[] memory slotPartIds,
-            IRMRKEquippable.Equipment[] memory childrenEquipped
+            IRMRKEquippable.Equipment[] memory childrenEquipped,
+            string[] memory childrenAssetMetadata
         )
     {
         IRMRKEquippable target_ = IRMRKEquippable(target);
@@ -245,10 +266,12 @@ contract RMRKEquipRenderUtils {
         (, , address catalogAddress, uint64[] memory partIds) = target_
             .getAssetAndEquippableData(tokenId, assetId);
 
-        (slotPartIds, ) = splitSlotAndFixedParts(partIds, catalogAddress);
-        childrenEquipped = new IRMRKEquippable.Equipment[](slotPartIds.length);
-
+        (slotPartIds, ) = _splitSlotAndFixedParts(partIds, catalogAddress);
         uint256 len = slotPartIds.length;
+
+        childrenEquipped = new IRMRKEquippable.Equipment[](len);
+        childrenAssetMetadata = new string[](len);
+
         for (uint256 i; i < len; ) {
             IRMRKEquippable.Equipment memory equipment = target_.getEquipment(
                 tokenId,
@@ -257,6 +280,9 @@ contract RMRKEquipRenderUtils {
             );
             if (equipment.assetId == assetId) {
                 childrenEquipped[i] = equipment;
+                childrenAssetMetadata[i] = IRMRKEquippable(
+                    equipment.childEquippableAddress
+                ).getAssetMetadata(equipment.childId, equipment.childAssetId);
             }
             unchecked {
                 ++i;
@@ -317,7 +343,7 @@ contract RMRKEquipRenderUtils {
         (
             uint64[] memory slotPartIds,
             uint64[] memory fixedPartIds
-        ) = splitSlotAndFixedParts(partIds, catalogAddress);
+        ) = _splitSlotAndFixedParts(partIds, catalogAddress);
 
         // Fixed parts:
         fixedParts = new FixedPart[](fixedPartIds.length);
@@ -339,12 +365,218 @@ contract RMRKEquipRenderUtils {
             }
         }
 
-        slotParts = getEquippedSlotParts(
+        slotParts = _getEquippedSlotParts(
             target_,
             tokenId,
             assetId,
             catalogAddress,
             slotPartIds
+        );
+    }
+
+    /**
+     * @notice Used to get the child's assets and slot parts pairs, identifying parts the said assets can be equipped into.
+     * @dev Reverts if child token is not owned by an NFT.
+     * @dev Reverts if child token is not owned by the expected parent.
+     * @dev The full `AssetWithSlot` struct looks like this:
+     *  [
+     *      assetId,
+     *      slotPartId,
+     *      priority,
+     *  ]
+     * @param targetChild Address of the smart contract of the given token
+     * @param childId ID of the child token whose assets will be matched against parent's slot parts
+     * @param expectedParent Address of the collection smart contract of the expected parent token
+     * @param expectedParentId ID of the expected parent token
+     * @param parentAssetId ID of the target parent asset to use to equip the child
+     * @return childIndex Index of the child in the parent's list of active children
+     * @return assetsWithSlots An array of `AssetWithSlot` structs containing info about the equippable child assets and their corresponding slot parts
+     */
+    function getEquippableSlotsFromParent(
+        address targetChild,
+        uint256 childId,
+        address expectedParent,
+        uint256 expectedParentId,
+        uint64 parentAssetId
+    )
+        public
+        view
+        returns (uint256 childIndex, AssetWithSlot[] memory assetsWithSlots)
+    {
+        uint64[] memory parentSlotPartIds = _getParentAndSlotParts(
+            targetChild,
+            childId,
+            expectedParent,
+            expectedParentId,
+            parentAssetId
+        );
+        childIndex = getChildIndex(
+            expectedParent,
+            expectedParentId,
+            targetChild,
+            childId
+        );
+
+        (
+            AssetWithSlot[] memory tempAssetsWithSlots,
+            uint256 totalMatches
+        ) = _matchAllAssetsWithSlots(
+                IRMRKEquippable(targetChild),
+                childId,
+                parentSlotPartIds,
+                expectedParent
+            );
+
+        // Finally, we copy the matches into the final array which has the right lenght according to results
+        assetsWithSlots = new AssetWithSlot[](totalMatches);
+        for (uint256 i; i < totalMatches; ) {
+            assetsWithSlots[i] = tempAssetsWithSlots[i];
+            unchecked {
+                ++i;
+            }
+        }
+    }
+
+    /**
+     * @notice Used to retrieve the equippable data of the specified token's asset with the highest priority.
+     * @param target Address of the collection smart contract of the specified token
+     * @param tokenId ID of the token for which to retrieve the equippable data of the asset with the highest priority
+     * @return topAsset `ExtendedEquippableActiveAsset` struct with the equippable data containing the asset with the highest priority
+     */
+    function getTopAssetAndEquippableDataForToken(
+        address target,
+        uint256 tokenId
+    ) public view returns (ExtendedEquippableActiveAsset memory topAsset) {
+        (uint64 topAssetId, uint16 topPriority) = getAssetIdWithTopPriority(
+            target,
+            tokenId
+        );
+        (
+            string memory metadataURI,
+            uint64 equippableGroupId,
+            address catalogAddress,
+            uint64[] memory partIds
+        ) = IRMRKEquippable(target).getAssetAndEquippableData(
+                tokenId,
+                topAssetId
+            );
+        topAsset = ExtendedEquippableActiveAsset({
+            id: topAssetId,
+            equippableGroupId: equippableGroupId,
+            priority: topPriority,
+            catalogAddress: catalogAddress,
+            metadata: metadataURI,
+            partIds: partIds
+        });
+    }
+
+    /**
+     * @notice Matches all child's assets with the corresponding slot parts of the parent, if they apply.
+     * @dev The full `AssetWithSlot` struct looks like this:
+     *  [
+     *      assetId,
+     *      slotPartId,
+     *      priority,
+     *  ]
+     * @dev The size of the returning array is equal to the total of available parent slots, even if there's not a match for each one.
+     * @dev The valid matches are located at the beginning of the array, and the rest of the slots are filled with empty structs. Use totalMatches to know how many valid matches there are.
+     * @param childContract IRMRKEquippable instance of the child smart contract
+     * @param childId ID of the child token whose assets will be matched against parent's slot parts
+     * @param parentSlotPartIds Array of slot part IDs of the parent token's asset
+     * @param parentAddress Address of the parent smart contract
+     * @return allAssetsWithSlots An array of `AssetWithSlot` structs containing info about the equippable child assets and their corresponding slot parts
+     * @return totalMatches Total of valid matches found
+     */
+    function _matchAllAssetsWithSlots(
+        IRMRKEquippable childContract,
+        uint256 childId,
+        uint64[] memory parentSlotPartIds,
+        address parentAddress
+    )
+        private
+        view
+        returns (
+            AssetWithSlot[] memory allAssetsWithSlots,
+            uint256 totalMatches
+        )
+    {
+        uint64[] memory childAssets = childContract.getActiveAssets(childId);
+        uint16[] memory priorities = childContract.getActiveAssetPriorities(
+            childId
+        );
+
+        uint256 totalChildAssets = childAssets.length;
+        uint256 totalParentSlots = parentSlotPartIds.length;
+
+        // There can be at most min(totalChildAssets, totalParentSlots) resulting matches, we just pick one of them.
+        allAssetsWithSlots = new AssetWithSlot[](totalParentSlots);
+
+        for (uint256 i; i < totalChildAssets; ) {
+            for (uint256 j; j < totalParentSlots; ) {
+                if (
+                    childContract.canTokenBeEquippedWithAssetIntoSlot(
+                        parentAddress,
+                        childId,
+                        childAssets[i],
+                        parentSlotPartIds[j]
+                    )
+                ) {
+                    allAssetsWithSlots[totalMatches] = AssetWithSlot({
+                        assetId: childAssets[i],
+                        slotPartId: parentSlotPartIds[j],
+                        priority: priorities[i]
+                    });
+                    unchecked {
+                        ++totalMatches;
+                    }
+                }
+                unchecked {
+                    ++j;
+                }
+            }
+            unchecked {
+                ++i;
+            }
+        }
+    }
+
+    /**
+     * @notice Used to retrieve the parent address and its slot part IDs for a given target child.
+     * @dev Reverts if the parent is not an NFT or if the parent asset is not composable.
+     * @param targetChild Address of the collection smart contract of the given token
+     * @param childId ID of the child token
+     * @param parentAssetId ID of the parent asset from which to get the slot parts
+     * @param expectedParent Address of the collection smart contract of the expected parent token
+     * @param expectedParentId ID of the expected parent token
+     * @return parentSlotPartIds Array of slot part IDs of the parent token's asset
+     */
+    function _getParentAndSlotParts(
+        address targetChild,
+        uint256 childId,
+        address expectedParent,
+        uint256 expectedParentId,
+        uint64 parentAssetId
+    ) private view returns (uint64[] memory parentSlotPartIds) {
+        checkExpectedParent(
+            targetChild,
+            childId,
+            expectedParent,
+            expectedParentId
+        );
+        (
+            ,
+            ,
+            address catalogAddress,
+            uint64[] memory parentPartIds
+        ) = IRMRKEquippable(expectedParent).getAssetAndEquippableData(
+                expectedParentId,
+                parentAssetId
+            );
+        if (catalogAddress == address(0)) revert RMRKNotComposableAsset();
+
+        (parentSlotPartIds, ) = _splitSlotAndFixedParts(
+            parentPartIds,
+            catalogAddress
         );
     }
 
@@ -367,7 +599,7 @@ contract RMRKEquipRenderUtils {
      * @param slotPartIds An array of slot part IDs in the asset for which to retrieve the equipped slot parts
      * @return slotParts An array of `EquippedSlotPart` structs representing the equipped slot parts
      */
-    function getEquippedSlotParts(
+    function _getEquippedSlotParts(
         IRMRKEquippable target_,
         uint256 tokenId,
         uint64 assetId,
@@ -377,6 +609,7 @@ contract RMRKEquipRenderUtils {
         slotParts = new EquippedSlotPart[](slotPartIds.length);
         uint256 len = slotPartIds.length;
 
+        // TODO: is this check really needed?
         if (len != 0) {
             string memory metadata;
             IRMRKCatalog.Part[] memory catalogSlotParts = IRMRKCatalog(
@@ -425,7 +658,7 @@ contract RMRKEquipRenderUtils {
      * @return slotPartIds An array of IDs of the `Slot` parts included in the `allPartIds`
      * @return fixedPartIds An array of IDs of the `Fixed` parts included in the `allPartIds`
      */
-    function splitSlotAndFixedParts(
+    function _splitSlotAndFixedParts(
         uint64[] memory allPartIds,
         address catalogAddress
     )
