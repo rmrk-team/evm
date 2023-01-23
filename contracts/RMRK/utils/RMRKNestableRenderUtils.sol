@@ -33,6 +33,16 @@ contract RMRKNestableRenderUtils {
         revert RMRKChildNotFoundInParent();
     }
 
+    function getParent(
+        address childAddress,
+        uint256 childId
+    ) public view returns (address parentAddress, uint256 parentId) {
+        bool isNFT;
+        (parentAddress, parentId, isNFT) = IRMRKNestable(childAddress)
+            .directOwnerOf(childId);
+        if (!isNFT) revert RMRKParentIsNotNFT();
+    }
+
     /**
      * @notice Check if the child is owned by the expected parent.
      * @dev Reverts if child token is not owned by an NFT.
@@ -50,10 +60,7 @@ contract RMRKNestableRenderUtils {
     ) public view {
         address parentAddress;
         uint256 parentId;
-        bool isNFT;
-        (parentAddress, parentId, isNFT) = IRMRKNestable(childAddress)
-            .directOwnerOf(childId);
-        if (!isNFT) revert RMRKParentIsNotNFT();
+        (parentAddress, parentId) = getParent(childAddress, childId);
         if (parentAddress != expectedParent || expectedParentId != parentId)
             revert RMRKUnexpectedParent();
     }

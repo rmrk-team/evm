@@ -9,13 +9,11 @@ import {
   RMRKEquippableMock,
   RMRKEquipRenderUtils,
   RMRKMultiAssetRenderUtils,
-  RMRKMultiAssetImplPreMint__factory,
 } from '../typechain-types';
 import { RMRKMultiAssetMock } from '../typechain-types';
 import { RMRKNestableMock } from '../typechain-types';
 import { RMRKNestableMultiAssetMock } from '../typechain-types';
 import { RMRKSoulboundNestableMock } from '../typechain-types';
-import { connect } from 'http2';
 import { RMRKMultiAssetImplPreMint } from '../typechain-types';
 
 // --------------- FIXTURES -----------------------
@@ -81,7 +79,7 @@ async function extendedNftRenderUtilsFixture() {
   const nestableMultiAssetFactory = await ethers.getContractFactory('RMRKNestableMultiAssetMock');
   const catalogFactory = await ethers.getContractFactory('RMRKCatalogMock');
   const equipFactory = await ethers.getContractFactory('RMRKEquippableMock');
-  const renderUtilsFactory = await ethers.getContractFactory('RMRKRenderUtils');
+  const renderUtilsFactory = await ethers.getContractFactory('RMRKEquipRenderUtils');
 
   const multiAsset = <RMRKMultiAssetMock>await multiAssetFactory.deploy('MultiAsset', 'MA');
   await multiAsset.deployed();
@@ -116,7 +114,7 @@ async function extendedNftRenderUtilsFixture() {
   const equip = <RMRKEquippableMock>await equipFactory.deploy('Equippable', 'EQ');
   await equip.deployed();
 
-  const renderUtils = <RMRKMultiAssetRenderUtils>await renderUtilsFactory.deploy();
+  const renderUtils = <RMRKEquipRenderUtils>await renderUtilsFactory.deploy();
   await renderUtils.deployed();
 
   return {
@@ -253,7 +251,7 @@ describe('MultiAsset and Equip Render Utils', async function () {
 
     it('cannot get equippable slots from parent if parent is not an NFT', async function () {
       await expect(
-        renderUtilsEquip.getEquippableSlotsFromParent(equip.address, tokenId, equip.address, 1, 1),
+        renderUtilsEquip.getEquippableSlotsFromParent(equip.address, tokenId, 1),
       ).to.be.revertedWithCustomError(renderUtilsEquip, 'RMRKParentIsNotNFT');
     });
   });
@@ -311,55 +309,151 @@ describe('Advanced Equip Render Utils', async function () {
     await setUpKanariaAsset(kanaria, kanariaId, catalog.address);
     await setUpGemAssets(gem, gemId1, gemId2, gemId3, kanaria.address, catalog.address);
 
+    await kanaria.equip({
+      tokenId: kanariaId,
+      childIndex: 0,
+      assetId: assetForKanariaFull,
+      slotPartId: slotIdGemLeft,
+      childAssetId: assetForGemALeft,
+    });
+    await kanaria.equip({
+      tokenId: kanariaId,
+      childIndex: 1,
+      assetId: assetForKanariaFull,
+      slotPartId: slotIdGemMid,
+      childAssetId: assetForGemAMid,
+    });
+    await kanaria.equip({
+      tokenId: kanariaId,
+      childIndex: 2,
+      assetId: assetForKanariaFull,
+      slotPartId: slotIdGemRight,
+      childAssetId: assetForGemBRight,
+    });
+
     expect(
-      await renderUtilsEquip.getEquippableSlotsFromParent(
-        gem.address,
-        gemId1,
-        kanaria.address,
-        kanariaId,
-        assetForKanariaFull,
-      ),
+      await renderUtilsEquip.getEquippableSlotsFromParent(gem.address, gemId1, assetForKanariaFull),
     ).to.eql([
       bn(0), // child Index
       [
         // [Slot Id, asset Id, Asset priority]
-        [bn(slotIdGemRight), bn(assetForGemARight), 0],
-        [bn(slotIdGemMid), bn(assetForGemAMid), 1],
-        [bn(slotIdGemLeft), bn(assetForGemALeft), 2],
+        [
+          bn(slotIdGemRight),
+          bn(assetForGemARight),
+          bn(assetForKanariaFull),
+          0,
+          catalog.address,
+          false,
+          'ipfs://metadataSlotGemRight',
+        ],
+        [
+          bn(slotIdGemMid),
+          bn(assetForGemAMid),
+          bn(assetForKanariaFull),
+          1,
+          catalog.address,
+          false,
+          'ipfs://metadataSlotGemMid',
+        ],
+        [
+          bn(slotIdGemLeft),
+          bn(assetForGemALeft),
+          bn(assetForKanariaFull),
+          2,
+          catalog.address,
+          true,
+          'ipfs://metadataSlotGemLeft',
+        ],
       ],
     ]);
     expect(
-      await renderUtilsEquip.getEquippableSlotsFromParent(
-        gem.address,
-        gemId2,
-        kanaria.address,
-        kanariaId,
-        assetForKanariaFull,
-      ),
+      await renderUtilsEquip.getEquippableSlotsFromParent(gem.address, gemId2, assetForKanariaFull),
     ).to.eql([
       bn(1), // child Index
       [
         // [Slot Id, asset Id, Asset priority]
-        [bn(slotIdGemRight), bn(assetForGemARight), 0],
-        [bn(slotIdGemMid), bn(assetForGemAMid), 1],
-        [bn(slotIdGemLeft), bn(assetForGemALeft), 2],
+        [
+          bn(slotIdGemRight),
+          bn(assetForGemARight),
+          bn(assetForKanariaFull),
+          0,
+          catalog.address,
+          false,
+          'ipfs://metadataSlotGemRight',
+        ],
+        [
+          bn(slotIdGemMid),
+          bn(assetForGemAMid),
+          bn(assetForKanariaFull),
+          1,
+          catalog.address,
+          true,
+          'ipfs://metadataSlotGemMid',
+        ],
+        [
+          bn(slotIdGemLeft),
+          bn(assetForGemALeft),
+          bn(assetForKanariaFull),
+          2,
+          catalog.address,
+          false,
+          'ipfs://metadataSlotGemLeft',
+        ],
       ],
     ]);
+    // Here we test with the more generic function which checks for all parent's assets
     expect(
-      await renderUtilsEquip.getEquippableSlotsFromParent(
-        gem.address,
-        gemId3,
-        kanaria.address,
-        kanariaId,
-        assetForKanariaFull,
-      ),
+      await renderUtilsEquip.getAllEquippableSlotsFromParent(gem.address, gemId3, false),
     ).to.eql([
       bn(2), // child Index
       [
         // [Slot Id, asset Id, Asset priority]
-        [bn(slotIdGemRight), bn(assetForGemBRight), 0],
-        [bn(slotIdGemMid), bn(assetForGemBMid), 1],
-        [bn(slotIdGemLeft), bn(assetForGemBLeft), 2],
+        [
+          bn(slotIdGemRight),
+          bn(assetForGemBRight),
+          bn(assetForKanariaFull),
+          0,
+          catalog.address,
+          true,
+          'ipfs://metadataSlotGemRight',
+        ],
+        [
+          bn(slotIdGemMid),
+          bn(assetForGemBMid),
+          bn(assetForKanariaFull),
+          1,
+          catalog.address,
+          false,
+          'ipfs://metadataSlotGemMid',
+        ],
+        [
+          bn(slotIdGemLeft),
+          bn(assetForGemBLeft),
+          bn(assetForKanariaFull),
+          2,
+          catalog.address,
+          false,
+          'ipfs://metadataSlotGemLeft',
+        ],
+      ],
+    ]);
+
+    // Again the more generic function which checks for all parent's assets, but this time filtering for only equipped results
+    expect(
+      await renderUtilsEquip.getAllEquippableSlotsFromParent(gem.address, gemId3, true),
+    ).to.eql([
+      bn(2), // child Index
+      [
+        // [Slot Id, asset Id, Asset priority]
+        [
+          bn(slotIdGemRight),
+          bn(assetForGemBRight),
+          bn(assetForKanariaFull),
+          0,
+          catalog.address,
+          true,
+          'ipfs://metadataSlotGemRight',
+        ],
       ],
     ]);
   });
@@ -383,32 +477,34 @@ describe('Advanced Equip Render Utils', async function () {
       renderUtilsEquip.getEquippableSlotsFromParent(
         gem.address,
         gemId1,
-        kanaria.address,
-        kanariaId,
         assetForKanariaNotEquippable,
       ),
     ).to.be.revertedWithCustomError(renderUtilsEquip, 'RMRKNotComposableAsset');
   });
 
-  it('cannot get equippable slots from parent if parent is not the expected one', async function () {
+  it('fails checking expected parent if parent is not the expected one', async function () {
     await expect(
-      renderUtilsEquip.getEquippableSlotsFromParent(
+      renderUtilsEquip.checkExpectedParent(
         gem.address,
         gemId1,
         gem.address, // Wrong parent address
         kanariaId,
-        assetForKanariaFull,
       ),
     ).to.be.revertedWithCustomError(renderUtilsEquip, 'RMRKUnexpectedParent');
     await expect(
-      renderUtilsEquip.getEquippableSlotsFromParent(
+      renderUtilsEquip.checkExpectedParent(
         gem.address,
         gemId1,
         kanaria.address,
         2, // Wrong parent id
-        assetForKanariaFull,
       ),
     ).to.be.revertedWithCustomError(renderUtilsEquip, 'RMRKUnexpectedParent');
+  });
+
+  it('succeds checking expected parent if parent is the expected one', async function () {
+    await expect(
+      renderUtilsEquip.checkExpectedParent(gem.address, gemId1, kanaria.address, kanariaId),
+    ).to.not.be.reverted;
   });
 });
 
@@ -422,7 +518,7 @@ describe('Extended NFT render utils', function () {
   let nestableMultiAsset: RMRKNestableMultiAssetMock;
   let catalog: RMRKCatalogMock;
   let equip: RMRKEquippableMock;
-  let renderUtils: RMRKRenderUtils;
+  let renderUtils: RMRKEquipRenderUtils;
 
   const metaURI = 'ipfs://meta';
   const supply = bn(10000);
@@ -679,7 +775,7 @@ async function setUpCatalog(catalog: RMRKCatalogMock, gemAddress: string): Promi
         itemType: 1, // Slot
         z: 4,
         equippable: [gemAddress], // Only gems tokens can be equipped here
-        metadataURI: '',
+        metadataURI: 'ipfs://metadataSlotGemLeft',
       },
     },
     {
@@ -689,7 +785,7 @@ async function setUpCatalog(catalog: RMRKCatalogMock, gemAddress: string): Promi
         itemType: 1, // Slot
         z: 4,
         equippable: [gemAddress], // Only gems tokens can be equipped here
-        metadataURI: '',
+        metadataURI: 'ipfs://metadataSlotGemMid',
       },
     },
     {
@@ -699,7 +795,7 @@ async function setUpCatalog(catalog: RMRKCatalogMock, gemAddress: string): Promi
         itemType: 1, // Slot
         z: 4,
         equippable: [gemAddress], // Only gems tokens can be equipped here
-        metadataURI: '',
+        metadataURI: 'ipfs://metadataSlotGemRight',
       },
     },
   ]);
