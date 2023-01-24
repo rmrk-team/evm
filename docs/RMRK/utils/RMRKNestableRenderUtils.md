@@ -54,6 +54,30 @@ function getChildIndex(address parentAddress, uint256 parentId, address childAdd
 |---|---|---|
 | _0 | uint256 | undefined |
 
+### getParent
+
+```solidity
+function getParent(address childAddress, uint256 childId) external view returns (address parentAddress, uint256 parentId)
+```
+
+Get&#39;s the contract address and ID of the parent of a child token.
+
+*Reverts if child token is not owned by an NFT.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| childAddress | address | Address of the child contract |
+| childId | uint256 | ID of the child token |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| parentAddress | address | Address of the parent contract |
+| parentId | uint256 | ID of the parent token |
+
 
 
 
