@@ -33,6 +33,14 @@ contract RMRKNestableRenderUtils {
         revert RMRKChildNotFoundInParent();
     }
 
+    /**
+     * @notice Get's the contract address and ID of the parent of a child token.
+     * @dev Reverts if child token is not owned by an NFT.
+     * @param childAddress Address of the child contract
+     * @param childId ID of the child token
+     * @return parentAddress Address of the parent contract
+     * @return parentId ID of the parent token
+     */
     function getParent(
         address childAddress,
         uint256 childId

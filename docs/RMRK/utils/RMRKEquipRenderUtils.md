@@ -10,30 +10,6 @@ Smart contract of the RMRK Equip render utils module.
 
 ## Methods
 
-### _splitSlotAndFixedParts
-
-```solidity
-function _splitSlotAndFixedParts(uint64[] allPartIds, address catalogAddress) external view returns (uint64[] slotPartIds, uint64[] fixedPartIds)
-```
-
-Used to split slot and fixed parts.
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| allPartIds | uint64[] | [] An array of `Part` IDs containing both, `Slot` and `Fixed` parts |
-| catalogAddress | address | An address of the catalog to which the given `Part`s belong to |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| slotPartIds | uint64[] | An array of IDs of the `Slot` parts included in the `allPartIds` |
-| fixedPartIds | uint64[] | An array of IDs of the `Fixed` parts included in the `allPartIds` |
-
 ### checkExpectedParent
 
 ```solidity
@@ -80,6 +56,31 @@ Used to compose the given equippables.
 | catalogAddress | address | Address of the catalog to which the asset belongs to |
 | fixedParts | RMRKEquipRenderUtils.FixedPart[] | An array of fixed parts respresented by the `FixedPart` structs present on the asset |
 | slotParts | RMRKEquipRenderUtils.EquippedSlotPart[] | An array of slot parts represented by the `EquippedSlotPart` structs present on the asset |
+
+### getAllEquippableSlotsFromParent
+
+```solidity
+function getAllEquippableSlotsFromParent(address targetChild, uint256 childId, bool onlyEquipped) external view returns (uint256 childIndex, struct RMRKEquipRenderUtils.EquippableData[] assetsWithSlots)
+```
+
+Used to get the child&#39;s assets and slot parts pairs, identifying parts the said assets can be equipped into, for all of parent&#39;s assets.
+
+*Reverts if child token is not owned by an NFT.The full `EquippableData` struct looks like this:  [      slotPartId      childAssetId      parentAssetId      priority      parentCatalogAddress      isEquipped      partMetadata  ]*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| targetChild | address | Address of the smart contract of the given token |
+| childId | uint256 | ID of the child token whose assets will be matched against parent&#39;s slot parts |
+| onlyEquipped | bool | Whether to return only the assets that are currently equipped |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| childIndex | uint256 | Index of the child in the parent&#39;s list of active children |
+| assetsWithSlots | RMRKEquipRenderUtils.EquippableData[] | An array of `EquippableData` structs containing info about the equippable child assets and their corresponding slot parts |
 
 ### getAssetIdWithTopPriority
 
@@ -157,12 +158,12 @@ function getChildIndex(address parentAddress, uint256 parentId, address childAdd
 ### getEquippableSlotsFromParent
 
 ```solidity
-function getEquippableSlotsFromParent(address targetChild, uint256 childId, address expectedParent, uint256 expectedParentId, uint64 parentAssetId) external view returns (uint256 childIndex, struct RMRKEquipRenderUtils.AssetWithSlot[] assetsWithSlots)
+function getEquippableSlotsFromParent(address targetChild, uint256 childId, uint64 parentAssetId) external view returns (uint256 childIndex, struct RMRKEquipRenderUtils.EquippableData[] assetsWithSlots)
 ```
 
-Used to get the child&#39;s assets and slot parts pairs, identifying parts the said assets can be equipped into.
+Used to get the child&#39;s assets and slot parts pairs, identifying parts the said assets can be equipped into, for a specific parent asset.
 
-*Reverts if child token is not owned by an NFT.Reverts if child token is not owned by the expected parent.The full `AssetWithSlot` struct looks like this:  [      assetId,      slotPartId,      priority,  ]*
+*Reverts if child token is not owned by an NFT.The full `EquippableData` struct looks like this:  [      slotPartId      childAssetId      parentAssetId      priority      parentCatalogAddress      isEquipped      partMetadata  ]*
 
 #### Parameters
 
@@ -170,8 +171,6 @@ Used to get the child&#39;s assets and slot parts pairs, identifying parts the s
 |---|---|---|
 | targetChild | address | Address of the smart contract of the given token |
 | childId | uint256 | ID of the child token whose assets will be matched against parent&#39;s slot parts |
-| expectedParent | address | Address of the collection smart contract of the expected parent token |
-| expectedParentId | uint256 | ID of the expected parent token |
 | parentAssetId | uint64 | ID of the target parent asset to use to equip the child |
 
 #### Returns
@@ -179,7 +178,7 @@ Used to get the child&#39;s assets and slot parts pairs, identifying parts the s
 | Name | Type | Description |
 |---|---|---|
 | childIndex | uint256 | Index of the child in the parent&#39;s list of active children |
-| assetsWithSlots | RMRKEquipRenderUtils.AssetWithSlot[] | An array of `AssetWithSlot` structs containing info about the equippable child assets and their corresponding slot parts |
+| assetsWithSlots | RMRKEquipRenderUtils.EquippableData[] | An array of `EquippableData` structs containing info about the equippable child assets and their corresponding slot parts |
 
 ### getEquipped
 
@@ -323,6 +322,30 @@ Used to get a list of existing token IDs in the range between `pageStart` and `p
 |---|---|---|
 | page | uint256[] | An array of IDs of the existing tokens |
 
+### getParent
+
+```solidity
+function getParent(address childAddress, uint256 childId) external view returns (address parentAddress, uint256 parentId)
+```
+
+Get&#39;s the contract address and ID of the parent of a child token.
+
+*Reverts if child token is not owned by an NFT.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| childAddress | address | Address of the child contract |
+| childId | uint256 | ID of the child token |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| parentAddress | address | Address of the parent contract |
+| parentId | uint256 | ID of the parent token |
+
 ### getPendingAssets
 
 ```solidity
@@ -345,6 +368,30 @@ Used to get the pending assets of the given token.
 | Name | Type | Description |
 |---|---|---|
 | _0 | RMRKMultiAssetRenderUtils.PendingAsset[] | struct[] An array of PendingAssets present on the given token |
+
+### getSlotParts
+
+```solidity
+function getSlotParts(address tokenAddress, uint256 tokenId, uint64 assetId) external view returns (uint64[] parentSlotPartIds)
+```
+
+Used to retrieve the parent address and its slot part IDs for a given target child.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenAddress | address | Address of the collection smart contract of parent token |
+| tokenId | uint256 | ID of the parent token |
+| assetId | uint64 | ID of the parent asset from which to get the slot parts |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| parentSlotPartIds | uint64[] | Array of slot part IDs of the parent token&#39;s asset |
 
 ### getTopAssetAndEquippableDataForToken
 
@@ -391,6 +438,58 @@ Used to retrieve the metadata URI of the specified token&#39;s asset with the hi
 | Name | Type | Description |
 |---|---|---|
 | _0 | string | string The metadata URI of the asset with the highest priority |
+
+### isAssetEquipped
+
+```solidity
+function isAssetEquipped(address parentAddress, uint256 parentId, address parentAssetCatalog, address childAddress, uint256 childId, uint64 childAssetId, uint64 slotPartId) external view returns (bool isEquipped)
+```
+
+Used to get whether a given child asset is equipped into a given parent slot
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| parentAddress | address | Address of the collection smart contract of the parent token |
+| parentId | uint256 | ID of the parent token |
+| parentAssetCatalog | address | Address of the catalog from the parent asset |
+| childAddress | address | Address of the collection smart contract of the child token |
+| childId | uint256 | ID of the child token |
+| childAssetId | uint64 | ID of the child asset |
+| slotPartId | uint64 | ID of the slot part |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| isEquipped | bool | Whether the child asset is equipped into the parent slot |
+
+### splitSlotAndFixedParts
+
+```solidity
+function splitSlotAndFixedParts(uint64[] allPartIds, address catalogAddress) external view returns (uint64[] slotPartIds, uint64[] fixedPartIds)
+```
+
+Used to split slot and fixed parts.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| allPartIds | uint64[] | [] An array of `Part` IDs containing both, `Slot` and `Fixed` parts |
+| catalogAddress | address | An address of the catalog to which the given `Part`s belong to |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| slotPartIds | uint64[] | An array of IDs of the `Slot` parts included in the `allPartIds` |
+| fixedPartIds | uint64[] | An array of IDs of the `Fixed` parts included in the `allPartIds` |
 
 
 
