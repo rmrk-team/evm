@@ -15,13 +15,6 @@ abstract contract RMRKEmotable is IRMRKEmotable {
         private _emotesPerAddress; // Cheaper than using a bool
     mapping(uint256 => mapping(bytes4 => uint256)) private _emotesPerToken;
 
-    event Emoted(
-        address indexed emoter,
-        uint256 indexed tokenId,
-        bytes4 emoji,
-        bool on
-    );
-
     /**
      * @inheritdoc IRMRKEmotable
      */
@@ -53,6 +46,7 @@ abstract contract RMRKEmotable is IRMRKEmotable {
             }
             _emotesPerAddress[msg.sender][tokenId][emoji] = state ? 1 : 0;
             emit Emoted(msg.sender, tokenId, emoji, state);
+            _afterEmote(tokenId, emoji, state);
         }
     }
 
@@ -63,6 +57,18 @@ abstract contract RMRKEmotable is IRMRKEmotable {
      * @param state Boolean value signifying whether to emote (`true`) or undo (`false`) emote
      */
     function _beforeEmote(
+        uint256 tokenId,
+        bytes4 emoji,
+        bool state
+    ) internal virtual {}
+
+    /**
+     * @notice Hook that is called after emote is added or removed.
+     * @param tokenId ID of the token being emoted
+     * @param emoji Unicode identifier of the emoji
+     * @param state Boolean value signifying whether to emote (`true`) or undo (`false`) emote
+     */
+    function _afterEmote(
         uint256 tokenId,
         bytes4 emoji,
         bool state

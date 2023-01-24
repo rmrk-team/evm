@@ -18,14 +18,6 @@ abstract contract RMRKEmoteTracker is IRMRKEmoteTracker {
     mapping(address => mapping(uint256 => mapping(bytes4 => uint256)))
         private _emotesPerToken;
 
-    event Emoted(
-        address indexed emoter,
-        address indexed collection,
-        uint256 indexed tokenId,
-        bytes4 emoji,
-        bool on
-    );
-
     /**
      * @inheritdoc IRMRKEmoteTracker
      */
@@ -64,6 +56,7 @@ abstract contract RMRKEmoteTracker is IRMRKEmoteTracker {
                 ? 1
                 : 0;
             emit Emoted(msg.sender, collection, tokenId, emoji, state);
+            _afterEmote(collection, tokenId, emoji, state);
         }
     }
 
@@ -75,6 +68,20 @@ abstract contract RMRKEmoteTracker is IRMRKEmoteTracker {
      * @param state Boolean value signifying whether to emote (`true`) or undo (`false`) emote
      */
     function _beforeEmote(
+        address collection,
+        uint256 tokenId,
+        bytes4 emoji,
+        bool state
+    ) internal virtual {}
+
+    /**
+     * @notice Hook that is called after emote is added or removed.
+     * @param collection Address of the collection containing the token being emoted
+     * @param tokenId ID of the token being emoted
+     * @param emoji Unicode identifier of the emoji
+     * @param state Boolean value signifying whether to emote (`true`) or undo (`false`) emote
+     */
+    function _afterEmote(
         address collection,
         uint256 tokenId,
         bytes4 emoji,

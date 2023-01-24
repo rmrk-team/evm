@@ -11,6 +11,23 @@ import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
  */
 interface IRMRKEmoteTracker is IERC165 {
     /**
+     * @notice Used to notify listeners of that the token with ID tokenId on collection has been emoted or unemoted.
+     * @dev The event is only emitted if the state of the emote is changed.
+     * @param emoter Address of the account that emoted or unemoted the token
+     * @param collection Address of the collection containing the token being emoted or unemoted
+     * @param tokenId ID of the token being emoted or unemoted
+     * @param emoji Unicode identifier of the emoji
+     * @param on Boolean value signifying whether the token was emoted (`true`) or unemoted (`false`)
+     */
+    event Emoted(
+        address indexed emoter,
+        address indexed collection,
+        uint256 indexed tokenId,
+        bytes4 emoji,
+        bool on
+    );
+
+    /**
      * @notice Used to get the number of emotes for a specific emoji on a token.
      * @param collection Address of the collection containing the token being checked for emoji count
      * @param tokenId ID of the token to check for emoji count
