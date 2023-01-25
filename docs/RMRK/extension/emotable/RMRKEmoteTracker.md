@@ -85,7 +85,7 @@ function supportsInterface(bytes4 interfaceId) external view returns (bool)
 event Emoted(address indexed emoter, address indexed collection, uint256 indexed tokenId, bytes4 emoji, bool on)
 ```
 
-Used to notify listeners of that the token with ID tokenId on collection has been emoted or unemoted.
+Used to notify listeners that the token with the specified ID has been emoted to or that the reaction has been revoked.
 
 
 

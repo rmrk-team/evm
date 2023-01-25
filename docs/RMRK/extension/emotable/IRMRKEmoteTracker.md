@@ -85,7 +85,7 @@ function supportsInterface(bytes4 interfaceId) external view returns (bool)
 event Emoted(address indexed emoter, address indexed collection, uint256 indexed tokenId, bytes4 emoji, bool on)
 ```
 
-Used to notify listeners of that the token with ID tokenId on collection has been emoted or unemoted.
+Used to notify listeners that the token with the specified ID has been emoted to or that the reaction has been revoked.
 
 *The event is only emitted if the state of the emote is changed.*
 
@@ -93,11 +93,11 @@ Used to notify listeners of that the token with ID tokenId on collection has bee
 
 | Name | Type | Description |
 |---|---|---|
-| emoter `indexed` | address | Address of the account that emoted or unemoted the token |
-| collection `indexed` | address | Address of the collection containing the token being emoted or unemoted |
-| tokenId `indexed` | uint256 | ID of the token being emoted or unemoted |
+| emoter `indexed` | address | Address of the account that emoted or revoked the reaction to the token |
+| collection `indexed` | address | Address of the collection smart contract containing the token being emoted to or having the reaction revoked |
+| tokenId `indexed` | uint256 | ID of the token |
 | emoji  | bytes4 | Unicode identifier of the emoji |
-| on  | bool | Boolean value signifying whether the token was emoted (`true`) or unemoted (`false`) |
+| on  | bool | Boolean value signifying whether the token was emoted to (`true`) or if the reaction has been revoked (`false`) |
 
 
 

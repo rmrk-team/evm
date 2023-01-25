@@ -747,7 +747,7 @@ Used to notify listeners that an asset object is initialized at `assetId`.
 event Emoted(address indexed emoter, uint256 indexed tokenId, bytes4 emoji, bool on)
 ```
 
-Used to notify listeners of that the token with ID tokenId has been emoted or unemoted.
+Used to notify listeners that the token with the specified ID has been emoted to or that the reaction has been revoked.
 
 
 
