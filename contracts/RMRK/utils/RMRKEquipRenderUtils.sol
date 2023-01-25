@@ -483,12 +483,12 @@ contract RMRKEquipRenderUtils is
      * @dev Reverts if child token is not owned by an NFT.
      * @dev The full `EquippableData` struct looks like this:
      *  [
-     *      slotPartId
-     *      childAssetId
-     *      parentAssetId
-     *      priority
-     *      parentCatalogAddress
-     *      isEquipped
+     *      slotPartId,
+     *      childAssetId,
+     *      parentAssetId,
+     *      priority,
+     *      parentCatalogAddress,
+     *      isEquipped,
      *      partMetadata
      *  ]
      * @param targetChild Address of the smart contract of the given token
@@ -541,7 +541,6 @@ contract RMRKEquipRenderUtils is
      *  ]
      * @param childAddress Address of the smart contract of the given token
      * @param childId ID of the child token whose assets will be matched against parent's slot parts
-     * @param targetChild Address of the collection smart contract of the given token
      * @param parentAddress Address of the parent smart contract
      * @param parentAssetId ID of the target parent asset to use to equip the child
      * @return assetsWithSlots An array of `EquippableData` structs containing info about the equippable child assets and their corresponding slot parts
