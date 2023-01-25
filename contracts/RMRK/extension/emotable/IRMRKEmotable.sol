@@ -11,12 +11,12 @@ import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
  */
 interface IRMRKEmotable is IERC165 {
     /**
-     * @notice Used to notify listeners of that the token with ID tokenId has been emoted or unemoted.
+     * @notice Used to notify listeners that the token with the specified ID has been emoted to or that the reaction has been revoked.
      * @dev The event is only emitted if the state of the emote is changed.
-     * @param emoter Address of the account that emoted or unemoted the token
-     * @param tokenId ID of the token being emoted or unemoted
+     * @param emoter Address of the account that emoted or revoked the reaction to the token
+     * @param tokenId ID of the token
      * @param emoji Unicode identifier of the emoji
-     * @param on Boolean value signifying whether the token was emoted (`true`) or unemoted (`false`)
+     * @param on Boolean value signifying whether the token was emoted to (`true`) or if the reaction has been revoked (`false`)
      */
     event Emoted(
         address indexed emoter,
