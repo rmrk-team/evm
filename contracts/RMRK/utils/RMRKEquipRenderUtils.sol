@@ -386,17 +386,17 @@ contract RMRKEquipRenderUtils is
      * @dev Reverts if child token is not owned by an NFT.
      * @dev The full `EquippableData` struct looks like this:
      *  [
-     *      slotPartId
-     *      childAssetId
-     *      parentAssetId
-     *      priority
-     *      parentCatalogAddress
-     *      isEquipped
+     *      slotPartId,
+     *      childAssetId,
+     *      parentAssetId,
+     *      priority,
+     *      parentCatalogAddress,
+     *      isEquipped,
      *      partMetadata
      *  ]
      * @param targetChild Address of the smart contract of the given token
      * @param childId ID of the child token whose assets will be matched against parent's slot parts
-     * @param onlyEquipped Whether to return only the assets that are currently equipped
+     * @param onlyEquipped Boolean value signifying whether to only return the assets that are currently equipped (`true`) or to include the non-equipped ones as well (`false`)
      * @return childIndex Index of the child in the parent's list of active children
      * @return assetsWithSlots An array of `EquippableData` structs containing info about the equippable child assets and their corresponding slot parts
      */
@@ -540,7 +540,8 @@ contract RMRKEquipRenderUtils is
      *       partMetadata
      *  ]
      * @param childAddress Address of the smart contract of the given token
-     * @param childId ID of the child token whose assets will be matched against parent's slot parts     * @param targetChild Address of the smart contract of the given token
+     * @param childId ID of the child token whose assets will be matched against parent's slot parts
+     * @param targetChild Address of the collection smart contract of the given token
      * @param parentAddress Address of the parent smart contract
      * @param parentAssetId ID of the target parent asset to use to equip the child
      * @return assetsWithSlots An array of `EquippableData` structs containing info about the equippable child assets and their corresponding slot parts
@@ -644,7 +645,7 @@ contract RMRKEquipRenderUtils is
      *  ]
      * @dev The size of the returning array is equal to the total of available parent slots, even if there's not a match for each one.
      * @dev The valid matches are located at the beginning of the array, and the rest of the slots are filled with empty structs. Use totalMatches to know how many valid matches there are.
-     * @dev Some data from the returned structs is not filled due to stack to deep limitation: parentAssetId, parentCatalogAddress, isEquipped and partMetadata
+     * @dev Some data from the returned structs is not filled due to stack to deep limitation: parentAssetId, parentCatalogAddress, isEquipped and partMetadata.
      * @param childContract IRMRKEquippable instance of the child smart contract
      * @param childId ID of the child token whose assets will be matched against parent's slot parts
      * @param parentSlotPartIds Array of slot part IDs of the parent token's asset
@@ -713,15 +714,15 @@ contract RMRKEquipRenderUtils is
     }
 
     /**
-     * @notice Used to get whether a given child asset is equipped into a given parent slot
+     * @notice Used to verify whether a given child asset is equipped into a given parent slot.
      * @param parentAddress Address of the collection smart contract of the parent token
      * @param parentId ID of the parent token
-     * @param parentAssetCatalog Address of the catalog from the parent asset
+     * @param parentAssetCatalog Address of the catalog the parent asset belongs to
      * @param childAddress Address of the collection smart contract of the child token
      * @param childId ID of the child token
      * @param childAssetId ID of the child asset
      * @param slotPartId ID of the slot part
-     * @return isEquipped Whether the child asset is equipped into the parent slot
+     * @return isEquipped Boolean value signifying whether the child asset is equipped into the parent slot or not
      */
     function isAssetEquipped(
         address parentAddress,

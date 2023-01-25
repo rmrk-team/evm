@@ -34,11 +34,11 @@ contract RMRKNestableRenderUtils {
     }
 
     /**
-     * @notice Get's the contract address and ID of the parent of a child token.
+     * @notice Used to retrieve the contract address and ID of the parent token of the specified child token.
      * @dev Reverts if child token is not owned by an NFT.
-     * @param childAddress Address of the child contract
+     * @param childAddress Address of the child token's collection smart contract
      * @param childId ID of the child token
-     * @return parentAddress Address of the parent contract
+     * @return parentAddress Address of the parent token's collection smart contract
      * @return parentId ID of the parent token
      */
     function getParent(
