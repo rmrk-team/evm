@@ -60,7 +60,7 @@ function getChildIndex(address parentAddress, uint256 parentId, address childAdd
 function getParent(address childAddress, uint256 childId) external view returns (address parentAddress, uint256 parentId)
 ```
 
-Get&#39;s the contract address and ID of the parent of a child token.
+Used to retrieve the contract address and ID of the parent token of the specified child token.
 
 *Reverts if child token is not owned by an NFT.*
 
@@ -68,14 +68,14 @@ Get&#39;s the contract address and ID of the parent of a child token.
 
 | Name | Type | Description |
 |---|---|---|
-| childAddress | address | Address of the child contract |
+| childAddress | address | Address of the child token&#39;s collection smart contract |
 | childId | uint256 | ID of the child token |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| parentAddress | address | Address of the parent contract |
+| parentAddress | address | Address of the parent token&#39;s collection smart contract |
 | parentId | uint256 | ID of the parent token |
 
 

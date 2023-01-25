@@ -65,7 +65,7 @@ function getAllEquippableSlotsFromParent(address targetChild, uint256 childId, b
 
 Used to get the child&#39;s assets and slot parts pairs, identifying parts the said assets can be equipped into, for all of parent&#39;s assets.
 
-*Reverts if child token is not owned by an NFT.The full `EquippableData` struct looks like this:  [      slotPartId      childAssetId      parentAssetId      priority      parentCatalogAddress      isEquipped      partMetadata  ]*
+*Reverts if child token is not owned by an NFT.The full `EquippableData` struct looks like this:  [      slotPartId,      childAssetId,      parentAssetId,      priority,      parentCatalogAddress,      isEquipped,      partMetadata  ]*
 
 #### Parameters
 
@@ -73,7 +73,7 @@ Used to get the child&#39;s assets and slot parts pairs, identifying parts the s
 |---|---|---|
 | targetChild | address | Address of the smart contract of the given token |
 | childId | uint256 | ID of the child token whose assets will be matched against parent&#39;s slot parts |
-| onlyEquipped | bool | Whether to return only the assets that are currently equipped |
+| onlyEquipped | bool | Boolean value signifying whether to only return the assets that are currently equipped (`true`) or to include the non-equipped ones as well (`false`) |
 
 #### Returns
 
@@ -163,7 +163,7 @@ function getEquippableSlotsFromParent(address targetChild, uint256 childId, uint
 
 Used to get the child&#39;s assets and slot parts pairs, identifying parts the said assets can be equipped into, for a specific parent asset.
 
-*Reverts if child token is not owned by an NFT.The full `EquippableData` struct looks like this:  [      slotPartId      childAssetId      parentAssetId      priority      parentCatalogAddress      isEquipped      partMetadata  ]*
+*Reverts if child token is not owned by an NFT.The full `EquippableData` struct looks like this:  [      slotPartId,      childAssetId,      parentAssetId,      priority,      parentCatalogAddress,      isEquipped,      partMetadata  ]*
 
 #### Parameters
 
@@ -328,7 +328,7 @@ Used to get a list of existing token IDs in the range between `pageStart` and `p
 function getParent(address childAddress, uint256 childId) external view returns (address parentAddress, uint256 parentId)
 ```
 
-Get&#39;s the contract address and ID of the parent of a child token.
+Used to retrieve the contract address and ID of the parent token of the specified child token.
 
 *Reverts if child token is not owned by an NFT.*
 
@@ -336,14 +336,14 @@ Get&#39;s the contract address and ID of the parent of a child token.
 
 | Name | Type | Description |
 |---|---|---|
-| childAddress | address | Address of the child contract |
+| childAddress | address | Address of the child token&#39;s collection smart contract |
 | childId | uint256 | ID of the child token |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| parentAddress | address | Address of the parent contract |
+| parentAddress | address | Address of the parent token&#39;s collection smart contract |
 | parentId | uint256 | ID of the parent token |
 
 ### getPendingAssets
@@ -445,7 +445,7 @@ Used to retrieve the metadata URI of the specified token&#39;s asset with the hi
 function isAssetEquipped(address parentAddress, uint256 parentId, address parentAssetCatalog, address childAddress, uint256 childId, uint64 childAssetId, uint64 slotPartId) external view returns (bool isEquipped)
 ```
 
-Used to get whether a given child asset is equipped into a given parent slot
+Used to verify whether a given child asset is equipped into a given parent slot.
 
 
 
@@ -455,7 +455,7 @@ Used to get whether a given child asset is equipped into a given parent slot
 |---|---|---|
 | parentAddress | address | Address of the collection smart contract of the parent token |
 | parentId | uint256 | ID of the parent token |
-| parentAssetCatalog | address | Address of the catalog from the parent asset |
+| parentAssetCatalog | address | Address of the catalog the parent asset belongs to |
 | childAddress | address | Address of the collection smart contract of the child token |
 | childId | uint256 | ID of the child token |
 | childAssetId | uint64 | ID of the child asset |
@@ -465,7 +465,7 @@ Used to get whether a given child asset is equipped into a given parent slot
 
 | Name | Type | Description |
 |---|---|---|
-| isEquipped | bool | Whether the child asset is equipped into the parent slot |
+| isEquipped | bool | Boolean value signifying whether the child asset is equipped into the parent slot or not |
 
 ### splitSlotAndFixedParts
 
