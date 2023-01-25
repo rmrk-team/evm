@@ -76,7 +76,7 @@ abstract contract RMRKEmoteTracker is IRMRKEmoteTracker {
 
     /**
      * @notice Hook that is called after emote is added or removed.
-     * @param collection Address of the collection containing the token being emoted
+     * @param collection Address of the collection smart contract containing the token being emoted
      * @param tokenId ID of the token being emoted
      * @param emoji Unicode identifier of the emoji
      * @param state Boolean value signifying whether to emote (`true`) or undo (`false`) emote
