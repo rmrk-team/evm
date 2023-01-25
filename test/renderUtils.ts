@@ -501,7 +501,7 @@ describe('Advanced Equip Render Utils', async function () {
     ).to.be.revertedWithCustomError(renderUtilsEquip, 'RMRKUnexpectedParent');
   });
 
-  it('succeds checking expected parent if parent is the expected one', async function () {
+  it('succeeds checking expected parent if parent is the expected one', async function () {
     await expect(
       renderUtilsEquip.checkExpectedParent(gem.address, gemId1, kanaria.address, kanariaId),
     ).to.not.be.reverted;
