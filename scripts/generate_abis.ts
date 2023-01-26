@@ -13,6 +13,7 @@ const getTheAbi = () => {
       if (!dirExists) {
         fs.mkdirSync(`${process.cwd()}/artifacts/abis`);
         fs.mkdirSync(`${process.cwd()}/artifacts/abis/implementations`);
+        fs.mkdirSync(`${process.cwd()}/artifacts/abis/implementations/nativeTokenPay`);
         fs.mkdirSync(`${process.cwd()}/artifacts/abis/implementations/abstracts`);
         fs.mkdirSync(`${process.cwd()}/artifacts/abis/implementations/erc20Pay`);
         fs.mkdirSync(`${process.cwd()}/artifacts/abis/implementations/premint`);

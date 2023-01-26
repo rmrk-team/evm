@@ -799,7 +799,6 @@ contract RMRKEquipRenderUtils is
         slotParts = new EquippedSlotPart[](slotPartIds.length);
         uint256 len = slotPartIds.length;
 
-        // TODO: is this check really needed?
         if (len != 0) {
             string memory metadata;
             IRMRKCatalog.Part[] memory catalogSlotParts = IRMRKCatalog(
