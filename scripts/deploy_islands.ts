@@ -3,56 +3,56 @@ import { ethers } from 'hardhat';
 
 const resourcesIslands = {
   '1': [
-    'https://rmrk.mypinata.cloud/ipfs/QmU6kDauEkhfenxNUDHMM52JXXuCSxAM5cwhdPgb43KP98/FloatingIslands(0)_0.png',
-    'https://rmrk.mypinata.cloud/ipfs/QmU6kDauEkhfenxNUDHMM52JXXuCSxAM5cwhdPgb43KP98/FloatingIslands(0)_1.png',
+    'https://nftstorage.link/ipfs/QmU6kDauEkhfenxNUDHMM52JXXuCSxAM5cwhdPgb43KP98/FloatingIslands(0)_0.png',
+    'https://nftstorage.link/ipfs/QmU6kDauEkhfenxNUDHMM52JXXuCSxAM5cwhdPgb43KP98/FloatingIslands(0)_1.png',
   ],
   '2': [
-    'https://rmrk.mypinata.cloud/ipfs/QmU6kDauEkhfenxNUDHMM52JXXuCSxAM5cwhdPgb43KP98/FloatingIslands(1)_0.png',
-    'https://rmrk.mypinata.cloud/ipfs/QmU6kDauEkhfenxNUDHMM52JXXuCSxAM5cwhdPgb43KP98/FloatingIslands(1)_1.png',
+    'https://nftstorage.link/ipfs/QmU6kDauEkhfenxNUDHMM52JXXuCSxAM5cwhdPgb43KP98/FloatingIslands(1)_0.png',
+    'https://nftstorage.link/ipfs/QmU6kDauEkhfenxNUDHMM52JXXuCSxAM5cwhdPgb43KP98/FloatingIslands(1)_1.png',
   ],
   '3': [
-    'https://rmrk.mypinata.cloud/ipfs/QmU6kDauEkhfenxNUDHMM52JXXuCSxAM5cwhdPgb43KP98/FloatingIslands(2)_0.png',
-    'https://rmrk.mypinata.cloud/ipfs/QmU6kDauEkhfenxNUDHMM52JXXuCSxAM5cwhdPgb43KP98/FloatingIslands(2)_1.png',
+    'https://nftstorage.link/ipfs/QmU6kDauEkhfenxNUDHMM52JXXuCSxAM5cwhdPgb43KP98/FloatingIslands(2)_0.png',
+    'https://nftstorage.link/ipfs/QmU6kDauEkhfenxNUDHMM52JXXuCSxAM5cwhdPgb43KP98/FloatingIslands(2)_1.png',
   ],
   '4': [
-    'https://rmrk.mypinata.cloud/ipfs/QmU6kDauEkhfenxNUDHMM52JXXuCSxAM5cwhdPgb43KP98/FloatingIslands(3)_0.png',
-    'https://rmrk.mypinata.cloud/ipfs/QmU6kDauEkhfenxNUDHMM52JXXuCSxAM5cwhdPgb43KP98/FloatingIslands(3)_1.png',
+    'https://nftstorage.link/ipfs/QmU6kDauEkhfenxNUDHMM52JXXuCSxAM5cwhdPgb43KP98/FloatingIslands(3)_0.png',
+    'https://nftstorage.link/ipfs/QmU6kDauEkhfenxNUDHMM52JXXuCSxAM5cwhdPgb43KP98/FloatingIslands(3)_1.png',
   ],
   '5': [
-    'https://rmrk.mypinata.cloud/ipfs/QmU6kDauEkhfenxNUDHMM52JXXuCSxAM5cwhdPgb43KP98/FloatingIslands(3)_2.png',
+    'https://nftstorage.link/ipfs/QmU6kDauEkhfenxNUDHMM52JXXuCSxAM5cwhdPgb43KP98/FloatingIslands(3)_2.png',
   ],
   '6': [
-    'https://rmrk.mypinata.cloud/ipfs/QmU6kDauEkhfenxNUDHMM52JXXuCSxAM5cwhdPgb43KP98/FloatingIslands(3)_3.png',
+    'https://nftstorage.link/ipfs/QmU6kDauEkhfenxNUDHMM52JXXuCSxAM5cwhdPgb43KP98/FloatingIslands(3)_3.png',
   ],
   '7': [
-    'https://rmrk.mypinata.cloud/ipfs/QmU6kDauEkhfenxNUDHMM52JXXuCSxAM5cwhdPgb43KP98/FloatingIslands(3)_4.png',
+    'https://nftstorage.link/ipfs/QmU6kDauEkhfenxNUDHMM52JXXuCSxAM5cwhdPgb43KP98/FloatingIslands(3)_4.png',
   ],
   '8': [
-    'https://rmrk.mypinata.cloud/ipfs/QmU6kDauEkhfenxNUDHMM52JXXuCSxAM5cwhdPgb43KP98/FloatingIslands(3)_5.png',
+    'https://nftstorage.link/ipfs/QmU6kDauEkhfenxNUDHMM52JXXuCSxAM5cwhdPgb43KP98/FloatingIslands(3)_5.png',
   ],
   '9': [
-    'https://rmrk.mypinata.cloud/ipfs/QmU6kDauEkhfenxNUDHMM52JXXuCSxAM5cwhdPgb43KP98/FloatingIslands(3)_6.png',
+    'https://nftstorage.link/ipfs/QmU6kDauEkhfenxNUDHMM52JXXuCSxAM5cwhdPgb43KP98/FloatingIslands(3)_6.png',
   ],
   '10': [
-    'https://rmrk.mypinata.cloud/ipfs/QmU6kDauEkhfenxNUDHMM52JXXuCSxAM5cwhdPgb43KP98/FloatingIslands(3)_7.png',
+    'https://nftstorage.link/ipfs/QmU6kDauEkhfenxNUDHMM52JXXuCSxAM5cwhdPgb43KP98/FloatingIslands(3)_7.png',
   ],
 };
 const resourcesTime = {
   '1': [
-    'https://rmrk.mypinata.cloud/ipfs/QmU6kDauEkhfenxNUDHMM52JXXuCSxAM5cwhdPgb43KP98/TimeToAnim(0)_0.png',
-    'https://rmrk.mypinata.cloud/ipfs/QmU6kDauEkhfenxNUDHMM52JXXuCSxAM5cwhdPgb43KP98/TimeToAnim(0)_1.png',
+    'https://nftstorage.link/ipfs/QmU6kDauEkhfenxNUDHMM52JXXuCSxAM5cwhdPgb43KP98/TimeToAnim(0)_0.png',
+    'https://nftstorage.link/ipfs/QmU6kDauEkhfenxNUDHMM52JXXuCSxAM5cwhdPgb43KP98/TimeToAnim(0)_1.png',
   ],
   '2': [
-    'https://rmrk.mypinata.cloud/ipfs/QmU6kDauEkhfenxNUDHMM52JXXuCSxAM5cwhdPgb43KP98/TimeToAnim(1)_0.png',
-    'https://rmrk.mypinata.cloud/ipfs/QmU6kDauEkhfenxNUDHMM52JXXuCSxAM5cwhdPgb43KP98/TimeToAnim(1)_1.png',
+    'https://nftstorage.link/ipfs/QmU6kDauEkhfenxNUDHMM52JXXuCSxAM5cwhdPgb43KP98/TimeToAnim(1)_0.png',
+    'https://nftstorage.link/ipfs/QmU6kDauEkhfenxNUDHMM52JXXuCSxAM5cwhdPgb43KP98/TimeToAnim(1)_1.png',
   ],
   '3': [
-    'https://rmrk.mypinata.cloud/ipfs/QmU6kDauEkhfenxNUDHMM52JXXuCSxAM5cwhdPgb43KP98/TimeToAnim(2)_0.png',
-    'https://rmrk.mypinata.cloud/ipfs/QmU6kDauEkhfenxNUDHMM52JXXuCSxAM5cwhdPgb43KP98/TimeToAnim(2)_1.png',
+    'https://nftstorage.link/ipfs/QmU6kDauEkhfenxNUDHMM52JXXuCSxAM5cwhdPgb43KP98/TimeToAnim(2)_0.png',
+    'https://nftstorage.link/ipfs/QmU6kDauEkhfenxNUDHMM52JXXuCSxAM5cwhdPgb43KP98/TimeToAnim(2)_1.png',
   ],
   '4': [
-    'https://rmrk.mypinata.cloud/ipfs/QmU6kDauEkhfenxNUDHMM52JXXuCSxAM5cwhdPgb43KP98/TimeToAnim(3)_0.png',
-    'https://rmrk.mypinata.cloud/ipfs/QmU6kDauEkhfenxNUDHMM52JXXuCSxAM5cwhdPgb43KP98/TimeToAnim(3)_1.png',
+    'https://nftstorage.link/ipfs/QmU6kDauEkhfenxNUDHMM52JXXuCSxAM5cwhdPgb43KP98/TimeToAnim(3)_0.png',
+    'https://nftstorage.link/ipfs/QmU6kDauEkhfenxNUDHMM52JXXuCSxAM5cwhdPgb43KP98/TimeToAnim(3)_1.png',
   ],
 };
 
