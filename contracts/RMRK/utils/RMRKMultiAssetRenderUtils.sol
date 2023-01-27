@@ -209,4 +209,35 @@ contract RMRKMultiAssetRenderUtils {
         }
         return (maxPriorityAssetId, maxPriority);
     }
+
+    /**
+     * @notice Used to retrieve ID, priority value and metadata URI of the asset with the highest priority that is
+     *  present on a specified token.
+     * @param target Collection smart contract of the token for which to retireve the top asset
+     * @param tokenId ID of the token for which to retrieve the top asset
+     * @return topAssetId ID of the asset with the highest priority
+     * @return topAssetPriority Priotity value of the asset with the highest priority
+     * @return topAssetMetadata Metadata URI of the asset with the highest priority
+     */
+    function getTopAsset(
+        address target,
+        uint256 tokenId
+    )
+        public
+        view
+        returns (
+            uint64 topAssetId,
+            uint16 topAssetPriority,
+            string memory topAssetMetadata
+        )
+    {
+        (topAssetId, topAssetPriority) = getAssetIdWithTopPriority(
+            target,
+            tokenId
+        );
+        topAssetMetadata = IRMRKMultiAsset(target).getAssetMetadata(
+            tokenId,
+            topAssetId
+        );
+    }
 }
