@@ -35,8 +35,8 @@ contract RMRKCatalog is IRMRKCatalog {
      * @param type_ Type of Catalog
      */
     constructor(string memory metadataURI, string memory type_) {
-        _metadataURI = metadataURI;
-        _type = type_;
+        _setMetadataURI(metadataURI);
+        _setType(type_);
     }
 
     /**
@@ -79,6 +79,22 @@ contract RMRKCatalog is IRMRKCatalog {
      */
     function getType() external view returns (string memory) {
         return _type;
+    }
+
+    /**
+     * @notice Internal helper function that sets the base metadata URI of the contract.
+     * @param metadataURI Base metadata URI of the contract
+     */
+    function _setMetadataURI(string memory metadataURI) internal {
+        _metadataURI = metadataURI;
+    }
+
+    /**
+     * @notice Internal helper function that sets the type of the contract.
+     * @param type_ Type of the contract
+     */
+    function _setType(string memory type_) internal {
+        _type = type_;
     }
 
     /**
