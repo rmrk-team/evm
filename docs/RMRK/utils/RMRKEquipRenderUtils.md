@@ -393,6 +393,31 @@ Used to retrieve the parent address and its slot part IDs for a given target chi
 |---|---|---|
 | parentSlotPartIds | uint64[] | Array of slot part IDs of the parent token&#39;s asset |
 
+### getTopAsset
+
+```solidity
+function getTopAsset(address target, uint256 tokenId) external view returns (uint64 topAssetId, uint16 topAssetPriority, string topAssetMetadata)
+```
+
+Used to retrieve ID, priority value and metadata URI of the asset with the highest priority that is  present on a specified token.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| target | address | Collection smart contract of the token for which to retireve the top asset |
+| tokenId | uint256 | ID of the token for which to retrieve the top asset |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| topAssetId | uint64 | ID of the asset with the highest priority |
+| topAssetPriority | uint16 | Priotity value of the asset with the highest priority |
+| topAssetMetadata | string | Metadata URI of the asset with the highest priority |
+
 ### getTopAssetAndEquippableDataForToken
 
 ```solidity

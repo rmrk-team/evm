@@ -15,6 +15,7 @@ import { RMRKNestableMock } from '../typechain-types';
 import { RMRKNestableMultiAssetMock } from '../typechain-types';
 import { RMRKSoulboundNestableMock } from '../typechain-types';
 import { RMRKMultiAssetImplPreMint } from '../typechain-types';
+import { connected } from 'process';
 
 // --------------- FIXTURES -----------------------
 
@@ -196,6 +197,14 @@ describe('MultiAsset and Equip Render Utils', async function () {
       expect(await renderUtils.getTopAssetMetaForToken(equip.address, tokenId)).to.eql(
         'ipfs://res1.jpg',
       );
+    });
+
+    it('can get full top asset data', async function () {
+      expect(await renderUtils.getTopAsset(equip.address, tokenId)).to.eql([
+        resId2,
+        5,
+        'ipfs://res2.jpg',
+      ]);
     });
 
     it('cannot get active assets if token has no assets', async function () {
