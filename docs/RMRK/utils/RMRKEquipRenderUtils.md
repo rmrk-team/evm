@@ -60,7 +60,7 @@ Used to compose the given equippables.
 ### getAllEquippableSlotsFromParent
 
 ```solidity
-function getAllEquippableSlotsFromParent(address targetChild, uint256 childId, bool onlyEquipped) external view returns (uint256 childIndex, struct RMRKEquipRenderUtils.EquippableData[] assetsWithSlots)
+function getAllEquippableSlotsFromParent(address targetChild, uint256 childId, bool onlyEquipped) external view returns (uint256 childIndex, struct RMRKEquipRenderUtils.EquippableData[] equippableData)
 ```
 
 Used to get the child&#39;s assets and slot parts pairs, identifying parts the said assets can be equipped into, for all of parent&#39;s assets.
@@ -80,7 +80,7 @@ Used to get the child&#39;s assets and slot parts pairs, identifying parts the s
 | Name | Type | Description |
 |---|---|---|
 | childIndex | uint256 | Index of the child in the parent&#39;s list of active children |
-| assetsWithSlots | RMRKEquipRenderUtils.EquippableData[] | An array of `EquippableData` structs containing info about the equippable child assets and their corresponding slot parts |
+| equippableData | RMRKEquipRenderUtils.EquippableData[] | An array of `EquippableData` structs containing info about the equippable child assets and their corresponding slot parts |
 
 ### getAssetIdWithTopPriority
 
@@ -158,7 +158,7 @@ function getChildIndex(address parentAddress, uint256 parentId, address childAdd
 ### getEquippableSlotsFromParent
 
 ```solidity
-function getEquippableSlotsFromParent(address targetChild, uint256 childId, uint64 parentAssetId) external view returns (uint256 childIndex, struct RMRKEquipRenderUtils.EquippableData[] assetsWithSlots)
+function getEquippableSlotsFromParent(address targetChild, uint256 childId, uint64 parentAssetId) external view returns (uint256 childIndex, struct RMRKEquipRenderUtils.EquippableData[] equippableData)
 ```
 
 Used to get the child&#39;s assets and slot parts pairs, identifying parts the said assets can be equipped into, for a specific parent asset.
@@ -178,7 +178,7 @@ Used to get the child&#39;s assets and slot parts pairs, identifying parts the s
 | Name | Type | Description |
 |---|---|---|
 | childIndex | uint256 | Index of the child in the parent&#39;s list of active children |
-| assetsWithSlots | RMRKEquipRenderUtils.EquippableData[] | An array of `EquippableData` structs containing info about the equippable child assets and their corresponding slot parts |
+| equippableData | RMRKEquipRenderUtils.EquippableData[] | An array of `EquippableData` structs containing info about the equippable child assets and their corresponding slot parts |
 
 ### getEquipped
 
