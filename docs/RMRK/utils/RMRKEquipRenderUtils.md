@@ -163,7 +163,7 @@ function getEquippableSlotsFromParent(address targetChild, uint256 childId, uint
 
 Used to get the child&#39;s assets and slot parts pairs, identifying parts the said assets can be equipped into, for a specific parent asset.
 
-*Reverts if child token is not owned by an NFT.The full `EquippableData` struct looks like this:  [      slotPartId,      childAssetId,      parentAssetId,      priority,      parentCatalogAddress,      isEquipped,      partMetadata  ]*
+*Reverts if child token is not owned by an NFT.The full `EquippableData` struct looks like this:  [      slotPartId,      childAssetId,      parentAssetId,      priority,      parentCatalogAddress,      isEquipped,      partMetadata,      childMetadata,      parentMetadata  ]*
 
 #### Parameters
 
