@@ -345,7 +345,7 @@ describe('Advanced Equip Render Utils', async function () {
     ).to.eql([
       bn(0), // child Index
       [
-        // [Slot Id, asset Id, Asset priority]
+        // [Slot Id, asset Id, Asset priority, catalog address, isEquipped, partMetadata, childMetadata, parentMetadata]
         [
           bn(slotIdGemRight),
           bn(assetForGemARight),
@@ -354,6 +354,8 @@ describe('Advanced Equip Render Utils', async function () {
           catalog.address,
           false,
           'ipfs://metadataSlotGemRight',
+          'ipfs://gems/typeA/right.svg',
+          'ipfs://kanaria/full.svg',
         ],
         [
           bn(slotIdGemMid),
@@ -363,6 +365,8 @@ describe('Advanced Equip Render Utils', async function () {
           catalog.address,
           false,
           'ipfs://metadataSlotGemMid',
+          'ipfs://gems/typeA/mid.svg',
+          'ipfs://kanaria/full.svg',
         ],
         [
           bn(slotIdGemLeft),
@@ -372,6 +376,8 @@ describe('Advanced Equip Render Utils', async function () {
           catalog.address,
           true,
           'ipfs://metadataSlotGemLeft',
+          'ipfs://gems/typeA/left.svg',
+          'ipfs://kanaria/full.svg',
         ],
       ],
     ]);
@@ -380,7 +386,7 @@ describe('Advanced Equip Render Utils', async function () {
     ).to.eql([
       bn(1), // child Index
       [
-        // [Slot Id, asset Id, Asset priority]
+        // [Slot Id, asset Id, Asset priority, catalog address, isEquipped, partMetadata, childMetadata, parentMetadata]
         [
           bn(slotIdGemRight),
           bn(assetForGemARight),
@@ -389,6 +395,8 @@ describe('Advanced Equip Render Utils', async function () {
           catalog.address,
           false,
           'ipfs://metadataSlotGemRight',
+          'ipfs://gems/typeA/right.svg',
+          'ipfs://kanaria/full.svg',
         ],
         [
           bn(slotIdGemMid),
@@ -398,6 +406,8 @@ describe('Advanced Equip Render Utils', async function () {
           catalog.address,
           true,
           'ipfs://metadataSlotGemMid',
+          'ipfs://gems/typeA/mid.svg',
+          'ipfs://kanaria/full.svg',
         ],
         [
           bn(slotIdGemLeft),
@@ -407,6 +417,8 @@ describe('Advanced Equip Render Utils', async function () {
           catalog.address,
           false,
           'ipfs://metadataSlotGemLeft',
+          'ipfs://gems/typeA/left.svg',
+          'ipfs://kanaria/full.svg',
         ],
       ],
     ]);
@@ -416,7 +428,7 @@ describe('Advanced Equip Render Utils', async function () {
     ).to.eql([
       bn(2), // child Index
       [
-        // [Slot Id, asset Id, Asset priority]
+        // [Slot Id, asset Id, Asset priority, catalog address, isEquipped, partMetadata, childMetadata, parentMetadata]
         [
           bn(slotIdGemRight),
           bn(assetForGemBRight),
@@ -425,6 +437,8 @@ describe('Advanced Equip Render Utils', async function () {
           catalog.address,
           true,
           'ipfs://metadataSlotGemRight',
+          'ipfs://gems/typeB/right.svg',
+          'ipfs://kanaria/full.svg',
         ],
         [
           bn(slotIdGemMid),
@@ -434,6 +448,8 @@ describe('Advanced Equip Render Utils', async function () {
           catalog.address,
           false,
           'ipfs://metadataSlotGemMid',
+          'ipfs://gems/typeB/mid.svg',
+          'ipfs://kanaria/full.svg',
         ],
         [
           bn(slotIdGemLeft),
@@ -443,6 +459,8 @@ describe('Advanced Equip Render Utils', async function () {
           catalog.address,
           false,
           'ipfs://metadataSlotGemLeft',
+          'ipfs://gems/typeB/left.svg',
+          'ipfs://kanaria/full.svg',
         ],
       ],
     ]);
@@ -453,7 +471,7 @@ describe('Advanced Equip Render Utils', async function () {
     ).to.eql([
       bn(2), // child Index
       [
-        // [Slot Id, asset Id, Asset priority]
+        // [Slot Id, asset Id, Asset priority, catalog address, isEquipped, partMetadata, childMetadata, parentMetadata]
         [
           bn(slotIdGemRight),
           bn(assetForGemBRight),
@@ -462,6 +480,8 @@ describe('Advanced Equip Render Utils', async function () {
           catalog.address,
           true,
           'ipfs://metadataSlotGemRight',
+          'ipfs://gems/typeB/right.svg',
+          'ipfs://kanaria/full.svg',
         ],
       ],
     ]);
