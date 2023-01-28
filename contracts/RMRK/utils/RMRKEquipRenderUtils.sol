@@ -103,6 +103,8 @@ contract RMRKEquipRenderUtils is
      * @return parentCatalogAddress Catalog address of the parent asset
      * @return isEquipped Whether the asset is currently equipped into the slot part or not
      * @return partMetadata Metadata URI of the given slot part
+     * @return childMetadata Metadata URI of the child asset
+     * @return parentMetadata Metadata URI of the parent asset
      */
     struct EquippableData {
         uint64 slotPartId;
@@ -112,6 +114,8 @@ contract RMRKEquipRenderUtils is
         address parentCatalogAddress;
         bool isEquipped;
         string partMetadata;
+        string childMetadata;
+        string parentMetadata;
     }
 
     /**
@@ -489,7 +493,9 @@ contract RMRKEquipRenderUtils is
      *      priority,
      *      parentCatalogAddress,
      *      isEquipped,
-     *      partMetadata
+     *      partMetadata,
+     *      childMetadata,
+     *      parentMetadata
      *  ]
      * @param targetChild Address of the smart contract of the given token
      * @param childId ID of the child token whose assets will be matched against parent's slot parts
@@ -537,7 +543,9 @@ contract RMRKEquipRenderUtils is
      *       priority
      *       parentCatalogAddress
      *       isEquipped
-     *       partMetadata
+     *       partMetadata,
+     *      childMetadata,
+     *      parentMetadata
      *  ]
      * @param childAddress Address of the smart contract of the given token
      * @param childId ID of the child token whose assets will be matched against parent's slot parts
@@ -570,7 +578,7 @@ contract RMRKEquipRenderUtils is
                 parentSlotPartIds,
                 parentAddress
             );
-
+        // TODO: rename assetWithSlots to equippableData
         // Finally, we copy the matches into the final array which has the right lenght according to results
         assetsWithSlots = new EquippableData[](totalMatches);
         for (uint256 i; i < totalMatches; ) {
@@ -591,6 +599,10 @@ contract RMRKEquipRenderUtils is
                 .metadataURI;
             assetsWithSlots[i].parentAssetId = parentAssetId;
             assetsWithSlots[i].parentCatalogAddress = parentAssetCatalog;
+            assetsWithSlots[i].childMetadata = IRMRKMultiAsset(childAddress)
+                .getAssetMetadata(childId, tempAssetsWithSlots[i].childAssetId);
+            assetsWithSlots[i].parentMetadata = IRMRKMultiAsset(parentAddress)
+                .getAssetMetadata(parentId, parentAssetId);
             unchecked {
                 ++i;
             }
