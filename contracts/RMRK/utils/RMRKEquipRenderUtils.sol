@@ -103,6 +103,8 @@ contract RMRKEquipRenderUtils is
      * @return parentCatalogAddress Catalog address of the parent asset
      * @return isEquipped Whether the asset is currently equipped into the slot part or not
      * @return partMetadata Metadata URI of the given slot part
+     * @return childAssetMetadata Metadata URI of the child asset
+     * @return parentAssetMetadata Metadata URI of the parent asset
      */
     struct EquippableData {
         uint64 slotPartId;
@@ -112,6 +114,8 @@ contract RMRKEquipRenderUtils is
         address parentCatalogAddress;
         bool isEquipped;
         string partMetadata;
+        string childAssetMetadata;
+        string parentAssetMetadata;
     }
 
     /**
@@ -398,7 +402,7 @@ contract RMRKEquipRenderUtils is
      * @param childId ID of the child token whose assets will be matched against parent's slot parts
      * @param onlyEquipped Boolean value signifying whether to only return the assets that are currently equipped (`true`) or to include the non-equipped ones as well (`false`)
      * @return childIndex Index of the child in the parent's list of active children
-     * @return assetsWithSlots An array of `EquippableData` structs containing info about the equippable child assets and their corresponding slot parts
+     * @return equippableData An array of `EquippableData` structs containing info about the equippable child assets and their corresponding slot parts
      */
     function getAllEquippableSlotsFromParent(
         address targetChild,
@@ -407,7 +411,7 @@ contract RMRKEquipRenderUtils is
     )
         public
         view
-        returns (uint256 childIndex, EquippableData[] memory assetsWithSlots)
+        returns (uint256 childIndex, EquippableData[] memory equippableData)
     {
         (address parentAddress, uint256 parentId) = getParent(
             targetChild,
@@ -462,9 +466,9 @@ contract RMRKEquipRenderUtils is
             }
         }
 
-        assetsWithSlots = new EquippableData[](totalMatchesForAll);
+        equippableData = new EquippableData[](totalMatchesForAll);
         for (uint256 i; i < totalMatchesForAll; ) {
-            assetsWithSlots[i] = allTempAssetsWithSlots[i];
+            equippableData[i] = allTempAssetsWithSlots[i];
             unchecked {
                 ++i;
             }
@@ -489,13 +493,15 @@ contract RMRKEquipRenderUtils is
      *      priority,
      *      parentCatalogAddress,
      *      isEquipped,
-     *      partMetadata
+     *      partMetadata,
+     *      childAssetMetadata,
+     *      parentAssetMetadata
      *  ]
      * @param targetChild Address of the smart contract of the given token
      * @param childId ID of the child token whose assets will be matched against parent's slot parts
      * @param parentAssetId ID of the target parent asset to use to equip the child
      * @return childIndex Index of the child in the parent's list of active children
-     * @return assetsWithSlots An array of `EquippableData` structs containing info about the equippable child assets and their corresponding slot parts
+     * @return equippableData An array of `EquippableData` structs containing info about the equippable child assets and their corresponding slot parts
      */
     function getEquippableSlotsFromParent(
         address targetChild,
@@ -504,7 +510,7 @@ contract RMRKEquipRenderUtils is
     )
         public
         view
-        returns (uint256 childIndex, EquippableData[] memory assetsWithSlots)
+        returns (uint256 childIndex, EquippableData[] memory equippableData)
     {
         (address parentAddress, uint256 parentId) = getParent(
             targetChild,
@@ -517,7 +523,7 @@ contract RMRKEquipRenderUtils is
             childId
         );
 
-        assetsWithSlots = _getEquippableSlotsFromParent(
+        equippableData = _getEquippableSlotsFromParent(
             targetChild,
             childId,
             parentAddress,
@@ -537,13 +543,15 @@ contract RMRKEquipRenderUtils is
      *       priority
      *       parentCatalogAddress
      *       isEquipped
-     *       partMetadata
+     *       partMetadata,
+     *       childAssetMetadata,
+     *       parentAssetMetadata
      *  ]
      * @param childAddress Address of the smart contract of the given token
      * @param childId ID of the child token whose assets will be matched against parent's slot parts
      * @param parentAddress Address of the parent smart contract
      * @param parentAssetId ID of the target parent asset to use to equip the child
-     * @return assetsWithSlots An array of `EquippableData` structs containing info about the equippable child assets and their corresponding slot parts
+     * @return equippableData An array of `EquippableData` structs containing info about the equippable child assets and their corresponding slot parts
      */
     function _getEquippableSlotsFromParent(
         address childAddress,
@@ -551,7 +559,7 @@ contract RMRKEquipRenderUtils is
         address parentAddress,
         uint256 parentId,
         uint64 parentAssetId
-    ) private view returns (EquippableData[] memory assetsWithSlots) {
+    ) private view returns (EquippableData[] memory equippableData) {
         uint64[] memory parentSlotPartIds = getSlotParts(
             parentAddress,
             parentId,
@@ -570,14 +578,13 @@ contract RMRKEquipRenderUtils is
                 parentSlotPartIds,
                 parentAddress
             );
-
         // Finally, we copy the matches into the final array which has the right lenght according to results
-        assetsWithSlots = new EquippableData[](totalMatches);
+        equippableData = new EquippableData[](totalMatches);
         for (uint256 i; i < totalMatches; ) {
-            assetsWithSlots[i] = tempAssetsWithSlots[i];
+            equippableData[i] = tempAssetsWithSlots[i];
             // Ideally we would check this directly in the _matchAllAssetsWithSlots function, but we'd get stack too deep error
             // Since that function uses the limit of variables already
-            assetsWithSlots[i].isEquipped = isAssetEquipped(
+            equippableData[i].isEquipped = isAssetEquipped(
                 parentAddress,
                 parentId,
                 parentAssetCatalog,
@@ -586,11 +593,15 @@ contract RMRKEquipRenderUtils is
                 tempAssetsWithSlots[i].childAssetId,
                 tempAssetsWithSlots[i].slotPartId
             );
-            assetsWithSlots[i].partMetadata = IRMRKCatalog(parentAssetCatalog)
+            equippableData[i].partMetadata = IRMRKCatalog(parentAssetCatalog)
                 .getPart(tempAssetsWithSlots[i].slotPartId)
                 .metadataURI;
-            assetsWithSlots[i].parentAssetId = parentAssetId;
-            assetsWithSlots[i].parentCatalogAddress = parentAssetCatalog;
+            equippableData[i].parentAssetId = parentAssetId;
+            equippableData[i].parentCatalogAddress = parentAssetCatalog;
+            equippableData[i].childAssetMetadata = IRMRKMultiAsset(childAddress)
+                .getAssetMetadata(childId, tempAssetsWithSlots[i].childAssetId);
+            equippableData[i].parentAssetMetadata = IRMRKMultiAsset(parentAddress)
+                .getAssetMetadata(parentId, parentAssetId);
             unchecked {
                 ++i;
             }
