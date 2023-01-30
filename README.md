@@ -76,6 +76,18 @@ RMRK Equippable lego composite comes in two configurations: Merged and Split Equ
 designed to handle the full implementation of MultiAsset, Nestable, and Equippable. The latter separates Nestable and
 Equippable with MultiAsset into two mutually dependent contracts to allow for more custom logic in each, if necessary.
 
+#### Quick-start Merged Equippable
+
+1. Deploy the [RMRKEquippable](./contracts/RMRK/equippable/RMRKEquippable.sol). This contract implements minting,
+   burning and asset management logic.
+2. Deploy the [RMRKCatalog](./contracts/RMRK/catalog/RMRKCatalog.sol).
+3. Initialize your catalog parts (fixed and slot). Address of the RMRKCatalog along with the catalog part IDs need to be
+   passed when initializing your assets in RMRKEquippable.
+4. Assign token assets in RMRKEquippable as you would in the MultiAsset above, with the added `ExtendedAsset` params,
+   `equippableRefId` and `catalogAddress`.
+
+#### Quick-start Split Equippable
+
 1. Deploy the [RMRKNestableExternalEquippable](./contracts/RMRK/equippable/RMRKNestableExternalEquip.sol). This contract
    contains core transfer and minting logic.
 2. Deploy the [RMRKExternalEquip](./contracts/RMRK/equippable/RMRKExternalEquip.sol). This contract contains equippable
@@ -86,7 +98,7 @@ Equippable with MultiAsset into two mutually dependent contracts to allow for mo
 4. Deploy [RMRKCatalog](./contracts/RMRK/catalog/RMRKCatalog.sol).
 5. Initialize your catalog parts (fixed and slot). Address of the RMRKCatalog along with the catalog part IDs need to be
    passed when initializing your assets in RMRKExternalEquip.
-6. Assign token assets in RMRKExternalEquippable as you would the in the MultiAsset above, with the added `ExtendedAsset`
+6. Assign token assets in RMRKExternalEquippable as you would in the MultiAsset above, with the added `ExtendedAsset`
    params, `equippableRefId` and `catalogAddress`.
 
 **NOTE: Please be aware that RMRKEquippable is likely very close to the maximum smart contract deployment size allowed
