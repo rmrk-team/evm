@@ -22,7 +22,7 @@ or
 npm -i @rmrk-team/evm-contracts
 ```
 
-Once the dependency is added to your project, simply import the smart contracts you whish to utilize into your own smart
+Once the dependency is added to your project, simply import the smart contracts you wish to utilize into your own smart
 contract.
 
 ## RMRK Legos
@@ -60,7 +60,7 @@ the use of our legos:
 
 1. Deploy like a regular ERC-721 compliant smart contract.
 
-That's it! This contract can recieve and be nested by other instances of RMRKNestable.
+That's it! This contract can receive and be nested by other instances of RMRKNestable.
 
 **NOTE: A smart contract that is only Nestable WILL NOT be compatible with other equippable contracts as a standalone.**
 
@@ -110,7 +110,7 @@ your own, you only need to import the desired interface.
 ## Implementations
 
 In addition to the raw RMRK legos and extensions, this repository also contains implementations of all of them in the
-[`implementations/`](./contracts/implementations/) directory. These implementations are oppinionated and utilize the
+[`implementations/`](./contracts/implementations/) directory. These implementations are opinionated and utilize the
 extensions that we feel provide the most utility for each of the implementations.
 
 <!-- ## Fractional
