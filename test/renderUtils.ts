@@ -345,7 +345,7 @@ describe('Advanced Equip Render Utils', async function () {
     ).to.eql([
       bn(0), // child Index
       [
-        // [Slot Id, asset Id, Asset priority, catalog address, isEquipped, partMetadata, childMetadata, parentMetadata]
+        // [Slot Id, asset Id, Asset priority, catalog address, isEquipped, partMetadata, childAssetMetadata, parentAssetMetadata]
         [
           bn(slotIdGemRight),
           bn(assetForGemARight),
@@ -386,7 +386,7 @@ describe('Advanced Equip Render Utils', async function () {
     ).to.eql([
       bn(1), // child Index
       [
-        // [Slot Id, asset Id, Asset priority, catalog address, isEquipped, partMetadata, childMetadata, parentMetadata]
+        // [Slot Id, asset Id, Asset priority, catalog address, isEquipped, partMetadata, childAssetMetadata, parentAssetMetadata]
         [
           bn(slotIdGemRight),
           bn(assetForGemARight),
@@ -428,7 +428,7 @@ describe('Advanced Equip Render Utils', async function () {
     ).to.eql([
       bn(2), // child Index
       [
-        // [Slot Id, asset Id, Asset priority, catalog address, isEquipped, partMetadata, childMetadata, parentMetadata]
+        // [Slot Id, asset Id, Asset priority, catalog address, isEquipped, partMetadata, childAssetMetadata, parentAssetMetadata]
         [
           bn(slotIdGemRight),
           bn(assetForGemBRight),
@@ -471,7 +471,7 @@ describe('Advanced Equip Render Utils', async function () {
     ).to.eql([
       bn(2), // child Index
       [
-        // [Slot Id, asset Id, Asset priority, catalog address, isEquipped, partMetadata, childMetadata, parentMetadata]
+        // [Slot Id, asset Id, Asset priority, catalog address, isEquipped, partMetadata, childAssetMetadata, parentAssetMetadata]
         [
           bn(slotIdGemRight),
           bn(assetForGemBRight),
