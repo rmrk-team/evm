@@ -103,8 +103,8 @@ contract RMRKEquipRenderUtils is
      * @return parentCatalogAddress Catalog address of the parent asset
      * @return isEquipped Whether the asset is currently equipped into the slot part or not
      * @return partMetadata Metadata URI of the given slot part
-     * @return childMetadata Metadata URI of the child asset
-     * @return parentMetadata Metadata URI of the parent asset
+     * @return childAssetMetadata Metadata URI of the child asset
+     * @return parentAssetMetadata Metadata URI of the parent asset
      */
     struct EquippableData {
         uint64 slotPartId;
@@ -114,8 +114,8 @@ contract RMRKEquipRenderUtils is
         address parentCatalogAddress;
         bool isEquipped;
         string partMetadata;
-        string childMetadata;
-        string parentMetadata;
+        string childAssetMetadata;
+        string parentAssetMetadata;
     }
 
     /**
@@ -494,8 +494,8 @@ contract RMRKEquipRenderUtils is
      *      parentCatalogAddress,
      *      isEquipped,
      *      partMetadata,
-     *      childMetadata,
-     *      parentMetadata
+     *      childAssetMetadata,
+     *      parentAssetMetadata
      *  ]
      * @param targetChild Address of the smart contract of the given token
      * @param childId ID of the child token whose assets will be matched against parent's slot parts
@@ -544,8 +544,8 @@ contract RMRKEquipRenderUtils is
      *       parentCatalogAddress
      *       isEquipped
      *       partMetadata,
-     *      childMetadata,
-     *      parentMetadata
+     *       childAssetMetadata,
+     *       parentAssetMetadata
      *  ]
      * @param childAddress Address of the smart contract of the given token
      * @param childId ID of the child token whose assets will be matched against parent's slot parts
@@ -598,9 +598,9 @@ contract RMRKEquipRenderUtils is
                 .metadataURI;
             equippableData[i].parentAssetId = parentAssetId;
             equippableData[i].parentCatalogAddress = parentAssetCatalog;
-            equippableData[i].childMetadata = IRMRKMultiAsset(childAddress)
+            equippableData[i].childAssetMetadata = IRMRKMultiAsset(childAddress)
                 .getAssetMetadata(childId, tempAssetsWithSlots[i].childAssetId);
-            equippableData[i].parentMetadata = IRMRKMultiAsset(parentAddress)
+            equippableData[i].parentAssetMetadata = IRMRKMultiAsset(parentAddress)
                 .getAssetMetadata(parentId, parentAssetId);
             unchecked {
                 ++i;
