@@ -4,23 +4,19 @@ pragma solidity ^0.8.16;
 
 import "./IRMRKMultiAssetAutoIndex.sol";
 import "../../multiasset/RMRKMultiAsset.sol";
-import "hardhat/console.sol";
 
 contract RMRKMultiAssetAutoIndex is IRMRKMultiAssetAutoIndex, RMRKMultiAsset {
     // Mapping of tokenId to assetId to index on the _pendingAssetIndex array
     mapping(uint256 => mapping(uint256 => uint256)) private _pendingAssetIndex;
 
-    constructor(string memory name_, string memory symbol_)
-        RMRKMultiAsset(name_, symbol_)
-    {}
+    constructor(
+        string memory name_,
+        string memory symbol_
+    ) RMRKMultiAsset(name_, symbol_) {}
 
-    function supportsInterface(bytes4 interfaceId)
-        public
-        view
-        virtual
-        override(IERC165, RMRKMultiAsset)
-        returns (bool)
-    {
+    function supportsInterface(
+        bytes4 interfaceId
+    ) public view virtual override(IERC165, RMRKMultiAsset) returns (bool) {
         return
             interfaceId == type(IRMRKMultiAssetAutoIndex).interfaceId ||
             super.supportsInterface(interfaceId);
@@ -63,7 +59,9 @@ contract RMRKMultiAssetAutoIndex is IRMRKMultiAssetAutoIndex, RMRKMultiAsset {
         } else {
             // Rejected intermediate asset --> update indexes
             uint256 replacingAssetId = pendingAssetsIds[index];
-            _pendingAssetIndex[tokenId][replacingAssetId] = _pendingAssetIndex[tokenId][assetId];
+            _pendingAssetIndex[tokenId][replacingAssetId] = _pendingAssetIndex[
+                tokenId
+            ][assetId];
             delete _pendingAssetIndex[tokenId][assetId];
         }
     }
@@ -89,7 +87,9 @@ contract RMRKMultiAssetAutoIndex is IRMRKMultiAssetAutoIndex, RMRKMultiAsset {
         } else {
             // Rejected intermediate asset --> update indexes
             uint256 replacingAssetId = pendingAssetsIds[index];
-            _pendingAssetIndex[tokenId][replacingAssetId] = _pendingAssetIndex[tokenId][assetId];
+            _pendingAssetIndex[tokenId][replacingAssetId] = _pendingAssetIndex[
+                tokenId
+            ][assetId];
             delete _pendingAssetIndex[tokenId][assetId];
         }
     }
