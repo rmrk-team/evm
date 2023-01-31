@@ -1,11 +1,15 @@
 import { Contract } from 'ethers';
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
-import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
+import { loadFixture, mine } from '@nomicfoundation/hardhat-network-helpers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { bn, mintFromMock, nestMintFromMock } from '../utils';
 import { IERC165, IRMRKSoulbound, IOtherInterface } from '../interfaces';
-import { RMRKSemiSoulboundNestableMock } from '../../typechain-types';
+import {
+  RMRKSoulboundAfterBlockMock,
+  RMRKSoulboundAfterTransactionsMock,
+  RMRKSoulboundPerTokenMock,
+} from '../../typechain-types';
 
 // --------------- FIXTURES -----------------------
 
@@ -106,51 +110,122 @@ describe('RMRKSoulboundNestableExternalEquippableMock', async function () {
   shouldBehaveLikeSoulboundNestable();
 });
 
-describe('RMRKSoulbound exempt', async function () {
-  let token: RMRKSemiSoulboundNestableMock;
+describe('RMRKSoulbound variants', async function () {
   let owner: SignerWithAddress;
   let otherOwner: SignerWithAddress;
 
   beforeEach(async function () {
-    const signers = await ethers.getSigners();
-    owner = signers[0];
-    otherOwner = signers[1];
-    const factory = await ethers.getContractFactory('RMRKSemiSoulboundNestableMock');
-    token = <RMRKSemiSoulboundNestableMock>await factory.deploy('Chunky', 'CHNK');
-    await token.deployed();
+    [owner, otherOwner] = await ethers.getSigners();
   });
 
-  it('can support IRMRKSoulbound', async function () {
-    expect(await token.supportsInterface(IRMRKSoulbound)).to.equal(true);
+  describe('RMRKSoulbound After Blocks', async function () {
+    const blocksToTransfer = 100;
+    let token: RMRKSoulboundAfterBlockMock;
+    let initBlock: number;
+
+    beforeEach(async function () {
+      const factory = await ethers.getContractFactory('RMRKSoulboundAfterBlockMock');
+      initBlock = (await ethers.provider.getBlock('latest')).number;
+      token = <RMRKSoulboundAfterBlockMock>(
+        await factory.deploy('Chunky', 'CHNK', initBlock + blocksToTransfer)
+      );
+      await token.deployed();
+    });
+
+    it('can support IRMRKSoulbound', async function () {
+      expect(await token.supportsInterface(IRMRKSoulbound)).to.equal(true);
+    });
+
+    it('can get last block to transfer', async function () {
+      expect(await token.getLastBlockToTransfer()).to.equal(initBlock + blocksToTransfer);
+    });
+
+    it('can transfer before max block', async function () {
+      await token.mint(owner.address, 1);
+      await token.transferFrom(owner.address, otherOwner.address, 1);
+      expect(await token.ownerOf(1)).to.equal(otherOwner.address);
+    });
+
+    it('cannot transfer after max block', async function () {
+      await token.mint(owner.address, 1);
+      await mine(blocksToTransfer + 1);
+      await expect(
+        token.transferFrom(owner.address, otherOwner.address, 1),
+      ).to.be.revertedWithCustomError(token, 'RMRKCannotTransferSoulbound');
+    });
   });
 
-  it('can transfer if soulbound exempt', async function () {
-    const tokenId = await mintFromMock(token, owner.address);
-    await token.setSoulboundExempt(tokenId);
+  describe('RMRKSoulbound After Transactions', async function () {
+    const maxTransactions = 2;
+    let token: RMRKSoulboundAfterTransactionsMock;
 
-    await token.transfer(otherOwner.address, tokenId);
-    expect(await token.ownerOf(tokenId)).eql(otherOwner.address);
+    beforeEach(async function () {
+      const factory = await ethers.getContractFactory('RMRKSoulboundAfterTransactionsMock');
+      token = <RMRKSoulboundAfterTransactionsMock>(
+        await factory.deploy('Chunky', 'CHNK', maxTransactions)
+      );
+      await token.deployed();
+    });
+
+    it('can support IRMRKSoulbound', async function () {
+      expect(await token.supportsInterface(IRMRKSoulbound)).to.equal(true);
+    });
+
+    it('does not support other interfaces', async function () {
+      expect(await token.supportsInterface(IOtherInterface)).to.equal(false);
+    });
+
+    it('can transfer token only 2 times', async function () {
+      await token.mint(owner.address, 1);
+      await token.transferFrom(owner.address, otherOwner.address, 1);
+      await token.connect(otherOwner).transferFrom(otherOwner.address, owner.address, 1);
+      expect(await token.getTransfersPerToken(1)).to.equal(bn(2));
+      expect(await token.getMaxNumberOfTransfers()).to.equal(bn(2));
+
+      await expect(
+        token.transferFrom(owner.address, otherOwner.address, 1),
+      ).to.be.revertedWithCustomError(token, 'RMRKCannotTransferSoulbound');
+    });
   });
 
-  it('can nest transfer if soulbound exempt', async function () {
-    const tokenId = await mintFromMock(token, owner.address);
-    const otherTokenId = await mintFromMock(token, owner.address);
-    await token.setSoulboundExempt(tokenId);
+  describe('RMRKSoulbound Per token', async function () {
+    let token: RMRKSoulboundPerTokenMock;
 
-    await token.connect(owner).nestTransfer(token.address, tokenId, otherTokenId);
-    expect(await token.directOwnerOf(tokenId)).eql([token.address, bn(otherTokenId), true]);
-  });
+    beforeEach(async function () {
+      const factory = await ethers.getContractFactory('RMRKSoulboundPerTokenMock');
+      token = <RMRKSoulboundPerTokenMock>await factory.deploy('Chunky', 'CHNK');
+      await token.deployed();
+    });
 
-  it('can transfer child if soulbound exempt', async function () {
-    const tokenId = await mintFromMock(token, owner.address);
-    const otherTokenId = await nestMintFromMock(token, token.address, tokenId);
-    await token.connect(owner).acceptChild(tokenId, 0, token.address, otherTokenId);
-    await token.setSoulboundExempt(otherTokenId);
+    it('can support IRMRKSoulbound', async function () {
+      expect(await token.supportsInterface(IRMRKSoulbound)).to.equal(true);
+    });
 
-    await token
-      .connect(owner)
-      .transferChild(tokenId, owner.address, 0, 0, token.address, otherTokenId, false, '0x');
-    expect(await token.directOwnerOf(otherTokenId)).eql([owner.address, bn(0), false]);
+    it('does not support other interfaces', async function () {
+      expect(await token.supportsInterface(IOtherInterface)).to.equal(false);
+    });
+
+    it('can transfer token if not soulbound', async function () {
+      await token.setSoulbound(1, false);
+      await token.mint(owner.address, 1);
+      await token.transferFrom(owner.address, otherOwner.address, 1);
+      expect(await token.ownerOf(1)).to.equal(otherOwner.address);
+    });
+
+    it('cannot transfer token if soulbound', async function () {
+      await token.setSoulbound(1, true);
+      await token.mint(owner.address, 1);
+      await expect(
+        token.transferFrom(owner.address, otherOwner.address, 1),
+      ).to.be.revertedWithCustomError(token, 'RMRKCannotTransferSoulbound');
+    });
+
+    it('cannot set soulbound if not collection owner', async function () {
+      await expect(token.connect(otherOwner).setSoulbound(1, true)).to.be.revertedWithCustomError(
+        token,
+        'RMRKNotOwner',
+      );
+    });
   });
 });
 
