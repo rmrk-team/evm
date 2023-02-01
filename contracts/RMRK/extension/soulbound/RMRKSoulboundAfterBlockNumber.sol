@@ -5,7 +5,7 @@ pragma solidity ^0.8.16;
 import "./RMRKSoulbound.sol";
 
 /**
- * @title RMRKSoulboundAfterBlockNumber 
+ * @title RMRKSoulboundAfterBlockNumber
  * @author RMRK team
  * @notice Smart contract of the RMRK Soulbound module where transfers are only allowed until a certain block number.
  */

@@ -6,7 +6,7 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { bn, mintFromMock, nestMintFromMock } from '../utils';
 import { IERC165, IRMRKSoulbound, IOtherInterface } from '../interfaces';
 import {
-  RMRKSoulboundAfterBlockMock,
+  RMRKSoulboundAfterBlockNumberMock,
   RMRKSoulboundAfterTransactionsMock,
   RMRKSoulboundPerTokenMock,
 } from '../../typechain-types';
@@ -120,13 +120,13 @@ describe('RMRKSoulbound variants', async function () {
 
   describe('RMRKSoulboundAfterBlockNumber', async function () {
     const blocksToTransfer = 100;
-    let token: RMRKSoulboundAfterBlockMock;
+    let token: RMRKSoulboundAfterBlockNumberMock;
     let initBlock: number;
 
     beforeEach(async function () {
-      const factory = await ethers.getContractFactory('RMRKSoulboundAfterBlockMock');
+      const factory = await ethers.getContractFactory('RMRKSoulboundAfterBlockNumberMock');
       initBlock = (await ethers.provider.getBlock('latest')).number;
-      token = <RMRKSoulboundAfterBlockMock>(
+      token = <RMRKSoulboundAfterBlockNumberMock>(
         await factory.deploy('Chunky', 'CHNK', initBlock + blocksToTransfer)
       );
       await token.deployed();

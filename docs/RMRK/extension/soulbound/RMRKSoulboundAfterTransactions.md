@@ -2,9 +2,9 @@
 
 *RMRK team*
 
-> RMRKSoulbound variant where transfers are allowed for a limited a number of transfers
+> RMRKSoulboundAfterTransactions
 
-Smart contract of the RMRK Soulbound after a number of transactions module.
+Smart contract of the RMRK Soulbound module where transfers are allowed for a limited a number of transfers.
 
 
 
@@ -33,7 +33,7 @@ Version of the @rmrk-team/evm-contracts package
 function getMaxNumberOfTransfers() external view returns (uint256)
 ```
 
-Gets the max number of transfers before a token becomes soulbound
+Gets the maximum number of transfers before a token becomes soulbound.
 
 
 
@@ -42,7 +42,7 @@ Gets the max number of transfers before a token becomes soulbound
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | Max number of transfer   s before a token becomes soulbound |
+| _0 | uint256 | Maximum number of transfers before a token becomes soulbound |
 
 ### getTransfersPerToken
 
@@ -50,7 +50,7 @@ Gets the max number of transfers before a token becomes soulbound
 function getTransfersPerToken(uint256 tokenId) external view returns (uint256)
 ```
 
-Gets the current number of transfer for a specific token
+Gets the current number of transfer the specified token.
 
 
 
@@ -64,7 +64,7 @@ Gets the current number of transfer for a specific token
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | Number of transfers for the token |
+| _0 | uint256 | Number of the token&#39;s transfers to date |
 
 ### isSoulbound
 

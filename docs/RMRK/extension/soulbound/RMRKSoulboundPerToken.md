@@ -2,9 +2,9 @@
 
 *RMRK team*
 
-> RMRKSoulbound variant where transfers are allowed or not, is set by NFT.
+> RMRKSoulboundPerToken
 
-Smart contract of the RMRK Soulbound per token module.
+Smart contract of the RMRK Soulbound module where the transfers are permitted or prohibited on a per-token basis.
 
 
 

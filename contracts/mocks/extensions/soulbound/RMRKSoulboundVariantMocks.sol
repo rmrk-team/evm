@@ -3,13 +3,13 @@
 pragma solidity ^0.8.16;
 
 import "../../../RMRK/access/Ownable.sol";
-import "../../../RMRK/extension/soulbound/RMRKSoulboundAfterBlock.sol";
+import "../../../RMRK/extension/soulbound/RMRKSoulboundAfterBlockNumber.sol";
 import "../../../RMRK/extension/soulbound/RMRKSoulboundAfterTransactions.sol";
 import "../../../RMRK/extension/soulbound/RMRKSoulboundPerToken.sol";
 import "../../RMRKMultiAssetMock.sol";
 
-contract RMRKSoulboundAfterBlockMock is
-    RMRKSoulboundAfterBlock,
+contract RMRKSoulboundAfterBlockNumberMock is
+    RMRKSoulboundAfterBlockNumber,
     RMRKMultiAssetMock
 {
     mapping(uint256 => bool) soulboundExempt;
@@ -20,7 +20,7 @@ contract RMRKSoulboundAfterBlockMock is
         uint256 lastBlockToTransfer
     )
         RMRKMultiAssetMock(name, symbol)
-        RMRKSoulboundAfterBlock(lastBlockToTransfer)
+        RMRKSoulboundAfterBlockNumber(lastBlockToTransfer)
     {}
 
     function supportsInterface(

@@ -1,10 +1,10 @@
-# RMRKSoulboundAfterBlock
+# RMRKSoulboundAfterBlockNumber
 
 *RMRK team*
 
-> RMRKSoulbound variant where transfers are allowed until a certain block number;
+> RMRKSoulboundAfterBlockNumber 
 
-Smart contract of the RMRK Soulbound after specific Block module.
+Smart contract of the RMRK Soulbound module where transfers are only allowed until a certain block number.
 
 
 
@@ -42,7 +42,7 @@ Gets the last block number where transfers are allowed
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | undefined |
+| _0 | uint256 | The block number after which tokens are soulbound |
 
 ### isSoulbound
 

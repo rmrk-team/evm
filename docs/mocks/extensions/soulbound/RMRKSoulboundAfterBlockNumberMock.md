@@ -1,4 +1,4 @@
-# RMRKSoulboundAfterBlockMock
+# RMRKSoulboundAfterBlockNumberMock
 
 
 
@@ -301,7 +301,7 @@ Gets the last block number where transfers are allowed
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | undefined |
+| _0 | uint256 | The block number after which tokens are soulbound |
 
 ### getPendingAssets
 
