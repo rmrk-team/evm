@@ -5,11 +5,11 @@ pragma solidity ^0.8.16;
 import "./RMRKSoulbound.sol";
 
 /**
- * @title RMRKSoulbound variant where transfers are allowed until a certain block number;
+ * @title RMRKSoulboundAfterBlockNumber 
  * @author RMRK team
- * @notice Smart contract of the RMRK Soulbound after specific Block module.
+ * @notice Smart contract of the RMRK Soulbound module where transfers are only allowed until a certain block number.
  */
-abstract contract RMRKSoulboundAfterBlock is RMRKSoulbound {
+abstract contract RMRKSoulboundAfterBlockNumber is RMRKSoulbound {
     // Last block number where transfers are allowed
     uint256 private _lastBlockToTransfer;
 
@@ -23,6 +23,7 @@ abstract contract RMRKSoulboundAfterBlock is RMRKSoulbound {
 
     /**
      * @notice Gets the last block number where transfers are allowed
+     * @return The block number after which tokens are soulbound
      */
     function getLastBlockToTransfer() public view returns (uint256) {
         return _lastBlockToTransfer;

@@ -5,9 +5,9 @@ pragma solidity ^0.8.16;
 import "./RMRKSoulbound.sol";
 
 /**
- * @title RMRKSoulbound variant where transfers are allowed for a limited a number of transfers
+ * @title RMRKSoulboundAfterTransactions
  * @author RMRK team
- * @notice Smart contract of the RMRK Soulbound after a number of transactions module.
+ * @notice Smart contract of the RMRK Soulbound module where transfers are allowed for a limited a number of transfers.
  */
 abstract contract RMRKSoulboundAfterTransactions is RMRKSoulbound {
     // Max number of transfers before a token becomes soulbound
@@ -39,17 +39,17 @@ abstract contract RMRKSoulboundAfterTransactions is RMRKSoulbound {
     }
 
     /**
-     * @notice Gets the max number of transfers before a token becomes soulbound
-     * @return Max number of transfer   s before a token becomes soulbound
+     * @notice Gets the maximum number of transfers before a token becomes soulbound.
+     * @return Maximum number of transfers before a token becomes soulbound
      */
     function getMaxNumberOfTransfers() public view returns (uint256) {
         return _maxNumberOfTransfers;
     }
 
     /**
-     * @notice Gets the current number of transfer for a specific token
+     * @notice Gets the current number of transfer the specified token.
      * @param tokenId ID of the token
-     * @return Number of transfers for the token
+     * @return Number of the token's transfers to date
      */
     function getTransfersPerToken(
         uint256 tokenId
