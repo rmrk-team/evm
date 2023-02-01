@@ -959,6 +959,23 @@ Used to anounce the transfer of ownership.
 | previousOwner `indexed` | address | undefined |
 | newOwner `indexed` | address | undefined |
 
+### Soulbound
+
+```solidity
+event Soulbound(uint256 indexed tokenId, bool state)
+```
+
+Emitted when a token&#39;s soulbound state changes.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId `indexed` | uint256 | undefined |
+| state  | bool | undefined |
+
 ### Transfer
 
 ```solidity

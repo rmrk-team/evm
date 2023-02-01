@@ -10,6 +10,13 @@ import "./RMRKSoulbound.sol";
  * @notice Smart contract of the RMRK Soulbound module where the transfers are permitted or prohibited on a per-token basis.
  */
 abstract contract RMRKSoulboundPerToken is RMRKSoulbound {
+    /**
+     * @notice Emitted when a token's soulbound state changes.
+     * @param tokenId ID of the token
+     * @param state New soulbound state
+     */
+    event Soulbound(uint256 indexed tokenId, bool state);
+
     // Mapping of token ID to soulbound state
     mapping(uint256 => bool) private _isSoulbound;
 
@@ -21,6 +28,7 @@ abstract contract RMRKSoulboundPerToken is RMRKSoulbound {
      */
     function _setSoulbound(uint256 tokenId, bool state) internal virtual {
         _isSoulbound[tokenId] = state;
+        emit Soulbound(tokenId, state);
     }
 
     /**

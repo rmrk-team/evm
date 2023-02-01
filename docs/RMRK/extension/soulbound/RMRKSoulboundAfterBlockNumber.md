@@ -2,7 +2,7 @@
 
 *RMRK team*
 
-> RMRKSoulboundAfterBlockNumber 
+> RMRKSoulboundAfterBlockNumber
 
 Smart contract of the RMRK Soulbound module where transfers are only allowed until a certain block number.
 

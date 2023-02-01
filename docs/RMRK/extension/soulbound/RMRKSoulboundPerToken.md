@@ -107,4 +107,24 @@ Used to retrieve the collection symbol.
 
 
 
+## Events
+
+### Soulbound
+
+```solidity
+event Soulbound(uint256 indexed tokenId, bool state)
+```
+
+Emitted when a token&#39;s soulbound state changes.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId `indexed` | uint256 | ID of the token |
+| state  | bool | New soulbound state |
+
+
 

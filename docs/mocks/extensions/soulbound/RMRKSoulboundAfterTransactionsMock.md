@@ -864,6 +864,22 @@ Used to notify listeners that an asset object is initialized at `assetId`.
 |---|---|---|
 | assetId `indexed` | uint64 | undefined |
 
+### Soulbound
+
+```solidity
+event Soulbound(uint256 indexed tokenId)
+```
+
+Emitted when a token becomes soulbound.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId `indexed` | uint256 | undefined |
+
 ### Transfer
 
 ```solidity

@@ -10,6 +10,12 @@ import "./RMRKSoulbound.sol";
  * @notice Smart contract of the RMRK Soulbound module where transfers are allowed for a limited a number of transfers.
  */
 abstract contract RMRKSoulboundAfterTransactions is RMRKSoulbound {
+    /**
+     * @notice Emitted when a token becomes soulbound.
+     * @param tokenId ID of the token
+     */
+    event Soulbound(uint256 indexed tokenId);
+
     // Max number of transfers before a token becomes soulbound
     uint256 private _maxNumberOfTransfers;
     // Mapping of token ID to number of transfers
@@ -35,6 +41,7 @@ abstract contract RMRKSoulboundAfterTransactions is RMRKSoulbound {
         // We won't count minting:
         if (from != address(0)) {
             _transfersPerToken[tokenId]++;
+            emit Soulbound(tokenId);
         }
     }
 

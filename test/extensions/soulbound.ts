@@ -178,7 +178,9 @@ describe('RMRKSoulbound variants', async function () {
     it('can transfer token only 2 times', async function () {
       await token.mint(owner.address, 1);
       await token.transferFrom(owner.address, otherOwner.address, 1);
-      await token.connect(otherOwner).transferFrom(otherOwner.address, owner.address, 1);
+      await expect(token.connect(otherOwner).transferFrom(otherOwner.address, owner.address, 1))
+        .to.emit(token, 'Soulbound')
+        .withArgs(1);
       expect(await token.getTransfersPerToken(1)).to.equal(bn(2));
       expect(await token.getMaxNumberOfTransfers()).to.equal(bn(2));
 
@@ -206,14 +208,14 @@ describe('RMRKSoulbound variants', async function () {
     });
 
     it('can transfer token if not soulbound', async function () {
-      await token.setSoulbound(1, false);
+      await expect(token.setSoulbound(1, false)).to.emit(token, 'Soulbound').withArgs(1, false);
       await token.mint(owner.address, 1);
       await token.transferFrom(owner.address, otherOwner.address, 1);
       expect(await token.ownerOf(1)).to.equal(otherOwner.address);
     });
 
     it('cannot transfer token if soulbound', async function () {
-      await token.setSoulbound(1, true);
+      await expect(token.setSoulbound(1, true)).to.emit(token, 'Soulbound').withArgs(1, true);
       await token.mint(owner.address, 1);
       await expect(
         token.transferFrom(owner.address, otherOwner.address, 1),
