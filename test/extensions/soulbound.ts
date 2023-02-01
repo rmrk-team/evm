@@ -118,7 +118,7 @@ describe('RMRKSoulbound variants', async function () {
     [owner, otherOwner] = await ethers.getSigners();
   });
 
-  describe('RMRKSoulbound After Blocks', async function () {
+  describe('RMRKSoulboundAfterBlockNumber', async function () {
     const blocksToTransfer = 100;
     let token: RMRKSoulboundAfterBlockMock;
     let initBlock: number;
@@ -155,7 +155,7 @@ describe('RMRKSoulbound variants', async function () {
     });
   });
 
-  describe('RMRKSoulbound After Transactions', async function () {
+  describe('RMRKSoulboundAfterTransactions', async function () {
     const maxTransactions = 2;
     let token: RMRKSoulboundAfterTransactionsMock;
 
@@ -188,7 +188,7 @@ describe('RMRKSoulbound variants', async function () {
     });
   });
 
-  describe('RMRKSoulbound Per token', async function () {
+  describe('RMRKSoulboundPerToken', async function () {
     let token: RMRKSoulboundPerTokenMock;
 
     beforeEach(async function () {
