@@ -124,7 +124,7 @@ Emitted when a token&#39;s soulbound state changes.
 | Name | Type | Description |
 |---|---|---|
 | tokenId `indexed` | uint256 | ID of the token |
-| state  | bool | New soulbound state |
+| state  | bool | A boolean value signifying whether the token became soulbound (`true`) or transferrable (`false`) |
 
 
 
