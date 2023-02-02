@@ -13,7 +13,7 @@ abstract contract RMRKSoulboundPerToken is RMRKSoulbound {
     /**
      * @notice Emitted when a token's soulbound state changes.
      * @param tokenId ID of the token
-     * @param state New soulbound state
+     * @param state A boolean value signifying whether the token became soulbound (`true`) or transferrable (`false`)
      */
     event Soulbound(uint256 indexed tokenId, bool state);
 
