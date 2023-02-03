@@ -31,7 +31,7 @@ Used to grant permission to an account to spend the tokens of another
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | uint256 Amount of tokens that the `spender` can manage |
+| _0 | uint256 | Amount of tokens that the `spender` can manage |
 
 ### transferFrom
 
@@ -55,7 +55,7 @@ Used to transfer tokens from one address to another.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | bool A boolean value signifying whether the transfer was succesfull (`true`) or not (`false`) |
+| _0 | bool | A boolean value signifying whether the transfer was succesfull (`true`) or not (`false`) |
 
 
 

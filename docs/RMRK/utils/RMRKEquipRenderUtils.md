@@ -63,7 +63,7 @@ Used to compose the given equippables.
 function getAllEquippableSlotsFromParent(address targetChild, uint256 childId, bool onlyEquipped) external view returns (uint256 childIndex, struct RMRKEquipRenderUtils.EquippableData[] equippableData)
 ```
 
-Used to get the child&#39;s assets and slot parts pairs, identifying parts the said assets can be equipped into, for all of parent&#39;s assets.
+Used to get the child&#39;s assets and slot parts pairs, identifying parts the said assets can be equipped  into, for all of parent&#39;s assets.
 
 *Reverts if child token is not owned by an NFT.The full `EquippableData` struct looks like this:  [      slotPartId,      childAssetId,      parentAssetId,      priority,      parentCatalogAddress,      isEquipped,      partMetadata  ]*
 
@@ -128,7 +128,7 @@ Used to retrieve the metadata URI of specified assets in the specified token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string[] | string[] An array of metadata URIs belonging to specified assets |
+| _0 | string[] | An array of metadata URIs belonging to specified assets |
 
 ### getChildIndex
 
@@ -136,7 +136,7 @@ Used to retrieve the metadata URI of specified assets in the specified token.
 function getChildIndex(address parentAddress, uint256 parentId, address childAddress, uint256 childId) external view returns (uint256)
 ```
 
-
+Used to retrieve the given child&#39;s index in its paren&#39;s child tokens array.
 
 
 
@@ -144,16 +144,16 @@ function getChildIndex(address parentAddress, uint256 parentId, address childAdd
 
 | Name | Type | Description |
 |---|---|---|
-| parentAddress | address | undefined |
-| parentId | uint256 | undefined |
-| childAddress | address | undefined |
-| childId | uint256 | undefined |
+| parentAddress | address | Address of the parent token&#39;s collection smart contract |
+| parentId | uint256 | ID of the parent token |
+| childAddress | address | Address of the child token&#39;s colection smart contract |
+| childId | uint256 | ID of the child token |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | undefined |
+| _0 | uint256 | The index of the child token in the parent token&#39;s child tokens array |
 
 ### getEquippableSlotsFromParent
 
@@ -161,7 +161,7 @@ function getChildIndex(address parentAddress, uint256 parentId, address childAdd
 function getEquippableSlotsFromParent(address targetChild, uint256 childId, uint64 parentAssetId) external view returns (uint256 childIndex, struct RMRKEquipRenderUtils.EquippableData[] equippableData)
 ```
 
-Used to get the child&#39;s assets and slot parts pairs, identifying parts the said assets can be equipped into, for a specific parent asset.
+Used to get the child&#39;s assets and slot parts pairs, identifying parts the said assets can be equipped  into, for a specific parent asset.
 
 *Reverts if child token is not owned by an NFT.The full `EquippableData` struct looks like this:  [      slotPartId,      childAssetId,      parentAssetId,      priority,      parentCatalogAddress,      isEquipped,      partMetadata,      childAssetMetadata,      parentAssetMetadata  ]*
 
@@ -178,7 +178,7 @@ Used to get the child&#39;s assets and slot parts pairs, identifying parts the s
 | Name | Type | Description |
 |---|---|---|
 | childIndex | uint256 | Index of the child in the parent&#39;s list of active children |
-| equippableData | RMRKEquipRenderUtils.EquippableData[] | An array of `EquippableData` structs containing info about the equippable child assets and their corresponding slot parts |
+| equippableData | RMRKEquipRenderUtils.EquippableData[] | An array of `EquippableData` structs containing info about the equippable child assets and  their corresponding slot parts |
 
 ### getEquipped
 
@@ -227,7 +227,7 @@ Used to get the active assets of the given token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | RMRKMultiAssetRenderUtils.ExtendedActiveAsset[] | struct[] An array of ActiveAssets present on the given token |
+| _0 | RMRKMultiAssetRenderUtils.ExtendedActiveAsset[] | An array of ActiveAssets present on the given token |
 
 ### getExtendedEquippableActiveAssets
 
@@ -250,7 +250,7 @@ Used to get extended active assets of the given token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | RMRKEquipRenderUtils.ExtendedEquippableActiveAsset[] | ExtendedEquippableActiveAsset[] An array of ExtendedEquippableActiveAssets present on the given token |
+| _0 | RMRKEquipRenderUtils.ExtendedEquippableActiveAsset[] | An array of ExtendedEquippableActiveAssets present on the given token |
 
 ### getExtendedNft
 
@@ -296,7 +296,7 @@ Used to get the extended pending assets of the given token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | RMRKEquipRenderUtils.ExtendedPendingAsset[] | ExtendedPendingAssets[] An array of ExtendedPendingAssets present on the given token |
+| _0 | RMRKEquipRenderUtils.ExtendedPendingAsset[] | An array of ExtendedPendingAssets present on the given token |
 
 ### getPaginatedMintedIds
 
@@ -306,7 +306,7 @@ function getPaginatedMintedIds(address target, uint256 pageStart, uint256 pageSi
 
 Used to get a list of existing token IDs in the range between `pageStart` and `pageSize`.
 
-*It is not optimized to avoid checking IDs out of max supply nor total supply, since this is not meant to be used during transaction execution; it is only meant to be used as a getter.The resulting array might be smaller than the given `pageSize` since no-existent IDs are not included.*
+*It is not optimized to avoid checking IDs out of max supply nor total supply, since this is not meant to be  used during transaction execution; it is only meant to be used as a getter.The resulting array might be smaller than the given `pageSize` since no-existent IDs are not included.*
 
 #### Parameters
 
@@ -367,7 +367,7 @@ Used to get the pending assets of the given token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | RMRKMultiAssetRenderUtils.PendingAsset[] | struct[] An array of PendingAssets present on the given token |
+| _0 | RMRKMultiAssetRenderUtils.PendingAsset[] | An array of PendingAssets present on the given token |
 
 ### getSlotParts
 
@@ -439,7 +439,7 @@ Used to retrieve the equippable data of the specified token&#39;s asset with the
 
 | Name | Type | Description |
 |---|---|---|
-| topAsset | RMRKEquipRenderUtils.ExtendedEquippableActiveAsset | `ExtendedEquippableActiveAsset` struct with the equippable data containing the asset with the highest priority |
+| topAsset | RMRKEquipRenderUtils.ExtendedEquippableActiveAsset | `ExtendedEquippableActiveAsset` struct with the equippable data containing the asset with the  highest priority |
 
 ### getTopAssetMetaForToken
 
@@ -462,7 +462,7 @@ Used to retrieve the metadata URI of the specified token&#39;s asset with the hi
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | string The metadata URI of the asset with the highest priority |
+| _0 | string | The metadata URI of the asset with the highest priority |
 
 ### isAssetEquipped
 

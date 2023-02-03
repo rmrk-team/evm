@@ -127,7 +127,7 @@ Used to verify whether a token can be equipped into a given parent&#39;s slot.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | bool The boolean indicating whether the token with the given asset can be equipped into the desired  slot |
+| _0 | bool | The boolean indicating whether the token with the given asset can be equipped into the desired slot |
 
 ### equip
 
@@ -165,7 +165,7 @@ Used to retrieve the priorities of the active resoources of a given token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint16[] | uint16[] An array of priorities of the active assets of the given token |
+| _0 | uint16[] | An array of priorities of the active assets of the given token |
 
 ### getActiveAssets
 
@@ -187,7 +187,7 @@ Used to retrieve IDs of the active assets of given token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint64[] | uint64[] An array of active asset IDs of the given token |
+| _0 | uint64[] | An array of active asset IDs of the given token |
 
 ### getApprovedForAssets
 
@@ -209,7 +209,7 @@ Used to get the address of the user that is approved to manage the specified tok
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | address | address Address of the account that is approved to manage the token |
+| _0 | address | Address of the account that is approved to manage the token |
 
 ### getAssetAndEquippableData
 
@@ -258,7 +258,7 @@ Used to fetch the asset metadata of the specified token&#39;s active asset with 
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | string The metadata of the asset belonging to the specified index in the token&#39;s active assets  array |
+| _0 | string | The metadata of the asset belonging to the specified index in the token&#39;s active assets  array |
 
 ### getAssetReplacements
 
@@ -281,7 +281,7 @@ Used to retrieve the asset that will be replaced if a given asset from the token
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint64 | uint64 ID of the asset which will be replaced |
+| _0 | uint64 | ID of the asset which will be replaced |
 
 ### getAssetType
 
@@ -303,7 +303,7 @@ Used to get the type of the asset.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | string The type of the asset |
+| _0 | string | The type of the asset |
 
 ### getEquipment
 
@@ -327,7 +327,7 @@ Used to get the Equipment object equipped into the specified slot of the desired
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IRMRKEquippable.Equipment | struct The `Equipment` struct containing data about the equipped object |
+| _0 | IRMRKEquippable.Equipment | The `Equipment` struct containing data about the equipped object |
 
 ### getNestableAddress
 
@@ -344,7 +344,7 @@ Returns the Equippable contract&#39;s corresponding nestable address.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | address | address Address of the Nestable module of the external equip composite |
+| _0 | address | Address of the Nestable module of the external equip composite |
 
 ### getPendingAssets
 
@@ -366,7 +366,7 @@ Used to retrieve IDs of the pending assets of given token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint64[] | uint64[] An array of pending asset IDs of the given token |
+| _0 | uint64[] | An array of pending asset IDs of the given token |
 
 ### isApprovedForAllForAssets
 
@@ -389,7 +389,7 @@ Used to check whether the address has been granted the operator role by a given 
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | bool The boolean value indicating wehter the account we are checking has been granted the operator role |
+| _0 | bool | The boolean value indicating wehter the account we are checking has been granted the operator role |
 
 ### isChildEquipped
 
@@ -430,7 +430,7 @@ Used to reject all pending assets of a given token.
 | Name | Type | Description |
 |---|---|---|
 | tokenId | uint256 | ID of the token for which we are clearing the pending array. |
-| maxRejections | uint256 | Maximum number of expected assets to reject, used to prevent from  rejecting assets which arrive just before this operation. |
+| maxRejections | uint256 | Maximum number of expected assets to reject, used to prevent from rejecting assets which  arrive just before this operation. |
 
 ### rejectAsset
 

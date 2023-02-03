@@ -31,7 +31,7 @@ Used to check whether the given address is allowed to equip the desired `Part`.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | bool The status indicating whether the `targetAddress` can be equipped into `Part` with `partId` or not |
+| _0 | bool | The status indicating whether the `targetAddress` can be equipped into `Part` with `partId` or not |
 
 ### checkIsEquippableToAll
 
@@ -53,7 +53,7 @@ Used to check if the part is equippable by all addresses.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | bool The status indicating whether the part with `partId` can be equipped by any address or not |
+| _0 | bool | The status indicating whether the part with `partId` can be equipped by any address or not |
 
 ### getMetadataURI
 
@@ -70,7 +70,7 @@ Used to return the metadata URI of the associated Catalog.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | string Case metadata URI |
+| _0 | string | Case metadata URI |
 
 ### getPart
 
@@ -92,7 +92,7 @@ Used to retrieve a `Part` with id `partId`
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IRMRKCatalog.Part | struct The `Part` struct associated with given `partId` |
+| _0 | IRMRKCatalog.Part | The `Part` struct associated with given `partId` |
 
 ### getParts
 
@@ -114,7 +114,7 @@ Used to retrieve multiple parts at the same time.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IRMRKCatalog.Part[] | struct An array of `Part` structs associated with given `partIds` |
+| _0 | IRMRKCatalog.Part[] | An array of `Part` structs associated with given `partIds` |
 
 ### getType
 
@@ -131,7 +131,7 @@ Used to return the `itemType` of the associated Catalog
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | string `itemType` of the associated Catalog |
+| _0 | string | `itemType` of the associated Catalog |
 
 ### supportsInterface
 

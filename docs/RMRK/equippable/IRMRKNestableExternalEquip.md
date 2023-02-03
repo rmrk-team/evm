@@ -25,7 +25,7 @@ Used to retrieve the `Equippable` smart contract&#39;s address.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | address | address Address of the `Equippable` smart contract |
+| _0 | address | Address of the `Equippable` smart contract |
 
 ### isApprovedOrOwner
 
@@ -48,7 +48,7 @@ Used to verify that the specified address is either the owner of the given token
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | bool A boolean value indicating whether the specified address is the owner of the given token or approved  to manage it |
+| _0 | bool | A boolean value indicating whether the specified address is the owner of the given token or approved to  manage it |
 
 ### supportsInterface
 
