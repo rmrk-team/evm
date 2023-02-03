@@ -25,7 +25,7 @@ Used to retrieve the collection name.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | string Name of the collection |
+| _0 | string | Name of the collection |
 
 ### symbol
 
@@ -42,7 +42,7 @@ Used to retrieve the collection symbol.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | string Symbol of the collection |
+| _0 | string | Symbol of the collection |
 
 
 

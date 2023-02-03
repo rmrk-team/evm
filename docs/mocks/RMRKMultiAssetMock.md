@@ -86,16 +86,16 @@ function addAssetToToken(uint256 tokenId, uint64 assetId, uint64 replacesAssetWi
 function approve(address to, uint256 tokenId) external nonpayable
 ```
 
+Used to grant a one-time approval to manage one&#39;s token.
 
-
-*Gives permission to `to` to transfer `tokenId` token to another account. The approval is cleared when the token is transferred. Only a single account can be approved at a time, so approving the zero address clears previous approvals. Requirements: - The caller must own the token or be an approved operator. - `tokenId` must exist. Emits an {Approval} event.*
+*Gives permission to `to` to transfer `tokenId` token to another account.The approval is cleared when the token is transferred.Only a single account can be approved at a time, so approving the zero address clears previous approvals.Requirements: - The caller must own the token or be an approved operator. - `tokenId` must exist.Emits an {Approval} event.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| to | address | undefined |
-| tokenId | uint256 | undefined |
+| to | address | Address receiving the approval |
+| tokenId | uint256 | ID of the token for which the approval is being granted |
 
 ### approveForAssets
 
@@ -120,21 +120,21 @@ Used to grant permission to the user to manage token&#39;s assets.
 function balanceOf(address owner) external view returns (uint256)
 ```
 
+Used to retrieve the number of tokens in ``owner``&#39;s account.
 
 
-*Returns the number of tokens in ``owner``&#39;s account.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| owner | address | undefined |
+| owner | address | Address of the account being checked |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | undefined |
+| _0 | uint256 | The balance of the given account |
 
 ### burn
 
@@ -172,7 +172,7 @@ Used to retrieve the priorities of the active resoources of a given token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint16[] | uint16[] An array of priorities of the active assets of the given token |
+| _0 | uint16[] | An array of priorities of the active assets of the given token |
 
 ### getActiveAssets
 
@@ -194,7 +194,7 @@ Used to retrieve IDs of the active assets of given token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint64[] | uint64[] An array of active asset IDs of the given token |
+| _0 | uint64[] | An array of active asset IDs of the given token |
 
 ### getApproved
 
@@ -202,21 +202,21 @@ Used to retrieve IDs of the active assets of given token.
 function getApproved(uint256 tokenId) external view returns (address)
 ```
 
+Used to retireve the account approved to manage given token.
 
-
-*Returns the account approved for `tokenId` token. Requirements: - `tokenId` must exist.*
+*Requirements:  - `tokenId` must exist.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | undefined |
+| tokenId | uint256 | ID of the token to check for approval |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | address | undefined |
+| _0 | address | Address of the account approved to manage the token |
 
 ### getApprovedForAssets
 
@@ -238,7 +238,7 @@ Used to retrieve the address of the account approved to manage assets of a given
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | address | address Address of the account that is approved to manage the specified token&#39;s assets |
+| _0 | address | Address of the account that is approved to manage the specified token&#39;s assets |
 
 ### getAssetMetadata
 
@@ -261,7 +261,7 @@ Used to fetch the asset metadata of the specified token&#39;s active asset with 
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | string The metadata of the asset belonging to the specified index in the token&#39;s active assets  array |
+| _0 | string | The metadata of the asset belonging to the specified index in the token&#39;s active assets  array |
 
 ### getAssetReplacements
 
@@ -284,7 +284,7 @@ Used to retrieve the asset that will be replaced if a given asset from the token
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint64 | uint64 ID of the asset which will be replaced |
+| _0 | uint64 | ID of the asset which will be replaced |
 
 ### getPendingAssets
 
@@ -306,7 +306,7 @@ Used to retrieve IDs of the pending assets of given token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint64[] | uint64[] An array of pending asset IDs of the given token |
+| _0 | uint64[] | An array of pending asset IDs of the given token |
 
 ### isApprovedForAll
 
@@ -314,22 +314,22 @@ Used to retrieve IDs of the pending assets of given token.
 function isApprovedForAll(address owner, address operator) external view returns (bool)
 ```
 
+Used to check if the given address is allowed to manage the tokens of the specified address.
 
 
-*Returns if the `operator` is allowed to manage all of the assets of `owner`. See {setApprovalForAll}*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| owner | address | undefined |
-| operator | address | undefined |
+| owner | address | Address of the owner of the tokens |
+| operator | address | Address being checked for approval |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | undefined |
+| _0 | bool | A boolean value signifying whether the *operator* is allowed to manage the tokens of the *owner* (`true`)  or not (`false`) |
 
 ### isApprovedForAllForAssets
 
@@ -352,7 +352,7 @@ Used to check whether the address has been granted the operator role by a given 
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | bool The boolean value indicating wehter the account we are checking has been granted the operator role |
+| _0 | bool | The boolean value indicating wehter the account we are checking has been granted the operator role |
 
 ### mint
 
@@ -386,7 +386,7 @@ Used to retrieve the collection name.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | string Name of the collection |
+| _0 | string | Name of the collection |
 
 ### ownerOf
 
@@ -394,21 +394,21 @@ Used to retrieve the collection name.
 function ownerOf(uint256 tokenId) external view returns (address)
 ```
 
+Used to retireve the owner of the given token.
 
-
-*Returns the owner of the `tokenId` token. Requirements: - `tokenId` must exist.*
+*Requirements:  - `tokenId` must exist.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | undefined |
+| tokenId | uint256 | ID of the token for which to retrieve the token for |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | address | undefined |
+| _0 | address | Address of the account owning the token |
 
 ### rejectAllAssets
 
@@ -486,17 +486,17 @@ function safeMint(address to, uint256 tokenId) external nonpayable
 function safeTransferFrom(address from, address to, uint256 tokenId) external nonpayable
 ```
 
+Used to safely transfer a given token token from `from` to `to`.
 
-
-*Safely transfers `tokenId` token from `from` to `to`, checking first that contract recipients are aware of the ERC721 protocol to prevent tokens from being forever locked. Requirements: - `from` cannot be the zero address. - `to` cannot be the zero address. - `tokenId` token must exist and be owned by `from`. - If the caller is not `from`, it must have been allowed to move this token by either {approve} or {setApprovalForAll}. - If `to` refers to a smart contract, it must implement {IERC721Receiver-onERC721Received}, which is called upon a safe transfer. Emits a {Transfer} event.*
+*Requirements:  - `from` cannot be the zero address.  - `to` cannot be the zero address.  - `tokenId` token must exist and be owned by `from`.  - If the caller is not `from`, it must be approved to move this token by either {approve} or {setApprovalForAll}.  - If `to` refers to a smart contract, it must implement {IERC721Receiver-onERC721Received}, which is called upon a safe transfer.Emits a {Transfer} event.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| from | address | undefined |
-| to | address | undefined |
-| tokenId | uint256 | undefined |
+| from | address | Address to transfer the tokens from |
+| to | address | Address to transfer the tokens to |
+| tokenId | uint256 | ID of the token to transfer |
 
 ### safeTransferFrom
 
@@ -504,18 +504,18 @@ function safeTransferFrom(address from, address to, uint256 tokenId) external no
 function safeTransferFrom(address from, address to, uint256 tokenId, bytes data) external nonpayable
 ```
 
+Used to safely transfer a given token token from `from` to `to`.
 
-
-*Safely transfers `tokenId` token from `from` to `to`. Requirements: - `from` cannot be the zero address. - `to` cannot be the zero address. - `tokenId` token must exist and be owned by `from`. - If the caller is not `from`, it must be approved to move this token by either {approve} or {setApprovalForAll}. - If `to` refers to a smart contract, it must implement {IERC721Receiver-onERC721Received}, which is called upon a safe transfer. Emits a {Transfer} event.*
+*Requirements:  - `from` cannot be the zero address.  - `to` cannot be the zero address.  - `tokenId` token must exist and be owned by `from`.  - If the caller is not `from`, it must be approved to move this token by either {approve} or {setApprovalForAll}.  - If `to` refers to a smart contract, it must implement {IERC721Receiver-onERC721Received}, which is called upon a safe transfer.Emits a {Transfer} event.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| from | address | undefined |
-| to | address | undefined |
-| tokenId | uint256 | undefined |
-| data | bytes | undefined |
+| from | address | Address to transfer the tokens from |
+| to | address | Address to transfer the tokens to |
+| tokenId | uint256 | ID of the token to transfer |
+| data | bytes | Additional data without a specified format to be sent along with the token transaction |
 
 ### setApprovalForAll
 
@@ -523,16 +523,16 @@ function safeTransferFrom(address from, address to, uint256 tokenId, bytes data)
 function setApprovalForAll(address operator, bool approved) external nonpayable
 ```
 
+Used to approve or remove `operator` as an operator for the caller.
 
-
-*Approve or remove `operator` as an operator for the caller. Operators can call {transferFrom} or {safeTransferFrom} for any token owned by the caller. Requirements: - The `operator` cannot be the caller. Emits an {ApprovalForAll} event.*
+*Operators can call {transferFrom} or {safeTransferFrom} for any token owned by the caller.Requirements: - The `operator` cannot be the caller.Emits an {ApprovalForAll} event.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| operator | address | undefined |
-| approved | bool | undefined |
+| operator | address | Address of the operator being managed |
+| approved | bool | A boolean value signifying whether the approval is being granted (`true`) or (`revoked`) |
 
 ### setApprovalForAllForAssets
 
@@ -605,7 +605,7 @@ Used to retrieve the collection symbol.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | string Symbol of the collection |
+| _0 | string | Symbol of the collection |
 
 ### transfer
 
@@ -630,17 +630,17 @@ function transfer(address to, uint256 tokenId) external nonpayable
 function transferFrom(address from, address to, uint256 tokenId) external nonpayable
 ```
 
+Transfers a given token from `from` to `to`.
 
-
-*Transfers `tokenId` token from `from` to `to`. WARNING: Note that the caller is responsible to confirm that the recipient is capable of receiving ERC721 or else they may be permanently lost. Usage of {safeTransferFrom} prevents loss, though the caller must understand this adds an external call which potentially creates a reentrancy vulnerability. Requirements: - `from` cannot be the zero address. - `to` cannot be the zero address. - `tokenId` token must be owned by `from`. - If the caller is not `from`, it must be approved to move this token by either {approve} or {setApprovalForAll}. Emits a {Transfer} event.*
+*Requirements:  - `from` cannot be the zero address.  - `to` cannot be the zero address.  - `tokenId` token must be owned by `from`.  - If the caller is not `from`, it must be approved to move this token by either {approve} or {setApprovalForAll}.Emits a {Transfer} event.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| from | address | undefined |
-| to | address | undefined |
-| tokenId | uint256 | undefined |
+| from | address | Address from which to transfer the token from |
+| to | address | Address to which to transfer the token to |
+| tokenId | uint256 | ID of the token to transfer |
 
 
 

@@ -33,16 +33,16 @@ user to create NFT systems of arbitrary complexity.
 There are various possibilities on how to combine these legos, all of which are ERC721 compatible:
 
 1. MultiAsset (Context-Dependent Multi-Asset Tokens)
-    - Only uses the MultiAsset RMRK lego
+   - Only uses the MultiAsset RMRK lego
 2. Nestable (Parent-Governed Nestable Non-Fungible Tokens)
-    - Only uses the Nestable RMRK lego
+   - Only uses the Nestable RMRK lego
 3. Nestable with MultiAsset
-    - Uses both Nestable and MultiAsset RMRK legos
+   - Uses both Nestable and MultiAsset RMRK legos
 4. Equippable MultiAsset with Nestable and Catalog
-    - Merged equippable is a more compact RMRK lego composite that uses less smart contracts, but has less space for
-    custom logic implementation
-    - Split equippable is a more customizable RMRK lego composite that uses more smart contracts, but has more space for
-    custom logic implementation
+   - Merged equippable is a more compact RMRK lego composite that uses less smart contracts, but has less space for
+     custom logic implementation
+   - Split equippable is a more customizable RMRK lego composite that uses more smart contracts, but has more space for
+     custom logic implementation
 
 ![RMRK Legos infographic](img/RMRKLegoInfographics.png)
 
@@ -52,7 +52,7 @@ the use of our legos:
 ### MultiAsset ([RMRKMultiAsset](./contracts/RMRK/multiasset/RMRKMultiAsset.sol)): [ERC-5773: Context-Dependent Multi-Asset Tokens](https://eips.ethereum.org/EIPS/eip-5773)
 
 1. Deploy the `MultiAsset` contract.
-2. Admin must add assets on a ***per-token*** basis. This could be very gas-intensive, so we recommend adding them in
+2. Admin must add assets on a **_per-token_** basis. This could be very gas-intensive, so we recommend adding them in
    batches.
 3. Mint the tokens using your preferred method.
 

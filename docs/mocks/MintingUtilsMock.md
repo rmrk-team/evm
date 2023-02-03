@@ -25,7 +25,7 @@ Used to retrieve the status of a lockable smart contract.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | bool A boolean value signifying whether the smart contract has been locked |
+| _0 | bool | A boolean value signifying whether the smart contract has been locked |
 
 ### isContributor
 
@@ -57,7 +57,7 @@ function manageContributor(address contributor, bool grantRole) external nonpaya
 
 Adds or removes a contributor to the smart contract.
 
-*Can only be called by the owner.*
+*Can only be called by the owner.Emits ***ContributorUpdate*** event.*
 
 #### Parameters
 
@@ -81,7 +81,7 @@ Used to retrieve the maximum supply of the collection.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | uint256 The maximum supply of tokens in the collection |
+| _0 | uint256 | The maximum supply of tokens in the collection |
 
 ### mockMint
 
@@ -131,7 +131,7 @@ Used to retrieve the price per mint.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | uint256 The price per mint of a single token expressed in the lowest denomination of a native currency |
+| _0 | uint256 | The price per mint of a single token expressed in the lowest denomination of a native currency |
 
 ### renounceOwnership
 
@@ -198,7 +198,7 @@ Used to retrieve the total supply of the tokens in a collection.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | uint256 The number of tokens in a collection |
+| _0 | uint256 | The number of tokens in a collection |
 
 ### transferOwnership
 

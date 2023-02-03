@@ -35,7 +35,7 @@ Check if the child is owned by the expected parent.
 function getChildIndex(address parentAddress, uint256 parentId, address childAddress, uint256 childId) external view returns (uint256)
 ```
 
-
+Used to retrieve the given child&#39;s index in its paren&#39;s child tokens array.
 
 
 
@@ -43,16 +43,16 @@ function getChildIndex(address parentAddress, uint256 parentId, address childAdd
 
 | Name | Type | Description |
 |---|---|---|
-| parentAddress | address | undefined |
-| parentId | uint256 | undefined |
-| childAddress | address | undefined |
-| childId | uint256 | undefined |
+| parentAddress | address | Address of the parent token&#39;s collection smart contract |
+| parentId | uint256 | ID of the parent token |
+| childAddress | address | Address of the child token&#39;s colection smart contract |
+| childId | uint256 | ID of the child token |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | undefined |
+| _0 | uint256 | The index of the child token in the parent token&#39;s child tokens array |
 
 ### getParent
 

@@ -56,7 +56,7 @@ Used to retrieve the metadata URI of specified assets in the specified token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string[] | string[] An array of metadata URIs belonging to specified assets |
+| _0 | string[] | An array of metadata URIs belonging to specified assets |
 
 ### getExtendedActiveAssets
 
@@ -79,7 +79,7 @@ Used to get the active assets of the given token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | RMRKMultiAssetRenderUtils.ExtendedActiveAsset[] | struct[] An array of ActiveAssets present on the given token |
+| _0 | RMRKMultiAssetRenderUtils.ExtendedActiveAsset[] | An array of ActiveAssets present on the given token |
 
 ### getPendingAssets
 
@@ -102,7 +102,7 @@ Used to get the pending assets of the given token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | RMRKMultiAssetRenderUtils.PendingAsset[] | struct[] An array of PendingAssets present on the given token |
+| _0 | RMRKMultiAssetRenderUtils.PendingAsset[] | An array of PendingAssets present on the given token |
 
 ### getTopAsset
 
@@ -150,7 +150,7 @@ Used to retrieve the metadata URI of the specified token&#39;s asset with the hi
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | string The metadata URI of the asset with the highest priority |
+| _0 | string | The metadata URI of the asset with the highest priority |
 
 
 

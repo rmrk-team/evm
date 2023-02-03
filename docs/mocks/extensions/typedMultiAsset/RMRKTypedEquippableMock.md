@@ -43,7 +43,7 @@ Accepts a asset at from the pending array of given token.
 |---|---|---|
 | tokenId | uint256 | ID of the token for which to accept the pending asset |
 | index | uint256 | Index of the asset in the pending array to accept |
-| assetId | uint64 | undefined |
+| assetId | uint64 | ID of the asset that is being accepted |
 
 ### acceptChild
 
@@ -147,16 +147,16 @@ function addTypedAssetEntry(uint64 id, uint64 equippableGroupId, address catalog
 function approve(address to, uint256 tokenId) external nonpayable
 ```
 
+Used to grant a one-time approval to manage one&#39;s token.
 
-
-*Gives permission to `to` to transfer `tokenId` token to another account. The approval is cleared when the token is transferred. Only a single account can be approved at a time, so approving the zero address clears previous approvals. Requirements: - The caller must own the token or be an approved operator. - `tokenId` must exist. Emits an {Approval} event.*
+*Gives permission to `to` to transfer `tokenId` token to another account.The approval is cleared when the token is transferred.Only a single account can be approved at a time, so approving the zero address clears previous approvals.Requirements: - The caller must own the token or be an approved operator. - `tokenId` must exist.Emits an {Approval} event.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| to | address | undefined |
-| tokenId | uint256 | undefined |
+| to | address | Address receiving the approval |
+| tokenId | uint256 | ID of the token for which the approval is being granted |
 
 ### approveForAssets
 
@@ -181,21 +181,21 @@ Used to grant approvals for specific tokens to a specified address.
 function balanceOf(address owner) external view returns (uint256)
 ```
 
+Used to retrieve the number of tokens in ``owner``&#39;s account.
 
 
-*Returns the number of tokens in ``owner``&#39;s account.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| owner | address | undefined |
+| owner | address | Address of the account being checked |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | undefined |
+| _0 | uint256 | The balance of the given account |
 
 ### burn
 
@@ -234,7 +234,7 @@ Used to burn a given token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | uint256 Number of recursively burned children |
+| _0 | uint256 | Number of recursively burned children |
 
 ### canTokenBeEquippedWithAssetIntoSlot
 
@@ -259,7 +259,7 @@ Used to verify whether a token can be equipped into a given parent&#39;s slot.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | bool The boolean indicating whether the token with the given asset can be equipped into the desired  slot |
+| _0 | bool | The boolean indicating whether the token with the given asset can be equipped into the desired slot |
 
 ### childIsInActive
 
@@ -282,7 +282,7 @@ Used to verify that the given child tokwn is included in an active array of a to
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | bool A boolean value signifying whether the given child token is included in an active child tokens array  of a token (`true`) or not (`false`) |
+| _0 | bool | A boolean value signifying whether the given child token is included in an active child tokens array of a  token (`true`) or not (`false`) |
 
 ### childOf
 
@@ -305,7 +305,7 @@ Used to retrieve a specific active child token for a given parent token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IRMRKNestable.Child | struct A Child struct containing data about the specified child |
+| _0 | IRMRKNestable.Child | A Child struct containing data about the specified child |
 
 ### childrenOf
 
@@ -327,7 +327,7 @@ Used to retrieve the active child tokens of a given parent token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IRMRKNestable.Child[] | struct[] An array of Child structs containing the parent token&#39;s active child tokens |
+| _0 | IRMRKNestable.Child[] | An array of Child structs containing the parent token&#39;s active child tokens |
 
 ### directOwnerOf
 
@@ -349,9 +349,9 @@ Used to retrieve the immediate owner of the given token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | address | address Address of the given token&#39;s owner |
-| _1 | uint256 | uint256 The ID of the parent token. Should be `0` if the owner is an externally owned account |
-| _2 | bool | bool The boolean value signifying whether the owner is an NFT or not |
+| _0 | address | Address of the given token&#39;s owner |
+| _1 | uint256 | The ID of the parent token. Should be `0` if the owner is an externally owned account |
+| _2 | bool | The boolean value signifying whether the owner is an NFT or not |
 
 ### equip
 
@@ -389,7 +389,7 @@ Used to retrieve the priorities of the active resoources of a given token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint16[] | uint16[] An array of priorities of the active assets of the given token |
+| _0 | uint16[] | An array of priorities of the active assets of the given token |
 
 ### getActiveAssets
 
@@ -411,7 +411,7 @@ Used to retrieve IDs of the active assets of given token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint64[] | uint64[] An array of active asset IDs of the given token |
+| _0 | uint64[] | An array of active asset IDs of the given token |
 
 ### getApproved
 
@@ -419,21 +419,21 @@ Used to retrieve IDs of the active assets of given token.
 function getApproved(uint256 tokenId) external view returns (address)
 ```
 
+Used to retireve the account approved to manage given token.
 
-
-*Returns the account approved for `tokenId` token. Requirements: - `tokenId` must exist.*
+*Requirements:  - `tokenId` must exist.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | undefined |
+| tokenId | uint256 | ID of the token to check for approval |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | address | undefined |
+| _0 | address | Address of the account approved to manage the token |
 
 ### getApprovedForAssets
 
@@ -455,7 +455,7 @@ Used to get the address of the user that is approved to manage the specified tok
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | address | address Address of the account that is approved to manage the token |
+| _0 | address | Address of the account that is approved to manage the token |
 
 ### getAssetAndEquippableData
 
@@ -504,7 +504,7 @@ Used to fetch the asset metadata of the specified token&#39;s active asset with 
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | string The metadata of the asset belonging to the specified index in the token&#39;s active assets  array |
+| _0 | string | The metadata of the asset belonging to the specified index in the token&#39;s active assets  array |
 
 ### getAssetReplacements
 
@@ -527,7 +527,7 @@ Used to retrieve the asset that will be replaced if a given asset from the token
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint64 | uint64 ID of the asset which will be replaced |
+| _0 | uint64 | ID of the asset which will be replaced |
 
 ### getAssetType
 
@@ -549,7 +549,7 @@ Used to get the type of the asset.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | string The type of the asset |
+| _0 | string | The type of the asset |
 
 ### getEquipment
 
@@ -573,7 +573,7 @@ Used to get the Equipment object equipped into the specified slot of the desired
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IRMRKEquippable.Equipment | struct The `Equipment` struct containing data about the equipped object |
+| _0 | IRMRKEquippable.Equipment | The `Equipment` struct containing data about the equipped object |
 
 ### getPendingAssets
 
@@ -595,7 +595,7 @@ Used to retrieve IDs of the pending assets of given token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint64[] | uint64[] An array of pending asset IDs of the given token |
+| _0 | uint64[] | An array of pending asset IDs of the given token |
 
 ### isApprovedForAll
 
@@ -603,22 +603,22 @@ Used to retrieve IDs of the pending assets of given token.
 function isApprovedForAll(address owner, address operator) external view returns (bool)
 ```
 
+Used to check if the given address is allowed to manage the tokens of the specified address.
 
 
-*Returns if the `operator` is allowed to manage all of the assets of `owner`. See {setApprovalForAll}*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| owner | address | undefined |
-| operator | address | undefined |
+| owner | address | Address of the owner of the tokens |
+| operator | address | Address being checked for approval |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | undefined |
+| _0 | bool | A boolean value signifying whether the *operator* is allowed to manage the tokens of the *owner* (`true`)  or not (`false`) |
 
 ### isApprovedForAllForAssets
 
@@ -641,7 +641,7 @@ Used to check whether the address has been granted the operator role by a given 
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | bool The boolean value indicating wehter the account we are checking has been granted the operator role |
+| _0 | bool | The boolean value indicating wehter the account we are checking has been granted the operator role |
 
 ### isChildEquipped
 
@@ -665,7 +665,7 @@ Used to check whether the token has a given child equipped.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | bool The boolean value indicating whether the child token is equipped into the given token or not |
+| _0 | bool | The boolean value indicating whether the child token is equipped into the given token or not |
 
 ### mint
 
@@ -699,7 +699,7 @@ Used to retrieve the collection name.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | string Name of the collection |
+| _0 | string | Name of the collection |
 
 ### nestMint
 
@@ -800,7 +800,7 @@ Used to retrieve a specific pending child token from a given parent token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IRMRKNestable.Child | struct A Child struct containting data about the specified child |
+| _0 | IRMRKNestable.Child | A Child struct containting data about the specified child |
 
 ### pendingChildrenOf
 
@@ -822,7 +822,7 @@ Used to retrieve the pending child tokens of a given parent token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IRMRKNestable.Child[] | struct[] An array of Child structs containing the parent token&#39;s pending child tokens |
+| _0 | IRMRKNestable.Child[] | An array of Child structs containing the parent token&#39;s pending child tokens |
 
 ### rejectAllAssets
 
@@ -856,7 +856,7 @@ Used to reject all pending children of a given parent token.
 | Name | Type | Description |
 |---|---|---|
 | tokenId | uint256 | undefined |
-| maxRejections | uint256 | Maximum number of expected children to reject, used to prevent from  rejecting children which arrive just before this operation. |
+| maxRejections | uint256 | Maximum number of expected children to reject, used to prevent from rejecting children which  arrive just before this operation. |
 
 ### rejectAsset
 
@@ -874,7 +874,7 @@ Rejects a asset from the pending array of given token.
 |---|---|---|
 | tokenId | uint256 | ID of the token that the asset is being rejected from |
 | index | uint256 | Index of the asset in the pending array to be rejected |
-| assetId | uint64 | undefined |
+| assetId | uint64 | ID of the asset that is being rejected |
 
 ### safeTransferFrom
 
@@ -882,17 +882,17 @@ Rejects a asset from the pending array of given token.
 function safeTransferFrom(address from, address to, uint256 tokenId) external nonpayable
 ```
 
+Used to safely transfer a given token token from `from` to `to`.
 
-
-*Safely transfers `tokenId` token from `from` to `to`, checking first that contract recipients are aware of the ERC721 protocol to prevent tokens from being forever locked. Requirements: - `from` cannot be the zero address. - `to` cannot be the zero address. - `tokenId` token must exist and be owned by `from`. - If the caller is not `from`, it must have been allowed to move this token by either {approve} or {setApprovalForAll}. - If `to` refers to a smart contract, it must implement {IERC721Receiver-onERC721Received}, which is called upon a safe transfer. Emits a {Transfer} event.*
+*Requirements:  - `from` cannot be the zero address.  - `to` cannot be the zero address.  - `tokenId` token must exist and be owned by `from`.  - If the caller is not `from`, it must be approved to move this token by either {approve} or {setApprovalForAll}.  - If `to` refers to a smart contract, it must implement {IERC721Receiver-onERC721Received}, which is called upon a safe transfer.Emits a {Transfer} event.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| from | address | undefined |
-| to | address | undefined |
-| tokenId | uint256 | undefined |
+| from | address | Address to transfer the tokens from |
+| to | address | Address to transfer the tokens to |
+| tokenId | uint256 | ID of the token to transfer |
 
 ### safeTransferFrom
 
@@ -900,18 +900,18 @@ function safeTransferFrom(address from, address to, uint256 tokenId) external no
 function safeTransferFrom(address from, address to, uint256 tokenId, bytes data) external nonpayable
 ```
 
+Used to safely transfer a given token token from `from` to `to`.
 
-
-*Safely transfers `tokenId` token from `from` to `to`. Requirements: - `from` cannot be the zero address. - `to` cannot be the zero address. - `tokenId` token must exist and be owned by `from`. - If the caller is not `from`, it must be approved to move this token by either {approve} or {setApprovalForAll}. - If `to` refers to a smart contract, it must implement {IERC721Receiver-onERC721Received}, which is called upon a safe transfer. Emits a {Transfer} event.*
+*Requirements:  - `from` cannot be the zero address.  - `to` cannot be the zero address.  - `tokenId` token must exist and be owned by `from`.  - If the caller is not `from`, it must be approved to move this token by either {approve} or {setApprovalForAll}.  - If `to` refers to a smart contract, it must implement {IERC721Receiver-onERC721Received}, which is called upon a safe transfer.Emits a {Transfer} event.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| from | address | undefined |
-| to | address | undefined |
-| tokenId | uint256 | undefined |
-| data | bytes | undefined |
+| from | address | Address to transfer the tokens from |
+| to | address | Address to transfer the tokens to |
+| tokenId | uint256 | ID of the token to transfer |
+| data | bytes | Additional data without a specified format to be sent along with the token transaction |
 
 ### setApprovalForAll
 
@@ -919,16 +919,16 @@ function safeTransferFrom(address from, address to, uint256 tokenId, bytes data)
 function setApprovalForAll(address operator, bool approved) external nonpayable
 ```
 
+Used to approve or remove `operator` as an operator for the caller.
 
-
-*Approve or remove `operator` as an operator for the caller. Operators can call {transferFrom} or {safeTransferFrom} for any token owned by the caller. Requirements: - The `operator` cannot be the caller. Emits an {ApprovalForAll} event.*
+*Operators can call {transferFrom} or {safeTransferFrom} for any token owned by the caller.Requirements: - The `operator` cannot be the caller.Emits an {ApprovalForAll} event.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| operator | address | undefined |
-| approved | bool | undefined |
+| operator | address | Address of the operator being managed |
+| approved | bool | A boolean value signifying whether the approval is being granted (`true`) or (`revoked`) |
 
 ### setApprovalForAllForAssets
 
@@ -1019,7 +1019,7 @@ Used to retrieve the collection symbol.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | string Symbol of the collection |
+| _0 | string | Symbol of the collection |
 
 ### transfer
 
@@ -1067,17 +1067,17 @@ Used to transfer a child token from a given parent token.
 function transferFrom(address from, address to, uint256 tokenId) external nonpayable
 ```
 
+Transfers a given token from `from` to `to`.
 
-
-*Transfers `tokenId` token from `from` to `to`. WARNING: Note that the caller is responsible to confirm that the recipient is capable of receiving ERC721 or else they may be permanently lost. Usage of {safeTransferFrom} prevents loss, though the caller must understand this adds an external call which potentially creates a reentrancy vulnerability. Requirements: - `from` cannot be the zero address. - `to` cannot be the zero address. - `tokenId` token must be owned by `from`. - If the caller is not `from`, it must be approved to move this token by either {approve} or {setApprovalForAll}. Emits a {Transfer} event.*
+*Requirements:  - `from` cannot be the zero address.  - `to` cannot be the zero address.  - `tokenId` token must be owned by `from`.  - If the caller is not `from`, it must be approved to move this token by either {approve} or {setApprovalForAll}.Emits a {Transfer} event.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| from | address | undefined |
-| to | address | undefined |
-| tokenId | uint256 | undefined |
+| from | address | Address from which to transfer the token from |
+| to | address | Address to which to transfer the token to |
+| tokenId | uint256 | ID of the token to transfer |
 
 ### unequip
 
