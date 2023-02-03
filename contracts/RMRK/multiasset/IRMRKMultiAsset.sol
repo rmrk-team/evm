@@ -163,7 +163,7 @@ interface IRMRKMultiAsset is IERC165 {
      *  `getAssetMetadata(tokenId, assetId)`.
      * @dev You can safely get 10k
      * @param tokenId ID of the token to retrieve the IDs of the active assets
-     * @return uint64[] An array of active asset IDs of the given token
+     * @return An array of active asset IDs of the given token
      */
     function getActiveAssets(
         uint256 tokenId
@@ -174,7 +174,7 @@ interface IRMRKMultiAsset is IERC165 {
      * @dev Asset data is stored by reference, in order to access the data corresponding to the ID, call
      *  `getAssetMetadata(tokenId, assetId)`.
      * @param tokenId ID of the token to retrieve the IDs of the pending assets
-     * @return uint64[] An array of pending asset IDs of the given token
+     * @return An array of pending asset IDs of the given token
      */
     function getPendingAssets(
         uint256 tokenId
@@ -185,7 +185,7 @@ interface IRMRKMultiAsset is IERC165 {
      * @dev Asset priorities are a non-sequential array of uint16 values with an array size equal to active asset
      *  priorites.
      * @param tokenId ID of the token for which to retrieve the priorities of the active assets
-     * @return uint16[] An array of priorities of the active assets of the given token
+     * @return An array of priorities of the active assets of the given token
      */
     function getActiveAssetPriorities(
         uint256 tokenId
@@ -198,7 +198,7 @@ interface IRMRKMultiAsset is IERC165 {
      *  `getAssetMetadata(tokenId, assetId)`.
      * @param tokenId ID of the token to check
      * @param newAssetId ID of the pending asset which will be accepted
-     * @return uint64 ID of the asset which will be replaced
+     * @return ID of the asset which will be replaced
      */
     function getAssetReplacements(
         uint256 tokenId,
@@ -211,7 +211,7 @@ interface IRMRKMultiAsset is IERC165 {
      * @dev Can be overriden to implement enumerate, fallback or other custom logic.
      * @param tokenId ID of the token from which to retrieve the asset metadata
      * @param assetId Asset Id, must be in the active assets array
-     * @return string The metadata of the asset belonging to the specified index in the token's active assets
+     * @return The metadata of the asset belonging to the specified index in the token's active assets
      *  array
      */
     function getAssetMetadata(
@@ -242,7 +242,7 @@ interface IRMRKMultiAsset is IERC165 {
      *
      *  - `tokenId` must exist.
      * @param tokenId ID of the token for which to retrieve the approved address
-     * @return address Address of the account that is approved to manage the specified token's assets
+     * @return Address of the account that is approved to manage the specified token's assets
      */
     function getApprovedForAssets(
         uint256 tokenId
@@ -270,7 +270,7 @@ interface IRMRKMultiAsset is IERC165 {
      * @dev See {setApprovalForAllForAssets}.
      * @param owner Address of the account that we are checking for whether it has granted the operator role
      * @param operator Address of the account that we are checking whether it has the operator role or not
-     * @return bool The boolean value indicating wehter the account we are checking has been granted the operator role
+     * @return The boolean value indicating wehter the account we are checking has been granted the operator role
      */
     function isApprovedForAllForAssets(
         address owner,

@@ -78,6 +78,7 @@ contract RMRKNestableExternalEquip is IRMRKNestableExternalEquip, RMRKNestable {
 
     /**
      * @notice Used to set the address of the `Equippable` smart contract.
+     * @dev Emits ***EquippableAddressSet*** event.
      * @param equippable Address of the `Equippable` smart contract
      */
     function _setEquippableAddress(address equippable) internal virtual {

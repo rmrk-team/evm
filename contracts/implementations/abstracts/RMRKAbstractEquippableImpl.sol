@@ -31,8 +31,8 @@ abstract contract RMRKAbstractEquippableImpl is
     /**
      * @notice Used to calculate the token IDs of tokens to be minted.
      * @param numToMint Amount of tokens to be minted
-     * @return uint256 The ID of the first token to be minted in the current minting cycle
-     * @return uint256 The ID of the last token to be minted in the current minting cycle
+     * @return The ID of the first token to be minted in the current minting cycle
+     * @return The ID of the last token to be minted in the current minting cycle
      */
     function _preMint(uint256 numToMint) internal returns (uint256, uint256) {
         if (numToMint == uint256(0)) revert RMRKMintZero();
@@ -86,7 +86,7 @@ abstract contract RMRKAbstractEquippableImpl is
      * @param catalogAddress Address of the `Catalog` smart contract this asset belongs to
      * @param metadataURI Metadata URI of the asset
      * @param partIds An array of IDs of fixed and slot parts to be included in the asset
-     * @return uint256 The total number of assets after this asset has been added
+     * @return The total number of assets after this asset has been added
      */
     function addEquippableAssetEntry(
         uint64 equippableGroupId,
@@ -111,6 +111,7 @@ abstract contract RMRKAbstractEquippableImpl is
      * @notice Used to add a asset entry.
      * @dev The ID of the asset is automatically assigned to be the next available asset ID.
      * @param metadataURI Metadata URI of the asset
+     * @return ID of the newly added asset
      */
     function addAssetEntry(
         string memory metadataURI
@@ -143,7 +144,7 @@ abstract contract RMRKAbstractEquippableImpl is
 
     /**
      * @notice Used to retrieve the total number of assets.
-     * @return uint256 The total number of assets
+     * @return The total number of assets
      */
     function totalAssets() public view virtual returns (uint256) {
         return _totalAssets;

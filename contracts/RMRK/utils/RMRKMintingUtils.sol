@@ -46,7 +46,7 @@ contract RMRKMintingUtils is OwnableLock {
 
     /**
      * @notice Used to retrieve the total supply of the tokens in a collection.
-     * @return uint256 The number of tokens in a collection
+     * @return The number of tokens in a collection
      */
     function totalSupply() public view returns (uint256) {
         return _totalSupply;
@@ -54,7 +54,7 @@ contract RMRKMintingUtils is OwnableLock {
 
     /**
      * @notice Used to retrieve the maximum supply of the collection.
-     * @return uint256 The maximum supply of tokens in the collection
+     * @return The maximum supply of tokens in the collection
      */
     function maxSupply() public view returns (uint256) {
         return _maxSupply;
@@ -62,7 +62,7 @@ contract RMRKMintingUtils is OwnableLock {
 
     /**
      * @notice Used to retrieve the price per mint.
-     * @return uint256 The price per mint of a single token expressed in the lowest denomination of a native currency
+     * @return The price per mint of a single token expressed in the lowest denomination of a native currency
      */
     function pricePerMint() public view returns (uint256) {
         return _pricePerMint;

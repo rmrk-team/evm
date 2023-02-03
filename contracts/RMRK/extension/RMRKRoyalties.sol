@@ -28,7 +28,6 @@ abstract contract RMRKRoyalties is IERC2981 {
         _royaltyPercentageBps = royaltyPercentageBps;
     }
 
-    //@notice Requires access control on the implementation contract like implementing Ownable and setting onlyOwner modifier
     /**
      * @notice Used to update recipient of royalties.
      * @dev Custom access control has to be implemented to ensure that only the intended actors can update the
@@ -49,7 +48,7 @@ abstract contract RMRKRoyalties is IERC2981 {
 
     /**
      * @notice Used to retrieve the recipient of royalties.
-     * @return address Address of the recipient of royalties
+     * @return Address of the recipient of royalties
      */
     function getRoyaltyRecipient() external view virtual returns (address) {
         return _royaltyRecipient;
@@ -57,7 +56,7 @@ abstract contract RMRKRoyalties is IERC2981 {
 
     /**
      * @notice Used to retrieve the specified royalty percentage.
-     + @return uint256 The royalty percentage expressed in the basis points
+     * @return The royalty percentage expressed in the basis points
      */
     function getRoyaltyPercentage() external view virtual returns (uint256) {
         return _royaltyPercentageBps;

@@ -27,6 +27,7 @@ abstract contract RMRKEmotable is IRMRKEmotable {
 
     /**
      * @notice Used to emote or undo an emote on a token.
+     * @dev Emits ***Emoted*** event.
      * @param tokenId ID of the token being emoted
      * @param emoji Unicode identifier of the emoji
      * @param state Boolean value signifying whether to emote (`true`) or undo (`false`) emote

@@ -67,7 +67,7 @@ contract RMRKMultiAsset is IERC165, IERC721, AbstractMultiAsset, RMRKCore {
      *   3. Is granted approval for the specific tokenId for asset management via the `approveForAssets` function.
      * @param user Address of the user we are checking for permission
      * @param tokenId ID of the token to query for permission for a given `user`
-     * @return bool A boolean value indicating whether the user is approved to manage the token or not
+     * @return A boolean value indicating whether the user is approved to manage the token or not
      */
     function _isApprovedForAssetsOrOwner(
         address user,
@@ -128,7 +128,9 @@ contract RMRKMultiAsset is IERC165, IERC721, AbstractMultiAsset, RMRKCore {
     }
 
     /**
-     * @inheritdoc IERC721
+     * @notice Used to retrieve the number of tokens in ``owner``'s account.
+     * @param owner Address of the account being checked
+     * @return The balance of the given account
      */
     function balanceOf(address owner) public view virtual returns (uint256) {
         if (owner == address(0)) revert ERC721AddressZeroIsNotaValidOwner();
@@ -136,7 +138,12 @@ contract RMRKMultiAsset is IERC165, IERC721, AbstractMultiAsset, RMRKCore {
     }
 
     /**
-     * @inheritdoc IERC721
+     * @notice Used to retireve the owner of the given token.
+     * @dev Requirements:
+     *
+     *  - `tokenId` must exist.
+     * @param tokenId ID of the token for which to retrieve the token for
+     * @return Address of the account owning the token
      */
     function ownerOf(uint256 tokenId) public view virtual returns (address) {
         address owner = _owners[tokenId];
@@ -145,7 +152,17 @@ contract RMRKMultiAsset is IERC165, IERC721, AbstractMultiAsset, RMRKCore {
     }
 
     /**
-     * @inheritdoc IERC721
+     * @notice Used to grant a one-time approval to manage one's token.
+     * @dev Gives permission to `to` to transfer `tokenId` token to another account.
+     * @dev The approval is cleared when the token is transferred.
+     * @dev Only a single account can be approved at a time, so approving the zero address clears previous approvals.
+     * @dev Requirements:
+     *
+     * - The caller must own the token or be an approved operator.
+     * - `tokenId` must exist.
+     * @dev Emits an {Approval} event.
+     * @param to Address receiving the approval
+     * @param tokenId ID of the token for which the approval is being granted
      */
     function approve(address to, uint256 tokenId) public virtual {
         address owner = ownerOf(tokenId);
@@ -158,7 +175,12 @@ contract RMRKMultiAsset is IERC165, IERC721, AbstractMultiAsset, RMRKCore {
     }
 
     /**
-     * @inheritdoc IERC721
+     * @notice Used to retireve the account approved to manage given token.
+     * @dev Requirements:
+     *
+     *  - `tokenId` must exist.
+     * @param tokenId ID of the token to check for approval
+     * @return Address of the account approved to manage the token
      */
     function getApproved(
         uint256 tokenId
@@ -169,14 +191,25 @@ contract RMRKMultiAsset is IERC165, IERC721, AbstractMultiAsset, RMRKCore {
     }
 
     /**
-     * @inheritdoc IERC721
+     * @notice Used to approve or remove `operator` as an operator for the caller.
+     * @dev Operators can call {transferFrom} or {safeTransferFrom} for any token owned by the caller.
+     * @dev Requirements:
+     *
+     * - The `operator` cannot be the caller.
+     * @dev Emits an {ApprovalForAll} event.
+     * @param operator Address of the operator being managed
+     * @param approved A boolean value signifying whether the approval is being granted (`true`) or (`revoked`)
      */
     function setApprovalForAll(address operator, bool approved) public virtual {
         _setApprovalForAll(_msgSender(), operator, approved);
     }
 
     /**
-     * @inheritdoc IERC721
+     * @notice Used to check if the given address is allowed to manage the tokens of the specified address.
+     * @param owner Address of the owner of the tokens
+     * @param operator Address being checked for approval
+     * @return A boolean value signifying whether the *operator* is allowed to manage the tokens of the *owner* (`true`)
+     *  or not (`false`)
      */
     function isApprovedForAll(
         address owner,
@@ -186,7 +219,17 @@ contract RMRKMultiAsset is IERC165, IERC721, AbstractMultiAsset, RMRKCore {
     }
 
     /**
-     * @inheritdoc IERC721
+     * @notice Transfers a given token from `from` to `to`.
+     * @dev Requirements:
+     *
+     *  - `from` cannot be the zero address.
+     *  - `to` cannot be the zero address.
+     *  - `tokenId` token must be owned by `from`.
+     *  - If the caller is not `from`, it must be approved to move this token by either {approve} or {setApprovalForAll}.
+     * @dev Emits a {Transfer} event.
+     * @param from Address from which to transfer the token from
+     * @param to Address to which to transfer the token to
+     * @param tokenId ID of the token to transfer
      */
     function transferFrom(
         address from,
@@ -197,7 +240,18 @@ contract RMRKMultiAsset is IERC165, IERC721, AbstractMultiAsset, RMRKCore {
     }
 
     /**
-     * @inheritdoc IERC721
+     * @notice Used to safely transfer a given token token from `from` to `to`.
+     * @dev Requirements:
+     *
+     *  - `from` cannot be the zero address.
+     *  - `to` cannot be the zero address.
+     *  - `tokenId` token must exist and be owned by `from`.
+     *  - If the caller is not `from`, it must be approved to move this token by either {approve} or {setApprovalForAll}.
+     *  - If `to` refers to a smart contract, it must implement {IERC721Receiver-onERC721Received}, which is called upon a safe transfer.
+     * @dev Emits a {Transfer} event.
+     * @param from Address to transfer the tokens from
+     * @param to Address to transfer the tokens to
+     * @param tokenId ID of the token to transfer
      */
     function safeTransferFrom(
         address from,
@@ -208,7 +262,19 @@ contract RMRKMultiAsset is IERC165, IERC721, AbstractMultiAsset, RMRKCore {
     }
 
     /**
-     * @inheritdoc IERC721
+     * @notice Used to safely transfer a given token token from `from` to `to`.
+     * @dev Requirements:
+     *
+     *  - `from` cannot be the zero address.
+     *  - `to` cannot be the zero address.
+     *  - `tokenId` token must exist and be owned by `from`.
+     *  - If the caller is not `from`, it must be approved to move this token by either {approve} or {setApprovalForAll}.
+     *  - If `to` refers to a smart contract, it must implement {IERC721Receiver-onERC721Received}, which is called upon a safe transfer.
+     * @dev Emits a {Transfer} event.
+     * @param from Address to transfer the tokens from
+     * @param to Address to transfer the tokens to
+     * @param tokenId ID of the token to transfer
+     * @param data Additional data without a specified format to be sent along with the token transaction
      */
     function safeTransferFrom(
         address from,
@@ -254,7 +320,7 @@ contract RMRKMultiAsset is IERC165, IERC721, AbstractMultiAsset, RMRKCore {
      * @dev Tokens can be managed by their owner or approved accounts via {approve} or {setApprovalForAll}.
      * @dev Tokens start existing when they are minted (`_mint`) and stop existing when they are burned (`_burn`).
      * @param tokenId ID of the token being checked
-     * @return bool The boolean value signifying whether the token exists
+     * @return The boolean value signifying whether the token exists
      */
     function _exists(uint256 tokenId) internal view virtual returns (bool) {
         return _owners[tokenId] != address(0);
@@ -267,7 +333,7 @@ contract RMRKMultiAsset is IERC165, IERC721, AbstractMultiAsset, RMRKCore {
      *  - `tokenId` must exist.
      * @param spender Address that is being checked for approval
      * @param tokenId ID of the token being checked
-     * @return bool The boolean value indicating whether the `spender` is approved to manage the given token
+     * @return The boolean value indicating whether the `spender` is approved to manage the given token
      */
     function _isApprovedOrOwner(
         address spender,
@@ -525,6 +591,7 @@ contract RMRKMultiAsset is IERC165, IERC721, AbstractMultiAsset, RMRKCore {
 
     /**
      * @notice Used to grant an approval to an address to manage assets of a given token.
+     * @dev Emits ***ApprovalForAssets*** event.
      * @param to Address of the account to grant the approval to
      * @param tokenId ID of the token for which the approval is being given
      */

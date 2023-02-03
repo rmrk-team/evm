@@ -14,7 +14,7 @@ interface IRMRKTypedMultiAsset is IERC165 {
     /**
      * @notice Used to get the type of the asset.
      * @param assetId ID of the asset to check
-     * @return string The type of the asset
+     * @return The type of the asset
      */
     function getAssetType(uint64 assetId) external view returns (string memory);
 }

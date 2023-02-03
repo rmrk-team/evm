@@ -124,7 +124,9 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
     }
 
     /**
-     * @inheritdoc IERC721
+     * @notice Used to retrieve the number of tokens in ``owner``'s account.
+     * @param owner Address of the account being checked
+     * @return The balance of the given account
      */
     function balanceOf(address owner) public view virtual returns (uint256) {
         if (owner == address(0)) revert ERC721AddressZeroIsNotaValidOwner();
@@ -136,7 +138,17 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
     ////////////////////////////////////////
 
     /**
-     * @inheritdoc IERC721
+     * @notice Transfers a given token from `from` to `to`.
+     * @dev Requirements:
+     *
+     *  - `from` cannot be the zero address.
+     *  - `to` cannot be the zero address.
+     *  - `tokenId` token must be owned by `from`.
+     *  - If the caller is not `from`, it must be approved to move this token by either {approve} or {setApprovalForAll}.
+     * @dev Emits a {Transfer} event.
+     * @param from Address from which to transfer the token from
+     * @param to Address to which to transfer the token to
+     * @param tokenId ID of the token to transfer
      */
     function transferFrom(
         address from,
@@ -147,7 +159,18 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
     }
 
     /**
-     * @inheritdoc IERC721
+     * @notice Used to safely transfer a given token token from `from` to `to`.
+     * @dev Requirements:
+     *
+     *  - `from` cannot be the zero address.
+     *  - `to` cannot be the zero address.
+     *  - `tokenId` token must exist and be owned by `from`.
+     *  - If the caller is not `from`, it must be approved to move this token by either {approve} or {setApprovalForAll}.
+     *  - If `to` refers to a smart contract, it must implement {IERC721Receiver-onERC721Received}, which is called upon a safe transfer.
+     * @dev Emits a {Transfer} event.
+     * @param from Address to transfer the tokens from
+     * @param to Address to transfer the tokens to
+     * @param tokenId ID of the token to transfer
      */
     function safeTransferFrom(
         address from,
@@ -158,7 +181,19 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
     }
 
     /**
-     * @inheritdoc IERC721
+     * @notice Used to safely transfer a given token token from `from` to `to`.
+     * @dev Requirements:
+     *
+     *  - `from` cannot be the zero address.
+     *  - `to` cannot be the zero address.
+     *  - `tokenId` token must exist and be owned by `from`.
+     *  - If the caller is not `from`, it must be approved to move this token by either {approve} or {setApprovalForAll}.
+     *  - If `to` refers to a smart contract, it must implement {IERC721Receiver-onERC721Received}, which is called upon a safe transfer.
+     * @dev Emits a {Transfer} event.
+     * @param from Address to transfer the tokens from
+     * @param to Address to transfer the tokens to
+     * @param tokenId ID of the token to transfer
+     * @param data Additional data without a specified format to be sent along with the token transaction
      */
     function safeTransferFrom(
         address from,
@@ -412,6 +447,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
      *  - `tokenId` must not exist.
      *  - `to` cannot be the zero address.
      * @dev Emits a {Transfer} event.
+     * @dev Emits a {NestTransfer} event.
      * @param to Address to mint the token to
      * @param tokenId ID of the token to mint
      * @param data Additional data with no specified format, sent in call to `to`
@@ -557,7 +593,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
      * @dev Emits a {NestTransfer} event.
      * @param tokenId ID of the token to burn
      * @param maxChildrenBurns Maximum children to recursively burn
-     * @return uint256 The number of recursive burns it took to burn all of the children
+     * @return The number of recursive burns it took to burn all of the children
      */
     function _burn(
         uint256 tokenId,
@@ -638,7 +674,17 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
     ////////////////////////////////////////
 
     /**
-     * @inheritdoc IERC721
+     * @notice Used to grant a one-time approval to manage one's token.
+     * @dev Gives permission to `to` to transfer `tokenId` token to another account.
+     * @dev The approval is cleared when the token is transferred.
+     * @dev Only a single account can be approved at a time, so approving the zero address clears previous approvals.
+     * @dev Requirements:
+     *
+     * - The caller must own the token or be an approved operator.
+     * - `tokenId` must exist.
+     * @dev Emits an {Approval} event.
+     * @param to Address receiving the approval
+     * @param tokenId ID of the token for which the approval is being granted
      */
     function approve(address to, uint256 tokenId) public virtual {
         address owner = ownerOf(tokenId);
@@ -651,7 +697,12 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
     }
 
     /**
-     * @inheritdoc IERC721
+     * @notice Used to retireve the account approved to manage given token.
+     * @dev Requirements:
+     *
+     *  - `tokenId` must exist.
+     * @param tokenId ID of the token to check for approval
+     * @return Address of the account approved to manage the token
      */
     function getApproved(
         uint256 tokenId
@@ -662,7 +713,14 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
     }
 
     /**
-     * @inheritdoc IERC721
+     * @notice Used to approve or remove `operator` as an operator for the caller.
+     * @dev Operators can call {transferFrom} or {safeTransferFrom} for any token owned by the caller.
+     * @dev Requirements:
+     *
+     * - The `operator` cannot be the caller.
+     * @dev Emits an {ApprovalForAll} event.
+     * @param operator Address of the operator being managed
+     * @param approved A boolean value signifying whether the approval is being granted (`true`) or (`revoked`)
      */
     function setApprovalForAll(address operator, bool approved) public virtual {
         if (_msgSender() == operator) revert ERC721ApproveToCaller();
@@ -671,7 +729,11 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
     }
 
     /**
-     * @inheritdoc IERC721
+     * @notice Used to check if the given address is allowed to manage the tokens of the specified address.
+     * @param owner Address of the owner of the tokens
+     * @param operator Address being checked for approval
+     * @return A boolean value signifying whether the *operator* is allowed to manage the tokens of the *owner* (`true`)
+     *  or not (`false`)
      */
     function isApprovedForAll(
         address owner,
@@ -735,7 +797,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
      *  - `tokenId` must exist.
      * @param spender Address that is being checked for approval
      * @param tokenId ID of the token being checked
-     * @return bool The boolean value indicating whether the `spender` is approved to manage the given token
+     * @return The boolean value indicating whether the `spender` is approved to manage the given token
      */
     function _isApprovedOrOwner(
         address spender,
@@ -751,7 +813,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
      * @notice Used to check whether the account is approved to manage the token or its direct owner.
      * @param spender Address that is being checked for approval or direct ownership
      * @param tokenId ID of the token being checked
-     * @return bool The boolean value indicating whether the `spender` is approved to manage the given token or its
+     * @return The boolean value indicating whether the `spender` is approved to manage the given token or its
      *  direct owner
      */
     function _isApprovedOrDirectOwner(
@@ -785,7 +847,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
      * @notice Used to check whether the given token exists.
      * @dev Tokens start existing when they are minted (`_mint`) and stop existing when they are burned (`_burn`).
      * @param tokenId ID of the token being checked
-     * @return bool The boolean value signifying whether the token exists
+     * @return The boolean value signifying whether the token exists
      */
     function _exists(uint256 tokenId) internal view virtual returns (bool) {
         return _RMRKOwners[tokenId].ownerAddress != address(0);
@@ -889,6 +951,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
      *
      *  - `tokenId` must exist
      *  - `index` must be in range of the pending children array
+     * @dev Emits ***ChildAccepted*** event.
      * @param parentId ID of the parent token for which the child token is being accepted
      * @param childIndex Index of a child tokem in the given parent's pending children array
      * @param childAddress Address of the collection smart contract of the child token expected to be located at the
@@ -939,9 +1002,10 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
      * @dev Requirements:
      *
      *  - `tokenId` must exist
+     * @dev Emits ***AllChildrenRejected*** event.
      * @param tokenId ID of the parent token for which to reject all of the pending tokens.
-     * @param maxRejections Maximum number of expected children to reject, used to prevent from
-     *  rejecting children which arrive just before this operation.
+     * @param maxRejections Maximum number of expected children to reject, used to prevent from rejecting children which
+     *  arrive just before this operation.
      */
     function _rejectAllChildren(
         uint256 tokenId,
@@ -1149,8 +1213,8 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
      * @notice Used to verify that the given child tokwn is included in an active array of a token.
      * @param childAddress Address of the given token's collection smart contract
      * @param childId ID of the child token being checked
-     * @return bool A boolean value signifying whether the given child token is included in an active child tokens array
-     *  of a token (`true`) or not (`false`)
+     * @return A boolean value signifying whether the given child token is included in an active child tokens array of a
+     *  token (`true`) or not (`false`)
      */
     function childIsInActive(
         address childAddress,

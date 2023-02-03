@@ -20,7 +20,7 @@ interface IRMRKNestableExternalEquip is IERC165 {
 
     /**
      * @notice Used to retrieve the `Equippable` smart contract's address.
-     * @return address Address of the `Equippable` smart contract
+     * @return Address of the `Equippable` smart contract
      */
     function getEquippableAddress() external view returns (address);
 
@@ -29,8 +29,8 @@ interface IRMRKNestableExternalEquip is IERC165 {
      *  it.
      * @param spender Address of the account we are checking for ownership or approval
      * @param tokenId ID of the token that we are checking
-     * @return bool A boolean value indicating whether the specified address is the owner of the given token or approved
-     *  to manage it
+     * @return A boolean value indicating whether the specified address is the owner of the given token or approved to
+     *  manage it
      */
     function isApprovedOrOwner(
         address spender,

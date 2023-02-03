@@ -31,6 +31,7 @@ abstract contract RMRKEmoteTracker is IRMRKEmoteTracker {
 
     /**
      * @notice Used to emote or undo an emote on a token.
+     * @dev Emits ***Emoted*** event.
      * @param collection Address of the collection containing the token being emoted
      * @param tokenId ID of the token being emoted
      * @param emoji Unicode identifier of the emoji

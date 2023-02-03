@@ -114,6 +114,7 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
     /**
      * @notice Used to accept a pending asset.
      * @dev The call is reverted if there is no pending asset at a given index.
+     * @dev Emits ***AssetAccepted*** event.
      * @param tokenId ID of the token for which to accept the pending asset
      * @param index Index of the asset in the pending array to accept
      * @param assetId ID of the asset to accept in token's pending array
@@ -156,6 +157,7 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
     /**
      * @notice Used to reject the specified asset from the pending array.
      * @dev The call is reverted if there is no pending asset at a given index.
+     * @dev Emits ***AssetRejected*** event.
      * @param tokenId ID of the token that the asset is being rejected from
      * @param index Index of the asset in the pending array to be rejected
      * @param assetId ID of the asset expected to be in the index
@@ -213,6 +215,7 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
      * @dev When rejecting all assets, the pending array is indiscriminately cleared.
      * @dev If the number of pending assets is greater than the value of `maxRejections`, the exectuion will be
      *  reverted.
+     * @dev Emits ***AssetRejected*** event.
      * @param tokenId ID of the token to reject all of the pending assets.
      * @param maxRejections Maximum number of expected assets to reject, used to prevent from
      *  rejecting assets which arrive just before this operation.
@@ -245,6 +248,7 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
      *  will be reverted.
      * @dev The position of the priority value in the array corresponds the position of the asset in the active
      *  assets array it will be applied to.
+     * @dev Emits ***AssetPrioritySet*** event.
      * @param tokenId ID of the token for which the priorities are being set
      * @param priorities Array of priorities for the assets
      */
@@ -267,6 +271,7 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
      * @notice Used to add an asset entry.
      * @dev If the specified ID is already used by another asset, the execution will be reverted.
      * @dev This internal function warrants custom access control to be implemented when used.
+     * @dev Emits ***AssetSet*** event.
      * @param id ID of the asset to assign to the new asset
      * @param metadataURI Metadata URI of the asset
      */
@@ -290,6 +295,7 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
      * @dev If the asset ID is invalid, the execution will be reverted.
      * @dev If the token already has the maximum amount of pending assets (128), the execution will be
      *  reverted.
+     * @dev Emits ***AssetAddedToToken*** event.
      * @param tokenId ID of the token to add the asset to
      * @param assetId ID of the asset to add to the token
      * @param replacesAssetWithId ID of the asset to replace from the token's list of active assets

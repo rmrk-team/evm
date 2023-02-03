@@ -127,7 +127,7 @@ interface IRMRKEquippable is IRMRKMultiAsset {
      * @param tokenId ID of the parent token for which we are querying for
      * @param childAddress Address of the child token's smart contract
      * @param childId ID of the child token
-     * @return bool The boolean value indicating whether the child token is equipped into the given token or not
+     * @return The boolean value indicating whether the child token is equipped into the given token or not
      */
     function isChildEquipped(
         uint256 tokenId,
@@ -141,8 +141,7 @@ interface IRMRKEquippable is IRMRKMultiAsset {
      * @param tokenId ID of the token we want to equip
      * @param assetId ID of the asset associated with the token we want to equip
      * @param slotId ID of the slot that we want to equip the token into
-     * @return bool The boolean indicating whether the token with the given asset can be equipped into the desired
-     *  slot
+     * @return The boolean indicating whether the token with the given asset can be equipped into the desired slot
      */
     function canTokenBeEquippedWithAssetIntoSlot(
         address parent,
@@ -163,7 +162,7 @@ interface IRMRKEquippable is IRMRKMultiAsset {
      * @param tokenId ID of the token for which we are retrieving the equipped object
      * @param targetCatalogAddress Address of the `Catalog` associated with the `Slot` part of the token
      * @param slotPartId ID of the `Slot` part that we are checking for equipped objects
-     * @return struct The `Equipment` struct containing data about the equipped object
+     * @return The `Equipment` struct containing data about the equipped object
      */
     function getEquipment(
         uint256 tokenId,

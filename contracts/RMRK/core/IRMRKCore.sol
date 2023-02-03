@@ -10,13 +10,13 @@ pragma solidity ^0.8.16;
 interface IRMRKCore {
     /**
      * @notice Used to retrieve the collection name.
-     * @return string Name of the collection
+     * @return Name of the collection
      */
     function name() external view returns (string memory);
 
     /**
      * @notice Used to retrieve the collection symbol.
-     * @return string Symbol of the collection
+     * @return Symbol of the collection
      */
     function symbol() external view returns (string memory);
 }

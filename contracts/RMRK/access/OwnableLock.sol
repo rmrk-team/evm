@@ -31,7 +31,7 @@ contract OwnableLock is Ownable {
 
     /**
      * @notice Used to retrieve the status of a lockable smart contract.
-     * @return bool A boolean value signifying whether the smart contract has been locked
+     * @return A boolean value signifying whether the smart contract has been locked
      */
     function getLock() public view returns (bool) {
         return _lock == 1;
