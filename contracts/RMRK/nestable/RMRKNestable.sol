@@ -124,7 +124,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
     }
 
     /**
-     * @notice Used to retrieve the number of tokens in ``owner``'s account.
+     * @notice Used to retrieve the number of tokens in `owner`'s account.
      * @param owner Address of the account being checked
      * @return The balance of the given account
      */
@@ -697,7 +697,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
     }
 
     /**
-     * @notice Used to retireve the account approved to manage given token.
+     * @notice Used to retrieve the account approved to manage given token.
      * @dev Requirements:
      *
      *  - `tokenId` must exist.
@@ -797,7 +797,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
      *  - `tokenId` must exist.
      * @param spender Address that is being checked for approval
      * @param tokenId ID of the token being checked
-     * @return The boolean value indicating whether the `spender` is approved to manage the given token
+     * @return A boolean value indicating whether the `spender` is approved to manage the given token
      */
     function _isApprovedOrOwner(
         address spender,
@@ -813,7 +813,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
      * @notice Used to check whether the account is approved to manage the token or its direct owner.
      * @param spender Address that is being checked for approval or direct ownership
      * @param tokenId ID of the token being checked
-     * @return The boolean value indicating whether the `spender` is approved to manage the given token or its
+     * @return A boolean value indicating whether the `spender` is approved to manage the given token or its
      *  direct owner
      */
     function _isApprovedOrDirectOwner(
@@ -847,7 +847,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
      * @notice Used to check whether the given token exists.
      * @dev Tokens start existing when they are minted (`_mint`) and stop existing when they are burned (`_burn`).
      * @param tokenId ID of the token being checked
-     * @return The boolean value signifying whether the token exists
+     * @return A boolean value signifying whether the token exists
      */
     function _exists(uint256 tokenId) internal view virtual returns (bool) {
         return _RMRKOwners[tokenId].ownerAddress != address(0);

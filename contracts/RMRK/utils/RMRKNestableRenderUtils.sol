@@ -12,7 +12,7 @@ import "../library/RMRKErrors.sol";
  */
 contract RMRKNestableRenderUtils {
     /**
-     * @notice Used to retrieve the given child's index in its paren's child tokens array.
+     * @notice Used to retrieve the given child's index in its parent's child tokens array.
      * @param parentAddress Address of the parent token's collection smart contract
      * @param parentId ID of the parent token
      * @param childAddress Address of the child token's colection smart contract
