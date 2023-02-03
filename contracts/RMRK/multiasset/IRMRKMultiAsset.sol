@@ -270,7 +270,7 @@ interface IRMRKMultiAsset is IERC165 {
      * @dev See {setApprovalForAllForAssets}.
      * @param owner Address of the account that we are checking for whether it has granted the operator role
      * @param operator Address of the account that we are checking whether it has the operator role or not
-     * @return The boolean value indicating wehter the account we are checking has been granted the operator role
+     * @return A boolean value indicating wehter the account we are checking has been granted the operator role
      */
     function isApprovedForAllForAssets(
         address owner,

@@ -110,7 +110,7 @@ interface IRMRKCatalog is IERC165 {
 
     /**
      * @notice Used to return the metadata URI of the associated Catalog.
-     * @return Case metadata URI
+     * @return Catalog metadata URI
      */
     function getMetadataURI() external view returns (string memory);
 

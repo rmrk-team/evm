@@ -138,7 +138,7 @@ contract RMRKMultiAsset is IERC165, IERC721, AbstractMultiAsset, RMRKCore {
     }
 
     /**
-     * @notice Used to retireve the owner of the given token.
+     * @notice Used to retrieve the owner of the given token.
      * @dev Requirements:
      *
      *  - `tokenId` must exist.
@@ -175,7 +175,7 @@ contract RMRKMultiAsset is IERC165, IERC721, AbstractMultiAsset, RMRKCore {
     }
 
     /**
-     * @notice Used to retireve the account approved to manage given token.
+     * @notice Used to retrieve the account approved to manage given token.
      * @dev Requirements:
      *
      *  - `tokenId` must exist.
@@ -320,7 +320,7 @@ contract RMRKMultiAsset is IERC165, IERC721, AbstractMultiAsset, RMRKCore {
      * @dev Tokens can be managed by their owner or approved accounts via {approve} or {setApprovalForAll}.
      * @dev Tokens start existing when they are minted (`_mint`) and stop existing when they are burned (`_burn`).
      * @param tokenId ID of the token being checked
-     * @return The boolean value signifying whether the token exists
+     * @return A boolean value signifying whether the token exists
      */
     function _exists(uint256 tokenId) internal view virtual returns (bool) {
         return _owners[tokenId] != address(0);
@@ -333,7 +333,7 @@ contract RMRKMultiAsset is IERC165, IERC721, AbstractMultiAsset, RMRKCore {
      *  - `tokenId` must exist.
      * @param spender Address that is being checked for approval
      * @param tokenId ID of the token being checked
-     * @return The boolean value indicating whether the `spender` is approved to manage the given token
+     * @return A boolean value indicating whether the `spender` is approved to manage the given token
      */
     function _isApprovedOrOwner(
         address spender,

@@ -171,7 +171,7 @@ abstract contract RMRKTokenProperties is IRMRKTokenProperties {
      * @notice Used to get the Id for a string value. If the value does not exist, a new Id is created.
      *  Ids are shared among all tokens and used only for strings.
      * @param value The property value
-     * @return The id for the value
+     * @return The id for the string value
      */
     function _getStringIdForValue(
         string memory value
