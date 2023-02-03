@@ -48,7 +48,7 @@ contract RMRKMultiAssetRenderUtils {
      *  ]
      * @param target Address of the smart contract of the given token
      * @param tokenId ID of the token to retrieve the active assets for
-     * @return struct[] An array of ActiveAssets present on the given token
+     * @return An array of ActiveAssets present on the given token
      */
     function getExtendedActiveAssets(
         address target,
@@ -92,7 +92,7 @@ contract RMRKMultiAssetRenderUtils {
      *  ]
      * @param target Address of the smart contract of the given token
      * @param tokenId ID of the token to retrieve the pending assets for
-     * @return struct[] An array of PendingAssets present on the given token
+     * @return An array of PendingAssets present on the given token
      */
     function getPendingAssets(
         address target,
@@ -136,7 +136,7 @@ contract RMRKMultiAssetRenderUtils {
      * @param target Address of the smart contract of the given token
      * @param tokenId ID of the token to retrieve the specified assets for
      * @param assetIds[] An array of asset IDs for which to retrieve the metadata URIs
-     * @return string[] An array of metadata URIs belonging to specified assets
+     * @return An array of metadata URIs belonging to specified assets
      */
     function getAssetsById(
         address target,
@@ -159,7 +159,7 @@ contract RMRKMultiAssetRenderUtils {
      * @notice Used to retrieve the metadata URI of the specified token's asset with the highest priority.
      * @param target Address of the smart contract of the given token
      * @param tokenId ID of the token for which to retrieve the metadata URI of the asset with the highest priority
-     * @return string The metadata URI of the asset with the highest priority
+     * @return The metadata URI of the asset with the highest priority
      */
     function getTopAssetMetaForToken(
         address target,

@@ -110,13 +110,13 @@ interface IRMRKCatalog is IERC165 {
 
     /**
      * @notice Used to return the metadata URI of the associated Catalog.
-     * @return string Case metadata URI
+     * @return Case metadata URI
      */
     function getMetadataURI() external view returns (string memory);
 
     /**
      * @notice Used to return the `itemType` of the associated Catalog
-     * @return string `itemType` of the associated Catalog
+     * @return `itemType` of the associated Catalog
      */
     function getType() external view returns (string memory);
 
@@ -125,7 +125,7 @@ interface IRMRKCatalog is IERC165 {
      * @dev Returns true if a collection may equip asset with `partId`.
      * @param partId The ID of the part that we are checking
      * @param targetAddress The address that we are checking for whether the part can be equipped into it or not
-     * @return bool The status indicating whether the `targetAddress` can be equipped into `Part` with `partId` or not
+     * @return The status indicating whether the `targetAddress` can be equipped into `Part` with `partId` or not
      */
     function checkIsEquippable(
         uint64 partId,
@@ -136,21 +136,21 @@ interface IRMRKCatalog is IERC165 {
      * @notice Used to check if the part is equippable by all addresses.
      * @dev Returns true if part is equippable to all.
      * @param partId ID of the part that we are checking
-     * @return bool The status indicating whether the part with `partId` can be equipped by any address or not
+     * @return The status indicating whether the part with `partId` can be equipped by any address or not
      */
     function checkIsEquippableToAll(uint64 partId) external view returns (bool);
 
     /**
      * @notice Used to retrieve a `Part` with id `partId`
      * @param partId ID of the part that we are retrieving
-     * @return struct The `Part` struct associated with given `partId`
+     * @return The `Part` struct associated with given `partId`
      */
     function getPart(uint64 partId) external view returns (Part memory);
 
     /**
      * @notice Used to retrieve multiple parts at the same time.
      * @param partIds An array of part IDs that we want to retrieve
-     * @return struct An array of `Part` structs associated with given `partIds`
+     * @return An array of `Part` structs associated with given `partIds`
      */
     function getParts(
         uint64[] calldata partIds

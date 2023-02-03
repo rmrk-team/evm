@@ -11,6 +11,14 @@ import "../library/RMRKErrors.sol";
  * @notice Smart contract of the RMRK Nestable render utils module.
  */
 contract RMRKNestableRenderUtils {
+    /**
+     * @notice Used to retrieve the given child's index in its paren's child tokens array.
+     * @param parentAddress Address of the parent token's collection smart contract
+     * @param parentId ID of the parent token
+     * @param childAddress Address of the child token's colection smart contract
+     * @param childId ID of the child token
+     * @return The index of the child token in the parent token's child tokens array
+     */
     function getChildIndex(
         address parentAddress,
         uint256 parentId,

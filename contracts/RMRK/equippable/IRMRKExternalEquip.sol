@@ -20,7 +20,7 @@ interface IRMRKExternalEquip is IRMRKEquippable {
 
     /**
      * @notice Returns the Equippable contract's corresponding nestable address.
-     * @return address Address of the Nestable module of the external equip composite
+     * @return Address of the Nestable module of the external equip composite
      */
     function getNestableAddress() external view returns (address);
 }

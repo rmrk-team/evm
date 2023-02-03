@@ -20,7 +20,8 @@ contract RMRKCatalog is IRMRKCatalog {
     mapping(uint64 => Part) private _parts;
 
     /**
-     * @notice Mapping of uint64 `partId` to boolean flag, indicating that a given `Part` can be equippable by any address
+     * @notice Mapping of uint64 `partId` to boolean flag, indicating that a given `Part` can be equippable by any
+     *  address
      */
     mapping(uint64 => bool) private _isEquippableToAll;
 
@@ -50,6 +51,11 @@ contract RMRKCatalog is IRMRKCatalog {
         _;
     }
 
+    /**
+     * @notice Used to verify that an operation is only executed on slot Parts.
+     * @dev If the Part is not Slot type, the execution will be reverted.
+     * @param partId ID of the part to check
+     */
     function _onlySlot(uint64 partId) private view {
         ItemType itemType = _parts[partId].itemType;
         if (itemType == ItemType.None) revert RMRKPartDoesNotExist();
@@ -143,6 +149,7 @@ contract RMRKCatalog is IRMRKCatalog {
     /**
      * @notice Internal function used to add multiple `equippableAddresses` to a single catalog entry.
      * @dev Can only be called on `Part`s of `Slot` type.
+     * @dev Emits ***AddedEquippables*** event.
      * @param partId ID of the `Part` that we are adding the equippable addresses to
      * @param equippableAddresses An array of addresses that can be equipped into the `Part` associated with the `partId`
      */
@@ -168,6 +175,7 @@ contract RMRKCatalog is IRMRKCatalog {
      * @notice Internal function used to set the new list of `equippableAddresses`.
      * @dev Overwrites existing `equippableAddresses`.
      * @dev Can only be called on `Part`s of `Slot` type.
+     * @dev Emits ***SetEquippable*** event.
      * @param partId ID of the `Part`s that we are overwiting the `equippableAddresses` for
      * @param equippableAddresses A full array of addresses that can be equipped into this `Part`
      */
@@ -185,6 +193,7 @@ contract RMRKCatalog is IRMRKCatalog {
     /**
      * @notice Internal function used to remove all of the `equippableAddresses` for a `Part` associated with the `partId`.
      * @dev Can only be called on `Part`s of `Slot` type.
+     * @dev Emits ***SetEquippable*** event.
      * @param partId ID of the part that we are clearing the `equippableAddresses` from
      */
     function _resetEquippableAddresses(
@@ -200,6 +209,7 @@ contract RMRKCatalog is IRMRKCatalog {
      * @notice Sets the isEquippableToAll flag to true, meaning that any collection may be equipped into the `Part` with this
      *  `partId`.
      * @dev Can only be called on `Part`s of `Slot` type.
+     * @dev Emits ***SetEquippableToAll*** event.
      * @param partId ID of the `Part` that we are setting as equippable by any address
      */
     function _setEquippableToAll(uint64 partId) internal onlySlot(partId) {

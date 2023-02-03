@@ -10,7 +10,7 @@ pragma solidity ^0.8.16;
 interface IRMRKErc20Pay {
     /**
      * @notice Used to retrieve the address of the ERC20 token this smart contract supports.
-     * @return address Address of the ERC20 token's smart contract
+     * @return Address of the ERC20 token's smart contract
      */
     function erc20TokenAddress() external view returns (address);
 }

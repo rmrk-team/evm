@@ -30,7 +30,6 @@ abstract contract RMRKAbstractMultiAssetImpl is
      * @notice Used to destroy the specified token.
      * @dev The approval is cleared when the token is burned.
      * @dev Requirements:
-     *
      *  - `tokenId` must exist.
      * @param tokenId ID of the token to burn
      */
@@ -65,6 +64,7 @@ abstract contract RMRKAbstractMultiAssetImpl is
      * @notice Used to add a asset entry.
      * @dev The ID of the asset is automatically assigned to be the next available asset ID.
      * @param metadataURI Metadata URI of the asset
+     * @return ID of the newly added asset
      */
     function addAssetEntry(
         string memory metadataURI
@@ -78,7 +78,7 @@ abstract contract RMRKAbstractMultiAssetImpl is
 
     /**
      * @notice Used to retrieve the total number of assets.
-     * @return uint256 The total number of assets
+     * @return The total number of assets
      */
     function totalAssets() public view virtual returns (uint256) {
         return _totalAssets;

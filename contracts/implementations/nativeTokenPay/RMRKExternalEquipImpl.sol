@@ -57,7 +57,7 @@ contract RMRKExternalEquipImpl is OwnableLock, RMRKExternalEquip {
      * @param catalogAddress Address of the `Catalog` smart contract this asset belongs to
      * @param metadataURI Metadata URI of the asset
      * @param partIds An array of IDs of fixed and slot parts to be included in the asset
-     * @return uint256 The total number of assets after this asset has been added
+     * @return The total number of assets after this asset has been added
      */
     function addEquippableAssetEntry(
         uint64 equippableGroupId,
@@ -82,6 +82,7 @@ contract RMRKExternalEquipImpl is OwnableLock, RMRKExternalEquip {
      * @notice Used to add a asset entry.
      * @dev The ID of the asset is automatically assigned to be the next available asset ID.
      * @param metadataURI Metadata URI of the asset
+     * @return ID of the newly added asset
      */
     function addAssetEntry(
         string memory metadataURI
@@ -114,7 +115,7 @@ contract RMRKExternalEquipImpl is OwnableLock, RMRKExternalEquip {
 
     /**
      * @notice Used to retrieve the total number of assets.
-     * @return uint256 The total number of assets
+     * @return The total number of assets
      */
     function totalAssets() public view virtual returns (uint256) {
         return _totalAssets;

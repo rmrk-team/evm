@@ -173,7 +173,7 @@ contract RMRKNestableMultiAsset is RMRKNestable, AbstractMultiAsset {
      *   3. Is granted approval for the specific tokenId for asset management via the `approveForAssets` function.
      * @param user Address of the user we are checking for permission
      * @param tokenId ID of the token to query for permission for a given `user`
-     * @return bool A boolean value indicating whether the user is approved to manage the token or not
+     * @return A boolean value indicating whether the user is approved to manage the token or not
      */
     function _isApprovedForAssetsOrOwner(
         address user,
