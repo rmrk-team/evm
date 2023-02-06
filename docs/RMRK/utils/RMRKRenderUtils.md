@@ -41,7 +41,7 @@ function getPaginatedMintedIds(address target, uint256 pageStart, uint256 pageSi
 
 Used to get a list of existing token IDs in the range between `pageStart` and `pageSize`.
 
-*It is not optimized to avoid checking IDs out of max supply nor total supply, since this is not meant to be used during transaction execution; it is only meant to be used as a getter.The resulting array might be smaller than the given `pageSize` since no-existent IDs are not included.*
+*It is not optimized to avoid checking IDs out of max supply nor total supply, since this is not meant to be  used during transaction execution; it is only meant to be used as a getter.The resulting array might be smaller than the given `pageSize` since no-existent IDs are not included.*
 
 #### Parameters
 

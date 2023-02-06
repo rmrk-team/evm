@@ -25,7 +25,7 @@ Used to retrieve the address of the ERC20 token this smart contract supports.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | address | address Address of the ERC20 token&#39;s smart contract |
+| _0 | address | Address of the ERC20 token&#39;s smart contract |
 
 
 

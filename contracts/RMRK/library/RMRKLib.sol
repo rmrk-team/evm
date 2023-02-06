@@ -27,8 +27,8 @@ library RMRKLib {
      * @dev If the item is not found the index returned will equal `0`.
      * @param A The array containing the item to be found
      * @param a The value of the item to find the index of
-     * @return uint256 The index of the item in the array
-     * @return bool A boolean value specifying whether the item was found
+     * @return The index of the item in the array
+     * @return A boolean value specifying whether the item was found
      */
     function indexOf(
         uint64[] memory A,

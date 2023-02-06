@@ -31,7 +31,7 @@ Used to retrieve the address type token properties.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | address | address The value of the address property |
+| _0 | address | The value of the address property |
 
 ### getBoolTokenProperty
 
@@ -54,7 +54,7 @@ Used to retrieve the bool type token properties.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | bool The value of the bool property |
+| _0 | bool | The value of the bool property |
 
 ### getBytesTokenProperty
 
@@ -77,7 +77,7 @@ Used to retrieve the bytes type token properties.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bytes | bytes The value of the bytes property |
+| _0 | bytes | The value of the bytes property |
 
 ### getStringTokenProperty
 
@@ -100,7 +100,7 @@ Used to retrieve the string type token properties.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | string The value of the string property |
+| _0 | string | The value of the string property |
 
 ### getUintTokenProperty
 
@@ -123,7 +123,7 @@ Used to retrieve the uint type token properties.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | uint256 The value of the uint property |
+| _0 | uint256 | The value of the uint property |
 
 ### setAddressProperty
 

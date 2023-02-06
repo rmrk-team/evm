@@ -68,7 +68,7 @@ Used to burn a given token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | uint256 Number of recursively burned children |
+| _0 | uint256 | Number of recursively burned children |
 
 ### childOf
 
@@ -91,7 +91,7 @@ Used to retrieve a specific active child token for a given parent token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IRMRKNestable.Child | struct A Child struct containing data about the specified child |
+| _0 | IRMRKNestable.Child | A Child struct containing data about the specified child |
 
 ### childrenOf
 
@@ -113,7 +113,7 @@ Used to retrieve the active child tokens of a given parent token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IRMRKNestable.Child[] | struct[] An array of Child structs containing the parent token&#39;s active child tokens |
+| _0 | IRMRKNestable.Child[] | An array of Child structs containing the parent token&#39;s active child tokens |
 
 ### directOwnerOf
 
@@ -135,9 +135,9 @@ Used to retrieve the immediate owner of the given token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | address | address Address of the given token&#39;s owner |
-| _1 | uint256 | uint256 The ID of the parent token. Should be `0` if the owner is an externally owned account |
-| _2 | bool | bool The boolean value signifying whether the owner is an NFT or not |
+| _0 | address | Address of the given token&#39;s owner |
+| _1 | uint256 | The ID of the parent token. Should be `0` if the owner is an externally owned account |
+| _2 | bool | The boolean value signifying whether the owner is an NFT or not |
 
 ### nestTransferFrom
 
@@ -202,7 +202,7 @@ Used to retrieve a specific pending child token from a given parent token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IRMRKNestable.Child | struct A Child struct containting data about the specified child |
+| _0 | IRMRKNestable.Child | A Child struct containting data about the specified child |
 
 ### pendingChildrenOf
 
@@ -224,7 +224,7 @@ Used to retrieve the pending child tokens of a given parent token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IRMRKNestable.Child[] | struct[] An array of Child structs containing the parent token&#39;s pending child tokens |
+| _0 | IRMRKNestable.Child[] | An array of Child structs containing the parent token&#39;s pending child tokens |
 
 ### rejectAllChildren
 
@@ -241,7 +241,7 @@ Used to reject all pending children of a given parent token.
 | Name | Type | Description |
 |---|---|---|
 | parentId | uint256 | ID of the parent token for which to reject all of the pending tokens. |
-| maxRejections | uint256 | Maximum number of expected children to reject, used to prevent from  rejecting children which arrive just before this operation. |
+| maxRejections | uint256 | Maximum number of expected children to reject, used to prevent from rejecting children which  arrive just before this operation. |
 
 ### supportsInterface
 

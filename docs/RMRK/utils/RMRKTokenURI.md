@@ -30,7 +30,7 @@ Used to retrieve the metadata URI of a token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | string Metadata URI of the specified token |
+| _0 | string | Metadata URI of the specified token |
 
 
 

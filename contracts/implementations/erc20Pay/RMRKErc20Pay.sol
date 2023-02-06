@@ -41,7 +41,7 @@ abstract contract RMRKErc20Pay is IRMRKErc20Pay {
 
     /**
      * @notice Used to retrieve the address of the ERC20 token this smart contract supports.
-     * @return address Address of the ERC20 token's smart contract
+     * @return Address of the ERC20 token's smart contract
      */
     function erc20TokenAddress() public view virtual returns (address) {
         return _erc20TokenAddress;

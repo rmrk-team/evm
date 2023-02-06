@@ -25,7 +25,7 @@ Used to retrieve the status of a lockable smart contract.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | bool A boolean value signifying whether the smart contract has been locked |
+| _0 | bool | A boolean value signifying whether the smart contract has been locked |
 
 ### isContributor
 
@@ -57,7 +57,7 @@ function manageContributor(address contributor, bool grantRole) external nonpaya
 
 Adds or removes a contributor to the smart contract.
 
-*Can only be called by the owner.*
+*Can only be called by the owner.Emits ***ContributorUpdate*** event.*
 
 #### Parameters
 

@@ -65,7 +65,7 @@ Used to retrieve the priorities of the active resoources of a given token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint16[] | uint16[] An array of priorities of the active assets of the given token |
+| _0 | uint16[] | An array of priorities of the active assets of the given token |
 
 ### getActiveAssets
 
@@ -87,7 +87,7 @@ Used to retrieve IDs of the active assets of given token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint64[] | uint64[] An array of active asset IDs of the given token |
+| _0 | uint64[] | An array of active asset IDs of the given token |
 
 ### getApprovedForAssets
 
@@ -109,7 +109,7 @@ Used to retrieve the address of the account approved to manage assets of a given
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | address | address Address of the account that is approved to manage the specified token&#39;s assets |
+| _0 | address | Address of the account that is approved to manage the specified token&#39;s assets |
 
 ### getAssetMetadata
 
@@ -132,7 +132,7 @@ Used to fetch the asset metadata of the specified token&#39;s active asset with 
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | string The metadata of the asset belonging to the specified index in the token&#39;s active assets  array |
+| _0 | string | The metadata of the asset belonging to the specified index in the token&#39;s active assets  array |
 
 ### getAssetReplacements
 
@@ -155,7 +155,7 @@ Used to retrieve the asset that will be replaced if a given asset from the token
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint64 | uint64 ID of the asset which will be replaced |
+| _0 | uint64 | ID of the asset which will be replaced |
 
 ### getPendingAssets
 
@@ -177,7 +177,7 @@ Used to retrieve IDs of the pending assets of given token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint64[] | uint64[] An array of pending asset IDs of the given token |
+| _0 | uint64[] | An array of pending asset IDs of the given token |
 
 ### isApprovedForAllForAssets
 
@@ -200,7 +200,7 @@ Used to check whether the address has been granted the operator role by a given 
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | bool The boolean value indicating wehter the account we are checking has been granted the operator role |
+| _0 | bool | The boolean value indicating wehter the account we are checking has been granted the operator role |
 
 ### rejectAllAssets
 

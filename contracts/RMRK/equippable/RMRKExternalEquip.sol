@@ -94,7 +94,7 @@ contract RMRKExternalEquip is
      *   3. Is granted approval for the specific tokenId for asset management via the `approveForAssets` function.
      * @param user Address of the user we are checking for permission
      * @param tokenId ID of the token to query for permission for a given `user`
-     * @return bool A boolean value indicating whether the user is approved to manage the token or not
+     * @return A boolean value indicating whether the user is approved to manage the token or not
      */
     function _isApprovedForAssetsOrOwner(
         address user,
@@ -210,8 +210,8 @@ contract RMRKExternalEquip is
      * @dev If the number of pending assets is greater than the value of `maxRejections`, the exectuion will be
      *  reverted.
      * @param tokenId ID of the token for which we are clearing the pending array.
-     * @param maxRejections Maximum number of expected assets to reject, used to prevent from
-     *  rejecting assets which arrive just before this operation.
+     * @param maxRejections Maximum number of expected assets to reject, used to prevent from rejecting assets which
+     *  arrive just before this operation.
      */
     function rejectAllAssets(
         uint256 tokenId,
@@ -266,7 +266,7 @@ contract RMRKExternalEquip is
      * @notice Used to get the address of the user that is approved to manage the specified token from the current
      *  owner.
      * @param tokenId ID of the token we are checking
-     * @return address Address of the account that is approved to manage the token
+     * @return Address of the account that is approved to manage the token
      */
     function getApprovedForAssets(
         uint256 tokenId
@@ -277,6 +277,7 @@ contract RMRKExternalEquip is
 
     /**
      * @notice Internal function for granting approvals for a specific token.
+     * @dev Emits ***ApprovalForAssets*** event.
      * @param to Address of the account we are granting an approval to
      * @param tokenId ID of the token we are granting the approval for
      */
@@ -310,6 +311,7 @@ contract RMRKExternalEquip is
      *      slotPartId,
      *      childAssetId
      *  ]
+     * @dev Emits ***ChildAssetEquipped*** event.
      * @param data An `IntakeEquip` struct specifying the equip data
      */
     function _equip(IntakeEquip memory data) internal virtual {
@@ -399,6 +401,7 @@ contract RMRKExternalEquip is
 
     /**
      * @notice Private function used to unequip child from parent token.
+     * @dev Emits ***ChildAssetUnequipped*** event.
      * @param tokenId ID of the parent from which the child is being unequipped
      * @param assetId ID of the parent's asset that contains the `Slot` into which the child is equipped
      * @param slotPartId ID of the `Slot` from which to unequip the child
@@ -455,7 +458,8 @@ contract RMRKExternalEquip is
 
     /**
      * @notice Internal function used to declare that the assets belonging to a given `equippableGroupId` are
-     *  equippable into the `Slot` associated with the `partId` of the collection at the specified `parentAddress`
+     *  equippable into the `Slot` associated with the `partId` of the collection at the specified `parentAddress`.
+     * @dev Emit ***ValidParentEquippableGroupIdSet*** event.
      * @param equippableGroupId ID of the equippable group
      * @param parentAddress Address of the parent into which the equippable group can be equipped into
      * @param slotPartId ID of the `Slot` that the items belonging to the equippable group can be equipped into
@@ -574,7 +578,7 @@ contract RMRKExternalEquip is
      * @dev As the check validates that the owner is not the `0x0` address, the token is marked as non-existent if it
      *  hasn't been minted yet, or if has already been burned.
      * @param tokenId ID of the token we are checking
-     * @return bool A boolean value specifying whether the token exists
+     * @return A boolean value specifying whether the token exists
      */
     function _exists(uint256 tokenId) internal view virtual returns (bool) {
         return ownerOf(tokenId) != address(0);
@@ -585,7 +589,7 @@ contract RMRKExternalEquip is
      * @dev This returns the root owner of the token. In case where the token is nested into a parent token, the owner
      *  is iteratively searched for, until non-smart contract owner is found.
      * @param tokenId ID of the token we are checking
-     * @return address Address of the root owner of the token
+     * @return Address of the root owner of the token
      */
     function ownerOf(uint256 tokenId) internal view returns (address) {
         return IRMRKNestable(_nestableAddress).ownerOf(tokenId);

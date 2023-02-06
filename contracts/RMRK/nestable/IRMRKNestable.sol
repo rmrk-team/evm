@@ -49,9 +49,9 @@ interface IRMRKNestable is IERC165 {
      * @notice Used to notify listeners that a new token has been added to a given token's pending children array.
      * @dev Emitted when a child NFT is added to a token's pending array.
      * @param tokenId ID of the token that received a new pending child token
+     * @param childIndex Index of the proposed child token in the parent token's pending children array
      * @param childAddress Address of the proposed child token's collection smart contract
      * @param childId ID of the child token in the child token's collection smart contract
-     * @param childIndex Index of the proposed child token in the parent token's pending children array
      */
     event ChildProposed(
         uint256 indexed tokenId,
@@ -64,9 +64,9 @@ interface IRMRKNestable is IERC165 {
      * @notice Used to notify listeners that a new child token was accepted by the parent token.
      * @dev Emitted when a parent token accepts a token from its pending array, migrating it to the active array.
      * @param tokenId ID of the token that accepted a new child token
+     * @param childIndex Index of the newly accepted child token in the parent token's active children array
      * @param childAddress Address of the child token's collection smart contract
      * @param childId ID of the child token in the child token's collection smart contract
-     * @param childIndex Index of the newly accepted child token in the parent token's active children array
      */
     event ChildAccepted(
         uint256 indexed tokenId,
@@ -86,9 +86,9 @@ interface IRMRKNestable is IERC165 {
      * @notice Used to notify listeners a child token has been transferred from parent token.
      * @dev Emitted when a token transfers a child from itself, transferring ownership to the root owner.
      * @param tokenId ID of the token that transferred a child token
+     * @param childIndex Index of a child in the array from which it is being transferred
      * @param childAddress Address of the child token's collection smart contract
      * @param childId ID of the child token in the child token's collection smart contract
-     * @param childIndex Index of a child in the array from which it is being transferred
      * @param fromPending A boolean value signifying whether the token was in the pending child tokens array (`true`) or
      *  in the active child tokens array (`false`)
      */
@@ -124,9 +124,9 @@ interface IRMRKNestable is IERC165 {
      * @dev If the immediate owner is another token, the address returned, should be the one of the parent token's
      *  collection smart contract.
      * @param tokenId ID of the token for which the RMRK owner is being retrieved
-     * @return address Address of the given token's owner
-     * @return uint256 The ID of the parent token. Should be `0` if the owner is an externally owned account
-     * @return bool The boolean value signifying whether the owner is an NFT or not
+     * @return Address of the given token's owner
+     * @return The ID of the parent token. Should be `0` if the owner is an externally owned account
+     * @return The boolean value signifying whether the owner is an NFT or not
      */
     function directOwnerOf(
         uint256 tokenId
@@ -146,7 +146,7 @@ interface IRMRKNestable is IERC165 {
      * @dev Emits a {Transfer} event.
      * @param tokenId ID of the token to burn
      * @param maxRecursiveBurns Maximum number of tokens to recursively burn
-     * @return uint256 Number of recursively burned children
+     * @return Number of recursively burned children
      */
     function burn(
         uint256 tokenId,
@@ -199,8 +199,8 @@ interface IRMRKNestable is IERC165 {
      *
      * - `parentId` must exist
      * @param parentId ID of the parent token for which to reject all of the pending tokens.
-     * @param maxRejections Maximum number of expected children to reject, used to prevent from
-     *  rejecting children which arrive just before this operation.
+     * @param maxRejections Maximum number of expected children to reject, used to prevent from rejecting children which
+     *  arrive just before this operation.
      */
     function rejectAllChildren(
         uint256 parentId,
@@ -242,7 +242,7 @@ interface IRMRKNestable is IERC165 {
      *      contractAddress
      *  ]
      * @param parentId ID of the parent token for which to retrieve the active child tokens
-     * @return struct[] An array of Child structs containing the parent token's active child tokens
+     * @return An array of Child structs containing the parent token's active child tokens
      */
     function childrenOf(
         uint256 parentId
@@ -257,7 +257,7 @@ interface IRMRKNestable is IERC165 {
      *      contractAddress
      *  ]
      * @param parentId ID of the parent token for which to retrieve the pending child tokens
-     * @return struct[] An array of Child structs containing the parent token's pending child tokens
+     * @return An array of Child structs containing the parent token's pending child tokens
      */
     function pendingChildrenOf(
         uint256 parentId
@@ -273,7 +273,7 @@ interface IRMRKNestable is IERC165 {
      *  ]
      * @param parentId ID of the parent token for which the child is being retrieved
      * @param index Index of the child token in the parent token's active child tokens array
-     * @return struct A Child struct containing data about the specified child
+     * @return A Child struct containing data about the specified child
      */
     function childOf(
         uint256 parentId,
@@ -290,7 +290,7 @@ interface IRMRKNestable is IERC165 {
      *  ]
      * @param parentId ID of the parent token for which the pending child token is being retrieved
      * @param index Index of the child token in the parent token's pending child tokens array
-     * @return struct A Child struct containting data about the specified child
+     * @return A Child struct containting data about the specified child
      */
     function pendingChildOf(
         uint256 parentId,

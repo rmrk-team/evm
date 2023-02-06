@@ -88,6 +88,7 @@ contract Ownable is Context {
     /**
      * @notice Transfers ownership of the contract to a new owner.
      * @dev Internal function without access restriction.
+     * @dev Emits ***OwnershipTransferred*** event.
      * @param newOwner Address of the new owner's account
      */
     function _transferOwnership(address newOwner) internal virtual {
@@ -99,6 +100,7 @@ contract Ownable is Context {
     /**
      * @notice Adds or removes a contributor to the smart contract.
      * @dev Can only be called by the owner.
+     * @dev Emits ***ContributorUpdate*** event.
      * @param contributor Address of the contributor's account
      * @param grantRole A boolean value signifying whether the contributor role is being granted (`true`) or revoked
      *  (`false`)

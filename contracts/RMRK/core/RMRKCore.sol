@@ -11,7 +11,10 @@ import "./IRMRKCore.sol";
  * @dev This is currently just a passthrough contract which allows for granular editing of base-level ERC721 functions.
  */
 contract RMRKCore is IRMRKCore {
-    /// @notice Version of the @rmrk-team/evm-contracts package
+    /**
+     * @notice Version of the @rmrk-team/evm-contracts package
+     * @return Version identifier of the smart contract
+     */
     string public constant VERSION = "0.24.2";
 
     /**
@@ -32,7 +35,7 @@ contract RMRKCore is IRMRKCore {
 
     /**
      * @notice Used to retrieve the collection name.
-     * @return string Name of the collection
+     * @return Name of the collection
      */
     function name() public view virtual override returns (string memory) {
         return _name;
@@ -40,7 +43,7 @@ contract RMRKCore is IRMRKCore {
 
     /**
      * @notice Used to retrieve the collection symbol.
-     * @return string Symbol of the collection
+     * @return Symbol of the collection
      */
     function symbol() public view virtual override returns (string memory) {
         return _symbol;

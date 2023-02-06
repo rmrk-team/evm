@@ -61,7 +61,8 @@ contract RMRKRenderUtils {
 
     /**
      * @notice Used to get a list of existing token IDs in the range between `pageStart` and `pageSize`.
-     * @dev It is not optimized to avoid checking IDs out of max supply nor total supply, since this is not meant to be used during transaction execution; it is only meant to be used as a getter.
+     * @dev It is not optimized to avoid checking IDs out of max supply nor total supply, since this is not meant to be
+     *  used during transaction execution; it is only meant to be used as a getter.
      * @dev The resulting array might be smaller than the given `pageSize` since no-existent IDs are not included.
      * @param target Address of the collection smart contract of the given token
      * @param pageStart The first ID to check

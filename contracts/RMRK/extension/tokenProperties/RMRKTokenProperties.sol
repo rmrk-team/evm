@@ -155,7 +155,7 @@ abstract contract RMRKTokenProperties is IRMRKTokenProperties {
      * @notice Used to get the Id for a key. If the key does not exist, a new Id is created.
      *  Ids are shared among all tokens and types
      * @param key The property key
-     * @return uint256 The id for the key
+     * @return The id for the key
      */
     function _getIdForKey(string memory key) internal returns (uint256) {
         if (_keysToIds[key] == 0) {
@@ -171,7 +171,7 @@ abstract contract RMRKTokenProperties is IRMRKTokenProperties {
      * @notice Used to get the Id for a string value. If the value does not exist, a new Id is created.
      *  Ids are shared among all tokens and used only for strings.
      * @param value The property value
-     * @return uint256 The id for the value
+     * @return The id for the string value
      */
     function _getStringIdForValue(
         string memory value
