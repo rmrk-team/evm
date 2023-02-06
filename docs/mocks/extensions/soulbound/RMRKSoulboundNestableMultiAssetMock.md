@@ -157,7 +157,7 @@ Used to grant permission to the user to manage token&#39;s assets.
 function balanceOf(address owner) external view returns (uint256)
 ```
 
-Used to retrieve the number of tokens in ``owner``&#39;s account.
+Used to retrieve the number of tokens in `owner`&#39;s account.
 
 
 
@@ -354,7 +354,7 @@ Used to retrieve IDs of the active assets of given token.
 function getApproved(uint256 tokenId) external view returns (address)
 ```
 
-Used to retireve the account approved to manage given token.
+Used to retrieve the account approved to manage given token.
 
 *Requirements:  - `tokenId` must exist.*
 
@@ -504,7 +504,7 @@ Used to check whether the address has been granted the operator role by a given 
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | The boolean value indicating wehter the account we are checking has been granted the operator role |
+| _0 | bool | A boolean value indicating wehter the account we are checking has been granted the operator role |
 
 ### isSoulbound
 

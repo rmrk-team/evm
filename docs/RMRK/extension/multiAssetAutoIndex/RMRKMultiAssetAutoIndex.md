@@ -1,4 +1,4 @@
-# RMRKMultiAssetMock
+# RMRKMultiAssetAutoIndex
 
 
 
@@ -30,6 +30,23 @@ Version of the @rmrk-team/evm-contracts package
 ### acceptAsset
 
 ```solidity
+function acceptAsset(uint256 tokenId, uint64 assetId) external nonpayable
+```
+
+Accepts an asset at from the pending array of given token.
+
+*Migrates the asset from the token&#39;s pending asset array to the token&#39;s active asset array.Active assets cannot be removed by anyone, but can be replaced by a new asset.Requirements:  - The caller must own the token or be approved to manage the token&#39;s assets  - `tokenId` must exist.Emits an {AssetAccepted} event.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId | uint256 | ID of the token for which to accept the pending asset |
+| assetId | uint64 | Id of the pending asset |
+
+### acceptAsset
+
+```solidity
 function acceptAsset(uint256 tokenId, uint256 index, uint64 assetId) external nonpayable
 ```
 
@@ -44,41 +61,6 @@ Accepts an asset at from the pending array of given token.
 | tokenId | uint256 | ID of the token for which to accept the pending asset |
 | index | uint256 | Index of the asset in the pending array to accept |
 | assetId | uint64 | ID of the asset expected to be in the index |
-
-### addAssetEntry
-
-```solidity
-function addAssetEntry(uint64 id, string metadataURI) external nonpayable
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| id | uint64 | undefined |
-| metadataURI | string | undefined |
-
-### addAssetToToken
-
-```solidity
-function addAssetToToken(uint256 tokenId, uint64 assetId, uint64 replacesAssetWithId) external nonpayable
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| tokenId | uint256 | undefined |
-| assetId | uint64 | undefined |
-| replacesAssetWithId | uint64 | undefined |
 
 ### approve
 
@@ -135,22 +117,6 @@ Used to retrieve the number of tokens in ``owner``&#39;s account.
 | Name | Type | Description |
 |---|---|---|
 | _0 | uint256 | The balance of the given account |
-
-### burn
-
-```solidity
-function burn(uint256 tokenId) external nonpayable
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| tokenId | uint256 | undefined |
 
 ### getActiveAssetPriorities
 
@@ -354,23 +320,6 @@ Used to check whether the address has been granted the operator role by a given 
 |---|---|---|
 | _0 | bool | A boolean value indicating wehter the account we are checking has been granted the operator role |
 
-### mint
-
-```solidity
-function mint(address to, uint256 tokenId) external nonpayable
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| to | address | undefined |
-| tokenId | uint256 | undefined |
-
 ### name
 
 ```solidity
@@ -430,6 +379,23 @@ Rejects all assets from the pending array of a given token.
 ### rejectAsset
 
 ```solidity
+function rejectAsset(uint256 tokenId, uint64 assetId) external nonpayable
+```
+
+Rejects an asset from the pending array of given token.
+
+*Removes the asset from the token&#39;s pending asset array.Requirements:  - The caller must own the token or be approved to manage the token&#39;s assets  - `tokenId` must exist.Emits a {AssetRejected} event.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId | uint256 | ID of the token that the asset is being rejected from |
+| assetId | uint64 | Id of the pending asset |
+
+### rejectAsset
+
+```solidity
 function rejectAsset(uint256 tokenId, uint256 index, uint64 assetId) external nonpayable
 ```
 
@@ -444,41 +410,6 @@ Rejects an asset from the pending array of given token.
 | tokenId | uint256 | ID of the token that the asset is being rejected from |
 | index | uint256 | Index of the asset in the pending array to be rejected |
 | assetId | uint64 | ID of the asset expected to be in the index |
-
-### safeMint
-
-```solidity
-function safeMint(address to, uint256 tokenId, bytes data) external nonpayable
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| to | address | undefined |
-| tokenId | uint256 | undefined |
-| data | bytes | undefined |
-
-### safeMint
-
-```solidity
-function safeMint(address to, uint256 tokenId) external nonpayable
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| to | address | undefined |
-| tokenId | uint256 | undefined |
 
 ### safeTransferFrom
 
@@ -576,7 +507,7 @@ function supportsInterface(bytes4 interfaceId) external view returns (bool)
 
 
 
-*Returns true if this contract implements the interface defined by `interfaceId`. See the corresponding https://eips.ethereum.org/EIPS/eip-165#how-interfaces-are-identified[EIP section] to learn more about how these ids are created. This function call must use less than 30 000 gas.*
+
 
 #### Parameters
 
@@ -606,23 +537,6 @@ Used to retrieve the collection symbol.
 | Name | Type | Description |
 |---|---|---|
 | _0 | string | Symbol of the collection |
-
-### transfer
-
-```solidity
-function transfer(address to, uint256 tokenId) external nonpayable
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| to | address | undefined |
-| tokenId | uint256 | undefined |
 
 ### transferFrom
 
@@ -880,17 +794,6 @@ Attempting to use an invalid token ID
 
 
 
-### ERC721MintToTheZeroAddress
-
-```solidity
-error ERC721MintToTheZeroAddress()
-```
-
-Attempting to mint to 0x0 address
-
-
-
-
 ### ERC721NotApprovedOrOwner
 
 ```solidity
@@ -898,17 +801,6 @@ error ERC721NotApprovedOrOwner()
 ```
 
 Attempting to manage a token without being its owner or approved by the owner
-
-
-
-
-### ERC721TokenAlreadyMinted
-
-```solidity
-error ERC721TokenAlreadyMinted()
-```
-
-Attempting to mint an already minted token
 
 
 
@@ -968,17 +860,6 @@ Attempting to grant approval of assets without being the caller or approved for 
 
 
 
-### RMRKAssetAlreadyExists
-
-```solidity
-error RMRKAssetAlreadyExists()
-```
-
-Attempting to add an asset using an ID that has already been used
-
-
-
-
 ### RMRKBadPriorityListLength
 
 ```solidity
@@ -990,17 +871,6 @@ Attempting to set the priorities with an array of length that doesn&#39;t match 
 
 
 
-### RMRKIdZeroForbidden
-
-```solidity
-error RMRKIdZeroForbidden()
-```
-
-Attempting to use ID 0, which is not supported
-
-*The ID 0 in RMRK suite is reserved for empty values. Guarding against its use ensures the expected operation*
-
-
 ### RMRKIndexOutOfRange
 
 ```solidity
@@ -1008,28 +878,6 @@ error RMRKIndexOutOfRange()
 ```
 
 Attempting to interact with an asset, using index greater than number of assets
-
-
-
-
-### RMRKMaxPendingAssetsReached
-
-```solidity
-error RMRKMaxPendingAssetsReached()
-```
-
-Attempting to add a pending asset after the number of pending assets has reached the limit (default limit is  128)
-
-
-
-
-### RMRKNoAssetMatchingId
-
-```solidity
-error RMRKNoAssetMatchingId()
-```
-
-Attempting to interact with an asset that can not be found
 
 
 

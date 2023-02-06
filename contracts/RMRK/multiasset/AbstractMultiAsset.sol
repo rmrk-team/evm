@@ -379,7 +379,7 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
     function _beforeAcceptAsset(
         uint256 tokenId,
         uint256 index,
-        uint256 assetId
+        uint64 assetId
     ) internal virtual {}
 
     /**
@@ -391,7 +391,7 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
     function _afterAcceptAsset(
         uint256 tokenId,
         uint256 index,
-        uint256 assetId
+        uint64 assetId
     ) internal virtual {}
 
     /**
@@ -403,7 +403,7 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
     function _beforeRejectAsset(
         uint256 tokenId,
         uint256 index,
-        uint256 assetId
+        uint64 assetId
     ) internal virtual {}
 
     /**
@@ -415,7 +415,7 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
     function _afterRejectAsset(
         uint256 tokenId,
         uint256 index,
-        uint256 assetId
+        uint64 assetId
     ) internal virtual {}
 
     /**

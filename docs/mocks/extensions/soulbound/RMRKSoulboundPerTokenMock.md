@@ -202,7 +202,7 @@ Used to retrieve IDs of the active assets of given token.
 function getApproved(uint256 tokenId) external view returns (address)
 ```
 
-Used to retireve the account approved to manage given token.
+Used to retrieve the account approved to manage given token.
 
 *Requirements:  - `tokenId` must exist.*
 
@@ -352,7 +352,7 @@ Used to check whether the address has been granted the operator role by a given 
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | The boolean value indicating wehter the account we are checking has been granted the operator role |
+| _0 | bool | A boolean value indicating wehter the account we are checking has been granted the operator role |
 
 ### isContributor
 
@@ -472,7 +472,7 @@ Returns the address of the current owner.
 function ownerOf(uint256 tokenId) external view returns (address)
 ```
 
-Used to retireve the owner of the given token.
+Used to retrieve the owner of the given token.
 
 *Requirements:  - `tokenId` must exist.*
 

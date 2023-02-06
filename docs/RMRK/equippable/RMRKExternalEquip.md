@@ -68,7 +68,7 @@ Used to verify whether a token can be equipped into a given parent&#39;s slot.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | The boolean indicating whether the token with the given asset can be equipped into the desired slot |
+| _0 | bool | A boolean indicating whether the token with the given asset can be equipped into the desired slot |
 
 ### equip
 
@@ -308,7 +308,7 @@ Used to check whether the address has been granted the operator role by a given 
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | The boolean value indicating wehter the account we are checking has been granted the operator role |
+| _0 | bool | A boolean value indicating wehter the account we are checking has been granted the operator role |
 
 ### isChildEquipped
 
