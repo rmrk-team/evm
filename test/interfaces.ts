@@ -10,6 +10,7 @@ const IRMRKExternalEquip = '0x289dfee5';
 const IRMRKMultiAsset = '0xd1526708';
 const IRMRKNestable = '0x42b0e56f';
 const IRMRKNestableAutoIndex = '0x1884d52d';
+const IRMRKMultiAssetAutoIndex = '0x1cf132fe';
 const IRMRKNestableExternalEquip = '0x8b7f3e99';
 const IRMRKReclaimableChild = '0x2fb59acf';
 const IRMRKSoulbound = '0x911ec470';
@@ -29,6 +30,7 @@ export {
   IRMRKMultiAsset,
   IRMRKNestable,
   IRMRKNestableAutoIndex,
+  IRMRKMultiAssetAutoIndex,
   IRMRKNestableExternalEquip,
   IRMRKReclaimableChild,
   IRMRKSoulbound,
