@@ -1,14 +1,31 @@
-# IRMRKExternalEquip
+# IRMRKMultiAssetAutoIndex
 
-*RMRK team*
 
-> IRMRKExternalEquip
 
-Interface smart contract of the RMRK external equippable module.
+
+
+
 
 
 
 ## Methods
+
+### acceptAsset
+
+```solidity
+function acceptAsset(uint256 tokenId, uint64 assetId) external nonpayable
+```
+
+Accepts an asset at from the pending array of given token.
+
+*Migrates the asset from the token&#39;s pending asset array to the token&#39;s active asset array.Active assets cannot be removed by anyone, but can be replaced by a new asset.Requirements:  - The caller must own the token or be approved to manage the token&#39;s assets  - `tokenId` must exist.Emits an {AssetAccepted} event.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId | uint256 | ID of the token for which to accept the pending asset |
+| assetId | uint64 | Id of the pending asset |
 
 ### acceptAsset
 
@@ -44,47 +61,6 @@ Used to grant permission to the user to manage token&#39;s assets.
 |---|---|---|
 | to | address | Address of the account to grant the approval to |
 | tokenId | uint256 | ID of the token for which the approval to manage the assets is granted |
-
-### canTokenBeEquippedWithAssetIntoSlot
-
-```solidity
-function canTokenBeEquippedWithAssetIntoSlot(address parent, uint256 tokenId, uint64 assetId, uint64 slotId) external view returns (bool)
-```
-
-Used to verify whether a token can be equipped into a given parent&#39;s slot.
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| parent | address | Address of the parent token&#39;s smart contract |
-| tokenId | uint256 | ID of the token we want to equip |
-| assetId | uint64 | ID of the asset associated with the token we want to equip |
-| slotId | uint64 | ID of the slot that we want to equip the token into |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | bool | A boolean indicating whether the token with the given asset can be equipped into the desired slot |
-
-### equip
-
-```solidity
-function equip(IRMRKEquippable.IntakeEquip data) external nonpayable
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| data | IRMRKEquippable.IntakeEquip | undefined |
 
 ### getActiveAssetPriorities
 
@@ -152,32 +128,6 @@ Used to retrieve the address of the account approved to manage assets of a given
 |---|---|---|
 | _0 | address | Address of the account that is approved to manage the specified token&#39;s assets |
 
-### getAssetAndEquippableData
-
-```solidity
-function getAssetAndEquippableData(uint256 tokenId, uint64 assetId) external view returns (string metadataURI, uint64 equippableGroupId, address catalogAddress, uint64[] partIds)
-```
-
-Used to get the asset and equippable data associated with given `assetId`.
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| tokenId | uint256 | ID of the token for which to retrieve the asset |
-| assetId | uint64 | ID of the asset of which we are retrieving |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| metadataURI | string | The metadata URI of the asset |
-| equippableGroupId | uint64 | ID of the equippable group this asset belongs to |
-| catalogAddress | address | The address of the catalog the part belongs to |
-| partIds | uint64[] | An array of IDs of parts included in the asset |
-
 ### getAssetMetadata
 
 ```solidity
@@ -224,47 +174,6 @@ Used to retrieve the asset that will be replaced if a given asset from the token
 |---|---|---|
 | _0 | uint64 | ID of the asset which will be replaced |
 
-### getEquipment
-
-```solidity
-function getEquipment(uint256 tokenId, address targetCatalogAddress, uint64 slotPartId) external view returns (struct IRMRKEquippable.Equipment)
-```
-
-Used to get the Equipment object equipped into the specified slot of the desired token.
-
-*The `Equipment` struct consists of the following data:  [      assetId,      childAssetId,      childId,      childEquippableAddress  ]*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| tokenId | uint256 | ID of the token for which we are retrieving the equipped object |
-| targetCatalogAddress | address | Address of the `Catalog` associated with the `Slot` part of the token |
-| slotPartId | uint64 | ID of the `Slot` part that we are checking for equipped objects |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | IRMRKEquippable.Equipment | The `Equipment` struct containing data about the equipped object |
-
-### getNestableAddress
-
-```solidity
-function getNestableAddress() external view returns (address)
-```
-
-Returns the Equippable contract&#39;s corresponding nestable address.
-
-
-
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | address | Address of the Nestable module of the external equip composite |
-
 ### getPendingAssets
 
 ```solidity
@@ -310,30 +219,6 @@ Used to check whether the address has been granted the operator role by a given 
 |---|---|---|
 | _0 | bool | A boolean value indicating wehter the account we are checking has been granted the operator role |
 
-### isChildEquipped
-
-```solidity
-function isChildEquipped(uint256 tokenId, address childAddress, uint256 childId) external view returns (bool)
-```
-
-Used to check whether the token has a given child equipped.
-
-*This is used to prevent from transferring a child that is equipped.*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| tokenId | uint256 | ID of the parent token for which we are querying for |
-| childAddress | address | Address of the child token&#39;s smart contract |
-| childId | uint256 | ID of the child token |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | bool | A boolean value indicating whether the child token is equipped into the given token or not |
-
 ### rejectAllAssets
 
 ```solidity
@@ -350,6 +235,23 @@ Rejects all assets from the pending array of a given token.
 |---|---|---|
 | tokenId | uint256 | ID of the token of which to clear the pending array. |
 | maxRejections | uint256 | Maximum number of expected assets to reject, used to prevent from rejecting assets which  arrive just before this operation. |
+
+### rejectAsset
+
+```solidity
+function rejectAsset(uint256 tokenId, uint64 assetId) external nonpayable
+```
+
+Rejects an asset from the pending array of given token.
+
+*Removes the asset from the token&#39;s pending asset array.Requirements:  - The caller must own the token or be approved to manage the token&#39;s assets  - `tokenId` must exist.Emits a {AssetRejected} event.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId | uint256 | ID of the token that the asset is being rejected from |
+| assetId | uint64 | Id of the pending asset |
 
 ### rejectAsset
 
@@ -424,24 +326,6 @@ function supportsInterface(bytes4 interfaceId) external view returns (bool)
 | Name | Type | Description |
 |---|---|---|
 | _0 | bool | undefined |
-
-### unequip
-
-```solidity
-function unequip(uint256 tokenId, uint64 assetId, uint64 slotPartId) external nonpayable
-```
-
-Used to unequip child from parent token.
-
-*This can only be called by the owner of the token or by an account that has been granted permission to  manage the given token by the current owner.*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| tokenId | uint256 | ID of the parent from which the child is being unequipped |
-| assetId | uint64 | ID of the parent&#39;s asset that contains the `Slot` into which the child is equipped |
-| slotPartId | uint64 | ID of the `Slot` from which to unequip the child |
 
 
 
@@ -567,83 +451,6 @@ Used to notify listeners that an asset object is initialized at `assetId`.
 | Name | Type | Description |
 |---|---|---|
 | assetId `indexed` | uint64 | undefined |
-
-### ChildAssetEquipped
-
-```solidity
-event ChildAssetEquipped(uint256 indexed tokenId, uint64 indexed assetId, uint64 indexed slotPartId, uint256 childId, address childAddress, uint64 childAssetId)
-```
-
-Used to notify listeners that a child&#39;s asset has been equipped into one of its parent assets.
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| tokenId `indexed` | uint256 | undefined |
-| assetId `indexed` | uint64 | undefined |
-| slotPartId `indexed` | uint64 | undefined |
-| childId  | uint256 | undefined |
-| childAddress  | address | undefined |
-| childAssetId  | uint64 | undefined |
-
-### ChildAssetUnequipped
-
-```solidity
-event ChildAssetUnequipped(uint256 indexed tokenId, uint64 indexed assetId, uint64 indexed slotPartId, uint256 childId, address childAddress, uint64 childAssetId)
-```
-
-Used to notify listeners that a child&#39;s asset has been unequipped from one of its parent assets.
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| tokenId `indexed` | uint256 | undefined |
-| assetId `indexed` | uint64 | undefined |
-| slotPartId `indexed` | uint64 | undefined |
-| childId  | uint256 | undefined |
-| childAddress  | address | undefined |
-| childAssetId  | uint64 | undefined |
-
-### NestableAddressSet
-
-```solidity
-event NestableAddressSet(address old, address new_)
-```
-
-Used to notify listeners of a new `Nestable` associated  smart contract address being set.
-
-*When initially setting the `Nestable` smart contract address, the `old` value should equal `0x0` address.*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| old  | address | Previous `Nestable` smart contract address |
-| new_  | address | New `Nestable` smart contract address |
-
-### ValidParentEquippableGroupIdSet
-
-```solidity
-event ValidParentEquippableGroupIdSet(uint64 indexed equippableGroupId, uint64 indexed slotPartId, address parentAddress)
-```
-
-Used to notify listeners that the assets belonging to a `equippableGroupId` have been marked as  equippable into a given slot and parent
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| equippableGroupId `indexed` | uint64 | undefined |
-| slotPartId `indexed` | uint64 | undefined |
-| parentAddress  | address | undefined |
 
 
 

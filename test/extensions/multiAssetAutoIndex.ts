@@ -16,7 +16,7 @@ async function multiAssetAutoIndexFixture() {
   return token;
 }
 
-describe('RMRKMultiAssetAutoIndexMock', async function () {
+describe.only('RMRKMultiAssetAutoIndexMock', async function () {
   let token: RMRKMultiAssetAutoIndexMock;
   let owner: SignerWithAddress;
   let user: SignerWithAddress;

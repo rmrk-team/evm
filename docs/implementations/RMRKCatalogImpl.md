@@ -136,7 +136,7 @@ Used to return the metadata URI of the associated Catalog.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | Case metadata URI |
+| _0 | string | Catalog metadata URI |
 
 ### getPart
 

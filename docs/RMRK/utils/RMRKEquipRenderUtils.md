@@ -136,7 +136,7 @@ Used to retrieve the metadata URI of specified assets in the specified token.
 function getChildIndex(address parentAddress, uint256 parentId, address childAddress, uint256 childId) external view returns (uint256)
 ```
 
-Used to retrieve the given child&#39;s index in its paren&#39;s child tokens array.
+Used to retrieve the given child&#39;s index in its parent&#39;s child tokens array.
 
 
 

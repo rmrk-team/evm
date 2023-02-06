@@ -200,7 +200,7 @@ Used to check whether the address has been granted the operator role by a given 
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | The boolean value indicating wehter the account we are checking has been granted the operator role |
+| _0 | bool | A boolean value indicating wehter the account we are checking has been granted the operator role |
 
 ### rejectAllAssets
 
