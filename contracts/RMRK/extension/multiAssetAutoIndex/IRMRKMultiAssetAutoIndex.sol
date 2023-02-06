@@ -13,10 +13,9 @@ interface IRMRKMultiAssetAutoIndex is IRMRKMultiAsset {
      *
      *  - The caller must own the token or be approved to manage the token's assets
      *  - `tokenId` must exist.
-     *  - `index` must be in range of the length of the pending asset array.
      * @dev Emits an {AssetAccepted} event.
      * @param tokenId ID of the token for which to accept the pending asset
-     * @param assetId Id of the asset expected to be in the index
+     * @param assetId Id of the pending asset
      */
     function acceptAsset(uint256 tokenId, uint64 assetId) external;
 
@@ -27,10 +26,9 @@ interface IRMRKMultiAssetAutoIndex is IRMRKMultiAsset {
      *
      *  - The caller must own the token or be approved to manage the token's assets
      *  - `tokenId` must exist.
-     *  - `index` must be in range of the length of the pending asset array.
      * @dev Emits a {AssetRejected} event.
      * @param tokenId ID of the token that the asset is being rejected from
-     * @param assetId Id of the asset expected to be in the index
+     * @param assetId Id of the pending asset
      */
     function rejectAsset(uint256 tokenId, uint64 assetId) external;
 }

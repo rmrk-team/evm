@@ -26,16 +26,21 @@ contract RMRKMultiAssetAutoIndex is IRMRKMultiAssetAutoIndex, RMRKMultiAsset {
      * @inheritdoc IRMRKMultiAssetAutoIndex
      */
     function acceptAsset(uint256 tokenId, uint64 assetId) public {
-        uint256 index = _pendingAssetIndex[tokenId][assetId];
-        _acceptAsset(tokenId, index, assetId);
+        _acceptAsset(tokenId, _getIndex(tokenId, assetId), assetId);
     }
 
     /**
      * @inheritdoc IRMRKMultiAssetAutoIndex
      */
     function rejectAsset(uint256 tokenId, uint64 assetId) public {
-        uint256 index = _pendingAssetIndex[tokenId][assetId];
-        _rejectAsset(tokenId, index, assetId);
+        _rejectAsset(tokenId, _getIndex(tokenId, assetId), assetId);
+    }
+
+    function _getIndex(
+        uint256 tokenId,
+        uint64 assetId
+    ) internal view returns (uint256) {
+        return _pendingAssetIndex[tokenId][assetId];
     }
 
     /**
@@ -44,26 +49,9 @@ contract RMRKMultiAssetAutoIndex is IRMRKMultiAssetAutoIndex, RMRKMultiAsset {
     function _afterAcceptAsset(
         uint256 tokenId,
         uint256 index,
-        uint256 assetId
+        uint64 assetId
     ) internal override {
-        require(
-            _pendingAssetIndex[tokenId][assetId] == index,
-            "Trying to delete asset at the wrong index"
-        );
-
-        uint64[] memory pendingAssetsIds = getPendingAssets(tokenId);
-
-        if (pendingAssetsIds.length == index) {
-            // Rejected last pending asset
-            delete _pendingAssetIndex[tokenId][assetId];
-        } else {
-            // Rejected intermediate asset --> update indexes
-            uint256 replacingAssetId = pendingAssetsIds[index];
-            _pendingAssetIndex[tokenId][replacingAssetId] = _pendingAssetIndex[
-                tokenId
-            ][assetId];
-            delete _pendingAssetIndex[tokenId][assetId];
-        }
+        _removePendingIndex(tokenId, index, assetId);
     }
 
     /**
@@ -72,26 +60,25 @@ contract RMRKMultiAssetAutoIndex is IRMRKMultiAssetAutoIndex, RMRKMultiAsset {
     function _afterRejectAsset(
         uint256 tokenId,
         uint256 index,
-        uint256 assetId
+        uint64 assetId
     ) internal override {
-        require(
-            _pendingAssetIndex[tokenId][assetId] == index,
-            "Trying to delete asset at the wrong index"
-        );
+        _removePendingIndex(tokenId, index, assetId);
+    }
 
-        uint64[] memory pendingAssetsIds = getPendingAssets(tokenId);
-
-        if (pendingAssetsIds.length == index) {
-            // Rejected last pending asset
-            delete _pendingAssetIndex[tokenId][assetId];
-        } else {
+    function _removePendingIndex(
+        uint256 tokenId,
+        uint256 index,
+        uint64 assetId
+    ) private {
+        if (_pendingAssets[tokenId].length != index) {
             // Rejected intermediate asset --> update indexes
-            uint256 replacingAssetId = pendingAssetsIds[index];
-            _pendingAssetIndex[tokenId][replacingAssetId] = _pendingAssetIndex[
-                tokenId
-            ][assetId];
-            delete _pendingAssetIndex[tokenId][assetId];
+            uint256 replacingAssetId = _pendingAssets[tokenId][index];
+            _pendingAssetIndex[tokenId][replacingAssetId] = _getIndex(
+                tokenId,
+                assetId
+            );
         }
+        delete _pendingAssetIndex[tokenId][assetId];
     }
 
     /**

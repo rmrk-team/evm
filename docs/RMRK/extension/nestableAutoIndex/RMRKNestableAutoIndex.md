@@ -105,7 +105,7 @@ Used to grant a one-time approval to manage one&#39;s token.
 function balanceOf(address owner) external view returns (uint256)
 ```
 
-Used to retrieve the number of tokens in ``owner``&#39;s account.
+Used to retrieve the number of tokens in `owner`&#39;s account.
 
 
 
@@ -258,7 +258,7 @@ Used to retrieve the immediate owner of the given token.
 function getApproved(uint256 tokenId) external view returns (address)
 ```
 
-Used to retireve the account approved to manage given token.
+Used to retrieve the account approved to manage given token.
 
 *Requirements:  - `tokenId` must exist.*
 

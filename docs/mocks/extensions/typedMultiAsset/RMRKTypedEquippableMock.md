@@ -181,7 +181,7 @@ Used to grant approvals for specific tokens to a specified address.
 function balanceOf(address owner) external view returns (uint256)
 ```
 
-Used to retrieve the number of tokens in ``owner``&#39;s account.
+Used to retrieve the number of tokens in `owner`&#39;s account.
 
 
 
@@ -259,7 +259,7 @@ Used to verify whether a token can be equipped into a given parent&#39;s slot.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | The boolean indicating whether the token with the given asset can be equipped into the desired slot |
+| _0 | bool | A boolean indicating whether the token with the given asset can be equipped into the desired slot |
 
 ### childIsInActive
 
@@ -419,7 +419,7 @@ Used to retrieve IDs of the active assets of given token.
 function getApproved(uint256 tokenId) external view returns (address)
 ```
 
-Used to retireve the account approved to manage given token.
+Used to retrieve the account approved to manage given token.
 
 *Requirements:  - `tokenId` must exist.*
 
@@ -641,7 +641,7 @@ Used to check whether the address has been granted the operator role by a given 
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | The boolean value indicating wehter the account we are checking has been granted the operator role |
+| _0 | bool | A boolean value indicating wehter the account we are checking has been granted the operator role |
 
 ### isChildEquipped
 
@@ -665,7 +665,7 @@ Used to check whether the token has a given child equipped.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | The boolean value indicating whether the child token is equipped into the given token or not |
+| _0 | bool | A boolean value indicating whether the child token is equipped into the given token or not |
 
 ### mint
 
