@@ -1397,7 +1397,7 @@ Used to notify listeners that a new token has been added to a given token&#39;s 
 ### ChildTransferred
 
 ```solidity
-event ChildTransferred(uint256 indexed tokenId, uint256 childIndex, address indexed childAddress, uint256 indexed childId, bool fromPending)
+event ChildTransferred(uint256 indexed tokenId, uint256 childIndex, address indexed childAddress, uint256 indexed childId, bool fromPending, bool toZero)
 ```
 
 Used to notify listeners a child token has been transferred from parent token.
@@ -1413,6 +1413,7 @@ Used to notify listeners a child token has been transferred from parent token.
 | childAddress `indexed` | address | undefined |
 | childId `indexed` | uint256 | undefined |
 | fromPending  | bool | undefined |
+| toZero  | bool | undefined |
 
 ### ContributorUpdate
 
