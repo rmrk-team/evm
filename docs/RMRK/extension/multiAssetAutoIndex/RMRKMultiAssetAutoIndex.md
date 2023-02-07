@@ -1,10 +1,10 @@
 # RMRKMultiAssetAutoIndex
 
+*RMRK team*
 
+> RMRKMultiAssetAutoIndex
 
-
-
-
+Smart contract of the RMRK MultiAsset AutoIndex module.
 
 
 
@@ -33,9 +33,9 @@ Version of the @rmrk-team/evm-contracts package
 function acceptAsset(uint256 tokenId, uint64 assetId) external nonpayable
 ```
 
-Accepts an asset at from the pending array of given token.
+Accepts an asset from the pending array of given token.
 
-*Migrates the asset from the token&#39;s pending asset array to the token&#39;s active asset array.Active assets cannot be removed by anyone, but can be replaced by a new asset.Requirements:  - The caller must own the token or be approved to manage the token&#39;s assets  - `tokenId` must exist.Emits an {AssetAccepted} event.*
+*Migrates the asset from the token&#39;s pending asset array to the token&#39;s active asset array.An active asset cannot be removed by anyone, but can be replaced by a new asset.Requirements:  - The caller must own the token or be approved to manage the token&#39;s assets  - `tokenId` must exist.Emits an {AssetAccepted} event.*
 
 #### Parameters
 
@@ -507,7 +507,7 @@ function supportsInterface(bytes4 interfaceId) external view returns (bool)
 
 
 
-
+*Returns true if this contract implements the interface defined by `interfaceId`. See the corresponding https://eips.ethereum.org/EIPS/eip-165#how-interfaces-are-identified[EIP section] to learn more about how these ids are created. This function call must use less than 30 000 gas.*
 
 #### Parameters
 
