@@ -2178,17 +2178,6 @@ Attempting to interact with a token without being its owner or having been grant
 *When a token is nested, only the direct owner (NFT parent) can mange it. In that case, approved addresses are  not allowed to manage it, in order to ensure the expected behaviour*
 
 
-### RMRKNotEnoughAllowance
-
-```solidity
-error RMRKNotEnoughAllowance()
-```
-
-
-
-
-
-
 ### RMRKNotEquipped
 
 ```solidity

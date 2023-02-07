@@ -117,9 +117,8 @@ async function shouldControlValidMintingErc20Pay(): Promise<void> {
 
     await erc20.mint(addrs[0].address, ONE_ETH);
     await erc20.approve(this.token.address, HALF_ETH);
-    await expect(this.token.mint(addrs[0].address, 1)).to.be.revertedWithCustomError(
-      this.token,
-      'RMRKNotEnoughAllowance',
+    await expect(this.token.mint(addrs[0].address, 1)).to.be.revertedWith(
+      'ERC20: insufficient allowance',
     );
   });
 
@@ -160,9 +159,9 @@ async function shouldControlValidMintingErc20Pay(): Promise<void> {
     expect(await this.token.totalSupply()).to.equal(10);
     expect(await this.token.balanceOf(addrs[0].address)).to.equal(10);
 
-    await expect(
-      this.token.connect(addrs[0]).mint(addrs[0].address, 1),
-    ).to.be.revertedWithCustomError(this.token, 'RMRKNotEnoughAllowance');
+    await expect(this.token.connect(addrs[0]).mint(addrs[0].address, 1)).to.be.revertedWith(
+      'ERC20: insufficient allowance',
+    );
   });
 
   describe('Nest minting', async () => {
