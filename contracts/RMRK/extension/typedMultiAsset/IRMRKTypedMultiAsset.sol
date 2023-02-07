@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
-pragma solidity ^0.8.16;
+pragma solidity ^0.8.18;
 
 // import "../../multiasset/IRMRKMultiAsset.sol";
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
