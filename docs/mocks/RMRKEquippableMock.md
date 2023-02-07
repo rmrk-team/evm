@@ -1066,13 +1066,13 @@ event AllChildrenRejected(uint256 indexed tokenId)
 
 Used to notify listeners that all pending child tokens of a given token have been rejected.
 
-
+*Emitted when a token removes all a child tokens from its pending array.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId `indexed` | uint256 | undefined |
+| tokenId `indexed` | uint256 | ID of the token that rejected all of the pending children |
 
 ### Approval
 
@@ -1082,7 +1082,7 @@ event Approval(address indexed owner, address indexed approved, uint256 indexed 
 
 
 
-
+*Emitted when `owner` enables `approved` to manage the `tokenId` token.*
 
 #### Parameters
 
@@ -1100,7 +1100,7 @@ event ApprovalForAll(address indexed owner, address indexed operator, bool appro
 
 
 
-
+*Emitted when `owner` enables or disables (`approved`) `operator` to manage all of its assets.*
 
 #### Parameters
 
@@ -1124,9 +1124,9 @@ Used to notify listeners that owner has granted approval to the user to manage a
 
 | Name | Type | Description |
 |---|---|---|
-| owner `indexed` | address | undefined |
-| operator `indexed` | address | undefined |
-| approved  | bool | undefined |
+| owner `indexed` | address | Address of the account that has granted the approval for all assets on all of their tokens |
+| operator `indexed` | address | Address of the account that has been granted the approval to manage the token&#39;s assets on all of  the tokens |
+| approved  | bool | Boolean value signifying whether the permission has been granted (`true`) or revoked (`false`) |
 
 ### ApprovalForAssets
 
@@ -1136,15 +1136,15 @@ event ApprovalForAssets(address indexed owner, address indexed approved, uint256
 
 Used to notify listeners that owner has granted an approval to the user to manage the assets of a  given token.
 
-
+*Approvals must be cleared on transfer*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| owner `indexed` | address | undefined |
-| approved `indexed` | address | undefined |
-| tokenId `indexed` | uint256 | undefined |
+| owner `indexed` | address | Address of the account that has granted the approval for all token&#39;s assets |
+| approved `indexed` | address | Address of the account that has been granted approval to manage the token&#39;s assets |
+| tokenId `indexed` | uint256 | ID of the token on which the approval was granted |
 
 ### AssetAccepted
 
@@ -1160,9 +1160,9 @@ Used to notify listeners that an asset object at `assetId` is accepted by the to
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId `indexed` | uint256 | undefined |
-| assetId `indexed` | uint64 | undefined |
-| replacesId `indexed` | uint64 | undefined |
+| tokenId `indexed` | uint256 | ID of the token that had a new asset accepted |
+| assetId `indexed` | uint64 | ID of the asset that was accepted |
+| replacesId `indexed` | uint64 | ID of the asset that was replaced |
 
 ### AssetAddedToToken
 
@@ -1178,9 +1178,9 @@ Used to notify listeners that an asset object at `assetId` is added to token&#39
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId `indexed` | uint256 | undefined |
-| assetId `indexed` | uint64 | undefined |
-| replacesId `indexed` | uint64 | undefined |
+| tokenId `indexed` | uint256 | ID of the token that received a new pending asset |
+| assetId `indexed` | uint64 | ID of the asset that has been added to the token&#39;s pending assets array |
+| replacesId `indexed` | uint64 | ID of the asset that would be replaced |
 
 ### AssetPrioritySet
 
@@ -1196,7 +1196,7 @@ Used to notify listeners that token&#39;s prioritiy array is reordered.
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId `indexed` | uint256 | undefined |
+| tokenId `indexed` | uint256 | ID of the token that had the asset priority array updated |
 
 ### AssetRejected
 
@@ -1212,8 +1212,8 @@ Used to notify listeners that an asset object at `assetId` is rejected from toke
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId `indexed` | uint256 | undefined |
-| assetId `indexed` | uint64 | undefined |
+| tokenId `indexed` | uint256 | ID of the token that had an asset rejected |
+| assetId `indexed` | uint64 | ID of the asset that was rejected |
 
 ### AssetSet
 
@@ -1229,7 +1229,7 @@ Used to notify listeners that an asset object is initialized at `assetId`.
 
 | Name | Type | Description |
 |---|---|---|
-| assetId `indexed` | uint64 | undefined |
+| assetId `indexed` | uint64 | ID of the asset that was initialized |
 
 ### ChildAccepted
 
@@ -1239,16 +1239,16 @@ event ChildAccepted(uint256 indexed tokenId, uint256 childIndex, address indexed
 
 Used to notify listeners that a new child token was accepted by the parent token.
 
-
+*Emitted when a parent token accepts a token from its pending array, migrating it to the active array.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId `indexed` | uint256 | undefined |
-| childIndex  | uint256 | undefined |
-| childAddress `indexed` | address | undefined |
-| childId `indexed` | uint256 | undefined |
+| tokenId `indexed` | uint256 | ID of the token that accepted a new child token |
+| childIndex  | uint256 | Index of the newly accepted child token in the parent token&#39;s active children array |
+| childAddress `indexed` | address | Address of the child token&#39;s collection smart contract |
+| childId `indexed` | uint256 | ID of the child token in the child token&#39;s collection smart contract |
 
 ### ChildAssetEquipped
 
@@ -1264,12 +1264,12 @@ Used to notify listeners that a child&#39;s asset has been equipped into one of 
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId `indexed` | uint256 | undefined |
-| assetId `indexed` | uint64 | undefined |
-| slotPartId `indexed` | uint64 | undefined |
-| childId  | uint256 | undefined |
-| childAddress  | address | undefined |
-| childAssetId  | uint64 | undefined |
+| tokenId `indexed` | uint256 | ID of the token that had an asset equipped |
+| assetId `indexed` | uint64 | ID of the asset associated with the token we are equipping into |
+| slotPartId `indexed` | uint64 | ID of the slot we are using to equip |
+| childId  | uint256 | ID of the child token we are equipping into the slot |
+| childAddress  | address | Address of the child token&#39;s collection |
+| childAssetId  | uint64 | ID of the asset associated with the token we are equipping |
 
 ### ChildAssetUnequipped
 
@@ -1285,12 +1285,12 @@ Used to notify listeners that a child&#39;s asset has been unequipped from one o
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId `indexed` | uint256 | undefined |
-| assetId `indexed` | uint64 | undefined |
-| slotPartId `indexed` | uint64 | undefined |
-| childId  | uint256 | undefined |
-| childAddress  | address | undefined |
-| childAssetId  | uint64 | undefined |
+| tokenId `indexed` | uint256 | ID of the token that had an asset unequipped |
+| assetId `indexed` | uint64 | ID of the asset associated with the token we are unequipping out of |
+| slotPartId `indexed` | uint64 | ID of the slot we are unequipping from |
+| childId  | uint256 | ID of the token being unequipped |
+| childAddress  | address | Address of the collection that a token that is being unequipped belongs to |
+| childAssetId  | uint64 | ID of the asset associated with the token we are unequipping |
 
 ### ChildProposed
 
@@ -1300,16 +1300,16 @@ event ChildProposed(uint256 indexed tokenId, uint256 childIndex, address indexed
 
 Used to notify listeners that a new token has been added to a given token&#39;s pending children array.
 
-
+*Emitted when a child NFT is added to a token&#39;s pending array.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId `indexed` | uint256 | undefined |
-| childIndex  | uint256 | undefined |
-| childAddress `indexed` | address | undefined |
-| childId `indexed` | uint256 | undefined |
+| tokenId `indexed` | uint256 | ID of the token that received a new pending child token |
+| childIndex  | uint256 | Index of the proposed child token in the parent token&#39;s pending children array |
+| childAddress `indexed` | address | Address of the proposed child token&#39;s collection smart contract |
+| childId `indexed` | uint256 | ID of the child token in the child token&#39;s collection smart contract |
 
 ### ChildTransferred
 
@@ -1319,17 +1319,17 @@ event ChildTransferred(uint256 indexed tokenId, uint256 childIndex, address inde
 
 Used to notify listeners a child token has been transferred from parent token.
 
-
+*Emitted when a token transfers a child from itself, transferring ownership to the root owner.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId `indexed` | uint256 | undefined |
-| childIndex  | uint256 | undefined |
-| childAddress `indexed` | address | undefined |
-| childId `indexed` | uint256 | undefined |
-| fromPending  | bool | undefined |
+| tokenId `indexed` | uint256 | ID of the token that transferred a child token |
+| childIndex  | uint256 | Index of a child in the array from which it is being transferred |
+| childAddress `indexed` | address | Address of the child token&#39;s collection smart contract |
+| childId `indexed` | uint256 | ID of the child token in the child token&#39;s collection smart contract |
+| fromPending  | bool | A boolean value signifying whether the token was in the pending child tokens array (`true`) or  in the active child tokens array (`false`) |
 
 ### NestTransfer
 
@@ -1339,17 +1339,17 @@ event NestTransfer(address indexed from, address indexed to, uint256 fromTokenId
 
 Used to notify listeners that the token is being transferred.
 
-
+*Emitted when `tokenId` token is transferred from `from` to `to`.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| from `indexed` | address | undefined |
-| to `indexed` | address | undefined |
-| fromTokenId  | uint256 | undefined |
-| toTokenId  | uint256 | undefined |
-| tokenId `indexed` | uint256 | undefined |
+| from `indexed` | address | Address of the previous immediate owner, which is a smart contract if the token was nested. |
+| to `indexed` | address | Address of the new immediate owner, which is a smart contract if the token is being nested. |
+| fromTokenId  | uint256 | ID of the previous parent token. If the token was not nested before, the value should be `0` |
+| toTokenId  | uint256 | ID of the new parent token. If the token is not being nested, the value should be `0` |
+| tokenId `indexed` | uint256 | ID of the token being transferred |
 
 ### Transfer
 
@@ -1359,7 +1359,7 @@ event Transfer(address indexed from, address indexed to, uint256 indexed tokenId
 
 
 
-
+*Emitted when `tokenId` token is transferred from `from` to `to`.*
 
 #### Parameters
 
@@ -1383,9 +1383,9 @@ Used to notify listeners that the assets belonging to a `equippableGroupId` have
 
 | Name | Type | Description |
 |---|---|---|
-| equippableGroupId `indexed` | uint64 | undefined |
-| slotPartId `indexed` | uint64 | undefined |
-| parentAddress  | address | undefined |
+| equippableGroupId `indexed` | uint64 | ID of the equippable group being marked as equippable into the slot associated with  `slotPartId` of the `parentAddress` collection |
+| slotPartId `indexed` | uint64 | ID of the slot part of the catalog into which the parts belonging to the equippable group  associated with `equippableGroupId` can be equipped |
+| parentAddress  | address | Address of the collection into which the parts belonging to `equippableGroupId` can be  equipped |
 
 
 
