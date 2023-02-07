@@ -167,14 +167,14 @@ event AddedEquippables(uint64 indexed partId, address[] equippableAddresses)
 
 Event to announce new equippables to the part.
 
-
+*It is emitted when new addresses are marked as equippable for `partId`.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| partId `indexed` | uint64 | undefined |
-| equippableAddresses  | address[] | undefined |
+| partId `indexed` | uint64 | ID of the part that had new equippable addresses added |
+| equippableAddresses  | address[] | An array of the new addresses that can equip this part |
 
 ### AddedPart
 
@@ -184,17 +184,17 @@ event AddedPart(uint64 indexed partId, enum IRMRKCatalog.ItemType indexed itemTy
 
 Event to announce addition of a new part.
 
-
+*It is emitted when a new part is added.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| partId `indexed` | uint64 | undefined |
-| itemType `indexed` | enum IRMRKCatalog.ItemType | undefined |
-| zIndex  | uint8 | undefined |
-| equippableAddresses  | address[] | undefined |
-| metadataURI  | string | undefined |
+| partId `indexed` | uint64 | ID of the part that was added |
+| itemType `indexed` | enum IRMRKCatalog.ItemType | Enum value specifying whether the part is `None`, `Slot` and `Fixed` |
+| zIndex  | uint8 | An uint specifying the z value of the part. It is used to specify the depth which the part should  be rendered at |
+| equippableAddresses  | address[] | An array of addresses that can equip this part |
+| metadataURI  | string | The metadata URI of the part |
 
 ### SetEquippableToAll
 
@@ -204,13 +204,13 @@ event SetEquippableToAll(uint64 indexed partId)
 
 Event to announce that a given part can be equipped by any address.
 
-
+*It is emitted when a given part is marked as equippable by any.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| partId `indexed` | uint64 | undefined |
+| partId `indexed` | uint64 | ID of the part marked as equippable by any address |
 
 ### SetEquippables
 
@@ -220,14 +220,14 @@ event SetEquippables(uint64 indexed partId, address[] equippableAddresses)
 
 Event to announce the overriding of equippable addresses of the part.
 
-
+*It is emitted when the existing list of addresses marked as equippable for `partId` is overwritten by a new one.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| partId `indexed` | uint64 | undefined |
-| equippableAddresses  | address[] | undefined |
+| partId `indexed` | uint64 | ID of the part whose list of equippable addresses was overwritten |
+| equippableAddresses  | address[] | The new, full, list of addresses that can equip this part |
 
 
 
