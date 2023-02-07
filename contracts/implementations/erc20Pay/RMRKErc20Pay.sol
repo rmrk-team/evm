@@ -5,8 +5,6 @@ pragma solidity ^0.8.16;
 import "../../RMRK/utils/IERC20.sol";
 import "./IRMRKErc20Pay.sol";
 
-error RMRKNotEnoughAllowance();
-
 /**
  * @title RMRKNestable
  * @author RMRK team
@@ -34,8 +32,6 @@ abstract contract RMRKErc20Pay is IRMRKErc20Pay {
         address to,
         uint256 value
     ) internal virtual {
-        if (IERC20(_erc20TokenAddress).allowance(from, to) < value)
-            revert RMRKNotEnoughAllowance();
         IERC20(_erc20TokenAddress).transferFrom(from, to, value);
     }
 

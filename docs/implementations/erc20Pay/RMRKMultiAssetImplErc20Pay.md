@@ -1413,17 +1413,6 @@ Attempting to manage an asset without owning it or having been granted permissio
 
 
 
-### RMRKNotEnoughAllowance
-
-```solidity
-error RMRKNotEnoughAllowance()
-```
-
-
-
-
-
-
 ### RMRKNotOwner
 
 ```solidity
