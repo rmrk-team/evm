@@ -349,7 +349,7 @@ Used to notify listeners that a new token has been added to a given token&#39;s 
 ### ChildTransferred
 
 ```solidity
-event ChildTransferred(uint256 indexed tokenId, uint256 childIndex, address indexed childAddress, uint256 indexed childId, bool fromPending)
+event ChildTransferred(uint256 indexed tokenId, uint256 childIndex, address indexed childAddress, uint256 indexed childId, bool fromPending, bool toZero)
 ```
 
 Used to notify listeners a child token has been transferred from parent token.
@@ -365,6 +365,7 @@ Used to notify listeners a child token has been transferred from parent token.
 | childAddress `indexed` | address | Address of the child token&#39;s collection smart contract |
 | childId `indexed` | uint256 | ID of the child token in the child token&#39;s collection smart contract |
 | fromPending  | bool | A boolean value signifying whether the token was in the pending child tokens array (`true`) or  in the active child tokens array (`false`) |
+| toZero  | bool | A boolean value signifying whether the token is being transferred to the `0x0` address (`true`) or  not (`false`) |
 
 ### NestTransfer
 

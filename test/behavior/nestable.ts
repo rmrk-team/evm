@@ -506,7 +506,7 @@ async function shouldBehaveLikeNestable(
           .transferChild(parentId, tokenOwner.address, 0, 0, child.address, childId, false, '0x'),
       )
         .to.emit(parent, 'ChildTransferred')
-        .withArgs(parentId, 0, child.address, childId, false);
+        .withArgs(parentId, 0, child.address, childId, false, false);
 
       await checkChildMovedToRootOwner();
     });
@@ -519,9 +519,22 @@ async function shouldBehaveLikeNestable(
           .transferChild(parentId, toOwnerAddress, 0, 0, child.address, childId, false, '0x'),
       )
         .to.emit(parent, 'ChildTransferred')
-        .withArgs(parentId, 0, child.address, childId, false);
+        .withArgs(parentId, 0, child.address, childId, false, false);
 
       await checkChildMovedToRootOwner(toOwnerAddress);
+    });
+
+    it('can transfer child to address zero (remove child)', async function () {
+      const newOwnerAddress = addrs[2].address;
+      const newParentId = await mint(parent, newOwnerAddress);
+      await expect(
+        parent
+          .connect(tokenOwner)
+          .transferChild(parentId, ADDRESS_ZERO, 0, 0, child.address, childId, false, '0x'),
+      )
+        .to.emit(parent, 'ChildTransferred')
+        .withArgs(parentId, 0, child.address, childId, false, true);
+      expect(await parent.childrenOf(parentId)).to.eql([]);
     });
 
     it('can transfer child to another NFT', async function () {
@@ -542,7 +555,7 @@ async function shouldBehaveLikeNestable(
           ),
       )
         .to.emit(parent, 'ChildTransferred')
-        .withArgs(parentId, 0, child.address, childId, false);
+        .withArgs(parentId, 0, child.address, childId, false, false);
 
       expect(await child.ownerOf(childId)).to.eql(newOwnerAddress);
       expect(await child.directOwnerOf(childId)).to.eql([parent.address, bn(newParentId), true]);
@@ -673,7 +686,7 @@ async function shouldBehaveLikeNestable(
           .transferChild(parentId, tokenOwner.address, 0, 0, child.address, childId, true, '0x'),
       )
         .to.emit(parent, 'ChildTransferred')
-        .withArgs(parentId, 0, child.address, childId, true);
+        .withArgs(parentId, 0, child.address, childId, true, false);
 
       await checkChildMovedToRootOwner();
     });
@@ -686,9 +699,20 @@ async function shouldBehaveLikeNestable(
           .transferChild(parentId, toOwnerAddress, 0, 0, child.address, childId, true, '0x'),
       )
         .to.emit(parent, 'ChildTransferred')
-        .withArgs(parentId, 0, child.address, childId, true);
+        .withArgs(parentId, 0, child.address, childId, true, false);
 
       await checkChildMovedToRootOwner(toOwnerAddress);
+    });
+
+    it('can transfer child to address zero (reject child)', async function () {
+      await expect(
+        parent
+          .connect(tokenOwner)
+          .transferChild(parentId, ADDRESS_ZERO, 0, 0, child.address, childId, true, '0x'),
+      )
+        .to.emit(parent, 'ChildTransferred')
+        .withArgs(parentId, 0, child.address, childId, true, true);
+      expect(await parent.pendingChildrenOf(parentId)).to.eql([]);
     });
 
     it('can transfer child to another NFT', async function () {
@@ -709,7 +733,7 @@ async function shouldBehaveLikeNestable(
           ),
       )
         .to.emit(parent, 'ChildTransferred')
-        .withArgs(parentId, 0, child.address, childId, true);
+        .withArgs(parentId, 0, child.address, childId, true, false);
 
       expect(await child.ownerOf(childId)).to.eql(newOwnerAddress);
       expect(await child.directOwnerOf(childId)).to.eql([parent.address, bn(newParentId), true]);
