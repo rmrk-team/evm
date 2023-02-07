@@ -91,13 +91,16 @@ interface IRMRKNestable is IERC165 {
      * @param childId ID of the child token in the child token's collection smart contract
      * @param fromPending A boolean value signifying whether the token was in the pending child tokens array (`true`) or
      *  in the active child tokens array (`false`)
+     * @param toZero A boolean value signifying whether the token is being transferred to the `0x0` address (`true`) or
+     *  not (`false`)
      */
     event ChildTransferred(
         uint256 indexed tokenId,
         uint256 childIndex,
         address indexed childAddress,
         uint256 indexed childId,
-        bool fromPending
+        bool fromPending,
+        bool toZero
     );
 
     /**
