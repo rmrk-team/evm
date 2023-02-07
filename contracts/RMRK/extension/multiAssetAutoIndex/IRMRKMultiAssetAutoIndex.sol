@@ -6,9 +6,9 @@ import "../../multiasset/IRMRKMultiAsset.sol";
 
 interface IRMRKMultiAssetAutoIndex is IRMRKMultiAsset {
     /**
-     * @notice Accepts an asset at from the pending array of given token.
+     * @notice Accepts an asset from the pending array of given token.
      * @dev Migrates the asset from the token's pending asset array to the token's active asset array.
-     * @dev Active assets cannot be removed by anyone, but can be replaced by a new asset.
+     * @dev An active asset cannot be removed by anyone, but can be replaced by a new asset.
      * @dev Requirements:
      *
      *  - The caller must own the token or be approved to manage the token's assets
