@@ -890,13 +890,13 @@ event AllChildrenRejected(uint256 indexed tokenId)
 
 Used to notify listeners that all pending child tokens of a given token have been rejected.
 
-
+*Emitted when a token removes all a child tokens from its pending array.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId `indexed` | uint256 | undefined |
+| tokenId `indexed` | uint256 | ID of the token that rejected all of the pending children |
 
 ### Approval
 
@@ -906,7 +906,7 @@ event Approval(address indexed owner, address indexed approved, uint256 indexed 
 
 
 
-
+*Emitted when `owner` enables `approved` to manage the `tokenId` token.*
 
 #### Parameters
 
@@ -924,7 +924,7 @@ event ApprovalForAll(address indexed owner, address indexed operator, bool appro
 
 
 
-
+*Emitted when `owner` enables or disables (`approved`) `operator` to manage all of its assets.*
 
 #### Parameters
 
@@ -942,16 +942,16 @@ event ChildAccepted(uint256 indexed tokenId, uint256 childIndex, address indexed
 
 Used to notify listeners that a new child token was accepted by the parent token.
 
-
+*Emitted when a parent token accepts a token from its pending array, migrating it to the active array.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId `indexed` | uint256 | undefined |
-| childIndex  | uint256 | undefined |
-| childAddress `indexed` | address | undefined |
-| childId `indexed` | uint256 | undefined |
+| tokenId `indexed` | uint256 | ID of the token that accepted a new child token |
+| childIndex  | uint256 | Index of the newly accepted child token in the parent token&#39;s active children array |
+| childAddress `indexed` | address | Address of the child token&#39;s collection smart contract |
+| childId `indexed` | uint256 | ID of the child token in the child token&#39;s collection smart contract |
 
 ### ChildProposed
 
@@ -961,37 +961,36 @@ event ChildProposed(uint256 indexed tokenId, uint256 childIndex, address indexed
 
 Used to notify listeners that a new token has been added to a given token&#39;s pending children array.
 
-
+*Emitted when a child NFT is added to a token&#39;s pending array.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId `indexed` | uint256 | undefined |
-| childIndex  | uint256 | undefined |
-| childAddress `indexed` | address | undefined |
-| childId `indexed` | uint256 | undefined |
+| tokenId `indexed` | uint256 | ID of the token that received a new pending child token |
+| childIndex  | uint256 | Index of the proposed child token in the parent token&#39;s pending children array |
+| childAddress `indexed` | address | Address of the proposed child token&#39;s collection smart contract |
+| childId `indexed` | uint256 | ID of the child token in the child token&#39;s collection smart contract |
 
 ### ChildTransferred
 
 ```solidity
-event ChildTransferred(uint256 indexed tokenId, uint256 childIndex, address indexed childAddress, uint256 indexed childId, bool fromPending, bool toZero)
+event ChildTransferred(uint256 indexed tokenId, uint256 childIndex, address indexed childAddress, uint256 indexed childId, bool fromPending)
 ```
 
 Used to notify listeners a child token has been transferred from parent token.
 
-
+*Emitted when a token transfers a child from itself, transferring ownership to the root owner.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId `indexed` | uint256 | undefined |
-| childIndex  | uint256 | undefined |
-| childAddress `indexed` | address | undefined |
-| childId `indexed` | uint256 | undefined |
-| fromPending  | bool | undefined |
-| toZero  | bool | undefined |
+| tokenId `indexed` | uint256 | ID of the token that transferred a child token |
+| childIndex  | uint256 | Index of a child in the array from which it is being transferred |
+| childAddress `indexed` | address | Address of the child token&#39;s collection smart contract |
+| childId `indexed` | uint256 | ID of the child token in the child token&#39;s collection smart contract |
+| fromPending  | bool | A boolean value signifying whether the token was in the pending child tokens array (`true`) or  in the active child tokens array (`false`) |
 
 ### ContributorUpdate
 
@@ -1001,14 +1000,14 @@ event ContributorUpdate(address indexed contributor, bool isContributor)
 
 Event that signifies that an address was granted contributor role or that the permission has been  revoked.
 
-
+*This can only be triggered by a current owner, so there is no need to include that information in the event.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| contributor `indexed` | address | undefined |
-| isContributor  | bool | undefined |
+| contributor `indexed` | address | Address of the account that had contributor role status updated |
+| isContributor  | bool | A boolean value signifying whether the role has been granted (`true`) or revoked (`false`) |
 
 ### NestTransfer
 
@@ -1018,17 +1017,17 @@ event NestTransfer(address indexed from, address indexed to, uint256 fromTokenId
 
 Used to notify listeners that the token is being transferred.
 
-
+*Emitted when `tokenId` token is transferred from `from` to `to`.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| from `indexed` | address | undefined |
-| to `indexed` | address | undefined |
-| fromTokenId  | uint256 | undefined |
-| toTokenId  | uint256 | undefined |
-| tokenId `indexed` | uint256 | undefined |
+| from `indexed` | address | Address of the previous immediate owner, which is a smart contract if the token was nested. |
+| to `indexed` | address | Address of the new immediate owner, which is a smart contract if the token is being nested. |
+| fromTokenId  | uint256 | ID of the previous parent token. If the token was not nested before, the value should be `0` |
+| toTokenId  | uint256 | ID of the new parent token. If the token is not being nested, the value should be `0` |
+| tokenId `indexed` | uint256 | ID of the token being transferred |
 
 ### OwnershipTransferred
 
@@ -1044,8 +1043,8 @@ Used to anounce the transfer of ownership.
 
 | Name | Type | Description |
 |---|---|---|
-| previousOwner `indexed` | address | undefined |
-| newOwner `indexed` | address | undefined |
+| previousOwner `indexed` | address | Address of the account that transferred their ownership role |
+| newOwner `indexed` | address | Address of the account receiving the ownership role |
 
 ### Transfer
 
@@ -1055,7 +1054,7 @@ event Transfer(address indexed from, address indexed to, uint256 indexed tokenId
 
 
 
-
+*Emitted when `tokenId` token is transferred from `from` to `to`.*
 
 #### Parameters
 
@@ -1381,17 +1380,6 @@ error RMRKNotApprovedOrDirectOwner()
 Attempting to interact with a token without being its owner or having been granted permission by the  owner to do so
 
 *When a token is nested, only the direct owner (NFT parent) can mange it. In that case, approved addresses are  not allowed to manage it, in order to ensure the expected behaviour*
-
-
-### RMRKNotEnoughAllowance
-
-```solidity
-error RMRKNotEnoughAllowance()
-```
-
-
-
-
 
 
 ### RMRKNotOwner

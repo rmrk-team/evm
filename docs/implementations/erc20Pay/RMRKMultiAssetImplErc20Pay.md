@@ -933,7 +933,7 @@ event Approval(address indexed owner, address indexed approved, uint256 indexed 
 
 
 
-
+*Emitted when `owner` enables `approved` to manage the `tokenId` token.*
 
 #### Parameters
 
@@ -951,7 +951,7 @@ event ApprovalForAll(address indexed owner, address indexed operator, bool appro
 
 
 
-
+*Emitted when `owner` enables or disables (`approved`) `operator` to manage all of its assets.*
 
 #### Parameters
 
@@ -975,9 +975,9 @@ Used to notify listeners that owner has granted approval to the user to manage a
 
 | Name | Type | Description |
 |---|---|---|
-| owner `indexed` | address | undefined |
-| operator `indexed` | address | undefined |
-| approved  | bool | undefined |
+| owner `indexed` | address | Address of the account that has granted the approval for all assets on all of their tokens |
+| operator `indexed` | address | Address of the account that has been granted the approval to manage the token&#39;s assets on all of  the tokens |
+| approved  | bool | Boolean value signifying whether the permission has been granted (`true`) or revoked (`false`) |
 
 ### ApprovalForAssets
 
@@ -987,15 +987,15 @@ event ApprovalForAssets(address indexed owner, address indexed approved, uint256
 
 Used to notify listeners that owner has granted an approval to the user to manage the assets of a  given token.
 
-
+*Approvals must be cleared on transfer*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| owner `indexed` | address | undefined |
-| approved `indexed` | address | undefined |
-| tokenId `indexed` | uint256 | undefined |
+| owner `indexed` | address | Address of the account that has granted the approval for all token&#39;s assets |
+| approved `indexed` | address | Address of the account that has been granted approval to manage the token&#39;s assets |
+| tokenId `indexed` | uint256 | ID of the token on which the approval was granted |
 
 ### AssetAccepted
 
@@ -1011,9 +1011,9 @@ Used to notify listeners that an asset object at `assetId` is accepted by the to
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId `indexed` | uint256 | undefined |
-| assetId `indexed` | uint64 | undefined |
-| replacesId `indexed` | uint64 | undefined |
+| tokenId `indexed` | uint256 | ID of the token that had a new asset accepted |
+| assetId `indexed` | uint64 | ID of the asset that was accepted |
+| replacesId `indexed` | uint64 | ID of the asset that was replaced |
 
 ### AssetAddedToToken
 
@@ -1029,9 +1029,9 @@ Used to notify listeners that an asset object at `assetId` is added to token&#39
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId `indexed` | uint256 | undefined |
-| assetId `indexed` | uint64 | undefined |
-| replacesId `indexed` | uint64 | undefined |
+| tokenId `indexed` | uint256 | ID of the token that received a new pending asset |
+| assetId `indexed` | uint64 | ID of the asset that has been added to the token&#39;s pending assets array |
+| replacesId `indexed` | uint64 | ID of the asset that would be replaced |
 
 ### AssetPrioritySet
 
@@ -1047,7 +1047,7 @@ Used to notify listeners that token&#39;s prioritiy array is reordered.
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId `indexed` | uint256 | undefined |
+| tokenId `indexed` | uint256 | ID of the token that had the asset priority array updated |
 
 ### AssetRejected
 
@@ -1063,8 +1063,8 @@ Used to notify listeners that an asset object at `assetId` is rejected from toke
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId `indexed` | uint256 | undefined |
-| assetId `indexed` | uint64 | undefined |
+| tokenId `indexed` | uint256 | ID of the token that had an asset rejected |
+| assetId `indexed` | uint64 | ID of the asset that was rejected |
 
 ### AssetSet
 
@@ -1080,7 +1080,7 @@ Used to notify listeners that an asset object is initialized at `assetId`.
 
 | Name | Type | Description |
 |---|---|---|
-| assetId `indexed` | uint64 | undefined |
+| assetId `indexed` | uint64 | ID of the asset that was initialized |
 
 ### ContributorUpdate
 
@@ -1090,14 +1090,14 @@ event ContributorUpdate(address indexed contributor, bool isContributor)
 
 Event that signifies that an address was granted contributor role or that the permission has been  revoked.
 
-
+*This can only be triggered by a current owner, so there is no need to include that information in the event.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| contributor `indexed` | address | undefined |
-| isContributor  | bool | undefined |
+| contributor `indexed` | address | Address of the account that had contributor role status updated |
+| isContributor  | bool | A boolean value signifying whether the role has been granted (`true`) or revoked (`false`) |
 
 ### OwnershipTransferred
 
@@ -1113,8 +1113,8 @@ Used to anounce the transfer of ownership.
 
 | Name | Type | Description |
 |---|---|---|
-| previousOwner `indexed` | address | undefined |
-| newOwner `indexed` | address | undefined |
+| previousOwner `indexed` | address | Address of the account that transferred their ownership role |
+| newOwner `indexed` | address | Address of the account receiving the ownership role |
 
 ### Transfer
 
@@ -1124,7 +1124,7 @@ event Transfer(address indexed from, address indexed to, uint256 indexed tokenId
 
 
 
-
+*Emitted when `tokenId` token is transferred from `from` to `to`.*
 
 #### Parameters
 
@@ -1409,17 +1409,6 @@ error RMRKNotApprovedForAssetsOrOwner()
 ```
 
 Attempting to manage an asset without owning it or having been granted permission by the owner to do so
-
-
-
-
-### RMRKNotEnoughAllowance
-
-```solidity
-error RMRKNotEnoughAllowance()
-```
-
-
 
 
 
