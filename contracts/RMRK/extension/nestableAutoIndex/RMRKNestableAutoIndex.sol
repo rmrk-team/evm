@@ -5,6 +5,11 @@ pragma solidity ^0.8.16;
 import "./IRMRKNestableAutoIndex.sol";
 import "../../nestable/RMRKNestable.sol";
 
+/**
+ * @title RMRKNestableAutoIndex
+ * @author RMRK team
+ * @notice Smart contract of the RMRK Nestable AutoIndex module.
+ */
 contract RMRKNestableAutoIndex is IRMRKNestableAutoIndex, RMRKNestable {
     // Mapping of tokenId to childAddress to childId to index on the _pendingChildren array
     mapping(uint256 => mapping(address => mapping(uint256 => uint256)))
