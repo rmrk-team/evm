@@ -4,6 +4,11 @@ pragma solidity ^0.8.16;
 
 import "../../nestable/IRMRKNestable.sol";
 
+/**
+ * @title RMRKNestableAutoIndex
+ * @author RMRK team
+ * @notice Interface smart contract of the RMRK Nestable AutoIndex module.
+ */
 interface IRMRKNestableAutoIndex is IRMRKNestable {
     /**
      * @notice Used to accept a pending child token for a given parent token.

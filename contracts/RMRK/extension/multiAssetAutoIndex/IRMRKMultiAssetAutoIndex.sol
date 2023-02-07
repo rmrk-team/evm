@@ -4,6 +4,11 @@ pragma solidity ^0.8.16;
 
 import "../../multiasset/IRMRKMultiAsset.sol";
 
+/**
+ * @title RMRKMultiAssetAutoIndex
+ * @author RMRK team
+ * @notice Interface smart contract of the RMRK MultiAsset AutoIndex module.
+ */
 interface IRMRKMultiAssetAutoIndex is IRMRKMultiAsset {
     /**
      * @notice Accepts an asset from the pending array of given token.
