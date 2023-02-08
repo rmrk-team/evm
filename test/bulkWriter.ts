@@ -108,9 +108,9 @@ describe('Advanced Equip Render Utils', async function () {
   it('can unequip and equip in bulk', async function () {
     // On a single call we remove the gem from the first slot and add 2 gems on the other 2 slots
     await bulkWriter.bulkEquip(
+      kanariaId,
       [
         {
-          tokenId: kanariaId,
           assetId: assetForKanariaFull,
           slotPartId: slotIdGemLeft,
         },
@@ -156,9 +156,9 @@ describe('Advanced Equip Render Utils', async function () {
   it('can use bulk with only unequip operations', async function () {
     // On a single call we remove the gem from the first slot and add 2 gems on the other 2 slots
     await bulkWriter.bulkEquip(
+      kanariaId,
       [
         {
-          tokenId: kanariaId,
           assetId: assetForKanariaFull,
           slotPartId: slotIdGemLeft,
         },
@@ -177,6 +177,7 @@ describe('Advanced Equip Render Utils', async function () {
   it('can use bulk with only equip operations', async function () {
     // On a single call we remove the gem from the first slot and add 2 gems on the other 2 slots
     await bulkWriter.bulkEquip(
+      kanariaId,
       [],
       [
         {
@@ -222,9 +223,9 @@ describe('Advanced Equip Render Utils', async function () {
     // On a single call we remove the gem from the first slot and add 2 gems on the other 2 slots
     await expect(
       bulkWriter.bulkEquip(
+        kanariaId,
         [
           {
-            tokenId: kanariaId,
             assetId: assetForKanariaFull,
             slotPartId: slotIdGemLeft,
           },
@@ -250,5 +251,59 @@ describe('Advanced Equip Render Utils', async function () {
         childAssetId: assetForGemALeft,
       }),
     ).to.be.revertedWithCustomError(kanaria, 'ERC721NotApprovedOrOwner');
+  });
+
+  it('cannot do operations if not token owner', async function () {
+    const [, notOwner] = await ethers.getSigners();
+
+    await expect(
+      bulkWriter.connect(notOwner).bulkEquip(
+        kanariaId,
+        [
+          {
+            assetId: assetForKanariaFull,
+            slotPartId: slotIdGemLeft,
+          },
+        ],
+        [
+          {
+            tokenId: kanariaId,
+            childIndex: 1,
+            assetId: assetForKanariaFull,
+            slotPartId: slotIdGemMid,
+            childAssetId: assetForGemAMid,
+          },
+        ],
+      ),
+    ).to.be.revertedWithCustomError(bulkWriter, 'RMRKCanOnlyDoBulkOperationsOnOwnedTokens');
+
+    await expect(
+      bulkWriter.connect(notOwner).replaceEquip({
+        tokenId: kanariaId,
+        childIndex: 1,
+        assetId: assetForKanariaFull,
+        slotPartId: slotIdGemLeft,
+        childAssetId: assetForGemALeft,
+      }),
+    ).to.be.revertedWithCustomError(bulkWriter, 'RMRKCanOnlyDoBulkOperationsOnOwnedTokens');
+  });
+
+  it('cannot do operations for if token id on equip data, does not match', async function () {
+    const otherId = 2;
+    await expect(
+      bulkWriter.bulkEquip(
+        kanariaId,
+        [],
+        [
+          {
+            tokenId: otherId,
+            childIndex: 1,
+            assetId: assetForKanariaFull,
+            slotPartId: slotIdGemMid,
+            childAssetId: assetForGemAMid,
+          },
+        ],
+      ),
+    ).to.be.revertedWithCustomError(bulkWriter, 'RMRKCanOnlyDoBulkOperationsWithOneTokenAtATime');
   });
 });
