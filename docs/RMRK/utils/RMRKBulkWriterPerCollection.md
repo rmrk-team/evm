@@ -13,7 +13,7 @@ Smart contract of the RMRK Bulk Writer per collection module.
 ### bulkEquip
 
 ```solidity
-function bulkEquip(RMRKBulkWriterPerCollection.IntakeUnequip[] unequips, IRMRKEquippable.IntakeEquip[] equips) external nonpayable
+function bulkEquip(uint256 tokenId, RMRKBulkWriterPerCollection.IntakeUnequip[] unequips, IRMRKEquippable.IntakeEquip[] equips) external nonpayable
 ```
 
 
@@ -24,6 +24,7 @@ function bulkEquip(RMRKBulkWriterPerCollection.IntakeUnequip[] unequips, IRMRKEq
 
 | Name | Type | Description |
 |---|---|---|
+| tokenId | uint256 | undefined |
 | unequips | RMRKBulkWriterPerCollection.IntakeUnequip[] | undefined |
 | equips | IRMRKEquippable.IntakeEquip[] | undefined |
 
@@ -59,6 +60,31 @@ function replaceEquip(IRMRKEquippable.IntakeEquip data) external nonpayable
 | Name | Type | Description |
 |---|---|---|
 | data | IRMRKEquippable.IntakeEquip | undefined |
+
+
+
+
+## Errors
+
+### RMRKCanOnlyDoBulkOperationsOnOwnedTokens
+
+```solidity
+error RMRKCanOnlyDoBulkOperationsOnOwnedTokens()
+```
+
+
+
+
+
+
+### RMRKCanOnlyDoBulkOperationsWithOneTokenAtATime
+
+```solidity
+error RMRKCanOnlyDoBulkOperationsWithOneTokenAtATime()
+```
+
+
+
 
 
 
