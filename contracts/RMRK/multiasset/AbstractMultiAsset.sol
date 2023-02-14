@@ -320,7 +320,9 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
             _assetReplacements[tokenId][assetId] = replacesAssetWithId;
         }
 
-        emit AssetAddedToToken(tokenId, assetId, replacesAssetWithId);
+        uint256[] memory tokenIds = new uint256[](1);
+        tokenIds[0] = tokenId;
+        emit AssetAddedToToken(tokenIds, assetId, replacesAssetWithId);
         _afterAddAssetToToken(tokenId, assetId, replacesAssetWithId);
     }
 
