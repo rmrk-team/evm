@@ -262,7 +262,7 @@ contract RMRKCatalog is IRMRKCatalog {
      * @inheritdoc IRMRKCatalog
      */
     function getParts(
-        uint64[] calldata partIds
+        uint64[] memory partIds
     ) public view returns (Part[] memory) {
         uint256 numParts = partIds.length;
         Part[] memory parts = new Part[](numParts);
