@@ -63,7 +63,7 @@ contract RMRKExternalEquipImpl is OwnableLock, RMRKExternalEquip {
         uint64 equippableGroupId,
         address catalogAddress,
         string memory metadataURI,
-        uint64[] calldata partIds
+        uint64[] memory partIds
     ) public virtual onlyOwnerOrContributor returns (uint256) {
         unchecked {
             _totalAssets += 1;
