@@ -330,7 +330,7 @@ async function shouldBehaveLikeEquippableAssets(
       // Add new asset to replace the first, and accept
       await expect(chunkyEquip.addAssetToToken(tokenId, resId2, resId))
         .to.emit(chunkyEquip, 'AssetAddedToToken')
-        .withArgs(tokenId, resId2, resId);
+        .withArgs([tokenId], resId2, resId);
 
       expect(await chunkyEquip.getAssetReplacements(tokenId, resId2)).to.eql(resId);
       await expect(chunkyEquip.acceptAsset(tokenId, 0, resId2))
