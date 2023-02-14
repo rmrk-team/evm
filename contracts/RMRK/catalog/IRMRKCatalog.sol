@@ -153,6 +153,6 @@ interface IRMRKCatalog is IERC165 {
      * @return An array of `Part` structs associated with given `partIds`
      */
     function getParts(
-        uint64[] calldata partIds
+        uint64[] memory partIds
     ) external view returns (Part[] memory);
 }
