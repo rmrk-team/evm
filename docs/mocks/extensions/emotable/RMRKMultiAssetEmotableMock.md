@@ -119,6 +119,29 @@ function emote(uint256 tokenId, bytes4 emoji, bool on) external nonpayable
 | emoji | bytes4 | undefined |
 | on | bool | undefined |
 
+### emoteCountOf
+
+```solidity
+function emoteCountOf(uint256 tokenId, bytes4 emoji) external view returns (uint256)
+```
+
+Used to get the number of emotes for a specific emoji on a token.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId | uint256 | ID of the token to check for emoji count |
+| emoji | bytes4 | Unicode identifier of the emoji |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint256 | Number of emotes with the emoji on the token |
+
 ### getActiveAssetPriorities
 
 ```solidity
@@ -252,29 +275,6 @@ Used to retrieve the asset that will be replaced if a given asset from the token
 | Name | Type | Description |
 |---|---|---|
 | _0 | uint64 | ID of the asset which will be replaced |
-
-### getEmoteCount
-
-```solidity
-function getEmoteCount(uint256 tokenId, bytes4 emoji) external view returns (uint256)
-```
-
-Used to get the number of emotes for a specific emoji on a token.
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| tokenId | uint256 | ID of the token to check for emoji count |
-| emoji | bytes4 | Unicode identifier of the emoji |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | uint256 | Number of emotes with the emoji on the token |
 
 ### getPendingAssets
 

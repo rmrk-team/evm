@@ -34,7 +34,7 @@ interface IRMRKEmoteTracker is IERC165 {
      * @param emoji Unicode identifier of the emoji
      * @return Number of emotes with the emoji on the token
      */
-    function getEmoteCount(
+    function emoteCountOf(
         address collection,
         uint256 tokenId,
         bytes4 emoji

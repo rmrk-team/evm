@@ -3,7 +3,7 @@
 pragma solidity ^0.8.18;
 
 import "../../core/RMRKCore.sol";
-import "./IRMRKSoulbound.sol";
+import "./IERC6454.sol";
 import "../../library/RMRKErrors.sol";
 
 /**
@@ -11,7 +11,7 @@ import "../../library/RMRKErrors.sol";
  * @author RMRK team
  * @notice Smart contract of the RMRK Soulbound module.
  */
-abstract contract RMRKSoulbound is IRMRKSoulbound, RMRKCore {
+abstract contract RMRKSoulbound is IERC6454, RMRKCore {
     /**
      * @notice Hook that is called before any token transfer. This includes minting and burning.
      * @dev This is a hook ensuring that all transfers of tokens are reverted if the token is soulbound.
@@ -28,16 +28,18 @@ abstract contract RMRKSoulbound is IRMRKSoulbound, RMRKCore {
         if (
             from != address(0) && // Exclude minting
             to != address(0) && // Exclude Burning
-            isSoulbound(tokenId)
+            isNonTransferable(tokenId)
         ) revert RMRKCannotTransferSoulbound();
 
         super._beforeTokenTransfer(from, to, tokenId);
     }
 
     /**
-     * @inheritdoc IRMRKSoulbound
+     * @inheritdoc IERC6454
      */
-    function isSoulbound(uint256 tokenId) public view virtual returns (bool) {
+    function isNonTransferable(
+        uint256 tokenId
+    ) public view virtual returns (bool) {
         return true;
     }
 
@@ -47,6 +49,6 @@ abstract contract RMRKSoulbound is IRMRKSoulbound, RMRKCore {
     function supportsInterface(
         bytes4 interfaceId
     ) public view virtual returns (bool) {
-        return interfaceId == type(IRMRKSoulbound).interfaceId;
+        return interfaceId == type(IERC6454).interfaceId;
     }
 }

@@ -21,7 +21,7 @@ abstract contract RMRKEmoteTracker is IRMRKEmoteTracker {
     /**
      * @inheritdoc IRMRKEmoteTracker
      */
-    function getEmoteCount(
+    function emoteCountOf(
         address collection,
         uint256 tokenId,
         bytes4 emoji

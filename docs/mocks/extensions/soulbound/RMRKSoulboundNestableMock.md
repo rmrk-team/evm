@@ -302,15 +302,15 @@ Used to check if the given address is allowed to manage the tokens of the specif
 |---|---|---|
 | _0 | bool | A boolean value signifying whether the *operator* is allowed to manage the tokens of the *owner* (`true`)  or not (`false`) |
 
-### isSoulbound
+### isNonTransferable
 
 ```solidity
-function isSoulbound(uint256 tokenId) external view returns (bool)
+function isNonTransferable(uint256 tokenId) external view returns (bool)
 ```
 
-Used to check whether the given token is soulbound or not.
+Used to check whether the given token is non-transferable or not.
 
-
+*If this function returns `true`, the transfer of the token MUST revert executionIf the tokenId does not exist, this method MUST revert execution*
 
 #### Parameters
 
@@ -322,7 +322,7 @@ Used to check whether the given token is soulbound or not.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | Boolean value indicating whether the given token is soulbound |
+| _0 | bool | Boolean value indicating whether the given token is non-transferable |
 
 ### mint
 

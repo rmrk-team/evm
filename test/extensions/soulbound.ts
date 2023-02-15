@@ -132,7 +132,7 @@ describe('RMRKSoulbound variants', async function () {
       await token.deployed();
     });
 
-    it('can support IRMRKSoulbound', async function () {
+    it('can support IERC6454', async function () {
       expect(await token.supportsInterface(IRMRKSoulbound)).to.equal(true);
     });
 
@@ -167,7 +167,7 @@ describe('RMRKSoulbound variants', async function () {
       await token.deployed();
     });
 
-    it('can support IRMRKSoulbound', async function () {
+    it('can support IERC6454', async function () {
       expect(await token.supportsInterface(IRMRKSoulbound)).to.equal(true);
     });
 
@@ -199,7 +199,7 @@ describe('RMRKSoulbound variants', async function () {
       await token.deployed();
     });
 
-    it('can support IRMRKSoulbound', async function () {
+    it('can support IERC6454', async function () {
       expect(await token.supportsInterface(IRMRKSoulbound)).to.equal(true);
     });
 
@@ -250,7 +250,7 @@ async function shouldBehaveLikeSoulboundBasic() {
     expect(await soulbound.supportsInterface(IERC165)).to.equal(true);
   });
 
-  it('can support IRMRKSoulbound', async function () {
+  it('can support IERC6454', async function () {
     expect(await soulbound.supportsInterface(IRMRKSoulbound)).to.equal(true);
   });
 
