@@ -30,9 +30,11 @@ abstract contract RMRKSoulboundAfterBlockNumber is RMRKSoulbound {
     }
 
     /**
-     * @inheritdoc IRMRKSoulbound
+     * @inheritdoc IERC6454
      */
-    function isSoulbound(uint256) public view virtual override returns (bool) {
+    function isNonTransferable(
+        uint256
+    ) public view virtual override returns (bool) {
         return _lastBlockToTransfer <= block.number;
     }
 }

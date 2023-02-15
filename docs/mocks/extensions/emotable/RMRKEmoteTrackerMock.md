@@ -29,10 +29,10 @@ function emote(address collection, uint256 tokenId, bytes4 emoji, bool on) exter
 | emoji | bytes4 | undefined |
 | on | bool | undefined |
 
-### getEmoteCount
+### emoteCountOf
 
 ```solidity
-function getEmoteCount(address collection, uint256 tokenId, bytes4 emoji) external view returns (uint256)
+function emoteCountOf(address collection, uint256 tokenId, bytes4 emoji) external view returns (uint256)
 ```
 
 Used to get the number of emotes for a specific emoji on a token.

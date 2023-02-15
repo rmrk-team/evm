@@ -2,23 +2,23 @@
 
 pragma solidity ^0.8.18;
 
-import "./IRMRKEmotable.sol";
+import "./IERC6381.sol";
 
 /**
  * @title RMRKEmotable
  * @author RMRK team
  * @notice Smart contract of the RMRK Emotable module.
  */
-abstract contract RMRKEmotable is IRMRKEmotable {
+abstract contract RMRKEmotable is IERC6381 {
     // Used to avoid double emoting and control undoing
     mapping(address => mapping(uint256 => mapping(bytes4 => uint256)))
         private _emotesPerAddress; // Cheaper than using a bool
     mapping(uint256 => mapping(bytes4 => uint256)) private _emotesPerToken;
 
     /**
-     * @inheritdoc IRMRKEmotable
+     * @inheritdoc IERC6381
      */
-    function getEmoteCount(
+    function emoteCountOf(
         uint256 tokenId,
         bytes4 emoji
     ) public view returns (uint256) {
@@ -81,6 +81,6 @@ abstract contract RMRKEmotable is IRMRKEmotable {
     function supportsInterface(
         bytes4 interfaceId
     ) public view virtual returns (bool) {
-        return interfaceId == type(IRMRKEmotable).interfaceId;
+        return interfaceId == type(IERC6381).interfaceId;
     }
 }
