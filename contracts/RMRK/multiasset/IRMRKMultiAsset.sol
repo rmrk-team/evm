@@ -23,7 +23,7 @@ interface IRMRKMultiAsset is IERC165 {
      * @param assetId ID of the asset that has been added to the token's pending assets array
      * @param replacesId ID of the asset that would be replaced
      */
-    event AssetAddedToToken(
+    event AssetAddedToTokens(
         uint256[] tokenIds,
         uint64 indexed assetId,
         uint64 indexed replacesId

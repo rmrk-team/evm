@@ -52,7 +52,7 @@ async function shouldBehaveLikeMultiAsset(
       it('can add asset to token', async function () {
         const resId = await addAssetEntryFunc(this.token);
         await expect(addAssetToTokenFunc(this.token, tokenId, resId, 0))
-          .to.emit(this.token, 'AssetAddedToToken')
+          .to.emit(this.token, 'AssetAddedToTokens')
           .withArgs([tokenId], resId, 0);
       });
 
@@ -122,7 +122,7 @@ async function shouldBehaveLikeMultiAsset(
 
         // Add new asset to replace the first, and accept
         await expect(this.token.addAssetToToken(tokenId, resId3, resId2))
-          .to.emit(this.token, 'AssetAddedToToken')
+          .to.emit(this.token, 'AssetAddedToTokens')
           .withArgs([tokenId], resId3, resId2);
 
         expect(await this.token.getAssetReplacements(tokenId, resId3)).to.eql(resId2);
