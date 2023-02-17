@@ -124,8 +124,8 @@ describe('MultiAssetMock Other Behavior', async function () {
       const resId2 = await addAssetEntryFromMock(token, 'data2');
       const tokenId = await mintFromMock(token, tokenOwner.address);
 
-      await expect(token.addAssetToToken(tokenId, resId, 0)).to.emit(token, 'AssetAddedToToken');
-      await expect(token.addAssetToToken(tokenId, resId2, 0)).to.emit(token, 'AssetAddedToToken');
+      await expect(token.addAssetToToken(tokenId, resId, 0)).to.emit(token, 'AssetAddedToTokens');
+      await expect(token.addAssetToToken(tokenId, resId2, 0)).to.emit(token, 'AssetAddedToTokens');
 
       expect(await renderUtils.getPendingAssets(token.address, tokenId)).to.eql([
         [resId, bn(0), bn(0), 'data1'],
