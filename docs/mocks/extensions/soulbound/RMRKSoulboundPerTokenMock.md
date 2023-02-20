@@ -376,15 +376,15 @@ Used to check if the address is one of the contributors.
 |---|---|---|
 | _0 | bool | Boolean value indicating whether the address is a contributor or not |
 
-### isSoulbound
+### isNonTransferable
 
 ```solidity
-function isSoulbound(uint256 tokenId) external view returns (bool)
+function isNonTransferable(uint256 tokenId) external view returns (bool)
 ```
 
-Used to check whether the given token is soulbound or not.
+Used to check whether the given token is non-transferable or not.
 
-
+*If this function returns `true`, the transfer of the token MUST revert executionIf the tokenId does not exist, this method MUST revert execution*
 
 #### Parameters
 
@@ -396,7 +396,7 @@ Used to check whether the given token is soulbound or not.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | Boolean value indicating whether the given token is soulbound |
+| _0 | bool | Boolean value indicating whether the given token is non-transferable |
 
 ### manageContributor
 
@@ -858,10 +858,10 @@ Used to notify listeners that an asset object at `assetId` is accepted by the to
 | assetId `indexed` | uint64 | ID of the asset that was accepted |
 | replacesId `indexed` | uint64 | ID of the asset that was replaced |
 
-### AssetAddedToToken
+### AssetAddedToTokens
 
 ```solidity
-event AssetAddedToToken(uint256 indexed tokenId, uint64 indexed assetId, uint64 indexed replacesId)
+event AssetAddedToTokens(uint256[] tokenIds, uint64 indexed assetId, uint64 indexed replacesId)
 ```
 
 Used to notify listeners that an asset object at `assetId` is added to token&#39;s pending asset  array.
@@ -872,7 +872,7 @@ Used to notify listeners that an asset object at `assetId` is added to token&#39
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId `indexed` | uint256 | ID of the token that received a new pending asset |
+| tokenIds  | uint256[] | An array of token IDs that received a new pending asset |
 | assetId `indexed` | uint64 | ID of the asset that has been added to the token&#39;s pending assets array |
 | replacesId `indexed` | uint64 | ID of the asset that would be replaced |
 

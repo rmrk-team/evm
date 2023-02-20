@@ -295,7 +295,7 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
      * @dev If the asset ID is invalid, the execution will be reverted.
      * @dev If the token already has the maximum amount of pending assets (128), the execution will be
      *  reverted.
-     * @dev Emits ***AssetAddedToToken*** event.
+     * @dev Emits ***AssetAddedToTokens*** event.
      * @param tokenId ID of the token to add the asset to
      * @param assetId ID of the asset to add to the token
      * @param replacesAssetWithId ID of the asset to replace from the token's list of active assets
@@ -320,7 +320,9 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
             _assetReplacements[tokenId][assetId] = replacesAssetWithId;
         }
 
-        emit AssetAddedToToken(tokenId, assetId, replacesAssetWithId);
+        uint256[] memory tokenIds = new uint256[](1);
+        tokenIds[0] = tokenId;
+        emit AssetAddedToTokens(tokenIds, assetId, replacesAssetWithId);
         _afterAddAssetToToken(tokenId, assetId, replacesAssetWithId);
     }
 

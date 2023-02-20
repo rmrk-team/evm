@@ -28,10 +28,10 @@ Used to emote or undo an emote on a token.
 | emoji | bytes4 | Unicode identifier of the emoji |
 | state | bool | Boolean value signifying whether to emote (`true`) or undo (`false`) emote |
 
-### getEmoteCount
+### emoteCountOf
 
 ```solidity
-function getEmoteCount(uint256 tokenId, bytes4 emoji) external view returns (uint256)
+function emoteCountOf(uint256 tokenId, bytes4 emoji) external view returns (uint256)
 ```
 
 Used to get the number of emotes for a specific emoji on a token.

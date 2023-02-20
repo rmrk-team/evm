@@ -5,11 +5,11 @@ pragma solidity ^0.8.18;
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 
 /**
- * @title IRMRKEmotable
+ * @title IERC6381
  * @author RMRK team
  * @notice Interface smart contract of the RMRK emotable module.
  */
-interface IRMRKEmotable is IERC165 {
+interface IERC6381 is IERC165 {
     /**
      * @notice Used to notify listeners that the token with the specified ID has been emoted to or that the reaction has been revoked.
      * @dev The event is only emitted if the state of the emote is changed.
@@ -31,7 +31,7 @@ interface IRMRKEmotable is IERC165 {
      * @param emoji Unicode identifier of the emoji
      * @return Number of emotes with the emoji on the token
      */
-    function getEmoteCount(
+    function emoteCountOf(
         uint256 tokenId,
         bytes4 emoji
     ) external view returns (uint256);
