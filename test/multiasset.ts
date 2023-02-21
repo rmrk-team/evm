@@ -1,4 +1,3 @@
-import { Contract } from 'ethers';
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
@@ -11,24 +10,30 @@ import {
   singleFixtureWithArgs,
 } from './utils';
 import { IERC721, IERC721Metadata } from './interfaces';
+import { RMRKMultiAssetMock, RMRKMultiAssetRenderUtils } from '../typechain-types';
 import shouldBehaveLikeMultiAsset from './behavior/multiasset';
 import shouldBehaveLikeERC721 from './behavior/erc721';
 
 const name = 'RmrkTest';
 const symbol = 'RMRKTST';
 
-async function singleFixture(): Promise<{ token: Contract; renderUtils: Contract }> {
+async function singleFixture(): Promise<{
+  token: RMRKMultiAssetMock;
+  renderUtils: RMRKMultiAssetRenderUtils;
+}> {
   const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiAssetRenderUtils');
   const renderUtils = await renderUtilsFactory.deploy();
   await renderUtils.deployed();
 
-  const token = await singleFixtureWithArgs('RMRKMultiAssetMock', [name, symbol]);
+  const token = <RMRKMultiAssetMock>(
+    await singleFixtureWithArgs('RMRKMultiAssetMock', [name, symbol])
+  );
   return { token, renderUtils };
 }
 
 describe('MultiAssetMock Other Behavior', async function () {
-  let token: Contract;
-  let renderUtils: Contract;
+  let token: RMRKMultiAssetMock;
+  let renderUtils: RMRKMultiAssetRenderUtils;
   let tokenOwner: SignerWithAddress;
   let addrs: SignerWithAddress[];
 
@@ -190,6 +195,16 @@ describe('MultiAssetMock Other Behavior', async function () {
 
       expect(await token.getPendingAssets(tokenId1)).to.be.eql([resId]);
       expect(await token.getPendingAssets(tokenId2)).to.be.eql([resId]);
+    });
+
+    it('can emit asset added to tokens event with thousands of token ids', async function () {
+      // Create array with 1000 consecutive numbers
+      const tokenIds = Array.from(Array(3000).keys()).map((i) => i + 1);
+      const resId = await addAssetEntryFromMock(token);
+      expect(await token.addAssetToTokensEventTest(tokenIds, resId, 0)).to.emit(
+        token,
+        'AssetAddedToTokens',
+      );
     });
   });
 
