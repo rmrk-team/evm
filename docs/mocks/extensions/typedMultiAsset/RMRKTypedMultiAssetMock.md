@@ -80,6 +80,24 @@ function addAssetToToken(uint256 tokenId, uint64 assetId, uint64 replacesAssetWi
 | assetId | uint64 | undefined |
 | replacesAssetWithId | uint64 | undefined |
 
+### addAssetToTokensEventTest
+
+```solidity
+function addAssetToTokensEventTest(uint256[] tokenIds, uint64 assetId, uint64 replacesAssetWithId) external nonpayable
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenIds | uint256[] | undefined |
+| assetId | uint64 | undefined |
+| replacesAssetWithId | uint64 | undefined |
+
 ### addTypedAssetEntry
 
 ```solidity

@@ -41,4 +41,12 @@ contract RMRKMultiAssetMock is RMRKMultiAsset {
     function addAssetEntry(uint64 id, string memory metadataURI) external {
         _addAssetEntry(id, metadataURI);
     }
+
+    function addAssetToTokensEventTest(
+        uint256[] memory tokenIds,
+        uint64 assetId,
+        uint64 replacesAssetWithId
+    ) external {
+        emit AssetAddedToTokens(tokenIds, assetId, replacesAssetWithId);
+    }
 }
