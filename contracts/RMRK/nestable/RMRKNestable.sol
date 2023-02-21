@@ -366,6 +366,10 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
     ) private {
         IRMRKNestable destContract = IRMRKNestable(to);
         destContract.addChild(destinationId, tokenId, data);
+
+        emit Transfer(from, to, tokenId);
+        emit NestTransfer(from, to, parentId, destinationId, tokenId);
+
         _afterTokenTransfer(from, to, tokenId);
         _afterNestedTokenTransfer(
             from,
@@ -375,9 +379,6 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
             tokenId,
             data
         );
-
-        emit Transfer(from, to, tokenId);
-        emit NestTransfer(from, to, parentId, destinationId, tokenId);
     }
 
     /**
@@ -654,6 +655,9 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
         // Can't remove before burning child since child will call back to get root owner
         delete _RMRKOwners[tokenId];
 
+        emit Transfer(owner, address(0), tokenId);
+        emit NestTransfer(immediateOwner, address(0), parentId, 0, tokenId);
+
         _afterTokenTransfer(owner, address(0), tokenId);
         _afterNestedTokenTransfer(
             immediateOwner,
@@ -663,8 +667,6 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
             tokenId,
             ""
         );
-        emit Transfer(owner, address(0), tokenId);
-        emit NestTransfer(immediateOwner, address(0), parentId, 0, tokenId);
 
         return totalChildBurns;
     }
