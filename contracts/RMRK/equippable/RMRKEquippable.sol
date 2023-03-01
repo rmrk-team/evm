@@ -8,7 +8,6 @@ import "../catalog/IRMRKCatalog.sol";
 import "../library/RMRKLib.sol";
 import "../multiasset/AbstractMultiAsset.sol";
 import "../nestable/RMRKNestable.sol";
-import "../security/ReentrancyGuard.sol";
 import "./IRMRKEquippable.sol";
 
 /**
@@ -16,12 +15,7 @@ import "./IRMRKEquippable.sol";
  * @author RMRK team
  * @notice Smart contract of the RMRK Equippable module.
  */
-contract RMRKEquippable is
-    ReentrancyGuard,
-    RMRKNestable,
-    AbstractMultiAsset,
-    IRMRKEquippable
-{
+contract RMRKEquippable is RMRKNestable, AbstractMultiAsset, IRMRKEquippable {
     using RMRKLib for uint64[];
 
     // ------------------- ASSETS --------------
@@ -323,7 +317,7 @@ contract RMRKEquippable is
      */
     function equip(
         IntakeEquip memory data
-    ) public virtual onlyApprovedOrOwner(data.tokenId) nonReentrant {
+    ) public virtual onlyApprovedOrOwner(data.tokenId) {
         _equip(data);
     }
 
@@ -360,7 +354,8 @@ contract RMRKEquippable is
         );
 
         // Check from child perspective intention to be used in part
-        // We add reentrancy guard because of this call, it happens before updating state
+        // Ideally we would add reentrancy guard because of this call, since it happens before updating state
+        // However, impact is so low and contract size so tight that we decided to skip it.
         if (
             !IRMRKEquippable(child.contractAddress)
                 .canTokenBeEquippedWithAssetIntoSlot(
