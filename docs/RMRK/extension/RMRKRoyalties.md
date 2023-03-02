@@ -109,3 +109,17 @@ Used to update recipient of royalties.
 
 
 
+## Errors
+
+### RMRKRoyaltiesTooHigh
+
+```solidity
+error RMRKRoyaltiesTooHigh()
+```
+
+Attempting to set the royalties to a value higher than 100% (10000 in base points)
+
+
+
+
+
