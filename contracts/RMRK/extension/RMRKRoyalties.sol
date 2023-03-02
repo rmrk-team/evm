@@ -52,7 +52,7 @@ abstract contract RMRKRoyalties is IERC2981 {
      * @notice Used to retrieve the recipient of royalties.
      * @return Address of the recipient of royalties
      */
-    function getRoyaltyRecipient() external view virtual returns (address) {
+    function getRoyaltyRecipient() public view virtual returns (address) {
         return _royaltyRecipient;
     }
 
@@ -60,7 +60,7 @@ abstract contract RMRKRoyalties is IERC2981 {
      * @notice Used to retrieve the specified royalty percentage.
      * @return The royalty percentage expressed in the basis points
      */
-    function getRoyaltyPercentage() external view virtual returns (uint256) {
+    function getRoyaltyPercentage() public view virtual returns (uint256) {
         return _royaltyPercentageBps;
     }
 
