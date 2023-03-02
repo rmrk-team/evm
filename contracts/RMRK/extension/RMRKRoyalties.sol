@@ -3,6 +3,7 @@
 pragma solidity ^0.8.18;
 
 import "@openzeppelin/contracts/interfaces/IERC2981.sol";
+import "../library/RMRKErrors.sol";
 
 /**
  * @title RMRKRoyalties
@@ -25,6 +26,7 @@ abstract contract RMRKRoyalties is IERC2981 {
         uint256 royaltyPercentageBps //in basis points
     ) {
         _setRoyaltyRecipient(royaltyRecipient);
+        if (royaltyPercentageBps >= 10000) revert RMRKRoyaltiesTooHigh();
         _royaltyPercentageBps = royaltyPercentageBps;
     }
 

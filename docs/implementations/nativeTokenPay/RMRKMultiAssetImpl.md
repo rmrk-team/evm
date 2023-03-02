@@ -1429,6 +1429,17 @@ Attempting to interact with a function without being the owner or contributor of
 
 
 
+### RMRKRoyaltiesTooHigh
+
+```solidity
+error RMRKRoyaltiesTooHigh()
+```
+
+Attempting to set the royalties to a value higher than 100% (10000 in base points)
+
+
+
+
 ### RMRKTokenDoesNotHaveAsset
 
 ```solidity
