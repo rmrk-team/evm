@@ -75,7 +75,7 @@ abstract contract RMRKAbstractEquippableImpl is
     ) public virtual onlyOwnerOrContributor {
         _addAssetToToken(tokenId, assetId, replacesAssetWithId);
         if (_msgSender() == ownerOf(tokenId)) {
-            _acceptAsset(tokenId, _pendingAssets[tokenId].length - 1, assetId);
+            acceptAsset(tokenId, _pendingAssets[tokenId].length - 1, assetId);
         }
     }
 
