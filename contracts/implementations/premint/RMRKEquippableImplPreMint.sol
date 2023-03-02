@@ -38,7 +38,7 @@ contract RMRKEquippableImplPreMint is RMRKAbstractEquippableImpl {
         RMRKCollectionMetadata(collectionMetadata_)
         RMRKRoyalties(data.royaltyRecipient, data.royaltyPercentageBps)
         RMRKTokenURI(tokenURI_, data.tokenUriIsEnumerable)
-        RMRKEquippable(name_, symbol_)
+        RMRKMinifiedEquippable(name_, symbol_)
     {}
 
     /**

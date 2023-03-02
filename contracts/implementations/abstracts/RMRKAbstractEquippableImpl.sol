@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.18;
 
-import "../../RMRK/equippable/RMRKEquippable.sol";
+import "../../RMRK/equippable/RMRKMinifiedEquippable.sol";
 import "../../RMRK/extension/RMRKRoyalties.sol";
 import "../../RMRK/utils/RMRKCollectionMetadata.sol";
 import "../../RMRK/utils/RMRKMintingUtils.sol";
@@ -24,7 +24,7 @@ abstract contract RMRKAbstractEquippableImpl is
     RMRKCollectionMetadata,
     RMRKRoyalties,
     RMRKTokenURI,
-    RMRKEquippable
+    RMRKMinifiedEquippable
 {
     uint256 private _totalAssets;
 
