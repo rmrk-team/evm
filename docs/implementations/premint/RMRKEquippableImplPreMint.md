@@ -2206,6 +2206,17 @@ Attempting to interact with a pending child using an index greater than the size
 
 
 
+### RMRKRoyaltiesTooHigh
+
+```solidity
+error RMRKRoyaltiesTooHigh()
+```
+
+Attempting to set the royalties to a value higher than 100% (10000 in base points)
+
+
+
+
 ### RMRKSlotAlreadyUsed
 
 ```solidity

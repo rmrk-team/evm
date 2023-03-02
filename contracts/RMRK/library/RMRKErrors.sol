@@ -141,3 +141,5 @@ error RMRKUnexpectedAssetId();
 error RMRKUnexpectedParent();
 /// Attempting not to pass an empty array of equippable addresses when adding or setting the equippable addresses
 error RMRKZeroLengthIdsPassed();
+/// Attempting to set the royalties to a value higher than 100% (10000 in base points)
+error RMRKRoyaltiesTooHigh();
