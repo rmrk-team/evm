@@ -1,22 +1,30 @@
+// Note: This is just a copy of the equippable test suit with the additional tests
+// for ERC721 and nestable behavior, but using MinifiedEquippable instead.
+
 import { Contract } from 'ethers';
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import {
+  addAssetEntryEquippablesFromMock,
   addAssetToToken,
   mintFromMock,
   nestMintFromMock,
-  addAssetEntryEquippablesFromMock,
+  nestTransfer,
+  parentChildFixtureWithArgs,
+  transfer,
 } from './utils';
 import { setupContextForParts } from './setup/equippableParts';
 import { setupContextForSlots } from './setup/equippableSlots';
 import shouldBehaveLikeEquippableAssets from './behavior/equippableAssets';
 import shouldBehaveLikeEquippableWithParts from './behavior/equippableParts';
 import shouldBehaveLikeEquippableWithSlots from './behavior/equippableSlots';
+import shouldBehaveLikeNestable from './behavior/nestable';
 import shouldBehaveLikeMultiAsset from './behavior/multiasset';
+import shouldBehaveLikeERC721 from './behavior/erc721';
 import {
   RMRKCatalogMock,
-  RMRKEquippableMock,
+  RMRKMinifiedEquippableMock,
   RMRKEquipRenderUtils,
   RMRKMultiAssetRenderUtils,
 } from '../typechain-types';
@@ -33,7 +41,7 @@ async function partsFixture() {
   const maskSymbol = 'NM';
 
   const catalogFactory = await ethers.getContractFactory('RMRKCatalogMock');
-  const equipFactory = await ethers.getContractFactory('RMRKEquippableMock');
+  const equipFactory = await ethers.getContractFactory('RMRKMinifiedEquippableMock');
   const viewFactory = await ethers.getContractFactory('RMRKEquipRenderUtils');
 
   // Catalog
@@ -41,11 +49,11 @@ async function partsFixture() {
   await catalog.deployed();
 
   // Neon token
-  const neon = <RMRKEquippableMock>await equipFactory.deploy(neonName, neonSymbol);
+  const neon = <RMRKMinifiedEquippableMock>await equipFactory.deploy(neonName, neonSymbol);
   await neon.deployed();
 
   // Weapon
-  const mask = <RMRKEquippableMock>await equipFactory.deploy(maskName, maskSymbol);
+  const mask = <RMRKMinifiedEquippableMock>await equipFactory.deploy(maskName, maskSymbol);
   await mask.deployed();
 
   // View
@@ -73,7 +81,7 @@ async function slotsFixture() {
   const backgroundSymbol = 'SB';
 
   const catalogFactory = await ethers.getContractFactory('RMRKCatalogMock');
-  const equipFactory = await ethers.getContractFactory('RMRKEquippableMock');
+  const equipFactory = await ethers.getContractFactory('RMRKMinifiedEquippableMock');
   const viewFactory = await ethers.getContractFactory('RMRKEquipRenderUtils');
 
   // View
@@ -85,19 +93,21 @@ async function slotsFixture() {
   await catalog.deployed();
 
   // Soldier token
-  const soldier = <RMRKEquippableMock>await equipFactory.deploy(soldierName, soldierSymbol);
+  const soldier = <RMRKMinifiedEquippableMock>await equipFactory.deploy(soldierName, soldierSymbol);
   await soldier.deployed();
 
   // Weapon
-  const weapon = <RMRKEquippableMock>await equipFactory.deploy(weaponName, weaponSymbol);
+  const weapon = <RMRKMinifiedEquippableMock>await equipFactory.deploy(weaponName, weaponSymbol);
   await weapon.deployed();
 
   // Weapon Gem
-  const weaponGem = <RMRKEquippableMock>await equipFactory.deploy(weaponGemName, weaponGemSymbol);
+  const weaponGem = <RMRKMinifiedEquippableMock>(
+    await equipFactory.deploy(weaponGemName, weaponGemSymbol)
+  );
   await weaponGem.deployed();
 
   // Background
-  const background = <RMRKEquippableMock>(
+  const background = <RMRKMinifiedEquippableMock>(
     await equipFactory.deploy(backgroundName, backgroundSymbol)
   );
   await background.deployed();
@@ -120,10 +130,10 @@ async function slotsFixture() {
 }
 
 async function equippableFixture() {
-  const equipFactory = await ethers.getContractFactory('RMRKEquippableMock');
+  const equipFactory = await ethers.getContractFactory('RMRKMinifiedEquippableMock');
   const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiAssetRenderUtils');
 
-  const equip = <RMRKEquippableMock>await equipFactory.deploy('Chunky', 'CHNK');
+  const equip = <RMRKMinifiedEquippableMock>await equipFactory.deploy('Chunky', 'CHNK');
   await equip.deployed();
 
   const renderUtils = <RMRKMultiAssetRenderUtils>await renderUtilsFactory.deploy();
@@ -132,11 +142,17 @@ async function equippableFixture() {
   return { equip, renderUtils };
 }
 
+async function parentChildFixture(): Promise<{ parent: Contract; child: Contract }> {
+  return parentChildFixtureWithArgs(
+    'RMRKMinifiedEquippableMock',
+    ['Chunky', 'CHNK'],
+    ['Monkey', 'MONK'],
+  );
+}
+
 // --------------- END FIXTURES -----------------------
 
-// --------------- EQUIPPABLE BEHAVIOR -----------------------
-
-describe('MinifiedEquippableMock with Parts', async () => {
+describe('MinifiedEquippableMock with Fixed Parts', async () => {
   beforeEach(async function () {
     const { catalog, neon, mask, view } = await loadFixture(partsFixture);
 
@@ -151,7 +167,7 @@ describe('MinifiedEquippableMock with Parts', async () => {
   shouldBehaveLikeEquippableWithParts();
 });
 
-describe('MinifiedEquippableMock with Slots', async () => {
+describe('MinifiedEquippableMock with Slot Parts', async () => {
   beforeEach(async function () {
     const { catalog, soldier, weapon, weaponGem, background, view } = await loadFixture(
       slotsFixture,
@@ -172,7 +188,7 @@ describe('MinifiedEquippableMock with Slots', async () => {
   shouldBehaveLikeEquippableWithSlots(nestMintFromMock);
 });
 
-describe('MinifiedEquippableMock Assets', async () => {
+describe('MinifiedEquippableMock Equippable Assets behavior', async () => {
   beforeEach(async function () {
     const { equip, renderUtils } = await loadFixture(equippableFixture);
     this.nestable = equip;
@@ -190,13 +206,11 @@ describe('MinifiedEquippableMock Assets', async () => {
   shouldBehaveLikeEquippableAssets(mintFromMock);
 });
 
-// --------------- END EQUIPPABLE BEHAVIOR -----------------------
-
 // --------------- MULTI ASSET BEHAVIOR -----------------------
 
-describe('MinifiedEquippableMock MR behavior', async () => {
+describe('MinifiedEquippableMock MA behavior', async () => {
   let nextTokenId = 1;
-  let equip: RMRKEquippableMock;
+  let equip: RMRKMinifiedEquippableMock;
   let renderUtils: RMRKMultiAssetRenderUtils;
 
   beforeEach(async function () {
@@ -215,4 +229,22 @@ describe('MinifiedEquippableMock MR behavior', async () => {
   shouldBehaveLikeMultiAsset(mintToNestable, addAssetEntryEquippablesFromMock, addAssetToToken);
 });
 
-// --------------- MULTI ASSET BEHAVIOR END ------------------------
+describe('MinifiedEquippableMock ERC721 behavior', function () {
+  beforeEach(async function () {
+    const { equip } = await loadFixture(equippableFixture);
+    this.token = equip;
+    this.ERC721Receiver = await ethers.getContractFactory('ERC721ReceiverMock');
+  });
+
+  shouldBehaveLikeERC721('Chunky', 'CHNK');
+});
+
+describe('NestableMultiAssetMock Nestable Behavior', function () {
+  beforeEach(async function () {
+    const { parent, child } = await loadFixture(parentChildFixture);
+    this.parentToken = parent;
+    this.childToken = child;
+  });
+
+  shouldBehaveLikeNestable(mintFromMock, nestMintFromMock, transfer, nestTransfer);
+});
