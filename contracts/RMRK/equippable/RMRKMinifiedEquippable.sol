@@ -2,7 +2,6 @@
 
 pragma solidity ^0.8.18;
 
-
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
@@ -16,8 +15,6 @@ import "../library/RMRKErrors.sol";
 import "../library/RMRKLib.sol";
 import "../nestable/IRMRKNestable.sol";
 import "../security/ReentrancyGuard.sol";
-
-
 
 /**
  * @title RMRKMinifiedEquippable
@@ -110,7 +107,6 @@ contract RMRKMinifiedEquippable is
     }
 
     // ------------------------------- ERC721 ---------------------------------
-
 
     /**
      * @notice Used to retrieve the number of tokens in `owner`'s account.
@@ -1700,7 +1696,7 @@ contract RMRKMinifiedEquippable is
     constructor(
         string memory name_,
         string memory symbol_
-    ) RMRKCore(name_, symbol_) { }
+    ) RMRKCore(name_, symbol_) {}
 
     /**
      * @inheritdoc IERC165
@@ -1953,7 +1949,6 @@ contract RMRKMinifiedEquippable is
     }
 
     // ------------------------------- EQUIPPING ------------------------------
-
 
     /**
      * @inheritdoc IRMRKEquippable
