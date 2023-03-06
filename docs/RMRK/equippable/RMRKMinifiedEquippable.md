@@ -4,9 +4,9 @@
 
 > RMRKMinifiedEquippable
 
-Smart contract of the RMRK Equippable module, without utility internal functions
+Smart contract of the RMRK Equippable module, without utility internal functions.
 
-
+*This includes all the code for MultiAsset, Nestable and Equippable.Most of the code is duplicated from the other legos, this version is created to save size.*
 
 ## Methods
 
