@@ -65,7 +65,7 @@ async function partsFixture() {
 }
 
 async function slotsFixture() {
-  const catalogSymbol = 'SSB';
+  const catalogSymbol = 'SSC';
   const catalogType = 'mixed';
 
   const soldierName = 'SnakeSoldier';
