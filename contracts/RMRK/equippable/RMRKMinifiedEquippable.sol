@@ -20,7 +20,7 @@ import "../security/ReentrancyGuard.sol";
  * @title RMRKMinifiedEquippable
  * @author RMRK team
  * @notice Smart contract of the RMRK Equippable module, without utility internal functions.
- * @dev This includes all the code for multi asset, nestable and equippable.
+ * @dev This includes all the code for MultiAsset, Nestable and Equippable.
  * @dev Most of the code is duplicated from the other legos, this version is created to save size.
  */
 contract RMRKMinifiedEquippable is
