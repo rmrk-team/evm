@@ -31,7 +31,7 @@ import {
 // --------------- FIXTURES -----------------------
 
 async function partsFixture() {
-  const catalogSymbol = 'NCB';
+  const catalogSymbol = 'NCC';
   const catalogType = 'mixed';
 
   const neonName = 'NeonCrisis';
