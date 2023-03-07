@@ -63,9 +63,9 @@ Used to compose the given equippables.
 function equippedChildrenOf(address parentAddress, uint256 parentId, uint64 parentAssetId) external view returns (struct IRMRKEquippable.Equipment[] equippedChildren)
 ```
 
-Used to get the child&#39;s assets and slot parts pairs, identifying parts the said assets can be equipped into.
+Used to get information about the current children equipped into a specific parent and asset.
 
-*Reverts if child token is not owned by an NFT.The full `IRMRKEquippable.Equipment` struct looks like this:  [       assetId       childAssetId       childId       childEquippableAddress  ]*
+*The full `IRMRKEquippable.Equipment` struct looks like this:  [       assetId       childAssetId       childId       childEquippableAddress  ]*
 
 #### Parameters
 
