@@ -377,7 +377,7 @@ contract RMRKEquipRenderUtils is
             }
         }
 
-        slotParts = _getEquippedSlotParts(
+        (slotParts, ) = _getEquippedSlotParts(
             target_,
             tokenId,
             assetId,
@@ -538,6 +538,68 @@ contract RMRKEquipRenderUtils is
     /**
      * @notice Used to get the child's assets and slot parts pairs, identifying parts the said assets can be equipped into.
      * @dev Reverts if child token is not owned by an NFT.
+     * @dev The full `IRMRKEquippable.Equipment` struct looks like this:
+     *  [
+     *       assetId
+     *       childAssetId
+     *       childId
+     *       childEquippableAddress
+     *  ]
+     * @param parentAddress Address of the parent token's smart contract
+     * @param parentId ID of the parent token
+     * @param parentAssetId ID of the target parent asset to use to equip the child
+     * @return equippedChildren An array of `IRMRKEquippable.Equipment` structs containing the info
+     *  about the equipped children
+     */
+    function equippedChildrenOf(
+        address parentAddress,
+        uint256 parentId,
+        uint64 parentAssetId
+    )
+        public
+        view
+        returns (IRMRKEquippable.Equipment[] memory equippedChildren)
+    {
+        (
+            uint64[] memory slotPartIds,
+            address parentAssetCatalog
+        ) = getSlotPartsAndCatalog(parentAddress, parentId, parentAssetId);
+        IRMRKEquippable target_ = IRMRKEquippable(parentAddress);
+        (
+            EquippedSlotPart[] memory tmpSlotParts,
+            uint256 totalEquipped
+        ) = _getEquippedSlotParts(
+                target_,
+                parentId,
+                parentAssetId,
+                parentAssetCatalog,
+                slotPartIds
+            );
+
+        uint256 totalSlots = slotPartIds.length;
+        uint256 finalIndex;
+        equippedChildren = new IRMRKEquippable.Equipment[](totalEquipped);
+        for (uint256 i; i < totalSlots; ) {
+            if (tmpSlotParts[i].childId != 0) {
+                equippedChildren[finalIndex] = IRMRKEquippable.Equipment({
+                    assetId: parentAssetId,
+                    childAssetId: tmpSlotParts[i].childAssetId,
+                    childId: tmpSlotParts[i].childId,
+                    childEquippableAddress: tmpSlotParts[i].childAddress
+                });
+                unchecked {
+                    ++finalIndex;
+                }
+            }
+            unchecked {
+                ++i;
+            }
+        }
+    }
+
+    /**
+     * @notice Used to get the child's assets and slot parts pairs, identifying parts the said assets can be equipped into.
+     * @dev Reverts if child token is not owned by an NFT.
      * @dev The full `EquippableData` struct looks like this:
      *  [
      *       slotPartId
@@ -565,14 +627,10 @@ contract RMRKEquipRenderUtils is
         uint256 parentId,
         uint64 parentAssetId
     ) private view returns (EquippableData[] memory equippableData) {
-        uint64[] memory parentSlotPartIds = getSlotParts(
-            parentAddress,
-            parentId,
-            parentAssetId
-        );
-
-        (, , address parentAssetCatalog, ) = IRMRKEquippable(parentAddress)
-            .getAssetAndEquippableData(parentId, parentAssetId);
+        (
+            uint64[] memory parentSlotPartIds,
+            address parentAssetCatalog
+        ) = getSlotPartsAndCatalog(parentAddress, parentId, parentAssetId);
 
         (
             EquippableData[] memory tempAssetsWithSlots,
@@ -764,26 +822,25 @@ contract RMRKEquipRenderUtils is
     }
 
     /**
-     * @notice Used to retrieve the parent address and its slot part IDs for a given target child.
+     * @notice Used to retrieve the parent address and its slot part IDs for a given target child, and the catalog of the parent asset.
      * @param tokenAddress Address of the collection smart contract of parent token
      * @param tokenId ID of the parent token
      * @param assetId ID of the parent asset from which to get the slot parts
      * @return parentSlotPartIds Array of slot part IDs of the parent token's asset
+     * @return catalogAddress Address of the catalog the parent asset belongs to
      */
-    function getSlotParts(
+    function getSlotPartsAndCatalog(
         address tokenAddress,
         uint256 tokenId,
         uint64 assetId
-    ) public view returns (uint64[] memory parentSlotPartIds) {
-        (
-            ,
-            ,
-            address catalogAddress,
-            uint64[] memory parentPartIds
-        ) = IRMRKEquippable(tokenAddress).getAssetAndEquippableData(
-                tokenId,
-                assetId
-            );
+    )
+        public
+        view
+        returns (uint64[] memory parentSlotPartIds, address catalogAddress)
+    {
+        uint64[] memory parentPartIds;
+        (, , catalogAddress, parentPartIds) = IRMRKEquippable(tokenAddress)
+            .getAssetAndEquippableData(tokenId, assetId);
         if (catalogAddress == address(0)) revert RMRKNotComposableAsset();
 
         (parentSlotPartIds, ) = splitSlotAndFixedParts(
@@ -810,6 +867,7 @@ contract RMRKEquipRenderUtils is
      * @param catalogAddress The address of the catalog to which the given asset belongs to
      * @param slotPartIds An array of slot part IDs in the asset for which to retrieve the equipped slot parts
      * @return slotParts An array of `EquippedSlotPart` structs representing the equipped slot parts
+     * @return totalEquipped Total of slot parts with some asset equipped.
      */
     function _getEquippedSlotParts(
         IRMRKEquippable target_,
@@ -817,7 +875,11 @@ contract RMRKEquipRenderUtils is
         uint64 assetId,
         address catalogAddress,
         uint64[] memory slotPartIds
-    ) private view returns (EquippedSlotPart[] memory slotParts) {
+    )
+        private
+        view
+        returns (EquippedSlotPart[] memory slotParts, uint256 totalEquipped)
+    {
         slotParts = new EquippedSlotPart[](slotPartIds.length);
         uint256 len = slotPartIds.length;
 
@@ -844,16 +906,13 @@ contract RMRKEquipRenderUtils is
                         childAssetMetadata: metadata,
                         partMetadata: catalogSlotParts[i].metadataURI
                     });
+                    unchecked {
+                        ++totalEquipped;
+                    }
                 } else {
-                    slotParts[i] = EquippedSlotPart({
-                        partId: slotPartIds[i],
-                        childAssetId: uint64(0),
-                        z: catalogSlotParts[i].z,
-                        childId: uint256(0),
-                        childAddress: address(0),
-                        childAssetMetadata: "",
-                        partMetadata: catalogSlotParts[i].metadataURI
-                    });
+                    slotParts[i].partId = slotPartIds[i];
+                    slotParts[i].z = catalogSlotParts[i].z;
+                    slotParts[i].partMetadata = catalogSlotParts[i].metadataURI;
                 }
                 unchecked {
                     ++i;

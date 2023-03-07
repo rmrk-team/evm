@@ -57,6 +57,30 @@ Used to compose the given equippables.
 | fixedParts | RMRKEquipRenderUtils.FixedPart[] | An array of fixed parts respresented by the `FixedPart` structs present on the asset |
 | slotParts | RMRKEquipRenderUtils.EquippedSlotPart[] | An array of slot parts represented by the `EquippedSlotPart` structs present on the asset |
 
+### equippedChildrenOf
+
+```solidity
+function equippedChildrenOf(address parentAddress, uint256 parentId, uint64 parentAssetId) external view returns (struct IRMRKEquippable.Equipment[] equippedChildren)
+```
+
+Used to get the child&#39;s assets and slot parts pairs, identifying parts the said assets can be equipped into.
+
+*Reverts if child token is not owned by an NFT.The full `IRMRKEquippable.Equipment` struct looks like this:  [       assetId       childAssetId       childId       childEquippableAddress  ]*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| parentAddress | address | Address of the parent token&#39;s smart contract |
+| parentId | uint256 | ID of the parent token |
+| parentAssetId | uint64 | ID of the target parent asset to use to equip the child |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| equippedChildren | IRMRKEquippable.Equipment[] | An array of `IRMRKEquippable.Equipment` structs containing the info  about the equipped children |
+
 ### getAllEquippableSlotsFromParent
 
 ```solidity
@@ -369,13 +393,13 @@ Used to get the pending assets of the given token.
 |---|---|---|
 | _0 | RMRKMultiAssetRenderUtils.PendingAsset[] | An array of PendingAssets present on the given token |
 
-### getSlotParts
+### getSlotPartsAndCatalog
 
 ```solidity
-function getSlotParts(address tokenAddress, uint256 tokenId, uint64 assetId) external view returns (uint64[] parentSlotPartIds)
+function getSlotPartsAndCatalog(address tokenAddress, uint256 tokenId, uint64 assetId) external view returns (uint64[] parentSlotPartIds, address catalogAddress)
 ```
 
-Used to retrieve the parent address and its slot part IDs for a given target child.
+Used to retrieve the parent address and its slot part IDs for a given target child, and the catalog of the parent asset.
 
 
 
@@ -392,6 +416,7 @@ Used to retrieve the parent address and its slot part IDs for a given target chi
 | Name | Type | Description |
 |---|---|---|
 | parentSlotPartIds | uint64[] | Array of slot part IDs of the parent token&#39;s asset |
+| catalogAddress | address | Address of the catalog the parent asset belongs to |
 
 ### getTopAsset
 
