@@ -308,6 +308,33 @@ describe('Advanced Equip Render Utils', async function () {
     await kanaria.acceptChild(kanariaId, 0, gem.address, gemId3);
   });
 
+  it('can get equipped children from parent', async function () {
+    await setUpCatalog(catalog, gem.address);
+    await setUpKanariaAsset(kanaria, kanariaId, catalog.address);
+    await setUpGemAssets(gem, gemId1, gemId2, gemId3, kanaria.address, catalog.address);
+
+    await kanaria.equip({
+      tokenId: kanariaId,
+      childIndex: 0,
+      assetId: assetForKanariaFull,
+      slotPartId: slotIdGemLeft,
+      childAssetId: assetForGemALeft,
+    });
+    await kanaria.equip({
+      tokenId: kanariaId,
+      childIndex: 1,
+      assetId: assetForKanariaFull,
+      slotPartId: slotIdGemMid,
+      childAssetId: assetForGemAMid,
+    });
+    expect(
+      await renderUtilsEquip.equippedChildrenOf(kanaria.address, kanariaId, assetForKanariaFull),
+    ).to.eql([
+      [bn(assetForKanariaFull), bn(assetForGemALeft), bn(gemId1), gem.address],
+      [bn(assetForKanariaFull), bn(assetForGemAMid), bn(gemId2), gem.address],
+    ]);
+  });
+
   it('can get equippable slots from parent', async function () {
     await setUpCatalog(catalog, gem.address);
     await setUpKanariaAsset(kanaria, kanariaId, catalog.address);
