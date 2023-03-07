@@ -536,8 +536,7 @@ contract RMRKEquipRenderUtils is
     }
 
     /**
-     * @notice Used to get the child's assets and slot parts pairs, identifying parts the said assets can be equipped into.
-     * @dev Reverts if child token is not owned by an NFT.
+     * @notice Used to get information about the current children equipped into a specific parent and asset.
      * @dev The full `IRMRKEquippable.Equipment` struct looks like this:
      *  [
      *       assetId
