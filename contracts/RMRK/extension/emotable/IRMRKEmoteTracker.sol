@@ -41,8 +41,25 @@ interface IRMRKEmoteTracker is IERC165 {
     ) external view returns (uint256);
 
     /**
+     * @notice Used to get the information on whether the specified address has used a specific emoji on a specific
+     *  token.
+     * @dev As storing a uint256 is cheaper than a bool, we use 1 for true and 0 for false.
+     * @param emoter Address of the account we are checking for a reaction to a token
+     * @param collection Address of the collection smart contract containing the token being checked for emoji reaction
+     * @param tokenId ID of the token being checked for emoji reaction
+     * @param emoji The ASCII emoji code being checked for reaction
+     * @return A numeric value indicating whether the `emoter` has used the `emoji` on the token (`1`) or not (`0`)
+     */
+    function getEmotesPerAddress(
+        address emoter,
+        address collection,
+        uint256 tokenId,
+        bytes4 emoji
+    ) external view returns (uint256);
+
+    /**
      * @notice Used to emote or undo an emote on a token.
-     * @dev Does nothing if attempting to set a pre-existent state
+     * @dev Does nothing if attempting to set a pre-existent state.
      * @param collection Address of the collection containing the token being checked for emoji count
      * @param tokenId ID of the token being emoted
      * @param emoji Unicode identifier of the emoji
