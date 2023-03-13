@@ -50,7 +50,7 @@ interface IRMRKEmoteTracker is IERC165 {
      * @param emoji The ASCII emoji code being checked for reaction
      * @return A numeric value indicating whether the `emoter` has used the `emoji` on the token (`1`) or not (`0`)
      */
-    function getEmotesPerAddress(
+    function hasEmoterUsedEmote(
         address emoter,
         address collection,
         uint256 tokenId,
