@@ -30,6 +30,18 @@ abstract contract RMRKEmoteTracker is IRMRKEmoteTracker {
     }
 
     /**
+     * @inheritdoc IRMRKEmoteTracker
+     */
+    function getEmotesPerAddress(
+        address emoter,
+        address collection,
+        uint256 tokenId,
+        bytes4 emoji
+    ) public view returns (uint256) {
+        return _emotesPerAddress[emoter][collection][tokenId][emoji];
+    }
+
+    /**
      * @notice Used to emote or undo an emote on a token.
      * @dev Emits ***Emoted*** event.
      * @param collection Address of the collection containing the token being emoted
