@@ -18,7 +18,7 @@ function emote(address collection, uint256 tokenId, bytes4 emoji, bool state) ex
 
 Used to emote or undo an emote on a token.
 
-*Does nothing if attempting to set a pre-existent state*
+*Does nothing if attempting to set a pre-existent state.*
 
 #### Parameters
 
@@ -52,6 +52,31 @@ Used to get the number of emotes for a specific emoji on a token.
 | Name | Type | Description |
 |---|---|---|
 | _0 | uint256 | Number of emotes with the emoji on the token |
+
+### hasEmoterUsedEmote
+
+```solidity
+function hasEmoterUsedEmote(address emoter, address collection, uint256 tokenId, bytes4 emoji) external view returns (uint256)
+```
+
+Used to get the information on whether the specified address has used a specific emoji on a specific  token.
+
+*As storing a uint256 is cheaper than a bool, we use 1 for true and 0 for false.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| emoter | address | Address of the account we are checking for a reaction to a token |
+| collection | address | Address of the collection smart contract containing the token being checked for emoji reaction |
+| tokenId | uint256 | ID of the token being checked for emoji reaction |
+| emoji | bytes4 | The ASCII emoji code being checked for reaction |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint256 | A numeric value indicating whether the `emoter` has used the `emoji` on the token (`1`) or not (`0`) |
 
 ### supportsInterface
 

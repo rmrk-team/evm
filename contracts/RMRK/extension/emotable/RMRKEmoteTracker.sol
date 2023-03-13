@@ -13,7 +13,7 @@ abstract contract RMRKEmoteTracker is IRMRKEmoteTracker {
     // Used to avoid double emoting and control undoing
     // emoter address => collection => tokenId => emoji => state (1 for emoted, 0 for not)
     mapping(address => mapping(address => mapping(uint256 => mapping(bytes4 => uint256))))
-        private _emotesPerAddress; // Cheaper than using a bool
+        private _emotesUsedByEmoter; // Cheaper than using a bool
     // collection => tokenId => emoji => count
     mapping(address => mapping(uint256 => mapping(bytes4 => uint256)))
         private _emotesPerToken;
@@ -30,6 +30,18 @@ abstract contract RMRKEmoteTracker is IRMRKEmoteTracker {
     }
 
     /**
+     * @inheritdoc IRMRKEmoteTracker
+     */
+    function hasEmoterUsedEmote(
+        address emoter,
+        address collection,
+        uint256 tokenId,
+        bytes4 emoji
+    ) public view returns (uint256) {
+        return _emotesUsedByEmoter[emoter][collection][tokenId][emoji];
+    }
+
+    /**
      * @notice Used to emote or undo an emote on a token.
      * @dev Emits ***Emoted*** event.
      * @param collection Address of the collection containing the token being emoted
@@ -43,7 +55,7 @@ abstract contract RMRKEmoteTracker is IRMRKEmoteTracker {
         bytes4 emoji,
         bool state
     ) internal virtual {
-        bool currentVal = _emotesPerAddress[msg.sender][collection][tokenId][
+        bool currentVal = _emotesUsedByEmoter[msg.sender][collection][tokenId][
             emoji
         ] == 1;
         if (currentVal != state) {
@@ -53,7 +65,7 @@ abstract contract RMRKEmoteTracker is IRMRKEmoteTracker {
             } else {
                 _emotesPerToken[collection][tokenId][emoji] -= 1;
             }
-            _emotesPerAddress[msg.sender][collection][tokenId][emoji] = state
+            _emotesUsedByEmoter[msg.sender][collection][tokenId][emoji] = state
                 ? 1
                 : 0;
             emit Emoted(msg.sender, collection, tokenId, emoji, state);
