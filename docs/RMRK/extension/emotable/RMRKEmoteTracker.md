@@ -56,7 +56,7 @@ Used to get the number of emotes for a specific emoji on a token.
 ### hasEmoterUsedEmote
 
 ```solidity
-function hasEmoterUsedEmote(address emoter, address collection, uint256 tokenId, bytes4 emoji) external view returns (uint256)
+function hasEmoterUsedEmote(address emoter, address collection, uint256 tokenId, bytes4 emoji) external view returns (bool)
 ```
 
 Used to get the information on whether the specified address has used a specific emoji on a specific  token.
@@ -76,7 +76,7 @@ Used to get the information on whether the specified address has used a specific
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | A numeric value indicating whether the `emoter` has used the `emoji` on the token (`1`) or not (`0`) |
+| _0 | bool | A boolean value indicating whether the `emoter` has used the `emoji` on the token (`true`) or not  (`false`) |
 
 ### supportsInterface
 

@@ -48,14 +48,15 @@ interface IRMRKEmoteTracker is IERC165 {
      * @param collection Address of the collection smart contract containing the token being checked for emoji reaction
      * @param tokenId ID of the token being checked for emoji reaction
      * @param emoji The ASCII emoji code being checked for reaction
-     * @return A numeric value indicating whether the `emoter` has used the `emoji` on the token (`1`) or not (`0`)
+     * @return A boolean value indicating whether the `emoter` has used the `emoji` on the token (`true`) or not
+     *  (`false`)
      */
     function hasEmoterUsedEmote(
         address emoter,
         address collection,
         uint256 tokenId,
         bytes4 emoji
-    ) external view returns (uint256);
+    ) external view returns (bool);
 
     /**
      * @notice Used to emote or undo an emote on a token.
