@@ -195,6 +195,16 @@ describe('RMRKEmoteTrackerMock', async function () {
       expect(await emoteTracker.emoteCountOf(tokenB.address, tokenId, emoji1)).to.equal(bn(2));
     });
 
+    it('tracks the right emoji when reacting to the token', async function () {
+      await emoteTracker.connect(addrs[0]).emote(tokenA.address, tokenId, emoji1, true);
+      expect(
+        await emoteTracker.hasEmoterUsedEmote(addrs[0].address, tokenA.address, tokenId, emoji1),
+      ).to.be.true;
+      expect(
+        await emoteTracker.hasEmoterUsedEmote(addrs[0].address, tokenA.address, tokenId, emoji2),
+      ).to.be.false;
+    });
+
     it('does nothing if new state is the same as old state', async function () {
       await emoteTracker.emote(tokenA.address, tokenId, emoji1, true);
       await emoteTracker.emote(tokenA.address, tokenId, emoji1, true);
