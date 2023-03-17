@@ -199,10 +199,10 @@ describe('RMRKEmoteTrackerMock', async function () {
       await emoteTracker.connect(addrs[0]).emote(tokenA.address, tokenId, emoji1, true);
       expect(
         await emoteTracker.hasEmoterUsedEmote(addrs[0].address, tokenA.address, tokenId, emoji1),
-      ).to.equal(bn(1));
+      ).to.be.true;
       expect(
         await emoteTracker.hasEmoterUsedEmote(addrs[0].address, tokenA.address, tokenId, emoji2),
-      ).to.equal(bn(0));
+      ).to.be.false;
     });
 
     it('does nothing if new state is the same as old state', async function () {

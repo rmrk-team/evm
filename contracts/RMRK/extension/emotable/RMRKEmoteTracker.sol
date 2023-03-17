@@ -37,8 +37,8 @@ abstract contract RMRKEmoteTracker is IRMRKEmoteTracker {
         address collection,
         uint256 tokenId,
         bytes4 emoji
-    ) public view returns (uint256) {
-        return _emotesUsedByEmoter[emoter][collection][tokenId][emoji];
+    ) public view returns (bool) {
+        return _emotesUsedByEmoter[emoter][collection][tokenId][emoji] == 1;
     }
 
     /**
