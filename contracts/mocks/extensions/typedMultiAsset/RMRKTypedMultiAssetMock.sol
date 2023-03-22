@@ -8,7 +8,7 @@ import "../../RMRKMultiAssetMock.sol";
 error RMRKTokenHasNoAssetsWithType();
 
 contract RMRKTypedMultiAssetMock is RMRKMultiAssetMock, RMRKTypedMultiAsset {
-    uint16 private constant _LOWEST_POSSIBLE_PRIORITY = 2 ** 16 - 1;
+    uint64 private constant _LOWEST_POSSIBLE_PRIORITY = 2 ** 64 - 1;
 
     constructor(
         string memory name,
@@ -42,15 +42,15 @@ contract RMRKTypedMultiAssetMock is RMRKMultiAssetMock, RMRKTypedMultiAsset {
         uint256 tokenId,
         string memory type_
     ) external view returns (string memory) {
-        uint16[] memory priorities = getActiveAssetPriorities(tokenId);
+        uint64[] memory priorities = getActiveAssetPriorities(tokenId);
         uint64[] memory assets = getActiveAssets(tokenId);
         uint256 len = priorities.length;
 
-        uint16 maxPriority = _LOWEST_POSSIBLE_PRIORITY;
+        uint64 maxPriority = _LOWEST_POSSIBLE_PRIORITY;
         uint64 maxPriorityAsset;
         bytes32 targetTypeEncoded = keccak256(bytes(type_));
         for (uint64 i; i < len; ) {
-            uint16 currentPrio = priorities[i];
+            uint64 currentPrio = priorities[i];
             bytes32 assetTypeEncoded = keccak256(
                 bytes(getAssetType(assets[i]))
             );

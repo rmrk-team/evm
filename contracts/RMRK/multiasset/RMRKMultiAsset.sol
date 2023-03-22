@@ -568,7 +568,7 @@ contract RMRKMultiAsset is IERC165, IERC721, AbstractMultiAsset, RMRKCore {
      */
     function setPriority(
         uint256 tokenId,
-        uint16[] calldata priorities
+        uint64[] calldata priorities
     ) public virtual onlyApprovedForAssetsOrOwner(tokenId) {
         _setPriority(tokenId, priorities);
     }

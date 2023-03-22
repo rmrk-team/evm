@@ -36,7 +36,7 @@ contract RMRKEquipRenderUtils is
     struct ExtendedEquippableActiveAsset {
         uint64 id;
         uint64 equippableGroupId;
-        uint16 priority;
+        uint64 priority;
         address catalogAddress;
         string metadata;
         uint64[] partIds;
@@ -110,7 +110,7 @@ contract RMRKEquipRenderUtils is
         uint64 slotPartId;
         uint64 childAssetId;
         uint64 parentAssetId;
-        uint16 priority;
+        uint64 priority;
         address parentCatalogAddress;
         bool isEquipped;
         string partMetadata;
@@ -147,7 +147,7 @@ contract RMRKEquipRenderUtils is
         IRMRKEquippable target_ = IRMRKEquippable(target);
 
         uint64[] memory assets = target_.getActiveAssets(tokenId);
-        uint16[] memory priorities = target_.getActiveAssetPriorities(tokenId);
+        uint64[] memory priorities = target_.getActiveAssetPriorities(tokenId);
         uint256 len = assets.length;
         if (len == uint256(0)) {
             revert RMRKTokenHasNoAssets();
@@ -682,7 +682,7 @@ contract RMRKEquipRenderUtils is
         address target,
         uint256 tokenId
     ) public view returns (ExtendedEquippableActiveAsset memory topAsset) {
-        (uint64 topAssetId, uint16 topPriority) = getAssetIdWithTopPriority(
+        (uint64 topAssetId, uint64 topPriority) = getAssetIdWithTopPriority(
             target,
             tokenId
         );
@@ -745,7 +745,7 @@ contract RMRKEquipRenderUtils is
         )
     {
         uint64[] memory childAssets = childContract.getActiveAssets(childId);
-        uint16[] memory priorities = childContract.getActiveAssetPriorities(
+        uint64[] memory priorities = childContract.getActiveAssetPriorities(
             childId
         );
 

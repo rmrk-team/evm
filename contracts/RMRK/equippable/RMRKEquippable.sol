@@ -168,7 +168,7 @@ contract RMRKEquippable is
 
     /**
      * @notice Sets a new priority array for a given token.
-     * @dev The priority array is a non-sequential list of `uint16`s, where the lowest value is considered highest
+     * @dev The priority array is a non-sequential list of `uint64`s, where the lowest value is considered highest
      *  priority.
      * @dev Value `0` of a priority is a special case equivalent to unitialized.
      * @dev Requirements:
@@ -182,7 +182,7 @@ contract RMRKEquippable is
      */
     function setPriority(
         uint256 tokenId,
-        uint16[] calldata priorities
+        uint64[] calldata priorities
     ) public virtual onlyApprovedForAssetsOrOwner(tokenId) {
         _setPriority(tokenId, priorities);
     }
