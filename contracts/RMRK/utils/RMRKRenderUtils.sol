@@ -46,7 +46,7 @@ contract RMRKRenderUtils {
         address rootOwner;
         uint256 activeAssetCount;
         uint256 pendingAssetCount;
-        uint16[] priorities;
+        uint64[] priorities;
         uint256 maxSupply;
         uint256 totalSupply;
         address issuer;

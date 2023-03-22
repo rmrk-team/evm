@@ -185,8 +185,8 @@ describe('MultiAsset and Equip Render Utils', async function () {
   describe('Render Utils MultiAsset', async function () {
     it('can get active assets', async function () {
       expect(await renderUtils.getExtendedActiveAssets(equip.address, tokenId)).to.eql([
-        [resId, 10, 'ipfs://res1.jpg'],
-        [resId2, 5, 'ipfs://res2.jpg'],
+        [resId, bn(10), 'ipfs://res1.jpg'],
+        [resId2, bn(5), 'ipfs://res2.jpg'],
       ]);
     });
 
@@ -218,7 +218,7 @@ describe('MultiAsset and Equip Render Utils', async function () {
     it('can get full top asset data', async function () {
       expect(await renderUtils.getTopAsset(equip.address, tokenId)).to.eql([
         resId2,
-        5,
+        bn(5),
         'ipfs://res2.jpg',
       ]);
     });
@@ -256,8 +256,8 @@ describe('MultiAsset and Equip Render Utils', async function () {
       expect(
         await renderUtilsEquip.getExtendedEquippableActiveAssets(equip.address, tokenId),
       ).to.eql([
-        [resId, bn(0), 10, ADDRESS_ZERO, 'ipfs://res1.jpg', []],
-        [resId2, bn(1), 5, catalog.address, 'ipfs://res2.jpg', [bn(1), bn(3), bn(4)]],
+        [resId, bn(0), bn(10), ADDRESS_ZERO, 'ipfs://res1.jpg', []],
+        [resId2, bn(1), bn(5), catalog.address, 'ipfs://res2.jpg', [bn(1), bn(3), bn(4)]],
       ]);
     });
 
@@ -271,7 +271,7 @@ describe('MultiAsset and Equip Render Utils', async function () {
     it('can get top equippable data for asset by priority', async function () {
       expect(
         await renderUtilsEquip.getTopAssetAndEquippableDataForToken(equip.address, tokenId),
-      ).to.eql([resId2, bn(1), 5, catalog.address, 'ipfs://res2.jpg', [bn(1), bn(3), bn(4)]]);
+      ).to.eql([resId2, bn(1), bn(5), catalog.address, 'ipfs://res2.jpg', [bn(1), bn(3), bn(4)]]);
     });
 
     it('cannot get equippable slots from parent if parent is not an NFT', async function () {
@@ -372,7 +372,7 @@ describe('Advanced Equip Render Utils', async function () {
           bn(slotIdGemRight),
           bn(assetForGemARight),
           bn(assetForKanariaFull),
-          0,
+          bn(0),
           catalog.address,
           false,
           'ipfs://metadataSlotGemRight',
@@ -383,7 +383,7 @@ describe('Advanced Equip Render Utils', async function () {
           bn(slotIdGemMid),
           bn(assetForGemAMid),
           bn(assetForKanariaFull),
-          1,
+          bn(1),
           catalog.address,
           false,
           'ipfs://metadataSlotGemMid',
@@ -394,7 +394,7 @@ describe('Advanced Equip Render Utils', async function () {
           bn(slotIdGemLeft),
           bn(assetForGemALeft),
           bn(assetForKanariaFull),
-          2,
+          bn(2),
           catalog.address,
           true,
           'ipfs://metadataSlotGemLeft',
@@ -413,7 +413,7 @@ describe('Advanced Equip Render Utils', async function () {
           bn(slotIdGemRight),
           bn(assetForGemARight),
           bn(assetForKanariaFull),
-          0,
+          bn(0),
           catalog.address,
           false,
           'ipfs://metadataSlotGemRight',
@@ -424,7 +424,7 @@ describe('Advanced Equip Render Utils', async function () {
           bn(slotIdGemMid),
           bn(assetForGemAMid),
           bn(assetForKanariaFull),
-          1,
+          bn(1),
           catalog.address,
           true,
           'ipfs://metadataSlotGemMid',
@@ -435,7 +435,7 @@ describe('Advanced Equip Render Utils', async function () {
           bn(slotIdGemLeft),
           bn(assetForGemALeft),
           bn(assetForKanariaFull),
-          2,
+          bn(2),
           catalog.address,
           false,
           'ipfs://metadataSlotGemLeft',
@@ -455,7 +455,7 @@ describe('Advanced Equip Render Utils', async function () {
           bn(slotIdGemRight),
           bn(assetForGemBRight),
           bn(assetForKanariaFull),
-          0,
+          bn(0),
           catalog.address,
           true,
           'ipfs://metadataSlotGemRight',
@@ -466,7 +466,7 @@ describe('Advanced Equip Render Utils', async function () {
           bn(slotIdGemMid),
           bn(assetForGemBMid),
           bn(assetForKanariaFull),
-          1,
+          bn(1),
           catalog.address,
           false,
           'ipfs://metadataSlotGemMid',
@@ -477,7 +477,7 @@ describe('Advanced Equip Render Utils', async function () {
           bn(slotIdGemLeft),
           bn(assetForGemBLeft),
           bn(assetForKanariaFull),
-          2,
+          bn(2),
           catalog.address,
           false,
           'ipfs://metadataSlotGemLeft',
@@ -498,7 +498,7 @@ describe('Advanced Equip Render Utils', async function () {
           bn(slotIdGemRight),
           bn(assetForGemBRight),
           bn(assetForKanariaFull),
-          0,
+          bn(0),
           catalog.address,
           true,
           'ipfs://metadataSlotGemRight',
@@ -610,7 +610,7 @@ describe('Extended NFT render utils', function () {
     expect(data.rootOwner).to.eql(rootOwner.address);
     expect(data.activeAssetCount).to.eql(bn(2));
     expect(data.pendingAssetCount).to.eql(bn(2));
-    expect(data.priorities).to.eql([10, 42]);
+    expect(data.priorities).to.eql([bn(10), bn(42)]);
     expect(data.maxSupply).to.eql(bn(0));
     expect(data.totalSupply).to.eql(bn(0));
     expect(data.issuer).to.eql(ethers.constants.AddressZero);
@@ -635,7 +635,7 @@ describe('Extended NFT render utils', function () {
     await multiAssetPremint.addAssetToToken(tokenId, 4, 0);
     await multiAssetPremint.connect(rootOwner).acceptAsset(tokenId, 0, 1);
     await multiAssetPremint.connect(rootOwner).acceptAsset(tokenId, 1, 2);
-    await multiAssetPremint.connect(rootOwner).setPriority(tokenId, [10, 42]);
+    await multiAssetPremint.connect(rootOwner).setPriority(tokenId, [bn(10), bn(42)]);
 
     const data = await renderUtils.getExtendedNft(tokenId, multiAssetPremint.address);
 
@@ -644,7 +644,7 @@ describe('Extended NFT render utils', function () {
     expect(data.rootOwner).to.eql(rootOwner.address);
     expect(data.activeAssetCount).to.eql(bn(2));
     expect(data.pendingAssetCount).to.eql(bn(2));
-    expect(data.priorities).to.eql([10, 42]);
+    expect(data.priorities).to.eql([bn(10), bn(42)]);
     expect(data.maxSupply).to.eql(bn(10000));
     expect(data.totalSupply).to.eql(bn(tokenId));
     expect(data.issuer).to.eql(issuer.address);
@@ -759,7 +759,7 @@ describe('Extended NFT render utils', function () {
     expect(data.rootOwner).to.eql(rootOwner.address);
     expect(data.activeAssetCount).to.eql(bn(2));
     expect(data.pendingAssetCount).to.eql(bn(2));
-    expect(data.priorities).to.eql([10, 42]);
+    expect(data.priorities).to.eql([bn(10), bn(42)]);
     expect(data.maxSupply).to.eql(bn(0));
     expect(data.totalSupply).to.eql(bn(0));
     expect(data.issuer).to.eql(ethers.constants.AddressZero);
@@ -803,7 +803,7 @@ describe('Extended NFT render utils', function () {
     expect(data.rootOwner).to.eql(rootOwner.address);
     expect(data.activeAssetCount).to.eql(bn(2));
     expect(data.pendingAssetCount).to.eql(bn(2));
-    expect(data.priorities).to.eql([10, 42]);
+    expect(data.priorities).to.eql([bn(10), bn(42)]);
     expect(data.maxSupply).to.eql(bn(0));
     expect(data.totalSupply).to.eql(bn(0));
     expect(data.issuer).to.eql(ethers.constants.AddressZero);

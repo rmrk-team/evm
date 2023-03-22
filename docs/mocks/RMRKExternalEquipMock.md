@@ -127,12 +127,12 @@ function equip(IRMRKEquippable.IntakeEquip data) external nonpayable
 ### getActiveAssetPriorities
 
 ```solidity
-function getActiveAssetPriorities(uint256 tokenId) external view returns (uint16[])
+function getActiveAssetPriorities(uint256 tokenId) external view returns (uint64[])
 ```
 
 Used to retrieve the priorities of the active resoources of a given token.
 
-*Asset priorities are a non-sequential array of uint16 values with an array size equal to active asset  priorites.*
+*Asset priorities are a non-sequential array of uint64 values with an array size equal to active asset  priorites.*
 
 #### Parameters
 
@@ -144,7 +144,7 @@ Used to retrieve the priorities of the active resoources of a given token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint16[] | An array of priorities of the active assets of the given token |
+| _0 | uint64[] | An array of priorities of the active assets of the given token |
 
 ### getActiveAssets
 
@@ -443,7 +443,7 @@ function setNestableAddress(address nestableAddress) external nonpayable
 ### setPriority
 
 ```solidity
-function setPriority(uint256 tokenId, uint16[] priorities) external nonpayable
+function setPriority(uint256 tokenId, uint64[] priorities) external nonpayable
 ```
 
 Used to set priorities of active assets of a token.
@@ -455,7 +455,7 @@ Used to set priorities of active assets of a token.
 | Name | Type | Description |
 |---|---|---|
 | tokenId | uint256 | ID of the token we are managing the priorities of |
-| priorities | uint16[] | An array of priorities of active assets. The succesion of items in the priorities array  matches that of the succesion of items in the active array |
+| priorities | uint64[] | An array of priorities of active assets. The succesion of items in the priorities array  matches that of the succesion of items in the active array |
 
 ### setValidParentForEquippableGroup
 

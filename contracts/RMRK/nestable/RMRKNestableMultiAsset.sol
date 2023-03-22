@@ -112,7 +112,7 @@ contract RMRKNestableMultiAsset is RMRKNestable, AbstractMultiAsset {
      */
     function setPriority(
         uint256 tokenId,
-        uint16[] calldata priorities
+        uint64[] calldata priorities
     ) public virtual onlyApprovedForAssetsOrOwner(tokenId) {
         _setPriority(tokenId, priorities);
     }
