@@ -307,7 +307,7 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
     ) internal virtual {
         if (_tokenAssets[tokenId][assetId]) revert RMRKAssetAlreadyExists();
 
-        if (bytes(_assets[assetId]).length == 0) revert RMRKNoAssetMatchingId();
+        if (bytes(_assets[assetId]).length == uint256(0)) revert RMRKNoAssetMatchingId();
 
         if (_pendingAssets[tokenId].length >= 128)
             revert RMRKMaxPendingAssetsReached();

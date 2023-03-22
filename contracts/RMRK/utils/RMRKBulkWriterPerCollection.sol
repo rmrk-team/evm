@@ -104,19 +104,25 @@ contract RMRKBulkWriterPerCollection {
         IRMRKEquippable.IntakeEquip[] memory equips
     ) public onlyTokenOwner(tokenId) {
         uint256 length = unequips.length;
-        for (uint256 i = 0; i < length; i++) {
+        for (uint256 i = 0; i < length;) {
             IRMRKEquippable(_collection).unequip(
                 tokenId,
                 unequips[i].assetId,
                 unequips[i].slotPartId
             );
+            unchecked {
+                ++i;
+            }
         }
         length = equips.length;
-        for (uint256 i = 0; i < length; i++) {
+        for (uint256 i = 0; i < length;) {
             if (equips[i].tokenId != tokenId) {
                 revert RMRKCanOnlyDoBulkOperationsWithOneTokenAtATime();
             }
             IRMRKEquippable(_collection).equip(equips[i]);
+            unchecked {
+                ++i;
+            }
         }
     }
 

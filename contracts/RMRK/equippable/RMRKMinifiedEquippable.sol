@@ -476,7 +476,7 @@ contract RMRKMinifiedEquippable is
     ) private {
         if (to == address(0)) revert ERC721MintToTheZeroAddress();
         if (_exists(tokenId)) revert ERC721TokenAlreadyMinted();
-        if (tokenId == 0) revert RMRKIdZeroForbidden();
+        if (tokenId == uint256(0)) revert RMRKIdZeroForbidden();
 
         _beforeTokenTransfer(address(0), to, tokenId);
         _beforeNestedTokenTransfer(
@@ -847,7 +847,7 @@ contract RMRKMinifiedEquippable is
             returns (bytes4 retval) {
                 return retval == IERC721Receiver.onERC721Received.selector;
             } catch (bytes memory reason) {
-                if (reason.length == 0) {
+                if (reason.length == uint256(0)) {
                     revert ERC721TransferToNonReceiverImplementer();
                 } else {
                     /// @solidity memory-safe-assembly
@@ -983,7 +983,7 @@ contract RMRKMinifiedEquippable is
         }
 
         if (to != address(0)) {
-            if (destinationId == 0) {
+            if (destinationId == uint256(0)) {
                 IERC721(childAddress).safeTransferFrom(
                     address(this),
                     to,
@@ -1491,7 +1491,7 @@ contract RMRKMinifiedEquippable is
     ) internal virtual {
         if (_tokenAssets[tokenId][assetId]) revert RMRKAssetAlreadyExists();
 
-        if (bytes(_assets[assetId]).length == 0) revert RMRKNoAssetMatchingId();
+        if (bytes(_assets[assetId]).length == uint256(0)) revert RMRKNoAssetMatchingId();
 
         if (_pendingAssets[tokenId].length >= 128)
             revert RMRKMaxPendingAssetsReached();
@@ -1661,7 +1661,7 @@ contract RMRKMinifiedEquippable is
         private _equipments;
 
     /// Mapping of token ID to child (nestable) address to child ID to count of equipped items. Used to check if equipped.
-    mapping(uint256 => mapping(address => mapping(uint256 => uint8)))
+    mapping(uint256 => mapping(address => mapping(uint256 => uint256)))
         private _equipCountPerChild;
 
     /// Mapping of `equippableGroupId` to parent contract address and valid `slotId`.
@@ -2071,7 +2071,7 @@ contract RMRKMinifiedEquippable is
         address childAddress,
         uint256 childId
     ) public view virtual returns (bool) {
-        return _equipCountPerChild[tokenId][childAddress][childId] != uint8(0);
+        return _equipCountPerChild[tokenId][childAddress][childId] != 0;
     }
 
     // --------------------- ADMIN VALIDATION ---------------------

@@ -66,7 +66,7 @@ contract RMRKExternalEquipImpl is OwnableLock, RMRKExternalEquip {
         uint64[] memory partIds
     ) public virtual onlyOwnerOrContributor returns (uint256) {
         unchecked {
-            _totalAssets += 1;
+            ++_totalAssets;
         }
         _addAssetEntry(
             uint64(_totalAssets),
@@ -88,7 +88,7 @@ contract RMRKExternalEquipImpl is OwnableLock, RMRKExternalEquip {
         string memory metadataURI
     ) public virtual onlyOwnerOrContributor returns (uint256) {
         unchecked {
-            _totalAssets += 1;
+            ++_totalAssets;
         }
         _addAssetEntry(uint64(_totalAssets), metadataURI);
         return _totalAssets;

@@ -509,7 +509,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
     ) private {
         if (to == address(0)) revert ERC721MintToTheZeroAddress();
         if (_exists(tokenId)) revert ERC721TokenAlreadyMinted();
-        if (tokenId == 0) revert RMRKIdZeroForbidden();
+        if (tokenId == uint256(0)) revert RMRKIdZeroForbidden();
 
         _beforeTokenTransfer(address(0), to, tokenId);
         _beforeNestedTokenTransfer(
@@ -881,7 +881,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
             returns (bytes4 retval) {
                 return retval == IERC721Receiver.onERC721Received.selector;
             } catch (bytes memory reason) {
-                if (reason.length == 0) {
+                if (reason.length == uint256(0)) {
                     revert ERC721TransferToNonReceiverImplementer();
                 } else {
                     /// @solidity memory-safe-assembly
@@ -1101,7 +1101,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
         }
 
         if (to != address(0)) {
-            if (destinationId == 0) {
+            if (destinationId == uint256(0)) {
                 IERC721(childAddress).safeTransferFrom(
                     address(this),
                     to,
