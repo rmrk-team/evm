@@ -59,7 +59,7 @@ contract RMRKMultiAssetRenderUtils {
         uint64[] memory assets = target_.getActiveAssets(tokenId);
         uint16[] memory priorities = target_.getActiveAssetPriorities(tokenId);
         uint256 len = assets.length;
-        if (len == 0) {
+        if (len == uint256(0)) {
             revert RMRKTokenHasNoAssets();
         }
 
@@ -102,7 +102,7 @@ contract RMRKMultiAssetRenderUtils {
 
         uint64[] memory assets = target_.getPendingAssets(tokenId);
         uint256 len = assets.length;
-        if (len == 0) {
+        if (len == uint256(0)) {
             revert RMRKTokenHasNoAssets();
         }
 
@@ -191,7 +191,7 @@ contract RMRKMultiAssetRenderUtils {
         uint16[] memory priorities = target_.getActiveAssetPriorities(tokenId);
         uint64[] memory assets = target_.getActiveAssets(tokenId);
         uint256 len = priorities.length;
-        if (len == 0) {
+        if (len == uint256(0)) {
             revert RMRKTokenHasNoAssets();
         }
 

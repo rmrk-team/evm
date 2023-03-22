@@ -49,7 +49,7 @@ contract RMRKEquippable is
         private _equipments;
 
     /// Mapping of token ID to child (nestable) address to child ID to count of equipped items. Used to check if equipped.
-    mapping(uint256 => mapping(address => mapping(uint256 => uint8)))
+    mapping(uint256 => mapping(address => mapping(uint256 => uint256)))
         private _equipCountPerChild;
 
     /// Mapping of `equippableGroupId` to parent contract address and valid `slotId`.
@@ -472,7 +472,7 @@ contract RMRKEquippable is
         address childAddress,
         uint256 childId
     ) public view virtual returns (bool) {
-        return _equipCountPerChild[tokenId][childAddress][childId] != uint8(0);
+        return _equipCountPerChild[tokenId][childAddress][childId] != 0;
     }
 
     // --------------------- ADMIN VALIDATION ---------------------
