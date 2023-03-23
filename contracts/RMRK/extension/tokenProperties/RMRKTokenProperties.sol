@@ -158,7 +158,7 @@ abstract contract RMRKTokenProperties is IRMRKTokenProperties {
      * @return The id for the key
      */
     function _getIdForKey(string memory key) internal returns (uint256) {
-        if (_keysToIds[key] == 0) {
+        if (_keysToIds[key] == uint256(0)) {
             _totalProperties++;
             _keysToIds[key] = _totalProperties;
             return _totalProperties;
@@ -176,7 +176,7 @@ abstract contract RMRKTokenProperties is IRMRKTokenProperties {
     function _getStringIdForValue(
         string memory value
     ) internal returns (uint256) {
-        if (_stringValueToId[value] == 0) {
+        if (_stringValueToId[value] == uint256(0)) {
             _totalStringValues++;
             _stringValueToId[value] = _totalStringValues;
             _stringIdToValue[_totalStringValues] = value;

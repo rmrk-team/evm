@@ -30,7 +30,7 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
     mapping(uint256 => uint64[]) internal _pendingAssets;
 
     /// Mapping of tokenId to an array of priorities for active assets
-    mapping(uint256 => uint16[]) internal _activeAssetPriorities;
+    mapping(uint256 => uint64[]) internal _activeAssetPriorities;
 
     /// Mapping of tokenId to assetId to whether the token has this asset assigned
     mapping(uint256 => mapping(uint64 => bool)) private _tokenAssets;
@@ -73,7 +73,7 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
      */
     function getActiveAssetPriorities(
         uint256 tokenId
-    ) public view virtual returns (uint16[] memory) {
+    ) public view virtual returns (uint64[] memory) {
         return _activeAssetPriorities[tokenId];
     }
 
@@ -143,7 +143,7 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
         } else {
             // We use the current size as next priority, by default priorities would be [0,1,2...]
             _activeAssetPriorities[tokenId].push(
-                uint16(_activeAssets[tokenId].length)
+                uint64(_activeAssets[tokenId].length)
             );
             _activeAssets[tokenId].push(assetId);
             replacesId = uint64(0);
@@ -254,7 +254,7 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
      */
     function _setPriority(
         uint256 tokenId,
-        uint16[] calldata priorities
+        uint64[] calldata priorities
     ) internal virtual {
         uint256 length = priorities.length;
         if (length != _activeAssets[tokenId].length)
@@ -307,7 +307,8 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
     ) internal virtual {
         if (_tokenAssets[tokenId][assetId]) revert RMRKAssetAlreadyExists();
 
-        if (bytes(_assets[assetId]).length == 0) revert RMRKNoAssetMatchingId();
+        if (bytes(_assets[assetId]).length == uint256(0))
+            revert RMRKNoAssetMatchingId();
 
         if (_pendingAssets[tokenId].length >= 128)
             revert RMRKMaxPendingAssetsReached();
@@ -439,7 +440,7 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
      */
     function _beforeSetPriority(
         uint256 tokenId,
-        uint16[] calldata priorities
+        uint64[] calldata priorities
     ) internal virtual {}
 
     /**
@@ -449,6 +450,6 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
      */
     function _afterSetPriority(
         uint256 tokenId,
-        uint16[] calldata priorities
+        uint64[] calldata priorities
     ) internal virtual {}
 }

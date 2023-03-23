@@ -139,7 +139,7 @@ interface IRMRKMultiAsset is IERC165 {
 
     /**
      * @notice Sets a new priority array for a given token.
-     * @dev The priority array is a non-sequential list of `uint16`s, where the lowest value is considered highest
+     * @dev The priority array is a non-sequential list of `uint64`s, where the lowest value is considered highest
      *  priority.
      * @dev Value `0` of a priority is a special case equivalent to unitialized.
      * @dev Requirements:
@@ -154,7 +154,7 @@ interface IRMRKMultiAsset is IERC165 {
      */
     function setPriority(
         uint256 tokenId,
-        uint16[] calldata priorities
+        uint64[] calldata priorities
     ) external;
 
     /**
@@ -182,14 +182,14 @@ interface IRMRKMultiAsset is IERC165 {
 
     /**
      * @notice Used to retrieve the priorities of the active resoources of a given token.
-     * @dev Asset priorities are a non-sequential array of uint16 values with an array size equal to active asset
+     * @dev Asset priorities are a non-sequential array of uint64 values with an array size equal to active asset
      *  priorites.
      * @param tokenId ID of the token for which to retrieve the priorities of the active assets
      * @return An array of priorities of the active assets of the given token
      */
     function getActiveAssetPriorities(
         uint256 tokenId
-    ) external view returns (uint16[] memory);
+    ) external view returns (uint64[] memory);
 
     /**
      * @notice Used to retrieve the asset that will be replaced if a given asset from the token's pending array

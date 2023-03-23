@@ -49,7 +49,7 @@ contract RMRKEquippable is
         private _equipments;
 
     /// Mapping of token ID to child (nestable) address to child ID to count of equipped items. Used to check if equipped.
-    mapping(uint256 => mapping(address => mapping(uint256 => uint8)))
+    mapping(uint256 => mapping(address => mapping(uint256 => uint256)))
         private _equipCountPerChild;
 
     /// Mapping of `equippableGroupId` to parent contract address and valid `slotId`.
@@ -168,7 +168,7 @@ contract RMRKEquippable is
 
     /**
      * @notice Sets a new priority array for a given token.
-     * @dev The priority array is a non-sequential list of `uint16`s, where the lowest value is considered highest
+     * @dev The priority array is a non-sequential list of `uint64`s, where the lowest value is considered highest
      *  priority.
      * @dev Value `0` of a priority is a special case equivalent to unitialized.
      * @dev Requirements:
@@ -182,7 +182,7 @@ contract RMRKEquippable is
      */
     function setPriority(
         uint256 tokenId,
-        uint16[] calldata priorities
+        uint64[] calldata priorities
     ) public virtual onlyApprovedForAssetsOrOwner(tokenId) {
         _setPriority(tokenId, priorities);
     }
@@ -472,7 +472,7 @@ contract RMRKEquippable is
         address childAddress,
         uint256 childId
     ) public view virtual returns (bool) {
-        return _equipCountPerChild[tokenId][childAddress][childId] != uint8(0);
+        return _equipCountPerChild[tokenId][childAddress][childId] != 0;
     }
 
     // --------------------- ADMIN VALIDATION ---------------------

@@ -10,7 +10,7 @@ import "../library/RMRKErrors.sol";
  * @author RMRK team
  */
 contract RMRKMultiAssetRenderUtils {
-    uint16 private constant _LOWEST_POSSIBLE_PRIORITY = 2 ** 16 - 1;
+    uint64 private constant _LOWEST_POSSIBLE_PRIORITY = 2 ** 64 - 1;
 
     /**
      * @notice The structure used to display information about an active asset.
@@ -20,7 +20,7 @@ contract RMRKMultiAssetRenderUtils {
      */
     struct ExtendedActiveAsset {
         uint64 id;
-        uint16 priority;
+        uint64 priority;
         string metadata;
     }
 
@@ -57,9 +57,9 @@ contract RMRKMultiAssetRenderUtils {
         IRMRKMultiAsset target_ = IRMRKMultiAsset(target);
 
         uint64[] memory assets = target_.getActiveAssets(tokenId);
-        uint16[] memory priorities = target_.getActiveAssetPriorities(tokenId);
+        uint64[] memory priorities = target_.getActiveAssetPriorities(tokenId);
         uint256 len = assets.length;
-        if (len == 0) {
+        if (len == uint256(0)) {
             revert RMRKTokenHasNoAssets();
         }
 
@@ -102,7 +102,7 @@ contract RMRKMultiAssetRenderUtils {
 
         uint64[] memory assets = target_.getPendingAssets(tokenId);
         uint256 len = assets.length;
-        if (len == 0) {
+        if (len == uint256(0)) {
             revert RMRKTokenHasNoAssets();
         }
 
@@ -186,19 +186,19 @@ contract RMRKMultiAssetRenderUtils {
     function getAssetIdWithTopPriority(
         address target,
         uint256 tokenId
-    ) public view returns (uint64, uint16) {
+    ) public view returns (uint64, uint64) {
         IRMRKMultiAsset target_ = IRMRKMultiAsset(target);
-        uint16[] memory priorities = target_.getActiveAssetPriorities(tokenId);
+        uint64[] memory priorities = target_.getActiveAssetPriorities(tokenId);
         uint64[] memory assets = target_.getActiveAssets(tokenId);
         uint256 len = priorities.length;
-        if (len == 0) {
+        if (len == uint256(0)) {
             revert RMRKTokenHasNoAssets();
         }
 
-        uint16 maxPriority = _LOWEST_POSSIBLE_PRIORITY;
+        uint64 maxPriority = _LOWEST_POSSIBLE_PRIORITY;
         uint64 maxPriorityAssetId;
         for (uint64 i; i < len; ) {
-            uint16 currentPrio = priorities[i];
+            uint64 currentPrio = priorities[i];
             if (currentPrio < maxPriority) {
                 maxPriority = currentPrio;
                 maxPriorityAssetId = assets[i];
@@ -227,7 +227,7 @@ contract RMRKMultiAssetRenderUtils {
         view
         returns (
             uint64 topAssetId,
-            uint16 topAssetPriority,
+            uint64 topAssetPriority,
             string memory topAssetMetadata
         )
     {

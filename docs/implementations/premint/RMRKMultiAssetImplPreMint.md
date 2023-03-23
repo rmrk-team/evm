@@ -177,12 +177,12 @@ Used to retrieve the metadata of the collection.
 ### getActiveAssetPriorities
 
 ```solidity
-function getActiveAssetPriorities(uint256 tokenId) external view returns (uint16[])
+function getActiveAssetPriorities(uint256 tokenId) external view returns (uint64[])
 ```
 
 Used to retrieve the priorities of the active resoources of a given token.
 
-*Asset priorities are a non-sequential array of uint16 values with an array size equal to active asset  priorites.*
+*Asset priorities are a non-sequential array of uint64 values with an array size equal to active asset  priorites.*
 
 #### Parameters
 
@@ -194,7 +194,7 @@ Used to retrieve the priorities of the active resoources of a given token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint16[] | An array of priorities of the active assets of the given token |
+| _0 | uint64[] | An array of priorities of the active assets of the given token |
 
 ### getActiveAssets
 
@@ -728,19 +728,19 @@ Locks the operation.
 ### setPriority
 
 ```solidity
-function setPriority(uint256 tokenId, uint16[] priorities) external nonpayable
+function setPriority(uint256 tokenId, uint64[] priorities) external nonpayable
 ```
 
 Sets a new priority array for a given token.
 
-*The priority array is a non-sequential list of `uint16`s, where the lowest value is considered highest  priority.Value `0` of a priority is a special case equivalent to unitialized.Requirements:  - The caller must own the token or be approved to manage the token&#39;s assets  - `tokenId` must exist.  - The length of `priorities` must be equal the length of the active assets array.Emits a {AssetPrioritySet} event.*
+*The priority array is a non-sequential list of `uint64`s, where the lowest value is considered highest  priority.Value `0` of a priority is a special case equivalent to unitialized.Requirements:  - The caller must own the token or be approved to manage the token&#39;s assets  - `tokenId` must exist.  - The length of `priorities` must be equal the length of the active assets array.Emits a {AssetPrioritySet} event.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
 | tokenId | uint256 | ID of the token to set the priorities for |
-| priorities | uint16[] | An array of priorities of active assets. The succesion of items in the priorities array  matches that of the succesion of items in the active array |
+| priorities | uint64[] | An array of priorities of active assets. The succesion of items in the priorities array  matches that of the succesion of items in the active array |
 
 ### supportsInterface
 

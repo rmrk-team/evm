@@ -34,7 +34,7 @@ contract RMRKTokenURI {
         uint256 tokenId
     ) public view virtual returns (string memory) {
         return
-            _tokenUriIsEnumerable == 0
+            _tokenUriIsEnumerable == uint256(0)
                 ? _tokenUri
                 : string(abi.encodePacked(_tokenUri, tokenId.toString()));
     }

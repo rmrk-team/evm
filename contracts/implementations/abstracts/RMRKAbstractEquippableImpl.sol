@@ -95,7 +95,7 @@ abstract contract RMRKAbstractEquippableImpl is
         uint64[] memory partIds
     ) public virtual onlyOwnerOrContributor returns (uint256) {
         unchecked {
-            _totalAssets += 1;
+            ++_totalAssets;
         }
         _addAssetEntry(
             uint64(_totalAssets),
@@ -117,7 +117,7 @@ abstract contract RMRKAbstractEquippableImpl is
         string memory metadataURI
     ) public virtual onlyOwnerOrContributor returns (uint256) {
         unchecked {
-            _totalAssets += 1;
+            ++_totalAssets;
         }
         _addAssetEntry(uint64(_totalAssets), metadataURI);
         return _totalAssets;

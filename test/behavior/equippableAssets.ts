@@ -338,7 +338,7 @@ async function shouldBehaveLikeEquippableAssets(
         .withArgs(tokenId, resId2, resId);
 
       expect(await chunkyEquip.getActiveAssets(tokenId)).to.be.eql([resId2]);
-      expect(await chunkyEquip.getActiveAssetPriorities(tokenId)).to.be.eql([0]);
+      expect(await chunkyEquip.getActiveAssetPriorities(tokenId)).to.be.eql([bn(0)]);
 
       // Replacements should be gone
       expect(await chunkyEquip.getAssetReplacements(tokenId, resId2)).to.eql(bn(0));
@@ -352,7 +352,7 @@ async function shouldBehaveLikeEquippableAssets(
       await chunkyEquip.acceptAsset(tokenId, 0, resId);
 
       expect(await chunkyEquip.getActiveAssets(tokenId)).to.be.eql([resId]);
-      expect(await chunkyEquip.getActiveAssetPriorities(tokenId)).to.eql([0]);
+      expect(await chunkyEquip.getActiveAssetPriorities(tokenId)).to.eql([bn(0)]);
     });
   });
 
@@ -509,11 +509,11 @@ async function shouldBehaveLikeEquippableAssets(
     it('can set and get priorities', async function () {
       const tokenId = await addAssetsToToken();
 
-      expect(await chunkyEquip.getActiveAssetPriorities(tokenId)).to.be.eql([0, 1]);
+      expect(await chunkyEquip.getActiveAssetPriorities(tokenId)).to.be.eql([bn(0), bn(1)]);
       await expect(chunkyEquip.setPriority(tokenId, [1, 0]))
         .to.emit(chunkyEquip, 'AssetPrioritySet')
         .withArgs(tokenId);
-      expect(await chunkyEquip.getActiveAssetPriorities(tokenId)).to.be.eql([1, 0]);
+      expect(await chunkyEquip.getActiveAssetPriorities(tokenId)).to.be.eql([bn(1), bn(0)]);
     });
 
     it('can set and get priorities if approved', async function () {
@@ -522,11 +522,11 @@ async function shouldBehaveLikeEquippableAssets(
 
       await chunkyEquip.approveForAssets(approvedAddress.address, tokenId);
 
-      expect(await chunkyEquip.getActiveAssetPriorities(tokenId)).to.be.eql([0, 1]);
+      expect(await chunkyEquip.getActiveAssetPriorities(tokenId)).to.be.eql([bn(0), bn(1)]);
       await expect(chunkyEquip.connect(approvedAddress).setPriority(tokenId, [1, 0]))
         .to.emit(chunkyEquip, 'AssetPrioritySet')
         .withArgs(tokenId);
-      expect(await chunkyEquip.getActiveAssetPriorities(tokenId)).to.be.eql([1, 0]);
+      expect(await chunkyEquip.getActiveAssetPriorities(tokenId)).to.be.eql([bn(1), bn(0)]);
     });
 
     it('cannot set priorities for non owned token', async function () {
