@@ -15,7 +15,7 @@ contract RMRKCore is IRMRKCore {
      * @notice Version of the @rmrk-team/evm-contracts package
      * @return Version identifier of the smart contract
      */
-    string public constant VERSION = "0.27.1";
+    string public constant VERSION = "0.28.0";
 
     /**
      * @notice Used to initialize the smart contract.
