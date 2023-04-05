@@ -56,7 +56,7 @@ abstract contract RMRKReclaimableChild is IRMRKReclaimableChild, RMRKNestable {
         address childAddress,
         uint256 childId
     ) internal virtual {
-        if (childIsInActive(childAddress, childId))
+        if (_childIsInActive[childAddress][childId] == 1)
             revert RMRKInvalidChildReclaim();
         if (_childIsInPending[childAddress][childId] != 0)
             revert RMRKInvalidChildReclaim();
