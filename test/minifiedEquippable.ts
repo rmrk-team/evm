@@ -239,7 +239,7 @@ describe('MinifiedEquippableMock ERC721 behavior', function () {
   shouldBehaveLikeERC721('Chunky', 'CHNK');
 });
 
-describe('NestableMultiAssetMock Nestable Behavior', function () {
+describe('MinifiedEquippableMock Nestable Behavior', function () {
   beforeEach(async function () {
     const { parent, child } = await loadFixture(parentChildFixture);
     this.parentToken = parent;
