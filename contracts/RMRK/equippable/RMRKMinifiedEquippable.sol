@@ -1392,11 +1392,11 @@ contract RMRKMinifiedEquippable is
         address operator,
         bool approved
     ) public virtual {
-        address owner = _msgSender();
-        if (owner == operator) revert RMRKApprovalForAssetsToCurrentOwner();
+        if (_msgSender() == operator)
+            revert RMRKApprovalForAssetsToCurrentOwner();
 
-        _operatorApprovalsForAssets[owner][operator] = approved;
-        emit ApprovalForAllForAssets(owner, operator, approved);
+        _operatorApprovalsForAssets[_msgSender()][operator] = approved;
+        emit ApprovalForAllForAssets(_msgSender(), operator, approved);
     }
 
     /**
