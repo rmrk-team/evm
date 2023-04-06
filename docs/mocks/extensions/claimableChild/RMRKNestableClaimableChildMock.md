@@ -165,29 +165,6 @@ Used to burn a given token.
 |---|---|---|
 | _0 | uint256 | Number of recursively burned children |
 
-### childIsInActive
-
-```solidity
-function childIsInActive(address childAddress, uint256 childId) external view returns (bool)
-```
-
-Used to verify that the given child tokwn is included in an active array of a token.
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| childAddress | address | Address of the given token&#39;s collection smart contract |
-| childId | uint256 | ID of the child token being checked |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | bool | A boolean value signifying whether the given child token is included in an active child tokens array of a  token (`true`) or not (`false`) |
-
 ### childOf
 
 ```solidity
