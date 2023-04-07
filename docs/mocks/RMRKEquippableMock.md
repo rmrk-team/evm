@@ -240,29 +240,6 @@ Used to verify whether a token can be equipped into a given parent&#39;s slot.
 |---|---|---|
 | _0 | bool | A boolean indicating whether the token with the given asset can be equipped into the desired slot |
 
-### childIsInActive
-
-```solidity
-function childIsInActive(address childAddress, uint256 childId) external view returns (bool)
-```
-
-Used to verify that the given child tokwn is included in an active array of a token.
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| childAddress | address | Address of the given token&#39;s collection smart contract |
-| childId | uint256 | ID of the child token being checked |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | bool | A boolean value signifying whether the given child token is included in an active child tokens array of a  token (`true`) or not (`false`) |
-
 ### childOf
 
 ```solidity

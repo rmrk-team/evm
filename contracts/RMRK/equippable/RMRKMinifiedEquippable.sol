@@ -62,7 +62,7 @@ contract RMRKMinifiedEquippable is
     // Mapping of child token address to child token ID to whether they are pending or active on any token
     // We might have a first extra mapping from token ID, but since the same child cannot be nested into multiple tokens
     //  we can strip it for size/gas savings.
-    mapping(address => mapping(uint256 => uint256)) private _childIsInActive;
+    mapping(address => mapping(uint256 => uint256)) internal _childIsInActive;
 
     // -------------------------- MODIFIERS ----------------------------
 
@@ -224,7 +224,7 @@ contract RMRKMinifiedEquippable is
             data
         );
         _balances[from] -= 1;
-        _updateOwnerAndClearApprovals(tokenId, destinationId, to, true);
+        _updateOwnerAndClearApprovals(tokenId, destinationId, to);
         _balances[to] += 1;
 
         // Sending to NFT:
@@ -294,7 +294,7 @@ contract RMRKMinifiedEquippable is
         );
 
         _balances[from] -= 1;
-        _updateOwnerAndClearApprovals(tokenId, 0, to, false);
+        _updateOwnerAndClearApprovals(tokenId, 0, to);
         _balances[to] += 1;
 
         emit Transfer(from, to, tokenId);
@@ -491,8 +491,7 @@ contract RMRKMinifiedEquippable is
         _balances[to] += 1;
         _RMRKOwners[tokenId] = DirectOwner({
             ownerAddress: to,
-            tokenId: destinationId,
-            isNft: destinationId != 0
+            tokenId: destinationId
         });
     }
 
@@ -524,7 +523,7 @@ contract RMRKMinifiedEquippable is
         DirectOwner memory owner = _RMRKOwners[tokenId];
         if (owner.ownerAddress == address(0)) revert ERC721InvalidTokenId();
 
-        return (owner.ownerAddress, owner.tokenId, owner.isNft);
+        return (owner.ownerAddress, owner.tokenId, owner.tokenId != 0);
     }
 
     ////////////////////////////////////////
@@ -729,19 +728,15 @@ contract RMRKMinifiedEquippable is
      * @param tokenId ID of the token being updated
      * @param destinationId ID of the token to receive the given token
      * @param to Address of account to receive the token
-     * @param isNft A boolean value signifying whether the new owner is a token (`true`) or externally owned account
-     *  (`false`)
      */
     function _updateOwnerAndClearApprovals(
         uint256 tokenId,
         uint256 destinationId,
-        address to,
-        bool isNft
+        address to
     ) internal {
         _RMRKOwners[tokenId] = DirectOwner({
             ownerAddress: to,
-            tokenId: destinationId,
-            isNft: isNft
+            tokenId: destinationId
         });
 
         // Clear approvals from the previous owner
@@ -1094,20 +1089,6 @@ contract RMRKMinifiedEquippable is
         return child;
     }
 
-    /**
-     * @notice Used to verify that the given child tokwn is included in an active array of a token.
-     * @param childAddress Address of the given token's collection smart contract
-     * @param childId ID of the child token being checked
-     * @return A boolean value signifying whether the given child token is included in an active child tokens array of a
-     *  token (`true`) or not (`false`)
-     */
-    function childIsInActive(
-        address childAddress,
-        uint256 childId
-    ) public view virtual returns (bool) {
-        return _childIsInActive[childAddress][childId] != 0;
-    }
-
     // HOOKS
 
     /**
@@ -1411,11 +1392,11 @@ contract RMRKMinifiedEquippable is
         address operator,
         bool approved
     ) public virtual {
-        address owner = _msgSender();
-        if (owner == operator) revert RMRKApprovalForAssetsToCurrentOwner();
+        if (_msgSender() == operator)
+            revert RMRKApprovalForAssetsToCurrentOwner();
 
-        _operatorApprovalsForAssets[owner][operator] = approved;
-        emit ApprovalForAllForAssets(owner, operator, approved);
+        _operatorApprovalsForAssets[_msgSender()][operator] = approved;
+        emit ApprovalForAllForAssets(_msgSender(), operator, approved);
     }
 
     /**
