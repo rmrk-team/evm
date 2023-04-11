@@ -139,8 +139,6 @@ error RMRKPendingChildIndexOutOfRange();
 error RMRKAssetAlreadyExists();
 /// Attempting to equip an item into a slot that already has an item equipped
 error RMRKSlotAlreadyUsed();
-/// Attempting to pass specific address address array and specific address permission array of different lengths
-error RMRKSpecificAddressArraysNotEqualLength();
 /// Attempting to equip an item into a `Slot` that the target asset does not implement
 error RMRKTargetAssetCannotReceiveSlot();
 /// Attempting to equip a child into a `Slot` and parent that the child's collection doesn't support

@@ -12,11 +12,10 @@ const IERC6059 = '0x42b0e56f'; // ERC6059
 const IRMRKNestableAutoIndex = '0x1884d52d';
 const IRMRKMultiAssetAutoIndex = '0x1cf132fe';
 const IRMRKNestableExternalEquip = '0x8b7f3e99';
-const IRMRKPropertiesAccessControl = '0x4b5c6eb7';
 const IRMRKReclaimableChild = '0x2fb59acf';
 const IRMRKSoulbound = '0xa7331ab1'; // ERC6454
 const IRMRKTokenProperties = '0x6a49fd01';
-const IRMRKTokenPropertiesRepository = '0x7ebe6a7b';
+const IRMRKTokenPropertiesRepository = '0xb3b0f3a7';
 const IRMRKTypedMultiAsset = '0x7f7bb665';
 
 export {
@@ -34,7 +33,6 @@ export {
   IRMRKNestableAutoIndex,
   IRMRKMultiAssetAutoIndex,
   IRMRKNestableExternalEquip,
-  IRMRKPropertiesAccessControl,
   IRMRKReclaimableChild,
   IRMRKSoulbound,
   IRMRKTypedMultiAsset,

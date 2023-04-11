@@ -133,7 +133,7 @@ Used to retrieve the uint type token properties.
 ### isCollaborator
 
 ```solidity
-function isCollaborator(address collaborator, address collection, enum IRMRKPropertiesAccessControl.ParameterType parameterType, uint256 parameterId) external view returns (bool)
+function isCollaborator(address collaborator, address collection) external view returns (bool)
 ```
 
 Used to check if the specified address is listed as a collaborator of the given collection&#39;s parameter.
@@ -146,19 +146,17 @@ Used to check if the specified address is listed as a collaborator of the given 
 |---|---|---|
 | collaborator | address | Address to be checked. |
 | collection | address | Address of the collection. |
-| parameterType | enum IRMRKPropertiesAccessControl.ParameterType | Type of the parameter being checked. |
-| parameterId | uint256 | ID of the parameter being checked. |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | Boolean value indicating if the address is a collaborator of the given collection&#39;s parameter (`true`) or  not (`false`). |
+| _0 | bool | Boolean value indicating if the address is a collaborator of the given collection&#39;s (`true`) or not  (`false`). |
 
 ### isSpecificAddress
 
 ```solidity
-function isSpecificAddress(address specificAddress, address collection, enum IRMRKPropertiesAccessControl.ParameterType parameterType, uint256 parameterId) external view returns (bool)
+function isSpecificAddress(address specificAddress, address collection, string key) external view returns (bool)
 ```
 
 Used to check if the specified address is listed as a specific address of the given collection&#39;s  parameter.
@@ -171,8 +169,7 @@ Used to check if the specified address is listed as a specific address of the gi
 |---|---|---|
 | specificAddress | address | Address to be checked. |
 | collection | address | Address of the collection. |
-| parameterType | enum IRMRKPropertiesAccessControl.ParameterType | Type of the parameter being checked. |
-| parameterId | uint256 | ID of the parameter being checked. |
+| key | string | The key of the property |
 
 #### Returns
 
@@ -183,25 +180,39 @@ Used to check if the specified address is listed as a specific address of the gi
 ### manageAccessControl
 
 ```solidity
-function manageAccessControl(address collection, enum IRMRKPropertiesAccessControl.ParameterType parameterType, uint256 parameterId, enum IRMRKPropertiesAccessControl.AccessType accessType, address[] collaboratorAddresses, bool[] collaboratorAddressAccess, address[] specificAddresses, bool[] specificAddressAccess) external nonpayable
+function manageAccessControl(address collection, string key, enum IRMRKTokenPropertiesRepository.AccessType accessType, address specificAddress) external nonpayable
 ```
 
 Used to manage the access control settings for a specific parameter.
 
-*Only the `issuer` of the collection can call this function.The `collaboratorAddresses` and `collaboratorAddressAccess` arrays must be of the same length.The `specificAddresses` and `specificAddressAccess` arrays must be of the same length.the possible `parameterType` values are:  [      STRING,      ADDRESS,      BYTES,      UINT,      BOOL  ]The possible `accessType` values are:  [      Issuer,      Collaborator,      IssuerOrCollaborator,      TokenOwner,      SpecificAddress,  ]Emits an {AccessControlUpdated} event.*
+*Only the `issuer` of the collection can call this function.The possible `accessType` values are:  [      Issuer,      Collaborator,      IssuerOrCollaborator,      TokenOwner,      SpecificAddress,  ]Emits an {AccessControlUpdated} event.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
 | collection | address | The address of the collection being managed. |
-| parameterType | enum IRMRKPropertiesAccessControl.ParameterType | Type of the parameter being managed. |
-| parameterId | uint256 | ID of the parameter being managed. |
-| accessType | enum IRMRKPropertiesAccessControl.AccessType | The type of access control to be applied to the parameter. |
-| collaboratorAddresses | address[] | The array of addresses to be added or removed from the list of collaborators. |
-| collaboratorAddressAccess | bool[] | The array of boolean values to indicate if the address should be added as a  collaborator (`true`) or removed (`false`). |
-| specificAddresses | address[] | The array of addresses to be added or removed from the list of specific addresses. |
-| specificAddressAccess | bool[] | The array of boolean values to indicate if the address should be added as a specific  address (`true`) or removed (`false`). |
+| key | string | The key of the property |
+| accessType | enum IRMRKTokenPropertiesRepository.AccessType | The type of access control to be applied to the parameter. |
+| specificAddress | address | The address to be added as a specific addresses allowed to manage the given  parameter. |
+
+### manageCollaborators
+
+```solidity
+function manageCollaborators(address collection, address[] collaboratorAddresses, bool[] collaboratorAddressAccess) external nonpayable
+```
+
+Used to manage the collaborators of a collection.
+
+*The `collaboratorAddresses` and `collaboratorAddressAccess` arrays must be of the same length.Emits a {CollaboratorUpdate} event.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| collection | address | The address of the collection |
+| collaboratorAddresses | address[] | The array of collaborator addresses being managed |
+| collaboratorAddressAccess | bool[] | The array of boolean values indicating if the collaborator address should  receive the permission (`true`) or not (`false`). |
 
 ### registerAccessControl
 
@@ -211,7 +222,7 @@ function registerAccessControl(address collection, address issuer, bool useOwnab
 
 Used to register a collection to use the RMRK token properties repository.
 
-*If the collection does not implement the Ownable interface, the `useOwnable` value must be set to `false`.*
+*If the collection does not implement the Ownable interface, the `useOwnable` value must be set to `false`.Emits an {AccessControlRegistration} event.*
 
 #### Parameters
 
@@ -220,6 +231,101 @@ Used to register a collection to use the RMRK token properties repository.
 | collection | address | The address of the collection that will use the RMRK token properties repository. |
 | issuer | address | The address of the issuer of the collection. |
 | useOwnable | bool | The boolean value to indicate if the collection implements the Ownable interface and whether it  should be used to validate that the caller is the issuer (`true`) or to use the manually set issuer address  (`false`). |
+
+### setAddressProperty
+
+```solidity
+function setAddressProperty(address collection, uint256 tokenId, string key, address value) external nonpayable
+```
+
+Used to set an address property.
+
+*Emits a {AddressPropertyUpdated} event.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| collection | address | Address of the collection receiving the property |
+| tokenId | uint256 | The token ID |
+| key | string | The property key |
+| value | address | The property value |
+
+### setBoolProperty
+
+```solidity
+function setBoolProperty(address collection, uint256 tokenId, string key, bool value) external nonpayable
+```
+
+Used to set a boolean property.
+
+*Emits a {BoolPropertyUpdated} event.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| collection | address | Address of the collection receiving the property |
+| tokenId | uint256 | The token ID |
+| key | string | The property key |
+| value | bool | The property value |
+
+### setBytesProperty
+
+```solidity
+function setBytesProperty(address collection, uint256 tokenId, string key, bytes value) external nonpayable
+```
+
+Used to set an bytes property.
+
+*Emits a {BytesPropertyUpdated} event.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| collection | address | Address of the collection receiving the property |
+| tokenId | uint256 | The token ID |
+| key | string | The property key |
+| value | bytes | The property value |
+
+### setStringProperty
+
+```solidity
+function setStringProperty(address collection, uint256 tokenId, string key, string value) external nonpayable
+```
+
+Used to set a string property.
+
+*Emits a {StringPropertyUpdated} event.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| collection | address | Address of the collection receiving the property |
+| tokenId | uint256 | The token ID |
+| key | string | The property key |
+| value | string | The property value |
+
+### setUintProperty
+
+```solidity
+function setUintProperty(address collection, uint256 tokenId, string key, uint256 value) external nonpayable
+```
+
+Used to set a number property.
+
+*Emits a {UintPropertyUpdated} event.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| collection | address | Address of the collection receiving the property |
+| tokenId | uint256 | The token ID |
+| key | string | The property key |
+| value | uint256 | The property value |
 
 ### supportsInterface
 
@@ -247,13 +353,13 @@ function supportsInterface(bytes4 interfaceId) external view returns (bool)
 
 ## Events
 
-### AccessControlUpdated
+### AccessControlRegistration
 
 ```solidity
-event AccessControlUpdated(address indexed collection, enum IRMRKPropertiesAccessControl.ParameterType parameterType, uint256 parameterId, enum IRMRKPropertiesAccessControl.AccessType accessType, address[] collaboratorAddresses, bool[] collaboratorAddressAccess, address[] specificAddresses, bool[] specificAddressAccess)
+event AccessControlRegistration(address indexed collection, address indexed issuer, address indexed registeringAddress, bool useOwnable)
 ```
 
-Used to noitfy listeners that the access control settings for a specific parameter have been updated.
+Used to notify listeners that a new collection has been registered to use the repository.
 
 
 
@@ -261,14 +367,29 @@ Used to noitfy listeners that the access control settings for a specific paramet
 
 | Name | Type | Description |
 |---|---|---|
-| collection `indexed` | address | Address of the collection. |
-| parameterType  | enum IRMRKPropertiesAccessControl.ParameterType | The type of parameter for which the access control settings have been updated. |
-| parameterId  | uint256 | The ID of the parameter for which the access control settings have been updated. |
-| accessType  | enum IRMRKPropertiesAccessControl.AccessType | The AccessType of the parameter for which the access control settings have been updated. |
-| collaboratorAddresses  | address[] | The array of collaborator addresses that have been updated. |
-| collaboratorAddressAccess  | bool[] | The boolean array of the access values for the collaborator addresses. |
-| specificAddresses  | address[] | The array of specific addresses that have been updated. |
-| specificAddressAccess  | bool[] | The boolean array of the access values for the specific addresses. |
+| collection `indexed` | address | Address of the collection |
+| issuer `indexed` | address | Address of the issuer of the collection; the addess authorized to manage the access control |
+| registeringAddress `indexed` | address | Address that registered the collection |
+| useOwnable  | bool | A boolean value indicating whether the collection uses the Ownable extension to verify the  issuer (`true`) or not (`false`) |
+
+### AccessControlUpdate
+
+```solidity
+event AccessControlUpdate(address indexed collection, string key, enum IRMRKTokenPropertiesRepository.AccessType accessType, address specificAddress)
+```
+
+Used to notify listeners that the access control settings for a specific parameter have been updated.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| collection `indexed` | address | Address of the collection |
+| key  | string | The name of the parameter for which the access control settings have been updated |
+| accessType  | enum IRMRKTokenPropertiesRepository.AccessType | The AccessType of the parameter for which the access control settings have been updated |
+| specificAddress  | address | The specific addresses that has been updated |
 
 ### AddressPropertyUpdated
 
@@ -326,6 +447,24 @@ Used to notify listeners that a bytes property has been updated.
 | tokenId `indexed` | uint256 | The token ID |
 | key  | string | The key of the property |
 | value  | bytes | The new value of the property |
+
+### CollaboratorUpdate
+
+```solidity
+event CollaboratorUpdate(address indexed collection, address indexed collaborator, bool isCollaborator)
+```
+
+Used to notify listeners that a new collaborator has been added or removed.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| collection `indexed` | address | Address of the collection |
+| collaborator `indexed` | address | Address of the collaborator |
+| isCollaborator  | bool | A boolean value indicating whether the collaborator has been added (`true`) or removed  (`false`) |
 
 ### StringPropertyUpdated
 
@@ -402,6 +541,17 @@ Attempting to manage or interact with colleciton that is not registered
 
 
 
+### RMRKNotCollectionCollaborator
+
+```solidity
+error RMRKNotCollectionCollaborator()
+```
+
+Attempting to manage a collection without being the collection&#39;s collaborator
+
+
+
+
 ### RMRKNotCollectionIssuer
 
 ```solidity
@@ -413,6 +563,39 @@ Attemting to manage a collection without being the collection&#39;s issuer
 
 
 
+### RMRKNotCollectionIssuerOrCollaborator
+
+```solidity
+error RMRKNotCollectionIssuerOrCollaborator()
+```
+
+Attempting to manage a collection without being the collection&#39;s issuer or collaborator
+
+
+
+
+### RMRKNotSpecificAddress
+
+```solidity
+error RMRKNotSpecificAddress()
+```
+
+Attempting to manage a collection without being the specific address
+
+
+
+
+### RMRKNotTokenOwner
+
+```solidity
+error RMRKNotTokenOwner()
+```
+
+Attempting to manage a token without being its owner
+
+
+
+
 ### RMRKOwnableNotImplemented
 
 ```solidity
@@ -420,17 +603,6 @@ error RMRKOwnableNotImplemented()
 ```
 
 Attemtping to use `Ownable` interface without implementing it
-
-
-
-
-### RMRKSpecificAddressArraysNotEqualLength
-
-```solidity
-error RMRKSpecificAddressArraysNotEqualLength()
-```
-
-Attempting to pass specific address address array and specific address permission array of different lengths
 
 
 
