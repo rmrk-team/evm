@@ -2,12 +2,10 @@
 
 pragma solidity ^0.8.18;
 
-import "./ERC721Mock.sol";
-import "./OwnableLockMock.sol";
+/// @dev This mock smart contract is intended to be used with `@defi-wonderland/smock` and doesn't need any business
+///  logic.
+contract OwnableMintableERC721Mock {
+    function owner() public returns (address) {}
 
-contract OwnableMintableERC721Mock is ERC721Mock, OwnableLockMock {
-    constructor(
-        string memory name,
-        string memory symbol
-    ) ERC721Mock(name, symbol) {}
+    function ownerOf(uint256 tokenId) public returns (address) {}
 }
