@@ -5,6 +5,7 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { IERC165, IRMRKTokenPropertiesRepository } from '../interfaces';
 import { OwnableMintableERC721Mock, RMRKTokenPropertiesRepository } from '../../typechain-types';
 import { bn } from '../utils';
+import { smock, FakeContract } from '@defi-wonderland/smock';
 
 // --------------- FIXTURES -----------------------
 
@@ -17,9 +18,7 @@ async function tokenPropertiesFixture() {
 }
 
 async function ownedCollectionFixture() {
-  const factory = await ethers.getContractFactory('OwnableMintableERC721Mock');
-  const ownedCollection = await factory.deploy('Owned Collection', 'OWNED');
-  await ownedCollection.deployed();
+  const ownedCollection = await smock.fake<OwnableMintableERC721Mock>('OwnableMintableERC721Mock');
 
   return { ownedCollection };
 }
@@ -28,7 +27,7 @@ async function ownedCollectionFixture() {
 
 describe('RMRKTokenPropertiesRepository', async function () {
   let tokenProperties: RMRKTokenPropertiesRepository;
-  let ownedCollection: OwnableMintableERC721Mock;
+  let ownedCollection: FakeContract<OwnableMintableERC721Mock>;
 
   beforeEach(async function () {
     ({ tokenProperties } = await loadFixture(tokenPropertiesFixture));
@@ -53,6 +52,8 @@ describe('RMRKTokenPropertiesRepository', async function () {
       const signers = await ethers.getSigners();
       issuer = signers[0];
       owner = signers[1];
+
+      ownedCollection.owner.returns(issuer.address);
 
       await tokenProperties.registerAccessControl(ownedCollection.address, issuer.address, false);
     });
@@ -282,6 +283,8 @@ describe('RMRKTokenPropertiesRepository', async function () {
       const signers = await ethers.getSigners();
       issuer = signers[0];
       owner = signers[1];
+
+      ownedCollection.owner.returns(issuer.address);
     });
 
     it('should not allow registering an already registered collection', async function () {
@@ -301,7 +304,7 @@ describe('RMRKTokenPropertiesRepository', async function () {
     });
 
     it('should not allow to register a collection without Ownable implemented', async function () {
-      await ownedCollection.connect(issuer).renounceOwnership();
+      ownedCollection.owner.reset();
 
       await expect(
         tokenProperties.registerAccessControl(ownedCollection.address, issuer.address, false),
@@ -431,7 +434,7 @@ describe('RMRKTokenPropertiesRepository', async function () {
           .setAddressProperty(ownedCollection.address, 1, 'X', owner.address),
       ).to.be.revertedWithCustomError(tokenProperties, 'RMRKNotCollectionIssuer');
 
-      await ownedCollection.connect(issuer).transferOwnership(owner.address);
+      ownedCollection.owner.returns(owner.address);
 
       await expect(
         tokenProperties
@@ -501,7 +504,7 @@ describe('RMRKTokenPropertiesRepository', async function () {
         .connect(issuer)
         .manageAccessControl(ownedCollection.address, 'X', 2, ethers.constants.AddressZero);
 
-      await ownedCollection.connect(issuer).transferOwnership(owner.address);
+      ownedCollection.owner.returns(owner.address);
 
       await tokenProperties
         .connect(owner)
@@ -535,9 +538,9 @@ describe('RMRKTokenPropertiesRepository', async function () {
         tokenProperties
           .connect(owner)
           .setAddressProperty(ownedCollection.address, 1, 'X', owner.address),
-      ).to.be.revertedWith('ERC721: invalid token ID');
+      ).to.be.revertedWithCustomError(tokenProperties, 'RMRKNotTokenOwner');
 
-      await ownedCollection.connect(issuer).mint(owner.address, 1);
+      ownedCollection.ownerOf.returns(owner.address);
 
       await tokenProperties
         .connect(owner)

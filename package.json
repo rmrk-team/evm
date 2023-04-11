@@ -19,6 +19,7 @@
     "@openzeppelin/contracts": "^4.6.0"
   },
   "devDependencies": {
+    "@defi-wonderland/smock": "^2.3.4",
     "@nomicfoundation/hardhat-chai-matchers": "^1.0.1",
     "@nomicfoundation/hardhat-network-helpers": "^1.0.7",
     "@nomiclabs/hardhat-ethers": "^2.2.1",
