@@ -9,7 +9,7 @@ import "../../RMRK/utils/RMRKMintingUtils.sol";
 import "../../RMRK/utils/RMRKTokenURI.sol";
 import "../IRMRKInitData.sol";
 
-error RMRKMintUnderpriced();
+error RMRKWrongValueSent();
 error RMRKMintZero();
 
 /**
@@ -118,7 +118,7 @@ contract RMRKNestableExternalEquipImpl is
         if (numToMint + _totalSupply > _maxSupply) revert RMRKMintOverMax();
 
         uint256 mintPriceRequired = numToMint * _pricePerMint;
-        if (mintPriceRequired != msg.value) revert RMRKMintUnderpriced();
+        if (mintPriceRequired != msg.value) revert RMRKWrongValueSent();
 
         uint256 nextToken = _totalSupply + 1;
         unchecked {
