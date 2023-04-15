@@ -4,7 +4,7 @@ pragma solidity ^0.8.18;
 
 import "../abstracts/RMRKAbstractEquippableImpl.sol";
 
-error RMRKMintUnderpriced();
+error RMRKWrongValueSent();
 
 /**
  * @title RMRKEquippableImpl
@@ -92,6 +92,6 @@ contract RMRKEquippableImpl is RMRKAbstractEquippableImpl {
      * @param value The expected amount to be received for the mint
      */
     function _charge(uint256 value) internal virtual override {
-        if (value != msg.value) revert RMRKMintUnderpriced();
+        if (value != msg.value) revert RMRKWrongValueSent();
     }
 }

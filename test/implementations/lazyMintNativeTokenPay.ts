@@ -113,7 +113,7 @@ async function shouldControlValidMintingNativeTokenPay(): Promise<void> {
     const HALF_ETH = ethers.utils.parseEther('0.05');
     await expect(
       this.token.mint(addrs[0].address, 1, { value: HALF_ETH }),
-    ).to.be.revertedWithCustomError(this.token, 'RMRKMintUnderpriced');
+    ).to.be.revertedWithCustomError(this.token, 'RMRKWrongValueSent');
   });
 
   it('cannot mint 0 units', async function () {
