@@ -164,7 +164,7 @@ contract RMRKMultiAssetRenderUtils {
     function getTopAssetMetaForToken(
         address target,
         uint256 tokenId
-    ) external view returns (string memory) {
+    ) public view returns (string memory) {
         (uint64 maxPriorityAssetId, ) = getAssetIdWithTopPriority(
             target,
             tokenId

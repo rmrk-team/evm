@@ -118,6 +118,12 @@ contract RMRKEquipRenderUtils is
         string parentAssetMetadata;
     }
 
+    struct ChildWithTopAssetMetadata {
+        address contractAddress;
+        uint256 tokenId;
+        string metadata;
+    }
+
     /**
      * @notice Used to get extended active assets of the given token.
      * @dev The full `ExtendedEquippableActiveAsset` looks like this:
@@ -520,6 +526,58 @@ contract RMRKEquipRenderUtils is
             childId
         );
         childIndex = getChildIndex(
+            parentAddress,
+            parentId,
+            targetChild,
+            childId
+        );
+
+        equippableData = _getEquippableSlotsFromParent(
+            targetChild,
+            childId,
+            parentAddress,
+            parentId,
+            parentAssetId
+        );
+    }
+
+    /**
+     * @notice Used to get the child's assets and slot parts pairs, identifying parts the said assets can be equipped
+     *  into, for a specific parent asset while the child is in pending array.
+     * @dev Reverts if child token is not owned by an NFT.
+     * @dev The full `EquippableData` struct looks like this:
+     *  [
+     *      slotPartId,
+     *      childAssetId,
+     *      parentAssetId,
+     *      priority,
+     *      parentCatalogAddress,
+     *      isEquipped,
+     *      partMetadata,
+     *      childAssetMetadata,
+     *      parentAssetMetadata
+     *  ]
+     * @param targetChild Address of the smart contract of the given token
+     * @param childId ID of the child token whose assets will be matched against parent's slot parts
+     * @param parentAssetId ID of the target parent asset to use to equip the child
+     * @return childIndex Index of the child in the parent's list of pending children
+     * @return equippableData An array of `EquippableData` structs containing info about the equippable child assets and
+     *  their corresponding slot parts
+     */
+    function getEquippableSlotsFromParentForPendingChild(
+        address targetChild,
+        uint256 childId,
+        uint64 parentAssetId
+    )
+        public
+        view
+        returns (uint256 childIndex, EquippableData[] memory equippableData)
+    {
+        (address parentAddress, uint256 parentId) = getParent(
+            targetChild,
+            childId
+        );
+        childIndex = getPendingChildIndex(
             parentAddress,
             parentId,
             targetChild,
@@ -971,5 +1029,33 @@ contract RMRKEquipRenderUtils is
                 ++i;
             }
         }
+    }
+
+    function getChildrenWithTopMetadata(
+        address parentAddress,
+        uint256 parentId
+    ) public view returns (ChildWithTopAssetMetadata[] memory) {
+        IRMRKNestable.Child[] memory children = IRMRKNestable(parentAddress)
+            .childrenOf(parentId);
+        (parentId);
+        uint256 len = children.length;
+        ChildWithTopAssetMetadata[]
+            memory childrenWithMetadata = new ChildWithTopAssetMetadata[](len);
+
+        for (uint256 i; i < len; ) {
+            string memory meta = getTopAssetMetaForToken(
+                children[i].contractAddress,
+                children[i].tokenId
+            );
+            childrenWithMetadata[i] = ChildWithTopAssetMetadata(
+                children[i].contractAddress,
+                children[i].tokenId,
+                meta
+            );
+            unchecked {
+                ++i;
+            }
+        }
+        return childrenWithMetadata;
     }
 }
