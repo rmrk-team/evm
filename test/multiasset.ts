@@ -201,7 +201,7 @@ describe('MultiAssetMock Other Behavior', async function () {
       // Create array with 1000 consecutive numbers
       const tokenIds = Array.from(Array(3000).keys()).map((i) => i + 1);
       const resId = await addAssetEntryFromMock(token);
-      expect(await token.addAssetToTokensEventTest(tokenIds, resId, 0)).to.emit(
+      await expect(token.addAssetToTokensEventTest(tokenIds, resId, 0)).to.emit(
         token,
         'AssetAddedToTokens',
       );

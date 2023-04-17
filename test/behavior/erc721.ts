@@ -115,7 +115,7 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
         });
 
         it('emits a Transfer event', async function () {
-          expect(receipt)
+          await expect(receipt)
             .to.emit(this.token, 'Transfer')
             .withArgs(owner.address, toWhom.address, tokenId);
         });
@@ -211,7 +211,7 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
           });
 
           it('emits only a transfer event', async function () {
-            expect(receipt)
+            await expect(receipt)
               .to.emit(this.token, 'Transfer')
               .withArgs(owner.address, owner.address, tokenId);
           });
@@ -330,7 +330,7 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
                 owner,
               );
 
-              expect(receipt)
+              await expect(receipt)
                 .to.emit(receiver, 'Received')
                 .withArgs(owner.address, owner.address, tokenId, data);
             });
@@ -343,7 +343,7 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
                 tokenId,
                 approved,
               );
-              expect(receipt)
+              await expect(receipt)
                 .to.emit(receiver, 'Received')
                 .withArgs(approved.address, owner.address, tokenId, data);
             });
@@ -586,7 +586,7 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
 
         const itEmitsApprovalEvent = function (address: string) {
           it('emits an approval event', async function () {
-            expect(receipt)
+            await expect(receipt)
               .to.emit(this.token, 'Approval')
               .withArgs(owner.address, address, tokenId);
           });
@@ -717,7 +717,7 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
             it('emits an approval event', async function () {
               const receipt = await this.token.setApprovalForAll(operator.address, true);
 
-              expect(receipt)
+              await expect(receipt)
                 .to.emit(this.token, 'ApprovalForAll')
                 .withArgs(owner.address, operator.address, true);
             });
@@ -739,7 +739,7 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
             it('emits an approval event', async function () {
               const receipt = await this.token.setApprovalForAll(operator.address, true);
 
-              expect(receipt)
+              await expect(receipt)
                 .to.emit(this.token, 'ApprovalForAll')
                 .withArgs(owner.address, operator.address, true);
             });
@@ -769,7 +769,7 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
             it('emits an approval event', async function () {
               const receipt = await this.token.setApprovalForAll(operator.address, true);
 
-              expect(receipt)
+              await expect(receipt)
                 .to.emit(this.token, 'ApprovalForAll')
                 .withArgs(owner.address, operator.address, true);
             });
@@ -832,8 +832,8 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
         receipt = await this.token['mint(address,uint256)'](owner.address, firstTokenId);
       });
 
-      it('emits a Transfer event', function () {
-        expect(receipt)
+      it('emits a Transfer event', async function () {
+        await expect(receipt)
           .to.emit(this.token, 'Transfer')
           .withArgs(ethers.constants.AddressZero, owner.address, firstTokenId);
       });
@@ -874,14 +874,14 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
           receipt = await this.token['burn(uint256)'](firstTokenId);
         });
 
-        it('emits a Transfer event', function () {
-          expect(receipt)
+        it('emits a Transfer event', async function () {
+          await expect(receipt)
             .to.emit(this.token, 'Transfer')
             .withArgs(owner.address, ethers.constants.AddressZero, firstTokenId);
         });
 
-        it('emits an Approval event', function () {
-          expect(receipt)
+        it('emits an Approval event', async function () {
+          await expect(receipt)
             .to.emit(this.token, 'Approval')
             .withArgs(owner.address, ethers.constants.AddressZero, firstTokenId);
         });
