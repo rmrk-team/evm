@@ -78,6 +78,31 @@ Used to retrieve the contract address and ID of the parent token of the specifie
 | parentAddress | address | Address of the parent token&#39;s collection smart contract |
 | parentId | uint256 | ID of the parent token |
 
+### getPendingChildIndex
+
+```solidity
+function getPendingChildIndex(address parentAddress, uint256 parentId, address childAddress, uint256 childId) external view returns (uint256)
+```
+
+Used to retrieve the given child&#39;s index in its parent&#39;s pending child tokens array.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| parentAddress | address | Address of the parent token&#39;s collection smart contract |
+| parentId | uint256 | ID of the parent token |
+| childAddress | address | Address of the child token&#39;s colection smart contract |
+| childId | uint256 | ID of the child token |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint256 | The index of the child token in the parent token&#39;s pending child tokens array |
+
 
 
 
