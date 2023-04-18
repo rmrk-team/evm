@@ -179,6 +179,29 @@ Used to retrieve the given child&#39;s index in its parent&#39;s child tokens ar
 |---|---|---|
 | _0 | uint256 | The index of the child token in the parent token&#39;s child tokens array |
 
+### getChildrenWithTopMetadata
+
+```solidity
+function getChildrenWithTopMetadata(address parentAddress, uint256 parentId) external view returns (struct RMRKEquipRenderUtils.ChildWithTopAssetMetadata[])
+```
+
+Used to retrieve the top asset metadata for every active child of a given parent.
+
+*The full `ChildWithTopAssetMetadata` struct looks like this:  [      contractAddress,      tokenId,      metadata  ]*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| parentAddress | address | Address of the collection smart contract of the parent token |
+| parentId | uint256 | ID of the parent token |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | RMRKEquipRenderUtils.ChildWithTopAssetMetadata[] | An array of `ChildWithTopAssetMetadata` structs representing the children with their top asset metadata |
+
 ### getEquippableSlotsFromParent
 
 ```solidity
@@ -202,6 +225,31 @@ Used to get the child&#39;s assets and slot parts pairs, identifying parts the s
 | Name | Type | Description |
 |---|---|---|
 | childIndex | uint256 | Index of the child in the parent&#39;s list of active children |
+| equippableData | RMRKEquipRenderUtils.EquippableData[] | An array of `EquippableData` structs containing info about the equippable child assets and  their corresponding slot parts |
+
+### getEquippableSlotsFromParentForPendingChild
+
+```solidity
+function getEquippableSlotsFromParentForPendingChild(address targetChild, uint256 childId, uint64 parentAssetId) external view returns (uint256 childIndex, struct RMRKEquipRenderUtils.EquippableData[] equippableData)
+```
+
+Used to get the child&#39;s assets and slot parts pairs, identifying parts the said assets can be equipped  into, for a specific parent asset while the child is in pending array.
+
+*Reverts if child token is not owned by an NFT.The full `EquippableData` struct looks like this:  [      slotPartId,      childAssetId,      parentAssetId,      priority,      parentCatalogAddress,      isEquipped,      partMetadata,      childAssetMetadata,      parentAssetMetadata  ]*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| targetChild | address | Address of the smart contract of the given token |
+| childId | uint256 | ID of the child token whose assets will be matched against parent&#39;s slot parts |
+| parentAssetId | uint64 | ID of the target parent asset to use to equip the child |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| childIndex | uint256 | Index of the child in the parent&#39;s list of pending children |
 | equippableData | RMRKEquipRenderUtils.EquippableData[] | An array of `EquippableData` structs containing info about the equippable child assets and  their corresponding slot parts |
 
 ### getEquipped
@@ -392,6 +440,31 @@ Used to get the pending assets of the given token.
 | Name | Type | Description |
 |---|---|---|
 | _0 | RMRKMultiAssetRenderUtils.PendingAsset[] | An array of PendingAssets present on the given token |
+
+### getPendingChildIndex
+
+```solidity
+function getPendingChildIndex(address parentAddress, uint256 parentId, address childAddress, uint256 childId) external view returns (uint256)
+```
+
+Used to retrieve the given child&#39;s index in its parent&#39;s pending child tokens array.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| parentAddress | address | Address of the parent token&#39;s collection smart contract |
+| parentId | uint256 | ID of the parent token |
+| childAddress | address | Address of the child token&#39;s colection smart contract |
+| childId | uint256 | ID of the child token |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint256 | The index of the child token in the parent token&#39;s pending child tokens array |
 
 ### getSlotPartsAndCatalog
 

@@ -1031,6 +1031,18 @@ contract RMRKEquipRenderUtils is
         }
     }
 
+    /**
+     * @notice Used to retrieve the top asset metadata for every active child of a given parent.
+     * @param parentAddress Address of the collection smart contract of the parent token
+     * @param parentId ID of the parent token
+     * @return An array of `ChildWithTopAssetMetadata` structs representing the children with their top asset metadata
+     * @dev The full `ChildWithTopAssetMetadata` struct looks like this:
+     *  [
+     *      contractAddress,
+     *      tokenId,
+     *      metadata
+     *  ]
+     */
     function getChildrenWithTopMetadata(
         address parentAddress,
         uint256 parentId
