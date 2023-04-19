@@ -135,13 +135,13 @@ contract RMRKRenderUtils {
     ) public view returns (ExtendedNft memory data) {
         RMRKEquippable target = RMRKEquippable(targetCollection);
         data.hasMultiAssetInterface = target.supportsInterface(
-            type(IRMRKMultiAsset).interfaceId
+            type(IERC5773).interfaceId
         );
         data.hasNestingInterface = target.supportsInterface(
-            type(IRMRKNestable).interfaceId
+            type(IERC6059).interfaceId
         );
         data.hasEquippableInterface = target.supportsInterface(
-            type(IRMRKEquippable).interfaceId
+            type(IERC6220).interfaceId
         );
         if (data.hasNestingInterface) {
             (data.directOwner, , ) = target.directOwnerOf(tokenId);

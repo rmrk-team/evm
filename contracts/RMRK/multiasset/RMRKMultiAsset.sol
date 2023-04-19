@@ -124,7 +124,7 @@ contract RMRKMultiAsset is IERC165, IERC721, AbstractMultiAsset, RMRKCore {
             interfaceId == type(IERC165).interfaceId ||
             interfaceId == type(IERC721).interfaceId ||
             interfaceId == type(IERC721Metadata).interfaceId ||
-            interfaceId == type(IRMRKMultiAsset).interfaceId;
+            interfaceId == type(IERC5773).interfaceId;
     }
 
     /**
@@ -532,7 +532,7 @@ contract RMRKMultiAsset is IERC165, IERC721, AbstractMultiAsset, RMRKCore {
     // ------------------------------- ASSETS ------------------------------
 
     /**
-     * @inheritdoc IRMRKMultiAsset
+     * @inheritdoc IERC5773
      */
     function acceptAsset(
         uint256 tokenId,
@@ -543,7 +543,7 @@ contract RMRKMultiAsset is IERC165, IERC721, AbstractMultiAsset, RMRKCore {
     }
 
     /**
-     * @inheritdoc IRMRKMultiAsset
+     * @inheritdoc IERC5773
      */
     function rejectAsset(
         uint256 tokenId,
@@ -554,7 +554,7 @@ contract RMRKMultiAsset is IERC165, IERC721, AbstractMultiAsset, RMRKCore {
     }
 
     /**
-     * @inheritdoc IRMRKMultiAsset
+     * @inheritdoc IERC5773
      */
     function rejectAllAssets(
         uint256 tokenId,
@@ -564,7 +564,7 @@ contract RMRKMultiAsset is IERC165, IERC721, AbstractMultiAsset, RMRKCore {
     }
 
     /**
-     * @inheritdoc IRMRKMultiAsset
+     * @inheritdoc IERC5773
      */
     function setPriority(
         uint256 tokenId,
@@ -576,7 +576,7 @@ contract RMRKMultiAsset is IERC165, IERC721, AbstractMultiAsset, RMRKCore {
     // ----------------------- APPROVALS FOR ASSETS ------------------------
 
     /**
-     * @inheritdoc IRMRKMultiAsset
+     * @inheritdoc IERC5773
      */
     function approveForAssets(address to, uint256 tokenId) public virtual {
         address owner = ownerOf(tokenId);
@@ -601,7 +601,7 @@ contract RMRKMultiAsset is IERC165, IERC721, AbstractMultiAsset, RMRKCore {
     }
 
     /**
-     * @inheritdoc IRMRKMultiAsset
+     * @inheritdoc IERC5773
      */
     function getApprovedForAssets(
         uint256 tokenId

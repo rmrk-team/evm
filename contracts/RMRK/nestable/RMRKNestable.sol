@@ -4,7 +4,7 @@
 
 pragma solidity ^0.8.18;
 
-import "./IRMRKNestable.sol";
+import "./IERC6059.sol";
 import "../core/RMRKCore.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
@@ -21,7 +21,7 @@ import "../library/RMRKErrors.sol";
  * @dev This contract is hierarchy agnostic and can support an arbitrary number of nested levels up and down, as long as
  *  gas limits allow it.
  */
-contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
+contract RMRKNestable is Context, IERC165, IERC721, IERC6059, RMRKCore {
     using Address for address;
 
     uint256 private constant _MAX_LEVELS_TO_CHECK_FOR_INHERITANCE_LOOP = 100;
@@ -120,7 +120,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
             interfaceId == type(IERC165).interfaceId ||
             interfaceId == type(IERC721).interfaceId ||
             interfaceId == type(IERC721Metadata).interfaceId ||
-            interfaceId == type(IRMRKNestable).interfaceId;
+            interfaceId == type(IERC6059).interfaceId;
     }
 
     /**
@@ -205,7 +205,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
     }
 
     /**
-     * @inheritdoc IRMRKNestable
+     * @inheritdoc IERC6059
      */
     function nestTransferFrom(
         address from,
@@ -323,7 +323,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
         // Destination contract checks:
         // It seems redundant, but otherwise it would revert with no error
         if (!to.isContract()) revert RMRKIsNotContract();
-        if (!IERC165(to).supportsInterface(type(IRMRKNestable).interfaceId))
+        if (!IERC165(to).supportsInterface(type(IERC6059).interfaceId))
             revert RMRKNestableTransferToNonRMRKNestableImplementer();
         _checkForInheritanceLoop(tokenId, to, destinationId);
 
@@ -364,7 +364,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
         uint256 tokenId,
         bytes memory data
     ) private {
-        IRMRKNestable destContract = IRMRKNestable(to);
+        IERC6059 destContract = IERC6059(to);
         destContract.addChild(destinationId, tokenId, data);
 
         emit Transfer(from, to, tokenId);
@@ -400,7 +400,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
                 address nextOwner,
                 uint256 nextOwnerTokenId,
                 bool isNft
-            ) = IRMRKNestable(targetContract).directOwnerOf(targetId);
+            ) = IERC6059(targetContract).directOwnerOf(targetId);
             // If there's a final address, we're good. There's no loop.
             if (!isNft) {
                 return;
@@ -482,7 +482,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
     ) internal virtual {
         // It seems redundant, but otherwise it would revert with no error
         if (!to.isContract()) revert RMRKIsNotContract();
-        if (!IERC165(to).supportsInterface(type(IRMRKNestable).interfaceId))
+        if (!IERC165(to).supportsInterface(type(IERC6059).interfaceId))
             revert RMRKMintToNonRMRKNestableImplementer();
 
         _innerMint(to, tokenId, destinationId, data);
@@ -533,22 +533,22 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
     ////////////////////////////////////////
 
     /**
-     * @inheritdoc IRMRKNestable
+     * @inheritdoc IERC6059
      */
     function ownerOf(
         uint256 tokenId
-    ) public view virtual override(IRMRKNestable, IERC721) returns (address) {
+    ) public view virtual override(IERC6059, IERC721) returns (address) {
         (address owner, uint256 ownerTokenId, bool isNft) = directOwnerOf(
             tokenId
         );
         if (isNft) {
-            owner = IRMRKNestable(owner).ownerOf(ownerTokenId);
+            owner = IERC6059(owner).ownerOf(ownerTokenId);
         }
         return owner;
     }
 
     /**
-     * @inheritdoc IRMRKNestable
+     * @inheritdoc IERC6059
      */
     function directOwnerOf(
         uint256 tokenId
@@ -573,7 +573,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
     }
 
     /**
-     * @inheritdoc IRMRKNestable
+     * @inheritdoc IERC6059
      */
     function burn(
         uint256 tokenId,
@@ -642,7 +642,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
             // We substract one to the next level to count for the token being burned, then add it again on returns
             // This is to allow the behavior of 0 recursive burns meaning only the current token is deleted.
             totalChildBurns +=
-                IRMRKNestable(children[i].contractAddress).burn(
+                IERC6059(children[i].contractAddress).burn(
                     children[i].tokenId,
                     pendingRecursiveBurns - 1
                 ) +
@@ -895,7 +895,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
     ////////////////////////////////////////
 
     /**
-     * @inheritdoc IRMRKNestable
+     * @inheritdoc IERC6059
      */
     function addChild(
         uint256 parentId,
@@ -929,7 +929,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
     }
 
     /**
-     * @inheritdoc IRMRKNestable
+     * @inheritdoc IERC6059
      */
     function acceptChild(
         uint256 parentId,
@@ -982,7 +982,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
     }
 
     /**
-     * @inheritdoc IRMRKNestable
+     * @inheritdoc IERC6059
      */
     function rejectAllChildren(
         uint256 tokenId,
@@ -1018,7 +1018,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
     }
 
     /**
-     * @inheritdoc IRMRKNestable
+     * @inheritdoc IERC6059
      */
     function transferChild(
         uint256 tokenId,
@@ -1105,7 +1105,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
                 );
             } else {
                 // Destination is an NFT
-                IRMRKNestable(child.contractAddress).nestTransferFrom(
+                IERC6059(child.contractAddress).nestTransferFrom(
                     address(this),
                     to,
                     child.tokenId,
@@ -1160,7 +1160,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
     ////////////////////////////////////////
 
     /**
-     * @inheritdoc IRMRKNestable
+     * @inheritdoc IERC6059
      */
 
     function childrenOf(
@@ -1171,7 +1171,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
     }
 
     /**
-     * @inheritdoc IRMRKNestable
+     * @inheritdoc IERC6059
      */
 
     function pendingChildrenOf(
@@ -1182,7 +1182,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
     }
 
     /**
-     * @inheritdoc IRMRKNestable
+     * @inheritdoc IERC6059
      */
     function childOf(
         uint256 parentId,
@@ -1195,7 +1195,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IRMRKNestable, RMRKCore {
     }
 
     /**
-     * @inheritdoc IRMRKNestable
+     * @inheritdoc IERC6059
      */
     function pendingChildOf(
         uint256 parentId,

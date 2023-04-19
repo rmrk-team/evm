@@ -270,7 +270,7 @@ Used to verify whether a token can be equipped into a given parent&#39;s slot.
 ### childOf
 
 ```solidity
-function childOf(uint256 parentId, uint256 index) external view returns (struct IRMRKNestable.Child)
+function childOf(uint256 parentId, uint256 index) external view returns (struct IERC6059.Child)
 ```
 
 Used to retrieve a specific active child token for a given parent token.
@@ -288,12 +288,12 @@ Used to retrieve a specific active child token for a given parent token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IRMRKNestable.Child | A Child struct containing data about the specified child |
+| _0 | IERC6059.Child | A Child struct containing data about the specified child |
 
 ### childrenOf
 
 ```solidity
-function childrenOf(uint256 parentId) external view returns (struct IRMRKNestable.Child[])
+function childrenOf(uint256 parentId) external view returns (struct IERC6059.Child[])
 ```
 
 Used to retrieve the active child tokens of a given parent token.
@@ -310,7 +310,7 @@ Used to retrieve the active child tokens of a given parent token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IRMRKNestable.Child[] | An array of Child structs containing the parent token&#39;s active child tokens |
+| _0 | IERC6059.Child[] | An array of Child structs containing the parent token&#39;s active child tokens |
 
 ### collectionMetadata
 
@@ -356,7 +356,7 @@ Used to retrieve the immediate owner of the given token.
 ### equip
 
 ```solidity
-function equip(IRMRKEquippable.IntakeEquip data) external nonpayable
+function equip(IERC6220.IntakeEquip data) external nonpayable
 ```
 
 
@@ -367,7 +367,7 @@ function equip(IRMRKEquippable.IntakeEquip data) external nonpayable
 
 | Name | Type | Description |
 |---|---|---|
-| data | IRMRKEquippable.IntakeEquip | undefined |
+| data | IERC6220.IntakeEquip | undefined |
 
 ### erc20TokenAddress
 
@@ -549,7 +549,7 @@ Used to retrieve the asset that will be replaced if a given asset from the token
 ### getEquipment
 
 ```solidity
-function getEquipment(uint256 tokenId, address targetCatalogAddress, uint64 slotPartId) external view returns (struct IRMRKEquippable.Equipment)
+function getEquipment(uint256 tokenId, address targetCatalogAddress, uint64 slotPartId) external view returns (struct IERC6220.Equipment)
 ```
 
 Used to get the Equipment object equipped into the specified slot of the desired token.
@@ -568,7 +568,7 @@ Used to get the Equipment object equipped into the specified slot of the desired
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IRMRKEquippable.Equipment | The `Equipment` struct containing data about the equipped object |
+| _0 | IERC6220.Equipment | The `Equipment` struct containing data about the equipped object |
 
 ### getLock
 
@@ -883,7 +883,7 @@ Used to retrieve the *root* owner of a given token.
 ### pendingChildOf
 
 ```solidity
-function pendingChildOf(uint256 parentId, uint256 index) external view returns (struct IRMRKNestable.Child)
+function pendingChildOf(uint256 parentId, uint256 index) external view returns (struct IERC6059.Child)
 ```
 
 Used to retrieve a specific pending child token from a given parent token.
@@ -901,12 +901,12 @@ Used to retrieve a specific pending child token from a given parent token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IRMRKNestable.Child | A Child struct containting data about the specified child |
+| _0 | IERC6059.Child | A Child struct containting data about the specified child |
 
 ### pendingChildrenOf
 
 ```solidity
-function pendingChildrenOf(uint256 parentId) external view returns (struct IRMRKNestable.Child[])
+function pendingChildrenOf(uint256 parentId) external view returns (struct IERC6059.Child[])
 ```
 
 Used to retrieve the pending child tokens of a given parent token.
@@ -923,7 +923,7 @@ Used to retrieve the pending child tokens of a given parent token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IRMRKNestable.Child[] | An array of Child structs containing the parent token&#39;s pending child tokens |
+| _0 | IERC6059.Child[] | An array of Child structs containing the parent token&#39;s pending child tokens |
 
 ### pricePerMint
 

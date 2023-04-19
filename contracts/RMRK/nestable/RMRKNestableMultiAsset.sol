@@ -5,7 +5,7 @@
 pragma solidity ^0.8.18;
 
 import "../multiasset/AbstractMultiAsset.sol";
-import "./IRMRKNestable.sol";
+import "./IERC6059.sol";
 import "./RMRKNestable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
@@ -68,7 +68,7 @@ contract RMRKNestableMultiAsset is RMRKNestable, AbstractMultiAsset {
     ) public view virtual override(IERC165, RMRKNestable) returns (bool) {
         return
             RMRKNestable.supportsInterface(interfaceId) ||
-            interfaceId == type(IRMRKMultiAsset).interfaceId;
+            interfaceId == type(IERC5773).interfaceId;
     }
 
     // ------------------------------- ASSETS ------------------------------
@@ -76,7 +76,7 @@ contract RMRKNestableMultiAsset is RMRKNestable, AbstractMultiAsset {
     // --------------------------- HANDLING ASSETS -------------------------
 
     /**
-     * @inheritdoc IRMRKMultiAsset
+     * @inheritdoc IERC5773
      */
     function acceptAsset(
         uint256 tokenId,
@@ -87,7 +87,7 @@ contract RMRKNestableMultiAsset is RMRKNestable, AbstractMultiAsset {
     }
 
     /**
-     * @inheritdoc IRMRKMultiAsset
+     * @inheritdoc IERC5773
      */
     function rejectAsset(
         uint256 tokenId,
@@ -98,7 +98,7 @@ contract RMRKNestableMultiAsset is RMRKNestable, AbstractMultiAsset {
     }
 
     /**
-     * @inheritdoc IRMRKMultiAsset
+     * @inheritdoc IERC5773
      */
     function rejectAllAssets(
         uint256 tokenId,
@@ -108,7 +108,7 @@ contract RMRKNestableMultiAsset is RMRKNestable, AbstractMultiAsset {
     }
 
     /**
-     * @inheritdoc IRMRKMultiAsset
+     * @inheritdoc IERC5773
      */
     function setPriority(
         uint256 tokenId,
@@ -120,7 +120,7 @@ contract RMRKNestableMultiAsset is RMRKNestable, AbstractMultiAsset {
     // ----------------------- APPROVALS FOR ASSETS ------------------------
 
     /**
-     * @inheritdoc IRMRKMultiAsset
+     * @inheritdoc IERC5773
      */
     function approveForAssets(address to, uint256 tokenId) public virtual {
         address owner = ownerOf(tokenId);
@@ -134,7 +134,7 @@ contract RMRKNestableMultiAsset is RMRKNestable, AbstractMultiAsset {
     }
 
     /**
-     * @inheritdoc IRMRKMultiAsset
+     * @inheritdoc IERC5773
      */
     function getApprovedForAssets(
         uint256 tokenId

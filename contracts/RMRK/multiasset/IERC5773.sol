@@ -5,11 +5,11 @@ pragma solidity ^0.8.18;
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 
 /**
- * @title IRMRKMultiAsset
+ * @title IERC5773
  * @author RMRK team
  * @notice Interface smart contract of the RMRK multi asset module.
  */
-interface IRMRKMultiAsset is IERC165 {
+interface IERC5773 is IERC165 {
     /**
      * @notice Used to notify listeners that an asset object is initialized at `assetId`.
      * @param assetId ID of the asset that was initialized

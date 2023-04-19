@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { BigNumber, Contract } from 'ethers';
 import { ADDRESS_ZERO, bn } from '../utils';
-import { IERC165, IRMRKEquippable, IOtherInterface } from '../interfaces';
+import { IERC165, IERC6220, IOtherInterface } from '../interfaces';
 
 async function shouldBehaveLikeEquippableAssets(
   mint: (token: Contract, to: string) => Promise<number>,
@@ -32,7 +32,7 @@ async function shouldBehaveLikeEquippableAssets(
     });
 
     it('can support IEquippable', async function () {
-      expect(await chunkyEquip.supportsInterface(IRMRKEquippable)).to.equal(true);
+      expect(await chunkyEquip.supportsInterface(IERC6220)).to.equal(true);
     });
 
     it('cannot support other interfaceId', async function () {

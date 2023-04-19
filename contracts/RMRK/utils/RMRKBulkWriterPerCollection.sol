@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.18;
 
-import "../equippable/IRMRKEquippable.sol";
+import "../equippable/IERC6220.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
 error RMRKCanOnlyDoBulkOperationsOnOwnedTokens();
@@ -66,14 +66,14 @@ contract RMRKBulkWriterPerCollection {
      * @param data An `IntakeEquip` struct specifying the equip data.
      */
     function replaceEquip(
-        IRMRKEquippable.IntakeEquip memory data
+        IERC6220.IntakeEquip memory data
     ) public onlyTokenOwner(data.tokenId) {
-        IRMRKEquippable(_collection).unequip(
+        IERC6220(_collection).unequip(
             data.tokenId,
             data.assetId,
             data.slotPartId
         );
-        IRMRKEquippable(_collection).equip(data);
+        IERC6220(_collection).equip(data);
     }
 
     /**
@@ -101,11 +101,11 @@ contract RMRKBulkWriterPerCollection {
     function bulkEquip(
         uint256 tokenId,
         IntakeUnequip[] memory unequips,
-        IRMRKEquippable.IntakeEquip[] memory equips
+        IERC6220.IntakeEquip[] memory equips
     ) public onlyTokenOwner(tokenId) {
         uint256 length = unequips.length;
         for (uint256 i = 0; i < length; ) {
-            IRMRKEquippable(_collection).unequip(
+            IERC6220(_collection).unequip(
                 tokenId,
                 unequips[i].assetId,
                 unequips[i].slotPartId
@@ -119,7 +119,7 @@ contract RMRKBulkWriterPerCollection {
             if (equips[i].tokenId != tokenId) {
                 revert RMRKCanOnlyDoBulkOperationsWithOneTokenAtATime();
             }
-            IRMRKEquippable(_collection).equip(equips[i]);
+            IERC6220(_collection).equip(equips[i]);
             unchecked {
                 ++i;
             }

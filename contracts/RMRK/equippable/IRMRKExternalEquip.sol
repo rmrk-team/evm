@@ -2,14 +2,14 @@
 
 pragma solidity ^0.8.18;
 
-import "./IRMRKEquippable.sol";
+import "./IERC6220.sol";
 
 /**
  * @title IRMRKExternalEquip
  * @author RMRK team
  * @notice Interface smart contract of the RMRK external equippable module.
  */
-interface IRMRKExternalEquip is IRMRKEquippable {
+interface IRMRKExternalEquip is IERC6220 {
     /**
      * @notice Used to notify listeners of a new `Nestable` associated  smart contract address being set.
      * @dev When initially setting the `Nestable` smart contract address, the `old` value should equal `0x0` address.

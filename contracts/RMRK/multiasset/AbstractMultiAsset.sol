@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.18;
 
-import "./IRMRKMultiAsset.sol";
+import "./IERC5773.sol";
 import "../library/RMRKLib.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
 import "../library/RMRKErrors.sol";
@@ -10,9 +10,9 @@ import "../library/RMRKErrors.sol";
 /**
  * @title AbstractMultiAsset
  * @author RMRK team
- * @notice Abstract Smart contract implementing most of the common logic for contracts implementing IRMRKMultiAsset
+ * @notice Abstract Smart contract implementing most of the common logic for contracts implementing IERC5773
  */
-abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
+abstract contract AbstractMultiAsset is Context, IERC5773 {
     using RMRKLib for uint64[];
 
     /// Mapping of uint64 Ids to asset metadata
@@ -40,7 +40,7 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
         private _operatorApprovalsForAssets;
 
     /**
-     * @inheritdoc IRMRKMultiAsset
+     * @inheritdoc IERC5773
      */
     function getAssetMetadata(
         uint256 tokenId,
@@ -51,7 +51,7 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
     }
 
     /**
-     * @inheritdoc IRMRKMultiAsset
+     * @inheritdoc IERC5773
      */
     function getActiveAssets(
         uint256 tokenId
@@ -60,7 +60,7 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
     }
 
     /**
-     * @inheritdoc IRMRKMultiAsset
+     * @inheritdoc IERC5773
      */
     function getPendingAssets(
         uint256 tokenId
@@ -69,7 +69,7 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
     }
 
     /**
-     * @inheritdoc IRMRKMultiAsset
+     * @inheritdoc IERC5773
      */
     function getActiveAssetPriorities(
         uint256 tokenId
@@ -78,7 +78,7 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
     }
 
     /**
-     * @inheritdoc IRMRKMultiAsset
+     * @inheritdoc IERC5773
      */
     function getAssetReplacements(
         uint256 tokenId,
@@ -88,7 +88,7 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
     }
 
     /**
-     * @inheritdoc IRMRKMultiAsset
+     * @inheritdoc IERC5773
      */
     function isApprovedForAllForAssets(
         address owner,
@@ -98,7 +98,7 @@ abstract contract AbstractMultiAsset is Context, IRMRKMultiAsset {
     }
 
     /**
-     * @inheritdoc IRMRKMultiAsset
+     * @inheritdoc IERC5773
      */
     function setApprovalForAllForAssets(
         address operator,

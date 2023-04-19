@@ -5,10 +5,10 @@ const IOtherInterface = '0xffffffff';
 const IRMRKCatalog = '0xd912401f'; // ERC6220
 const IRMRKEmotable = '0x580d1840'; //ERC6381
 const IRMRKEmoteTracker = '0x08eb97a6';
-const IRMRKEquippable = '0x28bc9ae4'; // ERC6220
+const IERC6220 = '0x28bc9ae4'; // ERC6220
 const IRMRKExternalEquip = '0x289dfee5';
-const IRMRKMultiAsset = '0x06b4329a'; // ERC5773
-const IRMRKNestable = '0x42b0e56f'; // EIP6059
+const IERC5773 = '0x06b4329a'; // ERC5773
+const IERC6059 = '0x42b0e56f'; // EIP6059
 const IRMRKNestableAutoIndex = '0x1884d52d';
 const IRMRKMultiAssetAutoIndex = '0x1cf132fe';
 const IRMRKNestableExternalEquip = '0x8b7f3e99';
@@ -25,10 +25,10 @@ export {
   IRMRKCatalog,
   IRMRKEmotable,
   IRMRKEmoteTracker,
-  IRMRKEquippable,
+  IERC6220,
   IRMRKExternalEquip,
-  IRMRKMultiAsset,
-  IRMRKNestable,
+  IERC5773,
+  IERC6059,
   IRMRKNestableAutoIndex,
   IRMRKMultiAssetAutoIndex,
   IRMRKNestableExternalEquip,

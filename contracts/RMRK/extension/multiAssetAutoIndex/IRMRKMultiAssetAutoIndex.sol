@@ -2,14 +2,14 @@
 
 pragma solidity ^0.8.18;
 
-import "../../multiasset/IRMRKMultiAsset.sol";
+import "../../multiasset/IERC5773.sol";
 
 /**
  * @title RMRKMultiAssetAutoIndex
  * @author RMRK team
  * @notice Interface smart contract of the RMRK MultiAsset AutoIndex module.
  */
-interface IRMRKMultiAssetAutoIndex is IRMRKMultiAsset {
+interface IRMRKMultiAssetAutoIndex is IERC5773 {
     /**
      * @notice Accepts an asset from the pending array of given token.
      * @dev Migrates the asset from the token's pending asset array to the token's active asset array.

@@ -9,7 +9,7 @@ import "../library/RMRKLib.sol";
 import "../multiasset/AbstractMultiAsset.sol";
 import "../nestable/RMRKNestable.sol";
 import "../security/ReentrancyGuard.sol";
-import "./IRMRKEquippable.sol";
+import "./IERC6220.sol";
 
 /**
  * @title RMRKEquippable
@@ -20,7 +20,7 @@ contract RMRKEquippable is
     ReentrancyGuard,
     RMRKNestable,
     AbstractMultiAsset,
-    IRMRKEquippable
+    IERC6220
 {
     using RMRKLib for uint64[];
 
@@ -96,8 +96,8 @@ contract RMRKEquippable is
     ) public view virtual override(IERC165, RMRKNestable) returns (bool) {
         return
             RMRKNestable.supportsInterface(interfaceId) ||
-            interfaceId == type(IRMRKMultiAsset).interfaceId ||
-            interfaceId == type(IRMRKEquippable).interfaceId;
+            interfaceId == type(IERC5773).interfaceId ||
+            interfaceId == type(IERC6220).interfaceId;
     }
 
     // ------------------------------- ASSETS ------------------------------
@@ -319,7 +319,7 @@ contract RMRKEquippable is
     }
 
     /**
-     * @inheritdoc IRMRKEquippable
+     * @inheritdoc IERC6220
      */
     function equip(
         IntakeEquip memory data
@@ -354,15 +354,12 @@ contract RMRKEquippable is
         // Check from parent's asset perspective:
         _checkAssetAcceptsSlot(data.assetId, slotPartId);
 
-        IRMRKNestable.Child memory child = childOf(
-            data.tokenId,
-            data.childIndex
-        );
+        IERC6059.Child memory child = childOf(data.tokenId, data.childIndex);
 
         // Check from child perspective intention to be used in part
         // We add reentrancy guard because of this call, it happens before updating state
         if (
-            !IRMRKEquippable(child.contractAddress)
+            !IERC6220(child.contractAddress)
                 .canTokenBeEquippedWithAssetIntoSlot(
                     address(this),
                     child.tokenId,
@@ -418,7 +415,7 @@ contract RMRKEquippable is
     }
 
     /**
-     * @inheritdoc IRMRKEquippable
+     * @inheritdoc IERC6220
      */
     function unequip(
         uint256 tokenId,
@@ -465,7 +462,7 @@ contract RMRKEquippable is
     }
 
     /**
-     * @inheritdoc IRMRKEquippable
+     * @inheritdoc IERC6220
      */
     function isChildEquipped(
         uint256 tokenId,
@@ -501,7 +498,7 @@ contract RMRKEquippable is
     }
 
     /**
-     * @inheritdoc IRMRKEquippable
+     * @inheritdoc IERC6220
      */
     function canTokenBeEquippedWithAssetIntoSlot(
         address parent,
@@ -521,7 +518,7 @@ contract RMRKEquippable is
     // --------------------- Getting Extended Assets ---------------------
 
     /**
-     * @inheritdoc IRMRKEquippable
+     * @inheritdoc IERC6220
      */
     function getAssetAndEquippableData(
         uint256 tokenId,
@@ -545,7 +542,7 @@ contract RMRKEquippable is
     ////////////////////////////////////////
 
     /**
-     * @inheritdoc IRMRKEquippable
+     * @inheritdoc IERC6220
      */
     function getEquipment(
         uint256 tokenId,

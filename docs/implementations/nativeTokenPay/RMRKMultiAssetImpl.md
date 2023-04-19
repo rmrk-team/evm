@@ -1341,17 +1341,6 @@ Attempting to mint a number of tokens that would cause the total supply to be gr
 
 
 
-### RMRKMintUnderpriced
-
-```solidity
-error RMRKMintUnderpriced()
-```
-
-
-
-
-
-
 ### RMRKMintZero
 
 ```solidity
@@ -1469,6 +1458,17 @@ error RMRKUnexpectedNumberOfAssets()
 ```
 
 Attempting to reject all pending assets but more assets than expected are pending
+
+
+
+
+### RMRKWrongValueSent
+
+```solidity
+error RMRKWrongValueSent()
+```
+
+
 
 
 

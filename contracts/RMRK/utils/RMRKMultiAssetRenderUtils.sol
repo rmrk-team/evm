@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.18;
 
-import "../multiasset/IRMRKMultiAsset.sol";
+import "../multiasset/IERC5773.sol";
 import "../library/RMRKErrors.sol";
 
 /**
@@ -54,7 +54,7 @@ contract RMRKMultiAssetRenderUtils {
         address target,
         uint256 tokenId
     ) public view virtual returns (ExtendedActiveAsset[] memory) {
-        IRMRKMultiAsset target_ = IRMRKMultiAsset(target);
+        IERC5773 target_ = IERC5773(target);
 
         uint64[] memory assets = target_.getActiveAssets(tokenId);
         uint64[] memory priorities = target_.getActiveAssetPriorities(tokenId);
@@ -98,7 +98,7 @@ contract RMRKMultiAssetRenderUtils {
         address target,
         uint256 tokenId
     ) public view virtual returns (PendingAsset[] memory) {
-        IRMRKMultiAsset target_ = IRMRKMultiAsset(target);
+        IERC5773 target_ = IERC5773(target);
 
         uint64[] memory assets = target_.getPendingAssets(tokenId);
         uint256 len = assets.length;
@@ -143,7 +143,7 @@ contract RMRKMultiAssetRenderUtils {
         uint256 tokenId,
         uint64[] calldata assetIds
     ) public view virtual returns (string[] memory) {
-        IRMRKMultiAsset target_ = IRMRKMultiAsset(target);
+        IERC5773 target_ = IERC5773(target);
         uint256 len = assetIds.length;
         string[] memory assets = new string[](len);
         for (uint256 i; i < len; ) {
@@ -169,11 +169,7 @@ contract RMRKMultiAssetRenderUtils {
             target,
             tokenId
         );
-        return
-            IRMRKMultiAsset(target).getAssetMetadata(
-                tokenId,
-                maxPriorityAssetId
-            );
+        return IERC5773(target).getAssetMetadata(tokenId, maxPriorityAssetId);
     }
 
     /**
@@ -187,7 +183,7 @@ contract RMRKMultiAssetRenderUtils {
         address target,
         uint256 tokenId
     ) public view returns (uint64, uint64) {
-        IRMRKMultiAsset target_ = IRMRKMultiAsset(target);
+        IERC5773 target_ = IERC5773(target);
         uint64[] memory priorities = target_.getActiveAssetPriorities(tokenId);
         uint64[] memory assets = target_.getActiveAssets(tokenId);
         uint256 len = priorities.length;
@@ -235,7 +231,7 @@ contract RMRKMultiAssetRenderUtils {
             target,
             tokenId
         );
-        topAssetMetadata = IRMRKMultiAsset(target).getAssetMetadata(
+        topAssetMetadata = IERC5773(target).getAssetMetadata(
             tokenId,
             topAssetId
         );

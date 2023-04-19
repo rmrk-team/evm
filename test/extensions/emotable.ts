@@ -5,7 +5,7 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { bn } from '../utils';
 import {
   IERC165,
-  IRMRKMultiAsset,
+  IERC5773,
   IRMRKEmotable,
   IRMRKEmoteTracker,
   IOtherInterface,
@@ -56,8 +56,8 @@ describe('RMRKMultiAssetEmotableMock', async function () {
     expect(await token.supportsInterface(IERC165)).to.equal(true);
   });
 
-  it('can support IRMRKMultiAsset', async function () {
-    expect(await token.supportsInterface(IRMRKMultiAsset)).to.equal(true);
+  it('can support IERC5773', async function () {
+    expect(await token.supportsInterface(IERC5773)).to.equal(true);
   });
 
   it('can support IERC6381', async function () {

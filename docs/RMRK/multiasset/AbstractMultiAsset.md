@@ -4,7 +4,7 @@
 
 > AbstractMultiAsset
 
-Abstract Smart contract implementing most of the common logic for contracts implementing IRMRKMultiAsset
+Abstract Smart contract implementing most of the common logic for contracts implementing IERC5773
 
 
 
