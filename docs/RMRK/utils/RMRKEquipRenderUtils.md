@@ -185,7 +185,7 @@ Used to retrieve the given child&#39;s index in its parent&#39;s child tokens ar
 function getChildrenWithTopMetadata(address parentAddress, uint256 parentId) external view returns (struct RMRKEquipRenderUtils.ChildWithTopAssetMetadata[])
 ```
 
-Used to retrieve the top asset metadata for every active child of a given parent.
+
 
 *The full `ChildWithTopAssetMetadata` struct looks like this:  [      contractAddress,      tokenId,      metadata  ]*
 
