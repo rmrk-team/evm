@@ -2,8 +2,9 @@
 
 pragma solidity ^0.8.18;
 
-import "../nestable/IRMRKNestable.sol";
+import "../nestable/IERC6059.sol";
 import "../library/RMRKErrors.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
 
 /**
  * @title RMRKNestableRenderUtils
@@ -25,8 +26,39 @@ contract RMRKNestableRenderUtils {
         address childAddress,
         uint256 childId
     ) public view returns (uint256) {
-        IRMRKNestable.Child[] memory children = IRMRKNestable(parentAddress)
-            .childrenOf(parentId);
+        IERC6059.Child[] memory children = IERC6059(parentAddress).childrenOf(
+            parentId
+        );
+        (parentId);
+        uint256 len = children.length;
+        for (uint256 i; i < len; ) {
+            if (
+                children[i].tokenId == childId &&
+                children[i].contractAddress == childAddress
+            ) return i;
+            unchecked {
+                ++i;
+            }
+        }
+        revert RMRKChildNotFoundInParent();
+    }
+
+    /**
+     * @notice Used to retrieve the given child's index in its parent's pending child tokens array.
+     * @param parentAddress Address of the parent token's collection smart contract
+     * @param parentId ID of the parent token
+     * @param childAddress Address of the child token's colection smart contract
+     * @param childId ID of the child token
+     * @return The index of the child token in the parent token's pending child tokens array
+     */
+    function getPendingChildIndex(
+        address parentAddress,
+        uint256 parentId,
+        address childAddress,
+        uint256 childId
+    ) public view returns (uint256) {
+        IERC6059.Child[] memory children = IERC6059(parentAddress)
+            .pendingChildrenOf(parentId);
         (parentId);
         uint256 len = children.length;
         for (uint256 i; i < len; ) {
@@ -54,8 +86,9 @@ contract RMRKNestableRenderUtils {
         uint256 childId
     ) public view returns (address parentAddress, uint256 parentId) {
         bool isNFT;
-        (parentAddress, parentId, isNFT) = IRMRKNestable(childAddress)
-            .directOwnerOf(childId);
+        (parentAddress, parentId, isNFT) = IERC6059(childAddress).directOwnerOf(
+            childId
+        );
         if (!isNFT) revert RMRKParentIsNotNFT();
     }
 

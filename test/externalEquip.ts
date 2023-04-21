@@ -287,12 +287,12 @@ describe('ExternalEquippableMock Assets', async () => {
 
   describe('Linking', async function () {
     it('can set nestable/equippable addresses', async function () {
-      expect(await this.nestable.setEquippableAddress(ethers.constants.AddressZero))
+      await expect(this.nestable.setEquippableAddress(ethers.constants.AddressZero))
         .to.emit(this.nestable, 'EquippableAddressSet')
         .withArgs(this.equip.address, ethers.constants.AddressZero);
 
-      expect(await this.equip.setNestableAddress(ethers.constants.AddressZero))
-        .to.emit(this.equip, 'EquippableAddressSet')
+      await expect(this.equip.setNestableAddress(ethers.constants.AddressZero))
+        .to.emit(this.equip, 'NestableAddressSet')
         .withArgs(this.nestable.address, ethers.constants.AddressZero);
     });
 

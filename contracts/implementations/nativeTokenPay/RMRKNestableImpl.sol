@@ -4,7 +4,7 @@ pragma solidity ^0.8.18;
 
 import "../abstracts/RMRKAbstractNestableImpl.sol";
 
-error RMRKMintUnderpriced();
+error RMRKWrongValueSent();
 
 /**
  * @title RMRKNestableImpl
@@ -92,6 +92,6 @@ contract RMRKNestableImpl is RMRKAbstractNestableImpl {
      * @param value The expected amount to be received for the mint
      */
     function _charge(uint256 value) internal virtual override {
-        if (value != msg.value) revert RMRKMintUnderpriced();
+        if (value != msg.value) revert RMRKWrongValueSent();
     }
 }

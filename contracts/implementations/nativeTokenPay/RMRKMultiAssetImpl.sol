@@ -4,7 +4,7 @@ pragma solidity ^0.8.18;
 
 import "./../abstracts/RMRKAbstractMultiAssetImpl.sol";
 
-error RMRKMintUnderpriced();
+error RMRKWrongValueSent();
 
 /**
  * @title RMRKMultiAssetImpl
@@ -58,7 +58,7 @@ contract RMRKMultiAssetImpl is RMRKAbstractMultiAssetImpl {
         if (numToMint + _totalSupply > _maxSupply) revert RMRKMintOverMax();
 
         uint256 mintPriceRequired = numToMint * _pricePerMint;
-        if (mintPriceRequired != msg.value) revert RMRKMintUnderpriced();
+        if (mintPriceRequired != msg.value) revert RMRKWrongValueSent();
 
         uint256 nextToken = _totalSupply + 1;
         unchecked {

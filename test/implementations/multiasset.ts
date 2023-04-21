@@ -68,10 +68,10 @@ describe('MultiAssetImpl Other Behavior', async () => {
 
       await expect(
         token.connect(owner).mint(owner.address, 1, { value: ONE_ETH.div(2) }),
-      ).to.be.revertedWithCustomError(token, 'RMRKMintUnderpriced');
+      ).to.be.revertedWithCustomError(token, 'RMRKWrongValueSent');
       await expect(
         token.connect(owner).mint(owner.address, 1, { value: 0 }),
-      ).to.be.revertedWithCustomError(token, 'RMRKMintUnderpriced');
+      ).to.be.revertedWithCustomError(token, 'RMRKWrongValueSent');
     });
 
     it('can mint multiple tokens through sale logic', async function () {
@@ -80,10 +80,10 @@ describe('MultiAssetImpl Other Behavior', async () => {
       expect(await token.balanceOf(owner.address)).to.equal(10);
       await expect(
         token.connect(owner).mint(owner.address, 1, { value: ONE_ETH.div(2) }),
-      ).to.be.revertedWithCustomError(token, 'RMRKMintUnderpriced');
+      ).to.be.revertedWithCustomError(token, 'RMRKWrongValueSent');
       await expect(
         token.connect(owner).mint(owner.address, 1, { value: 0 }),
-      ).to.be.revertedWithCustomError(token, 'RMRKMintUnderpriced');
+      ).to.be.revertedWithCustomError(token, 'RMRKWrongValueSent');
     });
 
     it('auto accepts resource if send is token owner', async function () {

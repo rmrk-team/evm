@@ -168,13 +168,7 @@ contract RMRKNestableAutoIndex is IRMRKNestableAutoIndex, RMRKNestable {
 
     function ownerOf(
         uint256 tokenId
-    )
-        public
-        view
-        virtual
-        override(IRMRKNestable, RMRKNestable)
-        returns (address)
-    {
+    ) public view virtual override(IERC6059, RMRKNestable) returns (address) {
         return super.ownerOf(tokenId);
     }
 }

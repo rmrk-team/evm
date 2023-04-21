@@ -4,7 +4,7 @@ pragma solidity ^0.8.18;
 
 import "../RMRK/equippable/RMRKNestableExternalEquip.sol";
 
-//Minimal public implementation of IRMRKNestable for testing.
+//Minimal public implementation of IERC6059 for testing.
 contract RMRKNestableExternalEquipMock is RMRKNestableExternalEquip {
     constructor(
         string memory name_,

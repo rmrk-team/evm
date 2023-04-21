@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.18;
 
-import "../../RMRK/equippable/IRMRKEquippable.sol";
+import "../../RMRK/equippable/IERC6220.sol";
 import "../../RMRK/equippable/IRMRKExternalEquip.sol";
 import "../../RMRK/equippable/IRMRKNestableExternalEquip.sol";
 import "../../RMRK/nestable/RMRKNestable.sol";
@@ -56,7 +56,7 @@ contract RMRKNestableExternalEquip is IRMRKNestableExternalEquip, RMRKNestable {
         if (!isPending) {
             _requireMinted(tokenId);
             if (
-                IRMRKEquippable(_equippableAddress).isChildEquipped(
+                IERC6220(_equippableAddress).isChildEquipped(
                     tokenId,
                     childAddress,
                     childId
@@ -108,9 +108,6 @@ contract RMRKNestableExternalEquip is IRMRKNestableExternalEquip, RMRKNestable {
      * @inheritdoc RMRKNestable
      */
     function _cleanApprovals(uint256 tokenId) internal virtual override {
-        IRMRKMultiAsset(_equippableAddress).approveForAssets(
-            address(0),
-            tokenId
-        );
+        IERC5773(_equippableAddress).approveForAssets(address(0), tokenId);
     }
 }

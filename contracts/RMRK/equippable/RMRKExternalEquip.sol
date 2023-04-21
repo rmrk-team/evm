@@ -10,7 +10,7 @@ pragma solidity ^0.8.18;
 
 import "../catalog/IRMRKCatalog.sol";
 import "../multiasset/AbstractMultiAsset.sol";
-import "../nestable/IRMRKNestable.sol";
+import "../nestable/IERC6059.sol";
 import "../library/RMRKLib.sol";
 import "../security/ReentrancyGuard.sol";
 import "./IRMRKNestableExternalEquip.sol";
@@ -140,8 +140,8 @@ contract RMRKExternalEquip is
         bytes4 interfaceId
     ) public view virtual returns (bool) {
         return (interfaceId == type(IRMRKExternalEquip).interfaceId ||
-            interfaceId == type(IRMRKEquippable).interfaceId ||
-            interfaceId == type(IRMRKMultiAsset).interfaceId ||
+            interfaceId == type(IERC6220).interfaceId ||
+            interfaceId == type(IERC5773).interfaceId ||
             interfaceId == type(IERC165).interfaceId);
     }
 
@@ -290,7 +290,7 @@ contract RMRKExternalEquip is
     // ------------------------------- EQUIPPING ------------------------------
 
     /**
-     * @inheritdoc IRMRKEquippable
+     * @inheritdoc IERC6220
      */
     function equip(
         IntakeEquip memory data
@@ -325,21 +325,22 @@ contract RMRKExternalEquip is
         // Check from parent's asset perspective:
         _checkAssetAcceptsSlot(data.assetId, slotPartId);
 
-        IRMRKNestable.Child memory child = IRMRKNestable(_nestableAddress)
-            .childOf(data.tokenId, data.childIndex);
+        IERC6059.Child memory child = IERC6059(_nestableAddress).childOf(
+            data.tokenId,
+            data.childIndex
+        );
         address childEquippable = IRMRKNestableExternalEquip(
             child.contractAddress
         ).getEquippableAddress();
 
         // Check from child perspective intention to be used in part
         if (
-            !IRMRKEquippable(childEquippable)
-                .canTokenBeEquippedWithAssetIntoSlot(
-                    address(this),
-                    child.tokenId,
-                    data.childAssetId,
-                    slotPartId
-                )
+            !IERC6220(childEquippable).canTokenBeEquippedWithAssetIntoSlot(
+                address(this),
+                child.tokenId,
+                data.childAssetId,
+                slotPartId
+            )
         ) revert RMRKTokenCannotBeEquippedWithAssetIntoSlot();
 
         // Check from catalog perspective
@@ -389,7 +390,7 @@ contract RMRKExternalEquip is
     }
 
     /**
-     * @inheritdoc IRMRKEquippable
+     * @inheritdoc IERC6220
      */
     function unequip(
         uint256 tokenId,
@@ -480,7 +481,7 @@ contract RMRKExternalEquip is
     }
 
     /**
-     * @inheritdoc IRMRKEquippable
+     * @inheritdoc IERC6220
      */
     function canTokenBeEquippedWithAssetIntoSlot(
         address parent,
@@ -528,7 +529,7 @@ contract RMRKExternalEquip is
     }
 
     /**
-     * @inheritdoc IRMRKEquippable
+     * @inheritdoc IERC6220
      */
     function getAssetAndEquippableData(
         uint256 tokenId,
@@ -552,7 +553,7 @@ contract RMRKExternalEquip is
     ////////////////////////////////////////
 
     /**
-     * @inheritdoc IRMRKEquippable
+     * @inheritdoc IERC6220
      */
     function getEquipment(
         uint256 tokenId,
@@ -592,7 +593,7 @@ contract RMRKExternalEquip is
      * @return Address of the root owner of the token
      */
     function ownerOf(uint256 tokenId) internal view returns (address) {
-        return IRMRKNestable(_nestableAddress).ownerOf(tokenId);
+        return IERC6059(_nestableAddress).ownerOf(tokenId);
     }
 
     // HOOKS

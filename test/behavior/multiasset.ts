@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { BigNumber, Contract } from 'ethers';
 import { bn } from '../utils';
-import { IERC165, IOtherInterface, IRMRKMultiAsset } from '../interfaces';
+import { IERC165, IOtherInterface, IERC5773 } from '../interfaces';
 
 async function shouldBehaveLikeMultiAsset(
   mint: (token: Contract, to: string) => Promise<number>,
@@ -35,7 +35,7 @@ async function shouldBehaveLikeMultiAsset(
     });
 
     it('can support IMultiAsset', async function () {
-      expect(await this.token.supportsInterface(IRMRKMultiAsset)).to.equal(true);
+      expect(await this.token.supportsInterface(IERC5773)).to.equal(true);
     });
 
     it('cannot support other interfaceId', async function () {

@@ -2,14 +2,14 @@
 
 pragma solidity ^0.8.18;
 
-import "../multiasset/IRMRKMultiAsset.sol";
+import "../multiasset/IERC5773.sol";
 
 /**
- * @title IRMRKEquippable
+ * @title IERC6220
  * @author RMRK team
  * @notice Interface smart contract of the RMRK equippable module.
  */
-interface IRMRKEquippable is IRMRKMultiAsset {
+interface IERC6220 is IERC5773 {
     /**
      * @notice Used to store the core structure of the `Equippable` RMRK lego.
      * @return assetId The ID of the asset equipping a child

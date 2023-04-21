@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.18;
 
-// import "../../multiasset/IRMRKMultiAsset.sol";
+// import "../../multiasset/IERC5773.sol";
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 
 /**

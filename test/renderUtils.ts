@@ -32,6 +32,8 @@ import {
   setUpKanariaAsset,
   setUpGemAssets,
 } from './kanariaUtils';
+import { getSystemErrorMap } from 'util';
+import { BigNumber } from 'ethers';
 
 // --------------- FIXTURES -----------------------
 
@@ -509,6 +511,91 @@ describe('Advanced Equip Render Utils', async function () {
     ]);
   });
 
+  it('can get children with top metadata', async function () {
+    await setUpCatalog(catalog, gem.address);
+    await setUpKanariaAsset(kanaria, kanariaId, catalog.address);
+    await setUpGemAssets(gem, gemId1, gemId2, gemId3, kanaria.address, catalog.address);
+
+    // Gem assets are accepted in this order: right, mid, left, full
+    await gem.setPriority(gemId1, [3, 2, 0, 1]); // Make left
+    await gem.setPriority(gemId2, [3, 2, 1, 0]); // Make full the highest priority
+    // We leave gemId3 as is, so it will be right
+
+    expect(await renderUtilsEquip.getChildrenWithTopMetadata(kanaria.address, kanariaId)).to.eql([
+      [gem.address, BigNumber.from(gemId1), 'ipfs://gems/typeA/left.svg'],
+      [gem.address, BigNumber.from(gemId2), 'ipfs://gems/typeA/full.svg'],
+      [gem.address, BigNumber.from(gemId3), 'ipfs://gems/typeB/right.svg'],
+    ]);
+
+    expect(
+      await renderUtilsEquip.getTopAssetMetadataForTokens(gem.address, [gemId1, gemId2, gemId3]),
+    ).to.eql([
+      'ipfs://gems/typeA/left.svg',
+      'ipfs://gems/typeA/full.svg',
+      'ipfs://gems/typeB/right.svg',
+    ]);
+  });
+
+  it('can get equippable slots from parent for pending child', async function () {
+    await setUpCatalog(catalog, gem.address);
+    await setUpKanariaAsset(kanaria, kanariaId, catalog.address);
+    await setUpGemAssets(gem, gemId1, gemId2, gemId3, kanaria.address, catalog.address);
+
+    // Transfer a gem out and then back so it becomes pending
+    await kanaria.transferChild(kanariaId, owner.address, 0, 2, gem.address, gemId3, false, '0x');
+    await gem.nestTransferFrom(owner.address, kanaria.address, gemId3, kanariaId, '0x');
+
+    expect(
+      await renderUtilsEquip.getPendingChildIndex(kanaria.address, kanariaId, gem.address, gemId3),
+    ).to.eql(BigNumber.from(0));
+
+    expect(
+      await renderUtilsEquip.getEquippableSlotsFromParentForPendingChild(
+        gem.address,
+        gemId3,
+        assetForKanariaFull,
+      ),
+    ).to.eql([
+      bn(0), // child Index
+      [
+        // [Slot Id, asset Id, Asset priority, catalog address, isEquipped, partMetadata, childAssetMetadata, parentAssetMetadata]
+        [
+          bn(slotIdGemRight),
+          bn(assetForGemBRight),
+          bn(assetForKanariaFull),
+          bn(0),
+          catalog.address,
+          false,
+          'ipfs://metadataSlotGemRight',
+          'ipfs://gems/typeB/right.svg',
+          'ipfs://kanaria/full.svg',
+        ],
+        [
+          bn(slotIdGemMid),
+          bn(assetForGemBMid),
+          bn(assetForKanariaFull),
+          bn(1),
+          catalog.address,
+          false,
+          'ipfs://metadataSlotGemMid',
+          'ipfs://gems/typeB/mid.svg',
+          'ipfs://kanaria/full.svg',
+        ],
+        [
+          bn(slotIdGemLeft),
+          bn(assetForGemBLeft),
+          bn(assetForKanariaFull),
+          bn(2),
+          catalog.address,
+          false,
+          'ipfs://metadataSlotGemLeft',
+          'ipfs://gems/typeB/left.svg',
+          'ipfs://kanaria/full.svg',
+        ],
+      ],
+    ]);
+  });
+
   it('cannot get equippable slots from parent if the asset id is not composable', async function () {
     const assetForKanariaNotEquippable = 10;
     await setUpCatalog(catalog, gem.address);
@@ -617,6 +704,7 @@ describe('Extended NFT render utils', function () {
     expect(data.name).to.eql('MultiAsset');
     expect(data.symbol).to.eql('MA');
     expect(data.activeChildrenNumber).to.eql(bn(0));
+    expect(data.pendingChildrenNumber).to.eql(bn(0));
     expect(data.isSoulbound).to.be.false;
     expect(data.hasMultiAssetInterface).to.be.true;
     expect(data.hasNestingInterface).to.be.false;
@@ -651,6 +739,7 @@ describe('Extended NFT render utils', function () {
     expect(data.name).to.eql('MultiAssetPreMint');
     expect(data.symbol).to.eql('MApM');
     expect(data.activeChildrenNumber).to.eql(bn(0));
+    expect(data.pendingChildrenNumber).to.eql(bn(0));
     expect(data.isSoulbound).to.be.false;
     expect(data.hasMultiAssetInterface).to.be.true;
     expect(data.hasNestingInterface).to.be.false;
@@ -684,6 +773,7 @@ describe('Extended NFT render utils', function () {
     expect(data.name).to.eql('Nestable');
     expect(data.symbol).to.eql('Ne');
     expect(data.activeChildrenNumber).to.eql(bn(2));
+    expect(data.pendingChildrenNumber).to.eql(bn(1));
     expect(data.isSoulbound).to.be.false;
     expect(data.hasMultiAssetInterface).to.be.false;
     expect(data.hasNestingInterface).to.be.true;
@@ -716,6 +806,7 @@ describe('Extended NFT render utils', function () {
     expect(data.name).to.eql('NestableSoulbound');
     expect(data.symbol).to.eql('NS');
     expect(data.activeChildrenNumber).to.eql(bn(2));
+    expect(data.pendingChildrenNumber).to.eql(bn(1));
     expect(data.isSoulbound).to.be.true;
     expect(data.hasMultiAssetInterface).to.be.false;
     expect(data.hasNestingInterface).to.be.true;
@@ -766,6 +857,7 @@ describe('Extended NFT render utils', function () {
     expect(data.name).to.eql('NestableMultiAsset');
     expect(data.symbol).to.eql('NMA');
     expect(data.activeChildrenNumber).to.eql(bn(2));
+    expect(data.pendingChildrenNumber).to.eql(bn(1));
     expect(data.isSoulbound).to.be.false;
     expect(data.hasMultiAssetInterface).to.be.true;
     expect(data.hasNestingInterface).to.be.true;
@@ -810,6 +902,7 @@ describe('Extended NFT render utils', function () {
     expect(data.name).to.eql('Equippable');
     expect(data.symbol).to.eql('EQ');
     expect(data.activeChildrenNumber).to.eql(bn(2));
+    expect(data.pendingChildrenNumber).to.eql(bn(1));
     expect(data.isSoulbound).to.be.false;
     expect(data.hasMultiAssetInterface).to.be.true;
     expect(data.hasNestingInterface).to.be.true;

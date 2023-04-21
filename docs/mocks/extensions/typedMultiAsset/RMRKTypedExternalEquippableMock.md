@@ -132,7 +132,7 @@ Used to verify whether a token can be equipped into a given parent&#39;s slot.
 ### equip
 
 ```solidity
-function equip(IRMRKEquippable.IntakeEquip data) external nonpayable
+function equip(IERC6220.IntakeEquip data) external nonpayable
 ```
 
 
@@ -143,7 +143,7 @@ function equip(IRMRKEquippable.IntakeEquip data) external nonpayable
 
 | Name | Type | Description |
 |---|---|---|
-| data | IRMRKEquippable.IntakeEquip | undefined |
+| data | IERC6220.IntakeEquip | undefined |
 
 ### getActiveAssetPriorities
 
@@ -308,7 +308,7 @@ Used to get the type of the asset.
 ### getEquipment
 
 ```solidity
-function getEquipment(uint256 tokenId, address targetCatalogAddress, uint64 slotPartId) external view returns (struct IRMRKEquippable.Equipment)
+function getEquipment(uint256 tokenId, address targetCatalogAddress, uint64 slotPartId) external view returns (struct IERC6220.Equipment)
 ```
 
 Used to get the Equipment object equipped into the specified slot of the desired token.
@@ -327,7 +327,7 @@ Used to get the Equipment object equipped into the specified slot of the desired
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IRMRKEquippable.Equipment | The `Equipment` struct containing data about the equipped object |
+| _0 | IERC6220.Equipment | The `Equipment` struct containing data about the equipped object |
 
 ### getNestableAddress
 

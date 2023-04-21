@@ -6,7 +6,7 @@ For each of the MultiAsset, Nestable and Equippable lego combinations, both simp
 presented in the [sample RMRK EVM contracts repository](https://github.com/rmrk-team/evm-sample-contracts).
 
 **NOTE: RMRK smart contract documentation as well as usage instructions and examples can be found in the
-[RMRK EVM developer socumentation](https://evm.rmrk.app)**
+[RMRK EVM developer documentation](https://evm.rmrk.app)**
 
 ## Usage
 

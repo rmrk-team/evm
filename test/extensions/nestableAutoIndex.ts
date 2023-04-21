@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { bn } from '../utils';
-import { IERC165, IRMRKNestable, IRMRKNestableAutoIndex, IOtherInterface } from '../interfaces';
+import { IERC165, IERC6059, IRMRKNestableAutoIndex, IOtherInterface } from '../interfaces';
 import { RMRKNestableAutoIndexMock } from '../../typechain-types';
 
 // --------------- FIXTURES -----------------------
@@ -33,8 +33,8 @@ describe('RMRKNestableAutoIndexMock', async function () {
     expect(await token.supportsInterface(IERC165)).to.equal(true);
   });
 
-  it('can support IRMRKNestable', async function () {
-    expect(await token.supportsInterface(IRMRKNestable)).to.equal(true);
+  it('can support IERC6059', async function () {
+    expect(await token.supportsInterface(IERC6059)).to.equal(true);
   });
 
   it('can support IRMRKNestableAutoIndex', async function () {

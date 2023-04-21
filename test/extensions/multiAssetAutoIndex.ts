@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { bn } from '../utils';
-import { IERC165, IRMRKMultiAsset, IRMRKMultiAssetAutoIndex, IOtherInterface } from '../interfaces';
+import { IERC165, IERC5773, IRMRKMultiAssetAutoIndex, IOtherInterface } from '../interfaces';
 import { RMRKMultiAssetAutoIndexMock } from '../../typechain-types';
 
 // --------------- FIXTURES -----------------------
@@ -31,8 +31,8 @@ describe('RMRKMultiAssetAutoIndexMock', async function () {
     expect(await token.supportsInterface(IERC165)).to.equal(true);
   });
 
-  it('can support IRMRKMultiAsset', async function () {
-    expect(await token.supportsInterface(IRMRKMultiAsset)).to.equal(true);
+  it('can support IERC5773', async function () {
+    expect(await token.supportsInterface(IERC5773)).to.equal(true);
   });
 
   it('can support IRMRKMultiAssetAutoIndex', async function () {

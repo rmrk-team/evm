@@ -6,10 +6,10 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { bn, mintFromMock } from '../utils';
 import {
   IERC165,
-  IRMRKEquippable,
-  IRMRKMultiAsset,
+  IERC6220,
+  IERC5773,
   IRMRKExternalEquip,
-  IRMRKNestable,
+  IERC6059,
   IRMRKTypedMultiAsset,
   IOtherInterface,
 } from '../interfaces';
@@ -122,7 +122,7 @@ describe('RMRKNestableTypedMultiAssetMock', async function () {
   });
 
   it('can support INestable', async function () {
-    expect(await this.assets.supportsInterface(IRMRKNestable)).to.equal(true);
+    expect(await this.assets.supportsInterface(IERC6059)).to.equal(true);
   });
 
   shouldBehaveLikeTypedMultiAssetInterface();
@@ -140,7 +140,7 @@ describe('RMRKTypedEquippableMock', async function () {
   });
 
   it('can support IEquippable', async function () {
-    expect(await this.assets.supportsInterface(IRMRKEquippable)).to.equal(true);
+    expect(await this.assets.supportsInterface(IERC6220)).to.equal(true);
   });
 
   shouldBehaveLikeTypedMultiAssetInterface();
@@ -159,7 +159,7 @@ describe('RMRKTypedExternalEquippableMock', async function () {
   });
 
   it('can support IEquippable', async function () {
-    expect(await this.assets.supportsInterface(IRMRKEquippable)).to.equal(true);
+    expect(await this.assets.supportsInterface(IERC6220)).to.equal(true);
   });
 
   it('can support IExternalEquip', async function () {
@@ -176,7 +176,7 @@ async function shouldBehaveLikeTypedMultiAssetInterface() {
   });
 
   it('can support IMultiAsset', async function () {
-    expect(await this.assets.supportsInterface(IRMRKMultiAsset)).to.equal(true);
+    expect(await this.assets.supportsInterface(IERC5773)).to.equal(true);
   });
 
   it('can support IRMRKTypedMultiAsset', async function () {

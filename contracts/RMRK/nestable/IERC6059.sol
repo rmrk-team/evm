@@ -5,11 +5,11 @@ pragma solidity ^0.8.18;
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 
 /**
- * @title IRMRKNestable
+ * @title IERC6059
  * @author RMRK team
  * @notice Interface smart contract of the RMRK nestable module.
  */
-interface IRMRKNestable is IERC165 {
+interface IERC6059 is IERC165 {
     /**
      * @notice The core struct of RMRK ownership.
      * @dev The `DirectOwner` struct is used to store information of the next immediate owner, be it the parent token or
