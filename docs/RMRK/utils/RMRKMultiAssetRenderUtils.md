@@ -166,14 +166,14 @@ Used to retrieve the metadata URI of the specified token&#39;s asset with the hi
 
 | Name | Type | Description |
 |---|---|---|
-| target | address | Address of the smart contract of the given token |
-| tokenIds | uint256[] | IDs of the tokens for which to retrieve the metadata URI |
+| target | address | Address of the smart contract of the tokens |
+| tokenIds | uint256[] | IDs of the tokens for which to retrieve the metadata URIs |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| metadata | string[] | An array of strings with the top asset metadata for each the given tokens, in the same order of input |
+| metadata | string[] | An array of strings with the top asset metadata for each of the given tokens, in the same order as the tokens passed in the `tokenIds` input array |
 
 
 
