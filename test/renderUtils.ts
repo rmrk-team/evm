@@ -704,6 +704,7 @@ describe('Extended NFT render utils', function () {
     expect(data.name).to.eql('MultiAsset');
     expect(data.symbol).to.eql('MA');
     expect(data.activeChildrenNumber).to.eql(bn(0));
+    expect(data.pendingChildrenNumber).to.eql(bn(0));
     expect(data.isSoulbound).to.be.false;
     expect(data.hasMultiAssetInterface).to.be.true;
     expect(data.hasNestingInterface).to.be.false;
@@ -738,6 +739,7 @@ describe('Extended NFT render utils', function () {
     expect(data.name).to.eql('MultiAssetPreMint');
     expect(data.symbol).to.eql('MApM');
     expect(data.activeChildrenNumber).to.eql(bn(0));
+    expect(data.pendingChildrenNumber).to.eql(bn(0));
     expect(data.isSoulbound).to.be.false;
     expect(data.hasMultiAssetInterface).to.be.true;
     expect(data.hasNestingInterface).to.be.false;
@@ -771,6 +773,7 @@ describe('Extended NFT render utils', function () {
     expect(data.name).to.eql('Nestable');
     expect(data.symbol).to.eql('Ne');
     expect(data.activeChildrenNumber).to.eql(bn(2));
+    expect(data.pendingChildrenNumber).to.eql(bn(1));
     expect(data.isSoulbound).to.be.false;
     expect(data.hasMultiAssetInterface).to.be.false;
     expect(data.hasNestingInterface).to.be.true;
@@ -803,6 +806,7 @@ describe('Extended NFT render utils', function () {
     expect(data.name).to.eql('NestableSoulbound');
     expect(data.symbol).to.eql('NS');
     expect(data.activeChildrenNumber).to.eql(bn(2));
+    expect(data.pendingChildrenNumber).to.eql(bn(1));
     expect(data.isSoulbound).to.be.true;
     expect(data.hasMultiAssetInterface).to.be.false;
     expect(data.hasNestingInterface).to.be.true;
@@ -853,6 +857,7 @@ describe('Extended NFT render utils', function () {
     expect(data.name).to.eql('NestableMultiAsset');
     expect(data.symbol).to.eql('NMA');
     expect(data.activeChildrenNumber).to.eql(bn(2));
+    expect(data.pendingChildrenNumber).to.eql(bn(1));
     expect(data.isSoulbound).to.be.false;
     expect(data.hasMultiAssetInterface).to.be.true;
     expect(data.hasNestingInterface).to.be.true;
@@ -897,6 +902,7 @@ describe('Extended NFT render utils', function () {
     expect(data.name).to.eql('Equippable');
     expect(data.symbol).to.eql('EQ');
     expect(data.activeChildrenNumber).to.eql(bn(2));
+    expect(data.pendingChildrenNumber).to.eql(bn(1));
     expect(data.isSoulbound).to.be.false;
     expect(data.hasMultiAssetInterface).to.be.true;
     expect(data.hasNestingInterface).to.be.true;

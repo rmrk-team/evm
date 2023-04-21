@@ -35,6 +35,8 @@ contract RMRKRenderUtils {
      * @return symbol Symbol of the collection the token belongs to
      * @return activeChildrenNumber Number of active child tokens of the given token (only account for direct child
      *  tokens)
+     * @return pendingChildrenNumber Number of pending child tokens of the given token (only account for direct child
+     *  tokens)
      * @return isSoulbound Boolean value signifying whether the token is soulbound or not
      * @return hasMultiAssetInterface Boolean value signifying whether the toke supports MultiAsset interface
      * @return hasNestingInterface Boolean value signifying whether the toke supports Nestable interface
@@ -53,6 +55,7 @@ contract RMRKRenderUtils {
         string name;
         string symbol;
         uint256 activeChildrenNumber;
+        uint256 pendingChildrenNumber;
         bool isSoulbound;
         bool hasMultiAssetInterface;
         bool hasNestingInterface;
@@ -120,6 +123,7 @@ contract RMRKRenderUtils {
      *      name,
      *      symbol,
      *      activeChildrenNumber,
+     *      pendingChildrenNumber,
      *      isSoulbound,
      *      hasMultiAssetInterface,
      *      hasNestingInterface,
@@ -146,6 +150,9 @@ contract RMRKRenderUtils {
         if (data.hasNestingInterface) {
             (data.directOwner, , ) = target.directOwnerOf(tokenId);
             data.activeChildrenNumber = target.childrenOf(tokenId).length;
+            data.pendingChildrenNumber = target
+                .pendingChildrenOf(tokenId)
+                .length;
         }
         if (data.hasMultiAssetInterface) {
             data.activeAssetCount = target.getActiveAssets(tokenId).length;
