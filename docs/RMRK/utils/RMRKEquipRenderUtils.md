@@ -562,6 +562,29 @@ Used to retrieve the metadata URI of the specified token&#39;s asset with the hi
 |---|---|---|
 | _0 | string | The metadata URI of the asset with the highest priority |
 
+### getTopAssetMetadataForTokens
+
+```solidity
+function getTopAssetMetadataForTokens(address target, uint256[] tokenIds) external view returns (string[] metadata)
+```
+
+Used to retrieve the metadata URI of the specified token&#39;s asset with the highest priority for each of the given tokens.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| target | address | Address of the smart contract of the given token |
+| tokenIds | uint256[] | IDs of the tokens for which to retrieve the metadata URI |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| metadata | string[] | An array of strings with the top asset metadata for each the given tokens, in the same order of input |
+
 ### isAssetEquipped
 
 ```solidity
