@@ -174,9 +174,9 @@ contract RMRKMultiAssetRenderUtils {
 
     /**
      * @notice Used to retrieve the metadata URI of the specified token's asset with the highest priority for each of the given tokens.
-     * @param target Address of the smart contract of the given token
-     * @param tokenIds IDs of the tokens for which to retrieve the metadata URI
-     * @return metadata An array of strings with the top asset metadata for each the given tokens, in the same order of input
+     * @param target Address of the smart contract of the tokens
+     * @param tokenIds IDs of the tokens for which to retrieve the metadata URIs
+     * @return metadata An array of strings with the top asset metadata for each of the given tokens, in the same order as the tokens passed in the `tokenIds` input array
      */
     function getTopAssetMetadataForTokens(
         address target,
