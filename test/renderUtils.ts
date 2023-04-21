@@ -526,6 +526,14 @@ describe('Advanced Equip Render Utils', async function () {
       [gem.address, BigNumber.from(gemId2), 'ipfs://gems/typeA/full.svg'],
       [gem.address, BigNumber.from(gemId3), 'ipfs://gems/typeB/right.svg'],
     ]);
+
+    expect(
+      await renderUtilsEquip.getTopAssetMetadataForTokens(gem.address, [gemId1, gemId2, gemId3]),
+    ).to.eql([
+      'ipfs://gems/typeA/left.svg',
+      'ipfs://gems/typeA/full.svg',
+      'ipfs://gems/typeB/right.svg',
+    ]);
   });
 
   it('can get equippable slots from parent for pending child', async function () {
