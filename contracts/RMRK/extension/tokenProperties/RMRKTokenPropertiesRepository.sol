@@ -23,9 +23,9 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
     mapping(address => mapping(address => bool)) private _collaborators;
 
     // For keys, we use a mapping from strings to IDs.
-    // The purpose is to store unique string keys only once, since they are more expensive,
-    mapping(address => mapping(string => uint256)) private _keysToIds;
-    mapping(address => uint256) private _totalProperties;
+    // The purpose is to store unique string keys only once, since they are more expensive.
+    mapping(string => uint256) private _keysToIds;
+    uint256 private _totalProperties;
 
     // For strings, we also use a mapping from strings to IDs, together with a reverse mapping
     // The purpose is to store unique string values only once, since they are more expensive,
@@ -95,7 +95,7 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
         AccessType accessType,
         address specificAddress
     ) external onlyRegisteredCollection(collection) onlyIssuer(collection) {
-        uint256 parameterId = _getIdForKey(collection, key);
+        uint256 parameterId = _getIdForKey(key);
 
         _parameterAccessType[collection][parameterId] = accessType;
         _parameterSpecificAddress[collection][parameterId] = specificAddress;
@@ -114,7 +114,7 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
         if (collaboratorAddresses.length != collaboratorAddressAccess.length) {
             revert RMRKCollaboratorArraysNotEqualLength();
         }
-        for (uint256 i = 0; i < collaboratorAddresses.length; i++) {
+        for (uint256 i; i < collaboratorAddresses.length; ) {
             _collaborators[collection][
                 collaboratorAddresses[i]
             ] = collaboratorAddressAccess[i];
@@ -123,6 +123,9 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
                 collaboratorAddresses[i],
                 collaboratorAddressAccess[i]
             );
+            unchecked {
+                i++;
+            }
         }
     }
 
@@ -145,9 +148,8 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
         string memory key
     ) external view returns (bool) {
         return
-            _parameterSpecificAddress[collection][
-                _keysToIds[collection][key]
-            ] == specificAddress;
+            _parameterSpecificAddress[collection][_keysToIds[key]] ==
+            specificAddress;
     }
 
     /**
@@ -218,7 +220,7 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
         uint256 tokenId
     ) private view {
         AccessType accessType = _parameterAccessType[collection][
-            _keysToIds[collection][key]
+            _keysToIds[key]
         ];
 
         if (
@@ -250,9 +252,8 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
             revert RMRKNotTokenOwner();
         } else if (
             accessType == AccessType.SpecificAddress &&
-            !(_parameterSpecificAddress[collection][
-                _keysToIds[collection][key]
-            ] == msg.sender)
+            !(_parameterSpecificAddress[collection][_keysToIds[key]] ==
+                msg.sender)
         ) {
             revert RMRKNotSpecificAddress();
         }
@@ -267,7 +268,7 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
         string memory key
     ) external view returns (string memory) {
         uint256 idForValue = _stringValueIds[collection][tokenId][
-            _keysToIds[collection][key]
+            _keysToIds[key]
         ];
         return _stringIdToValue[collection][idForValue];
     }
@@ -280,7 +281,7 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
         uint256 tokenId,
         string memory key
     ) external view returns (uint256) {
-        return _uintValues[collection][tokenId][_keysToIds[collection][key]];
+        return _uintValues[collection][tokenId][_keysToIds[key]];
     }
 
     /**
@@ -291,7 +292,7 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
         uint256 tokenId,
         string memory key
     ) external view returns (bool) {
-        return _boolValues[collection][tokenId][_keysToIds[collection][key]];
+        return _boolValues[collection][tokenId][_keysToIds[key]];
     }
 
     /**
@@ -302,7 +303,7 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
         uint256 tokenId,
         string memory key
     ) external view returns (address) {
-        return _addressValues[collection][tokenId][_keysToIds[collection][key]];
+        return _addressValues[collection][tokenId][_keysToIds[key]];
     }
 
     /**
@@ -313,7 +314,7 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
         uint256 tokenId,
         string memory key
     ) external view returns (bytes memory) {
-        return _bytesValues[collection][tokenId][_keysToIds[collection][key]];
+        return _bytesValues[collection][tokenId][_keysToIds[key]];
     }
 
     /**
@@ -330,7 +331,7 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
         string memory key,
         uint256 value
     ) external onlyAuthorizedCaller(collection, key, tokenId) {
-        _uintValues[collection][tokenId][_getIdForKey(collection, key)] = value;
+        _uintValues[collection][tokenId][_getIdForKey(key)] = value;
         emit UintPropertyUpdated(collection, tokenId, key, value);
     }
 
@@ -349,7 +350,7 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
         string memory value
     ) external onlyAuthorizedCaller(collection, key, tokenId) {
         _stringValueIds[collection][tokenId][
-            _getIdForKey(collection, key)
+            _getIdForKey(key)
         ] = _getStringIdForValue(collection, value);
         emit StringPropertyUpdated(collection, tokenId, key, value);
     }
@@ -368,7 +369,7 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
         string memory key,
         bool value
     ) external onlyAuthorizedCaller(collection, key, tokenId) {
-        _boolValues[collection][tokenId][_getIdForKey(collection, key)] = value;
+        _boolValues[collection][tokenId][_getIdForKey(key)] = value;
         emit BoolPropertyUpdated(collection, tokenId, key, value);
     }
 
@@ -386,9 +387,7 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
         string memory key,
         bytes memory value
     ) external onlyAuthorizedCaller(collection, key, tokenId) {
-        _bytesValues[collection][tokenId][
-            _getIdForKey(collection, key)
-        ] = value;
+        _bytesValues[collection][tokenId][_getIdForKey(key)] = value;
         emit BytesPropertyUpdated(collection, tokenId, key, value);
     }
 
@@ -406,9 +405,7 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
         string memory key,
         address value
     ) external onlyAuthorizedCaller(collection, key, tokenId) {
-        _addressValues[collection][tokenId][
-            _getIdForKey(collection, key)
-        ] = value;
+        _addressValues[collection][tokenId][_getIdForKey(key)] = value;
         emit AddressPropertyUpdated(collection, tokenId, key, value);
     }
 
@@ -416,20 +413,16 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
      * @notice Used to get the Id for a key. If the key does not exist, a new ID is created.
      *  IDs are shared among all tokens and types
      * @dev The ID of 0 is not used as it represents the default value.
-     * @param collection Address of the collection being checked for key ID
      * @param key The property key
      * @return The ID of the key
      */
-    function _getIdForKey(
-        address collection,
-        string memory key
-    ) internal returns (uint256) {
-        if (_keysToIds[collection][key] == 0) {
-            _totalProperties[collection]++;
-            _keysToIds[collection][key] = _totalProperties[collection];
-            return _totalProperties[collection];
+    function _getIdForKey(string memory key) internal returns (uint256) {
+        if (_keysToIds[key] == 0) {
+            _totalProperties++;
+            _keysToIds[key] = _totalProperties;
+            return _totalProperties;
         } else {
-            return _keysToIds[collection][key];
+            return _keysToIds[key];
         }
     }
 
