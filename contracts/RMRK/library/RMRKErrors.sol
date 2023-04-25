@@ -50,6 +50,12 @@ error RMRKChildAlreadyExists();
 error RMRKChildIndexOutOfRange();
 /// Attempting to find the index of a child token on a parent which does not own it.
 error RMRKChildNotFoundInParent();
+/// Attempting to pass collaborator address array and collaborator permission array of different lengths
+error RMRKCollaboratorArraysNotEqualLength();
+/// Attempting to register a collection that is already registered
+error RMRKCollectionAlreadyRegistered();
+/// Attempting to manage or interact with colleciton that is not registered
+error RMRKCollectionNotRegistered();
 /// Attempting to equip a `Part` with a child not approved by the Catalog
 error RMRKEquippableEquipNotAllowedByCatalog();
 /// Attempting to use ID 0, which is not supported
@@ -95,6 +101,12 @@ error RMRKNotApprovedForAssetsOrOwner();
 /// @dev When a token is nested, only the direct owner (NFT parent) can mange it. In that case, approved addresses are
 ///  not allowed to manage it, in order to ensure the expected behaviour
 error RMRKNotApprovedOrDirectOwner();
+/// Attempting to manage a collection without being the collection's collaborator
+error RMRKNotCollectionCollaborator();
+/// Attemting to manage a collection without being the collection's issuer
+error RMRKNotCollectionIssuer();
+/// Attempting to manage a collection without being the collection's issuer or collaborator
+error RMRKNotCollectionIssuerOrCollaborator();
 /// Attempting to compose an asset wihtout having an associated Catalog
 error RMRKNotComposableAsset();
 /// Attempting to unequip an item that isn't equipped
@@ -103,10 +115,16 @@ error RMRKNotEquipped();
 error RMRKNotOwner();
 /// Attempting to interact with a function without being the owner or contributor of the collection
 error RMRKNotOwnerOrContributor();
+/// Attempting to manage a collection without being the specific address
+error RMRKNotSpecificAddress();
+/// Attempting to manage a token without being its owner
+error RMRKNotTokenOwner();
 /// Attempting to transfer the ownership to the 0x0 address
 error RMRKNewOwnerIsZeroAddress();
 /// Attempting to assign a 0x0 address as a contributor
 error RMRKNewContributorIsZeroAddress();
+/// Attemtping to use `Ownable` interface without implementing it
+error RMRKOwnableNotImplemented();
 /// Attempting an operation requiring the token being nested, while it is not
 error RMRKParentIsNotNFT();
 /// Attempting to add a `Part` with an ID that is already used
