@@ -653,24 +653,6 @@ function nestMint(address to, uint256 tokenId, uint256 destinationId) external n
 | tokenId | uint256 | undefined |
 | destinationId | uint256 | undefined |
 
-### nestTransfer
-
-```solidity
-function nestTransfer(address to, uint256 tokenId, uint256 destinationId) external nonpayable
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| to | address | undefined |
-| tokenId | uint256 | undefined |
-| destinationId | uint256 | undefined |
-
 ### nestTransferFrom
 
 ```solidity
@@ -989,23 +971,6 @@ Used to retrieve the collection symbol.
 | Name | Type | Description |
 |---|---|---|
 | _0 | string | Symbol of the collection |
-
-### transfer
-
-```solidity
-function transfer(address to, uint256 tokenId) external nonpayable
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| to | address | undefined |
-| tokenId | uint256 | undefined |
 
 ### transferChild
 
