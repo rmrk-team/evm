@@ -151,6 +151,12 @@ async function shouldControlValidMintingErc20Pay(): Promise<void> {
     expect(await this.token.balanceOf(addrs[0].address)).to.equal(1);
   });
 
+  it('reduces total supply on burn', async function () {
+    const tokenId = await mintFromImplErc20Pay(this.token, addrs[0].address);
+    await this.token.connect(addrs[0])['burn(uint256)'](tokenId);
+    expect(await this.token.totalSupply()).to.equal(0);
+  });
+
   it('can mint multiple tokens through sale logic', async function () {
     await erc20.mint(addrs[0].address, ONE_ETH.mul(10));
     await erc20.connect(addrs[0]).approve(this.token.address, ONE_ETH.mul(10));

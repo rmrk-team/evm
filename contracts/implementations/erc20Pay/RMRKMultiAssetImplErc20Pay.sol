@@ -72,4 +72,17 @@ contract RMRKMultiAssetImplErc20Pay is
             }
         }
     }
+
+    function _beforeTokenTransfer(
+        address from,
+        address to,
+        uint256 tokenId
+    ) internal virtual override {
+        super._beforeTokenTransfer(from, to, tokenId);
+        if (to == address(0)) {
+            unchecked {
+                _totalSupply -= 1;
+            }
+        }
+    }
 }
