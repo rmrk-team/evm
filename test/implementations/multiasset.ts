@@ -80,6 +80,15 @@ describe('MultiAssetImpl Other Behavior', async () => {
       expect(await this.token.totalSupply()).to.equal(0);
     });
 
+    it('reduces total supply on burn and does not reuse Id', async function () {
+      const tokenId = await mintFromImplNativeToken(token, owner.address);
+      await this.token.connect(owner)['burn(uint256)'](tokenId);
+
+      const newTokenId = await mintFromImplNativeToken(this.token, owner.address);
+      expect(newTokenId).to.equal(tokenId.add(1));
+      expect(await this.token.totalSupply()).to.equal(1);
+    });
+
     it('can mint multiple tokens through sale logic', async function () {
       await token.connect(owner).mint(owner.address, 10, { value: ONE_ETH.mul(10) });
       expect(await token.totalSupply()).to.equal(10);

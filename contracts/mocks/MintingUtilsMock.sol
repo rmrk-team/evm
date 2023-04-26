@@ -11,7 +11,7 @@ contract MintingUtilsMock is RMRKMintingUtils {
     ) RMRKMintingUtils(maxSupply_, pricePerMint_) {}
 
     function setupTestSaleIsOpen() external {
-        _totalSupply = _maxSupply;
+        _nextId = _maxSupply;
     }
 
     function testSaleIsOpen() external view saleIsOpen returns (bool) {
@@ -20,5 +20,6 @@ contract MintingUtilsMock is RMRKMintingUtils {
 
     function mockMint(uint256 total) external payable {
         _totalSupply += total;
+        _nextId += total;
     }
 }

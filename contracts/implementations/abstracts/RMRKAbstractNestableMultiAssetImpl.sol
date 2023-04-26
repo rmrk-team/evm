@@ -34,16 +34,17 @@ abstract contract RMRKAbstractNestableMultiAssetImpl is
      */
     function _preMint(uint256 numToMint) internal returns (uint256, uint256) {
         if (numToMint == uint256(0)) revert RMRKMintZero();
-        if (numToMint + _totalSupply > _maxSupply) revert RMRKMintOverMax();
+        if (numToMint + _nextId > _maxSupply) revert RMRKMintOverMax();
 
         uint256 mintPriceRequired = numToMint * _pricePerMint;
         _charge(mintPriceRequired);
 
-        uint256 nextToken = _totalSupply + 1;
+        uint256 nextToken = _nextId + 1;
         unchecked {
+            _nextId += numToMint;
             _totalSupply += numToMint;
         }
-        uint256 totalSupplyOffset = _totalSupply + 1;
+        uint256 totalSupplyOffset = _nextId + 1;
 
         return (nextToken, totalSupplyOffset);
     }
