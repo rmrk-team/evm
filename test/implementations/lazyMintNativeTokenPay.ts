@@ -42,7 +42,7 @@ async function nestableMultiAssetFixture(): Promise<Contract> {
 }
 
 async function nestableExternalEquipFixture(): Promise<Contract> {
-  return await singleFixtureWithArgs('RMRKNestableExternalEquipImpl', [
+  const nestable = await singleFixtureWithArgs('RMRKNestableExternalEquipImpl', [
     ADDRESS_ZERO,
     'MultiAsset',
     'MA',
@@ -50,6 +50,11 @@ async function nestableExternalEquipFixture(): Promise<Contract> {
     'ipfs://tokenURI',
     [ADDRESS_ZERO, false, ADDRESS_ZERO, 0, 10000, ONE_ETH],
   ]);
+
+  const equippable = await singleFixtureWithArgs('RMRKExternalEquipImpl', [nestable.address]);
+  await nestable.setEquippableAddress(equippable.address);
+
+  return nestable;
 }
 
 async function equippableFixture(): Promise<Contract> {
@@ -143,6 +148,12 @@ async function shouldControlValidMintingNativeTokenPay(): Promise<void> {
     expect(await this.token.ownerOf(1)).to.equal(addrs[0].address);
     expect(await this.token.totalSupply()).to.equal(1);
     expect(await this.token.balanceOf(addrs[0].address)).to.equal(1);
+  });
+
+  it('reduces total supply on burn', async function () {
+    const tokenId = await mintFromImplNativeToken(this.token, addrs[0].address);
+    await this.token.connect(addrs[0])['burn(uint256)'](tokenId);
+    expect(await this.token.totalSupply()).to.equal(0);
   });
 
   it('can mint multiple tokens through sale logic', async function () {
