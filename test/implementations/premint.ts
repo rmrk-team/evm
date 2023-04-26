@@ -126,6 +126,20 @@ async function shouldControlValidPreMinting(): Promise<void> {
     expect(await this.token.totalSupply()).to.equal(0);
   });
 
+  it('reduces total supply on burn and does not reuse Id', async function () {
+    let tx = await this.token.connect(owner).mint(owner.address, 1);
+    let event = (await tx.wait()).events?.find((e) => e.event === 'Transfer');
+    const tokenId = event?.args?.tokenId;
+    await this.token.connect(owner)['burn(uint256)'](tokenId);
+
+    tx = await this.token.connect(owner).mint(owner.address, 1);
+    event = (await tx.wait()).events?.find((e) => e.event === 'Transfer');
+    const newTokenId = event?.args?.tokenId;
+
+    expect(newTokenId).to.equal(tokenId.add(1));
+    expect(await this.token.totalSupply()).to.equal(1);
+  });
+
   describe('Nest minting', async () => {
     beforeEach(async function () {
       if (this.token.nestMint === undefined) {

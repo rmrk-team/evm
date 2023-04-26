@@ -15,6 +15,7 @@ async function mintFromMock(token: Contract, to: string): Promise<number> {
   const tokenId = nextTokenId;
   nextTokenId++;
   await token['mint(address,uint256)'](to, tokenId);
+
   return tokenId;
 }
 
@@ -25,7 +26,7 @@ async function nestMintFromMock(token: Contract, to: string, parentId: number): 
   return childTokenId;
 }
 
-async function mintFromImplErc20Pay(token: Contract, to: string): Promise<number> {
+async function mintFromImplErc20Pay(token: Contract, to: string): Promise<BigNumber> {
   const erc20Address = token.erc20TokenAddress();
   const erc20Factory = await ethers.getContractFactory('ERC20Mock');
   const erc20 = erc20Factory.attach(erc20Address);
@@ -34,20 +35,26 @@ async function mintFromImplErc20Pay(token: Contract, to: string): Promise<number
   await erc20.mint(owner.address, ONE_ETH);
   await erc20.approve(token.address, ONE_ETH);
 
-  await token.mint(to, 1);
-  return await token.totalSupply();
+  const tx = await token.mint(to, 1);
+  // Get the event from the tx
+  const event = (await tx.wait()).events?.find((e) => e.event === 'Transfer');
+  // Get the tokenId from the event
+  return event?.args?.tokenId;
 }
 
-async function mintFromImplNativeToken(token: Contract, to: string): Promise<number> {
-  await token.mint(to, 1, { value: ONE_ETH });
-  return await token.totalSupply();
+async function mintFromImplNativeToken(token: Contract, to: string): Promise<BigNumber> {
+  const tx = await token.mint(to, 1, { value: ONE_ETH });
+  // Get the event from the tx
+  const event = (await tx.wait()).events?.find((e) => e.event === 'Transfer');
+  // Get the tokenId from the event
+  return event?.args?.tokenId;
 }
 
 async function nestMintFromImplErc20Pay(
   token: Contract,
   to: string,
   destinationId: number,
-): Promise<number> {
+): Promise<BigNumber> {
   const erc20Address = token.erc20TokenAddress();
   const erc20Factory = await ethers.getContractFactory('ERC20Mock');
   const erc20 = erc20Factory.attach(erc20Address);
@@ -56,17 +63,23 @@ async function nestMintFromImplErc20Pay(
   await erc20.mint(owner.address, ONE_ETH);
   await erc20.approve(token.address, ONE_ETH);
 
-  await token.nestMint(to, 1, destinationId);
-  return await token.totalSupply();
+  const tx = await token.nestMint(to, 1, destinationId);
+  // Get the event from the tx
+  const event = (await tx.wait()).events?.find((e) => e.event === 'Transfer');
+  // Get the tokenId from the event
+  return event?.args?.tokenId;
 }
 
 async function nestMintFromImplNativeToken(
   token: Contract,
   to: string,
   destinationId: number,
-): Promise<number> {
-  await token.nestMint(to, 1, destinationId, { value: ONE_ETH });
-  return await token.totalSupply();
+): Promise<BigNumber> {
+  const tx = await token.nestMint(to, 1, destinationId, { value: ONE_ETH });
+  // Get the event from the tx
+  const event = (await tx.wait()).events?.find((e) => e.event === 'Transfer');
+  // Get the tokenId from the event
+  return event?.args?.tokenId;
 }
 
 async function transfer(

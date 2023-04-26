@@ -156,6 +156,15 @@ async function shouldControlValidMintingNativeTokenPay(): Promise<void> {
     expect(await this.token.totalSupply()).to.equal(0);
   });
 
+  it('reduces total supply on burn and does not reuse Id', async function () {
+    const tokenId = await mintFromImplNativeToken(this.token, addrs[0].address);
+    await this.token.connect(addrs[0])['burn(uint256)'](tokenId);
+
+    const newTokenId = await mintFromImplNativeToken(this.token, addrs[0].address);
+    expect(newTokenId).to.equal(tokenId.add(1));
+    expect(await this.token.totalSupply()).to.equal(1);
+  });
+
   it('can mint multiple tokens through sale logic', async function () {
     await this.token.connect(addrs[0]).mint(addrs[0].address, 10, { value: ONE_ETH.mul(10) });
     expect(await this.token.totalSupply()).to.equal(10);
