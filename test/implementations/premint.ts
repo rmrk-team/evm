@@ -119,6 +119,13 @@ async function shouldControlValidPreMinting(): Promise<void> {
     ).to.be.revertedWithCustomError(this.token, 'RMRKLocked');
   });
 
+  it('reduces total supply on burn', async function () {
+    await this.token.connect(owner).mint(owner.address, 1);
+    const tokenId = this.token.totalSupply();
+    await this.token.connect(owner)['burn(uint256)'](tokenId);
+    expect(await this.token.totalSupply()).to.equal(0);
+  });
+
   describe('Nest minting', async () => {
     beforeEach(async function () {
       if (this.token.nestMint === undefined) {
