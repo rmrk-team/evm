@@ -12,6 +12,7 @@ import "../library/RMRKErrors.sol";
  * @dev Max supply-related and pricing variables are immutable after deployment.
  */
 contract RMRKMintingUtils is OwnableLock {
+    uint256 internal _nextId;
     uint256 internal _totalSupply;
     uint256 internal _maxSupply;
     uint256 internal immutable _pricePerMint;
@@ -93,6 +94,6 @@ contract RMRKMintingUtils is OwnableLock {
      * @dev In case the maximum supply of the collection is reached, the execution is reverted.
      */
     function _checkSaleIsOpen() private view {
-        if (_totalSupply >= _maxSupply) revert RMRKMintOverMax();
+        if (_nextId >= _maxSupply) revert RMRKMintOverMax();
     }
 }
