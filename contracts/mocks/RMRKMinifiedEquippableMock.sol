@@ -33,20 +33,6 @@ contract RMRKMinifiedEquippableMock is RMRKMinifiedEquippable {
         _nestMint(to, tokenId, destinationId, "");
     }
 
-    // Utility transfers:
-
-    function transfer(address to, uint256 tokenId) public virtual {
-        transferFrom(_msgSender(), to, tokenId);
-    }
-
-    function nestTransfer(
-        address to,
-        uint256 tokenId,
-        uint256 destinationId
-    ) public virtual {
-        nestTransferFrom(_msgSender(), to, tokenId, destinationId, "");
-    }
-
     function addAssetToToken(
         uint256 tokenId,
         uint64 assetId,
