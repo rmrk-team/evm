@@ -126,7 +126,7 @@ async function shouldControlValidPreMinting(): Promise<void> {
     expect(await this.token.totalSupply()).to.equal(0);
   });
 
-  it('reduces total supply on burn and does not reuse Id', async function () {
+  it('reduces total supply on burn and does not reuse ID', async function () {
     let tx = await this.token.connect(owner).mint(owner.address, 1);
     let event = (await tx.wait()).events?.find((e) => e.event === 'Transfer');
     const tokenId = event?.args?.tokenId;
