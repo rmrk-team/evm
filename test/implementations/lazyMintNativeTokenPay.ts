@@ -152,6 +152,7 @@ async function shouldControlValidMintingNativeTokenPay(): Promise<void> {
 
   it('reduces total supply on burn', async function () {
     const tokenId = await mintFromImplNativeToken(this.token, addrs[0].address);
+    expect(await this.token.totalSupply()).to.equal(1);
     await this.token.connect(addrs[0])['burn(uint256)'](tokenId);
     expect(await this.token.totalSupply()).to.equal(0);
   });
