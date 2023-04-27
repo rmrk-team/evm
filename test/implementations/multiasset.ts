@@ -80,7 +80,7 @@ describe('MultiAssetImpl Other Behavior', async () => {
       expect(await this.token.totalSupply()).to.equal(0);
     });
 
-    it('reduces total supply on burn and does not reuse Id', async function () {
+    it('reduces total supply on burn and does not reuse ID', async function () {
       const tokenId = await mintFromImplNativeToken(token, owner.address);
       await this.token.connect(owner)['burn(uint256)'](tokenId);
 
