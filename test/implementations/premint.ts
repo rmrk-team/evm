@@ -122,6 +122,7 @@ async function shouldControlValidPreMinting(): Promise<void> {
   it('reduces total supply on burn', async function () {
     await this.token.connect(owner).mint(owner.address, 1);
     const tokenId = this.token.totalSupply();
+    expect(await tokenId).to.equal(1);
     await this.token.connect(owner)['burn(uint256)'](tokenId);
     expect(await this.token.totalSupply()).to.equal(0);
   });
