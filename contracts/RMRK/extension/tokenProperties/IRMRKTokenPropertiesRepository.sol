@@ -27,6 +27,56 @@ interface IRMRKTokenPropertiesRepository is IERC165 {
     }
 
     /**
+     * @notice Structure used to represent a string property.
+     * @return key The key of the property
+     * @return value The value of the property
+     */
+    struct StringProperty {
+        string key;
+        string value;
+    }
+
+    /**
+     * @notice Structure used to represent an uint property.
+     * @return key The key of the property
+     * @return value The value of the property
+     */
+    struct UintProperty {
+        string key;
+        uint256 value;
+    }
+
+    /**
+     * @notice Structure used to represent a boolean property.
+     * @return key The key of the property
+     * @return value The value of the property
+     */
+    struct BoolProperty {
+        string key;
+        bool value;
+    }
+
+    /**
+     * @notice Structure used to represent an address property.
+     * @return key The key of the property
+     * @return value The value of the property
+     */
+    struct AddressProperty {
+        string key;
+        address value;
+    }
+
+    /**
+     * @notice Structure used to represent a bytes property.
+     * @return key The key of the property
+     * @return value The value of the property
+     */
+    struct BytesProperty {
+        string key;
+        bytes value;
+    }
+
+    /**
      * @notice Used to notify listeners that a new collection has been registered to use the repository.
      * @param collection Address of the collection
      * @param issuer Address of the issuer of the collection; the addess authorized to manage the access control
@@ -195,6 +245,193 @@ interface IRMRKTokenPropertiesRepository is IERC165 {
     ) external;
 
     /**
+     * @notice Used to set a number property.
+     * @dev Emits a {UintPropertyUpdated} event.
+     * @param collection Address of the collection receiving the property
+     * @param tokenId The token ID
+     * @param key The property key
+     * @param value The property value
+     */
+    function setUintProperty(
+        address collection,
+        uint256 tokenId,
+        string memory key,
+        uint256 value
+    ) external;
+
+    /**
+     * @notice Used to set a string property.
+     * @dev Emits a {StringPropertyUpdated} event.
+     * @param collection Address of the collection receiving the property
+     * @param tokenId The token ID
+     * @param key The property key
+     * @param value The property value
+     */
+    function setStringProperty(
+        address collection,
+        uint256 tokenId,
+        string memory key,
+        string memory value
+    ) external;
+
+    /**
+     * @notice Used to set a boolean property.
+     * @dev Emits a {BoolPropertyUpdated} event.
+     * @param collection Address of the collection receiving the property
+     * @param tokenId The token ID
+     * @param key The property key
+     * @param value The property value
+     */
+    function setBoolProperty(
+        address collection,
+        uint256 tokenId,
+        string memory key,
+        bool value
+    ) external;
+
+    /**
+     * @notice Used to set an bytes property.
+     * @dev Emits a {BytesPropertyUpdated} event.
+     * @param collection Address of the collection receiving the property
+     * @param tokenId The token ID
+     * @param key The property key
+     * @param value The property value
+     */
+    function setBytesProperty(
+        address collection,
+        uint256 tokenId,
+        string memory key,
+        bytes memory value
+    ) external;
+
+    /**
+     * @notice Used to set an address property.
+     * @dev Emits a {AddressPropertyUpdated} event.
+     * @param collection Address of the collection receiving the property
+     * @param tokenId The token ID
+     * @param key The property key
+     * @param value The property value
+     */
+    function setAddressProperty(
+        address collection,
+        uint256 tokenId,
+        string memory key,
+        address value
+    ) external;
+
+    /**
+     * @notice Sets multiple string properties for a token at once.
+     * @dev The `StringProperty` struct contains the following fields:
+     *  [
+     *      string key,
+     *      string value
+     *  ]
+     * @param collection Address of the collection
+     * @param tokenId ID of the token
+     * @param properties An array of `StringProperty` structs to be assigned to the given token
+     */
+    function setStringProperties(
+        address collection,
+        uint256 tokenId,
+        StringProperty[] memory properties
+    ) external;
+
+    /**
+     * @notice Sets multiple uint properties for a token at once.
+     * @dev The `UintProperty` struct contains the following fields:
+     *  [
+     *      string key,
+     *      uint value
+     *  ]
+     * @param collection Address of the collection
+     * @param tokenId ID of the token
+     * @param properties An array of `UintProperty` structs to be assigned to the given token
+     */
+    function setUintProperties(
+        address collection,
+        uint256 tokenId,
+        UintProperty[] memory properties
+    ) external;
+
+    /**
+     * @notice Sets multiple bool properties for a token at once.
+     * @dev The `BoolProperty` struct contains the following fields:
+     *  [
+     *      string key,
+     *      bool value
+     *  ]
+     * @param collection Address of the collection
+     * @param tokenId ID of the token
+     * @param properties An array of `BoolProperty` structs to be assigned to the given token
+     */
+    function setBoolProperties(
+        address collection,
+        uint256 tokenId,
+        BoolProperty[] memory properties
+    ) external;
+
+    /**
+     * @notice Sets multiple address properties for a token at once.
+     * @dev The `AddressProperty` struct contains the following fields:
+     *  [
+     *      string key,
+     *      address value
+     *  ]
+     * @param collection Address of the collection
+     * @param tokenId ID of the token
+     * @param properties An array of `AddressProperty` structs to be assigned to the given token
+     */
+    function setAddressProperties(
+        address collection,
+        uint256 tokenId,
+        AddressProperty[] memory properties
+    ) external;
+
+    /**
+     * @notice Sets multiple bytes properties for a token at once.
+     * @dev The `BytesProperty` struct contains the following fields:
+     *  [
+     *      string key,
+     *      bytes value
+     *  ]
+     * @param collection Address of the collection
+     * @param tokenId ID of the token
+     * @param properties An array of `BytesProperty` structs to be assigned to the given token
+     */
+    function setBytesProperties(
+        address collection,
+        uint256 tokenId,
+        BytesProperty[] memory properties
+    ) external;
+
+    /**
+     * @notice Sets multiple properties of multiple types for a token at the same time.
+     * @dev Emits a separate event for each property set.
+     * @dev The `StringProperty`, `UintProperty`, `BoolProperty`, `AddressProperty` and `BytesProperty` structs consists
+     *  to the following fields (where `value` is of the appropriate type):
+     *  [
+     *      key,
+     *      value,
+     *  ]
+     * @param collection The address of the collection
+     * @param tokenId The token ID
+     * @param stringProperties An array of `StringProperty` structs containing string properties to set
+     * @param uintProperties An array of `UintProperty` structs containing uint properties to set
+     * @param boolProperties An array of `BoolProperty` structs containing bool properties to set
+     * @param addressProperties An array of `AddressProperty` structs containing address properties to set
+     * @param bytesProperties An array of `BytesProperty` structs containing bytes properties to set
+     */
+    function setProperties(
+        address collection,
+        uint256 tokenId,
+        StringProperty[] memory stringProperties,
+        UintProperty[] memory uintProperties,
+        BoolProperty[] memory boolProperties,
+        AddressProperty[] memory addressProperties,
+        BytesProperty[] memory bytesProperties
+    ) external;
+
+    /**
      * @notice Used to check if the specified address is listed as a collaborator of the given collection's parameter.
      * @param collaborator Address to be checked.
      * @param collection Address of the collection.
@@ -285,4 +522,44 @@ interface IRMRKTokenPropertiesRepository is IERC165 {
         uint256 tokenId,
         string memory key
     ) external view returns (bytes memory);
+
+    /**
+     * @notice Used to retrieve multiple token properties of any type at once.
+     * @dev The `StringProperty`, `UintProperty`, `BoolProperty`, `AddressProperty` and `BytesProperty` structs consists
+     *  to the following fields (where `value` is of the appropriate type):
+     *  [
+     *      key,
+     *      value,
+     *  ]
+     * @param collection The collection address
+     * @param tokenId The token ID
+     * @param stringKeys An array of string type property keys to retrieve
+     * @param uintKeys An array of uint type property keys to retrieve
+     * @param boolKeys An array of bool type property keys to retrieve
+     * @param addressKeys An array of address type property keys to retrieve
+     * @param bytesKeys An array of bytes type property keys to retrieve
+     * @return stringProperties An array of `StringProperty` structs containing the string type properties
+     * @return uintProperties An array of `UintProperty` structs containing the uint type properties
+     * @return boolProperties An array of `BoolProperty` structs containing the bool type properties
+     * @return addressProperties An array of `AddressProperty` structs containing the address type properties
+     * @return bytesProperties An array of `BytesProperty` structs containing the bytes type properties
+     */
+    function getTokenProperties(
+        address collection,
+        uint256 tokenId,
+        string[] memory stringKeys,
+        string[] memory uintKeys,
+        string[] memory boolKeys,
+        string[] memory addressKeys,
+        string[] memory bytesKeys
+    )
+        external
+        view
+        returns (
+            StringProperty[] memory stringProperties,
+            UintProperty[] memory uintProperties,
+            BoolProperty[] memory boolProperties,
+            AddressProperty[] memory addressProperties,
+            BytesProperty[] memory bytesProperties
+        );
 }
