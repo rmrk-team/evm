@@ -106,6 +106,38 @@ Used to retrieve the string type token properties.
 |---|---|---|
 | _0 | string | The value of the string property |
 
+### getTokenProperties
+
+```solidity
+function getTokenProperties(address collection, uint256 tokenId, string[] stringKeys, string[] uintKeys, string[] boolKeys, string[] addressKeys, string[] bytesKeys) external view returns (struct IRMRKTokenPropertiesRepository.StringProperty[] stringProperties, struct IRMRKTokenPropertiesRepository.UintProperty[] uintProperties, struct IRMRKTokenPropertiesRepository.BoolProperty[] boolProperties, struct IRMRKTokenPropertiesRepository.AddressProperty[] addressProperties, struct IRMRKTokenPropertiesRepository.BytesProperty[] bytesProperties)
+```
+
+Used to retrieve multiple token properties of any type at once.
+
+*The `StringProperty`, `UintProperty`, `BoolProperty`, `AddressProperty` and `BytesProperty` structs consists  to the following fields (where `value` is of the appropriate type):  [      key,      value,  ]*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| collection | address | The collection address |
+| tokenId | uint256 | The token ID |
+| stringKeys | string[] | An array of string type property keys to retrieve |
+| uintKeys | string[] | An array of uint type property keys to retrieve |
+| boolKeys | string[] | An array of bool type property keys to retrieve |
+| addressKeys | string[] | An array of address type property keys to retrieve |
+| bytesKeys | string[] | An array of bytes type property keys to retrieve |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| stringProperties | IRMRKTokenPropertiesRepository.StringProperty[] | An array of `StringProperty` structs containing the string type properties |
+| uintProperties | IRMRKTokenPropertiesRepository.UintProperty[] | An array of `UintProperty` structs containing the uint type properties |
+| boolProperties | IRMRKTokenPropertiesRepository.BoolProperty[] | An array of `BoolProperty` structs containing the bool type properties |
+| addressProperties | IRMRKTokenPropertiesRepository.AddressProperty[] | An array of `AddressProperty` structs containing the address type properties |
+| bytesProperties | IRMRKTokenPropertiesRepository.BytesProperty[] | An array of `BytesProperty` structs containing the bytes type properties |
+
 ### getUintTokenProperty
 
 ```solidity
@@ -232,6 +264,24 @@ Used to register a collection to use the RMRK token properties repository.
 | issuer | address | The address of the issuer of the collection. |
 | useOwnable | bool | The boolean value to indicate if the collection implements the Ownable interface and whether it  should be used to validate that the caller is the issuer (`true`) or to use the manually set issuer address  (`false`). |
 
+### setAddressProperties
+
+```solidity
+function setAddressProperties(address collection, uint256 tokenId, IRMRKTokenPropertiesRepository.AddressProperty[] properties) external nonpayable
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| collection | address | undefined |
+| tokenId | uint256 | undefined |
+| properties | IRMRKTokenPropertiesRepository.AddressProperty[] | undefined |
+
 ### setAddressProperty
 
 ```solidity
@@ -250,6 +300,24 @@ Used to set an address property.
 | tokenId | uint256 | The token ID |
 | key | string | The property key |
 | value | address | The property value |
+
+### setBoolProperties
+
+```solidity
+function setBoolProperties(address collection, uint256 tokenId, IRMRKTokenPropertiesRepository.BoolProperty[] properties) external nonpayable
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| collection | address | undefined |
+| tokenId | uint256 | undefined |
+| properties | IRMRKTokenPropertiesRepository.BoolProperty[] | undefined |
 
 ### setBoolProperty
 
@@ -270,6 +338,24 @@ Used to set a boolean property.
 | key | string | The property key |
 | value | bool | The property value |
 
+### setBytesProperties
+
+```solidity
+function setBytesProperties(address collection, uint256 tokenId, IRMRKTokenPropertiesRepository.BytesProperty[] properties) external nonpayable
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| collection | address | undefined |
+| tokenId | uint256 | undefined |
+| properties | IRMRKTokenPropertiesRepository.BytesProperty[] | undefined |
+
 ### setBytesProperty
 
 ```solidity
@@ -289,6 +375,46 @@ Used to set an bytes property.
 | key | string | The property key |
 | value | bytes | The property value |
 
+### setProperties
+
+```solidity
+function setProperties(address collection, uint256 tokenId, IRMRKTokenPropertiesRepository.StringProperty[] stringProperties, IRMRKTokenPropertiesRepository.UintProperty[] uintProperties, IRMRKTokenPropertiesRepository.BoolProperty[] boolProperties, IRMRKTokenPropertiesRepository.AddressProperty[] addressProperties, IRMRKTokenPropertiesRepository.BytesProperty[] bytesProperties) external nonpayable
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| collection | address | undefined |
+| tokenId | uint256 | undefined |
+| stringProperties | IRMRKTokenPropertiesRepository.StringProperty[] | undefined |
+| uintProperties | IRMRKTokenPropertiesRepository.UintProperty[] | undefined |
+| boolProperties | IRMRKTokenPropertiesRepository.BoolProperty[] | undefined |
+| addressProperties | IRMRKTokenPropertiesRepository.AddressProperty[] | undefined |
+| bytesProperties | IRMRKTokenPropertiesRepository.BytesProperty[] | undefined |
+
+### setStringProperties
+
+```solidity
+function setStringProperties(address collection, uint256 tokenId, IRMRKTokenPropertiesRepository.StringProperty[] properties) external nonpayable
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| collection | address | undefined |
+| tokenId | uint256 | undefined |
+| properties | IRMRKTokenPropertiesRepository.StringProperty[] | undefined |
+
 ### setStringProperty
 
 ```solidity
@@ -307,6 +433,24 @@ Used to set a string property.
 | tokenId | uint256 | The token ID |
 | key | string | The property key |
 | value | string | The property value |
+
+### setUintProperties
+
+```solidity
+function setUintProperties(address collection, uint256 tokenId, IRMRKTokenPropertiesRepository.UintProperty[] properties) external nonpayable
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| collection | address | undefined |
+| tokenId | uint256 | undefined |
+| properties | IRMRKTokenPropertiesRepository.UintProperty[] | undefined |
 
 ### setUintProperty
 

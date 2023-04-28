@@ -15,7 +15,7 @@ const IRMRKNestableExternalEquip = '0x8b7f3e99';
 const IRMRKReclaimableChild = '0x2fb59acf';
 const IRMRKSoulbound = '0xa7331ab1'; // ERC6454
 const IRMRKTokenProperties = '0x6a49fd01';
-const IRMRKTokenPropertiesRepository = '0xb3b0f3a7';
+const IRMRKTokenPropertiesRepository = '0x226ab23b';
 const IRMRKTypedMultiAsset = '0x7f7bb665';
 
 export {

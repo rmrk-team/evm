@@ -163,6 +163,488 @@ describe('RMRKTokenPropertiesRepository', async function () {
       ).to.eql('test description update');
     });
 
+    it('can set multiple properties of multiple types at the same time', async function () {
+      await expect(
+        tokenProperties.setProperties(
+          ownedCollection.address,
+          tokenId,
+          [
+            { key: 'string1', value: 'value1' },
+            { key: 'string2', value: 'value2' },
+          ],
+          [
+            { key: 'uint1', value: bn(1) },
+            { key: 'uint2', value: bn(2) },
+          ],
+          [
+            { key: 'bool1', value: true },
+            { key: 'bool2', value: false },
+          ],
+          [
+            { key: 'address1', value: owner.address },
+            { key: 'address2', value: issuer.address },
+          ],
+          [
+            { key: 'bytes1', value: '0x1234' },
+            { key: 'bytes2', value: '0x5678' },
+          ],
+        ),
+      )
+        .to.emit(tokenProperties, 'StringPropertyUpdated')
+        .withArgs(ownedCollection.address, tokenId, 'string1', 'value1')
+        .to.emit(tokenProperties, 'StringPropertyUpdated')
+        .withArgs(ownedCollection.address, tokenId, 'string2', 'value2')
+        .to.emit(tokenProperties, 'UintPropertyUpdated')
+        .withArgs(ownedCollection.address, tokenId, 'uint1', bn(1))
+        .to.emit(tokenProperties, 'UintPropertyUpdated')
+        .withArgs(ownedCollection.address, tokenId, 'uint2', bn(2))
+        .to.emit(tokenProperties, 'BoolPropertyUpdated')
+        .withArgs(ownedCollection.address, tokenId, 'bool1', true)
+        .to.emit(tokenProperties, 'BoolPropertyUpdated')
+        .withArgs(ownedCollection.address, tokenId, 'bool2', false)
+        .to.emit(tokenProperties, 'AddressPropertyUpdated')
+        .withArgs(ownedCollection.address, tokenId, 'address1', owner.address)
+        .to.emit(tokenProperties, 'AddressPropertyUpdated')
+        .withArgs(ownedCollection.address, tokenId, 'address2', issuer.address)
+        .to.emit(tokenProperties, 'BytesPropertyUpdated')
+        .withArgs(ownedCollection.address, tokenId, 'bytes1', '0x1234')
+        .to.emit(tokenProperties, 'BytesPropertyUpdated')
+        .withArgs(ownedCollection.address, tokenId, 'bytes2', '0x5678');
+    });
+
+    it('can update multiple properties of multiple types at the same time', async function () {
+      await tokenProperties.setProperties(
+        ownedCollection.address,
+        tokenId,
+        [
+          { key: 'string1', value: 'value0' },
+          { key: 'string2', value: 'value1' },
+        ],
+        [
+          { key: 'uint1', value: bn(0) },
+          { key: 'uint2', value: bn(1) },
+        ],
+        [
+          { key: 'bool1', value: false },
+          { key: 'bool2', value: true },
+        ],
+        [
+          { key: 'address1', value: issuer.address },
+          { key: 'address2', value: owner.address },
+        ],
+        [
+          { key: 'bytes1', value: '0x5678' },
+          { key: 'bytes2', value: '0x1234' },
+        ],
+      );
+
+      await expect(
+        tokenProperties.setProperties(
+          ownedCollection.address,
+          tokenId,
+          [
+            { key: 'string1', value: 'value1' },
+            { key: 'string2', value: 'value2' },
+          ],
+          [
+            { key: 'uint1', value: bn(1) },
+            { key: 'uint2', value: bn(2) },
+          ],
+          [
+            { key: 'bool1', value: true },
+            { key: 'bool2', value: false },
+          ],
+          [
+            { key: 'address1', value: owner.address },
+            { key: 'address2', value: issuer.address },
+          ],
+          [
+            { key: 'bytes1', value: '0x1234' },
+            { key: 'bytes2', value: '0x5678' },
+          ],
+        ),
+      )
+        .to.emit(tokenProperties, 'StringPropertyUpdated')
+        .withArgs(ownedCollection.address, tokenId, 'string1', 'value1')
+        .to.emit(tokenProperties, 'StringPropertyUpdated')
+        .withArgs(ownedCollection.address, tokenId, 'string2', 'value2')
+        .to.emit(tokenProperties, 'UintPropertyUpdated')
+        .withArgs(ownedCollection.address, tokenId, 'uint1', bn(1))
+        .to.emit(tokenProperties, 'UintPropertyUpdated')
+        .withArgs(ownedCollection.address, tokenId, 'uint2', bn(2))
+        .to.emit(tokenProperties, 'BoolPropertyUpdated')
+        .withArgs(ownedCollection.address, tokenId, 'bool1', true)
+        .to.emit(tokenProperties, 'BoolPropertyUpdated')
+        .withArgs(ownedCollection.address, tokenId, 'bool2', false)
+        .to.emit(tokenProperties, 'AddressPropertyUpdated')
+        .withArgs(ownedCollection.address, tokenId, 'address1', owner.address)
+        .to.emit(tokenProperties, 'AddressPropertyUpdated')
+        .withArgs(ownedCollection.address, tokenId, 'address2', issuer.address)
+        .to.emit(tokenProperties, 'BytesPropertyUpdated')
+        .withArgs(ownedCollection.address, tokenId, 'bytes1', '0x1234')
+        .to.emit(tokenProperties, 'BytesPropertyUpdated')
+        .withArgs(ownedCollection.address, tokenId, 'bytes2', '0x5678');
+    });
+
+    it('can set and update multiple properties of multiple types at the same time even if not all types are updated at the same time', async function () {
+      await tokenProperties.setProperties(
+        ownedCollection.address,
+        tokenId,
+        [{ key: 'string1', value: 'value0' }],
+        [
+          { key: 'uint1', value: bn(0) },
+          { key: 'uint2', value: bn(1) },
+        ],
+        [
+          { key: 'bool1', value: false },
+          { key: 'bool2', value: true },
+        ],
+        [
+          { key: 'address1', value: issuer.address },
+          { key: 'address2', value: owner.address },
+        ],
+        [],
+      );
+
+      await expect(
+        tokenProperties.setProperties(
+          ownedCollection.address,
+          tokenId,
+          [],
+          [
+            { key: 'uint1', value: bn(1) },
+            { key: 'uint2', value: bn(2) },
+          ],
+          [
+            { key: 'bool1', value: true },
+            { key: 'bool2', value: false },
+          ],
+          [
+            { key: 'address1', value: owner.address },
+            { key: 'address2', value: issuer.address },
+          ],
+          [
+            { key: 'bytes1', value: '0x1234' },
+            { key: 'bytes2', value: '0x5678' },
+          ],
+        ),
+      )
+        .to.emit(tokenProperties, 'UintPropertyUpdated')
+        .withArgs(ownedCollection.address, tokenId, 'uint1', bn(1))
+        .to.emit(tokenProperties, 'UintPropertyUpdated')
+        .withArgs(ownedCollection.address, tokenId, 'uint2', bn(2))
+        .to.emit(tokenProperties, 'BoolPropertyUpdated')
+        .withArgs(ownedCollection.address, tokenId, 'bool1', true)
+        .to.emit(tokenProperties, 'BoolPropertyUpdated')
+        .withArgs(ownedCollection.address, tokenId, 'bool2', false)
+        .to.emit(tokenProperties, 'AddressPropertyUpdated')
+        .withArgs(ownedCollection.address, tokenId, 'address1', owner.address)
+        .to.emit(tokenProperties, 'AddressPropertyUpdated')
+        .withArgs(ownedCollection.address, tokenId, 'address2', issuer.address)
+        .to.emit(tokenProperties, 'BytesPropertyUpdated')
+        .withArgs(ownedCollection.address, tokenId, 'bytes1', '0x1234')
+        .to.emit(tokenProperties, 'BytesPropertyUpdated')
+        .withArgs(ownedCollection.address, tokenId, 'bytes2', '0x5678');
+
+      await expect(
+        tokenProperties.setProperties(
+          ownedCollection.address,
+          tokenId,
+          [],
+          [],
+          [
+            { key: 'bool1', value: false },
+            { key: 'bool2', value: true },
+          ],
+          [],
+          [],
+        ),
+      )
+        .to.emit(tokenProperties, 'BoolPropertyUpdated')
+        .withArgs(ownedCollection.address, tokenId, 'bool1', false)
+        .to.emit(tokenProperties, 'BoolPropertyUpdated')
+        .withArgs(ownedCollection.address, tokenId, 'bool2', true);
+    });
+
+    it('can set and update multiple properties of multiple types at the same time', async function () {
+      await expect(
+        tokenProperties.setProperties(
+          ownedCollection.address,
+          tokenId,
+          [
+            { key: 'string1', value: 'value1' },
+            { key: 'string2', value: 'value2' },
+          ],
+          [
+            { key: 'uint1', value: bn(1) },
+            { key: 'uint2', value: bn(2) },
+          ],
+          [
+            { key: 'bool1', value: true },
+            { key: 'bool2', value: false },
+          ],
+          [
+            { key: 'address1', value: owner.address },
+            { key: 'address2', value: issuer.address },
+          ],
+          [
+            { key: 'bytes1', value: '0x1234' },
+            { key: 'bytes2', value: '0x5678' },
+          ],
+        ),
+      )
+        .to.emit(tokenProperties, 'StringPropertyUpdated')
+        .withArgs(ownedCollection.address, tokenId, 'string1', 'value1')
+        .to.emit(tokenProperties, 'StringPropertyUpdated')
+        .withArgs(ownedCollection.address, tokenId, 'string2', 'value2')
+        .to.emit(tokenProperties, 'UintPropertyUpdated')
+        .withArgs(ownedCollection.address, tokenId, 'uint1', bn(1))
+        .to.emit(tokenProperties, 'UintPropertyUpdated')
+        .withArgs(ownedCollection.address, tokenId, 'uint2', bn(2))
+        .to.emit(tokenProperties, 'BoolPropertyUpdated')
+        .withArgs(ownedCollection.address, tokenId, 'bool1', true)
+        .to.emit(tokenProperties, 'BoolPropertyUpdated')
+        .withArgs(ownedCollection.address, tokenId, 'bool2', false)
+        .to.emit(tokenProperties, 'AddressPropertyUpdated')
+        .withArgs(ownedCollection.address, tokenId, 'address1', owner.address)
+        .to.emit(tokenProperties, 'AddressPropertyUpdated')
+        .withArgs(ownedCollection.address, tokenId, 'address2', issuer.address)
+        .to.emit(tokenProperties, 'BytesPropertyUpdated')
+        .withArgs(ownedCollection.address, tokenId, 'bytes1', '0x1234')
+        .to.emit(tokenProperties, 'BytesPropertyUpdated')
+        .withArgs(ownedCollection.address, tokenId, 'bytes2', '0x5678');
+    });
+
+    it('should allow to retrieve multiple properties at once', async function () {
+      await tokenProperties.setProperties(
+        ownedCollection.address,
+        tokenId,
+        [
+          { key: 'string1', value: 'value1' },
+          { key: 'string2', value: 'value2' },
+        ],
+        [
+          { key: 'uint1', value: bn(1) },
+          { key: 'uint2', value: bn(2) },
+        ],
+        [
+          { key: 'bool1', value: true },
+          { key: 'bool2', value: false },
+        ],
+        [
+          { key: 'address1', value: owner.address },
+          { key: 'address2', value: issuer.address },
+        ],
+        [
+          { key: 'bytes1', value: '0x1234' },
+          { key: 'bytes2', value: '0x5678' },
+        ],
+      );
+
+      expect(
+        await tokenProperties.getTokenProperties(
+          ownedCollection.address,
+          tokenId,
+          ['string1', 'string2'],
+          ['uint1', 'uint2'],
+          ['bool1', 'bool2'],
+          ['address1', 'address2'],
+          ['bytes1', 'bytes2'],
+        ),
+      ).to.eql([
+        [
+          ['string1', 'value1'],
+          ['string2', 'value2'],
+        ],
+        [
+          ['uint1', bn(1)],
+          ['uint2', bn(2)],
+        ],
+        [
+          ['bool1', true],
+          ['bool2', false],
+        ],
+        [
+          ['address1', owner.address],
+          ['address2', issuer.address],
+        ],
+        [
+          ['bytes1', '0x1234'],
+          ['bytes2', '0x5678'],
+        ],
+      ]);
+    });
+
+    it('can set multiple string properties at the same time', async function () {
+      await expect(
+        tokenProperties.setStringProperties(ownedCollection.address, tokenId, [
+          { key: 'string1', value: 'value1' },
+          { key: 'string2', value: 'value2' },
+        ]),
+      )
+        .to.emit(tokenProperties, 'StringPropertyUpdated')
+        .withArgs(ownedCollection.address, tokenId, 'string1', 'value1')
+        .to.emit(tokenProperties, 'StringPropertyUpdated')
+        .withArgs(ownedCollection.address, tokenId, 'string2', 'value2');
+
+      expect(
+        await tokenProperties.getTokenProperties(
+          ownedCollection.address,
+          tokenId,
+          ['string1', 'string2'],
+          [],
+          [],
+          [],
+          [],
+        ),
+      ).to.eql([
+        [
+          ['string1', 'value1'],
+          ['string2', 'value2'],
+        ],
+        [],
+        [],
+        [],
+        [],
+      ]);
+    });
+
+    it('can set multiple uint properties at the same time', async function () {
+      await expect(
+        tokenProperties.setUintProperties(ownedCollection.address, tokenId, [
+          { key: 'uint1', value: bn(1) },
+          { key: 'uint2', value: bn(2) },
+        ]),
+      )
+        .to.emit(tokenProperties, 'UintPropertyUpdated')
+        .withArgs(ownedCollection.address, tokenId, 'uint1', bn(1))
+        .to.emit(tokenProperties, 'UintPropertyUpdated')
+        .withArgs(ownedCollection.address, tokenId, 'uint2', bn(2));
+
+      expect(
+        await tokenProperties.getTokenProperties(
+          ownedCollection.address,
+          tokenId,
+          [],
+          ['uint1', 'uint2'],
+          [],
+          [],
+          [],
+        ),
+      ).to.eql([
+        [],
+        [
+          ['uint1', bn(1)],
+          ['uint2', bn(2)],
+        ],
+        [],
+        [],
+        [],
+      ]);
+    });
+
+    it('can set multiple bool properties at the same time', async function () {
+      await expect(
+        tokenProperties.setBoolProperties(ownedCollection.address, tokenId, [
+          { key: 'bool1', value: true },
+          { key: 'bool2', value: false },
+        ]),
+      )
+        .to.emit(tokenProperties, 'BoolPropertyUpdated')
+        .withArgs(ownedCollection.address, tokenId, 'bool1', true)
+        .to.emit(tokenProperties, 'BoolPropertyUpdated')
+        .withArgs(ownedCollection.address, tokenId, 'bool2', false);
+
+      expect(
+        await tokenProperties.getTokenProperties(
+          ownedCollection.address,
+          tokenId,
+          [],
+          [],
+          ['bool1', 'bool2'],
+          [],
+          [],
+        ),
+      ).to.eql([
+        [],
+        [],
+        [
+          ['bool1', true],
+          ['bool2', false],
+        ],
+        [],
+        [],
+      ]);
+    });
+
+    it('can set multiple address properties at the same time', async function () {
+      await expect(
+        tokenProperties.setAddressProperties(ownedCollection.address, tokenId, [
+          { key: 'address1', value: owner.address },
+          { key: 'address2', value: issuer.address },
+        ]),
+      )
+        .to.emit(tokenProperties, 'AddressPropertyUpdated')
+        .withArgs(ownedCollection.address, tokenId, 'address1', owner.address)
+        .to.emit(tokenProperties, 'AddressPropertyUpdated')
+        .withArgs(ownedCollection.address, tokenId, 'address2', issuer.address);
+
+      expect(
+        await tokenProperties.getTokenProperties(
+          ownedCollection.address,
+          tokenId,
+          [],
+          [],
+          [],
+          ['address1', 'address2'],
+          [],
+        ),
+      ).to.eql([
+        [],
+        [],
+        [],
+        [
+          ['address1', owner.address],
+          ['address2', issuer.address],
+        ],
+        [],
+      ]);
+    });
+
+    it('can set multiple bytes properties at the same time', async function () {
+      await expect(
+        tokenProperties.setBytesProperties(ownedCollection.address, tokenId, [
+          { key: 'bytes1', value: '0x1234' },
+          { key: 'bytes2', value: '0x5678' },
+        ]),
+      )
+        .to.emit(tokenProperties, 'BytesPropertyUpdated')
+        .withArgs(ownedCollection.address, tokenId, 'bytes1', '0x1234')
+        .to.emit(tokenProperties, 'BytesPropertyUpdated')
+        .withArgs(ownedCollection.address, tokenId, 'bytes2', '0x5678');
+
+      expect(
+        await tokenProperties.getTokenProperties(
+          ownedCollection.address,
+          tokenId,
+          [],
+          [],
+          [],
+          [],
+          ['bytes1', 'bytes2'],
+        ),
+      ).to.eql([
+        [],
+        [],
+        [],
+        [],
+        [
+          ['bytes1', '0x1234'],
+          ['bytes2', '0x5678'],
+        ],
+      ]);
+    });
+
     it('can reuse keys and values are fine', async function () {
       await tokenProperties.setStringProperty(ownedCollection.address, tokenId, 'X', 'X1');
       await tokenProperties.setStringProperty(ownedCollection.address, tokenId2, 'X', 'X2');
