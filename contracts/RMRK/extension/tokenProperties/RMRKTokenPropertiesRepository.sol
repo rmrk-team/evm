@@ -124,7 +124,7 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
                 collaboratorAddressAccess[i]
             );
             unchecked {
-                i++;
+                ++i;
             }
         }
     }
@@ -339,27 +339,164 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
             BytesProperty[] memory bytesProperties
         )
     {
-        stringProperties = _getStringTokenProperties(
+        stringProperties = getStringTokenProperties(
             collection,
             tokenId,
             stringKeys
         );
 
-        uintProperties = _getUintTokenProperties(collection, tokenId, uintKeys);
+        uintProperties = getUintTokenProperties(collection, tokenId, uintKeys);
 
-        boolProperties = _getBoolTokenProperties(collection, tokenId, boolKeys);
+        boolProperties = getBoolTokenProperties(collection, tokenId, boolKeys);
 
-        addressProperties = _getAddressTokenProperties(
+        addressProperties = getAddressTokenProperties(
             collection,
             tokenId,
             addressKeys
         );
 
-        bytesProperties = _getBytesTokenProperties(
+        bytesProperties = getBytesTokenProperties(
             collection,
             tokenId,
             bytesKeys
         );
+    }
+
+    /**
+     * @inheritdoc IRMRKTokenPropertiesRepository
+     */
+    function getStringTokenProperties(
+        address collection,
+        uint256 tokenId,
+        string[] memory stringKeys
+    ) public view returns (StringProperty[] memory) {
+        uint256 stringLen = stringKeys.length;
+
+        StringProperty[] memory stringProperties = new StringProperty[](
+            stringLen
+        );
+
+        for (uint i; i < stringLen; ) {
+            stringProperties[i] = StringProperty({
+                key: stringKeys[i],
+                value: _stringIdToValue[collection][
+                    _stringValueIds[collection][tokenId][
+                        _keysToIds[stringKeys[i]]
+                    ]
+                ]
+            });
+            unchecked {
+                ++i;
+            }
+        }
+
+        return stringProperties;
+    }
+
+    /**
+     * @inheritdoc IRMRKTokenPropertiesRepository
+     */
+    function getUintTokenProperties(
+        address collection,
+        uint256 tokenId,
+        string[] memory uintKeys
+    ) public view returns (UintProperty[] memory) {
+        uint256 uintLen = uintKeys.length;
+
+        UintProperty[] memory uintProperties = new UintProperty[](uintLen);
+
+        for (uint i; i < uintLen; ) {
+            uintProperties[i] = UintProperty({
+                key: uintKeys[i],
+                value: _uintValues[collection][tokenId][_keysToIds[uintKeys[i]]]
+            });
+            unchecked {
+                ++i;
+            }
+        }
+
+        return uintProperties;
+    }
+
+    /**
+     * @inheritdoc IRMRKTokenPropertiesRepository
+     */
+    function getBoolTokenProperties(
+        address collection,
+        uint256 tokenId,
+        string[] memory boolKeys
+    ) public view returns (BoolProperty[] memory) {
+        uint256 boolLen = boolKeys.length;
+
+        BoolProperty[] memory boolProperties = new BoolProperty[](boolLen);
+
+        for (uint i; i < boolLen; ) {
+            boolProperties[i] = BoolProperty({
+                key: boolKeys[i],
+                value: _boolValues[collection][tokenId][_keysToIds[boolKeys[i]]]
+            });
+            unchecked {
+                ++i;
+            }
+        }
+
+        return boolProperties;
+    }
+
+    /**
+     * @inheritdoc IRMRKTokenPropertiesRepository
+     */
+    function getAddressTokenProperties(
+        address collection,
+        uint256 tokenId,
+        string[] memory addressKeys
+    ) public view returns (AddressProperty[] memory) {
+        uint256 addressLen = addressKeys.length;
+
+        AddressProperty[] memory addressProperties = new AddressProperty[](
+            addressLen
+        );
+
+        for (uint i; i < addressLen; ) {
+            addressProperties[i] = AddressProperty({
+                key: addressKeys[i],
+                value: _addressValues[collection][tokenId][
+                    _keysToIds[addressKeys[i]]
+                ]
+            });
+            unchecked {
+                ++i;
+            }
+        }
+
+        return addressProperties;
+    }
+
+    /**
+     * @inheritdoc IRMRKTokenPropertiesRepository
+     */
+    function getBytesTokenProperties(
+        address collection,
+        uint256 tokenId,
+        string[] memory bytesKeys
+    ) public view returns (BytesProperty[] memory) {
+        uint256 bytesLen = bytesKeys.length;
+
+        BytesProperty[] memory bytesProperties = new BytesProperty[](bytesLen);
+
+        for (uint i; i < bytesLen; ) {
+            bytesProperties[i] = BytesProperty({
+                key: bytesKeys[i],
+                value: _bytesValues[collection][tokenId][
+                    _keysToIds[bytesKeys[i]]
+                ]
+            });
+            unchecked {
+                ++i;
+            }
+        }
+
+        return bytesProperties;
     }
 
     /**
@@ -448,7 +585,7 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
                 properties[i].value
             );
             unchecked {
-                i++;
+                ++i;
             }
         }
     }
@@ -472,7 +609,7 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
                 properties[i].value
             );
             unchecked {
-                i++;
+                ++i;
             }
         }
     }
@@ -496,7 +633,7 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
                 properties[i].value
             );
             unchecked {
-                i++;
+                ++i;
             }
         }
     }
@@ -520,7 +657,7 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
                 properties[i].value
             );
             unchecked {
-                i++;
+                ++i;
             }
         }
     }
@@ -544,7 +681,7 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
                 properties[i].value
             );
             unchecked {
-                i++;
+                ++i;
             }
         }
     }
@@ -552,7 +689,7 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
     /**
      * @inheritdoc IRMRKTokenPropertiesRepository
      */
-    function setProperties(
+    function setTokenProperties(
         address collection,
         uint256 tokenId,
         StringProperty[] memory stringProperties,
@@ -561,88 +698,78 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
         AddressProperty[] memory addressProperties,
         BytesProperty[] memory bytesProperties
     ) external onlyAuthorizedCaller(collection, "", tokenId) {
-        if (stringProperties.length > 0) {
-            for (uint256 i = 0; i < stringProperties.length; ) {
-                _stringValueIds[collection][tokenId][
-                    _getIdForKey(stringProperties[i].key)
-                ] = _getStringIdForValue(collection, stringProperties[i].value);
-                emit StringPropertyUpdated(
-                    collection,
-                    tokenId,
-                    stringProperties[i].key,
-                    stringProperties[i].value
-                );
-                unchecked {
-                    i++;
-                }
+        for (uint256 i = 0; i < stringProperties.length; ) {
+            _stringValueIds[collection][tokenId][
+                _getIdForKey(stringProperties[i].key)
+            ] = _getStringIdForValue(collection, stringProperties[i].value);
+            emit StringPropertyUpdated(
+                collection,
+                tokenId,
+                stringProperties[i].key,
+                stringProperties[i].value
+            );
+            unchecked {
+                ++i;
             }
         }
 
-        if (uintProperties.length > 0) {
-            for (uint256 i = 0; i < uintProperties.length; ) {
-                _uintValues[collection][tokenId][
-                    _getIdForKey(uintProperties[i].key)
-                ] = uintProperties[i].value;
-                emit UintPropertyUpdated(
-                    collection,
-                    tokenId,
-                    uintProperties[i].key,
-                    uintProperties[i].value
-                );
-                unchecked {
-                    i++;
-                }
+        for (uint256 i = 0; i < uintProperties.length; ) {
+            _uintValues[collection][tokenId][
+                _getIdForKey(uintProperties[i].key)
+            ] = uintProperties[i].value;
+            emit UintPropertyUpdated(
+                collection,
+                tokenId,
+                uintProperties[i].key,
+                uintProperties[i].value
+            );
+            unchecked {
+                ++i;
             }
         }
 
-        if (boolProperties.length > 0) {
-            for (uint256 i = 0; i < boolProperties.length; ) {
-                _boolValues[collection][tokenId][
-                    _getIdForKey(boolProperties[i].key)
-                ] = boolProperties[i].value;
-                emit BoolPropertyUpdated(
-                    collection,
-                    tokenId,
-                    boolProperties[i].key,
-                    boolProperties[i].value
-                );
-                unchecked {
-                    i++;
-                }
+        for (uint256 i = 0; i < boolProperties.length; ) {
+            _boolValues[collection][tokenId][
+                _getIdForKey(boolProperties[i].key)
+            ] = boolProperties[i].value;
+            emit BoolPropertyUpdated(
+                collection,
+                tokenId,
+                boolProperties[i].key,
+                boolProperties[i].value
+            );
+            unchecked {
+                ++i;
             }
         }
 
-        if (addressProperties.length > 0) {
-            for (uint256 i = 0; i < addressProperties.length; ) {
-                _addressValues[collection][tokenId][
-                    _getIdForKey(addressProperties[i].key)
-                ] = addressProperties[i].value;
-                emit AddressPropertyUpdated(
-                    collection,
-                    tokenId,
-                    addressProperties[i].key,
-                    addressProperties[i].value
-                );
-                unchecked {
-                    i++;
-                }
+        for (uint256 i = 0; i < addressProperties.length; ) {
+            _addressValues[collection][tokenId][
+                _getIdForKey(addressProperties[i].key)
+            ] = addressProperties[i].value;
+            emit AddressPropertyUpdated(
+                collection,
+                tokenId,
+                addressProperties[i].key,
+                addressProperties[i].value
+            );
+            unchecked {
+                ++i;
             }
         }
 
-        if (bytesProperties.length > 0) {
-            for (uint256 i = 0; i < bytesProperties.length; ) {
-                _bytesValues[collection][tokenId][
-                    _getIdForKey(bytesProperties[i].key)
-                ] = bytesProperties[i].value;
-                emit BytesPropertyUpdated(
-                    collection,
-                    tokenId,
-                    bytesProperties[i].key,
-                    bytesProperties[i].value
-                );
-                unchecked {
-                    i++;
-                }
+        for (uint256 i = 0; i < bytesProperties.length; ) {
+            _bytesValues[collection][tokenId][
+                _getIdForKey(bytesProperties[i].key)
+            ] = bytesProperties[i].value;
+            emit BytesPropertyUpdated(
+                collection,
+                tokenId,
+                bytesProperties[i].key,
+                bytesProperties[i].value
+            );
+            unchecked {
+                ++i;
             }
         }
     }
@@ -687,188 +814,6 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
         } else {
             return _stringValueToId[collection][value];
         }
-    }
-
-    /**
-     * @notice Used to get multiple sting parameter values for a token.
-     * @dev The `StringProperty` struct contains the following fields:
-     *  [
-     *     string key,
-     *     string value
-     *  ]
-     * @param collection Address of the collection the token belongs to
-     * @param tokenId ID of the token for which the properties are being retrieved
-     * @param stringKeys An array of string keys to retrieve
-     * @return An array of `StringProperty` structs
-     */
-    function _getStringTokenProperties(
-        address collection,
-        uint256 tokenId,
-        string[] memory stringKeys
-    ) internal view returns (StringProperty[] memory) {
-        uint256 stringLen = stringKeys.length;
-
-        StringProperty[] memory stringProperties = new StringProperty[](
-            stringLen
-        );
-
-        for (uint i; i < stringLen; ) {
-            stringProperties[i] = StringProperty({
-                key: stringKeys[i],
-                value: _stringIdToValue[collection][
-                    _stringValueIds[collection][tokenId][
-                        _keysToIds[stringKeys[i]]
-                    ]
-                ]
-            });
-            unchecked {
-                i++;
-            }
-        }
-
-        return stringProperties;
-    }
-
-    /**
-     * @notice Used to get multiple uint parameter values for a token.
-     * @dev The `UintProperty` struct contains the following fields:
-     *  [
-     *     string key,
-     *     uint value
-     *  ]
-     * @param collection Address of the collection the token belongs to
-     * @param tokenId ID of the token for which the properties are being retrieved
-     * @param uintKeys An array of uint keys to retrieve
-     * @return An array of `UintProperty` structs
-     */
-    function _getUintTokenProperties(
-        address collection,
-        uint256 tokenId,
-        string[] memory uintKeys
-    ) internal view returns (UintProperty[] memory) {
-        uint256 uintLen = uintKeys.length;
-
-        UintProperty[] memory uintProperties = new UintProperty[](uintLen);
-
-        for (uint i; i < uintLen; ) {
-            uintProperties[i] = UintProperty({
-                key: uintKeys[i],
-                value: _uintValues[collection][tokenId][_keysToIds[uintKeys[i]]]
-            });
-            unchecked {
-                i++;
-            }
-        }
-
-        return uintProperties;
-    }
-
-    /**
-     * @notice Used to get multiple bool parameter values for a token.
-     * @dev The `BoolProperty` struct contains the following fields:
-     *  [
-     *     string key,
-     *     bool value
-     *  ]
-     * @param collection Address of the collection the token belongs to
-     * @param tokenId ID of the token for which the properties are being retrieved
-     * @param boolKeys An array of bool keys to retrieve
-     * @return An array of `BoolProperty` structs
-     */
-    function _getBoolTokenProperties(
-        address collection,
-        uint256 tokenId,
-        string[] memory boolKeys
-    ) internal view returns (BoolProperty[] memory) {
-        uint256 boolLen = boolKeys.length;
-
-        BoolProperty[] memory boolProperties = new BoolProperty[](boolLen);
-
-        for (uint i; i < boolLen; ) {
-            boolProperties[i] = BoolProperty({
-                key: boolKeys[i],
-                value: _boolValues[collection][tokenId][_keysToIds[boolKeys[i]]]
-            });
-            unchecked {
-                i++;
-            }
-        }
-
-        return boolProperties;
-    }
-
-    /**
-     * @notice Used to get multiple address parameter values for a token.
-     * @dev The `AddressProperty` struct contains the following fields:
-     *  [
-     *     string key,
-     *     address value
-     *  ]
-     * @param collection Address of the collection the token belongs to
-     * @param tokenId ID of the token for which the properties are being retrieved
-     * @param addressKeys An array of address keys to retrieve
-     * @return An array of `AddressProperty` structs
-     */
-    function _getAddressTokenProperties(
-        address collection,
-        uint256 tokenId,
-        string[] memory addressKeys
-    ) internal view returns (AddressProperty[] memory) {
-        uint256 addressLen = addressKeys.length;
-
-        AddressProperty[] memory addressProperties = new AddressProperty[](
-            addressLen
-        );
-
-        for (uint i; i < addressLen; ) {
-            addressProperties[i] = AddressProperty({
-                key: addressKeys[i],
-                value: _addressValues[collection][tokenId][
-                    _keysToIds[addressKeys[i]]
-                ]
-            });
-            unchecked {
-                i++;
-            }
-        }
-
-        return addressProperties;
-    }
-
-    /**
-     * @notice Used to get multiple bytes parameter values for a token.
-     * @dev The `BytesProperty` struct contains the following fields:
-     *  [
-     *     string key,
-     *     bytes value
-     *  ]
-     * @param collection Address of the collection the token belongs to
-     * @param tokenId ID of the token for which the properties are being retrieved
-     * @param bytesKeys An array of bytes keys to retrieve
-     * @return An array of `BytesProperty` structs
-     */
-    function _getBytesTokenProperties(
-        address collection,
-        uint256 tokenId,
-        string[] memory bytesKeys
-    ) internal view returns (BytesProperty[] memory) {
-        uint256 bytesLen = bytesKeys.length;
-
-        BytesProperty[] memory bytesProperties = new BytesProperty[](bytesLen);
-
-        for (uint i; i < bytesLen; ) {
-            bytesProperties[i] = BytesProperty({
-                key: bytesKeys[i],
-                value: _bytesValues[collection][tokenId][
-                    _keysToIds[bytesKeys[i]]
-                ]
-            });
-            unchecked {
-                i++;
-            }
-        }
-
-        return bytesProperties;
     }
 
     /**

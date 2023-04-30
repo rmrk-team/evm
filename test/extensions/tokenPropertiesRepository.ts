@@ -165,7 +165,7 @@ describe('RMRKTokenPropertiesRepository', async function () {
 
     it('can set multiple properties of multiple types at the same time', async function () {
       await expect(
-        tokenProperties.setProperties(
+        tokenProperties.setTokenProperties(
           ownedCollection.address,
           tokenId,
           [
@@ -213,7 +213,7 @@ describe('RMRKTokenPropertiesRepository', async function () {
     });
 
     it('can update multiple properties of multiple types at the same time', async function () {
-      await tokenProperties.setProperties(
+      await tokenProperties.setTokenProperties(
         ownedCollection.address,
         tokenId,
         [
@@ -239,7 +239,7 @@ describe('RMRKTokenPropertiesRepository', async function () {
       );
 
       await expect(
-        tokenProperties.setProperties(
+        tokenProperties.setTokenProperties(
           ownedCollection.address,
           tokenId,
           [
@@ -287,7 +287,7 @@ describe('RMRKTokenPropertiesRepository', async function () {
     });
 
     it('can set and update multiple properties of multiple types at the same time even if not all types are updated at the same time', async function () {
-      await tokenProperties.setProperties(
+      await tokenProperties.setTokenProperties(
         ownedCollection.address,
         tokenId,
         [{ key: 'string1', value: 'value0' }],
@@ -307,7 +307,7 @@ describe('RMRKTokenPropertiesRepository', async function () {
       );
 
       await expect(
-        tokenProperties.setProperties(
+        tokenProperties.setTokenProperties(
           ownedCollection.address,
           tokenId,
           [],
@@ -347,7 +347,7 @@ describe('RMRKTokenPropertiesRepository', async function () {
         .withArgs(ownedCollection.address, tokenId, 'bytes2', '0x5678');
 
       await expect(
-        tokenProperties.setProperties(
+        tokenProperties.setTokenProperties(
           ownedCollection.address,
           tokenId,
           [],
@@ -368,7 +368,7 @@ describe('RMRKTokenPropertiesRepository', async function () {
 
     it('can set and update multiple properties of multiple types at the same time', async function () {
       await expect(
-        tokenProperties.setProperties(
+        tokenProperties.setTokenProperties(
           ownedCollection.address,
           tokenId,
           [
@@ -416,7 +416,7 @@ describe('RMRKTokenPropertiesRepository', async function () {
     });
 
     it('should allow to retrieve multiple properties at once', async function () {
-      await tokenProperties.setProperties(
+      await tokenProperties.setTokenProperties(
         ownedCollection.address,
         tokenId,
         [
