@@ -421,7 +421,7 @@ interface IRMRKTokenPropertiesRepository is IERC165 {
      * @param addressProperties An array of `AddressProperty` structs containing address properties to set
      * @param bytesProperties An array of `BytesProperty` structs containing bytes properties to set
      */
-    function setProperties(
+    function setTokenProperties(
         address collection,
         uint256 tokenId,
         StringProperty[] memory stringProperties,
@@ -562,4 +562,94 @@ interface IRMRKTokenPropertiesRepository is IERC165 {
             AddressProperty[] memory addressProperties,
             BytesProperty[] memory bytesProperties
         );
+
+    /**
+     * @notice Used to get multiple sting parameter values for a token.
+     * @dev The `StringProperty` struct contains the following fields:
+     *  [
+     *     string key,
+     *     string value
+     *  ]
+     * @param collection Address of the collection the token belongs to
+     * @param tokenId ID of the token for which the properties are being retrieved
+     * @param stringKeys An array of string keys to retrieve
+     * @return An array of `StringProperty` structs
+     */
+    function getStringTokenProperties(
+        address collection,
+        uint256 tokenId,
+        string[] memory stringKeys
+    ) external view returns (StringProperty[] memory);
+
+    /**
+     * @notice Used to get multiple uint parameter values for a token.
+     * @dev The `UintProperty` struct contains the following fields:
+     *  [
+     *     string key,
+     *     uint value
+     *  ]
+     * @param collection Address of the collection the token belongs to
+     * @param tokenId ID of the token for which the properties are being retrieved
+     * @param uintKeys An array of uint keys to retrieve
+     * @return An array of `UintProperty` structs
+     */
+    function getUintTokenProperties(
+        address collection,
+        uint256 tokenId,
+        string[] memory uintKeys
+    ) external view returns (UintProperty[] memory);
+
+    /**
+     * @notice Used to get multiple bool parameter values for a token.
+     * @dev The `BoolProperty` struct contains the following fields:
+     *  [
+     *     string key,
+     *     bool value
+     *  ]
+     * @param collection Address of the collection the token belongs to
+     * @param tokenId ID of the token for which the properties are being retrieved
+     * @param boolKeys An array of bool keys to retrieve
+     * @return An array of `BoolProperty` structs
+     */
+    function getBoolTokenProperties(
+        address collection,
+        uint256 tokenId,
+        string[] memory boolKeys
+    ) external view returns (BoolProperty[] memory);
+
+    /**
+     * @notice Used to get multiple address parameter values for a token.
+     * @dev The `AddressProperty` struct contains the following fields:
+     *  [
+     *     string key,
+     *     address value
+     *  ]
+     * @param collection Address of the collection the token belongs to
+     * @param tokenId ID of the token for which the properties are being retrieved
+     * @param addressKeys An array of address keys to retrieve
+     * @return An array of `AddressProperty` structs
+     */
+    function getAddressTokenProperties(
+        address collection,
+        uint256 tokenId,
+        string[] memory addressKeys
+    ) external view returns (AddressProperty[] memory);
+
+    /**
+     * @notice Used to get multiple bytes parameter values for a token.
+     * @dev The `BytesProperty` struct contains the following fields:
+     *  [
+     *     string key,
+     *     bytes value
+     *  ]
+     * @param collection Address of the collection the token belongs to
+     * @param tokenId ID of the token for which the properties are being retrieved
+     * @param bytesKeys An array of bytes keys to retrieve
+     * @return An array of `BytesProperty` structs
+     */
+    function getBytesTokenProperties(
+        address collection,
+        uint256 tokenId,
+        string[] memory bytesKeys
+    ) external view returns (BytesProperty[] memory);
 }
