@@ -159,8 +159,8 @@ contract RMRKRenderUtils {
             data.pendingAssetCount = target.getPendingAssets(tokenId).length;
             data.priorities = target.getActiveAssetPriorities(tokenId);
         }
-        if (target.supportsInterface(type(IERC6454).interfaceId)) {
-            data.isSoulbound = IERC6454(targetCollection).isNonTransferable(
+        if (target.supportsInterface(type(IERC6454alpha).interfaceId)) {
+            data.isSoulbound = !IERC6454alpha(targetCollection).isTransferable(
                 tokenId
             );
         }
