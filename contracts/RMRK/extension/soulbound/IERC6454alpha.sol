@@ -28,6 +28,9 @@ interface IERC6454alpha is IERC165 {
      * @param to Address to which the token is being transferred
      * @return Boolean value indicating whether the given token is transferable
      */
-    function isTransferable(uint256 tokenId, address from, address to) external view returns (bool);
-
+    function isTransferable(
+        uint256 tokenId,
+        address from,
+        address to
+    ) external view returns (bool);
 }

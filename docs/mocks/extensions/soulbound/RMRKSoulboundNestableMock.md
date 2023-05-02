@@ -279,27 +279,51 @@ Used to check if the given address is allowed to manage the tokens of the specif
 |---|---|---|
 | _0 | bool | A boolean value signifying whether the *operator* is allowed to manage the tokens of the *owner* (`true`)  or not (`false`) |
 
-### isNonTransferable
+### isTransferable
 
 ```solidity
-function isNonTransferable(uint256 tokenId) external view returns (bool)
+function isTransferable(uint256 tokenId, address, address) external view returns (bool)
 ```
 
-Used to check whether the given token is non-transferable or not.
 
-*If this function returns `true`, the transfer of the token MUST revert executionIf the tokenId does not exist, this method MUST revert execution*
+
+
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | ID of the token being checked |
+| tokenId | uint256 | undefined |
+| _1 | address | undefined |
+| _2 | address | undefined |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | Boolean value indicating whether the given token is non-transferable |
+| _0 | bool | undefined |
+
+### isTransferable
+
+```solidity
+function isTransferable(uint256) external view returns (bool)
+```
+
+Used to check whether the given token is transferable or not.
+
+*If this function returns `false`, the transfer of the token MUST revert executionIf the tokenId does not exist, this method MUST revert execution*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint256 | undefined |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | bool | Boolean value indicating whether the given token is transferable |
 
 ### mint
 
