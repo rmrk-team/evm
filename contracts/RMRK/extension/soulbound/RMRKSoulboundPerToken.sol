@@ -40,7 +40,11 @@ abstract contract RMRKSoulboundPerToken is RMRKSoulbound {
     /**
      * @inheritdoc IERC6454alpha
      */
-    function isTransferable(uint256 tokenId, address, address) public view virtual override returns (bool) {
+    function isTransferable(
+        uint256 tokenId,
+        address,
+        address
+    ) public view virtual override returns (bool) {
         return isTransferable(tokenId);
     }
 }
