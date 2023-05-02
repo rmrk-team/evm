@@ -1,60 +1,43 @@
-# RMRKSoulbound
+# IERC6454alpha
 
 *RMRK team*
 
-> RMRKSoulbound
+> IERC6454alpha
 
-Smart contract of the RMRK Soulbound module.
+A minimal extension to identify the transferability of Non-Fungible Tokens.
 
 
 
 ## Methods
 
-### VERSION
-
-```solidity
-function VERSION() external view returns (string)
-```
-
-Version of the @rmrk-team/evm-contracts package
-
-
-
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | string | undefined |
-
 ### isTransferable
 
 ```solidity
-function isTransferable(uint256 tokenId, address, address) external view returns (bool)
+function isTransferable(uint256 tokenId, address from, address to) external view returns (bool)
 ```
 
+Used to check whether the given token is transferable or not based on source and destination address.
 
-
-
+*If this function returns `false`, the transfer of the token MUST revert executionIf the tokenId does not exist, this method MUST revert execution*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | undefined |
-| _1 | address | undefined |
-| _2 | address | undefined |
+| tokenId | uint256 | ID of the token being checked |
+| from | address | Address from which the token is being transferred |
+| to | address | Address to which the token is being transferred |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | undefined |
+| _0 | bool | Boolean value indicating whether the given token is transferable |
 
 ### isTransferable
 
 ```solidity
-function isTransferable(uint256) external view returns (bool)
+function isTransferable(uint256 tokenId) external view returns (bool)
 ```
 
 Used to check whether the given token is transferable or not.
@@ -65,30 +48,13 @@ Used to check whether the given token is transferable or not.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | undefined |
+| tokenId | uint256 | ID of the token being checked |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
 | _0 | bool | Boolean value indicating whether the given token is transferable |
-
-### name
-
-```solidity
-function name() external view returns (string)
-```
-
-Used to retrieve the collection name.
-
-
-
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | string | Name of the collection |
 
 ### supportsInterface
 
@@ -111,23 +77,6 @@ function supportsInterface(bytes4 interfaceId) external view returns (bool)
 | Name | Type | Description |
 |---|---|---|
 | _0 | bool | undefined |
-
-### symbol
-
-```solidity
-function symbol() external view returns (string)
-```
-
-Used to retrieve the collection symbol.
-
-
-
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | string | Symbol of the collection |
 
 
 

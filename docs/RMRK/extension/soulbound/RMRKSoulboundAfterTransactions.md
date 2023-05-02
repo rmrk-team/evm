@@ -66,15 +66,39 @@ Gets the current number of transfer the specified token.
 |---|---|---|
 | _0 | uint256 | Number of the token&#39;s transfers to date |
 
-### isNonTransferable
+### isTransferable
 
 ```solidity
-function isNonTransferable(uint256 tokenId) external view returns (bool)
+function isTransferable(uint256 tokenId, address, address) external view returns (bool)
 ```
 
-Used to check whether the given token is non-transferable or not.
+Used to check whether the given token is transferable or not based on source and destination address.
 
-*If this function returns `true`, the transfer of the token MUST revert executionIf the tokenId does not exist, this method MUST revert execution*
+*If this function returns `false`, the transfer of the token MUST revert executionIf the tokenId does not exist, this method MUST revert execution*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId | uint256 | ID of the token being checked |
+| _1 | address | undefined |
+| _2 | address | undefined |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | bool | Boolean value indicating whether the given token is transferable |
+
+### isTransferable
+
+```solidity
+function isTransferable(uint256 tokenId) external view returns (bool)
+```
+
+Used to check whether the given token is transferable or not.
+
+*If this function returns `false`, the transfer of the token MUST revert executionIf the tokenId does not exist, this method MUST revert execution*
 
 #### Parameters
 
@@ -86,7 +110,7 @@ Used to check whether the given token is non-transferable or not.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | Boolean value indicating whether the given token is non-transferable |
+| _0 | bool | Boolean value indicating whether the given token is transferable |
 
 ### name
 

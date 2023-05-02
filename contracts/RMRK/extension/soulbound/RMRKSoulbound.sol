@@ -37,14 +37,16 @@ abstract contract RMRKSoulbound is IERC6454alpha, RMRKCore {
     /**
      * @inheritdoc IERC6454alpha
      */
-    function isTransferable(
-        uint256
-    ) public view virtual returns (bool) {
+    function isTransferable(uint256) public view virtual returns (bool) {
         return false;
     }
 
-    function isTransferable(uint256, address, address) public view virtual returns (bool) {
-        return false;
+    function isTransferable(
+        uint256 tokenId,
+        address,
+        address
+    ) public view virtual returns (bool) {
+        return isTransferable(tokenId);
     }
 
     /**
