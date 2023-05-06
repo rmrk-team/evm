@@ -4,7 +4,7 @@ pragma solidity ^0.8.18;
 
 import "../nestable/IERC6059.sol";
 import "../library/RMRKErrors.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
+import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 
 /**
  * @title RMRKNestableUtils
@@ -26,11 +26,19 @@ contract RMRKNestableUtils {
         uint256 parentId,
         uint256 childId
     ) public view returns (bool) {
+        if (
+            !IERC165(childAddress).supportsInterface(type(IERC6059).interfaceId)
+        ) {
+            return false;
+        }
+
         (address directOwner, uint256 ownerId, ) = IERC6059(childAddress)
             .directOwnerOf(childId);
+
         if (directOwner == parentAddress && ownerId == parentId) {
             return true;
         }
+
         return false;
     }
 
@@ -62,13 +70,21 @@ contract RMRKNestableUtils {
         bool isValid = true;
 
         for (uint256 i; i < childAddresses.length; ) {
-            (directOwner, ownerId, ) = IERC6059(childAddresses[i])
-                .directOwnerOf(childIds[i]);
+            if (
+                IERC165(childAddresses[i]).supportsInterface(
+                    type(IERC6059).interfaceId
+                )
+            ) {
+                (directOwner, ownerId, ) = IERC6059(childAddresses[i])
+                    .directOwnerOf(childIds[i]);
+            }
+
             if (directOwner != parentAddress || ownerId != parentId) {
                 tmpInvalidChildIds[numberOfInvalidChildTokens] = childIds[i];
                 ++numberOfInvalidChildTokens;
                 isValid = false;
             }
+
             unchecked {
                 ++i;
             }
@@ -77,8 +93,10 @@ contract RMRKNestableUtils {
         uint256[] memory invalidChildIds = new uint256[](
             numberOfInvalidChildTokens
         );
+
         for (uint256 i; i < numberOfInvalidChildTokens; ) {
             invalidChildIds[i] = tmpInvalidChildIds[i];
+
             unchecked {
                 ++i;
             }
