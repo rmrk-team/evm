@@ -82,6 +82,8 @@ error RMRKMaxRecursiveBurnsReached(address childContract, uint256 childId);
 error RMRKMintOverMax();
 /// Attempting to mint a nested token to a smart contract that doesn't support nesting
 error RMRKMintToNonRMRKNestableImplementer();
+/// Attempting to pass complementary arrays of different lengths
+error RMRKMismachedArrayLength();
 /// Attempting to transfer a child before it is unequipped
 error RMRKMustUnequipFirst();
 /// Attempting to nest a child over the nestable limit (current limit is 100 levels of nesting)
