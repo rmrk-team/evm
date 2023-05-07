@@ -16,7 +16,7 @@ contract RMRKNestableUtils {
     /**
      * @notice Used to validate whether the specified child token is owned by a given parent token.
      * @param parentAddress Address of the parent token's collection smart contract
-     * @param childAddress Address of the child token's colection smart contract
+     * @param childAddress Address of the child token's collection smart contract
      * @param parentId ID of the parent token
      * @param childId ID of the child token
      * @return A boolean value indicating whether the child token is owned by the parent token or not
@@ -46,10 +46,11 @@ contract RMRKNestableUtils {
     /**
      * @notice Used to validate whether the specified child token is owned by a given parent token.
      * @param parentAddress Address of the parent token's collection smart contract
-     * @param childAddresses An array of the child token's colection smart contract addresses
+     * @param childAddresses An array of the child token's collection smart contract addresses
      * @param parentId ID of the parent token
      * @param childIds An array of child token IDs to verify
      * @return A boolean value indicating whether all of the child tokens are owned by the parent token or not
+     * @return An array of smart contract addresses of the tokens that are not owned by the parent token
      * @return An array of token IDs of child tokens that are not owned by the parent token
      */
     function validateChildrenOf(

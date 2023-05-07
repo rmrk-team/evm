@@ -25,7 +25,7 @@ Used to validate whether the specified child token is owned by a given parent to
 | Name | Type | Description |
 |---|---|---|
 | parentAddress | address | Address of the parent token&#39;s collection smart contract |
-| childAddress | address | Address of the child token&#39;s colection smart contract |
+| childAddress | address | Address of the child token&#39;s collection smart contract |
 | parentId | uint256 | ID of the parent token |
 | childId | uint256 | ID of the child token |
 
@@ -50,7 +50,7 @@ Used to validate whether the specified child token is owned by a given parent to
 | Name | Type | Description |
 |---|---|---|
 | parentAddress | address | Address of the parent token&#39;s collection smart contract |
-| childAddresses | address[] | An array of the child token&#39;s colection smart contract addresses |
+| childAddresses | address[] | An array of the child token&#39;s collection smart contract addresses |
 | parentId | uint256 | ID of the parent token |
 | childIds | uint256[] | An array of child token IDs to verify |
 
@@ -59,8 +59,8 @@ Used to validate whether the specified child token is owned by a given parent to
 | Name | Type | Description |
 |---|---|---|
 | _0 | bool | A boolean value indicating whether all of the child tokens are owned by the parent token or not |
-| _1 | address[] | An array of token IDs of child tokens that are not owned by the parent token |
-| _2 | uint256[] | undefined |
+| _1 | address[] | An array of smart contract addresses of the tokens that are not owned by the parent token |
+| _2 | uint256[] | An array of token IDs of child tokens that are not owned by the parent token |
 
 
 
