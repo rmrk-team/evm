@@ -38,7 +38,7 @@ Used to validate whether the specified child token is owned by a given parent to
 ### validateChildrenOf
 
 ```solidity
-function validateChildrenOf(address parentAddress, address[] childAddresses, uint256 parentId, uint256[] childIds) external view returns (bool, uint256[])
+function validateChildrenOf(address parentAddress, address[] childAddresses, uint256 parentId, uint256[] childIds) external view returns (bool, address[], uint256[])
 ```
 
 Used to validate whether the specified child token is owned by a given parent token.
@@ -59,7 +59,8 @@ Used to validate whether the specified child token is owned by a given parent to
 | Name | Type | Description |
 |---|---|---|
 | _0 | bool | A boolean value indicating whether all of the child tokens are owned by the parent token or not |
-| _1 | uint256[] | An array of token IDs of child tokens that are not owned by the parent token |
+| _1 | address[] | An array of token IDs of child tokens that are not owned by the parent token |
+| _2 | uint256[] | undefined |
 
 
 

@@ -5,6 +5,7 @@ pragma solidity ^0.8.18;
 import "../nestable/IERC6059.sol";
 import "../library/RMRKErrors.sol";
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+import "hardhat/console.sol";
 
 /**
  * @title RMRKNestableUtils
@@ -56,7 +57,7 @@ contract RMRKNestableUtils {
         address[] memory childAddresses,
         uint256 parentId,
         uint256[] memory childIds
-    ) public view returns (bool, uint256[] memory) {
+    ) public view returns (bool, address[] memory, uint256[] memory) {
         if (childAddresses.length != childIds.length) {
             revert RMRKMismachedArrayLength();
         }
@@ -64,6 +65,9 @@ contract RMRKNestableUtils {
         address directOwner;
         uint256 ownerId;
         uint256 numberOfInvalidChildTokens;
+        address[] memory tmpInvalidChildAddresses = new address[](
+            childAddresses.length
+        );
         uint256[] memory tmpInvalidChildIds = new uint256[](
             childAddresses.length
         );
@@ -80,21 +84,31 @@ contract RMRKNestableUtils {
             }
 
             if (directOwner != parentAddress || ownerId != parentId) {
+                tmpInvalidChildAddresses[
+                    numberOfInvalidChildTokens
+                ] = childAddresses[i];
                 tmpInvalidChildIds[numberOfInvalidChildTokens] = childIds[i];
-                ++numberOfInvalidChildTokens;
+                numberOfInvalidChildTokens++;
                 isValid = false;
             }
+
+            delete directOwner;
+            delete ownerId;
 
             unchecked {
                 ++i;
             }
         }
 
+        address[] memory invalidChildAddresses = new address[](
+            numberOfInvalidChildTokens
+        );
         uint256[] memory invalidChildIds = new uint256[](
             numberOfInvalidChildTokens
         );
 
         for (uint256 i; i < numberOfInvalidChildTokens; ) {
+            invalidChildAddresses[i] = tmpInvalidChildAddresses[i];
             invalidChildIds[i] = tmpInvalidChildIds[i];
 
             unchecked {
@@ -102,6 +116,6 @@ contract RMRKNestableUtils {
             }
         }
 
-        return (isValid, invalidChildIds);
+        return (isValid, invalidChildAddresses, invalidChildIds);
     }
 }
