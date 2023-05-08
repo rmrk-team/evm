@@ -29,7 +29,8 @@ abstract contract ERC20Holder is IERC20Holder {
         address erc20Contract,
         uint256 tokenId,
         address to,
-        uint256 value
+        uint256 value,
+        bytes memory data
     ) external {
         if (value == 0) {
             revert InvalidValue();
@@ -40,11 +41,13 @@ abstract contract ERC20Holder is IERC20Holder {
         if (balances[tokenId][erc20Contract] < value) {
             revert InsufficientBalance();
         }
-        _beforeTransferERC20FromToken(erc20Contract, tokenId, to, value);
+        _beforeTransferERC20FromToken(erc20Contract, tokenId, to, value, data);
         balances[tokenId][erc20Contract] -= value;
 
+        IERC20(erc20Contract).transfer(to, value);
+
         emit TransferredERC20(erc20Contract, tokenId, to, value);
-        _afterTransferERC20FromToken(erc20Contract, tokenId, to, value);
+        _afterTransferERC20FromToken(erc20Contract, tokenId, to, value, data);
     }
 
     /**
@@ -53,7 +56,8 @@ abstract contract ERC20Holder is IERC20Holder {
     function transferERC20ToToken(
         address erc20Contract,
         uint256 tokenId,
-        uint256 value
+        uint256 value,
+        bytes memory data
     ) external {
         if (value == 0) {
             revert InvalidValue();
@@ -61,12 +65,24 @@ abstract contract ERC20Holder is IERC20Holder {
         if (erc20Contract == address(0)) {
             revert InvalidAddress();
         }
-        _beforeTransferERC20ToToken(erc20Contract, tokenId, msg.sender, value);
+        _beforeTransferERC20ToToken(
+            erc20Contract,
+            tokenId,
+            msg.sender,
+            value,
+            data
+        );
         IERC20(erc20Contract).transferFrom(msg.sender, address(this), value);
         balances[tokenId][erc20Contract] += value;
 
         emit ReceivedERC20(erc20Contract, tokenId, msg.sender, value);
-        _afterTransferERC20ToToken(erc20Contract, tokenId, msg.sender, value);
+        _afterTransferERC20ToToken(
+            erc20Contract,
+            tokenId,
+            msg.sender,
+            value,
+            data
+        );
     }
 
     /**
@@ -75,12 +91,14 @@ abstract contract ERC20Holder is IERC20Holder {
      * @param to The address to send the ERC-20 tokens to
      * @param erc20Contract The ERC-20 contract
      * @param value The number of ERC-20 tokens to transfer
+     * @param data Additional data with no specified format, to allow for custom logic.
      */
     function _beforeTransferERC20FromToken(
         address erc20Contract,
         uint256 tokenId,
         address to,
-        uint256 value
+        uint256 value,
+        bytes memory data
     ) internal virtual {}
 
     /**
@@ -89,12 +107,14 @@ abstract contract ERC20Holder is IERC20Holder {
      * @param to The address to send the ERC-20 tokens to
      * @param erc20Contract The ERC-20 contract
      * @param value The number of ERC-20 tokens to transfer
+     * @param data Additional data with no specified format, to allow for custom logic.
      */
     function _afterTransferERC20FromToken(
         address erc20Contract,
         uint256 tokenId,
         address to,
-        uint256 value
+        uint256 value,
+        bytes memory data
     ) internal virtual {}
 
     /**
@@ -103,12 +123,14 @@ abstract contract ERC20Holder is IERC20Holder {
      * @param from The address to send the ERC-20 tokens from
      * @param erc20Contract The ERC-20 contract
      * @param value The number of ERC-20 tokens to transfer
+     * @param data Additional data with no specified format, to allow for custom logic.
      */
     function _beforeTransferERC20ToToken(
         address erc20Contract,
         uint256 tokenId,
         address from,
-        uint256 value
+        uint256 value,
+        bytes memory data
     ) internal virtual {}
 
     /**
@@ -117,11 +139,13 @@ abstract contract ERC20Holder is IERC20Holder {
      * @param from The address to send the ERC-20 tokens from
      * @param erc20Contract The ERC-20 contract
      * @param value The number of ERC-20 tokens to transfer
+     * @param data Additional data with no specified format, to allow for custom logic.
      */
     function _afterTransferERC20ToToken(
         address erc20Contract,
         uint256 tokenId,
         address from,
-        uint256 value
+        uint256 value,
+        bytes memory data
     ) internal virtual {}
 }

@@ -36,7 +36,7 @@ Look up the balance of ERC-20 tokens for a specific token and ERC-20 contract
 ### transferERC20FromToken
 
 ```solidity
-function transferERC20FromToken(address erc20Contract, uint256 tokenId, address to, uint256 value) external nonpayable
+function transferERC20FromToken(address erc20Contract, uint256 tokenId, address to, uint256 value, bytes data) external nonpayable
 ```
 
 Transfer ERC-20 tokens to address
@@ -51,11 +51,12 @@ Transfer ERC-20 tokens to address
 | tokenId | uint256 | The token to transfer from |
 | to | address | The address to send the ERC-20 tokens to |
 | value | uint256 | The number of ERC-20 tokens to transfer |
+| data | bytes | Additional data with no specified format, to allow for custom logic. |
 
 ### transferERC20ToToken
 
 ```solidity
-function transferERC20ToToken(address erc20Contract, uint256 tokenId, uint256 value) external nonpayable
+function transferERC20ToToken(address erc20Contract, uint256 tokenId, uint256 value, bytes data) external nonpayable
 ```
 
 Transfer ERC-20 tokens to a specific token
@@ -69,6 +70,7 @@ Transfer ERC-20 tokens to a specific token
 | erc20Contract | address | The ERC-20 contract |
 | tokenId | uint256 | The token to transfer to |
 | value | uint256 | The number of ERC-20 tokens to transfer |
+| data | bytes | Additional data with no specified format, to allow for custom logic. |
 
 
 
@@ -109,7 +111,7 @@ This emits when a token transfers ERC-20 tokens.
 |---|---|---|
 | erc20Contract `indexed` | address | The ERC-20 contract. |
 | fromTokenId `indexed` | uint256 | The token that owned the ERC-20 tokens. |
-| to `indexed` | address | The address that receives the ERC-20 tokens. |
+| to `indexed` | address | The address that sends the ERC-20 tokens. |
 | value  | uint256 | The number of ERC-20 tokens transferred. |
 
 
