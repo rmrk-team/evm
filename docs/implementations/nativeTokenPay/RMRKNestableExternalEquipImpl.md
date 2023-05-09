@@ -723,7 +723,7 @@ function setLock() external nonpayable
 
 Locks the operation.
 
-*Once locked, functions using `notLocked` modifier cannot be executed.*
+*Once locked, functions using `notLocked` modifier cannot be executed.Emits ***LockSet*** event.*
 
 
 ### supportsInterface
@@ -1042,6 +1042,17 @@ used to notify the listeners that the address of the `Equippable` associated sma
 |---|---|---|
 | old  | address | Address of the previous `Equippable` smart contract |
 | new_  | address | Address of the new `Equippable` smart contract |
+
+### LockSet
+
+```solidity
+event LockSet()
+```
+
+Emitted when the smart contract is locked.
+
+
+
 
 ### NestTransfer
 

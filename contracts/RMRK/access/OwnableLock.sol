@@ -14,6 +14,11 @@ contract OwnableLock is Ownable {
     uint256 private _lock;
 
     /**
+     * @notice Emitted when the smart contract is locked.
+     */
+    event LockSet();
+
+    /**
      * @notice Reverts if the lock flag is set to true.
      */
     modifier notLocked() {
@@ -24,9 +29,11 @@ contract OwnableLock is Ownable {
     /**
      * @notice Locks the operation.
      * @dev Once locked, functions using `notLocked` modifier cannot be executed.
+     * @dev Emits ***LockSet*** event.
      */
     function setLock() public virtual onlyOwner {
         _lock = 1;
+        emit LockSet();
     }
 
     /**
