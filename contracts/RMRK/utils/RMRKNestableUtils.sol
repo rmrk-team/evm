@@ -65,24 +65,16 @@ contract RMRKNestableUtils {
         bool isValid = true;
 
         for (uint256 i; i < childAddresses.length; ) {
-            if (
-                IERC165(childAddresses[i]).supportsInterface(
-                    type(IERC6059).interfaceId
-                )
-            ) {
-                (directOwner, ownerId, ) = IERC6059(childAddresses[i])
-                    .directOwnerOf(childIds[i]);
-            }
+            validityOfChildren[i] = validateChildOf(
+                parentAddress,
+                childAddresses[i],
+                parentId,
+                childIds[i]
+            );
 
-            if (
-                isValid && (directOwner != parentAddress || ownerId != parentId)
-            ) {
+            if (isValid && !validityOfChildren[i]) {
                 isValid = false;
             }
-
-            validityOfChildren[i] =
-                directOwner == parentAddress &&
-                ownerId == parentId;
 
             delete directOwner;
             delete ownerId;
