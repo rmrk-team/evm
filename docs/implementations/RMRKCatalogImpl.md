@@ -323,7 +323,7 @@ function setLock() external nonpayable
 
 Locks the operation.
 
-*Once locked, functions using `notLocked` modifier cannot be executed.*
+*Once locked, functions using `notLocked` modifier cannot be executed.Emits ***LockSet*** event.*
 
 
 ### supportsInterface
@@ -421,6 +421,17 @@ Event that signifies that an address was granted contributor role or that the pe
 |---|---|---|
 | contributor `indexed` | address | Address of the account that had contributor role status updated |
 | isContributor  | bool | A boolean value signifying whether the role has been granted (`true`) or revoked (`false`) |
+
+### LockSet
+
+```solidity
+event LockSet()
+```
+
+Emitted when the smart contract is locked.
+
+
+
 
 ### OwnershipTransferred
 
