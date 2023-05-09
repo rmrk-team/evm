@@ -114,7 +114,7 @@ describe('NestableUtils', function () {
         parentTokenOne,
         [childTokenOne, childTokenThree],
       ),
-    ).to.eql([true, [], []]);
+    ).to.eql([true, [true, true]]);
   });
 
   it('does not allow to pass different length child token address and token ID arrays', async function () {
@@ -136,7 +136,7 @@ describe('NestableUtils', function () {
         parentTokenOne,
         [childTokenOne, childTokenTwo],
       ),
-    ).to.eql([false, [multiAsset.address], [bn(childTokenTwo)]]);
+    ).to.eql([false, [true, false]]);
   });
 
   it('returns false if any of the given tokens is not owned by the specified parent token', async function () {
@@ -147,6 +147,6 @@ describe('NestableUtils', function () {
         parentTokenOne,
         [childTokenOne, childTokenTwo, childTokenThree],
       ),
-    ).to.eql([false, [child.address], [bn(childTokenTwo)]]);
+    ).to.eql([false, [true, false, true]]);
   });
 });

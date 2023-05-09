@@ -36,11 +36,7 @@ contract RMRKNestableUtils {
         (address directOwner, uint256 ownerId, ) = IERC6059(childAddress)
             .directOwnerOf(childId);
 
-        if (directOwner == parentAddress && ownerId == parentId) {
-            return true;
-        }
-
-        return false;
+        return (directOwner == parentAddress && ownerId == parentId);
     }
 
     /**
@@ -50,28 +46,22 @@ contract RMRKNestableUtils {
      * @param parentId ID of the parent token
      * @param childIds An array of child token IDs to verify
      * @return A boolean value indicating whether all of the child tokens are owned by the parent token or not
-     * @return An array of smart contract addresses of the tokens that are not owned by the parent token
-     * @return An array of token IDs of child tokens that are not owned by the parent token
+     * @return An array of boolean values indicating whether each of the child tokens are owned by the parent token or
+     *  not
      */
     function validateChildrenOf(
         address parentAddress,
         address[] memory childAddresses,
         uint256 parentId,
         uint256[] memory childIds
-    ) public view returns (bool, address[] memory, uint256[] memory) {
+    ) public view returns (bool, bool[] memory) {
         if (childAddresses.length != childIds.length) {
             revert RMRKMismachedArrayLength();
         }
 
         address directOwner;
         uint256 ownerId;
-        uint256 numberOfInvalidChildTokens;
-        address[] memory tmpInvalidChildAddresses = new address[](
-            childAddresses.length
-        );
-        uint256[] memory tmpInvalidChildIds = new uint256[](
-            childAddresses.length
-        );
+        bool[] memory validityOfChildren = new bool[](childAddresses.length);
         bool isValid = true;
 
         for (uint256 i; i < childAddresses.length; ) {
@@ -84,14 +74,15 @@ contract RMRKNestableUtils {
                     .directOwnerOf(childIds[i]);
             }
 
-            if (directOwner != parentAddress || ownerId != parentId) {
-                tmpInvalidChildAddresses[
-                    numberOfInvalidChildTokens
-                ] = childAddresses[i];
-                tmpInvalidChildIds[numberOfInvalidChildTokens] = childIds[i];
-                numberOfInvalidChildTokens++;
+            if (
+                isValid && (directOwner != parentAddress || ownerId != parentId)
+            ) {
                 isValid = false;
             }
+
+            validityOfChildren[i] =
+                directOwner == parentAddress &&
+                ownerId == parentId;
 
             delete directOwner;
             delete ownerId;
@@ -101,22 +92,6 @@ contract RMRKNestableUtils {
             }
         }
 
-        address[] memory invalidChildAddresses = new address[](
-            numberOfInvalidChildTokens
-        );
-        uint256[] memory invalidChildIds = new uint256[](
-            numberOfInvalidChildTokens
-        );
-
-        for (uint256 i; i < numberOfInvalidChildTokens; ) {
-            invalidChildAddresses[i] = tmpInvalidChildAddresses[i];
-            invalidChildIds[i] = tmpInvalidChildIds[i];
-
-            unchecked {
-                ++i;
-            }
-        }
-
-        return (isValid, invalidChildAddresses, invalidChildIds);
+        return (isValid, validityOfChildren);
     }
 }
