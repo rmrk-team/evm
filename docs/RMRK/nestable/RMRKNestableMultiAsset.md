@@ -10,6 +10,23 @@ Smart contract of the joined RMRK Nestable and Multi asset module.
 
 ## Methods
 
+### RMRK_INTERFACE
+
+```solidity
+function RMRK_INTERFACE() external view returns (bytes4)
+```
+
+
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | bytes4 | undefined |
+
 ### VERSION
 
 ```solidity

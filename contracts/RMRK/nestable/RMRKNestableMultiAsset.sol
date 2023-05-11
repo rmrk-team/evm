@@ -7,9 +7,6 @@ pragma solidity ^0.8.18;
 import "../multiasset/AbstractMultiAsset.sol";
 import "./IERC6059.sol";
 import "./RMRKNestable.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 
 /**

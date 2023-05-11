@@ -1,10 +1,10 @@
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
-import { Contract } from 'ethers';
+import { BigNumber, Contract } from 'ethers';
 import { ADDRESS_ZERO, bn, ONE_ETH } from '../utils';
 
 async function shouldHaveRoyalties(
-  mint: (token: Contract, to: string) => Promise<number>,
+  mint: (token: Contract, to: string) => Promise<BigNumber>,
 ): Promise<void> {
   it('can get royalty data', async function () {
     const owner = (await ethers.getSigners())[0];

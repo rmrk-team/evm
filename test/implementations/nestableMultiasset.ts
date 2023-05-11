@@ -21,6 +21,7 @@ import {
   transfer,
 } from '../utils';
 import { RMRKMultiAssetRenderUtils, RMRKNestableMultiAssetImpl } from '../../typechain-types';
+import { IERC6059, IERC721, IRMRKImplementation } from '../interfaces';
 
 const isTokenUriEnumerated = false;
 
@@ -99,6 +100,12 @@ describe('NestableMultiAssetImpl Other Behavior', function () {
 
     ({ token } = await loadFixture(singleFixture));
     this.parentToken = token;
+  });
+
+  it('can support expected interfaces', async function () {
+    expect(await token.supportsInterface(IERC721)).to.equal(true);
+    expect(await token.supportsInterface(IERC6059)).to.equal(true);
+    expect(await token.supportsInterface(IRMRKImplementation)).to.equal(true);
   });
 
   describe('Approval Cleaning', async function () {

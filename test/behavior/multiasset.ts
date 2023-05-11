@@ -6,7 +6,7 @@ import { bn } from '../utils';
 import { IERC165, IOtherInterface, IERC5773 } from '../interfaces';
 
 async function shouldBehaveLikeMultiAsset(
-  mint: (token: Contract, to: string) => Promise<number>,
+  mint: (token: Contract, to: string) => Promise<BigNumber>,
   addAssetEntryFunc: (token: Contract, data?: string) => Promise<BigNumber>,
   addAssetToTokenFunc: (
     token: Contract,
