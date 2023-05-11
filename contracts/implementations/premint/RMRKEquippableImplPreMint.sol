@@ -47,11 +47,12 @@ contract RMRKEquippableImplPreMint is RMRKAbstractEquippableImpl {
      * @dev Can only be called while the open sale is open.
      * @param to Address to which to mint the token
      * @param numToMint Number of tokens to mint
+     * @return The ID of the first token to be minted in the current minting cycle
      */
     function mint(
         address to,
         uint256 numToMint
-    ) public virtual notLocked onlyOwnerOrContributor {
+    ) public virtual notLocked onlyOwnerOrContributor returns (uint256) {
         (uint256 nextToken, uint256 totalSupplyOffset) = _preMint(numToMint);
 
         for (uint256 i = nextToken; i < totalSupplyOffset; ) {
@@ -60,6 +61,8 @@ contract RMRKEquippableImplPreMint is RMRKAbstractEquippableImpl {
                 ++i;
             }
         }
+
+        return nextToken;
     }
 
     /**
@@ -69,12 +72,13 @@ contract RMRKEquippableImplPreMint is RMRKAbstractEquippableImpl {
      * @param to Address of the collection smart contract of the token into which to mint the child token
      * @param numToMint Number of tokens to mint
      * @param destinationId ID of the token into which to mint the new child token
+     * @return The ID of the first token to be minted in the current minting cycle
      */
     function nestMint(
         address to,
         uint256 numToMint,
         uint256 destinationId
-    ) public virtual notLocked onlyOwnerOrContributor {
+    ) public virtual notLocked onlyOwnerOrContributor returns (uint256) {
         (uint256 nextToken, uint256 totalSupplyOffset) = _preMint(numToMint);
 
         for (uint256 i = nextToken; i < totalSupplyOffset; ) {
@@ -83,6 +87,8 @@ contract RMRKEquippableImplPreMint is RMRKAbstractEquippableImpl {
                 ++i;
             }
         }
+
+        return nextToken;
     }
 
     /**
