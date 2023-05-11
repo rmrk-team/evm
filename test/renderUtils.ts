@@ -908,6 +908,99 @@ describe('Extended NFT render utils', function () {
     expect(data.hasNestingInterface).to.be.true;
     expect(data.hasEquippableInterface).to.be.true;
   });
+
+  describe('Nesting validation', function () {
+    let parentTokenOne: number;
+    let parentTokenTwo: number;
+    let childTokenOne: number;
+    let childTokenTwo: number;
+    let childTokenThree: number;
+
+    beforeEach(async function () {
+      parentTokenOne = await mintFromMock(nestable, rootOwner.address);
+      parentTokenTwo = await mintFromMock(nestable, rootOwner.address);
+      childTokenOne = await nestMintFromMock(nestable, nestable.address, parentTokenOne);
+      childTokenTwo = await nestMintFromMock(nestable, nestable.address, parentTokenTwo);
+      childTokenThree = await nestMintFromMock(nestable, nestable.address, parentTokenOne);
+    });
+
+    it('returns true if the specified token is nested into the given parent', async function () {
+      expect(
+        await renderUtils.validateChildOf(
+          nestable.address,
+          nestable.address,
+          parentTokenOne,
+          childTokenOne,
+        ),
+      ).to.be.true;
+    });
+
+    it('returns false if the child does not implement IERC6059', async function () {
+      expect(
+        await renderUtils.validateChildOf(
+          nestable.address,
+          multiAsset.address,
+          parentTokenOne,
+          childTokenOne,
+        ),
+      ).to.be.false;
+    });
+
+    it('returns false if the specified child token is not the child token of the parent token', async function () {
+      expect(
+        await renderUtils.validateChildOf(
+          nestable.address,
+          nestable.address,
+          parentTokenOne,
+          childTokenTwo,
+        ),
+      ).to.be.false;
+    });
+
+    it('returns true if the specified children are the child tokens of the given parent token', async function () {
+      expect(
+        await renderUtils.validateChildrenOf(
+          nestable.address,
+          [nestable.address, nestable.address],
+          parentTokenOne,
+          [childTokenOne, childTokenThree],
+        ),
+      ).to.eql([true, [true, true]]);
+    });
+
+    it('does not allow to pass different length child token address and token ID arrays', async function () {
+      await expect(
+        renderUtils.validateChildrenOf(
+          nestable.address,
+          [nestable.address, nestable.address],
+          parentTokenOne,
+          [childTokenOne],
+        ),
+      ).to.be.revertedWithCustomError(renderUtils, 'RMRKMismachedArrayLength');
+    });
+
+    it('returns false if one of the child tokens does not implement IERC6059', async function () {
+      expect(
+        await renderUtils.validateChildrenOf(
+          nestable.address,
+          [nestable.address, multiAsset.address],
+          parentTokenOne,
+          [childTokenOne, childTokenTwo],
+        ),
+      ).to.eql([false, [true, false]]);
+    });
+
+    it('returns false if any of the given tokens is not owned by the specified parent token', async function () {
+      expect(
+        await renderUtils.validateChildrenOf(
+          nestable.address,
+          [nestable.address, nestable.address, nestable.address],
+          parentTokenOne,
+          [childTokenOne, childTokenTwo, childTokenThree],
+        ),
+      ).to.eql([false, [true, false, true]]);
+    });
+  });
 });
 
 describe('Render Utils', async function () {
