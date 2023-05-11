@@ -10,6 +10,23 @@ Implementation of RMRK multi asset module with ERC20 pay.
 
 ## Methods
 
+### RMRK_INTERFACE
+
+```solidity
+function RMRK_INTERFACE() external view returns (bytes4)
+```
+
+
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | bytes4 | undefined |
+
 ### VERSION
 
 ```solidity
