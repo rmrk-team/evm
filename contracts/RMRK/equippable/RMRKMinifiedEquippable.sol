@@ -903,6 +903,31 @@ contract RMRKMinifiedEquippable is
         address childAddress,
         uint256 childId
     ) public virtual onlyApprovedOrOwner(parentId) {
+        _acceptChild(parentId, childIndex, childAddress, childId);
+    }
+
+    /**
+     * @notice Used to accept a pending child token for a given parent token.
+     * @dev This moves the child token from parent token's pending child tokens array into the active child tokens
+     *  array.
+     * @dev Requirements:
+     *
+     *  - `tokenId` must exist
+     *  - `index` must be in range of the pending children array
+     * @dev Emits ***ChildAccepted*** event.
+     * @param parentId ID of the parent token for which the child token is being accepted
+     * @param childIndex Index of a child tokem in the given parent's pending children array
+     * @param childAddress Address of the collection smart contract of the child token expected to be located at the
+     *  specified index of the given parent token's pending children array
+     * @param childId ID of the child token expected to be located at the specified index of the given parent token's
+     *  pending children array
+     */
+    function _acceptChild(
+        uint256 parentId,
+        uint256 childIndex,
+        address childAddress,
+        uint256 childId
+    ) internal virtual {
         Child memory child = pendingChildOf(parentId, childIndex);
         _checkExpectedChild(child, childAddress, childId);
         if (_childIsInActive[childAddress][childId] != 0)
@@ -1719,6 +1744,22 @@ contract RMRKMinifiedEquippable is
         uint256 index,
         uint64 assetId
     ) public virtual onlyApprovedForAssetsOrOwner(tokenId) {
+        _acceptAsset(tokenId, index, assetId);
+    }
+
+    /**
+     * @notice Used to accept a pending asset.
+     * @dev The call is reverted if there is no pending asset at a given index.
+     * @dev Emits ***AssetAccepted*** event.
+     * @param tokenId ID of the token for which to accept the pending asset
+     * @param index Index of the asset in the pending array to accept
+     * @param assetId ID of the asset to accept in token's pending array
+     */
+    function _acceptAsset(
+        uint256 tokenId,
+        uint256 index,
+        uint64 assetId
+    ) internal virtual {
         _validatePendingAssetAtIndex(tokenId, index, assetId);
         _beforeAcceptAsset(tokenId, index, assetId);
 
