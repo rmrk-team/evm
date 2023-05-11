@@ -417,9 +417,9 @@ Used to check whether the address has been granted the operator role by a given 
 function isTransferable(uint256 tokenId, address, address) external view returns (bool)
 ```
 
-Used to check whether the given token is transferable or not based on source and destination address.
+Used to check whether the given token is transferable or not.
 
-*If this function returns `false`, the transfer of the token MUST revert executionIf the tokenId does not exist, this method MUST revert execution*
+*If this function returns `false`, the transfer of the token MUST revert execution.If the tokenId does not exist, this method MUST revert execution, unless the token is being checked for  minting.*
 
 #### Parameters
 
@@ -428,28 +428,6 @@ Used to check whether the given token is transferable or not based on source and
 | tokenId | uint256 | ID of the token being checked |
 | _1 | address | undefined |
 | _2 | address | undefined |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | bool | Boolean value indicating whether the given token is transferable |
-
-### isTransferable
-
-```solidity
-function isTransferable(uint256 tokenId) external view returns (bool)
-```
-
-Used to check whether the given token is transferable or not.
-
-*If this function returns `false`, the transfer of the token MUST revert executionIf the tokenId does not exist, this method MUST revert execution*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| tokenId | uint256 | ID of the token being checked |
 
 #### Returns
 

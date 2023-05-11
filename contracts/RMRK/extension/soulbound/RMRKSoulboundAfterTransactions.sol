@@ -65,22 +65,13 @@ abstract contract RMRKSoulboundAfterTransactions is RMRKSoulbound {
     }
 
     /**
-     * @inheritdoc IERC6454alpha
-     */
-    function isTransferable(
-        uint256 tokenId
-    ) public view virtual override returns (bool) {
-        return _transfersPerToken[tokenId] < _maxNumberOfTransfers;
-    }
-
-    /**
-     * @inheritdoc IERC6454alpha
+     * @inheritdoc IERC6454beta
      */
     function isTransferable(
         uint256 tokenId,
         address,
         address
     ) public view virtual override returns (bool) {
-        return isTransferable(tokenId);
+        return _transfersPerToken[tokenId] < _maxNumberOfTransfers;
     }
 }
