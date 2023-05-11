@@ -632,7 +632,7 @@ Used to retrieve the maximum supply of the collection.
 ### mint
 
 ```solidity
-function mint(address to, uint256 numToMint) external nonpayable
+function mint(address to, uint256 numToMint) external nonpayable returns (uint256)
 ```
 
 Used to mint the desired number of tokens to the specified address.
@@ -645,6 +645,12 @@ Used to mint the desired number of tokens to the specified address.
 |---|---|---|
 | to | address | Address to which to mint the token |
 | numToMint | uint256 | Number of tokens to mint |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint256 | The ID of the first token to be minted in the current minting cycle |
 
 ### name
 
@@ -666,7 +672,7 @@ Used to retrieve the collection name.
 ### nestMint
 
 ```solidity
-function nestMint(address to, uint256 numToMint, uint256 destinationId) external nonpayable
+function nestMint(address to, uint256 numToMint, uint256 destinationId) external nonpayable returns (uint256)
 ```
 
 Used to mint a desired number of child tokens to a given parent token.
@@ -680,6 +686,12 @@ Used to mint a desired number of child tokens to a given parent token.
 | to | address | Address of the collection smart contract of the token into which to mint the child token |
 | numToMint | uint256 | Number of tokens to mint |
 | destinationId | uint256 | ID of the token into which to mint the new child token |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint256 | The ID of the first token to be minted in the current minting cycle |
 
 ### nestTransferFrom
 

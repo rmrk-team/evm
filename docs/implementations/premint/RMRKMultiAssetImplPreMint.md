@@ -486,7 +486,7 @@ Used to retrieve the maximum supply of the collection.
 ### mint
 
 ```solidity
-function mint(address to, uint256 numToMint) external nonpayable
+function mint(address to, uint256 numToMint) external nonpayable returns (uint256)
 ```
 
 Used to mint the desired number of tokens to the specified address.
@@ -499,6 +499,12 @@ Used to mint the desired number of tokens to the specified address.
 |---|---|---|
 | to | address | Address to which to mint the token |
 | numToMint | uint256 | Number of tokens to mint |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint256 | The ID of the first token to be minted in the current minting cycle |
 
 ### name
 

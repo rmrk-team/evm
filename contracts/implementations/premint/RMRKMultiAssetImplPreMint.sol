@@ -47,11 +47,12 @@ contract RMRKMultiAssetImplPreMint is RMRKAbstractMultiAssetImpl {
      * @dev Can only be called while the open sale is open.
      * @param to Address to which to mint the token
      * @param numToMint Number of tokens to mint
+     * @return The ID of the first token to be minted in the current minting cycle
      */
     function mint(
         address to,
         uint256 numToMint
-    ) public virtual notLocked onlyOwnerOrContributor {
+    ) public virtual notLocked onlyOwnerOrContributor returns (uint256) {
         if (numToMint == uint256(0)) revert RMRKMintZero();
         if (numToMint + _nextId > _maxSupply) revert RMRKMintOverMax();
 
@@ -68,6 +69,8 @@ contract RMRKMultiAssetImplPreMint is RMRKAbstractMultiAssetImpl {
                 ++i;
             }
         }
+
+        return nextToken;
     }
 
     function _beforeTokenTransfer(
