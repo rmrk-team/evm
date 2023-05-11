@@ -1,13 +1,13 @@
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { Contract } from 'ethers';
+import { BigNumber, Contract } from 'ethers';
 import { bn, ADDRESS_ZERO } from '../utils';
 import { IERC165, IERC721, IERC6059, IOtherInterface } from '../interfaces';
 
 async function shouldBehaveLikeNestable(
-  mint: (token: Contract, to: string) => Promise<number>,
-  nestMint: (token: Contract, to: string, parentId: number) => Promise<number>,
+  mint: (token: Contract, to: string) => Promise<BigNumber>,
+  nestMint: (token: Contract, to: string, parentId: number) => Promise<BigNumber>,
   transfer: (
     token: Contract,
     caller: SignerWithAddress,

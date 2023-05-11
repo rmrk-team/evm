@@ -16,6 +16,7 @@ contract RMRKCore is IRMRKCore {
      * @return Version identifier of the smart contract
      */
     string public constant VERSION = "1.1.0";
+    bytes4 public constant RMRK_INTERFACE = 0x524D524B; // "RMRK" in ASCII hex
 
     /**
      * @notice Used to initialize the smart contract.

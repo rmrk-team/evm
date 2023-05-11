@@ -172,4 +172,21 @@ abstract contract RMRKAbstractEquippableImpl is
             }
         }
     }
+
+    /**
+     * @inheritdoc IERC165
+     */
+    function supportsInterface(
+        bytes4 interfaceId
+    )
+        public
+        view
+        virtual
+        override(IERC165, RMRKMinifiedEquippable)
+        returns (bool)
+    {
+        return
+            super.supportsInterface(interfaceId) ||
+            interfaceId == RMRK_INTERFACE;
+    }
 }

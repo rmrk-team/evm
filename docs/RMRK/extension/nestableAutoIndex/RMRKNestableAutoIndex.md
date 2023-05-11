@@ -10,6 +10,23 @@ Smart contract of the RMRK Nestable AutoIndex module.
 
 ## Methods
 
+### RMRK_INTERFACE
+
+```solidity
+function RMRK_INTERFACE() external view returns (bytes4)
+```
+
+
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | bytes4 | undefined |
+
 ### VERSION
 
 ```solidity
