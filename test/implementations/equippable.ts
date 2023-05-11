@@ -1,4 +1,4 @@
-import { Contract } from 'ethers';
+import { BigNumber, Contract } from 'ethers';
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
@@ -15,6 +15,14 @@ import {
   ONE_ETH,
 } from '../utils';
 import { RMRKEquippableImpl, RMRKMultiAssetRenderUtils } from '../../typechain-types';
+import {
+  IERC5773,
+  IERC6059,
+  IERC6220,
+  IERC721,
+  IERC721Metadata,
+  IRMRKImplementation,
+} from '../interfaces';
 
 const isTokenUriEnumerated = false;
 
@@ -55,9 +63,9 @@ describe('RMRKEquippableImpl MR behavior', async () => {
     this.renderUtils = renderUtils;
   });
 
-  async function mintToNestable(token: Contract, to: string): Promise<number> {
+  async function mintToNestable(token: Contract, to: string): Promise<BigNumber> {
     await equip.mint(to, 1, { value: ONE_ETH });
-    return (await equip.totalSupply()).toNumber();
+    return await equip.totalSupply();
   }
 
   shouldBehaveLikeMultiAsset(mintToNestable, addAssetEntryEquippablesFromImpl, addAssetToToken);
@@ -80,6 +88,15 @@ describe('RMRKEquippableImpl Other', async function () {
       expect(await equip.name()).to.equal('equipWithEquippable');
       expect(await equip.symbol()).to.equal('NWE');
     });
+  });
+
+  it('can support expected interfaces', async function () {
+    expect(await equip.supportsInterface(IERC721)).to.equal(true);
+    expect(await equip.supportsInterface(IERC721Metadata)).to.equal(true);
+    expect(await equip.supportsInterface(IERC5773)).to.equal(true);
+    expect(await equip.supportsInterface(IERC6059)).to.equal(true);
+    expect(await equip.supportsInterface(IERC6220)).to.equal(true);
+    expect(await equip.supportsInterface(IRMRKImplementation)).to.equal(true);
   });
 
   it('auto accepts resource if send is token owner', async function () {

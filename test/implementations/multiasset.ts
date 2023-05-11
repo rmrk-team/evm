@@ -16,7 +16,7 @@ import {
   ONE_ETH,
   singleFixtureWithArgs,
 } from '../utils';
-import { IERC721 } from '../interfaces';
+import { IERC721, IERC721Metadata, IERC5773, IRMRKImplementation } from '../interfaces';
 import { RMRKMultiAssetImpl, RMRKMultiAssetRenderUtils } from '../../typechain-types';
 
 const isTokenUriEnumerated = true;
@@ -54,8 +54,11 @@ describe('MultiAssetImpl Other Behavior', async () => {
       this.token = token;
     });
 
-    it('can support IERC721', async function () {
+    it('can support expected interfaces', async function () {
       expect(await token.supportsInterface(IERC721)).to.equal(true);
+      expect(await token.supportsInterface(IERC721Metadata)).to.equal(true);
+      expect(await token.supportsInterface(IERC5773)).to.equal(true);
+      expect(await token.supportsInterface(IRMRKImplementation)).to.equal(true);
     });
 
     shouldBehaveLikeOwnableLock(isOwnableLockMock);

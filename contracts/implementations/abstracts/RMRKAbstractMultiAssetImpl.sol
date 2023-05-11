@@ -92,4 +92,15 @@ abstract contract RMRKAbstractMultiAssetImpl is
     ) public virtual override onlyOwner {
         _setRoyaltyRecipient(newRoyaltyRecipient);
     }
+
+    /**
+     * @inheritdoc IERC165
+     */
+    function supportsInterface(
+        bytes4 interfaceId
+    ) public view virtual override(IERC165, RMRKMultiAsset) returns (bool) {
+        return
+            super.supportsInterface(interfaceId) ||
+            interfaceId == RMRK_INTERFACE;
+    }
 }

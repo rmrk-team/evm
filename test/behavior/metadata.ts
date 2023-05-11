@@ -1,9 +1,9 @@
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
-import { Contract } from 'ethers';
+import { BigNumber, Contract } from 'ethers';
 
 async function shouldHaveMetadata(
-  mint: (token: Contract, to: string) => Promise<number>,
+  mint: (token: Contract, to: string) => Promise<BigNumber>,
   isTokenUriEnumerated: boolean,
 ): Promise<void> {
   it('can get tokenURI', async function () {

@@ -10,6 +10,23 @@ Smart contract of the RMRK Soulbound module where transfers are only allowed unt
 
 ## Methods
 
+### RMRK_INTERFACE
+
+```solidity
+function RMRK_INTERFACE() external view returns (bytes4)
+```
+
+
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | bytes4 | undefined |
+
 ### VERSION
 
 ```solidity
