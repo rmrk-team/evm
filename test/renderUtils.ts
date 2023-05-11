@@ -369,7 +369,7 @@ describe('Advanced Equip Render Utils', async function () {
     ).to.eql([
       bn(0), // child Index
       [
-        // [Slot Id, asset Id, Asset priority, catalog address, isEquipped, partMetadata, childAssetMetadata, parentAssetMetadata]
+        // [Slot Id, child asset Id, parent asset Id, Asset priority, catalog address, isEquipped, partMetadata, childAssetMetadata, parentAssetMetadata]
         [
           bn(slotIdGemRight),
           bn(assetForGemARight),
@@ -410,7 +410,7 @@ describe('Advanced Equip Render Utils', async function () {
     ).to.eql([
       bn(1), // child Index
       [
-        // [Slot Id, asset Id, Asset priority, catalog address, isEquipped, partMetadata, childAssetMetadata, parentAssetMetadata]
+        // [Slot Id, child asset Id, parent asset Id, Asset priority, catalog address, isEquipped, partMetadata, childAssetMetadata, parentAssetMetadata]
         [
           bn(slotIdGemRight),
           bn(assetForGemARight),
@@ -452,7 +452,7 @@ describe('Advanced Equip Render Utils', async function () {
     ).to.eql([
       bn(2), // child Index
       [
-        // [Slot Id, asset Id, Asset priority, catalog address, isEquipped, partMetadata, childAssetMetadata, parentAssetMetadata]
+        // [Slot Id, child asset Id, parent asset Id, Asset priority, catalog address, isEquipped, partMetadata, childAssetMetadata, parentAssetMetadata]
         [
           bn(slotIdGemRight),
           bn(assetForGemBRight),
@@ -495,7 +495,7 @@ describe('Advanced Equip Render Utils', async function () {
     ).to.eql([
       bn(2), // child Index
       [
-        // [Slot Id, asset Id, Asset priority, catalog address, isEquipped, partMetadata, childAssetMetadata, parentAssetMetadata]
+        // [Slot Id, child asset Id, parent asset Id, Asset priority, catalog address, isEquipped, partMetadata, childAssetMetadata, parentAssetMetadata]
         [
           bn(slotIdGemRight),
           bn(assetForGemBRight),
@@ -558,7 +558,72 @@ describe('Advanced Equip Render Utils', async function () {
     ).to.eql([
       bn(0), // child Index
       [
-        // [Slot Id, asset Id, Asset priority, catalog address, isEquipped, partMetadata, childAssetMetadata, parentAssetMetadata]
+        // [Slot Id, child asset Id, parent asset Id, Asset priority, catalog address, isEquipped, partMetadata, childAssetMetadata, parentAssetMetadata]
+        [
+          bn(slotIdGemRight),
+          bn(assetForGemBRight),
+          bn(assetForKanariaFull),
+          bn(0),
+          catalog.address,
+          false,
+          'ipfs://metadataSlotGemRight',
+          'ipfs://gems/typeB/right.svg',
+          'ipfs://kanaria/full.svg',
+        ],
+        [
+          bn(slotIdGemMid),
+          bn(assetForGemBMid),
+          bn(assetForKanariaFull),
+          bn(1),
+          catalog.address,
+          false,
+          'ipfs://metadataSlotGemMid',
+          'ipfs://gems/typeB/mid.svg',
+          'ipfs://kanaria/full.svg',
+        ],
+        [
+          bn(slotIdGemLeft),
+          bn(assetForGemBLeft),
+          bn(assetForKanariaFull),
+          bn(2),
+          catalog.address,
+          false,
+          'ipfs://metadataSlotGemLeft',
+          'ipfs://gems/typeB/left.svg',
+          'ipfs://kanaria/full.svg',
+        ],
+      ],
+    ]);
+  });
+
+  it('can get equippable slots from parent asset and excludes if catalog does not match', async function () {
+    await setUpCatalog(catalog, gem.address);
+    await setUpKanariaAsset(kanaria, kanariaId, catalog.address);
+    await setUpGemAssets(gem, gemId1, gemId2, gemId3, kanaria.address, catalog.address);
+
+    const catalogFactory = await ethers.getContractFactory('RMRKCatalogMock');
+    const otherCatalog = <RMRKCatalogMock>(
+      await catalogFactory.deploy('ipfs://catalog.json', 'misc')
+    );
+    await otherCatalog.deployed();
+
+    const newResourceId = bn(99);
+    await gem.addEquippableAssetEntry(
+      newResourceId,
+      1,
+      otherCatalog.address,
+      'ipfs://assetFromOtherCatalog.jpg',
+      [],
+    );
+    await gem.addAssetToToken(gemId3, newResourceId, 0);
+    await gem.acceptAsset(gemId3, 0, newResourceId);
+
+    expect(
+      await renderUtilsEquip.getEquippableSlotsFromParent(gem.address, gemId3, assetForKanariaFull),
+    ).to.eql([
+      bn(2), // child Index
+      [
+        // [Slot Id, child asset Id, parent asset Id, Asset priority, catalog address, isEquipped, partMetadata, childAssetMetadata, parentAssetMetadata]
         [
           bn(slotIdGemRight),
           bn(assetForGemBRight),

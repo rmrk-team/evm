@@ -693,7 +693,8 @@ contract RMRKEquipRenderUtils is
                 IERC6220(childAddress),
                 childId,
                 parentSlotPartIds,
-                parentAddress
+                parentAddress,
+                parentAssetCatalog
             );
         // Finally, we copy the matches into the final array which has the right lenght according to results
         equippableData = new EquippableData[](totalMatches);
@@ -778,6 +779,7 @@ contract RMRKEquipRenderUtils is
      * @param childId ID of the child token whose assets will be matched against parent's slot parts
      * @param parentSlotPartIds Array of slot part IDs of the parent token's asset
      * @param parentAddress Address of the parent smart contract
+     * @param parentAssetCatalog Address of the parent asset's catalog
      * @return allAssetsWithSlots An array of `EquippableData` structs containing info about the equippable child assets
      *  and their corresponding slot parts
      * @return totalMatches Total of valid matches found
@@ -786,7 +788,8 @@ contract RMRKEquipRenderUtils is
         IERC6220 childContract,
         uint256 childId,
         uint64[] memory parentSlotPartIds,
-        address parentAddress
+        address parentAddress,
+        address parentAssetCatalog
     )
         private
         view
@@ -801,14 +804,16 @@ contract RMRKEquipRenderUtils is
         );
 
         uint256 totalChildAssets = childAssets.length;
-        uint256 totalParentSlots = parentSlotPartIds.length;
 
         // There can be at most min(totalChildAssets, totalParentSlots) resulting matches, we just pick one of them.
-        allAssetsWithSlots = new EquippableData[](totalParentSlots);
+        allAssetsWithSlots = new EquippableData[](totalChildAssets);
 
         for (uint256 i; i < totalChildAssets; ) {
-            for (uint256 j; j < totalParentSlots; ) {
+            (, , address catalogAddress, ) = childContract
+                .getAssetAndEquippableData(childId, childAssets[i]);
+            for (uint256 j; j < parentSlotPartIds.length; ) {
                 if (
+                    catalogAddress == parentAssetCatalog &&
                     childContract.canTokenBeEquippedWithAssetIntoSlot(
                         parentAddress,
                         childId,
