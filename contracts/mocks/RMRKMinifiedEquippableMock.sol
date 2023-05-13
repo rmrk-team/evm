@@ -22,7 +22,7 @@ contract RMRKMinifiedEquippableMock is RMRKMinifiedEquippable {
     }
 
     function mint(address to, uint256 tokenId) external {
-        _mint(to, tokenId, "");
+        _safeMint(to, tokenId, "");
     }
 
     function nestMint(

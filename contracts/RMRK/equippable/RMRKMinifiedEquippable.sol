@@ -74,8 +74,12 @@ contract RMRKMinifiedEquippable is
      * @param tokenId ID of the token to check
      */
     function _onlyApprovedOrOwner(uint256 tokenId) private view {
-        if (!_isApprovedOrOwner(_msgSender(), tokenId))
-            revert ERC721NotApprovedOrOwner();
+        address owner = ownerOf(tokenId);
+        if (
+            !(_msgSender() == owner ||
+                isApprovedForAll(owner, _msgSender()) ||
+                getApproved(tokenId) == _msgSender())
+        ) revert ERC721NotApprovedOrOwner();
     }
 
     /**
@@ -96,8 +100,16 @@ contract RMRKMinifiedEquippable is
      * @param tokenId ID of the token to check.
      */
     function _onlyApprovedOrDirectOwner(uint256 tokenId) private view {
-        if (!_isApprovedOrDirectOwner(_msgSender(), tokenId))
+        (address owner, uint256 parentId, ) = directOwnerOf(tokenId);
+        // When the parent is an NFT, only it can do operations. Otherwise, the owner or approved address can
+        if (
+            (parentId != 0 && _msgSender() != owner) ||
+            !(_msgSender() == owner ||
+                isApprovedForAll(owner, _msgSender()) ||
+                getApproved(tokenId) == _msgSender())
+        ) {
             revert RMRKNotApprovedOrDirectOwner();
+        }
     }
 
     /**
@@ -189,7 +201,9 @@ contract RMRKMinifiedEquippable is
         uint256 tokenId,
         bytes memory data
     ) public virtual onlyApprovedOrDirectOwner(tokenId) {
-        _safeTransfer(from, to, tokenId, data);
+        _transfer(from, to, tokenId, data);
+        if (!_checkOnERC721Received(from, to, tokenId, data))
+            revert ERC721TransferToNonReceiverImplementer();
     }
 
     /**
@@ -230,35 +244,6 @@ contract RMRKMinifiedEquippable is
 
         // Sending to NFT:
         _sendToNFT(immediateOwner, to, parentId, destinationId, tokenId, data);
-    }
-
-    /**
-     * @notice Used to safely transfer the token form `from` to `to`.
-     * @dev The function checks that contract recipients are aware of the ERC721 protocol to prevent tokens from being
-     *  forever locked.
-     * @dev This internal function is equivalent to {safeTransferFrom}, and can be used to e.g. implement alternative
-     *  mechanisms to perform token transfer, such as signature-based.
-     * @dev Requirements:
-     *
-     *  - `from` cannot be the zero address.
-     *  - `to` cannot be the zero address.
-     *  - `tokenId` token must exist and be owned by `from`.
-     *  - If `to` refers to a smart contract, it must implement {IERC721Receiver-onERC721Received}, which is called upon a safe transfer.
-     * @dev Emits a {Transfer} event.
-     * @param from Address of the account currently owning the given token
-     * @param to Address to transfer the token to
-     * @param tokenId ID of the token to transfer
-     * @param data Additional data with no specified format, sent in call to `to`
-     */
-    function _safeTransfer(
-        address from,
-        address to,
-        uint256 tokenId,
-        bytes memory data
-    ) internal virtual {
-        _transfer(from, to, tokenId, data);
-        if (!_checkOnERC721Received(from, to, tokenId, data))
-            revert ERC721TransferToNonReceiverImplementer();
     }
 
     /**
@@ -403,29 +388,6 @@ contract RMRKMinifiedEquippable is
         uint256 tokenId,
         bytes memory data
     ) internal virtual {
-        _mint(to, tokenId, data);
-        if (!_checkOnERC721Received(address(0), to, tokenId, data))
-            revert ERC721TransferToNonReceiverImplementer();
-    }
-
-    /**
-     * @notice Used to mint a specified token to a given address.
-     * @dev WARNING: Usage of this method is discouraged, use {_safeMint} whenever possible.
-     * @dev Requirements:
-     *
-     *  - `tokenId` must not exist.
-     *  - `to` cannot be the zero address.
-     * @dev Emits a {Transfer} event.
-     * @dev Emits a {NestTransfer} event.
-     * @param to Address to mint the token to
-     * @param tokenId ID of the token to mint
-     * @param data Additional data with no specified format, sent in call to `to`
-     */
-    function _mint(
-        address to,
-        uint256 tokenId,
-        bytes memory data
-    ) internal virtual {
         _innerMint(to, tokenId, 0, data);
 
         emit Transfer(address(0), to, tokenId);
@@ -433,6 +395,8 @@ contract RMRKMinifiedEquippable is
 
         _afterTokenTransfer(address(0), to, tokenId);
         _afterNestedTokenTransfer(address(0), to, 0, 0, tokenId, data);
+        if (!_checkOnERC721Received(address(0), to, tokenId, data))
+            revert ERC721TransferToNonReceiverImplementer();
     }
 
     /**
@@ -547,26 +511,6 @@ contract RMRKMinifiedEquippable is
         uint256 tokenId,
         uint256 maxChildrenBurns
     ) public virtual onlyApprovedOrDirectOwner(tokenId) returns (uint256) {
-        return _burn(tokenId, maxChildrenBurns);
-    }
-
-    /**
-     * @notice Used to burn a token.
-     * @dev When a token is burned, its children are recursively burned as well.
-     * @dev The approvals are cleared when the token is burned.
-     * @dev Requirements:
-     *
-     *  - `tokenId` must exist.
-     * @dev Emits a {Transfer} event.
-     * @dev Emits a {NestTransfer} event.
-     * @param tokenId ID of the token to burn
-     * @param maxChildrenBurns Maximum children to recursively burn
-     * @return The number of recursive burns it took to burn all of the children
-     */
-    function _burn(
-        uint256 tokenId,
-        uint256 maxChildrenBurns
-    ) internal virtual returns (uint256) {
         (address immediateOwner, uint256 parentId, ) = directOwnerOf(tokenId);
         address owner = ownerOf(tokenId);
         _balances[immediateOwner] -= 1;
@@ -753,47 +697,6 @@ contract RMRKMinifiedEquippable is
     ////////////////////////////////////////
     //              UTILS
     ////////////////////////////////////////
-
-    /**
-     * @notice Used to check whether the given account is allowed to manage the given token.
-     * @dev Requirements:
-     *
-     *  - `tokenId` must exist.
-     * @param spender Address that is being checked for approval
-     * @param tokenId ID of the token being checked
-     * @return A boolean value indicating whether the `spender` is approved to manage the given token
-     */
-    function _isApprovedOrOwner(
-        address spender,
-        uint256 tokenId
-    ) internal view virtual returns (bool) {
-        address owner = ownerOf(tokenId);
-        return (spender == owner ||
-            isApprovedForAll(owner, spender) ||
-            getApproved(tokenId) == spender);
-    }
-
-    /**
-     * @notice Used to check whether the account is approved to manage the token or its direct owner.
-     * @param spender Address that is being checked for approval or direct ownership
-     * @param tokenId ID of the token being checked
-     * @return A boolean value indicating whether the `spender` is approved to manage the given token or its
-     *  direct owner
-     */
-    function _isApprovedOrDirectOwner(
-        address spender,
-        uint256 tokenId
-    ) internal view virtual returns (bool) {
-        (address owner, uint256 parentId, ) = directOwnerOf(tokenId);
-        // When the parent is an NFT, only it can do operations
-        if (parentId != 0) {
-            return (spender == owner);
-        }
-        // Otherwise, the owner or approved address can
-        return (spender == owner ||
-            isApprovedForAll(owner, spender) ||
-            getApproved(tokenId) == spender);
-    }
 
     /**
      * @notice Used to enforce that the given token has been minted.
@@ -1681,8 +1584,12 @@ contract RMRKMinifiedEquippable is
      * @param tokenId ID of the token that we are checking
      */
     function _onlyApprovedForAssetsOrOwner(uint256 tokenId) private view {
-        if (!_isApprovedForAssetsOrOwner(_msgSender(), tokenId))
-            revert RMRKNotApprovedForAssetsOrOwner();
+        address owner = ownerOf(tokenId);
+        if (
+            !(_msgSender() == owner ||
+                isApprovedForAllForAssets(owner, _msgSender()) ||
+                getApprovedForAssets(tokenId) == _msgSender())
+        ) revert RMRKNotApprovedForAssetsOrOwner();
     }
 
     /**
@@ -1943,25 +1850,6 @@ contract RMRKMinifiedEquippable is
     ) public view virtual returns (address) {
         _requireMinted(tokenId);
         return _tokenApprovalsForAssets[tokenId][ownerOf(tokenId)];
-    }
-
-    /**
-     * @notice Internal function to check whether the queried user is either:
-     *   1. The root owner of the token associated with `tokenId`.
-     *   2. Is approved for all assets of the current owner via the `setApprovalForAllForAssets` function.
-     *   3. Is granted approval for the specific tokenId for asset management via the `approveForAssets` function.
-     * @param user Address of the user we are checking for permission
-     * @param tokenId ID of the token to query for permission for a given `user`
-     * @return A boolean value indicating whether the user is approved to manage the token or not
-     */
-    function _isApprovedForAssetsOrOwner(
-        address user,
-        uint256 tokenId
-    ) internal view virtual returns (bool) {
-        address owner = ownerOf(tokenId);
-        return (user == owner ||
-            isApprovedForAllForAssets(owner, user) ||
-            getApprovedForAssets(tokenId) == user);
     }
 
     /**
