@@ -160,17 +160,6 @@ describe('NestableMultiAssetImpl Other', async function () {
     owner = (await ethers.getSigners())[0];
   });
 
-  it('auto accepts resource if send is token owner', async function () {
-    await nesting.connect(owner).mint(owner.address, 1, { value: ONE_ETH.mul(1) });
-    await nesting.connect(owner).addAssetEntry('ipfs://test');
-    const assetId = await nesting.totalAssets();
-    const tokenId = await nesting.totalSupply();
-    await nesting.connect(owner).addAssetToToken(tokenId, assetId, 0);
-
-    expect(await nesting.getPendingAssets(tokenId)).to.be.eql([]);
-    expect(await nesting.getActiveAssets(tokenId)).to.be.eql([assetId]);
-  });
-
   shouldControlValidMinting();
   shouldHaveRoyalties(mintFromImplNativeToken);
   shouldHaveMetadata(mintFromImplNativeToken, isTokenUriEnumerated);

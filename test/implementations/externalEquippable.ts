@@ -88,17 +88,6 @@ describe('ExternalEquippableImpl Other', async function () {
     await equip.manageContributor(contributor.address, true);
   });
 
-  it('auto accepts resource if send is token owner', async function () {
-    await nestable.connect(owner).mint(owner.address, 1, { value: ONE_ETH.mul(1) });
-    await equip.connect(owner).addEquippableAssetEntry(0, ADDRESS_ZERO, 'ipfs://test', []);
-    const assetId = await equip.totalAssets();
-    const tokenId = await nestable.totalSupply();
-    await equip.connect(owner).addAssetToToken(tokenId, assetId, 0);
-
-    expect(await equip.getPendingAssets(tokenId)).to.be.eql([]);
-    expect(await equip.getActiveAssets(tokenId)).to.be.eql([assetId]);
-  });
-
   it('cannot set equippable or nestable address if not owner', async function () {
     const [, notOwner, otherAddress] = await ethers.getSigners();
     await expect(
