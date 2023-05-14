@@ -99,17 +99,6 @@ describe('RMRKEquippableImpl Other', async function () {
     expect(await equip.supportsInterface(IRMRKImplementation)).to.equal(true);
   });
 
-  it('auto accepts resource if send is token owner', async function () {
-    await equip.connect(owner).mint(owner.address, 1, { value: ONE_ETH.mul(1) });
-    await equip.connect(owner).addEquippableAssetEntry(0, ADDRESS_ZERO, 'ipfs://test', []);
-    const assetId = await equip.totalAssets();
-    const tokenId = await equip.totalSupply();
-    await equip.connect(owner).addAssetToToken(tokenId, assetId, 0);
-
-    expect(await equip.getPendingAssets(tokenId)).to.be.eql([]);
-    expect(await equip.getActiveAssets(tokenId)).to.be.eql([assetId]);
-  });
-
   shouldControlValidMinting();
   shouldHaveRoyalties(mintFromImplNativeToken);
   shouldHaveMetadata(mintFromImplNativeToken, isTokenUriEnumerated);

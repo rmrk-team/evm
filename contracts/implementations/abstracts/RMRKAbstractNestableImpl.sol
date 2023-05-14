@@ -85,6 +85,7 @@ abstract contract RMRKAbstractNestableImpl is
     ) public view virtual override(IERC165, RMRKNestable) returns (bool) {
         return
             super.supportsInterface(interfaceId) ||
+            interfaceId == type(IERC2981).interfaceId ||
             interfaceId == RMRK_INTERFACE;
     }
 }

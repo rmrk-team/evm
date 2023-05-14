@@ -61,8 +61,6 @@ abstract contract RMRKAbstractNestableMultiAssetImpl is
      * @dev If the asset ID is invalid, the execution will be reverted.
      * @dev If the token already has the maximum amount of pending assets (128), the execution will be
      *  reverted.
-     * @dev If the asset is being added by the current root owner of the token, the asset will be automatically
-     *  accepted.
      * @param tokenId ID of the token to add the asset to
      * @param assetId ID of the asset to add to the token
      * @param replacesAssetWithId ID of the asset to replace from the token's list of active assets
@@ -73,9 +71,6 @@ abstract contract RMRKAbstractNestableMultiAssetImpl is
         uint64 replacesAssetWithId
     ) public onlyOwnerOrContributor {
         _addAssetToToken(tokenId, assetId, replacesAssetWithId);
-        if (_msgSender() == ownerOf(tokenId)) {
-            _acceptAsset(tokenId, _pendingAssets[tokenId].length - 1, assetId);
-        }
     }
 
     /**
@@ -138,6 +133,7 @@ abstract contract RMRKAbstractNestableMultiAssetImpl is
     {
         return
             super.supportsInterface(interfaceId) ||
+            interfaceId == type(IERC2981).interfaceId ||
             interfaceId == RMRK_INTERFACE;
     }
 }
