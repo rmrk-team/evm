@@ -58,7 +58,7 @@ function addAssetToToken(uint256 tokenId, uint64 assetId, uint64 replacesAssetWi
 
 Used to add an asset to a token.
 
-*If the given asset is already added to the token, the execution will be reverted.If the asset ID is invalid, the execution will be reverted.If the token already has the maximum amount of pending assets (128), the execution will be  reverted.If the asset is being added by the current root owner of the token, the asset will be automatically  accepted.*
+*If the given asset is already added to the token, the execution will be reverted.If the asset ID is invalid, the execution will be reverted.If the token already has the maximum amount of pending assets (128), the execution will be  reverted.*
 
 #### Parameters
 
