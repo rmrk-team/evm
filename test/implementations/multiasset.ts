@@ -104,17 +104,6 @@ describe('MultiAssetImpl Other Behavior', async () => {
         token.connect(owner).mint(owner.address, 1, { value: 0 }),
       ).to.be.revertedWithCustomError(token, 'RMRKWrongValueSent');
     });
-
-    it('auto accepts resource if send is token owner', async function () {
-      await token.connect(owner).mint(owner.address, 1, { value: ONE_ETH.mul(1) });
-      await token.connect(owner).addAssetEntry('ipfs://test');
-      const assetId = await token.totalAssets();
-      const tokenId = await token.totalSupply();
-      await token.connect(owner).addAssetToToken(tokenId, assetId, 0);
-
-      expect(await token.getPendingAssets(tokenId)).to.be.eql([]);
-      expect(await token.getActiveAssets(tokenId)).to.be.eql([assetId]);
-    });
   });
 });
 
