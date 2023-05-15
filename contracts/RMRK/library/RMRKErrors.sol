@@ -32,6 +32,8 @@ error ERC721TransferFromIncorrectOwner();
 error ERC721TransferToNonReceiverImplementer();
 /// Attempting to transfer the token to a 0x0 address
 error ERC721TransferToTheZeroAddress();
+/// Attempting to call an initialize of an already initalized contract
+error RMRKAlreadyInitialized();
 /// Attempting to grant approval of assets to their current owner
 error RMRKApprovalForAssetsToCurrentOwner();
 /// Attempting to grant approval of assets without being the caller or approved for all
