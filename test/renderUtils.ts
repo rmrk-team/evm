@@ -1066,6 +1066,12 @@ describe('Extended NFT render utils', function () {
       ).to.eql([false, [true, false, true]]);
     });
 
+    it('can get directOwnerOf with parents perspective', async function () {
+      expect(
+        await renderUtils.directOwnerOfWithParentsPerspective(nestable.address, parentTokenOne),
+      ).to.eql([rootOwner.address, ethers.BigNumber.from(0), false, false, false]);
+    });
+
     it('can identify rejected children', async function () {
       expect(await renderUtils.isTokenRejectedOrAbandoned(nestable.address, childTokenOne)).to.be
         .false;
