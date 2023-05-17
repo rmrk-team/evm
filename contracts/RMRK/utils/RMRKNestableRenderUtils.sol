@@ -92,6 +92,17 @@ contract RMRKNestableRenderUtils {
         if (!isNFT) revert RMRKParentIsNotNFT();
     }
 
+    /**
+     * @notice Used to retrieve the immediate owner of the given token, and whether it is on the parent's active or pending children list.
+     * @dev If the immediate owner is not an NFT, the function returns false for both `inParentsActiveChildren` and `inParentsPendingChildren`.
+     * @param collection Address of the token's collection smart contract
+     * @param tokenId ID of the token
+     * @return directOwner Address of the given token's owner
+     * @return ownerId The ID of the parent token. Should be `0` if the owner is an externally owned account
+     * @return isNFT The boolean value signifying whether the owner is an NFT or not
+     * @return inParentsActiveChildren Whether the token is on the parent's active children list
+     * @return inParentsPendingChildren Whether the token is on the parent's pending children list
+     */
     function directOwnerOfWithParentsPerspective(
         address collection,
         uint256 tokenId
@@ -150,6 +161,13 @@ contract RMRKNestableRenderUtils {
         }
     }
 
+    /**
+     * @notice Used to identify if the given token is rejected or abandoned. That is, it's parent is an NFT but this token is neither on the parent's active nor pending children list.
+     * @dev Returns false if the immediate owner is not an NFT.
+     * @param collection Address of the token's collection smart contract
+     * @param tokenId ID of the token
+     * @return isRejectedOrAbandoned Whether the token is rejected or abandoned
+     */
     function isTokenRejectedOrAbandoned(
         address collection,
         uint256 tokenId
