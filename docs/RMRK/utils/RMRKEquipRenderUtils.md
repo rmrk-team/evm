@@ -63,26 +63,26 @@ Used to compose the given equippables.
 function directOwnerOfWithParentsPerspective(address collection, uint256 tokenId) external view returns (address directOwner, uint256 ownerId, bool isNFT, bool inParentsActiveChildren, bool inParentsPendingChildren)
 ```
 
+Used to retrieve the immediate owner of the given token, and whether it is on the parent&#39;s active or pending children list.
 
-
-
+*If the immediate owner is not an NFT, the function returns false for both `inParentsActiveChildren` and `inParentsPendingChildren`.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| collection | address | undefined |
-| tokenId | uint256 | undefined |
+| collection | address | Address of the token&#39;s collection smart contract |
+| tokenId | uint256 | ID of the token |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| directOwner | address | undefined |
-| ownerId | uint256 | undefined |
-| isNFT | bool | undefined |
-| inParentsActiveChildren | bool | undefined |
-| inParentsPendingChildren | bool | undefined |
+| directOwner | address | Address of the given token&#39;s owner |
+| ownerId | uint256 | The ID of the parent token. Should be `0` if the owner is an externally owned account |
+| isNFT | bool | The boolean value signifying whether the owner is an NFT or not |
+| inParentsActiveChildren | bool | Whether the token is on the parent&#39;s active children list |
+| inParentsPendingChildren | bool | Whether the token is on the parent&#39;s pending children list |
 
 ### equippedChildrenOf
 
@@ -646,22 +646,22 @@ Used to verify whether a given child asset is equipped into a given parent slot.
 function isTokenRejectedOrAbandoned(address collection, uint256 tokenId) external view returns (bool isRejectedOrAbandoned)
 ```
 
+Used to identify if the given token is rejected or abandoned. That is, it&#39;s parent is an NFT but this token is neither on the parent&#39;s active nor pending children list.
 
-
-
+*Returns false if the immediate owner is not an NFT.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| collection | address | undefined |
-| tokenId | uint256 | undefined |
+| collection | address | Address of the token&#39;s collection smart contract |
+| tokenId | uint256 | ID of the token |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| isRejectedOrAbandoned | bool | undefined |
+| isRejectedOrAbandoned | bool | Whether the token is rejected or abandoned |
 
 ### splitSlotAndFixedParts
 
