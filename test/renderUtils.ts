@@ -1065,6 +1065,48 @@ describe('Extended NFT render utils', function () {
         ),
       ).to.eql([false, [true, false, true]]);
     });
+
+    it('can identify rejected children', async function () {
+      expect(await renderUtils.isTokenRejectedOrAbandoned(nestable.address, childTokenOne)).to.be
+        .false;
+      await nestable
+        .connect(rootOwner)
+        .transferChild(
+          parentTokenOne,
+          ethers.constants.AddressZero,
+          0,
+          0,
+          nestable.address,
+          childTokenOne,
+          true,
+          '0x',
+        );
+      expect(await renderUtils.isTokenRejectedOrAbandoned(nestable.address, childTokenOne)).to.be
+        .true;
+    });
+
+    it('can identify abandoned children', async function () {
+      await nestable
+        .connect(rootOwner)
+        .acceptChild(parentTokenOne, 0, nestable.address, childTokenOne);
+
+      expect(await renderUtils.isTokenRejectedOrAbandoned(nestable.address, childTokenOne)).to.be
+        .false;
+      await nestable
+        .connect(rootOwner)
+        .transferChild(
+          parentTokenOne,
+          ethers.constants.AddressZero,
+          0,
+          0,
+          nestable.address,
+          childTokenOne,
+          false,
+          '0x',
+        );
+      expect(await renderUtils.isTokenRejectedOrAbandoned(nestable.address, childTokenOne)).to.be
+        .true;
+    });
   });
 });
 

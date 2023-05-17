@@ -92,6 +92,81 @@ contract RMRKNestableRenderUtils {
         if (!isNFT) revert RMRKParentIsNotNFT();
     }
 
+    function directOwnerOfWithParentsPerspective(
+        address collection,
+        uint256 tokenId
+    )
+        public
+        view
+        returns (
+            address directOwner,
+            uint256 ownerId,
+            bool isNFT,
+            bool inParentsActiveChildren,
+            bool inParentsPendingChildren
+        )
+    {
+        (directOwner, ownerId, isNFT) = IERC6059(collection).directOwnerOf(
+            tokenId
+        );
+        if (!isNFT) {
+            inParentsActiveChildren = false;
+            inParentsPendingChildren = false;
+        } else {
+            IERC6059.Child[] memory activeChildren = IERC6059(directOwner)
+                .childrenOf(ownerId);
+            IERC6059.Child[] memory pendingChildren = IERC6059(directOwner)
+                .pendingChildrenOf(ownerId);
+
+            uint256 len = activeChildren.length;
+            for (uint256 i; i < len; ) {
+                if (
+                    activeChildren[i].tokenId == tokenId &&
+                    activeChildren[i].contractAddress == collection
+                ) {
+                    inParentsActiveChildren = true;
+                    break;
+                }
+                unchecked {
+                    ++i;
+                }
+            }
+            if (!inParentsActiveChildren) {
+                // Cannot be on both lists
+                len = pendingChildren.length;
+                for (uint256 i; i < len; ) {
+                    if (
+                        pendingChildren[i].tokenId == tokenId &&
+                        pendingChildren[i].contractAddress == collection
+                    ) {
+                        inParentsPendingChildren = true;
+                        break;
+                    }
+                    unchecked {
+                        ++i;
+                    }
+                }
+            }
+        }
+    }
+
+    function isTokenRejectedOrAbandoned(
+        address collection,
+        uint256 tokenId
+    ) public view returns (bool isRejectedOrAbandoned) {
+        (
+            ,
+            ,
+            bool parentIsNft,
+            bool inParentsActiveChildren,
+            bool inParentsPendingChildren
+        ) = directOwnerOfWithParentsPerspective(collection, tokenId);
+        return
+            parentIsNft &&
+            !inParentsActiveChildren &&
+            !inParentsPendingChildren;
+    }
+
     /**
      * @notice Check if the child is owned by the expected parent.
      * @dev Reverts if child token is not owned by an NFT.
