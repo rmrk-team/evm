@@ -57,6 +57,33 @@ Used to compose the given equippables.
 | fixedParts | RMRKEquipRenderUtils.FixedPart[] | An array of fixed parts respresented by the `FixedPart` structs present on the asset |
 | slotParts | RMRKEquipRenderUtils.EquippedSlotPart[] | An array of slot parts represented by the `EquippedSlotPart` structs present on the asset |
 
+### directOwnerOfWithParentsPerspective
+
+```solidity
+function directOwnerOfWithParentsPerspective(address collection, uint256 tokenId) external view returns (address directOwner, uint256 ownerId, bool isNFT, bool inParentsActiveChildren, bool inParentsPendingChildren)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| collection | address | undefined |
+| tokenId | uint256 | undefined |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| directOwner | address | undefined |
+| ownerId | uint256 | undefined |
+| isNFT | bool | undefined |
+| inParentsActiveChildren | bool | undefined |
+| inParentsPendingChildren | bool | undefined |
+
 ### equippedChildrenOf
 
 ```solidity
@@ -612,6 +639,29 @@ Used to verify whether a given child asset is equipped into a given parent slot.
 | Name | Type | Description |
 |---|---|---|
 | isEquipped | bool | Boolean value signifying whether the child asset is equipped into the parent slot or not |
+
+### isTokenRejectedOrAbandoned
+
+```solidity
+function isTokenRejectedOrAbandoned(address collection, uint256 tokenId) external view returns (bool isRejectedOrAbandoned)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| collection | address | undefined |
+| tokenId | uint256 | undefined |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| isRejectedOrAbandoned | bool | undefined |
 
 ### splitSlotAndFixedParts
 
