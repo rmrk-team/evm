@@ -29,6 +29,33 @@ Check if the child is owned by the expected parent.
 | expectedParent | address | Address of the expected parent contract |
 | expectedParentId | uint256 | ID of the expected parent token |
 
+### directOwnerOfWithParentsPerspective
+
+```solidity
+function directOwnerOfWithParentsPerspective(address collection, uint256 tokenId) external view returns (address directOwner, uint256 ownerId, bool isNFT, bool inParentsActiveChildren, bool inParentsPendingChildren)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| collection | address | undefined |
+| tokenId | uint256 | undefined |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| directOwner | address | undefined |
+| ownerId | uint256 | undefined |
+| isNFT | bool | undefined |
+| inParentsActiveChildren | bool | undefined |
+| inParentsPendingChildren | bool | undefined |
+
 ### getChildIndex
 
 ```solidity
@@ -102,6 +129,29 @@ Used to retrieve the given child&#39;s index in its parent&#39;s pending child t
 | Name | Type | Description |
 |---|---|---|
 | _0 | uint256 | The index of the child token in the parent token&#39;s pending child tokens array |
+
+### isTokenRejectedOrAbandoned
+
+```solidity
+function isTokenRejectedOrAbandoned(address collection, uint256 tokenId) external view returns (bool isRejectedOrAbandoned)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| collection | address | undefined |
+| tokenId | uint256 | undefined |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| isRejectedOrAbandoned | bool | undefined |
 
 ### validateChildOf
 
