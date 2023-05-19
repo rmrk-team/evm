@@ -4,7 +4,8 @@
   "license": "Apache-2.0",
   "files": [
     "contracts/RMRK/*",
-    "contracts/implementations/*"
+    "contracts/implementations/*",
+    "contracts/upgradeable/*"
   ],
   "scripts": {
     "test": "yarn typechain && hardhat test",
