@@ -24,11 +24,11 @@ contract RMRKNestableAutoIndexUpgradeable is
     mapping(uint256 => mapping(address => mapping(uint256 => uint256)))
         private _activeChildrenIndex;
 
-    function initialize(
+    function __RMRKNestableAutoIndexUpgradeable_init(
         string memory name_,
         string memory symbol_
-    ) public virtual override initializable {
-        RMRKNestableUpgradeable.initialize(name_, symbol_);
+    ) internal initializable {
+        __RMRKNestableUpgradeable_init(name_, symbol_);
     }
 
     function supportsInterface(

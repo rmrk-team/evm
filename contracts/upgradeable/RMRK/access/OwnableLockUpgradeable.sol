@@ -26,6 +26,13 @@ contract OwnableLockUpgradeable is OwnableUpgradeable {
         _;
     }
 
+    function __OwnableLockUpgradeable_init() internal initializer {
+        __OwnableLockUpgradeable_init_unchained();
+        __OwnableUpgradeable_init();
+    }
+
+    function __OwnableLockUpgradeable_init_unchained() internal initializer {}
+
     /**
      * @notice Locks the operation.
      * @dev Once locked, functions using `notLocked` modifier cannot be executed.

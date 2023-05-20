@@ -30,9 +30,9 @@ abstract contract RMRKSoulboundAfterTransactionsUpgradeable is
      * @notice Used to initialize the smart contract.
      * @param maxNumberOfTransfers Max number of transfers before a token becomes soulbound
      */
-    function initialize(
+    function __RMRKSoulboundAfterTransactionsUpgradeable_init(
         uint256 maxNumberOfTransfers
-    ) public virtual initializable {
+    ) internal initializable {
         _maxNumberOfTransfers = maxNumberOfTransfers;
     }
 

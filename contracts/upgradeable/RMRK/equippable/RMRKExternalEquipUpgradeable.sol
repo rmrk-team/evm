@@ -125,11 +125,16 @@ contract RMRKExternalEquipUpgradeable is
         _;
     }
 
+    function __RMRKExternalEquipUpgradeable_init(address nestableAddress) internal initializable {
+        __RMRKExternalEquipUpgradeable_init_unchained(nestableAddress);
+        __AbstractMultiAssetUpgradeable_init();
+    }
+
     /**
      * @notice Used to initialize the smart contract.
      * @param nestableAddress Address of the Nestable module of external equip composite
      */
-    function initialize(address nestableAddress) public virtual initializable {
+    function __RMRKExternalEquipUpgradeable_init_unchained(address nestableAddress) internal initializable {
         _setNestableAddress(nestableAddress);
     }
 

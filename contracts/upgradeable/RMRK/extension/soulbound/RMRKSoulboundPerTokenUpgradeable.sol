@@ -9,7 +9,7 @@ import "./RMRKSoulboundUpgradeable.sol";
  * @author RMRK team
  * @notice Smart contract of the upgradeable RMRK Soulbound module where the transfers are permitted or prohibited on a per-token basis.
  */
-abstract contract RMRKSoulboundPerTokenUpgradeable is RMRKSoulboundUpgradeable {
+contract RMRKSoulboundPerTokenUpgradeable is RMRKSoulboundUpgradeable {
     /**
      * @notice Emitted when a token's soulbound state changes.
      * @param tokenId ID of the token

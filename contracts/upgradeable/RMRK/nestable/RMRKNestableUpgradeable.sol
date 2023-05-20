@@ -112,12 +112,15 @@ contract RMRKNestableUpgradeable is
      * @param name_ Name of the token collection
      * @param symbol_ Symbol of the token collection
      */
-    function initialize(
+    function __RMRKNestableUpgradeable_init(
         string memory name_,
         string memory symbol_
-    ) public virtual override initializable {
-        RMRKCoreUpgradeable.initialize(name_, symbol_);
+    ) internal initializable {
+        __RMRKNestableUpgradeable_init_unchained();
+        __RMRKCoreUpgradeable_init(name_, symbol_);
     }
+
+    function __RMRKNestableUpgradeable_init_unchained() internal initializable {}
 
     // ------------------------------- ERC721 ---------------------------------
     /**

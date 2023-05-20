@@ -42,10 +42,14 @@ abstract contract ReentrancyGuardUpgradeable is InitializationGuard {
 
     uint256 private _status;
 
+    function __ReentrancyGuard_init() internal initializable {
+        __ReentrancyGuard_init_unchained();
+    }
+
     /**
      * @notice Initializes the ReentrancyGuard with the `_status` of `_NOT_ENTERED`.
      */
-    function initialize() public initializable {
+    function __ReentrancyGuard_init_unchained() internal initializable {
         _status = _NOT_ENTERED;
     }
 

@@ -24,12 +24,15 @@ contract RMRKMultiAssetAutoIndexUpgradeable is
      * @param name_ Name of the token collection
      * @param symbol_ Symbol of the token collection
      */
-    function initialize(
+    function __RMRKMultiAssetAutoIndexUpgradeable_init(
         string memory name_,
         string memory symbol_
-    ) public virtual override initializable {
-        RMRKMultiAssetUpgradeable.initialize(name_, symbol_);
+    ) internal initializable {
+        __RMRKMultiAssetAutoIndexUpgradeable_init_unchained();
+        __RMRKMultiAssetUpgradeable_init(name_, symbol_);
     }
+
+    function __RMRKMultiAssetAutoIndexUpgradeable_init_unchained() internal initializer {}
 
     /**
      * @inheritdoc IERC165Upgradeable

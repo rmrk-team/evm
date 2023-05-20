@@ -11,7 +11,7 @@ import "../../../../RMRK/library/RMRKErrors.sol";
  * @author RMRK team
  * @notice Smart contract of the upgradeable RMRK Soulbound module.
  */
-abstract contract RMRKSoulboundUpgradeable is
+contract RMRKSoulboundUpgradeable is
     IERC6454betaUpgradeable,
     RMRKCoreUpgradeable
 {

@@ -1,6 +1,6 @@
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { BigNumber, Contract } from 'ethers';
-import { ethers } from 'hardhat';
+import { ethers, upgrades } from 'hardhat';
 
 let nextTokenId = 1;
 let nextChildTokenId = 100;
@@ -164,6 +164,13 @@ async function singleFixtureWithArgs(contractName: string, args: any[]): Promise
   return token;
 }
 
+async function singleUpgradeableFixtureWithArgs(contractName: string, args: any[]): Promise<Contract> {
+  const factory = await ethers.getContractFactory(contractName);
+  const token = await upgrades.deployProxy(factory, [...args]);
+  await token.deployed();
+  return token;
+}
+
 async function parentChildFixtureWithArgs(
   contractName: string,
   parentArgs: any[],
@@ -197,5 +204,6 @@ export {
   ONE_ETH,
   parentChildFixtureWithArgs,
   singleFixtureWithArgs,
+  singleUpgradeableFixtureWithArgs,
   transfer,
 };

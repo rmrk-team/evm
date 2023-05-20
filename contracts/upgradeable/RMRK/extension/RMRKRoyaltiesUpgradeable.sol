@@ -25,10 +25,10 @@ abstract contract RMRKRoyaltiesUpgradeable is
      * @param royaltyRecipient Address to which royalties should be sent
      * @param royaltyPercentageBps The royalty percentage expressed in basis points
      */
-    function initialize(
+    function __RMRKRoyaltiesUpgradeable_init(
         address royaltyRecipient,
         uint256 royaltyPercentageBps //in basis points
-    ) public virtual initializable {
+    ) internal initializable {
         _setRoyaltyRecipient(royaltyRecipient);
         if (royaltyPercentageBps >= 10000) revert RMRKRoyaltiesTooHigh();
         _royaltyPercentageBps = royaltyPercentageBps;

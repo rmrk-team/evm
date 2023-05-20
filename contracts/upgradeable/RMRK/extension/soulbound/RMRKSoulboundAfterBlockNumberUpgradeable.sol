@@ -21,9 +21,9 @@ abstract contract RMRKSoulboundAfterBlockNumberUpgradeable is
      * @notice Used to initialize the smart contract.
      * @param lastBlockToTransfer Last block number where transfers are allowed
      */
-    function initialize(
+    function __RMRKSoulboundAfterBlockNumberUpgradeable_init(
         uint256 lastBlockToTransfer
-    ) public virtual initializable {
+    ) internal initializable {
         _lastBlockToTransfer = lastBlockToTransfer;
     }
 

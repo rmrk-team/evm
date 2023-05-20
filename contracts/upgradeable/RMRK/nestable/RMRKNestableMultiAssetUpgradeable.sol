@@ -57,11 +57,11 @@ contract RMRKNestableMultiAssetUpgradeable is
      * @param name_ Name of the token collection
      * @param symbol_ Symbol of the token collection
      */
-    function initialize(
+    function __RMRKNestableMultiAssetUpgradeable_init(
         string memory name_,
         string memory symbol_
-    ) public virtual override initializable {
-        RMRKNestableUpgradeable.initialize(name_, symbol_);
+    ) internal initializable {
+        __RMRKNestableUpgradeable_init(name_, symbol_);
     }
 
     /**

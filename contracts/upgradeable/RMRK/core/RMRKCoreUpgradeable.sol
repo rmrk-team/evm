@@ -19,15 +19,21 @@ contract RMRKCoreUpgradeable is IRMRKCoreUpgradeable, InitializationGuard {
     string public constant VERSION = "1.1.0";
     bytes4 public constant RMRK_INTERFACE = 0x524D524B; // "RMRK" in ASCII hex
 
+    function __RMRKCoreUpgradeable_init(
+        string memory name_,
+        string memory symbol_
+    ) internal initializable {
+        __RMRKCoreUpgradeable_init_unchained(name_, symbol_);
+    }
     /**
      * @notice Used to initialize the smart contract.
      * @param name_ Name of the token collection
      * @param symbol_ Symbol of the token collection
      */
-    function initialize(
+    function __RMRKCoreUpgradeable_init_unchained(
         string memory name_,
         string memory symbol_
-    ) public virtual initializable {
+    ) internal initializable {
         _name = name_;
         _symbol = symbol_;
     }

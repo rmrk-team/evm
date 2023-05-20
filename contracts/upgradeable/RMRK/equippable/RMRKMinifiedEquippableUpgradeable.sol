@@ -1626,12 +1626,17 @@ contract RMRKMinifiedEquippableUpgradeable is
      * @param name_ Name of the token collection
      * @param symbol_ Symbol of the token collection
      */
-    function initialize(
+    function __RMRKMinifiedEquippableUpgradeable_init(
         string memory name_,
         string memory symbol_
-    ) public virtual override initializable {
-        RMRKCoreUpgradeable.initialize(name_, symbol_);
+    ) internal initializable {
+        __RMRKMinifiedEquippableUpgradeable_init_unchained();
+        __ReentrancyGuard_init();
+        __Context_init();
+        __RMRKCoreUpgradeable_init(name_, symbol_);
     }
+
+    function __RMRKMinifiedEquippableUpgradeable_init_unchained() internal initializable {}
 
     /**
      * @inheritdoc IERC165Upgradeable

@@ -8,14 +8,14 @@ contract InitializationGuard {
     bool private _initialized;
 
     modifier initializable() {
-        _initialize();
+        _initializable();
         _;
+        _initialized = true;
     }
 
-    function _initialize() internal {
+    function _initializable() internal {
         if (_initialized) {
             revert RMRKAlreadyInitialized();
         }
-        _initialized = true;
     }
 }

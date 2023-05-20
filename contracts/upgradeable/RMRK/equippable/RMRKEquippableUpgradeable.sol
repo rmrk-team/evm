@@ -18,11 +18,11 @@ import "./IERC6220Upgradeable.sol";
  * @notice Smart contract of the upgradeable RMRK Equippable module.
  */
 contract RMRKEquippableUpgradeable is
+    IERC6220Upgradeable,
     InitializationGuard,
     ReentrancyGuardUpgradeable,
-    RMRKNestableUpgradeable,
     AbstractMultiAssetUpgradeable,
-    IERC6220Upgradeable
+    RMRKNestableUpgradeable
 {
     using RMRKLib for uint64[];
 
@@ -85,12 +85,17 @@ contract RMRKEquippableUpgradeable is
      * @param name_ Name of the token collection
      * @param symbol_ Symbol of the token collection
      */
-    function initialize(
+    function __RMRKEquippableUpgradeable_init(
         string memory name_,
         string memory symbol_
-    ) public virtual override initializable {
-        RMRKNestableUpgradeable.initialize(name_, symbol_);
+    ) internal initializer {
+        __RMRKEquippableUpgradeable_init_unchained();
+        __Context_init();
+        __RMRKCoreUpgradeable_init(name_, symbol_);
+        __RMRKNestableUpgradeable_init_unchained();
     }
+
+    function __RMRKEquippableUpgradeable_init_unchained() internal initializable {}
 
     /**
      * @inheritdoc IERC165Upgradeable

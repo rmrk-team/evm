@@ -51,10 +51,16 @@ contract OwnableUpgradeable is InitializationGuard, ContextUpgradeable {
         _;
     }
 
+
+    function __OwnableUpgradeable_init() internal initializer {
+        __OwnableUpgradeable_init_unchained();
+        __Context_init();
+    }
+
     /**
      * @dev Initializes the contract by setting the deployer as the initial owner.
      */
-    function initialize() public virtual initializable {
+    function __OwnableUpgradeable_init_unchained() internal initializable {
         _transferOwnership(_msgSender());
     }
 

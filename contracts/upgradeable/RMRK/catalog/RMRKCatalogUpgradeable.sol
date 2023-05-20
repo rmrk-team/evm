@@ -34,15 +34,22 @@ contract RMRKCatalogUpgradeable is
     string private _metadataURI;
     string private _type;
 
+    function __RMRKCatalogUpgradeable_init(
+        string memory metadataURI,
+        string memory type_
+    ) internal initializable {
+        __RMRKCatalogUpgradeable_init_unchained(metadataURI, type_);
+    }
+
     /**
      * @notice Used to initialize the Catalog.
      * @param metadataURI Base metadata URI of the Catalog
      * @param type_ Type of Catalog
      */
-    function initialize(
+    function __RMRKCatalogUpgradeable_init_unchained(
         string memory metadataURI,
         string memory type_
-    ) public virtual initializable {
+    ) internal initializable {
         _setMetadataURI(metadataURI);
         _setType(type_);
     }
