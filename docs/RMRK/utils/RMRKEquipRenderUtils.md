@@ -81,8 +81,8 @@ Used to retrieve the immediate owner of the given token, and whether it is on th
 | directOwner | address | Address of the given token&#39;s owner |
 | ownerId | uint256 | The ID of the parent token. Should be `0` if the owner is an externally owned account |
 | isNFT | bool | The boolean value signifying whether the owner is an NFT or not |
-| inParentsActiveChildren | bool | Whether the token is on the parent&#39;s active children list |
-| inParentsPendingChildren | bool | Whether the token is on the parent&#39;s pending children list |
+| inParentsActiveChildren | bool | A boolean value signifying whether the token is in the parent&#39;s active children list |
+| inParentsPendingChildren | bool | A boolean value signifying whether the token is in the parent&#39;s pending children list |
 
 ### equippedChildrenOf
 
