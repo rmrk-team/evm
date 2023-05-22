@@ -100,8 +100,8 @@ contract RMRKNestableRenderUtils {
      * @return directOwner Address of the given token's owner
      * @return ownerId The ID of the parent token. Should be `0` if the owner is an externally owned account
      * @return isNFT The boolean value signifying whether the owner is an NFT or not
-     * @return inParentsActiveChildren Whether the token is on the parent's active children list
-     * @return inParentsPendingChildren Whether the token is on the parent's pending children list
+     * @return inParentsActiveChildren A boolean value signifying whether the token is in the parent's active children list
+     * @return inParentsPendingChildren A boolean value signifying whether the token is in the parent's pending children list
      */
     function directOwnerOfWithParentsPerspective(
         address collection,
