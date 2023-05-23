@@ -16,7 +16,6 @@ import "../../../RMRK/library/RMRKErrors.sol";
 import "../../../RMRK/library/RMRKLib.sol";
 import "../nestable/IERC6059Upgradeable.sol";
 import "../security/ReentrancyGuardUpgradeable.sol";
-import "../security/InitializationGuard.sol";
 
 /**
  * @title RMRKMinifiedEquippableUpgradeable
@@ -26,7 +25,6 @@ import "../security/InitializationGuard.sol";
  * @dev Most of the code is duplicated from the other legos, this version is created to save size.
  */
 contract RMRKMinifiedEquippableUpgradeable is
-    InitializationGuard,
     ReentrancyGuardUpgradeable,
     ContextUpgradeable,
     IERC165Upgradeable,
@@ -1629,14 +1627,17 @@ contract RMRKMinifiedEquippableUpgradeable is
     function __RMRKMinifiedEquippableUpgradeable_init(
         string memory name_,
         string memory symbol_
-    ) internal initializable {
+    ) internal onlyInitializing {
         __RMRKMinifiedEquippableUpgradeable_init_unchained();
         __ReentrancyGuard_init();
         __Context_init();
         __RMRKCoreUpgradeable_init(name_, symbol_);
     }
 
-    function __RMRKMinifiedEquippableUpgradeable_init_unchained() internal initializable {}
+    function __RMRKMinifiedEquippableUpgradeable_init_unchained()
+        internal
+        onlyInitializing
+    {}
 
     /**
      * @inheritdoc IERC165Upgradeable

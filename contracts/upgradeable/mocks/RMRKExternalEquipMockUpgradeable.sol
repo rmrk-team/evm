@@ -3,13 +3,14 @@
 pragma solidity ^0.8.18;
 
 import "../RMRK/equippable/RMRKExternalEquipUpgradeable.sol";
-import "../RMRK/security/InitializationGuard.sol";
 
 /* import "hardhat/console.sol"; */
 
 //Minimal public upgradeable implementation of RMRKEquippableWithNestable for testing.
-contract RMRKExternalEquipMockUpgradeable is InitializationGuard, RMRKExternalEquipUpgradeable {
-    function initialize(address nestableAddress) public virtual initializable {
+contract RMRKExternalEquipMockUpgradeable is RMRKExternalEquipUpgradeable {
+    function __RMRKExternalEquipMockUpgradeable_init(
+        address nestableAddress
+    ) public virtual onlyInitializing {
         __RMRKExternalEquipUpgradeable_init(nestableAddress);
     }
 

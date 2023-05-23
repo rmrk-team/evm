@@ -2,7 +2,6 @@
 pragma solidity ^0.8.18;
 
 import "../access/OwnableLockUpgradeable.sol";
-import "../security/InitializationGuard.sol";
 import "../../../RMRK/library/RMRKErrors.sol";
 
 /**
@@ -12,7 +11,7 @@ import "../../../RMRK/library/RMRKErrors.sol";
  * @dev This smart contract includes the top-level utilities for managing minting and implements OwnableLock by default.
  * @dev Max supply-related and pricing variables are immutable after deployment.
  */
-contract RMRKMintingUtilsUpgradeable is InitializationGuard, OwnableLockUpgradeable {
+contract RMRKMintingUtilsUpgradeable is OwnableLockUpgradeable {
     uint256 internal _nextId;
     uint256 internal _totalSupply;
     uint256 internal _maxSupply;
@@ -24,7 +23,10 @@ contract RMRKMintingUtilsUpgradeable is InitializationGuard, OwnableLockUpgradea
      * @param pricePerMint_ The minting price to initialize the smart contract with, expressed in the smallest
      *  denomination of the native currency of the chain to which the smart contract is deployed to
      */
-    function __RMRKMintingUtilsUpgradeable_init(uint256 maxSupply_, uint256 pricePerMint_) internal initializable {
+    function __RMRKMintingUtilsUpgradeable_init(
+        uint256 maxSupply_,
+        uint256 pricePerMint_
+    ) internal onlyInitializing {
         _maxSupply = maxSupply_;
         _pricePerMint = pricePerMint_;
     }

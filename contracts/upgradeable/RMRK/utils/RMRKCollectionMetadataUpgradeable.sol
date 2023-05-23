@@ -2,21 +2,23 @@
 
 pragma solidity ^0.8.18;
 
-import "../security/InitializationGuard.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 /**
  * @title RMRKCollectionMetadataUpgradeable
  * @author RMRK team
  * @notice Smart contract of the upgradeable RMRK Collection metadata module.
  */
-contract RMRKCollectionMetadataUpgradeable is InitializationGuard {
+contract RMRKCollectionMetadataUpgradeable is Initializable {
     string private _collectionMetadata;
 
     /**
      * @notice Used to initialize the contract with the given metadata.
      * @param collectionMetadata_ The collection metadata with which to initialize the smart contract
      */
-    function __RMRKCollectionMetadataUpgradeable_init(string memory collectionMetadata_) internal initializable {
+    function __RMRKCollectionMetadataUpgradeable_init(
+        string memory collectionMetadata_
+    ) internal onlyInitializing {
         _setCollectionMetadata(collectionMetadata_);
     }
 

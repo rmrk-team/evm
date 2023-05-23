@@ -250,23 +250,6 @@ Used to retrieve the account approved to manage given token.
 |---|---|---|
 | _0 | address | Address of the account approved to manage the token |
 
-### initialize
-
-```solidity
-function initialize(string name_, string symbol_) external nonpayable
-```
-
-Initializes the contract by setting a `name` and a `symbol` to the token collection.
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| name_ | string | Name of the token collection |
-| symbol_ | string | Symbol of the token collection |
-
 ### isApprovedForAll
 
 ```solidity
@@ -813,17 +796,6 @@ error ERC721TransferToTheZeroAddress()
 ```
 
 Attempting to transfer the token to a 0x0 address
-
-
-
-
-### RMRKAlreadyInitialized
-
-```solidity
-error RMRKAlreadyInitialized()
-```
-
-Attempting to call an initialize of an already initalized contract
 
 
 

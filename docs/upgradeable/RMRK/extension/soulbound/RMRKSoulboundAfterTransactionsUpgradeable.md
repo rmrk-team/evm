@@ -83,39 +83,6 @@ Gets the current number of transfer the specified token.
 |---|---|---|
 | _0 | uint256 | Number of the token&#39;s transfers to date |
 
-### initialize
-
-```solidity
-function initialize(string name_, string symbol_) external nonpayable
-```
-
-Used to initialize the smart contract.
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| name_ | string | Name of the token collection |
-| symbol_ | string | Symbol of the token collection |
-
-### initialize
-
-```solidity
-function initialize(uint256 maxNumberOfTransfers) external nonpayable
-```
-
-Used to initialize the smart contract.
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| maxNumberOfTransfers | uint256 | Max number of transfers before a token becomes soulbound |
-
 ### isTransferable
 
 ```solidity
@@ -200,6 +167,22 @@ Used to retrieve the collection symbol.
 
 ## Events
 
+### Initialized
+
+```solidity
+event Initialized(uint8 version)
+```
+
+
+
+*Triggered when the contract has been initialized or reinitialized.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| version  | uint8 | undefined |
+
 ### Soulbound
 
 ```solidity
@@ -215,20 +198,6 @@ Emitted when a token becomes soulbound.
 | Name | Type | Description |
 |---|---|---|
 | tokenId `indexed` | uint256 | ID of the token |
-
-
-
-## Errors
-
-### RMRKAlreadyInitialized
-
-```solidity
-error RMRKAlreadyInitialized()
-```
-
-Attempting to call an initialize of an already initalized contract
-
-
 
 
 

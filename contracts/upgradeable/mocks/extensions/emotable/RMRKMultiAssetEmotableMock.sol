@@ -5,11 +5,14 @@ pragma solidity ^0.8.18;
 import "../../../RMRK/multiasset/RMRKMultiAssetUpgradeable.sol";
 import "../../../RMRK/extension/emotable/RMRKEmotableUpgradeable.sol";
 
-contract RMRKMultiAssetEmotableMockUpgradeable is RMRKEmotableUpgradeable, RMRKMultiAssetUpgradeable {
-    function initialize(
+contract RMRKMultiAssetEmotableMockUpgradeable is
+    RMRKEmotableUpgradeable,
+    RMRKMultiAssetUpgradeable
+{
+    function __RMRKMultiAssetEmotableMockUpgradeable_init(
         string memory name,
         string memory symbol
-    ) public initializable{
+    ) public onlyInitializing {
         __RMRKMultiAssetUpgradeable_init(name, symbol);
     }
 

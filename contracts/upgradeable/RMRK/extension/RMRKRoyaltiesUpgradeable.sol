@@ -4,7 +4,7 @@ pragma solidity ^0.8.18;
 
 import "@openzeppelin/contracts-upgradeable/interfaces/IERC2981Upgradeable.sol";
 import "../../../RMRK/library/RMRKErrors.sol";
-import "../security/InitializationGuard.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 /**
  * @title RMRKRoyaltiesUpgradeable
@@ -13,7 +13,7 @@ import "../security/InitializationGuard.sol";
  */
 abstract contract RMRKRoyaltiesUpgradeable is
     IERC2981Upgradeable,
-    InitializationGuard
+    Initializable
 {
     address private _royaltyRecipient;
     uint256 private _royaltyPercentageBps;
@@ -28,7 +28,7 @@ abstract contract RMRKRoyaltiesUpgradeable is
     function __RMRKRoyaltiesUpgradeable_init(
         address royaltyRecipient,
         uint256 royaltyPercentageBps //in basis points
-    ) internal initializable {
+    ) internal onlyInitializing {
         _setRoyaltyRecipient(royaltyRecipient);
         if (royaltyPercentageBps >= 10000) revert RMRKRoyaltiesTooHigh();
         _royaltyPercentageBps = royaltyPercentageBps;

@@ -169,7 +169,11 @@ contract RMRKMultiAssetRenderUtilsUpgradeable {
             target,
             tokenId
         );
-        return IERC5773Upgradeable(target).getAssetMetadata(tokenId, maxPriorityAssetId);
+        return
+            IERC5773Upgradeable(target).getAssetMetadata(
+                tokenId,
+                maxPriorityAssetId
+            );
     }
 
     /**

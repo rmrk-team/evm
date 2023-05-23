@@ -3,7 +3,7 @@
 pragma solidity ^0.8.18;
 
 import "../equippable/IERC6220Upgradeable.sol";
-import "../security/InitializationGuard.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol";
 
 error RMRKCanOnlyDoBulkOperationsOnOwnedTokens();
@@ -15,7 +15,7 @@ error RMRKCanOnlyDoBulkOperationsWithOneTokenAtATime();
  * @notice Smart contract of the upgradeable RMRK Bulk Writer per collection module.
  * @dev Extra utility functions for RMRK contracts.
  */
-contract RMRKBulkWriterPerCollectionUpgradeable is InitializationGuard {
+contract RMRKBulkWriterPerCollectionUpgradeable is Initializable {
     /**
      * @notice Used to provide a struct for inputing unequip data.
      * @dev Only used for input and not storage of data
@@ -42,7 +42,9 @@ contract RMRKBulkWriterPerCollectionUpgradeable is InitializationGuard {
      * @notice Initializes the contract by setting the collection
      * @param collection Address of the collection that this contract is managing.
      */
-    function __RMRKBulkWriterPerCollectionUpgradeable_init(address collection) internal initializable {
+    function __RMRKBulkWriterPerCollectionUpgradeable_init(
+        address collection
+    ) internal onlyInitializing {
         _collection = collection;
     }
 

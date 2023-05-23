@@ -10,8 +10,12 @@ import { RMRKNestableClaimableChildMockUpgradeable } from '../../../typechain-ty
 
 async function reclaimableChildNestableFixture() {
   const factory = await ethers.getContractFactory('RMRKNestableClaimableChildMockUpgradeable');
-  const child = <RMRKNestableClaimableChildMockUpgradeable>await upgrades.deployProxy(factory, ['Chunky', 'CHNK']);
-  const parent = <RMRKNestableClaimableChildMockUpgradeable>await upgrades.deployProxy(factory, ['Chunky', 'CHNK']);
+  const child = <RMRKNestableClaimableChildMockUpgradeable>(
+    await upgrades.deployProxy(factory, ['Chunky', 'CHNK'])
+  );
+  const parent = <RMRKNestableClaimableChildMockUpgradeable>(
+    await upgrades.deployProxy(factory, ['Chunky', 'CHNK'])
+  );
   await parent.deployed();
   await child.deployed();
 

@@ -61,39 +61,6 @@ Gets the last block number where transfers are allowed
 |---|---|---|
 | _0 | uint256 | The block number after which tokens are soulbound |
 
-### initialize
-
-```solidity
-function initialize(string name_, string symbol_) external nonpayable
-```
-
-Used to initialize the smart contract.
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| name_ | string | Name of the token collection |
-| symbol_ | string | Symbol of the token collection |
-
-### initialize
-
-```solidity
-function initialize(uint256 lastBlockToTransfer) external nonpayable
-```
-
-Used to initialize the smart contract.
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| lastBlockToTransfer | uint256 | Last block number where transfers are allowed |
-
 ### isTransferable
 
 ```solidity
@@ -176,18 +143,23 @@ Used to retrieve the collection symbol.
 
 
 
+## Events
 
-## Errors
-
-### RMRKAlreadyInitialized
+### Initialized
 
 ```solidity
-error RMRKAlreadyInitialized()
+event Initialized(uint8 version)
 ```
 
-Attempting to call an initialize of an already initalized contract
 
 
+*Triggered when the contract has been initialized or reinitialized.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| version  | uint8 | undefined |
 
 
 

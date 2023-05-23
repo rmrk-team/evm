@@ -44,23 +44,6 @@ Version of the @rmrk-team/evm-contracts package
 |---|---|---|
 | _0 | string | undefined |
 
-### initialize
-
-```solidity
-function initialize(string name_, string symbol_) external nonpayable
-```
-
-Used to initialize the smart contract.
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| name_ | string | Name of the token collection |
-| symbol_ | string | Symbol of the token collection |
-
 ### isTransferable
 
 ```solidity
@@ -145,6 +128,22 @@ Used to retrieve the collection symbol.
 
 ## Events
 
+### Initialized
+
+```solidity
+event Initialized(uint8 version)
+```
+
+
+
+*Triggered when the contract has been initialized or reinitialized.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| version  | uint8 | undefined |
+
 ### Soulbound
 
 ```solidity
@@ -161,20 +160,6 @@ Emitted when a token&#39;s soulbound state changes.
 |---|---|---|
 | tokenId `indexed` | uint256 | ID of the token |
 | state  | bool | A boolean value signifying whether the token became soulbound (`true`) or transferrable (`false`) |
-
-
-
-## Errors
-
-### RMRKAlreadyInitialized
-
-```solidity
-error RMRKAlreadyInitialized()
-```
-
-Attempting to call an initialize of an already initalized contract
-
-
 
 
 

@@ -314,7 +314,10 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
 
           describe('to a valid receiver contract', function () {
             beforeEach(async function () {
-              receiver = await upgrades.deployProxy(this.ERC721Receiver, [RECEIVER_MAGIC_VALUE, Error.None]);
+              receiver = await upgrades.deployProxy(this.ERC721Receiver, [
+                RECEIVER_MAGIC_VALUE,
+                Error.None,
+              ]);
               await receiver.deployed();
               toWhom = receiver;
             });
@@ -413,7 +416,7 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
         describe('to a receiver contract that reverts without message', function () {
           it('reverts', async function () {
             const ERC721Receiver = await ethers.getContractFactory('ERC721ReceiverMockUpgradeable');
-            const revertingReceiver = await upgrades.deployProxy( ERC721Receiver, [
+            const revertingReceiver = await upgrades.deployProxy(ERC721Receiver, [
               RECEIVER_MAGIC_VALUE,
               Error.RevertWithoutMessage,
             ]);
@@ -433,7 +436,7 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
         describe('to a receiver contract that panics', function () {
           it('reverts', async function () {
             const ERC721Receiver = await ethers.getContractFactory('ERC721ReceiverMockUpgradeable');
-            const revertingReceiver = await upgrades.deployProxy( ERC721Receiver, [
+            const revertingReceiver = await upgrades.deployProxy(ERC721Receiver, [
               RECEIVER_MAGIC_VALUE,
               Error.Panic,
             ]);
@@ -516,7 +519,7 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
       context('to a receiver contract that reverts with message', function () {
         it('reverts', async function () {
           const ERC721Receiver = await ethers.getContractFactory('ERC721ReceiverMockUpgradeable');
-          const revertingReceiver = await upgrades.deployProxy( ERC721Receiver, [
+          const revertingReceiver = await upgrades.deployProxy(ERC721Receiver, [
             ethers.utils.hexZeroPad('0x42', 4),
             Error.RevertWithMessage,
           ]);
@@ -532,7 +535,7 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
       context('to a receiver contract that reverts without message', function () {
         it('reverts', async function () {
           const ERC721Receiver = await ethers.getContractFactory('ERC721ReceiverMockUpgradeable');
-          const revertingReceiver = await upgrades.deployProxy( ERC721Receiver, [
+          const revertingReceiver = await upgrades.deployProxy(ERC721Receiver, [
             RECEIVER_MAGIC_VALUE,
             Error.RevertWithoutMessage,
           ]);
@@ -548,7 +551,10 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
       context('to a receiver contract that panics', function () {
         it('reverts', async function () {
           const ERC721Receiver = await ethers.getContractFactory('ERC721ReceiverMockUpgradeable');
-          const revertingReceiver = await upgrades.deployProxy(ERC721Receiver, [RECEIVER_MAGIC_VALUE, Error.Panic]);
+          const revertingReceiver = await upgrades.deployProxy(ERC721Receiver, [
+            RECEIVER_MAGIC_VALUE,
+            Error.Panic,
+          ]);
           await revertingReceiver.deployed();
           await expect(
             this.token

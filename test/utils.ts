@@ -164,7 +164,10 @@ async function singleFixtureWithArgs(contractName: string, args: any[]): Promise
   return token;
 }
 
-async function singleUpgradeableFixtureWithArgs(contractName: string, args: any[]): Promise<Contract> {
+async function singleUpgradeableFixtureWithArgs(
+  contractName: string,
+  args: any[],
+): Promise<Contract> {
   const factory = await ethers.getContractFactory(contractName);
   const token = await upgrades.deployProxy(factory, [...args]);
   await token.deployed();

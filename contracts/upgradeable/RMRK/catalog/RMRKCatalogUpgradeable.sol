@@ -4,18 +4,15 @@ pragma solidity ^0.8.18;
 
 import "./IRMRKCatalogUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "../../../RMRK/library/RMRKErrors.sol";
-import "../security/InitializationGuard.sol";
 
 /**
  * @title RMRKCatalogUpgradeable
  * @author RMRK team
  * @notice Upgradeable catalog contract for RMRK equippable module.
  */
-contract RMRKCatalogUpgradeable is
-    IRMRKCatalogUpgradeable,
-    InitializationGuard
-{
+contract RMRKCatalogUpgradeable is IRMRKCatalogUpgradeable, Initializable {
     using AddressUpgradeable for address;
 
     /**
@@ -37,7 +34,7 @@ contract RMRKCatalogUpgradeable is
     function __RMRKCatalogUpgradeable_init(
         string memory metadataURI,
         string memory type_
-    ) internal initializable {
+    ) internal onlyInitializing {
         __RMRKCatalogUpgradeable_init_unchained(metadataURI, type_);
     }
 
@@ -49,7 +46,7 @@ contract RMRKCatalogUpgradeable is
     function __RMRKCatalogUpgradeable_init_unchained(
         string memory metadataURI,
         string memory type_
-    ) internal initializable {
+    ) internal onlyInitializing {
         _setMetadataURI(metadataURI);
         _setType(type_);
     }

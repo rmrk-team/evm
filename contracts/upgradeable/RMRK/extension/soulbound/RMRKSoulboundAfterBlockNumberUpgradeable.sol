@@ -3,7 +3,6 @@
 pragma solidity ^0.8.18;
 
 import "./RMRKSoulboundUpgradeable.sol";
-import "../../security/InitializationGuard.sol";
 
 /**
  * @title RMRKSoulboundAfterBlockNumberUpgradeable
@@ -11,7 +10,6 @@ import "../../security/InitializationGuard.sol";
  * @notice Smart contract of the upgradeable RMRK Soulbound module where transfers are only allowed until a certain block number.
  */
 abstract contract RMRKSoulboundAfterBlockNumberUpgradeable is
-    InitializationGuard,
     RMRKSoulboundUpgradeable
 {
     // Last block number where transfers are allowed
@@ -23,7 +21,7 @@ abstract contract RMRKSoulboundAfterBlockNumberUpgradeable is
      */
     function __RMRKSoulboundAfterBlockNumberUpgradeable_init(
         uint256 lastBlockToTransfer
-    ) internal initializable {
+    ) internal onlyInitializing {
         _lastBlockToTransfer = lastBlockToTransfer;
     }
 

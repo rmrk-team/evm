@@ -26,12 +26,15 @@ contract OwnableLockUpgradeable is OwnableUpgradeable {
         _;
     }
 
-    function __OwnableLockUpgradeable_init() internal initializer {
+    function __OwnableLockUpgradeable_init() internal onlyInitializing {
         __OwnableLockUpgradeable_init_unchained();
         __OwnableUpgradeable_init();
     }
 
-    function __OwnableLockUpgradeable_init_unchained() internal initializer {}
+    function __OwnableLockUpgradeable_init_unchained()
+        internal
+        onlyInitializing
+    {}
 
     /**
      * @notice Locks the operation.

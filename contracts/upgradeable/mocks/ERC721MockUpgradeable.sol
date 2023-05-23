@@ -3,17 +3,16 @@
 pragma solidity ^0.8.18;
 
 import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
-import "../RMRK/security/InitializationGuard.sol";
 
 /**
  * @title ERC721MockUpgradeable
  * Used for tests with non RMRK implementer
  */
-contract ERC721MockUpgradeable is InitializationGuard, ERC721Upgradeable {
-    function initialize(
+contract ERC721MockUpgradeable is ERC721Upgradeable {
+    function __ERC721MockUpgradeable_init(
         string memory name,
         string memory symbol
-    ) public initializable{
+    ) public onlyInitializing {
         __ERC721_init(name, symbol);
     }
 

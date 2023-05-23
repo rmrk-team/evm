@@ -3,13 +3,12 @@
 pragma solidity ^0.8.18;
 
 import "../RMRK/utils/RMRKMintingUtilsUpgradeable.sol";
-import "../RMRK/security/InitializationGuard.sol";
 
-contract MintingUtilsMockUpgradeable is InitializationGuard, RMRKMintingUtilsUpgradeable {
-    function initialize(
+contract MintingUtilsMockUpgradeable is RMRKMintingUtilsUpgradeable {
+    function __MintingUtilsMockUpgradeable_init(
         uint256 maxSupply_,
         uint256 pricePerMint_
-    ) public initializable {
+    ) public onlyInitializing {
         __RMRKMintingUtilsUpgradeable_init(maxSupply_, pricePerMint_);
     }
 

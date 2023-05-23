@@ -7,7 +7,6 @@ pragma solidity ^0.8.18;
 import "../multiasset/AbstractMultiAssetUpgradeable.sol";
 import "./IERC6059Upgradeable.sol";
 import "./RMRKNestableUpgradeable.sol";
-import "../security/InitializationGuard.sol";
 import "@openzeppelin/contracts-upgradeable/utils/introspection/IERC165Upgradeable.sol";
 
 /**
@@ -16,7 +15,6 @@ import "@openzeppelin/contracts-upgradeable/utils/introspection/IERC165Upgradeab
  * @notice Smart contract of the joined upgradeable RMRK Nestable and Multi asset module.
  */
 contract RMRKNestableMultiAssetUpgradeable is
-    InitializationGuard,
     RMRKNestableUpgradeable,
     AbstractMultiAssetUpgradeable
 {
@@ -60,7 +58,7 @@ contract RMRKNestableMultiAssetUpgradeable is
     function __RMRKNestableMultiAssetUpgradeable_init(
         string memory name_,
         string memory symbol_
-    ) internal initializable {
+    ) internal onlyInitializing {
         __RMRKNestableUpgradeable_init(name_, symbol_);
     }
 

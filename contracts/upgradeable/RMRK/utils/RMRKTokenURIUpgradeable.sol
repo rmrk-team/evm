@@ -3,14 +3,14 @@
 pragma solidity ^0.8.18;
 
 import "@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol";
-import "../security/InitializationGuard.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 /**
  * @title RMRKTokenURIUpgradeable
  * @author RMRK team
  * @notice Implementation of upgradeable token URI with option to be enumerable.
  */
-contract RMRKTokenURIUpgradeable is InitializationGuard {
+contract RMRKTokenURIUpgradeable is Initializable {
     using StringsUpgradeable for uint256;
 
     string private _tokenUri;
@@ -22,7 +22,10 @@ contract RMRKTokenURIUpgradeable is InitializationGuard {
      * @param isEnumerable Whether to treat the tokenURI as enumerable or not. If true, the tokenID will be appended to
      *  the base when getting the tokenURI
      */
-    function __RMRKTokenURIUpgradeable_init(string memory tokenURI_, bool isEnumerable) internal initializable {
+    function __RMRKTokenURIUpgradeable_init(
+        string memory tokenURI_,
+        bool isEnumerable
+    ) internal onlyInitializing {
         _setTokenURI(tokenURI_, isEnumerable);
     }
 

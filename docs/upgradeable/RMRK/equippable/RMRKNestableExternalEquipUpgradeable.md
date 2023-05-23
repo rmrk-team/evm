@@ -267,23 +267,6 @@ Used to retrieve the `Equippable` smart contract&#39;s address.
 |---|---|---|
 | _0 | address | Address of the `Equippable` smart contract |
 
-### initialize
-
-```solidity
-function initialize(string name_, string symbol_) external nonpayable
-```
-
-Used to initialize the smart contract.
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| name_ | string | Name of the token collection |
-| symbol_ | string | Symbol of the token collection |
-
 ### isApprovedForAll
 
 ```solidity
@@ -870,17 +853,6 @@ error ERC721TransferToTheZeroAddress()
 ```
 
 Attempting to transfer the token to a 0x0 address
-
-
-
-
-### RMRKAlreadyInitialized
-
-```solidity
-error RMRKAlreadyInitialized()
-```
-
-Attempting to call an initialize of an already initalized contract
 
 
 

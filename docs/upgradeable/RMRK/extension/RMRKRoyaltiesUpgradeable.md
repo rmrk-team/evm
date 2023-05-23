@@ -44,23 +44,6 @@ Used to retrieve the recipient of royalties.
 |---|---|---|
 | _0 | address | Address of the recipient of royalties |
 
-### initialize
-
-```solidity
-function initialize(address royaltyRecipient, uint256 royaltyPercentageBps) external nonpayable
-```
-
-Used to initiate the smart contract.
-
-*`royaltyPercentageBps` is expressed in basis points, so 1 basis point equals 0.01% and 500 basis points  equal 5%.*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| royaltyRecipient | address | Address to which royalties should be sent |
-| royaltyPercentageBps | uint256 | The royalty percentage expressed in basis points |
-
 ### royaltyInfo
 
 ```solidity
@@ -125,29 +108,23 @@ Used to update recipient of royalties.
 
 
 
+## Events
 
-## Errors
-
-### RMRKAlreadyInitialized
-
-```solidity
-error RMRKAlreadyInitialized()
-```
-
-Attempting to call an initialize of an already initalized contract
-
-
-
-
-### RMRKRoyaltiesTooHigh
+### Initialized
 
 ```solidity
-error RMRKRoyaltiesTooHigh()
+event Initialized(uint8 version)
 ```
 
-Attempting to set the royalties to a value higher than 100% (10000 in base points)
 
 
+*Triggered when the contract has been initialized or reinitialized.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| version  | uint8 | undefined |
 
 
 

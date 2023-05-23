@@ -4,7 +4,6 @@ pragma solidity ^0.8.18;
 
 import "./IRMRKNestableAutoIndexUpgradeable.sol";
 import "../../nestable/RMRKNestableUpgradeable.sol";
-import "../../security/InitializationGuard.sol";
 
 /**
  * @title RMRKNestableAutoIndexUpgradeable
@@ -13,7 +12,6 @@ import "../../security/InitializationGuard.sol";
  */
 contract RMRKNestableAutoIndexUpgradeable is
     IRMRKNestableAutoIndexUpgradeable,
-    InitializationGuard,
     RMRKNestableUpgradeable
 {
     // Mapping of tokenId to childAddress to childId to index on the _pendingChildren array
@@ -27,7 +25,7 @@ contract RMRKNestableAutoIndexUpgradeable is
     function __RMRKNestableAutoIndexUpgradeable_init(
         string memory name_,
         string memory symbol_
-    ) internal initializable {
+    ) internal onlyInitializing {
         __RMRKNestableUpgradeable_init(name_, symbol_);
     }
 

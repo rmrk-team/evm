@@ -3,9 +3,12 @@
 pragma solidity ^0.8.18;
 
 import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721ReceiverUpgradeable.sol";
-import "../RMRK/security/InitializationGuard.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-contract ERC721ReceiverMockUpgradeable is InitializationGuard, IERC721ReceiverUpgradeable {
+contract ERC721ReceiverMockUpgradeable is
+    Initializable,
+    IERC721ReceiverUpgradeable
+{
     enum Error {
         None,
         RevertWithMessage,
@@ -18,7 +21,10 @@ contract ERC721ReceiverMockUpgradeable is InitializationGuard, IERC721ReceiverUp
 
     event Received(address operator, address from, uint256 tokenId, bytes data);
 
-    function initialize(bytes4 retval, Error error) public initializable {
+    function __ERC721ReceiverMockUpgradeable_init(
+        bytes4 retval,
+        Error error
+    ) public onlyInitializing {
         _retval = retval;
         _error = error;
     }

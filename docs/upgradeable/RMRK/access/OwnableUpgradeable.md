@@ -10,17 +10,6 @@ A minimal upgradeable ownable smart contractf or owner and contributors.
 
 ## Methods
 
-### initialize
-
-```solidity
-function initialize() external nonpayable
-```
-
-
-
-*Initializes the contract by setting the deployer as the initial owner.*
-
-
 ### isContributor
 
 ```solidity
@@ -161,17 +150,6 @@ Used to anounce the transfer of ownership.
 
 
 ## Errors
-
-### RMRKAlreadyInitialized
-
-```solidity
-error RMRKAlreadyInitialized()
-```
-
-Attempting to call an initialize of an already initalized contract
-
-
-
 
 ### RMRKNewContributorIsZeroAddress
 

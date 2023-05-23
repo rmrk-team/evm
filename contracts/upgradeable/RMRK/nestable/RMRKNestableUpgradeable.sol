@@ -12,7 +12,6 @@ import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721ReceiverUpgradea
 import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/introspection/IERC165Upgradeable.sol";
-import "../security/InitializationGuard.sol";
 import "../../../RMRK/library/RMRKErrors.sol";
 
 /**
@@ -27,7 +26,6 @@ contract RMRKNestableUpgradeable is
     IERC165Upgradeable,
     IERC721Upgradeable,
     IERC6059Upgradeable,
-    InitializationGuard,
     RMRKCoreUpgradeable
 {
     using AddressUpgradeable for address;
@@ -115,12 +113,15 @@ contract RMRKNestableUpgradeable is
     function __RMRKNestableUpgradeable_init(
         string memory name_,
         string memory symbol_
-    ) internal initializable {
+    ) internal onlyInitializing {
         __RMRKNestableUpgradeable_init_unchained();
         __RMRKCoreUpgradeable_init(name_, symbol_);
     }
 
-    function __RMRKNestableUpgradeable_init_unchained() internal initializable {}
+    function __RMRKNestableUpgradeable_init_unchained()
+        internal
+        onlyInitializing
+    {}
 
     // ------------------------------- ERC721 ---------------------------------
     /**

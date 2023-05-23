@@ -27,17 +27,6 @@ Used to retrieve the status of a lockable smart contract.
 |---|---|---|
 | _0 | bool | A boolean value signifying whether the smart contract has been locked |
 
-### initialize
-
-```solidity
-function initialize() external nonpayable
-```
-
-
-
-*Initializes the contract by setting the deployer as the initial owner.*
-
-
 ### isContributor
 
 ```solidity
@@ -200,17 +189,6 @@ Used to anounce the transfer of ownership.
 
 
 ## Errors
-
-### RMRKAlreadyInitialized
-
-```solidity
-error RMRKAlreadyInitialized()
-```
-
-Attempting to call an initialize of an already initalized contract
-
-
-
 
 ### RMRKNewContributorIsZeroAddress
 

@@ -510,34 +510,6 @@ Used to retrieve IDs of the pending assets of given token.
 |---|---|---|
 | _0 | uint64[] | An array of pending asset IDs of the given token |
 
-### initialize
-
-```solidity
-function initialize(string name_, string symbol_) external nonpayable
-```
-
-Initializes the contract by setting a `name` and a `symbol` of the token collection.
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| name_ | string | Name of the token collection |
-| symbol_ | string | Symbol of the token collection |
-
-### initialize
-
-```solidity
-function initialize() external nonpayable
-```
-
-Initializes the ReentrancyGuard with the `_status` of `_NOT_ENTERED`.
-
-
-
-
 ### isApprovedForAll
 
 ```solidity
@@ -1399,17 +1371,6 @@ error ERC721TransferToTheZeroAddress()
 ```
 
 Attempting to transfer the token to a 0x0 address
-
-
-
-
-### RMRKAlreadyInitialized
-
-```solidity
-error RMRKAlreadyInitialized()
-```
-
-Attempting to call an initialize of an already initalized contract
 
 
 

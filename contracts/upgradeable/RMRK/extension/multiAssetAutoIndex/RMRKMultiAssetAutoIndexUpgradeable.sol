@@ -4,7 +4,6 @@ pragma solidity ^0.8.18;
 
 import "./IRMRKMultiAssetAutoIndexUpgradeable.sol";
 import "../../multiasset/RMRKMultiAssetUpgradeable.sol";
-import "../../security/InitializationGuard.sol";
 
 /**
  * @title RMRKMultiAssetAutoIndexUpgradeable
@@ -13,7 +12,6 @@ import "../../security/InitializationGuard.sol";
  */
 contract RMRKMultiAssetAutoIndexUpgradeable is
     IRMRKMultiAssetAutoIndexUpgradeable,
-    InitializationGuard,
     RMRKMultiAssetUpgradeable
 {
     // Mapping of tokenId to assetId to index on the _pendingAssetIndex array
@@ -27,12 +25,15 @@ contract RMRKMultiAssetAutoIndexUpgradeable is
     function __RMRKMultiAssetAutoIndexUpgradeable_init(
         string memory name_,
         string memory symbol_
-    ) internal initializable {
+    ) internal onlyInitializing {
         __RMRKMultiAssetAutoIndexUpgradeable_init_unchained();
         __RMRKMultiAssetUpgradeable_init(name_, symbol_);
     }
 
-    function __RMRKMultiAssetAutoIndexUpgradeable_init_unchained() internal initializer {}
+    function __RMRKMultiAssetAutoIndexUpgradeable_init_unchained()
+        internal
+        initializer
+    {}
 
     /**
      * @inheritdoc IERC165Upgradeable

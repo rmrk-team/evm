@@ -124,7 +124,9 @@ describe('RMRKSoulbound variants', async function () {
     let initBlock: number;
 
     beforeEach(async function () {
-      const factory = await ethers.getContractFactory('RMRKSoulboundAfterBlockNumberMockUpgradeable');
+      const factory = await ethers.getContractFactory(
+        'RMRKSoulboundAfterBlockNumberMockUpgradeable',
+      );
       initBlock = (await ethers.provider.getBlock('latest')).number;
       token = <RMRKSoulboundAfterBlockNumberMockUpgradeable>(
         await upgrades.deployProxy(factory, ['Chunky', 'CHNK', initBlock + blocksToTransfer])
@@ -160,7 +162,9 @@ describe('RMRKSoulbound variants', async function () {
     let token: RMRKSoulboundAfterTransactionsMockUpgradeable;
 
     beforeEach(async function () {
-      const factory = await ethers.getContractFactory('RMRKSoulboundAfterTransactionsMockUpgradeable');
+      const factory = await ethers.getContractFactory(
+        'RMRKSoulboundAfterTransactionsMockUpgradeable',
+      );
       token = <RMRKSoulboundAfterTransactionsMockUpgradeable>(
         await upgrades.deployProxy(factory, ['Chunky', 'CHNK', maxTransactions])
       );
@@ -195,7 +199,9 @@ describe('RMRKSoulbound variants', async function () {
 
     beforeEach(async function () {
       const factory = await ethers.getContractFactory('RMRKSoulboundPerTokenMockUpgradeable');
-      token = <RMRKSoulboundPerTokenMockUpgradeable>await upgrades.deployProxy(factory, ['Chunky', 'CHNK']);
+      token = <RMRKSoulboundPerTokenMockUpgradeable>(
+        await upgrades.deployProxy(factory, ['Chunky', 'CHNK'])
+      );
       await token.deployed();
     });
 

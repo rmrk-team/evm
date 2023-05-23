@@ -6,7 +6,6 @@ import "../../RMRK/equippable/IERC6220Upgradeable.sol";
 import "../../RMRK/equippable/IRMRKExternalEquipUpgradeable.sol";
 import "../../RMRK/equippable/IRMRKNestableExternalEquipUpgradeable.sol";
 import "../../RMRK/nestable/RMRKNestableUpgradeable.sol";
-import "../security/InitializationGuard.sol";
 
 /**
  * @title RMRKNestableExternalEquipUpgradeable
@@ -20,7 +19,6 @@ import "../security/InitializationGuard.sol";
  */
 contract RMRKNestableExternalEquipUpgradeable is
     IRMRKNestableExternalEquipUpgradeable,
-    InitializationGuard,
     RMRKNestableUpgradeable
 {
     address private _equippableAddress;
@@ -33,11 +31,14 @@ contract RMRKNestableExternalEquipUpgradeable is
     function __RMRKNestableExternalEquipUpgradeable_init(
         string memory name_,
         string memory symbol_
-    ) internal initializable {
+    ) internal onlyInitializing {
         __RMRKNestableUpgradeable_init(name_, symbol_);
     }
 
-    function __RMRKNestableExternalEquipUpgradeable_init_unchained() internal initializer {}
+    function __RMRKNestableExternalEquipUpgradeable_init_unchained()
+        internal
+        initializer
+    {}
 
     /**
      * @inheritdoc IERC165Upgradeable

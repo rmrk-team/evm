@@ -9,7 +9,6 @@ import "../../../RMRK/library/RMRKLib.sol";
 import "../multiasset/AbstractMultiAssetUpgradeable.sol";
 import "../nestable/RMRKNestableUpgradeable.sol";
 import "../security/ReentrancyGuardUpgradeable.sol";
-import "../security/InitializationGuard.sol";
 import "./IERC6220Upgradeable.sol";
 
 /**
@@ -19,7 +18,6 @@ import "./IERC6220Upgradeable.sol";
  */
 contract RMRKEquippableUpgradeable is
     IERC6220Upgradeable,
-    InitializationGuard,
     ReentrancyGuardUpgradeable,
     AbstractMultiAssetUpgradeable,
     RMRKNestableUpgradeable
@@ -88,14 +86,17 @@ contract RMRKEquippableUpgradeable is
     function __RMRKEquippableUpgradeable_init(
         string memory name_,
         string memory symbol_
-    ) internal initializer {
+    ) internal onlyInitializing {
         __RMRKEquippableUpgradeable_init_unchained();
         __Context_init();
         __RMRKCoreUpgradeable_init(name_, symbol_);
         __RMRKNestableUpgradeable_init_unchained();
     }
 
-    function __RMRKEquippableUpgradeable_init_unchained() internal initializable {}
+    function __RMRKEquippableUpgradeable_init_unchained()
+        internal
+        onlyInitializing
+    {}
 
     /**
      * @inheritdoc IERC165Upgradeable

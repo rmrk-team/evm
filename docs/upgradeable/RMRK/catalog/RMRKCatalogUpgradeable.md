@@ -133,23 +133,6 @@ Used to return the `itemType` of the associated Catalog
 |---|---|---|
 | _0 | string | `itemType` of the associated Catalog |
 
-### initialize
-
-```solidity
-function initialize(string metadataURI, string type_) external nonpayable
-```
-
-Used to initialize the Catalog.
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| metadataURI | string | Base metadata URI of the Catalog |
-| type_ | string | Type of Catalog |
-
 ### supportsInterface
 
 ```solidity
@@ -213,6 +196,22 @@ Event to announce addition of a new part.
 | equippableAddresses  | address[] | An array of addresses that can equip this part |
 | metadataURI  | string | The metadata URI of the part |
 
+### Initialized
+
+```solidity
+event Initialized(uint8 version)
+```
+
+
+
+*Triggered when the contract has been initialized or reinitialized.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| version  | uint8 | undefined |
+
 ### SetEquippableToAll
 
 ```solidity
@@ -245,20 +244,6 @@ Event to announce the overriding of equippable addresses of the part.
 |---|---|---|
 | partId `indexed` | uint64 | ID of the part whose list of equippable addresses was overwritten |
 | equippableAddresses  | address[] | The new, full, list of addresses that can equip this part |
-
-
-
-## Errors
-
-### RMRKAlreadyInitialized
-
-```solidity
-error RMRKAlreadyInitialized()
-```
-
-Attempting to call an initialize of an already initalized contract
-
-
 
 
 

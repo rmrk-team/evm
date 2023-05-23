@@ -5,7 +5,10 @@ import { IOtherInterface, IRMRKNestableExternalEquip, IRMRKExternalEquip } from 
 import shouldBehaveLikeNestable from './behavior/nestable';
 import shouldBehaveLikeERC721 from './behavior/erc721';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import { RMRKExternalEquipMockUpgradeable, RMRKNestableExternalEquipMockUpgradeable } from '../../typechain-types';
+import {
+  RMRKExternalEquipMockUpgradeable,
+  RMRKNestableExternalEquipMockUpgradeable,
+} from '../../typechain-types';
 
 describe('NestableWithEquippableMock Nestable Behavior', function () {
   const name = 'ownerChunky';
@@ -16,7 +19,9 @@ describe('NestableWithEquippableMock Nestable Behavior', function () {
 
   async function nestableFixture() {
     const CHNKY = await ethers.getContractFactory('RMRKNestableExternalEquipMockUpgradeable');
-    const ownerChunky = <RMRKNestableExternalEquipMockUpgradeable>await upgrades.deployProxy(CHNKY, [name, symbol]);
+    const ownerChunky = <RMRKNestableExternalEquipMockUpgradeable>(
+      await upgrades.deployProxy(CHNKY, [name, symbol])
+    );
     await ownerChunky.deployed();
 
     const CHNKYEQUIPPABLE = await ethers.getContractFactory('RMRKExternalEquipMockUpgradeable');
@@ -28,11 +33,15 @@ describe('NestableWithEquippableMock Nestable Behavior', function () {
     await ownerChunky.setEquippableAddress(chunkyEquippable.address);
 
     const MONKY = await ethers.getContractFactory('RMRKNestableExternalEquipMockUpgradeable');
-    const petMonkey = <RMRKNestableExternalEquipMockUpgradeable>await upgrades.deployProxy(MONKY, [name2, symbol2]);
+    const petMonkey = <RMRKNestableExternalEquipMockUpgradeable>(
+      await upgrades.deployProxy(MONKY, [name2, symbol2])
+    );
     await petMonkey.deployed();
 
     const MONKYEQUIPPABLE = await ethers.getContractFactory('RMRKExternalEquipMockUpgradeable');
-    const monkyEquippable = <RMRKExternalEquipMockUpgradeable>await upgrades.deployProxy(MONKYEQUIPPABLE, [petMonkey.address]);
+    const monkyEquippable = <RMRKExternalEquipMockUpgradeable>(
+      await upgrades.deployProxy(MONKYEQUIPPABLE, [petMonkey.address])
+    );
     await monkyEquippable.deployed();
 
     await petMonkey.setEquippableAddress(monkyEquippable.address);
@@ -54,12 +63,18 @@ describe('NestableWithEquippableMock ERC721 Behavior', function () {
   const symbol = 'RMRKTST';
 
   async function nestableFixture() {
-    const nestableFactory = await ethers.getContractFactory('RMRKNestableExternalEquipMockUpgradeable');
-    const nestable = <RMRKNestableExternalEquipMockUpgradeable>await upgrades.deployProxy(nestableFactory, [name, symbol]);
+    const nestableFactory = await ethers.getContractFactory(
+      'RMRKNestableExternalEquipMockUpgradeable',
+    );
+    const nestable = <RMRKNestableExternalEquipMockUpgradeable>(
+      await upgrades.deployProxy(nestableFactory, [name, symbol])
+    );
     await nestable.deployed();
 
     const equipFactory = await ethers.getContractFactory('RMRKExternalEquipMockUpgradeable');
-    const equip = <RMRKExternalEquipMockUpgradeable>await upgrades.deployProxy(equipFactory, [nestable.address]);
+    const equip = <RMRKExternalEquipMockUpgradeable>(
+      await upgrades.deployProxy(equipFactory, [nestable.address])
+    );
     await equip.deployed();
 
     await nestable.setEquippableAddress(equip.address);

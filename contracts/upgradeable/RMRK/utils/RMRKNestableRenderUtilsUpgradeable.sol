@@ -26,9 +26,9 @@ contract RMRKNestableRenderUtilsUpgradeable {
         address childAddress,
         uint256 childId
     ) public view returns (uint256) {
-        IERC6059Upgradeable.Child[] memory children = IERC6059Upgradeable(parentAddress).childrenOf(
-            parentId
-        );
+        IERC6059Upgradeable.Child[] memory children = IERC6059Upgradeable(
+            parentAddress
+        ).childrenOf(parentId);
         (parentId);
         uint256 len = children.length;
         for (uint256 i; i < len; ) {
@@ -57,8 +57,9 @@ contract RMRKNestableRenderUtilsUpgradeable {
         address childAddress,
         uint256 childId
     ) public view returns (uint256) {
-        IERC6059Upgradeable.Child[] memory children = IERC6059Upgradeable(parentAddress)
-            .pendingChildrenOf(parentId);
+        IERC6059Upgradeable.Child[] memory children = IERC6059Upgradeable(
+            parentAddress
+        ).pendingChildrenOf(parentId);
         (parentId);
         uint256 len = children.length;
         for (uint256 i; i < len; ) {
@@ -86,9 +87,8 @@ contract RMRKNestableRenderUtilsUpgradeable {
         uint256 childId
     ) public view returns (address parentAddress, uint256 parentId) {
         bool isNFT;
-        (parentAddress, parentId, isNFT) = IERC6059Upgradeable(childAddress).directOwnerOf(
-            childId
-        );
+        (parentAddress, parentId, isNFT) = IERC6059Upgradeable(childAddress)
+            .directOwnerOf(childId);
         if (!isNFT) revert RMRKParentIsNotNFT();
     }
 
@@ -129,13 +129,16 @@ contract RMRKNestableRenderUtilsUpgradeable {
         uint256 childId
     ) public view returns (bool) {
         if (
-            !IERC165Upgradeable(childAddress).supportsInterface(type(IERC6059Upgradeable).interfaceId)
+            !IERC165Upgradeable(childAddress).supportsInterface(
+                type(IERC6059Upgradeable).interfaceId
+            )
         ) {
             return false;
         }
 
-        (address directOwner, uint256 ownerId, ) = IERC6059Upgradeable(childAddress)
-            .directOwnerOf(childId);
+        (address directOwner, uint256 ownerId, ) = IERC6059Upgradeable(
+            childAddress
+        ).directOwnerOf(childId);
 
         return (directOwner == parentAddress && ownerId == parentId);
     }

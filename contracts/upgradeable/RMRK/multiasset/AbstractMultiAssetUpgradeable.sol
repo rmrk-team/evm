@@ -6,7 +6,6 @@ import "./IERC5773Upgradeable.sol";
 import "../../../RMRK/library/RMRKLib.sol";
 import "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol";
 import "../../../RMRK/library/RMRKErrors.sol";
-import "../security/InitializationGuard.sol";
 
 /**
  * @title AbstractMultiAssetUpgradeable
@@ -15,7 +14,6 @@ import "../security/InitializationGuard.sol";
  *  IERC5773Upgradeable
  */
 abstract contract AbstractMultiAssetUpgradeable is
-    InitializationGuard,
     ContextUpgradeable,
     IERC5773Upgradeable
 {
@@ -45,14 +43,14 @@ abstract contract AbstractMultiAssetUpgradeable is
     mapping(address => mapping(address => bool))
         private _operatorApprovalsForAssets;
 
-    function __AbstractMultiAssetUpgradeable_init() internal initializable {
+    function __AbstractMultiAssetUpgradeable_init() internal onlyInitializing {
         __AbstractMultiAssetUpgradeable_init_unchained();
         __Context_init();
     }
 
     function __AbstractMultiAssetUpgradeable_init_unchained()
         internal
-        initializer
+        onlyInitializing
     {}
 
     /**

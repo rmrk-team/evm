@@ -4,19 +4,17 @@ pragma solidity ^0.8.18;
 
 import "../../../RMRK/extension/typedMultiAsset/RMRKTypedMultiAssetUpgradeable.sol";
 import "../../RMRKExternalEquipMockUpgradeable.sol";
-import "../../../RMRK/security/InitializationGuard.sol";
 
 error RMRKTokenHasNoAssetsWithType();
 
 contract RMRKTypedExternalEquippableMockUpgradeable is
-    InitializationGuard,
     RMRKExternalEquipMockUpgradeable,
     RMRKTypedMultiAssetUpgradeable
 {
-    function initialize(
+    function __RMRKTypedExternalEquippableMockUpgradeable_init(
         address nestableAddress
-    ) public override initializable {
-        super.initialize(nestableAddress);
+    ) public onlyInitializing {
+        __RMRKExternalEquipMockUpgradeable_init(nestableAddress);
     }
 
     function supportsInterface(

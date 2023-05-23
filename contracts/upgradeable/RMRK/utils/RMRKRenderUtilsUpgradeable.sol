@@ -80,7 +80,9 @@ contract RMRKRenderUtilsUpgradeable {
         uint256[] memory tmpIds = new uint[](pageSize);
         uint256 found;
         for (uint256 i = 0; i < pageSize; ) {
-            try IERC721Upgradeable(target).ownerOf(pageStart + i) returns (address) {
+            try IERC721Upgradeable(target).ownerOf(pageStart + i) returns (
+                address
+            ) {
                 tmpIds[i] = pageStart + i;
                 unchecked {
                     found += 1;
@@ -137,7 +139,9 @@ contract RMRKRenderUtilsUpgradeable {
         uint256 tokenId,
         address targetCollection
     ) public view returns (ExtendedNft memory data) {
-        RMRKEquippableUpgradeable target = RMRKEquippableUpgradeable(targetCollection);
+        RMRKEquippableUpgradeable target = RMRKEquippableUpgradeable(
+            targetCollection
+        );
         data.hasMultiAssetInterface = target.supportsInterface(
             type(IERC5773Upgradeable).interfaceId
         );
@@ -159,28 +163,27 @@ contract RMRKRenderUtilsUpgradeable {
             data.pendingAssetCount = target.getPendingAssets(tokenId).length;
             data.priorities = target.getActiveAssetPriorities(tokenId);
         }
-        if (target.supportsInterface(type(IERC6454betaUpgradeable).interfaceId)) {
-            data.isSoulbound = !IERC6454betaUpgradeable(targetCollection).isTransferable(
-                tokenId,
-                address(0),
-                address(0)
-            );
+        if (
+            target.supportsInterface(type(IERC6454betaUpgradeable).interfaceId)
+        ) {
+            data.isSoulbound = !IERC6454betaUpgradeable(targetCollection)
+                .isTransferable(tokenId, address(0), address(0));
         }
         data.rootOwner = target.ownerOf(tokenId);
         if (data.directOwner == address(0x0)) {
             data.directOwner = data.rootOwner;
         }
         data.name = target.name();
-        try IERC721MetadataUpgradeable(targetCollection).tokenURI(tokenId) returns (
-            string memory metadataUri_
-        ) {
+        try
+            IERC721MetadataUpgradeable(targetCollection).tokenURI(tokenId)
+        returns (string memory metadataUri_) {
             data.tokenMetadataUri = metadataUri_;
         } catch {
             // Retain default value
         }
-        try RMRKMintingUtilsUpgradeable(targetCollection).totalSupply() returns (
-            uint256 totalSupplly_
-        ) {
+        try
+            RMRKMintingUtilsUpgradeable(targetCollection).totalSupply()
+        returns (uint256 totalSupplly_) {
             data.totalSupply = totalSupplly_;
         } catch {
             // Retain default value
@@ -192,7 +195,9 @@ contract RMRKRenderUtilsUpgradeable {
         } catch {
             // Retain default value
         }
-        try OwnableUpgradeable(targetCollection).owner() returns (address issuer_) {
+        try OwnableUpgradeable(targetCollection).owner() returns (
+            address issuer_
+        ) {
             data.issuer = issuer_;
         } catch {
             // Retain default value

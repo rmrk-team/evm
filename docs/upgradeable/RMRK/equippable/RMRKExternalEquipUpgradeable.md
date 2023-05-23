@@ -287,33 +287,6 @@ Used to retrieve IDs of the pending assets of given token.
 |---|---|---|
 | _0 | uint64[] | An array of pending asset IDs of the given token |
 
-### initialize
-
-```solidity
-function initialize() external nonpayable
-```
-
-Initializes the ReentrancyGuard with the `_status` of `_NOT_ENTERED`.
-
-
-
-
-### initialize
-
-```solidity
-function initialize(address nestableAddress) external nonpayable
-```
-
-Used to initialize the smart contract.
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| nestableAddress | address | Address of the Nestable module of external equip composite |
-
 ### isApprovedForAllForAssets
 
 ```solidity
@@ -710,17 +683,6 @@ error ERC721NotApprovedOrOwner()
 ```
 
 Attempting to manage a token without being its owner or approved by the owner
-
-
-
-
-### RMRKAlreadyInitialized
-
-```solidity
-error RMRKAlreadyInitialized()
-```
-
-Attempting to call an initialize of an already initalized contract
 
 
 

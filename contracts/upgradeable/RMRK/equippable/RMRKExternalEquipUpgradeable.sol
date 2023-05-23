@@ -13,7 +13,6 @@ import "../multiasset/AbstractMultiAssetUpgradeable.sol";
 import "../nestable/IERC6059Upgradeable.sol";
 import "../../../RMRK/library/RMRKLib.sol";
 import "../security/ReentrancyGuardUpgradeable.sol";
-import "../security/InitializationGuard.sol";
 import "./IRMRKNestableExternalEquipUpgradeable.sol";
 import "./IRMRKExternalEquipUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/introspection/IERC165Upgradeable.sol";
@@ -25,7 +24,6 @@ import "@openzeppelin/contracts-upgradeable/utils/introspection/IERC165Upgradeab
  * @dev This smart contract is expected to be paired with an instance of `RMRKNestableExternalEquipUpgradeable`.
  */
 contract RMRKExternalEquipUpgradeable is
-    InitializationGuard,
     ReentrancyGuardUpgradeable,
     AbstractMultiAssetUpgradeable,
     IRMRKExternalEquipUpgradeable
@@ -125,7 +123,9 @@ contract RMRKExternalEquipUpgradeable is
         _;
     }
 
-    function __RMRKExternalEquipUpgradeable_init(address nestableAddress) internal initializable {
+    function __RMRKExternalEquipUpgradeable_init(
+        address nestableAddress
+    ) internal onlyInitializing {
         __RMRKExternalEquipUpgradeable_init_unchained(nestableAddress);
         __AbstractMultiAssetUpgradeable_init();
     }
@@ -134,7 +134,9 @@ contract RMRKExternalEquipUpgradeable is
      * @notice Used to initialize the smart contract.
      * @param nestableAddress Address of the Nestable module of external equip composite
      */
-    function __RMRKExternalEquipUpgradeable_init_unchained(address nestableAddress) internal initializable {
+    function __RMRKExternalEquipUpgradeable_init_unchained(
+        address nestableAddress
+    ) internal onlyInitializing {
         _setNestableAddress(nestableAddress);
     }
 

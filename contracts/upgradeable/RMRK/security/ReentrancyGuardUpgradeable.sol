@@ -3,7 +3,7 @@
 
 pragma solidity ^0.8.18;
 
-import "./InitializationGuard.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 error RentrantCall();
 
@@ -25,7 +25,7 @@ error RentrantCall();
  * to protect against it, check out our blog post
  * https://blog.openzeppelin.com/reentrancy-after-istanbul/[Reentrancy After Istanbul].
  */
-abstract contract ReentrancyGuardUpgradeable is InitializationGuard {
+abstract contract ReentrancyGuardUpgradeable is Initializable {
     // Booleans are more expensive than uint256 or any type that takes up a full
     // word because each write operation emits an extra SLOAD to first read the
     // slot's contents, replace the bits taken up by the boolean, and then write
@@ -42,14 +42,14 @@ abstract contract ReentrancyGuardUpgradeable is InitializationGuard {
 
     uint256 private _status;
 
-    function __ReentrancyGuard_init() internal initializable {
+    function __ReentrancyGuard_init() internal onlyInitializing {
         __ReentrancyGuard_init_unchained();
     }
 
     /**
      * @notice Initializes the ReentrancyGuard with the `_status` of `_NOT_ENTERED`.
      */
-    function __ReentrancyGuard_init_unchained() internal initializable {
+    function __ReentrancyGuard_init_unchained() internal onlyInitializing {
         _status = _NOT_ENTERED;
     }
 

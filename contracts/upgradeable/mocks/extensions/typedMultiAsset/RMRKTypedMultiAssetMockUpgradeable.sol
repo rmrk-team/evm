@@ -4,18 +4,20 @@ pragma solidity ^0.8.18;
 
 import "../../../RMRK/extension/typedMultiAsset/RMRKTypedMultiAssetUpgradeable.sol";
 import "../../RMRKMultiAssetMockUpgradeable.sol";
-import "../../../RMRK/security/InitializationGuard.sol";
 
 error RMRKTokenHasNoAssetsWithType();
 
-contract RMRKTypedMultiAssetMockUpgradeable is InitializationGuard, RMRKMultiAssetMockUpgradeable, RMRKTypedMultiAssetUpgradeable {
+contract RMRKTypedMultiAssetMockUpgradeable is
+    RMRKMultiAssetMockUpgradeable,
+    RMRKTypedMultiAssetUpgradeable
+{
     uint64 private constant _LOWEST_POSSIBLE_PRIORITY = 2 ** 64 - 1;
 
-    function initialize(
+    function __RMRKTypedMultiAssetMockUpgradeable_init(
         string memory name,
         string memory symbol
-    ) public override initializable {
-        super.initialize(name, symbol);
+    ) public onlyInitializing {
+        __RMRKMultiAssetMockUpgradeable_init(name, symbol);
     }
 
     function supportsInterface(

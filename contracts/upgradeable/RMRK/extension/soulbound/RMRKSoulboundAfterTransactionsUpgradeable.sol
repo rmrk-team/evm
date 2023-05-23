@@ -3,7 +3,6 @@
 pragma solidity ^0.8.18;
 
 import "./RMRKSoulboundUpgradeable.sol";
-import "../../security/InitializationGuard.sol";
 
 /**
  * @title RMRKSoulboundAfterTransactionsUpgradeable
@@ -12,7 +11,6 @@ import "../../security/InitializationGuard.sol";
  *  transfers.
  */
 abstract contract RMRKSoulboundAfterTransactionsUpgradeable is
-    InitializationGuard,
     RMRKSoulboundUpgradeable
 {
     /**
@@ -32,13 +30,10 @@ abstract contract RMRKSoulboundAfterTransactionsUpgradeable is
      */
     function __RMRKSoulboundAfterTransactionsUpgradeable_init(
         uint256 maxNumberOfTransfers
-    ) internal initializable {
+    ) internal onlyInitializing {
         _maxNumberOfTransfers = maxNumberOfTransfers;
     }
 
-    /**
-     * @inheritdoc RMRKCoreUpgradeable
-     */
     function _afterTokenTransfer(
         address from,
         address to,

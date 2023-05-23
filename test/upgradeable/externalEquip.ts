@@ -35,21 +35,29 @@ async function partsFixture() {
   const maskSymbol = 'NM';
 
   const catalogFactory = await ethers.getContractFactory('RMRKCatalogMockUpgradeable');
-  const nestableFactory = await ethers.getContractFactory('RMRKNestableExternalEquipMockUpgradeable');
+  const nestableFactory = await ethers.getContractFactory(
+    'RMRKNestableExternalEquipMockUpgradeable',
+  );
   const equipFactory = await ethers.getContractFactory('RMRKExternalEquipMockUpgradeable');
   const viewFactory = await ethers.getContractFactory('RMRKEquipRenderUtils');
 
   // Catalog
-  const catalog = <RMRKCatalogMockUpgradeable>await upgrades.deployProxy(catalogFactory, [catalogSymbol, catalogType]);
+  const catalog = <RMRKCatalogMockUpgradeable>(
+    await upgrades.deployProxy(catalogFactory, [catalogSymbol, catalogType])
+  );
   await catalog.deployed();
 
   // Neon token
-  const neon = <RMRKNestableExternalEquipMockUpgradeable>await upgrades.deployProxy(nestableFactory, [neonName, neonSymbol]);
+  const neon = <RMRKNestableExternalEquipMockUpgradeable>(
+    await upgrades.deployProxy(nestableFactory, [neonName, neonSymbol])
+  );
   await neon.deployed();
 
   // Neon Equip
 
-  const neonEquip = <RMRKExternalEquipMockUpgradeable>await upgrades.deployProxy(equipFactory, [neon.address]);
+  const neonEquip = <RMRKExternalEquipMockUpgradeable>(
+    await upgrades.deployProxy(equipFactory, [neon.address])
+  );
   await neonEquip.deployed();
 
   // View contract
@@ -106,7 +114,9 @@ async function slotsFixture() {
   await view.deployed();
 
   // catalog
-  const catalog = <RMRKCatalogMockUpgradeable>await upgrades.deployProxy(catalogFactory, [catalogSymbol, catalogType]);
+  const catalog = <RMRKCatalogMockUpgradeable>(
+    await upgrades.deployProxy(catalogFactory, [catalogSymbol, catalogType])
+  );
   await catalog.deployed();
 
   // Soldier token
@@ -140,7 +150,10 @@ async function slotsFixture() {
   await weaponGem.setEquippableAddress(weaponGemEquip.address);
 
   // Background
-  const background = await upgrades.deployProxy(nestableFactory, [backgroundName, backgroundSymbol]);
+  const background = await upgrades.deployProxy(nestableFactory, [
+    backgroundName,
+    backgroundSymbol,
+  ]);
   await background.deployed();
   const backgroundEquip = await equipFactory.deploy(background.address);
   await backgroundEquip.deployed();
@@ -196,7 +209,9 @@ async function assetsFixture() {
 }
 
 async function multiAssetFixture() {
-  const NestableFactory = await ethers.getContractFactory('RMRKNestableExternalEquipMockUpgradeable');
+  const NestableFactory = await ethers.getContractFactory(
+    'RMRKNestableExternalEquipMockUpgradeable',
+  );
   const EquipFactory = await ethers.getContractFactory('RMRKExternalEquipMockUpgradeable');
   const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiAssetRenderUtils');
 
@@ -205,7 +220,9 @@ async function multiAssetFixture() {
   );
   await nestable.deployed();
 
-  const equip = <RMRKExternalEquipMockUpgradeable>await upgrades.deployProxy(EquipFactory, [nestable.address]);
+  const equip = <RMRKExternalEquipMockUpgradeable>(
+    await upgrades.deployProxy(EquipFactory, [nestable.address])
+  );
   await equip.deployed();
 
   const renderUtils = <RMRKMultiAssetRenderUtils>await renderUtilsFactory.deploy();

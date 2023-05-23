@@ -3,16 +3,17 @@
 pragma solidity ^0.8.18;
 
 import "../RMRK/equippable/RMRKMinifiedEquippableUpgradeable.sol";
-import "../RMRK/security/InitializationGuard.sol";
 
 /* import "hardhat/console.sol"; */
 
 //Minimal upgradeable public implementation of RMRKEquippable for testing.
-contract RMRKMinifiedEquippableMockUpgradeable is InitializationGuard, RMRKMinifiedEquippableUpgradeable {
-    function initialize(
+contract RMRKMinifiedEquippableMockUpgradeable is
+    RMRKMinifiedEquippableUpgradeable
+{
+    function __RMRKMinifiedEquippableMockUpgradeableinit(
         string memory name,
         string memory symbol
-    ) public initializable {
+    ) public onlyInitializing {
         __RMRKMinifiedEquippableUpgradeable_init(name, symbol);
     }
 

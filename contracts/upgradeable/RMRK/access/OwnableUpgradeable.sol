@@ -3,7 +3,6 @@
 pragma solidity ^0.8.18;
 
 import "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol";
-import "../security/InitializationGuard.sol";
 import "../../../RMRK/library/RMRKErrors.sol";
 
 /**
@@ -12,7 +11,7 @@ import "../../../RMRK/library/RMRKErrors.sol";
  * @notice A minimal upgradeable ownable smart contractf or owner and contributors.
  * @dev This smart contract is based on "openzeppelin's access/Ownable.sol".
  */
-contract OwnableUpgradeable is InitializationGuard, ContextUpgradeable {
+contract OwnableUpgradeable is ContextUpgradeable {
     address private _owner;
     mapping(address => uint256) private _contributors;
 
@@ -51,8 +50,7 @@ contract OwnableUpgradeable is InitializationGuard, ContextUpgradeable {
         _;
     }
 
-
-    function __OwnableUpgradeable_init() internal initializer {
+    function __OwnableUpgradeable_init() internal onlyInitializing {
         __OwnableUpgradeable_init_unchained();
         __Context_init();
     }
@@ -60,7 +58,7 @@ contract OwnableUpgradeable is InitializationGuard, ContextUpgradeable {
     /**
      * @dev Initializes the contract by setting the deployer as the initial owner.
      */
-    function __OwnableUpgradeable_init_unchained() internal initializable {
+    function __OwnableUpgradeable_init_unchained() internal onlyInitializing {
         _transferOwnership(_msgSender());
     }
 

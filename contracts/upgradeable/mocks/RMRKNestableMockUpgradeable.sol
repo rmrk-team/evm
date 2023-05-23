@@ -3,17 +3,16 @@
 pragma solidity ^0.8.18;
 
 import "../RMRK/nestable/RMRKNestableUpgradeable.sol";
-import "../RMRK/security/InitializationGuard.sol";
 
 //Minimal upgradeable public implementation of IERC6059 for testing.
-contract RMRKNestableMockUpgradeable is InitializationGuard, RMRKNestableUpgradeable {
+contract RMRKNestableMockUpgradeable is RMRKNestableUpgradeable {
     // This is used to test the usage of hooks
     mapping(address => mapping(uint256 => uint256)) private _balancesPerNft;
 
-    function initialize(
+    function __RMRKNestableMockUpgradeable_init(
         string memory name_,
         string memory symbol_
-    ) public virtual initializable {
+    ) public virtual onlyInitializing {
         __RMRKNestableUpgradeable_init(name_, symbol_);
     }
 

@@ -3,13 +3,12 @@
 pragma solidity ^0.8.18;
 
 import "../RMRK/catalog/RMRKCatalogUpgradeable.sol";
-import "../RMRK/security/InitializationGuard.sol";
 
-contract RMRKCatalogMockUpgradeable is InitializationGuard, RMRKCatalogUpgradeable {
-    function initialize(
+contract RMRKCatalogMockUpgradeable is RMRKCatalogUpgradeable {
+    function __RMRKCatalogMockUpgradeable_init(
         string memory metadataURI,
         string memory type_
-    ) public initializable {
+    ) public onlyInitializing {
         __RMRKCatalogUpgradeable_init(metadataURI, type_);
     }
 

@@ -10,7 +10,6 @@ import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/introspection/IERC165Upgradeable.sol";
 import "./AbstractMultiAssetUpgradeable.sol";
 import "../core/RMRKCoreUpgradeable.sol";
-import "../security/InitializationGuard.sol";
 import "../../../RMRK/library/RMRKErrors.sol";
 
 /**
@@ -21,7 +20,6 @@ import "../../../RMRK/library/RMRKErrors.sol";
 contract RMRKMultiAssetUpgradeable is
     IERC165Upgradeable,
     IERC721Upgradeable,
-    InitializationGuard,
     AbstractMultiAssetUpgradeable,
     RMRKCoreUpgradeable
 {
@@ -118,7 +116,7 @@ contract RMRKMultiAssetUpgradeable is
     function __RMRKMultiAssetUpgradeable_init(
         string memory name_,
         string memory symbol_
-    ) internal initializable {
+    ) internal onlyInitializing {
         __RMRKCoreUpgradeable_init(name_, symbol_);
     }
 

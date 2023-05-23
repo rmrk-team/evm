@@ -3,13 +3,14 @@
 pragma solidity ^0.8.18;
 
 import "../RMRK/extension/nestableAutoIndex/RMRKNestableAutoIndexUpgradeable.sol";
-import "../RMRK/security/InitializationGuard.sol";
 
-contract RMRKNestableAutoIndexMockUpgradeable is InitializationGuard, RMRKNestableAutoIndexUpgradeable {
-    function initialize(
+contract RMRKNestableAutoIndexMockUpgradeable is
+    RMRKNestableAutoIndexUpgradeable
+{
+    function __RMRKNestableAutoIndexMockUpgradeable_init(
         string memory name_,
         string memory symbol_
-    ) public initializable {
+    ) public onlyInitializing {
         __RMRKNestableAutoIndexUpgradeable_init(name_, symbol_);
     }
 

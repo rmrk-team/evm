@@ -2,10 +2,9 @@
 pragma solidity ^0.8.18;
 
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
-import "../RMRK/security/InitializationGuard.sol";
 
-contract ERC20MockUpgradeable is InitializationGuard, ERC20Upgradeable {
-    function initialize() public initializable {
+contract ERC20MockUpgradeable is ERC20Upgradeable {
+    function __ERC20MockUpgradeable_init() public initializer {
         __ERC20_init("TestToken", "TEST");
     }
 

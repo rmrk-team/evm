@@ -3,13 +3,12 @@
 pragma solidity ^0.8.18;
 
 import "../RMRK/multiasset/RMRKMultiAssetUpgradeable.sol";
-import "../RMRK/security/InitializationGuard.sol";
 
-contract RMRKMultiAssetMockUpgradeable is InitializationGuard, RMRKMultiAssetUpgradeable {
-    function initialize(
+contract RMRKMultiAssetMockUpgradeable is RMRKMultiAssetUpgradeable {
+    function __RMRKMultiAssetMockUpgradeable_init(
         string memory name,
         string memory symbol
-    ) public virtual initializable {
+    ) public virtual onlyInitializing {
         __RMRKMultiAssetUpgradeable_init(name, symbol);
     }
 

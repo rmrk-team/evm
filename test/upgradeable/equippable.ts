@@ -37,15 +37,21 @@ async function partsFixture() {
   const viewFactory = await ethers.getContractFactory('RMRKEquipRenderUtils');
 
   // Catalog
-  const catalog = <RMRKCatalogMockUpgradeable>await upgrades.deployProxy(catalogFactory, [catalogSymbol, catalogType]);
+  const catalog = <RMRKCatalogMockUpgradeable>(
+    await upgrades.deployProxy(catalogFactory, [catalogSymbol, catalogType])
+  );
   await catalog.deployed();
 
   // Neon token
-  const neon = <RMRKEquippableMockUpgradeable>await upgrades.deployProxy(equipFactory, [neonName, neonSymbol]);
+  const neon = <RMRKEquippableMockUpgradeable>(
+    await upgrades.deployProxy(equipFactory, [neonName, neonSymbol])
+  );
   await neon.deployed();
 
   // Weapon
-  const mask = <RMRKEquippableMockUpgradeable>await upgrades.deployProxy(equipFactory, [maskName, maskSymbol]);
+  const mask = <RMRKEquippableMockUpgradeable>(
+    await upgrades.deployProxy(equipFactory, [maskName, maskSymbol])
+  );
   await mask.deployed();
 
   // View
@@ -81,19 +87,27 @@ async function slotsFixture() {
   await view.deployed();
 
   // catalog
-  const catalog = <RMRKCatalogMockUpgradeable>await upgrades.deployProxy(catalogFactory, [catalogSymbol, catalogType]);
+  const catalog = <RMRKCatalogMockUpgradeable>(
+    await upgrades.deployProxy(catalogFactory, [catalogSymbol, catalogType])
+  );
   await catalog.deployed();
 
   // Soldier token
-  const soldier = <RMRKEquippableMockUpgradeable>await upgrades.deployProxy(equipFactory, [soldierName, soldierSymbol]);
+  const soldier = <RMRKEquippableMockUpgradeable>(
+    await upgrades.deployProxy(equipFactory, [soldierName, soldierSymbol])
+  );
   await soldier.deployed();
 
-  const weapon = <RMRKEquippableMockUpgradeable>await upgrades.deployProxy(equipFactory, [weaponName, weaponSymbol]);
+  const weapon = <RMRKEquippableMockUpgradeable>(
+    await upgrades.deployProxy(equipFactory, [weaponName, weaponSymbol])
+  );
   // Weapon
   await weapon.deployed();
 
   // Weapon Gem
-  const weaponGem = <RMRKEquippableMockUpgradeable>await upgrades.deployProxy(equipFactory, [weaponGemName, weaponGemSymbol]);
+  const weaponGem = <RMRKEquippableMockUpgradeable>(
+    await upgrades.deployProxy(equipFactory, [weaponGemName, weaponGemSymbol])
+  );
   await weaponGem.deployed();
 
   // Background
@@ -123,7 +137,9 @@ async function equippableFixture() {
   const equipFactory = await ethers.getContractFactory('RMRKEquippableMockUpgradeable');
   const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiAssetRenderUtils');
 
-  const equip = <RMRKEquippableMockUpgradeable>await upgrades.deployProxy(equipFactory, ['Chunky', 'CHNK']);
+  const equip = <RMRKEquippableMockUpgradeable>(
+    await upgrades.deployProxy(equipFactory, ['Chunky', 'CHNK'])
+  );
   await equip.deployed();
 
   const renderUtils = <RMRKMultiAssetRenderUtils>await renderUtilsFactory.deploy();
@@ -212,7 +228,11 @@ describe('MinifiedEquippableMockUpgradeable MR behavior', async () => {
     return tokenId;
   }
 
-  shouldBehaveLikeMultiAsset(mintToNestable, addAssetEntryEquippablesFromMockUpgradeable, addAssetToToken);
+  shouldBehaveLikeMultiAsset(
+    mintToNestable,
+    addAssetEntryEquippablesFromMockUpgradeable,
+    addAssetToToken,
+  );
 });
 
 // --------------- MULTI ASSET BEHAVIOR END ------------------------

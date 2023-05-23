@@ -3,14 +3,15 @@
 pragma solidity ^0.8.18;
 
 import "../RMRK/nestable/RMRKNestableMultiAssetUpgradeable.sol";
-import "../RMRK/security/InitializationGuard.sol";
 
 //Minimal upgradeable public implementation of RMRKNestableMultiAsset for testing.
-contract RMRKNestableMultiAssetMockUpgradeable is InitializationGuard, RMRKNestableMultiAssetUpgradeable {
-    function initialize(
+contract RMRKNestableMultiAssetMockUpgradeable is
+    RMRKNestableMultiAssetUpgradeable
+{
+    function __RMRKNestableMultiAssetMockUpgradeable_init(
         string memory name,
         string memory symbol
-    ) public virtual initializable {
+    ) public virtual onlyInitializing {
         __RMRKNestableMultiAssetUpgradeable_init(name, symbol);
     }
 

@@ -3,14 +3,15 @@
 pragma solidity ^0.8.18;
 
 import "../RMRK/equippable/RMRKNestableExternalEquipUpgradeable.sol";
-import "../RMRK/security/InitializationGuard.sol";
 
 //Minimal upgradeable public implementation of IERC6059 for testing.
-contract RMRKNestableExternalEquipMockUpgradeable is InitializationGuard, RMRKNestableExternalEquipUpgradeable {
-    function initialize(
+contract RMRKNestableExternalEquipMockUpgradeable is
+    RMRKNestableExternalEquipUpgradeable
+{
+    function __RMRKNestableExternalEquipMockUpgradeable_init(
         string memory name_,
         string memory symbol_
-    ) public virtual initializable {
+    ) public virtual onlyInitializing {
         __RMRKNestableExternalEquipUpgradeable_init(name_, symbol_);
     }
 

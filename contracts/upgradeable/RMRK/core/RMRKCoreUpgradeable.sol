@@ -3,7 +3,7 @@
 pragma solidity ^0.8.18;
 
 import "./IRMRKCoreUpgradeable.sol";
-import "../security/InitializationGuard.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 /**
  * @title RMRKCoreUpgradeable
@@ -11,7 +11,7 @@ import "../security/InitializationGuard.sol";
  * @notice Upgradeable smart contract of the RMRK core module.
  * @dev This is currently just a passthrough contract which allows for granular editing of base-level ERC721 functions.
  */
-contract RMRKCoreUpgradeable is IRMRKCoreUpgradeable, InitializationGuard {
+contract RMRKCoreUpgradeable is IRMRKCoreUpgradeable, Initializable {
     /**
      * @notice Version of the @rmrk-team/evm-contracts package
      * @return Version identifier of the smart contract
@@ -22,9 +22,10 @@ contract RMRKCoreUpgradeable is IRMRKCoreUpgradeable, InitializationGuard {
     function __RMRKCoreUpgradeable_init(
         string memory name_,
         string memory symbol_
-    ) internal initializable {
+    ) internal onlyInitializing {
         __RMRKCoreUpgradeable_init_unchained(name_, symbol_);
     }
+
     /**
      * @notice Used to initialize the smart contract.
      * @param name_ Name of the token collection
@@ -33,7 +34,7 @@ contract RMRKCoreUpgradeable is IRMRKCoreUpgradeable, InitializationGuard {
     function __RMRKCoreUpgradeable_init_unchained(
         string memory name_,
         string memory symbol_
-    ) internal initializable {
+    ) internal onlyInitializing {
         _name = name_;
         _symbol = symbol_;
     }
