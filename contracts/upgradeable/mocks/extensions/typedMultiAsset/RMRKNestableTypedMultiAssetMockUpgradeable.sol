@@ -11,11 +11,11 @@ contract RMRKNestableTypedMultiAssetMockUpgradeable is
     RMRKNestableMultiAssetMockUpgradeable,
     RMRKTypedMultiAssetUpgradeable
 {
-    function __RMRKNestableTypedMultiAssetMockUpgradeable_init(
+    function initialize(
         string memory name,
         string memory symbol
-    ) public onlyInitializing {
-        __RMRKNestableMultiAssetMockUpgradeable_init(name, symbol);
+    ) public override initializer {
+        super.initialize(name, symbol);
     }
 
     function supportsInterface(

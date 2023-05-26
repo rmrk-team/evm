@@ -44,23 +44,6 @@ Version of the @rmrk-team/evm-contracts package
 |---|---|---|
 | _0 | string | undefined |
 
-### __RMRKNestableExternalEquipMockUpgradeable_init
-
-```solidity
-function __RMRKNestableExternalEquipMockUpgradeable_init(string name_, string symbol_) external nonpayable
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| name_ | string | undefined |
-| symbol_ | string | undefined |
-
 ### acceptChild
 
 ```solidity
@@ -283,6 +266,23 @@ Used to retrieve the `Equippable` smart contract&#39;s address.
 | Name | Type | Description |
 |---|---|---|
 | _0 | address | Address of the `Equippable` smart contract |
+
+### initialize
+
+```solidity
+function initialize(string name_, string symbol_) external nonpayable
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| name_ | string | undefined |
+| symbol_ | string | undefined |
 
 ### isApprovedForAll
 

@@ -11,11 +11,11 @@ contract RMRKTypedEquippableMockUpgradeable is
     RMRKEquippableMockUpgradeable,
     RMRKTypedMultiAssetUpgradeable
 {
-    function __RMRKTypedEquippableMockUpgradeable_init(
+    function initialize(
         string memory name,
         string memory symbol
-    ) public onlyInitializing {
-        __RMRKEquippableMockUpgradeable_init(name, symbol);
+    ) public override initializer {
+        super.initialize(name, symbol);
     }
 
     function supportsInterface(

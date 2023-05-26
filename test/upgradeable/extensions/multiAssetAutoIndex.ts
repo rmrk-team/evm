@@ -9,14 +9,14 @@ import { RMRKMultiAssetAutoIndexMockUpgradeable } from '../../../typechain-types
 // --------------- FIXTURES -----------------------
 
 async function multiAssetAutoIndexFixture() {
-  const factory = await ethers.getContractFactory('RMRKMultiAssetAutoIndexMock');
+  const factory = await ethers.getContractFactory('RMRKMultiAssetAutoIndexMockUpgradeable');
   const token = await upgrades.deployProxy(factory, ['Chunky', 'CHNK']);
   await token.deployed();
 
   return token;
 }
 
-describe('RMRKMultiAssetAutoIndexMock', async function () {
+describe('RMRKMultiAssetAutoIndexMockUpgradeable', async function () {
   let token: RMRKMultiAssetAutoIndexMockUpgradeable;
   let owner: SignerWithAddress;
   let user: SignerWithAddress;

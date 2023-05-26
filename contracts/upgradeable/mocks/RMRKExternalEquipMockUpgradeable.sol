@@ -8,9 +8,7 @@ import "../RMRK/equippable/RMRKExternalEquipUpgradeable.sol";
 
 //Minimal public upgradeable implementation of RMRKEquippableWithNestable for testing.
 contract RMRKExternalEquipMockUpgradeable is RMRKExternalEquipUpgradeable {
-    function __RMRKExternalEquipMockUpgradeable_init(
-        address nestableAddress
-    ) public virtual onlyInitializing {
+    function initialize(address nestableAddress) public virtual initializer {
         __RMRKExternalEquipUpgradeable_init(nestableAddress);
     }
 

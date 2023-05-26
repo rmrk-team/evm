@@ -44,23 +44,6 @@ Version of the @rmrk-team/evm-contracts package
 |---|---|---|
 | _0 | string | undefined |
 
-### __RMRKMultiAssetAutoIndexMockUpgradeable_init
-
-```solidity
-function __RMRKMultiAssetAutoIndexMockUpgradeable_init(string name_, string symbol_) external nonpayable
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| name_ | string | undefined |
-| symbol_ | string | undefined |
-
 ### acceptAsset
 
 ```solidity
@@ -342,6 +325,23 @@ Used to retrieve IDs of the pending assets of given token.
 | Name | Type | Description |
 |---|---|---|
 | _0 | uint64[] | An array of pending asset IDs of the given token |
+
+### initialize
+
+```solidity
+function initialize(string name_, string symbol_) external nonpayable
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| name_ | string | undefined |
+| symbol_ | string | undefined |
 
 ### isApprovedForAll
 

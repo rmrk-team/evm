@@ -5,10 +5,10 @@ pragma solidity ^0.8.18;
 import "../RMRK/catalog/RMRKCatalogUpgradeable.sol";
 
 contract RMRKCatalogMockUpgradeable is RMRKCatalogUpgradeable {
-    function __RMRKCatalogMockUpgradeable_init(
+    function initialize(
         string memory metadataURI,
         string memory type_
-    ) public onlyInitializing {
+    ) public initializer {
         __RMRKCatalogUpgradeable_init(metadataURI, type_);
     }
 

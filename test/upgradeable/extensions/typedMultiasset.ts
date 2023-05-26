@@ -25,7 +25,7 @@ async function typeMultiAssetFixture() {
 }
 
 async function nestableTypedMultiAssetFixture() {
-  const factory = await ethers.getContractFactory('RMRKNestableTypedMultiAssetMock');
+  const factory = await ethers.getContractFactory('RMRKNestableTypedMultiAssetMockUpgradeable');
   const typedNestableMultiAsset = await upgrades.deployProxy(factory, ['Chunky', 'CHNK']);
   await typedNestableMultiAsset.deployed();
 
@@ -33,7 +33,7 @@ async function nestableTypedMultiAssetFixture() {
 }
 
 async function typedEquippableFixture() {
-  const factory = await ethers.getContractFactory('RMRKTypedEquippableMock');
+  const factory = await ethers.getContractFactory('RMRKTypedEquippableMockUpgradeable');
   const typedEquippable = await upgrades.deployProxy(factory, ['Chunky', 'CHNK']);
   await typedEquippable.deployed();
 
@@ -41,11 +41,15 @@ async function typedEquippableFixture() {
 }
 
 async function typedExternalEquippableFixture() {
-  const nestableFactory = await ethers.getContractFactory('RMRKNestableExternalEquipMock');
+  const nestableFactory = await ethers.getContractFactory(
+    'RMRKNestableExternalEquipMockUpgradeable',
+  );
   const nestable = await upgrades.deployProxy(nestableFactory, ['Chunky', 'CHNK']);
   await nestable.deployed();
 
-  const equipFactory = await ethers.getContractFactory('RMRKTypedExternalEquippableMock');
+  const equipFactory = await ethers.getContractFactory(
+    'RMRKTypedExternalEquippableMockUpgradeable',
+  );
   const typedExternalEquippable = await upgrades.deployProxy(equipFactory, [nestable.address]);
   await typedExternalEquippable.deployed();
 

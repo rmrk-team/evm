@@ -8,10 +8,10 @@ import "../RMRK/nestable/RMRKNestableMultiAssetUpgradeable.sol";
 contract RMRKNestableMultiAssetMockUpgradeable is
     RMRKNestableMultiAssetUpgradeable
 {
-    function __RMRKNestableMultiAssetMockUpgradeable_init(
+    function initialize(
         string memory name,
         string memory symbol
-    ) public virtual onlyInitializing {
+    ) public virtual initializer {
         __RMRKNestableMultiAssetUpgradeable_init(name, symbol);
     }
 

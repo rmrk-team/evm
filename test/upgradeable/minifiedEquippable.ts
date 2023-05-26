@@ -247,7 +247,7 @@ describe('MinifiedEquippableMock ERC721 behavior', function () {
   beforeEach(async function () {
     const { equip } = await loadFixture(equippableFixture);
     this.token = equip;
-    this.ERC721Receiver = await ethers.getContractFactory('ERC721ReceiverMockUpgradable');
+    this.ERC721Receiver = await ethers.getContractFactory('ERC721ReceiverMockUpgradeable');
   });
 
   shouldBehaveLikeERC721('Chunky', 'CHNK');

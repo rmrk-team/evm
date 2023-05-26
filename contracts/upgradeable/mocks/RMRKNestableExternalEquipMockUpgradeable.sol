@@ -8,10 +8,10 @@ import "../RMRK/equippable/RMRKNestableExternalEquipUpgradeable.sol";
 contract RMRKNestableExternalEquipMockUpgradeable is
     RMRKNestableExternalEquipUpgradeable
 {
-    function __RMRKNestableExternalEquipMockUpgradeable_init(
+    function initialize(
         string memory name_,
         string memory symbol_
-    ) public virtual onlyInitializing {
+    ) public virtual initializer {
         __RMRKNestableExternalEquipUpgradeable_init(name_, symbol_);
     }
 

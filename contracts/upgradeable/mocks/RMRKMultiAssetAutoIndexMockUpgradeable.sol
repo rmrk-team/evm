@@ -7,10 +7,10 @@ import "../RMRK/extension/multiAssetAutoIndex/RMRKMultiAssetAutoIndexUpgradeable
 contract RMRKMultiAssetAutoIndexMockUpgradeable is
     RMRKMultiAssetAutoIndexUpgradeable
 {
-    function __RMRKMultiAssetAutoIndexMockUpgradeable_init(
+    function initialize(
         string memory name_,
         string memory symbol_
-    ) public onlyInitializing {
+    ) public initializer {
         __RMRKMultiAssetAutoIndexUpgradeable_init(name_, symbol_);
     }
 

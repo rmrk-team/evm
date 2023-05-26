@@ -44,40 +44,6 @@ Version of the @rmrk-team/evm-contracts package
 |---|---|---|
 | _0 | string | undefined |
 
-### __RMRKEquippableMockUpgradeable_init
-
-```solidity
-function __RMRKEquippableMockUpgradeable_init(string name, string symbol) external nonpayable
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| name | string | undefined |
-| symbol | string | undefined |
-
-### __RMRKTypedEquippableMockUpgradeable_init
-
-```solidity
-function __RMRKTypedEquippableMockUpgradeable_init(string name, string symbol) external nonpayable
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| name | string | undefined |
-| symbol | string | undefined |
-
 ### acceptAsset
 
 ```solidity
@@ -624,6 +590,23 @@ Used to retrieve IDs of the pending assets of given token.
 | Name | Type | Description |
 |---|---|---|
 | _0 | uint64[] | An array of pending asset IDs of the given token |
+
+### initialize
+
+```solidity
+function initialize(string name, string symbol) external nonpayable
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| name | string | undefined |
+| symbol | string | undefined |
 
 ### isApprovedForAll
 

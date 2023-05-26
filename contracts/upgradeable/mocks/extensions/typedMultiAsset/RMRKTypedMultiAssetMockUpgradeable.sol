@@ -13,11 +13,11 @@ contract RMRKTypedMultiAssetMockUpgradeable is
 {
     uint64 private constant _LOWEST_POSSIBLE_PRIORITY = 2 ** 64 - 1;
 
-    function __RMRKTypedMultiAssetMockUpgradeable_init(
+    function initialize(
         string memory name,
         string memory symbol
-    ) public onlyInitializing {
-        __RMRKMultiAssetMockUpgradeable_init(name, symbol);
+    ) public override initializer {
+        super.initialize(name, symbol);
     }
 
     function supportsInterface(

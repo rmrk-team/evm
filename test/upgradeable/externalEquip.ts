@@ -104,9 +104,11 @@ async function slotsFixture() {
   const backgroundName = 'SnakeBackground';
   const backgroundSymbol = 'SB';
 
-  const catalogFactory = await ethers.getContractFactory('RMRKCatalogMock');
-  const nestableFactory = await ethers.getContractFactory('RMRKNestableExternalEquipMock');
-  const equipFactory = await ethers.getContractFactory('RMRKExternalEquipMock');
+  const catalogFactory = await ethers.getContractFactory('RMRKCatalogMockUpgradeable');
+  const nestableFactory = await ethers.getContractFactory(
+    'RMRKNestableExternalEquipMockUpgradeable',
+  );
+  const equipFactory = await ethers.getContractFactory('RMRKExternalEquipMockUpgradeable');
   const viewFactory = await ethers.getContractFactory('RMRKEquipRenderUtils');
 
   // View
@@ -124,7 +126,9 @@ async function slotsFixture() {
     await upgrades.deployProxy(nestableFactory, [soldierName, soldierSymbol])
   );
   await soldier.deployed();
-  const soldierEquip = <RMRKExternalEquipMockUpgradeable>await equipFactory.deploy(soldier.address);
+  const soldierEquip = <RMRKExternalEquipMockUpgradeable>(
+    await upgrades.deployProxy(equipFactory, [soldier.address])
+  );
   await soldierEquip.deployed();
 
   // Link nestable and equippable:
@@ -134,7 +138,7 @@ async function slotsFixture() {
   // Weapon
   const weapon = await upgrades.deployProxy(nestableFactory, [weaponName, weaponSymbol]);
   await weapon.deployed();
-  const weaponEquip = await equipFactory.deploy(weapon.address);
+  const weaponEquip = await upgrades.deployProxy(equipFactory, [weapon.address]);
   await weaponEquip.deployed();
   // Link nestable and equippable:
   await weaponEquip.setNestableAddress(weapon.address);
@@ -143,7 +147,7 @@ async function slotsFixture() {
   // Weapon Gem
   const weaponGem = await upgrades.deployProxy(nestableFactory, [weaponGemName, weaponGemSymbol]);
   await weaponGem.deployed();
-  const weaponGemEquip = await equipFactory.deploy(weaponGem.address);
+  const weaponGemEquip = await upgrades.deployProxy(equipFactory, [weaponGem.address]);
   await weaponGemEquip.deployed();
   // Link nestable and equippable:
   await weaponGemEquip.setNestableAddress(weaponGem.address);
@@ -155,7 +159,7 @@ async function slotsFixture() {
     backgroundSymbol,
   ]);
   await background.deployed();
-  const backgroundEquip = await equipFactory.deploy(background.address);
+  const backgroundEquip = await upgrades.deployProxy(equipFactory, [background.address]);
   await backgroundEquip.deployed();
   // Link nestable and equippable:
   await backgroundEquip.setNestableAddress(background.address);

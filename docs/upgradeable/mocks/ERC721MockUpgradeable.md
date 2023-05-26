@@ -10,23 +10,6 @@
 
 ## Methods
 
-### __ERC721MockUpgradeable_init
-
-```solidity
-function __ERC721MockUpgradeable_init(string name, string symbol) external nonpayable
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| name | string | undefined |
-| symbol | string | undefined |
-
 ### approve
 
 ```solidity
@@ -87,6 +70,23 @@ function getApproved(uint256 tokenId) external view returns (address)
 | Name | Type | Description |
 |---|---|---|
 | _0 | address | undefined |
+
+### initialize
+
+```solidity
+function initialize(string name, string symbol) external nonpayable
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| name | string | undefined |
+| symbol | string | undefined |
 
 ### isApprovedForAll
 

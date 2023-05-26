@@ -8,7 +8,7 @@ import {
   nestMintFromMock,
   addAssetEntryEquippablesFromMock,
 } from '../utils';
-import { setupContextForParts } from '../setup/equippableParts';
+import { setupContextForParts } from './setup/equippablePartsUpgradeable';
 import { setupContextForSlots } from './setup/equippableSlots';
 import shouldBehaveLikeEquippableAssets from './behavior/equippableAssets';
 import shouldBehaveLikeEquippableWithParts from './behavior/equippableParts';

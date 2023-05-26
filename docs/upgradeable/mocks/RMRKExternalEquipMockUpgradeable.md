@@ -10,22 +10,6 @@
 
 ## Methods
 
-### __RMRKExternalEquipMockUpgradeable_init
-
-```solidity
-function __RMRKExternalEquipMockUpgradeable_init(address nestableAddress) external nonpayable
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| nestableAddress | address | undefined |
-
 ### acceptAsset
 
 ```solidity
@@ -340,6 +324,22 @@ Used to retrieve IDs of the pending assets of given token.
 | Name | Type | Description |
 |---|---|---|
 | _0 | uint64[] | An array of pending asset IDs of the given token |
+
+### initialize
+
+```solidity
+function initialize(address nestableAddress) external nonpayable
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| nestableAddress | address | undefined |
 
 ### isApprovedForAllForAssets
 

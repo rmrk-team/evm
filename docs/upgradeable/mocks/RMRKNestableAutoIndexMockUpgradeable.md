@@ -44,23 +44,6 @@ Version of the @rmrk-team/evm-contracts package
 |---|---|---|
 | _0 | string | undefined |
 
-### __RMRKNestableAutoIndexMockUpgradeable_init
-
-```solidity
-function __RMRKNestableAutoIndexMockUpgradeable_init(string name_, string symbol_) external nonpayable
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| name_ | string | undefined |
-| symbol_ | string | undefined |
-
 ### acceptChild
 
 ```solidity
@@ -284,6 +267,23 @@ Used to retrieve the account approved to manage given token.
 | Name | Type | Description |
 |---|---|---|
 | _0 | address | Address of the account approved to manage the token |
+
+### initialize
+
+```solidity
+function initialize(string name_, string symbol_) external nonpayable
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| name_ | string | undefined |
+| symbol_ | string | undefined |
 
 ### isApprovedForAll
 

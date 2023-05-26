@@ -15,7 +15,7 @@ import {
   neonResIds,
   maskAssetsEquip,
   maskEquippableGroupId,
-} from '../../setup/equippableParts';
+} from '../setup/equippablePartsUpgradeable';
 import { bn } from '../../utils';
 
 // The general idea is having these tokens: Neon and Mask

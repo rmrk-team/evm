@@ -7,10 +7,10 @@ import "../RMRK/extension/nestableAutoIndex/RMRKNestableAutoIndexUpgradeable.sol
 contract RMRKNestableAutoIndexMockUpgradeable is
     RMRKNestableAutoIndexUpgradeable
 {
-    function __RMRKNestableAutoIndexMockUpgradeable_init(
+    function initialize(
         string memory name_,
         string memory symbol_
-    ) public onlyInitializing {
+    ) public initializer {
         __RMRKNestableAutoIndexUpgradeable_init(name_, symbol_);
     }
 

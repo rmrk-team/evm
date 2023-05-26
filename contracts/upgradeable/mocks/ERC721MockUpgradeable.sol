@@ -9,10 +9,10 @@ import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
  * Used for tests with non RMRK implementer
  */
 contract ERC721MockUpgradeable is ERC721Upgradeable {
-    function __ERC721MockUpgradeable_init(
+    function initialize(
         string memory name,
         string memory symbol
-    ) public onlyInitializing {
+    ) public initializer {
         __ERC721_init(name, symbol);
     }
 

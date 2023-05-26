@@ -10,17 +10,6 @@
 
 ## Methods
 
-### __OwnableLockMockUpgradeable_init
-
-```solidity
-function __OwnableLockMockUpgradeable_init() external nonpayable
-```
-
-
-
-
-
-
 ### getLock
 
 ```solidity
@@ -37,6 +26,17 @@ Used to retrieve the status of a lockable smart contract.
 | Name | Type | Description |
 |---|---|---|
 | _0 | bool | A boolean value signifying whether the smart contract has been locked |
+
+### initialize
+
+```solidity
+function initialize() external nonpayable
+```
+
+
+
+
+
 
 ### isContributor
 

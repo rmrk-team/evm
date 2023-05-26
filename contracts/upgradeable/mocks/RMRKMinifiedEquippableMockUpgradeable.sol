@@ -10,10 +10,10 @@ import "../RMRK/equippable/RMRKMinifiedEquippableUpgradeable.sol";
 contract RMRKMinifiedEquippableMockUpgradeable is
     RMRKMinifiedEquippableUpgradeable
 {
-    function __RMRKMinifiedEquippableMockUpgradeableinit(
+    function initialize(
         string memory name,
         string memory symbol
-    ) public onlyInitializing {
+    ) public initializer {
         __RMRKMinifiedEquippableUpgradeable_init(name, symbol);
     }
 

@@ -5,10 +5,10 @@ pragma solidity ^0.8.18;
 import "../RMRK/multiasset/RMRKMultiAssetUpgradeable.sol";
 
 contract RMRKMultiAssetMockUpgradeable is RMRKMultiAssetUpgradeable {
-    function __RMRKMultiAssetMockUpgradeable_init(
+    function initialize(
         string memory name,
         string memory symbol
-    ) public virtual onlyInitializing {
+    ) public virtual initializer {
         __RMRKMultiAssetUpgradeable_init(name, symbol);
     }
 

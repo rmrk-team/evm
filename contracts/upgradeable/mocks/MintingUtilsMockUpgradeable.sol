@@ -5,10 +5,10 @@ pragma solidity ^0.8.18;
 import "../RMRK/utils/RMRKMintingUtilsUpgradeable.sol";
 
 contract MintingUtilsMockUpgradeable is RMRKMintingUtilsUpgradeable {
-    function __MintingUtilsMockUpgradeable_init(
+    function initialize(
         uint256 maxSupply_,
         uint256 pricePerMint_
-    ) public onlyInitializing {
+    ) public initializer {
         __RMRKMintingUtilsUpgradeable_init(maxSupply_, pricePerMint_);
     }
 

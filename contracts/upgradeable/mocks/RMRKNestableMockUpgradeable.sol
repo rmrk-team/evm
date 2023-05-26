@@ -9,10 +9,10 @@ contract RMRKNestableMockUpgradeable is RMRKNestableUpgradeable {
     // This is used to test the usage of hooks
     mapping(address => mapping(uint256 => uint256)) private _balancesPerNft;
 
-    function __RMRKNestableMockUpgradeable_init(
+    function initialize(
         string memory name_,
         string memory symbol_
-    ) public virtual onlyInitializing {
+    ) public virtual initializer {
         __RMRKNestableUpgradeable_init(name_, symbol_);
     }
 

@@ -8,10 +8,10 @@ import "../RMRK/equippable/RMRKEquippableUpgradeable.sol";
 
 //Minimal public implementation of upgradeable RMRKEquippable for testing.
 contract RMRKEquippableMockUpgradeable is RMRKEquippableUpgradeable {
-    function __RMRKEquippableMockUpgradeable_init(
+    function initialize(
         string memory name,
         string memory symbol
-    ) public virtual onlyInitializing {
+    ) public virtual initializer {
         __RMRKEquippableUpgradeable_init(name, symbol);
     }
 

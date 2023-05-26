@@ -11,11 +11,11 @@ contract RMRKNestableClaimableChildMockUpgradeable is
     RMRKNestableMockUpgradeable,
     RMRKReclaimableChildUpgradeable
 {
-    function __RMRKNestableClaimableChildMockUpgradeable_init(
+    function initialize(
         string memory name,
         string memory symbol
-    ) public onlyInitializing {
-        __RMRKNestableUpgradeable_init(name, symbol);
+    ) public override initializer {
+        super.initialize(name, symbol);
     }
 
     function supportsInterface(

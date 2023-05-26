@@ -10,23 +10,6 @@
 
 ## Methods
 
-### __MintingUtilsMockUpgradeable_init
-
-```solidity
-function __MintingUtilsMockUpgradeable_init(uint256 maxSupply_, uint256 pricePerMint_) external nonpayable
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| maxSupply_ | uint256 | undefined |
-| pricePerMint_ | uint256 | undefined |
-
 ### getLock
 
 ```solidity
@@ -43,6 +26,23 @@ Used to retrieve the status of a lockable smart contract.
 | Name | Type | Description |
 |---|---|---|
 | _0 | bool | A boolean value signifying whether the smart contract has been locked |
+
+### initialize
+
+```solidity
+function initialize(uint256 maxSupply_, uint256 pricePerMint_) external nonpayable
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| maxSupply_ | uint256 | undefined |
+| pricePerMint_ | uint256 | undefined |
 
 ### isContributor
 

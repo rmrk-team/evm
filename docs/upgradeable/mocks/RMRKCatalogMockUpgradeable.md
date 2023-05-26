@@ -10,23 +10,6 @@
 
 ## Methods
 
-### __RMRKCatalogMockUpgradeable_init
-
-```solidity
-function __RMRKCatalogMockUpgradeable_init(string metadataURI, string type_) external nonpayable
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| metadataURI | string | undefined |
-| type_ | string | undefined |
-
 ### addEquippableAddresses
 
 ```solidity
@@ -198,6 +181,23 @@ Used to return the `itemType` of the associated Catalog
 | Name | Type | Description |
 |---|---|---|
 | _0 | string | `itemType` of the associated Catalog |
+
+### initialize
+
+```solidity
+function initialize(string metadataURI, string type_) external nonpayable
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| metadataURI | string | undefined |
+| type_ | string | undefined |
 
 ### resetEquippableAddresses
 

@@ -10,17 +10,6 @@
 
 ## Methods
 
-### __ERC20MockUpgradeable_init
-
-```solidity
-function __ERC20MockUpgradeable_init() external nonpayable
-```
-
-
-
-
-
-
 ### allowance
 
 ```solidity
@@ -151,6 +140,17 @@ function increaseAllowance(address spender, uint256 addedValue) external nonpaya
 | Name | Type | Description |
 |---|---|---|
 | _0 | bool | undefined |
+
+### initialize
+
+```solidity
+function initialize() external nonpayable
+```
+
+
+
+
+
 
 ### mint
 

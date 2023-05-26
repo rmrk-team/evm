@@ -5,7 +5,7 @@ pragma solidity ^0.8.18;
 import "../RMRK/access/OwnableLockUpgradeable.sol";
 
 contract OwnableLockMockUpgradeable is OwnableLockUpgradeable {
-    function __OwnableLockMockUpgradeable_init() public initializer {
+    function initialize() public initializer {
         __OwnableLockUpgradeable_init();
     }
 

@@ -11,10 +11,8 @@ contract RMRKTypedExternalEquippableMockUpgradeable is
     RMRKExternalEquipMockUpgradeable,
     RMRKTypedMultiAssetUpgradeable
 {
-    function __RMRKTypedExternalEquippableMockUpgradeable_init(
-        address nestableAddress
-    ) public onlyInitializing {
-        __RMRKExternalEquipMockUpgradeable_init(nestableAddress);
+    function initialize(address nestableAddress) public override initializer {
+        super.initialize(nestableAddress);
     }
 
     function supportsInterface(

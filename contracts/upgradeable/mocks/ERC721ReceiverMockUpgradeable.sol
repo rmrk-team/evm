@@ -21,10 +21,7 @@ contract ERC721ReceiverMockUpgradeable is
 
     event Received(address operator, address from, uint256 tokenId, bytes data);
 
-    function __ERC721ReceiverMockUpgradeable_init(
-        bytes4 retval,
-        Error error
-    ) public onlyInitializing {
+    function initialize(bytes4 retval, Error error) public initializer {
         _retval = retval;
         _error = error;
     }

@@ -44,40 +44,6 @@ Version of the @rmrk-team/evm-contracts package
 |---|---|---|
 | _0 | string | undefined |
 
-### __RMRKMultiAssetMockUpgradeable_init
-
-```solidity
-function __RMRKMultiAssetMockUpgradeable_init(string name, string symbol) external nonpayable
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| name | string | undefined |
-| symbol | string | undefined |
-
-### __RMRKTypedMultiAssetMockUpgradeable_init
-
-```solidity
-function __RMRKTypedMultiAssetMockUpgradeable_init(string name, string symbol) external nonpayable
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| name | string | undefined |
-| symbol | string | undefined |
-
 ### acceptAsset
 
 ```solidity
@@ -439,6 +405,23 @@ function getTopAssetMetaForTokenWithType(uint256 tokenId, string type_) external
 | Name | Type | Description |
 |---|---|---|
 | _0 | string | undefined |
+
+### initialize
+
+```solidity
+function initialize(string name, string symbol) external nonpayable
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| name | string | undefined |
+| symbol | string | undefined |
 
 ### isApprovedForAll
 

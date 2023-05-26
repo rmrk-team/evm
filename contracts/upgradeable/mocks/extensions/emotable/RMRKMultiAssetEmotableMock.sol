@@ -9,10 +9,10 @@ contract RMRKMultiAssetEmotableMockUpgradeable is
     RMRKEmotableUpgradeable,
     RMRKMultiAssetUpgradeable
 {
-    function __RMRKMultiAssetEmotableMockUpgradeable_init(
+    function initialize(
         string memory name,
         string memory symbol
-    ) public onlyInitializing {
+    ) public initializer {
         __RMRKMultiAssetUpgradeable_init(name, symbol);
     }
 

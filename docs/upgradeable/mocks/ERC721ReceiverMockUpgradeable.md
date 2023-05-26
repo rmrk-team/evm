@@ -10,10 +10,10 @@
 
 ## Methods
 
-### __ERC721ReceiverMockUpgradeable_init
+### initialize
 
 ```solidity
-function __ERC721ReceiverMockUpgradeable_init(bytes4 retval, enum ERC721ReceiverMockUpgradeable.Error error) external nonpayable
+function initialize(bytes4 retval, enum ERC721ReceiverMockUpgradeable.Error error) external nonpayable
 ```
 
 

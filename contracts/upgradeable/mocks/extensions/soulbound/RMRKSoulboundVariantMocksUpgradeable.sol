@@ -16,7 +16,7 @@ import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 // {
 //     mapping(uint256 => bool) soulboundExempt;
 
-//     function __RMRKSoulboundAfterBlockNumberMockUpgradeable_init(
+//     function initialize(
 //         string memory _name,
 //         string memory _symbol,
 //         uint256 lastBlockToTransfer
@@ -67,11 +67,11 @@ import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 // {
 //     mapping(uint256 => bool) soulboundExempt;
 
-//     function __RMRKSoulboundAfterTransactionsMockUpgradeable_init(
+//     function initialize(
 //         string memory _name,
 //         string memory _symbol,
 //         uint256 numberOfTransfers
-//     ) public virtual onlyInitializing
+//     ) public virtual initializer
 //     {
 //         __ERC721_init(_name, _symbol);
 //         __RMRKSoulboundAfterTransactionsUpgradeable_init(numberOfTransfers);
@@ -126,10 +126,10 @@ import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 // {
 //     mapping(uint256 => bool) soulboundExempt;
 
-//     function __RMRKSoulboundPerTokenMockUpgradeable_init(
+//     function initialize(
 //         string memory _name,
 //         string memory _symbol
-//     ) public onlyInitializing {
+//     ) public initializer {
 //         __ERC721_init(_name, _symbol);
 //     }
 

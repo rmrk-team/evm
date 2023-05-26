@@ -5,15 +5,14 @@ pragma solidity ^0.8.18;
 import "../../../RMRK/extension/soulbound/RMRKSoulboundUpgradeable.sol";
 import "../../RMRKNestableExternalEquipMockUpgradeable.sol";
 
-contract RMRKSoulboundNestableExternalEquippableMock // is RMRKSoulboundUpgradeable, RMRKNestableExternalEquipMockUpgradeable
-{
-    // function __RMRKSoulboundNestableExternalEquippableMock_init(
+// is RMRKSoulboundUpgradeable, RMRKNestableExternalEquipMockUpgradeable
+contract RMRKSoulboundNestableExternalEquippableMock {
+    // function initialize(
     //     string memory name,
     //     string memory symbol
-    // ) public override onlyInitializing {
+    // ) public override initializer {
     //     RMRKNestableExternalEquipMockUpgradeable_init(name, symbol);
     // }
-
     // function supportsInterface(
     //     bytes4 interfaceId
     // )
@@ -27,7 +26,6 @@ contract RMRKSoulboundNestableExternalEquippableMock // is RMRKSoulboundUpgradea
     //         RMRKSoulboundUpgradeable.supportsInterface(interfaceId) ||
     //         super.supportsInterface(interfaceId);
     // }
-
     // function _beforeTokenTransfer(
     //     address from,
     //     address to,
