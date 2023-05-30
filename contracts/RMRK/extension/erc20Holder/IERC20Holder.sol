@@ -2,7 +2,9 @@
 
 pragma solidity ^0.8.18;
 
-interface IERC20Holder {
+import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+
+interface IERC20Holder is IERC165 {
     /**
      * @notice This emits when a token receives ERC-20 tokens.
      * @param erc20Contract The ERC-20 contract.

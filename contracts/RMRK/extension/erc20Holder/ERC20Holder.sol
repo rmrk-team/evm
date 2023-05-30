@@ -23,15 +23,21 @@ abstract contract ERC20Holder is IERC20Holder {
     }
 
     /**
-     * @inheritdoc IERC20Holder
+     * @notice Transfer ERC-20 tokens to a specific token
+     * @dev The ERC-20 contract must have approved this contract to transfer the ERC-20 tokens
+     * @dev The balance MUST be transferred from the message sender
+     * @param erc20Contract The ERC-20 contract
+     * @param tokenId The token to transfer to
+     * @param value The number of ERC-20 tokens to transfer
+     * @param data Additional data with no specified format, to allow for custom logic.
      */
-    function transferERC20FromToken(
+    function _transferERC20FromToken(
         address erc20Contract,
         uint256 tokenId,
         address to,
         uint256 value,
         bytes memory data
-    ) external {
+    ) internal {
         if (value == 0) {
             revert InvalidValue();
         }
@@ -148,4 +154,10 @@ abstract contract ERC20Holder is IERC20Holder {
         uint256 value,
         bytes memory data
     ) internal virtual {}
+
+    function supportsInterface(
+        bytes4 interfaceId
+    ) public view virtual override returns (bool) {
+        return type(ERC20Holder).interfaceId == interfaceId;
+    }
 }
