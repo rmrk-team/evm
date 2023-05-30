@@ -17,7 +17,7 @@ error RMRKCanOnlyDoBulkOperationsWithOneTokenAtATime();
 contract RMRKBulkWriter {
     /**
      * @notice Used to provide a struct for inputing unequip data.
-     * @dev Only used for input and not storage of data
+     * @dev Only used for input and not storage of data.
      * @return assetId ID of the asset that we are equipping into
      * @return slotPartId ID of the slot part that we are using to unequip
      */
@@ -27,9 +27,9 @@ contract RMRKBulkWriter {
     }
 
     /**
-     * @notice Reverts if the caller is not the owner of the token
-     * @param collection Address of the collection that this contract is managing.
-     * @param tokenId ID of the token we are managing.
+     * @notice Reverts if the caller is not the owner of the token.
+     * @param collection Address of the collection that this contract is managing
+     * @param tokenId ID of the token we are managing
      */
     modifier onlyTokenOwner(address collection, uint256 tokenId) {
         _checkTokenOwner(collection, tokenId);
@@ -37,12 +37,12 @@ contract RMRKBulkWriter {
     }
 
     /**
-     * @notice Initializes the contract
+     * @notice Initializes the contract.
      */
     constructor() {}
 
     /**
-     * @notice Replaces the current equipped child on the asset and slot combination with the given one
+     * @notice Replaces the current equipped child in the asset and slot combination with the given one.
      * @dev The `IntakeEquip` stuct contains the following data:
      *  [
      *      tokenId,
@@ -51,8 +51,8 @@ contract RMRKBulkWriter {
      *      slotPartId,
      *      childAssetId
      *  ]
-     * @param collection Address of the collection that this contract is managing.
-     * @param data An `IntakeEquip` struct specifying the equip data.
+     * @param collection Address of the collection that this contract is managing
+     * @param data An `IntakeEquip` struct specifying the equip data
      */
     function replaceEquip(
         address collection,
@@ -67,10 +67,11 @@ contract RMRKBulkWriter {
     }
 
     /**
-     * @notice Performs multiple unequip and equip operations
-     * @dev Unequip operations must run first
-     * @dev tokenId is included as a parameter to be able to do a single check for ownership
-     * @dev Every tokenId in the `IntakeEquip` structs must match the tokenId passed in
+     * @notice Performs multiple unequip and/or equip operations.
+     * @dev Unequip operations must run first.
+     * @dev Unequip operations do not need to be related to the equip operations; this method does not force you to only equip the assets into the slots that were unequipped.
+     * @dev `tokenId` is included as a parameter to be able to do a single check for ownership.
+     * @dev Every `tokenId` in the `IntakeEquip` structs must match the `tokenId` passed as the argument.
      * @dev The `IntakeUnequip` stuct contains the following data:
      *  [
      *      assetId,
@@ -84,10 +85,10 @@ contract RMRKBulkWriter {
      *      slotPartId,
      *      childAssetId
      *  ]
-     * @param collection Address of the collection that this contract is managing.
-     * @param tokenId ID of the token we are managing.
-     * @param unequips[] An array of `IntakeUnequip` structs specifying the slots to unequip.
-     * @param equips[] An array of `IntakeEquip` structs specifying the slots to equip.
+     * @param collection Address of the collection that this contract is managing
+     * @param tokenId ID of the token we are managing
+     * @param unequips[] An array of `IntakeUnequip` structs specifying the slots to unequip
+     * @param equips[] An array of `IntakeEquip` structs specifying the slots to equip
      */
     function bulkEquip(
         address collection,
@@ -96,7 +97,7 @@ contract RMRKBulkWriter {
         IERC6220.IntakeEquip[] memory equips
     ) public onlyTokenOwner(collection, tokenId) {
         uint256 length = unequips.length;
-        for (uint256 i = 0; i < length; ) {
+        for (uint256 i; i < length; ) {
             IERC6220(collection).unequip(
                 tokenId,
                 unequips[i].assetId,
@@ -107,7 +108,7 @@ contract RMRKBulkWriter {
             }
         }
         length = equips.length;
-        for (uint256 i = 0; i < length; ) {
+        for (uint256 i; i < length; ) {
             if (equips[i].tokenId != tokenId) {
                 revert RMRKCanOnlyDoBulkOperationsWithOneTokenAtATime();
             }
@@ -119,10 +120,10 @@ contract RMRKBulkWriter {
     }
 
     /**
-     * @notice Checks if the caller is the owner of the token
-     * @dev Reverts if the caller is not the owner of the token
-     * @param collection Address of the collection that this contract is managing.
-     * @param tokenId ID of the token we are managing.
+     * @notice Validates that the caller is the owner of the token.
+     * @dev Reverts if the caller is not the owner of the token.
+     * @param collection Address of the collection that this contract is managing
+     * @param tokenId ID of the token we are managing
      */
     function _checkTokenOwner(
         address collection,
