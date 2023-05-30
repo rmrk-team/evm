@@ -57,7 +57,7 @@ function replaceEquip(address collection, IERC6220.IntakeEquip data) external no
 error RMRKCanOnlyDoBulkOperationsOnOwnedTokens()
 ```
 
-
+Attempting to do a bulk operation on a token that is not owned by the caller
 
 
 
@@ -68,7 +68,7 @@ error RMRKCanOnlyDoBulkOperationsOnOwnedTokens()
 error RMRKCanOnlyDoBulkOperationsWithOneTokenAtATime()
 ```
 
-
+Attempting to do a bulk operation with multiple tokens at a time
 
 
 
