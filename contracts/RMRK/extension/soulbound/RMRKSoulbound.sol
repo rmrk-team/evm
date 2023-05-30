@@ -3,7 +3,7 @@
 pragma solidity ^0.8.18;
 
 import "../../core/RMRKCore.sol";
-import "./IERC6454beta.sol";
+import "./IERC6454.sol";
 import "../../library/RMRKErrors.sol";
 
 /**
@@ -11,7 +11,7 @@ import "../../library/RMRKErrors.sol";
  * @author RMRK team
  * @notice Smart contract of the RMRK Soulbound module.
  */
-abstract contract RMRKSoulbound is IERC6454beta, RMRKCore {
+abstract contract RMRKSoulbound is IERC6454, RMRKCore {
     /**
      * @notice Hook that is called before any token transfer. This includes minting and burning.
      * @dev This is a hook ensuring that all transfers of tokens are reverted if the token is soulbound.
@@ -46,6 +46,6 @@ abstract contract RMRKSoulbound is IERC6454beta, RMRKCore {
     function supportsInterface(
         bytes4 interfaceId
     ) public view virtual returns (bool) {
-        return interfaceId == type(IERC6454beta).interfaceId;
+        return interfaceId == type(IERC6454).interfaceId;
     }
 }
