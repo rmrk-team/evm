@@ -89,4 +89,6 @@ abstract contract RMRKRoyaltiesUpgradeable is
         receiver = _royaltyRecipient;
         royaltyAmount = (salePrice * _royaltyPercentageBps) / 10000;
     }
+
+    uint256[50] private __gap;
 }

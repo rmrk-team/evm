@@ -288,4 +288,6 @@ contract RMRKCatalogUpgradeable is IRMRKCatalogUpgradeable, Initializable {
 
         return parts;
     }
+
+    uint256[50] private __gap;
 }

@@ -54,4 +54,6 @@ abstract contract RMRKSoulboundAfterBlockNumberUpgradeable is
     ) public view virtual override returns (bool) {
         return _lastBlockToTransfer > block.number;
     }
+
+    uint256[50] private __gap;
 }

@@ -134,4 +134,6 @@ contract RMRKMultiAssetAutoIndexUpgradeable is
         // The asset has already been put into the pending asset list
         _pendingAssetIndex[tokenId][assetId] = _pendingAssets[tokenId].length;
     }
+
+    uint256[50] private __gap;
 }

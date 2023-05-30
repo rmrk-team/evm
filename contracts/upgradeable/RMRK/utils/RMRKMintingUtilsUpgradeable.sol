@@ -99,4 +99,6 @@ contract RMRKMintingUtilsUpgradeable is OwnableLockUpgradeable {
     function _checkSaleIsOpen() private view {
         if (_nextId >= _maxSupply) revert RMRKMintOverMax();
     }
+
+    uint256[50] private __gap;
 }

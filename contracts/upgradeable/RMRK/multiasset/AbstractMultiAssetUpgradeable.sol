@@ -466,4 +466,6 @@ abstract contract AbstractMultiAssetUpgradeable is
         uint256 tokenId,
         uint64[] calldata priorities
     ) internal virtual {}
+
+    uint256[50] private __gap;
 }

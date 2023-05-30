@@ -190,4 +190,6 @@ contract RMRKNestableRenderUtilsUpgradeable {
 
         return (isValid, validityOfChildren);
     }
+
+    uint256[50] private __gap;
 }

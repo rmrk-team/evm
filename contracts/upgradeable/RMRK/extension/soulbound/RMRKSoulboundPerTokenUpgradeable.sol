@@ -50,4 +50,6 @@ contract RMRKSoulboundPerTokenUpgradeable is RMRKSoulboundUpgradeable {
             to == address(0) || // Exclude Burning
             !_isSoulbound[tokenId]);
     }
+
+    uint256[50] private __gap;
 }

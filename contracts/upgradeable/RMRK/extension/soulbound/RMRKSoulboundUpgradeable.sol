@@ -64,4 +64,6 @@ abstract contract RMRKSoulboundUpgradeable is
     ) public view virtual returns (bool) {
         return interfaceId == type(IERC6454betaUpgradeable).interfaceId;
     }
+
+    uint256[50] private __gap;
 }

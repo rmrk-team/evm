@@ -152,4 +152,6 @@ abstract contract RMRKReclaimableChildUpgradeable is
         );
         if (isPending) delete _childIsInPending[childAddress][childId];
     }
+
+    uint256[50] private __gap;
 }

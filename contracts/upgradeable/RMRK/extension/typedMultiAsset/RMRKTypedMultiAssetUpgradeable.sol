@@ -36,4 +36,6 @@ contract RMRKTypedMultiAssetUpgradeable is IRMRKTypedMultiAssetUpgradeable {
     function _setAssetType(uint64 assetId, string memory type_) internal {
         _assetTypes[assetId] = type_;
     }
+
+    uint256[50] private __gap;
 }

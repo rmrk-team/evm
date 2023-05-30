@@ -111,4 +111,6 @@ abstract contract RMRKEmoteTrackerUpgradeable is IRMRKEmoteTrackerUpgradeable {
             interfaceId == type(IRMRKEmoteTrackerUpgradeable).interfaceId ||
             interfaceId == type(IERC165Upgradeable).interfaceId;
     }
+
+    uint256[50] private __gap;
 }

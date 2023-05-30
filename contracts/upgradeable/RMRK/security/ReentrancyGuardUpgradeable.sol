@@ -80,4 +80,6 @@ abstract contract ReentrancyGuardUpgradeable is Initializable {
         // Any calls to nonReentrant after this point will fail
         _status = _ENTERED;
     }
+
+    uint256[50] private __gap;
 }

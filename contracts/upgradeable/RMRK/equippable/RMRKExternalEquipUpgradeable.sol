@@ -657,4 +657,6 @@ contract RMRKExternalEquipUpgradeable is
         uint64 assetId,
         uint64 slotPartId
     ) internal virtual {}
+
+    uint256[50] private __gap;
 }

@@ -37,4 +37,6 @@ contract RMRKCollectionMetadataUpgradeable is Initializable {
     function collectionMetadata() public view returns (string memory) {
         return _collectionMetadata;
     }
+
+    uint256[50] private __gap;
 }

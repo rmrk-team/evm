@@ -56,4 +56,6 @@ contract RMRKTokenURIUpgradeable is Initializable {
         _tokenUri = tokenURI_;
         _tokenUriIsEnumerable = isEnumerable ? 1 : 0;
     }
+
+    uint256[50] private __gap;
 }

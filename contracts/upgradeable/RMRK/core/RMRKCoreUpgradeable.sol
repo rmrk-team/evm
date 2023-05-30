@@ -98,4 +98,6 @@ contract RMRKCoreUpgradeable is IRMRKCoreUpgradeable, Initializable {
         address to,
         uint256 tokenId
     ) internal virtual {}
+
+    uint256[50] private __gap;
 }

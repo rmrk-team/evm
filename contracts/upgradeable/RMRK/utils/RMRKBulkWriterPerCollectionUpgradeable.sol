@@ -140,4 +140,6 @@ contract RMRKBulkWriterPerCollectionUpgradeable is Initializable {
             revert RMRKCanOnlyDoBulkOperationsOnOwnedTokens();
         }
     }
+
+    uint256[50] private __gap;
 }

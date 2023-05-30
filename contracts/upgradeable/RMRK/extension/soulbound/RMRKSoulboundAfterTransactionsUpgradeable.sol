@@ -76,4 +76,6 @@ abstract contract RMRKSoulboundAfterTransactionsUpgradeable is
     ) public view virtual override returns (bool) {
         return _transfersPerToken[tokenId] < _maxNumberOfTransfers;
     }
+
+    uint256[50] private __gap;
 }

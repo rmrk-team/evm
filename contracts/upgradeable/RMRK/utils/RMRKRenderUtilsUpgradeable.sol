@@ -204,4 +204,6 @@ contract RMRKRenderUtilsUpgradeable {
         }
         data.symbol = target.symbol();
     }
+
+    uint256[50] private __gap;
 }

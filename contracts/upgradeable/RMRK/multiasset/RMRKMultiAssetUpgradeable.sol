@@ -618,4 +618,6 @@ contract RMRKMultiAssetUpgradeable is
         _requireMinted(tokenId);
         return _tokenApprovalsForAssets[tokenId];
     }
+
+    uint256[50] private __gap;
 }

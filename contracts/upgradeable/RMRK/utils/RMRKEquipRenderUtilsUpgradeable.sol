@@ -1083,4 +1083,6 @@ contract RMRKEquipRenderUtilsUpgradeable is
         }
         return childrenWithMetadata;
     }
+
+    uint256[50] private __gap;
 }

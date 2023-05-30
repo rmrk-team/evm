@@ -61,4 +61,6 @@ contract OwnableLockUpgradeable is OwnableUpgradeable {
     function _onlyNotLocked() private view {
         if (_lock == 1) revert RMRKLocked();
     }
+
+    uint256[50] private __gap;
 }

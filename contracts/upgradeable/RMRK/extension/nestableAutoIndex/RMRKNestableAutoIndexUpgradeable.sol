@@ -189,4 +189,6 @@ contract RMRKNestableAutoIndexUpgradeable is
     {
         return super.ownerOf(tokenId);
     }
+
+    uint256[50] private __gap;
 }

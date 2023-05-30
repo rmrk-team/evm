@@ -83,4 +83,6 @@ abstract contract RMRKEmotableUpgradeable is IERC6381Upgradeable {
     ) public view virtual returns (bool) {
         return interfaceId == type(IERC6381Upgradeable).interfaceId;
     }
+
+    uint256[50] private __gap;
 }

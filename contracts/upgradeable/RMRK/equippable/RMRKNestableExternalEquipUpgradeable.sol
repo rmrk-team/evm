@@ -131,4 +131,6 @@ contract RMRKNestableExternalEquipUpgradeable is
             tokenId
         );
     }
+
+    uint256[50] private __gap;
 }

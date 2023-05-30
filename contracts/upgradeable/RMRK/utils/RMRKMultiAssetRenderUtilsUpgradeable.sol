@@ -261,4 +261,6 @@ contract RMRKMultiAssetRenderUtilsUpgradeable {
             topAssetId
         );
     }
+
+    uint256[50] private __gap;
 }

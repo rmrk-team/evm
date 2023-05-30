@@ -128,10 +128,12 @@ describe('RMRKSoulbound variants', async function () {
         'contracts/upgradeable/mocks/extensions/soulbound/RMRKSoulboundVariantMocksUpgradeable.sol:RMRKSoulboundAfterBlockNumberMockUpgradeable',
       );
       initBlock = (await ethers.provider.getBlock('latest')).number;
-      token = <RMRKSoulboundAfterBlockNumberMockUpgradeable>(
-        await upgrades.deployProxy(factory, ['Chunky', 'CHNK', initBlock + blocksToTransfer], {
+      token = <RMRKSoulboundAfterBlockNumberMockUpgradeable>await upgrades.deployProxy(
+        factory,
+        ['Chunky', 'CHNK', initBlock + blocksToTransfer],
+        {
           initializer: 'initialize(string,string,uint256)',
-        })
+        },
       );
       await token.deployed();
     });
@@ -167,10 +169,12 @@ describe('RMRKSoulbound variants', async function () {
       const factory = await ethers.getContractFactory(
         'contracts/upgradeable/mocks/extensions/soulbound/RMRKSoulboundVariantMocksUpgradeable.sol:RMRKSoulboundAfterTransactionsMockUpgradeable',
       );
-      token = <RMRKSoulboundAfterTransactionsMockUpgradeable>(
-        await upgrades.deployProxy(factory, ['Chunky', 'CHNK', maxTransactions], {
+      token = <RMRKSoulboundAfterTransactionsMockUpgradeable>await upgrades.deployProxy(
+        factory,
+        ['Chunky', 'CHNK', maxTransactions],
+        {
           initializer: 'initialize(string,string,uint256)',
-        })
+        },
       );
       await token.deployed();
     });

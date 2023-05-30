@@ -146,4 +146,6 @@ contract OwnableUpgradeable is ContextUpgradeable {
     function _onlyOwner() private view {
         if (owner() != _msgSender()) revert RMRKNotOwner();
     }
+
+    uint256[50] private __gap;
 }

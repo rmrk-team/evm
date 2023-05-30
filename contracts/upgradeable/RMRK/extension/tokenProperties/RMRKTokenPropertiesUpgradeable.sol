@@ -198,4 +198,6 @@ abstract contract RMRKTokenPropertiesUpgradeable is
             interfaceId == type(IRMRKTokenPropertiesUpgradeable).interfaceId ||
             interfaceId == type(IERC165Upgradeable).interfaceId;
     }
+
+    uint256[50] private __gap;
 }

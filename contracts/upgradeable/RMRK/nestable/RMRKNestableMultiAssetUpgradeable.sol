@@ -192,4 +192,6 @@ contract RMRKNestableMultiAssetUpgradeable is
             isApprovedForAllForAssets(owner, user) ||
             getApprovedForAssets(tokenId) == user);
     }
+
+    uint256[50] private __gap;
 }

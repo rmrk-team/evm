@@ -1448,4 +1448,6 @@ contract RMRKNestableUpgradeable is
         array[index] = array[array.length - 1];
         array.pop();
     }
+
+    uint256[50] private __gap;
 }
