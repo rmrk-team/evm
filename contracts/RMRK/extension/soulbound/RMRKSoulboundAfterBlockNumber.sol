@@ -30,7 +30,7 @@ abstract contract RMRKSoulboundAfterBlockNumber is RMRKSoulbound {
     }
 
     /**
-     * @inheritdoc IERC6454beta
+     * @inheritdoc IERC6454
      */
     function isTransferable(
         uint256,
