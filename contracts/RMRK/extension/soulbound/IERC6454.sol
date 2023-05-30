@@ -5,11 +5,11 @@ pragma solidity ^0.8.18;
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 
 /**
- * @title IERC6454beta
+ * @title IERC6454
  * @author RMRK team
  * @notice A minimal extension to identify the transferability of Non-Fungible Tokens.
  */
-interface IERC6454beta is IERC165 {
+interface IERC6454 is IERC165 {
     /**
      * @notice Used to check whether the given token is transferable or not.
      * @dev If this function returns `false`, the transfer of the token MUST revert execution.
