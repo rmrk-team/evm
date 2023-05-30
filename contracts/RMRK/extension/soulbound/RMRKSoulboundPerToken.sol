@@ -32,7 +32,7 @@ abstract contract RMRKSoulboundPerToken is RMRKSoulbound {
     }
 
     /**
-     * @inheritdoc IERC6454beta
+     * @inheritdoc IERC6454
      */
     function isTransferable(
         uint256 tokenId,
