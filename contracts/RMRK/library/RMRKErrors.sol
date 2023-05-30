@@ -161,3 +161,7 @@ error RMRKUnexpectedParent();
 error RMRKZeroLengthIdsPassed();
 /// Attempting to set the royalties to a value higher than 100% (10000 in base points)
 error RMRKRoyaltiesTooHigh();
+/// Attempting to do a bulk operation on a token that is not owned by the caller
+error RMRKCanOnlyDoBulkOperationsOnOwnedTokens();
+/// Attempting to do a bulk operation with multiple tokens at a time
+error RMRKCanOnlyDoBulkOperationsWithOneTokenAtATime();
