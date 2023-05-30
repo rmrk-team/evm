@@ -15,6 +15,14 @@ abstract contract RMRKSoulboundUpgradeable is
     IERC6454betaUpgradeable,
     RMRKCoreUpgradeable
 {
+    function __RMRKSoulboundUpgradeable_init(
+        string memory name_,
+        string memory symbol_
+    ) internal onlyInitializing {
+        __RMRKSoulboundUpgradeable_init_unchained();
+        __RMRKCoreUpgradeable_init(name_, symbol_);
+    }
+
     function __RMRKSoulboundUpgradeable_init_unchained()
         internal
         onlyInitializing

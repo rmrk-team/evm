@@ -1,4 +1,4 @@
-# RMRKSoulboundNestableMultiAssetMockUpgradeable
+# RMRKSoulboundPerTokenMockUpgradeable
 
 
 
@@ -62,25 +62,6 @@ Accepts an asset at from the pending array of given token.
 | index | uint256 | Index of the asset in the pending array to accept |
 | assetId | uint64 | ID of the asset expected to be in the index |
 
-### acceptChild
-
-```solidity
-function acceptChild(uint256 parentId, uint256 childIndex, address childAddress, uint256 childId) external nonpayable
-```
-
-Used to accept a pending child token for a given parent token.
-
-*This moves the child token from parent token&#39;s pending child tokens array into the active child tokens  array.*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| parentId | uint256 | ID of the parent token for which the child token is being accepted |
-| childIndex | uint256 | Index of a child tokem in the given parent&#39;s pending children array |
-| childAddress | address | Address of the collection smart contract of the child token expected to be located at the  specified index of the given parent token&#39;s pending children array |
-| childId | uint256 | ID of the child token expected to be located at the specified index of the given parent token&#39;s  pending children array |
-
 ### addAssetEntry
 
 ```solidity
@@ -116,23 +97,23 @@ function addAssetToToken(uint256 tokenId, uint64 assetId, uint64 replacesAssetWi
 | assetId | uint64 | undefined |
 | replacesAssetWithId | uint64 | undefined |
 
-### addChild
+### addAssetToTokensEventTest
 
 ```solidity
-function addChild(uint256 parentId, uint256 childId, bytes data) external nonpayable
+function addAssetToTokensEventTest(uint256[] tokenIds, uint64 assetId, uint64 replacesAssetWithId) external nonpayable
 ```
 
-Used to add a child token to a given parent token.
 
-*This adds the child token into the given parent token&#39;s pending child tokens array.Requirements:  - `directOwnerOf` on the child contract must resolve to the called contract.  - the pending array of the parent contract must not be full.*
+
+
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| parentId | uint256 | ID of the parent token to receive the new child token |
-| childId | uint256 | ID of the new proposed child token |
-| data | bytes | Additional data with no specified format |
+| tokenIds | uint256[] | undefined |
+| assetId | uint64 | undefined |
+| replacesAssetWithId | uint64 | undefined |
 
 ### approve
 
@@ -174,7 +155,7 @@ Used to grant permission to the user to manage token&#39;s assets.
 function balanceOf(address owner) external view returns (uint256)
 ```
 
-Used to retrieve the number of tokens in `owner`&#39;s account.
+Used to retrieve the number of tokens in ``owner``&#39;s account.
 
 
 
@@ -196,107 +177,15 @@ Used to retrieve the number of tokens in `owner`&#39;s account.
 function burn(uint256 tokenId) external nonpayable
 ```
 
-Used to burn a given token.
 
-*In case the token has any child tokens, the execution will be reverted.*
 
-#### Parameters
 
-| Name | Type | Description |
-|---|---|---|
-| tokenId | uint256 | ID of the token to burn |
-
-### burn
-
-```solidity
-function burn(uint256 tokenId, uint256 maxChildrenBurns) external nonpayable returns (uint256)
-```
-
-Used to burn a given token.
-
-*When a token is burned, all of its child tokens are recursively burned as well.When specifying the maximum recursive burns, the execution will be reverted if there are more children to be  burned.Setting the `maxRecursiveBurn` value to 0 will only attempt to burn the specified token and revert if there  are any child tokens present.The approvals are cleared when the token is burned.Requirements:  - `tokenId` must exist.Emits a {Transfer} event.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId | uint256 | ID of the token to burn |
-| maxChildrenBurns | uint256 | undefined |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | uint256 | Number of recursively burned children |
-
-### childOf
-
-```solidity
-function childOf(uint256 parentId, uint256 index) external view returns (struct IERC6059Upgradeable.Child)
-```
-
-Used to retrieve a specific active child token for a given parent token.
-
-*Returns a single Child struct locating at `index` of parent token&#39;s active child tokens array.The Child struct consists of the following values:  [      tokenId,      contractAddress  ]*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| parentId | uint256 | ID of the parent token for which the child is being retrieved |
-| index | uint256 | Index of the child token in the parent token&#39;s active child tokens array |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | IERC6059Upgradeable.Child | A Child struct containing data about the specified child |
-
-### childrenOf
-
-```solidity
-function childrenOf(uint256 parentId) external view returns (struct IERC6059Upgradeable.Child[])
-```
-
-Used to retrieve the active child tokens of a given parent token.
-
-*Returns array of Child structs existing for parent token.The Child struct consists of the following values:  [      tokenId,      contractAddress  ]*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| parentId | uint256 | ID of the parent token for which to retrieve the active child tokens |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | IERC6059Upgradeable.Child[] | An array of Child structs containing the parent token&#39;s active child tokens |
-
-### directOwnerOf
-
-```solidity
-function directOwnerOf(uint256 tokenId) external view returns (address, uint256, bool)
-```
-
-Used to retrieve the immediate owner of the given token.
-
-*If the immediate owner is another token, the address returned, should be the one of the parent token&#39;s  collection smart contract.*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| tokenId | uint256 | ID of the token for which the RMRK owner is being retrieved |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | address | Address of the given token&#39;s owner |
-| _1 | uint256 | The ID of the parent token. Should be `0` if the owner is an externally owned account |
-| _2 | bool | The boolean value signifying whether the owner is an NFT or not |
+| tokenId | uint256 | undefined |
 
 ### getActiveAssetPriorities
 
@@ -457,7 +346,7 @@ Used to retrieve IDs of the pending assets of given token.
 ### initialize
 
 ```solidity
-function initialize(string name, string symbol) external nonpayable
+function initialize(string _name, string _symbol) external nonpayable
 ```
 
 
@@ -468,8 +357,8 @@ function initialize(string name, string symbol) external nonpayable
 
 | Name | Type | Description |
 |---|---|---|
-| name | string | undefined |
-| symbol | string | undefined |
+| _name | string | undefined |
+| _symbol | string | undefined |
 
 ### isApprovedForAll
 
@@ -517,13 +406,13 @@ Used to check whether the address has been granted the operator role by a given 
 |---|---|---|
 | _0 | bool | A boolean value indicating wehter the account we are checking has been granted the operator role |
 
-### isTransferable
+### isContributor
 
 ```solidity
-function isTransferable(uint256, address from, address to) external view returns (bool)
+function isContributor(address contributor) external view returns (bool)
 ```
 
-
+Used to check if the address is one of the contributors.
 
 
 
@@ -531,15 +420,54 @@ function isTransferable(uint256, address from, address to) external view returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | undefined |
-| from | address | undefined |
-| to | address | undefined |
+| contributor | address | Address of the contributor whose status we are checking |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | undefined |
+| _0 | bool | Boolean value indicating whether the address is a contributor or not |
+
+### isTransferable
+
+```solidity
+function isTransferable(uint256 tokenId, address from, address to) external view returns (bool)
+```
+
+Used to check whether the given token is transferable or not.
+
+*If this function returns `false`, the transfer of the token MUST revert execution.If the tokenId does not exist, this method MUST revert execution, unless the token is being checked for  minting.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId | uint256 | ID of the token being checked |
+| from | address | Address from which the token is being transferred |
+| to | address | Address to which the token is being transferred |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | bool | Boolean value indicating whether the given token is transferable |
+
+### manageContributor
+
+```solidity
+function manageContributor(address contributor, bool grantRole) external nonpayable
+```
+
+Adds or removes a contributor to the smart contract.
+
+*Can only be called by the owner.Emits ***ContributorUpdate*** event.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| contributor | address | Address of the contributor&#39;s account |
+| grantRole | bool | A boolean value signifying whether the contributor role is being granted (`true`) or revoked  (`false`) |
 
 ### mint
 
@@ -575,61 +503,22 @@ Used to retrieve the collection name.
 |---|---|---|
 | _0 | string | Name of the collection |
 
-### nestMint
+### owner
 
 ```solidity
-function nestMint(address to, uint256 tokenId, uint256 destinationId) external nonpayable
+function owner() external view returns (address)
 ```
 
+Returns the address of the current owner.
 
 
 
 
-#### Parameters
+#### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| to | address | undefined |
-| tokenId | uint256 | undefined |
-| destinationId | uint256 | undefined |
-
-### nestTransfer
-
-```solidity
-function nestTransfer(address to, uint256 tokenId, uint256 destinationId) external nonpayable
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| to | address | undefined |
-| tokenId | uint256 | undefined |
-| destinationId | uint256 | undefined |
-
-### nestTransferFrom
-
-```solidity
-function nestTransferFrom(address from, address to, uint256 tokenId, uint256 destinationId, bytes data) external nonpayable
-```
-
-Used to transfer the token into another token.
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| from | address | Address of the direct owner of the token to be transferred |
-| to | address | Address of the receiving token&#39;s collection smart contract |
-| tokenId | uint256 | ID of the token being transferred |
-| destinationId | uint256 | ID of the token to receive the token being transferred |
-| data | bytes | Additional data with no specified format, sent in the addChild call |
+| _0 | address | Address of the current owner |
 
 ### ownerOf
 
@@ -637,66 +526,21 @@ Used to transfer the token into another token.
 function ownerOf(uint256 tokenId) external view returns (address)
 ```
 
-Used to retrieve the *root* owner of a given token.
+Used to retrieve the owner of the given token.
 
-*The *root* owner of the token is an externally owned account (EOA). If the given token is child of another  NFT, this will return an EOA address. Otherwise, if the token is owned by an EOA, this EOA wil be returned.*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| tokenId | uint256 | ID of the token for which the *root* owner has been retrieved |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | address | The *root* owner of the token |
-
-### pendingChildOf
-
-```solidity
-function pendingChildOf(uint256 parentId, uint256 index) external view returns (struct IERC6059Upgradeable.Child)
-```
-
-Used to retrieve a specific pending child token from a given parent token.
-
-*Returns a single Child struct locating at `index` of parent token&#39;s active child tokens array.The Child struct consists of the following values:  [      tokenId,      contractAddress  ]*
+*Requirements:  - `tokenId` must exist.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| parentId | uint256 | ID of the parent token for which the pending child token is being retrieved |
-| index | uint256 | Index of the child token in the parent token&#39;s pending child tokens array |
+| tokenId | uint256 | ID of the token for which to retrieve the token for |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IERC6059Upgradeable.Child | A Child struct containting data about the specified child |
-
-### pendingChildrenOf
-
-```solidity
-function pendingChildrenOf(uint256 parentId) external view returns (struct IERC6059Upgradeable.Child[])
-```
-
-Used to retrieve the pending child tokens of a given parent token.
-
-*Returns array of pending Child structs existing for given parent.The Child struct consists of the following values:  [      tokenId,      contractAddress  ]*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| parentId | uint256 | ID of the parent token for which to retrieve the pending child tokens |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | IERC6059Upgradeable.Child[] | An array of Child structs containing the parent token&#39;s pending child tokens |
+| _0 | address | Address of the account owning the token |
 
 ### rejectAllAssets
 
@@ -714,23 +558,6 @@ Rejects all assets from the pending array of a given token.
 |---|---|---|
 | tokenId | uint256 | ID of the token of which to clear the pending array. |
 | maxRejections | uint256 | Maximum number of expected assets to reject, used to prevent from rejecting assets which  arrive just before this operation. |
-
-### rejectAllChildren
-
-```solidity
-function rejectAllChildren(uint256 tokenId, uint256 maxRejections) external nonpayable
-```
-
-Used to reject all pending children of a given parent token.
-
-*Removes the children from the pending array mapping.This does not update the ownership storage data on children. If necessary, ownership can be reclaimed by the  rootOwner of the previous parent.Requirements: Requirements: - `parentId` must exist*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| tokenId | uint256 | undefined |
-| maxRejections | uint256 | Maximum number of expected children to reject, used to prevent from rejecting children which  arrive just before this operation. |
 
 ### rejectAsset
 
@@ -750,10 +577,21 @@ Rejects an asset from the pending array of given token.
 | index | uint256 | Index of the asset in the pending array to be rejected |
 | assetId | uint64 | ID of the asset expected to be in the index |
 
+### renounceOwnership
+
+```solidity
+function renounceOwnership() external nonpayable
+```
+
+Leaves the contract without owner. Functions using the `onlyOwner` modifier will be disabled.
+
+*Can only be called by the current owner.Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is  only available to the owner.*
+
+
 ### safeMint
 
 ```solidity
-function safeMint(address to, uint256 tokenId, bytes _data) external nonpayable
+function safeMint(address to, uint256 tokenId, bytes data) external nonpayable
 ```
 
 
@@ -766,7 +604,7 @@ function safeMint(address to, uint256 tokenId, bytes _data) external nonpayable
 |---|---|---|
 | to | address | undefined |
 | tokenId | uint256 | undefined |
-| _data | bytes | undefined |
+| data | bytes | undefined |
 
 ### safeMint
 
@@ -873,6 +711,23 @@ Sets a new priority array for a given token.
 | tokenId | uint256 | ID of the token to set the priorities for |
 | priorities | uint64[] | An array of priorities of active assets. The succesion of items in the priorities array  matches that of the succesion of items in the active array |
 
+### setSoulbound
+
+```solidity
+function setSoulbound(uint256 tokenId, bool state) external nonpayable
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId | uint256 | undefined |
+| state | bool | undefined |
+
 ### supportsInterface
 
 ```solidity
@@ -929,29 +784,6 @@ function transfer(address to, uint256 tokenId) external nonpayable
 | to | address | undefined |
 | tokenId | uint256 | undefined |
 
-### transferChild
-
-```solidity
-function transferChild(uint256 tokenId, address to, uint256 destinationId, uint256 childIndex, address childAddress, uint256 childId, bool isPending, bytes data) external nonpayable
-```
-
-Used to transfer a child token from a given parent token.
-
-*When transferring a child token, the owner of the token is set to `to`, or is not updated in the event of  `to` being the `0x0` address.*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| tokenId | uint256 | ID of the parent token from which the child token is being transferred |
-| to | address | Address to which to transfer the token to |
-| destinationId | uint256 | ID of the token to receive this child token (MUST be 0 if the destination is not a token) |
-| childIndex | uint256 | Index of a token we are transferring, in the array it belongs to (can be either active array or  pending array) |
-| childAddress | address | Address of the child token&#39;s collection smart contract. |
-| childId | uint256 | ID of the child token in its own collection smart contract. |
-| isPending | bool | A boolean value indicating whether the child token being transferred is in the pending array of  the parent token (`true`) or in the active array (`false`) |
-| data | bytes | Additional data with no specified format, sent in call to `_to` |
-
 ### transferFrom
 
 ```solidity
@@ -970,25 +802,25 @@ Transfers a given token from `from` to `to`.
 | to | address | Address to which to transfer the token to |
 | tokenId | uint256 | ID of the token to transfer |
 
-
-
-## Events
-
-### AllChildrenRejected
+### transferOwnership
 
 ```solidity
-event AllChildrenRejected(uint256 indexed tokenId)
+function transferOwnership(address newOwner) external nonpayable
 ```
 
-Used to notify listeners that all pending child tokens of a given token have been rejected.
+Transfers ownership of the contract to a new owner.
 
-*Emitted when a token removes all a child tokens from its pending array.*
+*Can only be called by the current owner.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId `indexed` | uint256 | ID of the token that rejected all of the pending children |
+| newOwner | address | Address of the new owner&#39;s account |
+
+
+
+## Events
 
 ### Approval
 
@@ -1147,64 +979,22 @@ Used to notify listeners that an asset object is initialized at `assetId`.
 |---|---|---|
 | assetId `indexed` | uint64 | ID of the asset that was initialized |
 
-### ChildAccepted
+### ContributorUpdate
 
 ```solidity
-event ChildAccepted(uint256 indexed tokenId, uint256 childIndex, address indexed childAddress, uint256 indexed childId)
+event ContributorUpdate(address indexed contributor, bool isContributor)
 ```
 
-Used to notify listeners that a new child token was accepted by the parent token.
+Event that signifies that an address was granted contributor role or that the permission has been  revoked.
 
-*Emitted when a parent token accepts a token from its pending array, migrating it to the active array.*
+*This can only be triggered by a current owner, so there is no need to include that information in the event.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| tokenId `indexed` | uint256 | ID of the token that accepted a new child token |
-| childIndex  | uint256 | Index of the newly accepted child token in the parent token&#39;s active children array |
-| childAddress `indexed` | address | Address of the child token&#39;s collection smart contract |
-| childId `indexed` | uint256 | ID of the child token in the child token&#39;s collection smart contract |
-
-### ChildProposed
-
-```solidity
-event ChildProposed(uint256 indexed tokenId, uint256 childIndex, address indexed childAddress, uint256 indexed childId)
-```
-
-Used to notify listeners that a new token has been added to a given token&#39;s pending children array.
-
-*Emitted when a child NFT is added to a token&#39;s pending array.*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| tokenId `indexed` | uint256 | ID of the token that received a new pending child token |
-| childIndex  | uint256 | Index of the proposed child token in the parent token&#39;s pending children array |
-| childAddress `indexed` | address | Address of the proposed child token&#39;s collection smart contract |
-| childId `indexed` | uint256 | ID of the child token in the child token&#39;s collection smart contract |
-
-### ChildTransferred
-
-```solidity
-event ChildTransferred(uint256 indexed tokenId, uint256 childIndex, address indexed childAddress, uint256 indexed childId, bool fromPending, bool toZero)
-```
-
-Used to notify listeners a child token has been transferred from parent token.
-
-*Emitted when a token transfers a child from itself, transferring ownership to the root owner.*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| tokenId `indexed` | uint256 | ID of the token that transferred a child token |
-| childIndex  | uint256 | Index of a child in the array from which it is being transferred |
-| childAddress `indexed` | address | Address of the child token&#39;s collection smart contract |
-| childId `indexed` | uint256 | ID of the child token in the child token&#39;s collection smart contract |
-| fromPending  | bool | A boolean value signifying whether the token was in the pending child tokens array (`true`) or  in the active child tokens array (`false`) |
-| toZero  | bool | A boolean value signifying whether the token is being transferred to the `0x0` address (`true`) or  not (`false`) |
+| contributor `indexed` | address | Address of the account that had contributor role status updated |
+| isContributor  | bool | A boolean value signifying whether the role has been granted (`true`) or revoked (`false`) |
 
 ### Initialized
 
@@ -1222,25 +1012,39 @@ event Initialized(uint8 version)
 |---|---|---|
 | version  | uint8 | undefined |
 
-### NestTransfer
+### OwnershipTransferred
 
 ```solidity
-event NestTransfer(address indexed from, address indexed to, uint256 fromTokenId, uint256 toTokenId, uint256 indexed tokenId)
+event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)
 ```
 
-Used to notify listeners that the token is being transferred.
+Used to anounce the transfer of ownership.
 
-*Emitted when `tokenId` token is transferred from `from` to `to`.*
+
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| from `indexed` | address | Address of the previous immediate owner, which is a smart contract if the token was nested. |
-| to `indexed` | address | Address of the new immediate owner, which is a smart contract if the token is being nested. |
-| fromTokenId  | uint256 | ID of the previous parent token. If the token was not nested before, the value should be `0` |
-| toTokenId  | uint256 | ID of the new parent token. If the token is not being nested, the value should be `0` |
-| tokenId `indexed` | uint256 | ID of the token being transferred |
+| previousOwner `indexed` | address | Address of the account that transferred their ownership role |
+| newOwner `indexed` | address | Address of the account receiving the ownership role |
+
+### Soulbound
+
+```solidity
+event Soulbound(uint256 indexed tokenId, bool state)
+```
+
+Emitted when a token&#39;s soulbound state changes.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId `indexed` | uint256 | ID of the token |
+| state  | bool | A boolean value signifying whether the token became soulbound (`true`) or transferrable (`false`) |
 
 ### Transfer
 
@@ -1440,28 +1244,6 @@ Attempting to transfer a soulbound (non-transferrable) token
 
 
 
-### RMRKChildAlreadyExists
-
-```solidity
-error RMRKChildAlreadyExists()
-```
-
-Attempting to accept a child that has already been accepted
-
-
-
-
-### RMRKChildIndexOutOfRange
-
-```solidity
-error RMRKChildIndexOutOfRange()
-```
-
-Attempting to interact with a child, using index that is higher than the number of children
-
-
-
-
 ### RMRKIdZeroForbidden
 
 ```solidity
@@ -1484,17 +1266,6 @@ Attempting to interact with an asset, using index greater than number of assets
 
 
 
-### RMRKIsNotContract
-
-```solidity
-error RMRKIsNotContract()
-```
-
-Attempting to interact with an end-user account when the contract account is expected
-
-
-
-
 ### RMRKMaxPendingAssetsReached
 
 ```solidity
@@ -1506,85 +1277,24 @@ Attempting to add a pending asset after the number of pending assets has reached
 
 
 
-### RMRKMaxPendingChildrenReached
+### RMRKNewContributorIsZeroAddress
 
 ```solidity
-error RMRKMaxPendingChildrenReached()
+error RMRKNewContributorIsZeroAddress()
 ```
 
-Attempting to add a pending child after the number of pending children has reached the limit (default limit is 128)
+Attempting to assign a 0x0 address as a contributor
 
 
 
 
-### RMRKMaxRecursiveBurnsReached
+### RMRKNewOwnerIsZeroAddress
 
 ```solidity
-error RMRKMaxRecursiveBurnsReached(address childContract, uint256 childId)
+error RMRKNewOwnerIsZeroAddress()
 ```
 
-Attempting to burn a total number of recursive children higher than maximum set
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| childContract | address | Address of the collection smart contract in which the maximum number of recursive burns was reached |
-| childId | uint256 | ID of the child token at which the maximum number of recursive burns was reached |
-
-### RMRKMintToNonRMRKNestableImplementer
-
-```solidity
-error RMRKMintToNonRMRKNestableImplementer()
-```
-
-Attempting to mint a nested token to a smart contract that doesn&#39;t support nesting
-
-
-
-
-### RMRKNestableTooDeep
-
-```solidity
-error RMRKNestableTooDeep()
-```
-
-Attempting to nest a child over the nestable limit (current limit is 100 levels of nesting)
-
-
-
-
-### RMRKNestableTransferToDescendant
-
-```solidity
-error RMRKNestableTransferToDescendant()
-```
-
-Attempting to nest the token to own descendant, which would create a loop and leave the looped tokens in limbo
-
-
-
-
-### RMRKNestableTransferToNonRMRKNestableImplementer
-
-```solidity
-error RMRKNestableTransferToNonRMRKNestableImplementer()
-```
-
-Attempting to nest the token to a smart contract that doesn&#39;t support nesting
-
-
-
-
-### RMRKNestableTransferToSelf
-
-```solidity
-error RMRKNestableTransferToSelf()
-```
-
-Attempting to nest the token into itself
+Attempting to transfer the ownership to the 0x0 address
 
 
 
@@ -1611,24 +1321,13 @@ Attempting to manage an asset without owning it or having been granted permissio
 
 
 
-### RMRKNotApprovedOrDirectOwner
+### RMRKNotOwner
 
 ```solidity
-error RMRKNotApprovedOrDirectOwner()
+error RMRKNotOwner()
 ```
 
-Attempting to interact with a token without being its owner or having been granted permission by the  owner to do so
-
-*When a token is nested, only the direct owner (NFT parent) can mange it. In that case, approved addresses are  not allowed to manage it, in order to ensure the expected behaviour*
-
-
-### RMRKPendingChildIndexOutOfRange
-
-```solidity
-error RMRKPendingChildIndexOutOfRange()
-```
-
-Attempting to interact with a pending child using an index greater than the size of pending array
+Attempting to interact with a management function without being the smart contract&#39;s owner
 
 
 
@@ -1655,17 +1354,6 @@ Attempting to accept or reject an asset which does not match the one at the spec
 
 
 
-### RMRKUnexpectedChildId
-
-```solidity
-error RMRKUnexpectedChildId()
-```
-
-Attempting to accept or transfer a child which does not match the one at the specified index
-
-
-
-
 ### RMRKUnexpectedNumberOfAssets
 
 ```solidity
@@ -1673,17 +1361,6 @@ error RMRKUnexpectedNumberOfAssets()
 ```
 
 Attempting to reject all pending assets but more assets than expected are pending
-
-
-
-
-### RMRKUnexpectedNumberOfChildren
-
-```solidity
-error RMRKUnexpectedNumberOfChildren()
-```
-
-Attempting to reject all pending children but children assets than expected are pending
 
 
 

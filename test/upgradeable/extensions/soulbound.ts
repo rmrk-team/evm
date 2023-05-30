@@ -14,7 +14,7 @@ import {
 // --------------- FIXTURES -----------------------
 
 async function soulboundMultiAssetFixture() {
-  const factory = await ethers.getContractFactory('RMRKSoulboundMultiAssetMockUpgradable');
+  const factory = await ethers.getContractFactory('RMRKSoulboundMultiAssetMockUpgradeable');
   const token = await upgrades.deployProxy(factory, ['Chunky', 'CHNK']);
   await token.deployed();
 
@@ -22,7 +22,7 @@ async function soulboundMultiAssetFixture() {
 }
 
 async function soulboundNestableFixture() {
-  const factory = await ethers.getContractFactory('RMRKSoulboundNestableMockUpgradable');
+  const factory = await ethers.getContractFactory('RMRKSoulboundNestableMockUpgradeable');
   const token = await upgrades.deployProxy(factory, ['Chunky', 'CHNK']);
   await token.deployed();
 
@@ -30,7 +30,7 @@ async function soulboundNestableFixture() {
 }
 
 async function soulboundNestableMultiAssetFixture() {
-  const factory = await ethers.getContractFactory('RMRKSoulboundNestableMultiAssetMockUpgradable');
+  const factory = await ethers.getContractFactory('RMRKSoulboundNestableMultiAssetMockUpgradeable');
   const token = await upgrades.deployProxy(factory, ['Chunky', 'CHNK']);
   await token.deployed();
 
@@ -38,7 +38,7 @@ async function soulboundNestableMultiAssetFixture() {
 }
 
 async function soulboundEquippableFixture() {
-  const factory = await ethers.getContractFactory('RMRKSoulboundEquippableMockUpgradable');
+  const factory = await ethers.getContractFactory('RMRKSoulboundEquippableMockUpgradeable');
   const token = await upgrades.deployProxy(factory, ['Chunky', 'CHNK']);
   await token.deployed();
 
@@ -47,12 +47,12 @@ async function soulboundEquippableFixture() {
 
 async function soulboundNestableExternalEquippableFixture() {
   const nestableFactory = await ethers.getContractFactory(
-    'contracts/mocks/extensions/soulbound/RMRKSoulboundNestableExternalEquippableMock.sol:RMRKSoulboundNestableExternalEquippableMock',
+    'RMRKSoulboundNestableExternalEquippableMockUpgradeable',
   );
   const nestable = await upgrades.deployProxy(nestableFactory, ['Chunky', 'CHNK']);
   await nestable.deployed();
 
-  const equipFactory = await ethers.getContractFactory('RMRKExternalEquipMock');
+  const equipFactory = await ethers.getContractFactory('RMRKExternalEquipMockUpgradeable');
   const equip = await upgrades.deployProxy(equipFactory, [nestable.address]);
   await equip.deployed();
 
@@ -61,7 +61,7 @@ async function soulboundNestableExternalEquippableFixture() {
   return { nestable, equip };
 }
 
-describe('RMRKSoulboundMultiAssetMockUpgradable', async function () {
+describe('RMRKSoulboundMultiAssetMockUpgradeable', async function () {
   beforeEach(async function () {
     const { token } = await loadFixture(soulboundMultiAssetFixture);
     this.token = token;
@@ -70,7 +70,7 @@ describe('RMRKSoulboundMultiAssetMockUpgradable', async function () {
   shouldBehaveLikeSoulboundBasic();
 });
 
-describe('RMRKSoulboundNestableMockUpgradable', async function () {
+describe('RMRKSoulboundNestableMockUpgradeable', async function () {
   beforeEach(async function () {
     const { token } = await loadFixture(soulboundNestableFixture);
     this.token = token;
@@ -80,7 +80,7 @@ describe('RMRKSoulboundNestableMockUpgradable', async function () {
   shouldBehaveLikeSoulboundNestable();
 });
 
-describe('RMRKSoulboundNestableMultiAssetMockUpgradable', async function () {
+describe('RMRKSoulboundNestableMultiAssetMockUpgradeable', async function () {
   beforeEach(async function () {
     const { token } = await loadFixture(soulboundNestableMultiAssetFixture);
     this.token = token;
@@ -90,7 +90,7 @@ describe('RMRKSoulboundNestableMultiAssetMockUpgradable', async function () {
   shouldBehaveLikeSoulboundNestable();
 });
 
-describe('RMRKSoulboundEquippableMockUpgradable', async function () {
+describe('RMRKSoulboundEquippableMockUpgradeable', async function () {
   beforeEach(async function () {
     const { token } = await loadFixture(soulboundEquippableFixture);
     this.token = token;
@@ -100,7 +100,7 @@ describe('RMRKSoulboundEquippableMockUpgradable', async function () {
   shouldBehaveLikeSoulboundNestable();
 });
 
-describe('contracts/mocks/extensions/soulbound/RMRKSoulboundNestableExternalEquippableMock.sol:RMRKSoulboundNestableExternalEquippableMock', async function () {
+describe('RMRKSoulboundNestableExternalEquippableMock', async function () {
   beforeEach(async function () {
     const { nestable } = await loadFixture(soulboundNestableExternalEquippableFixture);
     this.token = nestable;
@@ -125,11 +125,13 @@ describe('RMRKSoulbound variants', async function () {
 
     beforeEach(async function () {
       const factory = await ethers.getContractFactory(
-        'RMRKSoulboundAfterBlockNumberMockUpgradeable',
+        'contracts/upgradeable/mocks/extensions/soulbound/RMRKSoulboundVariantMocksUpgradeable.sol:RMRKSoulboundAfterBlockNumberMockUpgradeable',
       );
       initBlock = (await ethers.provider.getBlock('latest')).number;
       token = <RMRKSoulboundAfterBlockNumberMockUpgradeable>(
-        await upgrades.deployProxy(factory, ['Chunky', 'CHNK', initBlock + blocksToTransfer])
+        await upgrades.deployProxy(factory, ['Chunky', 'CHNK', initBlock + blocksToTransfer], {
+          initializer: 'initialize(string,string,uint256)',
+        })
       );
       await token.deployed();
     });
@@ -163,10 +165,12 @@ describe('RMRKSoulbound variants', async function () {
 
     beforeEach(async function () {
       const factory = await ethers.getContractFactory(
-        'RMRKSoulboundAfterTransactionsMockUpgradeable',
+        'contracts/upgradeable/mocks/extensions/soulbound/RMRKSoulboundVariantMocksUpgradeable.sol:RMRKSoulboundAfterTransactionsMockUpgradeable',
       );
       token = <RMRKSoulboundAfterTransactionsMockUpgradeable>(
-        await upgrades.deployProxy(factory, ['Chunky', 'CHNK', maxTransactions])
+        await upgrades.deployProxy(factory, ['Chunky', 'CHNK', maxTransactions], {
+          initializer: 'initialize(string,string,uint256)',
+        })
       );
       await token.deployed();
     });
@@ -198,7 +202,9 @@ describe('RMRKSoulbound variants', async function () {
     let token: RMRKSoulboundPerTokenMockUpgradeable;
 
     beforeEach(async function () {
-      const factory = await ethers.getContractFactory('RMRKSoulboundPerTokenMockUpgradeable');
+      const factory = await ethers.getContractFactory(
+        'contracts/upgradeable/mocks/extensions/soulbound/RMRKSoulboundVariantMocksUpgradeable.sol:RMRKSoulboundPerTokenMockUpgradeable',
+      );
       token = <RMRKSoulboundPerTokenMockUpgradeable>(
         await upgrades.deployProxy(factory, ['Chunky', 'CHNK'])
       );
