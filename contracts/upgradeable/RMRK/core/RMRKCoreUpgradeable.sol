@@ -19,6 +19,9 @@ contract RMRKCoreUpgradeable is IRMRKCoreUpgradeable, Initializable {
     string public constant VERSION = "1.1.0";
     bytes4 public constant RMRK_INTERFACE = 0x524D524B; // "RMRK" in ASCII hex
 
+    /**
+     * @notice Initializes the contract and the inherited contracts.
+     */
     function __RMRKCoreUpgradeable_init(
         string memory name_,
         string memory symbol_
@@ -27,7 +30,7 @@ contract RMRKCoreUpgradeable is IRMRKCoreUpgradeable, Initializable {
     }
 
     /**
-     * @notice Used to initialize the smart contract.
+     * @notice Initializes the contract without the inherited contracts.
      * @param name_ Name of the token collection
      * @param symbol_ Symbol of the token collection
      */

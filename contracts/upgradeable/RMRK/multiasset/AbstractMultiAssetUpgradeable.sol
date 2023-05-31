@@ -43,11 +43,17 @@ abstract contract AbstractMultiAssetUpgradeable is
     mapping(address => mapping(address => bool))
         private _operatorApprovalsForAssets;
 
+    /**
+     * @notice Initializes the contract and the inherited contracts.
+     */
     function __AbstractMultiAssetUpgradeable_init() internal onlyInitializing {
         __AbstractMultiAssetUpgradeable_init_unchained();
         __Context_init();
     }
 
+    /**
+     * @notice Initializes the contract without the inherited contracts.
+     */
     function __AbstractMultiAssetUpgradeable_init_unchained()
         internal
         onlyInitializing

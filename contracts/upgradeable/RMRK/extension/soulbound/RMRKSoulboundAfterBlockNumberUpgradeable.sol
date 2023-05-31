@@ -24,7 +24,9 @@ abstract contract RMRKSoulboundAfterBlockNumberUpgradeable is
         string memory symbol_,
         uint256 lastBlockToTransfer
     ) internal onlyInitializing {
-        _lastBlockToTransfer = lastBlockToTransfer;
+        __RMRKSoulboundAfterBlockNumberUpgradeable_init_unchained(
+            lastBlockToTransfer
+        );
         __RMRKSoulboundUpgradeable_init(name_, symbol_);
     }
 
@@ -34,7 +36,9 @@ abstract contract RMRKSoulboundAfterBlockNumberUpgradeable is
      */
     function __RMRKSoulboundAfterBlockNumberUpgradeable_init_unchained(
         uint256 lastBlockToTransfer
-    ) internal onlyInitializing {}
+    ) internal onlyInitializing {
+        _lastBlockToTransfer = lastBlockToTransfer;
+    }
 
     /**
      * @notice Gets the last block number where transfers are allowed

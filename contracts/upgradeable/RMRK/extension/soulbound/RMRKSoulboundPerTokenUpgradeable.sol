@@ -10,12 +10,24 @@ import "./RMRKSoulboundUpgradeable.sol";
  * @notice Smart contract of the upgradeable RMRK Soulbound module where the transfers are permitted or prohibited on a per-token basis.
  */
 contract RMRKSoulboundPerTokenUpgradeable is RMRKSoulboundUpgradeable {
-    function __RMRKSoulboundPerTokenUpgradeable_init()
+    /**
+     * @notice Initializes the contract and the inherited contracts.
+     */
+    function __RMRKSoulboundPerTokenUpgradeable_init(
+        string memory _name,
+        string memory _symbol
+    ) internal onlyInitializing {
+        __RMRKSoulboundPerTokenUpgradeable_init_unchained();
+        __RMRKSoulboundUpgradeable_init(_name, _symbol);
+    }
+
+    /**
+     * @notice Initializes the contract without the inherited contracts.
+     */
+    function __RMRKSoulboundPerTokenUpgradeable_init_unchained()
         internal
         onlyInitializing
-    {
-        __RMRKSoulboundUpgradeable_init_unchained();
-    }
+    {}
 
     /**
      * @notice Emitted when a token's soulbound state changes.

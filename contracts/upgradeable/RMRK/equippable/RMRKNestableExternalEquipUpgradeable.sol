@@ -24,7 +24,7 @@ contract RMRKNestableExternalEquipUpgradeable is
     address private _equippableAddress;
 
     /**
-     * @notice Used to initialize the smart contract.
+     * @notice Initializes the contract and the inherited contracts.
      * @param name_ Name of the token collection
      * @param symbol_ Symbol of the token collection
      */
@@ -32,9 +32,13 @@ contract RMRKNestableExternalEquipUpgradeable is
         string memory name_,
         string memory symbol_
     ) internal onlyInitializing {
+        __RMRKNestableExternalEquipUpgradeable_init_unchained();
         __RMRKNestableUpgradeable_init(name_, symbol_);
     }
 
+    /**
+     * @notice Initializes the contract without the inherited contracts.
+     */
     function __RMRKNestableExternalEquipUpgradeable_init_unchained()
         internal
         initializer

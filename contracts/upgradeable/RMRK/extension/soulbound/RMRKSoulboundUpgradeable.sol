@@ -15,6 +15,11 @@ abstract contract RMRKSoulboundUpgradeable is
     IERC6454betaUpgradeable,
     RMRKCoreUpgradeable
 {
+    /**
+     * @notice Initializes the contract and the inherited contracts.
+     * @param name_ Name of the token
+     * @param symbol_ Symbol of the token
+     */
     function __RMRKSoulboundUpgradeable_init(
         string memory name_,
         string memory symbol_
@@ -23,6 +28,9 @@ abstract contract RMRKSoulboundUpgradeable is
         __RMRKCoreUpgradeable_init(name_, symbol_);
     }
 
+    /**
+     * @notice Initializes the contract without the inherited contracts.
+     */
     function __RMRKSoulboundUpgradeable_init_unchained()
         internal
         onlyInitializing

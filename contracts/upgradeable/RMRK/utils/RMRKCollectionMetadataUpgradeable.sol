@@ -19,6 +19,16 @@ contract RMRKCollectionMetadataUpgradeable is Initializable {
     function __RMRKCollectionMetadataUpgradeable_init(
         string memory collectionMetadata_
     ) internal onlyInitializing {
+        __RMRKCollectionMetadataUpgradeable_init_unchained(collectionMetadata_);
+    }
+
+    /**
+     * @notice Initializes the contract without the inherited contracts.
+     * @param collectionMetadata_ The collection metadata with which to initialize the smart contract
+     */
+    function __RMRKCollectionMetadataUpgradeable_init_unchained(
+        string memory collectionMetadata_
+    ) internal onlyInitializing {
         _setCollectionMetadata(collectionMetadata_);
     }
 

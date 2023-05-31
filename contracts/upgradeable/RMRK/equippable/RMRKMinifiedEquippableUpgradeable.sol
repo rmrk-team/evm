@@ -1617,10 +1617,10 @@ contract RMRKMinifiedEquippableUpgradeable is
         _;
     }
 
-    // ----------------------------- CONSTRUCTOR ------------------------------
+    // ----------------------------- INITIALIZER ------------------------------
 
     /**
-     * @notice Initializes the contract by setting a `name` and a `symbol` of the token collection.
+     * @notice Initializes the contract and the inherited contracts.
      * @param name_ Name of the token collection
      * @param symbol_ Symbol of the token collection
      */
@@ -1634,6 +1634,9 @@ contract RMRKMinifiedEquippableUpgradeable is
         __RMRKCoreUpgradeable_init(name_, symbol_);
     }
 
+    /**
+     * @notice Initializes the contract without the inherited contracts.
+     */
     function __RMRKMinifiedEquippableUpgradeable_init_unchained()
         internal
         onlyInitializing

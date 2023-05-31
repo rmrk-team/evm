@@ -109,7 +109,7 @@ contract RMRKMultiAssetUpgradeable is
     // ----------------------------- CONSTRUCTOR ------------------------------
 
     /**
-     * @notice Initializes the contract by setting a name and a symbol to the token collection.
+     * @notice Initializes the contract and the inherited contracts.
      * @param name_ Name of the token collection
      * @param symbol_ Symbol of the token collection
      */
@@ -117,8 +117,18 @@ contract RMRKMultiAssetUpgradeable is
         string memory name_,
         string memory symbol_
     ) internal onlyInitializing {
+        __RMRKMultiAssetUpgradeable_init_unchained();
+        __AbstractMultiAssetUpgradeable_init();
         __RMRKCoreUpgradeable_init(name_, symbol_);
     }
+
+    /**
+     * @notice Initializes the contract without the inherited contracts.
+     */
+    function __RMRKMultiAssetUpgradeable_init_unchained()
+        internal
+        onlyInitializing
+    {}
 
     // ------------------------------- ERC721 ---------------------------------
     /**

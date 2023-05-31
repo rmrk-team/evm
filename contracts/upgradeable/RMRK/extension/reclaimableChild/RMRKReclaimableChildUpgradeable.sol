@@ -21,6 +21,27 @@ abstract contract RMRKReclaimableChildUpgradeable is
     mapping(address => mapping(uint256 => uint256)) private _childIsInPending;
 
     /**
+     * @notice Initializes the contract without and inherited contracts.
+     * @param name_ Name of the token
+     * @param symbol_ Symbol of the token
+     */
+    function __RMRKReclaimableChildUpgradeable_init(
+        string memory name_,
+        string memory symbol_
+    ) internal onlyInitializing {
+        __RMRKReclaimableChildUpgradeable_init_unchained();
+        __RMRKNestableUpgradeable_init(name_, symbol_);
+    }
+
+    /**
+     * @notice Initializes the contract without the inherited contracts.
+     */
+    function __RMRKReclaimableChildUpgradeable_init_unchained()
+        internal
+        onlyInitializing
+    {}
+
+    /**
      * @inheritdoc IERC165Upgradeable
      */
     function supportsInterface(

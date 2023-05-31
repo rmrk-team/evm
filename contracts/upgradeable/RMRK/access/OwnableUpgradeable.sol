@@ -50,12 +50,16 @@ contract OwnableUpgradeable is ContextUpgradeable {
         _;
     }
 
+    /**
+     * @notice Initializes the contract and the inherited contracts.
+     */
     function __OwnableUpgradeable_init() internal onlyInitializing {
         __OwnableUpgradeable_init_unchained();
         __Context_init();
     }
 
     /**
+     * @notice Initializes the contract without the inherited contracts.
      * @dev Initializes the contract by setting the deployer as the initial owner.
      */
     function __OwnableUpgradeable_init_unchained() internal onlyInitializing {

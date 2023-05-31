@@ -18,7 +18,7 @@ contract RMRKMultiAssetAutoIndexUpgradeable is
     mapping(uint256 => mapping(uint256 => uint256)) private _pendingAssetIndex;
 
     /**
-     * @notice Initializes the contract by setting a name and a symbol to the token collection.
+     * @notice Initializes the contract and the inherited contracts.
      * @param name_ Name of the token collection
      * @param symbol_ Symbol of the token collection
      */
@@ -30,6 +30,9 @@ contract RMRKMultiAssetAutoIndexUpgradeable is
         __RMRKMultiAssetUpgradeable_init(name_, symbol_);
     }
 
+    /**
+     * @notice Initializes the contract without the inherited contracts.
+     */
     function __RMRKMultiAssetAutoIndexUpgradeable_init_unchained()
         internal
         initializer

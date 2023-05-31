@@ -26,11 +26,17 @@ contract OwnableLockUpgradeable is OwnableUpgradeable {
         _;
     }
 
+    /**
+     * @notice Initializes the contract and the inherited contracts.
+     */
     function __OwnableLockUpgradeable_init() internal onlyInitializing {
         __OwnableLockUpgradeable_init_unchained();
         __OwnableUpgradeable_init();
     }
 
+    /**
+     * @notice Initializes the contract without the inherited contracts.
+     */
     function __OwnableLockUpgradeable_init_unchained()
         internal
         onlyInitializing

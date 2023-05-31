@@ -22,12 +22,21 @@ contract RMRKNestableAutoIndexUpgradeable is
     mapping(uint256 => mapping(address => mapping(uint256 => uint256)))
         private _activeChildrenIndex;
 
+    /**
+     * @notice Initializes the contract and the inherited contracts.
+     */
     function __RMRKNestableAutoIndexUpgradeable_init(
         string memory name_,
         string memory symbol_
     ) internal onlyInitializing {
+        __RMRKNestableAutoIndexUpgradeable_init_unchained();
         __RMRKNestableUpgradeable_init(name_, symbol_);
     }
+
+    function __RMRKNestableAutoIndexUpgradeable_init_unchained()
+        internal
+        onlyInitializing
+    {}
 
     function supportsInterface(
         bytes4 interfaceId

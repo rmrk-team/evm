@@ -79,7 +79,7 @@ contract RMRKEquippableUpgradeable is
     // ----------------------------- CONSTRUCTOR ------------------------------
 
     /**
-     * @notice Initializes the contract by setting a `name` and a `symbol` of the token collection.
+     * @notice Initializes the contract and the inherited contracts.
      * @param name_ Name of the token collection
      * @param symbol_ Symbol of the token collection
      */
@@ -88,11 +88,14 @@ contract RMRKEquippableUpgradeable is
         string memory symbol_
     ) internal onlyInitializing {
         __RMRKEquippableUpgradeable_init_unchained();
-        __Context_init();
-        __RMRKCoreUpgradeable_init(name_, symbol_);
-        __RMRKNestableUpgradeable_init_unchained();
+        __ReentrancyGuard_init();
+        __AbstractMultiAssetUpgradeable_init();
+        __RMRKNestableUpgradeable_init(name_, symbol_);
     }
 
+    /**
+     * @notice Initializes the contract without the inherited contracts.
+     */
     function __RMRKEquippableUpgradeable_init_unchained()
         internal
         onlyInitializing

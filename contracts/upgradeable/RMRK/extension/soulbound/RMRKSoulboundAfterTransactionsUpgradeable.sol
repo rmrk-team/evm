@@ -25,10 +25,24 @@ abstract contract RMRKSoulboundAfterTransactionsUpgradeable is
     mapping(uint256 => uint256) private _transfersPerToken;
 
     /**
-     * @notice Used to initialize the smart contract.
+     * @notice Initializes the contract and the inherited contracts.
      * @param maxNumberOfTransfers Max number of transfers before a token becomes soulbound
      */
     function __RMRKSoulboundAfterTransactionsUpgradeable_init(
+        string memory name_,
+        string memory symbol_,
+        uint256 maxNumberOfTransfers
+    ) internal onlyInitializing {
+        __RMRKSoulboundAfterTransactionsUpgradeable_init_unchained(
+            maxNumberOfTransfers
+        );
+        __RMRKSoulboundUpgradeable_init(name_, symbol_);
+    }
+
+    /**
+     * @notice Initializes the contract without the inherited contracts.
+     */
+    function __RMRKSoulboundAfterTransactionsUpgradeable_init_unchained(
         uint256 maxNumberOfTransfers
     ) internal onlyInitializing {
         _maxNumberOfTransfers = maxNumberOfTransfers;

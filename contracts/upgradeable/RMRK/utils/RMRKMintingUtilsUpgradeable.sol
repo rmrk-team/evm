@@ -18,12 +18,28 @@ contract RMRKMintingUtilsUpgradeable is OwnableLockUpgradeable {
     uint256 internal _pricePerMint;
 
     /**
-     * @notice Initializes the smart contract with a given maximum supply and minting price.
+     * @notice Initializes the smart contract with a given maximum supply and minting price with the inherited smart
+     *  contracts.
      * @param maxSupply_ The maximum supply of tokens to initialize the smart contract with
      * @param pricePerMint_ The minting price to initialize the smart contract with, expressed in the smallest
      *  denomination of the native currency of the chain to which the smart contract is deployed to
      */
     function __RMRKMintingUtilsUpgradeable_init(
+        uint256 maxSupply_,
+        uint256 pricePerMint_
+    ) internal onlyInitializing {
+        __RMRKMintingUtilsUpgradeable_init_unchained(maxSupply_, pricePerMint_);
+        __OwnableLockUpgradeable_init();
+    }
+
+    /**
+     * @notice Initializes the smart contract with a given maximum supply and minting price without the inherited smart
+     *  contracts.
+     * @param maxSupply_ The maximum supply of tokens to initialize the smart contract with
+     * @param pricePerMint_ The minting price to initialize the smart contract with, expressed in the smallest
+     *  denomination of the native currency of the chain to which the smart contract is deployed to
+     */
+    function __RMRKMintingUtilsUpgradeable_init_unchained(
         uint256 maxSupply_,
         uint256 pricePerMint_
     ) internal onlyInitializing {

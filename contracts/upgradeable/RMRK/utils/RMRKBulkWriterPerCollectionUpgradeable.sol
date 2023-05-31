@@ -18,7 +18,7 @@ error RMRKCanOnlyDoBulkOperationsWithOneTokenAtATime();
 contract RMRKBulkWriterPerCollectionUpgradeable is Initializable {
     /**
      * @notice Used to provide a struct for inputing unequip data.
-     * @dev Only used for input and not storage of data
+     * @dev Only used for input and not storage of data.
      * @return assetId ID of the asset that we are equipping into
      * @return slotPartId ID of the slot part that we are using to unequip
      */
@@ -39,10 +39,20 @@ contract RMRKBulkWriterPerCollectionUpgradeable is Initializable {
     }
 
     /**
-     * @notice Initializes the contract by setting the collection
+     * @notice Initializes the contract by setting the collection.
      * @param collection Address of the collection that this contract is managing.
      */
     function __RMRKBulkWriterPerCollectionUpgradeable_init(
+        address collection
+    ) internal onlyInitializing {
+        __RMRKBulkWriterPerCollectionUpgradeable_init_unchained(collection);
+    }
+
+    /**
+     * @notice Initializes the contract without the inherited contracts.
+     * @param collection Address of the collection that this contract is managing.
+     */
+    function __RMRKBulkWriterPerCollectionUpgradeable_init_unchained(
         address collection
     ) internal onlyInitializing {
         _collection = collection;

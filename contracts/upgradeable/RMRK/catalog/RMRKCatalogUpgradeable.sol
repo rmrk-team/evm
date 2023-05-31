@@ -31,6 +31,9 @@ contract RMRKCatalogUpgradeable is IRMRKCatalogUpgradeable, Initializable {
     string private _metadataURI;
     string private _type;
 
+    /**
+     * @notice Initializes the contract and the inherited contracts.
+     */
     function __RMRKCatalogUpgradeable_init(
         string memory metadataURI,
         string memory type_
@@ -39,7 +42,7 @@ contract RMRKCatalogUpgradeable is IRMRKCatalogUpgradeable, Initializable {
     }
 
     /**
-     * @notice Used to initialize the Catalog.
+     * @notice Initializes the contract without the inherited contracts.
      * @param metadataURI Base metadata URI of the Catalog
      * @param type_ Type of Catalog
      */

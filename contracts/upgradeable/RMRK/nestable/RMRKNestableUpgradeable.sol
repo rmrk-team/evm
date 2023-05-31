@@ -106,7 +106,7 @@ contract RMRKNestableUpgradeable is
     // ----------------------------- CONSTRUCTOR ------------------------------
 
     /**
-     * @notice Initializes the contract by setting a `name` and a `symbol` to the token collection.
+     * @notice Initializes the contract and the inherited contracts.
      * @param name_ Name of the token collection
      * @param symbol_ Symbol of the token collection
      */
@@ -115,9 +115,13 @@ contract RMRKNestableUpgradeable is
         string memory symbol_
     ) internal onlyInitializing {
         __RMRKNestableUpgradeable_init_unchained();
+        __Context_init();
         __RMRKCoreUpgradeable_init(name_, symbol_);
     }
 
+    /**
+     * @notice Initializes the contract without the inherited contracts.
+     */
     function __RMRKNestableUpgradeable_init_unchained()
         internal
         onlyInitializing

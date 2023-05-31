@@ -123,15 +123,19 @@ contract RMRKExternalEquipUpgradeable is
         _;
     }
 
+    /**
+     * @notice Initializes the contract and the inherited contracts.
+     */
     function __RMRKExternalEquipUpgradeable_init(
         address nestableAddress
     ) internal onlyInitializing {
         __RMRKExternalEquipUpgradeable_init_unchained(nestableAddress);
+        __ReentrancyGuard_init();
         __AbstractMultiAssetUpgradeable_init();
     }
 
     /**
-     * @notice Used to initialize the smart contract.
+     * @notice Initializes the contract without the inherited contracts.
      * @param nestableAddress Address of the Nestable module of external equip composite
      */
     function __RMRKExternalEquipUpgradeable_init_unchained(
