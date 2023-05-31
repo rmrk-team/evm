@@ -4,7 +4,7 @@ import { expect } from 'chai';
 import { loadFixture, mine } from '@nomicfoundation/hardhat-network-helpers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { bn, mintFromMock, nestMintFromMock } from '../../utils';
-import { IERC165, IERC6454beta, IOtherInterface } from '../../interfaces';
+import { IERC165, IERC6454, IOtherInterface } from '../../interfaces';
 import {
   RMRKSoulboundAfterBlockNumberMockUpgradeable,
   RMRKSoulboundAfterTransactionsMockUpgradeable,
@@ -139,7 +139,7 @@ describe('RMRKSoulbound variants', async function () {
     });
 
     it('can support IERC6454', async function () {
-      expect(await token.supportsInterface(IERC6454beta)).to.equal(true);
+      expect(await token.supportsInterface(IERC6454)).to.equal(true);
     });
 
     it('can get last block to transfer', async function () {
@@ -180,7 +180,7 @@ describe('RMRKSoulbound variants', async function () {
     });
 
     it('can support IERC6454', async function () {
-      expect(await token.supportsInterface(IERC6454beta)).to.equal(true);
+      expect(await token.supportsInterface(IERC6454)).to.equal(true);
     });
 
     it('does not support other interfaces', async function () {
@@ -216,7 +216,7 @@ describe('RMRKSoulbound variants', async function () {
     });
 
     it('can support IERC6454', async function () {
-      expect(await token.supportsInterface(IERC6454beta)).to.equal(true);
+      expect(await token.supportsInterface(IERC6454)).to.equal(true);
     });
 
     it('does not support other interfaces', async function () {
@@ -267,7 +267,7 @@ async function shouldBehaveLikeSoulboundBasic() {
   });
 
   it('can support IERC6454', async function () {
-    expect(await soulbound.supportsInterface(IERC6454beta)).to.equal(true);
+    expect(await soulbound.supportsInterface(IERC6454)).to.equal(true);
   });
 
   it('does not support other interfaces', async function () {
