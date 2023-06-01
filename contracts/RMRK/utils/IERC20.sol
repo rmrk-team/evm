@@ -8,6 +8,14 @@ pragma solidity ^0.8.18;
  */
 interface IERC20 {
     /**
+     * @notice Used to transfer tokens from the caller's account to another.
+     * @param to Address of the account to which the tokens are being transferred
+     * @param amount Amount of tokens that are being transferred
+     * @return A boolean value signifying whether the transfer was succesfull (`true`) or not (`false`)
+     */
+    function transfer(address to, uint256 amount) external returns (bool);
+
+    /**
      * @notice Used to transfer tokens from one address to another.
      * @param from Address of the account from which the the tokens are being transferred
      * @param to Address of the account to which the tokens are being transferred
