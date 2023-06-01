@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.18;
 
-import "./IRMRKCoreUpgradeable.sol";
+import "../../../RMRK/core/IRMRKCore.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 /**
@@ -11,7 +11,7 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
  * @notice Upgradeable smart contract of the RMRK core module.
  * @dev This is currently just a passthrough contract which allows for granular editing of base-level ERC721 functions.
  */
-contract RMRKCoreUpgradeable is IRMRKCoreUpgradeable, Initializable {
+contract RMRKCoreUpgradeable is IRMRKCore, Initializable {
     /**
      * @notice Version of the @rmrk-team/evm-contracts package
      * @return Version identifier of the smart contract

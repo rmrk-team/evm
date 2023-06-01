@@ -13,7 +13,7 @@ Smart contract of the upgradeable RMRK Bulk Writer per collection module.
 ### bulkEquip
 
 ```solidity
-function bulkEquip(uint256 tokenId, RMRKBulkWriterPerCollectionUpgradeable.IntakeUnequip[] unequips, IERC6220Upgradeable.IntakeEquip[] equips) external nonpayable
+function bulkEquip(uint256 tokenId, RMRKBulkWriterPerCollectionUpgradeable.IntakeUnequip[] unequips, IERC6220.IntakeEquip[] equips) external nonpayable
 ```
 
 
@@ -26,7 +26,7 @@ function bulkEquip(uint256 tokenId, RMRKBulkWriterPerCollectionUpgradeable.Intak
 |---|---|---|
 | tokenId | uint256 | undefined |
 | unequips | RMRKBulkWriterPerCollectionUpgradeable.IntakeUnequip[] | undefined |
-| equips | IERC6220Upgradeable.IntakeEquip[] | undefined |
+| equips | IERC6220.IntakeEquip[] | undefined |
 
 ### getCollection
 
@@ -48,7 +48,7 @@ Returns the address of the collection that this contract is managing
 ### replaceEquip
 
 ```solidity
-function replaceEquip(IERC6220Upgradeable.IntakeEquip data) external nonpayable
+function replaceEquip(IERC6220.IntakeEquip data) external nonpayable
 ```
 
 
@@ -59,7 +59,7 @@ function replaceEquip(IERC6220Upgradeable.IntakeEquip data) external nonpayable
 
 | Name | Type | Description |
 |---|---|---|
-| data | IERC6220Upgradeable.IntakeEquip | undefined |
+| data | IERC6220.IntakeEquip | undefined |
 
 
 

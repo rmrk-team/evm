@@ -2,21 +2,21 @@
 
 pragma solidity ^0.8.18;
 
-import "./IERC6381Upgradeable.sol";
+import "../../../../RMRK/extension/emotable/IERC6381.sol";
 
 /**
  * @title RMRKEmotableUpgradeable
  * @author RMRK team
  * @notice Smart contract of the upgradeable RMRK Emotable module.
  */
-abstract contract RMRKEmotableUpgradeable is IERC6381Upgradeable {
+abstract contract RMRKEmotableUpgradeable is IERC6381 {
     // Used to avoid double emoting and control undoing
     mapping(address => mapping(uint256 => mapping(bytes4 => uint256)))
         private _emotesPerAddress; // Cheaper than using a bool
     mapping(uint256 => mapping(bytes4 => uint256)) private _emotesPerToken;
 
     /**
-     * @inheritdoc IERC6381Upgradeable
+     * @inheritdoc IERC6381
      */
     function emoteCountOf(
         uint256 tokenId,
@@ -76,12 +76,12 @@ abstract contract RMRKEmotableUpgradeable is IERC6381Upgradeable {
     ) internal virtual {}
 
     /**
-     * @inheritdoc IERC165Upgradeable
+     * @inheritdoc IERC165
      */
     function supportsInterface(
         bytes4 interfaceId
     ) public view virtual returns (bool) {
-        return interfaceId == type(IERC6381Upgradeable).interfaceId;
+        return interfaceId == type(IERC6381).interfaceId;
     }
 
     uint256[50] private __gap;

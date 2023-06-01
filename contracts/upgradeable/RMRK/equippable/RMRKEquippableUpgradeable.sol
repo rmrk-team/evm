@@ -4,12 +4,12 @@
 
 pragma solidity ^0.8.18;
 
-import "../catalog/IRMRKCatalogUpgradeable.sol";
+import "../../../RMRK/catalog/IRMRKCatalog.sol";
 import "../../../RMRK/library/RMRKLib.sol";
 import "../multiasset/AbstractMultiAssetUpgradeable.sol";
 import "../nestable/RMRKNestableUpgradeable.sol";
 import "../security/ReentrancyGuardUpgradeable.sol";
-import "./IERC6220Upgradeable.sol";
+import "../../../RMRK/equippable/IERC6220.sol";
 
 /**
  * @title RMRKEquippableUpgradeable
@@ -17,7 +17,7 @@ import "./IERC6220Upgradeable.sol";
  * @notice Smart contract of the upgradeable RMRK Equippable module.
  */
 contract RMRKEquippableUpgradeable is
-    IERC6220Upgradeable,
+    IERC6220,
     ReentrancyGuardUpgradeable,
     AbstractMultiAssetUpgradeable,
     RMRKNestableUpgradeable
@@ -102,7 +102,7 @@ contract RMRKEquippableUpgradeable is
     {}
 
     /**
-     * @inheritdoc IERC165Upgradeable
+     * @inheritdoc IERC165
      */
     function supportsInterface(
         bytes4 interfaceId
@@ -110,13 +110,13 @@ contract RMRKEquippableUpgradeable is
         public
         view
         virtual
-        override(IERC165Upgradeable, RMRKNestableUpgradeable)
+        override(IERC165, RMRKNestableUpgradeable)
         returns (bool)
     {
         return
             RMRKNestableUpgradeable.supportsInterface(interfaceId) ||
-            interfaceId == type(IERC5773Upgradeable).interfaceId ||
-            interfaceId == type(IERC6220Upgradeable).interfaceId;
+            interfaceId == type(IERC5773).interfaceId ||
+            interfaceId == type(IERC6220).interfaceId;
     }
 
     // ------------------------------- ASSETS ------------------------------
@@ -338,7 +338,7 @@ contract RMRKEquippableUpgradeable is
     }
 
     /**
-     * @inheritdoc IERC6220Upgradeable
+     * @inheritdoc IERC6220
      */
     function equip(
         IntakeEquip memory data
@@ -373,15 +373,12 @@ contract RMRKEquippableUpgradeable is
         // Check from parent's asset perspective:
         _checkAssetAcceptsSlot(data.assetId, slotPartId);
 
-        IERC6059Upgradeable.Child memory child = childOf(
-            data.tokenId,
-            data.childIndex
-        );
+        IERC6059.Child memory child = childOf(data.tokenId, data.childIndex);
 
         // Check from child perspective intention to be used in part
         // We add reentrancy guard because of this call, it happens before updating state
         if (
-            !IERC6220Upgradeable(child.contractAddress)
+            !IERC6220(child.contractAddress)
                 .canTokenBeEquippedWithAssetIntoSlot(
                     address(this),
                     child.tokenId,
@@ -392,7 +389,7 @@ contract RMRKEquippableUpgradeable is
 
         // Check from catalog perspective
         if (
-            !IRMRKCatalogUpgradeable(catalogAddress).checkIsEquippable(
+            !IRMRKCatalog(catalogAddress).checkIsEquippable(
                 slotPartId,
                 child.contractAddress
             )
@@ -437,7 +434,7 @@ contract RMRKEquippableUpgradeable is
     }
 
     /**
-     * @inheritdoc IERC6220Upgradeable
+     * @inheritdoc IERC6220
      */
     function unequip(
         uint256 tokenId,
@@ -484,7 +481,7 @@ contract RMRKEquippableUpgradeable is
     }
 
     /**
-     * @inheritdoc IERC6220Upgradeable
+     * @inheritdoc IERC6220
      */
     function isChildEquipped(
         uint256 tokenId,
@@ -520,7 +517,7 @@ contract RMRKEquippableUpgradeable is
     }
 
     /**
-     * @inheritdoc IERC6220Upgradeable
+     * @inheritdoc IERC6220
      */
     function canTokenBeEquippedWithAssetIntoSlot(
         address parent,
@@ -540,7 +537,7 @@ contract RMRKEquippableUpgradeable is
     // --------------------- Getting Extended Assets ---------------------
 
     /**
-     * @inheritdoc IERC6220Upgradeable
+     * @inheritdoc IERC6220
      */
     function getAssetAndEquippableData(
         uint256 tokenId,
@@ -564,7 +561,7 @@ contract RMRKEquippableUpgradeable is
     ////////////////////////////////////////
 
     /**
-     * @inheritdoc IERC6220Upgradeable
+     * @inheritdoc IERC6220
      */
     function getEquipment(
         uint256 tokenId,

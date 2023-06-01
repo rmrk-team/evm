@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.18;
 
-import "./IERC5773Upgradeable.sol";
+import "../../../RMRK/multiasset/IERC5773.sol";
 import "../../../RMRK/library/RMRKLib.sol";
 import "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol";
 import "../../../RMRK/library/RMRKErrors.sol";
@@ -10,12 +10,11 @@ import "../../../RMRK/library/RMRKErrors.sol";
 /**
  * @title AbstractMultiAssetUpgradeable
  * @author RMRK team
- * @notice Abstract upgradeable Smart contract implementing most of the common logic for contracts implementing
- *  IERC5773Upgradeable
+ * @notice Abstract upgradeable Smart contract implementing most of the common logic for contracts implementing IERC5773
  */
 abstract contract AbstractMultiAssetUpgradeable is
     ContextUpgradeable,
-    IERC5773Upgradeable
+    IERC5773
 {
     using RMRKLib for uint64[];
 
@@ -60,7 +59,7 @@ abstract contract AbstractMultiAssetUpgradeable is
     {}
 
     /**
-     * @inheritdoc IERC5773Upgradeable
+     * @inheritdoc IERC5773
      */
     function getAssetMetadata(
         uint256 tokenId,
@@ -71,7 +70,7 @@ abstract contract AbstractMultiAssetUpgradeable is
     }
 
     /**
-     * @inheritdoc IERC5773Upgradeable
+     * @inheritdoc IERC5773
      */
     function getActiveAssets(
         uint256 tokenId
@@ -80,7 +79,7 @@ abstract contract AbstractMultiAssetUpgradeable is
     }
 
     /**
-     * @inheritdoc IERC5773Upgradeable
+     * @inheritdoc IERC5773
      */
     function getPendingAssets(
         uint256 tokenId
@@ -89,7 +88,7 @@ abstract contract AbstractMultiAssetUpgradeable is
     }
 
     /**
-     * @inheritdoc IERC5773Upgradeable
+     * @inheritdoc IERC5773
      */
     function getActiveAssetPriorities(
         uint256 tokenId
@@ -98,7 +97,7 @@ abstract contract AbstractMultiAssetUpgradeable is
     }
 
     /**
-     * @inheritdoc IERC5773Upgradeable
+     * @inheritdoc IERC5773
      */
     function getAssetReplacements(
         uint256 tokenId,
@@ -108,7 +107,7 @@ abstract contract AbstractMultiAssetUpgradeable is
     }
 
     /**
-     * @inheritdoc IERC5773Upgradeable
+     * @inheritdoc IERC5773
      */
     function isApprovedForAllForAssets(
         address owner,
@@ -118,7 +117,7 @@ abstract contract AbstractMultiAssetUpgradeable is
     }
 
     /**
-     * @inheritdoc IERC5773Upgradeable
+     * @inheritdoc IERC5773
      */
     function setApprovalForAllForAssets(
         address operator,

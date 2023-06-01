@@ -5,7 +5,7 @@
 pragma solidity ^0.8.18;
 
 import "../multiasset/AbstractMultiAssetUpgradeable.sol";
-import "./IERC6059Upgradeable.sol";
+import "../../../RMRK/nestable/IERC6059.sol";
 import "./RMRKNestableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/introspection/IERC165Upgradeable.sol";
 
@@ -73,7 +73,7 @@ contract RMRKNestableMultiAssetUpgradeable is
     {}
 
     /**
-     * @inheritdoc IERC165Upgradeable
+     * @inheritdoc IERC165
      */
     function supportsInterface(
         bytes4 interfaceId
@@ -81,12 +81,12 @@ contract RMRKNestableMultiAssetUpgradeable is
         public
         view
         virtual
-        override(IERC165Upgradeable, RMRKNestableUpgradeable)
+        override(IERC165, RMRKNestableUpgradeable)
         returns (bool)
     {
         return
             RMRKNestableUpgradeable.supportsInterface(interfaceId) ||
-            interfaceId == type(IERC5773Upgradeable).interfaceId;
+            interfaceId == type(IERC5773).interfaceId;
     }
 
     // ------------------------------- ASSETS ------------------------------
@@ -94,7 +94,7 @@ contract RMRKNestableMultiAssetUpgradeable is
     // --------------------------- HANDLING ASSETS -------------------------
 
     /**
-     * @inheritdoc IERC5773Upgradeable
+     * @inheritdoc IERC5773
      */
     function acceptAsset(
         uint256 tokenId,
@@ -105,7 +105,7 @@ contract RMRKNestableMultiAssetUpgradeable is
     }
 
     /**
-     * @inheritdoc IERC5773Upgradeable
+     * @inheritdoc IERC5773
      */
     function rejectAsset(
         uint256 tokenId,
@@ -116,7 +116,7 @@ contract RMRKNestableMultiAssetUpgradeable is
     }
 
     /**
-     * @inheritdoc IERC5773Upgradeable
+     * @inheritdoc IERC5773
      */
     function rejectAllAssets(
         uint256 tokenId,
@@ -126,7 +126,7 @@ contract RMRKNestableMultiAssetUpgradeable is
     }
 
     /**
-     * @inheritdoc IERC5773Upgradeable
+     * @inheritdoc IERC5773
      */
     function setPriority(
         uint256 tokenId,
@@ -138,7 +138,7 @@ contract RMRKNestableMultiAssetUpgradeable is
     // ----------------------- APPROVALS FOR ASSETS ------------------------
 
     /**
-     * @inheritdoc IERC5773Upgradeable
+     * @inheritdoc IERC5773
      */
     function approveForAssets(address to, uint256 tokenId) public virtual {
         address owner = ownerOf(tokenId);
@@ -152,7 +152,7 @@ contract RMRKNestableMultiAssetUpgradeable is
     }
 
     /**
-     * @inheritdoc IERC5773Upgradeable
+     * @inheritdoc IERC5773
      */
     function getApprovedForAssets(
         uint256 tokenId

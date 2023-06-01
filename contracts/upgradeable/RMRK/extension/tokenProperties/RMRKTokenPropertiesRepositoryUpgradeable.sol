@@ -7,7 +7,7 @@ import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol"
 import "@openzeppelin/contracts-upgradeable/utils/introspection/IERC165Upgradeable.sol";
 
 import "../../../../RMRK/library/RMRKErrors.sol";
-import "./IRMRKTokenPropertiesRepositoryUpgradeable.sol";
+import "../../../../RMRK/extension/tokenProperties/IRMRKTokenPropertiesRepository.sol";
 
 /**
  * @title RMRKTokenPropertiesRepositoryUpgradeable
@@ -15,7 +15,7 @@ import "./IRMRKTokenPropertiesRepositoryUpgradeable.sol";
  * @notice Smart contract of the upgradeable RMRK Token property repository module.
  */
 contract RMRKTokenPropertiesRepositoryUpgradeable is
-    IRMRKTokenPropertiesRepositoryUpgradeable
+    IRMRKTokenPropertiesRepository
 {
     mapping(address => mapping(uint256 => AccessType))
         private _parameterAccessType;
@@ -54,7 +54,7 @@ contract RMRKTokenPropertiesRepositoryUpgradeable is
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesRepositoryUpgradeable
+     * @inheritdoc IRMRKTokenPropertiesRepository
      */
     function registerAccessControl(
         address collection,
@@ -89,7 +89,7 @@ contract RMRKTokenPropertiesRepositoryUpgradeable is
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesRepositoryUpgradeable
+     * @inheritdoc IRMRKTokenPropertiesRepository
      */
     function manageAccessControl(
         address collection,
@@ -106,7 +106,7 @@ contract RMRKTokenPropertiesRepositoryUpgradeable is
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesRepositoryUpgradeable
+     * @inheritdoc IRMRKTokenPropertiesRepository
      */
     function manageCollaborators(
         address collection,
@@ -132,7 +132,7 @@ contract RMRKTokenPropertiesRepositoryUpgradeable is
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesRepositoryUpgradeable
+     * @inheritdoc IRMRKTokenPropertiesRepository
      */
     function isCollaborator(
         address collaborator,
@@ -142,7 +142,7 @@ contract RMRKTokenPropertiesRepositoryUpgradeable is
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesRepositoryUpgradeable
+     * @inheritdoc IRMRKTokenPropertiesRepository
      */
     function isSpecificAddress(
         address specificAddress,
@@ -262,7 +262,7 @@ contract RMRKTokenPropertiesRepositoryUpgradeable is
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesRepositoryUpgradeable
+     * @inheritdoc IRMRKTokenPropertiesRepository
      */
     function getStringTokenProperty(
         address collection,
@@ -276,7 +276,7 @@ contract RMRKTokenPropertiesRepositoryUpgradeable is
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesRepositoryUpgradeable
+     * @inheritdoc IRMRKTokenPropertiesRepository
      */
     function getUintTokenProperty(
         address collection,
@@ -287,7 +287,7 @@ contract RMRKTokenPropertiesRepositoryUpgradeable is
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesRepositoryUpgradeable
+     * @inheritdoc IRMRKTokenPropertiesRepository
      */
     function getBoolTokenProperty(
         address collection,
@@ -298,7 +298,7 @@ contract RMRKTokenPropertiesRepositoryUpgradeable is
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesRepositoryUpgradeable
+     * @inheritdoc IRMRKTokenPropertiesRepository
      */
     function getAddressTokenProperty(
         address collection,
@@ -309,7 +309,7 @@ contract RMRKTokenPropertiesRepositoryUpgradeable is
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesRepositoryUpgradeable
+     * @inheritdoc IRMRKTokenPropertiesRepository
      */
     function getBytesTokenProperty(
         address collection,
@@ -320,7 +320,7 @@ contract RMRKTokenPropertiesRepositoryUpgradeable is
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesRepositoryUpgradeable
+     * @inheritdoc IRMRKTokenPropertiesRepository
      */
     function getTokenProperties(
         address collection,
@@ -365,7 +365,7 @@ contract RMRKTokenPropertiesRepositoryUpgradeable is
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesRepositoryUpgradeable
+     * @inheritdoc IRMRKTokenPropertiesRepository
      */
     function getStringTokenProperties(
         address collection,
@@ -396,7 +396,7 @@ contract RMRKTokenPropertiesRepositoryUpgradeable is
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesRepositoryUpgradeable
+     * @inheritdoc IRMRKTokenPropertiesRepository
      */
     function getUintTokenProperties(
         address collection,
@@ -421,7 +421,7 @@ contract RMRKTokenPropertiesRepositoryUpgradeable is
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesRepositoryUpgradeable
+     * @inheritdoc IRMRKTokenPropertiesRepository
      */
     function getBoolTokenProperties(
         address collection,
@@ -446,7 +446,7 @@ contract RMRKTokenPropertiesRepositoryUpgradeable is
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesRepositoryUpgradeable
+     * @inheritdoc IRMRKTokenPropertiesRepository
      */
     function getAddressTokenProperties(
         address collection,
@@ -475,7 +475,7 @@ contract RMRKTokenPropertiesRepositoryUpgradeable is
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesRepositoryUpgradeable
+     * @inheritdoc IRMRKTokenPropertiesRepository
      */
     function getBytesTokenProperties(
         address collection,
@@ -502,7 +502,7 @@ contract RMRKTokenPropertiesRepositoryUpgradeable is
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesRepositoryUpgradeable
+     * @inheritdoc IRMRKTokenPropertiesRepository
      */
     function setUintProperty(
         address collection,
@@ -515,7 +515,7 @@ contract RMRKTokenPropertiesRepositoryUpgradeable is
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesRepositoryUpgradeable
+     * @inheritdoc IRMRKTokenPropertiesRepository
      */
     function setStringProperty(
         address collection,
@@ -530,7 +530,7 @@ contract RMRKTokenPropertiesRepositoryUpgradeable is
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesRepositoryUpgradeable
+     * @inheritdoc IRMRKTokenPropertiesRepository
      */
     function setBoolProperty(
         address collection,
@@ -543,7 +543,7 @@ contract RMRKTokenPropertiesRepositoryUpgradeable is
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesRepositoryUpgradeable
+     * @inheritdoc IRMRKTokenPropertiesRepository
      */
     function setBytesProperty(
         address collection,
@@ -556,7 +556,7 @@ contract RMRKTokenPropertiesRepositoryUpgradeable is
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesRepositoryUpgradeable
+     * @inheritdoc IRMRKTokenPropertiesRepository
      */
     function setAddressProperty(
         address collection,
@@ -569,7 +569,7 @@ contract RMRKTokenPropertiesRepositoryUpgradeable is
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesRepositoryUpgradeable
+     * @inheritdoc IRMRKTokenPropertiesRepository
      */
     function setStringProperties(
         address collection,
@@ -593,7 +593,7 @@ contract RMRKTokenPropertiesRepositoryUpgradeable is
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesRepositoryUpgradeable
+     * @inheritdoc IRMRKTokenPropertiesRepository
      */
     function setUintProperties(
         address collection,
@@ -617,7 +617,7 @@ contract RMRKTokenPropertiesRepositoryUpgradeable is
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesRepositoryUpgradeable
+     * @inheritdoc IRMRKTokenPropertiesRepository
      */
     function setBoolProperties(
         address collection,
@@ -641,7 +641,7 @@ contract RMRKTokenPropertiesRepositoryUpgradeable is
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesRepositoryUpgradeable
+     * @inheritdoc IRMRKTokenPropertiesRepository
      */
     function setAddressProperties(
         address collection,
@@ -665,7 +665,7 @@ contract RMRKTokenPropertiesRepositoryUpgradeable is
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesRepositoryUpgradeable
+     * @inheritdoc IRMRKTokenPropertiesRepository
      */
     function setBytesProperties(
         address collection,
@@ -689,7 +689,7 @@ contract RMRKTokenPropertiesRepositoryUpgradeable is
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesRepositoryUpgradeable
+     * @inheritdoc IRMRKTokenPropertiesRepository
      */
     function setTokenProperties(
         address collection,
@@ -819,15 +819,14 @@ contract RMRKTokenPropertiesRepositoryUpgradeable is
     }
 
     /**
-     * @inheritdoc IERC165Upgradeable
+     * @inheritdoc IERC165
      */
     function supportsInterface(
         bytes4 interfaceId
     ) public view virtual returns (bool) {
         return
-            interfaceId ==
-            type(IRMRKTokenPropertiesRepositoryUpgradeable).interfaceId ||
-            interfaceId == type(IERC165Upgradeable).interfaceId;
+            interfaceId == type(IRMRKTokenPropertiesRepository).interfaceId ||
+            interfaceId == type(IERC165).interfaceId;
     }
 
     uint256[50] private __gap;

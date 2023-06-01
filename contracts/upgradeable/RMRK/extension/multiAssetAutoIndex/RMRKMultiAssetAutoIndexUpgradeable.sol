@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.18;
 
-import "./IRMRKMultiAssetAutoIndexUpgradeable.sol";
+import "../../../../RMRK/extension/multiAssetAutoIndex/IRMRKMultiAssetAutoIndex.sol";
 import "../../multiasset/RMRKMultiAssetUpgradeable.sol";
 
 /**
@@ -11,7 +11,7 @@ import "../../multiasset/RMRKMultiAssetUpgradeable.sol";
  * @notice Smart contract of the upgradeable RMRK MultiAsset AutoIndex module.
  */
 contract RMRKMultiAssetAutoIndexUpgradeable is
-    IRMRKMultiAssetAutoIndexUpgradeable,
+    IRMRKMultiAssetAutoIndex,
     RMRKMultiAssetUpgradeable
 {
     // Mapping of tokenId to assetId to index on the _pendingAssetIndex array
@@ -39,7 +39,7 @@ contract RMRKMultiAssetAutoIndexUpgradeable is
     {}
 
     /**
-     * @inheritdoc IERC165Upgradeable
+     * @inheritdoc IERC165
      */
     function supportsInterface(
         bytes4 interfaceId
@@ -47,24 +47,23 @@ contract RMRKMultiAssetAutoIndexUpgradeable is
         public
         view
         virtual
-        override(IERC165Upgradeable, RMRKMultiAssetUpgradeable)
+        override(IERC165, RMRKMultiAssetUpgradeable)
         returns (bool)
     {
         return
-            interfaceId ==
-            type(IRMRKMultiAssetAutoIndexUpgradeable).interfaceId ||
+            interfaceId == type(IRMRKMultiAssetAutoIndex).interfaceId ||
             super.supportsInterface(interfaceId);
     }
 
     /**
-     * @inheritdoc IRMRKMultiAssetAutoIndexUpgradeable
+     * @inheritdoc IRMRKMultiAssetAutoIndex
      */
     function acceptAsset(uint256 tokenId, uint64 assetId) public {
         _acceptAsset(tokenId, _getIndex(tokenId, assetId), assetId);
     }
 
     /**
-     * @inheritdoc IRMRKMultiAssetAutoIndexUpgradeable
+     * @inheritdoc IRMRKMultiAssetAutoIndex
      */
     function rejectAsset(uint256 tokenId, uint64 assetId) public {
         _rejectAsset(tokenId, _getIndex(tokenId, assetId), assetId);

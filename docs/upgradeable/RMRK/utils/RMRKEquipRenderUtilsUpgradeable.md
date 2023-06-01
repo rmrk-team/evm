@@ -60,7 +60,7 @@ Used to compose the given equippables.
 ### equippedChildrenOf
 
 ```solidity
-function equippedChildrenOf(address parentAddress, uint256 parentId, uint64 parentAssetId) external view returns (struct IERC6220Upgradeable.Equipment[] equippedChildren)
+function equippedChildrenOf(address parentAddress, uint256 parentId, uint64 parentAssetId) external view returns (struct IERC6220.Equipment[] equippedChildren)
 ```
 
 Used to get information about the current children equipped into a specific parent and asset.
@@ -79,7 +79,7 @@ Used to get information about the current children equipped into a specific pare
 
 | Name | Type | Description |
 |---|---|---|
-| equippedChildren | IERC6220Upgradeable.Equipment[] | An array of `IERC6220.Equipment` structs containing the info  about the equipped children |
+| equippedChildren | IERC6220.Equipment[] | An array of `IERC6220.Equipment` structs containing the info  about the equipped children |
 
 ### getAllEquippableSlotsFromParent
 
@@ -255,7 +255,7 @@ Used to get the child&#39;s assets and slot parts pairs, identifying parts the s
 ### getEquipped
 
 ```solidity
-function getEquipped(address target, uint64 tokenId, uint64 assetId) external view returns (uint64[] slotPartIds, struct IERC6220Upgradeable.Equipment[] childrenEquipped, string[] childrenAssetMetadata)
+function getEquipped(address target, uint64 tokenId, uint64 assetId) external view returns (uint64[] slotPartIds, struct IERC6220.Equipment[] childrenEquipped, string[] childrenAssetMetadata)
 ```
 
 Used to retrieve the equipped parts of the given token.
@@ -275,7 +275,7 @@ Used to retrieve the equipped parts of the given token.
 | Name | Type | Description |
 |---|---|---|
 | slotPartIds | uint64[] | An array of the IDs of the slot parts present in the given asset |
-| childrenEquipped | IERC6220Upgradeable.Equipment[] | An array of `Equipment` structs containing info about the equipped children |
+| childrenEquipped | IERC6220.Equipment[] | An array of `Equipment` structs containing info about the equipped children |
 | childrenAssetMetadata | string[] | An array of strings corresponding to asset metadata of the equipped children |
 
 ### getExtendedActiveAssets

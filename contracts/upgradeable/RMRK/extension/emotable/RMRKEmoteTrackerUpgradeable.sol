@@ -2,14 +2,14 @@
 
 pragma solidity ^0.8.18;
 
-import "./IRMRKEmoteTrackerUpgradeable.sol";
+import "../../../../RMRK/extension/emotable/IRMRKEmoteTracker.sol";
 
 /**
  * @title RMRKEmotable
  * @author RMRK team
  * @notice Smart contract of the RMRK Emotable module.
  */
-abstract contract RMRKEmoteTrackerUpgradeable is IRMRKEmoteTrackerUpgradeable {
+abstract contract RMRKEmoteTrackerUpgradeable is IRMRKEmoteTracker {
     // Used to avoid double emoting and control undoing
     // emoter address => collection => tokenId => emoji => state (1 for emoted, 0 for not)
     mapping(address => mapping(address => mapping(uint256 => mapping(bytes4 => uint256))))
@@ -19,7 +19,7 @@ abstract contract RMRKEmoteTrackerUpgradeable is IRMRKEmoteTrackerUpgradeable {
         private _emotesPerToken;
 
     /**
-     * @inheritdoc IRMRKEmoteTrackerUpgradeable
+     * @inheritdoc IRMRKEmoteTracker
      */
     function emoteCountOf(
         address collection,
@@ -30,7 +30,7 @@ abstract contract RMRKEmoteTrackerUpgradeable is IRMRKEmoteTrackerUpgradeable {
     }
 
     /**
-     * @inheritdoc IRMRKEmoteTrackerUpgradeable
+     * @inheritdoc IRMRKEmoteTracker
      */
     function hasEmoterUsedEmote(
         address emoter,
@@ -102,14 +102,14 @@ abstract contract RMRKEmoteTrackerUpgradeable is IRMRKEmoteTrackerUpgradeable {
     ) internal virtual {}
 
     /**
-     * @inheritdoc IERC165Upgradeable
+     * @inheritdoc IERC165
      */
     function supportsInterface(
         bytes4 interfaceId
     ) public view virtual returns (bool) {
         return
-            interfaceId == type(IRMRKEmoteTrackerUpgradeable).interfaceId ||
-            interfaceId == type(IERC165Upgradeable).interfaceId;
+            interfaceId == type(IRMRKEmoteTracker).interfaceId ||
+            interfaceId == type(IERC165).interfaceId;
     }
 
     uint256[50] private __gap;

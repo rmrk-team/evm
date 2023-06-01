@@ -75,7 +75,7 @@ Used to return the metadata URI of the associated Catalog.
 ### getPart
 
 ```solidity
-function getPart(uint64 partId) external view returns (struct IRMRKCatalogUpgradeable.Part)
+function getPart(uint64 partId) external view returns (struct IRMRKCatalog.Part)
 ```
 
 Used to retrieve a `Part` with id `partId`
@@ -92,12 +92,12 @@ Used to retrieve a `Part` with id `partId`
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IRMRKCatalogUpgradeable.Part | The `Part` struct associated with given `partId` |
+| _0 | IRMRKCatalog.Part | The `Part` struct associated with given `partId` |
 
 ### getParts
 
 ```solidity
-function getParts(uint64[] partIds) external view returns (struct IRMRKCatalogUpgradeable.Part[])
+function getParts(uint64[] partIds) external view returns (struct IRMRKCatalog.Part[])
 ```
 
 Used to retrieve multiple parts at the same time.
@@ -114,7 +114,7 @@ Used to retrieve multiple parts at the same time.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IRMRKCatalogUpgradeable.Part[] | An array of `Part` structs associated with given `partIds` |
+| _0 | IRMRKCatalog.Part[] | An array of `Part` structs associated with given `partIds` |
 
 ### getType
 
@@ -179,7 +179,7 @@ Event to announce new equippables to the part.
 ### AddedPart
 
 ```solidity
-event AddedPart(uint64 indexed partId, enum IRMRKCatalogUpgradeable.ItemType indexed itemType, uint8 zIndex, address[] equippableAddresses, string metadataURI)
+event AddedPart(uint64 indexed partId, enum IRMRKCatalog.ItemType indexed itemType, uint8 zIndex, address[] equippableAddresses, string metadataURI)
 ```
 
 Event to announce addition of a new part.
@@ -191,7 +191,7 @@ Event to announce addition of a new part.
 | Name | Type | Description |
 |---|---|---|
 | partId `indexed` | uint64 | ID of the part that was added |
-| itemType `indexed` | enum IRMRKCatalogUpgradeable.ItemType | Enum value specifying whether the part is `None`, `Slot` and `Fixed` |
+| itemType `indexed` | enum IRMRKCatalog.ItemType | Enum value specifying whether the part is `None`, `Slot` and `Fixed` |
 | zIndex  | uint8 | An uint specifying the z value of the part. It is used to specify the depth which the part should  be rendered at |
 | equippableAddresses  | address[] | An array of addresses that can equip this part |
 | metadataURI  | string | The metadata URI of the part |

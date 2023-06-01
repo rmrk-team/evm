@@ -8,13 +8,13 @@
 
 pragma solidity ^0.8.18;
 
-import "../catalog/IRMRKCatalogUpgradeable.sol";
+import "../../../RMRK/catalog/IRMRKCatalog.sol";
 import "../multiasset/AbstractMultiAssetUpgradeable.sol";
-import "../nestable/IERC6059Upgradeable.sol";
+import "../../../RMRK/nestable/IERC6059.sol";
 import "../../../RMRK/library/RMRKLib.sol";
 import "../security/ReentrancyGuardUpgradeable.sol";
-import "./IRMRKNestableExternalEquipUpgradeable.sol";
-import "./IRMRKExternalEquipUpgradeable.sol";
+import "../../../RMRK/equippable/IRMRKNestableExternalEquip.sol";
+import "../../../RMRK/equippable/IRMRKExternalEquip.sol";
 import "@openzeppelin/contracts-upgradeable/utils/introspection/IERC165Upgradeable.sol";
 
 /**
@@ -26,7 +26,7 @@ import "@openzeppelin/contracts-upgradeable/utils/introspection/IERC165Upgradeab
 contract RMRKExternalEquipUpgradeable is
     ReentrancyGuardUpgradeable,
     AbstractMultiAssetUpgradeable,
-    IRMRKExternalEquipUpgradeable
+    IRMRKExternalEquip
 {
     using RMRKLib for uint64[];
 
@@ -71,8 +71,10 @@ contract RMRKExternalEquipUpgradeable is
      */
     function _onlyApprovedOrOwner(uint256 tokenId) internal view {
         if (
-            !IRMRKNestableExternalEquipUpgradeable(_nestableAddress)
-                .isApprovedOrOwner(_msgSender(), tokenId)
+            !IRMRKNestableExternalEquip(_nestableAddress).isApprovedOrOwner(
+                _msgSender(),
+                tokenId
+            )
         ) revert ERC721NotApprovedOrOwner();
     }
 
@@ -145,16 +147,15 @@ contract RMRKExternalEquipUpgradeable is
     }
 
     /**
-     * @inheritdoc IERC165Upgradeable
+     * @inheritdoc IERC165
      */
     function supportsInterface(
         bytes4 interfaceId
     ) public view virtual returns (bool) {
-        return (interfaceId ==
-            type(IRMRKExternalEquipUpgradeable).interfaceId ||
-            interfaceId == type(IERC6220Upgradeable).interfaceId ||
-            interfaceId == type(IERC5773Upgradeable).interfaceId ||
-            interfaceId == type(IERC165Upgradeable).interfaceId);
+        return (interfaceId == type(IRMRKExternalEquip).interfaceId ||
+            interfaceId == type(IERC6220).interfaceId ||
+            interfaceId == type(IERC5773).interfaceId ||
+            interfaceId == type(IERC165).interfaceId);
     }
 
     /**
@@ -168,7 +169,7 @@ contract RMRKExternalEquipUpgradeable is
     }
 
     /**
-     * @inheritdoc IRMRKExternalEquipUpgradeable
+     * @inheritdoc IRMRKExternalEquip
      */
     function getNestableAddress() public view returns (address) {
         return _nestableAddress;
@@ -302,7 +303,7 @@ contract RMRKExternalEquipUpgradeable is
     // ------------------------------- EQUIPPING ------------------------------
 
     /**
-     * @inheritdoc IERC6220Upgradeable
+     * @inheritdoc IERC6220
      */
     function equip(
         IntakeEquip memory data
@@ -337,27 +338,27 @@ contract RMRKExternalEquipUpgradeable is
         // Check from parent's asset perspective:
         _checkAssetAcceptsSlot(data.assetId, slotPartId);
 
-        IERC6059Upgradeable.Child memory child = IERC6059Upgradeable(
-            _nestableAddress
-        ).childOf(data.tokenId, data.childIndex);
-        address childEquippable = IRMRKNestableExternalEquipUpgradeable(
+        IERC6059.Child memory child = IERC6059(_nestableAddress).childOf(
+            data.tokenId,
+            data.childIndex
+        );
+        address childEquippable = IRMRKNestableExternalEquip(
             child.contractAddress
         ).getEquippableAddress();
 
         // Check from child perspective intention to be used in part
         if (
-            !IERC6220Upgradeable(childEquippable)
-                .canTokenBeEquippedWithAssetIntoSlot(
-                    address(this),
-                    child.tokenId,
-                    data.childAssetId,
-                    slotPartId
-                )
+            !IERC6220(childEquippable).canTokenBeEquippedWithAssetIntoSlot(
+                address(this),
+                child.tokenId,
+                data.childAssetId,
+                slotPartId
+            )
         ) revert RMRKTokenCannotBeEquippedWithAssetIntoSlot();
 
         // Check from catalog perspective
         if (
-            !IRMRKCatalogUpgradeable(catalogAddress).checkIsEquippable(
+            !IRMRKCatalog(catalogAddress).checkIsEquippable(
                 slotPartId,
                 childEquippable
             )
@@ -402,7 +403,7 @@ contract RMRKExternalEquipUpgradeable is
     }
 
     /**
-     * @inheritdoc IERC6220Upgradeable
+     * @inheritdoc IERC6220
      */
     function unequip(
         uint256 tokenId,
@@ -433,7 +434,7 @@ contract RMRKExternalEquipUpgradeable is
 
         _beforeUnequip(tokenId, assetId, slotPartId);
         delete _equipments[tokenId][targetCatalogAddress][slotPartId];
-        address childNestableAddress = IRMRKExternalEquipUpgradeable(
+        address childNestableAddress = IRMRKExternalEquip(
             equipment.childEquippableAddress
         ).getNestableAddress();
         _equipCountPerChild[tokenId][childNestableAddress][
@@ -493,7 +494,7 @@ contract RMRKExternalEquipUpgradeable is
     }
 
     /**
-     * @inheritdoc IERC6220Upgradeable
+     * @inheritdoc IERC6220
      */
     function canTokenBeEquippedWithAssetIntoSlot(
         address parent,
@@ -541,7 +542,7 @@ contract RMRKExternalEquipUpgradeable is
     }
 
     /**
-     * @inheritdoc IERC6220Upgradeable
+     * @inheritdoc IERC6220
      */
     function getAssetAndEquippableData(
         uint256 tokenId,
@@ -565,7 +566,7 @@ contract RMRKExternalEquipUpgradeable is
     ////////////////////////////////////////
 
     /**
-     * @inheritdoc IERC6220Upgradeable
+     * @inheritdoc IERC6220
      */
     function getEquipment(
         uint256 tokenId,
@@ -605,7 +606,7 @@ contract RMRKExternalEquipUpgradeable is
      * @return Address of the root owner of the token
      */
     function ownerOf(uint256 tokenId) internal view returns (address) {
-        return IERC6059Upgradeable(_nestableAddress).ownerOf(tokenId);
+        return IERC6059(_nestableAddress).ownerOf(tokenId);
     }
 
     // HOOKS

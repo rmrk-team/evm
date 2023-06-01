@@ -5,9 +5,9 @@ pragma solidity ^0.8.18;
 import "./RMRKRenderUtilsUpgradeable.sol";
 import "./RMRKMultiAssetRenderUtilsUpgradeable.sol";
 import "./RMRKNestableRenderUtilsUpgradeable.sol";
-import "../catalog/IRMRKCatalogUpgradeable.sol";
-import "../equippable/IERC6220Upgradeable.sol";
-import "../nestable/IERC6059Upgradeable.sol";
+import "../../../RMRK/catalog/IRMRKCatalog.sol";
+import "../../../RMRK/equippable/IERC6220.sol";
+import "../../../RMRK/nestable/IERC6059.sol";
 import "../../../RMRK/library/RMRKLib.sol";
 import "../../../RMRK/library/RMRKErrors.sol";
 
@@ -150,7 +150,7 @@ contract RMRKEquipRenderUtilsUpgradeable is
         address target,
         uint256 tokenId
     ) public view virtual returns (ExtendedEquippableActiveAsset[] memory) {
-        IERC6220Upgradeable target_ = IERC6220Upgradeable(target);
+        IERC6220 target_ = IERC6220(target);
 
         uint64[] memory assets = target_.getActiveAssets(tokenId);
         uint64[] memory priorities = target_.getActiveAssetPriorities(tokenId);
@@ -211,7 +211,7 @@ contract RMRKEquipRenderUtilsUpgradeable is
         address target,
         uint256 tokenId
     ) public view virtual returns (ExtendedPendingAsset[] memory) {
-        IERC6220Upgradeable target_ = IERC6220Upgradeable(target);
+        IERC6220 target_ = IERC6220(target);
 
         uint64[] memory assets = target_.getPendingAssets(tokenId);
         uint256 len = assets.length;
@@ -275,11 +275,11 @@ contract RMRKEquipRenderUtilsUpgradeable is
         view
         returns (
             uint64[] memory slotPartIds,
-            IERC6220Upgradeable.Equipment[] memory childrenEquipped,
+            IERC6220.Equipment[] memory childrenEquipped,
             string[] memory childrenAssetMetadata
         )
     {
-        IERC6220Upgradeable target_ = IERC6220Upgradeable(target);
+        IERC6220 target_ = IERC6220(target);
 
         (, , address catalogAddress, uint64[] memory partIds) = target_
             .getAssetAndEquippableData(tokenId, assetId);
@@ -287,15 +287,18 @@ contract RMRKEquipRenderUtilsUpgradeable is
         (slotPartIds, ) = splitSlotAndFixedParts(partIds, catalogAddress);
         uint256 len = slotPartIds.length;
 
-        childrenEquipped = new IERC6220Upgradeable.Equipment[](len);
+        childrenEquipped = new IERC6220.Equipment[](len);
         childrenAssetMetadata = new string[](len);
 
         for (uint256 i; i < len; ) {
-            IERC6220Upgradeable.Equipment memory equipment = target_
-                .getEquipment(tokenId, catalogAddress, slotPartIds[i]);
+            IERC6220.Equipment memory equipment = target_.getEquipment(
+                tokenId,
+                catalogAddress,
+                slotPartIds[i]
+            );
             if (equipment.assetId == assetId) {
                 childrenEquipped[i] = equipment;
-                childrenAssetMetadata[i] = IERC6220Upgradeable(
+                childrenAssetMetadata[i] = IERC6220(
                     equipment.childEquippableAddress
                 ).getAssetMetadata(equipment.childId, equipment.childAssetId);
             }
@@ -347,7 +350,7 @@ contract RMRKEquipRenderUtilsUpgradeable is
             EquippedSlotPart[] memory slotParts
         )
     {
-        IERC6220Upgradeable target_ = IERC6220Upgradeable(target);
+        IERC6220 target_ = IERC6220(target);
         uint64[] memory partIds;
 
         // If token does not have uint64[] memory slotPartId to save the asset, it would fail here.
@@ -365,10 +368,9 @@ contract RMRKEquipRenderUtilsUpgradeable is
 
         uint256 len = fixedPartIds.length;
         if (len != 0) {
-            IRMRKCatalogUpgradeable.Part[]
-                memory catalogFixedParts = IRMRKCatalogUpgradeable(
-                    catalogAddress
-                ).getParts(fixedPartIds);
+            IRMRKCatalog.Part[] memory catalogFixedParts = IRMRKCatalog(
+                catalogAddress
+            ).getParts(fixedPartIds);
             for (uint256 i; i < len; ) {
                 fixedParts[i] = FixedPart({
                     partId: fixedPartIds[i],
@@ -422,11 +424,12 @@ contract RMRKEquipRenderUtilsUpgradeable is
             targetChild,
             childId
         );
-        uint64[] memory parentAssets = IERC5773Upgradeable(parentAddress)
-            .getActiveAssets(parentId);
+        uint64[] memory parentAssets = IERC5773(parentAddress).getActiveAssets(
+            parentId
+        );
         uint256 totalParentAssets = parentAssets.length;
 
-        uint256 totalChildAssets = IERC5773Upgradeable(targetChild)
+        uint256 totalChildAssets = IERC5773(targetChild)
             .getActiveAssets(childId)
             .length;
         uint256 totalMatchesForAll = 0;
@@ -610,16 +613,12 @@ contract RMRKEquipRenderUtilsUpgradeable is
         address parentAddress,
         uint256 parentId,
         uint64 parentAssetId
-    )
-        public
-        view
-        returns (IERC6220Upgradeable.Equipment[] memory equippedChildren)
-    {
+    ) public view returns (IERC6220.Equipment[] memory equippedChildren) {
         (
             uint64[] memory slotPartIds,
             address parentAssetCatalog
         ) = getSlotPartsAndCatalog(parentAddress, parentId, parentAssetId);
-        IERC6220Upgradeable target_ = IERC6220Upgradeable(parentAddress);
+        IERC6220 target_ = IERC6220(parentAddress);
         (
             EquippedSlotPart[] memory tmpSlotParts,
             uint256 totalEquipped
@@ -633,10 +632,10 @@ contract RMRKEquipRenderUtilsUpgradeable is
 
         uint256 totalSlots = slotPartIds.length;
         uint256 finalIndex;
-        equippedChildren = new IERC6220Upgradeable.Equipment[](totalEquipped);
+        equippedChildren = new IERC6220.Equipment[](totalEquipped);
         for (uint256 i; i < totalSlots; ) {
             if (tmpSlotParts[i].childId != 0) {
-                equippedChildren[finalIndex] = IERC6220Upgradeable.Equipment({
+                equippedChildren[finalIndex] = IERC6220.Equipment({
                     assetId: parentAssetId,
                     childAssetId: tmpSlotParts[i].childAssetId,
                     childId: tmpSlotParts[i].childId,
@@ -691,7 +690,7 @@ contract RMRKEquipRenderUtilsUpgradeable is
             EquippableData[] memory tempAssetsWithSlots,
             uint256 totalMatches
         ) = _matchAllAssetsWithSlots(
-                IERC6220Upgradeable(childAddress),
+                IERC6220(childAddress),
                 childId,
                 parentSlotPartIds,
                 parentAddress,
@@ -712,17 +711,15 @@ contract RMRKEquipRenderUtilsUpgradeable is
                 tempAssetsWithSlots[i].childAssetId,
                 tempAssetsWithSlots[i].slotPartId
             );
-            equippableData[i].partMetadata = IRMRKCatalogUpgradeable(
-                parentAssetCatalog
-            ).getPart(tempAssetsWithSlots[i].slotPartId).metadataURI;
+            equippableData[i].partMetadata = IRMRKCatalog(parentAssetCatalog)
+                .getPart(tempAssetsWithSlots[i].slotPartId)
+                .metadataURI;
             equippableData[i].parentAssetId = parentAssetId;
             equippableData[i].parentCatalogAddress = parentAssetCatalog;
-            equippableData[i].childAssetMetadata = IERC5773Upgradeable(
-                childAddress
-            ).getAssetMetadata(childId, tempAssetsWithSlots[i].childAssetId);
-            equippableData[i].parentAssetMetadata = IERC5773Upgradeable(
-                parentAddress
-            ).getAssetMetadata(parentId, parentAssetId);
+            equippableData[i].childAssetMetadata = IERC5773(childAddress)
+                .getAssetMetadata(childId, tempAssetsWithSlots[i].childAssetId);
+            equippableData[i].parentAssetMetadata = IERC5773(parentAddress)
+                .getAssetMetadata(parentId, parentAssetId);
             unchecked {
                 ++i;
             }
@@ -749,10 +746,7 @@ contract RMRKEquipRenderUtilsUpgradeable is
             uint64 equippableGroupId,
             address catalogAddress,
             uint64[] memory partIds
-        ) = IERC6220Upgradeable(target).getAssetAndEquippableData(
-                tokenId,
-                topAssetId
-            );
+        ) = IERC6220(target).getAssetAndEquippableData(tokenId, topAssetId);
         topAsset = ExtendedEquippableActiveAsset({
             id: topAssetId,
             equippableGroupId: equippableGroupId,
@@ -781,7 +775,7 @@ contract RMRKEquipRenderUtilsUpgradeable is
      *  structs. Use totalMatches to know how many valid matches there are.
      * @dev Some data from the returned structs is not filled due to stack to deep limitation: parentAssetId,
      *  parentCatalogAddress, isEquipped and partMetadata.
-     * @param childContract IERC6220Upgradeable instance of the child smart contract
+     * @param childContract IERC6220 instance of the child smart contract
      * @param childId ID of the child token whose assets will be matched against parent's slot parts
      * @param parentSlotPartIds Array of slot part IDs of the parent token's asset
      * @param parentAddress Address of the parent smart contract
@@ -791,7 +785,7 @@ contract RMRKEquipRenderUtilsUpgradeable is
      * @return totalMatches Total of valid matches found
      */
     function _matchAllAssetsWithSlots(
-        IERC6220Upgradeable childContract,
+        IERC6220 childContract,
         uint256 childId,
         uint64[] memory parentSlotPartIds,
         address parentAddress,
@@ -873,9 +867,8 @@ contract RMRKEquipRenderUtilsUpgradeable is
         uint64 childAssetId,
         uint64 slotPartId
     ) public view returns (bool isEquipped) {
-        IERC6220Upgradeable.Equipment memory equipment = IERC6220Upgradeable(
-            parentAddress
-        ).getEquipment(parentId, parentAssetCatalog, slotPartId);
+        IERC6220.Equipment memory equipment = IERC6220(parentAddress)
+            .getEquipment(parentId, parentAssetCatalog, slotPartId);
         isEquipped =
             equipment.childEquippableAddress == childAddress &&
             equipment.childId == childId &&
@@ -900,7 +893,7 @@ contract RMRKEquipRenderUtilsUpgradeable is
         returns (uint64[] memory parentSlotPartIds, address catalogAddress)
     {
         uint64[] memory parentPartIds;
-        (, , catalogAddress, parentPartIds) = IERC6220Upgradeable(tokenAddress)
+        (, , catalogAddress, parentPartIds) = IERC6220(tokenAddress)
             .getAssetAndEquippableData(tokenId, assetId);
         if (catalogAddress == address(0)) revert RMRKNotComposableAsset();
 
@@ -931,7 +924,7 @@ contract RMRKEquipRenderUtilsUpgradeable is
      * @return totalEquipped Total of slot parts with some asset equipped.
      */
     function _getEquippedSlotParts(
-        IERC6220Upgradeable target_,
+        IERC6220 target_,
         uint256 tokenId,
         uint64 assetId,
         address catalogAddress,
@@ -946,17 +939,18 @@ contract RMRKEquipRenderUtilsUpgradeable is
 
         if (len != 0) {
             string memory metadata;
-            IRMRKCatalogUpgradeable.Part[]
-                memory catalogSlotParts = IRMRKCatalogUpgradeable(
-                    catalogAddress
-                ).getParts(slotPartIds);
+            IRMRKCatalog.Part[] memory catalogSlotParts = IRMRKCatalog(
+                catalogAddress
+            ).getParts(slotPartIds);
             for (uint256 i; i < len; ) {
-                IERC6220Upgradeable.Equipment memory equipment = target_
-                    .getEquipment(tokenId, catalogAddress, slotPartIds[i]);
+                IERC6220.Equipment memory equipment = target_.getEquipment(
+                    tokenId,
+                    catalogAddress,
+                    slotPartIds[i]
+                );
                 if (equipment.assetId == assetId) {
-                    metadata = IERC6220Upgradeable(
-                        equipment.childEquippableAddress
-                    ).getAssetMetadata(
+                    metadata = IERC6220(equipment.childEquippableAddress)
+                        .getAssetMetadata(
                             equipment.childId,
                             equipment.childAssetId
                         );
@@ -999,22 +993,19 @@ contract RMRKEquipRenderUtilsUpgradeable is
         view
         returns (uint64[] memory slotPartIds, uint64[] memory fixedPartIds)
     {
-        IRMRKCatalogUpgradeable.Part[]
-            memory allParts = IRMRKCatalogUpgradeable(catalogAddress).getParts(
-                allPartIds
-            );
+        IRMRKCatalog.Part[] memory allParts = IRMRKCatalog(catalogAddress)
+            .getParts(allPartIds);
         uint256 numFixedParts;
         uint256 numSlotParts;
 
         uint256 numParts = allPartIds.length;
         // This for loop is just to discover the right size of the split arrays, since we can't create them dynamically
         for (uint256 i; i < numParts; ) {
-            if (allParts[i].itemType == IRMRKCatalogUpgradeable.ItemType.Fixed)
+            if (allParts[i].itemType == IRMRKCatalog.ItemType.Fixed)
                 numFixedParts += 1;
                 // We could just take the numParts - numFixedParts, but it doesn't hurt to double check it's not an uninitialized part:
-            else if (
-                allParts[i].itemType == IRMRKCatalogUpgradeable.ItemType.Slot
-            ) numSlotParts += 1;
+            else if (allParts[i].itemType == IRMRKCatalog.ItemType.Slot)
+                numSlotParts += 1;
             unchecked {
                 ++i;
             }
@@ -1027,14 +1018,10 @@ contract RMRKEquipRenderUtilsUpgradeable is
 
         // This for loop is to actually fill the split arrays
         for (uint256 i; i < numParts; ) {
-            if (
-                allParts[i].itemType == IRMRKCatalogUpgradeable.ItemType.Fixed
-            ) {
+            if (allParts[i].itemType == IRMRKCatalog.ItemType.Fixed) {
                 fixedPartIds[fixedPartsIndex] = allPartIds[i];
                 fixedPartsIndex += 1;
-            } else if (
-                allParts[i].itemType == IRMRKCatalogUpgradeable.ItemType.Slot
-            ) {
+            } else if (allParts[i].itemType == IRMRKCatalog.ItemType.Slot) {
                 slotPartIds[slotPartsIndex] = allPartIds[i];
                 slotPartsIndex += 1;
             }
@@ -1059,9 +1046,9 @@ contract RMRKEquipRenderUtilsUpgradeable is
         address parentAddress,
         uint256 parentId
     ) public view returns (ChildWithTopAssetMetadata[] memory) {
-        IERC6059Upgradeable.Child[] memory children = IERC6059Upgradeable(
-            parentAddress
-        ).childrenOf(parentId);
+        IERC6059.Child[] memory children = IERC6059(parentAddress).childrenOf(
+            parentId
+        );
         (parentId);
         uint256 len = children.length;
         ChildWithTopAssetMetadata[]
@@ -1083,6 +1070,4 @@ contract RMRKEquipRenderUtilsUpgradeable is
         }
         return childrenWithMetadata;
     }
-
-    uint256[50] private __gap;
 }

@@ -3,7 +3,7 @@
 pragma solidity ^0.8.18;
 
 import "../../nestable/RMRKNestableUpgradeable.sol";
-import "./IRMRKReclaimableChildUpgradeable.sol";
+import "../../../../RMRK/extension/reclaimableChild/IRMRKReclaimableChild.sol";
 
 /**
  * @title RMRKReclaimableChildUpgradeable
@@ -11,7 +11,7 @@ import "./IRMRKReclaimableChildUpgradeable.sol";
  * @notice Smart contract of the upgradeable RMRK Reclaimable child module.
  */
 abstract contract RMRKReclaimableChildUpgradeable is
-    IRMRKReclaimableChildUpgradeable,
+    IRMRKReclaimableChild,
     RMRKNestableUpgradeable
 {
     /**
@@ -42,7 +42,7 @@ abstract contract RMRKReclaimableChildUpgradeable is
     {}
 
     /**
-     * @inheritdoc IERC165Upgradeable
+     * @inheritdoc IERC165
      */
     function supportsInterface(
         bytes4 interfaceId
@@ -50,16 +50,16 @@ abstract contract RMRKReclaimableChildUpgradeable is
         public
         view
         virtual
-        override(IERC165Upgradeable, RMRKNestableUpgradeable)
+        override(IERC165, RMRKNestableUpgradeable)
         returns (bool)
     {
         return
             RMRKNestableUpgradeable.supportsInterface(interfaceId) ||
-            interfaceId == type(IRMRKReclaimableChildUpgradeable).interfaceId;
+            interfaceId == type(IRMRKReclaimableChild).interfaceId;
     }
 
     /**
-     * @inheritdoc IRMRKReclaimableChildUpgradeable
+     * @inheritdoc IRMRKReclaimableChild
      */
     function reclaimChild(
         uint256 tokenId,
@@ -91,7 +91,7 @@ abstract contract RMRKReclaimableChildUpgradeable is
         if (_childIsInPending[childAddress][childId] != 0)
             revert RMRKInvalidChildReclaim();
 
-        (address owner, uint256 ownerTokenId, bool isNft) = IERC6059Upgradeable(
+        (address owner, uint256 ownerTokenId, bool isNft) = IERC6059(
             childAddress
         ).directOwnerOf(childId);
         if (owner != address(this) || ownerTokenId != tokenId || !isNft)

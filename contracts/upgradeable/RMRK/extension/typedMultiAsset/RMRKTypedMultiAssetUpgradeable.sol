@@ -2,27 +2,27 @@
 
 pragma solidity ^0.8.18;
 
-import "./IRMRKTypedMultiAssetUpgradeable.sol";
+import "../../../../RMRK/extension/typedMultiAsset/IRMRKTypedMultiAsset.sol";
 
 /**
  * @title RMRKTypedMultiAsset
  * @author RMRK team
  * @notice Smart contract of the RMRK Typed multi asset module.
  */
-contract RMRKTypedMultiAssetUpgradeable is IRMRKTypedMultiAssetUpgradeable {
+contract RMRKTypedMultiAssetUpgradeable is IRMRKTypedMultiAsset {
     mapping(uint64 => string) private _assetTypes;
 
     /**
-     * @inheritdoc IERC165Upgradeable
+     * @inheritdoc IERC165
      */
     function supportsInterface(
         bytes4 interfaceId
     ) public view virtual returns (bool) {
-        return interfaceId == type(IRMRKTypedMultiAssetUpgradeable).interfaceId;
+        return interfaceId == type(IRMRKTypedMultiAsset).interfaceId;
     }
 
     /**
-     * @inheritdoc IRMRKTypedMultiAssetUpgradeable
+     * @inheritdoc IRMRKTypedMultiAsset
      */
     function getAssetType(uint64 assetId) public view returns (string memory) {
         return _assetTypes[assetId];

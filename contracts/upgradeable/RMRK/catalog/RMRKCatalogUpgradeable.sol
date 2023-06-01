@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.18;
 
-import "./IRMRKCatalogUpgradeable.sol";
+import "../../../RMRK/catalog/IRMRKCatalog.sol";
 import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "../../../RMRK/library/RMRKErrors.sol";
@@ -12,7 +12,7 @@ import "../../../RMRK/library/RMRKErrors.sol";
  * @author RMRK team
  * @notice Upgradeable catalog contract for RMRK equippable module.
  */
-contract RMRKCatalogUpgradeable is IRMRKCatalogUpgradeable, Initializable {
+contract RMRKCatalogUpgradeable is IRMRKCatalog, Initializable {
     using AddressUpgradeable for address;
 
     /**
@@ -77,25 +77,25 @@ contract RMRKCatalogUpgradeable is IRMRKCatalogUpgradeable, Initializable {
     }
 
     /**
-     * @inheritdoc IERC165Upgradeable
+     * @inheritdoc IERC165
      */
     function supportsInterface(
         bytes4 interfaceId
     ) public view virtual returns (bool) {
         return
-            interfaceId == type(IERC165Upgradeable).interfaceId ||
-            interfaceId == type(IRMRKCatalogUpgradeable).interfaceId;
+            interfaceId == type(IERC165).interfaceId ||
+            interfaceId == type(IRMRKCatalog).interfaceId;
     }
 
     /**
-     * @inheritdoc IRMRKCatalogUpgradeable
+     * @inheritdoc IRMRKCatalog
      */
     function getMetadataURI() external view returns (string memory) {
         return _metadataURI;
     }
 
     /**
-     * @inheritdoc IRMRKCatalogUpgradeable
+     * @inheritdoc IRMRKCatalog
      */
     function getType() external view returns (string memory) {
         return _type;
@@ -232,14 +232,14 @@ contract RMRKCatalogUpgradeable is IRMRKCatalogUpgradeable, Initializable {
     }
 
     /**
-     * @inheritdoc IRMRKCatalogUpgradeable
+     * @inheritdoc IRMRKCatalog
      */
     function checkIsEquippableToAll(uint64 partId) public view returns (bool) {
         return _isEquippableToAll[partId];
     }
 
     /**
-     * @inheritdoc IRMRKCatalogUpgradeable
+     * @inheritdoc IRMRKCatalog
      */
     function checkIsEquippable(
         uint64 partId,
@@ -266,14 +266,14 @@ contract RMRKCatalogUpgradeable is IRMRKCatalogUpgradeable, Initializable {
     }
 
     /**
-     * @inheritdoc IRMRKCatalogUpgradeable
+     * @inheritdoc IRMRKCatalog
      */
     function getPart(uint64 partId) public view returns (Part memory) {
         return (_parts[partId]);
     }
 
     /**
-     * @inheritdoc IRMRKCatalogUpgradeable
+     * @inheritdoc IRMRKCatalog
      */
     function getParts(
         uint64[] memory partIds

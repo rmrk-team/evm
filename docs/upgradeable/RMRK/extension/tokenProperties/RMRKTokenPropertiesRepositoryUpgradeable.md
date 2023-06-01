@@ -13,7 +13,7 @@ Smart contract of the upgradeable RMRK Token property repository module.
 ### getAddressTokenProperties
 
 ```solidity
-function getAddressTokenProperties(address collection, uint256 tokenId, string[] addressKeys) external view returns (struct IRMRKTokenPropertiesRepositoryUpgradeable.AddressProperty[])
+function getAddressTokenProperties(address collection, uint256 tokenId, string[] addressKeys) external view returns (struct IRMRKTokenPropertiesRepository.AddressProperty[])
 ```
 
 Used to get multiple address parameter values for a token.
@@ -32,7 +32,7 @@ Used to get multiple address parameter values for a token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IRMRKTokenPropertiesRepositoryUpgradeable.AddressProperty[] | An array of `AddressProperty` structs |
+| _0 | IRMRKTokenPropertiesRepository.AddressProperty[] | An array of `AddressProperty` structs |
 
 ### getAddressTokenProperty
 
@@ -61,7 +61,7 @@ Used to retrieve the address type token properties.
 ### getBoolTokenProperties
 
 ```solidity
-function getBoolTokenProperties(address collection, uint256 tokenId, string[] boolKeys) external view returns (struct IRMRKTokenPropertiesRepositoryUpgradeable.BoolProperty[])
+function getBoolTokenProperties(address collection, uint256 tokenId, string[] boolKeys) external view returns (struct IRMRKTokenPropertiesRepository.BoolProperty[])
 ```
 
 Used to get multiple bool parameter values for a token.
@@ -80,7 +80,7 @@ Used to get multiple bool parameter values for a token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IRMRKTokenPropertiesRepositoryUpgradeable.BoolProperty[] | An array of `BoolProperty` structs |
+| _0 | IRMRKTokenPropertiesRepository.BoolProperty[] | An array of `BoolProperty` structs |
 
 ### getBoolTokenProperty
 
@@ -109,7 +109,7 @@ Used to retrieve the bool type token properties.
 ### getBytesTokenProperties
 
 ```solidity
-function getBytesTokenProperties(address collection, uint256 tokenId, string[] bytesKeys) external view returns (struct IRMRKTokenPropertiesRepositoryUpgradeable.BytesProperty[])
+function getBytesTokenProperties(address collection, uint256 tokenId, string[] bytesKeys) external view returns (struct IRMRKTokenPropertiesRepository.BytesProperty[])
 ```
 
 Used to get multiple bytes parameter values for a token.
@@ -128,7 +128,7 @@ Used to get multiple bytes parameter values for a token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IRMRKTokenPropertiesRepositoryUpgradeable.BytesProperty[] | An array of `BytesProperty` structs |
+| _0 | IRMRKTokenPropertiesRepository.BytesProperty[] | An array of `BytesProperty` structs |
 
 ### getBytesTokenProperty
 
@@ -157,7 +157,7 @@ Used to retrieve the bytes type token properties.
 ### getStringTokenProperties
 
 ```solidity
-function getStringTokenProperties(address collection, uint256 tokenId, string[] stringKeys) external view returns (struct IRMRKTokenPropertiesRepositoryUpgradeable.StringProperty[])
+function getStringTokenProperties(address collection, uint256 tokenId, string[] stringKeys) external view returns (struct IRMRKTokenPropertiesRepository.StringProperty[])
 ```
 
 Used to get multiple sting parameter values for a token.
@@ -176,7 +176,7 @@ Used to get multiple sting parameter values for a token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IRMRKTokenPropertiesRepositoryUpgradeable.StringProperty[] | An array of `StringProperty` structs |
+| _0 | IRMRKTokenPropertiesRepository.StringProperty[] | An array of `StringProperty` structs |
 
 ### getStringTokenProperty
 
@@ -205,7 +205,7 @@ Used to retrieve the string type token properties.
 ### getTokenProperties
 
 ```solidity
-function getTokenProperties(address collection, uint256 tokenId, string[] stringKeys, string[] uintKeys, string[] boolKeys, string[] addressKeys, string[] bytesKeys) external view returns (struct IRMRKTokenPropertiesRepositoryUpgradeable.StringProperty[] stringProperties, struct IRMRKTokenPropertiesRepositoryUpgradeable.UintProperty[] uintProperties, struct IRMRKTokenPropertiesRepositoryUpgradeable.BoolProperty[] boolProperties, struct IRMRKTokenPropertiesRepositoryUpgradeable.AddressProperty[] addressProperties, struct IRMRKTokenPropertiesRepositoryUpgradeable.BytesProperty[] bytesProperties)
+function getTokenProperties(address collection, uint256 tokenId, string[] stringKeys, string[] uintKeys, string[] boolKeys, string[] addressKeys, string[] bytesKeys) external view returns (struct IRMRKTokenPropertiesRepository.StringProperty[] stringProperties, struct IRMRKTokenPropertiesRepository.UintProperty[] uintProperties, struct IRMRKTokenPropertiesRepository.BoolProperty[] boolProperties, struct IRMRKTokenPropertiesRepository.AddressProperty[] addressProperties, struct IRMRKTokenPropertiesRepository.BytesProperty[] bytesProperties)
 ```
 
 Used to retrieve multiple token properties of any type at once.
@@ -228,16 +228,16 @@ Used to retrieve multiple token properties of any type at once.
 
 | Name | Type | Description |
 |---|---|---|
-| stringProperties | IRMRKTokenPropertiesRepositoryUpgradeable.StringProperty[] | An array of `StringProperty` structs containing the string type properties |
-| uintProperties | IRMRKTokenPropertiesRepositoryUpgradeable.UintProperty[] | An array of `UintProperty` structs containing the uint type properties |
-| boolProperties | IRMRKTokenPropertiesRepositoryUpgradeable.BoolProperty[] | An array of `BoolProperty` structs containing the bool type properties |
-| addressProperties | IRMRKTokenPropertiesRepositoryUpgradeable.AddressProperty[] | An array of `AddressProperty` structs containing the address type properties |
-| bytesProperties | IRMRKTokenPropertiesRepositoryUpgradeable.BytesProperty[] | An array of `BytesProperty` structs containing the bytes type properties |
+| stringProperties | IRMRKTokenPropertiesRepository.StringProperty[] | An array of `StringProperty` structs containing the string type properties |
+| uintProperties | IRMRKTokenPropertiesRepository.UintProperty[] | An array of `UintProperty` structs containing the uint type properties |
+| boolProperties | IRMRKTokenPropertiesRepository.BoolProperty[] | An array of `BoolProperty` structs containing the bool type properties |
+| addressProperties | IRMRKTokenPropertiesRepository.AddressProperty[] | An array of `AddressProperty` structs containing the address type properties |
+| bytesProperties | IRMRKTokenPropertiesRepository.BytesProperty[] | An array of `BytesProperty` structs containing the bytes type properties |
 
 ### getUintTokenProperties
 
 ```solidity
-function getUintTokenProperties(address collection, uint256 tokenId, string[] uintKeys) external view returns (struct IRMRKTokenPropertiesRepositoryUpgradeable.UintProperty[])
+function getUintTokenProperties(address collection, uint256 tokenId, string[] uintKeys) external view returns (struct IRMRKTokenPropertiesRepository.UintProperty[])
 ```
 
 Used to get multiple uint parameter values for a token.
@@ -256,7 +256,7 @@ Used to get multiple uint parameter values for a token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IRMRKTokenPropertiesRepositoryUpgradeable.UintProperty[] | An array of `UintProperty` structs |
+| _0 | IRMRKTokenPropertiesRepository.UintProperty[] | An array of `UintProperty` structs |
 
 ### getUintTokenProperty
 
@@ -332,7 +332,7 @@ Used to check if the specified address is listed as a specific address of the gi
 ### manageAccessControl
 
 ```solidity
-function manageAccessControl(address collection, string key, enum IRMRKTokenPropertiesRepositoryUpgradeable.AccessType accessType, address specificAddress) external nonpayable
+function manageAccessControl(address collection, string key, enum IRMRKTokenPropertiesRepository.AccessType accessType, address specificAddress) external nonpayable
 ```
 
 Used to manage the access control settings for a specific parameter.
@@ -345,7 +345,7 @@ Used to manage the access control settings for a specific parameter.
 |---|---|---|
 | collection | address | The address of the collection being managed. |
 | key | string | The key of the property |
-| accessType | enum IRMRKTokenPropertiesRepositoryUpgradeable.AccessType | The type of access control to be applied to the parameter. |
+| accessType | enum IRMRKTokenPropertiesRepository.AccessType | The type of access control to be applied to the parameter. |
 | specificAddress | address | The address to be added as a specific addresses allowed to manage the given  parameter. |
 
 ### manageCollaborators
@@ -387,7 +387,7 @@ Used to register a collection to use the RMRK token properties repository.
 ### setAddressProperties
 
 ```solidity
-function setAddressProperties(address collection, uint256 tokenId, IRMRKTokenPropertiesRepositoryUpgradeable.AddressProperty[] properties) external nonpayable
+function setAddressProperties(address collection, uint256 tokenId, IRMRKTokenPropertiesRepository.AddressProperty[] properties) external nonpayable
 ```
 
 
@@ -400,7 +400,7 @@ function setAddressProperties(address collection, uint256 tokenId, IRMRKTokenPro
 |---|---|---|
 | collection | address | undefined |
 | tokenId | uint256 | undefined |
-| properties | IRMRKTokenPropertiesRepositoryUpgradeable.AddressProperty[] | undefined |
+| properties | IRMRKTokenPropertiesRepository.AddressProperty[] | undefined |
 
 ### setAddressProperty
 
@@ -424,7 +424,7 @@ Used to set an address property.
 ### setBoolProperties
 
 ```solidity
-function setBoolProperties(address collection, uint256 tokenId, IRMRKTokenPropertiesRepositoryUpgradeable.BoolProperty[] properties) external nonpayable
+function setBoolProperties(address collection, uint256 tokenId, IRMRKTokenPropertiesRepository.BoolProperty[] properties) external nonpayable
 ```
 
 
@@ -437,7 +437,7 @@ function setBoolProperties(address collection, uint256 tokenId, IRMRKTokenProper
 |---|---|---|
 | collection | address | undefined |
 | tokenId | uint256 | undefined |
-| properties | IRMRKTokenPropertiesRepositoryUpgradeable.BoolProperty[] | undefined |
+| properties | IRMRKTokenPropertiesRepository.BoolProperty[] | undefined |
 
 ### setBoolProperty
 
@@ -461,7 +461,7 @@ Used to set a boolean property.
 ### setBytesProperties
 
 ```solidity
-function setBytesProperties(address collection, uint256 tokenId, IRMRKTokenPropertiesRepositoryUpgradeable.BytesProperty[] properties) external nonpayable
+function setBytesProperties(address collection, uint256 tokenId, IRMRKTokenPropertiesRepository.BytesProperty[] properties) external nonpayable
 ```
 
 
@@ -474,7 +474,7 @@ function setBytesProperties(address collection, uint256 tokenId, IRMRKTokenPrope
 |---|---|---|
 | collection | address | undefined |
 | tokenId | uint256 | undefined |
-| properties | IRMRKTokenPropertiesRepositoryUpgradeable.BytesProperty[] | undefined |
+| properties | IRMRKTokenPropertiesRepository.BytesProperty[] | undefined |
 
 ### setBytesProperty
 
@@ -498,7 +498,7 @@ Used to set an bytes property.
 ### setStringProperties
 
 ```solidity
-function setStringProperties(address collection, uint256 tokenId, IRMRKTokenPropertiesRepositoryUpgradeable.StringProperty[] properties) external nonpayable
+function setStringProperties(address collection, uint256 tokenId, IRMRKTokenPropertiesRepository.StringProperty[] properties) external nonpayable
 ```
 
 
@@ -511,7 +511,7 @@ function setStringProperties(address collection, uint256 tokenId, IRMRKTokenProp
 |---|---|---|
 | collection | address | undefined |
 | tokenId | uint256 | undefined |
-| properties | IRMRKTokenPropertiesRepositoryUpgradeable.StringProperty[] | undefined |
+| properties | IRMRKTokenPropertiesRepository.StringProperty[] | undefined |
 
 ### setStringProperty
 
@@ -535,7 +535,7 @@ Used to set a string property.
 ### setTokenProperties
 
 ```solidity
-function setTokenProperties(address collection, uint256 tokenId, IRMRKTokenPropertiesRepositoryUpgradeable.StringProperty[] stringProperties, IRMRKTokenPropertiesRepositoryUpgradeable.UintProperty[] uintProperties, IRMRKTokenPropertiesRepositoryUpgradeable.BoolProperty[] boolProperties, IRMRKTokenPropertiesRepositoryUpgradeable.AddressProperty[] addressProperties, IRMRKTokenPropertiesRepositoryUpgradeable.BytesProperty[] bytesProperties) external nonpayable
+function setTokenProperties(address collection, uint256 tokenId, IRMRKTokenPropertiesRepository.StringProperty[] stringProperties, IRMRKTokenPropertiesRepository.UintProperty[] uintProperties, IRMRKTokenPropertiesRepository.BoolProperty[] boolProperties, IRMRKTokenPropertiesRepository.AddressProperty[] addressProperties, IRMRKTokenPropertiesRepository.BytesProperty[] bytesProperties) external nonpayable
 ```
 
 
@@ -548,16 +548,16 @@ function setTokenProperties(address collection, uint256 tokenId, IRMRKTokenPrope
 |---|---|---|
 | collection | address | undefined |
 | tokenId | uint256 | undefined |
-| stringProperties | IRMRKTokenPropertiesRepositoryUpgradeable.StringProperty[] | undefined |
-| uintProperties | IRMRKTokenPropertiesRepositoryUpgradeable.UintProperty[] | undefined |
-| boolProperties | IRMRKTokenPropertiesRepositoryUpgradeable.BoolProperty[] | undefined |
-| addressProperties | IRMRKTokenPropertiesRepositoryUpgradeable.AddressProperty[] | undefined |
-| bytesProperties | IRMRKTokenPropertiesRepositoryUpgradeable.BytesProperty[] | undefined |
+| stringProperties | IRMRKTokenPropertiesRepository.StringProperty[] | undefined |
+| uintProperties | IRMRKTokenPropertiesRepository.UintProperty[] | undefined |
+| boolProperties | IRMRKTokenPropertiesRepository.BoolProperty[] | undefined |
+| addressProperties | IRMRKTokenPropertiesRepository.AddressProperty[] | undefined |
+| bytesProperties | IRMRKTokenPropertiesRepository.BytesProperty[] | undefined |
 
 ### setUintProperties
 
 ```solidity
-function setUintProperties(address collection, uint256 tokenId, IRMRKTokenPropertiesRepositoryUpgradeable.UintProperty[] properties) external nonpayable
+function setUintProperties(address collection, uint256 tokenId, IRMRKTokenPropertiesRepository.UintProperty[] properties) external nonpayable
 ```
 
 
@@ -570,7 +570,7 @@ function setUintProperties(address collection, uint256 tokenId, IRMRKTokenProper
 |---|---|---|
 | collection | address | undefined |
 | tokenId | uint256 | undefined |
-| properties | IRMRKTokenPropertiesRepositoryUpgradeable.UintProperty[] | undefined |
+| properties | IRMRKTokenPropertiesRepository.UintProperty[] | undefined |
 
 ### setUintProperty
 
@@ -639,7 +639,7 @@ Used to notify listeners that a new collection has been registered to use the re
 ### AccessControlUpdate
 
 ```solidity
-event AccessControlUpdate(address indexed collection, string key, enum IRMRKTokenPropertiesRepositoryUpgradeable.AccessType accessType, address specificAddress)
+event AccessControlUpdate(address indexed collection, string key, enum IRMRKTokenPropertiesRepository.AccessType accessType, address specificAddress)
 ```
 
 Used to notify listeners that the access control settings for a specific parameter have been updated.
@@ -652,7 +652,7 @@ Used to notify listeners that the access control settings for a specific paramet
 |---|---|---|
 | collection `indexed` | address | Address of the collection |
 | key  | string | The name of the parameter for which the access control settings have been updated |
-| accessType  | enum IRMRKTokenPropertiesRepositoryUpgradeable.AccessType | The AccessType of the parameter for which the access control settings have been updated |
+| accessType  | enum IRMRKTokenPropertiesRepository.AccessType | The AccessType of the parameter for which the access control settings have been updated |
 | specificAddress  | address | The specific addresses that has been updated |
 
 ### AddressPropertyUpdated

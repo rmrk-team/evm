@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.18;
 
-import "../equippable/IERC6220Upgradeable.sol";
+import "../../../RMRK/equippable/IERC6220.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol";
 
@@ -79,14 +79,14 @@ contract RMRKBulkWriterPerCollectionUpgradeable is Initializable {
      * @param data An `IntakeEquip` struct specifying the equip data.
      */
     function replaceEquip(
-        IERC6220Upgradeable.IntakeEquip memory data
+        IERC6220.IntakeEquip memory data
     ) public onlyTokenOwner(data.tokenId) {
-        IERC6220Upgradeable(_collection).unequip(
+        IERC6220(_collection).unequip(
             data.tokenId,
             data.assetId,
             data.slotPartId
         );
-        IERC6220Upgradeable(_collection).equip(data);
+        IERC6220(_collection).equip(data);
     }
 
     /**
@@ -114,11 +114,11 @@ contract RMRKBulkWriterPerCollectionUpgradeable is Initializable {
     function bulkEquip(
         uint256 tokenId,
         IntakeUnequip[] memory unequips,
-        IERC6220Upgradeable.IntakeEquip[] memory equips
+        IERC6220.IntakeEquip[] memory equips
     ) public onlyTokenOwner(tokenId) {
         uint256 length = unequips.length;
         for (uint256 i = 0; i < length; ) {
-            IERC6220Upgradeable(_collection).unequip(
+            IERC6220(_collection).unequip(
                 tokenId,
                 unequips[i].assetId,
                 unequips[i].slotPartId
@@ -132,7 +132,7 @@ contract RMRKBulkWriterPerCollectionUpgradeable is Initializable {
             if (equips[i].tokenId != tokenId) {
                 revert RMRKCanOnlyDoBulkOperationsWithOneTokenAtATime();
             }
-            IERC6220Upgradeable(_collection).equip(equips[i]);
+            IERC6220(_collection).equip(equips[i]);
             unchecked {
                 ++i;
             }

@@ -2,16 +2,14 @@
 
 pragma solidity ^0.8.18;
 
-import "./IRMRKTokenPropertiesUpgradeable.sol";
+import "../../../../RMRK/extension/tokenProperties/IRMRKTokenProperties.sol";
 
 /**
  * @title RMRKTokenPropertiesUpgradeable
  * @author RMRK team
  * @notice Smart contract of the upgradeable RMRK Token properties module.
  */
-abstract contract RMRKTokenPropertiesUpgradeable is
-    IRMRKTokenPropertiesUpgradeable
-{
+abstract contract RMRKTokenPropertiesUpgradeable is IRMRKTokenProperties {
     // For keys, we use a mapping from strings to Ids.
     // The purpose is to store unique string keys only once, since they are more expensive,
     mapping(string => uint256) private _keysToIds;
@@ -31,7 +29,7 @@ abstract contract RMRKTokenPropertiesUpgradeable is
     mapping(uint256 => mapping(uint256 => bool)) private _boolValues;
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesUpgradeable
+     * @inheritdoc IRMRKTokenProperties
      */
     function getStringTokenProperty(
         uint256 tokenId,
@@ -42,7 +40,7 @@ abstract contract RMRKTokenPropertiesUpgradeable is
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesUpgradeable
+     * @inheritdoc IRMRKTokenProperties
      */
     function getUintTokenProperty(
         uint256 tokenId,
@@ -52,7 +50,7 @@ abstract contract RMRKTokenPropertiesUpgradeable is
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesUpgradeable
+     * @inheritdoc IRMRKTokenProperties
      */
     function getBoolTokenProperty(
         uint256 tokenId,
@@ -62,7 +60,7 @@ abstract contract RMRKTokenPropertiesUpgradeable is
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesUpgradeable
+     * @inheritdoc IRMRKTokenProperties
      */
     function getAddressTokenProperty(
         uint256 tokenId,
@@ -72,7 +70,7 @@ abstract contract RMRKTokenPropertiesUpgradeable is
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesUpgradeable
+     * @inheritdoc IRMRKTokenProperties
      */
     function getBytesTokenProperty(
         uint256 tokenId,
@@ -189,14 +187,14 @@ abstract contract RMRKTokenPropertiesUpgradeable is
     }
 
     /**
-     * @inheritdoc IERC165Upgradeable
+     * @inheritdoc IERC165
      */
     function supportsInterface(
         bytes4 interfaceId
     ) public view virtual returns (bool) {
         return
-            interfaceId == type(IRMRKTokenPropertiesUpgradeable).interfaceId ||
-            interfaceId == type(IERC165Upgradeable).interfaceId;
+            interfaceId == type(IRMRKTokenProperties).interfaceId ||
+            interfaceId == type(IERC165).interfaceId;
     }
 
     uint256[50] private __gap;

@@ -4,7 +4,7 @@
 
 > AbstractMultiAssetUpgradeable
 
-Abstract upgradeable Smart contract implementing most of the common logic for contracts implementing  IERC5773Upgradeable
+Abstract upgradeable Smart contract implementing most of the common logic for contracts implementing IERC5773
 
 
 

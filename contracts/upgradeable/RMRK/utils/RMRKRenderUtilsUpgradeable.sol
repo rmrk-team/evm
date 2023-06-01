@@ -143,13 +143,13 @@ contract RMRKRenderUtilsUpgradeable {
             targetCollection
         );
         data.hasMultiAssetInterface = target.supportsInterface(
-            type(IERC5773Upgradeable).interfaceId
+            type(IERC5773).interfaceId
         );
         data.hasNestingInterface = target.supportsInterface(
-            type(IERC6059Upgradeable).interfaceId
+            type(IERC6059).interfaceId
         );
         data.hasEquippableInterface = target.supportsInterface(
-            type(IERC6220Upgradeable).interfaceId
+            type(IERC6220).interfaceId
         );
         if (data.hasNestingInterface) {
             (data.directOwner, , ) = target.directOwnerOf(tokenId);
@@ -163,11 +163,12 @@ contract RMRKRenderUtilsUpgradeable {
             data.pendingAssetCount = target.getPendingAssets(tokenId).length;
             data.priorities = target.getActiveAssetPriorities(tokenId);
         }
-        if (
-            target.supportsInterface(type(IERC6454betaUpgradeable).interfaceId)
-        ) {
-            data.isSoulbound = !IERC6454betaUpgradeable(targetCollection)
-                .isTransferable(tokenId, address(0), address(0));
+        if (target.supportsInterface(type(IERC6454).interfaceId)) {
+            data.isSoulbound = !IERC6454(targetCollection).isTransferable(
+                tokenId,
+                address(0),
+                address(0)
+            );
         }
         data.rootOwner = target.ownerOf(tokenId);
         if (data.directOwner == address(0x0)) {

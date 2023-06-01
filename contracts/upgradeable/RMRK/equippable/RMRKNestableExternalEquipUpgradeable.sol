@@ -2,9 +2,9 @@
 
 pragma solidity ^0.8.18;
 
-import "../../RMRK/equippable/IERC6220Upgradeable.sol";
-import "../../RMRK/equippable/IRMRKExternalEquipUpgradeable.sol";
-import "../../RMRK/equippable/IRMRKNestableExternalEquipUpgradeable.sol";
+import "../../../RMRK/equippable/IERC6220.sol";
+import "../../../RMRK/equippable/IRMRKExternalEquip.sol";
+import "../../../RMRK/equippable/IRMRKNestableExternalEquip.sol";
 import "../../RMRK/nestable/RMRKNestableUpgradeable.sol";
 
 /**
@@ -18,7 +18,7 @@ import "../../RMRK/nestable/RMRKNestableUpgradeable.sol";
  *  equippable address after deployment.
  */
 contract RMRKNestableExternalEquipUpgradeable is
-    IRMRKNestableExternalEquipUpgradeable,
+    IRMRKNestableExternalEquip,
     RMRKNestableUpgradeable
 {
     address private _equippableAddress;
@@ -45,7 +45,7 @@ contract RMRKNestableExternalEquipUpgradeable is
     {}
 
     /**
-     * @inheritdoc IERC165Upgradeable
+     * @inheritdoc IERC165
      */
     function supportsInterface(
         bytes4 interfaceId
@@ -53,12 +53,11 @@ contract RMRKNestableExternalEquipUpgradeable is
         public
         view
         virtual
-        override(IERC165Upgradeable, RMRKNestableUpgradeable)
+        override(IERC165, RMRKNestableUpgradeable)
         returns (bool)
     {
         return
-            interfaceId ==
-            type(IRMRKNestableExternalEquipUpgradeable).interfaceId ||
+            interfaceId == type(IRMRKNestableExternalEquip).interfaceId ||
             super.supportsInterface(interfaceId);
     }
 
@@ -78,7 +77,7 @@ contract RMRKNestableExternalEquipUpgradeable is
         if (!isPending) {
             _requireMinted(tokenId);
             if (
-                IERC6220Upgradeable(_equippableAddress).isChildEquipped(
+                IERC6220(_equippableAddress).isChildEquipped(
                     tokenId,
                     childAddress,
                     childId
@@ -110,14 +109,14 @@ contract RMRKNestableExternalEquipUpgradeable is
     }
 
     /**
-     * @inheritdoc IRMRKNestableExternalEquipUpgradeable
+     * @inheritdoc IRMRKNestableExternalEquip
      */
     function getEquippableAddress() external view virtual returns (address) {
         return _equippableAddress;
     }
 
     /**
-     * @inheritdoc IRMRKNestableExternalEquipUpgradeable
+     * @inheritdoc IRMRKNestableExternalEquip
      */
     function isApprovedOrOwner(
         address spender,
@@ -130,10 +129,7 @@ contract RMRKNestableExternalEquipUpgradeable is
      * @inheritdoc RMRKNestableUpgradeable
      */
     function _cleanApprovals(uint256 tokenId) internal virtual override {
-        IERC5773Upgradeable(_equippableAddress).approveForAssets(
-            address(0),
-            tokenId
-        );
+        IERC5773(_equippableAddress).approveForAssets(address(0), tokenId);
     }
 
     uint256[50] private __gap;

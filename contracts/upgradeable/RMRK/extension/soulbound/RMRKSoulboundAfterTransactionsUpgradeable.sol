@@ -81,7 +81,7 @@ abstract contract RMRKSoulboundAfterTransactionsUpgradeable is
     }
 
     /**
-     * @inheritdoc IERC6454betaUpgradeable
+     * @inheritdoc IERC6454
      */
     function isTransferable(
         uint256 tokenId,

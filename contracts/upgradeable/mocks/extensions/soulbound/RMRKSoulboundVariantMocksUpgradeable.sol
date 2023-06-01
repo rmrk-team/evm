@@ -8,11 +8,11 @@ import "../../../RMRK/extension/soulbound/RMRKSoulboundAfterTransactionsUpgradea
 import "../../../RMRK/extension/soulbound/RMRKSoulboundPerTokenUpgradeable.sol";
 import "../../RMRKMultiAssetMockUpgradeable.sol";
 
-import "../../../RMRK/extension/soulbound/IERC6454betaUpgradeable.sol";
+import "../../../../RMRK/extension/soulbound/IERC6454.sol";
 
 contract RMRKSoulboundAfterBlockNumberMockUpgradeable is
     RMRKMultiAssetMockUpgradeable,
-    IERC6454betaUpgradeable
+    IERC6454
 {
     uint256 private _lastBlockToTransfer;
 
@@ -52,7 +52,7 @@ contract RMRKSoulboundAfterBlockNumberMockUpgradeable is
     }
 
     /**
-     * @inheritdoc IERC6454betaUpgradeable
+     * @inheritdoc IERC6454
      */
     function isTransferable(
         uint256,
@@ -68,11 +68,11 @@ contract RMRKSoulboundAfterBlockNumberMockUpgradeable is
         public
         view
         virtual
-        override(IERC165Upgradeable, RMRKMultiAssetUpgradeable)
+        override(IERC165, RMRKMultiAssetUpgradeable)
         returns (bool)
     {
         return
-            interfaceId == type(IERC6454betaUpgradeable).interfaceId ||
+            interfaceId == type(IERC6454).interfaceId ||
             super.supportsInterface(interfaceId);
     }
 
@@ -90,7 +90,7 @@ contract RMRKSoulboundAfterBlockNumberMockUpgradeable is
 
 contract RMRKSoulboundAfterTransactionsMockUpgradeable is
     RMRKMultiAssetMockUpgradeable,
-    IERC6454betaUpgradeable
+    IERC6454
 {
     /**
      * @notice Emitted when a token becomes soulbound.
@@ -150,7 +150,7 @@ contract RMRKSoulboundAfterTransactionsMockUpgradeable is
     }
 
     /**
-     * @inheritdoc IERC6454betaUpgradeable
+     * @inheritdoc IERC6454
      */
     function isTransferable(
         uint256 tokenId,
@@ -166,11 +166,11 @@ contract RMRKSoulboundAfterTransactionsMockUpgradeable is
         public
         view
         virtual
-        override(IERC165Upgradeable, RMRKMultiAssetUpgradeable)
+        override(IERC165, RMRKMultiAssetUpgradeable)
         returns (bool)
     {
         return
-            interfaceId == type(IERC6454betaUpgradeable).interfaceId ||
+            interfaceId == type(IERC6454).interfaceId ||
             super.supportsInterface(interfaceId);
     }
 
@@ -203,7 +203,7 @@ contract RMRKSoulboundAfterTransactionsMockUpgradeable is
 contract RMRKSoulboundPerTokenMockUpgradeable is
     RMRKMultiAssetMockUpgradeable,
     OwnableUpgradeable,
-    IERC6454betaUpgradeable
+    IERC6454
 {
     /**
      * @notice Emitted when a token's soulbound state changes.
@@ -242,7 +242,7 @@ contract RMRKSoulboundPerTokenMockUpgradeable is
     }
 
     /**
-     * @inheritdoc IERC6454betaUpgradeable
+     * @inheritdoc IERC6454
      */
     function isTransferable(
         uint256 tokenId,
@@ -260,11 +260,11 @@ contract RMRKSoulboundPerTokenMockUpgradeable is
         public
         view
         virtual
-        override(IERC165Upgradeable, RMRKMultiAssetUpgradeable)
+        override(IERC165, RMRKMultiAssetUpgradeable)
         returns (bool)
     {
         return
-            interfaceId == type(IERC6454betaUpgradeable).interfaceId ||
+            interfaceId == type(IERC6454).interfaceId ||
             super.supportsInterface(interfaceId);
     }
 

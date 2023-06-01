@@ -9,12 +9,12 @@ import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/introspection/IERC165Upgradeable.sol";
 
-import "../catalog/IRMRKCatalogUpgradeable.sol";
+import "../../../RMRK/catalog/IRMRKCatalog.sol";
 import "../core/RMRKCoreUpgradeable.sol";
-import "../equippable/IERC6220Upgradeable.sol";
+import "../../../RMRK/equippable/IERC6220.sol";
 import "../../../RMRK/library/RMRKErrors.sol";
 import "../../../RMRK/library/RMRKLib.sol";
-import "../nestable/IERC6059Upgradeable.sol";
+import "../../../RMRK/nestable/IERC6059.sol";
 import "../security/ReentrancyGuardUpgradeable.sol";
 
 /**
@@ -29,8 +29,8 @@ contract RMRKMinifiedEquippableUpgradeable is
     ContextUpgradeable,
     IERC165Upgradeable,
     IERC721Upgradeable,
-    IERC6059Upgradeable,
-    IERC6220Upgradeable,
+    IERC6059,
+    IERC6220,
     RMRKCoreUpgradeable
 {
     using RMRKLib for uint64[];
@@ -207,7 +207,7 @@ contract RMRKMinifiedEquippableUpgradeable is
     }
 
     /**
-     * @inheritdoc IERC6059Upgradeable
+     * @inheritdoc IERC6059
      */
     function nestTransferFrom(
         address from,
@@ -227,7 +227,7 @@ contract RMRKMinifiedEquippableUpgradeable is
         if (!to.isContract()) revert RMRKIsNotContract();
         if (
             !IERC165Upgradeable(to).supportsInterface(
-                type(IERC6059Upgradeable).interfaceId
+                type(IERC6059).interfaceId
             )
         ) revert RMRKNestableTransferToNonRMRKNestableImplementer();
         _checkForInheritanceLoop(tokenId, to, destinationId);
@@ -320,7 +320,7 @@ contract RMRKMinifiedEquippableUpgradeable is
         uint256 tokenId,
         bytes memory data
     ) private {
-        IERC6059Upgradeable destContract = IERC6059Upgradeable(to);
+        IERC6059 destContract = IERC6059(to);
         destContract.addChild(destinationId, tokenId, data);
 
         emit Transfer(from, to, tokenId);
@@ -356,7 +356,7 @@ contract RMRKMinifiedEquippableUpgradeable is
                 address nextOwner,
                 uint256 nextOwnerTokenId,
                 bool isNft
-            ) = IERC6059Upgradeable(targetContract).directOwnerOf(targetId);
+            ) = IERC6059(targetContract).directOwnerOf(targetId);
             // If there's a final address, we're good. There's no loop.
             if (!isNft) {
                 return;
@@ -419,7 +419,7 @@ contract RMRKMinifiedEquippableUpgradeable is
         if (!to.isContract()) revert RMRKIsNotContract();
         if (
             !IERC165Upgradeable(to).supportsInterface(
-                type(IERC6059Upgradeable).interfaceId
+                type(IERC6059).interfaceId
             )
         ) revert RMRKMintToNonRMRKNestableImplementer();
 
@@ -471,7 +471,7 @@ contract RMRKMinifiedEquippableUpgradeable is
     ////////////////////////////////////////
 
     /**
-     * @inheritdoc IERC6059Upgradeable
+     * @inheritdoc IERC6059
      */
     function ownerOf(
         uint256 tokenId
@@ -479,20 +479,20 @@ contract RMRKMinifiedEquippableUpgradeable is
         public
         view
         virtual
-        override(IERC6059Upgradeable, IERC721Upgradeable)
+        override(IERC6059, IERC721Upgradeable)
         returns (address)
     {
         (address owner, uint256 ownerTokenId, bool isNft) = directOwnerOf(
             tokenId
         );
         if (isNft) {
-            owner = IERC6059Upgradeable(owner).ownerOf(ownerTokenId);
+            owner = IERC6059(owner).ownerOf(ownerTokenId);
         }
         return owner;
     }
 
     /**
-     * @inheritdoc IERC6059Upgradeable
+     * @inheritdoc IERC6059
      */
     function directOwnerOf(
         uint256 tokenId
@@ -517,7 +517,7 @@ contract RMRKMinifiedEquippableUpgradeable is
     }
 
     /**
-     * @inheritdoc IERC6059Upgradeable
+     * @inheritdoc IERC6059
      */
     function burn(
         uint256 tokenId,
@@ -566,7 +566,7 @@ contract RMRKMinifiedEquippableUpgradeable is
             // We substract one to the next level to count for the token being burned, then add it again on returns
             // This is to allow the behavior of 0 recursive burns meaning only the current token is deleted.
             totalChildBurns +=
-                IERC6059Upgradeable(children[i].contractAddress).burn(
+                IERC6059(children[i].contractAddress).burn(
                     children[i].tokenId,
                     pendingRecursiveBurns - 1
                 ) +
@@ -779,7 +779,7 @@ contract RMRKMinifiedEquippableUpgradeable is
     ////////////////////////////////////////
 
     /**
-     * @inheritdoc IERC6059Upgradeable
+     * @inheritdoc IERC6059
      */
     function addChild(
         uint256 parentId,
@@ -813,7 +813,7 @@ contract RMRKMinifiedEquippableUpgradeable is
     }
 
     /**
-     * @inheritdoc IERC6059Upgradeable
+     * @inheritdoc IERC6059
      */
     function acceptChild(
         uint256 parentId,
@@ -866,7 +866,7 @@ contract RMRKMinifiedEquippableUpgradeable is
     }
 
     /**
-     * @inheritdoc IERC6059Upgradeable
+     * @inheritdoc IERC6059
      */
     function rejectAllChildren(
         uint256 tokenId,
@@ -882,7 +882,7 @@ contract RMRKMinifiedEquippableUpgradeable is
     }
 
     /**
-     * @inheritdoc IERC6059Upgradeable
+     * @inheritdoc IERC6059
      */
     function transferChild(
         uint256 tokenId,
@@ -930,7 +930,7 @@ contract RMRKMinifiedEquippableUpgradeable is
                 );
             } else {
                 // Destination is an NFT
-                IERC6059Upgradeable(child.contractAddress).nestTransferFrom(
+                IERC6059(child.contractAddress).nestTransferFrom(
                     address(this),
                     to,
                     child.tokenId,
@@ -985,7 +985,7 @@ contract RMRKMinifiedEquippableUpgradeable is
     ////////////////////////////////////////
 
     /**
-     * @inheritdoc IERC6059Upgradeable
+     * @inheritdoc IERC6059
      */
 
     function childrenOf(
@@ -996,7 +996,7 @@ contract RMRKMinifiedEquippableUpgradeable is
     }
 
     /**
-     * @inheritdoc IERC6059Upgradeable
+     * @inheritdoc IERC6059
      */
 
     function pendingChildrenOf(
@@ -1007,7 +1007,7 @@ contract RMRKMinifiedEquippableUpgradeable is
     }
 
     /**
-     * @inheritdoc IERC6059Upgradeable
+     * @inheritdoc IERC6059
      */
     function childOf(
         uint256 parentId,
@@ -1020,7 +1020,7 @@ contract RMRKMinifiedEquippableUpgradeable is
     }
 
     /**
-     * @inheritdoc IERC6059Upgradeable
+     * @inheritdoc IERC6059
      */
     function pendingChildOf(
         uint256 parentId,
@@ -1271,7 +1271,7 @@ contract RMRKMinifiedEquippableUpgradeable is
         private _operatorApprovalsForAssets;
 
     /**
-     * @inheritdoc IERC5773Upgradeable
+     * @inheritdoc IERC5773
      */
     function getAssetMetadata(
         uint256 tokenId,
@@ -1282,7 +1282,7 @@ contract RMRKMinifiedEquippableUpgradeable is
     }
 
     /**
-     * @inheritdoc IERC5773Upgradeable
+     * @inheritdoc IERC5773
      */
     function getActiveAssets(
         uint256 tokenId
@@ -1291,7 +1291,7 @@ contract RMRKMinifiedEquippableUpgradeable is
     }
 
     /**
-     * @inheritdoc IERC5773Upgradeable
+     * @inheritdoc IERC5773
      */
     function getPendingAssets(
         uint256 tokenId
@@ -1300,7 +1300,7 @@ contract RMRKMinifiedEquippableUpgradeable is
     }
 
     /**
-     * @inheritdoc IERC5773Upgradeable
+     * @inheritdoc IERC5773
      */
     function getActiveAssetPriorities(
         uint256 tokenId
@@ -1309,7 +1309,7 @@ contract RMRKMinifiedEquippableUpgradeable is
     }
 
     /**
-     * @inheritdoc IERC5773Upgradeable
+     * @inheritdoc IERC5773
      */
     function getAssetReplacements(
         uint256 tokenId,
@@ -1319,7 +1319,7 @@ contract RMRKMinifiedEquippableUpgradeable is
     }
 
     /**
-     * @inheritdoc IERC5773Upgradeable
+     * @inheritdoc IERC5773
      */
     function isApprovedForAllForAssets(
         address owner,
@@ -1329,7 +1329,7 @@ contract RMRKMinifiedEquippableUpgradeable is
     }
 
     /**
-     * @inheritdoc IERC5773Upgradeable
+     * @inheritdoc IERC5773
      */
     function setApprovalForAllForAssets(
         address operator,
@@ -1647,14 +1647,14 @@ contract RMRKMinifiedEquippableUpgradeable is
      */
     function supportsInterface(
         bytes4 interfaceId
-    ) public view virtual override returns (bool) {
+    ) public view virtual override(IERC165, IERC165Upgradeable) returns (bool) {
         return
             interfaceId == type(IERC165Upgradeable).interfaceId ||
             interfaceId == type(IERC721Upgradeable).interfaceId ||
             interfaceId == type(IERC721MetadataUpgradeable).interfaceId ||
-            interfaceId == type(IERC6059Upgradeable).interfaceId ||
-            interfaceId == type(IERC5773Upgradeable).interfaceId ||
-            interfaceId == type(IERC6220Upgradeable).interfaceId;
+            interfaceId == type(IERC6059).interfaceId ||
+            interfaceId == type(IERC5773).interfaceId ||
+            interfaceId == type(IERC6220).interfaceId;
     }
 
     // ------------------------------- ASSETS ------------------------------
@@ -1893,7 +1893,7 @@ contract RMRKMinifiedEquippableUpgradeable is
     // ------------------------------- EQUIPPING ------------------------------
 
     /**
-     * @inheritdoc IERC6220Upgradeable
+     * @inheritdoc IERC6220
      */
     function equip(
         IntakeEquip memory data
@@ -1908,15 +1908,12 @@ contract RMRKMinifiedEquippableUpgradeable is
         // Check from parent's asset perspective:
         _checkAssetAcceptsSlot(data.assetId, slotPartId);
 
-        IERC6059Upgradeable.Child memory child = childOf(
-            data.tokenId,
-            data.childIndex
-        );
+        IERC6059.Child memory child = childOf(data.tokenId, data.childIndex);
 
         // Check from child perspective intention to be used in part
         // We add reentrancy guard because of this call, it happens before updating state
         if (
-            !IERC6220Upgradeable(child.contractAddress)
+            !IERC6220(child.contractAddress)
                 .canTokenBeEquippedWithAssetIntoSlot(
                     address(this),
                     child.tokenId,
@@ -1927,7 +1924,7 @@ contract RMRKMinifiedEquippableUpgradeable is
 
         // Check from catalog perspective
         if (
-            !IRMRKCatalogUpgradeable(catalogAddress).checkIsEquippable(
+            !IRMRKCatalog(catalogAddress).checkIsEquippable(
                 slotPartId,
                 child.contractAddress
             )
@@ -1972,7 +1969,7 @@ contract RMRKMinifiedEquippableUpgradeable is
     }
 
     /**
-     * @inheritdoc IERC6220Upgradeable
+     * @inheritdoc IERC6220
      */
     function unequip(
         uint256 tokenId,
@@ -2004,7 +2001,7 @@ contract RMRKMinifiedEquippableUpgradeable is
     }
 
     /**
-     * @inheritdoc IERC6220Upgradeable
+     * @inheritdoc IERC6220
      */
     function isChildEquipped(
         uint256 tokenId,
@@ -2040,7 +2037,7 @@ contract RMRKMinifiedEquippableUpgradeable is
     }
 
     /**
-     * @inheritdoc IERC6220Upgradeable
+     * @inheritdoc IERC6220
      */
     function canTokenBeEquippedWithAssetIntoSlot(
         address parent,
@@ -2060,7 +2057,7 @@ contract RMRKMinifiedEquippableUpgradeable is
     // --------------------- Getting Extended Assets ---------------------
 
     /**
-     * @inheritdoc IERC6220Upgradeable
+     * @inheritdoc IERC6220
      */
     function getAssetAndEquippableData(
         uint256 tokenId,
@@ -2084,7 +2081,7 @@ contract RMRKMinifiedEquippableUpgradeable is
     ////////////////////////////////////////
 
     /**
-     * @inheritdoc IERC6220Upgradeable
+     * @inheritdoc IERC6220
      */
     function getEquipment(
         uint256 tokenId,

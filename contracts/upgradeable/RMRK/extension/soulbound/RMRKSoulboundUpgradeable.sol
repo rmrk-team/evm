@@ -4,17 +4,14 @@ pragma solidity ^0.8.18;
 
 import "../../../../RMRK/library/RMRKErrors.sol";
 import "../../core/RMRKCoreUpgradeable.sol";
-import "./IERC6454betaUpgradeable.sol";
+import "../../../../RMRK/extension/soulbound/IERC6454.sol";
 
 /**
  * @title RMRKSoulboundUpgradeable
  * @author RMRK team
  * @notice Smart contract of the upgradeable RMRK Soulbound module.
  */
-abstract contract RMRKSoulboundUpgradeable is
-    IERC6454betaUpgradeable,
-    RMRKCoreUpgradeable
-{
+abstract contract RMRKSoulboundUpgradeable is IERC6454, RMRKCoreUpgradeable {
     /**
      * @notice Initializes the contract and the inherited contracts.
      * @param name_ Name of the token
@@ -65,12 +62,12 @@ abstract contract RMRKSoulboundUpgradeable is
     }
 
     /**
-     * @inheritdoc IERC165Upgradeable
+     * @inheritdoc IERC165
      */
     function supportsInterface(
         bytes4 interfaceId
     ) public view virtual returns (bool) {
-        return interfaceId == type(IERC6454betaUpgradeable).interfaceId;
+        return interfaceId == type(IERC6454).interfaceId;
     }
 
     uint256[50] private __gap;

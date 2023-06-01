@@ -136,12 +136,12 @@ contract RMRKMultiAssetUpgradeable is
      */
     function supportsInterface(
         bytes4 interfaceId
-    ) public view virtual returns (bool) {
+    ) public view virtual override(IERC165, IERC165Upgradeable) returns (bool) {
         return
             interfaceId == type(IERC165Upgradeable).interfaceId ||
             interfaceId == type(IERC721Upgradeable).interfaceId ||
             interfaceId == type(IERC721MetadataUpgradeable).interfaceId ||
-            interfaceId == type(IERC5773Upgradeable).interfaceId;
+            interfaceId == type(IERC5773).interfaceId;
     }
 
     /**
@@ -551,7 +551,7 @@ contract RMRKMultiAssetUpgradeable is
     // ------------------------------- ASSETS ------------------------------
 
     /**
-     * @inheritdoc IERC5773Upgradeable
+     * @inheritdoc IERC5773
      */
     function acceptAsset(
         uint256 tokenId,
@@ -562,7 +562,7 @@ contract RMRKMultiAssetUpgradeable is
     }
 
     /**
-     * @inheritdoc IERC5773Upgradeable
+     * @inheritdoc IERC5773
      */
     function rejectAsset(
         uint256 tokenId,
@@ -573,7 +573,7 @@ contract RMRKMultiAssetUpgradeable is
     }
 
     /**
-     * @inheritdoc IERC5773Upgradeable
+     * @inheritdoc IERC5773
      */
     function rejectAllAssets(
         uint256 tokenId,
@@ -583,7 +583,7 @@ contract RMRKMultiAssetUpgradeable is
     }
 
     /**
-     * @inheritdoc IERC5773Upgradeable
+     * @inheritdoc IERC5773
      */
     function setPriority(
         uint256 tokenId,
@@ -595,7 +595,7 @@ contract RMRKMultiAssetUpgradeable is
     // ----------------------- APPROVALS FOR ASSETS ------------------------
 
     /**
-     * @inheritdoc IERC5773Upgradeable
+     * @inheritdoc IERC5773
      */
     function approveForAssets(address to, uint256 tokenId) public virtual {
         address owner = ownerOf(tokenId);
@@ -620,7 +620,7 @@ contract RMRKMultiAssetUpgradeable is
     }
 
     /**
-     * @inheritdoc IERC5773Upgradeable
+     * @inheritdoc IERC5773
      */
     function getApprovedForAssets(
         uint256 tokenId

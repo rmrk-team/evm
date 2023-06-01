@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.18;
 
-import "./IRMRKNestableAutoIndexUpgradeable.sol";
+import "../../../../RMRK/extension/nestableAutoIndex/IRMRKNestableAutoIndex.sol";
 import "../../nestable/RMRKNestableUpgradeable.sol";
 
 /**
@@ -11,7 +11,7 @@ import "../../nestable/RMRKNestableUpgradeable.sol";
  * @notice Smart contract of the upgradeable RMRK Nestable AutoIndex module.
  */
 contract RMRKNestableAutoIndexUpgradeable is
-    IRMRKNestableAutoIndexUpgradeable,
+    IRMRKNestableAutoIndex,
     RMRKNestableUpgradeable
 {
     // Mapping of tokenId to childAddress to childId to index on the _pendingChildren array
@@ -44,12 +44,11 @@ contract RMRKNestableAutoIndexUpgradeable is
         public
         view
         virtual
-        override(IERC165Upgradeable, RMRKNestableUpgradeable)
+        override(IERC165, RMRKNestableUpgradeable)
         returns (bool)
     {
         return
-            interfaceId ==
-            type(IRMRKNestableAutoIndexUpgradeable).interfaceId ||
+            interfaceId == type(IRMRKNestableAutoIndex).interfaceId ||
             super.supportsInterface(interfaceId);
     }
 
@@ -193,7 +192,7 @@ contract RMRKNestableAutoIndexUpgradeable is
         public
         view
         virtual
-        override(IERC6059Upgradeable, RMRKNestableUpgradeable)
+        override(IERC6059, RMRKNestableUpgradeable)
         returns (address)
     {
         return super.ownerOf(tokenId);

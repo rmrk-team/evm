@@ -2,12 +2,12 @@
 
 pragma solidity ^0.8.18;
 
-import "../../../RMRK/extension/soulbound/IERC6454betaUpgradeable.sol";
+import "../../../../RMRK/extension/soulbound/IERC6454.sol";
 import "../../RMRKNestableMultiAssetMockUpgradeable.sol";
 
 contract RMRKSoulboundNestableMultiAssetMockUpgradeable is
     RMRKNestableMultiAssetMockUpgradeable,
-    IERC6454betaUpgradeable
+    IERC6454
 {
     function initialize(
         string memory name,
@@ -31,11 +31,11 @@ contract RMRKSoulboundNestableMultiAssetMockUpgradeable is
         public
         view
         virtual
-        override(IERC165Upgradeable, RMRKNestableMultiAssetUpgradeable)
+        override(IERC165, RMRKNestableMultiAssetUpgradeable)
         returns (bool)
     {
         return
-            interfaceId == type(IERC6454betaUpgradeable).interfaceId ||
+            interfaceId == type(IERC6454).interfaceId ||
             super.supportsInterface(interfaceId);
     }
 

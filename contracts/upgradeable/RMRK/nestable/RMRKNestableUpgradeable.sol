@@ -4,7 +4,7 @@
 
 pragma solidity ^0.8.18;
 
-import "./IERC6059Upgradeable.sol";
+import "../../../RMRK/nestable/IERC6059.sol";
 import "../core/RMRKCoreUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/IERC721MetadataUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol";
@@ -25,7 +25,7 @@ contract RMRKNestableUpgradeable is
     ContextUpgradeable,
     IERC165Upgradeable,
     IERC721Upgradeable,
-    IERC6059Upgradeable,
+    IERC6059,
     RMRKCoreUpgradeable
 {
     using AddressUpgradeable for address;
@@ -133,12 +133,12 @@ contract RMRKNestableUpgradeable is
      */
     function supportsInterface(
         bytes4 interfaceId
-    ) public view virtual returns (bool) {
+    ) public view virtual override(IERC165, IERC165Upgradeable) returns (bool) {
         return
             interfaceId == type(IERC165Upgradeable).interfaceId ||
             interfaceId == type(IERC721Upgradeable).interfaceId ||
             interfaceId == type(IERC721MetadataUpgradeable).interfaceId ||
-            interfaceId == type(IERC6059Upgradeable).interfaceId;
+            interfaceId == type(IERC6059).interfaceId;
     }
 
     /**
@@ -223,7 +223,7 @@ contract RMRKNestableUpgradeable is
     }
 
     /**
-     * @inheritdoc IERC6059Upgradeable
+     * @inheritdoc IERC6059
      */
     function nestTransferFrom(
         address from,
@@ -343,7 +343,7 @@ contract RMRKNestableUpgradeable is
         if (!to.isContract()) revert RMRKIsNotContract();
         if (
             !IERC165Upgradeable(to).supportsInterface(
-                type(IERC6059Upgradeable).interfaceId
+                type(IERC6059).interfaceId
             )
         ) revert RMRKNestableTransferToNonRMRKNestableImplementer();
         _checkForInheritanceLoop(tokenId, to, destinationId);
@@ -385,7 +385,7 @@ contract RMRKNestableUpgradeable is
         uint256 tokenId,
         bytes memory data
     ) private {
-        IERC6059Upgradeable destContract = IERC6059Upgradeable(to);
+        IERC6059 destContract = IERC6059(to);
         destContract.addChild(destinationId, tokenId, data);
 
         emit Transfer(from, to, tokenId);
@@ -421,7 +421,7 @@ contract RMRKNestableUpgradeable is
                 address nextOwner,
                 uint256 nextOwnerTokenId,
                 bool isNft
-            ) = IERC6059Upgradeable(targetContract).directOwnerOf(targetId);
+            ) = IERC6059(targetContract).directOwnerOf(targetId);
             // If there's a final address, we're good. There's no loop.
             if (!isNft) {
                 return;
@@ -505,7 +505,7 @@ contract RMRKNestableUpgradeable is
         if (!to.isContract()) revert RMRKIsNotContract();
         if (
             !IERC165Upgradeable(to).supportsInterface(
-                type(IERC6059Upgradeable).interfaceId
+                type(IERC6059).interfaceId
             )
         ) revert RMRKMintToNonRMRKNestableImplementer();
 
@@ -557,7 +557,7 @@ contract RMRKNestableUpgradeable is
     ////////////////////////////////////////
 
     /**
-     * @inheritdoc IERC6059Upgradeable
+     * @inheritdoc IERC6059
      */
     function ownerOf(
         uint256 tokenId
@@ -565,20 +565,20 @@ contract RMRKNestableUpgradeable is
         public
         view
         virtual
-        override(IERC6059Upgradeable, IERC721Upgradeable)
+        override(IERC6059, IERC721Upgradeable)
         returns (address)
     {
         (address owner, uint256 ownerTokenId, bool isNft) = directOwnerOf(
             tokenId
         );
         if (isNft) {
-            owner = IERC6059Upgradeable(owner).ownerOf(ownerTokenId);
+            owner = IERC6059(owner).ownerOf(ownerTokenId);
         }
         return owner;
     }
 
     /**
-     * @inheritdoc IERC6059Upgradeable
+     * @inheritdoc IERC6059
      */
     function directOwnerOf(
         uint256 tokenId
@@ -603,7 +603,7 @@ contract RMRKNestableUpgradeable is
     }
 
     /**
-     * @inheritdoc IERC6059Upgradeable
+     * @inheritdoc IERC6059
      */
     function burn(
         uint256 tokenId,
@@ -672,7 +672,7 @@ contract RMRKNestableUpgradeable is
             // We substract one to the next level to count for the token being burned, then add it again on returns
             // This is to allow the behavior of 0 recursive burns meaning only the current token is deleted.
             totalChildBurns +=
-                IERC6059Upgradeable(children[i].contractAddress).burn(
+                IERC6059(children[i].contractAddress).burn(
                     children[i].tokenId,
                     pendingRecursiveBurns - 1
                 ) +
@@ -927,7 +927,7 @@ contract RMRKNestableUpgradeable is
     ////////////////////////////////////////
 
     /**
-     * @inheritdoc IERC6059Upgradeable
+     * @inheritdoc IERC6059
      */
     function addChild(
         uint256 parentId,
@@ -961,7 +961,7 @@ contract RMRKNestableUpgradeable is
     }
 
     /**
-     * @inheritdoc IERC6059Upgradeable
+     * @inheritdoc IERC6059
      */
     function acceptChild(
         uint256 parentId,
@@ -1014,7 +1014,7 @@ contract RMRKNestableUpgradeable is
     }
 
     /**
-     * @inheritdoc IERC6059Upgradeable
+     * @inheritdoc IERC6059
      */
     function rejectAllChildren(
         uint256 tokenId,
@@ -1050,7 +1050,7 @@ contract RMRKNestableUpgradeable is
     }
 
     /**
-     * @inheritdoc IERC6059Upgradeable
+     * @inheritdoc IERC6059
      */
     function transferChild(
         uint256 tokenId,
@@ -1137,7 +1137,7 @@ contract RMRKNestableUpgradeable is
                 );
             } else {
                 // Destination is an NFT
-                IERC6059Upgradeable(child.contractAddress).nestTransferFrom(
+                IERC6059(child.contractAddress).nestTransferFrom(
                     address(this),
                     to,
                     child.tokenId,
@@ -1192,7 +1192,7 @@ contract RMRKNestableUpgradeable is
     ////////////////////////////////////////
 
     /**
-     * @inheritdoc IERC6059Upgradeable
+     * @inheritdoc IERC6059
      */
 
     function childrenOf(
@@ -1203,7 +1203,7 @@ contract RMRKNestableUpgradeable is
     }
 
     /**
-     * @inheritdoc IERC6059Upgradeable
+     * @inheritdoc IERC6059
      */
 
     function pendingChildrenOf(
@@ -1214,7 +1214,7 @@ contract RMRKNestableUpgradeable is
     }
 
     /**
-     * @inheritdoc IERC6059Upgradeable
+     * @inheritdoc IERC6059
      */
     function childOf(
         uint256 parentId,
@@ -1227,7 +1227,7 @@ contract RMRKNestableUpgradeable is
     }
 
     /**
-     * @inheritdoc IERC6059Upgradeable
+     * @inheritdoc IERC6059
      */
     function pendingChildOf(
         uint256 parentId,
