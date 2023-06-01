@@ -1202,6 +1202,24 @@ Used to withdraw the minting proceedings to a specified address.
 | to | address | Address to receive the given amount of minting proceedings |
 | amount | uint256 | The amount to withdraw |
 
+### withdrawRaisedERC20
+
+```solidity
+function withdrawRaisedERC20(address erc20, address to, uint256 amount) external nonpayable
+```
+
+Used to withdraw the minting proceedings to a specified address.
+
+*This function can only be called by the owner.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| erc20 | address | Address of the ERC20 token to withdraw |
+| to | address | Address to receive the given amount of minting proceedings |
+| amount | uint256 | The amount to withdraw |
+
 
 
 ## Events

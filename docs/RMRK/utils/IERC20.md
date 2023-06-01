@@ -33,6 +33,29 @@ Used to grant permission to an account to spend the tokens of another
 |---|---|---|
 | _0 | uint256 | Amount of tokens that the `spender` can manage |
 
+### transfer
+
+```solidity
+function transfer(address to, uint256 amount) external nonpayable returns (bool)
+```
+
+Used to transfer tokens from the caller&#39;s account to another.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| to | address | Address of the account to which the tokens are being transferred |
+| amount | uint256 | Amount of tokens that are being transferred |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | bool | A boolean value signifying whether the transfer was succesfull (`true`) or not (`false`) |
+
 ### transferFrom
 
 ```solidity
