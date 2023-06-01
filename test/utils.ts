@@ -53,7 +53,7 @@ async function mintFromImplNativeToken(token: Contract, to: string): Promise<Big
 async function nestMintFromImplErc20Pay(
   token: Contract,
   to: string,
-  destinationId: number,
+  destinationId: BigNumber,
 ): Promise<BigNumber> {
   const erc20Address = token.erc20TokenAddress();
   const erc20Factory = await ethers.getContractFactory('ERC20Mock');
