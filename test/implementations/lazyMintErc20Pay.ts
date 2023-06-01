@@ -8,7 +8,7 @@ import {
   ONE_ETH,
   singleFixtureWithArgs,
 } from '../utils';
-import { Contract } from 'ethers';
+import { BigNumber, Contract } from 'ethers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { ERC20Mock } from '../../typechain-types';
 
@@ -151,6 +151,18 @@ async function shouldControlValidMintingErc20Pay(): Promise<void> {
     expect(await this.token.balanceOf(addrs[0].address)).to.equal(1);
   });
 
+  it('can withdraw raised funds', async function () {
+    await mintFromImplErc20Pay(this.token, addrs[0].address);
+    const contractBalance = await erc20.balanceOf(this.token.address);
+    const initAddressBalance = await erc20.balanceOf(addrs[0].address);
+    expect(contractBalance).to.equal(ONE_ETH);
+    await this.token.withdrawRaisedERC20(erc20.address, addrs[0].address, contractBalance);
+    expect(await erc20.balanceOf(this.token.address)).to.equal(0);
+    expect(await erc20.balanceOf(addrs[0].address)).to.equal(
+      initAddressBalance.add(contractBalance),
+    );
+  });
+
   it('reduces total supply on burn', async function () {
     const tokenId = await mintFromImplErc20Pay(this.token, addrs[0].address);
     expect(await this.token.totalSupply()).to.equal(1);
@@ -181,7 +193,7 @@ async function shouldControlValidMintingErc20Pay(): Promise<void> {
   });
 
   describe('Nest minting', async () => {
-    let parentId: number;
+    let parentId: BigNumber;
 
     beforeEach(async function () {
       if (this.token.nestMint === undefined) {

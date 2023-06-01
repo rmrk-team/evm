@@ -92,4 +92,19 @@ contract RMRKMultiAssetImplErc20Pay is
             }
         }
     }
+
+    /**
+     * @notice Used to withdraw the minting proceedings to a specified address.
+     * @dev This function can only be called by the owner.
+     * @param erc20 Address of the ERC20 token to withdraw
+     * @param to Address to receive the given amount of minting proceedings
+     * @param amount The amount to withdraw
+     */
+    function withdrawRaisedERC20(
+        address erc20,
+        address to,
+        uint256 amount
+    ) external onlyOwner {
+        IERC20(erc20).transfer(to, amount);
+    }
 }
