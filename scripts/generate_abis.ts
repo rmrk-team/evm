@@ -9,6 +9,10 @@ const getTheAbi = () => {
         directories: false,
       });
 
+      const utils = walkSync(`${process.cwd()}/artifacts/contracts/RMRK/utils`, {
+        directories: false,
+      });
+
       const dirExists = fs.existsSync(`${process.cwd()}/artifacts/abis/implementations`);
       if (!dirExists) {
         fs.mkdirSync(`${process.cwd()}/artifacts/abis`);
@@ -17,6 +21,8 @@ const getTheAbi = () => {
         fs.mkdirSync(`${process.cwd()}/artifacts/abis/implementations/abstracts`);
         fs.mkdirSync(`${process.cwd()}/artifacts/abis/implementations/erc20Pay`);
         fs.mkdirSync(`${process.cwd()}/artifacts/abis/implementations/premint`);
+        fs.mkdirSync(`${process.cwd()}/artifacts/abis/RMRK`);
+        fs.mkdirSync(`${process.cwd()}/artifacts/abis/RMRK/utils`);
       }
 
       implementations.forEach((implementation) => {
@@ -30,6 +36,23 @@ const getTheAbi = () => {
         if (json.abi) {
           fs.writeFileSync(
             `${process.cwd()}/artifacts/abis/implementations/${filename}.json`,
+            JSON.stringify(json.abi),
+          );
+        }
+      });
+
+
+      utils.forEach((util) => {
+        const filename = util.slice(0, util.indexOf('.sol'));
+        const file = fs.readFileSync(
+          `${process.cwd()}/artifacts/contracts/RMRK/utils/${util}`,
+          'utf8',
+        );
+        const json = JSON.parse(file);
+
+        if (json.abi) {
+          fs.writeFileSync(
+            `${process.cwd()}/artifacts/abis/RMRK/utils/${filename}.json`,
             JSON.stringify(json.abi),
           );
         }
