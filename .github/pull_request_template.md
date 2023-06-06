@@ -2,10 +2,6 @@
 
 Describe the additions/improvements this PR contains.
 
-# Actions
-
-Provide overview of actions taken to address the additions/improvements.
-
 # Checklist
 
 - [ ] Verified code additions
