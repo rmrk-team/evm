@@ -10,7 +10,7 @@ error InvalidAddress();
 error InsufficientBalance();
 
 abstract contract ERC20Holder is IERC20Holder {
-    mapping(uint256 tokenId => mapping(address erc20address => uint256 balance)) private balances;
+    mapping(uint256 => mapping(address => uint256)) private _balances;
 
     /**
      * @inheritdoc IERC20Holder
@@ -19,13 +19,14 @@ abstract contract ERC20Holder is IERC20Holder {
         address erc20Contract,
         uint256 tokenId
     ) external view returns (uint256) {
-        return balances[tokenId][erc20Contract];
+        return _balances[tokenId][erc20Contract];
     }
 
     /**
      * @notice Transfer ERC-20 tokens to a specific token
      * @dev The ERC-20 contract must have approved this contract to transfer the ERC-20 tokens
      * @dev The balance MUST be transferred from the message sender
+     * @dev Implementers should validate that the msg sender is either the token owner or approved before calling this.
      * @param erc20Contract The ERC-20 contract
      * @param tokenId The token to transfer to
      * @param value The number of ERC-20 tokens to transfer
@@ -44,11 +45,11 @@ abstract contract ERC20Holder is IERC20Holder {
         if (to == address(0) || erc20Contract == address(0)) {
             revert InvalidAddress();
         }
-        if (balances[tokenId][erc20Contract] < value) {
+        if (_balances[tokenId][erc20Contract] < value) {
             revert InsufficientBalance();
         }
         _beforeTransferERC20FromToken(erc20Contract, tokenId, to, value, data);
-        balances[tokenId][erc20Contract] -= value;
+        _balances[tokenId][erc20Contract] -= value;
 
         IERC20(erc20Contract).transfer(to, value);
 
@@ -79,7 +80,7 @@ abstract contract ERC20Holder is IERC20Holder {
             data
         );
         IERC20(erc20Contract).transferFrom(msg.sender, address(this), value);
-        balances[tokenId][erc20Contract] += value;
+        _balances[tokenId][erc20Contract] += value;
 
         emit ReceivedERC20(erc20Contract, tokenId, msg.sender, value);
         _afterTransferERC20ToToken(
