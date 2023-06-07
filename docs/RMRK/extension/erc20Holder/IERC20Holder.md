@@ -73,7 +73,7 @@ Transfer ERC-20 tokens to address
 | tokenId | uint256 | The token to transfer from |
 | to | address | The address to send the ERC-20 tokens to |
 | value | uint256 | The number of ERC-20 tokens to transfer |
-| data | bytes | Additional data with no specified format, to allow for custom logic. |
+| data | bytes | Additional data with no specified format, to allow for custom logic |
 
 ### transferERC20ToToken
 
@@ -92,7 +92,7 @@ Transfer ERC-20 tokens to a specific token
 | erc20Contract | address | The ERC-20 contract |
 | tokenId | uint256 | The token to transfer to |
 | value | uint256 | The number of ERC-20 tokens to transfer |
-| data | bytes | Additional data with no specified format, to allow for custom logic. |
+| data | bytes | Additional data with no specified format, to allow for custom logic |
 
 
 
@@ -112,10 +112,10 @@ This emits when a token receives ERC-20 tokens.
 
 | Name | Type | Description |
 |---|---|---|
-| erc20Contract `indexed` | address | The ERC-20 contract. |
-| toTokenId `indexed` | uint256 | The token that receives the ERC-20 tokens. |
-| from `indexed` | address | The prior owner of the token. |
-| value  | uint256 | The number of ERC-20 tokens received. |
+| erc20Contract `indexed` | address | The ERC-20 contract |
+| toTokenId `indexed` | uint256 | The token that receives the ERC-20 tokens |
+| from `indexed` | address | The prior owner of the token |
+| value  | uint256 | The number of ERC-20 tokens received |
 
 ### TransferredERC20
 
@@ -131,10 +131,10 @@ This emits when a token transfers ERC-20 tokens.
 
 | Name | Type | Description |
 |---|---|---|
-| erc20Contract `indexed` | address | The ERC-20 contract. |
-| fromTokenId `indexed` | uint256 | The token that owned the ERC-20 tokens. |
-| to `indexed` | address | The address that sends the ERC-20 tokens. |
-| value  | uint256 | The number of ERC-20 tokens transferred. |
+| erc20Contract `indexed` | address | The ERC-20 contract |
+| fromTokenId `indexed` | uint256 | The token that owned the ERC-20 tokens |
+| to `indexed` | address | The address that sends the ERC-20 tokens |
+| value  | uint256 | The number of ERC-20 tokens transferred |
 
 
 

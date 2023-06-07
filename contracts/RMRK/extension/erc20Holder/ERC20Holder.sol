@@ -30,7 +30,7 @@ abstract contract ERC20Holder is IERC20Holder {
      * @param erc20Contract The ERC-20 contract
      * @param tokenId The token to transfer to
      * @param value The number of ERC-20 tokens to transfer
-     * @param data Additional data with no specified format, to allow for custom logic.
+     * @param data Additional data with no specified format, to allow for custom logic
      */
     function _transferERC20FromToken(
         address erc20Contract,
@@ -98,7 +98,7 @@ abstract contract ERC20Holder is IERC20Holder {
      * @param to The address to send the ERC-20 tokens to
      * @param erc20Contract The ERC-20 contract
      * @param value The number of ERC-20 tokens to transfer
-     * @param data Additional data with no specified format, to allow for custom logic.
+     * @param data Additional data with no specified format, to allow for custom logic
      */
     function _beforeTransferERC20FromToken(
         address erc20Contract,
@@ -114,7 +114,7 @@ abstract contract ERC20Holder is IERC20Holder {
      * @param to The address to send the ERC-20 tokens to
      * @param erc20Contract The ERC-20 contract
      * @param value The number of ERC-20 tokens to transfer
-     * @param data Additional data with no specified format, to allow for custom logic.
+     * @param data Additional data with no specified format, to allow for custom logic
      */
     function _afterTransferERC20FromToken(
         address erc20Contract,
@@ -130,7 +130,7 @@ abstract contract ERC20Holder is IERC20Holder {
      * @param from The address to send the ERC-20 tokens from
      * @param erc20Contract The ERC-20 contract
      * @param value The number of ERC-20 tokens to transfer
-     * @param data Additional data with no specified format, to allow for custom logic.
+     * @param data Additional data with no specified format, to allow for custom logic
      */
     function _beforeTransferERC20ToToken(
         address erc20Contract,
@@ -146,7 +146,7 @@ abstract contract ERC20Holder is IERC20Holder {
      * @param from The address to send the ERC-20 tokens from
      * @param erc20Contract The ERC-20 contract
      * @param value The number of ERC-20 tokens to transfer
-     * @param data Additional data with no specified format, to allow for custom logic.
+     * @param data Additional data with no specified format, to allow for custom logic
      */
     function _afterTransferERC20ToToken(
         address erc20Contract,
