@@ -45,7 +45,7 @@ interface IERC20Holder is IERC165 {
     ) external view returns (uint256);
 
     /**
-     * @notice Transfer ERC-20 tokens to address
+     * @notice Transfer ERC-20 tokens to an address
      * @param erc20Contract The ERC-20 contract
      * @param tokenId The token to transfer from
      * @param to The address to send the ERC-20 tokens to

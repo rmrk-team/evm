@@ -294,7 +294,7 @@ function tokenURI(uint256 tokenId) external view returns (string)
 function transferERC20FromToken(address erc20Contract, uint256 tokenId, address to, uint256 value, bytes data) external nonpayable
 ```
 
-Transfer ERC-20 tokens to address
+Transfer ERC-20 tokens to an address
 
 
 

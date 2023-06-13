@@ -24,10 +24,9 @@ abstract contract ERC20Holder is IERC20Holder {
     }
 
     /**
-     * @notice Transfer ERC-20 tokens to a specific token
-     * @dev The ERC-20 contract must have approved this contract to transfer the ERC-20 tokens
-     * @dev The balance MUST be transferred from the message sender
-     * @dev Implementers should validate that the msg sender is either the token owner or approved before calling this.
+     * @notice Transfer ERC-20 tokens from a specific token
+     * @dev The balance MUST be transferred from this smart contract.
+     * @dev Implementers should validate that the `msg.sender` is either the token owner or approved to manage it before calling this.
      * @param erc20Contract The ERC-20 contract
      * @param tokenId The token to transfer to
      * @param value The number of ERC-20 tokens to transfer
