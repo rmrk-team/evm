@@ -44,4 +44,26 @@ contract RMRKERC20HolderMock is ERC20Holder, ERC721 {
         }
         _transferERC20FromToken(erc20Contract, tokenId, to, value, data);
     }
+
+    /**
+     * @inheritdoc IERC20Holder
+     */
+    function transferERC20BetweenTokens(
+        address erc20Contract,
+        uint256 fromTokenId,
+        uint256 toTokenId,
+        uint256 value,
+        bytes memory data
+    ) external {
+        if (msg.sender != ownerOf(fromTokenId)) {
+            revert OnlyNFTOwnerCanTransferTokensFromIt();
+        }
+        _transferERC20BetweenTokens(
+            erc20Contract,
+            fromTokenId,
+            toTokenId,
+            value,
+            data
+        );
+    }
 }

@@ -45,10 +45,11 @@ interface IERC20Holder is IERC165 {
     ) external view returns (uint256);
 
     /**
-     * @notice Transfer ERC-20 tokens to an address
+     * @notice Transfer ERC-20 tokens from a specific token
+     * @dev The balance MUST be transferred from this smart contract.
+     * @dev Implementers should validate that the `msg.sender` is either the token owner or approved to manage it before calling this.
      * @param erc20Contract The ERC-20 contract
      * @param tokenId The token to transfer from
-     * @param to The address to send the ERC-20 tokens to
      * @param value The number of ERC-20 tokens to transfer
      * @param data Additional data with no specified format, to allow for custom logic
      */
@@ -72,6 +73,24 @@ interface IERC20Holder is IERC165 {
     function transferERC20ToToken(
         address erc20Contract,
         uint256 tokenId,
+        uint256 value,
+        bytes memory data
+    ) external;
+
+    /**
+     * @notice Transfer ERC-20 tokens from a specific token to another one in the same collection
+     * @dev ERC-20 tokens are only transferred internally, they never leave this contract.
+     * @dev Implementers should validate that the `msg.sender` is either the token owner or approved to manage the `fromTokenId` before calling this.
+     * @param erc20Contract The ERC-20 contract
+     * @param toTokenId The token to transfer from
+     * @param toTokenId The token to transfer to
+     * @param value The number of ERC-20 tokens to transfer
+     * @param data Additional data with no specified format, to allow for custom logic
+     */
+    function transferERC20BetweenTokens(
+        address erc20Contract,
+        uint256 fromTokenId,
+        uint256 toTokenId,
         uint256 value,
         bytes memory data
     ) external;

@@ -288,15 +288,35 @@ function tokenURI(uint256 tokenId) external view returns (string)
 |---|---|---|
 | _0 | string | undefined |
 
+### transferERC20BetweenTokens
+
+```solidity
+function transferERC20BetweenTokens(address erc20Contract, uint256 fromTokenId, uint256 toTokenId, uint256 value, bytes data) external nonpayable
+```
+
+Transfer ERC-20 tokens from a specific token to another one in the same collection
+
+*ERC-20 tokens are only transferred internally, they never leave this contract.Implementers should validate that the `msg.sender` is either the token owner or approved to manage the `fromTokenId` before calling this.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| erc20Contract | address | The ERC-20 contract |
+| fromTokenId | uint256 | undefined |
+| toTokenId | uint256 | The token to transfer to |
+| value | uint256 | The number of ERC-20 tokens to transfer |
+| data | bytes | Additional data with no specified format, to allow for custom logic |
+
 ### transferERC20FromToken
 
 ```solidity
 function transferERC20FromToken(address erc20Contract, uint256 tokenId, address to, uint256 value, bytes data) external nonpayable
 ```
 
-Transfer ERC-20 tokens to an address
+Transfer ERC-20 tokens from a specific token
 
-
+*The balance MUST be transferred from this smart contract.Implementers should validate that the `msg.sender` is either the token owner or approved to manage it before calling this.*
 
 #### Parameters
 
@@ -304,7 +324,7 @@ Transfer ERC-20 tokens to an address
 |---|---|---|
 | erc20Contract | address | The ERC-20 contract |
 | tokenId | uint256 | The token to transfer from |
-| to | address | The address to send the ERC-20 tokens to |
+| to | address | undefined |
 | value | uint256 | The number of ERC-20 tokens to transfer |
 | data | bytes | Additional data with no specified format, to allow for custom logic |
 

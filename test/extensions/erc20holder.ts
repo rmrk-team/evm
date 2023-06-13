@@ -85,12 +85,38 @@ describe('RMRKERC20HolderMock', async function () {
       expect(await erc20.balanceOf(erc20holder.address)).to.equal(mockValue.div(2));
     });
 
+    it('can transfer from a token to another', async function () {
+      await erc20.approve(erc20holder.address, mockValue);
+      await erc20holder.transferERC20ToToken(erc20.address, tokenId, mockValue, '0x00');
+      await expect(
+        erc20holder.transferERC20BetweenTokens(
+          erc20.address,
+          tokenId,
+          otherTokenId,
+          mockValue.div(2),
+          '0x00',
+        ),
+      )
+        .to.emit(erc20holder, 'TransferredERC20')
+        .withArgs(erc20.address, tokenId, erc20holder.address, mockValue.div(2))
+        .to.emit(erc20holder, 'ReceivedERC20')
+        .withArgs(erc20.address, otherTokenId, erc20holder.address, mockValue.div(2));
+      expect(await erc20.balanceOf(erc20holder.address)).to.equal(mockValue);
+      expect(await erc20holder.balanceOfERC20(erc20.address, tokenId)).to.equal(mockValue.div(2));
+      expect(await erc20holder.balanceOfERC20(erc20.address, otherTokenId)).to.equal(
+        mockValue.div(2),
+      );
+    });
+
     it('cannot transfer 0 value', async function () {
       await expect(
         erc20holder.transferERC20ToToken(erc20.address, tokenId, 0, '0x00'),
       ).to.be.revertedWithCustomError(erc20holder, 'InvalidValue');
       await expect(
         erc20holder.transferERC20FromToken(erc20.address, tokenId, addrs[0].address, 0, '0x00'),
+      ).to.be.revertedWithCustomError(erc20holder, 'InvalidValue');
+      await expect(
+        erc20holder.transferERC20BetweenTokens(erc20.address, tokenId, otherTokenId, 0, '0x00'),
       ).to.be.revertedWithCustomError(erc20holder, 'InvalidValue');
     });
 
@@ -119,6 +145,15 @@ describe('RMRKERC20HolderMock', async function () {
           '0x00',
         ),
       ).to.be.revertedWithCustomError(erc20holder, 'InvalidAddress');
+      await expect(
+        erc20holder.transferERC20BetweenTokens(
+          ethers.constants.AddressZero,
+          tokenId,
+          otherTokenId,
+          mockValue,
+          '0x00',
+        ),
+      ).to.be.revertedWithCustomError(erc20holder, 'InvalidAddress');
     });
 
     it('cannot transfer more balance than the token has', async function () {
@@ -136,6 +171,21 @@ describe('RMRKERC20HolderMock', async function () {
       ).to.be.revertedWithCustomError(erc20holder, 'InsufficientBalance');
     });
 
+    it('cannot transfer between tokens more balance than the token has', async function () {
+      await erc20.approve(erc20holder.address, mockValue);
+      await erc20holder.transferERC20ToToken(erc20.address, tokenId, mockValue.div(2), '0x00');
+      await erc20holder.transferERC20ToToken(erc20.address, otherTokenId, mockValue.div(2), '0x00');
+      await expect(
+        erc20holder.transferERC20BetweenTokens(
+          erc20.address,
+          tokenId,
+          otherTokenId,
+          mockValue, // The token only owns half of this value
+          '0x00',
+        ),
+      ).to.be.revertedWithCustomError(erc20holder, 'InsufficientBalance');
+    });
+
     it('cannot transfer balance from not owned token', async function () {
       await erc20.approve(erc20holder.address, mockValue);
       await erc20holder.transferERC20ToToken(erc20.address, tokenId, mockValue, '0x00');
@@ -144,6 +194,17 @@ describe('RMRKERC20HolderMock', async function () {
         erc20holder
           .connect(otherHolder)
           .transferERC20FromToken(erc20.address, tokenId, otherHolder.address, mockValue, '0x00'),
+      ).to.be.revertedWithCustomError(erc20holder, 'OnlyNFTOwnerCanTransferTokensFromIt');
+    });
+
+    it('cannot transfer balance between tokens from not owned token', async function () {
+      await erc20.approve(erc20holder.address, mockValue);
+      await erc20holder.transferERC20ToToken(erc20.address, tokenId, mockValue, '0x00');
+      // Other holder is not the owner of tokenId
+      await expect(
+        erc20holder
+          .connect(otherHolder)
+          .transferERC20BetweenTokens(erc20.address, tokenId, otherTokenId, mockValue, '0x00'),
       ).to.be.revertedWithCustomError(erc20holder, 'OnlyNFTOwnerCanTransferTokensFromIt');
     });
 

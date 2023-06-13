@@ -28,7 +28,7 @@ abstract contract ERC20Holder is IERC20Holder {
      * @dev The balance MUST be transferred from this smart contract.
      * @dev Implementers should validate that the `msg.sender` is either the token owner or approved to manage it before calling this.
      * @param erc20Contract The ERC-20 contract
-     * @param tokenId The token to transfer to
+     * @param tokenId The token to transfer from
      * @param value The number of ERC-20 tokens to transfer
      * @param data Additional data with no specified format, to allow for custom logic
      */
@@ -90,6 +90,69 @@ abstract contract ERC20Holder is IERC20Holder {
             value,
             data
         );
+    }
+
+    /**
+     * @notice Transfer ERC-20 tokens from a specific token
+     * @dev ERC-20 tokens are only transferred internally, they never leave this contract.
+     * @dev Implementers should validate that the `msg.sender` is either the token owner or approved to manage the `fromTokenId` before calling this.
+     * @param erc20Contract The ERC-20 contract
+     * @param toTokenId The token to transfer from
+     * @param toTokenId The token to transfer to
+     * @param value The number of ERC-20 tokens to transfer
+     * @param data Additional data with no specified format, to allow for custom logic
+     */
+    function _transferERC20BetweenTokens(
+        address erc20Contract,
+        uint256 fromTokenId,
+        uint256 toTokenId,
+        uint256 value,
+        bytes memory data
+    ) internal {
+        if (value == 0) {
+            revert InvalidValue();
+        }
+        if (erc20Contract == address(0)) {
+            revert InvalidAddress();
+        }
+        if (_balances[fromTokenId][erc20Contract] < value) {
+            revert InsufficientBalance();
+        }
+        _beforeTransferERC20FromToken(
+            erc20Contract,
+            fromTokenId,
+            address(this),
+            value,
+            data
+        );
+        _balances[fromTokenId][erc20Contract] -= value;
+        emit TransferredERC20(erc20Contract, fromTokenId, address(this), value);
+
+        _afterTransferERC20FromToken(
+            erc20Contract,
+            fromTokenId,
+            address(this),
+            value,
+            data
+        );
+
+        _beforeTransferERC20ToToken(
+            erc20Contract,
+            toTokenId,
+            address(this),
+            value,
+            data
+        );
+        _balances[toTokenId][erc20Contract] += value;
+        _afterTransferERC20ToToken(
+            erc20Contract,
+            toTokenId,
+            address(this),
+            value,
+            data
+        );
+
+        emit ReceivedERC20(erc20Contract, toTokenId, address(this), value);
     }
 
     /**
