@@ -93,7 +93,7 @@ abstract contract ERC20Holder is IERC20Holder {
     }
 
     /**
-     * @notice Transfer ERC-20 tokens from a specific token
+     * @notice Transfer ERC-20 tokens from one token to another
      * @dev ERC-20 tokens are only transferred internally, they never leave this contract.
      * @dev Implementers should validate that the `msg.sender` is either the token owner or approved to manage the `fromTokenId` before calling this.
      * @param erc20Contract The ERC-20 contract
