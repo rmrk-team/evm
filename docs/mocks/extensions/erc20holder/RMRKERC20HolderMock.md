@@ -55,7 +55,7 @@ function balanceOf(address owner) external view returns (uint256)
 function balanceOfERC20(address erc20Contract, uint256 tokenId) external view returns (uint256)
 ```
 
-Look up the balance of ERC-20 tokens for a specific token and ERC-20 contract
+Used to retrieve the given token&#39;s specific ERC-20 balance
 
 
 
@@ -63,14 +63,14 @@ Look up the balance of ERC-20 tokens for a specific token and ERC-20 contract
 
 | Name | Type | Description |
 |---|---|---|
-| erc20Contract | address | The ERC-20 contract |
-| tokenId | uint256 | The token that owns the ERC-20 tokens |
+| erc20Contract | address | The address of the ERC-20 smart contract |
+| tokenId | uint256 | The ID of the token being checked for ERC-20 balance |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | The number of ERC-20 tokens owned by a token from an ERC-20 contract |
+| _0 | uint256 | The amount of the specified ERC-20 tokens owned by a given token |
 
 ### getApproved
 
@@ -294,17 +294,17 @@ function tokenURI(uint256 tokenId) external view returns (string)
 function transferERC20BetweenTokens(address erc20Contract, uint256 fromTokenId, uint256 toTokenId, uint256 value, bytes data) external nonpayable
 ```
 
-Transfer ERC-20 tokens from a specific token to another one in the same collection
+Transfer ERC-20 tokens from one token to another one within the same collection.
 
-*ERC-20 tokens are only transferred internally, they never leave this contract.Implementers should validate that the `msg.sender` is either the token owner or approved to manage the `fromTokenId` before calling this.*
+*ERC-20 tokens are only transferred internally; they never leave this smart contract.Implementers should validate that the `msg.sender` is either the token owner or approved to manage the `fromTokenId` before calling this.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| erc20Contract | address | The ERC-20 contract |
+| erc20Contract | address | The address of the ERC-20 smart contract |
 | fromTokenId | uint256 | undefined |
-| toTokenId | uint256 | The token to transfer to |
+| toTokenId | uint256 | The ID of the token to transfer ERC-20 tokens to |
 | value | uint256 | The number of ERC-20 tokens to transfer |
 | data | bytes | Additional data with no specified format, to allow for custom logic |
 
@@ -314,7 +314,7 @@ Transfer ERC-20 tokens from a specific token to another one in the same collecti
 function transferERC20FromToken(address erc20Contract, uint256 tokenId, address to, uint256 value, bytes data) external nonpayable
 ```
 
-Transfer ERC-20 tokens from a specific token
+Transfer ERC-20 tokens from a specific token.
 
 *The balance MUST be transferred from this smart contract.Implementers should validate that the `msg.sender` is either the token owner or approved to manage it before calling this.*
 
@@ -322,8 +322,8 @@ Transfer ERC-20 tokens from a specific token
 
 | Name | Type | Description |
 |---|---|---|
-| erc20Contract | address | The ERC-20 contract |
-| tokenId | uint256 | The token to transfer from |
+| erc20Contract | address | The address of the ERC-20 smart contract |
+| tokenId | uint256 | The ID of the token to transfer the ERC-20 tokens from |
 | to | address | undefined |
 | value | uint256 | The number of ERC-20 tokens to transfer |
 | data | bytes | Additional data with no specified format, to allow for custom logic |
@@ -334,16 +334,16 @@ Transfer ERC-20 tokens from a specific token
 function transferERC20ToToken(address erc20Contract, uint256 tokenId, uint256 value, bytes data) external nonpayable
 ```
 
-Transfer ERC-20 tokens to a specific token
+Transfer ERC-20 tokens to a specific token.
 
-*The ERC-20 contract must have approved this contract to transfer the ERC-20 tokensThe balance MUST be transferred from the message sender*
+*The ERC-20 smart contract must have approval for this contract to transfer the ERC-20 tokens.The balance MUST be transferred from the `msg.sender`.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| erc20Contract | address | The ERC-20 contract |
-| tokenId | uint256 | The token to transfer to |
+| erc20Contract | address | The address of the ERC-20 smart contract |
+| tokenId | uint256 | The ID of the token to transfer ERC-20 tokens to |
 | value | uint256 | The number of ERC-20 tokens to transfer |
 | data | bytes | Additional data with no specified format, to allow for custom logic |
 
@@ -411,7 +411,7 @@ event ApprovalForAll(address indexed owner, address indexed operator, bool appro
 event ReceivedERC20(address indexed erc20Contract, uint256 indexed toTokenId, address indexed from, uint256 value)
 ```
 
-This emits when a token receives ERC-20 tokens.
+Used to notify listeners that the token received ERC-20 tokens.
 
 
 
@@ -419,9 +419,9 @@ This emits when a token receives ERC-20 tokens.
 
 | Name | Type | Description |
 |---|---|---|
-| erc20Contract `indexed` | address | The ERC-20 contract |
-| toTokenId `indexed` | uint256 | The token that receives the ERC-20 tokens |
-| from `indexed` | address | The prior owner of the token |
+| erc20Contract `indexed` | address | The address of the ERC-20 smart contract |
+| toTokenId `indexed` | uint256 | The ID of the token receiving the ERC-20 tokens |
+| from `indexed` | address | The address of the account from which the tokens are being transferred |
 | value  | uint256 | The number of ERC-20 tokens received |
 
 ### Transfer
@@ -448,7 +448,7 @@ event Transfer(address indexed from, address indexed to, uint256 indexed tokenId
 event TransferredERC20(address indexed erc20Contract, uint256 indexed fromTokenId, address indexed to, uint256 value)
 ```
 
-This emits when a token transfers ERC-20 tokens.
+Used to notify the listeners that the ERC-20 tokens have been transferred.
 
 
 
@@ -456,9 +456,9 @@ This emits when a token transfers ERC-20 tokens.
 
 | Name | Type | Description |
 |---|---|---|
-| erc20Contract `indexed` | address | The ERC-20 contract |
-| fromTokenId `indexed` | uint256 | The token that owned the ERC-20 tokens |
-| to `indexed` | address | The address that sends the ERC-20 tokens |
+| erc20Contract `indexed` | address | The address of the ERC-20 smart contract |
+| fromTokenId `indexed` | uint256 | The ID of the token from which the ERC-20 tokens have been transferred |
+| to `indexed` | address | The address receiving the ERC-20 tokens |
 | value  | uint256 | The number of ERC-20 tokens transferred |
 
 
