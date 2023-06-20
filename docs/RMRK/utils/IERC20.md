@@ -54,7 +54,7 @@ Used to transfer tokens from the caller&#39;s account to another.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | A boolean value signifying whether the transfer was succesfull (`true`) or not (`false`) |
+| _0 | bool | A boolean value signifying whether the transfer was successful (`true`) or not (`false`) |
 
 ### transferFrom
 
@@ -70,7 +70,7 @@ Used to transfer tokens from one address to another.
 
 | Name | Type | Description |
 |---|---|---|
-| from | address | Address of the account from which the the tokens are being transferred |
+| from | address | Address of the account from which the tokens are being transferred |
 | to | address | Address of the account to which the tokens are being transferred |
 | amount | uint256 | Amount of tokens that are being transferred |
 
@@ -78,7 +78,7 @@ Used to transfer tokens from one address to another.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | A boolean value signifying whether the transfer was succesfull (`true`) or not (`false`) |
+| _0 | bool | A boolean value signifying whether the transfer was successful (`true`) or not (`false`) |
 
 
 
