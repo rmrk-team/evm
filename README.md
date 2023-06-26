@@ -66,7 +66,7 @@ That's it! This contract can receive and be nested by other instances of RMRKNes
 
 ### Nestable with MultiAsset
 
-A combination of Nestable and MultiAsset lego is a powerful way of designing Non-Fungible Tokens. To quickstart this
+A combintation of Nestable and MultiAsset lego is a powerful way of designing Non-Fungible Tokens. To quickstart this
 implementation ([RMRKNestableMultiAsset](./contracts/RMRK/nestable/RMRKNestableMultiAsset.sol)), you only need to follow
 the steps outlined for the [MultiAsset lego](#multiasset-rmrkmultiasset-erc-5773-context-dependent-multi-asset-tokens).
 
