@@ -92,9 +92,9 @@ function equip(IERC6220.IntakeEquip data) external nonpayable
 function getActiveAssetPriorities(uint256 tokenId) external view returns (uint64[])
 ```
 
-Used to retrieve the priorities of the active resources of a given token.
+Used to retrieve the priorities of the active resoources of a given token.
 
-*Asset priorities are a non-sequential array of uint64 values with an array size equal to active asset  priorities.*
+*Asset priorities are a non-sequential array of uint64 values with an array size equal to active asset  priorites.*
 
 #### Parameters
 
@@ -116,7 +116,7 @@ function getActiveAssets(uint256 tokenId) external view returns (uint64[])
 
 Used to retrieve IDs of the active assets of given token.
 
-*Asset data is stored by reference, in order to access the data corresponding to the ID, call  `getAssetMetadata(tokenId, assetId)`. You can safely get 10k*
+*Asset data is stored by reference, in order to access the data corresponding to the ID, call  `getAssetMetadata(tokenId, assetId)`.You can safely get 10k*
 
 #### Parameters
 
@@ -186,7 +186,7 @@ function getAssetMetadata(uint256 tokenId, uint64 assetId) external view returns
 
 Used to fetch the asset metadata of the specified token&#39;s active asset with the given index.
 
-*Assets are stored by reference mapping `_assets[assetId]`. Can be overridden to implement enumerate, fallback or other custom logic.*
+*Assets are stored by reference mapping `_assets[assetId]`.Can be overriden to implement enumerate, fallback or other custom logic.*
 
 #### Parameters
 
@@ -308,7 +308,7 @@ Used to check whether the address has been granted the operator role by a given 
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | A boolean value indicating whether the account we are checking has been granted the operator role |
+| _0 | bool | A boolean value indicating wehter the account we are checking has been granted the operator role |
 
 ### isChildEquipped
 
@@ -342,7 +342,7 @@ function rejectAllAssets(uint256 tokenId, uint256 maxRejections) external nonpay
 
 Rejects all assets from the pending array of a given token.
 
-*Effectively deletes the pending array. Requirements:  - The caller must own the token or be approved to manage the token&#39;s assets  - `tokenId` must exist.Emits a {AssetRejected} event with assetId = 0.*
+*Effecitvely deletes the pending array.Requirements:  - The caller must own the token or be approved to manage the token&#39;s assets  - `tokenId` must exist.Emits a {AssetRejected} event with assetId = 0.*
 
 #### Parameters
 
@@ -394,14 +394,14 @@ function setPriority(uint256 tokenId, uint64[] priorities) external nonpayable
 
 Sets a new priority array for a given token.
 
-*The priority array is a non-sequential list of `uint64`s, where the lowest value is considered highest  priority.Value `0` of a priority is a special case equivalent to uninitialized. Requirements:  - The caller must own the token or be approved to manage the token&#39;s assets  - `tokenId` must exist.  - The length of `priorities` must be equal the length of the active assets array.Emits a {AssetPrioritySet} event.*
+*The priority array is a non-sequential list of `uint64`s, where the lowest value is considered highest  priority.Value `0` of a priority is a special case equivalent to unitialized.Requirements:  - The caller must own the token or be approved to manage the token&#39;s assets  - `tokenId` must exist.  - The length of `priorities` must be equal the length of the active assets array.Emits a {AssetPrioritySet} event.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
 | tokenId | uint256 | ID of the token to set the priorities for |
-| priorities | uint64[] | An array of priorities of active assets. The succession of items in the priorities array  matches that of the succession of items in the active array |
+| priorities | uint64[] | An array of priorities of active assets. The succesion of items in the priorities array  matches that of the succesion of items in the active array |
 
 ### supportsInterface
 
@@ -525,7 +525,7 @@ Used to notify listeners that an asset object at `assetId` is added to token&#39
 event AssetPrioritySet(uint256 indexed tokenId)
 ```
 
-Used to notify listeners that token&#39;s priority array is reordered.
+Used to notify listeners that token&#39;s prioritiy array is reordered.
 
 
 
