@@ -3,13 +3,7 @@ import { expect } from 'chai';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { bn } from '../utils';
-import {
-  IERC165,
-  IERC5773,
-  IRMRKEmotable,
-  IRMRKEmoteTracker,
-  IOtherInterface,
-} from '../interfaces';
+import { IERC165, IERC5773, IRMRKEmotable, IERC6381, IOtherInterface } from '../interfaces';
 import {
   RMRKMultiAssetEmotableMock,
   ERC721Mock,
@@ -140,8 +134,8 @@ describe('RMRKEmoteTrackerMock', async function () {
   it('can support IERC165', async function () {
     expect(await emoteTracker.supportsInterface(IERC165)).to.equal(true);
   });
-  it('can support IRMRKEmoteTracker', async function () {
-    expect(await emoteTracker.supportsInterface(IRMRKEmoteTracker)).to.equal(true);
+  it('can support IERC6381', async function () {
+    expect(await emoteTracker.supportsInterface(IERC6381)).to.equal(true);
   });
 
   it('does not support other interfaces', async function () {

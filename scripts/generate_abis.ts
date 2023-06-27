@@ -41,7 +41,6 @@ const getTheAbi = () => {
         }
       });
 
-
       utils.forEach((util) => {
         const filename = util.slice(0, util.indexOf('.sol'));
         const file = fs.readFileSync(
