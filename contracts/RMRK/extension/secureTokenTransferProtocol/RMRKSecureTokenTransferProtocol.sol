@@ -11,7 +11,9 @@ error InvalidValue();
 error InvalidAddress();
 error InsufficientBalance();
 
-abstract contract RMRKSecureTokenTransferProtocol is IRMRKSecureTokenTransferProtocol {
+abstract contract RMRKSecureTokenTransferProtocol is
+    IRMRKSecureTokenTransferProtocol
+{
     mapping(uint256 tokenId => mapping(address tokenAddress => mapping(TokenType tokenType => mapping(uint256 heldTokenId => uint256 balance))))
         private _balances;
 
@@ -64,19 +66,53 @@ abstract contract RMRKSecureTokenTransferProtocol is IRMRKSecureTokenTransferPro
         if (_balances[tokenId][tokenContract][tokenType][tokenId] < amount) {
             revert InsufficientBalance();
         }
-        _beforeTransferHeldTokenFromToken(tokenContract, tokenType, tokenId, heldTokenId, to, amount, data);
+        _beforeTransferHeldTokenFromToken(
+            tokenContract,
+            tokenType,
+            tokenId,
+            heldTokenId,
+            to,
+            amount,
+            data
+        );
         _balances[tokenId][tokenContract][tokenType][heldTokenId] -= amount;
 
-        if(tokenType == TokenType.ERC20){
+        if (tokenType == TokenType.ERC20) {
             IERC20(tokenContract).transfer(to, amount);
         } else if (tokenType == TokenType.ERC721) {
-            IERC721(tokenContract).safeTransferFrom(address(this), to, heldTokenId, data);
+            IERC721(tokenContract).safeTransferFrom(
+                address(this),
+                to,
+                heldTokenId,
+                data
+            );
         } else {
-            IERC1155(tokenContract).safeTransferFrom(address(this), to, heldTokenId, amount, data);
+            IERC1155(tokenContract).safeTransferFrom(
+                address(this),
+                to,
+                heldTokenId,
+                amount,
+                data
+            );
         }
 
-        emit TransferredToken(tokenContract, tokenType, tokenId, heldTokenId, to, amount);
-        _afterTransferHeldTokenFromToken(tokenContract, tokenType, tokenId, heldTokenId, to, amount, data);
+        emit TransferredToken(
+            tokenContract,
+            tokenType,
+            tokenId,
+            heldTokenId,
+            to,
+            amount
+        );
+        _afterTransferHeldTokenFromToken(
+            tokenContract,
+            tokenType,
+            tokenId,
+            heldTokenId,
+            to,
+            amount,
+            data
+        );
     }
 
     /**
@@ -117,20 +153,56 @@ abstract contract RMRKSecureTokenTransferProtocol is IRMRKSecureTokenTransferPro
         );
 
         if (tokenType == TokenType.ERC20) {
-            IERC20(tokenContract).transferFrom(msg.sender, address(this), amount);
+            IERC20(tokenContract).transferFrom(
+                msg.sender,
+                address(this),
+                amount
+            );
             _balances[tokenId][tokenContract][tokenType][0] += amount;
 
-            emit ReceivedToken(tokenContract, tokenType, tokenId, 0, msg.sender, amount);
+            emit ReceivedToken(
+                tokenContract,
+                tokenType,
+                tokenId,
+                0,
+                msg.sender,
+                amount
+            );
         } else if (tokenType == TokenType.ERC721) {
-            IERC721(tokenContract).safeTransferFrom(msg.sender, address(this), heldTokenId, data);
+            IERC721(tokenContract).safeTransferFrom(
+                msg.sender,
+                address(this),
+                heldTokenId,
+                data
+            );
             _balances[tokenId][tokenContract][tokenType][heldTokenId] += 1;
 
-            emit ReceivedToken(tokenContract, tokenType, tokenId, heldTokenId, msg.sender, 1);
+            emit ReceivedToken(
+                tokenContract,
+                tokenType,
+                tokenId,
+                heldTokenId,
+                msg.sender,
+                1
+            );
         } else {
-            IERC1155(tokenContract).safeTransferFrom(msg.sender, address(this), heldTokenId, amount, data);
+            IERC1155(tokenContract).safeTransferFrom(
+                msg.sender,
+                address(this),
+                heldTokenId,
+                amount,
+                data
+            );
             _balances[tokenId][tokenContract][tokenType][heldTokenId] += amount;
 
-            emit ReceivedToken(tokenContract, tokenType, tokenId, heldTokenId, msg.sender, amount);
+            emit ReceivedToken(
+                tokenContract,
+                tokenType,
+                tokenId,
+                heldTokenId,
+                msg.sender,
+                amount
+            );
         }
 
         _afterTransferHeldTokenToToken(

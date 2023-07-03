@@ -5,7 +5,7 @@ pragma solidity ^0.8.18;
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 
 interface IRMRKSecureTokenTransferProtocol is IERC165 {
-    enum TokenType{
+    enum TokenType {
         ERC20,
         ERC721,
         ERC1155

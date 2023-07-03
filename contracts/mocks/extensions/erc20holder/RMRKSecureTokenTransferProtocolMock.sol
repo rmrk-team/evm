@@ -12,7 +12,10 @@ error OnlyNFTOwnerCanTransferTokensToIt();
  * @author RMRK team
  * @notice Smart contract of the RMRK ERC20 Holder module.
  */
-contract RMRKSecureTokenTransferProtocolMock is RMRKSecureTokenTransferProtocol, ERC721 {
+contract RMRKSecureTokenTransferProtocolMock is
+    RMRKSecureTokenTransferProtocol,
+    ERC721
+{
     constructor(
         string memory name,
         string memory symbol
@@ -24,7 +27,13 @@ contract RMRKSecureTokenTransferProtocolMock is RMRKSecureTokenTransferProtocol,
 
     function supportsInterface(
         bytes4 interfaceId
-    ) public view virtual override(RMRKSecureTokenTransferProtocol, ERC721) returns (bool) {
+    )
+        public
+        view
+        virtual
+        override(RMRKSecureTokenTransferProtocol, ERC721)
+        returns (bool)
+    {
         return
             RMRKSecureTokenTransferProtocol.supportsInterface(interfaceId) ||
             super.supportsInterface(interfaceId);
@@ -41,7 +50,14 @@ contract RMRKSecureTokenTransferProtocolMock is RMRKSecureTokenTransferProtocol,
         uint256 amount,
         bytes memory data
     ) external {
-        _transferHeldTokenToToken(tokenContract, tokenType, tokenId, heldTokenId, amount, data);
+        _transferHeldTokenToToken(
+            tokenContract,
+            tokenType,
+            tokenId,
+            heldTokenId,
+            amount,
+            data
+        );
     }
 
     /**
@@ -59,6 +75,14 @@ contract RMRKSecureTokenTransferProtocolMock is RMRKSecureTokenTransferProtocol,
         if (msg.sender != ownerOf(tokenId)) {
             revert OnlyNFTOwnerCanTransferTokensFromIt();
         }
-        _transferHeldTokenFromToken(tokenContract, tokenType, tokenId, heldTokenId, amount, to, data);
+        _transferHeldTokenFromToken(
+            tokenContract,
+            tokenType,
+            tokenId,
+            heldTokenId,
+            amount,
+            to,
+            data
+        );
     }
 }

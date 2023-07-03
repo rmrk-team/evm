@@ -1,8 +1,8 @@
-# RMRKERC20HolderMock
+# RMRKSecureTokenTransferProtocolMock
 
 *RMRK team*
 
-> RMRKERC20HolderMock
+> RMRKSecureTokenTransferProtocolMock
 
 Smart contract of the RMRK ERC20 Holder module.
 
@@ -49,22 +49,24 @@ function balanceOf(address owner) external view returns (uint256)
 |---|---|---|
 | _0 | uint256 | undefined |
 
-### balanceOfERC20
+### balanceOfToken
 
 ```solidity
-function balanceOfERC20(address erc20Contract, uint256 tokenId) external view returns (uint256)
+function balanceOfToken(address tokenContract, enum IRMRKSecureTokenTransferProtocol.TokenType tokenType, uint256 tokenId, uint256 heldTokenId) external view returns (uint256)
 ```
 
-Used to retrieve the given token&#39;s specific ERC-20 balance
+Used to retrieve the given token&#39;s balance of given token
 
-
+*When retrieving the balance of an ERC-20 token, the `heldTokenId` parameter MUST be ignored.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| erc20Contract | address | The address of the ERC-20 smart contract |
-| tokenId | uint256 | The ID of the token being checked for ERC-20 balance |
+| tokenContract | address | undefined |
+| tokenType | enum IRMRKSecureTokenTransferProtocol.TokenType | The type of the token being checked for balance |
+| tokenId | uint256 | The ID of the token being checked for balance |
+| heldTokenId | uint256 | The ID of the held token of which the balance is being retrieved |
 
 #### Returns
 
@@ -288,65 +290,6 @@ function tokenURI(uint256 tokenId) external view returns (string)
 |---|---|---|
 | _0 | string | undefined |
 
-### transferERC20BetweenTokens
-
-```solidity
-function transferERC20BetweenTokens(address erc20Contract, uint256 fromTokenId, uint256 toTokenId, uint256 value, bytes data) external nonpayable
-```
-
-Transfer ERC-20 tokens from one token to another one within the same collection.
-
-*ERC-20 tokens are only transferred internally; they never leave this smart contract.Implementers should validate that the `msg.sender` is either the token owner or approved to manage the `fromTokenId` before calling this.*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| erc20Contract | address | The address of the ERC-20 smart contract |
-| fromTokenId | uint256 | undefined |
-| toTokenId | uint256 | The ID of the token to transfer ERC-20 tokens to |
-| value | uint256 | undefined |
-| data | bytes | Additional data with no specified format, to allow for custom logic |
-
-### transferERC20FromToken
-
-```solidity
-function transferERC20FromToken(address erc20Contract, uint256 tokenId, address to, uint256 value, bytes data) external nonpayable
-```
-
-Transfer ERC-20 tokens from a specific token.
-
-*The balance MUST be transferred from this smart contract.Implementers should validate that the `msg.sender` is either the token owner or approved to manage it before calling this.*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| erc20Contract | address | The address of the ERC-20 smart contract |
-| tokenId | uint256 | The ID of the token to transfer the ERC-20 tokens from |
-| to | address | undefined |
-| value | uint256 | undefined |
-| data | bytes | Additional data with no specified format, to allow for custom logic |
-
-### transferERC20ToToken
-
-```solidity
-function transferERC20ToToken(address erc20Contract, uint256 tokenId, uint256 amount, bytes data) external nonpayable
-```
-
-Transfer ERC-20 tokens to a specific token.
-
-*The ERC-20 smart contract must have approval for this contract to transfer the ERC-20 tokens.The balance MUST be transferred from the `msg.sender`.*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| erc20Contract | address | The address of the ERC-20 smart contract |
-| tokenId | uint256 | The ID of the token to transfer ERC-20 tokens to |
-| amount | uint256 | The number of ERC-20 tokens to transfer |
-| data | bytes | Additional data with no specified format, to allow for custom logic |
-
 ### transferFrom
 
 ```solidity
@@ -364,6 +307,49 @@ function transferFrom(address from, address to, uint256 tokenId) external nonpay
 | from | address | undefined |
 | to | address | undefined |
 | tokenId | uint256 | undefined |
+
+### transferHeldTokenFromToken
+
+```solidity
+function transferHeldTokenFromToken(address tokenContract, enum IRMRKSecureTokenTransferProtocol.TokenType tokenType, uint256 tokenId, uint256 heldTokenId, uint256 amount, address to, bytes data) external nonpayable
+```
+
+Transfer held tokens from a specific token.
+
+*The balance MUST be transferred from this smart contract.Implementers should validate that the `msg.sender` is either the token owner or approved to manage it before  calling this.If the token type is `ERC-20`, the `heldTokenId` MUST be ignored.IF the token type is `ERC-721`, the `amount` MUST be ignored.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenContract | address | The address of the held token&#39;s smart contract |
+| tokenType | enum IRMRKSecureTokenTransferProtocol.TokenType | The type of the token being transferred |
+| tokenId | uint256 | The ID of the token to transfer the held token from |
+| heldTokenId | uint256 | The ID of the held token to transfer |
+| amount | uint256 | The number of held tokens to transfer |
+| to | address | The address to transfer the held tokens to |
+| data | bytes | Additional data with no specified format, to allow for custom logic |
+
+### transferHeldTokenToToken
+
+```solidity
+function transferHeldTokenToToken(address tokenContract, enum IRMRKSecureTokenTransferProtocol.TokenType tokenType, uint256 tokenId, uint256 heldTokenId, uint256 amount, bytes data) external nonpayable
+```
+
+Transfer tokens to a specific holder token.
+
+*The token smart contract must have approval for this contract to transfer the tokens.The balance MUST be transferred from the `msg.sender`.If the token type is `ERC-20`, the `heldTokenId` MUST be ignored.If the token type is `ERC-721`, the `amount` MUST be ignored.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenContract | address | The address of the token smart contract |
+| tokenType | enum IRMRKSecureTokenTransferProtocol.TokenType | The type of the token being transferred |
+| tokenId | uint256 | The ID of the token to transfer the tokens to |
+| heldTokenId | uint256 | The ID of the held token to transfer |
+| amount | uint256 | The number of ERC-20 tokens to transfer |
+| data | bytes | Additional data with no specified format, to allow for custom logic |
 
 
 
@@ -405,24 +391,26 @@ event ApprovalForAll(address indexed owner, address indexed operator, bool appro
 | operator `indexed` | address | undefined |
 | approved  | bool | undefined |
 
-### ReceivedERC20
+### ReceivedToken
 
 ```solidity
-event ReceivedERC20(address indexed erc20Contract, uint256 indexed toTokenId, address indexed from, uint256 amount)
+event ReceivedToken(address indexed tokenContract, enum IRMRKSecureTokenTransferProtocol.TokenType tokenType, uint256 indexed toTokenId, uint256 heldTokenId, address indexed from, uint256 amount)
 ```
 
-Used to notify listeners that the token received ERC-20 tokens.
+Used to notify listeners that the token received held tokens.
 
-
+*If the token type is `ERC-20`, the `heldTokenId` MUST equal `0`If the token type is `ERC-721`, the `amount` MUST equal `1`.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| erc20Contract `indexed` | address | The address of the ERC-20 smart contract |
-| toTokenId `indexed` | uint256 | The ID of the token receiving the ERC-20 tokens |
+| tokenContract `indexed` | address | The address of the held token&#39;s smart contract |
+| tokenType  | enum IRMRKSecureTokenTransferProtocol.TokenType | The type of the held token being received |
+| toTokenId `indexed` | uint256 | The ID of the token receiving the held tokens |
+| heldTokenId  | uint256 | The ID of the held token being received |
 | from `indexed` | address | The address of the account from which the tokens are being transferred |
-| amount  | uint256 | The number of ERC-20 tokens received |
+| amount  | uint256 | The amount of held tokens received |
 
 ### Transfer
 
@@ -442,24 +430,26 @@ event Transfer(address indexed from, address indexed to, uint256 indexed tokenId
 | to `indexed` | address | undefined |
 | tokenId `indexed` | uint256 | undefined |
 
-### TransferredERC20
+### TransferredToken
 
 ```solidity
-event TransferredERC20(address indexed erc20Contract, uint256 indexed fromTokenId, address indexed to, uint256 amount)
+event TransferredToken(address indexed tokenContract, enum IRMRKSecureTokenTransferProtocol.TokenType tokenType, uint256 indexed fromTokenId, uint256 heldTokenId, address indexed to, uint256 amount)
 ```
 
 Used to notify the listeners that the ERC-20 tokens have been transferred.
 
-
+*If the token type is `ERC-20`, the `heldTokenId` MUST equal `0`If the token type is `ERC-721`, the `amount` MUST equal `1`.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| erc20Contract `indexed` | address | The address of the ERC-20 smart contract |
-| fromTokenId `indexed` | uint256 | The ID of the token from which the ERC-20 tokens have been transferred |
+| tokenContract `indexed` | address | The address of the smart contract of the token being transferred |
+| tokenType  | enum IRMRKSecureTokenTransferProtocol.TokenType | The type of the token being transferred |
+| fromTokenId `indexed` | uint256 | The ID of the token from which the held tokens have been transferred |
+| heldTokenId  | uint256 | The Id of the held token being transferred |
 | to `indexed` | address | The address receiving the ERC-20 tokens |
-| amount  | uint256 | The number of ERC-20 tokens transferred |
+| amount  | uint256 | The amount of held tokens transferred |
 
 
 
