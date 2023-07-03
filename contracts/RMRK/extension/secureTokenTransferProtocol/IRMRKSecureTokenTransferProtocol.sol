@@ -54,14 +54,14 @@ interface IRMRKSecureTokenTransferProtocol is IERC165 {
     /**
      * @notice Used to retrieve the given token's balance of given token
      * @dev When retrieving the balance of an ERC-20 token, the `heldTokenId` parameter MUST be ignored.
-     * @param erc20Contract The address of the held token's smart contract
+     * @param tokenContract The address of the held token's smart contract
      * @param tokenType The type of the token being checked for balance
      * @param tokenId The ID of the token being checked for balance
      * @param heldTokenId The ID of the held token of which the balance is being retrieved
      * @return The amount of the specified ERC-20 tokens owned by a given token
      */
     function balanceOfToken(
-        address erc20Contract,
+        address tokenContract,
         TokenType tokenType,
         uint256 tokenId,
         uint256 heldTokenId

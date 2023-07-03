@@ -27,7 +27,7 @@ abstract contract RMRKSecureTokenTransferProtocol is
         uint256 heldTokenId
     ) external view returns (uint256) {
         if (tokenType == TokenType.ERC20) {
-            return _balances[tokenId][tokenContract][tokenType][heldTokenId];
+            return _balances[tokenId][tokenContract][tokenType][0];
         } else {
             return _balances[tokenId][tokenContract][tokenType][heldTokenId];
         }
@@ -63,7 +63,7 @@ abstract contract RMRKSecureTokenTransferProtocol is
         if (to == address(0) || tokenContract == address(0)) {
             revert InvalidAddress();
         }
-        if (_balances[tokenId][tokenContract][tokenType][tokenId] < amount) {
+        if (_balances[tokenId][tokenContract][tokenType][heldTokenId] < amount) {
             revert InsufficientBalance();
         }
         _beforeTransferHeldTokenFromToken(
