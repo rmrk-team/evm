@@ -5,7 +5,9 @@ pragma solidity ^0.8.18;
 import "./IRMRKSecureTokenTransferProtocol.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
+import "@openzeppelin/contracts/token/ERC1155/IERC1155Receiver.sol";
 
 error InvalidValue();
 error InvalidAddress();
@@ -57,15 +59,24 @@ abstract contract RMRKSecureTokenTransferProtocol is
         address to,
         bytes memory data
     ) internal {
-        if (amount == 0 && tokenType != TokenType.ERC721) {
+        if (tokenType == TokenType.ERC20) {
+            heldTokenId = 0;
+        } else if (tokenType == TokenType.ERC721) {
+            amount = 1;
+        }
+
+        if (amount == 0) {
             revert InvalidValue();
         }
         if (to == address(0) || tokenContract == address(0)) {
             revert InvalidAddress();
         }
-        if (_balances[tokenId][tokenContract][tokenType][heldTokenId] < amount) {
+        if (
+            _balances[tokenId][tokenContract][tokenType][heldTokenId] < amount
+        ) {
             revert InsufficientBalance();
         }
+
         _beforeTransferHeldTokenFromToken(
             tokenContract,
             tokenType,
@@ -76,34 +87,16 @@ abstract contract RMRKSecureTokenTransferProtocol is
             data
         );
 
+        _balances[tokenId][tokenContract][tokenType][heldTokenId] -= amount;
+
         if (tokenType == TokenType.ERC20) {
             IERC20(tokenContract).transfer(to, amount);
-            _balances[tokenId][tokenContract][tokenType][0] -= amount;
-
-            emit TransferredToken(
-                tokenContract,
-                tokenType,
-                tokenId,
-                0,
-                to,
-                amount
-            );
         } else if (tokenType == TokenType.ERC721) {
             IERC721(tokenContract).safeTransferFrom(
                 address(this),
                 to,
                 heldTokenId,
                 data
-            );
-            _balances[tokenId][tokenContract][tokenType][heldTokenId] -= 1;
-
-            emit TransferredToken(
-                tokenContract,
-                tokenType,
-                tokenId,
-                heldTokenId,
-                to,
-                1
             );
         } else {
             IERC1155(tokenContract).safeTransferFrom(
@@ -113,17 +106,16 @@ abstract contract RMRKSecureTokenTransferProtocol is
                 amount,
                 data
             );
-            _balances[tokenId][tokenContract][tokenType][heldTokenId] -= amount;
-
-            emit TransferredToken(
-                tokenContract,
-                tokenType,
-                tokenId,
-                heldTokenId,
-                to,
-                amount
-            );
         }
+
+        emit TransferredToken(
+            tokenContract,
+            tokenType,
+            tokenId,
+            heldTokenId,
+            to,
+            amount
+        );
 
         _afterTransferHeldTokenFromToken(
             tokenContract,
@@ -157,12 +149,19 @@ abstract contract RMRKSecureTokenTransferProtocol is
         uint256 amount,
         bytes memory data
     ) internal {
-        if (amount == 0 && TokenType.ERC721 != tokenType) {
+        if (tokenType == TokenType.ERC20) {
+            heldTokenId = 0;
+        } else if (tokenType == TokenType.ERC721) {
+            amount = 1;
+        }
+
+        if (amount == 0) {
             revert InvalidValue();
         }
         if (tokenContract == address(0)) {
             revert InvalidAddress();
         }
+
         _beforeTransferHeldTokenToToken(
             tokenContract,
             tokenType,
@@ -173,20 +172,12 @@ abstract contract RMRKSecureTokenTransferProtocol is
             data
         );
 
+        _balances[tokenId][tokenContract][tokenType][heldTokenId] += amount;
+
         if (tokenType == TokenType.ERC20) {
             IERC20(tokenContract).transferFrom(
                 msg.sender,
                 address(this),
-                amount
-            );
-            _balances[tokenId][tokenContract][tokenType][0] += amount;
-
-            emit ReceivedToken(
-                tokenContract,
-                tokenType,
-                tokenId,
-                0,
-                msg.sender,
                 amount
             );
         } else if (tokenType == TokenType.ERC721) {
@@ -196,16 +187,6 @@ abstract contract RMRKSecureTokenTransferProtocol is
                 heldTokenId,
                 data
             );
-            _balances[tokenId][tokenContract][tokenType][heldTokenId] += 1;
-
-            emit ReceivedToken(
-                tokenContract,
-                tokenType,
-                tokenId,
-                heldTokenId,
-                msg.sender,
-                1
-            );
         } else {
             IERC1155(tokenContract).safeTransferFrom(
                 msg.sender,
@@ -214,17 +195,16 @@ abstract contract RMRKSecureTokenTransferProtocol is
                 amount,
                 data
             );
-            _balances[tokenId][tokenContract][tokenType][heldTokenId] += amount;
-
-            emit ReceivedToken(
-                tokenContract,
-                tokenType,
-                tokenId,
-                heldTokenId,
-                msg.sender,
-                amount
-            );
         }
+
+        emit ReceivedToken(
+            tokenContract,
+            tokenType,
+            tokenId,
+            heldTokenId,
+            msg.sender,
+            amount
+        );
 
         _afterTransferHeldTokenToToken(
             tokenContract,
@@ -328,6 +308,26 @@ abstract contract RMRKSecureTokenTransferProtocol is
     function supportsInterface(
         bytes4 interfaceId
     ) public view virtual override returns (bool) {
-        return type(RMRKSecureTokenTransferProtocol).interfaceId == interfaceId;
+        return
+            type(IRMRKSecureTokenTransferProtocol).interfaceId == interfaceId;
+    }
+
+    function onERC721Received(
+        address,
+        address,
+        uint256,
+        bytes memory
+    ) public pure virtual returns (bytes4) {
+        return this.onERC721Received.selector;
+    }
+
+    function onERC1155Received(
+        address,
+        address,
+        uint256,
+        uint256,
+        bytes memory
+    ) public pure virtual returns (bytes4) {
+        return this.onERC1155Received.selector;
     }
 }

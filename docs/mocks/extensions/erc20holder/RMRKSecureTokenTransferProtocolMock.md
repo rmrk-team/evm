@@ -63,7 +63,7 @@ Used to retrieve the given token&#39;s balance of given token
 
 | Name | Type | Description |
 |---|---|---|
-| tokenContract | address | undefined |
+| tokenContract | address | The address of the held token&#39;s smart contract |
 | tokenType | enum IRMRKSecureTokenTransferProtocol.TokenType | The type of the token being checked for balance |
 | tokenId | uint256 | The ID of the token being checked for balance |
 | heldTokenId | uint256 | The ID of the held token of which the balance is being retrieved |
@@ -152,6 +152,57 @@ function name() external view returns (string)
 | Name | Type | Description |
 |---|---|---|
 | _0 | string | undefined |
+
+### onERC1155Received
+
+```solidity
+function onERC1155Received(address, address, uint256, uint256, bytes) external pure returns (bytes4)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | address | undefined |
+| _1 | address | undefined |
+| _2 | uint256 | undefined |
+| _3 | uint256 | undefined |
+| _4 | bytes | undefined |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | bytes4 | undefined |
+
+### onERC721Received
+
+```solidity
+function onERC721Received(address, address, uint256, bytes) external pure returns (bytes4)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | address | undefined |
+| _1 | address | undefined |
+| _2 | uint256 | undefined |
+| _3 | bytes | undefined |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | bytes4 | undefined |
 
 ### ownerOf
 

@@ -13,7 +13,7 @@
 ### balanceOfToken
 
 ```solidity
-function balanceOfToken(address erc20Contract, enum IRMRKSecureTokenTransferProtocol.TokenType tokenType, uint256 tokenId, uint256 heldTokenId) external view returns (uint256)
+function balanceOfToken(address tokenContract, enum IRMRKSecureTokenTransferProtocol.TokenType tokenType, uint256 tokenId, uint256 heldTokenId) external view returns (uint256)
 ```
 
 Used to retrieve the given token&#39;s balance of given token
@@ -24,7 +24,7 @@ Used to retrieve the given token&#39;s balance of given token
 
 | Name | Type | Description |
 |---|---|---|
-| erc20Contract | address | The address of the held token&#39;s smart contract |
+| tokenContract | address | The address of the held token&#39;s smart contract |
 | tokenType | enum IRMRKSecureTokenTransferProtocol.TokenType | The type of the token being checked for balance |
 | tokenId | uint256 | The ID of the token being checked for balance |
 | heldTokenId | uint256 | The ID of the held token of which the balance is being retrieved |
