@@ -432,6 +432,131 @@ interface IRMRKTokenPropertiesRepository is IERC165 {
     ) external;
 
     /**
+     * @notice Used to set the uint property on behalf of an authorized account.
+     * @dev Emits a {UintPropertyUpdated} event.
+     * @param setter Address of the account that presigned the property change
+     * @param collection Address of the collection receiving the property
+     * @param tokenId The ID of the token receiving the property
+     * @param key The property key
+     * @param value The property value
+     * @param deadline The deadline timestamp for the presigned transaction
+     * @param v `v` value of an ECDSA signature of the presigned message
+     * @param r `r` value of an ECDSA signature of the presigned message
+     * @param s `s` value of an ECDSA signature of the presigned message
+     */
+    function presignedSetUintProperty(
+        address setter,
+        address collection,
+        uint256 tokenId,
+        string memory key,
+        uint256 value,
+        uint256 deadline,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) external;
+
+    /**
+     * @notice Used to set the string property on behalf of an authorized account.
+     * @dev Emits a {StringPropertyUpdated} event.
+     * @param setter Address of the account that presigned the property change
+     * @param collection Address of the collection receiving the property
+     * @param tokenId The ID of the token receiving the property
+     * @param key The property key
+     * @param value The property value
+     * @param deadline The deadline timestamp for the presigned transaction
+     * @param v `v` value of an ECDSA signature of the presigned message
+     * @param r `r` value of an ECDSA signature of the presigned message
+     * @param s `s` value of an ECDSA signature of the presigned message
+     */
+    function presignedSetStringProperty(
+        address setter,
+        address collection,
+        uint256 tokenId,
+        string memory key,
+        string memory value,
+        uint256 deadline,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) external;
+
+    /**
+     * @notice Used to set the bool property on behalf of an authorized account.
+     * @dev Emits a {BoolPropertyUpdated} event.
+     * @param setter Address of the account that presigned the property change
+     * @param collection Address of the collection receiving the property
+     * @param tokenId The ID of the token receiving the property
+     * @param key The property key
+     * @param value The property value
+     * @param deadline The deadline timestamp for the presigned transaction
+     * @param v `v` value of an ECDSA signature of the presigned message
+     * @param r `r` value of an ECDSA signature of the presigned message
+     * @param s `s` value of an ECDSA signature of the presigned message
+     */
+    function presignedSetBoolProperty(
+        address setter,
+        address collection,
+        uint256 tokenId,
+        string memory key,
+        bool value,
+        uint256 deadline,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) external;
+
+    /**
+     * @notice Used to set the bytes property on behalf of an authorized account.
+     * @dev Emits a {BytesPropertyUpdated} event.
+     * @param setter Address of the account that presigned the property change
+     * @param collection Address of the collection receiving the property
+     * @param tokenId The ID of the token receiving the property
+     * @param key The property key
+     * @param value The property value
+     * @param deadline The deadline timestamp for the presigned transaction
+     * @param v `v` value of an ECDSA signature of the presigned message
+     * @param r `r` value of an ECDSA signature of the presigned message
+     * @param s `s` value of an ECDSA signature of the presigned message
+     */
+    function presignedSetBytesProperty(
+        address setter,
+        address collection,
+        uint256 tokenId,
+        string memory key,
+        bytes memory value,
+        uint256 deadline,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) external;
+
+    /**
+     * @notice Used to set the address property on behalf of an authorized account.
+     * @dev Emits a {AddressPropertyUpdated} event.
+     * @param setter Address of the account that presigned the property change
+     * @param collection Address of the collection receiving the property
+     * @param tokenId The ID of the token receiving the property
+     * @param key The property key
+     * @param value The property value
+     * @param deadline The deadline timestamp for the presigned transaction
+     * @param v `v` value of an ECDSA signature of the presigned message
+     * @param r `r` value of an ECDSA signature of the presigned message
+     * @param s `s` value of an ECDSA signature of the presigned message
+     */
+    function presignedSetAddressProperty(
+        address setter,
+        address collection,
+        uint256 tokenId,
+        string memory key,
+        address value,
+        uint256 deadline,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) external;
+
+    /**
      * @notice Used to check if the specified address is listed as a collaborator of the given collection's parameter.
      * @param collaborator Address to be checked.
      * @param collection Address of the collection.
@@ -522,6 +647,91 @@ interface IRMRKTokenPropertiesRepository is IERC165 {
         uint256 tokenId,
         string memory key
     ) external view returns (bytes memory);
+
+    /**
+     * @notice Used to retrieve the message to be signed for submitting a presigned uint property change.
+     * @param collection The address of the collection smart contract of the token receiving the property
+     * @param tokenId The ID of the token receiving the property
+     * @param key The property key
+     * @param value The property value
+     * @param deadline The deadline timestamp for the presigned transaction after which the message is invalid
+     * @return Raw message to be signed by the authorized account
+     */
+    function prepareMessageToPresignUintProperty(
+        address collection,
+        uint256 tokenId,
+        string memory key,
+        uint256 value,
+        uint256 deadline
+    ) external view returns (bytes32);
+
+    /**
+     * @notice Used to retrieve the message to be signed for submitting a presigned string property change.
+     * @param collection The address of the collection smart contract of the token receiving the property
+     * @param tokenId The ID of the token receiving the property
+     * @param key The property key
+     * @param value The property value
+     * @param deadline The deadline timestamp for the presigned transaction after which the message is invalid
+     * @return Raw message to be signed by the authorized account
+     */
+    function prepareMessageToPresignStringProperty(
+        address collection,
+        uint256 tokenId,
+        string memory key,
+        string memory value,
+        uint256 deadline
+    ) external view returns (bytes32);
+
+    /**
+     * @notice Used to retrieve the message to be signed for submitting a presigned bool property change.
+     * @param collection The address of the collection smart contract of the token receiving the property
+     * @param tokenId The ID of the token receiving the property
+     * @param key The property key
+     * @param value The property value
+     * @param deadline The deadline timestamp for the presigned transaction after which the message is invalid
+     * @return Raw message to be signed by the authorized account
+     */
+    function prepareMessageToPresignBoolProperty(
+        address collection,
+        uint256 tokenId,
+        string memory key,
+        bool value,
+        uint256 deadline
+    ) external view returns (bytes32);
+
+    /**
+     * @notice Used to retrieve the message to be signed for submitting a presigned bytes property change.
+     * @param collection The address of the collection smart contract of the token receiving the property
+     * @param tokenId The ID of the token receiving the property
+     * @param key The property key
+     * @param value The property value
+     * @param deadline The deadline timestamp for the presigned transaction after which the message is invalid
+     * @return Raw message to be signed by the authorized account
+     */
+    function prepareMessageToPresignBytesProperty(
+        address collection,
+        uint256 tokenId,
+        string memory key,
+        bytes memory value,
+        uint256 deadline
+    ) external view returns (bytes32);
+
+    /**
+     * @notice Used to retrieve the message to be signed for submitting a presigned address property change.
+     * @param collection The address of the collection smart contract of the token receiving the property
+     * @param tokenId The ID of the token receiving the property
+     * @param key The property key
+     * @param value The property value
+     * @param deadline The deadline timestamp for the presigned transaction after which the message is invalid
+     * @return Raw message to be signed by the authorized account
+     */
+    function prepareMessageToPresignAddressProperty(
+        address collection,
+        uint256 tokenId,
+        string memory key,
+        address value,
+        uint256 deadline
+    ) external view returns (bytes32);
 
     /**
      * @notice Used to retrieve multiple token properties of any type at once.
