@@ -10,6 +10,108 @@ Smart contract of the RMRK Token property repository module.
 
 ## Methods
 
+### DOMAIN_SEPARATOR
+
+```solidity
+function DOMAIN_SEPARATOR() external view returns (bytes32)
+```
+
+
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | bytes32 | undefined |
+
+### SET_ADDRESS_PROPERTY_TYPEHASH
+
+```solidity
+function SET_ADDRESS_PROPERTY_TYPEHASH() external view returns (bytes32)
+```
+
+
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | bytes32 | undefined |
+
+### SET_BOOL_PROPERTY_TYPEHASH
+
+```solidity
+function SET_BOOL_PROPERTY_TYPEHASH() external view returns (bytes32)
+```
+
+
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | bytes32 | undefined |
+
+### SET_BYTES_PROPERTY_TYPEHASH
+
+```solidity
+function SET_BYTES_PROPERTY_TYPEHASH() external view returns (bytes32)
+```
+
+
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | bytes32 | undefined |
+
+### SET_STRING_PROPERTY_TYPEHASH
+
+```solidity
+function SET_STRING_PROPERTY_TYPEHASH() external view returns (bytes32)
+```
+
+
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | bytes32 | undefined |
+
+### SET_UINT_PROPERTY_TYPEHASH
+
+```solidity
+function SET_UINT_PROPERTY_TYPEHASH() external view returns (bytes32)
+```
+
+
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | bytes32 | undefined |
+
 ### getAddressTokenProperties
 
 ```solidity
@@ -365,6 +467,256 @@ Used to manage the collaborators of a collection.
 | collection | address | The address of the collection |
 | collaboratorAddresses | address[] | The array of collaborator addresses being managed |
 | collaboratorAddressAccess | bool[] | The array of boolean values indicating if the collaborator address should  receive the permission (`true`) or not (`false`). |
+
+### prepareMessageToPresignAddressProperty
+
+```solidity
+function prepareMessageToPresignAddressProperty(address collection, uint256 tokenId, string key, address value, uint256 deadline) external view returns (bytes32)
+```
+
+Used to retrieve the message to be signed for submitting a presigned address property change.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| collection | address | The address of the collection smart contract of the token receiving the property |
+| tokenId | uint256 | The ID of the token receiving the property |
+| key | string | The property key |
+| value | address | The property value |
+| deadline | uint256 | The deadline timestamp for the presigned transaction after which the message is invalid |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | bytes32 | Raw message to be signed by the authorized account |
+
+### prepareMessageToPresignBoolProperty
+
+```solidity
+function prepareMessageToPresignBoolProperty(address collection, uint256 tokenId, string key, bool value, uint256 deadline) external view returns (bytes32)
+```
+
+Used to retrieve the message to be signed for submitting a presigned bool property change.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| collection | address | The address of the collection smart contract of the token receiving the property |
+| tokenId | uint256 | The ID of the token receiving the property |
+| key | string | The property key |
+| value | bool | The property value |
+| deadline | uint256 | The deadline timestamp for the presigned transaction after which the message is invalid |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | bytes32 | Raw message to be signed by the authorized account |
+
+### prepareMessageToPresignBytesProperty
+
+```solidity
+function prepareMessageToPresignBytesProperty(address collection, uint256 tokenId, string key, bytes value, uint256 deadline) external view returns (bytes32)
+```
+
+Used to retrieve the message to be signed for submitting a presigned bytes property change.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| collection | address | The address of the collection smart contract of the token receiving the property |
+| tokenId | uint256 | The ID of the token receiving the property |
+| key | string | The property key |
+| value | bytes | The property value |
+| deadline | uint256 | The deadline timestamp for the presigned transaction after which the message is invalid |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | bytes32 | Raw message to be signed by the authorized account |
+
+### prepareMessageToPresignStringProperty
+
+```solidity
+function prepareMessageToPresignStringProperty(address collection, uint256 tokenId, string key, string value, uint256 deadline) external view returns (bytes32)
+```
+
+Used to retrieve the message to be signed for submitting a presigned string property change.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| collection | address | The address of the collection smart contract of the token receiving the property |
+| tokenId | uint256 | The ID of the token receiving the property |
+| key | string | The property key |
+| value | string | The property value |
+| deadline | uint256 | The deadline timestamp for the presigned transaction after which the message is invalid |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | bytes32 | Raw message to be signed by the authorized account |
+
+### prepareMessageToPresignUintProperty
+
+```solidity
+function prepareMessageToPresignUintProperty(address collection, uint256 tokenId, string key, uint256 value, uint256 deadline) external view returns (bytes32)
+```
+
+Used to retrieve the message to be signed for submitting a presigned uint property change.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| collection | address | The address of the collection smart contract of the token receiving the property |
+| tokenId | uint256 | The ID of the token receiving the property |
+| key | string | The property key |
+| value | uint256 | The property value |
+| deadline | uint256 | The deadline timestamp for the presigned transaction after which the message is invalid |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | bytes32 | Raw message to be signed by the authorized account |
+
+### presignedSetAddressProperty
+
+```solidity
+function presignedSetAddressProperty(address setter, address collection, uint256 tokenId, string key, address value, uint256 deadline, uint8 v, bytes32 r, bytes32 s) external nonpayable
+```
+
+Used to set the address property on behalf of an authorized account.
+
+*Emits a {AddressPropertyUpdated} event.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| setter | address | Address of the account that presigned the property change |
+| collection | address | Address of the collection receiving the property |
+| tokenId | uint256 | The ID of the token receiving the property |
+| key | string | The property key |
+| value | address | The property value |
+| deadline | uint256 | The deadline timestamp for the presigned transaction |
+| v | uint8 | `v` value of an ECDSA signature of the presigned message |
+| r | bytes32 | `r` value of an ECDSA signature of the presigned message |
+| s | bytes32 | `s` value of an ECDSA signature of the presigned message |
+
+### presignedSetBoolProperty
+
+```solidity
+function presignedSetBoolProperty(address setter, address collection, uint256 tokenId, string key, bool value, uint256 deadline, uint8 v, bytes32 r, bytes32 s) external nonpayable
+```
+
+Used to set the bool property on behalf of an authorized account.
+
+*Emits a {BoolPropertyUpdated} event.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| setter | address | Address of the account that presigned the property change |
+| collection | address | Address of the collection receiving the property |
+| tokenId | uint256 | The ID of the token receiving the property |
+| key | string | The property key |
+| value | bool | The property value |
+| deadline | uint256 | The deadline timestamp for the presigned transaction |
+| v | uint8 | `v` value of an ECDSA signature of the presigned message |
+| r | bytes32 | `r` value of an ECDSA signature of the presigned message |
+| s | bytes32 | `s` value of an ECDSA signature of the presigned message |
+
+### presignedSetBytesProperty
+
+```solidity
+function presignedSetBytesProperty(address setter, address collection, uint256 tokenId, string key, bytes value, uint256 deadline, uint8 v, bytes32 r, bytes32 s) external nonpayable
+```
+
+Used to set the bytes property on behalf of an authorized account.
+
+*Emits a {BytesPropertyUpdated} event.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| setter | address | Address of the account that presigned the property change |
+| collection | address | Address of the collection receiving the property |
+| tokenId | uint256 | The ID of the token receiving the property |
+| key | string | The property key |
+| value | bytes | The property value |
+| deadline | uint256 | The deadline timestamp for the presigned transaction |
+| v | uint8 | `v` value of an ECDSA signature of the presigned message |
+| r | bytes32 | `r` value of an ECDSA signature of the presigned message |
+| s | bytes32 | `s` value of an ECDSA signature of the presigned message |
+
+### presignedSetStringProperty
+
+```solidity
+function presignedSetStringProperty(address setter, address collection, uint256 tokenId, string key, string value, uint256 deadline, uint8 v, bytes32 r, bytes32 s) external nonpayable
+```
+
+Used to set the string property on behalf of an authorized account.
+
+*Emits a {StringPropertyUpdated} event.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| setter | address | Address of the account that presigned the property change |
+| collection | address | Address of the collection receiving the property |
+| tokenId | uint256 | The ID of the token receiving the property |
+| key | string | The property key |
+| value | string | The property value |
+| deadline | uint256 | The deadline timestamp for the presigned transaction |
+| v | uint8 | `v` value of an ECDSA signature of the presigned message |
+| r | bytes32 | `r` value of an ECDSA signature of the presigned message |
+| s | bytes32 | `s` value of an ECDSA signature of the presigned message |
+
+### presignedSetUintProperty
+
+```solidity
+function presignedSetUintProperty(address setter, address collection, uint256 tokenId, string key, uint256 value, uint256 deadline, uint8 v, bytes32 r, bytes32 s) external nonpayable
+```
+
+Used to set the uint property on behalf of an authorized account.
+
+*Emits a {UintPropertyUpdated} event.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| setter | address | Address of the account that presigned the property change |
+| collection | address | Address of the collection receiving the property |
+| tokenId | uint256 | The ID of the token receiving the property |
+| key | string | The property key |
+| value | uint256 | The property value |
+| deadline | uint256 | The deadline timestamp for the presigned transaction |
+| v | uint8 | `v` value of an ECDSA signature of the presigned message |
+| r | bytes32 | `r` value of an ECDSA signature of the presigned message |
+| s | bytes32 | `s` value of an ECDSA signature of the presigned message |
 
 ### registerAccessControl
 
@@ -801,6 +1153,28 @@ error RMRKCollectionNotRegistered()
 ```
 
 Attempting to manage or interact with colleciton that is not registered
+
+
+
+
+### RMRKExpiredDeadline
+
+```solidity
+error RMRKExpiredDeadline()
+```
+
+Attempting to pass an epired ECDSA deadline
+
+
+
+
+### RMRKInvalidSignature
+
+```solidity
+error RMRKInvalidSignature()
+```
+
+Attempting to use and invalid ECDSA signature
 
 
 

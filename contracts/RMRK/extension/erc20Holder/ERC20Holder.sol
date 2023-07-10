@@ -10,7 +10,8 @@ error InvalidAddress();
 error InsufficientBalance();
 
 abstract contract ERC20Holder is IERC20Holder {
-    mapping(uint256 tokenId => mapping(address erc20Address => uint256 balance)) private _balances;
+    mapping(uint256 tokenId => mapping(address erc20Address => uint256 balance))
+        private _balances;
 
     /**
      * @inheritdoc IERC20Holder

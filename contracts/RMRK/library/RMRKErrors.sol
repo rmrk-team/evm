@@ -58,6 +58,8 @@ error RMRKCollectionAlreadyRegistered();
 error RMRKCollectionNotRegistered();
 /// Attempting to equip a `Part` with a child not approved by the Catalog
 error RMRKEquippableEquipNotAllowedByCatalog();
+/// Attempting to pass an epired ECDSA deadline
+error RMRKExpiredDeadline();
 /// Attempting to use ID 0, which is not supported
 /// @dev The ID 0 in RMRK suite is reserved for empty values. Guarding against its use ensures the expected operation
 error RMRKIdZeroForbidden();
@@ -65,6 +67,8 @@ error RMRKIdZeroForbidden();
 error RMRKIndexOutOfRange();
 /// Attempting to reclaim a child that can't be reclaimed
 error RMRKInvalidChildReclaim();
+/// Attempting to use and invalid ECDSA signature
+error RMRKInvalidSignature();
 /// Attempting to interact with an end-user account when the contract account is expected
 error RMRKIsNotContract();
 /// Attempting to interact with a contract that had its operation locked
