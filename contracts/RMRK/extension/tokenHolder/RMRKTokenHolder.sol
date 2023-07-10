@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.18;
 
-import "./IRMRKSecureTokenTransferProtocol.sol";
+import "./IRMRKTokenHolder.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
@@ -13,14 +13,18 @@ error InvalidValue();
 error InvalidAddress();
 error InsufficientBalance();
 
-abstract contract RMRKSecureTokenTransferProtocol is
-    IRMRKSecureTokenTransferProtocol
-{
+/**
+ * @title RMRKTokenHolder
+ * @author RMRK team
+ * @notice Smart contract of a token holder RMRK extension.
+ * @dev The RMRKTokenHolder extension is capable of holding ERC-20, ERC-721, and ERC-1155 tokens.
+ */
+abstract contract RMRKTokenHolder is IRMRKTokenHolder {
     mapping(uint256 tokenId => mapping(address tokenAddress => mapping(TokenType tokenType => mapping(uint256 heldTokenId => uint256 balance))))
         private _balances;
 
     /**
-     * @inheritdoc IRMRKSecureTokenTransferProtocol
+     * @inheritdoc IRMRKTokenHolder
      */
     function balanceOfToken(
         address tokenContract,
@@ -308,8 +312,7 @@ abstract contract RMRKSecureTokenTransferProtocol is
     function supportsInterface(
         bytes4 interfaceId
     ) public view virtual override returns (bool) {
-        return
-            type(IRMRKSecureTokenTransferProtocol).interfaceId == interfaceId;
+        return type(IRMRKTokenHolder).interfaceId == interfaceId;
     }
 
     function onERC721Received(

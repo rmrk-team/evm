@@ -4,7 +4,12 @@ pragma solidity ^0.8.18;
 
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 
-interface IRMRKSecureTokenTransferProtocol is IERC165 {
+/**
+ * @title IRMRKTokenHolder
+ * @author RMRK team
+ * @notice Interface smart contract of the RMRKTokenHolder extension.
+ */
+interface IRMRKTokenHolder is IERC165 {
     enum TokenType {
         ERC20,
         ERC721,

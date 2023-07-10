@@ -1,21 +1,18 @@
 // SPDX-License-Identifier: Apache-2.0
 
 pragma solidity ^0.8.18;
-import "../../../RMRK/extension/secureTokenTransferProtocol/RMRKSecureTokenTransferProtocol.sol";
+import "../../../RMRK/extension/tokenHolder/RMRKTokenHolder.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
 error OnlyNFTOwnerCanTransferTokensFromIt();
 error OnlyNFTOwnerCanTransferTokensToIt();
 
 /**
- * @title RMRKSecureTokenTransferProtocolMock
+ * @title RMRKTokenHolderMock
  * @author RMRK team
  * @notice Smart contract of the RMRK ERC20 Holder module.
  */
-contract RMRKSecureTokenTransferProtocolMock is
-    RMRKSecureTokenTransferProtocol,
-    ERC721
-{
+contract RMRKTokenHolderMock is RMRKTokenHolder, ERC721 {
     constructor(
         string memory name,
         string memory symbol
@@ -27,20 +24,14 @@ contract RMRKSecureTokenTransferProtocolMock is
 
     function supportsInterface(
         bytes4 interfaceId
-    )
-        public
-        view
-        virtual
-        override(RMRKSecureTokenTransferProtocol, ERC721)
-        returns (bool)
-    {
+    ) public view virtual override(RMRKTokenHolder, ERC721) returns (bool) {
         return
-            RMRKSecureTokenTransferProtocol.supportsInterface(interfaceId) ||
+            RMRKTokenHolder.supportsInterface(interfaceId) ||
             super.supportsInterface(interfaceId);
     }
 
     /**
-     * @inheritdoc IRMRKSecureTokenTransferProtocol
+     * @inheritdoc IRMRKTokenHolder
      */
     function transferHeldTokenToToken(
         address tokenContract,
@@ -61,7 +52,7 @@ contract RMRKSecureTokenTransferProtocolMock is
     }
 
     /**
-     * @inheritdoc IRMRKSecureTokenTransferProtocol
+     * @inheritdoc IRMRKTokenHolder
      */
     function transferHeldTokenFromToken(
         address tokenContract,
