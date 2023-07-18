@@ -3,7 +3,6 @@
 pragma solidity ^0.8.16;
 
 import "./IERC6381.sol";
-import "@openzeppelin/contracts/utils/introspection/ERC165.sol";
 
 error BulkParametersOfUnequalLength();
 error ExpiredPresignedEmote();

@@ -2,7 +2,9 @@
 
 pragma solidity ^0.8.16;
 
-interface IERC6381 {
+import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+
+interface IERC6381 is IERC165 {
     event Emoted(
         address indexed emoter,
         address indexed collection,
