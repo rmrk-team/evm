@@ -580,23 +580,6 @@ Used to check whether the token has a given child equipped.
 |---|---|---|
 | _0 | bool | A boolean value indicating whether the child token is equipped into the given token or not |
 
-### name
-
-```solidity
-function name() external view returns (string)
-```
-
-Used to retrieve the collection name.
-
-
-
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | string | Name of the collection |
-
 ### nestTransferFrom
 
 ```solidity
@@ -845,23 +828,6 @@ function supportsInterface(bytes4 interfaceId) external view returns (bool)
 | Name | Type | Description |
 |---|---|---|
 | _0 | bool | undefined |
-
-### symbol
-
-```solidity
-function symbol() external view returns (string)
-```
-
-Used to retrieve the collection symbol.
-
-
-
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | string | Symbol of the collection |
 
 ### transferChild
 

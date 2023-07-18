@@ -36,7 +36,7 @@ Used to get extended information about a specified token.
 ### getPaginatedMintedIds
 
 ```solidity
-function getPaginatedMintedIds(address target, uint256 pageStart, uint256 pageSize) external view returns (uint256[] page)
+function getPaginatedMintedIds(address targetEquippable, uint256 pageStart, uint256 pageSize) external view returns (uint256[] page)
 ```
 
 Used to get a list of existing token IDs in the range between `pageStart` and `pageSize`.
@@ -47,7 +47,7 @@ Used to get a list of existing token IDs in the range between `pageStart` and `p
 
 | Name | Type | Description |
 |---|---|---|
-| target | address | Address of the collection smart contract of the given token |
+| targetEquippable | address | Address of the collection smart contract of the given token |
 | pageStart | uint256 | The first ID to check |
 | pageSize | uint256 | The number of IDs to check |
 

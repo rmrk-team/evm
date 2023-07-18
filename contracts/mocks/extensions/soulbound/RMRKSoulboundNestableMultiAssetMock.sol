@@ -9,11 +9,6 @@ contract RMRKSoulboundNestableMultiAssetMock is
     RMRKSoulbound,
     RMRKNestableMultiAssetMock
 {
-    constructor(
-        string memory name,
-        string memory symbol
-    ) RMRKNestableMultiAssetMock(name, symbol) {}
-
     function supportsInterface(
         bytes4 interfaceId
     )
@@ -32,7 +27,8 @@ contract RMRKSoulboundNestableMultiAssetMock is
         address from,
         address to,
         uint256 tokenId
-    ) internal virtual override(RMRKCore, RMRKSoulbound) {
-        super._beforeTokenTransfer(from, to, tokenId);
+    ) internal virtual override(RMRKNestable, RMRKSoulbound) {
+        RMRKSoulbound._beforeTokenTransfer(from, to, tokenId);
+        RMRKNestable._beforeTokenTransfer(from, to, tokenId);
     }
 }

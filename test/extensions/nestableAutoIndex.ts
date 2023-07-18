@@ -10,7 +10,7 @@ import { RMRKNestableAutoIndexMock } from '../../typechain-types';
 
 async function nestableAutoIndexFixture() {
   const factory = await ethers.getContractFactory('RMRKNestableAutoIndexMock');
-  const token = await factory.deploy('Chunky', 'CHNK');
+  const token = await factory.deploy();
   await token.deployed();
 
   return token;

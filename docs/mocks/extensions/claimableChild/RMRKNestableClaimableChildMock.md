@@ -313,23 +313,6 @@ function mint(address to, uint256 tokenId) external nonpayable
 | to | address | undefined |
 | tokenId | uint256 | undefined |
 
-### name
-
-```solidity
-function name() external view returns (string)
-```
-
-Used to retrieve the collection name.
-
-
-
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | string | Name of the collection |
-
 ### nestMint
 
 ```solidity
@@ -598,23 +581,6 @@ function supportsInterface(bytes4 interfaceId) external view returns (bool)
 | Name | Type | Description |
 |---|---|---|
 | _0 | bool | undefined |
-
-### symbol
-
-```solidity
-function symbol() external view returns (string)
-```
-
-Used to retrieve the collection symbol.
-
-
-
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | string | Symbol of the collection |
 
 ### transfer
 

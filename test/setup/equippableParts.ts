@@ -1,5 +1,5 @@
 import { ethers } from 'hardhat';
-import { Contract } from 'ethers';
+import { BigNumber, Contract } from 'ethers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 
 let addrs: SignerWithAddress[];
@@ -33,8 +33,8 @@ const partIdForMask = 25;
 const uniqueNeons = 10;
 const uniqueMasks = 4;
 // Ids could be the same since they are different collections, but to avoid log problems we have them unique
-const neons: number[] = [];
-const masks: number[] = [];
+const neons: BigNumber[] = [];
+const masks: BigNumber[] = [];
 
 const neonResIds = [100, 101, 102, 103, 104];
 const maskAssetsFull = [1, 2, 3, 4]; // Must match the total of uniqueAssets
@@ -53,8 +53,8 @@ async function setupContextForParts(
   neonEquip: Contract,
   mask: Contract,
   maskEquip: Contract,
-  mint: (token: Contract, to: string) => Promise<number>,
-  nestMint: (token: Contract, to: string, parentId: number) => Promise<number>,
+  mint: (token: Contract, to: string) => Promise<BigNumber>,
+  nestMint: (token: Contract, to: string, parentId: BigNumber) => Promise<BigNumber>,
 ) {
   const [, ...signersAddr] = await ethers.getSigners();
   addrs = signersAddr;

@@ -1,6 +1,6 @@
 import { Contract } from 'ethers';
 import { ethers } from 'hardhat';
-import { expect } from 'chai';
+import { BigNumber } from 'ethers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import {
   addAssetToToken,
@@ -41,11 +41,11 @@ async function partsFixture() {
   await catalog.deployed();
 
   // Neon token
-  const neon = <RMRKEquippableMock>await equipFactory.deploy(neonName, neonSymbol);
+  const neon = <RMRKEquippableMock>await equipFactory.deploy();
   await neon.deployed();
 
   // Weapon
-  const mask = <RMRKEquippableMock>await equipFactory.deploy(maskName, maskSymbol);
+  const mask = <RMRKEquippableMock>await equipFactory.deploy();
   await mask.deployed();
 
   // View
@@ -85,21 +85,19 @@ async function slotsFixture() {
   await catalog.deployed();
 
   // Soldier token
-  const soldier = <RMRKEquippableMock>await equipFactory.deploy(soldierName, soldierSymbol);
+  const soldier = <RMRKEquippableMock>await equipFactory.deploy();
   await soldier.deployed();
 
   // Weapon
-  const weapon = <RMRKEquippableMock>await equipFactory.deploy(weaponName, weaponSymbol);
+  const weapon = <RMRKEquippableMock>await equipFactory.deploy();
   await weapon.deployed();
 
   // Weapon Gem
-  const weaponGem = <RMRKEquippableMock>await equipFactory.deploy(weaponGemName, weaponGemSymbol);
+  const weaponGem = <RMRKEquippableMock>await equipFactory.deploy();
   await weaponGem.deployed();
 
   // Background
-  const background = <RMRKEquippableMock>(
-    await equipFactory.deploy(backgroundName, backgroundSymbol)
-  );
+  const background = <RMRKEquippableMock>await equipFactory.deploy();
   await background.deployed();
 
   await setupContextForSlots(
@@ -123,7 +121,7 @@ async function equippableFixture() {
   const equipFactory = await ethers.getContractFactory('RMRKEquippableMock');
   const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiAssetRenderUtils');
 
-  const equip = <RMRKEquippableMock>await equipFactory.deploy('Chunky', 'CHNK');
+  const equip = <RMRKEquippableMock>await equipFactory.deploy();
   await equip.deployed();
 
   const renderUtils = <RMRKMultiAssetRenderUtils>await renderUtilsFactory.deploy();
@@ -180,13 +178,6 @@ describe('MinifiedEquippableMock Assets', async () => {
     this.renderUtils = renderUtils;
   });
 
-  describe('Init', async function () {
-    it('can get names and symbols', async function () {
-      expect(await this.equip.name()).to.equal('Chunky');
-      expect(await this.equip.symbol()).to.equal('CHNK');
-    });
-  });
-
   shouldBehaveLikeEquippableAssets(mintFromMock);
 });
 
@@ -194,7 +185,7 @@ describe('MinifiedEquippableMock Assets', async () => {
 
 // --------------- MULTI ASSET BEHAVIOR -----------------------
 
-describe('MinifiedEquippableMock MR behavior', async () => {
+describe('MinifiedEquippableMock MA behavior', async () => {
   let nextTokenId = 1;
   let equip: RMRKEquippableMock;
   let renderUtils: RMRKMultiAssetRenderUtils;
@@ -205,11 +196,11 @@ describe('MinifiedEquippableMock MR behavior', async () => {
     this.renderUtils = renderUtils;
   });
 
-  async function mintToNestable(token: Contract, to: string): Promise<number> {
+  async function mintToNestable(token: Contract, to: string): Promise<BigNumber> {
     const tokenId = nextTokenId;
     nextTokenId++;
     await equip.mint(to, tokenId);
-    return tokenId;
+    return BigNumber.from(tokenId);
   }
 
   shouldBehaveLikeMultiAsset(mintToNestable, addAssetEntryEquippablesFromMock, addAssetToToken);

@@ -6,11 +6,6 @@ import "../../../RMRK/extension/soulbound/RMRKSoulbound.sol";
 import "../../RMRKNestableMock.sol";
 
 contract RMRKSoulboundNestableMock is RMRKSoulbound, RMRKNestableMock {
-    constructor(
-        string memory name,
-        string memory symbol
-    ) RMRKNestableMock(name, symbol) {}
-
     function supportsInterface(
         bytes4 interfaceId
     ) public view virtual override(RMRKSoulbound, RMRKNestable) returns (bool) {
@@ -23,7 +18,8 @@ contract RMRKSoulboundNestableMock is RMRKSoulbound, RMRKNestableMock {
         address from,
         address to,
         uint256 tokenId
-    ) internal virtual override(RMRKCore, RMRKSoulbound) {
-        super._beforeTokenTransfer(from, to, tokenId);
+    ) internal virtual override(RMRKNestable, RMRKSoulbound) {
+        RMRKSoulbound._beforeTokenTransfer(from, to, tokenId);
+        RMRKNestable._beforeTokenTransfer(from, to, tokenId);
     }
 }

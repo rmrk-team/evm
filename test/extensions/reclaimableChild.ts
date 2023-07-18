@@ -10,8 +10,8 @@ import { RMRKNestableClaimableChildMock } from '../../typechain-types';
 
 async function reclaimableChildNestableFixture() {
   const factory = await ethers.getContractFactory('RMRKNestableClaimableChildMock');
-  const child = <RMRKNestableClaimableChildMock>await factory.deploy('Chunky', 'CHNK');
-  const parent = <RMRKNestableClaimableChildMock>await factory.deploy('Chunky', 'CHNK');
+  const child = <RMRKNestableClaimableChildMock>await factory.deploy();
+  const parent = <RMRKNestableClaimableChildMock>await factory.deploy();
   await parent.deployed();
   await child.deployed();
 

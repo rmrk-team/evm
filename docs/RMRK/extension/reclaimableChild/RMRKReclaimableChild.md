@@ -273,23 +273,6 @@ Used to check if the given address is allowed to manage the tokens of the specif
 |---|---|---|
 | _0 | bool | A boolean value signifying whether the *operator* is allowed to manage the tokens of the *owner* (`true`)  or not (`false`) |
 
-### name
-
-```solidity
-function name() external view returns (string)
-```
-
-Used to retrieve the collection name.
-
-
-
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | string | Name of the collection |
-
 ### nestTransferFrom
 
 ```solidity
@@ -487,23 +470,6 @@ function supportsInterface(bytes4 interfaceId) external view returns (bool)
 | Name | Type | Description |
 |---|---|---|
 | _0 | bool | undefined |
-
-### symbol
-
-```solidity
-function symbol() external view returns (string)
-```
-
-Used to retrieve the collection symbol.
-
-
-
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | string | Symbol of the collection |
 
 ### transferChild
 

@@ -8,7 +8,6 @@ import {
   IERC165,
   IERC6220,
   IERC5773,
-  IRMRKExternalEquip,
   IERC6059,
   IRMRKTypedMultiAsset,
   IOtherInterface,
@@ -18,7 +17,7 @@ import {
 
 async function typeMultiAssetFixture() {
   const factory = await ethers.getContractFactory('RMRKTypedMultiAssetMock');
-  const typedMultiAsset = await factory.deploy('Chunky', 'CHNK');
+  const typedMultiAsset = await factory.deploy();
   await typedMultiAsset.deployed();
 
   return { typedMultiAsset };
@@ -26,7 +25,7 @@ async function typeMultiAssetFixture() {
 
 async function nestableTypedMultiAssetFixture() {
   const factory = await ethers.getContractFactory('RMRKNestableTypedMultiAssetMock');
-  const typedNestableMultiAsset = await factory.deploy('Chunky', 'CHNK');
+  const typedNestableMultiAsset = await factory.deploy();
   await typedNestableMultiAsset.deployed();
 
   return { typedNestableMultiAsset };
@@ -34,24 +33,10 @@ async function nestableTypedMultiAssetFixture() {
 
 async function typedEquippableFixture() {
   const factory = await ethers.getContractFactory('RMRKTypedEquippableMock');
-  const typedEquippable = await factory.deploy('Chunky', 'CHNK');
+  const typedEquippable = await factory.deploy();
   await typedEquippable.deployed();
 
   return { typedEquippable };
-}
-
-async function typedExternalEquippableFixture() {
-  const nestableFactory = await ethers.getContractFactory('RMRKNestableExternalEquipMock');
-  const nestable = await nestableFactory.deploy('Chunky', 'CHNK');
-  await nestable.deployed();
-
-  const equipFactory = await ethers.getContractFactory('RMRKTypedExternalEquippableMock');
-  const typedExternalEquippable = await equipFactory.deploy(nestable.address);
-  await typedExternalEquippable.deployed();
-
-  await nestable.setEquippableAddress(typedExternalEquippable.address);
-
-  return { nestable, typedExternalEquippable };
 }
 
 describe('RMRKTypedMultiAssetMock', async function () {
@@ -141,29 +126,6 @@ describe('RMRKTypedEquippableMock', async function () {
 
   it('can support IEquippable', async function () {
     expect(await this.assets.supportsInterface(IERC6220)).to.equal(true);
-  });
-
-  shouldBehaveLikeTypedMultiAssetInterface();
-  shouldBehaveLikeTypedEquippable(mintFromMock);
-});
-
-describe('RMRKTypedExternalEquippableMock', async function () {
-  let typedExternalEquippable: Contract;
-  let nestable: Contract;
-
-  beforeEach(async function () {
-    ({ nestable, typedExternalEquippable } = await loadFixture(typedExternalEquippableFixture));
-
-    this.assets = typedExternalEquippable;
-    this.nestable = nestable;
-  });
-
-  it('can support IEquippable', async function () {
-    expect(await this.assets.supportsInterface(IERC6220)).to.equal(true);
-  });
-
-  it('can support IExternalEquip', async function () {
-    expect(await this.assets.supportsInterface(IRMRKExternalEquip)).to.equal(true);
   });
 
   shouldBehaveLikeTypedMultiAssetInterface();

@@ -39,14 +39,6 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
     });
 
     describe('metadata', function () {
-      it('has a name', async function () {
-        expect(await this.token.name()).to.be.equal(name);
-      });
-
-      it('has a symbol', async function () {
-        expect(await this.token.symbol()).to.be.equal(symbol);
-      });
-
       describe('token URI', function () {
         it.skip('reverts when queried for non existent token id', async function () {
           await expect(this.token.tokenURI(nonExistentTokenId)).to.be.revertedWithCustomError(

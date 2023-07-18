@@ -19,11 +19,6 @@ contract RMRKNestableAutoIndex is IRMRKNestableAutoIndex, RMRKNestable {
     mapping(uint256 => mapping(address => mapping(uint256 => uint256)))
         private _activeChildrenIndex;
 
-    constructor(
-        string memory name_,
-        string memory symbol_
-    ) RMRKNestable(name_, symbol_) {}
-
     function supportsInterface(
         bytes4 interfaceId
     ) public view virtual override(IERC165, RMRKNestable) returns (bool) {

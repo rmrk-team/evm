@@ -15,13 +15,8 @@ contract RMRKSoulboundAfterBlockNumberMock is
     mapping(uint256 => bool) soulboundExempt;
 
     constructor(
-        string memory name,
-        string memory symbol,
         uint256 lastBlockToTransfer
-    )
-        RMRKMultiAssetMock(name, symbol)
-        RMRKSoulboundAfterBlockNumber(lastBlockToTransfer)
-    {}
+    ) RMRKSoulboundAfterBlockNumber(lastBlockToTransfer) {}
 
     function supportsInterface(
         bytes4 interfaceId
@@ -41,8 +36,9 @@ contract RMRKSoulboundAfterBlockNumberMock is
         address from,
         address to,
         uint256 tokenId
-    ) internal virtual override(RMRKCore, RMRKSoulbound) {
-        super._beforeTokenTransfer(from, to, tokenId);
+    ) internal virtual override(RMRKMultiAsset, RMRKSoulbound) {
+        RMRKSoulbound._beforeTokenTransfer(from, to, tokenId);
+        RMRKMultiAsset._beforeTokenTransfer(from, to, tokenId);
     }
 }
 
@@ -53,13 +49,8 @@ contract RMRKSoulboundAfterTransactionsMock is
     mapping(uint256 => bool) soulboundExempt;
 
     constructor(
-        string memory name,
-        string memory symbol,
         uint256 numberOfTransfers
-    )
-        RMRKMultiAssetMock(name, symbol)
-        RMRKSoulboundAfterTransactions(numberOfTransfers)
-    {}
+    ) RMRKSoulboundAfterTransactions(numberOfTransfers) {}
 
     function supportsInterface(
         bytes4 interfaceId
@@ -79,16 +70,22 @@ contract RMRKSoulboundAfterTransactionsMock is
         address from,
         address to,
         uint256 tokenId
-    ) internal virtual override(RMRKCore, RMRKSoulbound) {
-        super._beforeTokenTransfer(from, to, tokenId);
+    ) internal virtual override(RMRKMultiAsset, RMRKSoulbound) {
+        RMRKSoulbound._beforeTokenTransfer(from, to, tokenId);
+        RMRKMultiAsset._beforeTokenTransfer(from, to, tokenId);
     }
 
     function _afterTokenTransfer(
         address from,
         address to,
         uint256 tokenId
-    ) internal virtual override(RMRKCore, RMRKSoulboundAfterTransactions) {
-        super._afterTokenTransfer(from, to, tokenId);
+    )
+        internal
+        virtual
+        override(RMRKMultiAsset, RMRKSoulboundAfterTransactions)
+    {
+        RMRKSoulboundAfterTransactions._afterTokenTransfer(from, to, tokenId);
+        RMRKMultiAsset._afterTokenTransfer(from, to, tokenId);
     }
 }
 
@@ -99,11 +96,6 @@ contract RMRKSoulboundPerTokenMock is
 {
     mapping(uint256 => bool) soulboundExempt;
 
-    constructor(
-        string memory name,
-        string memory symbol
-    ) RMRKMultiAssetMock(name, symbol) {}
-
     function supportsInterface(
         bytes4 interfaceId
     )
@@ -122,8 +114,9 @@ contract RMRKSoulboundPerTokenMock is
         address from,
         address to,
         uint256 tokenId
-    ) internal virtual override(RMRKCore, RMRKSoulbound) {
-        super._beforeTokenTransfer(from, to, tokenId);
+    ) internal virtual override(RMRKMultiAsset, RMRKSoulbound) {
+        RMRKSoulbound._beforeTokenTransfer(from, to, tokenId);
+        RMRKMultiAsset._beforeTokenTransfer(from, to, tokenId);
     }
 
     function setSoulbound(uint256 tokenId, bool state) public onlyOwner {

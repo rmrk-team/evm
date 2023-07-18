@@ -9,11 +9,6 @@ contract RMRKNestableMock is RMRKNestable {
     // This is used to test the usage of hooks
     mapping(address => mapping(uint256 => uint256)) private _balancesPerNft;
 
-    constructor(
-        string memory name_,
-        string memory symbol_
-    ) RMRKNestable(name_, symbol_) {}
-
     function safeMint(address to, uint256 tokenId) public {
         _safeMint(to, tokenId, "");
     }

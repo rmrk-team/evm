@@ -45,18 +45,6 @@ contract RMRKNestableMultiAsset is RMRKNestable, AbstractMultiAsset {
         _;
     }
 
-    // ----------------------------- CONSTRUCTOR ------------------------------
-
-    /**
-     * @notice Initializes the contract by setting a `name` and a `symbol` of the token collection.
-     * @param name_ Name of the token collection
-     * @param symbol_ Symbol of the token collection
-     */
-    constructor(
-        string memory name_,
-        string memory symbol_
-    ) RMRKNestable(name_, symbol_) {}
-
     /**
      * @inheritdoc IERC165
      */

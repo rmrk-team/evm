@@ -9,8 +9,7 @@ import "../equippable/RMRKEquippable.sol";
 import "../extension/soulbound/RMRKSoulbound.sol";
 import "../library/RMRKLib.sol";
 import "../library/RMRKErrors.sol";
-import "./RMRKMintingUtils.sol";
-import "./RMRKTokenURI.sol";
+import "./IRMRKCollectionData.sol";
 
 /**
  * @title RMRKRenderUtils
@@ -67,20 +66,22 @@ contract RMRKRenderUtils {
      * @dev It is not optimized to avoid checking IDs out of max supply nor total supply, since this is not meant to be
      *  used during transaction execution; it is only meant to be used as a getter.
      * @dev The resulting array might be smaller than the given `pageSize` since no-existent IDs are not included.
-     * @param target Address of the collection smart contract of the given token
+     * @param targetEquippable Address of the collection smart contract of the given token
      * @param pageStart The first ID to check
      * @param pageSize The number of IDs to check
      * @return page An array of IDs of the existing tokens
      */
     function getPaginatedMintedIds(
-        address target,
+        address targetEquippable,
         uint256 pageStart,
         uint256 pageSize
     ) public view returns (uint256[] memory page) {
         uint256[] memory tmpIds = new uint[](pageSize);
         uint256 found;
         for (uint256 i = 0; i < pageSize; ) {
-            try IERC721(target).ownerOf(pageStart + i) returns (address) {
+            try IERC721(targetEquippable).ownerOf(pageStart + i) returns (
+                address
+            ) {
                 tmpIds[i] = pageStart + i;
                 unchecked {
                     found += 1;
@@ -137,40 +138,60 @@ contract RMRKRenderUtils {
         uint256 tokenId,
         address targetCollection
     ) public view returns (ExtendedNft memory data) {
-        RMRKEquippable target = RMRKEquippable(targetCollection);
-        data.hasMultiAssetInterface = target.supportsInterface(
+        RMRKEquippable targetEquippable = RMRKEquippable(targetCollection);
+        IRMRKCollectionData targetCollectionData = IRMRKCollectionData(
+            targetCollection
+        );
+        data.hasMultiAssetInterface = targetEquippable.supportsInterface(
             type(IERC5773).interfaceId
         );
-        data.hasNestingInterface = target.supportsInterface(
+        data.hasNestingInterface = targetEquippable.supportsInterface(
             type(IERC6059).interfaceId
         );
-        data.hasEquippableInterface = target.supportsInterface(
+        data.hasEquippableInterface = targetEquippable.supportsInterface(
             type(IERC6220).interfaceId
         );
         if (data.hasNestingInterface) {
-            (data.directOwner, , ) = target.directOwnerOf(tokenId);
-            data.activeChildrenNumber = target.childrenOf(tokenId).length;
-            data.pendingChildrenNumber = target
+            (data.directOwner, , ) = targetEquippable.directOwnerOf(tokenId);
+            data.activeChildrenNumber = targetEquippable
+                .childrenOf(tokenId)
+                .length;
+            data.pendingChildrenNumber = targetEquippable
                 .pendingChildrenOf(tokenId)
                 .length;
         }
         if (data.hasMultiAssetInterface) {
-            data.activeAssetCount = target.getActiveAssets(tokenId).length;
-            data.pendingAssetCount = target.getPendingAssets(tokenId).length;
-            data.priorities = target.getActiveAssetPriorities(tokenId);
+            data.activeAssetCount = targetEquippable
+                .getActiveAssets(tokenId)
+                .length;
+            data.pendingAssetCount = targetEquippable
+                .getPendingAssets(tokenId)
+                .length;
+            data.priorities = targetEquippable.getActiveAssetPriorities(
+                tokenId
+            );
         }
-        if (target.supportsInterface(type(IERC6454).interfaceId)) {
+        if (targetEquippable.supportsInterface(type(IERC6454).interfaceId)) {
             data.isSoulbound = !IERC6454(targetCollection).isTransferable(
                 tokenId,
                 address(0),
                 address(0)
             );
         }
-        data.rootOwner = target.ownerOf(tokenId);
+        data.rootOwner = targetEquippable.ownerOf(tokenId);
         if (data.directOwner == address(0x0)) {
             data.directOwner = data.rootOwner;
         }
-        data.name = target.name();
+        try targetCollectionData.name() returns (string memory name) {
+            data.name = name;
+        } catch {
+            // Retain default value
+        }
+        try targetCollectionData.symbol() returns (string memory symbol) {
+            data.symbol = symbol;
+        } catch {
+            // Retain default value
+        }
         try IERC721Metadata(targetCollection).tokenURI(tokenId) returns (
             string memory metadataUri_
         ) {
@@ -178,17 +199,13 @@ contract RMRKRenderUtils {
         } catch {
             // Retain default value
         }
-        try RMRKMintingUtils(targetCollection).totalSupply() returns (
-            uint256 totalSupplly_
-        ) {
-            data.totalSupply = totalSupplly_;
+        try targetCollectionData.totalSupply() returns (uint256 totalSupply_) {
+            data.totalSupply = totalSupply_;
         } catch {
             // Retain default value
         }
-        try RMRKMintingUtils(targetCollection).maxSupply() returns (
-            uint256 maxSupplly_
-        ) {
-            data.maxSupply = maxSupplly_;
+        try targetCollectionData.maxSupply() returns (uint256 maxSupply_) {
+            data.maxSupply = maxSupply_;
         } catch {
             // Retain default value
         }
@@ -197,6 +214,5 @@ contract RMRKRenderUtils {
         } catch {
             // Retain default value
         }
-        data.symbol = target.symbol();
     }
 }

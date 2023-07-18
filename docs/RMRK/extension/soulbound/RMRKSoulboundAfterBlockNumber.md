@@ -10,40 +10,6 @@ Smart contract of the RMRK Soulbound module where transfers are only allowed unt
 
 ## Methods
 
-### RMRK_INTERFACE
-
-```solidity
-function RMRK_INTERFACE() external view returns (bytes4)
-```
-
-
-
-
-
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | bytes4 | undefined |
-
-### VERSION
-
-```solidity
-function VERSION() external view returns (string)
-```
-
-Version of the @rmrk-team/evm-contracts package
-
-
-
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | string | undefined |
-
 ### getLastBlockToTransfer
 
 ```solidity
@@ -85,23 +51,6 @@ Used to check whether the given token is transferable or not.
 |---|---|---|
 | _0 | bool | Boolean value indicating whether the given token is transferable |
 
-### name
-
-```solidity
-function name() external view returns (string)
-```
-
-Used to retrieve the collection name.
-
-
-
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | string | Name of the collection |
-
 ### supportsInterface
 
 ```solidity
@@ -123,23 +72,6 @@ function supportsInterface(bytes4 interfaceId) external view returns (bool)
 | Name | Type | Description |
 |---|---|---|
 | _0 | bool | undefined |
-
-### symbol
-
-```solidity
-function symbol() external view returns (string)
-```
-
-Used to retrieve the collection symbol.
-
-
-
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | string | Symbol of the collection |
 
 
 

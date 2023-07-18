@@ -11,7 +11,7 @@ import "../../library/RMRKErrors.sol";
  * @author RMRK team
  * @notice Smart contract of the RMRK Soulbound module.
  */
-abstract contract RMRKSoulbound is IERC6454, RMRKCore {
+abstract contract RMRKSoulbound is IERC6454 {
     /**
      * @notice Hook that is called before any token transfer. This includes minting and burning.
      * @dev This is a hook ensuring that all transfers of tokens are reverted if the token is soulbound.
@@ -24,13 +24,14 @@ abstract contract RMRKSoulbound is IERC6454, RMRKCore {
         address from,
         address to,
         uint256 tokenId
-    ) internal virtual override {
+    ) internal virtual {
         if (!isTransferable(tokenId, from, to))
             revert RMRKCannotTransferSoulbound();
-
-        super._beforeTokenTransfer(from, to, tokenId);
     }
 
+    /**
+     * @inheritdoc IERC6454
+     */
     function isTransferable(
         uint256,
         address from,

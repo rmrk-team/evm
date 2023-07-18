@@ -10,12 +10,12 @@ async function shouldBehaveLikeMultiAsset(
   addAssetEntryFunc: (token: Contract, data?: string) => Promise<BigNumber>,
   addAssetToTokenFunc: (
     token: Contract,
-    tokenId: number,
+    tokenId: BigNumber,
     resId: BigNumber,
     replaces: BigNumber | number,
   ) => Promise<void>,
 ) {
-  let tokenId: number;
+  let tokenId: BigNumber;
   let tokenOwner: SignerWithAddress;
   let approved: SignerWithAddress;
   let operator: SignerWithAddress;
