@@ -1,19 +1,15 @@
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: CC0-1.0
 
-pragma solidity ^0.8.18;
+pragma solidity ^0.8.16;
 
 import "./IERC6381.sol";
+import "@openzeppelin/contracts/utils/introspection/ERC165.sol";
 
 error BulkParametersOfUnequalLength();
 error ExpiredPresignedEmote();
 error InvalidSignature();
 
-/**
- * @title RMRKEmotable
- * @author RMRK team
- * @notice Smart contract of the RMRK Emotable module.
- */
-abstract contract RMRKEmoteTracker is IERC6381 {
+contract EmotableRepository is IERC6381 {
     bytes32 public immutable DOMAIN_SEPARATOR =
         keccak256(
             abi.encode(
@@ -25,31 +21,23 @@ abstract contract RMRKEmoteTracker is IERC6381 {
         );
 
     // Used to avoid double emoting and control undoing
-    // emoter address => collection => tokenId => emoji => state (1 for emoted, 0 for not)
-    mapping(address => mapping(address => mapping(uint256 => mapping(bytes4 => uint256))))
+    mapping(address => mapping(address => mapping(uint256 => mapping(string => uint256))))
         private _emotesUsedByEmoter; // Cheaper than using a bool
-    // collection => tokenId => emoji => count
-    mapping(address => mapping(uint256 => mapping(bytes4 => uint256)))
+    mapping(address => mapping(uint256 => mapping(string => uint256)))
         private _emotesPerToken;
 
-    /**
-     * @inheritdoc IERC6381
-     */
     function emoteCountOf(
         address collection,
         uint256 tokenId,
-        bytes4 emoji
+        string memory emoji
     ) public view returns (uint256) {
         return _emotesPerToken[collection][tokenId][emoji];
     }
 
-    /**
-     * @inheritdoc IERC6381
-     */
     function bulkEmoteCountOf(
         address[] memory collections,
         uint256[] memory tokenIds,
-        bytes4[] memory emojis
+        string[] memory emojis
     ) public view returns (uint256[] memory) {
         if (
             collections.length != tokenIds.length ||
@@ -68,26 +56,20 @@ abstract contract RMRKEmoteTracker is IERC6381 {
         return counts;
     }
 
-    /**
-     * @inheritdoc IERC6381
-     */
     function hasEmoterUsedEmote(
         address emoter,
         address collection,
         uint256 tokenId,
-        bytes4 emoji
+        string memory emoji
     ) public view returns (bool) {
         return _emotesUsedByEmoter[emoter][collection][tokenId][emoji] == 1;
     }
 
-    /**
-     * @inheritdoc IERC6381
-     */
     function haveEmotersUsedEmotes(
         address[] memory emoters,
         address[] memory collections,
         uint256[] memory tokenIds,
-        bytes4[] memory emojis
+        string[] memory emojis
     ) public view returns (bool[] memory) {
         if (
             emoters.length != collections.length ||
@@ -111,25 +93,16 @@ abstract contract RMRKEmoteTracker is IERC6381 {
         return states;
     }
 
-    /**
-     * @notice Used to emote or undo an emote on a token.
-     * @dev Emits ***Emoted*** event.
-     * @param collection Address of the collection containing the token being emoted
-     * @param tokenId ID of the token being emoted
-     * @param emoji Unicode identifier of the emoji
-     * @param state Boolean value signifying whether to emote (`true`) or undo (`false`) emote
-     */
-    function _emote(
+    function emote(
         address collection,
         uint256 tokenId,
-        bytes4 emoji,
+        string memory emoji,
         bool state
-    ) internal virtual {
+    ) public {
         bool currentVal = _emotesUsedByEmoter[msg.sender][collection][tokenId][
             emoji
         ] == 1;
         if (currentVal != state) {
-            _beforeEmote(collection, tokenId, emoji, state);
             if (state) {
                 _emotesPerToken[collection][tokenId][emoji] += 1;
             } else {
@@ -139,26 +112,15 @@ abstract contract RMRKEmoteTracker is IERC6381 {
                 ? 1
                 : 0;
             emit Emoted(msg.sender, collection, tokenId, emoji, state);
-            _afterEmote(collection, tokenId, emoji, state);
         }
     }
 
-    /**
-     * @notice Used to emote or undo an emote on multiple tokens.
-     * @dev Does nothing if attempting to set a pre-existent state.
-     * @dev MUST emit the `Emoted` event is the state of the emote is changed.
-     * @dev MUST revert if the lengths of the `collections`, `tokenIds`, `emojis` and `states` arrays are not equal.
-     * @param collections An array of addresses of the collections containing the tokens being emoted at
-     * @param tokenIds An array of IDs of the tokens being emoted
-     * @param emojis An array of unicode identifiers of the emojis
-     * @param states An array of boolean values signifying whether to emote (`true`) or undo (`false`) emote
-     */
-    function _bulkEmote(
+    function bulkEmote(
         address[] memory collections,
         uint256[] memory tokenIds,
-        bytes4[] memory emojis,
+        string[] memory emojis,
         bool[] memory states
-    ) internal virtual {
+    ) public {
         if (
             collections.length != tokenIds.length ||
             collections.length != emojis.length ||
@@ -175,7 +137,6 @@ abstract contract RMRKEmoteTracker is IERC6381 {
                 ] ==
                 1;
             if (currentVal != states[i]) {
-                _beforeEmote(collections[i], tokenIds[i], emojis[i], states[i]);
                 if (states[i]) {
                     _emotesPerToken[collections[i]][tokenIds[i]][
                         emojis[i]
@@ -195,7 +156,6 @@ abstract contract RMRKEmoteTracker is IERC6381 {
                     emojis[i],
                     states[i]
                 );
-                _afterEmote(collections[i], tokenIds[i], emojis[i], states[i]);
             }
             unchecked {
                 ++i;
@@ -203,13 +163,10 @@ abstract contract RMRKEmoteTracker is IERC6381 {
         }
     }
 
-    /**
-     * @inheritdoc IERC6381
-     */
     function prepareMessageToPresignEmote(
         address collection,
         uint256 tokenId,
-        bytes4 emoji,
+        string memory emoji,
         bool state,
         uint256 deadline
     ) public view returns (bytes32) {
@@ -226,13 +183,10 @@ abstract contract RMRKEmoteTracker is IERC6381 {
             );
     }
 
-    /**
-     * @inheritdoc IERC6381
-     */
     function bulkPrepareMessagesToPresignEmote(
         address[] memory collections,
         uint256[] memory tokenIds,
-        bytes4[] memory emojis,
+        string[] memory emojis,
         bool[] memory states,
         uint256[] memory deadlines
     ) public view returns (bytes32[] memory) {
@@ -265,34 +219,17 @@ abstract contract RMRKEmoteTracker is IERC6381 {
         return messages;
     }
 
-    /**
-     * @notice Used to emote or undo an emote on someone else's behalf.
-     * @dev Does nothing if attempting to set a pre-existent state.
-     * @dev MUST emit the `Emoted` event is the state of the emote is changed.
-     * @dev MUST revert if the lengths of the `collections`, `tokenIds`, `emojis` and `states` arrays are not equal.
-     * @dev MUST revert if the `deadline` has passed.
-     * @dev MUST revert if the recovered address is the zero address.
-     * @param emoter The address that presigned the emote
-     * @param collection The address of the collection smart contract containing the token being emoted at
-     * @param tokenId IDs of the token being emoted
-     * @param emoji Unicode identifier of the emoji
-     * @param state Boolean value signifying whether to emote (`true`) or undo (`false`) emote
-     * @param deadline UNIX timestamp of the deadline for the signature to be submitted
-     * @param v `v` value of an ECDSA signature of the message obtained via `prepareMessageToPresignEmote`
-     * @param r `r` value of an ECDSA signature of the message obtained via `prepareMessageToPresignEmote`
-     * @param s `s` value of an ECDSA signature of the message obtained via `prepareMessageToPresignEmote`
-     */
-    function _presignedEmote(
+    function presignedEmote(
         address emoter,
         address collection,
         uint256 tokenId,
-        bytes4 emoji,
+        string memory emoji,
         bool state,
         uint256 deadline,
         uint8 v,
         bytes32 r,
         bytes32 s
-    ) internal virtual {
+    ) public {
         if (block.timestamp > deadline) {
             revert ExpiredPresignedEmote();
         }
@@ -320,7 +257,6 @@ abstract contract RMRKEmoteTracker is IERC6381 {
             emoji
         ] == 1;
         if (currentVal != state) {
-            _beforeEmote(collection, tokenId, emoji, state);
             if (state) {
                 _emotesPerToken[collection][tokenId][emoji] += 1;
             } else {
@@ -330,38 +266,20 @@ abstract contract RMRKEmoteTracker is IERC6381 {
                 ? 1
                 : 0;
             emit Emoted(signer, collection, tokenId, emoji, state);
-            _afterEmote(collection, tokenId, emoji, state);
         }
     }
 
-    /**
-     * @notice Used to bulk emote or undo an emote on someone else's behalf.
-     * @dev Does nothing if attempting to set a pre-existent state.
-     * @dev MUST emit the `Emoted` event is the state of the emote is changed.
-     * @dev MUST revert if the lengths of the `collections`, `tokenIds`, `emojis` and `states` arrays are not equal.
-     * @dev MUST revert if the `deadline` has passed.
-     * @dev MUST revert if the recovered address is the zero address.
-     * @param emoters An array of addresses of the accounts that presigned the emotes
-     * @param collections An array of addresses of the collections containing the tokens being emoted at
-     * @param tokenIds An array of IDs of the tokens being emoted
-     * @param emojis An array of unicode identifiers of the emojis
-     * @param states An array of boolean values signifying whether to emote (`true`) or undo (`false`) emote
-     * @param deadlines UNIX timestamp of the deadline for the signature to be submitted
-     * @param v An array of `v` values of an ECDSA signatures of the messages obtained via `prepareMessageToPresignEmote`
-     * @param r An array of `r` values of an ECDSA signatures of the messages obtained via `prepareMessageToPresignEmote`
-     * @param s An array of `s` values of an ECDSA signatures of the messages obtained via `prepareMessageToPresignEmote`
-     */
-    function _bulkPresignedEmote(
+    function bulkPresignedEmote(
         address[] memory emoters,
         address[] memory collections,
         uint256[] memory tokenIds,
-        bytes4[] memory emojis,
+        string[] memory emojis,
         bool[] memory states,
         uint256[] memory deadlines,
         uint8[] memory v,
         bytes32[] memory r,
         bytes32[] memory s
-    ) internal virtual {
+    ) public {
         if (
             emoters.length != collections.length ||
             emoters.length != tokenIds.length ||
@@ -408,7 +326,6 @@ abstract contract RMRKEmoteTracker is IERC6381 {
                 ] ==
                 1;
             if (currentVal != states[i]) {
-                _beforeEmote(collections[i], tokenIds[i], emojis[i], states[i]);
                 if (states[i]) {
                     _emotesPerToken[collections[i]][tokenIds[i]][
                         emojis[i]
@@ -428,7 +345,6 @@ abstract contract RMRKEmoteTracker is IERC6381 {
                     emojis[i],
                     states[i]
                 );
-                _afterEmote(collections[i], tokenIds[i], emojis[i], states[i]);
             }
             unchecked {
                 ++i;
@@ -436,37 +352,6 @@ abstract contract RMRKEmoteTracker is IERC6381 {
         }
     }
 
-    /**
-     * @notice Hook that is called before emote is added or removed.
-     * @param collection Address of the collection containing the token being emoted
-     * @param tokenId ID of the token being emoted
-     * @param emoji Unicode identifier of the emoji
-     * @param state Boolean value signifying whether to emote (`true`) or undo (`false`) emote
-     */
-    function _beforeEmote(
-        address collection,
-        uint256 tokenId,
-        bytes4 emoji,
-        bool state
-    ) internal virtual {}
-
-    /**
-     * @notice Hook that is called after emote is added or removed.
-     * @param collection Address of the collection smart contract containing the token being emoted
-     * @param tokenId ID of the token being emoted
-     * @param emoji Unicode identifier of the emoji
-     * @param state Boolean value signifying whether to emote (`true`) or undo (`false`) emote
-     */
-    function _afterEmote(
-        address collection,
-        uint256 tokenId,
-        bytes4 emoji,
-        bool state
-    ) internal virtual {}
-
-    /**
-     * @inheritdoc IERC165
-     */
     function supportsInterface(
         bytes4 interfaceId
     ) public view virtual returns (bool) {
