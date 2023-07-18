@@ -6,46 +6,39 @@ import { Contract } from 'ethers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 
 async function multiAssetFixture(): Promise<Contract> {
-  return await singleFixtureWithArgs('RMRKMultiAssetImplPreMint', [
+  return await singleFixtureWithArgs('RMRKMultiAssetPreMint', [
     'MultiAsset',
-    'MR',
+    'MA',
     'ipfs://collection-meta',
-    'ipfs://tokenURI',
-    [ADDRESS_ZERO, false, ADDRESS_ZERO, 0, 10000, ONE_ETH],
-  ]);
-}
-
-async function nestableFixture(): Promise<Contract> {
-  return await singleFixtureWithArgs('RMRKNestableImplPreMint', [
-    'MultiAsset',
-    'MR',
-    'ipfs://collection-meta',
-    'ipfs://tokenURI',
-    [ADDRESS_ZERO, false, ADDRESS_ZERO, 0, 10000, ONE_ETH],
+    10000,
+    ADDRESS_ZERO,
+    0,
   ]);
 }
 
 async function nestableMultiAssetFixture(): Promise<Contract> {
-  return await singleFixtureWithArgs('RMRKNestableMultiAssetImplPreMint', [
-    'MultiAsset',
-    'MR',
+  return await singleFixtureWithArgs('RMRKNestableMultiAssetPreMint', [
+    'NestableMultiAsset',
+    'NMA',
     'ipfs://collection-meta',
-    'ipfs://tokenURI',
-    [ADDRESS_ZERO, false, ADDRESS_ZERO, 0, 10000, ONE_ETH],
+    10000,
+    ADDRESS_ZERO,
+    0,
   ]);
 }
 
 async function equippableFixture(): Promise<Contract> {
-  return await singleFixtureWithArgs('RMRKEquippableImplPreMint', [
-    'MultiAsset',
-    'MR',
+  return await singleFixtureWithArgs('RMRKEquippablePreMint', [
+    'Equippable',
+    'EQ',
     'ipfs://collection-meta',
-    'ipfs://tokenURI',
-    [ADDRESS_ZERO, false, ADDRESS_ZERO, 0, 10000, ONE_ETH],
+    10000,
+    ADDRESS_ZERO,
+    0,
   ]);
 }
 
-describe('MultiAssetImplPreMint Minting', async () => {
+describe('MultiAssetPreMint Minting', async () => {
   beforeEach(async function () {
     this.token = await loadFixture(multiAssetFixture);
   });
@@ -53,15 +46,7 @@ describe('MultiAssetImplPreMint Minting', async () => {
   shouldControlValidPreMinting();
 });
 
-describe('NestableImplPreMint Minting', async () => {
-  beforeEach(async function () {
-    this.token = await loadFixture(nestableFixture);
-  });
-
-  shouldControlValidPreMinting();
-});
-
-describe('NestableMultiAssetImplPreMint Minting', async () => {
+describe('NestableMultiAssetPreMint Minting', async () => {
   beforeEach(async function () {
     this.token = await loadFixture(nestableMultiAssetFixture);
   });
@@ -69,7 +54,7 @@ describe('NestableMultiAssetImplPreMint Minting', async () => {
   shouldControlValidPreMinting();
 });
 
-describe('EquippableImplPreMint Minting', async () => {
+describe('EquippablePreMint Minting', async () => {
   beforeEach(async function () {
     this.token = await loadFixture(equippableFixture);
   });
@@ -88,39 +73,31 @@ async function shouldControlValidPreMinting(): Promise<void> {
   it('cannot mint if not owner', async function () {
     const notOwner = addrs[0];
     await expect(
-      this.token.connect(notOwner).mint(notOwner.address, 1),
+      this.token.connect(notOwner).mint(notOwner.address, 1, 'ipfs://tokenURI'),
     ).to.be.revertedWithCustomError(this.token, 'RMRKNotOwnerOrContributor');
   });
 
   it('can mint if owner', async function () {
-    await expect(this.token.connect(owner).mint(addrs[0].address, 1)).to.be.emit(
+    await expect(this.token.connect(owner).mint(addrs[0].address, 1, 'ipfs://tokenURI')).to.be.emit(
       this.token,
       'Transfer',
     );
   });
 
   it('cannot mint 0 units', async function () {
-    await expect(this.token.mint(addrs[0].address, 0)).to.be.revertedWithCustomError(
-      this.token,
-      'RMRKMintZero',
-    );
+    await expect(
+      this.token.mint(addrs[0].address, 0, 'ipfs://tokenURI'),
+    ).to.be.revertedWithCustomError(this.token, 'RMRKMintZero');
   });
 
   it('cannot mint over max supply', async function () {
     await expect(
-      this.token.connect(owner).mint(addrs[0].address, 99999),
+      this.token.connect(owner).mint(addrs[0].address, 99999, 'ipfs://tokenURI'),
     ).to.be.revertedWithCustomError(this.token, 'RMRKMintOverMax');
   });
 
-  it('cannot mint if locked', async function () {
-    await this.token.connect(owner).setLock();
-    await expect(
-      this.token.connect(owner).mint(addrs[0].address, 99999),
-    ).to.be.revertedWithCustomError(this.token, 'RMRKLocked');
-  });
-
   it('reduces total supply on burn', async function () {
-    await this.token.connect(owner).mint(owner.address, 1);
+    await this.token.connect(owner).mint(owner.address, 1, 'ipfs://tokenURI');
     const tokenId = this.token.totalSupply();
     expect(await tokenId).to.equal(1);
     await this.token.connect(owner)['burn(uint256)'](tokenId);
@@ -128,12 +105,12 @@ async function shouldControlValidPreMinting(): Promise<void> {
   });
 
   it('reduces total supply on burn and does not reuse ID', async function () {
-    let tx = await this.token.connect(owner).mint(owner.address, 1);
+    let tx = await this.token.connect(owner).mint(owner.address, 1, 'ipfs://tokenURI');
     let event = (await tx.wait()).events?.find((e) => e.event === 'Transfer');
     const tokenId = event?.args?.tokenId;
     await this.token.connect(owner)['burn(uint256)'](tokenId);
 
-    tx = await this.token.connect(owner).mint(owner.address, 1);
+    tx = await this.token.connect(owner).mint(owner.address, 1, 'ipfs://tokenURI');
     event = (await tx.wait()).events?.find((e) => e.event === 'Transfer');
     const newTokenId = event?.args?.tokenId;
 
@@ -146,32 +123,25 @@ async function shouldControlValidPreMinting(): Promise<void> {
       if (this.token.nestMint === undefined) {
         this.skip();
       }
-      this.token.connect(owner).mint(addrs[0].address, 1);
+      this.token.connect(owner).mint(addrs[0].address, 1, 'ipfs://tokenURI');
     });
 
     it('cannot nest mint if not owner', async function () {
       const notOwner = addrs[0];
       await expect(
-        this.token.connect(notOwner).nestMint(this.token.address, 1, 1),
+        this.token.connect(notOwner).nestMint(this.token.address, 1, 1, 'ipfs://tokenURI'),
       ).to.be.revertedWithCustomError(this.token, 'RMRKNotOwnerOrContributor');
     });
 
     it('can nest mint if owner', async function () {
-      this.token.connect(owner).mint(addrs[0].address, 1);
-      await this.token.connect(owner).nestMint(this.token.address, 1, 1);
+      this.token.connect(owner).mint(addrs[0].address, 1, 'ipfs://tokenURI');
+      await this.token.connect(owner).nestMint(this.token.address, 1, 1, 'ipfs://tokenURI');
     });
 
     it('cannot nest mint over max supply', async function () {
       await expect(
-        this.token.connect(owner).nestMint(this.token.address, 99999, 1),
+        this.token.connect(owner).nestMint(this.token.address, 99999, 1, 'ipfs://tokenURI'),
       ).to.be.revertedWithCustomError(this.token, 'RMRKMintOverMax');
-    });
-
-    it('cannot mint if locked', async function () {
-      await this.token.connect(owner).setLock();
-      await expect(
-        this.token.connect(owner).nestMint(this.token.address, 99999, 1),
-      ).to.be.revertedWithCustomError(this.token, 'RMRKLocked');
     });
   });
 }

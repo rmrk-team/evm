@@ -6,11 +6,6 @@ import "../../../RMRK/multiasset/RMRKMultiAsset.sol";
 import "../../../RMRK/extension/emotable/RMRKEmotable.sol";
 
 contract RMRKMultiAssetEmotableMock is RMRKEmotable, RMRKMultiAsset {
-    constructor(
-        string memory name,
-        string memory symbol
-    ) RMRKMultiAsset(name, symbol) {}
-
     function mint(address to, uint256 tokenId) external {
         _mint(to, tokenId);
     }

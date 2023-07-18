@@ -7,11 +7,6 @@ import "../../../RMRK/extension/soulbound/RMRKSoulbound.sol";
 import "../../RMRKEquippableMock.sol";
 
 contract RMRKSoulboundEquippableMock is RMRKSoulbound, RMRKEquippableMock {
-    constructor(
-        string memory name,
-        string memory symbol
-    ) RMRKEquippableMock(name, symbol) {}
-
     function supportsInterface(
         bytes4 interfaceId
     )
@@ -30,7 +25,8 @@ contract RMRKSoulboundEquippableMock is RMRKSoulbound, RMRKEquippableMock {
         address from,
         address to,
         uint256 tokenId
-    ) internal virtual override(RMRKCore, RMRKSoulbound) {
-        super._beforeTokenTransfer(from, to, tokenId);
+    ) internal virtual override(RMRKNestable, RMRKSoulbound) {
+        RMRKSoulbound._beforeTokenTransfer(from, to, tokenId);
+        RMRKNestable._beforeTokenTransfer(from, to, tokenId);
     }
 }

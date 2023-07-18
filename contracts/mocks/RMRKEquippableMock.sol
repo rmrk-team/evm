@@ -8,11 +8,6 @@ import "../RMRK/equippable/RMRKEquippable.sol";
 
 //Minimal public implementation of RMRKEquippable for testing.
 contract RMRKEquippableMock is RMRKEquippable {
-    constructor(
-        string memory name,
-        string memory symbol
-    ) RMRKEquippable(name, symbol) {}
-
     function mint(address to, uint256 tokenId) external {
         _mint(to, tokenId, "");
     }

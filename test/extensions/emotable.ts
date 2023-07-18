@@ -14,7 +14,7 @@ import {
 
 async function multiAssetEmotableFixture() {
   const factory = await ethers.getContractFactory('RMRKMultiAssetEmotableMock');
-  const token = await factory.deploy('Chunky', 'CHNK');
+  const token = await factory.deploy();
   await token.deployed();
 
   return token;

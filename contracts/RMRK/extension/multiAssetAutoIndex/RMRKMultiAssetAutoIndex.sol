@@ -15,16 +15,6 @@ contract RMRKMultiAssetAutoIndex is IRMRKMultiAssetAutoIndex, RMRKMultiAsset {
     mapping(uint256 => mapping(uint256 => uint256)) private _pendingAssetIndex;
 
     /**
-     * @notice Initializes the contract by setting a name and a symbol to the token collection.
-     * @param name_ Name of the token collection
-     * @param symbol_ Symbol of the token collection
-     */
-    constructor(
-        string memory name_,
-        string memory symbol_
-    ) RMRKMultiAsset(name_, symbol_) {}
-
-    /**
      * @inheritdoc IERC165
      */
     function supportsInterface(

@@ -1,4 +1,4 @@
-import { Contract } from 'ethers';
+import { BigNumber, Contract } from 'ethers';
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { loadFixture, mine } from '@nomicfoundation/hardhat-network-helpers';
@@ -15,7 +15,7 @@ import {
 
 async function soulboundMultiAssetFixture() {
   const factory = await ethers.getContractFactory('RMRKSoulboundMultiAssetMock');
-  const token = await factory.deploy('Chunky', 'CHNK');
+  const token = await factory.deploy();
   await token.deployed();
 
   return { token };
@@ -23,7 +23,7 @@ async function soulboundMultiAssetFixture() {
 
 async function soulboundNestableFixture() {
   const factory = await ethers.getContractFactory('RMRKSoulboundNestableMock');
-  const token = await factory.deploy('Chunky', 'CHNK');
+  const token = await factory.deploy();
   await token.deployed();
 
   return { token };
@@ -31,7 +31,7 @@ async function soulboundNestableFixture() {
 
 async function soulboundNestableMultiAssetFixture() {
   const factory = await ethers.getContractFactory('RMRKSoulboundNestableMultiAssetMock');
-  const token = await factory.deploy('Chunky', 'CHNK');
+  const token = await factory.deploy();
   await token.deployed();
 
   return { token };
@@ -39,26 +39,10 @@ async function soulboundNestableMultiAssetFixture() {
 
 async function soulboundEquippableFixture() {
   const factory = await ethers.getContractFactory('RMRKSoulboundEquippableMock');
-  const token = await factory.deploy('Chunky', 'CHNK');
+  const token = await factory.deploy();
   await token.deployed();
 
   return { token };
-}
-
-async function soulboundNestableExternalEquippableFixture() {
-  const nestableFactory = await ethers.getContractFactory(
-    'RMRKSoulboundNestableExternalEquippableMock',
-  );
-  const nestable = await nestableFactory.deploy('Chunky', 'CHNK');
-  await nestable.deployed();
-
-  const equipFactory = await ethers.getContractFactory('RMRKExternalEquipMock');
-  const equip = await equipFactory.deploy(nestable.address);
-  await equip.deployed();
-
-  await nestable.setEquippableAddress(equip.address);
-
-  return { nestable, equip };
 }
 
 describe('RMRKSoulboundMultiAssetMock', async function () {
@@ -100,16 +84,6 @@ describe('RMRKSoulboundEquippableMock', async function () {
   shouldBehaveLikeSoulboundNestable();
 });
 
-describe('RMRKSoulboundNestableExternalEquippableMock', async function () {
-  beforeEach(async function () {
-    const { nestable } = await loadFixture(soulboundNestableExternalEquippableFixture);
-    this.token = nestable;
-  });
-
-  shouldBehaveLikeSoulboundBasic();
-  shouldBehaveLikeSoulboundNestable();
-});
-
 describe('RMRKSoulbound variants', async function () {
   let owner: SignerWithAddress;
   let otherOwner: SignerWithAddress;
@@ -126,9 +100,7 @@ describe('RMRKSoulbound variants', async function () {
     beforeEach(async function () {
       const factory = await ethers.getContractFactory('RMRKSoulboundAfterBlockNumberMock');
       initBlock = (await ethers.provider.getBlock('latest')).number;
-      token = <RMRKSoulboundAfterBlockNumberMock>(
-        await factory.deploy('Chunky', 'CHNK', initBlock + blocksToTransfer)
-      );
+      token = <RMRKSoulboundAfterBlockNumberMock>await factory.deploy(initBlock + blocksToTransfer);
       await token.deployed();
     });
 
@@ -161,9 +133,7 @@ describe('RMRKSoulbound variants', async function () {
 
     beforeEach(async function () {
       const factory = await ethers.getContractFactory('RMRKSoulboundAfterTransactionsMock');
-      token = <RMRKSoulboundAfterTransactionsMock>(
-        await factory.deploy('Chunky', 'CHNK', maxTransactions)
-      );
+      token = <RMRKSoulboundAfterTransactionsMock>await factory.deploy(maxTransactions);
       await token.deployed();
     });
 
@@ -195,7 +165,7 @@ describe('RMRKSoulbound variants', async function () {
 
     beforeEach(async function () {
       const factory = await ethers.getContractFactory('RMRKSoulboundPerTokenMock');
-      token = <RMRKSoulboundPerTokenMock>await factory.deploy('Chunky', 'CHNK');
+      token = <RMRKSoulboundPerTokenMock>await factory.deploy();
       await token.deployed();
     });
 
@@ -235,7 +205,7 @@ async function shouldBehaveLikeSoulboundBasic() {
   let soulbound: Contract;
   let owner: SignerWithAddress;
   let otherOwner: SignerWithAddress;
-  let tokenId: number;
+  let tokenId: BigNumber;
 
   beforeEach(async function () {
     const signers = await ethers.getSigners();
@@ -276,7 +246,7 @@ async function shouldBehaveLikeSoulboundBasic() {
 async function shouldBehaveLikeSoulboundNestable() {
   let soulbound: Contract;
   let owner: SignerWithAddress;
-  let tokenId: number;
+  let tokenId: BigNumber;
 
   beforeEach(async function () {
     const signers = await ethers.getSigners();

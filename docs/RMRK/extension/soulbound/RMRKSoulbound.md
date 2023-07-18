@@ -10,80 +10,29 @@ Smart contract of the RMRK Soulbound module.
 
 ## Methods
 
-### RMRK_INTERFACE
-
-```solidity
-function RMRK_INTERFACE() external view returns (bytes4)
-```
-
-
-
-
-
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | bytes4 | undefined |
-
-### VERSION
-
-```solidity
-function VERSION() external view returns (string)
-```
-
-Version of the @rmrk-team/evm-contracts package
-
-
-
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | string | undefined |
-
 ### isTransferable
 
 ```solidity
 function isTransferable(uint256, address from, address to) external view returns (bool)
 ```
 
+Used to check whether the given token is transferable or not.
 
-
-
+*If this function returns `false`, the transfer of the token MUST revert execution.If the tokenId does not exist, this method MUST revert execution, unless the token is being checked for  minting.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
 | _0 | uint256 | undefined |
-| from | address | undefined |
-| to | address | undefined |
+| from | address | Address from which the token is being transferred |
+| to | address | Address to which the token is being transferred |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | undefined |
-
-### name
-
-```solidity
-function name() external view returns (string)
-```
-
-Used to retrieve the collection name.
-
-
-
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | string | Name of the collection |
+| _0 | bool | Boolean value indicating whether the given token is transferable |
 
 ### supportsInterface
 
@@ -106,23 +55,6 @@ function supportsInterface(bytes4 interfaceId) external view returns (bool)
 | Name | Type | Description |
 |---|---|---|
 | _0 | bool | undefined |
-
-### symbol
-
-```solidity
-function symbol() external view returns (string)
-```
-
-Used to retrieve the collection symbol.
-
-
-
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | string | Symbol of the collection |
 
 
 

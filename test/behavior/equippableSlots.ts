@@ -1,4 +1,5 @@
 import { ethers } from 'hardhat';
+import { BigNumber } from 'ethers';
 import { expect } from 'chai';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { Contract } from 'ethers';
@@ -28,7 +29,7 @@ import { bn } from '../utils';
 // Background will have a single asset for each, it can be used as full view and to equip
 // Weapon Gems will have 2 enumerated assets, one for full view, one for equipping.
 async function shouldBehaveLikeEquippableWithSlots(
-  nestMint: (token: Contract, to: string, parentId: number) => Promise<number>,
+  nestMint: (token: Contract, to: string, parentId: BigNumber) => Promise<BigNumber>,
 ) {
   let catalog: Contract;
   let soldier: Contract;
@@ -196,8 +197,8 @@ async function shouldBehaveLikeEquippableWithSlots(
 
       const expectedSlots = [bn(partIdForWeapon), bn(partIdForBackground)];
       const expectedEquips = [
-        [bn(soldierResId), bn(weaponResId), bn(weaponsIds[0]), weaponEquip.address],
-        [bn(soldierResId), bn(backgroundAssetId), bn(backgroundsIds[0]), backgroundEquip.address],
+        [bn(soldierResId), bn(weaponResId), weaponsIds[0], weaponEquip.address],
+        [bn(soldierResId), bn(backgroundAssetId), backgroundsIds[0], backgroundEquip.address],
       ];
       const expectedMetadata = ['ipfs:weapon/equip/5', 'ipfs:background/'];
       expect(await view.getEquipped(soldierEquip.address, soldiersIds[0], soldierResId)).to.eql([
@@ -509,7 +510,7 @@ async function shouldBehaveLikeEquippableWithSlots(
           bn(weaponAssetsEquip[0]), // childAssetId
           2, // z
           weaponEquip.address, // childAddress
-          bn(weaponsIds[0]), // childTokenId
+          weaponsIds[0], // childTokenId
           'ipfs:weapon/equip/5', // childAssetMetadata
           '', // partMetadata
         ],
@@ -594,7 +595,7 @@ async function shouldBehaveLikeEquippableWithSlots(
     // All part slots are included on the response:
     // If a slot has nothing equipped, it returns an empty equip:
     const expectedEquips = [
-      [bn(soldierResId), bn(weaponResId), bn(weaponsIds[0]), weaponEquip.address],
+      [bn(soldierResId), bn(weaponResId), weaponsIds[0], weaponEquip.address],
       [bn(0), bn(0), bn(0), ethers.constants.AddressZero],
     ];
     const expectedMetadata = ['ipfs:weapon/equip/5', ''];
@@ -643,9 +644,9 @@ async function shouldBehaveLikeEquippableWithSlots(
 
   async function mintWeaponToSoldier(
     soldierOwner: SignerWithAddress,
-    soldierId: number,
+    soldierId: BigNumber,
     assetIndex: number,
-  ): Promise<number> {
+  ): Promise<BigNumber> {
     // Mint another weapon to the soldier and accept it
     const newWeaponId = await nestMint(weapon, soldier.address, soldierId);
     await soldier.connect(soldierOwner).acceptChild(soldierId, 0, weapon.address, newWeaponId);

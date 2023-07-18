@@ -8,11 +8,6 @@ import "../RMRK/equippable/RMRKMinifiedEquippable.sol";
 
 //Minimal public implementation of RMRKEquippable for testing.
 contract RMRKMinifiedEquippableMock is RMRKMinifiedEquippable {
-    constructor(
-        string memory name,
-        string memory symbol
-    ) RMRKMinifiedEquippable(name, symbol) {}
-
     function safeMint(address to, uint256 tokenId) public {
         _safeMint(to, tokenId, "");
     }
