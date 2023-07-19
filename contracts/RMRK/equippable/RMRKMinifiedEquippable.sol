@@ -1572,7 +1572,7 @@ contract RMRKMinifiedEquippable is
      */
     function _beforeSetPriority(
         uint256 tokenId,
-        uint64[] calldata priorities
+        uint64[] memory priorities
     ) internal virtual {}
 
     /**
@@ -1582,7 +1582,7 @@ contract RMRKMinifiedEquippable is
      */
     function _afterSetPriority(
         uint256 tokenId,
-        uint64[] calldata priorities
+        uint64[] memory priorities
     ) internal virtual {}
 
     // ------------------- ASSETS --------------
@@ -1803,7 +1803,7 @@ contract RMRKMinifiedEquippable is
      */
     function setPriority(
         uint256 tokenId,
-        uint64[] calldata priorities
+        uint64[] memory priorities
     ) public virtual onlyApprovedForAssetsOrOwner(tokenId) {
         uint256 length = priorities.length;
         if (length != _activeAssets[tokenId].length)
