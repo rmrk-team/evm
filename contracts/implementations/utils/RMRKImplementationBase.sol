@@ -43,7 +43,7 @@ abstract contract RMRKImplementationBase is Ownable {
      * @notice Used to retrieve the total supply of the tokens in a collection.
      * @return The number of tokens in a collection
      */
-    function totalSupply() public view returns (uint256) {
+    function totalSupply() public view virtual returns (uint256) {
         return _totalSupply;
     }
 
@@ -51,7 +51,7 @@ abstract contract RMRKImplementationBase is Ownable {
      * @notice Used to retrieve the maximum supply of the collection.
      * @return The maximum supply of tokens in the collection
      */
-    function maxSupply() public view returns (uint256) {
+    function maxSupply() public view virtual returns (uint256) {
         return _maxSupply;
     }
 
@@ -67,7 +67,7 @@ abstract contract RMRKImplementationBase is Ownable {
      * @notice Used to retrieve the metadata of the collection.
      * @return string The metadata URI of the collection
      */
-    function collectionMetadata() public view returns (string memory) {
+    function collectionMetadata() public view virtual returns (string memory) {
         return _collectionMetadata;
     }
 
@@ -95,7 +95,7 @@ abstract contract RMRKImplementationBase is Ownable {
      */
     function _prepareMint(
         uint256 numToMint
-    ) internal returns (uint256 nextToken, uint256 totalSupplyOffset) {
+    ) internal virtual returns (uint256 nextToken, uint256 totalSupplyOffset) {
         if (numToMint == uint256(0)) revert RMRKMintZero();
         if (numToMint + _nextId > _maxSupply) revert RMRKMintOverMax();
 
