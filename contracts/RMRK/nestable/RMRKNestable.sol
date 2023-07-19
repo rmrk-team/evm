@@ -258,31 +258,17 @@ contract RMRKNestable is Context, IERC165, IERC721, IERC6059, RMRKCore {
         if (to == address(0)) revert ERC721TransferToTheZeroAddress();
 
         _beforeTokenTransfer(from, to, tokenId);
-        _beforeNestedTokenTransfer(
-            immediateOwner,
-            to,
-            parentId,
-            0,
-            tokenId,
-            data
-        );
+        _beforeNestedTokenTransfer(from, to, parentId, 0, tokenId, data);
 
         _balances[from] -= 1;
         _updateOwnerAndClearApprovals(tokenId, 0, to);
         _balances[to] += 1;
 
         emit Transfer(from, to, tokenId);
-        emit NestTransfer(immediateOwner, to, parentId, 0, tokenId);
+        emit NestTransfer(from, to, parentId, 0, tokenId);
 
         _afterTokenTransfer(from, to, tokenId);
-        _afterNestedTokenTransfer(
-            immediateOwner,
-            to,
-            parentId,
-            0,
-            tokenId,
-            data
-        );
+        _afterNestedTokenTransfer(from, to, parentId, 0, tokenId, data);
     }
 
     /**
@@ -588,10 +574,10 @@ contract RMRKNestable is Context, IERC165, IERC721, IERC6059, RMRKCore {
         uint256 maxChildrenBurns
     ) internal virtual returns (uint256) {
         (address immediateOwner, uint256 parentId, ) = directOwnerOf(tokenId);
-        address owner = ownerOf(tokenId);
+        address rootOwner = ownerOf(tokenId);
         _balances[immediateOwner] -= 1;
 
-        _beforeTokenTransfer(owner, address(0), tokenId);
+        _beforeTokenTransfer(immediateOwner, address(0), tokenId);
         _beforeNestedTokenTransfer(
             immediateOwner,
             address(0),
@@ -608,7 +594,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IERC6059, RMRKCore {
 
         delete _activeChildren[tokenId];
         delete _pendingChildren[tokenId];
-        delete _tokenApprovals[tokenId][owner];
+        delete _tokenApprovals[tokenId][rootOwner];
 
         uint256 pendingRecursiveBurns;
         uint256 totalChildBurns;
@@ -642,10 +628,10 @@ contract RMRKNestable is Context, IERC165, IERC721, IERC6059, RMRKCore {
         // Can't remove before burning child since child will call back to get root owner
         delete _RMRKOwners[tokenId];
 
-        emit Transfer(owner, address(0), tokenId);
+        emit Transfer(immediateOwner, address(0), tokenId);
         emit NestTransfer(immediateOwner, address(0), parentId, 0, tokenId);
 
-        _afterTokenTransfer(owner, address(0), tokenId);
+        _afterTokenTransfer(immediateOwner, address(0), tokenId);
         _afterNestedTokenTransfer(
             immediateOwner,
             address(0),
