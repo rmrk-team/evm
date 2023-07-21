@@ -1,7 +1,7 @@
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { expect } from 'chai';
-import { Contract } from 'ethers';
+import { BigNumber, Contract } from 'ethers';
 import { ethers } from 'hardhat';
 import {
   ADDRESS_ZERO,
@@ -15,6 +15,16 @@ async function multiAssetFixture(): Promise<Contract> {
   return await singleFixtureWithArgs('RMRKMultiAssetLazyMintNative', [
     'MultiAsset',
     'MA',
+    'ipfs://collection-meta',
+    'ipfs://tokenURI',
+    [ADDRESS_ZERO, 1000, 10000, ONE_ETH],
+  ]);
+}
+
+async function nestableFixture(): Promise<Contract> {
+  return await singleFixtureWithArgs('RMRKNestableLazyMintNative', [
+    'Nestable',
+    'N',
     'ipfs://collection-meta',
     'ipfs://tokenURI',
     [ADDRESS_ZERO, 1000, 10000, ONE_ETH],
@@ -44,6 +54,14 @@ async function equippableFixture(): Promise<Contract> {
 describe('MultiAssetNativeTokenPay Minting', async () => {
   beforeEach(async function () {
     this.token = await loadFixture(multiAssetFixture);
+  });
+
+  shouldControlValidMintingNativeTokenPay();
+});
+
+describe('NestableNativeTokenPay Minting', async () => {
+  beforeEach(async function () {
+    this.token = await loadFixture(nestableFixture);
   });
 
   shouldControlValidMintingNativeTokenPay();
@@ -123,7 +141,7 @@ async function shouldControlValidMintingNativeTokenPay(): Promise<void> {
   });
 
   describe('Nest minting', async () => {
-    let parentId: number;
+    let parentId: BigNumber;
 
     beforeEach(async function () {
       if (this.token.nestMint === undefined) {

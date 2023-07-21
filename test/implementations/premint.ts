@@ -1,7 +1,7 @@
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { ADDRESS_ZERO, ONE_ETH, singleFixtureWithArgs } from '../utils';
+import { ADDRESS_ZERO, singleFixtureWithArgs } from '../utils';
 import { Contract } from 'ethers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 
@@ -9,6 +9,17 @@ async function multiAssetFixture(): Promise<Contract> {
   return await singleFixtureWithArgs('RMRKMultiAssetPreMint', [
     'MultiAsset',
     'MA',
+    'ipfs://collection-meta',
+    10000,
+    ADDRESS_ZERO,
+    0,
+  ]);
+}
+
+async function nestableFixture(): Promise<Contract> {
+  return await singleFixtureWithArgs('RMRKNestablePreMint', [
+    'Nestable',
+    'N',
     'ipfs://collection-meta',
     10000,
     ADDRESS_ZERO,
@@ -41,6 +52,14 @@ async function equippableFixture(): Promise<Contract> {
 describe('MultiAssetPreMint Minting', async () => {
   beforeEach(async function () {
     this.token = await loadFixture(multiAssetFixture);
+  });
+
+  shouldControlValidPreMinting();
+});
+
+describe('NestablePreMint Minting', async () => {
+  beforeEach(async function () {
+    this.token = await loadFixture(nestableFixture);
   });
 
   shouldControlValidPreMinting();

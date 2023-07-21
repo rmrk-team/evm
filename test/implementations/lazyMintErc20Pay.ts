@@ -26,6 +26,20 @@ async function multiAssetFixture(): Promise<Contract> {
   ]);
 }
 
+async function nestableFixture(): Promise<Contract> {
+  const erc20Factory = await ethers.getContractFactory('ERC20Mock');
+  const erc20 = <ERC20Mock>await erc20Factory.deploy();
+  await erc20.deployed();
+
+  return await singleFixtureWithArgs('RMRKNestableLazyMintErc20', [
+    'Nestable',
+    'N',
+    'ipfs://collection-meta',
+    'ipfs://tokenURI',
+    [erc20.address, ADDRESS_ZERO, 0, 10000, ONE_ETH],
+  ]);
+}
+
 async function nestableMultiAssetFixture(): Promise<Contract> {
   const erc20Factory = await ethers.getContractFactory('ERC20Mock');
   const erc20 = <ERC20Mock>await erc20Factory.deploy();
@@ -57,6 +71,14 @@ async function equippableFixture(): Promise<Contract> {
 describe('MultiAssetErc20Pay Minting', async () => {
   beforeEach(async function () {
     this.token = await loadFixture(multiAssetFixture);
+  });
+
+  shouldControlValidMintingErc20Pay();
+});
+
+describe('NestableErc20Pay Minting', async () => {
+  beforeEach(async function () {
+    this.token = await loadFixture(nestableFixture);
   });
 
   shouldControlValidMintingErc20Pay();

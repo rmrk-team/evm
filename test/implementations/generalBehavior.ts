@@ -15,12 +15,18 @@ import {
   RMRKMultiAssetLazyMintNativeSoulbound,
   RMRKMultiAssetPreMint,
   RMRKMultiAssetPreMintSoulbound,
+  RMRKNestableLazyMintErc20,
+  RMRKNestableLazyMintErc20Soulbound,
+  RMRKNestableLazyMintNative,
+  RMRKNestableLazyMintNativeSoulbound,
   RMRKNestableMultiAssetLazyMintErc20,
   RMRKNestableMultiAssetLazyMintErc20Soulbound,
   RMRKNestableMultiAssetLazyMintNative,
   RMRKNestableMultiAssetLazyMintNativeSoulbound,
   RMRKNestableMultiAssetPreMint,
   RMRKNestableMultiAssetPreMintSoulbound,
+  RMRKNestablePreMint,
+  RMRKNestablePreMintSoulbound,
 } from '../../typechain-types';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { BigNumber, Contract } from 'ethers';
@@ -64,18 +70,24 @@ describe('RMRKImplementations', async () => {
 
   let multiAssetPreMintImpl: RMRKMultiAssetPreMint;
   let multiAssetPreMintSoulboundImpl: RMRKMultiAssetPreMintSoulbound;
+  let nestablePreMintImpl: RMRKNestablePreMint;
+  let nestablePreMintSoulboundImpl: RMRKNestablePreMintSoulbound;
   let nestableMultiAssetPreMintImpl: RMRKNestableMultiAssetPreMint;
   let nestableMultiAssetPreMintSoulboundImpl: RMRKNestableMultiAssetPreMintSoulbound;
   let equippablePreMintImpl: RMRKEquippablePreMint;
   let equippablePreMintSoulboundImpl: RMRKEquippablePreMintSoulbound;
   let multiAssetLazyMintNativeImpl: RMRKMultiAssetLazyMintNative;
   let multiAssetLazyMintNativeSoulboundImpl: RMRKMultiAssetLazyMintNativeSoulbound;
+  let nestableLazyMintNativeImpl: RMRKNestableLazyMintNative;
+  let nestableLazyMintNativeSoulboundImpl: RMRKNestableLazyMintNativeSoulbound;
   let nestableMultiAssetLazyMintNativeImpl: RMRKNestableMultiAssetLazyMintNative;
   let nestableMultiAssetLazyMintNativeSoulboundImpl: RMRKNestableMultiAssetLazyMintNativeSoulbound;
   let equippableLazyMintNativeImpl: RMRKEquippableLazyMintNative;
   let equippableLazyMintNativeSoulboundImpl: RMRKEquippableLazyMintNativeSoulbound;
   let multiAssetLazyMintErc20Impl: RMRKMultiAssetLazyMintErc20;
   let multiAssetLazyMintErc20SoulboundImpl: RMRKMultiAssetLazyMintErc20Soulbound;
+  let nestableLazyMintErc20Impl: RMRKNestableLazyMintErc20;
+  let nestableLazyMintErc20SoulboundImpl: RMRKNestableLazyMintErc20Soulbound;
   let nestableMultiAssetLazyMintErc20Impl: RMRKNestableMultiAssetLazyMintErc20;
   let nestableMultiAssetLazyMintErc20SoulboundImpl: RMRKNestableMultiAssetLazyMintErc20Soulbound;
   let equippableLazyMintErc20Impl: RMRKEquippableLazyMintErc20;
@@ -97,6 +109,10 @@ describe('RMRKImplementations', async () => {
     const multiAssetPreMintSoulboundImplFactory = await ethers.getContractFactory(
       'RMRKMultiAssetPreMintSoulbound',
     );
+    const nestablePreMintImplFactory = await ethers.getContractFactory('RMRKNestablePreMint');
+    const nestablePreMintSoulboundImplFactory = await ethers.getContractFactory(
+      'RMRKNestablePreMintSoulbound',
+    );
     const nestableMultiAssetPreMintImplFactory = await ethers.getContractFactory(
       'RMRKNestableMultiAssetPreMint',
     );
@@ -114,6 +130,12 @@ describe('RMRKImplementations', async () => {
     );
     const multiAssetLazyMintNativeSoulboundImplFactory = await ethers.getContractFactory(
       'RMRKMultiAssetLazyMintNativeSoulbound',
+    );
+    const nestableLazyMintNativeImplFactory = await ethers.getContractFactory(
+      'RMRKNestableLazyMintNative',
+    );
+    const nestableLazyMintNativeSoulboundImplFactory = await ethers.getContractFactory(
+      'RMRKNestableLazyMintNativeSoulbound',
     );
     const nestableMultiAssetLazyMintNativeImplFactory = await ethers.getContractFactory(
       'RMRKNestableMultiAssetLazyMintNative',
@@ -134,6 +156,12 @@ describe('RMRKImplementations', async () => {
     );
     const multiAssetLazyMintErc20SoulboundImplFactory = await ethers.getContractFactory(
       'RMRKMultiAssetLazyMintErc20Soulbound',
+    );
+    const nestableLazyMintErc20ImplFactory = await ethers.getContractFactory(
+      'RMRKNestableLazyMintErc20',
+    );
+    const nestableLazyMintErc20SoulboundImplFactory = await ethers.getContractFactory(
+      'RMRKNestableLazyMintErc20Soulbound',
     );
     const nestableMultiAssetLazyMintErc20ImplFactory = await ethers.getContractFactory(
       'RMRKNestableMultiAssetLazyMintErc20',
@@ -190,6 +218,12 @@ describe('RMRKImplementations', async () => {
     const multiAssetPreMintSoulboundImpl = <RMRKMultiAssetPreMintSoulbound>(
       await multiAssetPreMintSoulboundImplFactory.deploy(...deployArgsPreMint)
     );
+    const nestablePreMintImpl = <RMRKNestablePreMint>(
+      await nestablePreMintImplFactory.deploy(...deployArgsPreMint)
+    );
+    const nestablePreMintSoulboundImpl = <RMRKNestablePreMintSoulbound>(
+      await nestablePreMintSoulboundImplFactory.deploy(...deployArgsPreMint)
+    );
     const nestableMultiAssetPreMintImpl = <RMRKNestableMultiAssetPreMint>(
       await nestableMultiAssetPreMintImplFactory.deploy(...deployArgsPreMint)
     );
@@ -208,6 +242,12 @@ describe('RMRKImplementations', async () => {
     );
     const multiAssetLazyMintNativeSoulboundImpl = <RMRKMultiAssetLazyMintNativeSoulbound>(
       await multiAssetLazyMintNativeSoulboundImplFactory.deploy(...deployArgsLazyMintNativePay)
+    );
+    const nestableLazyMintNativeImpl = <RMRKNestableMultiAssetLazyMintNative>(
+      await nestableLazyMintNativeImplFactory.deploy(...deployArgsLazyMintNativePay)
+    );
+    const nestableLazyMintNativeSoulboundImpl = <RMRKNestableMultiAssetLazyMintNativeSoulbound>(
+      await nestableLazyMintNativeSoulboundImplFactory.deploy(...deployArgsLazyMintNativePay)
     );
     const nestableMultiAssetLazyMintNativeImpl = <RMRKNestableMultiAssetLazyMintNative>(
       await nestableMultiAssetLazyMintNativeImplFactory.deploy(...deployArgsLazyMintNativePay)
@@ -232,6 +272,12 @@ describe('RMRKImplementations', async () => {
     );
     const multiAssetLazyMintErc20SoulboundImpl = <RMRKMultiAssetLazyMintErc20Soulbound>(
       await multiAssetLazyMintErc20SoulboundImplFactory.deploy(...deployArgsLazyMintERC20Pay)
+    );
+    const nestableLazyMintErc20Impl = <RMRKNestableMultiAssetLazyMintErc20>(
+      await nestableLazyMintErc20ImplFactory.deploy(...deployArgsLazyMintERC20Pay)
+    );
+    const nestableLazyMintErc20SoulboundImpl = <RMRKNestableMultiAssetLazyMintErc20Soulbound>(
+      await nestableLazyMintErc20SoulboundImplFactory.deploy(...deployArgsLazyMintERC20Pay)
     );
     const nestableMultiAssetLazyMintErc20Impl = <RMRKNestableMultiAssetLazyMintErc20>(
       await nestableMultiAssetLazyMintErc20ImplFactory.deploy(...deployArgsLazyMintERC20Pay)
@@ -265,6 +311,12 @@ describe('RMRKImplementations', async () => {
       multiAssetLazyMintNativeSoulboundImpl,
       multiAssetPreMintImpl,
       multiAssetPreMintSoulboundImpl,
+      nestableLazyMintErc20Impl,
+      nestableLazyMintErc20SoulboundImpl,
+      nestableLazyMintNativeImpl,
+      nestableLazyMintNativeSoulboundImpl,
+      nestablePreMintImpl,
+      nestablePreMintSoulboundImpl,
       nestableMultiAssetLazyMintErc20Impl,
       nestableMultiAssetLazyMintErc20SoulboundImpl,
       nestableMultiAssetLazyMintNativeImpl,
@@ -292,6 +344,12 @@ describe('RMRKImplementations', async () => {
       multiAssetLazyMintNativeSoulboundImpl,
       multiAssetPreMintImpl,
       multiAssetPreMintSoulboundImpl,
+      nestableLazyMintErc20Impl,
+      nestableLazyMintErc20SoulboundImpl,
+      nestableLazyMintNativeImpl,
+      nestableLazyMintNativeSoulboundImpl,
+      nestablePreMintImpl,
+      nestablePreMintSoulboundImpl,
       nestableMultiAssetLazyMintErc20Impl,
       nestableMultiAssetLazyMintErc20SoulboundImpl,
       nestableMultiAssetLazyMintNativeImpl,
@@ -323,6 +381,24 @@ describe('RMRKImplementations', async () => {
     testInterfaceSupport(LegoCombination.MultiAsset, true);
     testMultiAssetBehavior(MintingType.RMRKPreMint);
     testGeneralBehavior(MintingType.RMRKPreMint);
+  });
+
+  describe('RMRKNestableLazyMintErc20', async () => {
+    beforeEach(async function () {
+      this.contract = nestableLazyMintErc20Impl;
+    });
+
+    testInterfaceSupport(LegoCombination.Nestable, false);
+    testGeneralBehavior(MintingType.RMRKLazyMintERC20);
+  });
+
+  describe('RMRKNestableLazyMintErc20Soulbound', async () => {
+    beforeEach(async function () {
+      this.contract = nestableLazyMintErc20SoulboundImpl;
+    });
+
+    testInterfaceSupport(LegoCombination.Nestable, true);
+    testGeneralBehavior(MintingType.RMRKLazyMintERC20);
   });
 
   describe('RMRKNestableMultiAssetPreMint', async () => {
@@ -384,6 +460,24 @@ describe('RMRKImplementations', async () => {
 
     testInterfaceSupport(LegoCombination.MultiAsset, true);
     testMultiAssetBehavior(MintingType.RMRKLazyMintNativeToken);
+    testGeneralBehavior(MintingType.RMRKLazyMintNativeToken);
+  });
+
+  describe('RMRKNestableLazyMintNative', async () => {
+    beforeEach(async function () {
+      this.contract = nestableLazyMintNativeImpl;
+    });
+
+    testInterfaceSupport(LegoCombination.Nestable, false);
+    testGeneralBehavior(MintingType.RMRKLazyMintNativeToken);
+  });
+
+  describe('RMRKNestableLazyMintNativeSoulbound', async () => {
+    beforeEach(async function () {
+      this.contract = nestableLazyMintNativeSoulboundImpl;
+    });
+
+    testInterfaceSupport(LegoCombination.Nestable, true);
     testGeneralBehavior(MintingType.RMRKLazyMintNativeToken);
   });
 
@@ -459,6 +553,24 @@ describe('RMRKImplementations', async () => {
     testGeneralBehavior(MintingType.RMRKLazyMintERC20);
   });
 
+  describe('RMRKNestablePreMint', async () => {
+    beforeEach(async function () {
+      this.contract = nestablePreMintImpl;
+    });
+
+    testInterfaceSupport(LegoCombination.Nestable, false);
+    testGeneralBehavior(MintingType.RMRKPreMint);
+  });
+
+  describe('RMRKNestablePreMintSoulbound', async () => {
+    beforeEach(async function () {
+      this.contract = nestablePreMintSoulboundImpl;
+    });
+
+    testInterfaceSupport(LegoCombination.Nestable, true);
+    testGeneralBehavior(MintingType.RMRKPreMint);
+  });
+
   describe('RMRKNestableMultiAssetLazyMintErc20Soulbound', async () => {
     beforeEach(async function () {
       this.contract = nestableMultiAssetLazyMintErc20SoulboundImpl;
@@ -509,7 +621,18 @@ async function testInterfaceSupport(legoCombination: LegoCombination, isSoulboun
     it('supports RMRK interfaces', async function () {
       expect(await contract.supportsInterface(RMRK_INTERFACE)).to.be.true;
       expect(await contract.supportsInterface(IERC2981)).to.be.true;
-      expect(await contract.supportsInterface(IERC5773)).to.be.true;
+      if (
+        [
+          LegoCombination.MultiAsset,
+          LegoCombination.NestableMultiAsset,
+          LegoCombination.Equippable,
+        ].includes(legoCombination)
+      ) {
+        expect(await contract.supportsInterface(IERC5773)).to.be.true;
+      } else {
+        expect(await contract.supportsInterface(IERC5773)).to.be.false;
+      }
+
       if (
         [
           LegoCombination.Equippable,
@@ -518,10 +641,16 @@ async function testInterfaceSupport(legoCombination: LegoCombination, isSoulboun
         ].includes(legoCombination)
       ) {
         expect(await contract.supportsInterface(IERC6059)).to.be.true;
+      } else {
+        expect(await contract.supportsInterface(IERC6059)).to.be.false;
       }
+
       if (legoCombination == LegoCombination.Equippable) {
         expect(await contract.supportsInterface(IERC6220)).to.be.true;
+      } else {
+        expect(await contract.supportsInterface(IERC6220)).to.be.false;
       }
+
       if (isSoulbound) {
         expect(await contract.supportsInterface(IERC6454)).to.be.true;
       } else {
