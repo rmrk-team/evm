@@ -675,11 +675,6 @@ contract RMRKMinifiedEquippable is
         _approveForAssets(address(0), tokenId);
     }
 
-    /**
-     * @notice Used to remove approvals for the current owner of the given token.
-     * @param tokenId ID of the token to clear the approvals for
-     */
-
     ////////////////////////////////////////
     //              UTILS
     ////////////////////////////////////////
