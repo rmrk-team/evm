@@ -280,4 +280,68 @@ contract RMRKNestableRenderUtils {
 
         return (isValid, validityOfChildren);
     }
+
+    /**
+     * @notice Used to retrieve the total number of descendants of the given token and whether it has more than one level of nesting.
+     * @param collection Address of the token's collection smart contract
+     * @param tokenId ID of the token
+     * @return totalDescendants The total number of descendants of the given token
+     * @return hasMoreThanOneLevelOfNesting_ A boolean value indicating whether the given token has more than one level of nesting
+     */
+    function getTotalDescendants(
+        address collection,
+        uint256 tokenId
+    )
+        public
+        view
+        returns (uint256 totalDescendants, bool hasMoreThanOneLevelOfNesting_)
+    {
+        IERC6059.Child[] memory children = IERC6059(collection).childrenOf(
+            tokenId
+        );
+        uint256 directChildrenCount = children.length;
+        totalDescendants = directChildrenCount;
+
+        for (uint256 i; i < directChildrenCount; ) {
+            (uint256 totalChildDescendants, ) = getTotalDescendants(
+                children[i].contractAddress,
+                children[i].tokenId
+            );
+            totalDescendants += totalChildDescendants;
+            unchecked {
+                ++i;
+            }
+        }
+        hasMoreThanOneLevelOfNesting_ = totalDescendants > directChildrenCount;
+    }
+
+    /**
+     * @notice Used to retrieve whether a token has more than one level of nesting.
+     * @param collection Address of the token's collection smart contract
+     * @param tokenId ID of the token
+     * @return A boolean value indicating whether the given token has more than one level of nesting
+     */
+    function hasMoreThanOneLevelOfNesting(
+        address collection,
+        uint256 tokenId
+    ) public view returns (bool) {
+        IERC6059.Child[] memory children = IERC6059(collection).childrenOf(
+            tokenId
+        );
+        uint256 directChildrenCount = children.length;
+
+        for (uint256 i; i < directChildrenCount; ) {
+            if (
+                IERC6059(children[i].contractAddress)
+                    .childrenOf(children[i].tokenId)
+                    .length > 0
+            ) {
+                return true;
+            }
+            unchecked {
+                ++i;
+            }
+        }
+        return false;
+    }
 }

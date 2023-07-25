@@ -130,6 +130,53 @@ Used to retrieve the given child&#39;s index in its parent&#39;s pending child t
 |---|---|---|
 | _0 | uint256 | The index of the child token in the parent token&#39;s pending child tokens array |
 
+### getTotalDescendants
+
+```solidity
+function getTotalDescendants(address collection, uint256 tokenId) external view returns (uint256 totalDescendants, bool hasMoreThanOneLevelOfNesting_)
+```
+
+Used to retrieve the total number of descendants of the given token and whether it has more than one level of nesting.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| collection | address | Address of the token&#39;s collection smart contract |
+| tokenId | uint256 | ID of the token |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| totalDescendants | uint256 | The total number of descendants of the given token |
+| hasMoreThanOneLevelOfNesting_ | bool | A boolean value indicating whether the given token has more than one level of nesting |
+
+### hasMoreThanOneLevelOfNesting
+
+```solidity
+function hasMoreThanOneLevelOfNesting(address collection, uint256 tokenId) external view returns (bool)
+```
+
+Used to retrieve whether a token has more than one level of nesting.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| collection | address | Address of the token&#39;s collection smart contract |
+| tokenId | uint256 | ID of the token |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | bool | A boolean value indicating whether the given token has more than one level of nesting |
+
 ### isTokenRejectedOrAbandoned
 
 ```solidity

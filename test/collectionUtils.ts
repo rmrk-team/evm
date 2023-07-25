@@ -200,4 +200,22 @@ describe('Collection Utils', function () {
       true,
     ]);
   });
+
+  it('can get pages of available ids', async function () {
+    await multiAsset.mint(holder.address, 9, '');
+    await multiAsset.connect(holder).burn(3);
+    await multiAsset.connect(holder).burn(8);
+
+    expect(await collectionUtils.getPaginatedMintedIds(multiAsset.address, 1, 5)).to.eql([
+      bn(1),
+      bn(2),
+      bn(4),
+      bn(5),
+    ]);
+    expect(await collectionUtils.getPaginatedMintedIds(multiAsset.address, 6, 10)).to.eql([
+      bn(6),
+      bn(7),
+      bn(9),
+    ]);
+  });
 });

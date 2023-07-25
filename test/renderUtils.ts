@@ -20,6 +20,7 @@ import {
   RMRKNestableMultiAssetPreMintSoulbound,
   RMRKRenderUtils,
   RMRKEquippableMock,
+  RMRKNestableRenderUtils,
 } from '../typechain-types';
 import {
   assetForGemALeft,
@@ -40,10 +41,11 @@ import { BigNumber } from 'ethers';
 
 // --------------- FIXTURES -----------------------
 
-async function multiAsetAndEquipRenderUtilsFixture() {
+async function multiAsetNestableAndEquipRenderUtilsFixture() {
   const catalogFactory = await ethers.getContractFactory('RMRKCatalogMock');
   const equipFactory = await ethers.getContractFactory('RMRKEquippableMock');
   const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiAssetRenderUtils');
+  const renderUtilsNestableFactory = await ethers.getContractFactory('RMRKNestableRenderUtils');
   const renderUtilsEquipFactory = await ethers.getContractFactory('RMRKEquipRenderUtils');
 
   const catalog = <RMRKCatalogMock>await catalogFactory.deploy('ipfs://catalog.json', 'misc');
@@ -55,10 +57,13 @@ async function multiAsetAndEquipRenderUtilsFixture() {
   const renderUtils = <RMRKMultiAssetRenderUtils>await renderUtilsFactory.deploy();
   await renderUtils.deployed();
 
+  const renderUtilsNestable = <RMRKNestableRenderUtils>await renderUtilsNestableFactory.deploy();
+  await renderUtilsNestable.deployed();
+
   const renderUtilsEquip = <RMRKEquipRenderUtils>await renderUtilsEquipFactory.deploy();
   await renderUtilsEquip.deployed();
 
-  return { catalog, equip, renderUtils, renderUtilsEquip };
+  return { catalog, equip, renderUtils, renderUtilsNestable, renderUtilsEquip };
 }
 
 async function advancedEquipRenderUtilsFixture() {
@@ -79,20 +84,6 @@ async function advancedEquipRenderUtilsFixture() {
 
   return { catalog, kanaria, gem, renderUtilsEquip };
 }
-
-async function simpleRenderUtilsFixture() {
-  const equipFactory = await ethers.getContractFactory('RMRKEquippableMock');
-  const renderUtilsFactory = await ethers.getContractFactory('RMRKRenderUtils');
-
-  const token = <RMRKEquippableMock>await equipFactory.deploy();
-  token.deployed();
-
-  const renderUtils = <RMRKEquipRenderUtils>await renderUtilsFactory.deploy();
-  await renderUtils.deployed();
-
-  return { token, renderUtils };
-}
-
 async function extendedNftRenderUtilsFixture() {
   const deployer = (await ethers.getSigners())[0];
   const multiAssetFactory = await ethers.getContractFactory('RMRKMultiAssetPreMint');
@@ -170,11 +161,12 @@ async function extendedNftRenderUtilsFixture() {
   };
 }
 
-describe('MultiAsset and Equip Render Utils', async function () {
+describe('MultiAsset Nestable and Equip Render Utils', async function () {
   let owner: SignerWithAddress;
   let catalog: RMRKCatalogMock;
   let equip: RMRKEquippableMock;
   let renderUtils: RMRKMultiAssetRenderUtils;
+  let renderUtilsNestable: RMRKNestableRenderUtils;
   let renderUtilsEquip: RMRKEquipRenderUtils;
   let tokenId: BigNumber;
 
@@ -184,8 +176,8 @@ describe('MultiAsset and Equip Render Utils', async function () {
   const resId4 = bn(4);
 
   beforeEach(async function () {
-    ({ catalog, equip, renderUtils, renderUtilsEquip } = await loadFixture(
-      multiAsetAndEquipRenderUtilsFixture,
+    ({ catalog, equip, renderUtils, renderUtilsNestable, renderUtilsEquip } = await loadFixture(
+      multiAsetNestableAndEquipRenderUtilsFixture,
     ));
 
     const signers = await ethers.getSigners();
@@ -272,6 +264,48 @@ describe('MultiAsset and Equip Render Utils', async function () {
       await expect(
         renderUtils.getTopAssetMetaForToken(equip.address, otherTokenId),
       ).to.be.revertedWithCustomError(renderUtils, 'RMRKTokenHasNoAssets');
+    });
+  });
+
+  describe('Render Utils Nestable', async function () {
+    let parentId: BigNumber;
+    let childId1: BigNumber;
+    let childId2: BigNumber;
+
+    beforeEach(async function () {
+      parentId = await mintFromMock(equip, owner.address);
+      childId1 = await nestMintFromMock(equip, equip.address, parentId);
+      childId2 = await nestMintFromMock(equip, equip.address, parentId);
+      await equip.acceptChild(parentId, 0, equip.address, childId1);
+      await equip.acceptChild(parentId, 0, equip.address, childId2);
+    });
+
+    it('can get total descendants', async function () {
+      expect(await renderUtilsNestable.getTotalDescendants(equip.address, parentId)).to.eql([
+        bn(2),
+        false,
+      ]);
+
+      const grandChildId = await nestMintFromMock(equip, equip.address, childId1);
+      await equip.acceptChild(childId1, 0, equip.address, grandChildId);
+
+      expect(await renderUtilsNestable.getTotalDescendants(equip.address, parentId)).to.eql([
+        bn(3),
+        true,
+      ]);
+    });
+
+    it('can tell if a token has multiple levels of nesting', async function () {
+      expect(
+        await renderUtilsNestable.hasMoreThanOneLevelOfNesting(equip.address, parentId),
+      ).to.eql(false);
+
+      const grandChildId = await nestMintFromMock(equip, equip.address, childId1);
+      await equip.acceptChild(childId1, 0, equip.address, grandChildId);
+
+      expect(
+        await renderUtilsNestable.hasMoreThanOneLevelOfNesting(equip.address, parentId),
+      ).to.eql(true);
     });
   });
 
@@ -1092,39 +1126,5 @@ describe('Extended NFT render utils', function () {
         await renderUtils.isTokenRejectedOrAbandoned(nestableMultiAsset.address, childTokenOne),
       ).to.be.true;
     });
-  });
-});
-
-describe('Render Utils', async function () {
-  let owner: SignerWithAddress;
-  let token: RMRKEquippableMock;
-  let renderUtils: RMRKRenderUtils;
-
-  beforeEach(async function () {
-    ({ token, renderUtils } = await loadFixture(simpleRenderUtilsFixture));
-
-    const signers = await ethers.getSigners();
-    owner = signers[0];
-  });
-
-  it('can get pages of available ids', async function () {
-    for (let i = 0; i < 9; i++) {
-      await token.mint(owner.address, i + 1);
-    }
-
-    await token['burn(uint256)'](3);
-    await token['burn(uint256)'](8);
-
-    expect(await renderUtils.getPaginatedMintedIds(token.address, 1, 5)).to.eql([
-      bn(1),
-      bn(2),
-      bn(4),
-      bn(5),
-    ]);
-    expect(await renderUtils.getPaginatedMintedIds(token.address, 6, 10)).to.eql([
-      bn(6),
-      bn(7),
-      bn(9),
-    ]);
   });
 });
