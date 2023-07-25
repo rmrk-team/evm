@@ -2,13 +2,13 @@
 
 pragma solidity ^0.8.16;
 
-import "./IERC6381.sol";
+import "./IERC6381Extended.sol";
 
 error BulkParametersOfUnequalLength();
 error ExpiredPresignedEmote();
 error InvalidSignature();
 
-contract EmotableRepository is IERC6381 {
+contract EmotableRepository is IERC6381Extended {
     bytes32 public immutable DOMAIN_SEPARATOR =
         keccak256(
             abi.encode(
@@ -355,7 +355,7 @@ contract EmotableRepository is IERC6381 {
         bytes4 interfaceId
     ) public view virtual returns (bool) {
         return
-            interfaceId == type(IERC6381).interfaceId ||
+            interfaceId == type(IERC6381Extended).interfaceId ||
             interfaceId == type(IERC165).interfaceId;
     }
 }
