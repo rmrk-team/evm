@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
-pragma solidity ^0.8.18;
+pragma solidity ^0.8.21;
 
 import "./IERC5773.sol";
 import "../library/RMRKLib.sol";
