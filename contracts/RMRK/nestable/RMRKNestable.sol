@@ -6,7 +6,6 @@ pragma solidity ^0.8.21;
 
 import "./IERC6059.sol";
 import "../core/RMRKCore.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
@@ -107,7 +106,6 @@ contract RMRKNestable is Context, IERC165, IERC721, IERC6059, RMRKCore {
         return
             interfaceId == type(IERC165).interfaceId ||
             interfaceId == type(IERC721).interfaceId ||
-            interfaceId == type(IERC721Metadata).interfaceId ||
             interfaceId == type(IERC6059).interfaceId;
     }
 

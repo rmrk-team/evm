@@ -1,10 +1,10 @@
 # RMRKRoyalties
 
-*RMRK team*
 
-> RMRKRoyalties
 
-Smart contract of the RMRK Royalties module.
+
+
+is IERC2981 *
 
 
 
@@ -68,28 +68,6 @@ Used to retrieve the information about who shall receive royalties of a sale of 
 | receiver | address | The beneficiary receiving royalties of the sale |
 | royaltyAmount | uint256 | The value of the royalties recieved by the `receiver` from the sale |
 
-### supportsInterface
-
-```solidity
-function supportsInterface(bytes4 interfaceId) external view returns (bool)
-```
-
-
-
-*Returns true if this contract implements the interface defined by `interfaceId`. See the corresponding https://eips.ethereum.org/EIPS/eip-165#how-interfaces-are-identified[EIP section] to learn more about how these ids are created. This function call must use less than 30 000 gas.*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| interfaceId | bytes4 | undefined |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | bool | undefined |
-
 ### updateRoyaltyRecipient
 
 ```solidity
@@ -117,7 +95,7 @@ Used to update recipient of royalties.
 error RMRKRoyaltiesTooHigh()
 ```
 
-Attempting to set the royalties to a value higher than 100% (10000 in base points)
+Attempting to set the royalties to a value higher than 100% (10000 in basis points)
 
 
 

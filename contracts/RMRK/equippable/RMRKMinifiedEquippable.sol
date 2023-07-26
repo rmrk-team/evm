@@ -4,7 +4,6 @@ pragma solidity ^0.8.21;
 
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
@@ -1631,7 +1630,6 @@ contract RMRKMinifiedEquippable is
         return
             interfaceId == type(IERC165).interfaceId ||
             interfaceId == type(IERC721).interfaceId ||
-            interfaceId == type(IERC721Metadata).interfaceId ||
             interfaceId == type(IERC6059).interfaceId ||
             interfaceId == type(IERC5773).interfaceId ||
             interfaceId == type(IERC6220).interfaceId;

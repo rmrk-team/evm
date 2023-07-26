@@ -27,6 +27,40 @@ Used to retrieve the metadata of the collection.
 |---|---|---|
 | _0 | string | string The metadata URI of the collection |
 
+### getRoyaltyPercentage
+
+```solidity
+function getRoyaltyPercentage() external view returns (uint256)
+```
+
+Used to retrieve the specified royalty percentage.
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint256 | The royalty percentage expressed in the basis points |
+
+### getRoyaltyRecipient
+
+```solidity
+function getRoyaltyRecipient() external view returns (address)
+```
+
+Used to retrieve the recipient of royalties.
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | address | Address of the recipient of royalties |
+
 ### isContributor
 
 ```solidity
@@ -128,6 +162,30 @@ Leaves the contract without owner. Functions using the `onlyOwner` modifier will
 *Can only be called by the current owner.Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is  only available to the owner.*
 
 
+### royaltyInfo
+
+```solidity
+function royaltyInfo(uint256 tokenId, uint256 salePrice) external view returns (address receiver, uint256 royaltyAmount)
+```
+
+Used to retrieve the information about who shall receive royalties of a sale of the specified token and  how much they will be.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId | uint256 | ID of the token for which the royalty info is being retrieved |
+| salePrice | uint256 | Price of the token sale |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| receiver | address | The beneficiary receiving royalties of the sale |
+| royaltyAmount | uint256 | The value of the royalties recieved by the `receiver` from the sale |
+
 ### symbol
 
 ```solidity
@@ -194,6 +252,22 @@ Transfers ownership of the contract to a new owner.
 | Name | Type | Description |
 |---|---|---|
 | newOwner | address | Address of the new owner&#39;s account |
+
+### updateRoyaltyRecipient
+
+```solidity
+function updateRoyaltyRecipient(address newRoyaltyRecipient) external nonpayable
+```
+
+Used to update recipient of royalties.
+
+*Custom access control has to be implemented to ensure that only the intended actors can update the  beneficiary.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| newRoyaltyRecipient | address | Address of the new recipient of royalties |
 
 
 
@@ -266,6 +340,17 @@ error RMRKNotOwner()
 ```
 
 Attempting to interact with a management function without being the smart contract&#39;s owner
+
+
+
+
+### RMRKRoyaltiesTooHigh
+
+```solidity
+error RMRKRoyaltiesTooHigh()
+```
+
+Attempting to set the royalties to a value higher than 100% (10000 in basis points)
 
 
 

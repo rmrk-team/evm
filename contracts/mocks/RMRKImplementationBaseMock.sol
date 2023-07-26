@@ -10,7 +10,16 @@ contract RMRKImplementationBaseMock is RMRKImplementationBase {
         string memory symbol,
         string memory collectionMetadata,
         uint256 maxSupply
-    ) RMRKImplementationBase(name, symbol, collectionMetadata, maxSupply) {}
+    )
+        RMRKImplementationBase(
+            name,
+            symbol,
+            collectionMetadata,
+            maxSupply,
+            address(0),
+            0
+        )
+    {}
 
     function mockMint(uint256 total) external payable {
         _prepareMint(total);

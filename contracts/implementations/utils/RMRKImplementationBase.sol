@@ -3,6 +3,7 @@ pragma solidity ^0.8.21;
 
 import "../../RMRK/access/Ownable.sol";
 import "../../RMRK/library/RMRKErrors.sol";
+import "../../RMRK/extension/RMRKRoyalties.sol";
 
 /**
  * @title RMRKImplementationBase
@@ -10,7 +11,7 @@ import "../../RMRK/library/RMRKErrors.sol";
  * @notice Smart contract of the RMRK minting utils module.
  * @dev This smart contract includes the top-level utilities for managing minting and implements Ownable by default.
  */
-abstract contract RMRKImplementationBase is Ownable {
+abstract contract RMRKImplementationBase is RMRKRoyalties, Ownable {
     string private _collectionMetadata;
     string private _name;
     string private _symbol;
@@ -26,13 +27,17 @@ abstract contract RMRKImplementationBase is Ownable {
      * @param symbol_ Symbol of the token collection
      * @param collectionMetadata_ The collection metadata URI
      * @param maxSupply_ The maximum supply of tokens
+     * @param royaltyRecipient Address to which royalties should be sent
+     * @param royaltyPercentageBps The royalty percentage expressed in basis points
      */
     constructor(
         string memory name_,
         string memory symbol_,
         string memory collectionMetadata_,
-        uint256 maxSupply_
-    ) {
+        uint256 maxSupply_,
+        address royaltyRecipient,
+        uint256 royaltyPercentageBps
+    ) RMRKRoyalties(royaltyRecipient, royaltyPercentageBps) {
         _name = name_;
         _symbol = symbol_;
         _collectionMetadata = collectionMetadata_;
@@ -85,6 +90,15 @@ abstract contract RMRKImplementationBase is Ownable {
      */
     function symbol() public view virtual returns (string memory) {
         return _symbol;
+    }
+
+    /**
+     * @inheritdoc RMRKRoyalties
+     */
+    function updateRoyaltyRecipient(
+        address newRoyaltyRecipient
+    ) public virtual override onlyOwner {
+        _setRoyaltyRecipient(newRoyaltyRecipient);
     }
 
     /**

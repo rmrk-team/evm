@@ -2232,7 +2232,7 @@ Attempting to interact with a pending child using an index greater than the size
 error RMRKRoyaltiesTooHigh()
 ```
 
-Attempting to set the royalties to a value higher than 100% (10000 in base points)
+Attempting to set the royalties to a value higher than 100% (10000 in basis points)
 
 
 
