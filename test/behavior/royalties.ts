@@ -12,7 +12,7 @@ async function shouldHaveRoyalties(
     expect(await this.token.royaltyInfo(tokenId, ONE_ETH.mul(10))).to.eql([ADDRESS_ZERO, ONE_ETH]);
   });
 
-  it('can get royalty receipient and % in base points', async function () {
+  it('can get royalty receipient and % in basis points', async function () {
     // These 2 values are used on all implementation deploys:
     expect(await this.token.getRoyaltyRecipient()).to.eql(ADDRESS_ZERO);
     expect(await this.token.getRoyaltyPercentage()).to.eql(bn(1000));

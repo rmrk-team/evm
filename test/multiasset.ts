@@ -45,10 +45,6 @@ describe('MultiAssetMock Other Behavior', async function () {
     it('can support IERC721', async function () {
       expect(await token.supportsInterface(IERC721)).to.equal(true);
     });
-
-    it('can support IERC721Metadata', async function () {
-      expect(await token.supportsInterface(IERC721Metadata)).to.equal(true);
-    });
   });
 
   describe('Minting', async function () {

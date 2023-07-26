@@ -2,13 +2,11 @@
 
 pragma solidity ^0.8.21;
 
-// For some reason, adding it to Core produces "Linearization of inheritance graph impossible"
-import "../../RMRK/extension/RMRKRoyalties.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
 import "../../RMRK/equippable/RMRKMinifiedEquippable.sol";
 import "../utils/RMRKImplementationBase.sol";
 
 abstract contract RMRKAbstractEquippable is
-    RMRKRoyalties,
     RMRKImplementationBase,
     RMRKMinifiedEquippable
 {
@@ -98,16 +96,11 @@ abstract contract RMRKAbstractEquippable is
      */
     function supportsInterface(
         bytes4 interfaceId
-    )
-        public
-        view
-        virtual
-        override(IERC165, RMRKMinifiedEquippable)
-        returns (bool)
-    {
+    ) public view virtual override returns (bool) {
         return
             super.supportsInterface(interfaceId) ||
             interfaceId == type(IERC2981).interfaceId ||
+            interfaceId == type(IERC721Metadata).interfaceId ||
             interfaceId == RMRK_INTERFACE;
     }
 
@@ -139,14 +132,5 @@ abstract contract RMRKAbstractEquippable is
         ) {
             _acceptAsset(tokenId, _pendingAssets[tokenId].length - 1, assetId);
         }
-    }
-
-    /**
-     * @inheritdoc RMRKRoyalties
-     */
-    function updateRoyaltyRecipient(
-        address newRoyaltyRecipient
-    ) public virtual override onlyOwner {
-        _setRoyaltyRecipient(newRoyaltyRecipient);
     }
 }

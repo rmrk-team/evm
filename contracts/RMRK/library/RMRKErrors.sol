@@ -167,7 +167,7 @@ error RMRKUnexpectedAssetId();
 error RMRKUnexpectedParent();
 /// Attempting not to pass an empty array of equippable addresses when adding or setting the equippable addresses
 error RMRKZeroLengthIdsPassed();
-/// Attempting to set the royalties to a value higher than 100% (10000 in base points)
+/// Attempting to set the royalties to a value higher than 100% (10000 in basis points)
 error RMRKRoyaltiesTooHigh();
 /// Attempting to do a bulk operation on a token that is not owned by the caller
 error RMRKCanOnlyDoBulkOperationsOnOwnedTokens();

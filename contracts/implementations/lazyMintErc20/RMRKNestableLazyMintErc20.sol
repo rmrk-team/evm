@@ -22,9 +22,15 @@ contract RMRKNestableLazyMintErc20 is
         string memory baseTokenURI,
         InitData memory data
     )
-        RMRKRoyalties(data.royaltyRecipient, data.royaltyPercentageBps)
         RMRKTokenURIEnumerated(baseTokenURI)
-        RMRKImplementationBase(name, symbol, collectionMetadata, data.maxSupply)
+        RMRKImplementationBase(
+            name,
+            symbol,
+            collectionMetadata,
+            data.maxSupply,
+            data.royaltyRecipient,
+            data.royaltyPercentageBps
+        )
     {
         _pricePerMint = data.pricePerMint;
         _erc20TokenAddress = data.erc20TokenAddress;

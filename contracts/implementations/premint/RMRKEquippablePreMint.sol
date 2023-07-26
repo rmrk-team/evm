@@ -23,8 +23,14 @@ contract RMRKEquippablePreMint is RMRKTokenURIPerToken, RMRKAbstractEquippable {
         address royaltyRecipient,
         uint16 royaltyPercentageBps
     )
-        RMRKRoyalties(royaltyRecipient, royaltyPercentageBps)
-        RMRKImplementationBase(name, symbol, collectionMetadata, maxSupply)
+        RMRKImplementationBase(
+            name,
+            symbol,
+            collectionMetadata,
+            maxSupply,
+            royaltyRecipient,
+            royaltyPercentageBps
+        )
     {}
 
     /**

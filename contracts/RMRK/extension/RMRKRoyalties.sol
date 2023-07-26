@@ -10,7 +10,8 @@ import "../library/RMRKErrors.sol";
  * @author RMRK team
  * @notice Smart contract of the RMRK Royalties module.
  */
-abstract contract RMRKRoyalties is IERC2981 {
+/** is IERC2981 **/ abstract contract RMRKRoyalties {
+    // Inheritance is commmnted to prevent linearization issues
     address private _royaltyRecipient;
     uint256 private _royaltyPercentageBps;
 
@@ -21,10 +22,7 @@ abstract contract RMRKRoyalties is IERC2981 {
      * @param royaltyRecipient Address to which royalties should be sent
      * @param royaltyPercentageBps The royalty percentage expressed in basis points
      */
-    constructor(
-        address royaltyRecipient,
-        uint256 royaltyPercentageBps //in basis points
-    ) {
+    constructor(address royaltyRecipient, uint256 royaltyPercentageBps) {
         _setRoyaltyRecipient(royaltyRecipient);
         if (royaltyPercentageBps >= 10000) revert RMRKRoyaltiesTooHigh();
         _royaltyPercentageBps = royaltyPercentageBps;
@@ -75,13 +73,7 @@ abstract contract RMRKRoyalties is IERC2981 {
     function royaltyInfo(
         uint256 tokenId,
         uint256 salePrice
-    )
-        external
-        view
-        virtual
-        override
-        returns (address receiver, uint256 royaltyAmount)
-    {
+    ) external view virtual returns (address receiver, uint256 royaltyAmount) {
         receiver = _royaltyRecipient;
         royaltyAmount = (salePrice * _royaltyPercentageBps) / 10000;
     }
