@@ -5,7 +5,7 @@ import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { ADDRESS_ZERO, bn, mintFromMock, nestMintFromMock } from './utils';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import {
-  RMRKCatalogMock,
+  RMRKCatalogImpl,
   RMRKEquippableMock,
   RMRKBulkWriter,
   RMRKBulkWriterPerCollection,
@@ -31,14 +31,14 @@ import {
 // --------------- FIXTURES -----------------------
 
 async function bulkWriterFixture() {
-  const catalogFactory = await ethers.getContractFactory('RMRKCatalogMock');
+  const catalogFactory = await ethers.getContractFactory('RMRKCatalogImpl');
   const equipFactory = await ethers.getContractFactory('RMRKEquippableMock');
   const bulkWriterPerCollectionFactory = await ethers.getContractFactory(
     'RMRKBulkWriterPerCollection',
   );
   const bulkWriterFactory = await ethers.getContractFactory('RMRKBulkWriter');
 
-  const catalog = <RMRKCatalogMock>await catalogFactory.deploy('ipfs://catalog.json', 'misc');
+  const catalog = <RMRKCatalogImpl>await catalogFactory.deploy('ipfs://catalog.json', 'misc');
 
   const kanaria = <RMRKEquippableMock>await equipFactory.deploy();
   kanaria.deployed();
@@ -92,7 +92,7 @@ async function bulkWriterFixture() {
 
 describe('Advanced Equip Render Utils', async function () {
   let owner: SignerWithAddress;
-  let catalog: RMRKCatalogMock;
+  let catalog: RMRKCatalogImpl;
   let kanaria: RMRKEquippableMock;
   let gem: RMRKEquippableMock;
   let bulkWriter: RMRKBulkWriter;

@@ -11,7 +11,7 @@ import {
 } from './utils';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import {
-  RMRKCatalogMock,
+  RMRKCatalogImpl,
   RMRKEquippablePreMint,
   RMRKEquipRenderUtils,
   RMRKMultiAssetPreMint,
@@ -42,13 +42,13 @@ import { BigNumber } from 'ethers';
 // --------------- FIXTURES -----------------------
 
 async function multiAsetNestableAndEquipRenderUtilsFixture() {
-  const catalogFactory = await ethers.getContractFactory('RMRKCatalogMock');
+  const catalogFactory = await ethers.getContractFactory('RMRKCatalogImpl');
   const equipFactory = await ethers.getContractFactory('RMRKEquippableMock');
   const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiAssetRenderUtils');
   const renderUtilsNestableFactory = await ethers.getContractFactory('RMRKNestableRenderUtils');
   const renderUtilsEquipFactory = await ethers.getContractFactory('RMRKEquipRenderUtils');
 
-  const catalog = <RMRKCatalogMock>await catalogFactory.deploy('ipfs://catalog.json', 'misc');
+  const catalog = <RMRKCatalogImpl>await catalogFactory.deploy('ipfs://catalog.json', 'misc');
   await catalog.deployed();
 
   const equip = <RMRKEquippableMock>await equipFactory.deploy();
@@ -67,11 +67,11 @@ async function multiAsetNestableAndEquipRenderUtilsFixture() {
 }
 
 async function advancedEquipRenderUtilsFixture() {
-  const catalogFactory = await ethers.getContractFactory('RMRKCatalogMock');
+  const catalogFactory = await ethers.getContractFactory('RMRKCatalogImpl');
   const equipFactory = await ethers.getContractFactory('RMRKEquippableMock');
   const renderUtilsEquipFactory = await ethers.getContractFactory('RMRKEquipRenderUtils');
 
-  const catalog = <RMRKCatalogMock>await catalogFactory.deploy('ipfs://catalog.json', 'misc');
+  const catalog = <RMRKCatalogImpl>await catalogFactory.deploy('ipfs://catalog.json', 'misc');
 
   const kanaria = <RMRKEquippableMock>await equipFactory.deploy();
   kanaria.deployed();
@@ -93,7 +93,7 @@ async function extendedNftRenderUtilsFixture() {
   const nestableMultiAssetSoulboundFactory = await ethers.getContractFactory(
     'RMRKNestableMultiAssetPreMintSoulbound',
   );
-  const catalogFactory = await ethers.getContractFactory('RMRKCatalogMock');
+  const catalogFactory = await ethers.getContractFactory('RMRKCatalogImpl');
   const equipFactory = await ethers.getContractFactory('RMRKEquippablePreMint');
   const renderUtilsFactory = await ethers.getContractFactory('RMRKEquipRenderUtils');
 
@@ -133,7 +133,7 @@ async function extendedNftRenderUtilsFixture() {
   );
   await nestableMultiAsset.deployed();
 
-  const catalog = <RMRKCatalogMock>await catalogFactory.deploy('ipfs://catalog.json', 'misc');
+  const catalog = <RMRKCatalogImpl>await catalogFactory.deploy('ipfs://catalog.json', 'misc');
   await catalog.deployed();
 
   const equip = <RMRKEquippablePreMint>(
@@ -163,7 +163,7 @@ async function extendedNftRenderUtilsFixture() {
 
 describe('MultiAsset Nestable and Equip Render Utils', async function () {
   let owner: SignerWithAddress;
-  let catalog: RMRKCatalogMock;
+  let catalog: RMRKCatalogImpl;
   let equip: RMRKEquippableMock;
   let renderUtils: RMRKMultiAssetRenderUtils;
   let renderUtilsNestable: RMRKNestableRenderUtils;
@@ -342,7 +342,7 @@ describe('MultiAsset Nestable and Equip Render Utils', async function () {
 
 describe('Advanced Equip Render Utils', async function () {
   let owner: SignerWithAddress;
-  let catalog: RMRKCatalogMock;
+  let catalog: RMRKCatalogImpl;
   let kanaria: RMRKEquippableMock;
   let gem: RMRKEquippableMock;
   let renderUtilsEquip: RMRKEquipRenderUtils;
@@ -657,8 +657,8 @@ describe('Advanced Equip Render Utils', async function () {
     await setUpKanariaAsset(kanaria, kanariaId, catalog.address);
     await setUpGemAssets(gem, gemId1, gemId2, gemId3, kanaria.address, catalog.address);
 
-    const catalogFactory = await ethers.getContractFactory('RMRKCatalogMock');
-    const otherCatalog = <RMRKCatalogMock>(
+    const catalogFactory = await ethers.getContractFactory('RMRKCatalogImpl');
+    const otherCatalog = <RMRKCatalogImpl>(
       await catalogFactory.deploy('ipfs://catalog.json', 'misc')
     );
     await otherCatalog.deployed();
@@ -773,7 +773,7 @@ describe('Extended NFT render utils', function () {
   let multiAsset: RMRKMultiAssetPreMint;
   let nestableMultiAssetSoulbound: RMRKNestableMultiAssetPreMintSoulbound;
   let nestableMultiAsset: RMRKNestableMultiAssetPreMint;
-  let catalog: RMRKCatalogMock;
+  let catalog: RMRKCatalogImpl;
   let equip: RMRKEquippablePreMint;
   let renderUtils: RMRKEquipRenderUtils;
 

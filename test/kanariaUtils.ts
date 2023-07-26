@@ -1,6 +1,6 @@
 import { ethers } from 'hardhat';
 import { BigNumber } from 'ethers';
-import { RMRKCatalogMock, RMRKEquippableMock } from '../typechain-types';
+import { RMRKCatalogImpl, RMRKEquippableMock } from '../typechain-types';
 
 // These refIds are used from the child's perspective, to group assets that can be equipped into a parent
 // With it, we avoid the need to do set it asset by asset
@@ -23,7 +23,7 @@ const slotIdGemLeft = 1;
 const slotIdGemMid = 2;
 const slotIdGemRight = 3;
 
-async function setUpCatalog(catalog: RMRKCatalogMock, gemAddress: string): Promise<void> {
+async function setUpCatalog(catalog: RMRKCatalogImpl, gemAddress: string): Promise<void> {
   await catalog.addPartList([
     {
       // Gems slot 1

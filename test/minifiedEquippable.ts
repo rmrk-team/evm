@@ -23,7 +23,7 @@ import shouldBehaveLikeNestable from './behavior/nestable';
 import shouldBehaveLikeMultiAsset from './behavior/multiasset';
 import shouldBehaveLikeERC721 from './behavior/erc721';
 import {
-  RMRKCatalogMock,
+  RMRKCatalogImpl,
   RMRKMinifiedEquippableMock,
   RMRKEquipRenderUtils,
   RMRKMultiAssetRenderUtils,
@@ -40,12 +40,12 @@ async function partsFixture() {
   const maskName = 'NeonMask';
   const maskSymbol = 'NM';
 
-  const catalogFactory = await ethers.getContractFactory('RMRKCatalogMock');
+  const catalogFactory = await ethers.getContractFactory('RMRKCatalogImpl');
   const equipFactory = await ethers.getContractFactory('RMRKMinifiedEquippableMock');
   const viewFactory = await ethers.getContractFactory('RMRKEquipRenderUtils');
 
   // Catalog
-  const catalog = <RMRKCatalogMock>await catalogFactory.deploy(catalogSymbol, catalogType);
+  const catalog = <RMRKCatalogImpl>await catalogFactory.deploy(catalogSymbol, catalogType);
   await catalog.deployed();
 
   // Neon token
@@ -80,7 +80,7 @@ async function slotsFixture() {
   const backgroundName = 'SnakeBackground';
   const backgroundSymbol = 'SB';
 
-  const catalogFactory = await ethers.getContractFactory('RMRKCatalogMock');
+  const catalogFactory = await ethers.getContractFactory('RMRKCatalogImpl');
   const equipFactory = await ethers.getContractFactory('RMRKMinifiedEquippableMock');
   const viewFactory = await ethers.getContractFactory('RMRKEquipRenderUtils');
 
@@ -89,7 +89,7 @@ async function slotsFixture() {
   await view.deployed();
 
   // catalog
-  const catalog = <RMRKCatalogMock>await catalogFactory.deploy(catalogSymbol, catalogType);
+  const catalog = <RMRKCatalogImpl>await catalogFactory.deploy(catalogSymbol, catalogType);
   await catalog.deployed();
 
   // Soldier token
