@@ -9,7 +9,7 @@ import {
   mintFromMock,
   singleFixtureWithArgs,
 } from './utils';
-import { IERC721, IERC721Metadata } from './interfaces';
+import { IERC721 } from './interfaces';
 import { RMRKMultiAssetMock, RMRKMultiAssetRenderUtils } from '../typechain-types';
 import shouldBehaveLikeMultiAsset from './behavior/multiasset';
 import shouldBehaveLikeERC721 from './behavior/erc721';
