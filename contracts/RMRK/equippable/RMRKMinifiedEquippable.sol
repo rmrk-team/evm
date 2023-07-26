@@ -498,7 +498,6 @@ contract RMRKMinifiedEquippable is
     ) public virtual onlyApprovedOrDirectOwner(tokenId) returns (uint256) {
         (address immediateOwner, uint256 parentId, ) = directOwnerOf(tokenId);
         address rootOwner = ownerOf(tokenId);
-        _balances[immediateOwner] -= 1;
 
         _beforeTokenTransfer(immediateOwner, address(0), tokenId);
         _beforeNestedTokenTransfer(
@@ -510,6 +509,7 @@ contract RMRKMinifiedEquippable is
             ""
         );
 
+        _balances[immediateOwner] -= 1;
         _approve(address(0), tokenId);
         _approveForAssets(address(0), tokenId);
 

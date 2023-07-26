@@ -573,7 +573,6 @@ contract RMRKNestable is Context, IERC165, IERC721, IERC6059, RMRKCore {
     ) internal virtual returns (uint256) {
         (address immediateOwner, uint256 parentId, ) = directOwnerOf(tokenId);
         address rootOwner = ownerOf(tokenId);
-        _balances[immediateOwner] -= 1;
 
         _beforeTokenTransfer(immediateOwner, address(0), tokenId);
         _beforeNestedTokenTransfer(
@@ -585,6 +584,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IERC6059, RMRKCore {
             ""
         );
 
+        _balances[immediateOwner] -= 1;
         _approve(address(0), tokenId);
         _cleanApprovals(tokenId);
 
