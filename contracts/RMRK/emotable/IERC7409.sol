@@ -4,7 +4,7 @@ pragma solidity ^0.8.21;
 
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 
-interface IERC6381Extended is IERC165 {
+interface IERC7409 is IERC165 {
     event Emoted(
         address indexed emoter,
         address indexed collection,

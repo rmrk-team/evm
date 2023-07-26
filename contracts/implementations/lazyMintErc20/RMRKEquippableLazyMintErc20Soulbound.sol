@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
-pragma solidity ^0.8.18;
+pragma solidity ^0.8.21;
 
 import "./RMRKEquippableLazyMintErc20.sol";
 import "../../RMRK/extension/soulbound/RMRKSoulbound.sol";
