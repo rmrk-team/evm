@@ -30,16 +30,17 @@ import {
 } from '../../typechain-types';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { BigNumber, Contract } from 'ethers';
-
-const RMRK_INTERFACE = '0x524D524B';
-const IERC165 = '0x01ffc9a7';
-const IERC721 = '0x80ac58cd';
-const IERC721Metadata = '0x5b5e139f';
-const IERC2981 = '0x2a55205a';
-const IERC5773 = '0x06b4329a';
-const IERC6059 = '0x42b0e56f';
-const IERC6454 = '0x91a6262f';
-const IERC6220 = '0x28bc9ae4';
+import {
+  IRMRKImplementation,
+  IERC165,
+  IERC721,
+  IERC721Metadata,
+  IERC2981,
+  IERC5773,
+  IERC6059,
+  IERC6454,
+  IERC6220,
+} from '../interfaces';
 
 export enum LegoCombination {
   None,
@@ -619,7 +620,7 @@ async function testInterfaceSupport(legoCombination: LegoCombination, isSoulboun
     });
 
     it('supports RMRK interfaces', async function () {
-      expect(await contract.supportsInterface(RMRK_INTERFACE)).to.be.true;
+      expect(await contract.supportsInterface(IRMRKImplementation)).to.be.true;
       expect(await contract.supportsInterface(IERC2981)).to.be.true;
       if (
         [

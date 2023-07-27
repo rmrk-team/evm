@@ -1,10 +1,10 @@
 # RMRKRoyalties
 
+*RMRK team*
 
+> RMRKRoyalties
 
-
-
-is IERC2981 *
+Smart contract of the RMRK Royalties module.
 
 
 

@@ -33,7 +33,7 @@ function DOMAIN_SEPARATOR() external view returns (bytes32)
 function bulkEmote(address[] collections, uint256[] tokenIds, string[] emojis, bool[] states) external nonpayable
 ```
 
-
+inheritdoc IEmotableRepository
 
 
 
@@ -52,7 +52,7 @@ function bulkEmote(address[] collections, uint256[] tokenIds, string[] emojis, b
 function bulkEmoteCountOf(address[] collections, uint256[] tokenIds, string[] emojis) external view returns (uint256[])
 ```
 
-
+inheritdoc IEmotableRepository
 
 
 
@@ -76,7 +76,7 @@ function bulkEmoteCountOf(address[] collections, uint256[] tokenIds, string[] em
 function bulkPrepareMessagesToPresignEmote(address[] collections, uint256[] tokenIds, string[] emojis, bool[] states, uint256[] deadlines) external view returns (bytes32[])
 ```
 
-
+inheritdoc IEmotableRepository
 
 
 
@@ -102,7 +102,7 @@ function bulkPrepareMessagesToPresignEmote(address[] collections, uint256[] toke
 function bulkPresignedEmote(address[] emoters, address[] collections, uint256[] tokenIds, string[] emojis, bool[] states, uint256[] deadlines, uint8[] v, bytes32[] r, bytes32[] s) external nonpayable
 ```
 
-
+inheritdoc IEmotableRepository
 
 
 
@@ -126,7 +126,7 @@ function bulkPresignedEmote(address[] emoters, address[] collections, uint256[] 
 function emote(address collection, uint256 tokenId, string emoji, bool state) external nonpayable
 ```
 
-
+inheritdoc IEmotableRepository
 
 
 
@@ -145,7 +145,7 @@ function emote(address collection, uint256 tokenId, string emoji, bool state) ex
 function emoteCountOf(address collection, uint256 tokenId, string emoji) external view returns (uint256)
 ```
 
-
+inheritdoc IEmotableRepository
 
 
 
@@ -169,7 +169,7 @@ function emoteCountOf(address collection, uint256 tokenId, string emoji) externa
 function hasEmoterUsedEmote(address emoter, address collection, uint256 tokenId, string emoji) external view returns (bool)
 ```
 
-
+inheritdoc IEmotableRepository
 
 
 
@@ -194,7 +194,7 @@ function hasEmoterUsedEmote(address emoter, address collection, uint256 tokenId,
 function haveEmotersUsedEmotes(address[] emoters, address[] collections, uint256[] tokenIds, string[] emojis) external view returns (bool[])
 ```
 
-
+inheritdoc IEmotableRepository
 
 
 
@@ -219,7 +219,7 @@ function haveEmotersUsedEmotes(address[] emoters, address[] collections, uint256
 function prepareMessageToPresignEmote(address collection, uint256 tokenId, string emoji, bool state, uint256 deadline) external view returns (bytes32)
 ```
 
-
+inheritdoc IEmotableRepository
 
 
 
@@ -245,7 +245,7 @@ function prepareMessageToPresignEmote(address collection, uint256 tokenId, strin
 function presignedEmote(address emoter, address collection, uint256 tokenId, string emoji, bool state, uint256 deadline, uint8 v, bytes32 r, bytes32 s) external nonpayable
 ```
 
-
+inheritdoc IEmotableRepository
 
 
 
@@ -269,9 +269,9 @@ function presignedEmote(address emoter, address collection, uint256 tokenId, str
 function supportsInterface(bytes4 interfaceId) external view returns (bool)
 ```
 
+inheritdoc IERC165
 
 
-*Returns true if this contract implements the interface defined by `interfaceId`. See the corresponding https://eips.ethereum.org/EIPS/eip-165#how-interfaces-are-identified[EIP section] to learn more about how these ids are created. This function call must use less than 30 000 gas.*
 
 #### Parameters
 
@@ -295,19 +295,19 @@ function supportsInterface(bytes4 interfaceId) external view returns (bool)
 event Emoted(address indexed emoter, address indexed collection, uint256 indexed tokenId, string emoji, bool on)
 ```
 
+Used to notify listeners that the token with the specified ID has been emoted to or that the reaction has been revoked.
 
-
-
+*The event MUST only be emitted if the state of the emote is changed.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| emoter `indexed` | address | undefined |
-| collection `indexed` | address | undefined |
-| tokenId `indexed` | uint256 | undefined |
-| emoji  | string | undefined |
-| on  | bool | undefined |
+| emoter `indexed` | address | Address of the account that emoted or revoked the reaction to the token |
+| collection `indexed` | address | Address of the collection smart contract containing the token being emoted to or having the reaction revoked |
+| tokenId `indexed` | uint256 | ID of the token |
+| emoji  | string | Unicode identifier of the emoji |
+| on  | bool | Boolean value signifying whether the token was emoted to (`true`) or if the reaction has been revoked (`false`) |
 
 
 

@@ -10,8 +10,8 @@ import "../library/RMRKErrors.sol";
  * @author RMRK team
  * @notice Smart contract of the RMRK Royalties module.
  */
-/** is IERC2981 **/ abstract contract RMRKRoyalties {
-    // Inheritance is commmnted to prevent linearization issues
+abstract contract RMRKRoyalties {
+    /** is IERC2981 **/ // Inheritance is commmnted to prevent linearization issues
     address private _royaltyRecipient;
     uint256 private _royaltyPercentageBps;
 
