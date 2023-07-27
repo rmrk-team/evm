@@ -4,7 +4,7 @@ import { BigNumber, Contract } from 'ethers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { ERC721Mock, EmotableRepository } from '../typechain-types';
-import { IERC6381Extended, IERC165, IOtherInterface } from './interfaces';
+import { IEmotableRepository, IERC165, IOtherInterface } from './interfaces';
 
 function bn(x: number): BigNumber {
   return BigNumber.from(x);
@@ -41,8 +41,8 @@ describe('EmotableRepository', async function () {
     repository = await loadFixture(emotableRepositoryFixture);
   });
 
-  it('can support IERC6381Extended', async function () {
-    expect(await repository.supportsInterface(IERC6381Extended)).to.equal(true);
+  it('can support IEmotableRepository', async function () {
+    expect(await repository.supportsInterface(IEmotableRepository)).to.equal(true);
   });
 
   it('can support IERC165', async function () {

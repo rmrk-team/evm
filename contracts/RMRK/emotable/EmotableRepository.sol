@@ -2,13 +2,13 @@
 
 pragma solidity ^0.8.21;
 
-import "./IERC6381Extended.sol";
+import "./IEmotableRepository.sol";
 
 error BulkParametersOfUnequalLength();
 error ExpiredPresignedEmote();
 error InvalidSignature();
 
-contract EmotableRepository is IERC6381Extended {
+contract EmotableRepository is IEmotableRepository {
     bytes32 public immutable DOMAIN_SEPARATOR =
         keccak256(
             abi.encode(
@@ -25,6 +25,9 @@ contract EmotableRepository is IERC6381Extended {
     mapping(address => mapping(uint256 => mapping(string => uint256)))
         private _emotesPerToken;
 
+    /**
+     * inheritdoc IEmotableRepository
+     */
     function emoteCountOf(
         address collection,
         uint256 tokenId,
@@ -33,6 +36,9 @@ contract EmotableRepository is IERC6381Extended {
         return _emotesPerToken[collection][tokenId][emoji];
     }
 
+    /**
+     * inheritdoc IEmotableRepository
+     */
     function bulkEmoteCountOf(
         address[] memory collections,
         uint256[] memory tokenIds,
@@ -55,6 +61,9 @@ contract EmotableRepository is IERC6381Extended {
         return counts;
     }
 
+    /**
+     * inheritdoc IEmotableRepository
+     */
     function hasEmoterUsedEmote(
         address emoter,
         address collection,
@@ -64,6 +73,9 @@ contract EmotableRepository is IERC6381Extended {
         return _emotesUsedByEmoter[emoter][collection][tokenId][emoji] == 1;
     }
 
+    /**
+     * inheritdoc IEmotableRepository
+     */
     function haveEmotersUsedEmotes(
         address[] memory emoters,
         address[] memory collections,
@@ -92,6 +104,9 @@ contract EmotableRepository is IERC6381Extended {
         return states;
     }
 
+    /**
+     * inheritdoc IEmotableRepository
+     */
     function emote(
         address collection,
         uint256 tokenId,
@@ -114,6 +129,9 @@ contract EmotableRepository is IERC6381Extended {
         }
     }
 
+    /**
+     * inheritdoc IEmotableRepository
+     */
     function bulkEmote(
         address[] memory collections,
         uint256[] memory tokenIds,
@@ -162,6 +180,9 @@ contract EmotableRepository is IERC6381Extended {
         }
     }
 
+    /**
+     * inheritdoc IEmotableRepository
+     */
     function prepareMessageToPresignEmote(
         address collection,
         uint256 tokenId,
@@ -182,6 +203,9 @@ contract EmotableRepository is IERC6381Extended {
             );
     }
 
+    /**
+     * inheritdoc IEmotableRepository
+     */
     function bulkPrepareMessagesToPresignEmote(
         address[] memory collections,
         uint256[] memory tokenIds,
@@ -218,6 +242,9 @@ contract EmotableRepository is IERC6381Extended {
         return messages;
     }
 
+    /**
+     * inheritdoc IEmotableRepository
+     */
     function presignedEmote(
         address emoter,
         address collection,
@@ -268,6 +295,9 @@ contract EmotableRepository is IERC6381Extended {
         }
     }
 
+    /**
+     * inheritdoc IEmotableRepository
+     */
     function bulkPresignedEmote(
         address[] memory emoters,
         address[] memory collections,
@@ -351,11 +381,14 @@ contract EmotableRepository is IERC6381Extended {
         }
     }
 
+    /**
+     * inheritdoc IERC165
+     */
     function supportsInterface(
         bytes4 interfaceId
     ) public view virtual returns (bool) {
         return
-            interfaceId == type(IERC6381Extended).interfaceId ||
+            interfaceId == type(IEmotableRepository).interfaceId ||
             interfaceId == type(IERC165).interfaceId;
     }
 }
