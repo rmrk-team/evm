@@ -11,7 +11,7 @@ import "../utils/RMRKImplementationBase.sol";
  * @author RMRK team
  * @notice Abstract implementation of RMRK nestable module.
  */
- abstract contract RMRKAbstractNestable is RMRKImplementationBase, RMRKNestable {
+abstract contract RMRKAbstractNestable is RMRKImplementationBase, RMRKNestable {
     /**
      * @inheritdoc IERC165
      */

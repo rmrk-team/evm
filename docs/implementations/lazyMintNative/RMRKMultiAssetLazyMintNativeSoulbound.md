@@ -1,10 +1,10 @@
 # RMRKMultiAssetLazyMintNativeSoulbound
 
+*RMRK team*
 
+> RMRKMultiAssetLazyMintNativeSoulbound
 
-
-
-
+Implementation of non-transferable RMRK multi asset module with native token-powered lazy minting.
 
 
 

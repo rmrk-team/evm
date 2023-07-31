@@ -1,10 +1,10 @@
 # RMRKNestableMultiAssetLazyMintErc20
 
+*RMRK team*
 
+> RMRKNestableMultiAssetLazyMintErc20
 
-
-
-
+Implementation of joined RMRK nestable and multi asset module with ERC20-powered lazy minting.
 
 
 

@@ -1,10 +1,10 @@
 # RMRKMultiAssetPreMint
 
+*RMRK team*
 
+> RMRKMultiAssetPreMint
 
-
-
-
+Implementation of RMRK multi asset module with pre-minting.
 
 
 

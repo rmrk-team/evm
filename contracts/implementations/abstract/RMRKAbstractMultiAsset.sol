@@ -11,7 +11,7 @@ import "../utils/RMRKImplementationBase.sol";
  * @author RMRK team
  * @notice Abstract implementation of RMRK multi-asset module.
  */
- abstract contract RMRKAbstractMultiAsset is
+abstract contract RMRKAbstractMultiAsset is
     RMRKImplementationBase,
     RMRKMultiAsset
 {

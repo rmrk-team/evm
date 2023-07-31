@@ -1,10 +1,10 @@
 # RMRKAbstractMultiAsset
 
+*RMRK team*
 
+> RMRKAbstractMultiAsset
 
-
-
-
+Abstract implementation of RMRK multi-asset module.
 
 
 

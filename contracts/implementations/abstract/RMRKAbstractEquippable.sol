@@ -11,7 +11,7 @@ import "../utils/RMRKImplementationBase.sol";
  * @author RMRK team
  * @notice Abstract implementation of RMRK equipable module.
  */
- abstract contract RMRKAbstractEquippable is
+abstract contract RMRKAbstractEquippable is
     RMRKImplementationBase,
     RMRKMinifiedEquippable
 {

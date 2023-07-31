@@ -1,10 +1,10 @@
 # RMRKMultiAssetPreMintSoulbound
 
+*RMRK team*
 
+> RMRKMultiAssetPreMintSoulbound
 
-
-
-
+Implementation of non-transferable RMRK multi asset module with pre-minting.
 
 
 

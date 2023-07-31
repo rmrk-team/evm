@@ -1,10 +1,10 @@
 # RMRKEquippableLazyMintErc20
 
+*RMRK team*
 
+> RMRKEquippableLazyMintErc20
 
-
-
-
+Implementation of RMRK equippable module with ERC20-powered lazy minting.
 
 
 

@@ -1,10 +1,10 @@
 # RMRKAbstractEquippable
 
+*RMRK team*
 
+> RMRKAbstractEquippable
 
-
-
-
+Abstract implementation of RMRK equipable module.
 
 
 

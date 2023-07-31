@@ -1,10 +1,10 @@
 # RMRKEquippableLazyMintErc20Soulbound
 
+*RMRK team*
 
+> RMRKEquippableLazyMintErc20Soulbound
 
-
-
-
+Implementation of non-transferable RMRK equippable module with ERC20-powered lazy minting.
 
 
 
