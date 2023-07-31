@@ -11,6 +11,15 @@ import "../utils/RMRKTokenURIPerToken.sol";
  * @notice Implementation of RMRK multi asset module with pre-minting.
  */
 contract RMRKMultiAssetPreMint is RMRKTokenURIPerToken, RMRKAbstractMultiAsset {
+    /**
+     * @notice Used to initialize the smart contract.
+     * @param name Name of the token collection
+     * @param symbol Symbol of the token collection
+     * @param collectionMetadata CID of the collection metadata
+     * @param maxSupply The maximum supply of tokens
+     * @param royaltyRecipient Recipient of resale royalties
+     * @param royaltyPercentageBps The percentage to be paid from the sale of the token expressed in basis points
+     */
     constructor(
         string memory name,
         string memory symbol,
