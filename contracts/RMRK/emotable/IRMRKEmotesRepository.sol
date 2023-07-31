@@ -4,7 +4,7 @@ pragma solidity ^0.8.21;
 
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 
-interface IEmotableRepository is IERC165 {
+interface IRMRKEmotesRepository is IERC165 {
     /**
      * @notice Used to notify listeners that the token with the specified ID has been emoted to or that the reaction has been revoked.
      * @dev The event MUST only be emitted if the state of the emote is changed.

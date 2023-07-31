@@ -4,7 +4,7 @@ const IERC721 = '0x80ac58cd';
 const IERC721Metadata = '0x5b5e139f';
 const IOtherInterface = '0xffffffff';
 const IRMRKCatalog = '0xd912401f'; // ERC6220
-const IEmotableRepository = '0x1b3327ab'; //ERC6381
+const IRMRKEmotesRepository = '0x1b3327ab'; //ERC6381
 const IERC2981 = '0x2a55205a'; // ERC6220
 const IERC6220 = '0x28bc9ae4'; // ERC6220
 const IERC5773 = '0x06b4329a'; // ERC5773
@@ -25,7 +25,7 @@ export {
   IERC721Metadata,
   IOtherInterface,
   IRMRKCatalog,
-  IEmotableRepository,
+  IRMRKEmotesRepository,
   IERC2981,
   IERC6220,
   IERC5773,
