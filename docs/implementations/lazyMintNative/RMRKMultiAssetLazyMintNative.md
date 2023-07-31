@@ -1452,7 +1452,7 @@ Attempting to reject all pending assets but more assets than expected are pendin
 error RMRKWrongValueSent()
 ```
 
-
+Attempting to pay with native token with a value different than expected
 
 
 
