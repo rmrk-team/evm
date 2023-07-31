@@ -5,6 +5,11 @@ pragma solidity ^0.8.21;
 import "../abstract/RMRKAbstractMultiAsset.sol";
 import "../utils/RMRKTokenURIPerToken.sol";
 
+/**
+ * @title RMRKMultiAssetPreMint
+ * @author RMRK team
+ * @notice Implementation of RMRK multi asset module with pre-minting.
+ */
 contract RMRKMultiAssetPreMint is RMRKTokenURIPerToken, RMRKAbstractMultiAsset {
     constructor(
         string memory name,

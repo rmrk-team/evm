@@ -5,10 +5,24 @@ pragma solidity ^0.8.21;
 import "./RMRKNestableMultiAssetPreMint.sol";
 import "../../RMRK/extension/soulbound/RMRKSoulbound.sol";
 
+/**
+ * @title RMRKNestableMultiAssetPreMintSoulbound
+ * @author RMRK team
+ * @notice Implementation of joined non-transferable RMRK nestable and multi asset modules with pre-minting.
+ */
 contract RMRKNestableMultiAssetPreMintSoulbound is
     RMRKSoulbound,
     RMRKNestableMultiAssetPreMint
 {
+    /**
+     * @notice Used to initialize the smart contract.
+     * @param name Name of the token collection
+     * @param symbol Symbol of the token collection
+     * @param collectionMetadata CID of the collection metadata
+     * @param maxSupply The maximum supply of tokens
+     * @param royaltyRecipient Recipient of resale royalties
+     * @param royaltyPercentageBps The percentage to be paid from the sale of the token expressed in basis points
+     */
     constructor(
         string memory name,
         string memory symbol,
