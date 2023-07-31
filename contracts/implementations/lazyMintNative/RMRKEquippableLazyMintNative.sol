@@ -8,6 +8,11 @@ import "./InitDataNativePay.sol";
 
 error RMRKWrongValueSent();
 
+/**
+ * @title RMRKEquippableLazyMintNative
+ * @author RMRK team
+ * @notice Implementation of RMRK equippable module with native token-powered lazy minting.
+ */
 contract RMRKEquippableLazyMintNative is
     InitDataNativePay,
     RMRKTokenURIEnumerated,
@@ -15,6 +20,14 @@ contract RMRKEquippableLazyMintNative is
 {
     uint256 private _pricePerMint;
 
+    /**
+     * @notice Used to initialize the smart contract.
+     * @param name Name of the token collection
+     * @param symbol Symbol of the token collection
+     * @param collectionMetadata URI to the collection's metadata
+     * @param baseTokenURI Each token's base URI
+     * @param data The `InitData` struct used to pass initialization parameters
+     */
     constructor(
         string memory name,
         string memory symbol,

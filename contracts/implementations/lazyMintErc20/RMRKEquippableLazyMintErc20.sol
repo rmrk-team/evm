@@ -7,7 +7,12 @@ import "../abstract/RMRKAbstractEquippable.sol";
 import "../utils/RMRKTokenURIEnumerated.sol";
 import "./InitDataERC20Pay.sol";
 
-contract RMRKEquippableLazyMintErc20 is
+/**
+ * @title RMRKEquippableLazyMintErc20
+ * @author RMRK team
+ * @notice Implementation of RMRK equippable module with ERC20-powered lazy minting.
+ */
+ contract RMRKEquippableLazyMintErc20 is
     InitDataERC20Pay,
     RMRKTokenURIEnumerated,
     RMRKAbstractEquippable
@@ -15,6 +20,13 @@ contract RMRKEquippableLazyMintErc20 is
     uint256 private _pricePerMint;
     address private _erc20TokenAddress;
 
+    /**
+     * @notice Used to initialize the smart contract.
+     * @param name Name of the token collection
+     * @param symbol Symbol of the token collection
+     * @param collectionMetadata The collection metadata URI
+     * @param baseTokenURI The base URI of the token metadata
+     */
     constructor(
         string memory name,
         string memory symbol,
@@ -92,6 +104,10 @@ contract RMRKEquippableLazyMintErc20 is
         return nextToken;
     }
 
+    /**
+     * @notice Used to charge the minter for the amount of tokens they desire to mint.
+     * @param numToMint The amount of tokens to charge the caller for
+     */
     function _chargeMints(uint256 numToMint) internal {
         uint256 price = numToMint * _pricePerMint;
         IERC20(_erc20TokenAddress).transferFrom(

@@ -5,10 +5,23 @@ pragma solidity ^0.8.21;
 import "./RMRKNestableMultiAssetLazyMintErc20.sol";
 import "../../RMRK/extension/soulbound/RMRKSoulbound.sol";
 
+/**
+ * @title RMRKNestableMultiAssetLazyMintErc20Soulbound
+ * @author RMRK team
+ * @notice Implementation of joined non-transferable RMRK nestable and multi asset module with ERC20-powered lazy minting.
+ */
 contract RMRKNestableMultiAssetLazyMintErc20Soulbound is
     RMRKSoulbound,
     RMRKNestableMultiAssetLazyMintErc20
 {
+    /**
+     * @notice Used to initialize the smart contract.
+     * @param name Name of the token collection
+     * @param symbol Symbol of the token collection
+     * @param collectionMetadata URI to the collection's metadata
+     * @param baseTokenURI Each token's base URI
+     * @param data The `InitData` struct used to pass initialization parameters
+     */
     constructor(
         string memory name,
         string memory symbol,

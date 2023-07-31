@@ -6,7 +6,12 @@ import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
 import "../../RMRK/equippable/RMRKMinifiedEquippable.sol";
 import "../utils/RMRKImplementationBase.sol";
 
-abstract contract RMRKAbstractEquippable is
+/**
+ * @title RMRKAbstractEquippable
+ * @author RMRK team
+ * @notice Abstract implementation of RMRK equipable module.
+ */
+ abstract contract RMRKAbstractEquippable is
     RMRKImplementationBase,
     RMRKMinifiedEquippable
 {
