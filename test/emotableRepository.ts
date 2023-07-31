@@ -3,8 +3,8 @@ import { expect } from 'chai';
 import { BigNumber, Contract } from 'ethers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { ERC721Mock, EmotableRepository } from '../typechain-types';
-import { IEmotableRepository, IERC165, IOtherInterface } from './interfaces';
+import { ERC721Mock, RMRKEmotesRepository } from '../typechain-types';
+import { IRMRKEmotesRepository, IERC165, IOtherInterface } from './interfaces';
 
 function bn(x: number): BigNumber {
   return BigNumber.from(x);
@@ -18,17 +18,17 @@ async function tokenFixture() {
   return token;
 }
 
-async function emotableRepositoryFixture() {
-  const factory = await ethers.getContractFactory('EmotableRepository');
+async function RMRKEmotesRepositoryFixture() {
+  const factory = await ethers.getContractFactory('RMRKEmotesRepository');
   const repository = await factory.deploy();
   await repository.deployed();
 
   return repository;
 }
 
-describe('EmotableRepository', async function () {
+describe('RMRKEmotesRepository', async function () {
   let token: ERC721Mock;
-  let repository: EmotableRepository;
+  let repository: RMRKEmotesRepository;
   let owner: SignerWithAddress;
   let addrs: SignerWithAddress[];
   const tokenId = bn(1);
@@ -38,11 +38,11 @@ describe('EmotableRepository', async function () {
   beforeEach(async function () {
     [owner, ...addrs] = await ethers.getSigners();
     token = await loadFixture(tokenFixture);
-    repository = await loadFixture(emotableRepositoryFixture);
+    repository = await loadFixture(RMRKEmotesRepositoryFixture);
   });
 
-  it('can support IEmotableRepository', async function () {
-    expect(await repository.supportsInterface(IEmotableRepository)).to.equal(true);
+  it('can support IRMRKEmotesRepository', async function () {
+    expect(await repository.supportsInterface(IRMRKEmotesRepository)).to.equal(true);
   });
 
   it('can support IERC165', async function () {
