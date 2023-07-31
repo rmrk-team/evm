@@ -6,8 +6,6 @@ import "../abstract/RMRKAbstractNestable.sol";
 import "../utils/RMRKTokenURIEnumerated.sol";
 import "./InitDataNativePay.sol";
 
-error RMRKWrongValueSent();
-
 /**
  * @title RMRKNestableLazyMintNative
  * @author RMRK team

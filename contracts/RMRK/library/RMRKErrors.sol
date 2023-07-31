@@ -173,3 +173,5 @@ error RMRKRoyaltiesTooHigh();
 error RMRKCanOnlyDoBulkOperationsOnOwnedTokens();
 /// Attempting to do a bulk operation with multiple tokens at a time
 error RMRKCanOnlyDoBulkOperationsWithOneTokenAtATime();
+/// Attempting to pay with native token with a value different than expected
+error RMRKWrongValueSent();
