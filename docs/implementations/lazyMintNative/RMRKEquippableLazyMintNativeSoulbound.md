@@ -1,10 +1,10 @@
 # RMRKEquippableLazyMintNativeSoulbound
 
+*RMRK team*
 
+> RMRKEquippableLazyMintNativeSoulbound
 
-
-
-
+Implementation of non-transferable RMRK equippable module with native token-powered lazy minting.
 
 
 

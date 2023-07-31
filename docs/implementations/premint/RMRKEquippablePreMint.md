@@ -1,10 +1,10 @@
 # RMRKEquippablePreMint
 
+*RMRK team*
 
+> RMRKEquippablePreMint
 
-
-
-
+Implementation of RMRK equippable module with pre-minting.
 
 
 

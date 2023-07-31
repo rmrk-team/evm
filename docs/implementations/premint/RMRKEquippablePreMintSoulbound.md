@@ -1,10 +1,10 @@
 # RMRKEquippablePreMintSoulbound
 
+*RMRK team*
 
+> RMRKEquippablePreMintSoulbound
 
-
-
-
+Implementation of non-transferable RMRK equippable module with pre-minting.
 
 
 

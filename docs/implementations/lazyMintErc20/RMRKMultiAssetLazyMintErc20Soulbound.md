@@ -1,10 +1,10 @@
 # RMRKMultiAssetLazyMintErc20Soulbound
 
+*RMRK team*
 
+> RMRKMultiAssetLazyMintErc20Soulbound
 
-
-
-
+Implementation of non-transferable RMRK multi-asset module with ERC20-powered lazy minting.
 
 
 

@@ -19,7 +19,9 @@ contract RMRKEquippableLazyMintErc20Soulbound is
      * @param name Name of the token collection
      * @param symbol Symbol of the token collection
      * @param collectionMetadata URI to the collection's metadata
+     * @param baseTokenURI The base URI of the token metadata
      * @param data The `InitData` struct used to pass the initialization parameters.
+     */
     constructor(
         string memory name,
         string memory symbol,

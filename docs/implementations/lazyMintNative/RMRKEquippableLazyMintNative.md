@@ -1,10 +1,10 @@
 # RMRKEquippableLazyMintNative
 
+*RMRK team*
 
+> RMRKEquippableLazyMintNative
 
-
-
-
+Implementation of RMRK equippable module with native token-powered lazy minting.
 
 
 

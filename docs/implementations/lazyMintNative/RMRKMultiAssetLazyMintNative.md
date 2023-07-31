@@ -1,10 +1,10 @@
 # RMRKMultiAssetLazyMintNative
 
+*RMRK team*
 
+> RMRKMultiAssetLazyMintNative
 
-
-
-
+Implementation of RMRK multi asset module with native token-powered lazy minting.
 
 
 

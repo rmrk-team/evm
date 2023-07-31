@@ -12,7 +12,7 @@ import "./InitDataERC20Pay.sol";
  * @author RMRK team
  * @notice Implementation of RMRK equippable module with ERC20-powered lazy minting.
  */
- contract RMRKEquippableLazyMintErc20 is
+contract RMRKEquippableLazyMintErc20 is
     InitDataERC20Pay,
     RMRKTokenURIEnumerated,
     RMRKAbstractEquippable
@@ -26,6 +26,7 @@ import "./InitDataERC20Pay.sol";
      * @param symbol Symbol of the token collection
      * @param collectionMetadata The collection metadata URI
      * @param baseTokenURI The base URI of the token metadata
+     * @param data The `InitData` struct used to pass the initialization parameters.
      */
     constructor(
         string memory name,
