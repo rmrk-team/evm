@@ -7,6 +7,11 @@ import "../abstract/RMRKAbstractMultiAsset.sol";
 import "../utils/RMRKTokenURIEnumerated.sol";
 import "./InitDataERC20Pay.sol";
 
+/**
+ * @title RMRKMultiAssetLazyMintErc20
+ * @author RMRK team
+ * @notice Implementation of RMRK multi-asset module with ERC20-powered lazy minting.
+ */
 contract RMRKMultiAssetLazyMintErc20 is
     InitDataERC20Pay,
     RMRKTokenURIEnumerated,
@@ -15,6 +20,14 @@ contract RMRKMultiAssetLazyMintErc20 is
     uint256 private _pricePerMint;
     address private _erc20TokenAddress;
 
+    /**
+     * @notice Used to initialize the smart contract.
+     * @param name Name of the token collection
+     * @param symbol Symbol of the token collection
+     * @param collectionMetadata URI to the collection's metadata
+     * @param baseTokenURI Each token's base URI
+     * @param data The `InitData` struct used to pass initialization parameters
+     */
     constructor(
         string memory name,
         string memory symbol,

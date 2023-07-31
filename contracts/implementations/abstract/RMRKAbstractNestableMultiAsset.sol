@@ -6,7 +6,12 @@ import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
 import "../../RMRK/nestable/RMRKNestableMultiAsset.sol";
 import "../utils/RMRKImplementationBase.sol";
 
-abstract contract RMRKAbstractNestableMultiAsset is
+/**
+ * @title RMRKAbstractNestableMultiAsset
+ * @author RMRK team
+ * @notice Abstract implementation of joined RMRK nestable and multi-asset module.
+ */
+ abstract contract RMRKAbstractNestableMultiAsset is
     RMRKImplementationBase,
     RMRKNestableMultiAsset
 {
