@@ -5,6 +5,11 @@ pragma solidity ^0.8.21;
 import "../abstract/RMRKAbstractEquippable.sol";
 import "../utils/RMRKTokenURIPerToken.sol";
 
+/**
+ * @title RMRKEquippablePreMint
+ * @author RMRK team
+ * @notice Implementation of RMRK equippable module with pre-minting.
+ */
 contract RMRKEquippablePreMint is RMRKTokenURIPerToken, RMRKAbstractEquippable {
     /**
      * @notice Used to initialize the smart contract.

@@ -20,9 +20,9 @@ contract EmotableRepository is IEmotableRepository {
         );
 
     // Used to avoid double emoting and control undoing
-    mapping(address => mapping(address => mapping(uint256 => mapping(string => uint256))))
+    mapping(address emoter => mapping(address collection => mapping(uint256 tokenId => mapping(string emoji => uint256 state))))
         private _emotesUsedByEmoter; // Cheaper than using a bool
-    mapping(address => mapping(uint256 => mapping(string => uint256)))
+    mapping(address collection => mapping(uint256 tokenId => mapping(string emoji => uint256 count)))
         private _emotesPerToken;
 
     /**

@@ -5,6 +5,11 @@ pragma solidity ^0.8.21;
 import "./RMRKMultiAssetPreMint.sol";
 import "../../RMRK/extension/soulbound/RMRKSoulbound.sol";
 
+/**
+ * @title RMRKMultiAssetPreMintSoulbound
+ * @author RMRK team
+ * @notice Implementation of non-transferable RMRK multi asset module with pre-minting.
+ */
 contract RMRKMultiAssetPreMintSoulbound is
     RMRKSoulbound,
     RMRKMultiAssetPreMint
