@@ -2278,7 +2278,7 @@ Attempting to reject all pending children but children assets than expected are 
 error RMRKWrongValueSent()
 ```
 
-
+Attempting to pay with native token with a value different than expected
 
 
 
