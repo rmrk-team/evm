@@ -10,6 +10,11 @@ import "../../RMRK/extension/soulbound/RMRKSoulbound.sol";
  * @author RMRK team
  * @notice Implementation of joined non-transferable RMRK nestable and multi asset modules with native token-powered lazy minting.
  */
+/**
+ * @title RMRKNestableMultiAssetLazyMintNativeSoulbound
+ * @author RMRK team
+ * @notice Implementation of joined non-transferable RMRK nestable and multi asset modules with native token-powered lazy minting.
+ */
 contract RMRKNestableMultiAssetLazyMintNativeSoulbound is
     RMRKSoulbound,
     RMRKNestableMultiAssetLazyMintNative

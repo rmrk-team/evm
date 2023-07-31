@@ -13,6 +13,11 @@ error RMRKWrongValueSent();
  * @author RMRK team
  * @notice Implementation of joined RMRK nestable and multi asset modules with native token-powered lazy minting.
  */
+/**
+ * @title RMRKNestableMultiAssetLazyMintNative
+ * @author RMRK team
+ * @notice Implementation of joined RMRK nestable and multi asset modules with native token-powered lazy minting.
+ */
 contract RMRKNestableMultiAssetLazyMintNative is
     InitDataNativePay,
     RMRKTokenURIEnumerated,
