@@ -33,7 +33,7 @@ Core implementations updates include breaking changes as well; names and symbols
 
 ### Changed
 
-- Recreated all ready-to-use implementations for premint and lazy minting with a native token or custom ERC20 token.
+- Recreated all ready-to-use implementations for premint and lazy minting with native tokens or custom ERC20 tokens.
 - Reduced size of `MinifiedEquippable` contract.
 - Premint versions now receive `tokenURI` on mint. Lazy mint versions use the base URL passed to a constructor and append `tokenId` to compose the `tokenURI`.
 - Removed Split Equippable implementations, which kept `MultiAsset` and `Equippable` legos in a different contract to `Nestable`.
