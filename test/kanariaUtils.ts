@@ -1,5 +1,6 @@
 import { ethers } from 'hardhat';
-import { RMRKCatalogMock, RMRKEquippableMock } from '../typechain-types';
+import { BigNumber } from 'ethers';
+import { RMRKCatalogImpl, RMRKEquippableMock } from '../typechain-types';
 
 // These refIds are used from the child's perspective, to group assets that can be equipped into a parent
 // With it, we avoid the need to do set it asset by asset
@@ -22,7 +23,7 @@ const slotIdGemLeft = 1;
 const slotIdGemMid = 2;
 const slotIdGemRight = 3;
 
-async function setUpCatalog(catalog: RMRKCatalogMock, gemAddress: string): Promise<void> {
+async function setUpCatalog(catalog: RMRKCatalogImpl, gemAddress: string): Promise<void> {
   await catalog.addPartList([
     {
       // Gems slot 1
@@ -59,7 +60,7 @@ async function setUpCatalog(catalog: RMRKCatalogMock, gemAddress: string): Promi
 
 async function setUpKanariaAsset(
   kanaria: RMRKEquippableMock,
-  kanariaId: number,
+  kanariaId: BigNumber,
   catalogAddress: string,
 ): Promise<void> {
   await kanaria.addEquippableAssetEntry(
@@ -75,9 +76,9 @@ async function setUpKanariaAsset(
 
 async function setUpGemAssets(
   gem: RMRKEquippableMock,
-  gemId1: number,
-  gemId2: number,
-  gemId3: number,
+  gemId1: BigNumber,
+  gemId2: BigNumber,
+  gemId3: BigNumber,
   kanariaAddress: string,
   catalogAddress: string,
 ): Promise<void> {

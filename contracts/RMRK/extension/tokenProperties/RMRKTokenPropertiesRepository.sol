@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
-pragma solidity ^0.8.18;
+pragma solidity ^0.8.21;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
@@ -15,6 +15,36 @@ import "./IRMRKTokenPropertiesRepository.sol";
  * @notice Smart contract of the RMRK Token property repository module.
  */
 contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
+    bytes32 public immutable DOMAIN_SEPARATOR =
+        keccak256(
+            abi.encode(
+                "ERC-X: Public Non-Fungible Token Attributes Repository",
+                "1",
+                block.chainid,
+                address(this)
+            )
+        );
+    bytes32 public immutable SET_UINT_PROPERTY_TYPEHASH =
+        keccak256(
+            "setUintProperty(address collection,uint256 tokenId,string memory key,uint256 value)"
+        );
+    bytes32 public immutable SET_STRING_PROPERTY_TYPEHASH =
+        keccak256(
+            "setStringProperty(address collection,uint256 tokenId,string memory key,string memory value)"
+        );
+    bytes32 public immutable SET_BOOL_PROPERTY_TYPEHASH =
+        keccak256(
+            "setBoolProperty(address collection,uint256 tokenId,string memory key,bool value)"
+        );
+    bytes32 public immutable SET_BYTES_PROPERTY_TYPEHASH =
+        keccak256(
+            "setBytesProperty(address collection,uint256 tokenId,string memory key,bytes memory value)"
+        );
+    bytes32 public immutable SET_ADDRESS_PROPERTY_TYPEHASH =
+        keccak256(
+            "setAddressProperty(address collection,uint256 tokenId,string memory key,address value)"
+        );
+
     mapping(address => mapping(uint256 => AccessType))
         private _parameterAccessType;
     mapping(address => mapping(uint256 => address))
@@ -167,7 +197,7 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
         string memory key,
         uint256 tokenId
     ) {
-        _onlyAuthorizedCaller(collection, key, tokenId);
+        _onlyAuthorizedCaller(msg.sender, collection, key, tokenId);
         _;
     }
 
@@ -215,6 +245,7 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
      * @param tokenId The ID of the token.
      */
     function _onlyAuthorizedCaller(
+        address caller,
         address collection,
         string memory key,
         uint256 tokenId
@@ -226,34 +257,33 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
         if (
             accessType == AccessType.Issuer &&
             ((_issuerSettings[collection].useOwnable &&
-                Ownable(collection).owner() != msg.sender) ||
+                Ownable(collection).owner() != caller) ||
                 (!_issuerSettings[collection].useOwnable &&
-                    _issuerSettings[collection].issuer != msg.sender))
+                    _issuerSettings[collection].issuer != caller))
         ) {
             revert RMRKNotCollectionIssuer();
         } else if (
             accessType == AccessType.Collaborator &&
-            !_collaborators[collection][msg.sender]
+            !_collaborators[collection][caller]
         ) {
             revert RMRKNotCollectionCollaborator();
         } else if (
             accessType == AccessType.IssuerOrCollaborator &&
             ((_issuerSettings[collection].useOwnable &&
-                Ownable(collection).owner() != msg.sender) ||
+                Ownable(collection).owner() != caller) ||
                 (!_issuerSettings[collection].useOwnable &&
-                    _issuerSettings[collection].issuer != msg.sender)) &&
-            !_collaborators[collection][msg.sender]
+                    _issuerSettings[collection].issuer != caller)) &&
+            !_collaborators[collection][caller]
         ) {
             revert RMRKNotCollectionIssuerOrCollaborator();
         } else if (
             accessType == AccessType.TokenOwner &&
-            IERC721(collection).ownerOf(tokenId) != msg.sender
+            IERC721(collection).ownerOf(tokenId) != caller
         ) {
             revert RMRKNotTokenOwner();
         } else if (
             accessType == AccessType.SpecificAddress &&
-            !(_parameterSpecificAddress[collection][_keysToIds[key]] ==
-                msg.sender)
+            !(_parameterSpecificAddress[collection][_keysToIds[key]] == caller)
         ) {
             revert RMRKNotSpecificAddress();
         }
@@ -497,6 +527,126 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
         }
 
         return bytesProperties;
+    }
+
+    /**
+     * @inheritdoc IRMRKTokenPropertiesRepository
+     */
+    function prepareMessageToPresignUintProperty(
+        address collection,
+        uint256 tokenId,
+        string memory key,
+        uint256 value,
+        uint256 deadline
+    ) public view returns (bytes32) {
+        return
+            keccak256(
+                abi.encode(
+                    DOMAIN_SEPARATOR,
+                    SET_UINT_PROPERTY_TYPEHASH,
+                    collection,
+                    tokenId,
+                    key,
+                    value,
+                    deadline
+                )
+            );
+    }
+
+    /**
+     * @inheritdoc IRMRKTokenPropertiesRepository
+     */
+    function prepareMessageToPresignStringProperty(
+        address collection,
+        uint256 tokenId,
+        string memory key,
+        string memory value,
+        uint256 deadline
+    ) public view returns (bytes32) {
+        return
+            keccak256(
+                abi.encode(
+                    DOMAIN_SEPARATOR,
+                    SET_STRING_PROPERTY_TYPEHASH,
+                    collection,
+                    tokenId,
+                    key,
+                    value,
+                    deadline
+                )
+            );
+    }
+
+    /**
+     * @inheritdoc IRMRKTokenPropertiesRepository
+     */
+    function prepareMessageToPresignBoolProperty(
+        address collection,
+        uint256 tokenId,
+        string memory key,
+        bool value,
+        uint256 deadline
+    ) public view returns (bytes32) {
+        return
+            keccak256(
+                abi.encode(
+                    DOMAIN_SEPARATOR,
+                    SET_BOOL_PROPERTY_TYPEHASH,
+                    collection,
+                    tokenId,
+                    key,
+                    value,
+                    deadline
+                )
+            );
+    }
+
+    /**
+     * @inheritdoc IRMRKTokenPropertiesRepository
+     */
+    function prepareMessageToPresignBytesProperty(
+        address collection,
+        uint256 tokenId,
+        string memory key,
+        bytes memory value,
+        uint256 deadline
+    ) public view returns (bytes32) {
+        return
+            keccak256(
+                abi.encode(
+                    DOMAIN_SEPARATOR,
+                    SET_BYTES_PROPERTY_TYPEHASH,
+                    collection,
+                    tokenId,
+                    key,
+                    value,
+                    deadline
+                )
+            );
+    }
+
+    /**
+     * @inheritdoc IRMRKTokenPropertiesRepository
+     */
+    function prepareMessageToPresignAddressProperty(
+        address collection,
+        uint256 tokenId,
+        string memory key,
+        address value,
+        uint256 deadline
+    ) public view returns (bytes32) {
+        return
+            keccak256(
+                abi.encode(
+                    DOMAIN_SEPARATOR,
+                    SET_ADDRESS_PROPERTY_TYPEHASH,
+                    collection,
+                    tokenId,
+                    key,
+                    value,
+                    deadline
+                )
+            );
     }
 
     /**
@@ -772,6 +922,228 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
                 ++i;
             }
         }
+    }
+
+    /**
+     * @inheritdoc IRMRKTokenPropertiesRepository
+     */
+    function presignedSetUintProperty(
+        address setter,
+        address collection,
+        uint256 tokenId,
+        string memory key,
+        uint256 value,
+        uint256 deadline,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) external {
+        if (block.timestamp > deadline) {
+            revert RMRKExpiredDeadline();
+        }
+
+        bytes32 digest = keccak256(
+            abi.encodePacked(
+                "\x19Ethereum Signed Message:\n32",
+                keccak256(
+                    abi.encode(
+                        DOMAIN_SEPARATOR,
+                        SET_UINT_PROPERTY_TYPEHASH,
+                        collection,
+                        tokenId,
+                        key,
+                        value,
+                        deadline
+                    )
+                )
+            )
+        );
+        address signer = ecrecover(digest, v, r, s);
+        if (signer != setter) {
+            revert RMRKInvalidSignature();
+        }
+        _onlyAuthorizedCaller(signer, collection, key, tokenId);
+
+        _uintValues[collection][tokenId][_getIdForKey(key)] = value;
+        emit UintPropertyUpdated(collection, tokenId, key, value);
+    }
+
+    /**
+     * @inheritdoc IRMRKTokenPropertiesRepository
+     */
+    function presignedSetStringProperty(
+        address setter,
+        address collection,
+        uint256 tokenId,
+        string memory key,
+        string memory value,
+        uint256 deadline,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) external {
+        if (block.timestamp > deadline) {
+            revert RMRKExpiredDeadline();
+        }
+
+        bytes32 digest = keccak256(
+            abi.encodePacked(
+                "\x19Ethereum Signed Message:\n32",
+                keccak256(
+                    abi.encode(
+                        DOMAIN_SEPARATOR,
+                        SET_STRING_PROPERTY_TYPEHASH,
+                        collection,
+                        tokenId,
+                        key,
+                        value,
+                        deadline
+                    )
+                )
+            )
+        );
+        address signer = ecrecover(digest, v, r, s);
+        if (signer != setter) {
+            revert RMRKInvalidSignature();
+        }
+        _onlyAuthorizedCaller(signer, collection, key, tokenId);
+
+        _stringValueIds[collection][tokenId][
+            _getIdForKey(key)
+        ] = _getStringIdForValue(collection, value);
+        emit StringPropertyUpdated(collection, tokenId, key, value);
+    }
+
+    /**
+     * @inheritdoc IRMRKTokenPropertiesRepository
+     */
+    function presignedSetBoolProperty(
+        address setter,
+        address collection,
+        uint256 tokenId,
+        string memory key,
+        bool value,
+        uint256 deadline,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) external {
+        if (block.timestamp > deadline) {
+            revert RMRKExpiredDeadline();
+        }
+
+        bytes32 digest = keccak256(
+            abi.encodePacked(
+                "\x19Ethereum Signed Message:\n32",
+                keccak256(
+                    abi.encode(
+                        DOMAIN_SEPARATOR,
+                        SET_BOOL_PROPERTY_TYPEHASH,
+                        collection,
+                        tokenId,
+                        key,
+                        value,
+                        deadline
+                    )
+                )
+            )
+        );
+        address signer = ecrecover(digest, v, r, s);
+        if (signer != setter) {
+            revert RMRKInvalidSignature();
+        }
+        _onlyAuthorizedCaller(signer, collection, key, tokenId);
+
+        _boolValues[collection][tokenId][_getIdForKey(key)] = value;
+        emit BoolPropertyUpdated(collection, tokenId, key, value);
+    }
+
+    /**
+     * @inheritdoc IRMRKTokenPropertiesRepository
+     */
+    function presignedSetBytesProperty(
+        address setter,
+        address collection,
+        uint256 tokenId,
+        string memory key,
+        bytes memory value,
+        uint256 deadline,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) external {
+        if (block.timestamp > deadline) {
+            revert RMRKExpiredDeadline();
+        }
+
+        bytes32 digest = keccak256(
+            abi.encodePacked(
+                "\x19Ethereum Signed Message:\n32",
+                keccak256(
+                    abi.encode(
+                        DOMAIN_SEPARATOR,
+                        SET_BYTES_PROPERTY_TYPEHASH,
+                        collection,
+                        tokenId,
+                        key,
+                        value,
+                        deadline
+                    )
+                )
+            )
+        );
+        address signer = ecrecover(digest, v, r, s);
+        if (signer != setter) {
+            revert RMRKInvalidSignature();
+        }
+        _onlyAuthorizedCaller(signer, collection, key, tokenId);
+
+        _bytesValues[collection][tokenId][_getIdForKey(key)] = value;
+        emit BytesPropertyUpdated(collection, tokenId, key, value);
+    }
+
+    /**
+     * @inheritdoc IRMRKTokenPropertiesRepository
+     */
+    function presignedSetAddressProperty(
+        address setter,
+        address collection,
+        uint256 tokenId,
+        string memory key,
+        address value,
+        uint256 deadline,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) external {
+        if (block.timestamp > deadline) {
+            revert RMRKExpiredDeadline();
+        }
+
+        bytes32 digest = keccak256(
+            abi.encodePacked(
+                "\x19Ethereum Signed Message:\n32",
+                keccak256(
+                    abi.encode(
+                        DOMAIN_SEPARATOR,
+                        SET_ADDRESS_PROPERTY_TYPEHASH,
+                        collection,
+                        tokenId,
+                        key,
+                        value,
+                        deadline
+                    )
+                )
+            )
+        );
+        address signer = ecrecover(digest, v, r, s);
+        if (signer != setter) {
+            revert RMRKInvalidSignature();
+        }
+        _onlyAuthorizedCaller(signer, collection, key, tokenId);
+
+        _addressValues[collection][tokenId][_getIdForKey(key)] = value;
+        emit AddressPropertyUpdated(collection, tokenId, key, value);
     }
 
     /**

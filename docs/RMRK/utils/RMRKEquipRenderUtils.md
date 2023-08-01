@@ -397,30 +397,6 @@ Used to get the extended pending assets of the given token.
 |---|---|---|
 | _0 | RMRKEquipRenderUtils.ExtendedPendingAsset[] | An array of ExtendedPendingAssets present on the given token |
 
-### getPaginatedMintedIds
-
-```solidity
-function getPaginatedMintedIds(address target, uint256 pageStart, uint256 pageSize) external view returns (uint256[] page)
-```
-
-Used to get a list of existing token IDs in the range between `pageStart` and `pageSize`.
-
-*It is not optimized to avoid checking IDs out of max supply nor total supply, since this is not meant to be  used during transaction execution; it is only meant to be used as a getter.The resulting array might be smaller than the given `pageSize` since no-existent IDs are not included.*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| target | address | Address of the collection smart contract of the given token |
-| pageStart | uint256 | The first ID to check |
-| pageSize | uint256 | The number of IDs to check |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| page | uint256[] | An array of IDs of the existing tokens |
-
 ### getParent
 
 ```solidity
@@ -611,6 +587,53 @@ Used to retrieve the metadata URI of the specified token&#39;s asset with the hi
 | Name | Type | Description |
 |---|---|---|
 | metadata | string[] | An array of strings with the top asset metadata for each of the given tokens, in the same order as the tokens passed in the `tokenIds` input array |
+
+### getTotalDescendants
+
+```solidity
+function getTotalDescendants(address collection, uint256 tokenId) external view returns (uint256 totalDescendants, bool hasMoreThanOneLevelOfNesting_)
+```
+
+Used to retrieve the total number of descendants of the given token and whether it has more than one level of nesting.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| collection | address | Address of the token&#39;s collection smart contract |
+| tokenId | uint256 | ID of the token |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| totalDescendants | uint256 | The total number of descendants of the given token |
+| hasMoreThanOneLevelOfNesting_ | bool | A boolean value indicating whether the given token has more than one level of nesting |
+
+### hasMoreThanOneLevelOfNesting
+
+```solidity
+function hasMoreThanOneLevelOfNesting(address collection, uint256 tokenId) external view returns (bool)
+```
+
+Used to retrieve whether a token has more than one level of nesting.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| collection | address | Address of the token&#39;s collection smart contract |
+| tokenId | uint256 | ID of the token |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | bool | A boolean value indicating whether the given token has more than one level of nesting |
 
 ### isAssetEquipped
 

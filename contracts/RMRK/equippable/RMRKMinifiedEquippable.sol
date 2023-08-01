@@ -1,10 +1,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
-pragma solidity ^0.8.18;
+pragma solidity ^0.8.21;
 
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
@@ -270,31 +269,17 @@ contract RMRKMinifiedEquippable is
         if (to == address(0)) revert ERC721TransferToTheZeroAddress();
 
         _beforeTokenTransfer(from, to, tokenId);
-        _beforeNestedTokenTransfer(
-            immediateOwner,
-            to,
-            parentId,
-            0,
-            tokenId,
-            data
-        );
+        _beforeNestedTokenTransfer(from, to, parentId, 0, tokenId, data);
 
         _balances[from] -= 1;
         _updateOwnerAndClearApprovals(tokenId, 0, to);
         _balances[to] += 1;
 
         emit Transfer(from, to, tokenId);
-        emit NestTransfer(immediateOwner, to, parentId, 0, tokenId);
+        emit NestTransfer(from, to, parentId, 0, tokenId);
 
         _afterTokenTransfer(from, to, tokenId);
-        _afterNestedTokenTransfer(
-            immediateOwner,
-            to,
-            parentId,
-            0,
-            tokenId,
-            data
-        );
+        _afterNestedTokenTransfer(from, to, parentId, 0, tokenId, data);
     }
 
     /**
@@ -512,10 +497,9 @@ contract RMRKMinifiedEquippable is
         uint256 maxChildrenBurns
     ) public virtual onlyApprovedOrDirectOwner(tokenId) returns (uint256) {
         (address immediateOwner, uint256 parentId, ) = directOwnerOf(tokenId);
-        address owner = ownerOf(tokenId);
-        _balances[immediateOwner] -= 1;
+        address rootOwner = ownerOf(tokenId);
 
-        _beforeTokenTransfer(owner, address(0), tokenId);
+        _beforeTokenTransfer(immediateOwner, address(0), tokenId);
         _beforeNestedTokenTransfer(
             immediateOwner,
             address(0),
@@ -525,6 +509,7 @@ contract RMRKMinifiedEquippable is
             ""
         );
 
+        _balances[immediateOwner] -= 1;
         _approve(address(0), tokenId);
         _approveForAssets(address(0), tokenId);
 
@@ -532,7 +517,7 @@ contract RMRKMinifiedEquippable is
 
         delete _activeChildren[tokenId];
         delete _pendingChildren[tokenId];
-        delete _tokenApprovals[tokenId][owner];
+        delete _tokenApprovals[tokenId][rootOwner];
 
         uint256 pendingRecursiveBurns;
         uint256 totalChildBurns;
@@ -566,10 +551,10 @@ contract RMRKMinifiedEquippable is
         // Can't remove before burning child since child will call back to get root owner
         delete _RMRKOwners[tokenId];
 
-        emit Transfer(owner, address(0), tokenId);
+        emit Transfer(immediateOwner, address(0), tokenId);
         emit NestTransfer(immediateOwner, address(0), parentId, 0, tokenId);
 
-        _afterTokenTransfer(owner, address(0), tokenId);
+        _afterTokenTransfer(immediateOwner, address(0), tokenId);
         _afterNestedTokenTransfer(
             immediateOwner,
             address(0),
@@ -688,11 +673,6 @@ contract RMRKMinifiedEquippable is
         _approve(address(0), tokenId);
         _approveForAssets(address(0), tokenId);
     }
-
-    /**
-     * @notice Used to remove approvals for the current owner of the given token.
-     * @param tokenId ID of the token to clear the approvals for
-     */
 
     ////////////////////////////////////////
     //              UTILS
@@ -1019,6 +999,44 @@ contract RMRKMinifiedEquippable is
     }
 
     // HOOKS
+
+    /**
+     * @notice Hook that is called before any token transfer. This includes minting and burning.
+     * @dev Calling conditions:
+     *
+     *  - When `from` and `to` are both non-zero, ``from``'s `tokenId` will be transferred to `to`.
+     *  - When `from` is zero, `tokenId` will be minted to `to`.
+     *  - When `to` is zero, ``from``'s `tokenId` will be burned.
+     *  - `from` and `to` are never zero at the same time.
+     *
+     *  To learn more about hooks, head to xref:ROOT:extending-contracts.adoc#using-hooks[Using Hooks].
+     * @param from Address from which the token is being transferred
+     * @param to Address to which the token is being transferred
+     * @param tokenId ID of the token being transferred
+     */
+    function _beforeTokenTransfer(
+        address from,
+        address to,
+        uint256 tokenId
+    ) internal virtual {}
+
+    /**
+     * @notice Hook that is called after any transfer of tokens. This includes minting and burning.
+     * @dev Calling conditions:
+     *
+     *  - When `from` and `to` are both non-zero.
+     *  - `from` and `to` are never zero at the same time.
+     *
+     *  To learn more about hooks, head to xref:ROOT:extending-contracts.adoc#using-hooks[Using Hooks].
+     * @param from Address from which the token has been transferred
+     * @param to Address to which the token has been transferred
+     * @param tokenId ID of the token that has been transferred
+     */
+    function _afterTokenTransfer(
+        address from,
+        address to,
+        uint256 tokenId
+    ) internal virtual {}
 
     /**
      * @notice Hook that is called before nested token transfer.
@@ -1534,7 +1552,7 @@ contract RMRKMinifiedEquippable is
      */
     function _beforeSetPriority(
         uint256 tokenId,
-        uint64[] calldata priorities
+        uint64[] memory priorities
     ) internal virtual {}
 
     /**
@@ -1544,7 +1562,7 @@ contract RMRKMinifiedEquippable is
      */
     function _afterSetPriority(
         uint256 tokenId,
-        uint64[] calldata priorities
+        uint64[] memory priorities
     ) internal virtual {}
 
     // ------------------- ASSETS --------------
@@ -1603,18 +1621,6 @@ contract RMRKMinifiedEquippable is
         _;
     }
 
-    // ----------------------------- CONSTRUCTOR ------------------------------
-
-    /**
-     * @notice Initializes the contract by setting a `name` and a `symbol` of the token collection.
-     * @param name_ Name of the token collection
-     * @param symbol_ Symbol of the token collection
-     */
-    constructor(
-        string memory name_,
-        string memory symbol_
-    ) RMRKCore(name_, symbol_) {}
-
     /**
      * @inheritdoc IERC165
      */
@@ -1624,7 +1630,6 @@ contract RMRKMinifiedEquippable is
         return
             interfaceId == type(IERC165).interfaceId ||
             interfaceId == type(IERC721).interfaceId ||
-            interfaceId == type(IERC721Metadata).interfaceId ||
             interfaceId == type(IERC6059).interfaceId ||
             interfaceId == type(IERC5773).interfaceId ||
             interfaceId == type(IERC6220).interfaceId;
@@ -1777,7 +1782,7 @@ contract RMRKMinifiedEquippable is
      */
     function setPriority(
         uint256 tokenId,
-        uint64[] calldata priorities
+        uint64[] memory priorities
     ) public virtual onlyApprovedForAssetsOrOwner(tokenId) {
         uint256 length = priorities.length;
         if (length != _activeAssets[tokenId].length)

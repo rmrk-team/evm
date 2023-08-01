@@ -9,13 +9,10 @@ import {
   mintFromMock,
   singleFixtureWithArgs,
 } from './utils';
-import { IERC721, IERC721Metadata } from './interfaces';
+import { IERC721 } from './interfaces';
 import { RMRKMultiAssetMock, RMRKMultiAssetRenderUtils } from '../typechain-types';
 import shouldBehaveLikeMultiAsset from './behavior/multiasset';
 import shouldBehaveLikeERC721 from './behavior/erc721';
-
-const name = 'RmrkTest';
-const symbol = 'RMRKTST';
 
 async function singleFixture(): Promise<{
   token: RMRKMultiAssetMock;
@@ -25,9 +22,7 @@ async function singleFixture(): Promise<{
   const renderUtils = await renderUtilsFactory.deploy();
   await renderUtils.deployed();
 
-  const token = <RMRKMultiAssetMock>(
-    await singleFixtureWithArgs('RMRKMultiAssetMock', [name, symbol])
-  );
+  const token = <RMRKMultiAssetMock>await singleFixtureWithArgs('RMRKMultiAssetMock', []);
   return { token, renderUtils };
 }
 
@@ -43,21 +38,12 @@ describe('MultiAssetMock Other Behavior', async function () {
   });
 
   describe('Init', async function () {
-    it('can get name and symbol', async function () {
-      expect(await token.name()).to.equal(name);
-      expect(await token.symbol()).to.equal(symbol);
-    });
-
     it('can support IERC721', async function () {
       expect(await token.supportsInterface(IERC721)).to.equal(true);
     });
 
     it('can support IERC721', async function () {
       expect(await token.supportsInterface(IERC721)).to.equal(true);
-    });
-
-    it('can support IERC721Metadata', async function () {
-      expect(await token.supportsInterface(IERC721Metadata)).to.equal(true);
     });
   });
 
@@ -86,7 +72,7 @@ describe('MultiAssetMock Other Behavior', async function () {
         token,
         'RMRKTokenDoesNotHaveAsset',
       );
-      await expect(token.getAssetMetadata(tokenId + 1, resId)).to.be.revertedWithCustomError(
+      await expect(token.getAssetMetadata(tokenId.add(1), resId)).to.be.revertedWithCustomError(
         token,
         'RMRKTokenDoesNotHaveAsset',
       );
@@ -151,7 +137,7 @@ describe('MultiAssetMock Other Behavior', async function () {
     it('can add asset to non existing token and it is pending when minted', async function () {
       const resId = await addAssetEntryFromMock(token);
       const lastTokenId = await mintFromMock(token, tokenOwner.address);
-      const nextTokenId = lastTokenId + 1; // not existing yet
+      const nextTokenId = lastTokenId.add(1); // not existing yet
 
       await token.addAssetToToken(nextTokenId, resId, 0);
       await mintFromMock(token, tokenOwner.address);
@@ -250,7 +236,7 @@ describe('MultiAssetMock Other Behavior', async function () {
   });
 });
 
-describe('MultiAssetMock MR behavior', async () => {
+describe('MultiAssetMock MA behavior', async () => {
   beforeEach(async function () {
     const { token, renderUtils } = await loadFixture(singleFixture);
     this.token = token;
@@ -260,12 +246,12 @@ describe('MultiAssetMock MR behavior', async () => {
   shouldBehaveLikeMultiAsset(mintFromMock, addAssetEntryFromMock, addAssetToToken);
 });
 
-describe('NestableMock ERC721 behavior', function () {
+describe('RMRKMultiAssetMock ERC721 behavior', function () {
   beforeEach(async function () {
     const { token } = await loadFixture(singleFixture);
     this.token = token;
     this.ERC721Receiver = await ethers.getContractFactory('ERC721ReceiverMock');
   });
 
-  shouldBehaveLikeERC721(name, symbol);
+  shouldBehaveLikeERC721('RmrkTest', 'RMRKTST');
 });

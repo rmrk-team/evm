@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
-pragma solidity ^0.8.18;
+pragma solidity ^0.8.21;
 
 import "../../../RMRK/extension/typedMultiAsset/RMRKTypedMultiAsset.sol";
 import "../../RMRKEquippableMock.sol";
@@ -8,11 +8,6 @@ import "../../RMRKEquippableMock.sol";
 error RMRKTokenHasNoAssetsWithType();
 
 contract RMRKTypedEquippableMock is RMRKEquippableMock, RMRKTypedMultiAsset {
-    constructor(
-        string memory name,
-        string memory symbol
-    ) RMRKEquippableMock(name, symbol) {}
-
     function supportsInterface(
         bytes4 interfaceId
     )

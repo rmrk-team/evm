@@ -6,7 +6,7 @@ import { ADDRESS_ZERO, bn } from '../utils';
 import { IERC165, IERC6220, IOtherInterface } from '../interfaces';
 
 async function shouldBehaveLikeEquippableAssets(
-  mint: (token: Contract, to: string) => Promise<number>,
+  mint: (token: Contract, to: string) => Promise<BigNumber>,
 ) {
   let chunky: Contract;
   let chunkyEquip: Contract;
@@ -72,7 +72,7 @@ async function shouldBehaveLikeEquippableAssets(
         chunkyEquip.getAssetAndEquippableData(tokenId, resId + 1),
       ).to.be.revertedWithCustomError(chunkyEquip, 'RMRKTokenDoesNotHaveAsset');
       await expect(
-        chunkyEquip.getAssetAndEquippableData(tokenId + 1, resId),
+        chunkyEquip.getAssetAndEquippableData(tokenId.add(1), resId),
       ).to.be.revertedWithCustomError(chunkyEquip, 'RMRKTokenDoesNotHaveAsset');
     });
 
@@ -190,7 +190,7 @@ async function shouldBehaveLikeEquippableAssets(
     it('can add asset to non existing token and it is pending when minted', async function () {
       const resId = bn(1);
       const lastTokenId = await mint(chunky, owner.address);
-      const nextTokenId = lastTokenId + 1; // not existing yet
+      const nextTokenId = lastTokenId.add(1); // not existing yet
 
       await addAssets([resId]);
       await chunkyEquip.addAssetToToken(nextTokenId, resId, 0);
@@ -609,7 +609,7 @@ async function shouldBehaveLikeEquippableAssets(
     }
   }
 
-  async function addAssetsToToken(): Promise<number> {
+  async function addAssetsToToken(): Promise<BigNumber> {
     const resId = bn(1);
     const resId2 = bn(2);
     const tokenId = await mint(chunky, owner.address);

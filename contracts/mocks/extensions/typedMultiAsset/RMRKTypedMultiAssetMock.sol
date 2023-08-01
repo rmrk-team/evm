@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
-pragma solidity ^0.8.18;
+pragma solidity ^0.8.21;
 
 import "../../../RMRK/extension/typedMultiAsset/RMRKTypedMultiAsset.sol";
 import "../../RMRKMultiAssetMock.sol";
@@ -9,11 +9,6 @@ error RMRKTokenHasNoAssetsWithType();
 
 contract RMRKTypedMultiAssetMock is RMRKMultiAssetMock, RMRKTypedMultiAsset {
     uint64 private constant _LOWEST_POSSIBLE_PRIORITY = 2 ** 64 - 1;
-
-    constructor(
-        string memory name,
-        string memory symbol
-    ) RMRKMultiAssetMock(name, symbol) {}
 
     function supportsInterface(
         bytes4 interfaceId

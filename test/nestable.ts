@@ -15,22 +15,11 @@ import {
 import shouldBehaveLikeNestable from './behavior/nestable';
 import shouldBehaveLikeERC721 from './behavior/erc721';
 
-const parentName = 'ownerChunky';
-const parentSymbol = 'CHNKY';
-
-const childName = 'petMonkey';
-const childSymbol = 'MONKE';
-
 async function singleFixture(): Promise<Contract> {
-  return singleFixtureWithArgs('RMRKNestableMock', [parentName, parentSymbol]);
+  return singleFixtureWithArgs('RMRKNestableMock', []);
 }
-
-async function parentChildFixture(): Promise<{ parent: Contract; child: Contract }> {
-  return parentChildFixtureWithArgs(
-    'RMRKNestableMock',
-    [parentName, parentSymbol],
-    [childName, childSymbol],
-  );
+function parentChildFixture(): Promise<{ parent: Contract; child: Contract }> {
+  return parentChildFixtureWithArgs('RMRKNestableMock', [], []);
 }
 
 describe('NestableMock', function () {
@@ -47,15 +36,6 @@ describe('NestableMock', function () {
   });
 
   shouldBehaveLikeNestable(mintFromMock, nestMintFromMock, transfer, nestTransfer);
-
-  describe('Init', async function () {
-    it('can get name and symbol', async function () {
-      expect(await parent.name()).to.equal(parentName);
-      expect(await child.name()).to.equal(childName);
-      expect(await parent.symbol()).to.equal(parentSymbol);
-      expect(await child.symbol()).to.equal(childSymbol);
-    });
-  });
 
   describe('Minting', async function () {
     it('cannot mint id 0', async function () {
@@ -102,14 +82,13 @@ describe('NestableMock', function () {
 
 describe('NestableMock ERC721 behavior', function () {
   let token: Contract;
-
   beforeEach(async function () {
     token = await loadFixture(singleFixture);
     this.token = token;
     this.ERC721Receiver = await ethers.getContractFactory('ERC721ReceiverMock');
   });
 
-  shouldBehaveLikeERC721(parentName, parentSymbol);
+  shouldBehaveLikeERC721('Chunky', 'CHNKY');
 });
 
 describe('NestableMock transfer hooks', function () {

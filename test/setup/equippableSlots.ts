@@ -1,4 +1,5 @@
 import { ethers } from 'hardhat';
+import { BigNumber } from 'ethers';
 import { Contract } from 'ethers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 
@@ -12,10 +13,10 @@ const uniqueWeapons = 4;
 // const uniqueWeaponGems = 2;
 // const uniqueBackgrounds = 3;
 
-const soldiersIds: number[] = [];
-const weaponsIds: number[] = [];
-const weaponGemsIds: number[] = [];
-const backgroundsIds: number[] = [];
+const soldiersIds: BigNumber[] = [];
+const weaponsIds: BigNumber[] = [];
+const weaponGemsIds: BigNumber[] = [];
+const backgroundsIds: BigNumber[] = [];
 
 const soldierResId = 100;
 const weaponAssetsFull = [1, 2, 3, 4]; // Must match the total of uniqueAssets
@@ -42,8 +43,8 @@ async function setupContextForSlots(
   weaponGemEquip: Contract,
   background: Contract,
   backgroundEquip: Contract,
-  mint: (token: Contract, to: string) => Promise<number>,
-  nestMint: (token: Contract, to: string, parentId: number) => Promise<number>,
+  mint: (token: Contract, to: string) => Promise<BigNumber>,
+  nestMint: (token: Contract, to: string, parentId: BigNumber) => Promise<BigNumber>,
 ) {
   const [, ...signersAddr] = await ethers.getSigners();
   addrs = signersAddr;

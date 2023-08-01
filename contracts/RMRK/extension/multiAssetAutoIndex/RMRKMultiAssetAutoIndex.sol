@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
-pragma solidity ^0.8.18;
+pragma solidity ^0.8.21;
 
 import "./IRMRKMultiAssetAutoIndex.sol";
 import "../../multiasset/RMRKMultiAsset.sol";
@@ -13,16 +13,6 @@ import "../../multiasset/RMRKMultiAsset.sol";
 contract RMRKMultiAssetAutoIndex is IRMRKMultiAssetAutoIndex, RMRKMultiAsset {
     // Mapping of tokenId to assetId to index on the _pendingAssetIndex array
     mapping(uint256 => mapping(uint256 => uint256)) private _pendingAssetIndex;
-
-    /**
-     * @notice Initializes the contract by setting a name and a symbol to the token collection.
-     * @param name_ Name of the token collection
-     * @param symbol_ Symbol of the token collection
-     */
-    constructor(
-        string memory name_,
-        string memory symbol_
-    ) RMRKMultiAsset(name_, symbol_) {}
 
     /**
      * @inheritdoc IERC165

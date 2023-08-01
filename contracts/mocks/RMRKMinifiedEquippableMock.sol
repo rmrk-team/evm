@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
-pragma solidity ^0.8.18;
+pragma solidity ^0.8.21;
 
 import "../RMRK/equippable/RMRKMinifiedEquippable.sol";
 
@@ -8,11 +8,6 @@ import "../RMRK/equippable/RMRKMinifiedEquippable.sol";
 
 //Minimal public implementation of RMRKEquippable for testing.
 contract RMRKMinifiedEquippableMock is RMRKMinifiedEquippable {
-    constructor(
-        string memory name,
-        string memory symbol
-    ) RMRKMinifiedEquippable(name, symbol) {}
-
     function safeMint(address to, uint256 tokenId) public {
         _safeMint(to, tokenId, "");
     }

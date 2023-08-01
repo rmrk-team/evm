@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
-pragma solidity ^0.8.18;
+pragma solidity ^0.8.21;
 
 import "./RMRKSoulbound.sol";
 
@@ -30,14 +30,22 @@ abstract contract RMRKSoulboundAfterTransactions is RMRKSoulbound {
     }
 
     /**
-     * @inheritdoc RMRKCore
+     * @notice Hook that is called after any transfer of tokens. This includes minting and burning.
+     * @dev Calling conditions:
+     *
+     *  - When `from` and `to` are both non-zero.
+     *  - `from` and `to` are never zero at the same time.
+     *
+     *  To learn more about hooks, head to xref:ROOT:extending-contracts.adoc#using-hooks[Using Hooks].
+     * @param from Address from which the token has been transferred
+     * @param to Address to which the token has been transferred
+     * @param tokenId ID of the token that has been transferred
      */
     function _afterTokenTransfer(
         address from,
         address to,
         uint256 tokenId
-    ) internal virtual override {
-        super._afterTokenTransfer(from, to, tokenId);
+    ) internal virtual {
         // We won't count minting:
         if (from != address(0)) {
             _transfersPerToken[tokenId]++;

@@ -1,15 +1,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
-pragma solidity ^0.8.18;
+pragma solidity ^0.8.21;
 
 import "../RMRK/extension/multiAssetAutoIndex/RMRKMultiAssetAutoIndex.sol";
 
 contract RMRKMultiAssetAutoIndexMock is RMRKMultiAssetAutoIndex {
-    constructor(
-        string memory name_,
-        string memory symbol_
-    ) RMRKMultiAssetAutoIndex(name_, symbol_) {}
-
     function mint(address to, uint256 tokenId) external {
         _mint(to, tokenId);
     }

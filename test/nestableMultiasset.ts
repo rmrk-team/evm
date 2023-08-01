@@ -27,17 +27,13 @@ async function singleFixture(): Promise<{
   await renderUtils.deployed();
 
   const token = <RMRKNestableMultiAssetMock>(
-    await singleFixtureWithArgs('RMRKNestableMultiAssetMock', ['NestableMultiAsset', 'NMR'])
+    await singleFixtureWithArgs('RMRKNestableMultiAssetMock', [])
   );
   return { token, renderUtils };
 }
 
 async function parentChildFixture(): Promise<{ parent: Contract; child: Contract }> {
-  return parentChildFixtureWithArgs(
-    'RMRKNestableMultiAssetMock',
-    ['Chunky', 'CHNK'],
-    ['Monkey', 'MONK'],
-  );
+  return parentChildFixtureWithArgs('RMRKNestableMultiAssetMock', [], []);
 }
 
 describe('NestableMultiAssetMock Nestable Behavior', function () {
@@ -50,7 +46,7 @@ describe('NestableMultiAssetMock Nestable Behavior', function () {
   shouldBehaveLikeNestable(mintFromMock, nestMintFromMock, transfer, nestTransfer);
 });
 
-describe('NestableMultiAssetMock MR behavior', async () => {
+describe('NestableMultiAssetMock MA behavior', async () => {
   beforeEach(async function () {
     const { token, renderUtils } = await loadFixture(singleFixture);
     this.token = token;
@@ -69,7 +65,7 @@ describe('NestableMultiAssetMock ERC721 behavior', function () {
     this.ERC721Receiver = await ethers.getContractFactory('ERC721ReceiverMock');
   });
 
-  shouldBehaveLikeERC721('NestableMultiAsset', 'NMR');
+  shouldBehaveLikeERC721('NestableMultiAsset', 'NMA');
 });
 
 describe('NestableMultiAssetMock Other Behavior', function () {

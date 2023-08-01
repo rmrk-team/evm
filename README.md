@@ -13,7 +13,7 @@ presented in the [sample RMRK EVM contracts repository](https://github.com/rmrk-
 To use the RMRK legos and smart contracts contained in this repository, simply add them to your project:
 
 ```shell
-yarn add @rmrk-team/evm-contract
+yarn add @rmrk-team/evm-contracts
 ```
 
 or

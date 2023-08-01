@@ -1,73 +1,57 @@
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { expect } from 'chai';
-import { Contract } from 'ethers';
+import { BigNumber, Contract } from 'ethers';
 import { ethers } from 'hardhat';
 import {
   ADDRESS_ZERO,
-  mintFromImplNativeToken,
-  nestMintFromImplNativeToken,
+  mintFromNativeToken,
+  nestMintFromNativeToken,
   ONE_ETH,
   singleFixtureWithArgs,
 } from '../utils';
 
 async function multiAssetFixture(): Promise<Contract> {
-  return await singleFixtureWithArgs('RMRKMultiAssetImpl', [
+  return await singleFixtureWithArgs('RMRKMultiAssetLazyMintNative', [
     'MultiAsset',
     'MA',
     'ipfs://collection-meta',
     'ipfs://tokenURI',
-    [ADDRESS_ZERO, false, ADDRESS_ZERO, 0, 10000, ONE_ETH],
+    [ADDRESS_ZERO, 1000, 10000, ONE_ETH],
   ]);
 }
 
 async function nestableFixture(): Promise<Contract> {
-  return await singleFixtureWithArgs('RMRKNestableImpl', [
-    'MultiAsset',
-    'MA',
+  return await singleFixtureWithArgs('RMRKNestableLazyMintNative', [
+    'Nestable',
+    'N',
     'ipfs://collection-meta',
     'ipfs://tokenURI',
-    [ADDRESS_ZERO, false, ADDRESS_ZERO, 0, 10000, ONE_ETH],
+    [ADDRESS_ZERO, 1000, 10000, ONE_ETH],
   ]);
 }
 
 async function nestableMultiAssetFixture(): Promise<Contract> {
-  return await singleFixtureWithArgs('RMRKNestableMultiAssetImpl', [
+  return await singleFixtureWithArgs('RMRKNestableMultiAssetLazyMintNative', [
     'MultiAsset',
-    'MA',
+    'NMA',
     'ipfs://collection-meta',
     'ipfs://tokenURI',
-    [ADDRESS_ZERO, false, ADDRESS_ZERO, 0, 10000, ONE_ETH],
+    [ADDRESS_ZERO, 1000, 10000, ONE_ETH],
   ]);
-}
-
-async function nestableExternalEquipFixture(): Promise<Contract> {
-  const nestable = await singleFixtureWithArgs('RMRKNestableExternalEquipImpl', [
-    ADDRESS_ZERO,
-    'MultiAsset',
-    'MA',
-    'ipfs://collection-meta',
-    'ipfs://tokenURI',
-    [ADDRESS_ZERO, false, ADDRESS_ZERO, 0, 10000, ONE_ETH],
-  ]);
-
-  const equippable = await singleFixtureWithArgs('RMRKExternalEquipImpl', [nestable.address]);
-  await nestable.setEquippableAddress(equippable.address);
-
-  return nestable;
 }
 
 async function equippableFixture(): Promise<Contract> {
-  return await singleFixtureWithArgs('RMRKEquippableImpl', [
-    'MultiAsset',
-    'MA',
+  return await singleFixtureWithArgs('RMRKEquippableLazyMintNative', [
+    'Equippable',
+    'EQ',
     'ipfs://collection-meta',
     'ipfs://tokenURI',
-    [ADDRESS_ZERO, false, ADDRESS_ZERO, 0, 10000, ONE_ETH],
+    [ADDRESS_ZERO, 1000, 10000, ONE_ETH],
   ]);
 }
 
-describe('MultiAssetImplNativeTokenPay Minting', async () => {
+describe('MultiAssetNativeTokenPay Minting', async () => {
   beforeEach(async function () {
     this.token = await loadFixture(multiAssetFixture);
   });
@@ -75,7 +59,7 @@ describe('MultiAssetImplNativeTokenPay Minting', async () => {
   shouldControlValidMintingNativeTokenPay();
 });
 
-describe('NestableImplNativeTokenPay Minting', async () => {
+describe('NestableNativeTokenPay Minting', async () => {
   beforeEach(async function () {
     this.token = await loadFixture(nestableFixture);
   });
@@ -83,7 +67,7 @@ describe('NestableImplNativeTokenPay Minting', async () => {
   shouldControlValidMintingNativeTokenPay();
 });
 
-describe('NestableMultiAssetImplNativeTokenPay Minting', async () => {
+describe('NestableMultiAssetNativeTokenPay Minting', async () => {
   beforeEach(async function () {
     this.token = await loadFixture(nestableMultiAssetFixture);
   });
@@ -91,15 +75,7 @@ describe('NestableMultiAssetImplNativeTokenPay Minting', async () => {
   shouldControlValidMintingNativeTokenPay();
 });
 
-describe('RMRKNestableExternalEquipImpl Minting', async () => {
-  beforeEach(async function () {
-    this.token = await loadFixture(nestableExternalEquipFixture);
-  });
-
-  shouldControlValidMintingNativeTokenPay();
-});
-
-describe('EquippableImplNativeTokenPay Minting', async () => {
+describe('EquippableNativeTokenPay Minting', async () => {
   beforeEach(async function () {
     this.token = await loadFixture(equippableFixture);
   });
@@ -135,33 +111,25 @@ async function shouldControlValidMintingNativeTokenPay(): Promise<void> {
     );
   });
 
-  it('cannot mint if locked', async function () {
-    await this.token.setLock();
-    await expect(this.token.mint(addrs[0].address, 99999)).to.be.revertedWithCustomError(
-      this.token,
-      'RMRKLocked',
-    );
-  });
-
   it('can mint tokens through sale logic', async function () {
-    await mintFromImplNativeToken(this.token, addrs[0].address);
+    await mintFromNativeToken(this.token, addrs[0].address);
     expect(await this.token.ownerOf(1)).to.equal(addrs[0].address);
     expect(await this.token.totalSupply()).to.equal(1);
     expect(await this.token.balanceOf(addrs[0].address)).to.equal(1);
   });
 
   it('reduces total supply on burn', async function () {
-    const tokenId = await mintFromImplNativeToken(this.token, addrs[0].address);
+    const tokenId = await mintFromNativeToken(this.token, addrs[0].address);
     expect(await this.token.totalSupply()).to.equal(1);
     await this.token.connect(addrs[0])['burn(uint256)'](tokenId);
     expect(await this.token.totalSupply()).to.equal(0);
   });
 
   it('reduces total supply on burn and does not reuse ID', async function () {
-    const tokenId = await mintFromImplNativeToken(this.token, addrs[0].address);
+    const tokenId = await mintFromNativeToken(this.token, addrs[0].address);
     await this.token.connect(addrs[0])['burn(uint256)'](tokenId);
 
-    const newTokenId = await mintFromImplNativeToken(this.token, addrs[0].address);
+    const newTokenId = await mintFromNativeToken(this.token, addrs[0].address);
     expect(newTokenId).to.equal(tokenId.add(1));
     expect(await this.token.totalSupply()).to.equal(1);
   });
@@ -173,17 +141,17 @@ async function shouldControlValidMintingNativeTokenPay(): Promise<void> {
   });
 
   describe('Nest minting', async () => {
-    let parentId: number;
+    let parentId: BigNumber;
 
     beforeEach(async function () {
       if (this.token.nestMint === undefined) {
         this.skip();
       }
-      parentId = await mintFromImplNativeToken(this.token, addrs[0].address);
+      parentId = await mintFromNativeToken(this.token, addrs[0].address);
     });
 
     it('can nest mint tokens through sale logic', async function () {
-      const childId = await nestMintFromImplNativeToken(this.token, this.token.address, parentId);
+      const childId = await nestMintFromNativeToken(this.token, this.token.address, parentId);
       expect(await this.token.ownerOf(childId)).to.equal(addrs[0].address);
       expect(await this.token.totalSupply()).to.equal(2);
     });
@@ -192,14 +160,6 @@ async function shouldControlValidMintingNativeTokenPay(): Promise<void> {
       await expect(this.token.nestMint(this.token.address, 99999, 1)).to.be.revertedWithCustomError(
         this.token,
         'RMRKMintOverMax',
-      );
-    });
-
-    it('cannot nest mint if locked', async function () {
-      await this.token.setLock();
-      await expect(this.token.nestMint(this.token.address, 99999, 1)).to.be.revertedWithCustomError(
-        this.token,
-        'RMRKLocked',
       );
     });
   });

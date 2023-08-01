@@ -1,16 +1,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
-pragma solidity ^0.8.18;
+pragma solidity ^0.8.21;
 
 import "../RMRK/nestable/RMRKNestableMultiAsset.sol";
 
 //Minimal public implementation of RMRKNestableMultiAsset for testing.
 contract RMRKNestableMultiAssetMock is RMRKNestableMultiAsset {
-    constructor(
-        string memory name,
-        string memory symbol
-    ) RMRKNestableMultiAsset(name, symbol) {}
-
     function mint(address to, uint256 tokenId) external {
         _mint(to, tokenId, "");
     }

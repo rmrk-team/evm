@@ -6,7 +6,7 @@ import { RMRKNestableMock, ChildAdder } from '../typechain-types';
 
 async function nestableFixture() {
   const NestableFactory = await ethers.getContractFactory('RMRKNestableMock');
-  const parent = <RMRKNestableMock>await NestableFactory.deploy('Test', 'TST');
+  const parent = <RMRKNestableMock>await NestableFactory.deploy();
   await parent.deployed();
 
   return parent;

@@ -3,8 +3,8 @@ import { expect } from 'chai';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import {
   ADDRESS_ZERO,
-  mintFromImplErc20Pay,
-  nestMintFromImplErc20Pay,
+  mintFromErc20Pay,
+  nestMintFromErc20Pay,
   ONE_ETH,
   singleFixtureWithArgs,
 } from '../utils';
@@ -17,12 +17,12 @@ async function multiAssetFixture(): Promise<Contract> {
   const erc20 = <ERC20Mock>await erc20Factory.deploy();
   await erc20.deployed();
 
-  return await singleFixtureWithArgs('RMRKMultiAssetImplErc20Pay', [
+  return await singleFixtureWithArgs('RMRKMultiAssetLazyMintErc20', [
     'MultiAsset',
     'MA',
     'ipfs://collection-meta',
     'ipfs://tokenURI',
-    [erc20.address, false, ADDRESS_ZERO, 0, 10000, ONE_ETH],
+    [erc20.address, ADDRESS_ZERO, 0, 10000, ONE_ETH],
   ]);
 }
 
@@ -31,12 +31,12 @@ async function nestableFixture(): Promise<Contract> {
   const erc20 = <ERC20Mock>await erc20Factory.deploy();
   await erc20.deployed();
 
-  return await singleFixtureWithArgs('RMRKNestableImplErc20Pay', [
-    'MultiAsset',
-    'MA',
+  return await singleFixtureWithArgs('RMRKNestableLazyMintErc20', [
+    'Nestable',
+    'N',
     'ipfs://collection-meta',
     'ipfs://tokenURI',
-    [erc20.address, false, ADDRESS_ZERO, 0, 10000, ONE_ETH],
+    [erc20.address, ADDRESS_ZERO, 0, 10000, ONE_ETH],
   ]);
 }
 
@@ -45,12 +45,12 @@ async function nestableMultiAssetFixture(): Promise<Contract> {
   const erc20 = <ERC20Mock>await erc20Factory.deploy();
   await erc20.deployed();
 
-  return await singleFixtureWithArgs('RMRKNestableMultiAssetImplErc20Pay', [
+  return await singleFixtureWithArgs('RMRKNestableMultiAssetLazyMintErc20', [
     'MultiAsset',
     'MA',
     'ipfs://collection-meta',
     'ipfs://tokenURI',
-    [erc20.address, false, ADDRESS_ZERO, 0, 10000, ONE_ETH],
+    [erc20.address, ADDRESS_ZERO, 0, 10000, ONE_ETH],
   ]);
 }
 
@@ -59,16 +59,16 @@ async function equippableFixture(): Promise<Contract> {
   const erc20 = await erc20Factory.deploy();
   await erc20.deployed();
 
-  return await singleFixtureWithArgs('RMRKEquippableImplErc20Pay', [
+  return await singleFixtureWithArgs('RMRKEquippableLazyMintErc20', [
     'MultiAsset',
     'MA',
     'ipfs://collection-meta',
     'ipfs://tokenURI',
-    [erc20.address, false, ADDRESS_ZERO, 0, 10000, ONE_ETH],
+    [erc20.address, ADDRESS_ZERO, 0, 10000, ONE_ETH],
   ]);
 }
 
-describe('MultiAssetImplErc20Pay Minting', async () => {
+describe('MultiAssetErc20Pay Minting', async () => {
   beforeEach(async function () {
     this.token = await loadFixture(multiAssetFixture);
   });
@@ -76,7 +76,7 @@ describe('MultiAssetImplErc20Pay Minting', async () => {
   shouldControlValidMintingErc20Pay();
 });
 
-describe('NestableImplErc20Pay Minting', async () => {
+describe('NestableErc20Pay Minting', async () => {
   beforeEach(async function () {
     this.token = await loadFixture(nestableFixture);
   });
@@ -84,7 +84,7 @@ describe('NestableImplErc20Pay Minting', async () => {
   shouldControlValidMintingErc20Pay();
 });
 
-describe('NestableMultiAssetImplErc20Pay Minting', async () => {
+describe('NestableMultiAssetErc20Pay Minting', async () => {
   beforeEach(async function () {
     this.token = await loadFixture(nestableMultiAssetFixture);
   });
@@ -92,7 +92,7 @@ describe('NestableMultiAssetImplErc20Pay Minting', async () => {
   shouldControlValidMintingErc20Pay();
 });
 
-describe('EquippableImplErc20Pay Minting', async () => {
+describe('EquippableErc20Pay Minting', async () => {
   beforeEach(async function () {
     this.token = await loadFixture(equippableFixture);
   });
@@ -136,23 +136,15 @@ async function shouldControlValidMintingErc20Pay(): Promise<void> {
     );
   });
 
-  it('cannot mint if locked', async function () {
-    await this.token.setLock();
-    await expect(this.token.mint(addrs[0].address, 99999)).to.be.revertedWithCustomError(
-      this.token,
-      'RMRKLocked',
-    );
-  });
-
   it('can mint tokens through sale logic', async function () {
-    await mintFromImplErc20Pay(this.token, addrs[0].address);
+    await mintFromErc20Pay(this.token, addrs[0].address);
     expect(await this.token.ownerOf(1)).to.equal(addrs[0].address);
     expect(await this.token.totalSupply()).to.equal(1);
     expect(await this.token.balanceOf(addrs[0].address)).to.equal(1);
   });
 
   it('can withdraw raised funds', async function () {
-    await mintFromImplErc20Pay(this.token, addrs[0].address);
+    await mintFromErc20Pay(this.token, addrs[0].address);
     const contractBalance = await erc20.balanceOf(this.token.address);
     const initAddressBalance = await erc20.balanceOf(addrs[0].address);
     expect(contractBalance).to.equal(ONE_ETH);
@@ -164,17 +156,17 @@ async function shouldControlValidMintingErc20Pay(): Promise<void> {
   });
 
   it('reduces total supply on burn', async function () {
-    const tokenId = await mintFromImplErc20Pay(this.token, addrs[0].address);
+    const tokenId = await mintFromErc20Pay(this.token, addrs[0].address);
     expect(await this.token.totalSupply()).to.equal(1);
     await this.token.connect(addrs[0])['burn(uint256)'](tokenId);
     expect(await this.token.totalSupply()).to.equal(0);
   });
 
   it('reduces total supply on burn and does not reuse ID', async function () {
-    const tokenId = await mintFromImplErc20Pay(this.token, addrs[0].address);
+    const tokenId = await mintFromErc20Pay(this.token, addrs[0].address);
     await this.token.connect(addrs[0])['burn(uint256)'](tokenId);
 
-    const newTokenId = await mintFromImplErc20Pay(this.token, addrs[0].address);
+    const newTokenId = await mintFromErc20Pay(this.token, addrs[0].address);
     expect(newTokenId).to.equal(tokenId.add(1));
     expect(await this.token.totalSupply()).to.equal(1);
   });
@@ -199,11 +191,11 @@ async function shouldControlValidMintingErc20Pay(): Promise<void> {
       if (this.token.nestMint === undefined) {
         this.skip();
       }
-      parentId = await mintFromImplErc20Pay(this.token, addrs[0].address);
+      parentId = await mintFromErc20Pay(this.token, addrs[0].address);
     });
 
     it('can nest mint tokens through sale logic', async function () {
-      const childId = await nestMintFromImplErc20Pay(this.token, this.token.address, parentId);
+      const childId = await nestMintFromErc20Pay(this.token, this.token.address, parentId);
       expect(await this.token.ownerOf(childId)).to.equal(addrs[0].address);
       expect(await this.token.totalSupply()).to.equal(2);
     });
@@ -212,14 +204,6 @@ async function shouldControlValidMintingErc20Pay(): Promise<void> {
       await expect(this.token.nestMint(this.token.address, 99999, 1)).to.be.revertedWithCustomError(
         this.token,
         'RMRKMintOverMax',
-      );
-    });
-
-    it('cannot nest mint if locked', async function () {
-      await this.token.setLock();
-      await expect(this.token.nestMint(this.token.address, 99999, 1)).to.be.revertedWithCustomError(
-        this.token,
-        'RMRKLocked',
       );
     });
   });

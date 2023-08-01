@@ -2,11 +2,10 @@
 
 //Generally all interactions should propagate downstream
 
-pragma solidity ^0.8.18;
+pragma solidity ^0.8.21;
 
 import "./IERC6059.sol";
 import "../core/RMRKCore.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
@@ -97,18 +96,6 @@ contract RMRKNestable is Context, IERC165, IERC721, IERC6059, RMRKCore {
         _;
     }
 
-    // ----------------------------- CONSTRUCTOR ------------------------------
-
-    /**
-     * @notice Initializes the contract by setting a `name` and a `symbol` to the token collection.
-     * @param name_ Name of the token collection
-     * @param symbol_ Symbol of the token collection
-     */
-    constructor(
-        string memory name_,
-        string memory symbol_
-    ) RMRKCore(name_, symbol_) {}
-
     // ------------------------------- ERC721 ---------------------------------
     /**
      * @inheritdoc IERC165
@@ -119,7 +106,6 @@ contract RMRKNestable is Context, IERC165, IERC721, IERC6059, RMRKCore {
         return
             interfaceId == type(IERC165).interfaceId ||
             interfaceId == type(IERC721).interfaceId ||
-            interfaceId == type(IERC721Metadata).interfaceId ||
             interfaceId == type(IERC6059).interfaceId;
     }
 
@@ -270,31 +256,17 @@ contract RMRKNestable is Context, IERC165, IERC721, IERC6059, RMRKCore {
         if (to == address(0)) revert ERC721TransferToTheZeroAddress();
 
         _beforeTokenTransfer(from, to, tokenId);
-        _beforeNestedTokenTransfer(
-            immediateOwner,
-            to,
-            parentId,
-            0,
-            tokenId,
-            data
-        );
+        _beforeNestedTokenTransfer(from, to, parentId, 0, tokenId, data);
 
         _balances[from] -= 1;
         _updateOwnerAndClearApprovals(tokenId, 0, to);
         _balances[to] += 1;
 
         emit Transfer(from, to, tokenId);
-        emit NestTransfer(immediateOwner, to, parentId, 0, tokenId);
+        emit NestTransfer(from, to, parentId, 0, tokenId);
 
         _afterTokenTransfer(from, to, tokenId);
-        _afterNestedTokenTransfer(
-            immediateOwner,
-            to,
-            parentId,
-            0,
-            tokenId,
-            data
-        );
+        _afterNestedTokenTransfer(from, to, parentId, 0, tokenId, data);
     }
 
     /**
@@ -600,10 +572,9 @@ contract RMRKNestable is Context, IERC165, IERC721, IERC6059, RMRKCore {
         uint256 maxChildrenBurns
     ) internal virtual returns (uint256) {
         (address immediateOwner, uint256 parentId, ) = directOwnerOf(tokenId);
-        address owner = ownerOf(tokenId);
-        _balances[immediateOwner] -= 1;
+        address rootOwner = ownerOf(tokenId);
 
-        _beforeTokenTransfer(owner, address(0), tokenId);
+        _beforeTokenTransfer(immediateOwner, address(0), tokenId);
         _beforeNestedTokenTransfer(
             immediateOwner,
             address(0),
@@ -613,6 +584,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IERC6059, RMRKCore {
             ""
         );
 
+        _balances[immediateOwner] -= 1;
         _approve(address(0), tokenId);
         _cleanApprovals(tokenId);
 
@@ -620,7 +592,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IERC6059, RMRKCore {
 
         delete _activeChildren[tokenId];
         delete _pendingChildren[tokenId];
-        delete _tokenApprovals[tokenId][owner];
+        delete _tokenApprovals[tokenId][rootOwner];
 
         uint256 pendingRecursiveBurns;
         uint256 totalChildBurns;
@@ -654,10 +626,10 @@ contract RMRKNestable is Context, IERC165, IERC721, IERC6059, RMRKCore {
         // Can't remove before burning child since child will call back to get root owner
         delete _RMRKOwners[tokenId];
 
-        emit Transfer(owner, address(0), tokenId);
+        emit Transfer(immediateOwner, address(0), tokenId);
         emit NestTransfer(immediateOwner, address(0), parentId, 0, tokenId);
 
-        _afterTokenTransfer(owner, address(0), tokenId);
+        _afterTokenTransfer(immediateOwner, address(0), tokenId);
         _afterNestedTokenTransfer(
             immediateOwner,
             address(0),
@@ -1208,6 +1180,44 @@ contract RMRKNestable is Context, IERC165, IERC721, IERC6059, RMRKCore {
     }
 
     // HOOKS
+
+    /**
+     * @notice Hook that is called before any token transfer. This includes minting and burning.
+     * @dev Calling conditions:
+     *
+     *  - When `from` and `to` are both non-zero, ``from``'s `tokenId` will be transferred to `to`.
+     *  - When `from` is zero, `tokenId` will be minted to `to`.
+     *  - When `to` is zero, ``from``'s `tokenId` will be burned.
+     *  - `from` and `to` are never zero at the same time.
+     *
+     *  To learn more about hooks, head to xref:ROOT:extending-contracts.adoc#using-hooks[Using Hooks].
+     * @param from Address from which the token is being transferred
+     * @param to Address to which the token is being transferred
+     * @param tokenId ID of the token being transferred
+     */
+    function _beforeTokenTransfer(
+        address from,
+        address to,
+        uint256 tokenId
+    ) internal virtual {}
+
+    /**
+     * @notice Hook that is called after any transfer of tokens. This includes minting and burning.
+     * @dev Calling conditions:
+     *
+     *  - When `from` and `to` are both non-zero.
+     *  - `from` and `to` are never zero at the same time.
+     *
+     *  To learn more about hooks, head to xref:ROOT:extending-contracts.adoc#using-hooks[Using Hooks].
+     * @param from Address from which the token has been transferred
+     * @param to Address to which the token has been transferred
+     * @param tokenId ID of the token that has been transferred
+     */
+    function _afterTokenTransfer(
+        address from,
+        address to,
+        uint256 tokenId
+    ) internal virtual {}
 
     /**
      * @notice Hook that is called before nested token transfer.

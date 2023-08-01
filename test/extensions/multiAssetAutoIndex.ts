@@ -10,7 +10,7 @@ import { RMRKMultiAssetAutoIndexMock } from '../../typechain-types';
 
 async function multiAssetAutoIndexFixture() {
   const factory = await ethers.getContractFactory('RMRKMultiAssetAutoIndexMock');
-  const token = await factory.deploy('Chunky', 'CHNK');
+  const token = await factory.deploy();
   await token.deployed();
 
   return token;

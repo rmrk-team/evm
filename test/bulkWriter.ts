@@ -1,10 +1,11 @@
 import { ethers } from 'hardhat';
+import { BigNumber } from 'ethers';
 import { expect } from 'chai';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { ADDRESS_ZERO, bn, mintFromMock, nestMintFromMock } from './utils';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import {
-  RMRKCatalogMock,
+  RMRKCatalogImpl,
   RMRKEquippableMock,
   RMRKBulkWriter,
   RMRKBulkWriterPerCollection,
@@ -30,19 +31,19 @@ import {
 // --------------- FIXTURES -----------------------
 
 async function bulkWriterFixture() {
-  const catalogFactory = await ethers.getContractFactory('RMRKCatalogMock');
+  const catalogFactory = await ethers.getContractFactory('RMRKCatalogImpl');
   const equipFactory = await ethers.getContractFactory('RMRKEquippableMock');
   const bulkWriterPerCollectionFactory = await ethers.getContractFactory(
     'RMRKBulkWriterPerCollection',
   );
   const bulkWriterFactory = await ethers.getContractFactory('RMRKBulkWriter');
 
-  const catalog = <RMRKCatalogMock>await catalogFactory.deploy('ipfs://catalog.json', 'misc');
+  const catalog = <RMRKCatalogImpl>await catalogFactory.deploy('ipfs://catalog.json', 'misc');
 
-  const kanaria = <RMRKEquippableMock>await equipFactory.deploy('Kanaria', 'KAN');
+  const kanaria = <RMRKEquippableMock>await equipFactory.deploy();
   kanaria.deployed();
 
-  const gem = <RMRKEquippableMock>await equipFactory.deploy('Kanaria Gem', 'KGEM');
+  const gem = <RMRKEquippableMock>await equipFactory.deploy();
   gem.deployed();
 
   const bulkWriterPerCollection = <RMRKBulkWriterPerCollection>(
@@ -91,15 +92,15 @@ async function bulkWriterFixture() {
 
 describe('Advanced Equip Render Utils', async function () {
   let owner: SignerWithAddress;
-  let catalog: RMRKCatalogMock;
+  let catalog: RMRKCatalogImpl;
   let kanaria: RMRKEquippableMock;
   let gem: RMRKEquippableMock;
   let bulkWriter: RMRKBulkWriter;
   let bulkWriterPerCollection: RMRKBulkWriterPerCollection;
-  let kanariaId: number;
-  let gemId1: number;
-  let gemId2: number;
-  let gemId3: number;
+  let kanariaId: BigNumber;
+  let gemId1: BigNumber;
+  let gemId2: BigNumber;
+  let gemId3: BigNumber;
 
   beforeEach(async function () {
     ({
@@ -133,7 +134,7 @@ describe('Advanced Equip Render Utils', async function () {
       expect(await kanaria.getEquipment(kanariaId, catalog.address, slotIdGemLeft)).to.eql([
         bn(assetForKanariaFull),
         bn(assetForGemALeft),
-        bn(gemId2),
+        gemId2,
         gem.address,
       ]);
     });
@@ -176,13 +177,13 @@ describe('Advanced Equip Render Utils', async function () {
       expect(await kanaria.getEquipment(kanariaId, catalog.address, slotIdGemMid)).to.eql([
         bn(assetForKanariaFull),
         bn(assetForGemAMid),
-        bn(gemId2),
+        gemId2,
         gem.address,
       ]);
       expect(await kanaria.getEquipment(kanariaId, catalog.address, slotIdGemRight)).to.eql([
         bn(assetForKanariaFull),
         bn(assetForGemBRight),
-        bn(gemId3),
+        gemId3,
         gem.address,
       ]);
     });
@@ -236,19 +237,19 @@ describe('Advanced Equip Render Utils', async function () {
       expect(await kanaria.getEquipment(kanariaId, catalog.address, slotIdGemLeft)).to.eql([
         bn(assetForKanariaFull),
         bn(assetForGemALeft),
-        bn(gemId1),
+        gemId1,
         gem.address,
       ]);
       expect(await kanaria.getEquipment(kanariaId, catalog.address, slotIdGemMid)).to.eql([
         bn(assetForKanariaFull),
         bn(assetForGemAMid),
-        bn(gemId2),
+        gemId2,
         gem.address,
       ]);
       expect(await kanaria.getEquipment(kanariaId, catalog.address, slotIdGemRight)).to.eql([
         bn(assetForKanariaFull),
         bn(assetForGemBRight),
-        bn(gemId3),
+        gemId3,
         gem.address,
       ]);
     });
@@ -368,7 +369,7 @@ describe('Advanced Equip Render Utils', async function () {
       expect(await kanaria.getEquipment(kanariaId, catalog.address, slotIdGemLeft)).to.eql([
         bn(assetForKanariaFull),
         bn(assetForGemALeft),
-        bn(gemId2),
+        gemId2,
         gem.address,
       ]);
     });
@@ -410,13 +411,13 @@ describe('Advanced Equip Render Utils', async function () {
       expect(await kanaria.getEquipment(kanariaId, catalog.address, slotIdGemMid)).to.eql([
         bn(assetForKanariaFull),
         bn(assetForGemAMid),
-        bn(gemId2),
+        gemId2,
         gem.address,
       ]);
       expect(await kanaria.getEquipment(kanariaId, catalog.address, slotIdGemRight)).to.eql([
         bn(assetForKanariaFull),
         bn(assetForGemBRight),
-        bn(gemId3),
+        gemId3,
         gem.address,
       ]);
     });
@@ -468,19 +469,19 @@ describe('Advanced Equip Render Utils', async function () {
       expect(await kanaria.getEquipment(kanariaId, catalog.address, slotIdGemLeft)).to.eql([
         bn(assetForKanariaFull),
         bn(assetForGemALeft),
-        bn(gemId1),
+        gemId1,
         gem.address,
       ]);
       expect(await kanaria.getEquipment(kanariaId, catalog.address, slotIdGemMid)).to.eql([
         bn(assetForKanariaFull),
         bn(assetForGemAMid),
-        bn(gemId2),
+        gemId2,
         gem.address,
       ]);
       expect(await kanaria.getEquipment(kanariaId, catalog.address, slotIdGemRight)).to.eql([
         bn(assetForKanariaFull),
         bn(assetForGemBRight),
-        bn(gemId3),
+        gemId3,
         gem.address,
       ]);
     });

@@ -1,6 +1,6 @@
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
-import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
+import { loadFixture, mine } from '@nomicfoundation/hardhat-network-helpers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { IERC165, IRMRKTokenPropertiesRepository } from '../interfaces';
 import { OwnableMintableERC721Mock, RMRKTokenPropertiesRepository } from '../../typechain-types';
@@ -1057,6 +1057,590 @@ describe('RMRKTokenPropertiesRepository', async function () {
       await tokenProperties
         .connect(owner)
         .setAddressProperty(ownedCollection.address, 1, 'X', owner.address);
+    });
+
+    it('should allow to use presigned message to modify the parameters', async function () {
+      await tokenProperties
+        .connect(issuer)
+        .registerAccessControl(ownedCollection.address, issuer.address, false);
+
+      const uintMessage = await tokenProperties.prepareMessageToPresignUintProperty(
+        ownedCollection.address,
+        1,
+        'X',
+        1,
+        bn(9999999999),
+      );
+      const stringMessage = await tokenProperties.prepareMessageToPresignStringProperty(
+        ownedCollection.address,
+        1,
+        'X',
+        'test',
+        bn(9999999999),
+      );
+      const boolMessage = await tokenProperties.prepareMessageToPresignBoolProperty(
+        ownedCollection.address,
+        1,
+        'X',
+        true,
+        bn(9999999999),
+      );
+      const bytesMessage = await tokenProperties.prepareMessageToPresignBytesProperty(
+        ownedCollection.address,
+        1,
+        'X',
+        '0x1234',
+        bn(9999999999),
+      );
+      const addressMessage = await tokenProperties.prepareMessageToPresignAddressProperty(
+        ownedCollection.address,
+        1,
+        'X',
+        owner.address,
+        bn(9999999999),
+      );
+
+      const uintSignature = await issuer.signMessage(ethers.utils.arrayify(uintMessage));
+      const stringSignature = await issuer.signMessage(ethers.utils.arrayify(stringMessage));
+      const boolSignature = await issuer.signMessage(ethers.utils.arrayify(boolMessage));
+      const bytesSignature = await issuer.signMessage(ethers.utils.arrayify(bytesMessage));
+      const addressSignature = await issuer.signMessage(ethers.utils.arrayify(addressMessage));
+
+      const uintR: string = uintSignature.substring(0, 66);
+      const uintS: string = '0x' + uintSignature.substring(66, 130);
+      const uintV: string = parseInt(uintSignature.substring(130, 132), 16);
+
+      const stringR: string = stringSignature.substring(0, 66);
+      const stringS: string = '0x' + stringSignature.substring(66, 130);
+      const stringV: string = parseInt(stringSignature.substring(130, 132), 16);
+
+      const boolR: string = boolSignature.substring(0, 66);
+      const boolS: string = '0x' + boolSignature.substring(66, 130);
+      const boolV: string = parseInt(boolSignature.substring(130, 132), 16);
+
+      const bytesR: string = bytesSignature.substring(0, 66);
+      const bytesS: string = '0x' + bytesSignature.substring(66, 130);
+      const bytesV: string = parseInt(bytesSignature.substring(130, 132), 16);
+
+      const addressR: string = addressSignature.substring(0, 66);
+      const addressS: string = '0x' + addressSignature.substring(66, 130);
+      const addressV: string = parseInt(addressSignature.substring(130, 132), 16);
+
+      await expect(
+        tokenProperties
+          .connect(owner)
+          .presignedSetUintProperty(
+            issuer.address,
+            ownedCollection.address,
+            1,
+            'X',
+            1,
+            bn(9999999999),
+            uintV,
+            uintR,
+            uintS,
+          ),
+      )
+        .to.emit(tokenProperties, 'UintPropertyUpdated')
+        .withArgs(ownedCollection.address, 1, 'X', 1);
+      await expect(
+        tokenProperties
+          .connect(owner)
+          .presignedSetStringProperty(
+            issuer.address,
+            ownedCollection.address,
+            1,
+            'X',
+            'test',
+            bn(9999999999),
+            stringV,
+            stringR,
+            stringS,
+          ),
+      )
+        .to.emit(tokenProperties, 'StringPropertyUpdated')
+        .withArgs(ownedCollection.address, 1, 'X', 'test');
+      await expect(
+        tokenProperties
+          .connect(owner)
+          .presignedSetBoolProperty(
+            issuer.address,
+            ownedCollection.address,
+            1,
+            'X',
+            true,
+            bn(9999999999),
+            boolV,
+            boolR,
+            boolS,
+          ),
+      )
+        .to.emit(tokenProperties, 'BoolPropertyUpdated')
+        .withArgs(ownedCollection.address, 1, 'X', true);
+      await expect(
+        tokenProperties
+          .connect(owner)
+          .presignedSetBytesProperty(
+            issuer.address,
+            ownedCollection.address,
+            1,
+            'X',
+            '0x1234',
+            bn(9999999999),
+            bytesV,
+            bytesR,
+            bytesS,
+          ),
+      )
+        .to.emit(tokenProperties, 'BytesPropertyUpdated')
+        .withArgs(ownedCollection.address, 1, 'X', '0x1234');
+      await expect(
+        tokenProperties
+          .connect(owner)
+          .presignedSetAddressProperty(
+            issuer.address,
+            ownedCollection.address,
+            1,
+            'X',
+            owner.address,
+            bn(9999999999),
+            addressV,
+            addressR,
+            addressS,
+          ),
+      )
+        .to.emit(tokenProperties, 'AddressPropertyUpdated')
+        .withArgs(ownedCollection.address, 1, 'X', owner.address);
+    });
+
+    it('should not allow to use presigned message to modify the parameters if the deadline has elapsed', async function () {
+      await tokenProperties
+        .connect(issuer)
+        .registerAccessControl(ownedCollection.address, issuer.address, false);
+
+      await mine(1000, { interval: 15 });
+
+      const uintMessage = await tokenProperties.prepareMessageToPresignUintProperty(
+        ownedCollection.address,
+        1,
+        'X',
+        1,
+        bn(10),
+      );
+      const stringMessage = await tokenProperties.prepareMessageToPresignStringProperty(
+        ownedCollection.address,
+        1,
+        'X',
+        'test',
+        bn(10),
+      );
+      const boolMessage = await tokenProperties.prepareMessageToPresignBoolProperty(
+        ownedCollection.address,
+        1,
+        'X',
+        true,
+        bn(10),
+      );
+      const bytesMessage = await tokenProperties.prepareMessageToPresignBytesProperty(
+        ownedCollection.address,
+        1,
+        'X',
+        '0x1234',
+        bn(10),
+      );
+      const addressMessage = await tokenProperties.prepareMessageToPresignAddressProperty(
+        ownedCollection.address,
+        1,
+        'X',
+        owner.address,
+        bn(10),
+      );
+
+      const uintSignature = await issuer.signMessage(ethers.utils.arrayify(uintMessage));
+      const stringSignature = await issuer.signMessage(ethers.utils.arrayify(stringMessage));
+      const boolSignature = await issuer.signMessage(ethers.utils.arrayify(boolMessage));
+      const bytesSignature = await issuer.signMessage(ethers.utils.arrayify(bytesMessage));
+      const addressSignature = await issuer.signMessage(ethers.utils.arrayify(addressMessage));
+
+      const uintR: string = uintSignature.substring(0, 66);
+      const uintS: string = '0x' + uintSignature.substring(66, 130);
+      const uintV: string = parseInt(uintSignature.substring(130, 132), 16);
+
+      const stringR: string = stringSignature.substring(0, 66);
+      const stringS: string = '0x' + stringSignature.substring(66, 130);
+      const stringV: string = parseInt(stringSignature.substring(130, 132), 16);
+
+      const boolR: string = boolSignature.substring(0, 66);
+      const boolS: string = '0x' + boolSignature.substring(66, 130);
+      const boolV: string = parseInt(boolSignature.substring(130, 132), 16);
+
+      const bytesR: string = bytesSignature.substring(0, 66);
+      const bytesS: string = '0x' + bytesSignature.substring(66, 130);
+      const bytesV: string = parseInt(bytesSignature.substring(130, 132), 16);
+
+      const addressR: string = addressSignature.substring(0, 66);
+      const addressS: string = '0x' + addressSignature.substring(66, 130);
+      const addressV: string = parseInt(addressSignature.substring(130, 132), 16);
+
+      await expect(
+        tokenProperties
+          .connect(owner)
+          .presignedSetUintProperty(
+            issuer.address,
+            ownedCollection.address,
+            1,
+            'X',
+            1,
+            bn(10),
+            uintV,
+            uintR,
+            uintS,
+          ),
+      ).to.be.revertedWithCustomError(tokenProperties, 'RMRKExpiredDeadline');
+      await expect(
+        tokenProperties
+          .connect(owner)
+          .presignedSetStringProperty(
+            issuer.address,
+            ownedCollection.address,
+            1,
+            'X',
+            'test',
+            bn(10),
+            stringV,
+            stringR,
+            stringS,
+          ),
+      ).to.be.revertedWithCustomError(tokenProperties, 'RMRKExpiredDeadline');
+      await expect(
+        tokenProperties
+          .connect(owner)
+          .presignedSetBoolProperty(
+            issuer.address,
+            ownedCollection.address,
+            1,
+            'X',
+            true,
+            bn(10),
+            boolV,
+            boolR,
+            boolS,
+          ),
+      ).to.be.revertedWithCustomError(tokenProperties, 'RMRKExpiredDeadline');
+      await expect(
+        tokenProperties
+          .connect(owner)
+          .presignedSetBytesProperty(
+            issuer.address,
+            ownedCollection.address,
+            1,
+            'X',
+            '0x1234',
+            bn(10),
+            bytesV,
+            bytesR,
+            bytesS,
+          ),
+      ).to.be.revertedWithCustomError(tokenProperties, 'RMRKExpiredDeadline');
+      await expect(
+        tokenProperties
+          .connect(owner)
+          .presignedSetAddressProperty(
+            issuer.address,
+            ownedCollection.address,
+            1,
+            'X',
+            owner.address,
+            bn(10),
+            addressV,
+            addressR,
+            addressS,
+          ),
+      ).to.be.revertedWithCustomError(tokenProperties, 'RMRKExpiredDeadline');
+    });
+
+    it('should not allow to use presigned message to modify the parameters if the setter does not match the actual signer', async function () {
+      await tokenProperties
+        .connect(issuer)
+        .registerAccessControl(ownedCollection.address, issuer.address, false);
+
+      const uintMessage = await tokenProperties.prepareMessageToPresignUintProperty(
+        ownedCollection.address,
+        1,
+        'X',
+        1,
+        bn(9999999999),
+      );
+      const stringMessage = await tokenProperties.prepareMessageToPresignStringProperty(
+        ownedCollection.address,
+        1,
+        'X',
+        'test',
+        bn(9999999999),
+      );
+      const boolMessage = await tokenProperties.prepareMessageToPresignBoolProperty(
+        ownedCollection.address,
+        1,
+        'X',
+        true,
+        bn(9999999999),
+      );
+      const bytesMessage = await tokenProperties.prepareMessageToPresignBytesProperty(
+        ownedCollection.address,
+        1,
+        'X',
+        '0x1234',
+        bn(9999999999),
+      );
+      const addressMessage = await tokenProperties.prepareMessageToPresignAddressProperty(
+        ownedCollection.address,
+        1,
+        'X',
+        owner.address,
+        bn(9999999999),
+      );
+
+      const uintSignature = await owner.signMessage(ethers.utils.arrayify(uintMessage));
+      const stringSignature = await owner.signMessage(ethers.utils.arrayify(stringMessage));
+      const boolSignature = await owner.signMessage(ethers.utils.arrayify(boolMessage));
+      const bytesSignature = await owner.signMessage(ethers.utils.arrayify(bytesMessage));
+      const addressSignature = await owner.signMessage(ethers.utils.arrayify(addressMessage));
+
+      const uintR: string = uintSignature.substring(0, 66);
+      const uintS: string = '0x' + uintSignature.substring(66, 130);
+      const uintV: string = parseInt(uintSignature.substring(130, 132), 16);
+
+      const stringR: string = stringSignature.substring(0, 66);
+      const stringS: string = '0x' + stringSignature.substring(66, 130);
+      const stringV: string = parseInt(stringSignature.substring(130, 132), 16);
+
+      const boolR: string = boolSignature.substring(0, 66);
+      const boolS: string = '0x' + boolSignature.substring(66, 130);
+      const boolV: string = parseInt(boolSignature.substring(130, 132), 16);
+
+      const bytesR: string = bytesSignature.substring(0, 66);
+      const bytesS: string = '0x' + bytesSignature.substring(66, 130);
+      const bytesV: string = parseInt(bytesSignature.substring(130, 132), 16);
+
+      const addressR: string = addressSignature.substring(0, 66);
+      const addressS: string = '0x' + addressSignature.substring(66, 130);
+      const addressV: string = parseInt(addressSignature.substring(130, 132), 16);
+
+      await expect(
+        tokenProperties
+          .connect(owner)
+          .presignedSetUintProperty(
+            issuer.address,
+            ownedCollection.address,
+            1,
+            'X',
+            1,
+            bn(9999999999),
+            uintV,
+            uintR,
+            uintS,
+          ),
+      ).to.be.revertedWithCustomError(tokenProperties, 'RMRKInvalidSignature');
+      await expect(
+        tokenProperties
+          .connect(owner)
+          .presignedSetStringProperty(
+            issuer.address,
+            ownedCollection.address,
+            1,
+            'X',
+            'test',
+            bn(9999999999),
+            stringV,
+            stringR,
+            stringS,
+          ),
+      ).to.be.revertedWithCustomError(tokenProperties, 'RMRKInvalidSignature');
+      await expect(
+        tokenProperties
+          .connect(owner)
+          .presignedSetBoolProperty(
+            issuer.address,
+            ownedCollection.address,
+            1,
+            'X',
+            true,
+            bn(9999999999),
+            boolV,
+            boolR,
+            boolS,
+          ),
+      ).to.be.revertedWithCustomError(tokenProperties, 'RMRKInvalidSignature');
+      await expect(
+        tokenProperties
+          .connect(owner)
+          .presignedSetBytesProperty(
+            issuer.address,
+            ownedCollection.address,
+            1,
+            'X',
+            '0x1234',
+            bn(9999999999),
+            bytesV,
+            bytesR,
+            bytesS,
+          ),
+      ).to.be.revertedWithCustomError(tokenProperties, 'RMRKInvalidSignature');
+      await expect(
+        tokenProperties
+          .connect(owner)
+          .presignedSetAddressProperty(
+            issuer.address,
+            ownedCollection.address,
+            1,
+            'X',
+            owner.address,
+            bn(9999999999),
+            addressV,
+            addressR,
+            addressS,
+          ),
+      ).to.be.revertedWithCustomError(tokenProperties, 'RMRKInvalidSignature');
+    });
+
+    it('should not allow to use presigned message to modify the parameters if the signer is not authorized to modify them', async function () {
+      const uintMessage = await tokenProperties.prepareMessageToPresignUintProperty(
+        ownedCollection.address,
+        1,
+        'X',
+        1,
+        bn(9999999999),
+      );
+      const stringMessage = await tokenProperties.prepareMessageToPresignStringProperty(
+        ownedCollection.address,
+        1,
+        'X',
+        'test',
+        bn(9999999999),
+      );
+      const boolMessage = await tokenProperties.prepareMessageToPresignBoolProperty(
+        ownedCollection.address,
+        1,
+        'X',
+        true,
+        bn(9999999999),
+      );
+      const bytesMessage = await tokenProperties.prepareMessageToPresignBytesProperty(
+        ownedCollection.address,
+        1,
+        'X',
+        '0x1234',
+        bn(9999999999),
+      );
+      const addressMessage = await tokenProperties.prepareMessageToPresignAddressProperty(
+        ownedCollection.address,
+        1,
+        'X',
+        owner.address,
+        bn(9999999999),
+      );
+
+      const uintSignature = await issuer.signMessage(ethers.utils.arrayify(uintMessage));
+      const stringSignature = await issuer.signMessage(ethers.utils.arrayify(stringMessage));
+      const boolSignature = await issuer.signMessage(ethers.utils.arrayify(boolMessage));
+      const bytesSignature = await issuer.signMessage(ethers.utils.arrayify(bytesMessage));
+      const addressSignature = await issuer.signMessage(ethers.utils.arrayify(addressMessage));
+
+      const uintR: string = uintSignature.substring(0, 66);
+      const uintS: string = '0x' + uintSignature.substring(66, 130);
+      const uintV: string = parseInt(uintSignature.substring(130, 132), 16);
+
+      const stringR: string = stringSignature.substring(0, 66);
+      const stringS: string = '0x' + stringSignature.substring(66, 130);
+      const stringV: string = parseInt(stringSignature.substring(130, 132), 16);
+
+      const boolR: string = boolSignature.substring(0, 66);
+      const boolS: string = '0x' + boolSignature.substring(66, 130);
+      const boolV: string = parseInt(boolSignature.substring(130, 132), 16);
+
+      const bytesR: string = bytesSignature.substring(0, 66);
+      const bytesS: string = '0x' + bytesSignature.substring(66, 130);
+      const bytesV: string = parseInt(bytesSignature.substring(130, 132), 16);
+
+      const addressR: string = addressSignature.substring(0, 66);
+      const addressS: string = '0x' + addressSignature.substring(66, 130);
+      const addressV: string = parseInt(addressSignature.substring(130, 132), 16);
+
+      await expect(
+        tokenProperties
+          .connect(owner)
+          .presignedSetUintProperty(
+            issuer.address,
+            ownedCollection.address,
+            1,
+            'X',
+            1,
+            bn(9999999999),
+            uintV,
+            uintR,
+            uintS,
+          ),
+      ).to.be.revertedWithCustomError(tokenProperties, 'RMRKNotCollectionIssuer');
+      await expect(
+        tokenProperties
+          .connect(owner)
+          .presignedSetStringProperty(
+            issuer.address,
+            ownedCollection.address,
+            1,
+            'X',
+            'test',
+            bn(9999999999),
+            stringV,
+            stringR,
+            stringS,
+          ),
+      ).to.be.revertedWithCustomError(tokenProperties, 'RMRKNotCollectionIssuer');
+      await expect(
+        tokenProperties
+          .connect(owner)
+          .presignedSetBoolProperty(
+            issuer.address,
+            ownedCollection.address,
+            1,
+            'X',
+            true,
+            bn(9999999999),
+            boolV,
+            boolR,
+            boolS,
+          ),
+      ).to.be.revertedWithCustomError(tokenProperties, 'RMRKNotCollectionIssuer');
+      await expect(
+        tokenProperties
+          .connect(owner)
+          .presignedSetBytesProperty(
+            issuer.address,
+            ownedCollection.address,
+            1,
+            'X',
+            '0x1234',
+            bn(9999999999),
+            bytesV,
+            bytesR,
+            bytesS,
+          ),
+      ).to.be.revertedWithCustomError(tokenProperties, 'RMRKNotCollectionIssuer');
+      await expect(
+        tokenProperties
+          .connect(owner)
+          .presignedSetAddressProperty(
+            issuer.address,
+            ownedCollection.address,
+            1,
+            'X',
+            owner.address,
+            bn(9999999999),
+            addressV,
+            addressR,
+            addressS,
+          ),
+      ).to.be.revertedWithCustomError(tokenProperties, 'RMRKNotCollectionIssuer');
     });
   });
 });

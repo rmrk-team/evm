@@ -11,22 +11,51 @@ function bn(x: number): BigNumber {
   return BigNumber.from(x);
 }
 
-async function mintFromMock(token: Contract, to: string): Promise<number> {
+async function mintFromMock(token: Contract, to: string): Promise<BigNumber> {
   const tokenId = nextTokenId;
   nextTokenId++;
   await token['mint(address,uint256)'](to, tokenId);
 
-  return tokenId;
+  return bn(tokenId);
 }
 
-async function nestMintFromMock(token: Contract, to: string, parentId: number): Promise<number> {
+async function mintFromMockPremint(token: Contract, to: string): Promise<BigNumber> {
+  const tx = await token['mint(address,uint256,string)'](to, 1, `ipfs://tokenURI`);
+  // Get the event from the tx
+  const event = (await tx.wait()).events?.find((e) => e.event === 'Transfer');
+  // Get the tokenId from the event
+  return bn(event?.args?.tokenId);
+}
+
+async function nestMintFromMock(
+  token: Contract,
+  to: string,
+  parentId: BigNumber,
+): Promise<BigNumber> {
   const childTokenId = nextChildTokenId;
   nextChildTokenId++;
   await token['nestMint(address,uint256,uint256)'](to, childTokenId, parentId);
-  return childTokenId;
+  return bn(childTokenId);
 }
 
-async function mintFromImplErc20Pay(token: Contract, to: string): Promise<BigNumber> {
+async function nestMintFromMockPreMint(
+  token: Contract,
+  to: string,
+  parentId: BigNumber,
+): Promise<BigNumber> {
+  const tx = await token['nestMint(address,uint256,uint256,string)'](
+    to,
+    1,
+    parentId,
+    `ipfs://tokenURI`,
+  );
+  // Get the event from the tx
+  const event = (await tx.wait()).events?.find((e) => e.event === 'Transfer');
+  // Get the tokenId from the event
+  return bn(event?.args?.tokenId);
+}
+
+async function mintFromErc20Pay(token: Contract, to: string): Promise<BigNumber> {
   const erc20Address = token.erc20TokenAddress();
   const erc20Factory = await ethers.getContractFactory('ERC20Mock');
   const erc20 = erc20Factory.attach(erc20Address);
@@ -42,7 +71,7 @@ async function mintFromImplErc20Pay(token: Contract, to: string): Promise<BigNum
   return event?.args?.tokenId;
 }
 
-async function mintFromImplNativeToken(token: Contract, to: string): Promise<BigNumber> {
+async function mintFromNativeToken(token: Contract, to: string): Promise<BigNumber> {
   const tx = await token.mint(to, 1, { value: ONE_ETH });
   // Get the event from the tx
   const event = (await tx.wait()).events?.find((e) => e.event === 'Transfer');
@@ -50,7 +79,7 @@ async function mintFromImplNativeToken(token: Contract, to: string): Promise<Big
   return event?.args?.tokenId;
 }
 
-async function nestMintFromImplErc20Pay(
+async function nestMintFromErc20Pay(
   token: Contract,
   to: string,
   destinationId: BigNumber,
@@ -70,10 +99,10 @@ async function nestMintFromImplErc20Pay(
   return event?.args?.tokenId;
 }
 
-async function nestMintFromImplNativeToken(
+async function nestMintFromNativeToken(
   token: Contract,
   to: string,
-  destinationId: number,
+  destinationId: BigNumber,
 ): Promise<BigNumber> {
   const tx = await token.nestMint(to, 1, destinationId, { value: ONE_ETH });
   // Get the event from the tx
@@ -86,7 +115,7 @@ async function transfer(
   token: Contract,
   caller: SignerWithAddress,
   to: string,
-  tokenId: number,
+  tokenId: BigNumber,
 ): Promise<void> {
   await token.connect(caller)['transferFrom(address,address,uint256)'](caller.address, to, tokenId);
 }
@@ -95,15 +124,15 @@ async function nestTransfer(
   token: Contract,
   caller: SignerWithAddress,
   to: string,
-  tokenId: number,
-  parentId: number,
+  tokenId: BigNumber,
+  parentId: BigNumber,
 ): Promise<void> {
   await token.connect(caller).nestTransferFrom(caller.address, to, tokenId, parentId, '0x');
 }
 
 async function addAssetToToken(
   token: Contract,
-  tokenId: number,
+  tokenId: BigNumber,
   resId: BigNumber,
   replaces: BigNumber | number,
 ): Promise<void> {
@@ -187,12 +216,14 @@ export {
   addAssetToToken,
   ADDRESS_ZERO,
   bn,
-  mintFromImplNativeToken,
-  mintFromImplErc20Pay,
+  mintFromNativeToken,
+  mintFromErc20Pay,
   mintFromMock,
-  nestMintFromImplNativeToken,
-  nestMintFromImplErc20Pay,
+  mintFromMockPremint,
+  nestMintFromNativeToken,
+  nestMintFromErc20Pay,
   nestMintFromMock,
+  nestMintFromMockPreMint,
   nestTransfer,
   ONE_ETH,
   parentChildFixtureWithArgs,

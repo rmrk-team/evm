@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
-pragma solidity ^0.8.18;
+pragma solidity ^0.8.21;
 
 import "../../../RMRK/extension/typedMultiAsset/RMRKTypedMultiAsset.sol";
 import "../../RMRKNestableMultiAssetMock.sol";
@@ -11,11 +11,6 @@ contract RMRKNestableTypedMultiAssetMock is
     RMRKNestableMultiAssetMock,
     RMRKTypedMultiAsset
 {
-    constructor(
-        string memory name,
-        string memory symbol
-    ) RMRKNestableMultiAssetMock(name, symbol) {}
-
     function supportsInterface(
         bytes4 interfaceId
     )

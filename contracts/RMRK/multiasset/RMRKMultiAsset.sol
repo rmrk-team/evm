@@ -1,11 +1,10 @@
 // SPDX-License-Identifier: MIT
 // OpenZeppelin Contracts (last updated v4.7.0) (token/ERC721/ERC721.sol)
 
-pragma solidity ^0.8.18;
+pragma solidity ^0.8.21;
 
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import "./AbstractMultiAsset.sol";
@@ -101,18 +100,6 @@ contract RMRKMultiAsset is IERC165, IERC721, AbstractMultiAsset, RMRKCore {
         _;
     }
 
-    // ----------------------------- CONSTRUCTOR ------------------------------
-
-    /**
-     * @notice Initializes the contract by setting a name and a symbol to the token collection.
-     * @param name_ Name of the token collection
-     * @param symbol_ Symbol of the token collection
-     */
-    constructor(
-        string memory name_,
-        string memory symbol_
-    ) RMRKCore(name_, symbol_) {}
-
     // ------------------------------- ERC721 ---------------------------------
     /**
      * @inheritdoc IERC165
@@ -123,7 +110,6 @@ contract RMRKMultiAsset is IERC165, IERC721, AbstractMultiAsset, RMRKCore {
         return
             interfaceId == type(IERC165).interfaceId ||
             interfaceId == type(IERC721).interfaceId ||
-            interfaceId == type(IERC721Metadata).interfaceId ||
             interfaceId == type(IERC5773).interfaceId;
     }
 
@@ -609,4 +595,42 @@ contract RMRKMultiAsset is IERC165, IERC721, AbstractMultiAsset, RMRKCore {
         _requireMinted(tokenId);
         return _tokenApprovalsForAssets[tokenId];
     }
+
+    /**
+     * @notice Hook that is called before any token transfer. This includes minting and burning.
+     * @dev Calling conditions:
+     *
+     *  - When `from` and `to` are both non-zero, ``from``'s `tokenId` will be transferred to `to`.
+     *  - When `from` is zero, `tokenId` will be minted to `to`.
+     *  - When `to` is zero, ``from``'s `tokenId` will be burned.
+     *  - `from` and `to` are never zero at the same time.
+     *
+     *  To learn more about hooks, head to xref:ROOT:extending-contracts.adoc#using-hooks[Using Hooks].
+     * @param from Address from which the token is being transferred
+     * @param to Address to which the token is being transferred
+     * @param tokenId ID of the token being transferred
+     */
+    function _beforeTokenTransfer(
+        address from,
+        address to,
+        uint256 tokenId
+    ) internal virtual {}
+
+    /**
+     * @notice Hook that is called after any transfer of tokens. This includes minting and burning.
+     * @dev Calling conditions:
+     *
+     *  - When `from` and `to` are both non-zero.
+     *  - `from` and `to` are never zero at the same time.
+     *
+     *  To learn more about hooks, head to xref:ROOT:extending-contracts.adoc#using-hooks[Using Hooks].
+     * @param from Address from which the token has been transferred
+     * @param to Address to which the token has been transferred
+     * @param tokenId ID of the token that has been transferred
+     */
+    function _afterTokenTransfer(
+        address from,
+        address to,
+        uint256 tokenId
+    ) internal virtual {}
 }

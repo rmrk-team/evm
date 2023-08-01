@@ -17,10 +17,13 @@ const getTheAbi = () => {
       if (!dirExists) {
         fs.mkdirSync(`${process.cwd()}/artifacts/abis`);
         fs.mkdirSync(`${process.cwd()}/artifacts/abis/implementations`);
+        fs.mkdirSync(`${process.cwd()}/artifacts/abis/implementations/abstract`);
+        fs.mkdirSync(`${process.cwd()}/artifacts/abis/implementations/lazyMintErc20`);
+        fs.mkdirSync(`${process.cwd()}/artifacts/abis/implementations/lazyMintNative`);
         fs.mkdirSync(`${process.cwd()}/artifacts/abis/implementations/nativeTokenPay`);
-        fs.mkdirSync(`${process.cwd()}/artifacts/abis/implementations/abstracts`);
         fs.mkdirSync(`${process.cwd()}/artifacts/abis/implementations/erc20Pay`);
         fs.mkdirSync(`${process.cwd()}/artifacts/abis/implementations/premint`);
+        fs.mkdirSync(`${process.cwd()}/artifacts/abis/implementations/utils`);
         fs.mkdirSync(`${process.cwd()}/artifacts/abis/RMRK`);
         fs.mkdirSync(`${process.cwd()}/artifacts/abis/RMRK/utils`);
       }
@@ -40,7 +43,6 @@ const getTheAbi = () => {
           );
         }
       });
-
 
       utils.forEach((util) => {
         const filename = util.slice(0, util.indexOf('.sol'));

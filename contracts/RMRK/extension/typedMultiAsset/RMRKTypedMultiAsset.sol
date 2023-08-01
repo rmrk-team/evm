@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
-pragma solidity ^0.8.18;
+pragma solidity ^0.8.21;
 
 import "./IRMRKTypedMultiAsset.sol";
 
@@ -9,7 +9,7 @@ import "./IRMRKTypedMultiAsset.sol";
  * @author RMRK team
  * @notice Smart contract of the RMRK Typed multi asset module.
  */
-contract RMRKTypedMultiAsset is IRMRKTypedMultiAsset {
+abstract contract RMRKTypedMultiAsset is IRMRKTypedMultiAsset {
     mapping(uint64 => string) private _assetTypes;
 
     /**

@@ -1,16 +1,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
-pragma solidity ^0.8.18;
+pragma solidity ^0.8.21;
 
 import "../../../RMRK/extension/soulbound/RMRKSoulbound.sol";
 import "../../RMRKMultiAssetMock.sol";
 
 contract RMRKSoulboundMultiAssetMock is RMRKSoulbound, RMRKMultiAssetMock {
-    constructor(
-        string memory name,
-        string memory symbol
-    ) RMRKMultiAssetMock(name, symbol) {}
-
     function supportsInterface(
         bytes4 interfaceId
     )
@@ -29,7 +24,8 @@ contract RMRKSoulboundMultiAssetMock is RMRKSoulbound, RMRKMultiAssetMock {
         address from,
         address to,
         uint256 tokenId
-    ) internal virtual override(RMRKCore, RMRKSoulbound) {
-        super._beforeTokenTransfer(from, to, tokenId);
+    ) internal virtual override(RMRKMultiAsset, RMRKSoulbound) {
+        RMRKSoulbound._beforeTokenTransfer(from, to, tokenId);
+        RMRKMultiAsset._beforeTokenTransfer(from, to, tokenId);
     }
 }

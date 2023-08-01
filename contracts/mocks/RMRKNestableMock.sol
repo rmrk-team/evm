@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
-pragma solidity ^0.8.18;
+pragma solidity ^0.8.21;
 
 import "../RMRK/nestable/RMRKNestable.sol";
 
@@ -8,11 +8,6 @@ import "../RMRK/nestable/RMRKNestable.sol";
 contract RMRKNestableMock is RMRKNestable {
     // This is used to test the usage of hooks
     mapping(address => mapping(uint256 => uint256)) private _balancesPerNft;
-
-    constructor(
-        string memory name_,
-        string memory symbol_
-    ) RMRKNestable(name_, symbol_) {}
 
     function safeMint(address to, uint256 tokenId) public {
         _safeMint(to, tokenId, "");
