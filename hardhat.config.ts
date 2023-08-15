@@ -31,7 +31,7 @@ const config: HardhatUserConfig = {
       evmVersion: 'london',
       optimizer: {
         enabled: true,
-        runs: 200,
+        runs: 100,
       },
       outputSelection: {
         '*': {
@@ -41,20 +41,14 @@ const config: HardhatUserConfig = {
     },
   },
   networks: {
+    hardhat: {
+      allowUnlimitedContractSize: true,
+    },
     moonbaseAlpha: {
-      url: 'https://rpc.testnet.moonbeam.network',
+      url: 'https://rpc.testnet.moonbeam.network/',
+      chainId: 1287,
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
-      gasPrice: 1000000000,
-    },
-    moonriver: {
-      url: 'https://rpc.api.moonriver.moonbeam.network',
-      chainId: 1285, // (hex: 0x505),
-      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
-    },
-    moonbeam: {
-      url: 'https://rpc.api.moonbeam.network',
-      chainId: 1284, // (hex: 0x504),
-      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+      gasPrice: 1100000000,
     },
     sepolia: {
       url: process.env.SEPOLIA_URL || '',
@@ -67,17 +61,38 @@ const config: HardhatUserConfig = {
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
       gasPrice: 135000000000,
     },
+    baseGoerli: {
+      chainId: 84531,
+      url: process.env.BASE_GOERLI_URL || 'https://goerli.base.org',
+      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+      gasPrice: 2000000000,
+    },
+    moonriver: {
+      url: 'https://rpc.api.moonriver.moonbeam.network',
+      chainId: 1285, // (hex: 0x505),
+      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+    },
+    moonbeam: {
+      url: 'https://rpc.api.moonbeam.network',
+      chainId: 1284, // (hex: 0x504),
+      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+    },
     mainnet: {
       url: process.env.ETHEREUM_URL || '',
       chainId: 1,
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
-      gasPrice: 12000000000,
+      gasPrice: 13000000000,
     },
     polygon: {
       url: process.env.POLYGON_URL || '',
       chainId: 137,
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
       gasPrice: 120000000000,
+    },
+    base: {
+      chainId: 8453,
+      url: process.env.BASE_URL,
+      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
   },
   gasReporter: {
@@ -88,14 +103,34 @@ const config: HardhatUserConfig = {
   },
   etherscan: {
     apiKey: {
-      moonriver: process.env.MOONRIVER_MOONSCAN_APIKEY || '', // Moonriver Moonscan API Key
       moonbaseAlpha: process.env.MOONBEAM_MOONSCAN_APIKEY || '', // Moonbeam Moonscan API Key
-      moonbeam: process.env.MOONBEAM_MOONSCAN_APIKEY || '', // Moonbeam Moonscan API Key
       sepolia: process.env.ETHERSCAN_API_KEY || '', // Sepolia Etherscan API Key
-      polygonMumbai: process.env.POLYGONSCAN_API_KEY || '', // Polygon Mumbai Etherscan API Key
+      polygonMumbai: process.env.POLYGON_ETHERSCAN_API_KEY || '', // Polygon Mumbai Etherscan API Key
+      baseGoerli: process.env.BASE_API_KEY || '', // Base Goerli Etherscan API Key
+      moonriver: process.env.MOONRIVER_MOONSCAN_APIKEY || '', // Moonriver Moonscan API Key
+      moonbeam: process.env.MOONBEAM_MOONSCAN_APIKEY || '', // Moonbeam Moonscan API Key
       mainnet: process.env.ETHERSCAN_API_KEY || '', // Ethereum Etherscan API Key
-      polygon: process.env.POLYGONSCAN_API_KEY || '', // Polygon Etherscan API Key
+      polygon: process.env.POLYGON_ETHERSCAN_API_KEY || '', // Polygon Etherscan API Key
+      base: process.env.BASE_API_KEY || '', // Base Etherscan API Key
     },
+    customChains: [
+      {
+        network: "baseGoerli",
+        chainId: 84531,
+        urls: {
+          apiURL: "https://api-goerli.basescan.org/api",
+          browserURL: "https://goerli.basescan.org"
+        }
+      },
+      {
+        network: "base",
+        chainId: 8453,
+        urls: {
+          apiURL: "https://api.basescan.org/api",
+          browserURL: "https://basescan.org"
+        }
+      }
+    ]
   },
   dodoc: {
     runOnCompile: false,
