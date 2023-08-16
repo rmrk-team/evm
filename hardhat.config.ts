@@ -91,7 +91,7 @@ const config: HardhatUserConfig = {
     },
     base: {
       chainId: 8453,
-      url: process.env.BASE_URL,
+      url: process.env.BASE_URL || '',
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
   },
