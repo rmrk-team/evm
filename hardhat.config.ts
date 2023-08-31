@@ -115,22 +115,22 @@ const config: HardhatUserConfig = {
     },
     customChains: [
       {
-        network: "baseGoerli",
+        network: 'baseGoerli',
         chainId: 84531,
         urls: {
-          apiURL: "https://api-goerli.basescan.org/api",
-          browserURL: "https://goerli.basescan.org"
-        }
+          apiURL: 'https://api-goerli.basescan.org/api',
+          browserURL: 'https://goerli.basescan.org',
+        },
       },
       {
-        network: "base",
+        network: 'base',
         chainId: 8453,
         urls: {
-          apiURL: "https://api.basescan.org/api",
-          browserURL: "https://basescan.org"
-        }
-      }
-    ]
+          apiURL: 'https://api.basescan.org/api',
+          browserURL: 'https://basescan.org',
+        },
+      },
+    ],
   },
   dodoc: {
     runOnCompile: false,
