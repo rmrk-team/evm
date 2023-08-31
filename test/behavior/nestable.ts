@@ -648,12 +648,12 @@ async function shouldBehaveLikeNestable(
     });
 
     it('cannot transfer child from not existing parent', async function () {
-      const badChildId = 99;
+      const badTokenId = 999;
       const toOwner = tokenOwner.address;
       await expect(
         parent
           .connect(tokenOwner)
-          .transferChild(badChildId, toOwner, 0, 0, child.address, childId, false, '0x'),
+          .transferChild(badTokenId, toOwner, 0, 0, child.address, childId, false, '0x'),
       ).to.be.revertedWithCustomError(child, 'ERC721InvalidTokenId');
     });
 
@@ -817,12 +817,12 @@ async function shouldBehaveLikeNestable(
     });
 
     it('cannot transfer child from not existing parent', async function () {
-      const badChildId = 99;
+      const badTokenId = 999;
       const toOwner = tokenOwner.address;
       await expect(
         parent
           .connect(tokenOwner)
-          .transferChild(badChildId, toOwner, 0, 0, child.address, childId, true, '0x'),
+          .transferChild(badTokenId, toOwner, 0, 0, child.address, childId, true, '0x'),
       ).to.be.revertedWithCustomError(child, 'ERC721InvalidTokenId');
     });
 
