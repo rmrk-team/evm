@@ -1875,7 +1875,7 @@ contract RMRKMinifiedEquippable is
      */
     function equip(
         IntakeEquip memory data
-    ) public virtual onlyApprovedOrOwner(data.tokenId) nonReentrant {
+    ) public virtual onlyApprovedForAssetsOrOwner(data.tokenId) nonReentrant {
         address catalogAddress = _catalogAddresses[data.assetId];
         uint64 slotPartId = data.slotPartId;
         if (
@@ -1953,7 +1953,7 @@ contract RMRKMinifiedEquippable is
         uint256 tokenId,
         uint64 assetId,
         uint64 slotPartId
-    ) public virtual onlyApprovedOrOwner(tokenId) {
+    ) public virtual onlyApprovedForAssetsOrOwner(tokenId) {
         address targetCatalogAddress = _catalogAddresses[assetId];
         Equipment memory equipment = _equipments[tokenId][targetCatalogAddress][
             slotPartId

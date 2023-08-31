@@ -119,7 +119,7 @@ describe('Advanced Equip Render Utils', async function () {
 
   describe('With General Bulk Writer', async function () {
     beforeEach(async function () {
-      await kanaria.setApprovalForAll(bulkWriter.address, true);
+      await kanaria.setApprovalForAllForAssets(bulkWriter.address, true);
     });
 
     it('can replace equip', async function () {
@@ -255,7 +255,7 @@ describe('Advanced Equip Render Utils', async function () {
     });
 
     it('cannot do operations if not writer is not approved', async function () {
-      await kanaria.setApprovalForAll(bulkWriter.address, false);
+      await kanaria.setApprovalForAllForAssets(bulkWriter.address, false);
 
       // On a single call we remove the gem from the first slot and add 2 gems on the other 2 slots
       await expect(
@@ -278,7 +278,7 @@ describe('Advanced Equip Render Utils', async function () {
             },
           ],
         ),
-      ).to.be.revertedWithCustomError(kanaria, 'ERC721NotApprovedOrOwner');
+      ).to.be.revertedWithCustomError(kanaria, 'RMRKNotApprovedForAssetsOrOwner');
 
       await expect(
         bulkWriter.replaceEquip(kanaria.address, {
@@ -288,7 +288,7 @@ describe('Advanced Equip Render Utils', async function () {
           slotPartId: slotIdGemLeft,
           childAssetId: assetForGemALeft,
         }),
-      ).to.be.revertedWithCustomError(kanaria, 'ERC721NotApprovedOrOwner');
+      ).to.be.revertedWithCustomError(kanaria, 'RMRKNotApprovedForAssetsOrOwner');
     });
 
     it('cannot do operations if not token owner', async function () {
@@ -350,7 +350,7 @@ describe('Advanced Equip Render Utils', async function () {
 
   describe('With Bulk Writer Per Collection', async function () {
     beforeEach(async function () {
-      await kanaria.setApprovalForAll(bulkWriterPerCollection.address, true);
+      await kanaria.setApprovalForAllForAssets(bulkWriterPerCollection.address, true);
     });
 
     it('can get managed collection', async function () {
@@ -487,7 +487,7 @@ describe('Advanced Equip Render Utils', async function () {
     });
 
     it('cannot do operations if not writer is not approved', async function () {
-      await kanaria.setApprovalForAll(bulkWriterPerCollection.address, false);
+      await kanaria.setApprovalForAllForAssets(bulkWriterPerCollection.address, false);
 
       // On a single call we remove the gem from the first slot and add 2 gems on the other 2 slots
       await expect(
@@ -509,7 +509,7 @@ describe('Advanced Equip Render Utils', async function () {
             },
           ],
         ),
-      ).to.be.revertedWithCustomError(kanaria, 'ERC721NotApprovedOrOwner');
+      ).to.be.revertedWithCustomError(kanaria, 'RMRKNotApprovedForAssetsOrOwner');
 
       await expect(
         bulkWriterPerCollection.replaceEquip({
@@ -519,7 +519,7 @@ describe('Advanced Equip Render Utils', async function () {
           slotPartId: slotIdGemLeft,
           childAssetId: assetForGemALeft,
         }),
-      ).to.be.revertedWithCustomError(kanaria, 'ERC721NotApprovedOrOwner');
+      ).to.be.revertedWithCustomError(kanaria, 'RMRKNotApprovedForAssetsOrOwner');
     });
 
     it('cannot do operations if not token owner', async function () {
