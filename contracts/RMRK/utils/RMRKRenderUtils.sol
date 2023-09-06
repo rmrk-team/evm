@@ -124,16 +124,16 @@ contract RMRKRenderUtils {
                 tokenId
             );
         }
-        if (targetEquippable.supportsInterface(type(IERC6454).interfaceId)) {
-            data.isSoulbound = !IERC6454(targetCollection).isTransferable(
-                tokenId,
-                address(0),
-                address(0)
-            );
-        }
         data.rootOwner = targetEquippable.ownerOf(tokenId);
         if (data.directOwner == address(0x0)) {
             data.directOwner = data.rootOwner;
+        }
+        if (targetEquippable.supportsInterface(type(IERC6454).interfaceId)) {
+            data.isSoulbound = !IERC6454(targetCollection).isTransferable(
+                tokenId,
+                data.rootOwner,
+                0x000000000000000000000000000000000000dEaD
+            );
         }
         try targetCollectionData.name() returns (string memory name) {
             data.name = name;
