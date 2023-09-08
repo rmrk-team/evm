@@ -5,11 +5,11 @@ pragma solidity ^0.8.21;
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 
 /**
- * @title IRMRKTokenPropertiesRepository
+ * @title IERC7508
  * @author RMRK team
  * @notice Interface smart contract of the RMRK token properties extension.
  */
-interface IRMRKTokenPropertiesRepository is IERC165 {
+interface IERC7508 is IERC165 {
     /**
      * @notice A list of supported access types.
      * @return The `Issuer` type, where only the issuer can manage the parameter.
@@ -27,51 +27,51 @@ interface IRMRKTokenPropertiesRepository is IERC165 {
     }
 
     /**
-     * @notice Structure used to represent a string property.
-     * @return key The key of the property
-     * @return value The value of the property
+     * @notice Structure used to represent a string attribute.
+     * @return key The key of the attribute
+     * @return value The value of the attribute
      */
-    struct StringProperty {
+    struct StringAttribute {
         string key;
         string value;
     }
 
     /**
-     * @notice Structure used to represent an uint property.
-     * @return key The key of the property
-     * @return value The value of the property
+     * @notice Structure used to represent an uint attribute.
+     * @return key The key of the attribute
+     * @return value The value of the attribute
      */
-    struct UintProperty {
+    struct UintAttribute {
         string key;
         uint256 value;
     }
 
     /**
-     * @notice Structure used to represent a boolean property.
-     * @return key The key of the property
-     * @return value The value of the property
+     * @notice Structure used to represent a boolean attribute.
+     * @return key The key of the attribute
+     * @return value The value of the attribute
      */
-    struct BoolProperty {
+    struct BoolAttribute {
         string key;
         bool value;
     }
 
     /**
-     * @notice Structure used to represent an address property.
-     * @return key The key of the property
-     * @return value The value of the property
+     * @notice Structure used to represent an address attribute.
+     * @return key The key of the attribute
+     * @return value The value of the attribute
      */
-    struct AddressProperty {
+    struct AddressAttribute {
         string key;
         address value;
     }
 
     /**
-     * @notice Structure used to represent a bytes property.
-     * @return key The key of the property
-     * @return value The value of the property
+     * @notice Structure used to represent a bytes attribute.
+     * @return key The key of the attribute
+     * @return value The value of the attribute
      */
-    struct BytesProperty {
+    struct BytesAttribute {
         string key;
         bytes value;
     }
@@ -119,13 +119,13 @@ interface IRMRKTokenPropertiesRepository is IERC165 {
     );
 
     /**
-     * @notice Used to notify listeners that a string property has been updated.
+     * @notice Used to notify listeners that a string attribute has been updated.
      * @param collection The collection address
      * @param tokenId The token ID
-     * @param key The key of the property
-     * @param value The new value of the property
+     * @param key The key of the attribute
+     * @param value The new value of the attribute
      */
-    event StringPropertyUpdated(
+    event StringAttributeUpdated(
         address indexed collection,
         uint256 indexed tokenId,
         string key,
@@ -133,13 +133,13 @@ interface IRMRKTokenPropertiesRepository is IERC165 {
     );
 
     /**
-     * @notice Used to notify listeners that an uint property has been updated.
+     * @notice Used to notify listeners that an uint attribute has been updated.
      * @param collection The collection address
      * @param tokenId The token ID
-     * @param key The key of the property
-     * @param value The new value of the property
+     * @param key The key of the attribute
+     * @param value The new value of the attribute
      */
-    event UintPropertyUpdated(
+    event UintAttributeUpdated(
         address indexed collection,
         uint256 indexed tokenId,
         string key,
@@ -147,13 +147,13 @@ interface IRMRKTokenPropertiesRepository is IERC165 {
     );
 
     /**
-     * @notice Used to notify listeners that a boolean property has been updated.
+     * @notice Used to notify listeners that a boolean attribute has been updated.
      * @param collection The collection address
      * @param tokenId The token ID
-     * @param key The key of the property
-     * @param value The new value of the property
+     * @param key The key of the attribute
+     * @param value The new value of the attribute
      */
-    event BoolPropertyUpdated(
+    event BoolAttributeUpdated(
         address indexed collection,
         uint256 indexed tokenId,
         string key,
@@ -161,13 +161,13 @@ interface IRMRKTokenPropertiesRepository is IERC165 {
     );
 
     /**
-     * @notice Used to notify listeners that an address property has been updated.
+     * @notice Used to notify listeners that an address attribute has been updated.
      * @param collection The collection address
      * @param tokenId The token ID
-     * @param key The key of the property
-     * @param value The new value of the property
+     * @param key The key of the attribute
+     * @param value The new value of the attribute
      */
-    event AddressPropertyUpdated(
+    event AddressAttributeUpdated(
         address indexed collection,
         uint256 indexed tokenId,
         string key,
@@ -175,13 +175,13 @@ interface IRMRKTokenPropertiesRepository is IERC165 {
     );
 
     /**
-     * @notice Used to notify listeners that a bytes property has been updated.
+     * @notice Used to notify listeners that a bytes attribute has been updated.
      * @param collection The collection address
      * @param tokenId The token ID
-     * @param key The key of the property
-     * @param value The new value of the property
+     * @param key The key of the attribute
+     * @param value The new value of the attribute
      */
-    event BytesPropertyUpdated(
+    event BytesAttributeUpdated(
         address indexed collection,
         uint256 indexed tokenId,
         string key,
@@ -189,10 +189,10 @@ interface IRMRKTokenPropertiesRepository is IERC165 {
     );
 
     /**
-     * @notice Used to register a collection to use the RMRK token properties repository.
+     * @notice Used to register a collection to use the RMRK token attributes repository.
      * @dev  If the collection does not implement the Ownable interface, the `useOwnable` value must be set to `false`.
      * @dev Emits an {AccessControlRegistration} event.
-     * @param collection The address of the collection that will use the RMRK token properties repository.
+     * @param collection The address of the collection that will use the RMRK token attributes repository.
      * @param issuer The address of the issuer of the collection.
      * @param useOwnable The boolean value to indicate if the collection implements the Ownable interface and whether it
      *  should be used to validate that the caller is the issuer (`true`) or to use the manually set issuer address
@@ -217,7 +217,7 @@ interface IRMRKTokenPropertiesRepository is IERC165 {
      *  ]
      * @dev Emits an {AccessControlUpdated} event.
      * @param collection The address of the collection being managed.
-     * @param key The key of the property
+     * @param key The key of the attribute
      * @param accessType The type of access control to be applied to the parameter.
      * @param specificAddress The address to be added as a specific addresses allowed to manage the given
      *  parameter.
@@ -245,14 +245,14 @@ interface IRMRKTokenPropertiesRepository is IERC165 {
     ) external;
 
     /**
-     * @notice Used to set a number property.
-     * @dev Emits a {UintPropertyUpdated} event.
-     * @param collection Address of the collection receiving the property
+     * @notice Used to set a number attribute.
+     * @dev Emits a {UintAttributeUpdated} event.
+     * @param collection Address of the collection receiving the attribute
      * @param tokenId The token ID
-     * @param key The property key
-     * @param value The property value
+     * @param key The attribute key
+     * @param value The attribute value
      */
-    function setUintProperty(
+    function setUintAttribute(
         address collection,
         uint256 tokenId,
         string memory key,
@@ -260,14 +260,14 @@ interface IRMRKTokenPropertiesRepository is IERC165 {
     ) external;
 
     /**
-     * @notice Used to set a string property.
-     * @dev Emits a {StringPropertyUpdated} event.
-     * @param collection Address of the collection receiving the property
+     * @notice Used to set a string attribute.
+     * @dev Emits a {StringAttributeUpdated} event.
+     * @param collection Address of the collection receiving the attribute
      * @param tokenId The token ID
-     * @param key The property key
-     * @param value The property value
+     * @param key The attribute key
+     * @param value The attribute value
      */
-    function setStringProperty(
+    function setStringAttribute(
         address collection,
         uint256 tokenId,
         string memory key,
@@ -275,14 +275,14 @@ interface IRMRKTokenPropertiesRepository is IERC165 {
     ) external;
 
     /**
-     * @notice Used to set a boolean property.
-     * @dev Emits a {BoolPropertyUpdated} event.
-     * @param collection Address of the collection receiving the property
+     * @notice Used to set a boolean attribute.
+     * @dev Emits a {BoolAttributeUpdated} event.
+     * @param collection Address of the collection receiving the attribute
      * @param tokenId The token ID
-     * @param key The property key
-     * @param value The property value
+     * @param key The attribute key
+     * @param value The attribute value
      */
-    function setBoolProperty(
+    function setBoolAttribute(
         address collection,
         uint256 tokenId,
         string memory key,
@@ -290,14 +290,14 @@ interface IRMRKTokenPropertiesRepository is IERC165 {
     ) external;
 
     /**
-     * @notice Used to set an bytes property.
-     * @dev Emits a {BytesPropertyUpdated} event.
-     * @param collection Address of the collection receiving the property
+     * @notice Used to set an bytes attribute.
+     * @dev Emits a {BytesAttributeUpdated} event.
+     * @param collection Address of the collection receiving the attribute
      * @param tokenId The token ID
-     * @param key The property key
-     * @param value The property value
+     * @param key The attribute key
+     * @param value The attribute value
      */
-    function setBytesProperty(
+    function setBytesAttribute(
         address collection,
         uint256 tokenId,
         string memory key,
@@ -305,14 +305,14 @@ interface IRMRKTokenPropertiesRepository is IERC165 {
     ) external;
 
     /**
-     * @notice Used to set an address property.
-     * @dev Emits a {AddressPropertyUpdated} event.
-     * @param collection Address of the collection receiving the property
+     * @notice Used to set an address attribute.
+     * @dev Emits a {AddressAttributeUpdated} event.
+     * @param collection Address of the collection receiving the attribute
      * @param tokenId The token ID
-     * @param key The property key
-     * @param value The property value
+     * @param key The attribute key
+     * @param value The attribute value
      */
-    function setAddressProperty(
+    function setAddressAttribute(
         address collection,
         uint256 tokenId,
         string memory key,
@@ -320,94 +320,94 @@ interface IRMRKTokenPropertiesRepository is IERC165 {
     ) external;
 
     /**
-     * @notice Sets multiple string properties for a token at once.
-     * @dev The `StringProperty` struct contains the following fields:
+     * @notice Sets multiple string attributes for a token at once.
+     * @dev The `StringAttribute` struct contains the following fields:
      *  [
      *      string key,
      *      string value
      *  ]
      * @param collection Address of the collection
      * @param tokenId ID of the token
-     * @param properties An array of `StringProperty` structs to be assigned to the given token
+     * @param attributes An array of `StringAttribute` structs to be assigned to the given token
      */
-    function setStringProperties(
+    function setStringAttributes(
         address collection,
         uint256 tokenId,
-        StringProperty[] memory properties
+        StringAttribute[] memory attributes
     ) external;
 
     /**
-     * @notice Sets multiple uint properties for a token at once.
-     * @dev The `UintProperty` struct contains the following fields:
+     * @notice Sets multiple uint attributes for a token at once.
+     * @dev The `UintAttribute` struct contains the following fields:
      *  [
      *      string key,
      *      uint value
      *  ]
      * @param collection Address of the collection
      * @param tokenId ID of the token
-     * @param properties An array of `UintProperty` structs to be assigned to the given token
+     * @param attributes An array of `UintAttribute` structs to be assigned to the given token
      */
-    function setUintProperties(
+    function setUintAttributes(
         address collection,
         uint256 tokenId,
-        UintProperty[] memory properties
+        UintAttribute[] memory attributes
     ) external;
 
     /**
-     * @notice Sets multiple bool properties for a token at once.
-     * @dev The `BoolProperty` struct contains the following fields:
+     * @notice Sets multiple bool attributes for a token at once.
+     * @dev The `BoolAttribute` struct contains the following fields:
      *  [
      *      string key,
      *      bool value
      *  ]
      * @param collection Address of the collection
      * @param tokenId ID of the token
-     * @param properties An array of `BoolProperty` structs to be assigned to the given token
+     * @param attributes An array of `BoolAttribute` structs to be assigned to the given token
      */
-    function setBoolProperties(
+    function setBoolAttributes(
         address collection,
         uint256 tokenId,
-        BoolProperty[] memory properties
+        BoolAttribute[] memory attributes
     ) external;
 
     /**
-     * @notice Sets multiple address properties for a token at once.
-     * @dev The `AddressProperty` struct contains the following fields:
+     * @notice Sets multiple address attributes for a token at once.
+     * @dev The `AddressAttribute` struct contains the following fields:
      *  [
      *      string key,
      *      address value
      *  ]
      * @param collection Address of the collection
      * @param tokenId ID of the token
-     * @param properties An array of `AddressProperty` structs to be assigned to the given token
+     * @param attributes An array of `AddressAttribute` structs to be assigned to the given token
      */
-    function setAddressProperties(
+    function setAddressAttributes(
         address collection,
         uint256 tokenId,
-        AddressProperty[] memory properties
+        AddressAttribute[] memory attributes
     ) external;
 
     /**
-     * @notice Sets multiple bytes properties for a token at once.
-     * @dev The `BytesProperty` struct contains the following fields:
+     * @notice Sets multiple bytes attributes for a token at once.
+     * @dev The `BytesAttribute` struct contains the following fields:
      *  [
      *      string key,
      *      bytes value
      *  ]
      * @param collection Address of the collection
      * @param tokenId ID of the token
-     * @param properties An array of `BytesProperty` structs to be assigned to the given token
+     * @param attributes An array of `BytesAttribute` structs to be assigned to the given token
      */
-    function setBytesProperties(
+    function setBytesAttributes(
         address collection,
         uint256 tokenId,
-        BytesProperty[] memory properties
+        BytesAttribute[] memory attributes
     ) external;
 
     /**
-     * @notice Sets multiple properties of multiple types for a token at the same time.
-     * @dev Emits a separate event for each property set.
-     * @dev The `StringProperty`, `UintProperty`, `BoolProperty`, `AddressProperty` and `BytesProperty` structs consists
+     * @notice Sets multiple attributes of multiple types for a token at the same time.
+     * @dev Emits a separate event for each attribute set.
+     * @dev The `StringAttribute`, `UintAttribute`, `BoolAttribute`, `AddressAttribute` and `BytesAttribute` structs consists
      *  to the following fields (where `value` is of the appropriate type):
      *  [
      *      key,
@@ -415,36 +415,36 @@ interface IRMRKTokenPropertiesRepository is IERC165 {
      *  ]
      * @param collection The address of the collection
      * @param tokenId The token ID
-     * @param stringProperties An array of `StringProperty` structs containing string properties to set
-     * @param uintProperties An array of `UintProperty` structs containing uint properties to set
-     * @param boolProperties An array of `BoolProperty` structs containing bool properties to set
-     * @param addressProperties An array of `AddressProperty` structs containing address properties to set
-     * @param bytesProperties An array of `BytesProperty` structs containing bytes properties to set
+     * @param stringAttributes An array of `StringAttribute` structs containing string attributes to set
+     * @param uintAttributes An array of `UintAttribute` structs containing uint attributes to set
+     * @param boolAttributes An array of `BoolAttribute` structs containing bool attributes to set
+     * @param addressAttributes An array of `AddressAttribute` structs containing address attributes to set
+     * @param bytesAttributes An array of `BytesAttribute` structs containing bytes attributes to set
      */
-    function setTokenProperties(
+    function setTokenAttributes(
         address collection,
         uint256 tokenId,
-        StringProperty[] memory stringProperties,
-        UintProperty[] memory uintProperties,
-        BoolProperty[] memory boolProperties,
-        AddressProperty[] memory addressProperties,
-        BytesProperty[] memory bytesProperties
+        StringAttribute[] memory stringAttributes,
+        UintAttribute[] memory uintAttributes,
+        BoolAttribute[] memory boolAttributes,
+        AddressAttribute[] memory addressAttributes,
+        BytesAttribute[] memory bytesAttributes
     ) external;
 
     /**
-     * @notice Used to set the uint property on behalf of an authorized account.
-     * @dev Emits a {UintPropertyUpdated} event.
-     * @param setter Address of the account that presigned the property change
-     * @param collection Address of the collection receiving the property
-     * @param tokenId The ID of the token receiving the property
-     * @param key The property key
-     * @param value The property value
+     * @notice Used to set the uint attribute on behalf of an authorized account.
+     * @dev Emits a {UintAttributeUpdated} event.
+     * @param setter Address of the account that presigned the attribute change
+     * @param collection Address of the collection receiving the attribute
+     * @param tokenId The ID of the token receiving the attribute
+     * @param key The attribute key
+     * @param value The attribute value
      * @param deadline The deadline timestamp for the presigned transaction
      * @param v `v` value of an ECDSA signature of the presigned message
      * @param r `r` value of an ECDSA signature of the presigned message
      * @param s `s` value of an ECDSA signature of the presigned message
      */
-    function presignedSetUintProperty(
+    function presignedSetUintAttribute(
         address setter,
         address collection,
         uint256 tokenId,
@@ -457,19 +457,19 @@ interface IRMRKTokenPropertiesRepository is IERC165 {
     ) external;
 
     /**
-     * @notice Used to set the string property on behalf of an authorized account.
-     * @dev Emits a {StringPropertyUpdated} event.
-     * @param setter Address of the account that presigned the property change
-     * @param collection Address of the collection receiving the property
-     * @param tokenId The ID of the token receiving the property
-     * @param key The property key
-     * @param value The property value
+     * @notice Used to set the string attribute on behalf of an authorized account.
+     * @dev Emits a {StringAttributeUpdated} event.
+     * @param setter Address of the account that presigned the attribute change
+     * @param collection Address of the collection receiving the attribute
+     * @param tokenId The ID of the token receiving the attribute
+     * @param key The attribute key
+     * @param value The attribute value
      * @param deadline The deadline timestamp for the presigned transaction
      * @param v `v` value of an ECDSA signature of the presigned message
      * @param r `r` value of an ECDSA signature of the presigned message
      * @param s `s` value of an ECDSA signature of the presigned message
      */
-    function presignedSetStringProperty(
+    function presignedSetStringAttribute(
         address setter,
         address collection,
         uint256 tokenId,
@@ -482,19 +482,19 @@ interface IRMRKTokenPropertiesRepository is IERC165 {
     ) external;
 
     /**
-     * @notice Used to set the bool property on behalf of an authorized account.
-     * @dev Emits a {BoolPropertyUpdated} event.
-     * @param setter Address of the account that presigned the property change
-     * @param collection Address of the collection receiving the property
-     * @param tokenId The ID of the token receiving the property
-     * @param key The property key
-     * @param value The property value
+     * @notice Used to set the bool attribute on behalf of an authorized account.
+     * @dev Emits a {BoolAttributeUpdated} event.
+     * @param setter Address of the account that presigned the attribute change
+     * @param collection Address of the collection receiving the attribute
+     * @param tokenId The ID of the token receiving the attribute
+     * @param key The attribute key
+     * @param value The attribute value
      * @param deadline The deadline timestamp for the presigned transaction
      * @param v `v` value of an ECDSA signature of the presigned message
      * @param r `r` value of an ECDSA signature of the presigned message
      * @param s `s` value of an ECDSA signature of the presigned message
      */
-    function presignedSetBoolProperty(
+    function presignedSetBoolAttribute(
         address setter,
         address collection,
         uint256 tokenId,
@@ -507,19 +507,19 @@ interface IRMRKTokenPropertiesRepository is IERC165 {
     ) external;
 
     /**
-     * @notice Used to set the bytes property on behalf of an authorized account.
-     * @dev Emits a {BytesPropertyUpdated} event.
-     * @param setter Address of the account that presigned the property change
-     * @param collection Address of the collection receiving the property
-     * @param tokenId The ID of the token receiving the property
-     * @param key The property key
-     * @param value The property value
+     * @notice Used to set the bytes attribute on behalf of an authorized account.
+     * @dev Emits a {BytesAttributeUpdated} event.
+     * @param setter Address of the account that presigned the attribute change
+     * @param collection Address of the collection receiving the attribute
+     * @param tokenId The ID of the token receiving the attribute
+     * @param key The attribute key
+     * @param value The attribute value
      * @param deadline The deadline timestamp for the presigned transaction
      * @param v `v` value of an ECDSA signature of the presigned message
      * @param r `r` value of an ECDSA signature of the presigned message
      * @param s `s` value of an ECDSA signature of the presigned message
      */
-    function presignedSetBytesProperty(
+    function presignedSetBytesAttribute(
         address setter,
         address collection,
         uint256 tokenId,
@@ -532,19 +532,19 @@ interface IRMRKTokenPropertiesRepository is IERC165 {
     ) external;
 
     /**
-     * @notice Used to set the address property on behalf of an authorized account.
-     * @dev Emits a {AddressPropertyUpdated} event.
-     * @param setter Address of the account that presigned the property change
-     * @param collection Address of the collection receiving the property
-     * @param tokenId The ID of the token receiving the property
-     * @param key The property key
-     * @param value The property value
+     * @notice Used to set the address attribute on behalf of an authorized account.
+     * @dev Emits a {AddressAttributeUpdated} event.
+     * @param setter Address of the account that presigned the attribute change
+     * @param collection Address of the collection receiving the attribute
+     * @param tokenId The ID of the token receiving the attribute
+     * @param key The attribute key
+     * @param value The attribute value
      * @param deadline The deadline timestamp for the presigned transaction
      * @param v `v` value of an ECDSA signature of the presigned message
      * @param r `r` value of an ECDSA signature of the presigned message
      * @param s `s` value of an ECDSA signature of the presigned message
      */
-    function presignedSetAddressProperty(
+    function presignedSetAddressAttribute(
         address setter,
         address collection,
         uint256 tokenId,
@@ -573,7 +573,7 @@ interface IRMRKTokenPropertiesRepository is IERC165 {
      *  parameter.
      * @param specificAddress Address to be checked.
      * @param collection Address of the collection.
-     * @param key The key of the property
+     * @param key The key of the attribute
      * @return Boolean value indicating if the address is a specific address of the given collection's parameter
      *  (`true`) or not (`false`).
      */
@@ -584,80 +584,80 @@ interface IRMRKTokenPropertiesRepository is IERC165 {
     ) external view returns (bool);
 
     /**
-     * @notice Used to retrieve the string type token properties.
+     * @notice Used to retrieve the string type token attributes.
      * @param collection The collection address
      * @param tokenId The token ID
-     * @param key The key of the property
-     * @return The value of the string property
+     * @param key The key of the attribute
+     * @return The value of the string attribute
      */
-    function getStringTokenProperty(
+    function getStringTokenAttribute(
         address collection,
         uint256 tokenId,
         string memory key
     ) external view returns (string memory);
 
     /**
-     * @notice Used to retrieve the uint type token properties.
+     * @notice Used to retrieve the uint type token attributes.
      * @param collection The collection address
      * @param tokenId The token ID
-     * @param key The key of the property
-     * @return The value of the uint property
+     * @param key The key of the attribute
+     * @return The value of the uint attribute
      */
-    function getUintTokenProperty(
+    function getUintTokenAttribute(
         address collection,
         uint256 tokenId,
         string memory key
     ) external view returns (uint256);
 
     /**
-     * @notice Used to retrieve the bool type token properties.
+     * @notice Used to retrieve the bool type token attributes.
      * @param collection The collection address
      * @param tokenId The token ID
-     * @param key The key of the property
-     * @return The value of the bool property
+     * @param key The key of the attribute
+     * @return The value of the bool attribute
      */
-    function getBoolTokenProperty(
+    function getBoolTokenAttribute(
         address collection,
         uint256 tokenId,
         string memory key
     ) external view returns (bool);
 
     /**
-     * @notice Used to retrieve the address type token properties.
+     * @notice Used to retrieve the address type token attributes.
      * @param collection The collection address
      * @param tokenId The token ID
-     * @param key The key of the property
-     * @return The value of the address property
+     * @param key The key of the attribute
+     * @return The value of the address attribute
      */
-    function getAddressTokenProperty(
+    function getAddressTokenAttribute(
         address collection,
         uint256 tokenId,
         string memory key
     ) external view returns (address);
 
     /**
-     * @notice Used to retrieve the bytes type token properties.
+     * @notice Used to retrieve the bytes type token attributes.
      * @param collection The collection address
      * @param tokenId The token ID
-     * @param key The key of the property
-     * @return The value of the bytes property
+     * @param key The key of the attribute
+     * @return The value of the bytes attribute
      */
-    function getBytesTokenProperty(
+    function getBytesTokenAttribute(
         address collection,
         uint256 tokenId,
         string memory key
     ) external view returns (bytes memory);
 
     /**
-     * @notice Used to retrieve the message to be signed for submitting a presigned uint property change.
-     * @param collection The address of the collection smart contract of the token receiving the property
-     * @param tokenId The ID of the token receiving the property
-     * @param key The property key
-     * @param value The property value
+     * @notice Used to retrieve the message to be signed for submitting a presigned uint attribute change.
+     * @param collection The address of the collection smart contract of the token receiving the attribute
+     * @param tokenId The ID of the token receiving the attribute
+     * @param key The attribute key
+     * @param value The attribute value
      * @param deadline The deadline timestamp for the presigned transaction after which the message is invalid
      * @return Raw message to be signed by the authorized account
      */
-    function prepareMessageToPresignUintProperty(
+    function prepareMessageToPresignUintAttribute(
         address collection,
         uint256 tokenId,
         string memory key,
@@ -666,15 +666,15 @@ interface IRMRKTokenPropertiesRepository is IERC165 {
     ) external view returns (bytes32);
 
     /**
-     * @notice Used to retrieve the message to be signed for submitting a presigned string property change.
-     * @param collection The address of the collection smart contract of the token receiving the property
-     * @param tokenId The ID of the token receiving the property
-     * @param key The property key
-     * @param value The property value
+     * @notice Used to retrieve the message to be signed for submitting a presigned string attribute change.
+     * @param collection The address of the collection smart contract of the token receiving the attribute
+     * @param tokenId The ID of the token receiving the attribute
+     * @param key The attribute key
+     * @param value The attribute value
      * @param deadline The deadline timestamp for the presigned transaction after which the message is invalid
      * @return Raw message to be signed by the authorized account
      */
-    function prepareMessageToPresignStringProperty(
+    function prepareMessageToPresignStringAttribute(
         address collection,
         uint256 tokenId,
         string memory key,
@@ -683,15 +683,15 @@ interface IRMRKTokenPropertiesRepository is IERC165 {
     ) external view returns (bytes32);
 
     /**
-     * @notice Used to retrieve the message to be signed for submitting a presigned bool property change.
-     * @param collection The address of the collection smart contract of the token receiving the property
-     * @param tokenId The ID of the token receiving the property
-     * @param key The property key
-     * @param value The property value
+     * @notice Used to retrieve the message to be signed for submitting a presigned bool attribute change.
+     * @param collection The address of the collection smart contract of the token receiving the attribute
+     * @param tokenId The ID of the token receiving the attribute
+     * @param key The attribute key
+     * @param value The attribute value
      * @param deadline The deadline timestamp for the presigned transaction after which the message is invalid
      * @return Raw message to be signed by the authorized account
      */
-    function prepareMessageToPresignBoolProperty(
+    function prepareMessageToPresignBoolAttribute(
         address collection,
         uint256 tokenId,
         string memory key,
@@ -700,15 +700,15 @@ interface IRMRKTokenPropertiesRepository is IERC165 {
     ) external view returns (bytes32);
 
     /**
-     * @notice Used to retrieve the message to be signed for submitting a presigned bytes property change.
-     * @param collection The address of the collection smart contract of the token receiving the property
-     * @param tokenId The ID of the token receiving the property
-     * @param key The property key
-     * @param value The property value
+     * @notice Used to retrieve the message to be signed for submitting a presigned bytes attribute change.
+     * @param collection The address of the collection smart contract of the token receiving the attribute
+     * @param tokenId The ID of the token receiving the attribute
+     * @param key The attribute key
+     * @param value The attribute value
      * @param deadline The deadline timestamp for the presigned transaction after which the message is invalid
      * @return Raw message to be signed by the authorized account
      */
-    function prepareMessageToPresignBytesProperty(
+    function prepareMessageToPresignBytesAttribute(
         address collection,
         uint256 tokenId,
         string memory key,
@@ -717,15 +717,15 @@ interface IRMRKTokenPropertiesRepository is IERC165 {
     ) external view returns (bytes32);
 
     /**
-     * @notice Used to retrieve the message to be signed for submitting a presigned address property change.
-     * @param collection The address of the collection smart contract of the token receiving the property
-     * @param tokenId The ID of the token receiving the property
-     * @param key The property key
-     * @param value The property value
+     * @notice Used to retrieve the message to be signed for submitting a presigned address attribute change.
+     * @param collection The address of the collection smart contract of the token receiving the attribute
+     * @param tokenId The ID of the token receiving the attribute
+     * @param key The attribute key
+     * @param value The attribute value
      * @param deadline The deadline timestamp for the presigned transaction after which the message is invalid
      * @return Raw message to be signed by the authorized account
      */
-    function prepareMessageToPresignAddressProperty(
+    function prepareMessageToPresignAddressAttribute(
         address collection,
         uint256 tokenId,
         string memory key,
@@ -734,8 +734,8 @@ interface IRMRKTokenPropertiesRepository is IERC165 {
     ) external view returns (bytes32);
 
     /**
-     * @notice Used to retrieve multiple token properties of any type at once.
-     * @dev The `StringProperty`, `UintProperty`, `BoolProperty`, `AddressProperty` and `BytesProperty` structs consists
+     * @notice Used to retrieve multiple token attributes of any type at once.
+     * @dev The `StringAttribute`, `UintAttribute`, `BoolAttribute`, `AddressAttribute` and `BytesAttribute` structs consists
      *  to the following fields (where `value` is of the appropriate type):
      *  [
      *      key,
@@ -743,18 +743,18 @@ interface IRMRKTokenPropertiesRepository is IERC165 {
      *  ]
      * @param collection The collection address
      * @param tokenId The token ID
-     * @param stringKeys An array of string type property keys to retrieve
-     * @param uintKeys An array of uint type property keys to retrieve
-     * @param boolKeys An array of bool type property keys to retrieve
-     * @param addressKeys An array of address type property keys to retrieve
-     * @param bytesKeys An array of bytes type property keys to retrieve
-     * @return stringProperties An array of `StringProperty` structs containing the string type properties
-     * @return uintProperties An array of `UintProperty` structs containing the uint type properties
-     * @return boolProperties An array of `BoolProperty` structs containing the bool type properties
-     * @return addressProperties An array of `AddressProperty` structs containing the address type properties
-     * @return bytesProperties An array of `BytesProperty` structs containing the bytes type properties
+     * @param stringKeys An array of string type attribute keys to retrieve
+     * @param uintKeys An array of uint type attribute keys to retrieve
+     * @param boolKeys An array of bool type attribute keys to retrieve
+     * @param addressKeys An array of address type attribute keys to retrieve
+     * @param bytesKeys An array of bytes type attribute keys to retrieve
+     * @return stringAttributes An array of `StringAttribute` structs containing the string type attributes
+     * @return uintAttributes An array of `UintAttribute` structs containing the uint type attributes
+     * @return boolAttributes An array of `BoolAttribute` structs containing the bool type attributes
+     * @return addressAttributes An array of `AddressAttribute` structs containing the address type attributes
+     * @return bytesAttributes An array of `BytesAttribute` structs containing the bytes type attributes
      */
-    function getTokenProperties(
+    function getTokenAttributes(
         address collection,
         uint256 tokenId,
         string[] memory stringKeys,
@@ -766,100 +766,100 @@ interface IRMRKTokenPropertiesRepository is IERC165 {
         external
         view
         returns (
-            StringProperty[] memory stringProperties,
-            UintProperty[] memory uintProperties,
-            BoolProperty[] memory boolProperties,
-            AddressProperty[] memory addressProperties,
-            BytesProperty[] memory bytesProperties
+            StringAttribute[] memory stringAttributes,
+            UintAttribute[] memory uintAttributes,
+            BoolAttribute[] memory boolAttributes,
+            AddressAttribute[] memory addressAttributes,
+            BytesAttribute[] memory bytesAttributes
         );
 
     /**
      * @notice Used to get multiple sting parameter values for a token.
-     * @dev The `StringProperty` struct contains the following fields:
+     * @dev The `StringAttribute` struct contains the following fields:
      *  [
      *     string key,
      *     string value
      *  ]
      * @param collection Address of the collection the token belongs to
-     * @param tokenId ID of the token for which the properties are being retrieved
+     * @param tokenId ID of the token for which the attributes are being retrieved
      * @param stringKeys An array of string keys to retrieve
-     * @return An array of `StringProperty` structs
+     * @return An array of `StringAttribute` structs
      */
-    function getStringTokenProperties(
+    function getStringTokenAttributes(
         address collection,
         uint256 tokenId,
         string[] memory stringKeys
-    ) external view returns (StringProperty[] memory);
+    ) external view returns (StringAttribute[] memory);
 
     /**
      * @notice Used to get multiple uint parameter values for a token.
-     * @dev The `UintProperty` struct contains the following fields:
+     * @dev The `UintAttribute` struct contains the following fields:
      *  [
      *     string key,
      *     uint value
      *  ]
      * @param collection Address of the collection the token belongs to
-     * @param tokenId ID of the token for which the properties are being retrieved
+     * @param tokenId ID of the token for which the attributes are being retrieved
      * @param uintKeys An array of uint keys to retrieve
-     * @return An array of `UintProperty` structs
+     * @return An array of `UintAttribute` structs
      */
-    function getUintTokenProperties(
+    function getUintTokenAttributes(
         address collection,
         uint256 tokenId,
         string[] memory uintKeys
-    ) external view returns (UintProperty[] memory);
+    ) external view returns (UintAttribute[] memory);
 
     /**
      * @notice Used to get multiple bool parameter values for a token.
-     * @dev The `BoolProperty` struct contains the following fields:
+     * @dev The `BoolAttribute` struct contains the following fields:
      *  [
      *     string key,
      *     bool value
      *  ]
      * @param collection Address of the collection the token belongs to
-     * @param tokenId ID of the token for which the properties are being retrieved
+     * @param tokenId ID of the token for which the attributes are being retrieved
      * @param boolKeys An array of bool keys to retrieve
-     * @return An array of `BoolProperty` structs
+     * @return An array of `BoolAttribute` structs
      */
-    function getBoolTokenProperties(
+    function getBoolTokenAttributes(
         address collection,
         uint256 tokenId,
         string[] memory boolKeys
-    ) external view returns (BoolProperty[] memory);
+    ) external view returns (BoolAttribute[] memory);
 
     /**
      * @notice Used to get multiple address parameter values for a token.
-     * @dev The `AddressProperty` struct contains the following fields:
+     * @dev The `AddressAttribute` struct contains the following fields:
      *  [
      *     string key,
      *     address value
      *  ]
      * @param collection Address of the collection the token belongs to
-     * @param tokenId ID of the token for which the properties are being retrieved
+     * @param tokenId ID of the token for which the attributes are being retrieved
      * @param addressKeys An array of address keys to retrieve
-     * @return An array of `AddressProperty` structs
+     * @return An array of `AddressAttribute` structs
      */
-    function getAddressTokenProperties(
+    function getAddressTokenAttributes(
         address collection,
         uint256 tokenId,
         string[] memory addressKeys
-    ) external view returns (AddressProperty[] memory);
+    ) external view returns (AddressAttribute[] memory);
 
     /**
      * @notice Used to get multiple bytes parameter values for a token.
-     * @dev The `BytesProperty` struct contains the following fields:
+     * @dev The `BytesAttribute` struct contains the following fields:
      *  [
      *     string key,
      *     bytes value
      *  ]
      * @param collection Address of the collection the token belongs to
-     * @param tokenId ID of the token for which the properties are being retrieved
+     * @param tokenId ID of the token for which the attributes are being retrieved
      * @param bytesKeys An array of bytes keys to retrieve
-     * @return An array of `BytesProperty` structs
+     * @return An array of `BytesAttribute` structs
      */
-    function getBytesTokenProperties(
+    function getBytesTokenAttributes(
         address collection,
         uint256 tokenId,
         string[] memory bytesKeys
-    ) external view returns (BytesProperty[] memory);
+    ) external view returns (BytesAttribute[] memory);
 }
