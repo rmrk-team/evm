@@ -20,7 +20,7 @@ error InsufficientBalance();
  * @dev The RMRKTokenHolder extension is capable of holding ERC-20, ERC-721, and ERC-1155 tokens.
  */
 abstract contract RMRKTokenHolder is IRMRKTokenHolder {
-    mapping(uint256 tokenId => mapping(address tokenAddress => mapping(TokenType tokenType => mapping(uint256 heldTokenId => uint256 balance))))
+    mapping(uint256 => mapping(address => mapping(TokenType => mapping(uint256 => uint256))))
         private _balances;
 
     /**

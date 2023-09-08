@@ -25,9 +25,9 @@ contract RMRKEmotesRepository is IRMRKEmotesRepository {
         );
 
     // Used to avoid double emoting and control undoing
-    mapping(address emoter => mapping(address collection => mapping(uint256 tokenId => mapping(string emoji => uint256 state))))
+    mapping(address => mapping(address => mapping(uint256 => mapping(string => uint256))))
         private _emotesUsedByEmoter; // Cheaper than using a bool
-    mapping(address collection => mapping(uint256 tokenId => mapping(string emoji => uint256 count)))
+    mapping(address => mapping(uint256 => mapping(string => uint256)))
         private _emotesPerToken;
 
     /**
