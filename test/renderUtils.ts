@@ -652,7 +652,7 @@ describe('Advanced Equip Render Utils', async function () {
     ]);
   });
 
-  it('can get equippable slots from parent asset and excludes if catalog does not match', async function () {
+  it('can get equippable slots from parent asset even if catalog does not match', async function () {
     await setUpCatalog(catalog, gem.address);
     await setUpKanariaAsset(kanaria, kanariaId, catalog.address);
     await setUpGemAssets(gem, gemId1, gemId2, gemId3, kanaria.address, catalog.address);
@@ -711,6 +711,17 @@ describe('Advanced Equip Render Utils', async function () {
           false,
           'ipfs://metadataSlotGemLeft',
           'ipfs://gems/typeB/left.svg',
+          'ipfs://kanaria/full.svg',
+        ],
+        [
+          bn(slotIdGemLeft),
+          newResourceId,
+          bn(assetForKanariaFull),
+          bn(4),
+          catalog.address, // This is the catalog address of the parent, not the child
+          false,
+          'ipfs://metadataSlotGemLeft',
+          'ipfs://assetFromOtherCatalog.jpg',
           'ipfs://kanaria/full.svg',
         ],
       ],

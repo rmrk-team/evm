@@ -813,7 +813,6 @@ contract RMRKEquipRenderUtils is
                 .getAssetAndEquippableData(childId, childAssets[i]);
             for (uint256 j; j < parentSlotPartIds.length; ) {
                 if (
-                    catalogAddress == parentAssetCatalog &&
                     childContract.canTokenBeEquippedWithAssetIntoSlot(
                         parentAddress,
                         childId,
