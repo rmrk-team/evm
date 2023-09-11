@@ -46,12 +46,12 @@ Core implementations updates include breaking changes as well; names and symbols
 - All contracts now use solidity version 0.8.21.
 - Upgrades dependencies.
 - Increases Istanbul code coverage:
-  | | **Previous** | **Current** | **Change** |
-  |:--------------: |:------------: |:-----------: |------------ |
-  | **Statements** | 100.00 % | 100.00 % | + 0.00 % |
-  | **Branches** | 95.53 % | 96.78 % | + 1.25 % |
-  | **Functions** | 99.60 % | 99.72 % | + 0.12 % |
-  | **Lines** | 99.63 % | 99.46 % | - 0.17 % |
+|                	| **Previous** 	| **Current** 	| **Change** 	|
+|:--------------:	|:------------:	|:-----------:	|------------	|
+| **Statements** 	|   100.00 %   	|   100.00 %  	|  + 0.00 %  	|
+|  **Branches**  	|    95.53 %   	|   96.78 %   	|  + 1.25 %  	|
+|  **Functions** 	|    99.60 %   	|   99.72 %   	|  + 0.12 %  	|
+|    **Lines**   	|    99.63 %   	|   99.46 %   	|  - 0.17 %  	|
 
 ### Fixed
 
