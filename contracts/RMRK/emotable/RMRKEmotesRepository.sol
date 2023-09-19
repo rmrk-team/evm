@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.21;
 
-import "./IRMRKEmotesRepository.sol";
+import "./IERC7409.sol";
 
 error BulkParametersOfUnequalLength();
 error ExpiredPresignedEmote();
@@ -13,7 +13,7 @@ error InvalidSignature();
  * @author RMRK team
  * @notice Smart contract of the RMRK Emotes repository.
  */
-contract RMRKEmotesRepository is IRMRKEmotesRepository {
+contract RMRKEmotesRepository is IERC7409 {
     bytes32 public immutable DOMAIN_SEPARATOR =
         keccak256(
             abi.encode(
@@ -31,7 +31,7 @@ contract RMRKEmotesRepository is IRMRKEmotesRepository {
         private _emotesPerToken;
 
     /**
-     * @inheritdoc IRMRKEmotesRepository
+     * @inheritdoc IERC7409
      */
     function emoteCountOf(
         address collection,
@@ -42,7 +42,7 @@ contract RMRKEmotesRepository is IRMRKEmotesRepository {
     }
 
     /**
-     * @inheritdoc IRMRKEmotesRepository
+     * @inheritdoc IERC7409
      */
     function bulkEmoteCountOf(
         address[] memory collections,
@@ -67,7 +67,7 @@ contract RMRKEmotesRepository is IRMRKEmotesRepository {
     }
 
     /**
-     * @inheritdoc IRMRKEmotesRepository
+     * @inheritdoc IERC7409
      */
     function hasEmoterUsedEmote(
         address emoter,
@@ -79,7 +79,7 @@ contract RMRKEmotesRepository is IRMRKEmotesRepository {
     }
 
     /**
-     * @inheritdoc IRMRKEmotesRepository
+     * @inheritdoc IERC7409
      */
     function haveEmotersUsedEmotes(
         address[] memory emoters,
@@ -110,7 +110,7 @@ contract RMRKEmotesRepository is IRMRKEmotesRepository {
     }
 
     /**
-     * @inheritdoc IRMRKEmotesRepository
+     * @inheritdoc IERC7409
      */
     function emote(
         address collection,
@@ -135,7 +135,7 @@ contract RMRKEmotesRepository is IRMRKEmotesRepository {
     }
 
     /**
-     * @inheritdoc IRMRKEmotesRepository
+     * @inheritdoc IERC7409
      */
     function bulkEmote(
         address[] memory collections,
@@ -186,7 +186,7 @@ contract RMRKEmotesRepository is IRMRKEmotesRepository {
     }
 
     /**
-     * @inheritdoc IRMRKEmotesRepository
+     * @inheritdoc IERC7409
      */
     function prepareMessageToPresignEmote(
         address collection,
@@ -209,7 +209,7 @@ contract RMRKEmotesRepository is IRMRKEmotesRepository {
     }
 
     /**
-     * @inheritdoc IRMRKEmotesRepository
+     * @inheritdoc IERC7409
      */
     function bulkPrepareMessagesToPresignEmote(
         address[] memory collections,
@@ -248,7 +248,7 @@ contract RMRKEmotesRepository is IRMRKEmotesRepository {
     }
 
     /**
-     * @inheritdoc IRMRKEmotesRepository
+     * @inheritdoc IERC7409
      */
     function presignedEmote(
         address emoter,
@@ -301,7 +301,7 @@ contract RMRKEmotesRepository is IRMRKEmotesRepository {
     }
 
     /**
-     * @inheritdoc IRMRKEmotesRepository
+     * @inheritdoc IERC7409
      */
     function bulkPresignedEmote(
         address[] memory emoters,
@@ -393,7 +393,7 @@ contract RMRKEmotesRepository is IRMRKEmotesRepository {
         bytes4 interfaceId
     ) public view virtual returns (bool) {
         return
-            interfaceId == type(IRMRKEmotesRepository).interfaceId ||
+            interfaceId == type(IERC7409).interfaceId ||
             interfaceId == type(IERC165).interfaceId;
     }
 }
