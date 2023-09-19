@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.1.0] - 2023-09-19
+
+This release covers minor improvements and updates the numbers for Nestable and Emotable EIPs. 
+
+The original Nestable EIP (6059) had a missing parameter on a method which was added during the EIP process. Luckily the interfaceId was correct, so all collections deployed using this package actually always used 7401 instead of 6059. For the Emotes EIP, we found before releasing in production that 6381 was not compatible with all current emojis, so we proposed 7409 to fix this and ensure forward compatibility. emotes.app always used 7409. To be extra clear, you do not need to worry about upgrading or fixing previously deployed collections using these EIPs, all Nestable collections deployed using any of RMRK products or libraries has always used 7401, the detection through interfaceId ensures that.
+
+### Changed
+- Equip and Unequip are now gated for owner or approved for assets, permission over transferring is no longer needed to delegate equipping.
+- Renames 6059 to 7401.
+- Renames emotes repository to 7409.
+- Adds base network on testing and production.
+- Improves hardhat config and .env.example for network configuration.
+
+### Fixed
+- No longer restricts child catalog to match parent's catalog to consider the child equippable on RMRKEquipRenderUtils.
+- Fixes soulbound detection on RenderUtils.getExtendedNFT.
+
 ## [2.0.0] - 2023-08-01
 
 This Release has significant breaking changes in all ready-to-use implementations. The inheritance flow was highly simplified, by merging all extra utilities, which a marketplace would typically expect, into a single abstract contract: `RMRKImplementationBase`. This contract replaces `RMRKCollectionMetadata`, `RMRKMintingUtils` contracts and `name` and `symbol` of all core implementations.
