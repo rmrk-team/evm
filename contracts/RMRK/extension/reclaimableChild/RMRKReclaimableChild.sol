@@ -61,7 +61,7 @@ abstract contract RMRKReclaimableChild is IRMRKReclaimableChild, RMRKNestable {
         if (_childIsInPending[childAddress][childId] != 0)
             revert RMRKInvalidChildReclaim();
 
-        (address owner, uint256 ownerTokenId, bool isNft) = IERC6059(
+        (address owner, uint256 ownerTokenId, bool isNft) = IERC7401(
             childAddress
         ).directOwnerOf(childId);
         if (owner != address(this) || ownerTokenId != tokenId || !isNft)

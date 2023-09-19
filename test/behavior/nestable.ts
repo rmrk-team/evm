@@ -3,7 +3,7 @@ import { ethers } from 'hardhat';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { BigNumber, Contract } from 'ethers';
 import { bn, ADDRESS_ZERO } from '../utils';
-import { IERC165, IERC721, IERC6059, IOtherInterface } from '../interfaces';
+import { IERC165, IERC721, IERC7401, IOtherInterface } from '../interfaces';
 
 async function shouldBehaveLikeNestable(
   mint: (token: Contract, to: string) => Promise<BigNumber>,
@@ -217,7 +217,7 @@ async function shouldBehaveLikeNestable(
     });
 
     it('can support INestable', async function () {
-      expect(await parent.supportsInterface(IERC6059)).to.equal(true);
+      expect(await parent.supportsInterface(IERC7401)).to.equal(true);
     });
 
     it('cannot support other interfaceId', async function () {
@@ -1047,7 +1047,7 @@ async function shouldBehaveLikeNestable(
       ).to.be.revertedWithCustomError(child, 'RMRKIsNotContract');
     });
 
-    it('cannot nest tranfer to contract if it does implement IERC6059', async function () {
+    it('cannot nest tranfer to contract if it does implement IERC7401', async function () {
       const ERC721 = await ethers.getContractFactory('ERC721Mock');
       const nonNestable = await ERC721.deploy('Non receiver', 'NR');
       await nonNestable.deployed();
@@ -1056,7 +1056,7 @@ async function shouldBehaveLikeNestable(
       ).to.be.revertedWithCustomError(child, 'RMRKNestableTransferToNonRMRKNestableImplementer');
     });
 
-    it('can nest tranfer to IERC6059 contract', async function () {
+    it('can nest tranfer to IERC7401 contract', async function () {
       await nestTransfer(child, firstOwner, parent.address, childId, parentId);
       expect(await child.ownerOf(childId)).to.eql(firstOwner.address);
       expect(await child.directOwnerOf(childId)).to.eql([parent.address, parentId, true]);

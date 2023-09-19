@@ -99,7 +99,7 @@ contract RMRKRenderUtils {
             type(IERC5773).interfaceId
         );
         data.hasNestingInterface = targetEquippable.supportsInterface(
-            type(IERC6059).interfaceId
+            type(IERC7401).interfaceId
         );
         data.hasEquippableInterface = targetEquippable.supportsInterface(
             type(IERC6220).interfaceId

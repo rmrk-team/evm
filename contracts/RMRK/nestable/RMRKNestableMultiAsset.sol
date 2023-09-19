@@ -5,7 +5,7 @@
 pragma solidity ^0.8.21;
 
 import "../multiasset/AbstractMultiAsset.sol";
-import "./IERC6059.sol";
+import "./IERC7401.sol";
 import "./RMRKNestable.sol";
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 

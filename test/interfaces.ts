@@ -8,7 +8,7 @@ const IRMRKEmotesRepository = '0x1b3327ab'; //ERC6381
 const IERC2981 = '0x2a55205a'; // ERC6220
 const IERC6220 = '0x28bc9ae4'; // ERC6220
 const IERC5773 = '0x06b4329a'; // ERC5773
-const IERC6059 = '0x42b0e56f'; // ERC6059
+const IERC7401 = '0x42b0e56f'; // ERC7401
 const IRMRKNestableAutoIndex = '0x1884d52d';
 const IRMRKMultiAssetAutoIndex = '0x1cf132fe';
 const IRMRKReclaimableChild = '0x2fb59acf';
@@ -29,7 +29,7 @@ export {
   IERC2981,
   IERC6220,
   IERC5773,
-  IERC6059,
+  IERC7401,
   IRMRKNestableAutoIndex,
   IRMRKMultiAssetAutoIndex,
   IRMRKReclaimableChild,

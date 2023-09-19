@@ -1017,7 +1017,7 @@ describe('Extended NFT render utils', function () {
       ).to.be.true;
     });
 
-    it('returns false if the child does not implement IERC6059', async function () {
+    it('returns false if the child does not implement IERC7401', async function () {
       expect(
         await renderUtils.validateChildOf(
           nestableMultiAsset.address,
@@ -1061,7 +1061,7 @@ describe('Extended NFT render utils', function () {
       ).to.be.revertedWithCustomError(renderUtils, 'RMRKMismachedArrayLength');
     });
 
-    it('returns false if one of the child tokens does not implement IERC6059', async function () {
+    it('returns false if one of the child tokens does not implement IERC7401', async function () {
       expect(
         await renderUtils.validateChildrenOf(
           nestableMultiAsset.address,

@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/interfaces/IERC2981.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "../equippable/IERC6220.sol";
-import "../nestable/IERC6059.sol";
+import "../nestable/IERC7401.sol";
 import "../extension/soulbound/IERC6454.sol";
 import "./IRMRKCollectionData.sol";
 
@@ -93,7 +93,7 @@ contract RMRKCollectionUtils {
      * @param collection Address of the collection to get the interface support from
      * @return supports721 Boolean value signifying whether the collection supports ERC721 interface
      * @return supportsMultiAsset Boolean value signifying whether the collection supports MultiAsset interface (ERC5773)
-     * @return supportsNesting Boolean value signifying whether the collection supports Nestable interface (ERC6059)
+     * @return supportsNesting Boolean value signifying whether the collection supports Nestable interface (ERC7401)
      * @return supportsEquippable Boolean value signifying whether the collection supports Equippable interface (ERC6220)
      * @return supportsSoulbound Boolean value signifying whether the collection supports Soulbound interface (ERC6454)
      * @return supportsRoyalties Boolean value signifying whether the collection supports Royaltiesy interface (ERC2981)
@@ -117,7 +117,7 @@ contract RMRKCollectionUtils {
         supportsMultiAsset = target.supportsInterface(
             type(IERC5773).interfaceId
         );
-        supportsNesting = target.supportsInterface(type(IERC6059).interfaceId);
+        supportsNesting = target.supportsInterface(type(IERC7401).interfaceId);
         supportsEquippable = target.supportsInterface(
             type(IERC6220).interfaceId
         );

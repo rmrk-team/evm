@@ -342,7 +342,7 @@ contract RMRKEquippable is
         // Check from parent's asset perspective:
         _checkAssetAcceptsSlot(data.assetId, slotPartId);
 
-        IERC6059.Child memory child = childOf(data.tokenId, data.childIndex);
+        IERC7401.Child memory child = childOf(data.tokenId, data.childIndex);
 
         // Check from child perspective intention to be used in part
         // We add reentrancy guard because of this call, it happens before updating state
