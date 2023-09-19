@@ -17,7 +17,7 @@ contract RMRKEmotesRepository is IRMRKEmotesRepository {
     bytes32 public immutable DOMAIN_SEPARATOR =
         keccak256(
             abi.encode(
-                "ERC-6381: Public Non-Fungible Token Emote Repository",
+                "ERC-7409: Public Non-Fungible Token Emote Repository",
                 "1",
                 block.chainid,
                 address(this)
