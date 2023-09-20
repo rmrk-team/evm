@@ -7,19 +7,23 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [2.1.0] - 2023-09-19
 
-This release covers minor improvements and updates the numbers for Nestable and Emotable EIPs. 
+This release covers minor improvements and updates the numbers for Nestable and Emotable ERCs. 
 
-The original Nestable EIP (6059) had a missing parameter on a method which was added during the EIP process. Luckily the interfaceId was correct, so all collections deployed using this package actually always used 7401 instead of 6059. For the Emotes EIP, we found before releasing in production that 6381 was not compatible with all current emojis, so we proposed 7409 to fix this and ensure forward compatibility. emotes.app always used 7409. To be extra clear, you do not need to worry about upgrading or fixing previously deployed collections using these EIPs, all Nestable collections deployed using any of RMRK products or libraries has always used 7401, the detection through interfaceId ensures that.
+The original Nestable standard (ERC-6059) was missing parameter in the specification due to a method modified during the EIP process. The `interfaceId` of the specified interface was correct, so all the collections deployed using this package in the past were using the newly finalized ERC-7401 instead of ERC-6059.
+
+The need to update the Emotes standard (ERC-6381) was noticed before it was released into production. The implementation was incompatible with the full set of Unicode emojis due to them having additional flags, and their codes extended well over the `bytes4` storage available. The updated standard (ERC-7409) uses `string` type values to store the emoji codes and is now compatible with all existing emojis as well as any of those that will be added in the future. Our emotes.app has used ERC-7409 since its release, so you don't need to worry that some reactions might be lost; they are all there.
+
+To reiterate: you do not need to worry about upgrading or fixing previously deployed collections using these ERCs, since they are already built based on the latest specification ever since they have been released into the public domain.
 
 ### Changed
-- Equip and Unequip are now gated for owner or approved for assets, permission over transferring is no longer needed to delegate equipping.
-- Renames 6059 to 7401.
-- Renames emotes repository to 7409.
-- Adds base network on testing and production.
+- `equip` and `unequip` methods are now gated to the owner or approved for assets, transfer permission no longer needs to be granted alongside equip/unequip permission.
+- Renames ERC-6059 to ERC-7401.
+- Renames emotes repository to ERC-7409.
+- Adds Base test and mainnet networks
 - Improves hardhat config and .env.example for network configuration.
 
 ### Fixed
-- No longer restricts child catalog to match parent's catalog to consider the child equippable on RMRKEquipRenderUtils.
+- No longer restricts child catalog from being different than parent's catalog to consider the child equippable in RMRKEquipRenderUtils.
 - Fixes soulbound detection on RenderUtils.getExtendedNFT.
 
 ## [2.0.0] - 2023-08-01
