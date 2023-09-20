@@ -8,7 +8,7 @@ import {
   IERC165,
   IERC6220,
   IERC5773,
-  IERC6059,
+  IERC7401,
   IRMRKTypedMultiAsset,
   IOtherInterface,
 } from '../interfaces';
@@ -107,7 +107,7 @@ describe('RMRKNestableTypedMultiAssetMock', async function () {
   });
 
   it('can support INestable', async function () {
-    expect(await this.assets.supportsInterface(IERC6059)).to.equal(true);
+    expect(await this.assets.supportsInterface(IERC7401)).to.equal(true);
   });
 
   shouldBehaveLikeTypedMultiAssetInterface();

@@ -162,7 +162,7 @@ Used to burn a given token.
 ### childOf
 
 ```solidity
-function childOf(uint256 parentId, uint256 index) external view returns (struct IERC6059.Child)
+function childOf(uint256 parentId, uint256 index) external view returns (struct IERC7401.Child)
 ```
 
 Used to retrieve a specific active child token for a given parent token.
@@ -180,12 +180,12 @@ Used to retrieve a specific active child token for a given parent token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IERC6059.Child | A Child struct containing data about the specified child |
+| _0 | IERC7401.Child | A Child struct containing data about the specified child |
 
 ### childrenOf
 
 ```solidity
-function childrenOf(uint256 parentId) external view returns (struct IERC6059.Child[])
+function childrenOf(uint256 parentId) external view returns (struct IERC7401.Child[])
 ```
 
 Used to retrieve the active child tokens of a given parent token.
@@ -202,7 +202,7 @@ Used to retrieve the active child tokens of a given parent token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IERC6059.Child[] | An array of Child structs containing the parent token&#39;s active child tokens |
+| _0 | IERC7401.Child[] | An array of Child structs containing the parent token&#39;s active child tokens |
 
 ### collectionMetadata
 
@@ -508,7 +508,7 @@ Used to retrieve the *root* owner of a given token.
 ### pendingChildOf
 
 ```solidity
-function pendingChildOf(uint256 parentId, uint256 index) external view returns (struct IERC6059.Child)
+function pendingChildOf(uint256 parentId, uint256 index) external view returns (struct IERC7401.Child)
 ```
 
 Used to retrieve a specific pending child token from a given parent token.
@@ -526,12 +526,12 @@ Used to retrieve a specific pending child token from a given parent token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IERC6059.Child | A Child struct containting data about the specified child |
+| _0 | IERC7401.Child | A Child struct containting data about the specified child |
 
 ### pendingChildrenOf
 
 ```solidity
-function pendingChildrenOf(uint256 parentId) external view returns (struct IERC6059.Child[])
+function pendingChildrenOf(uint256 parentId) external view returns (struct IERC7401.Child[])
 ```
 
 Used to retrieve the pending child tokens of a given parent token.
@@ -548,7 +548,7 @@ Used to retrieve the pending child tokens of a given parent token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IERC6059.Child[] | An array of Child structs containing the parent token&#39;s pending child tokens |
+| _0 | IERC7401.Child[] | An array of Child structs containing the parent token&#39;s pending child tokens |
 
 ### rejectAllChildren
 

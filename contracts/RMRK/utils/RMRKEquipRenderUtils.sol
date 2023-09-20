@@ -7,7 +7,7 @@ import "./RMRKMultiAssetRenderUtils.sol";
 import "./RMRKNestableRenderUtils.sol";
 import "../catalog/IRMRKCatalog.sol";
 import "../equippable/IERC6220.sol";
-import "../nestable/IERC6059.sol";
+import "../nestable/IERC7401.sol";
 import "../library/RMRKLib.sol";
 import "../library/RMRKErrors.sol";
 
@@ -813,7 +813,6 @@ contract RMRKEquipRenderUtils is
                 .getAssetAndEquippableData(childId, childAssets[i]);
             for (uint256 j; j < parentSlotPartIds.length; ) {
                 if (
-                    catalogAddress == parentAssetCatalog &&
                     childContract.canTokenBeEquippedWithAssetIntoSlot(
                         parentAddress,
                         childId,
@@ -1046,7 +1045,7 @@ contract RMRKEquipRenderUtils is
         address parentAddress,
         uint256 parentId
     ) public view returns (ChildWithTopAssetMetadata[] memory) {
-        IERC6059.Child[] memory children = IERC6059(parentAddress).childrenOf(
+        IERC7401.Child[] memory children = IERC7401(parentAddress).childrenOf(
             parentId
         );
         (parentId);

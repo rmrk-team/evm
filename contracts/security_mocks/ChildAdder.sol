@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.21;
 
-import "../RMRK/nestable/IERC6059.sol";
+import "../RMRK/nestable/IERC7401.sol";
 
 /**
  * @title ChildAdder
@@ -25,7 +25,7 @@ contract ChildAdder {
         uint256 numChildren
     ) external {
         for (uint256 i; i < numChildren; i++) {
-            IERC6059(destContract).addChild(parentId, childId, "");
+            IERC7401(destContract).addChild(parentId, childId, "");
         }
     }
 }

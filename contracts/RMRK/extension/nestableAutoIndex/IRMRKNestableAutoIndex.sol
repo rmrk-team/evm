@@ -2,14 +2,14 @@
 
 pragma solidity ^0.8.21;
 
-import "../../nestable/IERC6059.sol";
+import "../../nestable/IERC7401.sol";
 
 /**
  * @title RMRKNestableAutoIndex
  * @author RMRK team
  * @notice Interface smart contract of the RMRK Nestable AutoIndex module.
  */
-interface IRMRKNestableAutoIndex is IERC6059 {
+interface IRMRKNestableAutoIndex is IERC7401 {
     /**
      * @notice Used to accept a pending child token for a given parent token.
      * @dev This moves the child token from parent token's pending child tokens array into the active child tokens

@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.21;
 
-import "../nestable/IERC6059.sol";
+import "../nestable/IERC7401.sol";
 import "../library/RMRKErrors.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
 
@@ -26,7 +26,7 @@ contract RMRKNestableRenderUtils {
         address childAddress,
         uint256 childId
     ) public view returns (uint256) {
-        IERC6059.Child[] memory children = IERC6059(parentAddress).childrenOf(
+        IERC7401.Child[] memory children = IERC7401(parentAddress).childrenOf(
             parentId
         );
         (parentId);
@@ -57,7 +57,7 @@ contract RMRKNestableRenderUtils {
         address childAddress,
         uint256 childId
     ) public view returns (uint256) {
-        IERC6059.Child[] memory children = IERC6059(parentAddress)
+        IERC7401.Child[] memory children = IERC7401(parentAddress)
             .pendingChildrenOf(parentId);
         (parentId);
         uint256 len = children.length;
@@ -86,7 +86,7 @@ contract RMRKNestableRenderUtils {
         uint256 childId
     ) public view returns (address parentAddress, uint256 parentId) {
         bool isNFT;
-        (parentAddress, parentId, isNFT) = IERC6059(childAddress).directOwnerOf(
+        (parentAddress, parentId, isNFT) = IERC7401(childAddress).directOwnerOf(
             childId
         );
         if (!isNFT) revert RMRKParentIsNotNFT();
@@ -117,16 +117,16 @@ contract RMRKNestableRenderUtils {
             bool inParentsPendingChildren
         )
     {
-        (directOwner, ownerId, isNFT) = IERC6059(collection).directOwnerOf(
+        (directOwner, ownerId, isNFT) = IERC7401(collection).directOwnerOf(
             tokenId
         );
         if (!isNFT) {
             inParentsActiveChildren = false;
             inParentsPendingChildren = false;
         } else {
-            IERC6059.Child[] memory activeChildren = IERC6059(directOwner)
+            IERC7401.Child[] memory activeChildren = IERC7401(directOwner)
                 .childrenOf(ownerId);
-            IERC6059.Child[] memory pendingChildren = IERC6059(directOwner)
+            IERC7401.Child[] memory pendingChildren = IERC7401(directOwner)
                 .pendingChildrenOf(ownerId);
 
             uint256 len = activeChildren.length;
@@ -222,12 +222,12 @@ contract RMRKNestableRenderUtils {
         uint256 childId
     ) public view returns (bool) {
         if (
-            !IERC165(childAddress).supportsInterface(type(IERC6059).interfaceId)
+            !IERC165(childAddress).supportsInterface(type(IERC7401).interfaceId)
         ) {
             return false;
         }
 
-        (address directOwner, uint256 ownerId, ) = IERC6059(childAddress)
+        (address directOwner, uint256 ownerId, ) = IERC7401(childAddress)
             .directOwnerOf(childId);
 
         return (directOwner == parentAddress && ownerId == parentId);
@@ -296,7 +296,7 @@ contract RMRKNestableRenderUtils {
         view
         returns (uint256 totalDescendants, bool hasMoreThanOneLevelOfNesting_)
     {
-        IERC6059.Child[] memory children = IERC6059(collection).childrenOf(
+        IERC7401.Child[] memory children = IERC7401(collection).childrenOf(
             tokenId
         );
         uint256 directChildrenCount = children.length;
@@ -325,14 +325,14 @@ contract RMRKNestableRenderUtils {
         address collection,
         uint256 tokenId
     ) public view returns (bool) {
-        IERC6059.Child[] memory children = IERC6059(collection).childrenOf(
+        IERC7401.Child[] memory children = IERC7401(collection).childrenOf(
             tokenId
         );
         uint256 directChildrenCount = children.length;
 
         for (uint256 i; i < directChildrenCount; ) {
             if (
-                IERC6059(children[i].contractAddress)
+                IERC7401(children[i].contractAddress)
                     .childrenOf(children[i].tokenId)
                     .length > 0
             ) {

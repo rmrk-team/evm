@@ -4,7 +4,7 @@ pragma solidity ^0.8.21;
 
 import "../RMRK/nestable/RMRKNestable.sol";
 
-//Minimal public implementation of IERC6059 for testing.
+//Minimal public implementation of IERC7401 for testing.
 contract RMRKNestableMock is RMRKNestable {
     // This is used to test the usage of hooks
     mapping(address => mapping(uint256 => uint256)) private _balancesPerNft;

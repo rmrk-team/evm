@@ -35,6 +35,7 @@ let addrs: SignerWithAddress[];
 
 async function setupContextForSlots(
   catalog: Contract,
+  catalogForWeapon: Contract,
   soldier: Contract,
   soldierEquip: Contract,
   weapon: Contract,
@@ -102,9 +103,10 @@ async function setupContextForSlots(
     await catalog.addPartList([
       { partId: partIdForBody, part: partForBody },
       { partId: partIdForWeapon, part: partForWeapon },
-      { partId: partIdForWeaponGem, part: partForWeaponGem },
       { partId: partIdForBackground, part: partForBackground },
     ]);
+
+    await catalogForWeapon.addPartList([{ partId: partIdForWeaponGem, part: partForWeaponGem }]);
   }
 
   async function mintSoldiers(): Promise<void> {
@@ -178,7 +180,7 @@ async function setupContextForSlots(
       await weaponEquip.addEquippableAssetEntry(
         weaponAssetsEquip[i],
         equippableGroupId,
-        catalog.address,
+        catalogForWeapon.address,
         `ipfs:weapon/equip/${weaponAssetsEquip[i]}`,
         [partIdForWeaponGem],
       );

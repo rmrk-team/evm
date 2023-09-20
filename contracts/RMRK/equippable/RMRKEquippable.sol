@@ -311,7 +311,7 @@ contract RMRKEquippable is
      */
     function equip(
         IntakeEquip memory data
-    ) public virtual onlyApprovedOrOwner(data.tokenId) nonReentrant {
+    ) public virtual onlyApprovedForAssetsOrOwner(data.tokenId) nonReentrant {
         _equip(data);
     }
 
@@ -342,7 +342,7 @@ contract RMRKEquippable is
         // Check from parent's asset perspective:
         _checkAssetAcceptsSlot(data.assetId, slotPartId);
 
-        IERC6059.Child memory child = childOf(data.tokenId, data.childIndex);
+        IERC7401.Child memory child = childOf(data.tokenId, data.childIndex);
 
         // Check from child perspective intention to be used in part
         // We add reentrancy guard because of this call, it happens before updating state
@@ -409,7 +409,7 @@ contract RMRKEquippable is
         uint256 tokenId,
         uint64 assetId,
         uint64 slotPartId
-    ) public virtual onlyApprovedOrOwner(tokenId) {
+    ) public virtual onlyApprovedForAssetsOrOwner(tokenId) {
         _unequip(tokenId, assetId, slotPartId);
     }
 

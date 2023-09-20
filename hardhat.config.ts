@@ -31,35 +31,27 @@ const config: HardhatUserConfig = {
       evmVersion: 'london',
       optimizer: {
         enabled: true,
-        runs: 100,
-      },
-      outputSelection: {
-        '*': {
-          '*': ['storageLayout'],
-        },
+        runs: 200,
       },
     },
   },
   networks: {
-    hardhat: {
-      allowUnlimitedContractSize: true,
-    },
     moonbaseAlpha: {
-      url: 'https://rpc.testnet.moonbeam.network/',
+      url: process.env.MOONBASE_URL || 'https://rpc.testnet.moonbeam.network',
       chainId: 1287,
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
       gasPrice: 1100000000,
     },
     sepolia: {
-      url: process.env.SEPOLIA_URL || '',
+      url: process.env.SEPOLIA_URL || 'https://rpc.sepolia.dev',
       chainId: 11155111,
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
     polygonMumbai: {
-      url: process.env.MUMBAI_URL || '',
+      url: process.env.MUMBAI_URL || 'https://rpc-mumbai.maticvigil.com',
       chainId: 80001,
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
-      gasPrice: 135000000000,
+      gasPrice: 2500000000,
     },
     baseGoerli: {
       chainId: 84531,
@@ -68,30 +60,30 @@ const config: HardhatUserConfig = {
       gasPrice: 2000000000,
     },
     moonriver: {
-      url: 'https://rpc.api.moonriver.moonbeam.network',
-      chainId: 1285, // (hex: 0x505),
+      url: process.env.MOONRIVER_URL || 'https://rpc.api.moonriver.moonbeam.network',
+      chainId: 1285,
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
     moonbeam: {
-      url: 'https://rpc.api.moonbeam.network',
-      chainId: 1284, // (hex: 0x504),
+      url: process.env.MOONBEAM_URL || 'https://rpc.api.moonbeam.network',
+      chainId: 1284,
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
     mainnet: {
-      url: process.env.ETHEREUM_URL || '',
+      url: process.env.ETHEREUM_URL || 'https://eth.drpc.org',
       chainId: 1,
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
-      gasPrice: 13000000000,
+      gasPrice: 12000000000,
     },
     polygon: {
-      url: process.env.POLYGON_URL || '',
+      url: process.env.POLYGON_URL || 'https://polygon.drpc.org',
       chainId: 137,
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
       gasPrice: 120000000000,
     },
     base: {
       chainId: 8453,
-      url: process.env.BASE_URL || '',
+      url: process.env.BASE_URL || 'https://developer-access-mainnet.base.org',
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
   },
@@ -103,15 +95,15 @@ const config: HardhatUserConfig = {
   },
   etherscan: {
     apiKey: {
-      moonbaseAlpha: process.env.MOONBEAM_MOONSCAN_APIKEY || '', // Moonbeam Moonscan API Key
+      moonbaseAlpha: process.env.MOONSCAN_APIKEY || '', // Moonbeam Moonscan API Key
       sepolia: process.env.ETHERSCAN_API_KEY || '', // Sepolia Etherscan API Key
-      polygonMumbai: process.env.POLYGON_ETHERSCAN_API_KEY || '', // Polygon Mumbai Etherscan API Key
-      baseGoerli: process.env.BASE_API_KEY || '', // Base Goerli Etherscan API Key
-      moonriver: process.env.MOONRIVER_MOONSCAN_APIKEY || '', // Moonriver Moonscan API Key
-      moonbeam: process.env.MOONBEAM_MOONSCAN_APIKEY || '', // Moonbeam Moonscan API Key
+      polygonMumbai: process.env.POLYGONSCAN_API_KEY || '', // Polygon Mumbai Etherscan API Key
+      baseGoerli: process.env.BASESCAN_API_KEY || '', // Base Goerli Etherscan API Key
+      moonriver: process.env.MOONSCAN_APIKEY || '', // Moonriver Moonscan API Key
+      moonbeam: process.env.MOONSCAN_APIKEY || '', // Moonbeam Moonscan API Key
       mainnet: process.env.ETHERSCAN_API_KEY || '', // Ethereum Etherscan API Key
-      polygon: process.env.POLYGON_ETHERSCAN_API_KEY || '', // Polygon Etherscan API Key
-      base: process.env.BASE_API_KEY || '', // Base Etherscan API Key
+      polygon: process.env.POLYGONSCAN_API_KEY || '', // Polygon Etherscan API Key
+      base: process.env.BASESCAN_API_KEY || '', // Base Etherscan API Key
     },
     customChains: [
       {

@@ -13,7 +13,7 @@ import "../core/RMRKCore.sol";
 import "../equippable/IERC6220.sol";
 import "../library/RMRKErrors.sol";
 import "../library/RMRKLib.sol";
-import "../nestable/IERC6059.sol";
+import "../nestable/IERC7401.sol";
 import "../security/ReentrancyGuard.sol";
 
 /**
@@ -28,7 +28,7 @@ contract RMRKMinifiedEquippable is
     Context,
     IERC165,
     IERC721,
-    IERC6059,
+    IERC7401,
     IERC6220,
     RMRKCore
 {
@@ -206,7 +206,7 @@ contract RMRKMinifiedEquippable is
     }
 
     /**
-     * @inheritdoc IERC6059
+     * @inheritdoc IERC7401
      */
     function nestTransferFrom(
         address from,
@@ -224,7 +224,7 @@ contract RMRKMinifiedEquippable is
         // Destination contract checks:
         // It seems redundant, but otherwise it would revert with no error
         if (!to.isContract()) revert RMRKIsNotContract();
-        if (!IERC165(to).supportsInterface(type(IERC6059).interfaceId))
+        if (!IERC165(to).supportsInterface(type(IERC7401).interfaceId))
             revert RMRKNestableTransferToNonRMRKNestableImplementer();
         _checkForInheritanceLoop(tokenId, to, destinationId);
 
@@ -302,7 +302,7 @@ contract RMRKMinifiedEquippable is
         uint256 tokenId,
         bytes memory data
     ) private {
-        IERC6059 destContract = IERC6059(to);
+        IERC7401 destContract = IERC7401(to);
         destContract.addChild(destinationId, tokenId, data);
 
         emit Transfer(from, to, tokenId);
@@ -338,7 +338,7 @@ contract RMRKMinifiedEquippable is
                 address nextOwner,
                 uint256 nextOwnerTokenId,
                 bool isNft
-            ) = IERC6059(targetContract).directOwnerOf(targetId);
+            ) = IERC7401(targetContract).directOwnerOf(targetId);
             // If there's a final address, we're good. There's no loop.
             if (!isNft) {
                 return;
@@ -399,7 +399,7 @@ contract RMRKMinifiedEquippable is
     ) internal virtual {
         // It seems redundant, but otherwise it would revert with no error
         if (!to.isContract()) revert RMRKIsNotContract();
-        if (!IERC165(to).supportsInterface(type(IERC6059).interfaceId))
+        if (!IERC165(to).supportsInterface(type(IERC7401).interfaceId))
             revert RMRKMintToNonRMRKNestableImplementer();
 
         _innerMint(to, tokenId, destinationId, data);
@@ -450,22 +450,22 @@ contract RMRKMinifiedEquippable is
     ////////////////////////////////////////
 
     /**
-     * @inheritdoc IERC6059
+     * @inheritdoc IERC7401
      */
     function ownerOf(
         uint256 tokenId
-    ) public view virtual override(IERC6059, IERC721) returns (address) {
+    ) public view virtual override(IERC7401, IERC721) returns (address) {
         (address owner, uint256 ownerTokenId, bool isNft) = directOwnerOf(
             tokenId
         );
         if (isNft) {
-            owner = IERC6059(owner).ownerOf(ownerTokenId);
+            owner = IERC7401(owner).ownerOf(ownerTokenId);
         }
         return owner;
     }
 
     /**
-     * @inheritdoc IERC6059
+     * @inheritdoc IERC7401
      */
     function directOwnerOf(
         uint256 tokenId
@@ -490,7 +490,7 @@ contract RMRKMinifiedEquippable is
     }
 
     /**
-     * @inheritdoc IERC6059
+     * @inheritdoc IERC7401
      */
     function burn(
         uint256 tokenId,
@@ -539,7 +539,7 @@ contract RMRKMinifiedEquippable is
             // We substract one to the next level to count for the token being burned, then add it again on returns
             // This is to allow the behavior of 0 recursive burns meaning only the current token is deleted.
             totalChildBurns +=
-                IERC6059(children[i].contractAddress).burn(
+                IERC7401(children[i].contractAddress).burn(
                     children[i].tokenId,
                     pendingRecursiveBurns - 1
                 ) +
@@ -745,7 +745,7 @@ contract RMRKMinifiedEquippable is
     ////////////////////////////////////////
 
     /**
-     * @inheritdoc IERC6059
+     * @inheritdoc IERC7401
      */
     function addChild(
         uint256 parentId,
@@ -779,7 +779,7 @@ contract RMRKMinifiedEquippable is
     }
 
     /**
-     * @inheritdoc IERC6059
+     * @inheritdoc IERC7401
      */
     function acceptChild(
         uint256 parentId,
@@ -832,7 +832,7 @@ contract RMRKMinifiedEquippable is
     }
 
     /**
-     * @inheritdoc IERC6059
+     * @inheritdoc IERC7401
      */
     function rejectAllChildren(
         uint256 tokenId,
@@ -848,7 +848,7 @@ contract RMRKMinifiedEquippable is
     }
 
     /**
-     * @inheritdoc IERC6059
+     * @inheritdoc IERC7401
      */
     function transferChild(
         uint256 tokenId,
@@ -896,7 +896,7 @@ contract RMRKMinifiedEquippable is
                 );
             } else {
                 // Destination is an NFT
-                IERC6059(child.contractAddress).nestTransferFrom(
+                IERC7401(child.contractAddress).nestTransferFrom(
                     address(this),
                     to,
                     child.tokenId,
@@ -951,7 +951,7 @@ contract RMRKMinifiedEquippable is
     ////////////////////////////////////////
 
     /**
-     * @inheritdoc IERC6059
+     * @inheritdoc IERC7401
      */
 
     function childrenOf(
@@ -962,7 +962,7 @@ contract RMRKMinifiedEquippable is
     }
 
     /**
-     * @inheritdoc IERC6059
+     * @inheritdoc IERC7401
      */
 
     function pendingChildrenOf(
@@ -973,7 +973,7 @@ contract RMRKMinifiedEquippable is
     }
 
     /**
-     * @inheritdoc IERC6059
+     * @inheritdoc IERC7401
      */
     function childOf(
         uint256 parentId,
@@ -986,7 +986,7 @@ contract RMRKMinifiedEquippable is
     }
 
     /**
-     * @inheritdoc IERC6059
+     * @inheritdoc IERC7401
      */
     function pendingChildOf(
         uint256 parentId,
@@ -1630,7 +1630,7 @@ contract RMRKMinifiedEquippable is
         return
             interfaceId == type(IERC165).interfaceId ||
             interfaceId == type(IERC721).interfaceId ||
-            interfaceId == type(IERC6059).interfaceId ||
+            interfaceId == type(IERC7401).interfaceId ||
             interfaceId == type(IERC5773).interfaceId ||
             interfaceId == type(IERC6220).interfaceId;
     }
@@ -1875,7 +1875,7 @@ contract RMRKMinifiedEquippable is
      */
     function equip(
         IntakeEquip memory data
-    ) public virtual onlyApprovedOrOwner(data.tokenId) nonReentrant {
+    ) public virtual onlyApprovedForAssetsOrOwner(data.tokenId) nonReentrant {
         address catalogAddress = _catalogAddresses[data.assetId];
         uint64 slotPartId = data.slotPartId;
         if (
@@ -1886,7 +1886,7 @@ contract RMRKMinifiedEquippable is
         // Check from parent's asset perspective:
         _checkAssetAcceptsSlot(data.assetId, slotPartId);
 
-        IERC6059.Child memory child = childOf(data.tokenId, data.childIndex);
+        IERC7401.Child memory child = childOf(data.tokenId, data.childIndex);
 
         // Check from child perspective intention to be used in part
         // We add reentrancy guard because of this call, it happens before updating state
@@ -1953,7 +1953,7 @@ contract RMRKMinifiedEquippable is
         uint256 tokenId,
         uint64 assetId,
         uint64 slotPartId
-    ) public virtual onlyApprovedOrOwner(tokenId) {
+    ) public virtual onlyApprovedForAssetsOrOwner(tokenId) {
         address targetCatalogAddress = _catalogAddresses[assetId];
         Equipment memory equipment = _equipments[tokenId][targetCatalogAddress][
             slotPartId
