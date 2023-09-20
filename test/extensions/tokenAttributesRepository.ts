@@ -2,19 +2,19 @@ import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { loadFixture, mine } from '@nomicfoundation/hardhat-network-helpers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { IERC165, IRMRKTokenPropertiesRepository } from '../interfaces';
-import { OwnableMintableERC721Mock, RMRKTokenPropertiesRepository } from '../../typechain-types';
+import { IERC165, IERC7508 } from '../interfaces';
+import { OwnableMintableERC721Mock, RMRKTokenAttributesRepository } from '../../typechain-types';
 import { bn } from '../utils';
 import { smock, FakeContract } from '@defi-wonderland/smock';
 
 // --------------- FIXTURES -----------------------
 
-async function tokenPropertiesFixture() {
-  const factory = await ethers.getContractFactory('RMRKTokenPropertiesRepository');
-  const tokenProperties = await factory.deploy();
-  await tokenProperties.deployed();
+async function tokenAttributesFixture() {
+  const factory = await ethers.getContractFactory('RMRKTokenAttributesRepository');
+  const tokenAttributes = await factory.deploy();
+  await tokenAttributes.deployed();
 
-  return { tokenProperties };
+  return { tokenAttributes };
 }
 
 async function ownedCollectionFixture() {
@@ -25,28 +25,28 @@ async function ownedCollectionFixture() {
 
 // --------------- TESTS -----------------------
 
-describe('RMRKTokenPropertiesRepository', async function () {
-  let tokenProperties: RMRKTokenPropertiesRepository;
+describe('RMRKTokenAttributesRepository', async function () {
+  let tokenAttributes: RMRKTokenAttributesRepository;
   let ownedCollection: FakeContract<OwnableMintableERC721Mock>;
 
   beforeEach(async function () {
-    ({ tokenProperties } = await loadFixture(tokenPropertiesFixture));
+    ({ tokenAttributes } = await loadFixture(tokenAttributesFixture));
     ({ ownedCollection } = await loadFixture(ownedCollectionFixture));
 
-    this.tokenProperties = tokenProperties;
+    this.tokenAttributes = tokenAttributes;
     this.ownedCollection = ownedCollection;
   });
 
-  shouldBehaveLikeTokenPropertiesRepositoryInterface();
+  shouldBehaveLikeTokenAttributesRepositoryInterface();
 
-  describe('RMRKTokenPropertiesRepository', async function () {
+  describe('RMRKTokenAttributesRepository', async function () {
     let issuer: SignerWithAddress;
     let owner: SignerWithAddress;
     const tokenId = 1;
     const tokenId2 = 2;
 
     beforeEach(async function () {
-      ({ tokenProperties } = await loadFixture(tokenPropertiesFixture));
+      ({ tokenAttributes } = await loadFixture(tokenAttributesFixture));
       ({ ownedCollection } = await loadFixture(ownedCollectionFixture));
 
       const signers = await ethers.getSigners();
@@ -55,107 +55,107 @@ describe('RMRKTokenPropertiesRepository', async function () {
 
       ownedCollection.owner.returns(issuer.address);
 
-      await tokenProperties.registerAccessControl(ownedCollection.address, issuer.address, false);
+      await tokenAttributes.registerAccessControl(ownedCollection.address, issuer.address, false);
     });
 
-    it('can set and get token properties', async function () {
+    it('can set and get token attributes', async function () {
       expect(
-        await tokenProperties.setStringProperty(
+        await tokenAttributes.setStringAttribute(
           ownedCollection.address,
           tokenId,
           'description',
           'test description',
         ),
       )
-        .to.emit(tokenProperties, 'StringPropertySet')
+        .to.emit(tokenAttributes, 'StringAttributeSet')
         .withArgs(ownedCollection.address, tokenId, 'description', 'test description');
       expect(
-        await tokenProperties.setStringProperty(
+        await tokenAttributes.setStringAttribute(
           ownedCollection.address,
           tokenId,
           'description1',
           'test description',
         ),
       )
-        .to.emit(tokenProperties, 'StringPropertySet')
+        .to.emit(tokenAttributes, 'StringAttributeSet')
         .withArgs(ownedCollection.address, tokenId, 'description1', 'test description');
-      expect(await tokenProperties.setBoolProperty(ownedCollection.address, tokenId, 'rare', true))
-        .to.emit(tokenProperties, 'BoolPropertySet')
+      expect(await tokenAttributes.setBoolAttribute(ownedCollection.address, tokenId, 'rare', true))
+        .to.emit(tokenAttributes, 'BoolAttributeSet')
         .withArgs(ownedCollection.address, tokenId, 'rare', true);
       expect(
-        await tokenProperties.setAddressProperty(
+        await tokenAttributes.setAddressAttribute(
           ownedCollection.address,
           tokenId,
           'owner',
           owner.address,
         ),
       )
-        .to.emit(tokenProperties, 'AddressPropertySet')
+        .to.emit(tokenAttributes, 'AddressAttributeSet')
         .withArgs(ownedCollection.address, tokenId, 'owner', owner.address);
       expect(
-        await tokenProperties.setUintProperty(ownedCollection.address, tokenId, 'atk', bn(100)),
+        await tokenAttributes.setUintAttribute(ownedCollection.address, tokenId, 'atk', bn(100)),
       )
-        .to.emit(tokenProperties, 'UintPropertySet')
+        .to.emit(tokenAttributes, 'UintAttributeSet')
         .withArgs(ownedCollection.address, tokenId, 'atk', bn(100));
       expect(
-        await tokenProperties.setUintProperty(ownedCollection.address, tokenId, 'health', bn(100)),
+        await tokenAttributes.setUintAttribute(ownedCollection.address, tokenId, 'health', bn(100)),
       )
-        .to.emit(tokenProperties, 'UintPropertySet')
+        .to.emit(tokenAttributes, 'UintAttributeSet')
         .withArgs(ownedCollection.address, tokenId, 'health', bn(100));
       expect(
-        await tokenProperties.setUintProperty(ownedCollection.address, tokenId, 'health', bn(95)),
+        await tokenAttributes.setUintAttribute(ownedCollection.address, tokenId, 'health', bn(95)),
       )
-        .to.emit(tokenProperties, 'UintPropertySet')
+        .to.emit(tokenAttributes, 'UintAttributeSet')
         .withArgs(ownedCollection.address, tokenId, 'health', bn(95));
       expect(
-        await tokenProperties.setUintProperty(ownedCollection.address, tokenId, 'health', bn(80)),
+        await tokenAttributes.setUintAttribute(ownedCollection.address, tokenId, 'health', bn(80)),
       )
-        .to.emit(tokenProperties, 'UintPropertySet')
+        .to.emit(tokenAttributes, 'UintAttributeSet')
         .withArgs(ownedCollection.address, tokenId, 'health', bn(80));
       expect(
-        await tokenProperties.setBytesProperty(ownedCollection.address, tokenId, 'data', '0x1234'),
+        await tokenAttributes.setBytesAttribute(ownedCollection.address, tokenId, 'data', '0x1234'),
       )
-        .to.emit(tokenProperties, 'BytesPropertySet')
+        .to.emit(tokenAttributes, 'BytesAttributeSet')
         .withArgs(ownedCollection.address, tokenId, 'data', '0x1234');
 
       expect(
-        await tokenProperties.getStringTokenProperty(
+        await tokenAttributes.getStringTokenAttribute(
           ownedCollection.address,
           tokenId,
           'description',
         ),
       ).to.eql('test description');
       expect(
-        await tokenProperties.getStringTokenProperty(
+        await tokenAttributes.getStringTokenAttribute(
           ownedCollection.address,
           tokenId,
           'description1',
         ),
       ).to.eql('test description');
       expect(
-        await tokenProperties.getBoolTokenProperty(ownedCollection.address, tokenId, 'rare'),
+        await tokenAttributes.getBoolTokenAttribute(ownedCollection.address, tokenId, 'rare'),
       ).to.eql(true);
       expect(
-        await tokenProperties.getAddressTokenProperty(ownedCollection.address, tokenId, 'owner'),
+        await tokenAttributes.getAddressTokenAttribute(ownedCollection.address, tokenId, 'owner'),
       ).to.eql(owner.address);
       expect(
-        await tokenProperties.getUintTokenProperty(ownedCollection.address, tokenId, 'atk'),
+        await tokenAttributes.getUintTokenAttribute(ownedCollection.address, tokenId, 'atk'),
       ).to.eql(bn(100));
       expect(
-        await tokenProperties.getUintTokenProperty(ownedCollection.address, tokenId, 'health'),
+        await tokenAttributes.getUintTokenAttribute(ownedCollection.address, tokenId, 'health'),
       ).to.eql(bn(80));
       expect(
-        await tokenProperties.getBytesTokenProperty(ownedCollection.address, tokenId, 'data'),
+        await tokenAttributes.getBytesTokenAttribute(ownedCollection.address, tokenId, 'data'),
       ).to.eql('0x1234');
 
-      await tokenProperties.setStringProperty(
+      await tokenAttributes.setStringAttribute(
         ownedCollection.address,
         tokenId,
         'description',
         'test description update',
       );
       expect(
-        await tokenProperties.getStringTokenProperty(
+        await tokenAttributes.getStringTokenAttribute(
           ownedCollection.address,
           tokenId,
           'description',
@@ -163,9 +163,9 @@ describe('RMRKTokenPropertiesRepository', async function () {
       ).to.eql('test description update');
     });
 
-    it('can set multiple properties of multiple types at the same time', async function () {
+    it('can set multiple attributes of multiple types at the same time', async function () {
       await expect(
-        tokenProperties.setTokenProperties(
+        tokenAttributes.setTokenAttributes(
           ownedCollection.address,
           tokenId,
           [
@@ -190,30 +190,30 @@ describe('RMRKTokenPropertiesRepository', async function () {
           ],
         ),
       )
-        .to.emit(tokenProperties, 'StringPropertyUpdated')
+        .to.emit(tokenAttributes, 'StringAttributeUpdated')
         .withArgs(ownedCollection.address, tokenId, 'string1', 'value1')
-        .to.emit(tokenProperties, 'StringPropertyUpdated')
+        .to.emit(tokenAttributes, 'StringAttributeUpdated')
         .withArgs(ownedCollection.address, tokenId, 'string2', 'value2')
-        .to.emit(tokenProperties, 'UintPropertyUpdated')
+        .to.emit(tokenAttributes, 'UintAttributeUpdated')
         .withArgs(ownedCollection.address, tokenId, 'uint1', bn(1))
-        .to.emit(tokenProperties, 'UintPropertyUpdated')
+        .to.emit(tokenAttributes, 'UintAttributeUpdated')
         .withArgs(ownedCollection.address, tokenId, 'uint2', bn(2))
-        .to.emit(tokenProperties, 'BoolPropertyUpdated')
+        .to.emit(tokenAttributes, 'BoolAttributeUpdated')
         .withArgs(ownedCollection.address, tokenId, 'bool1', true)
-        .to.emit(tokenProperties, 'BoolPropertyUpdated')
+        .to.emit(tokenAttributes, 'BoolAttributeUpdated')
         .withArgs(ownedCollection.address, tokenId, 'bool2', false)
-        .to.emit(tokenProperties, 'AddressPropertyUpdated')
+        .to.emit(tokenAttributes, 'AddressAttributeUpdated')
         .withArgs(ownedCollection.address, tokenId, 'address1', owner.address)
-        .to.emit(tokenProperties, 'AddressPropertyUpdated')
+        .to.emit(tokenAttributes, 'AddressAttributeUpdated')
         .withArgs(ownedCollection.address, tokenId, 'address2', issuer.address)
-        .to.emit(tokenProperties, 'BytesPropertyUpdated')
+        .to.emit(tokenAttributes, 'BytesAttributeUpdated')
         .withArgs(ownedCollection.address, tokenId, 'bytes1', '0x1234')
-        .to.emit(tokenProperties, 'BytesPropertyUpdated')
+        .to.emit(tokenAttributes, 'BytesAttributeUpdated')
         .withArgs(ownedCollection.address, tokenId, 'bytes2', '0x5678');
     });
 
-    it('can update multiple properties of multiple types at the same time', async function () {
-      await tokenProperties.setTokenProperties(
+    it('can update multiple attributes of multiple types at the same time', async function () {
+      await tokenAttributes.setTokenAttributes(
         ownedCollection.address,
         tokenId,
         [
@@ -239,7 +239,7 @@ describe('RMRKTokenPropertiesRepository', async function () {
       );
 
       await expect(
-        tokenProperties.setTokenProperties(
+        tokenAttributes.setTokenAttributes(
           ownedCollection.address,
           tokenId,
           [
@@ -264,30 +264,30 @@ describe('RMRKTokenPropertiesRepository', async function () {
           ],
         ),
       )
-        .to.emit(tokenProperties, 'StringPropertyUpdated')
+        .to.emit(tokenAttributes, 'StringAttributeUpdated')
         .withArgs(ownedCollection.address, tokenId, 'string1', 'value1')
-        .to.emit(tokenProperties, 'StringPropertyUpdated')
+        .to.emit(tokenAttributes, 'StringAttributeUpdated')
         .withArgs(ownedCollection.address, tokenId, 'string2', 'value2')
-        .to.emit(tokenProperties, 'UintPropertyUpdated')
+        .to.emit(tokenAttributes, 'UintAttributeUpdated')
         .withArgs(ownedCollection.address, tokenId, 'uint1', bn(1))
-        .to.emit(tokenProperties, 'UintPropertyUpdated')
+        .to.emit(tokenAttributes, 'UintAttributeUpdated')
         .withArgs(ownedCollection.address, tokenId, 'uint2', bn(2))
-        .to.emit(tokenProperties, 'BoolPropertyUpdated')
+        .to.emit(tokenAttributes, 'BoolAttributeUpdated')
         .withArgs(ownedCollection.address, tokenId, 'bool1', true)
-        .to.emit(tokenProperties, 'BoolPropertyUpdated')
+        .to.emit(tokenAttributes, 'BoolAttributeUpdated')
         .withArgs(ownedCollection.address, tokenId, 'bool2', false)
-        .to.emit(tokenProperties, 'AddressPropertyUpdated')
+        .to.emit(tokenAttributes, 'AddressAttributeUpdated')
         .withArgs(ownedCollection.address, tokenId, 'address1', owner.address)
-        .to.emit(tokenProperties, 'AddressPropertyUpdated')
+        .to.emit(tokenAttributes, 'AddressAttributeUpdated')
         .withArgs(ownedCollection.address, tokenId, 'address2', issuer.address)
-        .to.emit(tokenProperties, 'BytesPropertyUpdated')
+        .to.emit(tokenAttributes, 'BytesAttributeUpdated')
         .withArgs(ownedCollection.address, tokenId, 'bytes1', '0x1234')
-        .to.emit(tokenProperties, 'BytesPropertyUpdated')
+        .to.emit(tokenAttributes, 'BytesAttributeUpdated')
         .withArgs(ownedCollection.address, tokenId, 'bytes2', '0x5678');
     });
 
-    it('can set and update multiple properties of multiple types at the same time even if not all types are updated at the same time', async function () {
-      await tokenProperties.setTokenProperties(
+    it('can set and update multiple attributes of multiple types at the same time even if not all types are updated at the same time', async function () {
+      await tokenAttributes.setTokenAttributes(
         ownedCollection.address,
         tokenId,
         [{ key: 'string1', value: 'value0' }],
@@ -307,7 +307,7 @@ describe('RMRKTokenPropertiesRepository', async function () {
       );
 
       await expect(
-        tokenProperties.setTokenProperties(
+        tokenAttributes.setTokenAttributes(
           ownedCollection.address,
           tokenId,
           [],
@@ -329,25 +329,25 @@ describe('RMRKTokenPropertiesRepository', async function () {
           ],
         ),
       )
-        .to.emit(tokenProperties, 'UintPropertyUpdated')
+        .to.emit(tokenAttributes, 'UintAttributeUpdated')
         .withArgs(ownedCollection.address, tokenId, 'uint1', bn(1))
-        .to.emit(tokenProperties, 'UintPropertyUpdated')
+        .to.emit(tokenAttributes, 'UintAttributeUpdated')
         .withArgs(ownedCollection.address, tokenId, 'uint2', bn(2))
-        .to.emit(tokenProperties, 'BoolPropertyUpdated')
+        .to.emit(tokenAttributes, 'BoolAttributeUpdated')
         .withArgs(ownedCollection.address, tokenId, 'bool1', true)
-        .to.emit(tokenProperties, 'BoolPropertyUpdated')
+        .to.emit(tokenAttributes, 'BoolAttributeUpdated')
         .withArgs(ownedCollection.address, tokenId, 'bool2', false)
-        .to.emit(tokenProperties, 'AddressPropertyUpdated')
+        .to.emit(tokenAttributes, 'AddressAttributeUpdated')
         .withArgs(ownedCollection.address, tokenId, 'address1', owner.address)
-        .to.emit(tokenProperties, 'AddressPropertyUpdated')
+        .to.emit(tokenAttributes, 'AddressAttributeUpdated')
         .withArgs(ownedCollection.address, tokenId, 'address2', issuer.address)
-        .to.emit(tokenProperties, 'BytesPropertyUpdated')
+        .to.emit(tokenAttributes, 'BytesAttributeUpdated')
         .withArgs(ownedCollection.address, tokenId, 'bytes1', '0x1234')
-        .to.emit(tokenProperties, 'BytesPropertyUpdated')
+        .to.emit(tokenAttributes, 'BytesAttributeUpdated')
         .withArgs(ownedCollection.address, tokenId, 'bytes2', '0x5678');
 
       await expect(
-        tokenProperties.setTokenProperties(
+        tokenAttributes.setTokenAttributes(
           ownedCollection.address,
           tokenId,
           [],
@@ -360,15 +360,15 @@ describe('RMRKTokenPropertiesRepository', async function () {
           [],
         ),
       )
-        .to.emit(tokenProperties, 'BoolPropertyUpdated')
+        .to.emit(tokenAttributes, 'BoolAttributeUpdated')
         .withArgs(ownedCollection.address, tokenId, 'bool1', false)
-        .to.emit(tokenProperties, 'BoolPropertyUpdated')
+        .to.emit(tokenAttributes, 'BoolAttributeUpdated')
         .withArgs(ownedCollection.address, tokenId, 'bool2', true);
     });
 
-    it('can set and update multiple properties of multiple types at the same time', async function () {
+    it('can set and update multiple attributes of multiple types at the same time', async function () {
       await expect(
-        tokenProperties.setTokenProperties(
+        tokenAttributes.setTokenAttributes(
           ownedCollection.address,
           tokenId,
           [
@@ -393,30 +393,30 @@ describe('RMRKTokenPropertiesRepository', async function () {
           ],
         ),
       )
-        .to.emit(tokenProperties, 'StringPropertyUpdated')
+        .to.emit(tokenAttributes, 'StringAttributeUpdated')
         .withArgs(ownedCollection.address, tokenId, 'string1', 'value1')
-        .to.emit(tokenProperties, 'StringPropertyUpdated')
+        .to.emit(tokenAttributes, 'StringAttributeUpdated')
         .withArgs(ownedCollection.address, tokenId, 'string2', 'value2')
-        .to.emit(tokenProperties, 'UintPropertyUpdated')
+        .to.emit(tokenAttributes, 'UintAttributeUpdated')
         .withArgs(ownedCollection.address, tokenId, 'uint1', bn(1))
-        .to.emit(tokenProperties, 'UintPropertyUpdated')
+        .to.emit(tokenAttributes, 'UintAttributeUpdated')
         .withArgs(ownedCollection.address, tokenId, 'uint2', bn(2))
-        .to.emit(tokenProperties, 'BoolPropertyUpdated')
+        .to.emit(tokenAttributes, 'BoolAttributeUpdated')
         .withArgs(ownedCollection.address, tokenId, 'bool1', true)
-        .to.emit(tokenProperties, 'BoolPropertyUpdated')
+        .to.emit(tokenAttributes, 'BoolAttributeUpdated')
         .withArgs(ownedCollection.address, tokenId, 'bool2', false)
-        .to.emit(tokenProperties, 'AddressPropertyUpdated')
+        .to.emit(tokenAttributes, 'AddressAttributeUpdated')
         .withArgs(ownedCollection.address, tokenId, 'address1', owner.address)
-        .to.emit(tokenProperties, 'AddressPropertyUpdated')
+        .to.emit(tokenAttributes, 'AddressAttributeUpdated')
         .withArgs(ownedCollection.address, tokenId, 'address2', issuer.address)
-        .to.emit(tokenProperties, 'BytesPropertyUpdated')
+        .to.emit(tokenAttributes, 'BytesAttributeUpdated')
         .withArgs(ownedCollection.address, tokenId, 'bytes1', '0x1234')
-        .to.emit(tokenProperties, 'BytesPropertyUpdated')
+        .to.emit(tokenAttributes, 'BytesAttributeUpdated')
         .withArgs(ownedCollection.address, tokenId, 'bytes2', '0x5678');
     });
 
-    it('should allow to retrieve multiple properties at once', async function () {
-      await tokenProperties.setTokenProperties(
+    it('should allow to retrieve multiple attributes at once', async function () {
+      await tokenAttributes.setTokenAttributes(
         ownedCollection.address,
         tokenId,
         [
@@ -442,7 +442,7 @@ describe('RMRKTokenPropertiesRepository', async function () {
       );
 
       expect(
-        await tokenProperties.getTokenProperties(
+        await tokenAttributes.getTokenAttributes(
           ownedCollection.address,
           tokenId,
           ['string1', 'string2'],
@@ -475,20 +475,20 @@ describe('RMRKTokenPropertiesRepository', async function () {
       ]);
     });
 
-    it('can set multiple string properties at the same time', async function () {
+    it('can set multiple string attributes at the same time', async function () {
       await expect(
-        tokenProperties.setStringProperties(ownedCollection.address, tokenId, [
+        tokenAttributes.setStringAttributes(ownedCollection.address, tokenId, [
           { key: 'string1', value: 'value1' },
           { key: 'string2', value: 'value2' },
         ]),
       )
-        .to.emit(tokenProperties, 'StringPropertyUpdated')
+        .to.emit(tokenAttributes, 'StringAttributeUpdated')
         .withArgs(ownedCollection.address, tokenId, 'string1', 'value1')
-        .to.emit(tokenProperties, 'StringPropertyUpdated')
+        .to.emit(tokenAttributes, 'StringAttributeUpdated')
         .withArgs(ownedCollection.address, tokenId, 'string2', 'value2');
 
       expect(
-        await tokenProperties.getTokenProperties(
+        await tokenAttributes.getTokenAttributes(
           ownedCollection.address,
           tokenId,
           ['string1', 'string2'],
@@ -509,20 +509,20 @@ describe('RMRKTokenPropertiesRepository', async function () {
       ]);
     });
 
-    it('can set multiple uint properties at the same time', async function () {
+    it('can set multiple uint attributes at the same time', async function () {
       await expect(
-        tokenProperties.setUintProperties(ownedCollection.address, tokenId, [
+        tokenAttributes.setUintAttributes(ownedCollection.address, tokenId, [
           { key: 'uint1', value: bn(1) },
           { key: 'uint2', value: bn(2) },
         ]),
       )
-        .to.emit(tokenProperties, 'UintPropertyUpdated')
+        .to.emit(tokenAttributes, 'UintAttributeUpdated')
         .withArgs(ownedCollection.address, tokenId, 'uint1', bn(1))
-        .to.emit(tokenProperties, 'UintPropertyUpdated')
+        .to.emit(tokenAttributes, 'UintAttributeUpdated')
         .withArgs(ownedCollection.address, tokenId, 'uint2', bn(2));
 
       expect(
-        await tokenProperties.getTokenProperties(
+        await tokenAttributes.getTokenAttributes(
           ownedCollection.address,
           tokenId,
           [],
@@ -543,20 +543,20 @@ describe('RMRKTokenPropertiesRepository', async function () {
       ]);
     });
 
-    it('can set multiple bool properties at the same time', async function () {
+    it('can set multiple bool attributes at the same time', async function () {
       await expect(
-        tokenProperties.setBoolProperties(ownedCollection.address, tokenId, [
+        tokenAttributes.setBoolAttributes(ownedCollection.address, tokenId, [
           { key: 'bool1', value: true },
           { key: 'bool2', value: false },
         ]),
       )
-        .to.emit(tokenProperties, 'BoolPropertyUpdated')
+        .to.emit(tokenAttributes, 'BoolAttributeUpdated')
         .withArgs(ownedCollection.address, tokenId, 'bool1', true)
-        .to.emit(tokenProperties, 'BoolPropertyUpdated')
+        .to.emit(tokenAttributes, 'BoolAttributeUpdated')
         .withArgs(ownedCollection.address, tokenId, 'bool2', false);
 
       expect(
-        await tokenProperties.getTokenProperties(
+        await tokenAttributes.getTokenAttributes(
           ownedCollection.address,
           tokenId,
           [],
@@ -577,20 +577,20 @@ describe('RMRKTokenPropertiesRepository', async function () {
       ]);
     });
 
-    it('can set multiple address properties at the same time', async function () {
+    it('can set multiple address attributes at the same time', async function () {
       await expect(
-        tokenProperties.setAddressProperties(ownedCollection.address, tokenId, [
+        tokenAttributes.setAddressAttributes(ownedCollection.address, tokenId, [
           { key: 'address1', value: owner.address },
           { key: 'address2', value: issuer.address },
         ]),
       )
-        .to.emit(tokenProperties, 'AddressPropertyUpdated')
+        .to.emit(tokenAttributes, 'AddressAttributeUpdated')
         .withArgs(ownedCollection.address, tokenId, 'address1', owner.address)
-        .to.emit(tokenProperties, 'AddressPropertyUpdated')
+        .to.emit(tokenAttributes, 'AddressAttributeUpdated')
         .withArgs(ownedCollection.address, tokenId, 'address2', issuer.address);
 
       expect(
-        await tokenProperties.getTokenProperties(
+        await tokenAttributes.getTokenAttributes(
           ownedCollection.address,
           tokenId,
           [],
@@ -611,20 +611,20 @@ describe('RMRKTokenPropertiesRepository', async function () {
       ]);
     });
 
-    it('can set multiple bytes properties at the same time', async function () {
+    it('can set multiple bytes attributes at the same time', async function () {
       await expect(
-        tokenProperties.setBytesProperties(ownedCollection.address, tokenId, [
+        tokenAttributes.setBytesAttributes(ownedCollection.address, tokenId, [
           { key: 'bytes1', value: '0x1234' },
           { key: 'bytes2', value: '0x5678' },
         ]),
       )
-        .to.emit(tokenProperties, 'BytesPropertyUpdated')
+        .to.emit(tokenAttributes, 'BytesAttributeUpdated')
         .withArgs(ownedCollection.address, tokenId, 'bytes1', '0x1234')
-        .to.emit(tokenProperties, 'BytesPropertyUpdated')
+        .to.emit(tokenAttributes, 'BytesAttributeUpdated')
         .withArgs(ownedCollection.address, tokenId, 'bytes2', '0x5678');
 
       expect(
-        await tokenProperties.getTokenProperties(
+        await tokenAttributes.getTokenAttributes(
           ownedCollection.address,
           tokenId,
           [],
@@ -646,59 +646,59 @@ describe('RMRKTokenPropertiesRepository', async function () {
     });
 
     it('can reuse keys and values are fine', async function () {
-      await tokenProperties.setStringProperty(ownedCollection.address, tokenId, 'X', 'X1');
-      await tokenProperties.setStringProperty(ownedCollection.address, tokenId2, 'X', 'X2');
+      await tokenAttributes.setStringAttribute(ownedCollection.address, tokenId, 'X', 'X1');
+      await tokenAttributes.setStringAttribute(ownedCollection.address, tokenId2, 'X', 'X2');
 
       expect(
-        await tokenProperties.getStringTokenProperty(ownedCollection.address, tokenId, 'X'),
+        await tokenAttributes.getStringTokenAttribute(ownedCollection.address, tokenId, 'X'),
       ).to.eql('X1');
       expect(
-        await tokenProperties.getStringTokenProperty(ownedCollection.address, tokenId2, 'X'),
+        await tokenAttributes.getStringTokenAttribute(ownedCollection.address, tokenId2, 'X'),
       ).to.eql('X2');
     });
 
-    it('can reuse keys among different properties and values are fine', async function () {
-      await tokenProperties.setStringProperty(
+    it('can reuse keys among different attributes and values are fine', async function () {
+      await tokenAttributes.setStringAttribute(
         ownedCollection.address,
         tokenId,
         'X',
         'test description',
       );
-      await tokenProperties.setBoolProperty(ownedCollection.address, tokenId, 'X', true);
-      await tokenProperties.setAddressProperty(
+      await tokenAttributes.setBoolAttribute(ownedCollection.address, tokenId, 'X', true);
+      await tokenAttributes.setAddressAttribute(
         ownedCollection.address,
         tokenId,
         'X',
         owner.address,
       );
-      await tokenProperties.setUintProperty(ownedCollection.address, tokenId, 'X', bn(100));
-      await tokenProperties.setBytesProperty(ownedCollection.address, tokenId, 'X', '0x1234');
+      await tokenAttributes.setUintAttribute(ownedCollection.address, tokenId, 'X', bn(100));
+      await tokenAttributes.setBytesAttribute(ownedCollection.address, tokenId, 'X', '0x1234');
 
       expect(
-        await tokenProperties.getStringTokenProperty(ownedCollection.address, tokenId, 'X'),
+        await tokenAttributes.getStringTokenAttribute(ownedCollection.address, tokenId, 'X'),
       ).to.eql('test description');
       expect(
-        await tokenProperties.getBoolTokenProperty(ownedCollection.address, tokenId, 'X'),
+        await tokenAttributes.getBoolTokenAttribute(ownedCollection.address, tokenId, 'X'),
       ).to.eql(true);
       expect(
-        await tokenProperties.getAddressTokenProperty(ownedCollection.address, tokenId, 'X'),
+        await tokenAttributes.getAddressTokenAttribute(ownedCollection.address, tokenId, 'X'),
       ).to.eql(owner.address);
       expect(
-        await tokenProperties.getUintTokenProperty(ownedCollection.address, tokenId, 'X'),
+        await tokenAttributes.getUintTokenAttribute(ownedCollection.address, tokenId, 'X'),
       ).to.eql(bn(100));
       expect(
-        await tokenProperties.getBytesTokenProperty(ownedCollection.address, tokenId, 'X'),
+        await tokenAttributes.getBytesTokenAttribute(ownedCollection.address, tokenId, 'X'),
       ).to.eql('0x1234');
     });
 
     it('can reuse string values and values are fine', async function () {
-      await tokenProperties.setStringProperty(
+      await tokenAttributes.setStringAttribute(
         ownedCollection.address,
         tokenId,
         'X',
         'common string',
       );
-      await tokenProperties.setStringProperty(
+      await tokenAttributes.setStringAttribute(
         ownedCollection.address,
         tokenId2,
         'X',
@@ -706,60 +706,62 @@ describe('RMRKTokenPropertiesRepository', async function () {
       );
 
       expect(
-        await tokenProperties.getStringTokenProperty(ownedCollection.address, tokenId, 'X'),
+        await tokenAttributes.getStringTokenAttribute(ownedCollection.address, tokenId, 'X'),
       ).to.eql('common string');
       expect(
-        await tokenProperties.getStringTokenProperty(ownedCollection.address, tokenId2, 'X'),
+        await tokenAttributes.getStringTokenAttribute(ownedCollection.address, tokenId2, 'X'),
       ).to.eql('common string');
     });
 
     it('should not allow to set string values to unauthorized caller', async function () {
       await expect(
-        tokenProperties
+        tokenAttributes
           .connect(owner)
-          .setStringProperty(ownedCollection.address, tokenId, 'X', 'test description'),
-      ).to.be.revertedWithCustomError(tokenProperties, 'RMRKNotCollectionIssuer');
+          .setStringAttribute(ownedCollection.address, tokenId, 'X', 'test description'),
+      ).to.be.revertedWithCustomError(tokenAttributes, 'NotCollectionIssuer');
     });
 
     it('should not allow to set uint values to unauthorized caller', async function () {
       await expect(
-        tokenProperties
+        tokenAttributes
           .connect(owner)
-          .setUintProperty(ownedCollection.address, tokenId, 'X', bn(42)),
-      ).to.be.revertedWithCustomError(tokenProperties, 'RMRKNotCollectionIssuer');
+          .setUintAttribute(ownedCollection.address, tokenId, 'X', bn(42)),
+      ).to.be.revertedWithCustomError(tokenAttributes, 'NotCollectionIssuer');
     });
 
     it('should not allow to set boolean values to unauthorized caller', async function () {
       await expect(
-        tokenProperties.connect(owner).setBoolProperty(ownedCollection.address, tokenId, 'X', true),
-      ).to.be.revertedWithCustomError(tokenProperties, 'RMRKNotCollectionIssuer');
+        tokenAttributes
+          .connect(owner)
+          .setBoolAttribute(ownedCollection.address, tokenId, 'X', true),
+      ).to.be.revertedWithCustomError(tokenAttributes, 'NotCollectionIssuer');
     });
 
     it('should not allow to set address values to unauthorized caller', async function () {
       await expect(
-        tokenProperties
+        tokenAttributes
           .connect(owner)
-          .setAddressProperty(ownedCollection.address, tokenId, 'X', owner.address),
-      ).to.be.revertedWithCustomError(tokenProperties, 'RMRKNotCollectionIssuer');
+          .setAddressAttribute(ownedCollection.address, tokenId, 'X', owner.address),
+      ).to.be.revertedWithCustomError(tokenAttributes, 'NotCollectionIssuer');
     });
 
     it('should not allow to set bytes values to unauthorized caller', async function () {
       await expect(
-        tokenProperties
+        tokenAttributes
           .connect(owner)
-          .setBytesProperty(ownedCollection.address, tokenId, 'X', '0x1234'),
-      ).to.be.revertedWithCustomError(tokenProperties, 'RMRKNotCollectionIssuer');
+          .setBytesAttribute(ownedCollection.address, tokenId, 'X', '0x1234'),
+      ).to.be.revertedWithCustomError(tokenAttributes, 'NotCollectionIssuer');
     });
   });
 
-  describe('Token properties access control', async function () {
+  describe('Token attributes access control', async function () {
     let issuer: SignerWithAddress;
     let owner: SignerWithAddress;
     const tokenId = 1;
     const tokenId2 = 2;
 
     beforeEach(async function () {
-      ({ tokenProperties } = await loadFixture(tokenPropertiesFixture));
+      ({ tokenAttributes } = await loadFixture(tokenAttributesFixture));
       ({ ownedCollection } = await loadFixture(ownedCollectionFixture));
 
       const signers = await ethers.getSigners();
@@ -770,329 +772,329 @@ describe('RMRKTokenPropertiesRepository', async function () {
     });
 
     it('should not allow registering an already registered collection', async function () {
-      await tokenProperties.registerAccessControl(ownedCollection.address, issuer.address, false);
+      await tokenAttributes.registerAccessControl(ownedCollection.address, issuer.address, false);
 
       await expect(
-        tokenProperties.registerAccessControl(ownedCollection.address, issuer.address, false),
-      ).to.be.revertedWithCustomError(tokenProperties, 'RMRKCollectionAlreadyRegistered');
+        tokenAttributes.registerAccessControl(ownedCollection.address, issuer.address, false),
+      ).to.be.revertedWithCustomError(tokenAttributes, 'CollectionAlreadyRegistered');
     });
 
     it('should not allow to register a collection if caller is not the owner of the collection', async function () {
       await expect(
-        tokenProperties
+        tokenAttributes
           .connect(owner)
           .registerAccessControl(ownedCollection.address, issuer.address, true),
-      ).to.be.revertedWithCustomError(tokenProperties, 'RMRKNotCollectionIssuer');
+      ).to.be.revertedWithCustomError(tokenAttributes, 'NotCollectionIssuer');
     });
 
     it('should not allow to register a collection without Ownable implemented', async function () {
       ownedCollection.owner.reset();
 
       await expect(
-        tokenProperties.registerAccessControl(ownedCollection.address, issuer.address, false),
-      ).to.be.revertedWithCustomError(tokenProperties, 'RMRKOwnableNotImplemented');
+        tokenAttributes.registerAccessControl(ownedCollection.address, issuer.address, false),
+      ).to.be.revertedWithCustomError(tokenAttributes, 'OwnableNotImplemented');
     });
 
     it('should allow to manage access control for registered collections', async function () {
-      await tokenProperties.registerAccessControl(ownedCollection.address, issuer.address, false);
+      await tokenAttributes.registerAccessControl(ownedCollection.address, issuer.address, false);
 
       expect(
-        await tokenProperties
+        await tokenAttributes
           .connect(issuer)
           .manageAccessControl(ownedCollection.address, 'X', 2, owner.address),
       )
-        .to.emit(tokenProperties, 'AccessControlUpdate')
+        .to.emit(tokenAttributes, 'AccessControlUpdate')
         .withArgs(ownedCollection.address, 'X', 2, owner);
     });
 
     it('should allow issuer to manage collaborators', async function () {
-      await tokenProperties.registerAccessControl(ownedCollection.address, issuer.address, false);
+      await tokenAttributes.registerAccessControl(ownedCollection.address, issuer.address, false);
 
       expect(
-        await tokenProperties
+        await tokenAttributes
           .connect(issuer)
           .manageCollaborators(ownedCollection.address, [owner.address], [true]),
       )
-        .to.emit(tokenProperties, 'CollaboratorUpdate')
+        .to.emit(tokenAttributes, 'CollaboratorUpdate')
         .withArgs(ownedCollection.address, [owner.address], [true]);
     });
 
     it('should not allow to manage collaborators of an unregistered collection', async function () {
       await expect(
-        tokenProperties
+        tokenAttributes
           .connect(issuer)
           .manageCollaborators(ownedCollection.address, [owner.address], [true]),
-      ).to.be.revertedWithCustomError(tokenProperties, 'RMRKCollectionNotRegistered');
+      ).to.be.revertedWithCustomError(tokenAttributes, 'CollectionNotRegistered');
     });
 
     it('should not allow to manage collaborators if the caller is not the issuer', async function () {
-      await tokenProperties.registerAccessControl(ownedCollection.address, issuer.address, false);
+      await tokenAttributes.registerAccessControl(ownedCollection.address, issuer.address, false);
 
       await expect(
-        tokenProperties
+        tokenAttributes
           .connect(owner)
           .manageCollaborators(ownedCollection.address, [owner.address], [true]),
-      ).to.be.revertedWithCustomError(tokenProperties, 'RMRKNotCollectionIssuer');
+      ).to.be.revertedWithCustomError(tokenAttributes, 'NotCollectionIssuer');
     });
 
     it('should not allow to manage collaborators for registered collections if collaborator arrays are not of equal length', async function () {
-      await tokenProperties.registerAccessControl(ownedCollection.address, issuer.address, false);
+      await tokenAttributes.registerAccessControl(ownedCollection.address, issuer.address, false);
 
       await expect(
-        tokenProperties
+        tokenAttributes
           .connect(issuer)
           .manageCollaborators(ownedCollection.address, [owner.address, issuer.address], [true]),
-      ).to.be.revertedWithCustomError(tokenProperties, 'RMRKCollaboratorArraysNotEqualLength');
+      ).to.be.revertedWithCustomError(tokenAttributes, 'CollaboratorArraysNotEqualLength');
     });
 
     it('should not allow to manage access control for unregistered collections', async function () {
       await expect(
-        tokenProperties
+        tokenAttributes
           .connect(issuer)
           .manageAccessControl(ownedCollection.address, 'X', 2, owner.address),
-      ).to.be.revertedWithCustomError(tokenProperties, 'RMRKCollectionNotRegistered');
+      ).to.be.revertedWithCustomError(tokenAttributes, 'CollectionNotRegistered');
     });
 
     it('should not allow to manage access control if the caller is not issuer', async function () {
-      await tokenProperties.registerAccessControl(ownedCollection.address, issuer.address, false);
+      await tokenAttributes.registerAccessControl(ownedCollection.address, issuer.address, false);
 
       await expect(
-        tokenProperties
+        tokenAttributes
           .connect(owner)
           .manageAccessControl(ownedCollection.address, 'X', 2, owner.address),
-      ).to.be.revertedWithCustomError(tokenProperties, 'RMRKNotCollectionIssuer');
+      ).to.be.revertedWithCustomError(tokenAttributes, 'NotCollectionIssuer');
     });
 
     it('should not allow to manage access control if the caller is not returned as collection owner when using ownable', async function () {
-      await tokenProperties.registerAccessControl(ownedCollection.address, issuer.address, true);
+      await tokenAttributes.registerAccessControl(ownedCollection.address, issuer.address, true);
 
       await expect(
-        tokenProperties
+        tokenAttributes
           .connect(owner)
           .manageAccessControl(ownedCollection.address, 'X', 2, owner.address),
-      ).to.be.revertedWithCustomError(tokenProperties, 'RMRKNotCollectionIssuer');
+      ).to.be.revertedWithCustomError(tokenAttributes, 'NotCollectionIssuer');
     });
 
     it('should return the expected value when checking for collaborators', async function () {
-      await tokenProperties.registerAccessControl(ownedCollection.address, issuer.address, false);
+      await tokenAttributes.registerAccessControl(ownedCollection.address, issuer.address, false);
 
-      expect(await tokenProperties.isCollaborator(owner.address, ownedCollection.address)).to.be
+      expect(await tokenAttributes.isCollaborator(owner.address, ownedCollection.address)).to.be
         .false;
 
-      await tokenProperties
+      await tokenAttributes
         .connect(issuer)
         .manageCollaborators(ownedCollection.address, [owner.address], [true]);
 
-      expect(await tokenProperties.isCollaborator(owner.address, ownedCollection.address)).to.be
+      expect(await tokenAttributes.isCollaborator(owner.address, ownedCollection.address)).to.be
         .true;
     });
 
     it('should return the expected value when checking for specific addresses', async function () {
-      await tokenProperties.registerAccessControl(ownedCollection.address, issuer.address, false);
+      await tokenAttributes.registerAccessControl(ownedCollection.address, issuer.address, false);
 
-      expect(await tokenProperties.isSpecificAddress(owner.address, ownedCollection.address, 'X'))
+      expect(await tokenAttributes.isSpecificAddress(owner.address, ownedCollection.address, 'X'))
         .to.be.false;
 
-      await tokenProperties
+      await tokenAttributes
         .connect(issuer)
         .manageAccessControl(ownedCollection.address, 'X', 2, owner.address);
 
-      expect(await tokenProperties.isSpecificAddress(owner.address, ownedCollection.address, 'X'))
+      expect(await tokenAttributes.isSpecificAddress(owner.address, ownedCollection.address, 'X'))
         .to.be.true;
     });
 
     it('should use the issuer returned from the collection when using only issuer when only issuer is allowed to manage parameter', async function () {
-      await tokenProperties
+      await tokenAttributes
         .connect(issuer)
         .registerAccessControl(ownedCollection.address, issuer.address, true);
 
-      await tokenProperties
+      await tokenAttributes
         .connect(issuer)
         .manageAccessControl(ownedCollection.address, 'X', 0, ethers.constants.AddressZero);
 
       await expect(
-        tokenProperties
+        tokenAttributes
           .connect(owner)
-          .setAddressProperty(ownedCollection.address, 1, 'X', owner.address),
-      ).to.be.revertedWithCustomError(tokenProperties, 'RMRKNotCollectionIssuer');
+          .setAddressAttribute(ownedCollection.address, 1, 'X', owner.address),
+      ).to.be.revertedWithCustomError(tokenAttributes, 'NotCollectionIssuer');
 
       ownedCollection.owner.returns(owner.address);
 
       await expect(
-        tokenProperties
+        tokenAttributes
           .connect(issuer)
-          .setAddressProperty(ownedCollection.address, 1, 'X', owner.address),
-      ).to.be.revertedWithCustomError(tokenProperties, 'RMRKNotCollectionIssuer');
+          .setAddressAttribute(ownedCollection.address, 1, 'X', owner.address),
+      ).to.be.revertedWithCustomError(tokenAttributes, 'NotCollectionIssuer');
     });
 
     it('should only allow collaborator to modify the parameters if only collaborator is allowed to modify them', async function () {
-      await tokenProperties
+      await tokenAttributes
         .connect(issuer)
         .registerAccessControl(ownedCollection.address, issuer.address, false);
 
-      await tokenProperties
+      await tokenAttributes
         .connect(issuer)
         .manageAccessControl(ownedCollection.address, 'X', 1, ethers.constants.AddressZero);
 
-      await tokenProperties
+      await tokenAttributes
         .connect(issuer)
         .manageCollaborators(ownedCollection.address, [owner.address], [true]);
 
-      await tokenProperties
+      await tokenAttributes
         .connect(owner)
-        .setAddressProperty(ownedCollection.address, 1, 'X', owner.address);
+        .setAddressAttribute(ownedCollection.address, 1, 'X', owner.address);
 
       await expect(
-        tokenProperties
+        tokenAttributes
           .connect(issuer)
-          .setAddressProperty(ownedCollection.address, 1, 'X', owner.address),
-      ).to.be.revertedWithCustomError(tokenProperties, 'RMRKNotCollectionCollaborator');
+          .setAddressAttribute(ownedCollection.address, 1, 'X', owner.address),
+      ).to.be.revertedWithCustomError(tokenAttributes, 'NotCollectionCollaborator');
     });
 
     it('should only allow issuer and collaborator to modify the parameters if only issuer and collaborator is allowed to modify them', async function () {
-      await tokenProperties
+      await tokenAttributes
         .connect(issuer)
         .registerAccessControl(ownedCollection.address, issuer.address, false);
 
-      await tokenProperties
+      await tokenAttributes
         .connect(issuer)
         .manageAccessControl(ownedCollection.address, 'X', 2, ethers.constants.AddressZero);
 
-      await tokenProperties
+      await tokenAttributes
         .connect(issuer)
-        .setAddressProperty(ownedCollection.address, 1, 'X', owner.address);
+        .setAddressAttribute(ownedCollection.address, 1, 'X', owner.address);
 
       await expect(
-        tokenProperties
+        tokenAttributes
           .connect(owner)
-          .setAddressProperty(ownedCollection.address, 1, 'X', owner.address),
-      ).to.be.revertedWithCustomError(tokenProperties, 'RMRKNotCollectionIssuerOrCollaborator');
+          .setAddressAttribute(ownedCollection.address, 1, 'X', owner.address),
+      ).to.be.revertedWithCustomError(tokenAttributes, 'NotCollectionIssuerOrCollaborator');
 
-      await tokenProperties
+      await tokenAttributes
         .connect(issuer)
         .manageCollaborators(ownedCollection.address, [owner.address], [true]);
 
-      await tokenProperties
+      await tokenAttributes
         .connect(owner)
-        .setAddressProperty(ownedCollection.address, 1, 'X', owner.address);
+        .setAddressAttribute(ownedCollection.address, 1, 'X', owner.address);
     });
 
     it('should only allow issuer and collaborator to modify the parameters if only issuer and collaborator is allowed to modify them even when using the ownable', async function () {
-      await tokenProperties
+      await tokenAttributes
         .connect(issuer)
         .registerAccessControl(ownedCollection.address, issuer.address, true);
 
-      await tokenProperties
+      await tokenAttributes
         .connect(issuer)
         .manageAccessControl(ownedCollection.address, 'X', 2, ethers.constants.AddressZero);
 
       ownedCollection.owner.returns(owner.address);
 
-      await tokenProperties
+      await tokenAttributes
         .connect(owner)
-        .setAddressProperty(ownedCollection.address, 1, 'X', owner.address);
+        .setAddressAttribute(ownedCollection.address, 1, 'X', owner.address);
 
       await expect(
-        tokenProperties
+        tokenAttributes
           .connect(issuer)
-          .setAddressProperty(ownedCollection.address, 1, 'X', owner.address),
-      ).to.be.revertedWithCustomError(tokenProperties, 'RMRKNotCollectionIssuerOrCollaborator');
+          .setAddressAttribute(ownedCollection.address, 1, 'X', owner.address),
+      ).to.be.revertedWithCustomError(tokenAttributes, 'NotCollectionIssuerOrCollaborator');
 
-      await tokenProperties
+      await tokenAttributes
         .connect(owner)
         .manageCollaborators(ownedCollection.address, [issuer.address], [true]);
 
-      await tokenProperties
+      await tokenAttributes
         .connect(issuer)
-        .setAddressProperty(ownedCollection.address, 1, 'X', owner.address);
+        .setAddressAttribute(ownedCollection.address, 1, 'X', owner.address);
     });
 
     it('should only allow token owner to modify the parameters if only token owner is allowed to modify them', async function () {
-      await tokenProperties
+      await tokenAttributes
         .connect(issuer)
         .registerAccessControl(ownedCollection.address, issuer.address, false);
 
-      await tokenProperties
+      await tokenAttributes
         .connect(issuer)
         .manageAccessControl(ownedCollection.address, 'X', 3, ethers.constants.AddressZero);
 
       await expect(
-        tokenProperties
+        tokenAttributes
           .connect(owner)
-          .setAddressProperty(ownedCollection.address, 1, 'X', owner.address),
-      ).to.be.revertedWithCustomError(tokenProperties, 'RMRKNotTokenOwner');
+          .setAddressAttribute(ownedCollection.address, 1, 'X', owner.address),
+      ).to.be.revertedWithCustomError(tokenAttributes, 'NotTokenOwner');
 
       ownedCollection.ownerOf.returns(owner.address);
 
-      await tokenProperties
+      await tokenAttributes
         .connect(owner)
-        .setAddressProperty(ownedCollection.address, 1, 'X', owner.address);
+        .setAddressAttribute(ownedCollection.address, 1, 'X', owner.address);
 
       await expect(
-        tokenProperties
+        tokenAttributes
           .connect(issuer)
-          .setAddressProperty(ownedCollection.address, 1, 'X', owner.address),
-      ).to.be.revertedWithCustomError(tokenProperties, 'RMRKNotTokenOwner');
+          .setAddressAttribute(ownedCollection.address, 1, 'X', owner.address),
+      ).to.be.revertedWithCustomError(tokenAttributes, 'NotTokenOwner');
     });
 
     it('should only allow specific address to modify the parameters if only specific address is allowed to modify them', async function () {
-      await tokenProperties
+      await tokenAttributes
         .connect(issuer)
         .registerAccessControl(ownedCollection.address, issuer.address, false);
 
-      await tokenProperties
+      await tokenAttributes
         .connect(issuer)
         .manageAccessControl(ownedCollection.address, 'X', 4, ethers.constants.AddressZero);
 
       await expect(
-        tokenProperties
+        tokenAttributes
           .connect(owner)
-          .setAddressProperty(ownedCollection.address, 1, 'X', owner.address),
-      ).to.be.revertedWithCustomError(tokenProperties, 'RMRKNotSpecificAddress');
+          .setAddressAttribute(ownedCollection.address, 1, 'X', owner.address),
+      ).to.be.revertedWithCustomError(tokenAttributes, 'NotSpecificAddress');
 
-      await tokenProperties
+      await tokenAttributes
         .connect(issuer)
         .manageAccessControl(ownedCollection.address, 'X', 4, owner.address);
 
-      await tokenProperties
+      await tokenAttributes
         .connect(owner)
-        .setAddressProperty(ownedCollection.address, 1, 'X', owner.address);
+        .setAddressAttribute(ownedCollection.address, 1, 'X', owner.address);
     });
 
     it('should allow to use presigned message to modify the parameters', async function () {
-      await tokenProperties
+      await tokenAttributes
         .connect(issuer)
         .registerAccessControl(ownedCollection.address, issuer.address, false);
 
-      const uintMessage = await tokenProperties.prepareMessageToPresignUintProperty(
+      const uintMessage = await tokenAttributes.prepareMessageToPresignUintAttribute(
         ownedCollection.address,
         1,
         'X',
         1,
         bn(9999999999),
       );
-      const stringMessage = await tokenProperties.prepareMessageToPresignStringProperty(
+      const stringMessage = await tokenAttributes.prepareMessageToPresignStringAttribute(
         ownedCollection.address,
         1,
         'X',
         'test',
         bn(9999999999),
       );
-      const boolMessage = await tokenProperties.prepareMessageToPresignBoolProperty(
+      const boolMessage = await tokenAttributes.prepareMessageToPresignBoolAttribute(
         ownedCollection.address,
         1,
         'X',
         true,
         bn(9999999999),
       );
-      const bytesMessage = await tokenProperties.prepareMessageToPresignBytesProperty(
+      const bytesMessage = await tokenAttributes.prepareMessageToPresignBytesAttribute(
         ownedCollection.address,
         1,
         'X',
         '0x1234',
         bn(9999999999),
       );
-      const addressMessage = await tokenProperties.prepareMessageToPresignAddressProperty(
+      const addressMessage = await tokenAttributes.prepareMessageToPresignAddressAttribute(
         ownedCollection.address,
         1,
         'X',
@@ -1127,9 +1129,9 @@ describe('RMRKTokenPropertiesRepository', async function () {
       const addressV: string = parseInt(addressSignature.substring(130, 132), 16);
 
       await expect(
-        tokenProperties
+        tokenAttributes
           .connect(owner)
-          .presignedSetUintProperty(
+          .presignedSetUintAttribute(
             issuer.address,
             ownedCollection.address,
             1,
@@ -1141,12 +1143,12 @@ describe('RMRKTokenPropertiesRepository', async function () {
             uintS,
           ),
       )
-        .to.emit(tokenProperties, 'UintPropertyUpdated')
+        .to.emit(tokenAttributes, 'UintAttributeUpdated')
         .withArgs(ownedCollection.address, 1, 'X', 1);
       await expect(
-        tokenProperties
+        tokenAttributes
           .connect(owner)
-          .presignedSetStringProperty(
+          .presignedSetStringAttribute(
             issuer.address,
             ownedCollection.address,
             1,
@@ -1158,12 +1160,12 @@ describe('RMRKTokenPropertiesRepository', async function () {
             stringS,
           ),
       )
-        .to.emit(tokenProperties, 'StringPropertyUpdated')
+        .to.emit(tokenAttributes, 'StringAttributeUpdated')
         .withArgs(ownedCollection.address, 1, 'X', 'test');
       await expect(
-        tokenProperties
+        tokenAttributes
           .connect(owner)
-          .presignedSetBoolProperty(
+          .presignedSetBoolAttribute(
             issuer.address,
             ownedCollection.address,
             1,
@@ -1175,12 +1177,12 @@ describe('RMRKTokenPropertiesRepository', async function () {
             boolS,
           ),
       )
-        .to.emit(tokenProperties, 'BoolPropertyUpdated')
+        .to.emit(tokenAttributes, 'BoolAttributeUpdated')
         .withArgs(ownedCollection.address, 1, 'X', true);
       await expect(
-        tokenProperties
+        tokenAttributes
           .connect(owner)
-          .presignedSetBytesProperty(
+          .presignedSetBytesAttribute(
             issuer.address,
             ownedCollection.address,
             1,
@@ -1192,12 +1194,12 @@ describe('RMRKTokenPropertiesRepository', async function () {
             bytesS,
           ),
       )
-        .to.emit(tokenProperties, 'BytesPropertyUpdated')
+        .to.emit(tokenAttributes, 'BytesAttributeUpdated')
         .withArgs(ownedCollection.address, 1, 'X', '0x1234');
       await expect(
-        tokenProperties
+        tokenAttributes
           .connect(owner)
-          .presignedSetAddressProperty(
+          .presignedSetAddressAttribute(
             issuer.address,
             ownedCollection.address,
             1,
@@ -1209,46 +1211,46 @@ describe('RMRKTokenPropertiesRepository', async function () {
             addressS,
           ),
       )
-        .to.emit(tokenProperties, 'AddressPropertyUpdated')
+        .to.emit(tokenAttributes, 'AddressAttributeUpdated')
         .withArgs(ownedCollection.address, 1, 'X', owner.address);
     });
 
     it('should not allow to use presigned message to modify the parameters if the deadline has elapsed', async function () {
-      await tokenProperties
+      await tokenAttributes
         .connect(issuer)
         .registerAccessControl(ownedCollection.address, issuer.address, false);
 
       await mine(1000, { interval: 15 });
 
-      const uintMessage = await tokenProperties.prepareMessageToPresignUintProperty(
+      const uintMessage = await tokenAttributes.prepareMessageToPresignUintAttribute(
         ownedCollection.address,
         1,
         'X',
         1,
         bn(10),
       );
-      const stringMessage = await tokenProperties.prepareMessageToPresignStringProperty(
+      const stringMessage = await tokenAttributes.prepareMessageToPresignStringAttribute(
         ownedCollection.address,
         1,
         'X',
         'test',
         bn(10),
       );
-      const boolMessage = await tokenProperties.prepareMessageToPresignBoolProperty(
+      const boolMessage = await tokenAttributes.prepareMessageToPresignBoolAttribute(
         ownedCollection.address,
         1,
         'X',
         true,
         bn(10),
       );
-      const bytesMessage = await tokenProperties.prepareMessageToPresignBytesProperty(
+      const bytesMessage = await tokenAttributes.prepareMessageToPresignBytesAttribute(
         ownedCollection.address,
         1,
         'X',
         '0x1234',
         bn(10),
       );
-      const addressMessage = await tokenProperties.prepareMessageToPresignAddressProperty(
+      const addressMessage = await tokenAttributes.prepareMessageToPresignAddressAttribute(
         ownedCollection.address,
         1,
         'X',
@@ -1283,9 +1285,9 @@ describe('RMRKTokenPropertiesRepository', async function () {
       const addressV: string = parseInt(addressSignature.substring(130, 132), 16);
 
       await expect(
-        tokenProperties
+        tokenAttributes
           .connect(owner)
-          .presignedSetUintProperty(
+          .presignedSetUintAttribute(
             issuer.address,
             ownedCollection.address,
             1,
@@ -1296,11 +1298,11 @@ describe('RMRKTokenPropertiesRepository', async function () {
             uintR,
             uintS,
           ),
-      ).to.be.revertedWithCustomError(tokenProperties, 'RMRKExpiredDeadline');
+      ).to.be.revertedWithCustomError(tokenAttributes, 'ExpiredDeadline');
       await expect(
-        tokenProperties
+        tokenAttributes
           .connect(owner)
-          .presignedSetStringProperty(
+          .presignedSetStringAttribute(
             issuer.address,
             ownedCollection.address,
             1,
@@ -1311,11 +1313,11 @@ describe('RMRKTokenPropertiesRepository', async function () {
             stringR,
             stringS,
           ),
-      ).to.be.revertedWithCustomError(tokenProperties, 'RMRKExpiredDeadline');
+      ).to.be.revertedWithCustomError(tokenAttributes, 'ExpiredDeadline');
       await expect(
-        tokenProperties
+        tokenAttributes
           .connect(owner)
-          .presignedSetBoolProperty(
+          .presignedSetBoolAttribute(
             issuer.address,
             ownedCollection.address,
             1,
@@ -1326,11 +1328,11 @@ describe('RMRKTokenPropertiesRepository', async function () {
             boolR,
             boolS,
           ),
-      ).to.be.revertedWithCustomError(tokenProperties, 'RMRKExpiredDeadline');
+      ).to.be.revertedWithCustomError(tokenAttributes, 'ExpiredDeadline');
       await expect(
-        tokenProperties
+        tokenAttributes
           .connect(owner)
-          .presignedSetBytesProperty(
+          .presignedSetBytesAttribute(
             issuer.address,
             ownedCollection.address,
             1,
@@ -1341,11 +1343,11 @@ describe('RMRKTokenPropertiesRepository', async function () {
             bytesR,
             bytesS,
           ),
-      ).to.be.revertedWithCustomError(tokenProperties, 'RMRKExpiredDeadline');
+      ).to.be.revertedWithCustomError(tokenAttributes, 'ExpiredDeadline');
       await expect(
-        tokenProperties
+        tokenAttributes
           .connect(owner)
-          .presignedSetAddressProperty(
+          .presignedSetAddressAttribute(
             issuer.address,
             ownedCollection.address,
             1,
@@ -1356,43 +1358,43 @@ describe('RMRKTokenPropertiesRepository', async function () {
             addressR,
             addressS,
           ),
-      ).to.be.revertedWithCustomError(tokenProperties, 'RMRKExpiredDeadline');
+      ).to.be.revertedWithCustomError(tokenAttributes, 'ExpiredDeadline');
     });
 
     it('should not allow to use presigned message to modify the parameters if the setter does not match the actual signer', async function () {
-      await tokenProperties
+      await tokenAttributes
         .connect(issuer)
         .registerAccessControl(ownedCollection.address, issuer.address, false);
 
-      const uintMessage = await tokenProperties.prepareMessageToPresignUintProperty(
+      const uintMessage = await tokenAttributes.prepareMessageToPresignUintAttribute(
         ownedCollection.address,
         1,
         'X',
         1,
         bn(9999999999),
       );
-      const stringMessage = await tokenProperties.prepareMessageToPresignStringProperty(
+      const stringMessage = await tokenAttributes.prepareMessageToPresignStringAttribute(
         ownedCollection.address,
         1,
         'X',
         'test',
         bn(9999999999),
       );
-      const boolMessage = await tokenProperties.prepareMessageToPresignBoolProperty(
+      const boolMessage = await tokenAttributes.prepareMessageToPresignBoolAttribute(
         ownedCollection.address,
         1,
         'X',
         true,
         bn(9999999999),
       );
-      const bytesMessage = await tokenProperties.prepareMessageToPresignBytesProperty(
+      const bytesMessage = await tokenAttributes.prepareMessageToPresignBytesAttribute(
         ownedCollection.address,
         1,
         'X',
         '0x1234',
         bn(9999999999),
       );
-      const addressMessage = await tokenProperties.prepareMessageToPresignAddressProperty(
+      const addressMessage = await tokenAttributes.prepareMessageToPresignAddressAttribute(
         ownedCollection.address,
         1,
         'X',
@@ -1427,9 +1429,9 @@ describe('RMRKTokenPropertiesRepository', async function () {
       const addressV: string = parseInt(addressSignature.substring(130, 132), 16);
 
       await expect(
-        tokenProperties
+        tokenAttributes
           .connect(owner)
-          .presignedSetUintProperty(
+          .presignedSetUintAttribute(
             issuer.address,
             ownedCollection.address,
             1,
@@ -1440,11 +1442,11 @@ describe('RMRKTokenPropertiesRepository', async function () {
             uintR,
             uintS,
           ),
-      ).to.be.revertedWithCustomError(tokenProperties, 'RMRKInvalidSignature');
+      ).to.be.revertedWithCustomError(tokenAttributes, 'InvalidSignature');
       await expect(
-        tokenProperties
+        tokenAttributes
           .connect(owner)
-          .presignedSetStringProperty(
+          .presignedSetStringAttribute(
             issuer.address,
             ownedCollection.address,
             1,
@@ -1455,11 +1457,11 @@ describe('RMRKTokenPropertiesRepository', async function () {
             stringR,
             stringS,
           ),
-      ).to.be.revertedWithCustomError(tokenProperties, 'RMRKInvalidSignature');
+      ).to.be.revertedWithCustomError(tokenAttributes, 'InvalidSignature');
       await expect(
-        tokenProperties
+        tokenAttributes
           .connect(owner)
-          .presignedSetBoolProperty(
+          .presignedSetBoolAttribute(
             issuer.address,
             ownedCollection.address,
             1,
@@ -1470,11 +1472,11 @@ describe('RMRKTokenPropertiesRepository', async function () {
             boolR,
             boolS,
           ),
-      ).to.be.revertedWithCustomError(tokenProperties, 'RMRKInvalidSignature');
+      ).to.be.revertedWithCustomError(tokenAttributes, 'InvalidSignature');
       await expect(
-        tokenProperties
+        tokenAttributes
           .connect(owner)
-          .presignedSetBytesProperty(
+          .presignedSetBytesAttribute(
             issuer.address,
             ownedCollection.address,
             1,
@@ -1485,11 +1487,11 @@ describe('RMRKTokenPropertiesRepository', async function () {
             bytesR,
             bytesS,
           ),
-      ).to.be.revertedWithCustomError(tokenProperties, 'RMRKInvalidSignature');
+      ).to.be.revertedWithCustomError(tokenAttributes, 'InvalidSignature');
       await expect(
-        tokenProperties
+        tokenAttributes
           .connect(owner)
-          .presignedSetAddressProperty(
+          .presignedSetAddressAttribute(
             issuer.address,
             ownedCollection.address,
             1,
@@ -1500,39 +1502,39 @@ describe('RMRKTokenPropertiesRepository', async function () {
             addressR,
             addressS,
           ),
-      ).to.be.revertedWithCustomError(tokenProperties, 'RMRKInvalidSignature');
+      ).to.be.revertedWithCustomError(tokenAttributes, 'InvalidSignature');
     });
 
     it('should not allow to use presigned message to modify the parameters if the signer is not authorized to modify them', async function () {
-      const uintMessage = await tokenProperties.prepareMessageToPresignUintProperty(
+      const uintMessage = await tokenAttributes.prepareMessageToPresignUintAttribute(
         ownedCollection.address,
         1,
         'X',
         1,
         bn(9999999999),
       );
-      const stringMessage = await tokenProperties.prepareMessageToPresignStringProperty(
+      const stringMessage = await tokenAttributes.prepareMessageToPresignStringAttribute(
         ownedCollection.address,
         1,
         'X',
         'test',
         bn(9999999999),
       );
-      const boolMessage = await tokenProperties.prepareMessageToPresignBoolProperty(
+      const boolMessage = await tokenAttributes.prepareMessageToPresignBoolAttribute(
         ownedCollection.address,
         1,
         'X',
         true,
         bn(9999999999),
       );
-      const bytesMessage = await tokenProperties.prepareMessageToPresignBytesProperty(
+      const bytesMessage = await tokenAttributes.prepareMessageToPresignBytesAttribute(
         ownedCollection.address,
         1,
         'X',
         '0x1234',
         bn(9999999999),
       );
-      const addressMessage = await tokenProperties.prepareMessageToPresignAddressProperty(
+      const addressMessage = await tokenAttributes.prepareMessageToPresignAddressAttribute(
         ownedCollection.address,
         1,
         'X',
@@ -1567,9 +1569,9 @@ describe('RMRKTokenPropertiesRepository', async function () {
       const addressV: string = parseInt(addressSignature.substring(130, 132), 16);
 
       await expect(
-        tokenProperties
+        tokenAttributes
           .connect(owner)
-          .presignedSetUintProperty(
+          .presignedSetUintAttribute(
             issuer.address,
             ownedCollection.address,
             1,
@@ -1580,11 +1582,11 @@ describe('RMRKTokenPropertiesRepository', async function () {
             uintR,
             uintS,
           ),
-      ).to.be.revertedWithCustomError(tokenProperties, 'RMRKNotCollectionIssuer');
+      ).to.be.revertedWithCustomError(tokenAttributes, 'NotCollectionIssuer');
       await expect(
-        tokenProperties
+        tokenAttributes
           .connect(owner)
-          .presignedSetStringProperty(
+          .presignedSetStringAttribute(
             issuer.address,
             ownedCollection.address,
             1,
@@ -1595,11 +1597,11 @@ describe('RMRKTokenPropertiesRepository', async function () {
             stringR,
             stringS,
           ),
-      ).to.be.revertedWithCustomError(tokenProperties, 'RMRKNotCollectionIssuer');
+      ).to.be.revertedWithCustomError(tokenAttributes, 'NotCollectionIssuer');
       await expect(
-        tokenProperties
+        tokenAttributes
           .connect(owner)
-          .presignedSetBoolProperty(
+          .presignedSetBoolAttribute(
             issuer.address,
             ownedCollection.address,
             1,
@@ -1610,11 +1612,11 @@ describe('RMRKTokenPropertiesRepository', async function () {
             boolR,
             boolS,
           ),
-      ).to.be.revertedWithCustomError(tokenProperties, 'RMRKNotCollectionIssuer');
+      ).to.be.revertedWithCustomError(tokenAttributes, 'NotCollectionIssuer');
       await expect(
-        tokenProperties
+        tokenAttributes
           .connect(owner)
-          .presignedSetBytesProperty(
+          .presignedSetBytesAttribute(
             issuer.address,
             ownedCollection.address,
             1,
@@ -1625,11 +1627,11 @@ describe('RMRKTokenPropertiesRepository', async function () {
             bytesR,
             bytesS,
           ),
-      ).to.be.revertedWithCustomError(tokenProperties, 'RMRKNotCollectionIssuer');
+      ).to.be.revertedWithCustomError(tokenAttributes, 'NotCollectionIssuer');
       await expect(
-        tokenProperties
+        tokenAttributes
           .connect(owner)
-          .presignedSetAddressProperty(
+          .presignedSetAddressAttribute(
             issuer.address,
             ownedCollection.address,
             1,
@@ -1640,19 +1642,17 @@ describe('RMRKTokenPropertiesRepository', async function () {
             addressR,
             addressS,
           ),
-      ).to.be.revertedWithCustomError(tokenProperties, 'RMRKNotCollectionIssuer');
+      ).to.be.revertedWithCustomError(tokenAttributes, 'NotCollectionIssuer');
     });
   });
 });
 
-async function shouldBehaveLikeTokenPropertiesRepositoryInterface() {
+async function shouldBehaveLikeTokenAttributesRepositoryInterface() {
   it('can support IERC165', async function () {
-    expect(await this.tokenProperties.supportsInterface(IERC165)).to.equal(true);
+    expect(await this.tokenAttributes.supportsInterface(IERC165)).to.equal(true);
   });
 
-  it('can support IRMRKTokenPropertiesRepository', async function () {
-    expect(await this.tokenProperties.supportsInterface(IRMRKTokenPropertiesRepository)).to.equal(
-      true,
-    );
+  it('can support IERC7508', async function () {
+    expect(await this.tokenAttributes.supportsInterface(IERC7508)).to.equal(true);
   });
 }

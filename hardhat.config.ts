@@ -124,6 +124,9 @@ const config: HardhatUserConfig = {
       },
     ],
   },
+  dodoc: {
+    runOnCompile: false,
+  },
 };
 
 export default config;

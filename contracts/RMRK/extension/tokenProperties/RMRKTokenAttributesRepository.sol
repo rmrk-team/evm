@@ -7,42 +7,42 @@ import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 
 import "../../library/RMRKErrors.sol";
-import "./IRMRKTokenPropertiesRepository.sol";
+import "./IERC7508.sol";
 
 /**
- * @title RMRKTokenPropertiesRepository
+ * @title RMRKTokenAttributesRepository
  * @author RMRK team
  * @notice Smart contract of the RMRK Token property repository module.
  */
-contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
+contract RMRKTokenAttributesRepository is IERC7508 {
     bytes32 public immutable DOMAIN_SEPARATOR =
         keccak256(
             abi.encode(
-                "ERC-X: Public Non-Fungible Token Attributes Repository",
+                "ERC-7508: Public On-Chain NFT Attributes Repository",
                 "1",
                 block.chainid,
                 address(this)
             )
         );
-    bytes32 public immutable SET_UINT_PROPERTY_TYPEHASH =
+    bytes32 public immutable SET_UINT_ATTRIBUTE_TYPEHASH =
         keccak256(
-            "setUintProperty(address collection,uint256 tokenId,string memory key,uint256 value)"
+            "setUintAttribute(address collection,uint256 tokenId,string memory key,uint256 value)"
         );
-    bytes32 public immutable SET_STRING_PROPERTY_TYPEHASH =
+    bytes32 public immutable SET_STRING_ATTRIBUTE_TYPEHASH =
         keccak256(
-            "setStringProperty(address collection,uint256 tokenId,string memory key,string memory value)"
+            "setStringAttribute(address collection,uint256 tokenId,string memory key,string memory value)"
         );
-    bytes32 public immutable SET_BOOL_PROPERTY_TYPEHASH =
+    bytes32 public immutable SET_BOOL_ATTRIBUTE_TYPEHASH =
         keccak256(
-            "setBoolProperty(address collection,uint256 tokenId,string memory key,bool value)"
+            "setBoolAttribute(address collection,uint256 tokenId,string memory key,bool value)"
         );
-    bytes32 public immutable SET_BYTES_PROPERTY_TYPEHASH =
+    bytes32 public immutable SET_BYTES_ATTRIBUTE_TYPEHASH =
         keccak256(
-            "setBytesProperty(address collection,uint256 tokenId,string memory key,bytes memory value)"
+            "setBytesAttribute(address collection,uint256 tokenId,string memory key,bytes memory value)"
         );
-    bytes32 public immutable SET_ADDRESS_PROPERTY_TYPEHASH =
+    bytes32 public immutable SET_ADDRESS_ATTRIBUTE_TYPEHASH =
         keccak256(
-            "setAddressProperty(address collection,uint256 tokenId,string memory key,address value)"
+            "setAddressAttribute(address collection,uint256 tokenId,string memory key,address value)"
         );
 
     mapping(address => mapping(uint256 => AccessType))
@@ -55,7 +55,7 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
     // For keys, we use a mapping from strings to IDs.
     // The purpose is to store unique string keys only once, since they are more expensive.
     mapping(string => uint256) private _keysToIds;
-    uint256 private _totalProperties;
+    uint256 private _totalAttributes;
 
     // For strings, we also use a mapping from strings to IDs, together with a reverse mapping
     // The purpose is to store unique string values only once, since they are more expensive,
@@ -81,8 +81,31 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
         address issuer;
     }
 
+    /// Used to signal that the smart contract interacting with the repository does not implement Ownable pattern.
+    error OwnableNotImplemented();
+    /// Used to signal that the caller is not the issuer of the collection.
+    error NotCollectionIssuer();
+    /// Used to signal that the collaborator and collaborator rights array are not of equal length.
+    error CollaboratorArraysNotEqualLength();
+    /// Used to signal that the collection is not registered in the repository yet.
+    error CollectionNotRegistered();
+    /// Used to signal that the collection is already registered in the repository.
+    error CollectionAlreadyRegistered();
+    /// Used to signal that the caller is not aa collaborator of the collection.
+    error NotCollectionCollaborator();
+    /// Used to signal that the caller is not the issuer or a collaborator of the collection.
+    error NotCollectionIssuerOrCollaborator();
+    /// Used to signal that the caller is not the owner of the token.
+    error NotTokenOwner();
+    /// Used to signal that the caller is not the specific address allowed to manage the attribute.
+    error NotSpecificAddress();
+    /// Used to signal that the presigned message's signature is invalid.
+    error InvalidSignature();
+    /// Used to signal that the presigned message's deadline has expired.
+    error ExpiredDeadline();
+
     /**
-     * @inheritdoc IRMRKTokenPropertiesRepository
+     * @inheritdoc IERC7508
      */
     function registerAccessControl(
         address collection,
@@ -94,13 +117,13 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
         );
 
         if (address(uint160(uint256(bytes32(ownableReturn)))) == address(0)) {
-            revert RMRKOwnableNotImplemented();
+            revert OwnableNotImplemented();
         }
         if (
             ownableSuccess &&
             address(uint160(uint256(bytes32(ownableReturn)))) != msg.sender
         ) {
-            revert RMRKNotCollectionIssuer();
+            revert NotCollectionIssuer();
         }
 
         IssuerSetting storage issuerSetting = _issuerSettings[collection];
@@ -117,7 +140,7 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesRepository
+     * @inheritdoc IERC7508
      */
     function manageAccessControl(
         address collection,
@@ -134,7 +157,7 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesRepository
+     * @inheritdoc IERC7508
      */
     function manageCollaborators(
         address collection,
@@ -142,7 +165,7 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
         bool[] memory collaboratorAddressAccess
     ) external onlyRegisteredCollection(collection) onlyIssuer(collection) {
         if (collaboratorAddresses.length != collaboratorAddressAccess.length) {
-            revert RMRKCollaboratorArraysNotEqualLength();
+            revert CollaboratorArraysNotEqualLength();
         }
         for (uint256 i; i < collaboratorAddresses.length; ) {
             _collaborators[collection][
@@ -160,7 +183,7 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesRepository
+     * @inheritdoc IERC7508
      */
     function isCollaborator(
         address collaborator,
@@ -170,7 +193,7 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesRepository
+     * @inheritdoc IERC7508
      */
     function isSpecificAddress(
         address specificAddress,
@@ -185,11 +208,11 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
     /**
      * @notice Modifier to check if the caller is authorized to call the function.
      * @dev If the authorization is set to TokenOwner and the tokenId provided is of the non-existent token, the
-     *  execution will revert with `ERC721InvalidTokenId` rather than `RMRKNotTokenOwner`.
+     *  execution will revert with `ERC721InvalidTokenId` rather than `NotTokenOwner`.
      * @dev The tokenId parameter is only needed for the TokenOwner authorization type, other authorization types ignore
      *  it.
      * @param collection The address of the collection.
-     * @param key Key of the property.
+     * @param key Key of the attribute.
      * @param tokenId The ID of the token.
      */
     modifier onlyAuthorizedCaller(
@@ -207,7 +230,7 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
      */
     modifier onlyRegisteredCollection(address collection) {
         if (!_issuerSettings[collection].registered) {
-            revert RMRKCollectionNotRegistered();
+            revert CollectionNotRegistered();
         }
         _;
     }
@@ -218,7 +241,7 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
      */
     modifier onlyUnregisteredCollection(address collection) {
         if (_issuerSettings[collection].registered) {
-            revert RMRKCollectionAlreadyRegistered();
+            revert CollectionAlreadyRegistered();
         }
         _;
     }
@@ -230,10 +253,10 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
     modifier onlyIssuer(address collection) {
         if (_issuerSettings[collection].useOwnable) {
             if (Ownable(collection).owner() != msg.sender) {
-                revert RMRKNotCollectionIssuer();
+                revert NotCollectionIssuer();
             }
         } else if (_issuerSettings[collection].issuer != msg.sender) {
-            revert RMRKNotCollectionIssuer();
+            revert NotCollectionIssuer();
         }
         _;
     }
@@ -241,7 +264,7 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
     /**
      * @notice Function to check if the caller is authorized to mamage a given parameter.
      * @param collection The address of the collection.
-     * @param key Key of the property.
+     * @param key Key of the attribute.
      * @param tokenId The ID of the token.
      */
     function _onlyAuthorizedCaller(
@@ -261,12 +284,12 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
                 (!_issuerSettings[collection].useOwnable &&
                     _issuerSettings[collection].issuer != caller))
         ) {
-            revert RMRKNotCollectionIssuer();
+            revert NotCollectionIssuer();
         } else if (
             accessType == AccessType.Collaborator &&
             !_collaborators[collection][caller]
         ) {
-            revert RMRKNotCollectionCollaborator();
+            revert NotCollectionCollaborator();
         } else if (
             accessType == AccessType.IssuerOrCollaborator &&
             ((_issuerSettings[collection].useOwnable &&
@@ -275,24 +298,24 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
                     _issuerSettings[collection].issuer != caller)) &&
             !_collaborators[collection][caller]
         ) {
-            revert RMRKNotCollectionIssuerOrCollaborator();
+            revert NotCollectionIssuerOrCollaborator();
         } else if (
             accessType == AccessType.TokenOwner &&
             IERC721(collection).ownerOf(tokenId) != caller
         ) {
-            revert RMRKNotTokenOwner();
+            revert NotTokenOwner();
         } else if (
             accessType == AccessType.SpecificAddress &&
             !(_parameterSpecificAddress[collection][_keysToIds[key]] == caller)
         ) {
-            revert RMRKNotSpecificAddress();
+            revert NotSpecificAddress();
         }
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesRepository
+     * @inheritdoc IERC7508
      */
-    function getStringTokenProperty(
+    function getStringTokenAttribute(
         address collection,
         uint256 tokenId,
         string memory key
@@ -304,9 +327,9 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesRepository
+     * @inheritdoc IERC7508
      */
-    function getUintTokenProperty(
+    function getUintTokenAttribute(
         address collection,
         uint256 tokenId,
         string memory key
@@ -315,9 +338,9 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesRepository
+     * @inheritdoc IERC7508
      */
-    function getBoolTokenProperty(
+    function getBoolTokenAttribute(
         address collection,
         uint256 tokenId,
         string memory key
@@ -326,9 +349,9 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesRepository
+     * @inheritdoc IERC7508
      */
-    function getAddressTokenProperty(
+    function getAddressTokenAttribute(
         address collection,
         uint256 tokenId,
         string memory key
@@ -337,9 +360,9 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesRepository
+     * @inheritdoc IERC7508
      */
-    function getBytesTokenProperty(
+    function getBytesTokenAttribute(
         address collection,
         uint256 tokenId,
         string memory key
@@ -348,9 +371,9 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesRepository
+     * @inheritdoc IERC7508
      */
-    function getTokenProperties(
+    function getTokenAttributes(
         address collection,
         uint256 tokenId,
         string[] memory stringKeys,
@@ -362,30 +385,30 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
         external
         view
         returns (
-            StringProperty[] memory stringProperties,
-            UintProperty[] memory uintProperties,
-            BoolProperty[] memory boolProperties,
-            AddressProperty[] memory addressProperties,
-            BytesProperty[] memory bytesProperties
+            StringAttribute[] memory stringAttributes,
+            UintAttribute[] memory uintAttributes,
+            BoolAttribute[] memory boolAttributes,
+            AddressAttribute[] memory addressAttributes,
+            BytesAttribute[] memory bytesAttributes
         )
     {
-        stringProperties = getStringTokenProperties(
+        stringAttributes = getStringTokenAttributes(
             collection,
             tokenId,
             stringKeys
         );
 
-        uintProperties = getUintTokenProperties(collection, tokenId, uintKeys);
+        uintAttributes = getUintTokenAttributes(collection, tokenId, uintKeys);
 
-        boolProperties = getBoolTokenProperties(collection, tokenId, boolKeys);
+        boolAttributes = getBoolTokenAttributes(collection, tokenId, boolKeys);
 
-        addressProperties = getAddressTokenProperties(
+        addressAttributes = getAddressTokenAttributes(
             collection,
             tokenId,
             addressKeys
         );
 
-        bytesProperties = getBytesTokenProperties(
+        bytesAttributes = getBytesTokenAttributes(
             collection,
             tokenId,
             bytesKeys
@@ -393,21 +416,21 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesRepository
+     * @inheritdoc IERC7508
      */
-    function getStringTokenProperties(
+    function getStringTokenAttributes(
         address collection,
         uint256 tokenId,
         string[] memory stringKeys
-    ) public view returns (StringProperty[] memory) {
+    ) public view returns (StringAttribute[] memory) {
         uint256 stringLen = stringKeys.length;
 
-        StringProperty[] memory stringProperties = new StringProperty[](
+        StringAttribute[] memory stringAttributes = new StringAttribute[](
             stringLen
         );
 
         for (uint i; i < stringLen; ) {
-            stringProperties[i] = StringProperty({
+            stringAttributes[i] = StringAttribute({
                 key: stringKeys[i],
                 value: _stringIdToValue[collection][
                     _stringValueIds[collection][tokenId][
@@ -420,23 +443,23 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
             }
         }
 
-        return stringProperties;
+        return stringAttributes;
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesRepository
+     * @inheritdoc IERC7508
      */
-    function getUintTokenProperties(
+    function getUintTokenAttributes(
         address collection,
         uint256 tokenId,
         string[] memory uintKeys
-    ) public view returns (UintProperty[] memory) {
+    ) public view returns (UintAttribute[] memory) {
         uint256 uintLen = uintKeys.length;
 
-        UintProperty[] memory uintProperties = new UintProperty[](uintLen);
+        UintAttribute[] memory uintAttributes = new UintAttribute[](uintLen);
 
         for (uint i; i < uintLen; ) {
-            uintProperties[i] = UintProperty({
+            uintAttributes[i] = UintAttribute({
                 key: uintKeys[i],
                 value: _uintValues[collection][tokenId][_keysToIds[uintKeys[i]]]
             });
@@ -445,23 +468,23 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
             }
         }
 
-        return uintProperties;
+        return uintAttributes;
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesRepository
+     * @inheritdoc IERC7508
      */
-    function getBoolTokenProperties(
+    function getBoolTokenAttributes(
         address collection,
         uint256 tokenId,
         string[] memory boolKeys
-    ) public view returns (BoolProperty[] memory) {
+    ) public view returns (BoolAttribute[] memory) {
         uint256 boolLen = boolKeys.length;
 
-        BoolProperty[] memory boolProperties = new BoolProperty[](boolLen);
+        BoolAttribute[] memory boolAttributes = new BoolAttribute[](boolLen);
 
         for (uint i; i < boolLen; ) {
-            boolProperties[i] = BoolProperty({
+            boolAttributes[i] = BoolAttribute({
                 key: boolKeys[i],
                 value: _boolValues[collection][tokenId][_keysToIds[boolKeys[i]]]
             });
@@ -470,25 +493,25 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
             }
         }
 
-        return boolProperties;
+        return boolAttributes;
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesRepository
+     * @inheritdoc IERC7508
      */
-    function getAddressTokenProperties(
+    function getAddressTokenAttributes(
         address collection,
         uint256 tokenId,
         string[] memory addressKeys
-    ) public view returns (AddressProperty[] memory) {
+    ) public view returns (AddressAttribute[] memory) {
         uint256 addressLen = addressKeys.length;
 
-        AddressProperty[] memory addressProperties = new AddressProperty[](
+        AddressAttribute[] memory addressAttributes = new AddressAttribute[](
             addressLen
         );
 
         for (uint i; i < addressLen; ) {
-            addressProperties[i] = AddressProperty({
+            addressAttributes[i] = AddressAttribute({
                 key: addressKeys[i],
                 value: _addressValues[collection][tokenId][
                     _keysToIds[addressKeys[i]]
@@ -499,23 +522,25 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
             }
         }
 
-        return addressProperties;
+        return addressAttributes;
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesRepository
+     * @inheritdoc IERC7508
      */
-    function getBytesTokenProperties(
+    function getBytesTokenAttributes(
         address collection,
         uint256 tokenId,
         string[] memory bytesKeys
-    ) public view returns (BytesProperty[] memory) {
+    ) public view returns (BytesAttribute[] memory) {
         uint256 bytesLen = bytesKeys.length;
 
-        BytesProperty[] memory bytesProperties = new BytesProperty[](bytesLen);
+        BytesAttribute[] memory bytesAttributes = new BytesAttribute[](
+            bytesLen
+        );
 
         for (uint i; i < bytesLen; ) {
-            bytesProperties[i] = BytesProperty({
+            bytesAttributes[i] = BytesAttribute({
                 key: bytesKeys[i],
                 value: _bytesValues[collection][tokenId][
                     _keysToIds[bytesKeys[i]]
@@ -526,13 +551,13 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
             }
         }
 
-        return bytesProperties;
+        return bytesAttributes;
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesRepository
+     * @inheritdoc IERC7508
      */
-    function prepareMessageToPresignUintProperty(
+    function prepareMessageToPresignUintAttribute(
         address collection,
         uint256 tokenId,
         string memory key,
@@ -543,7 +568,7 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
             keccak256(
                 abi.encode(
                     DOMAIN_SEPARATOR,
-                    SET_UINT_PROPERTY_TYPEHASH,
+                    SET_UINT_ATTRIBUTE_TYPEHASH,
                     collection,
                     tokenId,
                     key,
@@ -554,9 +579,9 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesRepository
+     * @inheritdoc IERC7508
      */
-    function prepareMessageToPresignStringProperty(
+    function prepareMessageToPresignStringAttribute(
         address collection,
         uint256 tokenId,
         string memory key,
@@ -567,7 +592,7 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
             keccak256(
                 abi.encode(
                     DOMAIN_SEPARATOR,
-                    SET_STRING_PROPERTY_TYPEHASH,
+                    SET_STRING_ATTRIBUTE_TYPEHASH,
                     collection,
                     tokenId,
                     key,
@@ -578,9 +603,9 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesRepository
+     * @inheritdoc IERC7508
      */
-    function prepareMessageToPresignBoolProperty(
+    function prepareMessageToPresignBoolAttribute(
         address collection,
         uint256 tokenId,
         string memory key,
@@ -591,7 +616,7 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
             keccak256(
                 abi.encode(
                     DOMAIN_SEPARATOR,
-                    SET_BOOL_PROPERTY_TYPEHASH,
+                    SET_BOOL_ATTRIBUTE_TYPEHASH,
                     collection,
                     tokenId,
                     key,
@@ -602,9 +627,9 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesRepository
+     * @inheritdoc IERC7508
      */
-    function prepareMessageToPresignBytesProperty(
+    function prepareMessageToPresignBytesAttribute(
         address collection,
         uint256 tokenId,
         string memory key,
@@ -615,7 +640,7 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
             keccak256(
                 abi.encode(
                     DOMAIN_SEPARATOR,
-                    SET_BYTES_PROPERTY_TYPEHASH,
+                    SET_BYTES_ATTRIBUTE_TYPEHASH,
                     collection,
                     tokenId,
                     key,
@@ -626,9 +651,9 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesRepository
+     * @inheritdoc IERC7508
      */
-    function prepareMessageToPresignAddressProperty(
+    function prepareMessageToPresignAddressAttribute(
         address collection,
         uint256 tokenId,
         string memory key,
@@ -639,7 +664,7 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
             keccak256(
                 abi.encode(
                     DOMAIN_SEPARATOR,
-                    SET_ADDRESS_PROPERTY_TYPEHASH,
+                    SET_ADDRESS_ATTRIBUTE_TYPEHASH,
                     collection,
                     tokenId,
                     key,
@@ -650,22 +675,22 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesRepository
+     * @inheritdoc IERC7508
      */
-    function setUintProperty(
+    function setUintAttribute(
         address collection,
         uint256 tokenId,
         string memory key,
         uint256 value
     ) external onlyAuthorizedCaller(collection, key, tokenId) {
         _uintValues[collection][tokenId][_getIdForKey(key)] = value;
-        emit UintPropertyUpdated(collection, tokenId, key, value);
+        emit UintAttributeUpdated(collection, tokenId, key, value);
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesRepository
+     * @inheritdoc IERC7508
      */
-    function setStringProperty(
+    function setStringAttribute(
         address collection,
         uint256 tokenId,
         string memory key,
@@ -674,65 +699,65 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
         _stringValueIds[collection][tokenId][
             _getIdForKey(key)
         ] = _getStringIdForValue(collection, value);
-        emit StringPropertyUpdated(collection, tokenId, key, value);
+        emit StringAttributeUpdated(collection, tokenId, key, value);
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesRepository
+     * @inheritdoc IERC7508
      */
-    function setBoolProperty(
+    function setBoolAttribute(
         address collection,
         uint256 tokenId,
         string memory key,
         bool value
     ) external onlyAuthorizedCaller(collection, key, tokenId) {
         _boolValues[collection][tokenId][_getIdForKey(key)] = value;
-        emit BoolPropertyUpdated(collection, tokenId, key, value);
+        emit BoolAttributeUpdated(collection, tokenId, key, value);
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesRepository
+     * @inheritdoc IERC7508
      */
-    function setBytesProperty(
+    function setBytesAttribute(
         address collection,
         uint256 tokenId,
         string memory key,
         bytes memory value
     ) external onlyAuthorizedCaller(collection, key, tokenId) {
         _bytesValues[collection][tokenId][_getIdForKey(key)] = value;
-        emit BytesPropertyUpdated(collection, tokenId, key, value);
+        emit BytesAttributeUpdated(collection, tokenId, key, value);
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesRepository
+     * @inheritdoc IERC7508
      */
-    function setAddressProperty(
+    function setAddressAttribute(
         address collection,
         uint256 tokenId,
         string memory key,
         address value
     ) external onlyAuthorizedCaller(collection, key, tokenId) {
         _addressValues[collection][tokenId][_getIdForKey(key)] = value;
-        emit AddressPropertyUpdated(collection, tokenId, key, value);
+        emit AddressAttributeUpdated(collection, tokenId, key, value);
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesRepository
+     * @inheritdoc IERC7508
      */
-    function setStringProperties(
+    function setStringAttributes(
         address collection,
         uint256 tokenId,
-        StringProperty[] memory properties
+        StringAttribute[] memory attributes
     ) external onlyAuthorizedCaller(collection, "", tokenId) {
-        for (uint256 i = 0; i < properties.length; ) {
+        for (uint256 i = 0; i < attributes.length; ) {
             _stringValueIds[collection][tokenId][
-                _getIdForKey(properties[i].key)
-            ] = _getStringIdForValue(collection, properties[i].value);
-            emit StringPropertyUpdated(
+                _getIdForKey(attributes[i].key)
+            ] = _getStringIdForValue(collection, attributes[i].value);
+            emit StringAttributeUpdated(
                 collection,
                 tokenId,
-                properties[i].key,
-                properties[i].value
+                attributes[i].key,
+                attributes[i].value
             );
             unchecked {
                 ++i;
@@ -741,22 +766,22 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesRepository
+     * @inheritdoc IERC7508
      */
-    function setUintProperties(
+    function setUintAttributes(
         address collection,
         uint256 tokenId,
-        UintProperty[] memory properties
+        UintAttribute[] memory attributes
     ) external onlyAuthorizedCaller(collection, "", tokenId) {
-        for (uint256 i = 0; i < properties.length; ) {
+        for (uint256 i = 0; i < attributes.length; ) {
             _uintValues[collection][tokenId][
-                _getIdForKey(properties[i].key)
-            ] = properties[i].value;
-            emit UintPropertyUpdated(
+                _getIdForKey(attributes[i].key)
+            ] = attributes[i].value;
+            emit UintAttributeUpdated(
                 collection,
                 tokenId,
-                properties[i].key,
-                properties[i].value
+                attributes[i].key,
+                attributes[i].value
             );
             unchecked {
                 ++i;
@@ -765,22 +790,22 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesRepository
+     * @inheritdoc IERC7508
      */
-    function setBoolProperties(
+    function setBoolAttributes(
         address collection,
         uint256 tokenId,
-        BoolProperty[] memory properties
+        BoolAttribute[] memory attributes
     ) external onlyAuthorizedCaller(collection, "", tokenId) {
-        for (uint256 i = 0; i < properties.length; ) {
+        for (uint256 i = 0; i < attributes.length; ) {
             _boolValues[collection][tokenId][
-                _getIdForKey(properties[i].key)
-            ] = properties[i].value;
-            emit BoolPropertyUpdated(
+                _getIdForKey(attributes[i].key)
+            ] = attributes[i].value;
+            emit BoolAttributeUpdated(
                 collection,
                 tokenId,
-                properties[i].key,
-                properties[i].value
+                attributes[i].key,
+                attributes[i].value
             );
             unchecked {
                 ++i;
@@ -789,22 +814,22 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesRepository
+     * @inheritdoc IERC7508
      */
-    function setAddressProperties(
+    function setAddressAttributes(
         address collection,
         uint256 tokenId,
-        AddressProperty[] memory properties
+        AddressAttribute[] memory attributes
     ) external onlyAuthorizedCaller(collection, "", tokenId) {
-        for (uint256 i = 0; i < properties.length; ) {
+        for (uint256 i = 0; i < attributes.length; ) {
             _addressValues[collection][tokenId][
-                _getIdForKey(properties[i].key)
-            ] = properties[i].value;
-            emit AddressPropertyUpdated(
+                _getIdForKey(attributes[i].key)
+            ] = attributes[i].value;
+            emit AddressAttributeUpdated(
                 collection,
                 tokenId,
-                properties[i].key,
-                properties[i].value
+                attributes[i].key,
+                attributes[i].value
             );
             unchecked {
                 ++i;
@@ -813,22 +838,22 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesRepository
+     * @inheritdoc IERC7508
      */
-    function setBytesProperties(
+    function setBytesAttributes(
         address collection,
         uint256 tokenId,
-        BytesProperty[] memory properties
+        BytesAttribute[] memory attributes
     ) external onlyAuthorizedCaller(collection, "", tokenId) {
-        for (uint256 i = 0; i < properties.length; ) {
+        for (uint256 i = 0; i < attributes.length; ) {
             _bytesValues[collection][tokenId][
-                _getIdForKey(properties[i].key)
-            ] = properties[i].value;
-            emit BytesPropertyUpdated(
+                _getIdForKey(attributes[i].key)
+            ] = attributes[i].value;
+            emit BytesAttributeUpdated(
                 collection,
                 tokenId,
-                properties[i].key,
-                properties[i].value
+                attributes[i].key,
+                attributes[i].value
             );
             unchecked {
                 ++i;
@@ -837,86 +862,86 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesRepository
+     * @inheritdoc IERC7508
      */
-    function setTokenProperties(
+    function setTokenAttributes(
         address collection,
         uint256 tokenId,
-        StringProperty[] memory stringProperties,
-        UintProperty[] memory uintProperties,
-        BoolProperty[] memory boolProperties,
-        AddressProperty[] memory addressProperties,
-        BytesProperty[] memory bytesProperties
+        StringAttribute[] memory stringAttributes,
+        UintAttribute[] memory uintAttributes,
+        BoolAttribute[] memory boolAttributes,
+        AddressAttribute[] memory addressAttributes,
+        BytesAttribute[] memory bytesAttributes
     ) external onlyAuthorizedCaller(collection, "", tokenId) {
-        for (uint256 i = 0; i < stringProperties.length; ) {
+        for (uint256 i = 0; i < stringAttributes.length; ) {
             _stringValueIds[collection][tokenId][
-                _getIdForKey(stringProperties[i].key)
-            ] = _getStringIdForValue(collection, stringProperties[i].value);
-            emit StringPropertyUpdated(
+                _getIdForKey(stringAttributes[i].key)
+            ] = _getStringIdForValue(collection, stringAttributes[i].value);
+            emit StringAttributeUpdated(
                 collection,
                 tokenId,
-                stringProperties[i].key,
-                stringProperties[i].value
+                stringAttributes[i].key,
+                stringAttributes[i].value
             );
             unchecked {
                 ++i;
             }
         }
 
-        for (uint256 i = 0; i < uintProperties.length; ) {
+        for (uint256 i = 0; i < uintAttributes.length; ) {
             _uintValues[collection][tokenId][
-                _getIdForKey(uintProperties[i].key)
-            ] = uintProperties[i].value;
-            emit UintPropertyUpdated(
+                _getIdForKey(uintAttributes[i].key)
+            ] = uintAttributes[i].value;
+            emit UintAttributeUpdated(
                 collection,
                 tokenId,
-                uintProperties[i].key,
-                uintProperties[i].value
+                uintAttributes[i].key,
+                uintAttributes[i].value
             );
             unchecked {
                 ++i;
             }
         }
 
-        for (uint256 i = 0; i < boolProperties.length; ) {
+        for (uint256 i = 0; i < boolAttributes.length; ) {
             _boolValues[collection][tokenId][
-                _getIdForKey(boolProperties[i].key)
-            ] = boolProperties[i].value;
-            emit BoolPropertyUpdated(
+                _getIdForKey(boolAttributes[i].key)
+            ] = boolAttributes[i].value;
+            emit BoolAttributeUpdated(
                 collection,
                 tokenId,
-                boolProperties[i].key,
-                boolProperties[i].value
+                boolAttributes[i].key,
+                boolAttributes[i].value
             );
             unchecked {
                 ++i;
             }
         }
 
-        for (uint256 i = 0; i < addressProperties.length; ) {
+        for (uint256 i = 0; i < addressAttributes.length; ) {
             _addressValues[collection][tokenId][
-                _getIdForKey(addressProperties[i].key)
-            ] = addressProperties[i].value;
-            emit AddressPropertyUpdated(
+                _getIdForKey(addressAttributes[i].key)
+            ] = addressAttributes[i].value;
+            emit AddressAttributeUpdated(
                 collection,
                 tokenId,
-                addressProperties[i].key,
-                addressProperties[i].value
+                addressAttributes[i].key,
+                addressAttributes[i].value
             );
             unchecked {
                 ++i;
             }
         }
 
-        for (uint256 i = 0; i < bytesProperties.length; ) {
+        for (uint256 i = 0; i < bytesAttributes.length; ) {
             _bytesValues[collection][tokenId][
-                _getIdForKey(bytesProperties[i].key)
-            ] = bytesProperties[i].value;
-            emit BytesPropertyUpdated(
+                _getIdForKey(bytesAttributes[i].key)
+            ] = bytesAttributes[i].value;
+            emit BytesAttributeUpdated(
                 collection,
                 tokenId,
-                bytesProperties[i].key,
-                bytesProperties[i].value
+                bytesAttributes[i].key,
+                bytesAttributes[i].value
             );
             unchecked {
                 ++i;
@@ -925,9 +950,9 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesRepository
+     * @inheritdoc IERC7508
      */
-    function presignedSetUintProperty(
+    function presignedSetUintAttribute(
         address setter,
         address collection,
         uint256 tokenId,
@@ -939,7 +964,7 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
         bytes32 s
     ) external {
         if (block.timestamp > deadline) {
-            revert RMRKExpiredDeadline();
+            revert ExpiredDeadline();
         }
 
         bytes32 digest = keccak256(
@@ -948,7 +973,7 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
                 keccak256(
                     abi.encode(
                         DOMAIN_SEPARATOR,
-                        SET_UINT_PROPERTY_TYPEHASH,
+                        SET_UINT_ATTRIBUTE_TYPEHASH,
                         collection,
                         tokenId,
                         key,
@@ -960,18 +985,18 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
         );
         address signer = ecrecover(digest, v, r, s);
         if (signer != setter) {
-            revert RMRKInvalidSignature();
+            revert InvalidSignature();
         }
         _onlyAuthorizedCaller(signer, collection, key, tokenId);
 
         _uintValues[collection][tokenId][_getIdForKey(key)] = value;
-        emit UintPropertyUpdated(collection, tokenId, key, value);
+        emit UintAttributeUpdated(collection, tokenId, key, value);
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesRepository
+     * @inheritdoc IERC7508
      */
-    function presignedSetStringProperty(
+    function presignedSetStringAttribute(
         address setter,
         address collection,
         uint256 tokenId,
@@ -983,7 +1008,7 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
         bytes32 s
     ) external {
         if (block.timestamp > deadline) {
-            revert RMRKExpiredDeadline();
+            revert ExpiredDeadline();
         }
 
         bytes32 digest = keccak256(
@@ -992,7 +1017,7 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
                 keccak256(
                     abi.encode(
                         DOMAIN_SEPARATOR,
-                        SET_STRING_PROPERTY_TYPEHASH,
+                        SET_STRING_ATTRIBUTE_TYPEHASH,
                         collection,
                         tokenId,
                         key,
@@ -1004,20 +1029,20 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
         );
         address signer = ecrecover(digest, v, r, s);
         if (signer != setter) {
-            revert RMRKInvalidSignature();
+            revert InvalidSignature();
         }
         _onlyAuthorizedCaller(signer, collection, key, tokenId);
 
         _stringValueIds[collection][tokenId][
             _getIdForKey(key)
         ] = _getStringIdForValue(collection, value);
-        emit StringPropertyUpdated(collection, tokenId, key, value);
+        emit StringAttributeUpdated(collection, tokenId, key, value);
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesRepository
+     * @inheritdoc IERC7508
      */
-    function presignedSetBoolProperty(
+    function presignedSetBoolAttribute(
         address setter,
         address collection,
         uint256 tokenId,
@@ -1029,7 +1054,7 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
         bytes32 s
     ) external {
         if (block.timestamp > deadline) {
-            revert RMRKExpiredDeadline();
+            revert ExpiredDeadline();
         }
 
         bytes32 digest = keccak256(
@@ -1038,7 +1063,7 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
                 keccak256(
                     abi.encode(
                         DOMAIN_SEPARATOR,
-                        SET_BOOL_PROPERTY_TYPEHASH,
+                        SET_BOOL_ATTRIBUTE_TYPEHASH,
                         collection,
                         tokenId,
                         key,
@@ -1050,18 +1075,18 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
         );
         address signer = ecrecover(digest, v, r, s);
         if (signer != setter) {
-            revert RMRKInvalidSignature();
+            revert InvalidSignature();
         }
         _onlyAuthorizedCaller(signer, collection, key, tokenId);
 
         _boolValues[collection][tokenId][_getIdForKey(key)] = value;
-        emit BoolPropertyUpdated(collection, tokenId, key, value);
+        emit BoolAttributeUpdated(collection, tokenId, key, value);
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesRepository
+     * @inheritdoc IERC7508
      */
-    function presignedSetBytesProperty(
+    function presignedSetBytesAttribute(
         address setter,
         address collection,
         uint256 tokenId,
@@ -1073,7 +1098,7 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
         bytes32 s
     ) external {
         if (block.timestamp > deadline) {
-            revert RMRKExpiredDeadline();
+            revert ExpiredDeadline();
         }
 
         bytes32 digest = keccak256(
@@ -1082,7 +1107,7 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
                 keccak256(
                     abi.encode(
                         DOMAIN_SEPARATOR,
-                        SET_BYTES_PROPERTY_TYPEHASH,
+                        SET_BYTES_ATTRIBUTE_TYPEHASH,
                         collection,
                         tokenId,
                         key,
@@ -1094,18 +1119,18 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
         );
         address signer = ecrecover(digest, v, r, s);
         if (signer != setter) {
-            revert RMRKInvalidSignature();
+            revert InvalidSignature();
         }
         _onlyAuthorizedCaller(signer, collection, key, tokenId);
 
         _bytesValues[collection][tokenId][_getIdForKey(key)] = value;
-        emit BytesPropertyUpdated(collection, tokenId, key, value);
+        emit BytesAttributeUpdated(collection, tokenId, key, value);
     }
 
     /**
-     * @inheritdoc IRMRKTokenPropertiesRepository
+     * @inheritdoc IERC7508
      */
-    function presignedSetAddressProperty(
+    function presignedSetAddressAttribute(
         address setter,
         address collection,
         uint256 tokenId,
@@ -1117,7 +1142,7 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
         bytes32 s
     ) external {
         if (block.timestamp > deadline) {
-            revert RMRKExpiredDeadline();
+            revert ExpiredDeadline();
         }
 
         bytes32 digest = keccak256(
@@ -1126,7 +1151,7 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
                 keccak256(
                     abi.encode(
                         DOMAIN_SEPARATOR,
-                        SET_ADDRESS_PROPERTY_TYPEHASH,
+                        SET_ADDRESS_ATTRIBUTE_TYPEHASH,
                         collection,
                         tokenId,
                         key,
@@ -1138,26 +1163,26 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
         );
         address signer = ecrecover(digest, v, r, s);
         if (signer != setter) {
-            revert RMRKInvalidSignature();
+            revert InvalidSignature();
         }
         _onlyAuthorizedCaller(signer, collection, key, tokenId);
 
         _addressValues[collection][tokenId][_getIdForKey(key)] = value;
-        emit AddressPropertyUpdated(collection, tokenId, key, value);
+        emit AddressAttributeUpdated(collection, tokenId, key, value);
     }
 
     /**
      * @notice Used to get the Id for a key. If the key does not exist, a new ID is created.
      *  IDs are shared among all tokens and types
      * @dev The ID of 0 is not used as it represents the default value.
-     * @param key The property key
+     * @param key The attribute key
      * @return The ID of the key
      */
     function _getIdForKey(string memory key) internal returns (uint256) {
         if (_keysToIds[key] == 0) {
-            _totalProperties++;
-            _keysToIds[key] = _totalProperties;
-            return _totalProperties;
+            _totalAttributes++;
+            _keysToIds[key] = _totalAttributes;
+            return _totalAttributes;
         } else {
             return _keysToIds[key];
         }
@@ -1167,7 +1192,7 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
      * @notice Used to get the ID for a string value. If the value does not exist, a new ID is created.
      * @dev IDs are shared among all tokens and used only for strings.
      * @param collection Address of the collection being checked for string ID
-     * @param value The property value
+     * @param value The attribute value
      * @return The id for the string value
      */
     function _getStringIdForValue(
@@ -1195,7 +1220,7 @@ contract RMRKTokenPropertiesRepository is IRMRKTokenPropertiesRepository {
         bytes4 interfaceId
     ) public view virtual returns (bool) {
         return
-            interfaceId == type(IRMRKTokenPropertiesRepository).interfaceId ||
+            interfaceId == type(IERC7508).interfaceId ||
             interfaceId == type(IERC165).interfaceId;
     }
 }
