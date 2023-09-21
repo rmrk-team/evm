@@ -1251,10 +1251,10 @@ contract RMRKMinifiedEquippable is
     }
 
     /// Mapping of uint64 Ids to asset metadata
-    mapping(uint64 => string) private _assets;
+    mapping(uint64 => string) internal _assets;
 
     /// Mapping of tokenId to new asset, to asset to be replaced
-    mapping(uint256 => mapping(uint64 => uint64)) private _assetReplacements;
+    mapping(uint256 => mapping(uint64 => uint64)) internal _assetReplacements;
 
     /// Mapping of tokenId to an array of active assets
     /// @dev Active recurses is unbounded, getting all would reach gas limit at around 30k items
@@ -1268,7 +1268,7 @@ contract RMRKMinifiedEquippable is
     mapping(uint256 => uint64[]) internal _activeAssetPriorities;
 
     /// Mapping of tokenId to assetId to whether the token has this asset assigned
-    mapping(uint256 => mapping(uint64 => bool)) private _tokenAssets;
+    mapping(uint256 => mapping(uint64 => bool)) internal _tokenAssets;
 
     /// Mapping from owner to operator approvals for assets
     mapping(address => mapping(address => bool))
@@ -1579,22 +1579,22 @@ contract RMRKMinifiedEquippable is
 
     // ------------------- EQUIPPABLE --------------
     /// Mapping of uint64 asset ID to corresponding catalog address.
-    mapping(uint64 => address) private _catalogAddresses;
+    mapping(uint64 => address) internal _catalogAddresses;
     /// Mapping of uint64 ID to asset object.
-    mapping(uint64 => uint64) private _equippableGroupIds;
+    mapping(uint64 => uint64) internal _equippableGroupIds;
     /// Mapping of assetId to catalog parts applicable to this asset, both fixed and slot
-    mapping(uint64 => uint64[]) private _partIds;
+    mapping(uint64 => uint64[]) internal _partIds;
 
     /// Mapping of token ID to catalog address to slot part ID to equipment information. Used to compose an NFT.
     mapping(uint256 => mapping(address => mapping(uint64 => Equipment)))
-        private _equipments;
+        internal _equipments;
 
     /// Mapping of token ID to child (nestable) address to child ID to count of equipped items. Used to check if equipped.
     mapping(uint256 => mapping(address => mapping(uint256 => uint256)))
-        private _equipCountPerChild;
+        internal _equipCountPerChild;
 
     /// Mapping of `equippableGroupId` to parent contract address and valid `slotId`.
-    mapping(uint64 => mapping(address => uint64)) private _validParentSlots;
+    mapping(uint64 => mapping(address => uint64)) internal _validParentSlots;
 
     /**
      * @notice Used to verify that the caller is either the owner of the given token or approved to manage the token's assets

@@ -5,9 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.1.1] - 2023-09-21
+
+### Changed
+
+- Most asset and equipping related variables are changed from `private` to `internal` visibility, to allow for more flexibility on implementations.
+
 ## [2.1.0] - 2023-09-19
 
-This release covers minor improvements and updates the numbers for Nestable and Emotable ERCs. 
+This release covers minor improvements and updates the numbers for Nestable and Emotable ERCs.
 
 The original Nestable standard (ERC-6059) was missing parameter in the specification due to a method modified during the EIP process. The `interfaceId` of the specified interface was correct, so all the collections deployed using this package in the past were using the newly finalized ERC-7401 instead of ERC-6059.
 
@@ -16,6 +22,7 @@ The need to update the Emotes standard (ERC-6381) was noticed before it was rele
 To reiterate: you do not need to worry about upgrading or fixing previously deployed collections using these ERCs, since they are already built based on the latest specification ever since they have been released into the public domain.
 
 ### Changed
+
 - `equip` and `unequip` methods are now gated to the owner or approved for assets, transfer permission no longer needs to be granted alongside equip/unequip permission.
 - Renames ERC-6059 to ERC-7401.
 - Renames emotes repository to ERC-7409.
@@ -23,6 +30,7 @@ To reiterate: you do not need to worry about upgrading or fixing previously depl
 - Improves hardhat config and .env.example for network configuration.
 
 ### Fixed
+
 - No longer restricts child catalog from being different than parent's catalog to consider the child equippable in RMRKEquipRenderUtils.
 - Fixes soulbound detection on RenderUtils.getExtendedNFT.
 

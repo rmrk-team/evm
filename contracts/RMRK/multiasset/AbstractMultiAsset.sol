@@ -16,10 +16,10 @@ abstract contract AbstractMultiAsset is Context, IERC5773 {
     using RMRKLib for uint64[];
 
     /// Mapping of uint64 Ids to asset metadata
-    mapping(uint64 => string) private _assets;
+    mapping(uint64 => string) internal _assets;
 
     /// Mapping of tokenId to new asset, to asset to be replaced
-    mapping(uint256 => mapping(uint64 => uint64)) private _assetReplacements;
+    mapping(uint256 => mapping(uint64 => uint64)) internal _assetReplacements;
 
     /// Mapping of tokenId to an array of active assets
     /// @dev Active recurses is unbounded, getting all would reach gas limit at around 30k items
@@ -33,7 +33,7 @@ abstract contract AbstractMultiAsset is Context, IERC5773 {
     mapping(uint256 => uint64[]) internal _activeAssetPriorities;
 
     /// Mapping of tokenId to assetId to whether the token has this asset assigned
-    mapping(uint256 => mapping(uint64 => bool)) private _tokenAssets;
+    mapping(uint256 => mapping(uint64 => bool)) internal _tokenAssets;
 
     /// Mapping from owner to operator approvals for assets
     mapping(address => mapping(address => bool))
