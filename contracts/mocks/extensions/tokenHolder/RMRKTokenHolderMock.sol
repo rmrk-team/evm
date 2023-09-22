@@ -5,7 +5,6 @@ import "../../../RMRK/extension/tokenHolder/RMRKTokenHolder.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
 error OnlyNFTOwnerCanTransferTokensFromIt();
-error OnlyNFTOwnerCanTransferTokensToIt();
 
 /**
  * @title RMRKTokenHolderMock
@@ -37,7 +36,7 @@ contract RMRKTokenHolderMock is RMRKTokenHolder, ERC721 {
         address tokenContract,
         TokenType tokenType,
         uint256 tokenId,
-        uint256 heldTokenId,
+        uint256 tokenToTransferId,
         uint256 amount,
         bytes memory data
     ) external {
@@ -45,7 +44,7 @@ contract RMRKTokenHolderMock is RMRKTokenHolder, ERC721 {
             tokenContract,
             tokenType,
             tokenId,
-            heldTokenId,
+            tokenToTransferId,
             amount,
             data
         );
@@ -58,7 +57,7 @@ contract RMRKTokenHolderMock is RMRKTokenHolder, ERC721 {
         address tokenContract,
         TokenType tokenType,
         uint256 tokenId,
-        uint256 heldTokenId,
+        uint256 tokenToTransferId,
         uint256 amount,
         address to,
         bytes memory data
@@ -70,7 +69,7 @@ contract RMRKTokenHolderMock is RMRKTokenHolder, ERC721 {
             tokenContract,
             tokenType,
             tokenId,
-            heldTokenId,
+            tokenToTransferId,
             amount,
             to,
             data

@@ -20,7 +20,7 @@ error InsufficientBalance();
  * @dev The RMRKTokenHolder extension is capable of holding ERC-20, ERC-721, and ERC-1155 tokens.
  */
 abstract contract RMRKTokenHolder is IRMRKTokenHolder {
-    mapping(uint256 tokenId => mapping(address tokenAddress => mapping(TokenType tokenType => mapping(uint256 heldTokenId => uint256 balance))))
+    mapping(uint256 tokenId => mapping(address tokenAddress => mapping(TokenType tokenType => mapping(uint256 tokenToTransferId => uint256 balance))))
         private _balances;
 
     /**
@@ -30,12 +30,13 @@ abstract contract RMRKTokenHolder is IRMRKTokenHolder {
         address tokenContract,
         TokenType tokenType,
         uint256 tokenId,
-        uint256 heldTokenId
+        uint256 tokenToTransferId
     ) external view returns (uint256) {
         if (tokenType == TokenType.ERC20) {
             return _balances[tokenId][tokenContract][tokenType][0];
         } else {
-            return _balances[tokenId][tokenContract][tokenType][heldTokenId];
+            return
+                _balances[tokenId][tokenContract][tokenType][tokenToTransferId];
         }
     }
 
@@ -44,12 +45,12 @@ abstract contract RMRKTokenHolder is IRMRKTokenHolder {
      * @dev The balance MUST be transferred from this smart contract.
      * @dev Implementers should validate that the `msg.sender` is either the token owner or approved to manage it before
      *  calling this.
-     * @dev If the token type is `ERC-20`, the `heldTokenId` MUST be ignored.
+     * @dev If the token type is `ERC-20`, the `tokenToTransferId` MUST be ignored.
      * @dev IF the token type is `ERC-721`, the `amount` MUST be ignored.
      * @param tokenContract The address of the held token's smart contract
      * @param tokenType The type of the token being transferred
      * @param tokenId The ID of the token to transfer the held token from
-     * @param heldTokenId The ID of the held token to transfer
+     * @param tokenToTransferId The ID of the held token to transfer
      * @param amount The number of held tokens to transfer
      * @param to The address to transfer the held tokens to
      * @param data Additional data with no specified format, to allow for custom logic
@@ -58,13 +59,13 @@ abstract contract RMRKTokenHolder is IRMRKTokenHolder {
         address tokenContract,
         TokenType tokenType,
         uint256 tokenId,
-        uint256 heldTokenId,
+        uint256 tokenToTransferId,
         uint256 amount,
         address to,
         bytes memory data
     ) internal {
         if (tokenType == TokenType.ERC20) {
-            heldTokenId = 0;
+            tokenToTransferId = 0;
         } else if (tokenType == TokenType.ERC721) {
             amount = 1;
         }
@@ -76,7 +77,8 @@ abstract contract RMRKTokenHolder is IRMRKTokenHolder {
             revert InvalidAddress();
         }
         if (
-            _balances[tokenId][tokenContract][tokenType][heldTokenId] < amount
+            _balances[tokenId][tokenContract][tokenType][tokenToTransferId] <
+            amount
         ) {
             revert InsufficientBalance();
         }
@@ -85,13 +87,15 @@ abstract contract RMRKTokenHolder is IRMRKTokenHolder {
             tokenContract,
             tokenType,
             tokenId,
-            heldTokenId,
+            tokenToTransferId,
             to,
             amount,
             data
         );
 
-        _balances[tokenId][tokenContract][tokenType][heldTokenId] -= amount;
+        _balances[tokenId][tokenContract][tokenType][
+            tokenToTransferId
+        ] -= amount;
 
         if (tokenType == TokenType.ERC20) {
             IERC20(tokenContract).transfer(to, amount);
@@ -99,14 +103,14 @@ abstract contract RMRKTokenHolder is IRMRKTokenHolder {
             IERC721(tokenContract).safeTransferFrom(
                 address(this),
                 to,
-                heldTokenId,
+                tokenToTransferId,
                 data
             );
         } else {
             IERC1155(tokenContract).safeTransferFrom(
                 address(this),
                 to,
-                heldTokenId,
+                tokenToTransferId,
                 amount,
                 data
             );
@@ -116,7 +120,7 @@ abstract contract RMRKTokenHolder is IRMRKTokenHolder {
             tokenContract,
             tokenType,
             tokenId,
-            heldTokenId,
+            tokenToTransferId,
             to,
             amount
         );
@@ -125,7 +129,7 @@ abstract contract RMRKTokenHolder is IRMRKTokenHolder {
             tokenContract,
             tokenType,
             tokenId,
-            heldTokenId,
+            tokenToTransferId,
             to,
             amount,
             data
@@ -136,12 +140,12 @@ abstract contract RMRKTokenHolder is IRMRKTokenHolder {
      * @notice Transfer tokens to a specific holder token.
      * @dev The token smart contract must have approval for this contract to transfer the tokens.
      * @dev The balance MUST be transferred from the `msg.sender`.
-     * @dev If the token type is `ERC-20`, the `heldTokenId` MUST be ignored.
+     * @dev If the token type is `ERC-20`, the `tokenToTransferId` MUST be ignored.
      * @dev If the token type is `ERC-721`, the `amount` MUST be ignored.
      * @param tokenContract The address of the token smart contract
      * @param tokenType The type of the token being transferred
      * @param tokenId The ID of the token to transfer the tokens to
-     * @param heldTokenId The ID of the held token to transfer
+     * @param tokenToTransferId The ID of the held token to transfer
      * @param amount The number of ERC-20 tokens to transfer
      * @param data Additional data with no specified format, to allow for custom logic
      */
@@ -149,12 +153,12 @@ abstract contract RMRKTokenHolder is IRMRKTokenHolder {
         address tokenContract,
         TokenType tokenType,
         uint256 tokenId,
-        uint256 heldTokenId,
+        uint256 tokenToTransferId,
         uint256 amount,
         bytes memory data
     ) internal {
         if (tokenType == TokenType.ERC20) {
-            heldTokenId = 0;
+            tokenToTransferId = 0;
         } else if (tokenType == TokenType.ERC721) {
             amount = 1;
         }
@@ -170,13 +174,15 @@ abstract contract RMRKTokenHolder is IRMRKTokenHolder {
             tokenContract,
             tokenType,
             tokenId,
-            heldTokenId,
+            tokenToTransferId,
             msg.sender,
             amount,
             data
         );
 
-        _balances[tokenId][tokenContract][tokenType][heldTokenId] += amount;
+        _balances[tokenId][tokenContract][tokenType][
+            tokenToTransferId
+        ] += amount;
 
         if (tokenType == TokenType.ERC20) {
             IERC20(tokenContract).transferFrom(
@@ -188,14 +194,14 @@ abstract contract RMRKTokenHolder is IRMRKTokenHolder {
             IERC721(tokenContract).safeTransferFrom(
                 msg.sender,
                 address(this),
-                heldTokenId,
+                tokenToTransferId,
                 data
             );
         } else {
             IERC1155(tokenContract).safeTransferFrom(
                 msg.sender,
                 address(this),
-                heldTokenId,
+                tokenToTransferId,
                 amount,
                 data
             );
@@ -205,7 +211,7 @@ abstract contract RMRKTokenHolder is IRMRKTokenHolder {
             tokenContract,
             tokenType,
             tokenId,
-            heldTokenId,
+            tokenToTransferId,
             msg.sender,
             amount
         );
@@ -214,7 +220,7 @@ abstract contract RMRKTokenHolder is IRMRKTokenHolder {
             tokenContract,
             tokenType,
             tokenId,
-            heldTokenId,
+            tokenToTransferId,
             msg.sender,
             amount,
             data
@@ -223,12 +229,12 @@ abstract contract RMRKTokenHolder is IRMRKTokenHolder {
 
     /**
      * @notice Hook that is called before any transfer of held tokens from a given token.
-     * @dev If the token type is `ERC-20`, the `heldTokenId` MUST equal `0`
+     * @dev If the token type is `ERC-20`, the `tokenToTransferId` MUST equal `0`
      * @dev If the token type is `ERC-721`, the `amount` MUST equal `1`.
      * @param tokenContract The address of the held token smart contract
      * @param tokenType The type of the held token being transferred
      * @param tokenId The ID of the token to transfer from
-     * @param heldTokenId The ID of the held token to transfer
+     * @param tokenToTransferId The ID of the held token to transfer
      * @param to The address to send the held tokens to
      * @param amount The amount of held tokens to transfer
      * @param data Additional data with no specified format, to allow for custom logic
@@ -237,7 +243,7 @@ abstract contract RMRKTokenHolder is IRMRKTokenHolder {
         address tokenContract,
         TokenType tokenType,
         uint256 tokenId,
-        uint256 heldTokenId,
+        uint256 tokenToTransferId,
         address to,
         uint256 amount,
         bytes memory data
@@ -245,12 +251,12 @@ abstract contract RMRKTokenHolder is IRMRKTokenHolder {
 
     /**
      * @notice Hook that is called after any transfer of held tokens from a token.
-     * @dev If the token type is `ERC-20`, the `heldTokenId` MUST equal `0`
+     * @dev If the token type is `ERC-20`, the `tokenToTransferId` MUST equal `0`
      * @dev If the token type is `ERC-721`, the `amount` MUST equal `1`.
      * @param tokenContract The address of the held token smart contract
      * @param tokenType The type of the held token being transferred
      * @param tokenId The ID of the token to transfer from
-     * @param heldTokenId The ID of the held token to transfer
+     * @param tokenToTransferId The ID of the held token to transfer
      * @param to The address to send the held tokens to
      * @param amount The amount of held tokens to transfer
      * @param data Additional data with no specified format, to allow for custom logic
@@ -259,7 +265,7 @@ abstract contract RMRKTokenHolder is IRMRKTokenHolder {
         address tokenContract,
         TokenType tokenType,
         uint256 tokenId,
-        uint256 heldTokenId,
+        uint256 tokenToTransferId,
         address to,
         uint256 amount,
         bytes memory data
@@ -267,12 +273,12 @@ abstract contract RMRKTokenHolder is IRMRKTokenHolder {
 
     /**
      * @notice Hook that is called before any transfer of held tokens to a token.
-     * @dev If the token type is `ERC-20`, the `heldTokenId` MUST equal `0`
+     * @dev If the token type is `ERC-20`, the `tokenToTransferId` MUST equal `0`
      * @dev If the token type is `ERC-721`, the `amount` MUST equal `1`.
      * @param tokenContract The address of the held token's smart contract
      * @param tokenType The type of the token being transferred
      * @param tokenId The ID of the token to transfer the held tokens to
-     * @param heldTokenId The ID of the held token to transfer
+     * @param tokenToTransferId The ID of the held token to transfer
      * @param from The address to send the held tokens from
      * @param amount The number of held tokens to transfer
      * @param data Additional data with no specified format, to allow for custom logic
@@ -281,7 +287,7 @@ abstract contract RMRKTokenHolder is IRMRKTokenHolder {
         address tokenContract,
         TokenType tokenType,
         uint256 tokenId,
-        uint256 heldTokenId,
+        uint256 tokenToTransferId,
         address from,
         uint256 amount,
         bytes memory data
@@ -289,12 +295,12 @@ abstract contract RMRKTokenHolder is IRMRKTokenHolder {
 
     /**
      * @notice Hook that is called after any transfer of held tokens to a token.
-     * @dev If the token type is `ERC-20`, the `heldTokenId` MUST equal `0`
+     * @dev If the token type is `ERC-20`, the `tokenToTransferId` MUST equal `0`
      * @dev If the token type is `ERC-721`, the `amount` MUST equal `1`.
      * @param tokenContract The address of the held token's smart contract contract
      * @param tokenType The type of the token being transferred
      * @param tokenId The ID of the token to transfer from
-     * @param heldTokenId The ID of the held token to transfer
+     * @param tokenToTransferId The ID of the held token to transfer
      * @param from The address to send the held tokens from
      * @param amount The amount of held tokens to transfer
      * @param data Additional data with no specified format, to allow for custom logic
@@ -303,7 +309,7 @@ abstract contract RMRKTokenHolder is IRMRKTokenHolder {
         address tokenContract,
         TokenType tokenType,
         uint256 tokenId,
-        uint256 heldTokenId,
+        uint256 tokenToTransferId,
         address from,
         uint256 amount,
         bytes memory data
