@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { ADDRESS_ZERO, bn, mintFromMock, nestMintFromMock } from '../utils';
-import { IERC165, IOtherInterface, IERC6059, IRMRKReclaimableChild } from '../interfaces';
+import { IERC165, IOtherInterface, IERC7401, IRMRKReclaimableChild } from '../interfaces';
 import { RMRKNestableClaimableChildMock } from '../../typechain-types';
 
 // --------------- FIXTURES -----------------------
@@ -50,8 +50,8 @@ async function shouldBehaveLikeReclaimableChild() {
     expect(await this.parent.supportsInterface(IRMRKReclaimableChild)).to.equal(true);
   });
 
-  it('can support IERC6059', async function () {
-    expect(await this.parent.supportsInterface(IERC6059)).to.equal(true);
+  it('can support IERC7401', async function () {
+    expect(await this.parent.supportsInterface(IERC7401)).to.equal(true);
   });
 
   it('does not support other interfaces', async function () {

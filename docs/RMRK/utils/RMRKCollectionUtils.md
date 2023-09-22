@@ -54,7 +54,7 @@ Used to get the interface support of a specified collection.
 |---|---|---|
 | supports721 | bool | Boolean value signifying whether the collection supports ERC721 interface |
 | supportsMultiAsset | bool | Boolean value signifying whether the collection supports MultiAsset interface (ERC5773) |
-| supportsNesting | bool | Boolean value signifying whether the collection supports Nestable interface (ERC6059) |
+| supportsNesting | bool | Boolean value signifying whether the collection supports Nestable interface (ERC7401) |
 | supportsEquippable | bool | Boolean value signifying whether the collection supports Equippable interface (ERC6220) |
 | supportsSoulbound | bool | Boolean value signifying whether the collection supports Soulbound interface (ERC6454) |
 | supportsRoyalties | bool | Boolean value signifying whether the collection supports Royaltiesy interface (ERC2981) |

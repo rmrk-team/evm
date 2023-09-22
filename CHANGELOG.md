@@ -5,6 +5,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.1.1] - 2023-09-21
+
+### Changed
+
+- Most asset and equipping related variables are changed from `private` to `internal` visibility, to allow for more flexibility on implementations.
+
+## [2.1.0] - 2023-09-19
+
+This release covers minor improvements and updates the numbers for Nestable and Emotable ERCs.
+
+The original Nestable standard (ERC-6059) was missing parameter in the specification due to a method modified during the EIP process. The `interfaceId` of the specified interface was correct, so all the collections deployed using this package in the past were using the newly finalized ERC-7401 instead of ERC-6059.
+
+The need to update the Emotes standard (ERC-6381) was noticed before it was released into production. The implementation was incompatible with the full set of Unicode emojis due to them having additional flags, and their codes extended well over the `bytes4` storage available. The updated standard (ERC-7409) uses `string` type values to store the emoji codes and is now compatible with all existing emojis as well as any of those that will be added in the future. Our emotes.app has used ERC-7409 since its release, so you don't need to worry that some reactions might be lost; they are all there.
+
+To reiterate: you do not need to worry about upgrading or fixing previously deployed collections using these ERCs, since they are already built based on the latest specification ever since they have been released into the public domain.
+
+### Changed
+
+- `equip` and `unequip` methods are now gated to the owner or approved for assets, transfer permission no longer needs to be granted alongside equip/unequip permission.
+- Renames ERC-6059 to ERC-7401.
+- Renames emotes repository to ERC-7409.
+- Adds Base test and mainnet networks
+- Improves hardhat config and .env.example for network configuration.
+
+### Fixed
+
+- No longer restricts child catalog from being different than parent's catalog to consider the child equippable in RMRKEquipRenderUtils.
+- Fixes soulbound detection on RenderUtils.getExtendedNFT.
+
 ## [2.0.0] - 2023-08-01
 
 This Release has significant breaking changes in all ready-to-use implementations. The inheritance flow was highly simplified, by merging all extra utilities, which a marketplace would typically expect, into a single abstract contract: `RMRKImplementationBase`. This contract replaces `RMRKCollectionMetadata`, `RMRKMintingUtils` contracts and `name` and `symbol` of all core implementations.

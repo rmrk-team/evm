@@ -38,22 +38,22 @@ contract RMRKEquippable is
 
     // ------------------- EQUIPPABLE --------------
     /// Mapping of uint64 asset ID to corresponding catalog address.
-    mapping(uint64 => address) private _catalogAddresses;
+    mapping(uint64 => address) internal _catalogAddresses;
     /// Mapping of uint64 ID to asset object.
-    mapping(uint64 => uint64) private _equippableGroupIds;
+    mapping(uint64 => uint64) internal _equippableGroupIds;
     /// Mapping of assetId to catalog parts applicable to this asset, both fixed and slot
-    mapping(uint64 => uint64[]) private _partIds;
+    mapping(uint64 => uint64[]) internal _partIds;
 
     /// Mapping of token ID to catalog address to slot part ID to equipment information. Used to compose an NFT.
     mapping(uint256 => mapping(address => mapping(uint64 => Equipment)))
-        private _equipments;
+        internal _equipments;
 
     /// Mapping of token ID to child (nestable) address to child ID to count of equipped items. Used to check if equipped.
     mapping(uint256 => mapping(address => mapping(uint256 => uint256)))
-        private _equipCountPerChild;
+        internal _equipCountPerChild;
 
     /// Mapping of `equippableGroupId` to parent contract address and valid `slotId`.
-    mapping(uint64 => mapping(address => uint64)) private _validParentSlots;
+    mapping(uint64 => mapping(address => uint64)) internal _validParentSlots;
 
     /**
      * @notice Used to verify that the caller is either the owner of the given token or approved to manage the token's assets
@@ -311,7 +311,7 @@ contract RMRKEquippable is
      */
     function equip(
         IntakeEquip memory data
-    ) public virtual onlyApprovedOrOwner(data.tokenId) nonReentrant {
+    ) public virtual onlyApprovedForAssetsOrOwner(data.tokenId) nonReentrant {
         _equip(data);
     }
 
@@ -342,7 +342,7 @@ contract RMRKEquippable is
         // Check from parent's asset perspective:
         _checkAssetAcceptsSlot(data.assetId, slotPartId);
 
-        IERC6059.Child memory child = childOf(data.tokenId, data.childIndex);
+        IERC7401.Child memory child = childOf(data.tokenId, data.childIndex);
 
         // Check from child perspective intention to be used in part
         // We add reentrancy guard because of this call, it happens before updating state
@@ -409,7 +409,7 @@ contract RMRKEquippable is
         uint256 tokenId,
         uint64 assetId,
         uint64 slotPartId
-    ) public virtual onlyApprovedOrOwner(tokenId) {
+    ) public virtual onlyApprovedForAssetsOrOwner(tokenId) {
         _unequip(tokenId, assetId, slotPartId);
     }
 

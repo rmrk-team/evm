@@ -83,6 +83,8 @@ async function slotsFixture() {
   // catalog
   const catalog = <RMRKCatalogImpl>await catalogFactory.deploy(catalogSymbol, catalogType);
   await catalog.deployed();
+  const catalogForWeapon = <RMRKCatalogImpl>await catalogFactory.deploy(catalogSymbol, catalogType);
+  await catalogForWeapon.deployed();
 
   // Soldier token
   const soldier = <RMRKEquippableMock>await equipFactory.deploy();
@@ -102,6 +104,7 @@ async function slotsFixture() {
 
   await setupContextForSlots(
     catalog,
+    catalogForWeapon,
     soldier,
     soldier,
     weapon,

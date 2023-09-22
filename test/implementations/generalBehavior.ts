@@ -37,7 +37,7 @@ import {
   IERC721Metadata,
   IERC2981,
   IERC5773,
-  IERC6059,
+  IERC7401,
   IERC6454,
   IERC6220,
 } from '../interfaces';
@@ -641,9 +641,9 @@ async function testInterfaceSupport(legoCombination: LegoCombination, isSoulboun
           LegoCombination.NestableMultiAsset,
         ].includes(legoCombination)
       ) {
-        expect(await contract.supportsInterface(IERC6059)).to.be.true;
+        expect(await contract.supportsInterface(IERC7401)).to.be.true;
       } else {
-        expect(await contract.supportsInterface(IERC6059)).to.be.false;
+        expect(await contract.supportsInterface(IERC7401)).to.be.false;
       }
 
       if (legoCombination == LegoCombination.Equippable) {
@@ -835,7 +835,7 @@ async function testGeneralBehavior(mintingType: MintingType) {
 
     it('cannot burn if not token owner', async function () {
       await mint(holder.address, contract, owner, rmrkERC20, mintingType);
-      const expectedError = (await contract.supportsInterface(IERC6059))
+      const expectedError = (await contract.supportsInterface(IERC7401))
         ? 'RMRKNotApprovedOrDirectOwner'
         : 'ERC721NotApprovedOrOwner';
       await expect(contract.connect(owner)['burn(uint256)'](1)).to.be.revertedWithCustomError(
