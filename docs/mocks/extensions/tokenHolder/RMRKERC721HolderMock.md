@@ -471,10 +471,10 @@ Used to notify the listeners that the ERC-721 tokens have been transferred.
 
 ## Errors
 
-### InvalidAddressForERC721
+### InvalidAddress
 
 ```solidity
-error InvalidAddressForERC721()
+error InvalidAddress()
 ```
 
 
@@ -493,10 +493,10 @@ error OnlyNFTOwnerCanTransferTokensFromIt()
 
 
 
-### TokenNotHeldForERC721
+### TokenNotHeld
 
 ```solidity
-error TokenNotHeldForERC721()
+error TokenNotHeld()
 ```
 
 

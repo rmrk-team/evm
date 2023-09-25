@@ -445,10 +445,10 @@ Used to notify the listeners that the ERC-20 tokens have been transferred.
 
 ## Errors
 
-### InsufficientBalanceForERC20
+### InsufficientBalance
 
 ```solidity
-error InsufficientBalanceForERC20()
+error InsufficientBalance()
 ```
 
 
@@ -456,10 +456,10 @@ error InsufficientBalanceForERC20()
 
 
 
-### InvalidAddressForERC20
+### InvalidAddress
 
 ```solidity
-error InvalidAddressForERC20()
+error InvalidAddress()
 ```
 
 
@@ -467,10 +467,10 @@ error InvalidAddressForERC20()
 
 
 
-### InvalidValueForERC20
+### InvalidValue
 
 ```solidity
-error InvalidValueForERC20()
+error InvalidValue()
 ```
 
 

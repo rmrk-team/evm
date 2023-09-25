@@ -487,10 +487,10 @@ error InsufficientBalance()
 
 
 
-### InvalidAddressForERC1155
+### InvalidAddress
 
 ```solidity
-error InvalidAddressForERC1155()
+error InvalidAddress()
 ```
 
 
@@ -498,10 +498,10 @@ error InvalidAddressForERC1155()
 
 
 
-### InvalidValueForERC1155
+### InvalidValue
 
 ```solidity
-error InvalidValueForERC1155()
+error InvalidValue()
 ```
 
 

@@ -3,11 +3,8 @@
 pragma solidity ^0.8.18;
 
 import "./IERC1155Holder.sol";
+import "./HolderErrors.sol";
 import "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
-
-error InvalidValueForERC1155();
-error InvalidAddressForERC1155();
-error InsufficientBalance();
 
 abstract contract ERC1155Holder is IERC1155Holder {
     mapping(uint256 tokenHolderId => mapping(address erc1155Address => mapping(uint256 tokenHeldId => uint256 balance)))
@@ -43,10 +40,10 @@ abstract contract ERC1155Holder is IERC1155Holder {
         bytes memory data
     ) internal {
         if (amount == 0) {
-            revert InvalidValueForERC1155();
+            revert InvalidValue();
         }
         if (to == address(0) || erc1155Contract == address(0)) {
-            revert InvalidAddressForERC1155();
+            revert InvalidAddress();
         }
         if (
             _balances[tokenHolderId][erc1155Contract][tokenToTransferId] <
@@ -100,10 +97,10 @@ abstract contract ERC1155Holder is IERC1155Holder {
         bytes memory data
     ) external {
         if (amount == 0) {
-            revert InvalidValueForERC1155();
+            revert InvalidValue();
         }
         if (erc1155Contract == address(0)) {
-            revert InvalidAddressForERC1155();
+            revert InvalidAddress();
         }
         _beforeTransferERC1155ToToken(
             erc1155Contract,

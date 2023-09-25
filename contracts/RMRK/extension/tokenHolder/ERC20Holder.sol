@@ -3,11 +3,8 @@
 pragma solidity ^0.8.18;
 
 import "./IERC20Holder.sol";
+import "./HolderErrors.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-
-error InvalidValueForERC20();
-error InvalidAddressForERC20();
-error InsufficientBalanceForERC20();
 
 abstract contract ERC20Holder is IERC20Holder {
     mapping(uint256 tokenId => mapping(address erc20Address => uint256 balance))
@@ -40,13 +37,13 @@ abstract contract ERC20Holder is IERC20Holder {
         bytes memory data
     ) internal {
         if (amount == 0) {
-            revert InvalidValueForERC20();
+            revert InvalidValue();
         }
         if (to == address(0) || erc20Contract == address(0)) {
-            revert InvalidAddressForERC20();
+            revert InvalidAddress();
         }
         if (_balances[tokenId][erc20Contract] < amount) {
-            revert InsufficientBalanceForERC20();
+            revert InsufficientBalance();
         }
         _beforeTransferHeldERC20FromToken(
             erc20Contract,
@@ -79,10 +76,10 @@ abstract contract ERC20Holder is IERC20Holder {
         bytes memory data
     ) external {
         if (amount == 0) {
-            revert InvalidValueForERC20();
+            revert InvalidValue();
         }
         if (erc20Contract == address(0)) {
-            revert InvalidAddressForERC20();
+            revert InvalidAddress();
         }
         _beforeTransferERC20ToToken(
             erc20Contract,

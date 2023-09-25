@@ -1,5 +1,8 @@
 const IERC165 = '0x01ffc9a7';
 const IRMRKTokenHolder = '0x99782111';
+const IRMRKERC20Holder = '0xc7ee1956';
+const IRMRKERC721Holder = '0xe6b1cc8c';
+const IRMRKERC1155Holder = '0x79fe70d1';
 const IERC721 = '0x80ac58cd';
 const IERC721Metadata = '0x5b5e139f';
 const IOtherInterface = '0xffffffff';
@@ -21,6 +24,9 @@ const IRMRKImplementation = '0x524D524B'; // "RMRK" in ASCII hex
 export {
   IERC165,
   IRMRKTokenHolder,
+  IRMRKERC20Holder,
+  IRMRKERC721Holder,
+  IRMRKERC1155Holder,
   IERC721,
   IERC721Metadata,
   IOtherInterface,

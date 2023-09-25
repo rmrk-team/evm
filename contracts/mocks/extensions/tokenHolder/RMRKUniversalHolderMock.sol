@@ -24,6 +24,10 @@ contract RMRKUniversalHolderMock is
         string memory symbol
     ) ERC721(name, symbol) {}
 
+    function mint(address to, uint256 tokenId) public {
+        _mint(to, tokenId);
+    }
+
     function supportsInterface(
         bytes4 interfaceId
     )

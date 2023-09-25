@@ -3,10 +3,8 @@
 pragma solidity ^0.8.18;
 
 import "./IERC721Holder.sol";
+import "./HolderErrors.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-
-error InvalidAddressForERC721();
-error TokenNotHeldForERC721();
 
 abstract contract ERC721Holder is IERC721Holder {
     mapping(uint256 tokenHolderId => mapping(address erc721Address => mapping(uint256 tokenHeldId => uint256 balance)))
@@ -40,10 +38,10 @@ abstract contract ERC721Holder is IERC721Holder {
         bytes memory data
     ) internal {
         if (to == address(0) || erc721Contract == address(0)) {
-            revert InvalidAddressForERC721();
+            revert InvalidAddress();
         }
         if (_balances[tokenHolderId][erc721Contract][tokenToTransferId] == 0) {
-            revert TokenNotHeldForERC721();
+            revert TokenNotHeld();
         }
         _beforeTransferHeldERC721FromToken(
             erc721Contract,
@@ -86,7 +84,7 @@ abstract contract ERC721Holder is IERC721Holder {
         bytes memory data
     ) external {
         if (erc721Contract == address(0)) {
-            revert InvalidAddressForERC721();
+            revert InvalidAddress();
         }
         _beforeTransferERC721ToToken(
             erc721Contract,

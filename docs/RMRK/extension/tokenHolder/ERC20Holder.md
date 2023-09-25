@@ -140,10 +140,10 @@ Used to notify the listeners that the ERC-20 tokens have been transferred.
 
 ## Errors
 
-### InvalidAddressForERC20
+### InvalidAddress
 
 ```solidity
-error InvalidAddressForERC20()
+error InvalidAddress()
 ```
 
 
@@ -151,10 +151,10 @@ error InvalidAddressForERC20()
 
 
 
-### InvalidValueForERC20
+### InvalidValue
 
 ```solidity
-error InvalidValueForERC20()
+error InvalidValue()
 ```
 
 

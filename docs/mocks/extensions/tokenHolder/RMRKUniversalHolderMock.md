@@ -165,6 +165,23 @@ function isApprovedForAll(address owner, address operator) external view returns
 |---|---|---|
 | _0 | bool | undefined |
 
+### mint
+
+```solidity
+function mint(address to, uint256 tokenId) external nonpayable
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| to | address | undefined |
+| tokenId | uint256 | undefined |
+
 ### name
 
 ```solidity
@@ -696,10 +713,10 @@ error InsufficientBalance()
 
 
 
-### InsufficientBalanceForERC20
+### InvalidAddress
 
 ```solidity
-error InsufficientBalanceForERC20()
+error InvalidAddress()
 ```
 
 
@@ -707,54 +724,10 @@ error InsufficientBalanceForERC20()
 
 
 
-### InvalidAddressForERC1155
+### InvalidValue
 
 ```solidity
-error InvalidAddressForERC1155()
-```
-
-
-
-
-
-
-### InvalidAddressForERC20
-
-```solidity
-error InvalidAddressForERC20()
-```
-
-
-
-
-
-
-### InvalidAddressForERC721
-
-```solidity
-error InvalidAddressForERC721()
-```
-
-
-
-
-
-
-### InvalidValueForERC1155
-
-```solidity
-error InvalidValueForERC1155()
-```
-
-
-
-
-
-
-### InvalidValueForERC20
-
-```solidity
-error InvalidValueForERC20()
+error InvalidValue()
 ```
 
 
@@ -773,10 +746,10 @@ error OnlyNFTOwnerCanTransferTokensFromIt()
 
 
 
-### TokenNotHeldForERC721
+### TokenNotHeld
 
 ```solidity
-error TokenNotHeldForERC721()
+error TokenNotHeld()
 ```
 
 
