@@ -59,6 +59,12 @@ const config: HardhatUserConfig = {
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
       gasPrice: 2000000000,
     },
+    shibuya: {
+      chainId: 81,
+      url: process.env.SHIBUYA_URL || 'https://evm.shibuya.astar.network',
+      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+      // gasPrice: 2000000000,
+    },
     moonriver: {
       url: process.env.MOONRIVER_URL || 'https://rpc.api.moonriver.moonbeam.network',
       chainId: 1285,
@@ -86,6 +92,11 @@ const config: HardhatUserConfig = {
       url: process.env.BASE_URL || 'https://developer-access-mainnet.base.org',
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
+    astar: {
+      url: process.env.ASTAR_URL || 'https://evm.astar.network',
+      chainId: 592,
+      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+    },
   },
   gasReporter: {
     enabled: process.env.REPORT_GAS !== undefined,
@@ -99,11 +110,13 @@ const config: HardhatUserConfig = {
       sepolia: process.env.ETHERSCAN_API_KEY || '', // Sepolia Etherscan API Key
       polygonMumbai: process.env.POLYGONSCAN_API_KEY || '', // Polygon Mumbai Etherscan API Key
       baseGoerli: process.env.BASESCAN_API_KEY || '', // Base Goerli Etherscan API Key
+      shibuya: process.env.SHIBUYA_BLOCKSCOUT_API_KEY || '', // Shibuya blockscout API Key
       moonriver: process.env.MOONSCAN_APIKEY || '', // Moonriver Moonscan API Key
       moonbeam: process.env.MOONSCAN_APIKEY || '', // Moonbeam Moonscan API Key
       mainnet: process.env.ETHERSCAN_API_KEY || '', // Ethereum Etherscan API Key
       polygon: process.env.POLYGONSCAN_API_KEY || '', // Polygon Etherscan API Key
       base: process.env.BASESCAN_API_KEY || '', // Base Etherscan API Key
+      astar: process.env.ASTAR_BLOCKSCOUT_API_KEY || '', // Astar blockscout API Key
     },
     customChains: [
       {
@@ -120,6 +133,22 @@ const config: HardhatUserConfig = {
         urls: {
           apiURL: 'https://api.basescan.org/api',
           browserURL: 'https://basescan.org',
+        },
+      },
+      {
+        network: 'shibuya',
+        chainId: 81,
+        urls: {
+          apiURL: 'https://blockscout.com/shibuya/api',
+          browserURL: 'https://blockscout.com/shibuya',
+        },
+      },
+      {
+        network: 'astar',
+        chainId: 592,
+        urls: {
+          apiURL: 'https://blockscout.com/astar/api',
+          browserURL: 'https://blockscout.com/astar/',
         },
       },
     ],
