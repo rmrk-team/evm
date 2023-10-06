@@ -2,7 +2,7 @@ import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { IOtherInterface, IRMRKRevealer } from '../interfaces';
+import { IOtherInterface, IRMRKRevealable, IRMRKRevealer, IERC5773 } from '../interfaces';
 import { RMRKMultiAssetRevealableMock, RMRKRevealerMock } from '../../typechain-types';
 import { bn } from '../utils';
 
@@ -76,11 +76,23 @@ describe('RMRKTokenPropertiesMock', async function () {
     expect(await revealable.getRevealer()).to.eql(revealer.address);
   });
 
-  it('supports revealer interface', async function () {
-    expect(await revealable.supportsInterface(IRMRKRevealer)).to.be.true;
+  it('supports revealable interface', async function () {
+    expect(await revealable.supportsInterface(IRMRKRevealable)).to.be.true;
+  });
+
+  it('supports multiasset interface', async function () {
+    expect(await revealable.supportsInterface(IERC5773)).to.be.true;
   });
 
   it('does not support random interfaces', async function () {
     expect(await revealable.supportsInterface(IOtherInterface)).to.be.false;
+  });
+
+  it('supports revealer interface', async function () {
+    expect(await revealer.supportsInterface(IRMRKRevealer)).to.be.true;
+  });
+
+  it('does not support random interfaces', async function () {
+    expect(await revealer.supportsInterface(IOtherInterface)).to.be.false;
   });
 });

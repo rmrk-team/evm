@@ -17,7 +17,8 @@ const IRMRKTokenProperties = '0x6a49fd01';
 const IERC7508 = '0x07cd44c7';
 const IRMRKTypedMultiAsset = '0x7f7bb665';
 const IRMRKImplementation = '0x524D524B'; // "RMRK" in ASCII hex
-const IRMRKRevealer = '0x4be9cc42'; // "RMRK" in ASCII hex
+const IRMRKRevealable = '0x4be9cc42';
+const IRMRKRevealer = '0xfeacbfa3';
 
 export {
   IERC165,
@@ -39,5 +40,6 @@ export {
   IERC7508,
   IRMRKTokenProperties,
   IRMRKImplementation,
+  IRMRKRevealable,
   IRMRKRevealer,
 };
