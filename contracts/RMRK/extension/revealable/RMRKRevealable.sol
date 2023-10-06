@@ -2,7 +2,6 @@
 
 import "./IRMRKRevealable.sol";
 import "./IRMRKRevealer.sol";
-import "hardhat/console.sol";
 
 pragma solidity ^0.8.21;
 
@@ -59,7 +58,6 @@ abstract contract RMRKRevealable is IRMRKRevealable {
     function supportsInterface(
         bytes4 interfaceId
     ) public view virtual returns (bool) {
-        console.logBytes4(type(IRMRKRevealable).interfaceId);
         return interfaceId == type(IRMRKRevealable).interfaceId;
     }
 
