@@ -60,7 +60,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IERC7401, RMRKCore {
      *  reverted.
      * @param tokenId ID of the token to check
      */
-    function _onlyApprovedOrOwner(uint256 tokenId) private view {
+    function _onlyApprovedOrOwner(uint256 tokenId) internal view {
         if (!_isApprovedOrOwner(_msgSender(), tokenId))
             revert ERC721NotApprovedOrOwner();
     }
@@ -82,7 +82,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IERC7401, RMRKCore {
      * @dev Used for parent-scoped transfers.
      * @param tokenId ID of the token to check.
      */
-    function _onlyApprovedOrDirectOwner(uint256 tokenId) private view {
+    function _onlyApprovedOrDirectOwner(uint256 tokenId) internal view {
         if (!_isApprovedOrDirectOwner(_msgSender(), tokenId))
             revert RMRKNotApprovedOrDirectOwner();
     }

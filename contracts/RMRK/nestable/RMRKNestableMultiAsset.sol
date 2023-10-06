@@ -30,7 +30,7 @@ contract RMRKNestableMultiAsset is RMRKNestable, AbstractMultiAsset {
      *  given token, the execution will be reverted.
      * @param tokenId ID of the token being checked
      */
-    function _onlyApprovedForAssetsOrOwner(uint256 tokenId) private view {
+    function _onlyApprovedForAssetsOrOwner(uint256 tokenId) internal view {
         if (!_isApprovedForAssetsOrOwner(_msgSender(), tokenId))
             revert RMRKNotApprovedForAssetsOrOwner();
     }

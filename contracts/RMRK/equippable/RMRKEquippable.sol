@@ -60,7 +60,7 @@ contract RMRKEquippable is
      *  of the owner.
      * @param tokenId ID of the token that we are checking
      */
-    function _onlyApprovedForAssetsOrOwner(uint256 tokenId) private view {
+    function _onlyApprovedForAssetsOrOwner(uint256 tokenId) internal view {
         if (!_isApprovedForAssetsOrOwner(_msgSender(), tokenId))
             revert RMRKNotApprovedForAssetsOrOwner();
     }

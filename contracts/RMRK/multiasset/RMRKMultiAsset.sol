@@ -43,7 +43,7 @@ contract RMRKMultiAsset is IERC165, IERC721, AbstractMultiAsset, RMRKCore {
      * @dev If the caller is not the owner or approved by the owner, the execution is reverted.
      * @param tokenId ID of the token being checked
      */
-    function _onlyApprovedOrOwner(uint256 tokenId) private view {
+    function _onlyApprovedOrOwner(uint256 tokenId) internal view {
         if (!_isApprovedOrOwner(_msgSender(), tokenId))
             revert ERC721NotApprovedOrOwner();
     }
@@ -85,7 +85,7 @@ contract RMRKMultiAsset is IERC165, IERC721, AbstractMultiAsset, RMRKCore {
      *  given token, the execution will be reverted.
      * @param tokenId ID of the token being checked
      */
-    function _onlyApprovedForAssetsOrOwner(uint256 tokenId) private view {
+    function _onlyApprovedForAssetsOrOwner(uint256 tokenId) internal view {
         if (!_isApprovedForAssetsOrOwner(_msgSender(), tokenId))
             revert RMRKNotApprovedForAssetsOrOwner();
     }
