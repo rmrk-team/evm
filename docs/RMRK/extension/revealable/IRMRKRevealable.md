@@ -16,7 +16,7 @@
 function getRevealer() external view returns (address)
 ```
 
-
+Gets the `IRMRKRevealer` associated with the contract.
 
 
 
@@ -25,7 +25,7 @@ function getRevealer() external view returns (address)
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | address | undefined |
+| _0 | address | revealer The `IRMRKRevealer` associated with the contract |
 
 ### reveal
 
@@ -33,9 +33,9 @@ function getRevealer() external view returns (address)
 function reveal(uint256[] tokenIds) external nonpayable
 ```
 
+Reveals the asset for the given tokenIds by adding and accepting and new one.
 
-
-
+*SHOULD ask revealer which assetId should be added to the token and which asset to replace through `IRMRKRevealer.getAssetsToReveal`SHOULD be called by the owner or approved for assetsSHOULD add the new asset to each token and accept it*
 
 #### Parameters
 
@@ -49,7 +49,7 @@ function reveal(uint256[] tokenIds) external nonpayable
 function setRevealer(address revealer) external nonpayable
 ```
 
-
+Sets the `IRMRKRevealer` associated with the contract.
 
 
 
@@ -57,7 +57,7 @@ function setRevealer(address revealer) external nonpayable
 
 | Name | Type | Description |
 |---|---|---|
-| revealer | address | undefined |
+| revealer | address | The `IRMRKRevealer` to associate with the contract |
 
 
 

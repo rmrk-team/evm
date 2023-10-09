@@ -3,13 +3,22 @@
 pragma solidity ^0.8.21;
 
 interface IRMRKRevealable {
+    /**
+     * @notice Gets the `IRMRKRevealer` associated with the contract.
+     * @return revealer The `IRMRKRevealer` associated with the contract
+     */
     function getRevealer() external view returns (address);
 
+    /**
+     * @notice Sets the `IRMRKRevealer` associated with the contract.
+     * @param revealer The `IRMRKRevealer` to associate with the contract
+     */
     function setRevealer(address revealer) external;
 
-    // Should ask revealor which assetId should be added to the token and optionally which asset to replace.
-    // It should send the active asset Ids for the token.
-    // The Revealer might need to be added as contributor on the main contract to add assets if needed
-    // This method should be called by the owner or approved for assets, and should add the asset to the token and accept it
+    /** @notice Reveals the asset for the given tokenIds by adding and accepting and new one.
+     * @dev SHOULD ask revealer which assetId should be added to the token and which asset to replace through `IRMRKRevealer.getAssetsToReveal`
+     * @dev SHOULD be called by the owner or approved for assets
+     * @dev SHOULD add the new asset to each token and accept it
+     */
     function reveal(uint256[] memory tokenIds) external;
 }
