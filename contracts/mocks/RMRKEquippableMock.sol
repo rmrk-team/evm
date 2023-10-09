@@ -4,8 +4,6 @@ pragma solidity ^0.8.21;
 
 import "../RMRK/equippable/RMRKEquippable.sol";
 
-/* import "hardhat/console.sol"; */
-
 //Minimal public implementation of RMRKEquippable for testing.
 contract RMRKEquippableMock is RMRKEquippable {
     function mint(address to, uint256 tokenId) external {

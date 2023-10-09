@@ -5,7 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [2.1.1] - 2023-09-21
+## [2.1.2] - 2023-10-06
+
+### Added
+
+- Adds Revealable and Revealer Interfaces, with Abstract implementation for Revealable. The purpose is to make the reveal flow much easier for the holders and cheaper for the issuer.
+
+### Changed
+
+- Makes methods to check for permissions internal instead of private on core implementations:
+  - \_onlyApprovedForAssetsOrOwner
+  - \_onlyApprovedOrDirectOwner
+  - \_onlyApprovedOrOwner
+
+## [2.2.0] - 2023-09-21
 
 ### Changed
 

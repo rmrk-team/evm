@@ -72,7 +72,7 @@ contract RMRKMinifiedEquippable is
      *  reverted.
      * @param tokenId ID of the token to check
      */
-    function _onlyApprovedOrOwner(uint256 tokenId) private view {
+    function _onlyApprovedOrOwner(uint256 tokenId) internal view {
         address owner = ownerOf(tokenId);
         if (
             !(_msgSender() == owner ||
@@ -98,7 +98,7 @@ contract RMRKMinifiedEquippable is
      * @dev Used for parent-scoped transfers.
      * @param tokenId ID of the token to check.
      */
-    function _onlyApprovedOrDirectOwner(uint256 tokenId) private view {
+    function _onlyApprovedOrDirectOwner(uint256 tokenId) internal view {
         (address owner, uint256 parentId, ) = directOwnerOf(tokenId);
         // When the parent is an NFT, only it can do operations. Otherwise, the owner or approved address can
         if (
@@ -1601,7 +1601,7 @@ contract RMRKMinifiedEquippable is
      *  of the owner.
      * @param tokenId ID of the token that we are checking
      */
-    function _onlyApprovedForAssetsOrOwner(uint256 tokenId) private view {
+    function _onlyApprovedForAssetsOrOwner(uint256 tokenId) internal view {
         address owner = ownerOf(tokenId);
         if (
             !(_msgSender() == owner ||
