@@ -18,7 +18,7 @@ const IERC7508 = '0x07cd44c7';
 const IRMRKTypedMultiAsset = '0x7f7bb665';
 const IRMRKImplementation = '0x524D524B'; // "RMRK" in ASCII hex
 const IRMRKRevealable = '0x4be9cc42';
-const IRMRKRevealer = '0xfeacbfa3';
+const IRMRKRevealer = '0xf9296b16';
 
 export {
   IERC165,

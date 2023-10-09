@@ -40,14 +40,14 @@ abstract contract RMRKRevealable is IRMRKRevealable {
         _checkRevealPermissions(tokenIds);
         uint256 length = tokenIds.length;
         (
-            uint64[] memory revealedAssetIds,
-            uint64[] memory assetToReplaceIds
-        ) = IRMRKRevealer(_revealer).getRevealedAssets(tokenIds);
+            uint64[] memory revealedAssetsIds,
+            uint64[] memory assetsToReplaceIds
+        ) = IRMRKRevealer(_revealer).reveal(tokenIds);
         for (uint256 i; i < length; ) {
             _addAndAcceptAssetToToken(
                 tokenIds[i],
-                revealedAssetIds[i],
-                assetToReplaceIds[i]
+                revealedAssetsIds[i],
+                assetsToReplaceIds[i]
             );
             unchecked {
                 ++i;

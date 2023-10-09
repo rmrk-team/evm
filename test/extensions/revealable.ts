@@ -22,7 +22,7 @@ async function revealableFixture(): Promise<{
   const revealable = await revealableFactory.deploy();
   await revealable.deployed();
 
-  const revealer = await revealerFactory.deploy(REVEALED_ASSET_ID);
+  const revealer = await revealerFactory.deploy(REVEALED_ASSET_ID, revealable.address);
   await revealer.deployed();
 
   await revealable.setRevealer(revealer.address);
@@ -47,15 +47,14 @@ async function revealableFixture(): Promise<{
 
 // --------------- TESTS -----------------------
 
-describe('RMRKTokenPropertiesMock', async function () {
+describe('RMRKRevealables', async function () {
   let revealable: RMRKMultiAssetRevealableMock;
   let revealer: RMRKRevealerMock;
-  let deployer: SignerWithAddress;
   let user1: SignerWithAddress;
   let user2: SignerWithAddress;
 
   beforeEach(async function () {
-    ({ revealable, revealer, deployer, user1, user2 } = await loadFixture(revealableFixture));
+    ({ revealable, revealer, user1, user2 } = await loadFixture(revealableFixture));
   });
 
   it('can reveal an asset if it holds it', async function () {
@@ -63,12 +62,28 @@ describe('RMRKTokenPropertiesMock', async function () {
     await revealable.connect(user1).reveal([1, 2]);
     expect(await revealable.getActiveAssets(1)).to.eql([bn(REVEALED_ASSET_ID)]);
     expect(await revealable.getActiveAssets(2)).to.eql([bn(REVEALED_ASSET_ID)]);
+    expect(await revealer.getRevealableTokens([1, 2, 3])).to.eql([false, false, true]);
   });
 
   it('cannot reveal an asset from another user', async function () {
     await expect(revealable.connect(user2).reveal([1, 2])).to.be.revertedWithCustomError(
       revealable,
       'RMRKNotApprovedForAssetsOrOwner',
+    );
+  });
+
+  it('cannot reveal an already revealed token', async function () {
+    await revealable.connect(user1).reveal([1, 2]);
+    await expect(revealable.connect(user1).reveal([1, 2])).to.be.revertedWithCustomError(
+      revealer,
+      'AlreadyRevealed',
+    );
+  });
+
+  it('cannot reveal direclty on revealer', async function () {
+    await expect(revealer.reveal([1, 2])).to.be.revertedWithCustomError(
+      revealer,
+      'CallerIsNotRevealable',
     );
   });
 

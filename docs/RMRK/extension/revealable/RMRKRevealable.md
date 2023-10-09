@@ -49,7 +49,7 @@ Reveals the assets for the given tokenIds
 function setRevealer(address revealer) external nonpayable
 ```
 
-
+Sets the `IRMRKRevealer` associated with the contract.
 
 
 
@@ -57,7 +57,7 @@ function setRevealer(address revealer) external nonpayable
 
 | Name | Type | Description |
 |---|---|---|
-| revealer | address | undefined |
+| revealer | address | The `IRMRKRevealer` to associate with the contract |
 
 ### supportsInterface
 
