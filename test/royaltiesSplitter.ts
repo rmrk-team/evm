@@ -26,6 +26,13 @@ describe('RMRKRoyaltiesSplitter', () => {
     await royaltiesSplitter.deployed();
   });
 
+  it('can get beneficiaries and shares', async () => {
+    expect(await royaltiesSplitter.getBenefiariesAndShares()).to.deep.equal([
+      beneficiaries.map((b) => b.address),
+      SHARES_BPS,
+    ]);
+  });
+
   it('should distribute native payment correctly', async () => {
     const amount = ethers.utils.parseEther('1');
     await expect(() => sender.sendTransaction({ to: royaltiesSplitter.address, value: amount }))

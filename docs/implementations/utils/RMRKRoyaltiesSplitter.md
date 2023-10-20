@@ -16,16 +16,34 @@ Smart contract of the RMRK Royalties Spliter module.
 function distributeERC20(address currency, uint256 amount) external nonpayable
 ```
 
+Distributes an ERC20 payment to the beneficiaries.
 
-
-
+*The payment is distributed according to the shares specified in the constructor.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| currency | address | undefined |
-| amount | uint256 | undefined |
+| currency | address | The address of the ERC20 token. |
+| amount | uint256 | The amount of tokens to distribute. |
+
+### getBenefiariesAndShares
+
+```solidity
+function getBenefiariesAndShares() external view returns (address[] beneficiaries, uint256[] shares)
+```
+
+Returns the list of beneficiaries and their shares.
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| beneficiaries | address[] | The list of beneficiaries. |
+| shares | uint256[] | The list of shares. |
 
 
 
