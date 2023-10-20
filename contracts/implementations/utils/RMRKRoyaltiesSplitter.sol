@@ -24,6 +24,11 @@ contract RMRKRoyaltiesSplitter {
     address[] private _beneficiaries;
     mapping(address => uint256) private _sharesBps;
 
+    /**
+     * @notice Creates a new royalties splitter contract.
+     * @param beneficiaries The list of beneficiaries.
+     * @param sharesBps The list of shares in basis points (1/10000).
+     */
     constructor(address[] memory beneficiaries, uint256[] memory sharesBps) {
         uint256 length = beneficiaries.length;
         if (length != sharesBps.length) revert InvalidInput();
@@ -40,18 +45,23 @@ contract RMRKRoyaltiesSplitter {
         if (totalShares != MAX_BPS) revert InvalidInput();
     }
 
+    /**
+     * @notice Distributes a native payment to the beneficiaries.
+     * @dev The payment is distributed according to the shares specified in the constructor.
+     */
     receive() external payable {
         uint256 length = _beneficiaries.length;
         uint256 totalDistribution;
 
         for (uint256 i; i < length; ) {
             uint256 share;
+            address beneficiary = _beneficiaries[i];
             if (i == length - 1) {
                 share = msg.value - totalDistribution; // leftover to last beneficiary
             } else {
-                share = (msg.value * _sharesBps[_beneficiaries[i]]) / MAX_BPS;
+                share = (msg.value * _sharesBps[beneficiary]) / MAX_BPS;
             }
-            (bool success, ) = _beneficiaries[i].call{value: share}("");
+            (bool success, ) = beneficiary.call{value: share}("");
             if (!success) revert FailedToSend();
             unchecked {
                 totalDistribution += share;
@@ -62,18 +72,25 @@ contract RMRKRoyaltiesSplitter {
         emit NativePaymentDistributed(msg.sender, msg.value);
     }
 
+    /**
+     * @notice Distributes an ERC20 payment to the beneficiaries.
+     * @dev The payment is distributed according to the shares specified in the constructor.
+     * @param currency The address of the ERC20 token.
+     * @param amount The amount of tokens to distribute.
+     */
     function distributeERC20(address currency, uint256 amount) external {
         uint256 length = _beneficiaries.length;
         uint256 totalDistribution;
 
         for (uint256 i; i < length; ) {
             uint256 share;
+            address beneficiary = _beneficiaries[i];
             if (i == length - 1) {
                 share = amount - totalDistribution; // leftover to last beneficiary
             } else {
-                share = (amount * _sharesBps[_beneficiaries[i]]) / MAX_BPS;
+                share = (amount * _sharesBps[beneficiary]) / MAX_BPS;
             }
-            IERC20(currency).transfer(_beneficiaries[i], share);
+            IERC20(currency).transfer(beneficiary, share);
 
             unchecked {
                 totalDistribution += share;
@@ -82,5 +99,27 @@ contract RMRKRoyaltiesSplitter {
         }
 
         emit ERCPaymentDistributed(msg.sender, currency, amount);
+    }
+
+    /**
+     * @notice Returns the list of beneficiaries and their shares.
+     * @return beneficiaries The list of beneficiaries.
+     * @return shares The list of shares.
+     */
+    function getBenefiariesAndShares()
+        external
+        view
+        returns (address[] memory beneficiaries, uint256[] memory shares)
+    {
+        uint256 length = _beneficiaries.length;
+        beneficiaries = _beneficiaries;
+        shares = new uint256[](length);
+
+        for (uint256 i; i < length; ) {
+            shares[i] = _sharesBps[_beneficiaries[i]];
+            unchecked {
+                ++i;
+            }
+        }
     }
 }
