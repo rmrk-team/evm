@@ -9,6 +9,8 @@ import "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
 abstract contract ERC1155Holder is IERC1155Holder {
     mapping(uint256 tokenHolderId => mapping(address erc1155Address => mapping(uint256 tokenHeldId => uint256 balance)))
         private _balances;
+    mapping(uint256 tokenHolderId => uint256 nonce)
+        private _erc1155TransferOutNonce;
 
     /**
      * @inheritdoc IERC1155Holder
@@ -134,6 +136,15 @@ abstract contract ERC1155Holder is IERC1155Holder {
             amount,
             data
         );
+    }
+
+    /**
+     * @inheritdoc IERC1155Holder
+     */
+    function erc1155TransferOutNonce(
+        uint256 tokenId
+    ) external view returns (uint256) {
+        return _erc1155TransferOutNonce[tokenId];
     }
 
     /**

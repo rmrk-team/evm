@@ -9,6 +9,8 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 abstract contract ERC20Holder is IERC20Holder {
     mapping(uint256 tokenId => mapping(address erc20Address => uint256 balance))
         private _balances;
+    mapping(uint256 tokenHolderId => uint256 nonce)
+        private _erc20TransferOutNonce;
 
     /**
      * @inheritdoc IERC20Holder
@@ -53,6 +55,7 @@ abstract contract ERC20Holder is IERC20Holder {
             data
         );
         _balances[tokenId][erc20Contract] -= amount;
+        _erc20TransferOutNonce[tokenId]++;
 
         IERC20(erc20Contract).transfer(to, amount);
 
@@ -99,6 +102,15 @@ abstract contract ERC20Holder is IERC20Holder {
             amount,
             data
         );
+    }
+
+    /**
+     * @inheritdoc IERC20Holder
+     */
+    function erc20TransferOutNonce(
+        uint256 tokenId
+    ) external view returns (uint256) {
+        return _erc20TransferOutNonce[tokenId];
     }
 
     /**

@@ -22,6 +22,7 @@ error InsufficientBalance();
 abstract contract RMRKTokenHolder is IRMRKTokenHolder {
     mapping(uint256 tokenId => mapping(address tokenAddress => mapping(TokenType tokenType => mapping(uint256 tokenToTransferId => uint256 balance))))
         private _balances;
+    mapping(uint256 tokenHolderId => uint256 nonce) private _transferOutNonce;
 
     /**
      * @inheritdoc IRMRKTokenHolder
@@ -96,6 +97,7 @@ abstract contract RMRKTokenHolder is IRMRKTokenHolder {
         _balances[tokenId][tokenContract][tokenType][
             tokenToTransferId
         ] -= amount;
+        _transferOutNonce[tokenId]++;
 
         if (tokenType == TokenType.ERC20) {
             IERC20(tokenContract).transfer(to, amount);
@@ -225,6 +227,13 @@ abstract contract RMRKTokenHolder is IRMRKTokenHolder {
             amount,
             data
         );
+    }
+
+    /**
+     * @inheritdoc IRMRKTokenHolder
+     */
+    function transferOutNonce(uint256 tokenId) external view returns (uint256) {
+        return _transferOutNonce[tokenId];
     }
 
     /**

@@ -9,6 +9,8 @@ import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 abstract contract ERC721Holder is IERC721Holder {
     mapping(uint256 tokenHolderId => mapping(address erc721Address => mapping(uint256 tokenHeldId => uint256 balance)))
         private _balances;
+    mapping(uint256 tokenHolderId => uint256 nonce)
+        private _erc721TransferOutNonce;
 
     /**
      * @inheritdoc IERC721Holder
@@ -51,6 +53,7 @@ abstract contract ERC721Holder is IERC721Holder {
             data
         );
         _balances[tokenHolderId][erc721Contract][tokenToTransferId] = 0;
+        _erc721TransferOutNonce[tokenHolderId]++;
 
         IERC721(erc721Contract).safeTransferFrom(
             address(this),
@@ -114,6 +117,15 @@ abstract contract ERC721Holder is IERC721Holder {
             msg.sender,
             data
         );
+    }
+
+    /**
+     * @inheritdoc IERC721Holder
+     */
+    function erc721TransferOutNonce(
+        uint256 tokenId
+    ) external view returns (uint256) {
+        return _erc721TransferOutNonce[tokenId];
     }
 
     /**

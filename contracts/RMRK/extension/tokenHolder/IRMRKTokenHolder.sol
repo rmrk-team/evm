@@ -118,4 +118,11 @@ interface IRMRKTokenHolder is IERC165 {
         uint256 amount,
         bytes memory data
     ) external;
+
+    /**
+     * @notice Nonce increased every time a held token is transferred out of a token
+     * @param tokenId The ID of the token to check the nonce for
+     * @return The nonce of the token
+     */
+    function transferOutNonce(uint256 tokenId) external view returns (uint256);
 }

@@ -77,4 +77,13 @@ interface IERC721Holder is IERC165 {
         uint256 tokenToTransferId,
         bytes memory data
     ) external;
+
+    /**
+     * @notice Nonce increased every time an ERC721 token is transferred out of a token
+     * @param tokenId The ID of the token to check the nonce for
+     * @return The nonce of the token
+     */
+    function erc721TransferOutNonce(
+        uint256 tokenId
+    ) external view returns (uint256);
 }

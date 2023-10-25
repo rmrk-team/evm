@@ -48,6 +48,7 @@ interface IERC20Holder is IERC165 {
      * @notice Transfer ERC-20 tokens from a specific token.
      * @dev The balance MUST be transferred from this smart contract.
      * @dev Implementers should validate that the `msg.sender` is either the token owner or approved to manage it before calling this.
+     * @dev Must increase the transfer-out-nonce for the tokenId
      * @param erc20Contract The address of the ERC-20 smart contract
      * @param tokenId The ID of the token to transfer the ERC-20 tokens from
      * @param amount The number of ERC-20 tokens to transfer
@@ -76,4 +77,13 @@ interface IERC20Holder is IERC165 {
         uint256 amount,
         bytes memory data
     ) external;
+
+    /**
+     * @notice Nonce increased every time an ERC20 token is transferred out of a token
+     * @param tokenId The ID of the token to check the nonce for
+     * @return The nonce of the token
+     */
+    function erc20TransferOutNonce(
+        uint256 tokenId
+    ) external view returns (uint256);
 }

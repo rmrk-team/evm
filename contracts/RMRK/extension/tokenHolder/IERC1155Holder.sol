@@ -86,4 +86,13 @@ interface IERC1155Holder is IERC165 {
         uint256 amount,
         bytes memory data
     ) external;
+
+    /**
+     * @notice Nonce increased every time an ERC1155 token is transferred out of a token
+     * @param tokenId The ID of the token to check the nonce for
+     * @return The nonce of the token
+     */
+    function erc1155TransferOutNonce(
+        uint256 tokenId
+    ) external view returns (uint256);
 }
