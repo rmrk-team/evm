@@ -5,6 +5,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 error InvalidInput();
 error FailedToSend();
+error OnlyBeneficiary();
 
 /**
  * @title RMRKRoyaltiesSplitter
@@ -81,6 +82,18 @@ contract RMRKRoyaltiesSplitter {
     function distributeERC20(address currency, uint256 amount) external {
         uint256 length = _beneficiaries.length;
         uint256 totalDistribution;
+
+        bool callerIsBeneficiary;
+        for (uint256 i; i < length; ) {
+            if (_beneficiaries[i] == msg.sender) {
+                callerIsBeneficiary = true;
+                break;
+            }
+            unchecked {
+                ++i;
+            }
+        }
+        if (!callerIsBeneficiary) revert OnlyBeneficiary();
 
         for (uint256 i; i < length; ) {
             uint256 share;
