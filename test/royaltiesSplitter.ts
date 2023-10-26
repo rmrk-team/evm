@@ -52,12 +52,28 @@ describe('RMRKRoyaltiesSplitter', () => {
     await erc20Token.mint(sender.address, amount);
     await erc20Token.connect(sender).transfer(royaltiesSplitter.address, amount);
 
-    expect(await royaltiesSplitter.distributeERC20(erc20Token.address, amount))
+    expect(
+      await royaltiesSplitter.connect(beneficiary2).distributeERC20(erc20Token.address, amount),
+    )
       .to.emit(royaltiesSplitter, 'ERCPaymentDistributed')
       .withArgs(sender.address, erc20Token.address, amount);
     expect(await erc20Token.balanceOf(beneficiary1.address)).to.equal(amount.mul(2500).div(10000));
     expect(await erc20Token.balanceOf(beneficiary2.address)).to.equal(amount.mul(2500).div(10000));
     expect(await erc20Token.balanceOf(beneficiary3.address)).to.equal(amount.mul(5000).div(10000));
+  });
+
+  it('canot distribute ERC20 if not beneficary', async () => {
+    const erc20MockFactory = await ethers.getContractFactory('ERC20Mock');
+    const erc20Token = await erc20MockFactory.deploy();
+    await erc20Token.deployed();
+
+    const amount = ethers.utils.parseUnits('100', 18);
+    await erc20Token.mint(sender.address, amount);
+    await erc20Token.connect(sender).transfer(royaltiesSplitter.address, amount);
+
+    await expect(
+      royaltiesSplitter.connect(sender).distributeERC20(erc20Token.address, amount),
+    ).to.be.revertedWithCustomError(royaltiesSplitter, 'OnlyBeneficiary');
   });
 
   it('cannot create with invalid configuration', async () => {
