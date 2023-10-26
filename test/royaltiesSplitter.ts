@@ -62,7 +62,7 @@ describe('RMRKRoyaltiesSplitter', () => {
     expect(await erc20Token.balanceOf(beneficiary3.address)).to.equal(amount.mul(5000).div(10000));
   });
 
-  it('canot distribute ERC20 if not beneficary', async () => {
+  it('cannot distribute ERC20 if not beneficary', async () => {
     const erc20MockFactory = await ethers.getContractFactory('ERC20Mock');
     const erc20Token = await erc20MockFactory.deploy();
     await erc20Token.deployed();
