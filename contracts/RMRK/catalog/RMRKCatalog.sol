@@ -108,7 +108,7 @@ contract RMRKCatalog is IRMRKCatalog {
      * @dev Delegates to { _addPart } below.
      * @param partIntake An array of `IntakeStruct` structs, consisting of `partId` and a nested `Part` struct
      */
-    function _addPartList(IntakeStruct[] calldata partIntake) internal {
+    function _addPartList(IntakeStruct[] memory partIntake) internal {
         uint256 len = partIntake.length;
         for (uint256 i; i < len; ) {
             _addPart(partIntake[i]);
@@ -123,7 +123,7 @@ contract RMRKCatalog is IRMRKCatalog {
      * @param partIntake `IntakeStruct` struct consisting of `partId` and a nested `Part` struct
      *
      */
-    function _addPart(IntakeStruct calldata partIntake) internal {
+    function _addPart(IntakeStruct memory partIntake) internal {
         uint64 partId = partIntake.partId;
         Part memory part = partIntake.part;
 
@@ -155,7 +155,7 @@ contract RMRKCatalog is IRMRKCatalog {
      */
     function _addEquippableAddresses(
         uint64 partId,
-        address[] calldata equippableAddresses
+        address[] memory equippableAddresses
     ) internal onlySlot(partId) {
         if (equippableAddresses.length <= 0) revert RMRKZeroLengthIdsPassed();
 
@@ -181,7 +181,7 @@ contract RMRKCatalog is IRMRKCatalog {
      */
     function _setEquippableAddresses(
         uint64 partId,
-        address[] calldata equippableAddresses
+        address[] memory equippableAddresses
     ) internal onlySlot(partId) {
         if (equippableAddresses.length <= 0) revert RMRKZeroLengthIdsPassed();
         _parts[partId].equippable = equippableAddresses;
