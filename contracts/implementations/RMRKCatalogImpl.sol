@@ -43,7 +43,7 @@ contract RMRKCatalogImpl is OwnableLock, RMRKCatalog {
      * @param intakeStruct `IntakeStruct` struct consisting of `partId` and a nested `Part` struct
      */
     function addPart(
-        IntakeStruct calldata intakeStruct
+        IntakeStruct memory intakeStruct
     ) public virtual onlyOwnerOrContributor notLocked {
         _addPart(intakeStruct);
     }
@@ -67,7 +67,7 @@ contract RMRKCatalogImpl is OwnableLock, RMRKCatalog {
      * @param intakeStructs[] An array of `IntakeStruct` structs consisting of `partId` and a nested `Part` struct
      */
     function addPartList(
-        IntakeStruct[] calldata intakeStructs
+        IntakeStruct[] memory intakeStructs
     ) public virtual onlyOwnerOrContributor notLocked {
         _addPartList(intakeStructs);
     }
@@ -80,7 +80,7 @@ contract RMRKCatalogImpl is OwnableLock, RMRKCatalog {
      */
     function addEquippableAddresses(
         uint64 partId,
-        address[] calldata equippableAddresses
+        address[] memory equippableAddresses
     ) public virtual onlyOwnerOrContributor {
         _addEquippableAddresses(partId, equippableAddresses);
     }
@@ -94,7 +94,7 @@ contract RMRKCatalogImpl is OwnableLock, RMRKCatalog {
      */
     function setEquippableAddresses(
         uint64 partId,
-        address[] calldata equippableAddresses
+        address[] memory equippableAddresses
     ) public virtual onlyOwnerOrContributor {
         _setEquippableAddresses(partId, equippableAddresses);
     }
