@@ -110,4 +110,15 @@ error InvalidInput()
 
 
 
+### OnlyBeneficiary
+
+```solidity
+error OnlyBeneficiary()
+```
+
+
+
+
+
+
 
