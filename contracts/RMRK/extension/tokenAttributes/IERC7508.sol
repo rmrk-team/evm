@@ -421,7 +421,7 @@ interface IERC7508 is IERC165 {
      * @param addressAttributes An array of `AddressAttribute` structs containing address attributes to set
      * @param bytesAttributes An array of `BytesAttribute` structs containing bytes attributes to set
      */
-    function setTokenAttributes(
+    function setAttributes(
         address collection,
         uint256 tokenId,
         StringAttribute[] memory stringAttributes,
@@ -590,7 +590,7 @@ interface IERC7508 is IERC165 {
      * @param key The key of the attribute
      * @return The value of the string attribute
      */
-    function getStringTokenAttribute(
+    function getStringAttribute(
         address collection,
         uint256 tokenId,
         string memory key
@@ -603,7 +603,7 @@ interface IERC7508 is IERC165 {
      * @param key The key of the attribute
      * @return The value of the uint attribute
      */
-    function getUintTokenAttribute(
+    function getUintAttribute(
         address collection,
         uint256 tokenId,
         string memory key
@@ -616,7 +616,7 @@ interface IERC7508 is IERC165 {
      * @param key The key of the attribute
      * @return The value of the bool attribute
      */
-    function getBoolTokenAttribute(
+    function getBoolAttribute(
         address collection,
         uint256 tokenId,
         string memory key
@@ -629,7 +629,7 @@ interface IERC7508 is IERC165 {
      * @param key The key of the attribute
      * @return The value of the address attribute
      */
-    function getAddressTokenAttribute(
+    function getAddressAttribute(
         address collection,
         uint256 tokenId,
         string memory key
@@ -642,7 +642,7 @@ interface IERC7508 is IERC165 {
      * @param key The key of the attribute
      * @return The value of the bytes attribute
      */
-    function getBytesTokenAttribute(
+    function getBytesAttribute(
         address collection,
         uint256 tokenId,
         string memory key
@@ -754,7 +754,7 @@ interface IERC7508 is IERC165 {
      * @return addressAttributes An array of `AddressAttribute` structs containing the address type attributes
      * @return bytesAttributes An array of `BytesAttribute` structs containing the bytes type attributes
      */
-    function getTokenAttributes(
+    function getAttributes(
         address collection,
         uint256 tokenId,
         string[] memory stringKeys,
@@ -785,7 +785,7 @@ interface IERC7508 is IERC165 {
      * @param stringKeys An array of string keys to retrieve
      * @return An array of `StringAttribute` structs
      */
-    function getStringTokenAttributes(
+    function getStringAttributes(
         address collection,
         uint256 tokenId,
         string[] memory stringKeys
@@ -803,7 +803,7 @@ interface IERC7508 is IERC165 {
      * @param uintKeys An array of uint keys to retrieve
      * @return An array of `UintAttribute` structs
      */
-    function getUintTokenAttributes(
+    function getUintAttributes(
         address collection,
         uint256 tokenId,
         string[] memory uintKeys
@@ -821,7 +821,7 @@ interface IERC7508 is IERC165 {
      * @param boolKeys An array of bool keys to retrieve
      * @return An array of `BoolAttribute` structs
      */
-    function getBoolTokenAttributes(
+    function getBoolAttributes(
         address collection,
         uint256 tokenId,
         string[] memory boolKeys
@@ -839,7 +839,7 @@ interface IERC7508 is IERC165 {
      * @param addressKeys An array of address keys to retrieve
      * @return An array of `AddressAttribute` structs
      */
-    function getAddressTokenAttributes(
+    function getAddressAttributes(
         address collection,
         uint256 tokenId,
         string[] memory addressKeys
@@ -857,7 +857,7 @@ interface IERC7508 is IERC165 {
      * @param bytesKeys An array of bytes keys to retrieve
      * @return An array of `BytesAttribute` structs
      */
-    function getBytesTokenAttributes(
+    function getBytesAttributes(
         address collection,
         uint256 tokenId,
         string[] memory bytesKeys

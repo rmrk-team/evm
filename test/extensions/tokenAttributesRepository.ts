@@ -119,33 +119,25 @@ describe('RMRKTokenAttributesRepository', async function () {
         .withArgs(ownedCollection.address, tokenId, 'data', '0x1234');
 
       expect(
-        await tokenAttributes.getStringTokenAttribute(
-          ownedCollection.address,
-          tokenId,
-          'description',
-        ),
+        await tokenAttributes.getStringAttribute(ownedCollection.address, tokenId, 'description'),
       ).to.eql('test description');
       expect(
-        await tokenAttributes.getStringTokenAttribute(
-          ownedCollection.address,
-          tokenId,
-          'description1',
-        ),
+        await tokenAttributes.getStringAttribute(ownedCollection.address, tokenId, 'description1'),
       ).to.eql('test description');
       expect(
-        await tokenAttributes.getBoolTokenAttribute(ownedCollection.address, tokenId, 'rare'),
+        await tokenAttributes.getBoolAttribute(ownedCollection.address, tokenId, 'rare'),
       ).to.eql(true);
       expect(
-        await tokenAttributes.getAddressTokenAttribute(ownedCollection.address, tokenId, 'owner'),
+        await tokenAttributes.getAddressAttribute(ownedCollection.address, tokenId, 'owner'),
       ).to.eql(owner.address);
       expect(
-        await tokenAttributes.getUintTokenAttribute(ownedCollection.address, tokenId, 'atk'),
+        await tokenAttributes.getUintAttribute(ownedCollection.address, tokenId, 'atk'),
       ).to.eql(bn(100));
       expect(
-        await tokenAttributes.getUintTokenAttribute(ownedCollection.address, tokenId, 'health'),
+        await tokenAttributes.getUintAttribute(ownedCollection.address, tokenId, 'health'),
       ).to.eql(bn(80));
       expect(
-        await tokenAttributes.getBytesTokenAttribute(ownedCollection.address, tokenId, 'data'),
+        await tokenAttributes.getBytesAttribute(ownedCollection.address, tokenId, 'data'),
       ).to.eql('0x1234');
 
       await tokenAttributes.setStringAttribute(
@@ -155,17 +147,13 @@ describe('RMRKTokenAttributesRepository', async function () {
         'test description update',
       );
       expect(
-        await tokenAttributes.getStringTokenAttribute(
-          ownedCollection.address,
-          tokenId,
-          'description',
-        ),
+        await tokenAttributes.getStringAttribute(ownedCollection.address, tokenId, 'description'),
       ).to.eql('test description update');
     });
 
     it('can set multiple attributes of multiple types at the same time', async function () {
       await expect(
-        tokenAttributes.setTokenAttributes(
+        tokenAttributes.setAttributes(
           ownedCollection.address,
           tokenId,
           [
@@ -213,7 +201,7 @@ describe('RMRKTokenAttributesRepository', async function () {
     });
 
     it('can update multiple attributes of multiple types at the same time', async function () {
-      await tokenAttributes.setTokenAttributes(
+      await tokenAttributes.setAttributes(
         ownedCollection.address,
         tokenId,
         [
@@ -239,7 +227,7 @@ describe('RMRKTokenAttributesRepository', async function () {
       );
 
       await expect(
-        tokenAttributes.setTokenAttributes(
+        tokenAttributes.setAttributes(
           ownedCollection.address,
           tokenId,
           [
@@ -287,7 +275,7 @@ describe('RMRKTokenAttributesRepository', async function () {
     });
 
     it('can set and update multiple attributes of multiple types at the same time even if not all types are updated at the same time', async function () {
-      await tokenAttributes.setTokenAttributes(
+      await tokenAttributes.setAttributes(
         ownedCollection.address,
         tokenId,
         [{ key: 'string1', value: 'value0' }],
@@ -307,7 +295,7 @@ describe('RMRKTokenAttributesRepository', async function () {
       );
 
       await expect(
-        tokenAttributes.setTokenAttributes(
+        tokenAttributes.setAttributes(
           ownedCollection.address,
           tokenId,
           [],
@@ -347,7 +335,7 @@ describe('RMRKTokenAttributesRepository', async function () {
         .withArgs(ownedCollection.address, tokenId, 'bytes2', '0x5678');
 
       await expect(
-        tokenAttributes.setTokenAttributes(
+        tokenAttributes.setAttributes(
           ownedCollection.address,
           tokenId,
           [],
@@ -368,7 +356,7 @@ describe('RMRKTokenAttributesRepository', async function () {
 
     it('can set and update multiple attributes of multiple types at the same time', async function () {
       await expect(
-        tokenAttributes.setTokenAttributes(
+        tokenAttributes.setAttributes(
           ownedCollection.address,
           tokenId,
           [
@@ -416,7 +404,7 @@ describe('RMRKTokenAttributesRepository', async function () {
     });
 
     it('should allow to retrieve multiple attributes at once', async function () {
-      await tokenAttributes.setTokenAttributes(
+      await tokenAttributes.setAttributes(
         ownedCollection.address,
         tokenId,
         [
@@ -442,7 +430,7 @@ describe('RMRKTokenAttributesRepository', async function () {
       );
 
       expect(
-        await tokenAttributes.getTokenAttributes(
+        await tokenAttributes.getAttributes(
           ownedCollection.address,
           tokenId,
           ['string1', 'string2'],
@@ -488,7 +476,7 @@ describe('RMRKTokenAttributesRepository', async function () {
         .withArgs(ownedCollection.address, tokenId, 'string2', 'value2');
 
       expect(
-        await tokenAttributes.getTokenAttributes(
+        await tokenAttributes.getAttributes(
           ownedCollection.address,
           tokenId,
           ['string1', 'string2'],
@@ -522,7 +510,7 @@ describe('RMRKTokenAttributesRepository', async function () {
         .withArgs(ownedCollection.address, tokenId, 'uint2', bn(2));
 
       expect(
-        await tokenAttributes.getTokenAttributes(
+        await tokenAttributes.getAttributes(
           ownedCollection.address,
           tokenId,
           [],
@@ -556,7 +544,7 @@ describe('RMRKTokenAttributesRepository', async function () {
         .withArgs(ownedCollection.address, tokenId, 'bool2', false);
 
       expect(
-        await tokenAttributes.getTokenAttributes(
+        await tokenAttributes.getAttributes(
           ownedCollection.address,
           tokenId,
           [],
@@ -590,7 +578,7 @@ describe('RMRKTokenAttributesRepository', async function () {
         .withArgs(ownedCollection.address, tokenId, 'address2', issuer.address);
 
       expect(
-        await tokenAttributes.getTokenAttributes(
+        await tokenAttributes.getAttributes(
           ownedCollection.address,
           tokenId,
           [],
@@ -624,7 +612,7 @@ describe('RMRKTokenAttributesRepository', async function () {
         .withArgs(ownedCollection.address, tokenId, 'bytes2', '0x5678');
 
       expect(
-        await tokenAttributes.getTokenAttributes(
+        await tokenAttributes.getAttributes(
           ownedCollection.address,
           tokenId,
           [],
@@ -650,10 +638,10 @@ describe('RMRKTokenAttributesRepository', async function () {
       await tokenAttributes.setStringAttribute(ownedCollection.address, tokenId2, 'X', 'X2');
 
       expect(
-        await tokenAttributes.getStringTokenAttribute(ownedCollection.address, tokenId, 'X'),
+        await tokenAttributes.getStringAttribute(ownedCollection.address, tokenId, 'X'),
       ).to.eql('X1');
       expect(
-        await tokenAttributes.getStringTokenAttribute(ownedCollection.address, tokenId2, 'X'),
+        await tokenAttributes.getStringAttribute(ownedCollection.address, tokenId2, 'X'),
       ).to.eql('X2');
     });
 
@@ -675,20 +663,20 @@ describe('RMRKTokenAttributesRepository', async function () {
       await tokenAttributes.setBytesAttribute(ownedCollection.address, tokenId, 'X', '0x1234');
 
       expect(
-        await tokenAttributes.getStringTokenAttribute(ownedCollection.address, tokenId, 'X'),
+        await tokenAttributes.getStringAttribute(ownedCollection.address, tokenId, 'X'),
       ).to.eql('test description');
+      expect(await tokenAttributes.getBoolAttribute(ownedCollection.address, tokenId, 'X')).to.eql(
+        true,
+      );
       expect(
-        await tokenAttributes.getBoolTokenAttribute(ownedCollection.address, tokenId, 'X'),
-      ).to.eql(true);
-      expect(
-        await tokenAttributes.getAddressTokenAttribute(ownedCollection.address, tokenId, 'X'),
+        await tokenAttributes.getAddressAttribute(ownedCollection.address, tokenId, 'X'),
       ).to.eql(owner.address);
-      expect(
-        await tokenAttributes.getUintTokenAttribute(ownedCollection.address, tokenId, 'X'),
-      ).to.eql(bn(100));
-      expect(
-        await tokenAttributes.getBytesTokenAttribute(ownedCollection.address, tokenId, 'X'),
-      ).to.eql('0x1234');
+      expect(await tokenAttributes.getUintAttribute(ownedCollection.address, tokenId, 'X')).to.eql(
+        bn(100),
+      );
+      expect(await tokenAttributes.getBytesAttribute(ownedCollection.address, tokenId, 'X')).to.eql(
+        '0x1234',
+      );
     });
 
     it('can reuse string values and values are fine', async function () {
@@ -706,10 +694,10 @@ describe('RMRKTokenAttributesRepository', async function () {
       );
 
       expect(
-        await tokenAttributes.getStringTokenAttribute(ownedCollection.address, tokenId, 'X'),
+        await tokenAttributes.getStringAttribute(ownedCollection.address, tokenId, 'X'),
       ).to.eql('common string');
       expect(
-        await tokenAttributes.getStringTokenAttribute(ownedCollection.address, tokenId2, 'X'),
+        await tokenAttributes.getStringAttribute(ownedCollection.address, tokenId2, 'X'),
       ).to.eql('common string');
     });
 
