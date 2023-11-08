@@ -315,7 +315,7 @@ contract RMRKTokenAttributesRepository is IERC7508 {
     /**
      * @inheritdoc IERC7508
      */
-    function getStringTokenAttribute(
+    function getStringAttribute(
         address collection,
         uint256 tokenId,
         string memory key
@@ -329,7 +329,7 @@ contract RMRKTokenAttributesRepository is IERC7508 {
     /**
      * @inheritdoc IERC7508
      */
-    function getUintTokenAttribute(
+    function getUintAttribute(
         address collection,
         uint256 tokenId,
         string memory key
@@ -340,7 +340,7 @@ contract RMRKTokenAttributesRepository is IERC7508 {
     /**
      * @inheritdoc IERC7508
      */
-    function getBoolTokenAttribute(
+    function getBoolAttribute(
         address collection,
         uint256 tokenId,
         string memory key
@@ -351,7 +351,7 @@ contract RMRKTokenAttributesRepository is IERC7508 {
     /**
      * @inheritdoc IERC7508
      */
-    function getAddressTokenAttribute(
+    function getAddressAttribute(
         address collection,
         uint256 tokenId,
         string memory key
@@ -362,7 +362,7 @@ contract RMRKTokenAttributesRepository is IERC7508 {
     /**
      * @inheritdoc IERC7508
      */
-    function getBytesTokenAttribute(
+    function getBytesAttribute(
         address collection,
         uint256 tokenId,
         string memory key
@@ -373,7 +373,7 @@ contract RMRKTokenAttributesRepository is IERC7508 {
     /**
      * @inheritdoc IERC7508
      */
-    function getTokenAttributes(
+    function getAttributes(
         address collection,
         uint256 tokenId,
         string[] memory stringKeys,
@@ -392,33 +392,25 @@ contract RMRKTokenAttributesRepository is IERC7508 {
             BytesAttribute[] memory bytesAttributes
         )
     {
-        stringAttributes = getStringTokenAttributes(
-            collection,
-            tokenId,
-            stringKeys
-        );
+        stringAttributes = getStringAttributes(collection, tokenId, stringKeys);
 
-        uintAttributes = getUintTokenAttributes(collection, tokenId, uintKeys);
+        uintAttributes = getUintAttributes(collection, tokenId, uintKeys);
 
-        boolAttributes = getBoolTokenAttributes(collection, tokenId, boolKeys);
+        boolAttributes = getBoolAttributes(collection, tokenId, boolKeys);
 
-        addressAttributes = getAddressTokenAttributes(
+        addressAttributes = getAddressAttributes(
             collection,
             tokenId,
             addressKeys
         );
 
-        bytesAttributes = getBytesTokenAttributes(
-            collection,
-            tokenId,
-            bytesKeys
-        );
+        bytesAttributes = getBytesAttributes(collection, tokenId, bytesKeys);
     }
 
     /**
      * @inheritdoc IERC7508
      */
-    function getStringTokenAttributes(
+    function getStringAttributes(
         address collection,
         uint256 tokenId,
         string[] memory stringKeys
@@ -449,7 +441,7 @@ contract RMRKTokenAttributesRepository is IERC7508 {
     /**
      * @inheritdoc IERC7508
      */
-    function getUintTokenAttributes(
+    function getUintAttributes(
         address collection,
         uint256 tokenId,
         string[] memory uintKeys
@@ -474,7 +466,7 @@ contract RMRKTokenAttributesRepository is IERC7508 {
     /**
      * @inheritdoc IERC7508
      */
-    function getBoolTokenAttributes(
+    function getBoolAttributes(
         address collection,
         uint256 tokenId,
         string[] memory boolKeys
@@ -499,7 +491,7 @@ contract RMRKTokenAttributesRepository is IERC7508 {
     /**
      * @inheritdoc IERC7508
      */
-    function getAddressTokenAttributes(
+    function getAddressAttributes(
         address collection,
         uint256 tokenId,
         string[] memory addressKeys
@@ -528,7 +520,7 @@ contract RMRKTokenAttributesRepository is IERC7508 {
     /**
      * @inheritdoc IERC7508
      */
-    function getBytesTokenAttributes(
+    function getBytesAttributes(
         address collection,
         uint256 tokenId,
         string[] memory bytesKeys
@@ -864,7 +856,7 @@ contract RMRKTokenAttributesRepository is IERC7508 {
     /**
      * @inheritdoc IERC7508
      */
-    function setTokenAttributes(
+    function setAttributes(
         address collection,
         uint256 tokenId,
         StringAttribute[] memory stringAttributes,
