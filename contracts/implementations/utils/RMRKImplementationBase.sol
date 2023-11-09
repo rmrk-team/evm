@@ -72,7 +72,7 @@ abstract contract RMRKImplementationBase is RMRKRoyalties, Ownable {
      * @notice Used to retrieve the metadata of the collection.
      * @return string The metadata URI of the collection
      */
-    function collectionMetadata() public view virtual returns (string memory) {
+    function contractURI() public view virtual returns (string memory) {
         return _collectionMetadata;
     }
 
