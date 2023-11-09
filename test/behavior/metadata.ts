@@ -17,7 +17,7 @@ async function shouldHaveMetadata(
   });
 
   it('can get collection meta', async function () {
-    expect(await this.token.collectionMetadata()).to.eql('ipfs://collection-meta');
+    expect(await this.token.contractURI()).to.eql('ipfs://collection-meta');
   });
 }
 
