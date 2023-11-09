@@ -5,6 +5,7 @@ pragma solidity ^0.8.21;
 import "@openzeppelin/contracts/interfaces/IERC2981.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "@openzeppelin/contracts/utils/Address.sol";
 import "../equippable/IERC6220.sol";
 import "../nestable/IERC7401.sol";
 import "../extension/soulbound/IERC6454.sol";
@@ -17,6 +18,14 @@ import "./IRMRKCollectionData.sol";
  * @dev Extra utility functions for RMRK contracts.
  */
 contract RMRKCollectionUtils {
+    using Address for address;
+
+    event CollectionTokensMetadataRefreshTriggered(address indexed collection);
+    event TokenMetadataRefreshTriggered(
+        address indexed collection,
+        uint256 indexed tokenId
+    );
+
     /**
      * notice Structure used to represent the collection data.
      * @return totalSupply The total supply of the collection
@@ -174,5 +183,35 @@ contract RMRKCollectionUtils {
                 ++i;
             }
         }
+    }
+
+    /**
+     * @notice Triggers an event to refresh the collection metadata.
+     * @dev It will do nothing if the given collection address is not a contract.
+     * @param collectionAddress Address of the collection to refresh the metadata from
+     */
+    function refreshCollectionTokensMetadata(address collectionAddress) public {
+        // To avoid some spam
+        if (!collectionAddress.isContract()) {
+            return;
+        }
+        emit CollectionTokensMetadataRefreshTriggered(collectionAddress);
+    }
+
+    /**
+     * @notice Triggers an event to refresh the token metadata.
+     * @dev It will do nothing if the given collection address is not a contract.
+     * @param collectionAddress Address of the collection to refresh the metadata from
+     * @param tokenId ID of the token to refresh the metadata from
+     */
+    function refreshTokenMetadata(
+        address collectionAddress,
+        uint256 tokenId
+    ) public {
+        // To avoid some spam
+        if (!collectionAddress.isContract()) {
+            return;
+        }
+        emit TokenMetadataRefreshTriggered(collectionAddress, tokenId);
     }
 }

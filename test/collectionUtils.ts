@@ -218,4 +218,28 @@ describe('Collection Utils', function () {
       bn(9),
     ]);
   });
+
+  it('can trigger collection metadata update', async function () {
+    await expect(
+      collectionUtils.connect(issuer).refreshCollectionTokensMetadata(multiAsset.address),
+    )
+      .to.emit(collectionUtils, 'CollectionTokensMetadataRefreshTriggered')
+      .withArgs(multiAsset.address);
+  });
+
+  it('can trigger token metadata update', async function () {
+    await expect(collectionUtils.connect(issuer).refreshTokenMetadata(multiAsset.address, 1))
+      .to.emit(collectionUtils, 'TokenMetadataRefreshTriggered')
+      .withArgs(multiAsset.address, 1);
+  });
+
+  it('does not emit event if contract address is not a contract', async function () {
+    await expect(
+      collectionUtils.connect(issuer).refreshCollectionTokensMetadata(ADDRESS_ZERO),
+    ).to.not.emit(collectionUtils, 'CollectionTokensMetadataRefreshTriggered');
+    await expect(collectionUtils.connect(issuer).refreshTokenMetadata(ADDRESS_ZERO, 1)).to.not.emit(
+      collectionUtils,
+      'TokenMetadataRefreshTriggered',
+    );
+  });
 });
