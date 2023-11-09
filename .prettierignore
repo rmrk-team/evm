@@ -5,3 +5,4 @@ typechain-types
 cache
 coverage*
 gasReporterOutput.json
+CHANGELOG.md
