@@ -83,6 +83,75 @@ Used to get a list of existing token IDs in the range between `pageStart` and `p
 |---|---|---|
 | page | uint256[] | An array of IDs of the existing tokens |
 
+### refreshCollectionTokensMetadata
+
+```solidity
+function refreshCollectionTokensMetadata(address collectionAddress) external nonpayable
+```
+
+Triggers an event to refresh the collection metadata.
+
+*It will do nothing if the given collection address is not a contract.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| collectionAddress | address | Address of the collection to refresh the metadata from |
+
+### refreshTokenMetadata
+
+```solidity
+function refreshTokenMetadata(address collectionAddress, uint256 tokenId) external nonpayable
+```
+
+Triggers an event to refresh the token metadata.
+
+*It will do nothing if the given collection address is not a contract.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| collectionAddress | address | Address of the collection to refresh the metadata from |
+| tokenId | uint256 | ID of the token to refresh the metadata from |
+
+
+
+## Events
+
+### CollectionTokensMetadataRefreshTriggered
+
+```solidity
+event CollectionTokensMetadataRefreshTriggered(address indexed collection)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| collection `indexed` | address | undefined |
+
+### TokenMetadataRefreshTriggered
+
+```solidity
+event TokenMetadataRefreshTriggered(address indexed collection, uint256 indexed tokenId)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| collection `indexed` | address | undefined |
+| tokenId `indexed` | uint256 | undefined |
 
 
 
