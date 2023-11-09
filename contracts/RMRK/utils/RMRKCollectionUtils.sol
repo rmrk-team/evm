@@ -85,7 +85,13 @@ contract RMRKCollectionUtils {
             string memory collectionMetadata
         ) {
             data.collectionMetadata = collectionMetadata;
-        } catch {}
+        } catch {
+            try target.contractURI() returns (
+                string memory collectionMetadata
+            ) {
+                data.collectionMetadata = collectionMetadata;
+            } catch {}
+        }
     }
 
     /**
