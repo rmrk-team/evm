@@ -5,7 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [2.1.2] - 2023-10-06
+## [2.3.0] - 2023-11-09
+
+### Added
+- Adds `RMRKRoyaltiesSplitter` to split native and ERC20 payments into multiple beneficiaries with customizable shares.
+- Adds `CatalogUtils` contract, to retrieve multiple data points from a catalog in a single call.
+- `CollectionUtils` now includes methods to trigger events to refresh metadata.
+
+### Changed
+
+- On implementation base `collectionMetadata` was replaced by `contractURI`, to be compatible with suggestion from OpenSea.
+- Uses `memory` instead of `callback` for catalog core and implementation methods.
+- On `ERC-7508` (draft) Removes 'Token' from getter methods for consistency.
+
+### Fixed
+
+- Changelog had truncated version headers for 2.2.0 and 2.1.1
+
+### Removed
+
+- TokenProperties extension in favor of `ERC-7508`
+
+## [2.2.0] - 2023-10-06
 
 ### Added
 
@@ -18,7 +39,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   - \_onlyApprovedOrDirectOwner
   - \_onlyApprovedOrOwner
 
-## [2.2.0] - 2023-09-21
+## [2.1.1] - 2023-09-21
 
 ### Changed
 
