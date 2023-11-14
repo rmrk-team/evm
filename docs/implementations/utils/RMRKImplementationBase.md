@@ -10,10 +10,10 @@ Smart contract of the RMRK minting utils module.
 
 ## Methods
 
-### collectionMetadata
+### contractURI
 
 ```solidity
-function collectionMetadata() external view returns (string)
+function contractURI() external view returns (string)
 ```
 
 Used to retrieve the metadata of the collection.

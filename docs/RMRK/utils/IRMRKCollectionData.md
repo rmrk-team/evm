@@ -27,6 +27,23 @@ function collectionMetadata() external view returns (string)
 |---|---|---|
 | _0 | string | undefined |
 
+### contractURI
+
+```solidity
+function contractURI() external view returns (string)
+```
+
+
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | string | undefined |
+
 ### getRoyaltyPercentage
 
 ```solidity

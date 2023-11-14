@@ -174,10 +174,10 @@ Used to destroy the specified token.
 |---|---|---|
 | tokenId | uint256 | ID of the token to burn |
 
-### collectionMetadata
+### contractURI
 
 ```solidity
-function collectionMetadata() external view returns (string)
+function contractURI() external view returns (string)
 ```
 
 Used to retrieve the metadata of the collection.

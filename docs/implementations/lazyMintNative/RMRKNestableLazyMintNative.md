@@ -204,10 +204,10 @@ Used to retrieve the active child tokens of a given parent token.
 |---|---|---|
 | _0 | IERC7401.Child[] | An array of Child structs containing the parent token&#39;s active child tokens |
 
-### collectionMetadata
+### contractURI
 
 ```solidity
-function collectionMetadata() external view returns (string)
+function contractURI() external view returns (string)
 ```
 
 Used to retrieve the metadata of the collection.
