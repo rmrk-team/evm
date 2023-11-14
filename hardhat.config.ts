@@ -155,6 +155,7 @@ const config: HardhatUserConfig = {
   },
   dodoc: {
     runOnCompile: false,
+    exclude: ['mocks', 'security_mocks', 'elin'],
   },
 };
 
