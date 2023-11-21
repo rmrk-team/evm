@@ -65,6 +65,12 @@ const config: HardhatUserConfig = {
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
       // gasPrice: 2000000000,
     },
+    zkatana: {
+      chainId: 1261120,
+      url: process.env.ZKATANA_URL || 'https://rpc.startale.com/zkatana',
+      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+      gasPrice: 650000000,
+    },
     moonriver: {
       url: process.env.MOONRIVER_URL || 'https://rpc.api.moonriver.moonbeam.network',
       chainId: 1285,
@@ -111,6 +117,7 @@ const config: HardhatUserConfig = {
       polygonMumbai: process.env.POLYGONSCAN_API_KEY || '', // Polygon Mumbai Etherscan API Key
       baseGoerli: process.env.BASESCAN_API_KEY || '', // Base Goerli Etherscan API Key
       shibuya: process.env.SHIBUYA_BLOCKSCOUT_API_KEY || '', // Shibuya blockscout API Key
+      zkatana: process.env.ZKATANA_BLOCKSCOUT_API_KEY || '', // ZKatana blockscout API Key
       moonriver: process.env.MOONSCAN_APIKEY || '', // Moonriver Moonscan API Key
       moonbeam: process.env.MOONSCAN_APIKEY || '', // Moonbeam Moonscan API Key
       mainnet: process.env.ETHERSCAN_API_KEY || '', // Ethereum Etherscan API Key
@@ -149,6 +156,14 @@ const config: HardhatUserConfig = {
         urls: {
           apiURL: 'https://blockscout.com/astar/api',
           browserURL: 'https://blockscout.com/astar/',
+        },
+      },
+      {
+        network: 'zkatana',
+        chainId: 1261120,
+        urls: {
+          apiURL: 'https://zkatana.blockscout.com/api',
+          browserURL: 'https://zkatana.blockscout.com',
         },
       },
     ],
