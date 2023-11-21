@@ -8,7 +8,7 @@ import "../library/RMRKErrors.sol";
 /**
  * @title Ownable
  * @author RMRK team
- * @notice A minimal ownable smart contractf or owner and contributors.
+ * @notice A minimal ownable smart contract or owner and contributors.
  * @dev This smart contract is based on "openzeppelin's access/Ownable.sol".
  */
 contract Ownable is Context {

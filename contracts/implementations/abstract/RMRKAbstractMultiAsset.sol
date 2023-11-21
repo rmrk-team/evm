@@ -70,7 +70,7 @@ abstract contract RMRKAbstractMultiAsset is
             super.supportsInterface(interfaceId) ||
             interfaceId == type(IERC2981).interfaceId ||
             interfaceId == type(IERC721Metadata).interfaceId ||
-            interfaceId == RMRK_INTERFACE;
+            interfaceId == RMRK_INTERFACE();
     }
 
     function _beforeTokenTransfer(
