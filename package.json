@@ -16,7 +16,7 @@
     "node": ">=16.0.0"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "^4.6.0"
+    "@openzeppelin/contracts": "^5.0.0"
   },
   "devDependencies": {
     "@defi-wonderland/smock": "^2.3.4",
