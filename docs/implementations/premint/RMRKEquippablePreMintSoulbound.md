@@ -2000,17 +2000,6 @@ Attempting to mint a number of tokens that would cause the total supply to be gr
 
 
 
-### RMRKMintToNonRMRKNestableImplementer
-
-```solidity
-error RMRKMintToNonRMRKNestableImplementer()
-```
-
-Attempting to mint a nested token to a smart contract that doesn&#39;t support nesting
-
-
-
-
 ### RMRKMintZero
 
 ```solidity
