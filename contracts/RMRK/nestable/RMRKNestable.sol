@@ -8,7 +8,6 @@ import "./IERC7401.sol";
 import "../core/RMRKCore.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
-import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import "../library/RMRKErrors.sol";
@@ -21,8 +20,6 @@ import "../library/RMRKErrors.sol";
  *  gas limits allow it.
  */
 contract RMRKNestable is Context, IERC165, IERC721, IERC7401, RMRKCore {
-    using Address for address;
-
     uint256 private constant _MAX_LEVELS_TO_CHECK_FOR_INHERITANCE_LOOP = 100;
 
     // Mapping owner address to token count
@@ -288,15 +285,10 @@ contract RMRKNestable is Context, IERC165, IERC721, IERC7401, RMRKCore {
     ) internal virtual {
         (address immediateOwner, uint256 parentId, ) = directOwnerOf(tokenId);
         if (immediateOwner != from) revert ERC721TransferFromIncorrectOwner();
-        if (to == address(0)) revert ERC721TransferToTheZeroAddress();
         if (to == address(this) && tokenId == destinationId)
             revert RMRKNestableTransferToSelf();
 
-        // Destination contract checks:
-        // It seems redundant, but otherwise it would revert with no error
-        if (!to.isContract()) revert RMRKIsNotContract();
-        if (!IERC165(to).supportsInterface(type(IERC7401).interfaceId))
-            revert RMRKNestableTransferToNonRMRKNestableImplementer();
+        _checkDestination(to);
         _checkForInheritanceLoop(tokenId, to, destinationId);
 
         _beforeTokenTransfer(from, to, tokenId);
@@ -453,9 +445,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IERC7401, RMRKCore {
         bytes memory data
     ) internal virtual {
         // It seems redundant, but otherwise it would revert with no error
-        if (!to.isContract()) revert RMRKIsNotContract();
-        if (!IERC165(to).supportsInterface(type(IERC7401).interfaceId))
-            revert RMRKMintToNonRMRKNestableImplementer();
+        _checkDestination(to);
 
         _innerMint(to, tokenId, destinationId, data);
         _sendToNFT(address(0), to, 0, destinationId, tokenId, data);
@@ -837,7 +827,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IERC7401, RMRKCore {
         uint256 tokenId,
         bytes memory data
     ) private returns (bool) {
-        if (to.isContract()) {
+        if (to.code.length != 0) {
             try
                 IERC721Receiver(to).onERC721Received(
                     _msgSender(),
@@ -877,7 +867,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IERC7401, RMRKCore {
         _requireMinted(parentId);
 
         address childAddress = _msgSender();
-        if (!childAddress.isContract()) revert RMRKIsNotContract();
+        if (childAddress.code.length == 0) revert RMRKIsNotContract();
 
         Child memory child = Child({
             contractAddress: childAddress,
@@ -1177,6 +1167,18 @@ contract RMRKNestable is Context, IERC165, IERC721, IERC7401, RMRKCore {
             revert RMRKPendingChildIndexOutOfRange();
         Child memory child = _pendingChildren[parentId][index];
         return child;
+    }
+
+    /**
+     * @notice Checks the destination is valid for a Nest Transfer/Mint.
+     * @dev The destination must be a contract that implements the IERC7401 interface.
+     * @param to Address of the destination
+     */
+    function _checkDestination(address to) internal view {
+        // It seems redundant, but otherwise it would revert with no error
+        if (to.code.length == 0) revert RMRKIsNotContract();
+        if (!IERC165(to).supportsInterface(type(IERC7401).interfaceId))
+            revert RMRKNestableTransferToNonRMRKNestableImplementer();
     }
 
     // HOOKS

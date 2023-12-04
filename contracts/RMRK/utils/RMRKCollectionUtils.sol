@@ -5,7 +5,6 @@ pragma solidity ^0.8.21;
 import "@openzeppelin/contracts/interfaces/IERC2981.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import "@openzeppelin/contracts/utils/Address.sol";
 import "../equippable/IERC6220.sol";
 import "../nestable/IERC7401.sol";
 import "../extension/soulbound/IERC6454.sol";
@@ -18,8 +17,6 @@ import "./IRMRKCollectionData.sol";
  * @dev Extra utility functions for RMRK contracts.
  */
 contract RMRKCollectionUtils {
-    using Address for address;
-
     event CollectionTokensMetadataRefreshTriggered(address indexed collection);
     event TokenMetadataRefreshTriggered(
         address indexed collection,
@@ -198,7 +195,7 @@ contract RMRKCollectionUtils {
      */
     function refreshCollectionTokensMetadata(address collectionAddress) public {
         // To avoid some spam
-        if (!collectionAddress.isContract()) {
+        if (collectionAddress.code.length == 0) {
             return;
         }
         emit CollectionTokensMetadataRefreshTriggered(collectionAddress);
@@ -215,7 +212,7 @@ contract RMRKCollectionUtils {
         uint256 tokenId
     ) public {
         // To avoid some spam
-        if (!collectionAddress.isContract()) {
+        if (collectionAddress.code.length == 0) {
             return;
         }
         emit TokenMetadataRefreshTriggered(collectionAddress, tokenId);

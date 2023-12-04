@@ -5,7 +5,6 @@ pragma solidity ^0.8.21;
 
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
-import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import "./AbstractMultiAsset.sol";
 import "../core/RMRKCore.sol";
@@ -17,8 +16,6 @@ import "../library/RMRKErrors.sol";
  * @notice Smart contract of the RMRK Multi asset module.
  */
 contract RMRKMultiAsset is IERC165, IERC721, AbstractMultiAsset, RMRKCore {
-    using Address for address;
-
     // Mapping from token ID to owner address
     mapping(uint256 => address) private _owners;
 
@@ -490,7 +487,7 @@ contract RMRKMultiAsset is IERC165, IERC721, AbstractMultiAsset, RMRKCore {
         uint256 tokenId,
         bytes memory data
     ) private returns (bool) {
-        if (to.isContract()) {
+        if (to.code.length != 0) {
             try
                 IERC721Receiver(to).onERC721Received(
                     _msgSender(),
