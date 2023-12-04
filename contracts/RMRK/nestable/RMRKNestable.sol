@@ -444,9 +444,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IERC7401, RMRKCore {
         uint256 destinationId,
         bytes memory data
     ) internal virtual {
-        // It seems redundant, but otherwise it would revert with no error
         _checkDestination(to);
-
         _innerMint(to, tokenId, destinationId, data);
         _sendToNFT(address(0), to, 0, destinationId, tokenId, data);
     }
@@ -1175,7 +1173,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IERC7401, RMRKCore {
      * @param to Address of the destination
      */
     function _checkDestination(address to) internal view {
-        // It seems redundant, but otherwise it would revert with no error
+        // Checking if it is a contract before calling it seems redundant, but otherwise it would revert with no error
         if (to.code.length == 0) revert RMRKIsNotContract();
         if (!IERC165(to).supportsInterface(type(IERC7401).interfaceId))
             revert RMRKNestableTransferToNonRMRKNestableImplementer();
