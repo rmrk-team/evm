@@ -4,7 +4,7 @@
 
 > Ownable
 
-A minimal ownable smart contractf or owner and contributors.
+A minimal ownable smart contract or owner and contributors.
 
 *This smart contract is based on &quot;openzeppelin&#39;s access/Ownable.sol&quot;.*
 
