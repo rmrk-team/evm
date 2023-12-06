@@ -5,6 +5,7 @@ pragma solidity ^0.8.21;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+import "@openzeppelin/contracts/utils/Context.sol";
 
 import "../../library/RMRKErrors.sol";
 import "./IERC7508.sol";
@@ -14,7 +15,7 @@ import "./IERC7508.sol";
  * @author RMRK team
  * @notice Smart contract of the RMRK Token property repository module.
  */
-contract RMRKTokenAttributesRepository is IERC7508 {
+contract RMRKTokenAttributesRepository is IERC7508, Context {
     bytes32 public immutable DOMAIN_SEPARATOR =
         keccak256(
             abi.encode(
@@ -121,7 +122,7 @@ contract RMRKTokenAttributesRepository is IERC7508 {
         }
         if (
             ownableSuccess &&
-            address(uint160(uint256(bytes32(ownableReturn)))) != msg.sender
+            address(uint160(uint256(bytes32(ownableReturn)))) != _msgSender()
         ) {
             revert NotCollectionIssuer();
         }
@@ -134,7 +135,7 @@ contract RMRKTokenAttributesRepository is IERC7508 {
         emit AccessControlRegistration(
             collection,
             issuer,
-            msg.sender,
+            _msgSender(),
             useOwnable
         );
     }
@@ -220,7 +221,7 @@ contract RMRKTokenAttributesRepository is IERC7508 {
         string memory key,
         uint256 tokenId
     ) {
-        _onlyAuthorizedCaller(msg.sender, collection, key, tokenId);
+        _onlyAuthorizedCaller(_msgSender(), collection, key, tokenId);
         _;
     }
 
@@ -252,10 +253,10 @@ contract RMRKTokenAttributesRepository is IERC7508 {
      */
     modifier onlyIssuer(address collection) {
         if (_issuerSettings[collection].useOwnable) {
-            if (Ownable(collection).owner() != msg.sender) {
+            if (Ownable(collection).owner() != _msgSender()) {
                 revert NotCollectionIssuer();
             }
-        } else if (_issuerSettings[collection].issuer != msg.sender) {
+        } else if (_issuerSettings[collection].issuer != _msgSender()) {
             revert NotCollectionIssuer();
         }
         _;

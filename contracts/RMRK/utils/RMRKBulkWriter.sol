@@ -2,8 +2,9 @@
 
 pragma solidity ^0.8.21;
 
-import "../equippable/IERC6220.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "@openzeppelin/contracts/utils/Context.sol";
+import "../equippable/IERC6220.sol";
 import "../library/RMRKErrors.sol";
 
 /**
@@ -12,7 +13,7 @@ import "../library/RMRKErrors.sol";
  * @notice Smart contract of the RMRK Bulk Writer module.
  * @dev Extra utility functions for RMRK contracts.
  */
-contract RMRKBulkWriter {
+contract RMRKBulkWriter is Context {
     /**
      * @notice Used to provide a struct for inputing unequip data.
      * @dev Only used for input and not storage of data.
@@ -128,7 +129,7 @@ contract RMRKBulkWriter {
         uint256 tokenId
     ) internal view {
         address tokenOwner = IERC721(collection).ownerOf(tokenId);
-        if (tokenOwner != msg.sender) {
+        if (tokenOwner != _msgSender()) {
             revert RMRKCanOnlyDoBulkOperationsOnOwnedTokens();
         }
     }

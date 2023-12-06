@@ -2,6 +2,7 @@
 pragma solidity ^0.8.21;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/utils/Context.sol";
 
 error InvalidInput();
 error FailedToSend();
@@ -13,7 +14,7 @@ error OnlyBeneficiary();
  * @notice Smart contract of the RMRK Royalties Spliter module.
  * @dev This smart contract provides a simple way to share royalties from either native or erc20 payments.
  */
-contract RMRKRoyaltiesSplitter {
+contract RMRKRoyaltiesSplitter is Context {
     event NativePaymentDistributed(address indexed sender, uint256 amount);
     event ERCPaymentDistributed(
         address indexed sender,
@@ -70,7 +71,7 @@ contract RMRKRoyaltiesSplitter {
             }
         }
 
-        emit NativePaymentDistributed(msg.sender, msg.value);
+        emit NativePaymentDistributed(_msgSender(), msg.value);
     }
 
     /**
@@ -85,7 +86,7 @@ contract RMRKRoyaltiesSplitter {
 
         bool callerIsBeneficiary;
         for (uint256 i; i < length; ) {
-            if (_beneficiaries[i] == msg.sender) {
+            if (_beneficiaries[i] == _msgSender()) {
                 callerIsBeneficiary = true;
                 break;
             }
@@ -111,7 +112,7 @@ contract RMRKRoyaltiesSplitter {
             }
         }
 
-        emit ERCPaymentDistributed(msg.sender, currency, amount);
+        emit ERCPaymentDistributed(_msgSender(), currency, amount);
     }
 
     /**
