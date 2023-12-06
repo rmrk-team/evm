@@ -79,7 +79,7 @@ contract RMRKMultiAssetLazyMintErc20 is
     function _chargeMints(uint256 numToMint) internal {
         uint256 price = numToMint * _pricePerMint;
         IERC20(_erc20TokenAddress).transferFrom(
-            msg.sender,
+            _msgSender(),
             address(this),
             price
         );

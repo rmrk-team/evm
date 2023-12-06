@@ -2,13 +2,14 @@
 
 pragma solidity ^0.8.21;
 
+import "@openzeppelin/contracts/utils/Context.sol";
 import "../../../RMRK/extension/revealable/IRMRKRevealer.sol";
 import "../../RMRKMultiAssetMock.sol";
 
 error AlreadyRevealed(uint256 tokenId);
 error CallerIsNotRevealable();
 
-contract RMRKRevealerMock is IRMRKRevealer {
+contract RMRKRevealerMock is IRMRKRevealer, Context {
     uint64 private _revealedAssetId;
     address private _revealableContract;
     mapping(uint256 tokenId => bool revealed) private _revealed;
@@ -52,7 +53,7 @@ contract RMRKRevealerMock is IRMRKRevealer {
             uint64[] memory assetsToReplaceIds
         )
     {
-        if (msg.sender != _revealableContract) {
+        if (_msgSender() != _revealableContract) {
             revert CallerIsNotRevealable();
         }
         uint256 length = tokenIds.length;
@@ -64,7 +65,7 @@ contract RMRKRevealerMock is IRMRKRevealer {
                 revert AlreadyRevealed(tokenId);
             }
             _revealed[tokenId] = true;
-            uint64[] memory activeAssets = RMRKMultiAssetMock(msg.sender)
+            uint64[] memory activeAssets = RMRKMultiAssetMock(_msgSender())
                 .getActiveAssets(tokenId);
             // Asumes that the token has at least one asset
             revealedAssetsIds[i] = _revealedAssetId;

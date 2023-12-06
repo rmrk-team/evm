@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 pragma solidity ^0.8.21;
-import "../../../RMRK/extension/tokenHolder/RMRKTokenHolder.sol";
+
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "../../../RMRK/extension/tokenHolder/RMRKTokenHolder.sol";
 
 error OnlyNFTOwnerCanTransferTokensFromIt();
 error OnlyNFTOwnerCanTransferTokensToIt();
@@ -63,7 +64,7 @@ contract RMRKTokenHolderMock is RMRKTokenHolder, ERC721 {
         address to,
         bytes memory data
     ) external {
-        if (msg.sender != ownerOf(tokenId)) {
+        if (_msgSender() != ownerOf(tokenId)) {
             revert OnlyNFTOwnerCanTransferTokensFromIt();
         }
         _transferHeldTokenFromToken(

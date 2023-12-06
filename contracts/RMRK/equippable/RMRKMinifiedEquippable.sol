@@ -240,7 +240,7 @@ contract RMRKMinifiedEquippable is
 
     /**
      * @notice Used to transfer the token from `from` to `to`.
-     * @dev As opposed to {transferFrom}, this imposes no restrictions on msg.sender.
+     * @dev As opposed to {transferFrom}, this imposes no restrictions on _msgSender()
      * @dev Requirements:
      *
      *  - `to` cannot be the zero address.
