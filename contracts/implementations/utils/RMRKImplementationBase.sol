@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: Apache-2.0
 pragma solidity ^0.8.21;
 
-import "../../RMRK/access/Ownable.sol";
+import {Ownable} from "../../RMRK/access/Ownable.sol";
 import "../../RMRK/library/RMRKErrors.sol";
-import "../../RMRK/extension/RMRKRoyalties.sol";
+import {RMRKRoyalties} from "../../RMRK/extension/RMRKRoyalties.sol";
 
 /**
  * @title RMRKImplementationBase

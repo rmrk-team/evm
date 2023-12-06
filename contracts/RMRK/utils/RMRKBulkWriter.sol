@@ -2,9 +2,9 @@
 
 pragma solidity ^0.8.21;
 
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import "@openzeppelin/contracts/utils/Context.sol";
-import "../equippable/IERC6220.sol";
+import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import {Context} from "@openzeppelin/contracts/utils/Context.sol";
+import {IERC6220} from "../equippable/IERC6220.sol";
 import "../library/RMRKErrors.sol";
 
 /**

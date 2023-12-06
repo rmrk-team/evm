@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.21;
 
-import "../../multiasset/IERC5773.sol";
+import {IERC5773} from "../../multiasset/IERC5773.sol";
 
 /**
  * @title RMRKMultiAssetAutoIndex

@@ -4,10 +4,12 @@
 
 pragma solidity ^0.8.21;
 
-import "../multiasset/AbstractMultiAsset.sol";
-import "./IERC7401.sol";
-import "./RMRKNestable.sol";
-import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+import {AbstractMultiAsset} from "../multiasset/AbstractMultiAsset.sol";
+import {IERC7401} from "./IERC7401.sol";
+import {IERC5773} from "../multiasset/IERC5773.sol";
+import {RMRKNestable} from "./RMRKNestable.sol";
+import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+import "../library/RMRKErrors.sol";
 
 /**
  * @title RMRKNestableMultiAsset

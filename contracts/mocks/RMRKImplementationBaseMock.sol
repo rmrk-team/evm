@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.21;
 
-import "../implementations/utils/RMRKImplementationBase.sol";
+import {RMRKImplementationBase} from "../implementations/utils/RMRKImplementationBase.sol";
 
 contract RMRKImplementationBaseMock is RMRKImplementationBase {
     constructor(

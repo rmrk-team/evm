@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.21;
 
-import "./IERC7409.sol";
+import {IERC7409, IERC165} from "./IERC7409.sol";
 
 error BulkParametersOfUnequalLength();
 error ExpiredPresignedEmote();

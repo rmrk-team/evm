@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.21;
 
-import "./Ownable.sol";
+import {Ownable} from "./Ownable.sol";
 import "../library/RMRKErrors.sol";
 
 /**

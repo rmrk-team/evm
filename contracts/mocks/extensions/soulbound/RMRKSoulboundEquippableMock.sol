@@ -2,9 +2,10 @@
 
 pragma solidity ^0.8.21;
 
-import "../../../RMRK/extension/soulbound/RMRKSoulbound.sol";
-// import "../../../RMRK/equippable/RMRKEquippable.sol";
-import "../../RMRKEquippableMock.sol";
+import {RMRKSoulbound} from "../../../RMRK/extension/soulbound/RMRKSoulbound.sol";
+import {RMRKNestable} from "../../../RMRK/nestable/RMRKNestable.sol";
+import {RMRKEquippable} from "../../../RMRK/equippable/RMRKEquippable.sol";
+import {RMRKEquippableMock} from "../../RMRKEquippableMock.sol";
 
 contract RMRKSoulboundEquippableMock is RMRKSoulbound, RMRKEquippableMock {
     function supportsInterface(

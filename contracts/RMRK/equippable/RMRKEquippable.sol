@@ -4,12 +4,16 @@
 
 pragma solidity ^0.8.21;
 
-import "../catalog/IRMRKCatalog.sol";
-import "../library/RMRKLib.sol";
-import "../multiasset/AbstractMultiAsset.sol";
-import "../nestable/RMRKNestable.sol";
-import "../security/ReentrancyGuard.sol";
-import "./IERC6220.sol";
+import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+import {IERC5773} from "../multiasset/IERC5773.sol";
+import {IERC6220} from "./IERC6220.sol";
+import {IERC7401} from "../nestable/IERC7401.sol";
+import {IRMRKCatalog} from "../catalog/IRMRKCatalog.sol";
+import {RMRKLib} from "../library/RMRKLib.sol";
+import {AbstractMultiAsset} from "../multiasset/AbstractMultiAsset.sol";
+import {RMRKNestable} from "../nestable/RMRKNestable.sol";
+import {ReentrancyGuard} from "../security/ReentrancyGuard.sol";
+import "../library/RMRKErrors.sol";
 
 /**
  * @title RMRKEquippable

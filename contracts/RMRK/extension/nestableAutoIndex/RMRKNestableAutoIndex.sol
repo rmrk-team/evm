@@ -2,8 +2,10 @@
 
 pragma solidity ^0.8.21;
 
-import "./IRMRKNestableAutoIndex.sol";
-import "../../nestable/RMRKNestable.sol";
+import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+import {IERC7401} from "../../nestable/IERC7401.sol";
+import {IRMRKNestableAutoIndex} from "./IRMRKNestableAutoIndex.sol";
+import {RMRKNestable} from "../../nestable/RMRKNestable.sol";
 
 /**
  * @title RMRKNestableAutoIndex

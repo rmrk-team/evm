@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.21;
 
-import "../RMRK/multiasset/RMRKMultiAsset.sol";
+import {RMRKMultiAsset} from "../RMRK/multiasset/RMRKMultiAsset.sol";
 
 contract RMRKMultiAssetMock is RMRKMultiAsset {
     function mint(address to, uint256 tokenId) external {

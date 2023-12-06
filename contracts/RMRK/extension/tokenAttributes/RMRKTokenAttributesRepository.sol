@@ -2,13 +2,13 @@
 
 pragma solidity ^0.8.21;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
-import "@openzeppelin/contracts/utils/Context.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+import {Context} from "@openzeppelin/contracts/utils/Context.sol";
 
 import "../../library/RMRKErrors.sol";
-import "./IERC7508.sol";
+import {IERC7508} from "./IERC7508.sol";
 
 /**
  * @title RMRKTokenAttributesRepository

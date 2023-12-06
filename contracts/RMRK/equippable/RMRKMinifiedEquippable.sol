@@ -2,18 +2,18 @@
 
 pragma solidity ^0.8.21;
 
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
-import "@openzeppelin/contracts/utils/Context.sol";
-import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
-
-import "../catalog/IRMRKCatalog.sol";
-import "../core/RMRKCore.sol";
-import "../equippable/IERC6220.sol";
+import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+import {IERC5773} from "../multiasset/IERC5773.sol";
+import {IERC6220} from "../equippable/IERC6220.sol";
+import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import {IERC721Receiver} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
+import {IERC7401} from "../nestable/IERC7401.sol";
+import {Context} from "@openzeppelin/contracts/utils/Context.sol";
+import {IRMRKCatalog} from "../catalog/IRMRKCatalog.sol";
+import {RMRKCore} from "../core/RMRKCore.sol";
+import {RMRKLib} from "../library/RMRKLib.sol";
+import {ReentrancyGuard} from "../security/ReentrancyGuard.sol";
 import "../library/RMRKErrors.sol";
-import "../library/RMRKLib.sol";
-import "../nestable/IERC7401.sol";
-import "../security/ReentrancyGuard.sol";
 
 /**
  * @title RMRKMinifiedEquippable

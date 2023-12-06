@@ -2,13 +2,14 @@
 
 pragma solidity ^0.8.21;
 
-import "./RMRKRenderUtils.sol";
-import "./RMRKMultiAssetRenderUtils.sol";
-import "./RMRKNestableRenderUtils.sol";
-import "../catalog/IRMRKCatalog.sol";
-import "../equippable/IERC6220.sol";
-import "../nestable/IERC7401.sol";
-import "../library/RMRKLib.sol";
+import {RMRKRenderUtils} from "./RMRKRenderUtils.sol";
+import {RMRKMultiAssetRenderUtils} from "./RMRKMultiAssetRenderUtils.sol";
+import {RMRKNestableRenderUtils} from "./RMRKNestableRenderUtils.sol";
+import {IRMRKCatalog} from "../catalog/IRMRKCatalog.sol";
+import {IERC6220} from "../equippable/IERC6220.sol";
+import {IERC7401} from "../nestable/IERC7401.sol";
+import {IERC5773} from "../multiasset/IERC5773.sol";
+import {RMRKLib} from "../library/RMRKLib.sol";
 import "../library/RMRKErrors.sol";
 
 /**

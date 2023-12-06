@@ -2,7 +2,8 @@
 
 pragma solidity ^0.8.21;
 
-import "./RMRKSoulbound.sol";
+import {IERC6454} from "./IERC6454.sol";
+import {RMRKSoulbound} from "./RMRKSoulbound.sol";
 
 /**
  * @title RMRKSoulboundAfterTransactions
