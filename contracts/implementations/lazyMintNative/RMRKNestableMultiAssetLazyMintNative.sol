@@ -2,9 +2,11 @@
 
 pragma solidity ^0.8.21;
 
-import "../abstract/RMRKAbstractNestableMultiAsset.sol";
-import "../utils/RMRKTokenURIEnumerated.sol";
-import "./InitDataNativePay.sol";
+import {RMRKAbstractNestableMultiAsset} from "../abstract/RMRKAbstractNestableMultiAsset.sol";
+import {RMRKImplementationBase} from "../utils/RMRKImplementationBase.sol";
+import {RMRKTokenURIEnumerated} from "../utils/RMRKTokenURIEnumerated.sol";
+import {InitDataNativePay} from "./InitDataNativePay.sol";
+import "../../RMRK/library/RMRKErrors.sol";
 
 /**
  * @title RMRKNestableMultiAssetLazyMintNative

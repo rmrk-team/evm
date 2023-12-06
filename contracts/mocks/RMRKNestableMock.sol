@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.21;
 
-import "../RMRK/nestable/RMRKNestable.sol";
+import {RMRKNestable} from "../RMRK/nestable/RMRKNestable.sol";
 
 //Minimal public implementation of IERC7401 for testing.
 contract RMRKNestableMock is RMRKNestable {

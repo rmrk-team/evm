@@ -2,8 +2,9 @@
 
 pragma solidity ^0.8.21;
 
-import "../abstract/RMRKAbstractEquippable.sol";
-import "../utils/RMRKTokenURIPerToken.sol";
+import {RMRKAbstractEquippable} from "../abstract/RMRKAbstractEquippable.sol";
+import {RMRKImplementationBase} from "../utils/RMRKImplementationBase.sol";
+import {RMRKTokenURIPerToken} from "../utils/RMRKTokenURIPerToken.sol";
 
 /**
  * @title RMRKEquippablePreMint

@@ -2,8 +2,10 @@
 
 pragma solidity ^0.8.21;
 
-import "./IRMRKMultiAssetAutoIndex.sol";
-import "../../multiasset/RMRKMultiAsset.sol";
+import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+import {IRMRKMultiAssetAutoIndex} from "./IRMRKMultiAssetAutoIndex.sol";
+import {RMRKMultiAsset} from "../../multiasset/RMRKMultiAsset.sol";
+import {AbstractMultiAsset} from "../../multiasset/AbstractMultiAsset.sol";
 
 /**
  * @title RMRKMultiAssetAutoIndex

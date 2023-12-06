@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 
-import "./IRMRKRevealable.sol";
-import "./IRMRKRevealer.sol";
+import {IRMRKRevealable} from "./IRMRKRevealable.sol";
+import {IRMRKRevealer} from "./IRMRKRevealer.sol";
 
 pragma solidity ^0.8.21;
 

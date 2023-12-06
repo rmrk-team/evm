@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.21;
 
-import "../../nestable/IERC7401.sol";
+import {IERC7401} from "../../nestable/IERC7401.sol";
 
 /**
  * @title RMRKNestableAutoIndex

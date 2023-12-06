@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.21;
 
-import "@openzeppelin/contracts/utils/Context.sol";
+import {Context} from "@openzeppelin/contracts/utils/Context.sol";
 import "../library/RMRKErrors.sol";
 
 /**

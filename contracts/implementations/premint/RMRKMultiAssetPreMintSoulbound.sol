@@ -2,8 +2,10 @@
 
 pragma solidity ^0.8.21;
 
-import "./RMRKMultiAssetPreMint.sol";
-import "../../RMRK/extension/soulbound/RMRKSoulbound.sol";
+import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+import {RMRKAbstractMultiAsset} from "../abstract/RMRKAbstractMultiAsset.sol";
+import {RMRKMultiAssetPreMint} from "./RMRKMultiAssetPreMint.sol";
+import {RMRKSoulbound} from "../../RMRK/extension/soulbound/RMRKSoulbound.sol";
 
 /**
  * @title RMRKMultiAssetPreMintSoulbound

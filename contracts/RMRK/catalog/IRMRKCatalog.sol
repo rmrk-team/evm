@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.21;
 
-import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 
 /**
  * @title IRMRKCatalog

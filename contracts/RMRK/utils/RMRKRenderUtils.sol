@@ -2,14 +2,20 @@
 
 pragma solidity ^0.8.21;
 
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
-import "../access/Ownable.sol";
-import "../equippable/RMRKEquippable.sol";
-import "../extension/soulbound/RMRKSoulbound.sol";
-import "../library/RMRKLib.sol";
+import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+import {IERC721Metadata} from "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
+import {Ownable} from "../access/Ownable.sol";
+import {RMRKEquippable} from "../equippable/RMRKEquippable.sol";
+import {RMRKSoulbound} from "../extension/soulbound/RMRKSoulbound.sol";
+import {IERC6454} from "../extension/soulbound/IERC6454.sol";
+import {IERC6220} from "../equippable/IERC6220.sol";
+import {IERC5773} from "../multiasset/IERC5773.sol";
+import {IERC7401} from "../nestable/IERC7401.sol";
+
+import {RMRKLib} from "../library/RMRKLib.sol";
 import "../library/RMRKErrors.sol";
-import "./IRMRKCollectionData.sol";
+import {IRMRKCollectionData} from "./IRMRKCollectionData.sol";
 
 /**
  * @title RMRKRenderUtils

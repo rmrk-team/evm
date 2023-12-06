@@ -2,8 +2,9 @@
 
 pragma solidity ^0.8.21;
 
-import "../../core/RMRKCore.sol";
-import "./IERC6454.sol";
+import {IERC6454} from "./IERC6454.sol";
+import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+import {RMRKCore} from "../../core/RMRKCore.sol";
 import "../../library/RMRKErrors.sol";
 
 /**

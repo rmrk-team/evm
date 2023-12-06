@@ -2,8 +2,8 @@
 
 pragma solidity ^0.8.21;
 
-import "./IRMRKCatalog.sol";
-import "@openzeppelin/contracts/utils/Address.sol";
+import {IRMRKCatalog, IERC165} from "./IRMRKCatalog.sol";
+import {Address} from "@openzeppelin/contracts/utils/Address.sol";
 import "../library/RMRKErrors.sol";
 
 /**

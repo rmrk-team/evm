@@ -2,8 +2,8 @@
 
 pragma solidity ^0.8.21;
 
-import "../RMRK/access/OwnableLock.sol";
-import "../RMRK/catalog/RMRKCatalog.sol";
+import {OwnableLock} from "../RMRK/access/OwnableLock.sol";
+import {RMRKCatalog} from "../RMRK/catalog/RMRKCatalog.sol";
 
 /**
  * @title RMRKCatalogImpl

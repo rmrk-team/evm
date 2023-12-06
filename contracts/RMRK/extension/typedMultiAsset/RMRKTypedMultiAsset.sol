@@ -2,7 +2,8 @@
 
 pragma solidity ^0.8.21;
 
-import "./IRMRKTypedMultiAsset.sol";
+import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+import {IRMRKTypedMultiAsset} from "./IRMRKTypedMultiAsset.sol";
 
 /**
  * @title RMRKTypedMultiAsset
