@@ -2,8 +2,8 @@
 
 pragma solidity ^0.8.21;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "../catalog/IRMRKCatalog.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import {IRMRKCatalog} from "../catalog/IRMRKCatalog.sol";
 
 /**
  * @title RMRKCatalogUtils

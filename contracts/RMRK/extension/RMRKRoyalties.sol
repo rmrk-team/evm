@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.21;
 
-import "@openzeppelin/contracts/interfaces/IERC2981.sol";
+import {IERC2981} from "@openzeppelin/contracts/interfaces/IERC2981.sol";
 import "../library/RMRKErrors.sol";
 
 /**

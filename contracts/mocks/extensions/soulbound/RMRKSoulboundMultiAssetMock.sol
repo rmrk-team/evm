@@ -2,8 +2,9 @@
 
 pragma solidity ^0.8.21;
 
-import "../../../RMRK/extension/soulbound/RMRKSoulbound.sol";
-import "../../RMRKMultiAssetMock.sol";
+import {RMRKSoulbound} from "../../../RMRK/extension/soulbound/RMRKSoulbound.sol";
+import {RMRKMultiAsset} from "../../../RMRK/multiasset/RMRKMultiAsset.sol";
+import {RMRKMultiAssetMock} from "../../RMRKMultiAssetMock.sol";
 
 contract RMRKSoulboundMultiAssetMock is RMRKSoulbound, RMRKMultiAssetMock {
     function supportsInterface(

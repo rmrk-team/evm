@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.21;
 
-import "../RMRK/extension/nestableAutoIndex/RMRKNestableAutoIndex.sol";
+import {RMRKNestableAutoIndex} from "../RMRK/extension/nestableAutoIndex/RMRKNestableAutoIndex.sol";
 
 contract RMRKNestableAutoIndexMock is RMRKNestableAutoIndex {
     function mint(address to, uint256 tokenId) external {
