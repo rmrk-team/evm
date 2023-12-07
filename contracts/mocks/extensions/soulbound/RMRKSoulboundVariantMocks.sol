@@ -14,8 +14,6 @@ contract RMRKSoulboundAfterBlockNumberMock is
     RMRKSoulboundAfterBlockNumber,
     RMRKMultiAssetMock
 {
-    mapping(uint256 => bool) soulboundExempt;
-
     constructor(
         uint256 lastBlockToTransfer
     ) RMRKSoulboundAfterBlockNumber(lastBlockToTransfer) {}
@@ -48,8 +46,6 @@ contract RMRKSoulboundAfterTransactionsMock is
     RMRKSoulboundAfterTransactions,
     RMRKMultiAssetMock
 {
-    mapping(uint256 => bool) soulboundExempt;
-
     constructor(
         uint256 numberOfTransfers
     ) RMRKSoulboundAfterTransactions(numberOfTransfers) {}
@@ -96,8 +92,6 @@ contract RMRKSoulboundPerTokenMock is
     RMRKMultiAssetMock,
     Ownable
 {
-    mapping(uint256 => bool) soulboundExempt;
-
     function supportsInterface(
         bytes4 interfaceId
     )

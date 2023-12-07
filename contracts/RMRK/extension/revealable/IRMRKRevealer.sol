@@ -4,7 +4,7 @@ pragma solidity ^0.8.21;
 
 interface IRMRKRevealer {
     event Revealed(
-        uint256[] tokenIds,
+        uint256[] indexed tokenIds,
         uint64[] revealedAssetsIds,
         uint64[] assetsToReplaceIds
     );
