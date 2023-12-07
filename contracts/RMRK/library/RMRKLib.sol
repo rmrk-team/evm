@@ -8,6 +8,8 @@ pragma solidity ^0.8.21;
  * @notice RMRK library smart contract.
  */
 library RMRKLib {
+    error IndexOutOfBounds();
+
     /**
      * @notice Used to remove an item from the array using the specified index.
      * @dev The item is removed by replacing it with the last item and removing the last element.
@@ -16,7 +18,7 @@ library RMRKLib {
      */
     function removeItemByIndex(uint64[] storage array, uint256 index) internal {
         //Check to see if this is already gated by require in all calls
-        require(index < array.length);
+        if (index >= array.length) revert IndexOutOfBounds();
         array[index] = array[array.length - 1];
         array.pop();
     }

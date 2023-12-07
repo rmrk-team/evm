@@ -21,7 +21,7 @@ contract RMRKImplementationBaseMock is RMRKImplementationBase {
         )
     {}
 
-    function mockMint(uint256 total) external payable {
+    function mockMint(uint256 total) external {
         _prepareMint(total);
     }
 }

@@ -1558,6 +1558,17 @@ Attempting to transfer the token to a 0x0 address
 
 
 
+### IndexOutOfBounds
+
+```solidity
+error IndexOutOfBounds()
+```
+
+
+
+
+
+
 ### RMRKApprovalForAssetsToCurrentOwner
 
 ```solidity
