@@ -885,7 +885,7 @@ async function testGeneralBehavior(mintingType: MintingType) {
       await mint(holder.address, contract, owner, rmrkERC20, mintingType);
       if (mintingType == MintingType.RMRKLazyMintNativeToken) {
         const balanceBefore = await holder.getBalance();
-        await contract.connect(owner).withdrawRaised(holder.address, pricePerMint.mul(2));
+        await contract.connect(owner).withdraw(holder.address, pricePerMint.mul(2));
         const balanceAfter = await holder.getBalance();
         expect(balanceAfter).to.eql(balanceBefore.add(pricePerMint.mul(2)));
       } else if (mintingType == MintingType.RMRKLazyMintERC20) {
@@ -904,7 +904,7 @@ async function testGeneralBehavior(mintingType: MintingType) {
       await mint(holder.address, contract, owner, rmrkERC20, mintingType);
       if (mintingType == MintingType.RMRKLazyMintNativeToken) {
         await expect(
-          contract.connect(holder).withdrawRaised(holder.address, pricePerMint),
+          contract.connect(holder).withdraw(holder.address, pricePerMint),
         ).to.be.revertedWithCustomError(contract, 'RMRKNotOwner');
       } else if (mintingType == MintingType.RMRKLazyMintERC20) {
         await expect(

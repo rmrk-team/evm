@@ -13,7 +13,7 @@
 ### getAssetIdWithTopPriority
 
 ```solidity
-function getAssetIdWithTopPriority(address target, uint256 tokenId) external view returns (uint64, uint64)
+function getAssetIdWithTopPriority(address target, uint256 tokenId) external view returns (uint64 maxPriorityAssetId, uint64 maxPriority)
 ```
 
 Used to retrieve the ID of the specified token&#39;s asset with the highest priority.
@@ -31,13 +31,13 @@ Used to retrieve the ID of the specified token&#39;s asset with the highest prio
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint64 | The ID of the asset with the highest priority |
-| _1 | uint64 | The priority value of the asset with the highest priority |
+| maxPriorityAssetId | uint64 | The ID of the asset with the highest priority |
+| maxPriority | uint64 | The priority value of the asset with the highest priority |
 
 ### getAssetsById
 
 ```solidity
-function getAssetsById(address target, uint256 tokenId, uint64[] assetIds) external view returns (string[])
+function getAssetsById(address target, uint256 tokenId, uint64[] assetIds) external view returns (string[] assets)
 ```
 
 Used to retrieve the metadata URI of specified assets in the specified token.
@@ -56,12 +56,12 @@ Used to retrieve the metadata URI of specified assets in the specified token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string[] | An array of metadata URIs belonging to specified assets |
+| assets | string[] | An array of metadata URIs belonging to specified assets |
 
 ### getExtendedActiveAssets
 
 ```solidity
-function getExtendedActiveAssets(address target, uint256 tokenId) external view returns (struct RMRKMultiAssetRenderUtils.ExtendedActiveAsset[])
+function getExtendedActiveAssets(address target, uint256 tokenId) external view returns (struct RMRKMultiAssetRenderUtils.ExtendedActiveAsset[] activeAssets)
 ```
 
 Used to get the active assets of the given token.
@@ -79,12 +79,12 @@ Used to get the active assets of the given token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | RMRKMultiAssetRenderUtils.ExtendedActiveAsset[] | An array of ActiveAssets present on the given token |
+| activeAssets | RMRKMultiAssetRenderUtils.ExtendedActiveAsset[] | An array of ActiveAssets present on the given token |
 
 ### getPendingAssets
 
 ```solidity
-function getPendingAssets(address target, uint256 tokenId) external view returns (struct RMRKMultiAssetRenderUtils.PendingAsset[])
+function getPendingAssets(address target, uint256 tokenId) external view returns (struct RMRKMultiAssetRenderUtils.PendingAsset[] pendingAssets)
 ```
 
 Used to get the pending assets of the given token.
@@ -102,7 +102,7 @@ Used to get the pending assets of the given token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | RMRKMultiAssetRenderUtils.PendingAsset[] | An array of PendingAssets present on the given token |
+| pendingAssets | RMRKMultiAssetRenderUtils.PendingAsset[] | An array of PendingAssets present on the given token |
 
 ### getTopAsset
 
@@ -132,7 +132,7 @@ Used to retrieve ID, priority value and metadata URI of the asset with the highe
 ### getTopAssetMetaForToken
 
 ```solidity
-function getTopAssetMetaForToken(address target, uint256 tokenId) external view returns (string)
+function getTopAssetMetaForToken(address target, uint256 tokenId) external view returns (string metadata)
 ```
 
 Used to retrieve the metadata URI of the specified token&#39;s asset with the highest priority.
@@ -150,7 +150,7 @@ Used to retrieve the metadata URI of the specified token&#39;s asset with the hi
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | The metadata URI of the asset with the highest priority |
+| metadata | string | The metadata URI of the asset with the highest priority |
 
 ### getTopAssetMetadataForTokens
 

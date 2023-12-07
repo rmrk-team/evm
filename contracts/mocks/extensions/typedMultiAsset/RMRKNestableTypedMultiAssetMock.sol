@@ -6,8 +6,6 @@ import {RMRKTypedMultiAsset} from "../../../RMRK/extension/typedMultiAsset/RMRKT
 import {RMRKNestableMultiAssetMock} from "../../RMRKNestableMultiAssetMock.sol";
 import {RMRKNestableMultiAsset} from "../../../RMRK/nestable/RMRKNestableMultiAsset.sol";
 
-error RMRKTokenHasNoAssetsWithType();
-
 contract RMRKNestableTypedMultiAssetMock is
     RMRKNestableMultiAssetMock,
     RMRKTypedMultiAsset

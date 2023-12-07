@@ -6,8 +6,6 @@ import {RMRKReclaimableChild} from "../../../RMRK/extension/reclaimableChild/RMR
 import {RMRKNestableMock} from "../../RMRKNestableMock.sol";
 import {RMRKNestable} from "../../../RMRK/nestable/RMRKNestable.sol";
 
-error RMRKTokenHasNoAssetsWithType();
-
 contract RMRKNestableClaimableChildMock is
     RMRKNestableMock,
     RMRKReclaimableChild

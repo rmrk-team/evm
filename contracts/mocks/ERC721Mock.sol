@@ -15,6 +15,6 @@ contract ERC721Mock is ERC721 {
     ) ERC721(name, symbol) {}
 
     function mint(address to, uint256 tokenId) public {
-        _mint(to, tokenId);
+        _safeMint(to, tokenId);
     }
 }

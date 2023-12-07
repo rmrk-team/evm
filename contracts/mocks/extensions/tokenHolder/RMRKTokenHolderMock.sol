@@ -7,7 +7,6 @@ import {RMRKTokenHolder} from "../../../RMRK/extension/tokenHolder/RMRKTokenHold
 import {IRMRKTokenHolder} from "../../../RMRK/extension/tokenHolder/IRMRKTokenHolder.sol";
 
 error OnlyNFTOwnerCanTransferTokensFromIt();
-error OnlyNFTOwnerCanTransferTokensToIt();
 
 /**
  * @title RMRKTokenHolderMock
@@ -21,7 +20,7 @@ contract RMRKTokenHolderMock is RMRKTokenHolder, ERC721 {
     ) ERC721(name, symbol) {}
 
     function mint(address to, uint256 tokenId) public {
-        _mint(to, tokenId);
+        _safeMint(to, tokenId);
     }
 
     function supportsInterface(

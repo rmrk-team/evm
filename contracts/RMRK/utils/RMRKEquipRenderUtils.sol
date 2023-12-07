@@ -145,12 +145,17 @@ contract RMRKEquipRenderUtils is
      *  ]
      * @param target Address of the smart contract of the given token
      * @param tokenId ID of the token to retrieve the extended active assets for
-     * @return An array of ExtendedEquippableActiveAssets present on the given token
+     * @return activeAssets An array of ExtendedEquippableActiveAssets present on the given token
      */
     function getExtendedEquippableActiveAssets(
         address target,
         uint256 tokenId
-    ) public view virtual returns (ExtendedEquippableActiveAsset[] memory) {
+    )
+        public
+        view
+        virtual
+        returns (ExtendedEquippableActiveAsset[] memory activeAssets)
+    {
         IERC6220 target_ = IERC6220(target);
 
         uint64[] memory assets = target_.getActiveAssets(tokenId);
@@ -160,8 +165,7 @@ contract RMRKEquipRenderUtils is
             revert RMRKTokenHasNoAssets();
         }
 
-        ExtendedEquippableActiveAsset[]
-            memory activeAssets = new ExtendedEquippableActiveAsset[](len);
+        activeAssets = new ExtendedEquippableActiveAsset[](len);
 
         for (uint256 i; i < len; ) {
             (
@@ -206,12 +210,17 @@ contract RMRKEquipRenderUtils is
      *  ]
      * @param target Address of the smart contract of the given token
      * @param tokenId ID of the token to retrieve the extended pending assets for
-     * @return An array of ExtendedPendingAssets present on the given token
+     * @return pendingAssets An array of ExtendedPendingAssets present on the given token
      */
     function getExtendedPendingAssets(
         address target,
         uint256 tokenId
-    ) public view virtual returns (ExtendedPendingAsset[] memory) {
+    )
+        public
+        view
+        virtual
+        returns (ExtendedPendingAsset[] memory pendingAssets)
+    {
         IERC6220 target_ = IERC6220(target);
 
         uint64[] memory assets = target_.getPendingAssets(tokenId);
@@ -220,8 +229,7 @@ contract RMRKEquipRenderUtils is
             revert RMRKTokenHasNoAssets();
         }
 
-        ExtendedPendingAsset[]
-            memory pendingAssets = new ExtendedPendingAsset[](len);
+        pendingAssets = new ExtendedPendingAsset[](len);
         uint64 replacesAssetWithId;
         for (uint256 i; i < len; ) {
             (
@@ -527,6 +535,7 @@ contract RMRKEquipRenderUtils is
             targetChild,
             childId
         );
+
         childIndex = getChildIndex(
             parentAddress,
             parentId,
@@ -579,6 +588,7 @@ contract RMRKEquipRenderUtils is
             targetChild,
             childId
         );
+
         childIndex = getPendingChildIndex(
             parentAddress,
             parentId,
@@ -1035,19 +1045,22 @@ contract RMRKEquipRenderUtils is
      *  ]
      * @param parentAddress Address of the collection smart contract of the parent token
      * @param parentId ID of the parent token
-     * @return An array of `ChildWithTopAssetMetadata` structs representing the children with their top asset metadata
+     * @return childrenWithMetadata An array of `ChildWithTopAssetMetadata` structs representing the children with their top asset metadata
      */
     function getChildrenWithTopMetadata(
         address parentAddress,
         uint256 parentId
-    ) public view returns (ChildWithTopAssetMetadata[] memory) {
+    )
+        public
+        view
+        returns (ChildWithTopAssetMetadata[] memory childrenWithMetadata)
+    {
         IERC7401.Child[] memory children = IERC7401(parentAddress).childrenOf(
             parentId
         );
         (parentId);
         uint256 len = children.length;
-        ChildWithTopAssetMetadata[]
-            memory childrenWithMetadata = new ChildWithTopAssetMetadata[](len);
+        childrenWithMetadata = new ChildWithTopAssetMetadata[](len);
 
         for (uint256 i; i < len; ) {
             string memory meta = getTopAssetMetaForToken(
