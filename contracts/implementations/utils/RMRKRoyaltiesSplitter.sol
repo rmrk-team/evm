@@ -22,7 +22,7 @@ contract RMRKRoyaltiesSplitter is Context {
         uint256 amount
     );
 
-    uint256 constant MAX_BPS = 10000;
+    uint256 public constant MAX_BPS = 10000;
     address[] private _beneficiaries;
     mapping(address => uint256) private _sharesBps;
 

@@ -21,8 +21,8 @@ contract RMRKRevealerMock is IRMRKRevealer, Context {
 
     function supportsInterface(
         bytes4 interfaceId
-    ) public view virtual returns (bool) {
-        return interfaceId == type(IRMRKRevealer).interfaceId;
+    ) public view virtual returns (bool supportsInterface_) {
+        supportsInterface_ = interfaceId == type(IRMRKRevealer).interfaceId;
     }
 
     /**-

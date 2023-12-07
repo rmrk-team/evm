@@ -906,10 +906,10 @@ Used to update recipient of royalties.
 |---|---|---|
 | newRoyaltyRecipient | address | Address of the new recipient of royalties |
 
-### withdrawRaised
+### withdraw
 
 ```solidity
-function withdrawRaised(address to, uint256 amount) external nonpayable
+function withdraw(address to, uint256 amount) external nonpayable
 ```
 
 Used to withdraw the minting proceedings to a specified address.
@@ -1488,6 +1488,17 @@ error RMRKWrongValueSent()
 ```
 
 Attempting to pay with native token with a value different than expected
+
+
+
+
+### TransferFailed
+
+```solidity
+error TransferFailed()
+```
+
+
 
 
 

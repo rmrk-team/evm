@@ -6,8 +6,6 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import {Context} from "@openzeppelin/contracts/utils/Context.sol";
-
-import "../../library/RMRKErrors.sol";
 import {IERC7508} from "./IERC7508.sol";
 
 /**
@@ -165,10 +163,11 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
         address[] memory collaboratorAddresses,
         bool[] memory collaboratorAddressAccess
     ) external onlyRegisteredCollection(collection) onlyIssuer(collection) {
-        if (collaboratorAddresses.length != collaboratorAddressAccess.length) {
+        uint256 length = collaboratorAddresses.length;
+        if (length != collaboratorAddressAccess.length) {
             revert CollaboratorArraysNotEqualLength();
         }
-        for (uint256 i; i < collaboratorAddresses.length; ) {
+        for (uint256 i; i < length; ) {
             _collaborators[collection][
                 collaboratorAddresses[i]
             ] = collaboratorAddressAccess[i];
@@ -742,7 +741,8 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
         uint256 tokenId,
         StringAttribute[] memory attributes
     ) external onlyAuthorizedCaller(collection, "", tokenId) {
-        for (uint256 i = 0; i < attributes.length; ) {
+        uint256 length = attributes.length;
+        for (uint256 i = 0; i < length; ) {
             _stringValueIds[collection][tokenId][
                 _getIdForKey(attributes[i].key)
             ] = _getStringIdForValue(collection, attributes[i].value);
@@ -766,7 +766,8 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
         uint256 tokenId,
         UintAttribute[] memory attributes
     ) external onlyAuthorizedCaller(collection, "", tokenId) {
-        for (uint256 i = 0; i < attributes.length; ) {
+        uint256 length = attributes.length;
+        for (uint256 i = 0; i < length; ) {
             _uintValues[collection][tokenId][
                 _getIdForKey(attributes[i].key)
             ] = attributes[i].value;
@@ -790,7 +791,8 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
         uint256 tokenId,
         BoolAttribute[] memory attributes
     ) external onlyAuthorizedCaller(collection, "", tokenId) {
-        for (uint256 i = 0; i < attributes.length; ) {
+        uint256 length = attributes.length;
+        for (uint256 i = 0; i < length; ) {
             _boolValues[collection][tokenId][
                 _getIdForKey(attributes[i].key)
             ] = attributes[i].value;
@@ -814,7 +816,8 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
         uint256 tokenId,
         AddressAttribute[] memory attributes
     ) external onlyAuthorizedCaller(collection, "", tokenId) {
-        for (uint256 i = 0; i < attributes.length; ) {
+        uint256 length = attributes.length;
+        for (uint256 i = 0; i < length; ) {
             _addressValues[collection][tokenId][
                 _getIdForKey(attributes[i].key)
             ] = attributes[i].value;
@@ -838,7 +841,8 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
         uint256 tokenId,
         BytesAttribute[] memory attributes
     ) external onlyAuthorizedCaller(collection, "", tokenId) {
-        for (uint256 i = 0; i < attributes.length; ) {
+        uint256 length = attributes.length;
+        for (uint256 i = 0; i < length; ) {
             _bytesValues[collection][tokenId][
                 _getIdForKey(attributes[i].key)
             ] = attributes[i].value;
@@ -866,7 +870,8 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
         AddressAttribute[] memory addressAttributes,
         BytesAttribute[] memory bytesAttributes
     ) external onlyAuthorizedCaller(collection, "", tokenId) {
-        for (uint256 i = 0; i < stringAttributes.length; ) {
+        uint256 length = stringAttributes.length;
+        for (uint256 i = 0; i < length; ) {
             _stringValueIds[collection][tokenId][
                 _getIdForKey(stringAttributes[i].key)
             ] = _getStringIdForValue(collection, stringAttributes[i].value);
@@ -881,7 +886,8 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
             }
         }
 
-        for (uint256 i = 0; i < uintAttributes.length; ) {
+        length = uintAttributes.length;
+        for (uint256 i = 0; i < length; ) {
             _uintValues[collection][tokenId][
                 _getIdForKey(uintAttributes[i].key)
             ] = uintAttributes[i].value;
@@ -896,7 +902,8 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
             }
         }
 
-        for (uint256 i = 0; i < boolAttributes.length; ) {
+        length = boolAttributes.length;
+        for (uint256 i = 0; i < length; ) {
             _boolValues[collection][tokenId][
                 _getIdForKey(boolAttributes[i].key)
             ] = boolAttributes[i].value;
@@ -911,7 +918,8 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
             }
         }
 
-        for (uint256 i = 0; i < addressAttributes.length; ) {
+        length = addressAttributes.length;
+        for (uint256 i = 0; i < length; ) {
             _addressValues[collection][tokenId][
                 _getIdForKey(addressAttributes[i].key)
             ] = addressAttributes[i].value;
@@ -926,7 +934,8 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
             }
         }
 
-        for (uint256 i = 0; i < bytesAttributes.length; ) {
+        length = bytesAttributes.length;
+        for (uint256 i = 0; i < length; ) {
             _bytesValues[collection][tokenId][
                 _getIdForKey(bytesAttributes[i].key)
             ] = bytesAttributes[i].value;

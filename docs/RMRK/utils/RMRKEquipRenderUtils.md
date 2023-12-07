@@ -136,7 +136,7 @@ Used to get the child&#39;s assets and slot parts pairs, identifying parts the s
 ### getAssetIdWithTopPriority
 
 ```solidity
-function getAssetIdWithTopPriority(address target, uint256 tokenId) external view returns (uint64, uint64)
+function getAssetIdWithTopPriority(address target, uint256 tokenId) external view returns (uint64 maxPriorityAssetId, uint64 maxPriority)
 ```
 
 Used to retrieve the ID of the specified token&#39;s asset with the highest priority.
@@ -154,13 +154,13 @@ Used to retrieve the ID of the specified token&#39;s asset with the highest prio
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint64 | The ID of the asset with the highest priority |
-| _1 | uint64 | The priority value of the asset with the highest priority |
+| maxPriorityAssetId | uint64 | The ID of the asset with the highest priority |
+| maxPriority | uint64 | The priority value of the asset with the highest priority |
 
 ### getAssetsById
 
 ```solidity
-function getAssetsById(address target, uint256 tokenId, uint64[] assetIds) external view returns (string[])
+function getAssetsById(address target, uint256 tokenId, uint64[] assetIds) external view returns (string[] assets)
 ```
 
 Used to retrieve the metadata URI of specified assets in the specified token.
@@ -179,12 +179,12 @@ Used to retrieve the metadata URI of specified assets in the specified token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string[] | An array of metadata URIs belonging to specified assets |
+| assets | string[] | An array of metadata URIs belonging to specified assets |
 
 ### getChildIndex
 
 ```solidity
-function getChildIndex(address parentAddress, uint256 parentId, address childAddress, uint256 childId) external view returns (uint256)
+function getChildIndex(address parentAddress, uint256 parentId, address childAddress, uint256 childId) external view returns (uint256 index)
 ```
 
 Used to retrieve the given child&#39;s index in its parent&#39;s child tokens array.
@@ -204,12 +204,12 @@ Used to retrieve the given child&#39;s index in its parent&#39;s child tokens ar
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | The index of the child token in the parent token&#39;s child tokens array |
+| index | uint256 | The index of the child token in the parent token&#39;s child tokens array |
 
 ### getChildrenWithTopMetadata
 
 ```solidity
-function getChildrenWithTopMetadata(address parentAddress, uint256 parentId) external view returns (struct RMRKEquipRenderUtils.ChildWithTopAssetMetadata[])
+function getChildrenWithTopMetadata(address parentAddress, uint256 parentId) external view returns (struct RMRKEquipRenderUtils.ChildWithTopAssetMetadata[] childrenWithMetadata)
 ```
 
 
@@ -227,7 +227,7 @@ function getChildrenWithTopMetadata(address parentAddress, uint256 parentId) ext
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | RMRKEquipRenderUtils.ChildWithTopAssetMetadata[] | An array of `ChildWithTopAssetMetadata` structs representing the children with their top asset metadata |
+| childrenWithMetadata | RMRKEquipRenderUtils.ChildWithTopAssetMetadata[] | An array of `ChildWithTopAssetMetadata` structs representing the children with their top asset metadata |
 
 ### getEquippableSlotsFromParent
 
@@ -308,7 +308,7 @@ Used to retrieve the equipped parts of the given token.
 ### getExtendedActiveAssets
 
 ```solidity
-function getExtendedActiveAssets(address target, uint256 tokenId) external view returns (struct RMRKMultiAssetRenderUtils.ExtendedActiveAsset[])
+function getExtendedActiveAssets(address target, uint256 tokenId) external view returns (struct RMRKMultiAssetRenderUtils.ExtendedActiveAsset[] activeAssets)
 ```
 
 Used to get the active assets of the given token.
@@ -326,12 +326,12 @@ Used to get the active assets of the given token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | RMRKMultiAssetRenderUtils.ExtendedActiveAsset[] | An array of ActiveAssets present on the given token |
+| activeAssets | RMRKMultiAssetRenderUtils.ExtendedActiveAsset[] | An array of ActiveAssets present on the given token |
 
 ### getExtendedEquippableActiveAssets
 
 ```solidity
-function getExtendedEquippableActiveAssets(address target, uint256 tokenId) external view returns (struct RMRKEquipRenderUtils.ExtendedEquippableActiveAsset[])
+function getExtendedEquippableActiveAssets(address target, uint256 tokenId) external view returns (struct RMRKEquipRenderUtils.ExtendedEquippableActiveAsset[] activeAssets)
 ```
 
 Used to get extended active assets of the given token.
@@ -349,7 +349,7 @@ Used to get extended active assets of the given token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | RMRKEquipRenderUtils.ExtendedEquippableActiveAsset[] | An array of ExtendedEquippableActiveAssets present on the given token |
+| activeAssets | RMRKEquipRenderUtils.ExtendedEquippableActiveAsset[] | An array of ExtendedEquippableActiveAssets present on the given token |
 
 ### getExtendedNft
 
@@ -377,7 +377,7 @@ Used to get extended information about a specified token.
 ### getExtendedPendingAssets
 
 ```solidity
-function getExtendedPendingAssets(address target, uint256 tokenId) external view returns (struct RMRKEquipRenderUtils.ExtendedPendingAsset[])
+function getExtendedPendingAssets(address target, uint256 tokenId) external view returns (struct RMRKEquipRenderUtils.ExtendedPendingAsset[] pendingAssets)
 ```
 
 Used to get the extended pending assets of the given token.
@@ -395,7 +395,7 @@ Used to get the extended pending assets of the given token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | RMRKEquipRenderUtils.ExtendedPendingAsset[] | An array of ExtendedPendingAssets present on the given token |
+| pendingAssets | RMRKEquipRenderUtils.ExtendedPendingAsset[] | An array of ExtendedPendingAssets present on the given token |
 
 ### getParent
 
@@ -424,7 +424,7 @@ Used to retrieve the contract address and ID of the parent token of the specifie
 ### getPendingAssets
 
 ```solidity
-function getPendingAssets(address target, uint256 tokenId) external view returns (struct RMRKMultiAssetRenderUtils.PendingAsset[])
+function getPendingAssets(address target, uint256 tokenId) external view returns (struct RMRKMultiAssetRenderUtils.PendingAsset[] pendingAssets)
 ```
 
 Used to get the pending assets of the given token.
@@ -442,12 +442,12 @@ Used to get the pending assets of the given token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | RMRKMultiAssetRenderUtils.PendingAsset[] | An array of PendingAssets present on the given token |
+| pendingAssets | RMRKMultiAssetRenderUtils.PendingAsset[] | An array of PendingAssets present on the given token |
 
 ### getPendingChildIndex
 
 ```solidity
-function getPendingChildIndex(address parentAddress, uint256 parentId, address childAddress, uint256 childId) external view returns (uint256)
+function getPendingChildIndex(address parentAddress, uint256 parentId, address childAddress, uint256 childId) external view returns (uint256 index)
 ```
 
 Used to retrieve the given child&#39;s index in its parent&#39;s pending child tokens array.
@@ -467,7 +467,7 @@ Used to retrieve the given child&#39;s index in its parent&#39;s pending child t
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | The index of the child token in the parent token&#39;s pending child tokens array |
+| index | uint256 | The index of the child token in the parent token&#39;s pending child tokens array |
 
 ### getSlotPartsAndCatalog
 
@@ -545,7 +545,7 @@ Used to retrieve the equippable data of the specified token&#39;s asset with the
 ### getTopAssetMetaForToken
 
 ```solidity
-function getTopAssetMetaForToken(address target, uint256 tokenId) external view returns (string)
+function getTopAssetMetaForToken(address target, uint256 tokenId) external view returns (string metadata)
 ```
 
 Used to retrieve the metadata URI of the specified token&#39;s asset with the highest priority.
@@ -563,7 +563,7 @@ Used to retrieve the metadata URI of the specified token&#39;s asset with the hi
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | The metadata URI of the asset with the highest priority |
+| metadata | string | The metadata URI of the asset with the highest priority |
 
 ### getTopAssetMetadataForTokens
 
@@ -615,7 +615,7 @@ Used to retrieve the total number of descendants of the given token and whether 
 ### hasMoreThanOneLevelOfNesting
 
 ```solidity
-function hasMoreThanOneLevelOfNesting(address collection, uint256 tokenId) external view returns (bool)
+function hasMoreThanOneLevelOfNesting(address collection, uint256 tokenId) external view returns (bool hasMoreThanOneLevelOfNesting_)
 ```
 
 Used to retrieve whether a token has more than one level of nesting.
@@ -633,7 +633,7 @@ Used to retrieve whether a token has more than one level of nesting.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | A boolean value indicating whether the given token has more than one level of nesting |
+| hasMoreThanOneLevelOfNesting_ | bool | A boolean value indicating whether the given token has more than one level of nesting |
 
 ### isAssetEquipped
 
@@ -713,7 +713,7 @@ Used to split slot and fixed parts.
 ### validateChildOf
 
 ```solidity
-function validateChildOf(address parentAddress, address childAddress, uint256 parentId, uint256 childId) external view returns (bool)
+function validateChildOf(address parentAddress, address childAddress, uint256 parentId, uint256 childId) external view returns (bool validChild)
 ```
 
 Used to validate whether the specified child token is owned by a given parent token.
@@ -733,12 +733,12 @@ Used to validate whether the specified child token is owned by a given parent to
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | A boolean value indicating whether the child token is owned by the parent token or not |
+| validChild | bool | A boolean value indicating whether the child token is owned by the parent token or not |
 
 ### validateChildrenOf
 
 ```solidity
-function validateChildrenOf(address parentAddress, address[] childAddresses, uint256 parentId, uint256[] childIds) external view returns (bool, bool[])
+function validateChildrenOf(address parentAddress, address[] childAddresses, uint256 parentId, uint256[] childIds) external view returns (bool isValid, bool[] validityOfChildren)
 ```
 
 Used to validate whether the specified child token is owned by a given parent token.
@@ -758,8 +758,8 @@ Used to validate whether the specified child token is owned by a given parent to
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | A boolean value indicating whether all of the child tokens are owned by the parent token or not |
-| _1 | bool[] | An array of boolean values indicating whether each of the child tokens are owned by the parent token or  not |
+| isValid | bool | A boolean value indicating whether all of the child tokens are owned by the parent token or not |
+| validityOfChildren | bool[] | An array of boolean values indicating whether each of the child tokens are owned by the parent token or  not |
 
 
 

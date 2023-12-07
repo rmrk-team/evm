@@ -6,8 +6,6 @@ import {RMRKTypedMultiAsset} from "../../../RMRK/extension/typedMultiAsset/RMRKT
 import {RMRKEquippableMock} from "../../RMRKEquippableMock.sol";
 import {RMRKEquippable} from "../../../RMRK/equippable/RMRKEquippable.sol";
 
-error RMRKTokenHasNoAssetsWithType();
-
 contract RMRKTypedEquippableMock is RMRKEquippableMock, RMRKTypedMultiAsset {
     function supportsInterface(
         bytes4 interfaceId

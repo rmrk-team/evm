@@ -62,7 +62,7 @@ Returns the revealed `assetIds` for the given `tokenIds` and marks them as revea
 ### Revealed
 
 ```solidity
-event Revealed(uint256[] tokenIds, uint64[] revealedAssetsIds, uint64[] assetsToReplaceIds)
+event Revealed(uint256[] indexed tokenIds, uint64[] revealedAssetsIds, uint64[] assetsToReplaceIds)
 ```
 
 
@@ -73,7 +73,7 @@ event Revealed(uint256[] tokenIds, uint64[] revealedAssetsIds, uint64[] assetsTo
 
 | Name | Type | Description |
 |---|---|---|
-| tokenIds  | uint256[] | undefined |
+| tokenIds `indexed` | uint256[] | undefined |
 | revealedAssetsIds  | uint64[] | undefined |
 | assetsToReplaceIds  | uint64[] | undefined |
 

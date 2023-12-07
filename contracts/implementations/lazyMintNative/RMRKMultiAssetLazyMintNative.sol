@@ -94,17 +94,8 @@ contract RMRKMultiAssetLazyMintNative is
      * @param to Address to receive the given amount of minting proceedings
      * @param amount The amount to withdraw
      */
-    function withdrawRaised(address to, uint256 amount) external onlyOwner {
-        _withdraw(to, amount);
-    }
-
-    /**
-     * @notice Used to withdraw the minting proceedings to a specified address.
-     * @param _address Address to receive the given amount of minting proceedings
-     * @param _amount The amount to withdraw
-     */
-    function _withdraw(address _address, uint256 _amount) private {
-        (bool success, ) = _address.call{value: _amount}("");
-        require(success, "Transfer failed.");
+    function withdraw(address to, uint256 amount) external onlyOwner {
+        (bool success, ) = to.call{value: amount}("");
+        if (!success) revert TransferFailed();
     }
 }
