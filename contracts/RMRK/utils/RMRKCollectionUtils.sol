@@ -19,10 +19,29 @@ import {IRMRKCollectionData} from "./IRMRKCollectionData.sol";
  * @dev Extra utility functions for RMRK contracts.
  */
 contract RMRKCollectionUtils {
-    event CollectionTokensMetadataRefreshTriggered(address indexed collection);
-    event TokenMetadataRefreshTriggered(
-        address indexed collection,
-        uint256 indexed tokenId
+    /**
+     * @notice This event emits when the metadata of a token is changed.
+     * So that the third-party platforms such as NFT market could
+     * timely update the images and related attributes of the NFT.
+     * Inspired on ERC4906, but adding collection.
+     * @param collection Address of the collection to emit the event from
+     * @param tokenId ID of the token to emit the event from
+     */
+    event MetadataUpdate(address collection, uint256 tokenId);
+
+    /**
+     * @notice This event emits when the metadata of a range of tokens is changed.
+     * So that the third-party platforms such as NFT market could
+     * timely update the images and related attributes of the NFTs.
+     * Inspired on ERC4906, but adding collection.
+     * @param collection Address of the collection to emit the event from
+     * @param fromTokenId ID of the first token to emit the event from
+     * @param toTokenId ID of the last token to emit the event from
+     */
+    event BatchMetadataUpdate(
+        address collection,
+        uint256 fromTokenId,
+        uint256 toTokenId
     );
 
     /**
@@ -194,13 +213,19 @@ contract RMRKCollectionUtils {
      * @notice Triggers an event to refresh the collection metadata.
      * @dev It will do nothing if the given collection address is not a contract.
      * @param collectionAddress Address of the collection to refresh the metadata from
+     * @param fromTokenId ID of the first token to refresh the metadata from
+     * @param toTokenId ID of the last token to refresh the metadata from
      */
-    function refreshCollectionTokensMetadata(address collectionAddress) public {
+    function refreshCollectionTokensMetadata(
+        address collectionAddress,
+        uint256 fromTokenId,
+        uint256 toTokenId
+    ) public {
         // To avoid some spam
         if (collectionAddress.code.length == 0) {
             return;
         }
-        emit CollectionTokensMetadataRefreshTriggered(collectionAddress);
+        emit BatchMetadataUpdate(collectionAddress, fromTokenId, toTokenId);
     }
 
     /**
@@ -217,6 +242,6 @@ contract RMRKCollectionUtils {
         if (collectionAddress.code.length == 0) {
             return;
         }
-        emit TokenMetadataRefreshTriggered(collectionAddress, tokenId);
+        emit MetadataUpdate(collectionAddress, tokenId);
     }
 }
