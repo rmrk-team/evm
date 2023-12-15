@@ -86,7 +86,7 @@ Used to get a list of existing token IDs in the range between `pageStart` and `p
 ### refreshCollectionTokensMetadata
 
 ```solidity
-function refreshCollectionTokensMetadata(address collectionAddress) external nonpayable
+function refreshCollectionTokensMetadata(address collectionAddress, uint256 fromTokenId, uint256 toTokenId) external nonpayable
 ```
 
 Triggers an event to refresh the collection metadata.
@@ -98,6 +98,8 @@ Triggers an event to refresh the collection metadata.
 | Name | Type | Description |
 |---|---|---|
 | collectionAddress | address | Address of the collection to refresh the metadata from |
+| fromTokenId | uint256 | ID of the first token to refresh the metadata from |
+| toTokenId | uint256 | ID of the last token to refresh the metadata from |
 
 ### refreshTokenMetadata
 
@@ -120,13 +122,13 @@ Triggers an event to refresh the token metadata.
 
 ## Events
 
-### CollectionTokensMetadataRefreshTriggered
+### BatchMetadataUpdate
 
 ```solidity
-event CollectionTokensMetadataRefreshTriggered(address indexed collection)
+event BatchMetadataUpdate(address collection, uint256 fromTokenId, uint256 toTokenId)
 ```
 
-
+This event emits when the metadata of a range of tokens is changed. So that the third-party platforms such as NFT market could timely update the images and related attributes of the NFTs. Inspired on ERC4906, but adding collection.
 
 
 
@@ -134,15 +136,17 @@ event CollectionTokensMetadataRefreshTriggered(address indexed collection)
 
 | Name | Type | Description |
 |---|---|---|
-| collection `indexed` | address | undefined |
+| collection  | address | Address of the collection to emit the event from |
+| fromTokenId  | uint256 | ID of the first token to emit the event from |
+| toTokenId  | uint256 | ID of the last token to emit the event from |
 
-### TokenMetadataRefreshTriggered
+### MetadataUpdate
 
 ```solidity
-event TokenMetadataRefreshTriggered(address indexed collection, uint256 indexed tokenId)
+event MetadataUpdate(address collection, uint256 tokenId)
 ```
 
-
+This event emits when the metadata of a token is changed. So that the third-party platforms such as NFT market could timely update the images and related attributes of the NFT. Inspired on ERC4906, but adding collection.
 
 
 
@@ -150,8 +154,8 @@ event TokenMetadataRefreshTriggered(address indexed collection, uint256 indexed 
 
 | Name | Type | Description |
 |---|---|---|
-| collection `indexed` | address | undefined |
-| tokenId `indexed` | uint256 | undefined |
+| collection  | address | Address of the collection to emit the event from |
+| tokenId  | uint256 | ID of the token to emit the event from |
 
 
 
