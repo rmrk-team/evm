@@ -36,6 +36,12 @@ const config: HardhatUserConfig = {
     },
   },
   networks: {
+    modularium: {
+      url: 'https://fraa-dancebox-3035-rpc.a.dancebox.tanssi.network',
+      chainId: 776877,
+      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+      gasPrice: 1000000000,
+    },
     moonbaseAlpha: {
       url: process.env.MOONBASE_URL || 'https://rpc.testnet.moonbeam.network',
       chainId: 1287,
@@ -85,7 +91,7 @@ const config: HardhatUserConfig = {
       url: process.env.ETHEREUM_URL || 'https://eth.drpc.org',
       chainId: 1,
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
-      gasPrice: 12000000000,
+      gasPrice: 27000000000,
     },
     polygon: {
       url: process.env.POLYGON_URL || 'https://polygon.drpc.org',
@@ -102,6 +108,12 @@ const config: HardhatUserConfig = {
       url: process.env.ASTAR_URL || 'https://evm.astar.network',
       chainId: 592,
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+    },
+    bsc: {
+      url: process.env.BSC_URL || 'https://bsc-dataseed.bnbchain.org',
+      chainId: 56,
+      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+      gasPrice: 3000000000,
     },
   },
   gasReporter: {
@@ -124,6 +136,7 @@ const config: HardhatUserConfig = {
       polygon: process.env.POLYGONSCAN_API_KEY || '', // Polygon Etherscan API Key
       base: process.env.BASESCAN_API_KEY || '', // Base Etherscan API Key
       astar: process.env.ASTAR_BLOCKSCOUT_API_KEY || '', // Astar blockscout API Key
+      bsc: process.env.BSCSCAN_API_KEY || '', // BSC Etherscan API Key
     },
     customChains: [
       {
