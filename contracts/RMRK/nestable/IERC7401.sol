@@ -126,13 +126,13 @@ interface IERC7401 is IERC165 {
      * @dev If the immediate owner is another token, the address returned, should be the one of the parent token's
      *  collection smart contract.
      * @param tokenId ID of the token for which the RMRK owner is being retrieved
-     * @return Address of the given token's owner
-     * @return The ID of the parent token. Should be `0` if the owner is an externally owned account
-     * @return The boolean value signifying whether the owner is an NFT or not
+     * @return owner Address of the given token's owner
+     * @return parentId The ID of the parent token. Should be `0` if the owner is an externally owned account
+     * @return isNFT The boolean value signifying whether the owner is an NFT or not
      */
     function directOwnerOf(
         uint256 tokenId
-    ) external view returns (address, uint256, bool);
+    ) external view returns (address owner, uint256 parentId, bool isNFT);
 
     /**
      * @notice Used to burn a given token.

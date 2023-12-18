@@ -512,7 +512,12 @@ contract RMRKNestable is Context, IERC165, IERC721, IERC7401, RMRKCore {
      */
     function directOwnerOf(
         uint256 tokenId
-    ) public view virtual returns (address, uint256, bool) {
+    )
+        public
+        view
+        virtual
+        returns (address owner, uint256 parentId, bool isNFT)
+    {
         DirectOwner memory owner = _RMRKOwners[tokenId];
         if (owner.ownerAddress == address(0)) revert ERC721InvalidTokenId();
 
