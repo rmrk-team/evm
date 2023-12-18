@@ -224,7 +224,7 @@ Used to retrieve the metadata of the collection.
 ### directOwnerOf
 
 ```solidity
-function directOwnerOf(uint256 tokenId) external view returns (address, uint256, bool)
+function directOwnerOf(uint256 tokenId) external view returns (address owner, uint256 parentId, bool isNFT)
 ```
 
 Used to retrieve the immediate owner of the given token.
@@ -241,9 +241,9 @@ Used to retrieve the immediate owner of the given token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | address | Address of the given token&#39;s owner |
-| _1 | uint256 | The ID of the parent token. Should be `0` if the owner is an externally owned account |
-| _2 | bool | The boolean value signifying whether the owner is an NFT or not |
+| owner | address | Address of the given token&#39;s owner |
+| parentId | uint256 | The ID of the parent token. Should be `0` if the owner is an externally owned account |
+| isNFT | bool | The boolean value signifying whether the owner is an NFT or not |
 
 ### getApproved
 
