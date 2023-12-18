@@ -13,7 +13,7 @@ Implementation of enumerable token URI.
 ### tokenURI
 
 ```solidity
-function tokenURI(uint256 tokenId) external view returns (string)
+function tokenURI(uint256 tokenId) external view returns (string tokenURI_)
 ```
 
 Used to retrieve the metadata URI of a token.
@@ -30,7 +30,7 @@ Used to retrieve the metadata URI of a token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | Metadata URI of the specified token |
+| tokenURI_ | string | Metadata URI of the specified token |
 
 
 

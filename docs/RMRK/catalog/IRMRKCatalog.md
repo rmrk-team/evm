@@ -13,7 +13,7 @@ An interface Catalog for RMRK equippable module.
 ### checkIsEquippable
 
 ```solidity
-function checkIsEquippable(uint64 partId, address targetAddress) external view returns (bool)
+function checkIsEquippable(uint64 partId, address targetAddress) external view returns (bool isEquippable)
 ```
 
 Used to check whether the given address is allowed to equip the desired `Part`.
@@ -31,12 +31,12 @@ Used to check whether the given address is allowed to equip the desired `Part`.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | The status indicating whether the `targetAddress` can be equipped into `Part` with `partId` or not |
+| isEquippable | bool | The status indicating whether the `targetAddress` can be equipped into `Part` with `partId` or not |
 
 ### checkIsEquippableToAll
 
 ```solidity
-function checkIsEquippableToAll(uint64 partId) external view returns (bool)
+function checkIsEquippableToAll(uint64 partId) external view returns (bool isEquippableToAll)
 ```
 
 Used to check if the part is equippable by all addresses.
@@ -53,7 +53,7 @@ Used to check if the part is equippable by all addresses.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | The status indicating whether the part with `partId` can be equipped by any address or not |
+| isEquippableToAll | bool | The status indicating whether the part with `partId` can be equipped by any address or not |
 
 ### getMetadataURI
 
@@ -75,7 +75,7 @@ Used to return the metadata URI of the associated Catalog.
 ### getPart
 
 ```solidity
-function getPart(uint64 partId) external view returns (struct IRMRKCatalog.Part)
+function getPart(uint64 partId) external view returns (struct IRMRKCatalog.Part part)
 ```
 
 Used to retrieve a `Part` with id `partId`
@@ -92,12 +92,12 @@ Used to retrieve a `Part` with id `partId`
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IRMRKCatalog.Part | The `Part` struct associated with given `partId` |
+| part | IRMRKCatalog.Part | The `Part` struct associated with given `partId` |
 
 ### getParts
 
 ```solidity
-function getParts(uint64[] partIds) external view returns (struct IRMRKCatalog.Part[])
+function getParts(uint64[] partIds) external view returns (struct IRMRKCatalog.Part[] part)
 ```
 
 Used to retrieve multiple parts at the same time.
@@ -114,7 +114,7 @@ Used to retrieve multiple parts at the same time.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IRMRKCatalog.Part[] | An array of `Part` structs associated with given `partIds` |
+| part | IRMRKCatalog.Part[] | An array of `Part` structs associated with given `partIds` |
 
 ### getType
 

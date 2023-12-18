@@ -59,10 +59,10 @@ contract Ownable is Context {
 
     /**
      * @notice Returns the address of the current owner.
-     * @return Address of the current owner
+     * @return owner_ Address of the current owner
      */
-    function owner() public view virtual returns (address) {
-        return _owner;
+    function owner() public view virtual returns (address owner_) {
+        owner_ = _owner;
     }
 
     /**
@@ -119,10 +119,12 @@ contract Ownable is Context {
     /**
      * @notice Used to check if the address is one of the contributors.
      * @param contributor Address of the contributor whose status we are checking
-     * @return Boolean value indicating whether the address is a contributor or not
+     * @return isContributor_ Boolean value indicating whether the address is a contributor or not
      */
-    function isContributor(address contributor) public view returns (bool) {
-        return _contributors[contributor] == 1;
+    function isContributor(
+        address contributor
+    ) public view returns (bool isContributor_) {
+        isContributor_ = _contributors[contributor] == 1;
     }
 
     /**

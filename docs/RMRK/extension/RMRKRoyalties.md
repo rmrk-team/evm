@@ -13,7 +13,7 @@ Smart contract of the RMRK Royalties module.
 ### getRoyaltyPercentage
 
 ```solidity
-function getRoyaltyPercentage() external view returns (uint256)
+function getRoyaltyPercentage() external view returns (uint256 royaltyPercentageBps)
 ```
 
 Used to retrieve the specified royalty percentage.
@@ -25,12 +25,12 @@ Used to retrieve the specified royalty percentage.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | The royalty percentage expressed in the basis points |
+| royaltyPercentageBps | uint256 | The royalty percentage expressed in the basis points |
 
 ### getRoyaltyRecipient
 
 ```solidity
-function getRoyaltyRecipient() external view returns (address)
+function getRoyaltyRecipient() external view returns (address recipient)
 ```
 
 Used to retrieve the recipient of royalties.
@@ -42,7 +42,7 @@ Used to retrieve the recipient of royalties.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | address | Address of the recipient of royalties |
+| recipient | address | Address of the recipient of royalties |
 
 ### royaltyInfo
 

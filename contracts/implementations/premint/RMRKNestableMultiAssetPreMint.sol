@@ -49,13 +49,13 @@ contract RMRKNestableMultiAssetPreMint is
      * @param to Address to which to mint the token
      * @param numToMint Number of tokens to mint
      * @param tokenURI URI assigned to all the minted tokens
-     * @return The ID of the first token to be minted in the current minting cycle
+     * @return firstTokenId The ID of the first token to be minted in the current minting cycle
      */
     function mint(
         address to,
         uint256 numToMint,
         string memory tokenURI
-    ) public virtual onlyOwnerOrContributor returns (uint256) {
+    ) public virtual onlyOwnerOrContributor returns (uint256 firstTokenId) {
         (uint256 nextToken, uint256 totalSupplyOffset) = _prepareMint(
             numToMint
         );
@@ -68,7 +68,7 @@ contract RMRKNestableMultiAssetPreMint is
             }
         }
 
-        return nextToken;
+        firstTokenId = nextToken;
     }
 
     /**
@@ -79,14 +79,14 @@ contract RMRKNestableMultiAssetPreMint is
      * @param numToMint Number of tokens to mint
      * @param destinationId ID of the token into which to mint the new child token
      * @param tokenURI URI assigned to all the minted tokens
-     * @return The ID of the first token to be minted in the current minting cycle
+     * @return firstTokenId The ID of the first token to be minted in the current minting cycle
      */
     function nestMint(
         address to,
         uint256 numToMint,
         uint256 destinationId,
         string memory tokenURI
-    ) public virtual onlyOwnerOrContributor returns (uint256) {
+    ) public virtual onlyOwnerOrContributor returns (uint256 firstTokenId) {
         (uint256 nextToken, uint256 totalSupplyOffset) = _prepareMint(
             numToMint
         );
@@ -99,6 +99,6 @@ contract RMRKNestableMultiAssetPreMint is
             }
         }
 
-        return nextToken;
+        firstTokenId = nextToken;
     }
 }

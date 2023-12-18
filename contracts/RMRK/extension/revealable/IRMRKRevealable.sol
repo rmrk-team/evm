@@ -7,7 +7,7 @@ interface IRMRKRevealable {
      * @notice Gets the `IRMRKRevealer` associated with the contract.
      * @return revealer The `IRMRKRevealer` associated with the contract
      */
-    function getRevealer() external view returns (address);
+    function getRevealer() external view returns (address revealer);
 
     /**
      * @notice Sets the `IRMRKRevealer` associated with the contract.

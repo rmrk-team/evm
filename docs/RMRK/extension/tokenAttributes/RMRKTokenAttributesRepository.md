@@ -115,7 +115,7 @@ function SET_UINT_ATTRIBUTE_TYPEHASH() external view returns (bytes32)
 ### getAddressAttribute
 
 ```solidity
-function getAddressAttribute(address collection, uint256 tokenId, string key) external view returns (address)
+function getAddressAttribute(address collection, uint256 tokenId, string key) external view returns (address attribute)
 ```
 
 Used to retrieve the address type token attributes.
@@ -134,12 +134,12 @@ Used to retrieve the address type token attributes.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | address | The value of the address attribute |
+| attribute | address | The value of the address attribute |
 
 ### getAddressAttributes
 
 ```solidity
-function getAddressAttributes(address collection, uint256 tokenId, string[] addressKeys) external view returns (struct IERC7508.AddressAttribute[])
+function getAddressAttributes(address collection, uint256 tokenId, string[] addressKeys) external view returns (struct IERC7508.AddressAttribute[] attributes)
 ```
 
 Used to get multiple address parameter values for a token.
@@ -158,7 +158,7 @@ Used to get multiple address parameter values for a token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IERC7508.AddressAttribute[] | An array of `AddressAttribute` structs |
+| attributes | IERC7508.AddressAttribute[] | An array of `AddressAttribute` structs |
 
 ### getAttributes
 
@@ -195,7 +195,7 @@ Used to retrieve multiple token attributes of any type at once.
 ### getBoolAttribute
 
 ```solidity
-function getBoolAttribute(address collection, uint256 tokenId, string key) external view returns (bool)
+function getBoolAttribute(address collection, uint256 tokenId, string key) external view returns (bool attribute)
 ```
 
 Used to retrieve the bool type token attributes.
@@ -214,12 +214,12 @@ Used to retrieve the bool type token attributes.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | The value of the bool attribute |
+| attribute | bool | The value of the bool attribute |
 
 ### getBoolAttributes
 
 ```solidity
-function getBoolAttributes(address collection, uint256 tokenId, string[] boolKeys) external view returns (struct IERC7508.BoolAttribute[])
+function getBoolAttributes(address collection, uint256 tokenId, string[] boolKeys) external view returns (struct IERC7508.BoolAttribute[] attributes)
 ```
 
 Used to get multiple bool parameter values for a token.
@@ -238,12 +238,12 @@ Used to get multiple bool parameter values for a token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IERC7508.BoolAttribute[] | An array of `BoolAttribute` structs |
+| attributes | IERC7508.BoolAttribute[] | An array of `BoolAttribute` structs |
 
 ### getBytesAttribute
 
 ```solidity
-function getBytesAttribute(address collection, uint256 tokenId, string key) external view returns (bytes)
+function getBytesAttribute(address collection, uint256 tokenId, string key) external view returns (bytes attribute)
 ```
 
 Used to retrieve the bytes type token attributes.
@@ -262,12 +262,12 @@ Used to retrieve the bytes type token attributes.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bytes | The value of the bytes attribute |
+| attribute | bytes | The value of the bytes attribute |
 
 ### getBytesAttributes
 
 ```solidity
-function getBytesAttributes(address collection, uint256 tokenId, string[] bytesKeys) external view returns (struct IERC7508.BytesAttribute[])
+function getBytesAttributes(address collection, uint256 tokenId, string[] bytesKeys) external view returns (struct IERC7508.BytesAttribute[] attributes)
 ```
 
 Used to get multiple bytes parameter values for a token.
@@ -286,12 +286,12 @@ Used to get multiple bytes parameter values for a token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IERC7508.BytesAttribute[] | An array of `BytesAttribute` structs |
+| attributes | IERC7508.BytesAttribute[] | An array of `BytesAttribute` structs |
 
 ### getStringAttribute
 
 ```solidity
-function getStringAttribute(address collection, uint256 tokenId, string key) external view returns (string)
+function getStringAttribute(address collection, uint256 tokenId, string key) external view returns (string attribute)
 ```
 
 Used to retrieve the string type token attributes.
@@ -310,12 +310,12 @@ Used to retrieve the string type token attributes.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | The value of the string attribute |
+| attribute | string | The value of the string attribute |
 
 ### getStringAttributes
 
 ```solidity
-function getStringAttributes(address collection, uint256 tokenId, string[] stringKeys) external view returns (struct IERC7508.StringAttribute[])
+function getStringAttributes(address collection, uint256 tokenId, string[] stringKeys) external view returns (struct IERC7508.StringAttribute[] attributes)
 ```
 
 Used to get multiple sting parameter values for a token.
@@ -334,12 +334,12 @@ Used to get multiple sting parameter values for a token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IERC7508.StringAttribute[] | An array of `StringAttribute` structs |
+| attributes | IERC7508.StringAttribute[] | An array of `StringAttribute` structs |
 
 ### getUintAttribute
 
 ```solidity
-function getUintAttribute(address collection, uint256 tokenId, string key) external view returns (uint256)
+function getUintAttribute(address collection, uint256 tokenId, string key) external view returns (uint256 attribute)
 ```
 
 Used to retrieve the uint type token attributes.
@@ -358,12 +358,12 @@ Used to retrieve the uint type token attributes.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | The value of the uint attribute |
+| attribute | uint256 | The value of the uint attribute |
 
 ### getUintAttributes
 
 ```solidity
-function getUintAttributes(address collection, uint256 tokenId, string[] uintKeys) external view returns (struct IERC7508.UintAttribute[])
+function getUintAttributes(address collection, uint256 tokenId, string[] uintKeys) external view returns (struct IERC7508.UintAttribute[] attributes)
 ```
 
 Used to get multiple uint parameter values for a token.
@@ -382,12 +382,12 @@ Used to get multiple uint parameter values for a token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IERC7508.UintAttribute[] | An array of `UintAttribute` structs |
+| attributes | IERC7508.UintAttribute[] | An array of `UintAttribute` structs |
 
 ### isCollaborator
 
 ```solidity
-function isCollaborator(address collaborator, address collection) external view returns (bool)
+function isCollaborator(address collaborator, address collection) external view returns (bool isCollaborator_)
 ```
 
 Used to check if the specified address is listed as a collaborator of the given collection&#39;s parameter.
@@ -405,12 +405,12 @@ Used to check if the specified address is listed as a collaborator of the given 
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | Boolean value indicating if the address is a collaborator of the given collection&#39;s (`true`) or not  (`false`). |
+| isCollaborator_ | bool | Boolean value indicating if the address is a collaborator of the given collection&#39;s (`true`) or not  (`false`). |
 
 ### isSpecificAddress
 
 ```solidity
-function isSpecificAddress(address specificAddress, address collection, string key) external view returns (bool)
+function isSpecificAddress(address specificAddress, address collection, string key) external view returns (bool isSpecificAddress_)
 ```
 
 Used to check if the specified address is listed as a specific address of the given collection&#39;s  parameter.
@@ -429,7 +429,7 @@ Used to check if the specified address is listed as a specific address of the gi
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | Boolean value indicating if the address is a specific address of the given collection&#39;s parameter  (`true`) or not (`false`). |
+| isSpecificAddress_ | bool | Boolean value indicating if the address is a specific address of the given collection&#39;s parameter  (`true`) or not (`false`). |
 
 ### manageAccessControl
 
@@ -471,7 +471,7 @@ Used to manage the collaborators of a collection.
 ### prepareMessageToPresignAddressAttribute
 
 ```solidity
-function prepareMessageToPresignAddressAttribute(address collection, uint256 tokenId, string key, address value, uint256 deadline) external view returns (bytes32)
+function prepareMessageToPresignAddressAttribute(address collection, uint256 tokenId, string key, address value, uint256 deadline) external view returns (bytes32 message)
 ```
 
 Used to retrieve the message to be signed for submitting a presigned address attribute change.
@@ -492,12 +492,12 @@ Used to retrieve the message to be signed for submitting a presigned address att
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bytes32 | Raw message to be signed by the authorized account |
+| message | bytes32 | Raw message to be signed by the authorized account |
 
 ### prepareMessageToPresignBoolAttribute
 
 ```solidity
-function prepareMessageToPresignBoolAttribute(address collection, uint256 tokenId, string key, bool value, uint256 deadline) external view returns (bytes32)
+function prepareMessageToPresignBoolAttribute(address collection, uint256 tokenId, string key, bool value, uint256 deadline) external view returns (bytes32 message)
 ```
 
 Used to retrieve the message to be signed for submitting a presigned bool attribute change.
@@ -518,12 +518,12 @@ Used to retrieve the message to be signed for submitting a presigned bool attrib
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bytes32 | Raw message to be signed by the authorized account |
+| message | bytes32 | Raw message to be signed by the authorized account |
 
 ### prepareMessageToPresignBytesAttribute
 
 ```solidity
-function prepareMessageToPresignBytesAttribute(address collection, uint256 tokenId, string key, bytes value, uint256 deadline) external view returns (bytes32)
+function prepareMessageToPresignBytesAttribute(address collection, uint256 tokenId, string key, bytes value, uint256 deadline) external view returns (bytes32 message)
 ```
 
 Used to retrieve the message to be signed for submitting a presigned bytes attribute change.
@@ -544,12 +544,12 @@ Used to retrieve the message to be signed for submitting a presigned bytes attri
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bytes32 | Raw message to be signed by the authorized account |
+| message | bytes32 | Raw message to be signed by the authorized account |
 
 ### prepareMessageToPresignStringAttribute
 
 ```solidity
-function prepareMessageToPresignStringAttribute(address collection, uint256 tokenId, string key, string value, uint256 deadline) external view returns (bytes32)
+function prepareMessageToPresignStringAttribute(address collection, uint256 tokenId, string key, string value, uint256 deadline) external view returns (bytes32 message)
 ```
 
 Used to retrieve the message to be signed for submitting a presigned string attribute change.
@@ -570,12 +570,12 @@ Used to retrieve the message to be signed for submitting a presigned string attr
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bytes32 | Raw message to be signed by the authorized account |
+| message | bytes32 | Raw message to be signed by the authorized account |
 
 ### prepareMessageToPresignUintAttribute
 
 ```solidity
-function prepareMessageToPresignUintAttribute(address collection, uint256 tokenId, string key, uint256 value, uint256 deadline) external view returns (bytes32)
+function prepareMessageToPresignUintAttribute(address collection, uint256 tokenId, string key, uint256 value, uint256 deadline) external view returns (bytes32 message)
 ```
 
 Used to retrieve the message to be signed for submitting a presigned uint attribute change.
@@ -596,7 +596,7 @@ Used to retrieve the message to be signed for submitting a presigned uint attrib
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bytes32 | Raw message to be signed by the authorized account |
+| message | bytes32 | Raw message to be signed by the authorized account |
 
 ### presignedSetAddressAttribute
 

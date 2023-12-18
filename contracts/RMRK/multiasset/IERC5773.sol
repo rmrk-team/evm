@@ -163,33 +163,33 @@ interface IERC5773 is IERC165 {
      *  `getAssetMetadata(tokenId, assetId)`.
      * @dev You can safely get 10k
      * @param tokenId ID of the token to retrieve the IDs of the active assets
-     * @return An array of active asset IDs of the given token
+     * @return assetIds An array of active asset IDs of the given token
      */
     function getActiveAssets(
         uint256 tokenId
-    ) external view returns (uint64[] memory);
+    ) external view returns (uint64[] memory assetIds);
 
     /**
      * @notice Used to retrieve IDs of the pending assets of given token.
      * @dev Asset data is stored by reference, in order to access the data corresponding to the ID, call
      *  `getAssetMetadata(tokenId, assetId)`.
      * @param tokenId ID of the token to retrieve the IDs of the pending assets
-     * @return An array of pending asset IDs of the given token
+     * @return assetIds An array of pending asset IDs of the given token
      */
     function getPendingAssets(
         uint256 tokenId
-    ) external view returns (uint64[] memory);
+    ) external view returns (uint64[] memory assetIds);
 
     /**
      * @notice Used to retrieve the priorities of the active resoources of a given token.
      * @dev Asset priorities are a non-sequential array of uint64 values with an array size equal to active asset
      *  priorites.
      * @param tokenId ID of the token for which to retrieve the priorities of the active assets
-     * @return An array of priorities of the active assets of the given token
+     * @return priorities An array of priorities of the active assets of the given token
      */
     function getActiveAssetPriorities(
         uint256 tokenId
-    ) external view returns (uint64[] memory);
+    ) external view returns (uint64[] memory priorities);
 
     /**
      * @notice Used to retrieve the asset that will be replaced if a given asset from the token's pending array
@@ -198,12 +198,12 @@ interface IERC5773 is IERC165 {
      *  `getAssetMetadata(tokenId, assetId)`.
      * @param tokenId ID of the token to check
      * @param newAssetId ID of the pending asset which will be accepted
-     * @return ID of the asset which will be replaced
+     * @return replacesAssetWithId ID of the asset which will be replaced
      */
     function getAssetReplacements(
         uint256 tokenId,
         uint64 newAssetId
-    ) external view returns (uint64);
+    ) external view returns (uint64 replacesAssetWithId);
 
     /**
      * @notice Used to fetch the asset metadata of the specified token's active asset with the given index.
@@ -211,13 +211,13 @@ interface IERC5773 is IERC165 {
      * @dev Can be overriden to implement enumerate, fallback or other custom logic.
      * @param tokenId ID of the token from which to retrieve the asset metadata
      * @param assetId Asset Id, must be in the active assets array
-     * @return The metadata of the asset belonging to the specified index in the token's active assets
+     * @return metadata The metadata of the asset belonging to the specified index in the token's active assets
      *  array
      */
     function getAssetMetadata(
         uint256 tokenId,
         uint64 assetId
-    ) external view returns (string memory);
+    ) external view returns (string memory metadata);
 
     // Approvals
 
@@ -242,11 +242,11 @@ interface IERC5773 is IERC165 {
      *
      *  - `tokenId` must exist.
      * @param tokenId ID of the token for which to retrieve the approved address
-     * @return Address of the account that is approved to manage the specified token's assets
+     * @return approved Address of the account that is approved to manage the specified token's assets
      */
     function getApprovedForAssets(
         uint256 tokenId
-    ) external view returns (address);
+    ) external view returns (address approved);
 
     /**
      * @notice Used to add or remove an operator of assets for the caller.
@@ -270,10 +270,10 @@ interface IERC5773 is IERC165 {
      * @dev See {setApprovalForAllForAssets}.
      * @param owner Address of the account that we are checking for whether it has granted the operator role
      * @param operator Address of the account that we are checking whether it has the operator role or not
-     * @return A boolean value indicating wehter the account we are checking has been granted the operator role
+     * @return isApproved A boolean value indicating whether the account we are checking has been granted the operator role
      */
     function isApprovedForAllForAssets(
         address owner,
         address operator
-    ) external view returns (bool);
+    ) external view returns (bool isApproved);
 }

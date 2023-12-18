@@ -47,6 +47,7 @@ abstract contract RMRKSoulboundAfterTransactions is RMRKSoulbound {
         address to,
         uint256 tokenId
     ) internal virtual {
+        // to
         // We won't count minting:
         if (from != address(0)) {
             _transfersPerToken[tokenId]++;
@@ -80,7 +81,7 @@ abstract contract RMRKSoulboundAfterTransactions is RMRKSoulbound {
         uint256 tokenId,
         address,
         address
-    ) public view virtual override returns (bool) {
-        return _transfersPerToken[tokenId] < _maxNumberOfTransfers;
+    ) public view virtual override returns (bool isTransferable_) {
+        isTransferable_ = _transfersPerToken[tokenId] < _maxNumberOfTransfers;
     }
 }

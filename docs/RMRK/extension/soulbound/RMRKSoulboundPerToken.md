@@ -13,7 +13,7 @@ Smart contract of the RMRK Soulbound module where the transfers are permitted or
 ### isTransferable
 
 ```solidity
-function isTransferable(uint256 tokenId, address from, address to) external view returns (bool)
+function isTransferable(uint256 tokenId, address from, address to) external view returns (bool isTransferable_)
 ```
 
 Used to check whether the given token is transferable or not.
@@ -32,7 +32,7 @@ Used to check whether the given token is transferable or not.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | Boolean value indicating whether the given token is transferable |
+| isTransferable_ | bool | Boolean value indicating whether the given token is transferable |
 
 ### supportsInterface
 
