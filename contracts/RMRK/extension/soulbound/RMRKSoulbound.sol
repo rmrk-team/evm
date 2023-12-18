@@ -36,8 +36,8 @@ abstract contract RMRKSoulbound is IERC6454 {
         uint256,
         address from,
         address to
-    ) public view virtual returns (bool) {
-        return ((from == address(0) || // Exclude minting
+    ) public view virtual returns (bool isTransferable_) {
+        isTransferable_ = ((from == address(0) || // Exclude minting
             to == address(0)) && from != to); // Exclude Burning // Besides the obvious transfer to self, if both are address 0 (general transferability check), it returns false
     }
 

@@ -560,13 +560,13 @@ interface IERC7508 is IERC165 {
      * @notice Used to check if the specified address is listed as a collaborator of the given collection's parameter.
      * @param collaborator Address to be checked.
      * @param collection Address of the collection.
-     * @return Boolean value indicating if the address is a collaborator of the given collection's (`true`) or not
+     * @return isCollaborator_ Boolean value indicating if the address is a collaborator of the given collection's (`true`) or not
      *  (`false`).
      */
     function isCollaborator(
         address collaborator,
         address collection
-    ) external view returns (bool);
+    ) external view returns (bool isCollaborator_);
 
     /**
      * @notice Used to check if the specified address is listed as a specific address of the given collection's
@@ -574,79 +574,79 @@ interface IERC7508 is IERC165 {
      * @param specificAddress Address to be checked.
      * @param collection Address of the collection.
      * @param key The key of the attribute
-     * @return Boolean value indicating if the address is a specific address of the given collection's parameter
+     * @return isSpecificAddress_ Boolean value indicating if the address is a specific address of the given collection's parameter
      *  (`true`) or not (`false`).
      */
     function isSpecificAddress(
         address specificAddress,
         address collection,
         string memory key
-    ) external view returns (bool);
+    ) external view returns (bool isSpecificAddress_);
 
     /**
      * @notice Used to retrieve the string type token attributes.
      * @param collection The collection address
      * @param tokenId The token ID
      * @param key The key of the attribute
-     * @return The value of the string attribute
+     * @return attribute The value of the string attribute
      */
     function getStringAttribute(
         address collection,
         uint256 tokenId,
         string memory key
-    ) external view returns (string memory);
+    ) external view returns (string memory attribute);
 
     /**
      * @notice Used to retrieve the uint type token attributes.
      * @param collection The collection address
      * @param tokenId The token ID
      * @param key The key of the attribute
-     * @return The value of the uint attribute
+     * @return attribute The value of the uint attribute
      */
     function getUintAttribute(
         address collection,
         uint256 tokenId,
         string memory key
-    ) external view returns (uint256);
+    ) external view returns (uint256 attribute);
 
     /**
      * @notice Used to retrieve the bool type token attributes.
      * @param collection The collection address
      * @param tokenId The token ID
      * @param key The key of the attribute
-     * @return The value of the bool attribute
+     * @return attribute The value of the bool attribute
      */
     function getBoolAttribute(
         address collection,
         uint256 tokenId,
         string memory key
-    ) external view returns (bool);
+    ) external view returns (bool attribute);
 
     /**
      * @notice Used to retrieve the address type token attributes.
      * @param collection The collection address
      * @param tokenId The token ID
      * @param key The key of the attribute
-     * @return The value of the address attribute
+     * @return attribute The value of the address attribute
      */
     function getAddressAttribute(
         address collection,
         uint256 tokenId,
         string memory key
-    ) external view returns (address);
+    ) external view returns (address attribute);
 
     /**
      * @notice Used to retrieve the bytes type token attributes.
      * @param collection The collection address
      * @param tokenId The token ID
      * @param key The key of the attribute
-     * @return The value of the bytes attribute
+     * @return attribute The value of the bytes attribute
      */
     function getBytesAttribute(
         address collection,
         uint256 tokenId,
         string memory key
-    ) external view returns (bytes memory);
+    ) external view returns (bytes memory attribute);
 
     /**
      * @notice Used to retrieve the message to be signed for submitting a presigned uint attribute change.
@@ -655,7 +655,7 @@ interface IERC7508 is IERC165 {
      * @param key The attribute key
      * @param value The attribute value
      * @param deadline The deadline timestamp for the presigned transaction after which the message is invalid
-     * @return Raw message to be signed by the authorized account
+     * @return message Raw message to be signed by the authorized account
      */
     function prepareMessageToPresignUintAttribute(
         address collection,
@@ -663,7 +663,7 @@ interface IERC7508 is IERC165 {
         string memory key,
         uint256 value,
         uint256 deadline
-    ) external view returns (bytes32);
+    ) external view returns (bytes32 message);
 
     /**
      * @notice Used to retrieve the message to be signed for submitting a presigned string attribute change.
@@ -672,7 +672,7 @@ interface IERC7508 is IERC165 {
      * @param key The attribute key
      * @param value The attribute value
      * @param deadline The deadline timestamp for the presigned transaction after which the message is invalid
-     * @return Raw message to be signed by the authorized account
+     * @return message Raw message to be signed by the authorized account
      */
     function prepareMessageToPresignStringAttribute(
         address collection,
@@ -680,7 +680,7 @@ interface IERC7508 is IERC165 {
         string memory key,
         string memory value,
         uint256 deadline
-    ) external view returns (bytes32);
+    ) external view returns (bytes32 message);
 
     /**
      * @notice Used to retrieve the message to be signed for submitting a presigned bool attribute change.
@@ -689,7 +689,7 @@ interface IERC7508 is IERC165 {
      * @param key The attribute key
      * @param value The attribute value
      * @param deadline The deadline timestamp for the presigned transaction after which the message is invalid
-     * @return Raw message to be signed by the authorized account
+     * @return message Raw message to be signed by the authorized account
      */
     function prepareMessageToPresignBoolAttribute(
         address collection,
@@ -697,7 +697,7 @@ interface IERC7508 is IERC165 {
         string memory key,
         bool value,
         uint256 deadline
-    ) external view returns (bytes32);
+    ) external view returns (bytes32 message);
 
     /**
      * @notice Used to retrieve the message to be signed for submitting a presigned bytes attribute change.
@@ -706,7 +706,7 @@ interface IERC7508 is IERC165 {
      * @param key The attribute key
      * @param value The attribute value
      * @param deadline The deadline timestamp for the presigned transaction after which the message is invalid
-     * @return Raw message to be signed by the authorized account
+     * @return message Raw message to be signed by the authorized account
      */
     function prepareMessageToPresignBytesAttribute(
         address collection,
@@ -714,7 +714,7 @@ interface IERC7508 is IERC165 {
         string memory key,
         bytes memory value,
         uint256 deadline
-    ) external view returns (bytes32);
+    ) external view returns (bytes32 message);
 
     /**
      * @notice Used to retrieve the message to be signed for submitting a presigned address attribute change.
@@ -723,7 +723,7 @@ interface IERC7508 is IERC165 {
      * @param key The attribute key
      * @param value The attribute value
      * @param deadline The deadline timestamp for the presigned transaction after which the message is invalid
-     * @return Raw message to be signed by the authorized account
+     * @return message Raw message to be signed by the authorized account
      */
     function prepareMessageToPresignAddressAttribute(
         address collection,
@@ -731,7 +731,7 @@ interface IERC7508 is IERC165 {
         string memory key,
         address value,
         uint256 deadline
-    ) external view returns (bytes32);
+    ) external view returns (bytes32 message);
 
     /**
      * @notice Used to retrieve multiple token attributes of any type at once.
@@ -783,13 +783,13 @@ interface IERC7508 is IERC165 {
      * @param collection Address of the collection the token belongs to
      * @param tokenId ID of the token for which the attributes are being retrieved
      * @param stringKeys An array of string keys to retrieve
-     * @return An array of `StringAttribute` structs
+     * @return attributes An array of `StringAttribute` structs
      */
     function getStringAttributes(
         address collection,
         uint256 tokenId,
         string[] memory stringKeys
-    ) external view returns (StringAttribute[] memory);
+    ) external view returns (StringAttribute[] memory attributes);
 
     /**
      * @notice Used to get multiple uint parameter values for a token.
@@ -801,13 +801,13 @@ interface IERC7508 is IERC165 {
      * @param collection Address of the collection the token belongs to
      * @param tokenId ID of the token for which the attributes are being retrieved
      * @param uintKeys An array of uint keys to retrieve
-     * @return An array of `UintAttribute` structs
+     * @return attributes An array of `UintAttribute` structs
      */
     function getUintAttributes(
         address collection,
         uint256 tokenId,
         string[] memory uintKeys
-    ) external view returns (UintAttribute[] memory);
+    ) external view returns (UintAttribute[] memory attributes);
 
     /**
      * @notice Used to get multiple bool parameter values for a token.
@@ -819,13 +819,13 @@ interface IERC7508 is IERC165 {
      * @param collection Address of the collection the token belongs to
      * @param tokenId ID of the token for which the attributes are being retrieved
      * @param boolKeys An array of bool keys to retrieve
-     * @return An array of `BoolAttribute` structs
+     * @return attributes An array of `BoolAttribute` structs
      */
     function getBoolAttributes(
         address collection,
         uint256 tokenId,
         string[] memory boolKeys
-    ) external view returns (BoolAttribute[] memory);
+    ) external view returns (BoolAttribute[] memory attributes);
 
     /**
      * @notice Used to get multiple address parameter values for a token.
@@ -837,13 +837,13 @@ interface IERC7508 is IERC165 {
      * @param collection Address of the collection the token belongs to
      * @param tokenId ID of the token for which the attributes are being retrieved
      * @param addressKeys An array of address keys to retrieve
-     * @return An array of `AddressAttribute` structs
+     * @return attributes An array of `AddressAttribute` structs
      */
     function getAddressAttributes(
         address collection,
         uint256 tokenId,
         string[] memory addressKeys
-    ) external view returns (AddressAttribute[] memory);
+    ) external view returns (AddressAttribute[] memory attributes);
 
     /**
      * @notice Used to get multiple bytes parameter values for a token.
@@ -855,11 +855,11 @@ interface IERC7508 is IERC165 {
      * @param collection Address of the collection the token belongs to
      * @param tokenId ID of the token for which the attributes are being retrieved
      * @param bytesKeys An array of bytes keys to retrieve
-     * @return An array of `BytesAttribute` structs
+     * @return attributes An array of `BytesAttribute` structs
      */
     function getBytesAttributes(
         address collection,
         uint256 tokenId,
         string[] memory bytesKeys
-    ) external view returns (BytesAttribute[] memory);
+    ) external view returns (BytesAttribute[] memory attributes);
 }

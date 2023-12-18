@@ -39,16 +39,16 @@ abstract contract RMRKAbstractMultiAsset is
      * @notice Used to add a asset entry.
      * @dev The ID of the asset is automatically assigned to be the next available asset ID.
      * @param metadataURI Metadata URI of the asset
-     * @return ID of the newly added asset
+     * @return assetId The ID of the newly added asset
      */
     function addAssetEntry(
         string memory metadataURI
-    ) public virtual onlyOwnerOrContributor returns (uint256) {
+    ) public virtual onlyOwnerOrContributor returns (uint256 assetId) {
         unchecked {
             ++_totalAssets;
         }
         _addAssetEntry(uint64(_totalAssets), metadataURI);
-        return _totalAssets;
+        assetId = _totalAssets;
     }
 
     /**

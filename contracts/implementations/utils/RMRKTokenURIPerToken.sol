@@ -13,12 +13,12 @@ contract RMRKTokenURIPerToken {
     /**
      * @notice Used to retrieve the metadata URI of a token.
      * @param tokenId ID of the token to retrieve the metadata URI for
-     * @return Metadata URI of the specified token
+     * @return tokenURI_ Metadata URI of the specified token
      */
     function tokenURI(
         uint256 tokenId
-    ) public view virtual returns (string memory) {
-        return _tokenURIs[tokenId];
+    ) public view virtual returns (string memory tokenURI_) {
+        tokenURI_ = _tokenURIs[tokenId];
     }
 
     /**

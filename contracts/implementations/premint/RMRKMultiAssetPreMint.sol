@@ -46,13 +46,13 @@ contract RMRKMultiAssetPreMint is RMRKTokenURIPerToken, RMRKAbstractMultiAsset {
      * @param to Address to which to mint the token
      * @param numToMint Number of tokens to mint
      * @param tokenURI URI assigned to all the minted tokens
-     * @return The ID of the first token to be minted in the current minting cycle
+     * @return firstTokenId The ID of the first token to be minted in the current minting cycle
      */
     function mint(
         address to,
         uint256 numToMint,
         string memory tokenURI
-    ) public virtual onlyOwnerOrContributor returns (uint256) {
+    ) public virtual onlyOwnerOrContributor returns (uint256 firstTokenId) {
         (uint256 nextToken, uint256 totalSupplyOffset) = _prepareMint(
             numToMint
         );
@@ -65,6 +65,6 @@ contract RMRKMultiAssetPreMint is RMRKTokenURIPerToken, RMRKAbstractMultiAsset {
             }
         }
 
-        return nextToken;
+        firstTokenId = nextToken;
     }
 }

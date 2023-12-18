@@ -31,7 +31,7 @@ function bulkEquip(uint256 tokenId, RMRKBulkWriterPerCollection.IntakeUnequip[] 
 ### getCollection
 
 ```solidity
-function getCollection() external view returns (address)
+function getCollection() external view returns (address collection)
 ```
 
 Returns the address of the collection that this contract is managing
@@ -43,7 +43,7 @@ Returns the address of the collection that this contract is managing
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | address | Address of the collection that this contract is managing |
+| collection | address | Address of the collection that this contract is managing |
 
 ### replaceEquip
 

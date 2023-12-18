@@ -52,7 +52,7 @@ Gets the current number of transfer the specified token.
 ### isTransferable
 
 ```solidity
-function isTransferable(uint256 tokenId, address, address) external view returns (bool)
+function isTransferable(uint256 tokenId, address, address) external view returns (bool isTransferable_)
 ```
 
 Used to check whether the given token is transferable or not.
@@ -71,7 +71,7 @@ Used to check whether the given token is transferable or not.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | Boolean value indicating whether the given token is transferable |
+| isTransferable_ | bool | Boolean value indicating whether the given token is transferable |
 
 ### supportsInterface
 

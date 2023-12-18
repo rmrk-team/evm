@@ -37,7 +37,7 @@ abstract contract RMRKSoulboundAfterBlockNumber is RMRKSoulbound {
         uint256,
         address,
         address
-    ) public view virtual override returns (bool) {
-        return _lastBlockToTransfer > block.number;
+    ) public view virtual override returns (bool isTransferable_) {
+        isTransferable_ = _lastBlockToTransfer > block.number;
     }
 }

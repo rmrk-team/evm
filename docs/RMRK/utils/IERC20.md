@@ -36,7 +36,7 @@ Used to grant permission to an account to spend the tokens of another
 ### transfer
 
 ```solidity
-function transfer(address to, uint256 amount) external nonpayable returns (bool)
+function transfer(address to, uint256 amount) external nonpayable returns (bool success)
 ```
 
 Used to transfer tokens from the caller&#39;s account to another.
@@ -54,12 +54,12 @@ Used to transfer tokens from the caller&#39;s account to another.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | A boolean value signifying whether the transfer was succesfull (`true`) or not (`false`) |
+| success | bool | A boolean value signifying whether the transfer was succesful (`true`) or not (`false`) |
 
 ### transferFrom
 
 ```solidity
-function transferFrom(address from, address to, uint256 amount) external nonpayable returns (bool)
+function transferFrom(address from, address to, uint256 amount) external nonpayable returns (bool success)
 ```
 
 Used to transfer tokens from one address to another.
@@ -78,7 +78,7 @@ Used to transfer tokens from one address to another.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | A boolean value signifying whether the transfer was succesfull (`true`) or not (`false`) |
+| success | bool | A boolean value signifying whether the transfer was succesful (`true`) or not (`false`) |
 
 
 

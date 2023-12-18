@@ -48,18 +48,28 @@ abstract contract RMRKRoyalties {
 
     /**
      * @notice Used to retrieve the recipient of royalties.
-     * @return Address of the recipient of royalties
+     * @return recipient Address of the recipient of royalties
      */
-    function getRoyaltyRecipient() public view virtual returns (address) {
-        return _royaltyRecipient;
+    function getRoyaltyRecipient()
+        public
+        view
+        virtual
+        returns (address recipient)
+    {
+        recipient = _royaltyRecipient;
     }
 
     /**
      * @notice Used to retrieve the specified royalty percentage.
-     * @return The royalty percentage expressed in the basis points
+     * @return royaltyPercentageBps The royalty percentage expressed in the basis points
      */
-    function getRoyaltyPercentage() public view virtual returns (uint256) {
-        return _royaltyPercentageBps;
+    function getRoyaltyPercentage()
+        public
+        view
+        virtual
+        returns (uint256 royaltyPercentageBps)
+    {
+        royaltyPercentageBps = _royaltyPercentageBps;
     }
 
     /**
@@ -74,6 +84,7 @@ abstract contract RMRKRoyalties {
         uint256 tokenId,
         uint256 salePrice
     ) external view virtual returns (address receiver, uint256 royaltyAmount) {
+        // tokenId is ignored as the royalty is the same for all tokens
         receiver = _royaltyRecipient;
         royaltyAmount = (salePrice * _royaltyPercentageBps) / 10000;
     }

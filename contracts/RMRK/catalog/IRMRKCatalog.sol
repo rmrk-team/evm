@@ -125,34 +125,36 @@ interface IRMRKCatalog is IERC165 {
      * @dev Returns true if a collection may equip asset with `partId`.
      * @param partId The ID of the part that we are checking
      * @param targetAddress The address that we are checking for whether the part can be equipped into it or not
-     * @return The status indicating whether the `targetAddress` can be equipped into `Part` with `partId` or not
+     * @return isEquippable The status indicating whether the `targetAddress` can be equipped into `Part` with `partId` or not
      */
     function checkIsEquippable(
         uint64 partId,
         address targetAddress
-    ) external view returns (bool);
+    ) external view returns (bool isEquippable);
 
     /**
      * @notice Used to check if the part is equippable by all addresses.
      * @dev Returns true if part is equippable to all.
      * @param partId ID of the part that we are checking
-     * @return The status indicating whether the part with `partId` can be equipped by any address or not
+     * @return isEquippableToAll The status indicating whether the part with `partId` can be equipped by any address or not
      */
-    function checkIsEquippableToAll(uint64 partId) external view returns (bool);
+    function checkIsEquippableToAll(
+        uint64 partId
+    ) external view returns (bool isEquippableToAll);
 
     /**
      * @notice Used to retrieve a `Part` with id `partId`
      * @param partId ID of the part that we are retrieving
-     * @return The `Part` struct associated with given `partId`
+     * @return part The `Part` struct associated with given `partId`
      */
-    function getPart(uint64 partId) external view returns (Part memory);
+    function getPart(uint64 partId) external view returns (Part memory part);
 
     /**
      * @notice Used to retrieve multiple parts at the same time.
      * @param partIds An array of part IDs that we want to retrieve
-     * @return An array of `Part` structs associated with given `partIds`
+     * @return part An array of `Part` structs associated with given `partIds`
      */
     function getParts(
         uint64[] memory partIds
-    ) external view returns (Part[] memory);
+    ) external view returns (Part[] memory part);
 }

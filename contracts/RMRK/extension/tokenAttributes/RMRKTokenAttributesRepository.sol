@@ -188,8 +188,8 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
     function isCollaborator(
         address collaborator,
         address collection
-    ) external view returns (bool) {
-        return _collaborators[collection][collaborator];
+    ) external view returns (bool isCollaborator_) {
+        isCollaborator_ = _collaborators[collection][collaborator];
     }
 
     /**
@@ -199,8 +199,8 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
         address specificAddress,
         address collection,
         string memory key
-    ) external view returns (bool) {
-        return
+    ) external view returns (bool isSpecificAddress_) {
+        isSpecificAddress_ =
             _parameterSpecificAddress[collection][_keysToIds[key]] ==
             specificAddress;
     }
@@ -319,11 +319,11 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
         address collection,
         uint256 tokenId,
         string memory key
-    ) external view returns (string memory) {
+    ) external view returns (string memory attribute) {
         uint256 idForValue = _stringValueIds[collection][tokenId][
             _keysToIds[key]
         ];
-        return _stringIdToValue[collection][idForValue];
+        attribute = _stringIdToValue[collection][idForValue];
     }
 
     /**
@@ -333,8 +333,8 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
         address collection,
         uint256 tokenId,
         string memory key
-    ) external view returns (uint256) {
-        return _uintValues[collection][tokenId][_keysToIds[key]];
+    ) external view returns (uint256 attribute) {
+        attribute = _uintValues[collection][tokenId][_keysToIds[key]];
     }
 
     /**
@@ -344,8 +344,8 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
         address collection,
         uint256 tokenId,
         string memory key
-    ) external view returns (bool) {
-        return _boolValues[collection][tokenId][_keysToIds[key]];
+    ) external view returns (bool attribute) {
+        attribute = _boolValues[collection][tokenId][_keysToIds[key]];
     }
 
     /**
@@ -355,8 +355,8 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
         address collection,
         uint256 tokenId,
         string memory key
-    ) external view returns (address) {
-        return _addressValues[collection][tokenId][_keysToIds[key]];
+    ) external view returns (address attribute) {
+        attribute = _addressValues[collection][tokenId][_keysToIds[key]];
     }
 
     /**
@@ -366,8 +366,8 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
         address collection,
         uint256 tokenId,
         string memory key
-    ) external view returns (bytes memory) {
-        return _bytesValues[collection][tokenId][_keysToIds[key]];
+    ) external view returns (bytes memory attribute) {
+        attribute = _bytesValues[collection][tokenId][_keysToIds[key]];
     }
 
     /**
@@ -414,15 +414,13 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
         address collection,
         uint256 tokenId,
         string[] memory stringKeys
-    ) public view returns (StringAttribute[] memory) {
+    ) public view returns (StringAttribute[] memory attributes) {
         uint256 stringLen = stringKeys.length;
 
-        StringAttribute[] memory stringAttributes = new StringAttribute[](
-            stringLen
-        );
+        attributes = new StringAttribute[](stringLen);
 
         for (uint i; i < stringLen; ) {
-            stringAttributes[i] = StringAttribute({
+            attributes[i] = StringAttribute({
                 key: stringKeys[i],
                 value: _stringIdToValue[collection][
                     _stringValueIds[collection][tokenId][
@@ -434,8 +432,6 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
                 ++i;
             }
         }
-
-        return stringAttributes;
     }
 
     /**
@@ -445,13 +441,13 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
         address collection,
         uint256 tokenId,
         string[] memory uintKeys
-    ) public view returns (UintAttribute[] memory) {
+    ) public view returns (UintAttribute[] memory attributes) {
         uint256 uintLen = uintKeys.length;
 
-        UintAttribute[] memory uintAttributes = new UintAttribute[](uintLen);
+        attributes = new UintAttribute[](uintLen);
 
         for (uint i; i < uintLen; ) {
-            uintAttributes[i] = UintAttribute({
+            attributes[i] = UintAttribute({
                 key: uintKeys[i],
                 value: _uintValues[collection][tokenId][_keysToIds[uintKeys[i]]]
             });
@@ -459,8 +455,6 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
                 ++i;
             }
         }
-
-        return uintAttributes;
     }
 
     /**
@@ -470,13 +464,13 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
         address collection,
         uint256 tokenId,
         string[] memory boolKeys
-    ) public view returns (BoolAttribute[] memory) {
+    ) public view returns (BoolAttribute[] memory attributes) {
         uint256 boolLen = boolKeys.length;
 
-        BoolAttribute[] memory boolAttributes = new BoolAttribute[](boolLen);
+        attributes = new BoolAttribute[](boolLen);
 
         for (uint i; i < boolLen; ) {
-            boolAttributes[i] = BoolAttribute({
+            attributes[i] = BoolAttribute({
                 key: boolKeys[i],
                 value: _boolValues[collection][tokenId][_keysToIds[boolKeys[i]]]
             });
@@ -484,8 +478,6 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
                 ++i;
             }
         }
-
-        return boolAttributes;
     }
 
     /**
@@ -495,15 +487,12 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
         address collection,
         uint256 tokenId,
         string[] memory addressKeys
-    ) public view returns (AddressAttribute[] memory) {
+    ) public view returns (AddressAttribute[] memory attributes) {
         uint256 addressLen = addressKeys.length;
-
-        AddressAttribute[] memory addressAttributes = new AddressAttribute[](
-            addressLen
-        );
+        attributes = new AddressAttribute[](addressLen);
 
         for (uint i; i < addressLen; ) {
-            addressAttributes[i] = AddressAttribute({
+            attributes[i] = AddressAttribute({
                 key: addressKeys[i],
                 value: _addressValues[collection][tokenId][
                     _keysToIds[addressKeys[i]]
@@ -513,8 +502,6 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
                 ++i;
             }
         }
-
-        return addressAttributes;
     }
 
     /**
@@ -524,15 +511,12 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
         address collection,
         uint256 tokenId,
         string[] memory bytesKeys
-    ) public view returns (BytesAttribute[] memory) {
+    ) public view returns (BytesAttribute[] memory attributes) {
         uint256 bytesLen = bytesKeys.length;
-
-        BytesAttribute[] memory bytesAttributes = new BytesAttribute[](
-            bytesLen
-        );
+        attributes = new BytesAttribute[](bytesLen);
 
         for (uint i; i < bytesLen; ) {
-            bytesAttributes[i] = BytesAttribute({
+            attributes[i] = BytesAttribute({
                 key: bytesKeys[i],
                 value: _bytesValues[collection][tokenId][
                     _keysToIds[bytesKeys[i]]
@@ -542,8 +526,6 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
                 ++i;
             }
         }
-
-        return bytesAttributes;
     }
 
     /**
@@ -555,19 +537,18 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
         string memory key,
         uint256 value,
         uint256 deadline
-    ) public view returns (bytes32) {
-        return
-            keccak256(
-                abi.encode(
-                    DOMAIN_SEPARATOR,
-                    SET_UINT_ATTRIBUTE_TYPEHASH,
-                    collection,
-                    tokenId,
-                    key,
-                    value,
-                    deadline
-                )
-            );
+    ) public view returns (bytes32 message) {
+        message = keccak256(
+            abi.encode(
+                DOMAIN_SEPARATOR,
+                SET_UINT_ATTRIBUTE_TYPEHASH,
+                collection,
+                tokenId,
+                key,
+                value,
+                deadline
+            )
+        );
     }
 
     /**
@@ -579,19 +560,18 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
         string memory key,
         string memory value,
         uint256 deadline
-    ) public view returns (bytes32) {
-        return
-            keccak256(
-                abi.encode(
-                    DOMAIN_SEPARATOR,
-                    SET_STRING_ATTRIBUTE_TYPEHASH,
-                    collection,
-                    tokenId,
-                    key,
-                    value,
-                    deadline
-                )
-            );
+    ) public view returns (bytes32 message) {
+        message = keccak256(
+            abi.encode(
+                DOMAIN_SEPARATOR,
+                SET_STRING_ATTRIBUTE_TYPEHASH,
+                collection,
+                tokenId,
+                key,
+                value,
+                deadline
+            )
+        );
     }
 
     /**
@@ -603,19 +583,18 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
         string memory key,
         bool value,
         uint256 deadline
-    ) public view returns (bytes32) {
-        return
-            keccak256(
-                abi.encode(
-                    DOMAIN_SEPARATOR,
-                    SET_BOOL_ATTRIBUTE_TYPEHASH,
-                    collection,
-                    tokenId,
-                    key,
-                    value,
-                    deadline
-                )
-            );
+    ) public view returns (bytes32 message) {
+        message = keccak256(
+            abi.encode(
+                DOMAIN_SEPARATOR,
+                SET_BOOL_ATTRIBUTE_TYPEHASH,
+                collection,
+                tokenId,
+                key,
+                value,
+                deadline
+            )
+        );
     }
 
     /**
@@ -627,19 +606,18 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
         string memory key,
         bytes memory value,
         uint256 deadline
-    ) public view returns (bytes32) {
-        return
-            keccak256(
-                abi.encode(
-                    DOMAIN_SEPARATOR,
-                    SET_BYTES_ATTRIBUTE_TYPEHASH,
-                    collection,
-                    tokenId,
-                    key,
-                    value,
-                    deadline
-                )
-            );
+    ) public view returns (bytes32 message) {
+        message = keccak256(
+            abi.encode(
+                DOMAIN_SEPARATOR,
+                SET_BYTES_ATTRIBUTE_TYPEHASH,
+                collection,
+                tokenId,
+                key,
+                value,
+                deadline
+            )
+        );
     }
 
     /**
@@ -651,19 +629,18 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
         string memory key,
         address value,
         uint256 deadline
-    ) public view returns (bytes32) {
-        return
-            keccak256(
-                abi.encode(
-                    DOMAIN_SEPARATOR,
-                    SET_ADDRESS_ATTRIBUTE_TYPEHASH,
-                    collection,
-                    tokenId,
-                    key,
-                    value,
-                    deadline
-                )
-            );
+    ) public view returns (bytes32 message) {
+        message = keccak256(
+            abi.encode(
+                DOMAIN_SEPARATOR,
+                SET_ADDRESS_ATTRIBUTE_TYPEHASH,
+                collection,
+                tokenId,
+                key,
+                value,
+                deadline
+            )
+        );
     }
 
     /**

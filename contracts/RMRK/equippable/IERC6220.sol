@@ -127,13 +127,13 @@ interface IERC6220 is IERC5773 {
      * @param tokenId ID of the parent token for which we are querying for
      * @param childAddress Address of the child token's smart contract
      * @param childId ID of the child token
-     * @return A boolean value indicating whether the child token is equipped into the given token or not
+     * @return isEquipped A boolean value indicating whether the child token is equipped into the given token or not
      */
     function isChildEquipped(
         uint256 tokenId,
         address childAddress,
         uint256 childId
-    ) external view returns (bool);
+    ) external view returns (bool isEquipped);
 
     /**
      * @notice Used to verify whether a token can be equipped into a given parent's slot.
@@ -141,14 +141,14 @@ interface IERC6220 is IERC5773 {
      * @param tokenId ID of the token we want to equip
      * @param assetId ID of the asset associated with the token we want to equip
      * @param slotId ID of the slot that we want to equip the token into
-     * @return A boolean indicating whether the token with the given asset can be equipped into the desired slot
+     * @return canBeEquipped A boolean indicating whether the token with the given asset can be equipped into the desired slot
      */
     function canTokenBeEquippedWithAssetIntoSlot(
         address parent,
         uint256 tokenId,
         uint64 assetId,
         uint64 slotId
-    ) external view returns (bool);
+    ) external view returns (bool canBeEquipped);
 
     /**
      * @notice Used to get the Equipment object equipped into the specified slot of the desired token.

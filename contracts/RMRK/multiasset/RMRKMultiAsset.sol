@@ -114,11 +114,13 @@ contract RMRKMultiAsset is IERC165, IERC721, AbstractMultiAsset, RMRKCore {
     /**
      * @notice Used to retrieve the number of tokens in ``owner``'s account.
      * @param owner Address of the account being checked
-     * @return The balance of the given account
+     * @return balance The balance of the given account
      */
-    function balanceOf(address owner) public view virtual returns (uint256) {
+    function balanceOf(
+        address owner
+    ) public view virtual returns (uint256 balance) {
         if (owner == address(0)) revert ERC721AddressZeroIsNotaValidOwner();
-        return _balances[owner];
+        balance = _balances[owner];
     }
 
     /**
@@ -127,12 +129,13 @@ contract RMRKMultiAsset is IERC165, IERC721, AbstractMultiAsset, RMRKCore {
      *
      *  - `tokenId` must exist.
      * @param tokenId ID of the token for which to retrieve the token for
-     * @return Address of the account owning the token
+     * @return owner Address of the account owning the token
      */
-    function ownerOf(uint256 tokenId) public view virtual returns (address) {
-        address owner = _owners[tokenId];
+    function ownerOf(
+        uint256 tokenId
+    ) public view virtual returns (address owner) {
+        owner = _owners[tokenId];
         if (owner == address(0)) revert ERC721InvalidTokenId();
-        return owner;
     }
 
     /**
@@ -164,14 +167,14 @@ contract RMRKMultiAsset is IERC165, IERC721, AbstractMultiAsset, RMRKCore {
      *
      *  - `tokenId` must exist.
      * @param tokenId ID of the token to check for approval
-     * @return Address of the account approved to manage the token
+     * @return approved Address of the account approved to manage the token
      */
     function getApproved(
         uint256 tokenId
-    ) public view virtual returns (address) {
+    ) public view virtual returns (address approved) {
         _requireMinted(tokenId);
 
-        return _tokenApprovals[tokenId];
+        approved = _tokenApprovals[tokenId];
     }
 
     /**
@@ -192,14 +195,14 @@ contract RMRKMultiAsset is IERC165, IERC721, AbstractMultiAsset, RMRKCore {
      * @notice Used to check if the given address is allowed to manage the tokens of the specified address.
      * @param owner Address of the owner of the tokens
      * @param operator Address being checked for approval
-     * @return A boolean value signifying whether the *operator* is allowed to manage the tokens of the *owner* (`true`)
+     * @return isApproved A boolean value signifying whether the *operator* is allowed to manage the tokens of the *owner* (`true`)
      *  or not (`false`)
      */
     function isApprovedForAll(
         address owner,
         address operator
-    ) public view virtual returns (bool) {
-        return _operatorApprovals[owner][operator];
+    ) public view virtual returns (bool isApproved) {
+        isApproved = _operatorApprovals[owner][operator];
     }
 
     /**
@@ -589,9 +592,9 @@ contract RMRKMultiAsset is IERC165, IERC721, AbstractMultiAsset, RMRKCore {
      */
     function getApprovedForAssets(
         uint256 tokenId
-    ) public view virtual returns (address) {
+    ) public view virtual returns (address approved) {
         _requireMinted(tokenId);
-        return _tokenApprovalsForAssets[tokenId];
+        approved = _tokenApprovalsForAssets[tokenId];
     }
 
     /**

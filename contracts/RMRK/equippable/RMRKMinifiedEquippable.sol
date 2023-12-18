@@ -123,11 +123,13 @@ contract RMRKMinifiedEquippable is
     /**
      * @notice Used to retrieve the number of tokens in `owner`'s account.
      * @param owner Address of the account being checked
-     * @return The balance of the given account
+     * @return balance The balance of the given account
      */
-    function balanceOf(address owner) public view virtual returns (uint256) {
+    function balanceOf(
+        address owner
+    ) public view virtual returns (uint256 balance) {
         if (owner == address(0)) revert ERC721AddressZeroIsNotaValidOwner();
-        return _balances[owner];
+        balance = _balances[owner];
     }
 
     ////////////////////////////////////////
@@ -443,14 +445,14 @@ contract RMRKMinifiedEquippable is
      */
     function ownerOf(
         uint256 tokenId
-    ) public view virtual override(IERC7401, IERC721) returns (address) {
+    ) public view virtual override(IERC7401, IERC721) returns (address owner_) {
         (address owner, uint256 ownerTokenId, bool isNft) = directOwnerOf(
             tokenId
         );
         if (isNft) {
             owner = IERC7401(owner).ownerOf(ownerTokenId);
         }
-        return owner;
+        owner_ = owner;
     }
 
     /**
@@ -462,7 +464,7 @@ contract RMRKMinifiedEquippable is
         public
         view
         virtual
-        returns (address owner, uint256 parentId, bool isNFT)
+        returns (address owner_, uint256 parentId, bool isNFT)
     {
         DirectOwner memory owner = _RMRKOwners[tokenId];
         if (owner.ownerAddress == address(0)) revert ERC721InvalidTokenId();
@@ -489,7 +491,12 @@ contract RMRKMinifiedEquippable is
     function burn(
         uint256 tokenId,
         uint256 maxChildrenBurns
-    ) public virtual onlyApprovedOrDirectOwner(tokenId) returns (uint256) {
+    )
+        public
+        virtual
+        onlyApprovedOrDirectOwner(tokenId)
+        returns (uint256 burnedChildren)
+    {
         (address immediateOwner, uint256 parentId, ) = directOwnerOf(tokenId);
         address rootOwner = ownerOf(tokenId);
 
@@ -514,11 +521,10 @@ contract RMRKMinifiedEquippable is
         delete _tokenApprovals[tokenId][rootOwner];
 
         uint256 pendingRecursiveBurns;
-        uint256 totalChildBurns;
 
         uint256 length = children.length; //gas savings
         for (uint256 i; i < length; ) {
-            if (totalChildBurns >= maxChildrenBurns)
+            if (burnedChildren >= maxChildrenBurns)
                 revert RMRKMaxRecursiveBurnsReached(
                     children[i].contractAddress,
                     children[i].tokenId
@@ -528,11 +534,11 @@ contract RMRKMinifiedEquippable is
             ];
             unchecked {
                 // At this point we know pendingRecursiveBurns must be at least 1
-                pendingRecursiveBurns = maxChildrenBurns - totalChildBurns;
+                pendingRecursiveBurns = maxChildrenBurns - burnedChildren;
             }
             // We substract one to the next level to count for the token being burned, then add it again on returns
             // This is to allow the behavior of 0 recursive burns meaning only the current token is deleted.
-            totalChildBurns +=
+            burnedChildren +=
                 IERC7401(children[i].contractAddress).burn(
                     children[i].tokenId,
                     pendingRecursiveBurns - 1
@@ -558,7 +564,7 @@ contract RMRKMinifiedEquippable is
             ""
         );
 
-        return totalChildBurns;
+        return burnedChildren;
     }
 
     ////////////////////////////////////////
@@ -594,14 +600,14 @@ contract RMRKMinifiedEquippable is
      *
      *  - `tokenId` must exist.
      * @param tokenId ID of the token to check for approval
-     * @return Address of the account approved to manage the token
+     * @return approved Address of the account approved to manage the token
      */
     function getApproved(
         uint256 tokenId
-    ) public view virtual returns (address) {
+    ) public view virtual returns (address approved) {
         _requireMinted(tokenId);
 
-        return _tokenApprovals[tokenId][ownerOf(tokenId)];
+        approved = _tokenApprovals[tokenId][ownerOf(tokenId)];
     }
 
     /**
@@ -624,14 +630,14 @@ contract RMRKMinifiedEquippable is
      * @notice Used to check if the given address is allowed to manage the tokens of the specified address.
      * @param owner Address of the owner of the tokens
      * @param operator Address being checked for approval
-     * @return A boolean value signifying whether the *operator* is allowed to manage the tokens of the *owner* (`true`)
+     * @return isApproved A boolean value signifying whether the *operator* is allowed to manage the tokens of the *owner* (`true`)
      *  or not (`false`)
      */
     function isApprovedForAll(
         address owner,
         address operator
-    ) public view virtual returns (bool) {
-        return _operatorApprovals[owner][operator];
+    ) public view virtual returns (bool isApproved) {
+        isApproved = _operatorApprovals[owner][operator];
     }
 
     /**
@@ -950,9 +956,8 @@ contract RMRKMinifiedEquippable is
 
     function childrenOf(
         uint256 parentId
-    ) public view virtual returns (Child[] memory) {
-        Child[] memory children = _activeChildren[parentId];
-        return children;
+    ) public view virtual returns (Child[] memory children) {
+        children = _activeChildren[parentId];
     }
 
     /**
@@ -961,9 +966,8 @@ contract RMRKMinifiedEquippable is
 
     function pendingChildrenOf(
         uint256 parentId
-    ) public view virtual returns (Child[] memory) {
-        Child[] memory pendingChildren = _pendingChildren[parentId];
-        return pendingChildren;
+    ) public view virtual returns (Child[] memory children) {
+        children = _pendingChildren[parentId];
     }
 
     /**
@@ -972,11 +976,10 @@ contract RMRKMinifiedEquippable is
     function childOf(
         uint256 parentId,
         uint256 index
-    ) public view virtual returns (Child memory) {
+    ) public view virtual returns (Child memory child) {
         if (childrenOf(parentId).length <= index)
             revert RMRKChildIndexOutOfRange();
-        Child memory child = _activeChildren[parentId][index];
-        return child;
+        child = _activeChildren[parentId][index];
     }
 
     /**
@@ -985,11 +988,10 @@ contract RMRKMinifiedEquippable is
     function pendingChildOf(
         uint256 parentId,
         uint256 index
-    ) public view virtual returns (Child memory) {
+    ) public view virtual returns (Child memory child) {
         if (pendingChildrenOf(parentId).length <= index)
             revert RMRKPendingChildIndexOutOfRange();
-        Child memory child = _pendingChildren[parentId][index];
-        return child;
+        child = _pendingChildren[parentId][index];
     }
 
     // HOOKS
@@ -1274,9 +1276,9 @@ contract RMRKMinifiedEquippable is
     function getAssetMetadata(
         uint256 tokenId,
         uint64 assetId
-    ) public view virtual returns (string memory) {
+    ) public view virtual returns (string memory metadata) {
         if (!_tokenAssets[tokenId][assetId]) revert RMRKTokenDoesNotHaveAsset();
-        return _assets[assetId];
+        metadata = _assets[assetId];
     }
 
     /**
@@ -1284,8 +1286,8 @@ contract RMRKMinifiedEquippable is
      */
     function getActiveAssets(
         uint256 tokenId
-    ) public view virtual returns (uint64[] memory) {
-        return _activeAssets[tokenId];
+    ) public view virtual returns (uint64[] memory assetIds) {
+        assetIds = _activeAssets[tokenId];
     }
 
     /**
@@ -1293,8 +1295,8 @@ contract RMRKMinifiedEquippable is
      */
     function getPendingAssets(
         uint256 tokenId
-    ) public view virtual returns (uint64[] memory) {
-        return _pendingAssets[tokenId];
+    ) public view virtual returns (uint64[] memory assetIds) {
+        assetIds = _pendingAssets[tokenId];
     }
 
     /**
@@ -1302,8 +1304,8 @@ contract RMRKMinifiedEquippable is
      */
     function getActiveAssetPriorities(
         uint256 tokenId
-    ) public view virtual returns (uint64[] memory) {
-        return _activeAssetPriorities[tokenId];
+    ) public view virtual returns (uint64[] memory priorities) {
+        priorities = _activeAssetPriorities[tokenId];
     }
 
     /**
@@ -1312,8 +1314,8 @@ contract RMRKMinifiedEquippable is
     function getAssetReplacements(
         uint256 tokenId,
         uint64 newAssetId
-    ) public view virtual returns (uint64) {
-        return _assetReplacements[tokenId][newAssetId];
+    ) public view virtual returns (uint64 replacedAssetId) {
+        replacedAssetId = _assetReplacements[tokenId][newAssetId];
     }
 
     /**
@@ -1322,8 +1324,8 @@ contract RMRKMinifiedEquippable is
     function isApprovedForAllForAssets(
         address owner,
         address operator
-    ) public view virtual returns (bool) {
-        return _operatorApprovalsForAssets[owner][operator];
+    ) public view virtual returns (bool isApproved) {
+        isApproved = _operatorApprovalsForAssets[owner][operator];
     }
 
     /**
@@ -1842,13 +1844,13 @@ contract RMRKMinifiedEquippable is
      * @notice Used to get the address of the user that is approved to manage the specified token from the current
      *  owner.
      * @param tokenId ID of the token we are checking
-     * @return Address of the account that is approved to manage the token
+     * @return approved Address of the account that is approved to manage the token
      */
     function getApprovedForAssets(
         uint256 tokenId
-    ) public view virtual returns (address) {
+    ) public view virtual returns (address approved) {
         _requireMinted(tokenId);
-        return _tokenApprovalsForAssets[tokenId][ownerOf(tokenId)];
+        approved = _tokenApprovalsForAssets[tokenId][ownerOf(tokenId)];
     }
 
     /**
@@ -1979,8 +1981,8 @@ contract RMRKMinifiedEquippable is
         uint256 tokenId,
         address childAddress,
         uint256 childId
-    ) public view virtual returns (bool) {
-        return _equipCountPerChild[tokenId][childAddress][childId] != 0;
+    ) public view virtual returns (bool isEquipped) {
+        isEquipped = _equipCountPerChild[tokenId][childAddress][childId] != 0;
     }
 
     // --------------------- ADMIN VALIDATION ---------------------
@@ -2016,14 +2018,13 @@ contract RMRKMinifiedEquippable is
         uint256 tokenId,
         uint64 assetId,
         uint64 slotId
-    ) public view virtual returns (bool) {
+    ) public view virtual returns (bool canBeEquipped) {
         uint64 equippableGroupId = _equippableGroupIds[assetId];
         uint64 equippableSlot = _validParentSlots[equippableGroupId][parent];
         if (equippableSlot == slotId) {
             (, bool found) = getActiveAssets(tokenId).indexOf(assetId);
-            return found;
+            canBeEquipped = found;
         }
-        return false;
     }
 
     // --------------------- Getting Extended Assets ---------------------
@@ -2038,14 +2039,17 @@ contract RMRKMinifiedEquippable is
         public
         view
         virtual
-        returns (string memory, uint64, address, uint64[] memory)
+        returns (
+            string memory metadataURI,
+            uint64 equippableGroupId,
+            address catalogAddress,
+            uint64[] memory partIds
+        )
     {
-        return (
-            getAssetMetadata(tokenId, assetId),
-            _equippableGroupIds[assetId],
-            _catalogAddresses[assetId],
-            _partIds[assetId]
-        );
+        metadataURI = getAssetMetadata(tokenId, assetId);
+        equippableGroupId = _equippableGroupIds[assetId];
+        catalogAddress = _catalogAddresses[assetId];
+        partIds = _partIds[assetId];
     }
 
     ////////////////////////////////////////
@@ -2059,8 +2063,8 @@ contract RMRKMinifiedEquippable is
         uint256 tokenId,
         address targetCatalogAddress,
         uint64 slotPartId
-    ) public view virtual returns (Equipment memory) {
-        return _equipments[tokenId][targetCatalogAddress][slotPartId];
+    ) public view virtual returns (Equipment memory equipment) {
+        equipment = _equipments[tokenId][targetCatalogAddress][slotPartId];
     }
 
     /**

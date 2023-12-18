@@ -46,50 +46,55 @@ abstract contract RMRKImplementationBase is RMRKRoyalties, Ownable {
 
     /**
      * @notice Used to retrieve the total supply of the tokens in a collection.
-     * @return The number of tokens in a collection
+     * @return totalSupply_ The number of tokens in a collection
      */
-    function totalSupply() public view virtual returns (uint256) {
-        return _totalSupply;
+    function totalSupply() public view virtual returns (uint256 totalSupply_) {
+        totalSupply_ = _totalSupply;
     }
 
     /**
      * @notice Used to retrieve the maximum supply of the collection.
-     * @return The maximum supply of tokens in the collection
+     * @return maxSupply_ The maximum supply of tokens in the collection
      */
-    function maxSupply() public view virtual returns (uint256) {
-        return _maxSupply;
+    function maxSupply() public view virtual returns (uint256 maxSupply_) {
+        maxSupply_ = _maxSupply;
     }
 
     /**
      * @notice Used to retrieve the total number of assets.
-     * @return The total number of assets
+     * @return totalAssets_ The total number of assets
      */
-    function totalAssets() public view virtual returns (uint256) {
-        return _totalAssets;
+    function totalAssets() public view virtual returns (uint256 totalAssets_) {
+        totalAssets_ = _totalAssets;
     }
 
     /**
-     * @notice Used to retrieve the metadata of the collection.
-     * @return string The metadata URI of the collection
+     * @notice Used to retrieve the metadata URI of the collection.
+     * @return contractURI_ string The metadata URI of the collection
      */
-    function contractURI() public view virtual returns (string memory) {
-        return _collectionMetadata;
+    function contractURI()
+        public
+        view
+        virtual
+        returns (string memory contractURI_)
+    {
+        contractURI_ = _collectionMetadata;
     }
 
     /**
      * @notice Used to retrieve the collection name.
-     * @return Name of the collection
+     * @return name_ Name of the collection
      */
-    function name() public view virtual returns (string memory) {
-        return _name;
+    function name() public view virtual returns (string memory name_) {
+        name_ = _name;
     }
 
     /**
      * @notice Used to retrieve the collection symbol.
-     * @return Symbol of the collection
+     * @return symbol_ Symbol of the collection
      */
-    function symbol() public view virtual returns (string memory) {
-        return _symbol;
+    function symbol() public view virtual returns (string memory symbol_) {
+        symbol_ = _symbol;
     }
 
     /**

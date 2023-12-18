@@ -124,9 +124,9 @@ contract RMRKNestableMultiAsset is RMRKNestable, AbstractMultiAsset {
      */
     function getApprovedForAssets(
         uint256 tokenId
-    ) public view virtual returns (address) {
+    ) public view virtual returns (address approved) {
         _requireMinted(tokenId);
-        return _tokenApprovalsForAssets[tokenId][ownerOf(tokenId)];
+        approved = _tokenApprovalsForAssets[tokenId][ownerOf(tokenId)];
     }
 
     /**

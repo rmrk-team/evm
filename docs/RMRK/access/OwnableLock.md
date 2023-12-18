@@ -13,7 +13,7 @@ A minimal ownable lock smart contract.
 ### getLock
 
 ```solidity
-function getLock() external view returns (bool)
+function getLock() external view returns (bool isLocked)
 ```
 
 Used to retrieve the status of a lockable smart contract.
@@ -25,12 +25,12 @@ Used to retrieve the status of a lockable smart contract.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | A boolean value signifying whether the smart contract has been locked |
+| isLocked | bool | A boolean value signifying whether the smart contract has been locked |
 
 ### isContributor
 
 ```solidity
-function isContributor(address contributor) external view returns (bool)
+function isContributor(address contributor) external view returns (bool isContributor_)
 ```
 
 Used to check if the address is one of the contributors.
@@ -47,7 +47,7 @@ Used to check if the address is one of the contributors.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | Boolean value indicating whether the address is a contributor or not |
+| isContributor_ | bool | Boolean value indicating whether the address is a contributor or not |
 
 ### manageContributor
 
@@ -69,7 +69,7 @@ Adds or removes a contributor to the smart contract.
 ### owner
 
 ```solidity
-function owner() external view returns (address)
+function owner() external view returns (address owner_)
 ```
 
 Returns the address of the current owner.
@@ -81,7 +81,7 @@ Returns the address of the current owner.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | address | Address of the current owner |
+| owner_ | address | Address of the current owner |
 
 ### renounceOwnership
 
