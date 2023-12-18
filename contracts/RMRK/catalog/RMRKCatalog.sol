@@ -220,8 +220,10 @@ contract RMRKCatalog is IRMRKCatalog {
     /**
      * @inheritdoc IRMRKCatalog
      */
-    function checkIsEquippableToAll(uint64 partId) public view returns (bool) {
-        return _isEquippableToAll[partId];
+    function checkIsEquippableToAll(
+        uint64 partId
+    ) public view returns (bool isEquippable) {
+        isEquippable = _isEquippableToAll[partId];
     }
 
     /**
@@ -230,9 +232,9 @@ contract RMRKCatalog is IRMRKCatalog {
     function checkIsEquippable(
         uint64 partId,
         address targetAddress
-    ) public view returns (bool) {
+    ) public view returns (bool isEquippable) {
         // If this is equippable to all, we're good
-        bool isEquippable = _isEquippableToAll[partId];
+        isEquippable = _isEquippableToAll[partId];
 
         // Otherwise, must check against each of the equippable for the part
         if (!isEquippable && _parts[partId].itemType == ItemType.Slot) {
@@ -248,14 +250,13 @@ contract RMRKCatalog is IRMRKCatalog {
                 }
             }
         }
-        return isEquippable;
     }
 
     /**
      * @inheritdoc IRMRKCatalog
      */
-    function getPart(uint64 partId) public view returns (Part memory) {
-        return (_parts[partId]);
+    function getPart(uint64 partId) public view returns (Part memory part) {
+        part = (_parts[partId]);
     }
 
     /**
@@ -263,9 +264,9 @@ contract RMRKCatalog is IRMRKCatalog {
      */
     function getParts(
         uint64[] memory partIds
-    ) public view returns (Part[] memory) {
+    ) public view returns (Part[] memory parts) {
         uint256 numParts = partIds.length;
-        Part[] memory parts = new Part[](numParts);
+        parts = new Part[](numParts);
 
         for (uint256 i; i < numParts; ) {
             uint64 partId = partIds[i];
@@ -274,7 +275,5 @@ contract RMRKCatalog is IRMRKCatalog {
                 ++i;
             }
         }
-
-        return parts;
     }
 }

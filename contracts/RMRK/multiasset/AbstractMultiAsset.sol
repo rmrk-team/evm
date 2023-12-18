@@ -45,9 +45,9 @@ abstract contract AbstractMultiAsset is Context, IERC5773 {
     function getAssetMetadata(
         uint256 tokenId,
         uint64 assetId
-    ) public view virtual returns (string memory) {
+    ) public view virtual returns (string memory metadata) {
         if (!_tokenAssets[tokenId][assetId]) revert RMRKTokenDoesNotHaveAsset();
-        return _assets[assetId];
+        metadata = _assets[assetId];
     }
 
     /**
@@ -55,8 +55,8 @@ abstract contract AbstractMultiAsset is Context, IERC5773 {
      */
     function getActiveAssets(
         uint256 tokenId
-    ) public view virtual returns (uint64[] memory) {
-        return _activeAssets[tokenId];
+    ) public view virtual returns (uint64[] memory assetIds) {
+        assetIds = _activeAssets[tokenId];
     }
 
     /**
@@ -64,8 +64,8 @@ abstract contract AbstractMultiAsset is Context, IERC5773 {
      */
     function getPendingAssets(
         uint256 tokenId
-    ) public view virtual returns (uint64[] memory) {
-        return _pendingAssets[tokenId];
+    ) public view virtual returns (uint64[] memory assetIds) {
+        assetIds = _pendingAssets[tokenId];
     }
 
     /**
@@ -73,8 +73,8 @@ abstract contract AbstractMultiAsset is Context, IERC5773 {
      */
     function getActiveAssetPriorities(
         uint256 tokenId
-    ) public view virtual returns (uint64[] memory) {
-        return _activeAssetPriorities[tokenId];
+    ) public view virtual returns (uint64[] memory priorities) {
+        priorities = _activeAssetPriorities[tokenId];
     }
 
     /**
@@ -83,8 +83,8 @@ abstract contract AbstractMultiAsset is Context, IERC5773 {
     function getAssetReplacements(
         uint256 tokenId,
         uint64 newAssetId
-    ) public view virtual returns (uint64) {
-        return _assetReplacements[tokenId][newAssetId];
+    ) public view virtual returns (uint64 replacesAssetId) {
+        replacesAssetId = _assetReplacements[tokenId][newAssetId];
     }
 
     /**
@@ -93,8 +93,8 @@ abstract contract AbstractMultiAsset is Context, IERC5773 {
     function isApprovedForAllForAssets(
         address owner,
         address operator
-    ) public view virtual returns (bool) {
-        return _operatorApprovalsForAssets[owner][operator];
+    ) public view virtual returns (bool isApproved) {
+        isApproved = _operatorApprovalsForAssets[owner][operator];
     }
 
     /**

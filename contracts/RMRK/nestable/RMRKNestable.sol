@@ -109,11 +109,13 @@ contract RMRKNestable is Context, IERC165, IERC721, IERC7401, RMRKCore {
     /**
      * @notice Used to retrieve the number of tokens in `owner`'s account.
      * @param owner Address of the account being checked
-     * @return The balance of the given account
+     * @return balance The balance of the given account
      */
-    function balanceOf(address owner) public view virtual returns (uint256) {
+    function balanceOf(
+        address owner
+    ) public view virtual returns (uint256 balance) {
         if (owner == address(0)) revert ERC721AddressZeroIsNotaValidOwner();
-        return _balances[owner];
+        balance = _balances[owner];
     }
 
     ////////////////////////////////////////
@@ -497,14 +499,14 @@ contract RMRKNestable is Context, IERC165, IERC721, IERC7401, RMRKCore {
      */
     function ownerOf(
         uint256 tokenId
-    ) public view virtual override(IERC7401, IERC721) returns (address) {
+    ) public view virtual override(IERC7401, IERC721) returns (address owner_) {
         (address owner, uint256 ownerTokenId, bool isNft) = directOwnerOf(
             tokenId
         );
         if (isNft) {
             owner = IERC7401(owner).ownerOf(ownerTokenId);
         }
-        return owner;
+        owner_ = owner;
     }
 
     /**
@@ -516,7 +518,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IERC7401, RMRKCore {
         public
         view
         virtual
-        returns (address owner, uint256 parentId, bool isNFT)
+        returns (address owner_, uint256 parentId, bool isNFT)
     {
         DirectOwner memory owner = _RMRKOwners[tokenId];
         if (owner.ownerAddress == address(0)) revert ERC721InvalidTokenId();
@@ -543,8 +545,13 @@ contract RMRKNestable is Context, IERC165, IERC721, IERC7401, RMRKCore {
     function burn(
         uint256 tokenId,
         uint256 maxChildrenBurns
-    ) public virtual onlyApprovedOrDirectOwner(tokenId) returns (uint256) {
-        return _burn(tokenId, maxChildrenBurns);
+    )
+        public
+        virtual
+        onlyApprovedOrDirectOwner(tokenId)
+        returns (uint256 burnedChildren)
+    {
+        burnedChildren = _burn(tokenId, maxChildrenBurns);
     }
 
     /**
@@ -668,14 +675,14 @@ contract RMRKNestable is Context, IERC165, IERC721, IERC7401, RMRKCore {
      *
      *  - `tokenId` must exist.
      * @param tokenId ID of the token to check for approval
-     * @return Address of the account approved to manage the token
+     * @return approved Address of the account approved to manage the token
      */
     function getApproved(
         uint256 tokenId
-    ) public view virtual returns (address) {
+    ) public view virtual returns (address approved) {
         _requireMinted(tokenId);
 
-        return _tokenApprovals[tokenId][ownerOf(tokenId)];
+        approved = _tokenApprovals[tokenId][ownerOf(tokenId)];
     }
 
     /**
@@ -698,14 +705,14 @@ contract RMRKNestable is Context, IERC165, IERC721, IERC7401, RMRKCore {
      * @notice Used to check if the given address is allowed to manage the tokens of the specified address.
      * @param owner Address of the owner of the tokens
      * @param operator Address being checked for approval
-     * @return A boolean value signifying whether the *operator* is allowed to manage the tokens of the *owner* (`true`)
+     * @return isApproved A boolean value signifying whether the *operator* is allowed to manage the tokens of the *owner* (`true`)
      *  or not (`false`)
      */
     function isApprovedForAll(
         address owner,
         address operator
-    ) public view virtual returns (bool) {
-        return _operatorApprovals[owner][operator];
+    ) public view virtual returns (bool isApproved) {
+        isApproved = _operatorApprovals[owner][operator];
     }
 
     /**
@@ -1130,9 +1137,8 @@ contract RMRKNestable is Context, IERC165, IERC721, IERC7401, RMRKCore {
 
     function childrenOf(
         uint256 parentId
-    ) public view virtual returns (Child[] memory) {
-        Child[] memory children = _activeChildren[parentId];
-        return children;
+    ) public view virtual returns (Child[] memory children) {
+        children = _activeChildren[parentId];
     }
 
     /**
@@ -1141,9 +1147,8 @@ contract RMRKNestable is Context, IERC165, IERC721, IERC7401, RMRKCore {
 
     function pendingChildrenOf(
         uint256 parentId
-    ) public view virtual returns (Child[] memory) {
-        Child[] memory pendingChildren = _pendingChildren[parentId];
-        return pendingChildren;
+    ) public view virtual returns (Child[] memory children) {
+        children = _pendingChildren[parentId];
     }
 
     /**
@@ -1152,11 +1157,10 @@ contract RMRKNestable is Context, IERC165, IERC721, IERC7401, RMRKCore {
     function childOf(
         uint256 parentId,
         uint256 index
-    ) public view virtual returns (Child memory) {
+    ) public view virtual returns (Child memory child) {
         if (childrenOf(parentId).length <= index)
             revert RMRKChildIndexOutOfRange();
-        Child memory child = _activeChildren[parentId][index];
-        return child;
+        child = _activeChildren[parentId][index];
     }
 
     /**
@@ -1165,11 +1169,10 @@ contract RMRKNestable is Context, IERC165, IERC721, IERC7401, RMRKCore {
     function pendingChildOf(
         uint256 parentId,
         uint256 index
-    ) public view virtual returns (Child memory) {
+    ) public view virtual returns (Child memory child) {
         if (pendingChildrenOf(parentId).length <= index)
             revert RMRKPendingChildIndexOutOfRange();
-        Child memory child = _pendingChildren[parentId][index];
-        return child;
+        child = _pendingChildren[parentId][index];
     }
 
     /**

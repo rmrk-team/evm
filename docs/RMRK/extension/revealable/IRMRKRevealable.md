@@ -13,7 +13,7 @@
 ### getRevealer
 
 ```solidity
-function getRevealer() external view returns (address)
+function getRevealer() external view returns (address revealer)
 ```
 
 Gets the `IRMRKRevealer` associated with the contract.
@@ -25,7 +25,7 @@ Gets the `IRMRKRevealer` associated with the contract.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | address | revealer The `IRMRKRevealer` associated with the contract |
+| revealer | address | The `IRMRKRevealer` associated with the contract |
 
 ### reveal
 

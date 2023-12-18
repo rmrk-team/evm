@@ -54,12 +54,12 @@ contract RMRKEquippableLazyMintNative is
      * @dev Can only be called while the open sale is open.
      * @param to Address to which to mint the token
      * @param numToMint Number of tokens to mint
-     * @return The ID of the first token to be minted in the current minting cycle
+     * @return firstTokenId The ID of the first token to be minted in the current minting cycle
      */
     function mint(
         address to,
         uint256 numToMint
-    ) public payable virtual returns (uint256) {
+    ) public payable virtual returns (uint256 firstTokenId) {
         (uint256 nextToken, uint256 totalSupplyOffset) = _prepareMint(
             numToMint
         );
@@ -72,7 +72,7 @@ contract RMRKEquippableLazyMintNative is
             }
         }
 
-        return nextToken;
+        firstTokenId = nextToken;
     }
 
     /**
@@ -82,13 +82,13 @@ contract RMRKEquippableLazyMintNative is
      * @param to Address of the collection smart contract of the token into which to mint the child token
      * @param numToMint Number of tokens to mint
      * @param destinationId ID of the token into which to mint the new child token
-     * @return The ID of the first token to be minted in the current minting cycle
+     * @return firstTokenId The ID of the first token to be minted in the current minting cycle
      */
     function nestMint(
         address to,
         uint256 numToMint,
         uint256 destinationId
-    ) public payable virtual returns (uint256) {
+    ) public payable virtual returns (uint256 firstTokenId) {
         (uint256 nextToken, uint256 totalSupplyOffset) = _prepareMint(
             numToMint
         );
@@ -101,7 +101,7 @@ contract RMRKEquippableLazyMintNative is
             }
         }
 
-        return nextToken;
+        firstTokenId = nextToken;
     }
 
     function _chargeMints(uint256 numToMint) internal {
@@ -111,10 +111,10 @@ contract RMRKEquippableLazyMintNative is
 
     /**
      * @notice Used to retrieve the price per mint.
-     * @return The price per mint of a single token expressed in the lowest denomination of a native currency
+     * @return price The price per mint of a single token expressed in the lowest denomination of a native currency
      */
-    function pricePerMint() public view returns (uint256) {
-        return _pricePerMint;
+    function pricePerMint() public view returns (uint256 price) {
+        price = _pricePerMint;
     }
 
     /**

@@ -117,9 +117,9 @@ interface IERC7401 is IERC165 {
      * @dev The *root* owner of the token is an externally owned account (EOA). If the given token is child of another
      *  NFT, this will return an EOA address. Otherwise, if the token is owned by an EOA, this EOA wil be returned.
      * @param tokenId ID of the token for which the *root* owner has been retrieved
-     * @return owner The *root* owner of the token
+     * @return owner_ The *root* owner of the token
      */
-    function ownerOf(uint256 tokenId) external view returns (address owner);
+    function ownerOf(uint256 tokenId) external view returns (address owner_);
 
     /**
      * @notice Used to retrieve the immediate owner of the given token.
@@ -244,11 +244,11 @@ interface IERC7401 is IERC165 {
      *      contractAddress
      *  ]
      * @param parentId ID of the parent token for which to retrieve the active child tokens
-     * @return An array of Child structs containing the parent token's active child tokens
+     * @return children An array of Child structs containing the parent token's active child tokens
      */
     function childrenOf(
         uint256 parentId
-    ) external view returns (Child[] memory);
+    ) external view returns (Child[] memory children);
 
     /**
      * @notice Used to retrieve the pending child tokens of a given parent token.
@@ -259,11 +259,11 @@ interface IERC7401 is IERC165 {
      *      contractAddress
      *  ]
      * @param parentId ID of the parent token for which to retrieve the pending child tokens
-     * @return An array of Child structs containing the parent token's pending child tokens
+     * @return children An array of Child structs containing the parent token's pending child tokens
      */
     function pendingChildrenOf(
         uint256 parentId
-    ) external view returns (Child[] memory);
+    ) external view returns (Child[] memory children);
 
     /**
      * @notice Used to retrieve a specific active child token for a given parent token.
@@ -275,12 +275,12 @@ interface IERC7401 is IERC165 {
      *  ]
      * @param parentId ID of the parent token for which the child is being retrieved
      * @param index Index of the child token in the parent token's active child tokens array
-     * @return A Child struct containing data about the specified child
+     * @return child A Child struct containing data about the specified child
      */
     function childOf(
         uint256 parentId,
         uint256 index
-    ) external view returns (Child memory);
+    ) external view returns (Child memory child);
 
     /**
      * @notice Used to retrieve a specific pending child token from a given parent token.
@@ -292,12 +292,12 @@ interface IERC7401 is IERC165 {
      *  ]
      * @param parentId ID of the parent token for which the pending child token is being retrieved
      * @param index Index of the child token in the parent token's pending child tokens array
-     * @return A Child struct containting data about the specified child
+     * @return child A Child struct containting data about the specified child
      */
     function pendingChildOf(
         uint256 parentId,
         uint256 index
-    ) external view returns (Child memory);
+    ) external view returns (Child memory child);
 
     /**
      * @notice Used to transfer the token into another token.

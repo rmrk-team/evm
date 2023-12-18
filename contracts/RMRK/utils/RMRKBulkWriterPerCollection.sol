@@ -48,10 +48,10 @@ contract RMRKBulkWriterPerCollection is Context {
 
     /**
      * @notice Returns the address of the collection that this contract is managing
-     * @return Address of the collection that this contract is managing
+     * @return collection Address of the collection that this contract is managing
      */
-    function getCollection() public view returns (address) {
-        return _collection;
+    function getCollection() public view returns (address collection) {
+        collection = _collection;
     }
 
     /**

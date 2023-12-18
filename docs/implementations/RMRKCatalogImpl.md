@@ -62,7 +62,7 @@ function addPartList(IRMRKCatalog.IntakeStruct[] intakeStructs) external nonpaya
 ### checkIsEquippable
 
 ```solidity
-function checkIsEquippable(uint64 partId, address targetAddress) external view returns (bool)
+function checkIsEquippable(uint64 partId, address targetAddress) external view returns (bool isEquippable)
 ```
 
 Used to check whether the given address is allowed to equip the desired `Part`.
@@ -80,12 +80,12 @@ Used to check whether the given address is allowed to equip the desired `Part`.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | The status indicating whether the `targetAddress` can be equipped into `Part` with `partId` or not |
+| isEquippable | bool | The status indicating whether the `targetAddress` can be equipped into `Part` with `partId` or not |
 
 ### checkIsEquippableToAll
 
 ```solidity
-function checkIsEquippableToAll(uint64 partId) external view returns (bool)
+function checkIsEquippableToAll(uint64 partId) external view returns (bool isEquippable)
 ```
 
 Used to check if the part is equippable by all addresses.
@@ -102,12 +102,12 @@ Used to check if the part is equippable by all addresses.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | The status indicating whether the part with `partId` can be equipped by any address or not |
+| isEquippable | bool | The status indicating whether the part with `partId` can be equipped by any address or not |
 
 ### getLock
 
 ```solidity
-function getLock() external view returns (bool)
+function getLock() external view returns (bool isLocked)
 ```
 
 Used to retrieve the status of a lockable smart contract.
@@ -119,7 +119,7 @@ Used to retrieve the status of a lockable smart contract.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | A boolean value signifying whether the smart contract has been locked |
+| isLocked | bool | A boolean value signifying whether the smart contract has been locked |
 
 ### getMetadataURI
 
@@ -141,7 +141,7 @@ Used to return the metadata URI of the associated Catalog.
 ### getPart
 
 ```solidity
-function getPart(uint64 partId) external view returns (struct IRMRKCatalog.Part)
+function getPart(uint64 partId) external view returns (struct IRMRKCatalog.Part part)
 ```
 
 Used to retrieve a `Part` with id `partId`
@@ -158,12 +158,12 @@ Used to retrieve a `Part` with id `partId`
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IRMRKCatalog.Part | The `Part` struct associated with given `partId` |
+| part | IRMRKCatalog.Part | The `Part` struct associated with given `partId` |
 
 ### getParts
 
 ```solidity
-function getParts(uint64[] partIds) external view returns (struct IRMRKCatalog.Part[])
+function getParts(uint64[] partIds) external view returns (struct IRMRKCatalog.Part[] parts)
 ```
 
 Used to retrieve multiple parts at the same time.
@@ -180,7 +180,7 @@ Used to retrieve multiple parts at the same time.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IRMRKCatalog.Part[] | An array of `Part` structs associated with given `partIds` |
+| parts | IRMRKCatalog.Part[] | An array of `Part` structs associated with given `partIds` |
 
 ### getType
 
@@ -202,7 +202,7 @@ Used to return the `itemType` of the associated Catalog
 ### isContributor
 
 ```solidity
-function isContributor(address contributor) external view returns (bool)
+function isContributor(address contributor) external view returns (bool isContributor_)
 ```
 
 Used to check if the address is one of the contributors.
@@ -219,7 +219,7 @@ Used to check if the address is one of the contributors.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | Boolean value indicating whether the address is a contributor or not |
+| isContributor_ | bool | Boolean value indicating whether the address is a contributor or not |
 
 ### manageContributor
 
@@ -241,7 +241,7 @@ Adds or removes a contributor to the smart contract.
 ### owner
 
 ```solidity
-function owner() external view returns (address)
+function owner() external view returns (address owner_)
 ```
 
 Returns the address of the current owner.
@@ -253,7 +253,7 @@ Returns the address of the current owner.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | address | Address of the current owner |
+| owner_ | address | Address of the current owner |
 
 ### renounceOwnership
 
