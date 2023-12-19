@@ -18,8 +18,8 @@ contract RMRKEquippableLazyMintErc20 is
     RMRKTokenURIEnumerated,
     RMRKAbstractEquippable
 {
-    uint256 private _pricePerMint;
-    address private _erc20TokenAddress;
+    uint256 internal _pricePerMint;
+    address internal _erc20TokenAddress;
 
     /**
      * @notice Used to initialize the smart contract.

@@ -34,7 +34,7 @@ contract RMRKRoyaltiesSplitter is Context {
     constructor(address[] memory beneficiaries, uint256[] memory sharesBps) {
         uint256 length = beneficiaries.length;
         if (length != sharesBps.length) revert InvalidInput();
-        uint256 totalShares = 0;
+        uint256 totalShares;
 
         for (uint256 i; i < length; ) {
             _beneficiaries.push(beneficiaries[i]);

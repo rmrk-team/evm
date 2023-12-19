@@ -307,10 +307,12 @@ contract RMRKMultiAsset is IERC165, IERC721, AbstractMultiAsset, RMRKCore {
      * @dev Tokens can be managed by their owner or approved accounts via {approve} or {setApprovalForAll}.
      * @dev Tokens start existing when they are minted (`_mint`) and stop existing when they are burned (`_burn`).
      * @param tokenId ID of the token being checked
-     * @return A boolean value signifying whether the token exists
+     * @return exists A boolean value signifying whether the token exists
      */
-    function _exists(uint256 tokenId) internal view virtual returns (bool) {
-        return _owners[tokenId] != address(0);
+    function _exists(
+        uint256 tokenId
+    ) internal view virtual returns (bool exists) {
+        exists = _owners[tokenId] != address(0);
     }
 
     /**
@@ -483,14 +485,14 @@ contract RMRKMultiAsset is IERC165, IERC721, AbstractMultiAsset, RMRKCore {
      * @param to Yarget address that will receive the tokens
      * @param tokenId ID of the token to be transferred
      * @param data Optional data to send along with the call
-     * @return Boolean value signifying whether the call correctly returned the expected magic value
+     * @return valid Boolean value signifying whether the call correctly returned the expected magic value
      */
     function _checkOnERC721Received(
         address from,
         address to,
         uint256 tokenId,
         bytes memory data
-    ) private returns (bool) {
+    ) private returns (bool valid) {
         if (to.code.length != 0) {
             try
                 IERC721Receiver(to).onERC721Received(
@@ -500,7 +502,7 @@ contract RMRKMultiAsset is IERC165, IERC721, AbstractMultiAsset, RMRKCore {
                     data
                 )
             returns (bytes4 retval) {
-                return retval == IERC721Receiver.onERC721Received.selector;
+                valid = retval == IERC721Receiver.onERC721Received.selector;
             } catch (bytes memory reason) {
                 if (reason.length == uint256(0)) {
                     revert ERC721TransferToNonReceiverImplementer();
@@ -512,7 +514,7 @@ contract RMRKMultiAsset is IERC165, IERC721, AbstractMultiAsset, RMRKCore {
                 }
             }
         } else {
-            return true;
+            valid = true;
         }
     }
 
