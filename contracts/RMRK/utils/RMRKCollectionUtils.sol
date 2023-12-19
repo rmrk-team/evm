@@ -27,7 +27,7 @@ contract RMRKCollectionUtils {
      * @param collection Address of the collection to emit the event from
      * @param tokenId ID of the token to emit the event from
      */
-    event MetadataUpdate(address collection, uint256 tokenId);
+    event MetadataUpdate(address indexed collection, uint256 indexed tokenId);
 
     /**
      * @notice This event emits when the metadata of a range of tokens is changed.
@@ -39,9 +39,9 @@ contract RMRKCollectionUtils {
      * @param toTokenId ID of the last token to emit the event from
      */
     event BatchMetadataUpdate(
-        address collection,
-        uint256 fromTokenId,
-        uint256 toTokenId
+        address indexed collection,
+        uint256 indexed fromTokenId,
+        uint256 indexed toTokenId
     );
 
     /**
@@ -177,7 +177,7 @@ contract RMRKCollectionUtils {
         uint256 pageStart,
         uint256 pageSize
     ) public view returns (uint256[] memory page) {
-        uint256[] memory tmpIds = new uint[](pageSize);
+        uint256[] memory tmpIds = new uint256[](pageSize);
         uint256 found;
         for (uint256 i = 0; i < pageSize; ) {
             try IERC721(targetEquippable).ownerOf(pageStart + i) returns (

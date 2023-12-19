@@ -125,7 +125,7 @@ Triggers an event to refresh the token metadata.
 ### BatchMetadataUpdate
 
 ```solidity
-event BatchMetadataUpdate(address collection, uint256 fromTokenId, uint256 toTokenId)
+event BatchMetadataUpdate(address indexed collection, uint256 indexed fromTokenId, uint256 indexed toTokenId)
 ```
 
 This event emits when the metadata of a range of tokens is changed. So that the third-party platforms such as NFT market could timely update the images and related attributes of the NFTs. Inspired on ERC4906, but adding collection.
@@ -136,14 +136,14 @@ This event emits when the metadata of a range of tokens is changed. So that the 
 
 | Name | Type | Description |
 |---|---|---|
-| collection  | address | Address of the collection to emit the event from |
-| fromTokenId  | uint256 | ID of the first token to emit the event from |
-| toTokenId  | uint256 | ID of the last token to emit the event from |
+| collection `indexed` | address | Address of the collection to emit the event from |
+| fromTokenId `indexed` | uint256 | ID of the first token to emit the event from |
+| toTokenId `indexed` | uint256 | ID of the last token to emit the event from |
 
 ### MetadataUpdate
 
 ```solidity
-event MetadataUpdate(address collection, uint256 tokenId)
+event MetadataUpdate(address indexed collection, uint256 indexed tokenId)
 ```
 
 This event emits when the metadata of a token is changed. So that the third-party platforms such as NFT market could timely update the images and related attributes of the NFT. Inspired on ERC4906, but adding collection.
@@ -154,8 +154,8 @@ This event emits when the metadata of a token is changed. So that the third-part
 
 | Name | Type | Description |
 |---|---|---|
-| collection  | address | Address of the collection to emit the event from |
-| tokenId  | uint256 | ID of the token to emit the event from |
+| collection `indexed` | address | Address of the collection to emit the event from |
+| tokenId `indexed` | uint256 | ID of the token to emit the event from |
 
 
 

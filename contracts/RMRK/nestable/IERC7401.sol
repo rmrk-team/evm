@@ -148,12 +148,12 @@ interface IERC7401 is IERC165 {
      * @dev Emits a {Transfer} event.
      * @param tokenId ID of the token to burn
      * @param maxRecursiveBurns Maximum number of tokens to recursively burn
-     * @return Number of recursively burned children
+     * @return burnedChildren Number of recursively burned children
      */
     function burn(
         uint256 tokenId,
         uint256 maxRecursiveBurns
-    ) external returns (uint256);
+    ) external returns (uint256 burnedChildren);
 
     /**
      * @notice Used to add a child token to a given parent token.

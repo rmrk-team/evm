@@ -68,7 +68,7 @@ contract RMRKCatalogUtils {
         uint256 length = partIds.length;
         IRMRKCatalog target = IRMRKCatalog(catalog);
         parts = new ExtendedPart[](length);
-        for (uint256 i = 0; i < length; i++) {
+        for (uint256 i = 0; i < length; ) {
             uint64 partId = partIds[i];
             bool isEquippableToAll = target.checkIsEquippableToAll(partId);
             IRMRKCatalog.Part memory part = target.getPart(partId);
@@ -80,6 +80,9 @@ contract RMRKCatalogUtils {
                 equippableToAll: isEquippableToAll,
                 metadataURI: part.metadataURI
             });
+            unchecked {
+                ++i;
+            }
         }
     }
 

@@ -18,8 +18,8 @@ contract RMRKMultiAssetLazyMintErc20 is
     RMRKTokenURIEnumerated,
     RMRKAbstractMultiAsset
 {
-    uint256 private _pricePerMint;
-    address private _erc20TokenAddress;
+    uint256 internal _pricePerMint;
+    address internal _erc20TokenAddress;
 
     /**
      * @notice Used to initialize the smart contract.

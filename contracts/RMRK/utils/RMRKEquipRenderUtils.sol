@@ -441,7 +441,7 @@ contract RMRKEquipRenderUtils is
         uint256 totalChildAssets = IERC5773(targetChild)
             .getActiveAssets(childId)
             .length;
-        uint256 totalMatchesForAll = 0;
+        uint256 totalMatchesForAll;
 
         // This is the most valid asset combinations that can be made. When we know the real total we'll recreate it
         EquippableData[] memory allTempAssetsWithSlots = new EquippableData[](
@@ -459,7 +459,7 @@ contract RMRKEquipRenderUtils is
                 parentId,
                 parentAssets[0]
             );
-            uint totalMatchesForParentAsset = assetsWithSlotsForParentAsset
+            uint256 totalMatchesForParentAsset = assetsWithSlotsForParentAsset
                 .length;
 
             // We move them to the temporary array of all matches. Optionally filtering for onlyEquipped
@@ -817,7 +817,8 @@ contract RMRKEquipRenderUtils is
         allAssetsWithSlots = new EquippableData[](totalChildAssets);
 
         for (uint256 i; i < totalChildAssets; ) {
-            for (uint256 j; j < parentSlotPartIds.length; ) {
+            uint256 slotsLength = parentSlotPartIds.length;
+            for (uint256 j; j < slotsLength; ) {
                 if (
                     childContract.canTokenBeEquippedWithAssetIntoSlot(
                         parentAddress,
@@ -1025,10 +1026,14 @@ contract RMRKEquipRenderUtils is
         for (uint256 i; i < numParts; ) {
             if (allParts[i].itemType == IRMRKCatalog.ItemType.Fixed) {
                 fixedPartIds[fixedPartsIndex] = allPartIds[i];
-                fixedPartsIndex += 1;
+                unchecked {
+                    ++fixedPartsIndex;
+                }
             } else if (allParts[i].itemType == IRMRKCatalog.ItemType.Slot) {
                 slotPartIds[slotPartsIndex] = allPartIds[i];
-                slotPartsIndex += 1;
+                unchecked {
+                    ++slotPartsIndex;
+                }
             }
             unchecked {
                 ++i;

@@ -419,7 +419,7 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
 
         attributes = new StringAttribute[](stringLen);
 
-        for (uint i; i < stringLen; ) {
+        for (uint256 i; i < stringLen; ) {
             attributes[i] = StringAttribute({
                 key: stringKeys[i],
                 value: _stringIdToValue[collection][
@@ -446,7 +446,7 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
 
         attributes = new UintAttribute[](uintLen);
 
-        for (uint i; i < uintLen; ) {
+        for (uint256 i; i < uintLen; ) {
             attributes[i] = UintAttribute({
                 key: uintKeys[i],
                 value: _uintValues[collection][tokenId][_keysToIds[uintKeys[i]]]
@@ -469,7 +469,7 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
 
         attributes = new BoolAttribute[](boolLen);
 
-        for (uint i; i < boolLen; ) {
+        for (uint256 i; i < boolLen; ) {
             attributes[i] = BoolAttribute({
                 key: boolKeys[i],
                 value: _boolValues[collection][tokenId][_keysToIds[boolKeys[i]]]
@@ -491,7 +491,7 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
         uint256 addressLen = addressKeys.length;
         attributes = new AddressAttribute[](addressLen);
 
-        for (uint i; i < addressLen; ) {
+        for (uint256 i; i < addressLen; ) {
             attributes[i] = AddressAttribute({
                 key: addressKeys[i],
                 value: _addressValues[collection][tokenId][
@@ -515,7 +515,7 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
         uint256 bytesLen = bytesKeys.length;
         attributes = new BytesAttribute[](bytesLen);
 
-        for (uint i; i < bytesLen; ) {
+        for (uint256 i; i < bytesLen; ) {
             attributes[i] = BytesAttribute({
                 key: bytesKeys[i],
                 value: _bytesValues[collection][tokenId][
@@ -1155,15 +1155,15 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
      *  IDs are shared among all tokens and types
      * @dev The ID of 0 is not used as it represents the default value.
      * @param key The attribute key
-     * @return The ID of the key
+     * @return keyID The ID of the key
      */
-    function _getIdForKey(string memory key) internal returns (uint256) {
+    function _getIdForKey(string memory key) internal returns (uint256 keyID) {
         if (_keysToIds[key] == 0) {
             _totalAttributes++;
             _keysToIds[key] = _totalAttributes;
-            return _totalAttributes;
+            keyID = _totalAttributes;
         } else {
-            return _keysToIds[key];
+            keyID = _keysToIds[key];
         }
     }
 
@@ -1172,12 +1172,12 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
      * @dev IDs are shared among all tokens and used only for strings.
      * @param collection Address of the collection being checked for string ID
      * @param value The attribute value
-     * @return The id for the string value
+     * @return stringId The id for the string value
      */
     function _getStringIdForValue(
         address collection,
         string memory value
-    ) internal returns (uint256) {
+    ) internal returns (uint256 stringId) {
         if (_stringValueToId[collection][value] == 0) {
             _totalStringValues[collection]++;
             _stringValueToId[collection][value] = _totalStringValues[
@@ -1186,9 +1186,9 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
             _stringIdToValue[collection][
                 _totalStringValues[collection]
             ] = value;
-            return _totalStringValues[collection];
+            stringId = _totalStringValues[collection];
         } else {
-            return _stringValueToId[collection][value];
+            stringId = _stringValueToId[collection][value];
         }
     }
 
