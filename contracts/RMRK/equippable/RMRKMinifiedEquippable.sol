@@ -469,7 +469,9 @@ contract RMRKMinifiedEquippable is
         DirectOwner memory owner = _RMRKOwners[tokenId];
         if (owner.ownerAddress == address(0)) revert ERC721InvalidTokenId();
 
-        return (owner.ownerAddress, owner.tokenId, owner.tokenId != 0);
+        owner_ = owner.ownerAddress;
+        parentId = owner.tokenId;
+        isNFT = owner.tokenId != 0;
     }
 
     ////////////////////////////////////////
@@ -563,8 +565,6 @@ contract RMRKMinifiedEquippable is
             tokenId,
             ""
         );
-
-        return burnedChildren;
     }
 
     ////////////////////////////////////////
@@ -694,10 +694,12 @@ contract RMRKMinifiedEquippable is
      * @notice Used to check whether the given token exists.
      * @dev Tokens start existing when they are minted (`_mint`) and stop existing when they are burned (`_burn`).
      * @param tokenId ID of the token being checked
-     * @return A boolean value signifying whether the token exists
+     * @return exists A boolean value signifying whether the token exists
      */
-    function _exists(uint256 tokenId) internal view virtual returns (bool) {
-        return _RMRKOwners[tokenId].ownerAddress != address(0);
+    function _exists(
+        uint256 tokenId
+    ) internal view virtual returns (bool exists) {
+        exists = _RMRKOwners[tokenId].ownerAddress != address(0);
     }
 
     /**
@@ -707,14 +709,14 @@ contract RMRKMinifiedEquippable is
      * @param to Yarget address that will receive the tokens
      * @param tokenId ID of the token to be transferred
      * @param data Optional data to send along with the call
-     * @return Boolean value signifying whether the call correctly returned the expected magic value
+     * @return valid Boolean value signifying whether the call correctly returned the expected magic value
      */
     function _checkOnERC721Received(
         address from,
         address to,
         uint256 tokenId,
         bytes memory data
-    ) private returns (bool) {
+    ) private returns (bool valid) {
         if (to.code.length != 0) {
             try
                 IERC721Receiver(to).onERC721Received(
@@ -724,7 +726,7 @@ contract RMRKMinifiedEquippable is
                     data
                 )
             returns (bytes4 retval) {
-                return retval == IERC721Receiver.onERC721Received.selector;
+                valid = retval == IERC721Receiver.onERC721Received.selector;
             } catch (bytes memory reason) {
                 if (reason.length == uint256(0)) {
                     revert ERC721TransferToNonReceiverImplementer();
@@ -736,7 +738,7 @@ contract RMRKMinifiedEquippable is
                 }
             }
         } else {
-            return true;
+            valid = true;
         }
     }
 

@@ -24,8 +24,11 @@ contract ChildAdder {
         uint256 childId,
         uint256 numChildren
     ) external {
-        for (uint256 i; i < numChildren; i++) {
+        for (uint256 i; i < numChildren; ) {
             IERC7401(destContract).addChild(parentId, childId, "");
+            unchecked {
+                ++i;
+            }
         }
     }
 }
