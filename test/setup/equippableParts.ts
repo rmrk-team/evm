@@ -50,9 +50,7 @@ enum ItemType {
 async function setupContextForParts(
   catalog: Contract,
   neon: Contract,
-  neonEquip: Contract,
   mask: Contract,
-  maskEquip: Contract,
   mint: (token: Contract, to: string) => Promise<BigNumber>,
   nestMint: (token: Contract, to: string, parentId: BigNumber) => Promise<BigNumber>,
 ) {
@@ -215,7 +213,7 @@ async function setupContextForParts(
     const partForMask = {
       itemType: ItemType.Slot,
       z: 2,
-      equippable: [maskEquip.address],
+      equippable: [mask.address],
       metadataURI: '',
     };
 
@@ -270,31 +268,31 @@ async function setupContextForParts(
   }
 
   async function addAssetsToNeon(): Promise<void> {
-    await neonEquip.addEquippableAssetEntry(neonResIds[0], 0, catalog.address, 'ipfs:neonRes/1', [
+    await neon.addEquippableAssetEntry(neonResIds[0], 0, catalog.address, 'ipfs:neonRes/1', [
       partIdForHead1,
       partIdForBody1,
       partIdForHair1,
       partIdForMask,
     ]);
-    await neonEquip.addEquippableAssetEntry(neonResIds[1], 0, catalog.address, 'ipfs:neonRes/2', [
+    await neon.addEquippableAssetEntry(neonResIds[1], 0, catalog.address, 'ipfs:neonRes/2', [
       partIdForHead2,
       partIdForBody2,
       partIdForHair2,
       partIdForMask,
     ]);
-    await neonEquip.addEquippableAssetEntry(neonResIds[2], 0, catalog.address, 'ipfs:neonRes/3', [
+    await neon.addEquippableAssetEntry(neonResIds[2], 0, catalog.address, 'ipfs:neonRes/3', [
       partIdForHead3,
       partIdForBody1,
       partIdForHair3,
       partIdForMask,
     ]);
-    await neonEquip.addEquippableAssetEntry(neonResIds[3], 0, catalog.address, 'ipfs:neonRes/4', [
+    await neon.addEquippableAssetEntry(neonResIds[3], 0, catalog.address, 'ipfs:neonRes/4', [
       partIdForHead1,
       partIdForBody2,
       partIdForHair2,
       partIdForMask,
     ]);
-    await neonEquip.addEquippableAssetEntry(neonResIds[4], 0, catalog.address, 'ipfs:neonRes/1', [
+    await neon.addEquippableAssetEntry(neonResIds[4], 0, catalog.address, 'ipfs:neonRes/1', [
       partIdForHead2,
       partIdForBody1,
       partIdForHair1,
@@ -302,37 +300,35 @@ async function setupContextForParts(
     ]);
 
     for (let i = 0; i < uniqueNeons; i++) {
-      await neonEquip.addAssetToToken(neons[i], neonResIds[i % neonResIds.length], 0);
-      await neonEquip
-        .connect(addrs[i % 3])
-        .acceptAsset(neons[i], 0, neonResIds[i % neonResIds.length]);
+      await neon.addAssetToToken(neons[i], neonResIds[i % neonResIds.length], 0);
+      await neon.connect(addrs[i % 3]).acceptAsset(neons[i], 0, neonResIds[i % neonResIds.length]);
     }
   }
 
   async function addAssetsToMask(): Promise<void> {
     // Assets for full view, composed with fixed parts
-    await maskEquip.addEquippableAssetEntry(
+    await mask.addEquippableAssetEntry(
       maskAssetsFull[0],
       0, // Not meant to equip
       catalog.address, // Not meant to equip, but catalog needed for parts
       `ipfs:weapon/full/${maskAssetsFull[0]}`,
       [partIdForMaskCatalog1, partIdForHorns1, partIdForEars1],
     );
-    await maskEquip.addEquippableAssetEntry(
+    await mask.addEquippableAssetEntry(
       maskAssetsFull[1],
       0, // Not meant to equip
       catalog.address, // Not meant to equip, but catalog needed for parts
       `ipfs:weapon/full/${maskAssetsFull[1]}`,
       [partIdForMaskCatalog2, partIdForHorns2, partIdForEars2],
     );
-    await maskEquip.addEquippableAssetEntry(
+    await mask.addEquippableAssetEntry(
       maskAssetsFull[2],
       0, // Not meant to equip
       catalog.address, // Not meant to equip, but catalog needed for parts
       `ipfs:weapon/full/${maskAssetsFull[2]}`,
       [partIdForMaskCatalog3, partIdForHorns1, partIdForEars2],
     );
-    await maskEquip.addEquippableAssetEntry(
+    await mask.addEquippableAssetEntry(
       maskAssetsFull[3],
       0, // Not meant to equip
       catalog.address, // Not meant to equip, but catalog needed for parts
@@ -341,7 +337,7 @@ async function setupContextForParts(
     );
 
     // Assets for equipping view, also composed with fixed parts
-    await maskEquip.addEquippableAssetEntry(
+    await mask.addEquippableAssetEntry(
       maskAssetsEquip[0],
       maskEquippableGroupId,
       catalog.address,
@@ -350,7 +346,7 @@ async function setupContextForParts(
     );
 
     // Assets for equipping view, also composed with fixed parts
-    await maskEquip.addEquippableAssetEntry(
+    await mask.addEquippableAssetEntry(
       maskAssetsEquip[1],
       maskEquippableGroupId,
       catalog.address,
@@ -359,7 +355,7 @@ async function setupContextForParts(
     );
 
     // Assets for equipping view, also composed with fixed parts
-    await maskEquip.addEquippableAssetEntry(
+    await mask.addEquippableAssetEntry(
       maskAssetsEquip[2],
       maskEquippableGroupId,
       catalog.address,
@@ -368,7 +364,7 @@ async function setupContextForParts(
     );
 
     // Assets for equipping view, also composed with fixed parts
-    await maskEquip.addEquippableAssetEntry(
+    await mask.addEquippableAssetEntry(
       maskAssetsEquip[3],
       maskEquippableGroupId,
       catalog.address,
@@ -377,23 +373,15 @@ async function setupContextForParts(
     );
 
     // Can be equipped into neons
-    await maskEquip.setValidParentForEquippableGroup(
-      maskEquippableGroupId,
-      neonEquip.address,
-      partIdForMask,
-    );
+    await mask.setValidParentForEquippableGroup(maskEquippableGroupId, neon.address, partIdForMask);
 
     // Add 2 assets to each weapon, one full, one for equip
     // There are 10 weapon tokens for 4 unique assets so we use %
     for (let i = 0; i < masks.length; i++) {
-      await maskEquip.addAssetToToken(masks[i], maskAssetsFull[i % uniqueMasks], 0);
-      await maskEquip.addAssetToToken(masks[i], maskAssetsEquip[i % uniqueMasks], 0);
-      await maskEquip
-        .connect(addrs[i % 3])
-        .acceptAsset(masks[i], 0, maskAssetsFull[i % uniqueMasks]);
-      await maskEquip
-        .connect(addrs[i % 3])
-        .acceptAsset(masks[i], 0, maskAssetsEquip[i % uniqueMasks]);
+      await mask.addAssetToToken(masks[i], maskAssetsFull[i % uniqueMasks], 0);
+      await mask.addAssetToToken(masks[i], maskAssetsEquip[i % uniqueMasks], 0);
+      await mask.connect(addrs[i % 3]).acceptAsset(masks[i], 0, maskAssetsFull[i % uniqueMasks]);
+      await mask.connect(addrs[i % 3]).acceptAsset(masks[i], 0, maskAssetsEquip[i % uniqueMasks]);
     }
   }
 }
