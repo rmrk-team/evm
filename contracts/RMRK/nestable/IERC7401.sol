@@ -115,7 +115,7 @@ interface IERC7401 is IERC165 {
     /**
      * @notice Used to retrieve the *root* owner of a given token.
      * @dev The *root* owner of the token is an externally owned account (EOA). If the given token is child of another
-     *  NFT, this will return an EOA address. Otherwise, if the token is owned by an EOA, this EOA wil be returned.
+     *  NFT, this will return an EOA address. Otherwise, if the token is owned by an EOA, this EOA will be returned.
      * @param tokenId ID of the token for which the *root* owner has been retrieved
      * @return owner_ The *root* owner of the token
      */
