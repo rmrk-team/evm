@@ -1,9 +1,27 @@
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import { ADDRESS_ZERO, bn } from './utils';
+import { ADDRESS_ZERO, bn, mintFromMock, nestMintFromMock } from './utils';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { RMRKCatalogUtils, RMRKCatalogImpl } from '../typechain-types';
+import {
+  RMRKCatalogUtils,
+  RMRKCatalogImpl,
+  RMRKEquipRenderUtils,
+  RMRKEquippableMock,
+} from '../typechain-types';
+import { setupContextForSlots } from './setup/equippableSlots';
+import { BigNumber, Contract } from 'ethers';
+import {
+  backgroundAssetId,
+  backgroundsIds,
+  partIdForBackground,
+  partIdForBody,
+  partIdForWeapon,
+  soldierResId,
+  soldiersIds,
+  weaponAssetsEquip,
+  weaponsIds,
+} from './setup/equippableSlots';
 
 const CATALOG_METADATA = 'ipfs://catalog-meta';
 const CATALOG_TYPE = 'image/png';
@@ -21,6 +39,54 @@ async function catalogUtilsFixture() {
     catalog,
     catalogUtils,
   };
+}
+
+async function slotsFixture() {
+  const catalogSymbol = 'SSB';
+  const catalogType = 'mixed';
+
+  const catalogFactory = await ethers.getContractFactory('RMRKCatalogImpl');
+  const equipFactory = await ethers.getContractFactory('RMRKEquippableMock');
+  const viewFactory = await ethers.getContractFactory('RMRKEquipRenderUtils');
+
+  // View
+  const view = <RMRKEquipRenderUtils>await viewFactory.deploy();
+  await view.deployed();
+
+  // catalog
+  const catalog = <RMRKCatalogImpl>await catalogFactory.deploy(catalogSymbol, catalogType);
+  await catalog.deployed();
+  const catalogForWeapon = <RMRKCatalogImpl>await catalogFactory.deploy(catalogSymbol, catalogType);
+  await catalogForWeapon.deployed();
+
+  // Soldier token
+  const soldier = <RMRKEquippableMock>await equipFactory.deploy();
+  await soldier.deployed();
+
+  // Weapon
+  const weapon = <RMRKEquippableMock>await equipFactory.deploy();
+  await weapon.deployed();
+
+  // Weapon Gem
+  const weaponGem = <RMRKEquippableMock>await equipFactory.deploy();
+  await weaponGem.deployed();
+
+  // Background
+  const background = <RMRKEquippableMock>await equipFactory.deploy();
+  await background.deployed();
+
+  await setupContextForSlots(
+    catalog,
+    catalogForWeapon,
+    soldier,
+    weapon,
+    weaponGem,
+    background,
+    mintFromMock,
+    nestMintFromMock,
+  );
+
+  return { catalog, soldier, weapon, weaponGem, background, view };
 }
 
 describe('Collection Utils', function () {
@@ -130,6 +196,119 @@ describe('Collection Utils', function () {
           true, // equippableToAll (set on beforeEach)
           partData1.metadataURI, // metadataURI
         ],
+      ],
+    ]);
+  });
+});
+
+describe('Collection Utils For Orphans', function () {
+  let catalog: Contract;
+  let soldier: Contract;
+  let weapon: Contract;
+  let background: Contract;
+  let catalogUtils: RMRKCatalogUtils;
+
+  let addrs: SignerWithAddress[];
+
+  let soldierID: BigNumber;
+  let soldierOwner: SignerWithAddress;
+  let weaponChildIndex = 0;
+  let backgroundChildIndex = 1;
+  let weaponResId = weaponAssetsEquip[0]; // This asset is assigned to weapon first weapon
+
+  beforeEach(async function () {
+    [, ...addrs] = await ethers.getSigners();
+
+    ({ catalogUtils } = await loadFixture(catalogUtilsFixture));
+    ({ catalog, soldier, weapon, background } = await loadFixture(slotsFixture));
+
+    soldierID = soldiersIds[0];
+    soldierOwner = addrs[0];
+
+    await soldier.connect(soldierOwner).equip({
+      tokenId: soldierID,
+      childIndex: weaponChildIndex,
+      assetId: soldierResId,
+      slotPartId: partIdForWeapon,
+      childAssetId: weaponResId,
+    });
+    await soldier.connect(soldierOwner).equip({
+      tokenId: soldierID,
+      childIndex: backgroundChildIndex,
+      assetId: soldierResId,
+      slotPartId: partIdForBackground,
+      childAssetId: backgroundAssetId,
+    });
+  });
+
+  it('can replace parent equipped asset and detect it as orphan', async function () {
+    // Weapon is child on index 0, background on index 1
+    const newSoldierResId = soldierResId + 1;
+    await soldier.addEquippableAssetEntry(newSoldierResId, 0, catalog.address, 'ipfs:soldier/', [
+      partIdForBody,
+      partIdForWeapon,
+      partIdForBackground,
+    ]);
+    await soldier.addAssetToToken(soldierID, newSoldierResId, soldierResId);
+    await soldier.connect(soldierOwner).acceptAsset(soldierID, 0, newSoldierResId);
+
+    // Children still marked as equipped, so the cannot be transferred
+    expect(await soldier.isChildEquipped(soldierID, weapon.address, weaponsIds[0])).to.eql(true);
+    expect(await soldier.isChildEquipped(soldierID, background.address, backgroundsIds[0])).to.eql(
+      true,
+    );
+
+    const equipments = await catalogUtils.getOrphanedEquipmentsFromParentAsset(
+      soldier.address,
+      soldierID,
+      catalog.address,
+      [partIdForBody, partIdForWeapon, partIdForBackground],
+    );
+
+    expect(equipments).to.eql([
+      [
+        bn(soldierResId),
+        bn(partIdForWeapon),
+        weapon.address,
+        weaponsIds[0],
+        bn(weaponAssetsEquip[0]),
+      ],
+      [
+        bn(soldierResId),
+        bn(partIdForBackground),
+        background.address,
+        backgroundsIds[0],
+        bn(backgroundAssetId),
+      ],
+    ]);
+  });
+
+  it('can replace child equipped asset and still unequip it', async function () {
+    // Weapon is child on index 0, background on index 1
+    const newWeaponAssetId = weaponAssetsEquip[0] + 10;
+    const weaponId = weaponsIds[0];
+    await weapon.addEquippableAssetEntry(
+      newWeaponAssetId,
+      1, // equippableGroupId
+      catalog.address,
+      'ipfs:weapon/new',
+      [],
+    );
+    await weapon.addAssetToToken(weaponId, newWeaponAssetId, weaponAssetsEquip[0]);
+    await weapon.connect(soldierOwner).acceptAsset(weaponId, 0, newWeaponAssetId);
+
+    // Children still marked as equipped, so it cannot be transferred or equip something else into the slot
+    expect(await soldier.isChildEquipped(soldierID, weapon.address, weaponsIds[0])).to.eql(true);
+
+    expect(
+      await catalogUtils.getOrphanedEquipmentFromChildAsset(soldier.address, soldierID),
+    ).to.eql([
+      [
+        bn(soldierResId),
+        bn(partIdForWeapon),
+        weapon.address,
+        weaponsIds[0],
+        bn(weaponAssetsEquip[0]),
       ],
     ]);
   });
