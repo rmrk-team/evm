@@ -493,7 +493,7 @@ function ownerOf(uint256 tokenId) external view returns (address owner_)
 
 Used to retrieve the *root* owner of a given token.
 
-*The *root* owner of the token is an externally owned account (EOA). If the given token is child of another  NFT, this will return an EOA address. Otherwise, if the token is owned by an EOA, this EOA wil be returned.*
+*The *root* owner of the token is an externally owned account (EOA). If the given token is child of another  NFT, this will return an EOA address. Otherwise, if the token is owned by an EOA, this EOA will be returned.*
 
 #### Parameters
 
