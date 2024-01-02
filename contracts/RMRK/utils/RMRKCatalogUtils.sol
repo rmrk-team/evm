@@ -144,7 +144,7 @@ contract RMRKCatalogUtils {
      * @param slotPartIds Array of slot part IDs of the parent token's assets to search for orphan equipments
      * @return equipments Array of extended equipment data structs containing the equipment data, including the slot part ID
      */
-    function getOrphanedEquipmentsFromParentAsset(
+    function getOrphanEquipmentsFromParentAsset(
         address parentAddress,
         uint256 parentId,
         address catalogAddress,
@@ -197,7 +197,7 @@ contract RMRKCatalogUtils {
      * @param parentId ID of the parent token
      * @return equipments Array of extended equipment data structs containing the equipment data, including the slot part ID
      */
-    function getOrphanedEquipmentFromChildAsset(
+    function getOrphanEquipmentsFromChildAsset(
         address parentAddress,
         uint256 parentId
     ) public view returns (ExtendedEquipment[] memory equipments) {

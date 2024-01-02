@@ -258,7 +258,7 @@ describe('Collection Utils For Orphans', function () {
       true,
     );
 
-    const equipments = await catalogUtils.getOrphanedEquipmentsFromParentAsset(
+    const equipments = await catalogUtils.getOrphanEquipmentsFromParentAsset(
       soldier.address,
       soldierID,
       catalog.address,
@@ -300,16 +300,16 @@ describe('Collection Utils For Orphans', function () {
     // Children still marked as equipped, so it cannot be transferred or equip something else into the slot
     expect(await soldier.isChildEquipped(soldierID, weapon.address, weaponsIds[0])).to.eql(true);
 
-    expect(
-      await catalogUtils.getOrphanedEquipmentFromChildAsset(soldier.address, soldierID),
-    ).to.eql([
+    expect(await catalogUtils.getOrphanEquipmentsFromChildAsset(soldier.address, soldierID)).to.eql(
       [
-        bn(soldierResId),
-        bn(partIdForWeapon),
-        weapon.address,
-        weaponsIds[0],
-        bn(weaponAssetsEquip[0]),
+        [
+          bn(soldierResId),
+          bn(partIdForWeapon),
+          weapon.address,
+          weaponsIds[0],
+          bn(weaponAssetsEquip[0]),
+        ],
       ],
-    ]);
+    );
   });
 });
