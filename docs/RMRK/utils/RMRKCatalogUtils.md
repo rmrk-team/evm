@@ -83,10 +83,10 @@ Used to get the extended part data of many parts from the specified catalog in a
 |---|---|---|
 | parts | RMRKCatalogUtils.ExtendedPart[] | Array of extended part data structs containing the part data |
 
-### getOrphanedEquipmentFromChildAsset
+### getOrphanEquipmentsFromChildAsset
 
 ```solidity
-function getOrphanedEquipmentFromChildAsset(address parentAddress, uint256 parentId) external view returns (struct RMRKCatalogUtils.ExtendedEquipment[] equipments)
+function getOrphanEquipmentsFromChildAsset(address parentAddress, uint256 parentId) external view returns (struct RMRKCatalogUtils.ExtendedEquipment[] equipments)
 ```
 
 Used to get data about children equipped to a specified token, where the child asset has been replaced.
@@ -106,10 +106,10 @@ Used to get data about children equipped to a specified token, where the child a
 |---|---|---|
 | equipments | RMRKCatalogUtils.ExtendedEquipment[] | Array of extended equipment data structs containing the equipment data, including the slot part ID |
 
-### getOrphanedEquipmentsFromParentAsset
+### getOrphanEquipmentsFromParentAsset
 
 ```solidity
-function getOrphanedEquipmentsFromParentAsset(address parentAddress, uint256 parentId, address catalogAddress, uint64[] slotPartIds) external view returns (struct RMRKCatalogUtils.ExtendedEquipment[] equipments)
+function getOrphanEquipmentsFromParentAsset(address parentAddress, uint256 parentId, address catalogAddress, uint64[] slotPartIds) external view returns (struct RMRKCatalogUtils.ExtendedEquipment[] equipments)
 ```
 
 Used to get data about children equipped to a specified token, where the parent asset has been replaced.
