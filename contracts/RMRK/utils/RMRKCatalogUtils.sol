@@ -18,7 +18,6 @@ import "../library/RMRKErrors.sol";
  */
 contract RMRKCatalogUtils {
     using RMRKLib for uint64[];
-    using RMRKLib for uint256[];
 
     /**
      * @notice Used to store the core structure of the `Equippable` RMRK lego.
