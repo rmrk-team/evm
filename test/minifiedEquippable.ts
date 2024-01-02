@@ -60,25 +60,13 @@ async function partsFixture() {
   const view = <RMRKEquipRenderUtils>await viewFactory.deploy();
   await view.deployed();
 
-  await setupContextForParts(catalog, neon, neon, mask, mask, mintFromMock, nestMintFromMock);
+  await setupContextForParts(catalog, neon, mask, mintFromMock, nestMintFromMock);
   return { catalog, neon, mask, view };
 }
 
 async function slotsFixture() {
   const catalogSymbol = 'SSC';
   const catalogType = 'mixed';
-
-  const soldierName = 'SnakeSoldier';
-  const soldierSymbol = 'SS';
-
-  const weaponName = 'SnakeWeapon';
-  const weaponSymbol = 'SW';
-
-  const weaponGemName = 'SnakeWeaponGem';
-  const weaponGemSymbol = 'SWG';
-
-  const backgroundName = 'SnakeBackground';
-  const backgroundSymbol = 'SB';
 
   const catalogFactory = await ethers.getContractFactory('RMRKCatalogImpl');
   const equipFactory = await ethers.getContractFactory('RMRKMinifiedEquippableMock');
@@ -114,12 +102,8 @@ async function slotsFixture() {
     catalog,
     catalogForWeapon,
     soldier,
-    soldier,
-    weapon,
     weapon,
     weaponGem,
-    weaponGem,
-    background,
     background,
     mintFromMock,
     nestMintFromMock,
@@ -153,9 +137,7 @@ describe('MinifiedEquippableMock with Fixed Parts', async () => {
 
     this.catalog = catalog;
     this.neon = neon;
-    this.neonEquip = neon;
     this.mask = mask;
-    this.maskEquip = mask;
     this.view = view;
   });
 
@@ -170,13 +152,9 @@ describe('MinifiedEquippableMock with Slot Parts', async () => {
 
     this.catalog = catalog;
     this.soldier = soldier;
-    this.soldierEquip = soldier;
     this.weapon = weapon;
-    this.weaponEquip = weapon;
     this.weaponGem = weaponGem;
-    this.weaponGemEquip = weaponGem;
     this.background = background;
-    this.backgroundEquip = background;
     this.view = view;
   });
 
