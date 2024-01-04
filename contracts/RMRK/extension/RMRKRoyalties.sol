@@ -84,7 +84,7 @@ abstract contract RMRKRoyalties {
         uint256 tokenId,
         uint256 salePrice
     ) external view virtual returns (address receiver, uint256 royaltyAmount) {
-        // tokenId is ignored as the royalty is the same for all tokens
+        uint256(tokenId); // Silence the warning about unused variable, needed for docs generation
         receiver = _royaltyRecipient;
         royaltyAmount = (salePrice * _royaltyPercentageBps) / 10000;
     }
