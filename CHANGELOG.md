@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.3.2] - 2024-01-04
+
+### Changed
+
+- Uses `msgSender()` instead of `msg.sender` where possible.
+- Uses explicit imports.
+- Removes several unused errors.
+- Uses named returns in most places.
+- Metadata updates from collection utils are now inspired by `ERC4906`
+- Updates configuration files to include more networks.
+- Improves docs for `directOwnerOf` method on `ERC7401`.
+- Adds methods to identify equipments where the parent or child asset was replaced.
+- Removes annoying warnings about unused variables.
+
 ## [2.3.1] - 2023-12-04
 
 ### Changed
