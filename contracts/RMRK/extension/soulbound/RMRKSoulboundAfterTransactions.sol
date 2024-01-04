@@ -47,7 +47,7 @@ abstract contract RMRKSoulboundAfterTransactions is RMRKSoulbound {
         address to,
         uint256 tokenId
     ) internal virtual {
-        // to
+        address(to); // Silence the warning about unused variable, needed for docs generation
         // We won't count minting:
         if (from != address(0)) {
             _transfersPerToken[tokenId]++;
