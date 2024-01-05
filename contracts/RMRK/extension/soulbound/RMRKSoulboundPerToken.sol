@@ -2,7 +2,8 @@
 
 pragma solidity ^0.8.21;
 
-import "./RMRKSoulbound.sol";
+import {IERC6454} from "./IERC6454.sol";
+import {RMRKSoulbound} from "./RMRKSoulbound.sol";
 
 /**
  * @title RMRKSoulboundPerToken
@@ -38,8 +39,8 @@ abstract contract RMRKSoulboundPerToken is RMRKSoulbound {
         uint256 tokenId,
         address from,
         address to
-    ) public view virtual override returns (bool) {
-        return (from == address(0) || // Exclude minting
+    ) public view virtual override returns (bool isTransferable_) {
+        isTransferable_ = (from == address(0) || // Exclude minting
             to == address(0) || // Exclude Burning
             !_isSoulbound[tokenId]);
     }

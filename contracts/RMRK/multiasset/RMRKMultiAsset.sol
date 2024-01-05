@@ -3,12 +3,12 @@
 
 pragma solidity ^0.8.21;
 
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
-import "@openzeppelin/contracts/utils/Address.sol";
-import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
-import "./AbstractMultiAsset.sol";
-import "../core/RMRKCore.sol";
+import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+import {IERC5773} from "./IERC5773.sol";
+import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import {IERC721Receiver} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
+import {AbstractMultiAsset} from "./AbstractMultiAsset.sol";
+import {RMRKCore} from "../core/RMRKCore.sol";
 import "../library/RMRKErrors.sol";
 
 /**
@@ -17,8 +17,6 @@ import "../library/RMRKErrors.sol";
  * @notice Smart contract of the RMRK Multi asset module.
  */
 contract RMRKMultiAsset is IERC165, IERC721, AbstractMultiAsset, RMRKCore {
-    using Address for address;
-
     // Mapping from token ID to owner address
     mapping(uint256 => address) private _owners;
 
@@ -43,7 +41,7 @@ contract RMRKMultiAsset is IERC165, IERC721, AbstractMultiAsset, RMRKCore {
      * @dev If the caller is not the owner or approved by the owner, the execution is reverted.
      * @param tokenId ID of the token being checked
      */
-    function _onlyApprovedOrOwner(uint256 tokenId) private view {
+    function _onlyApprovedOrOwner(uint256 tokenId) internal view {
         if (!_isApprovedOrOwner(_msgSender(), tokenId))
             revert ERC721NotApprovedOrOwner();
     }
@@ -85,7 +83,7 @@ contract RMRKMultiAsset is IERC165, IERC721, AbstractMultiAsset, RMRKCore {
      *  given token, the execution will be reverted.
      * @param tokenId ID of the token being checked
      */
-    function _onlyApprovedForAssetsOrOwner(uint256 tokenId) private view {
+    function _onlyApprovedForAssetsOrOwner(uint256 tokenId) internal view {
         if (!_isApprovedForAssetsOrOwner(_msgSender(), tokenId))
             revert RMRKNotApprovedForAssetsOrOwner();
     }
@@ -116,11 +114,13 @@ contract RMRKMultiAsset is IERC165, IERC721, AbstractMultiAsset, RMRKCore {
     /**
      * @notice Used to retrieve the number of tokens in ``owner``'s account.
      * @param owner Address of the account being checked
-     * @return The balance of the given account
+     * @return balance The balance of the given account
      */
-    function balanceOf(address owner) public view virtual returns (uint256) {
+    function balanceOf(
+        address owner
+    ) public view virtual returns (uint256 balance) {
         if (owner == address(0)) revert ERC721AddressZeroIsNotaValidOwner();
-        return _balances[owner];
+        balance = _balances[owner];
     }
 
     /**
@@ -129,12 +129,13 @@ contract RMRKMultiAsset is IERC165, IERC721, AbstractMultiAsset, RMRKCore {
      *
      *  - `tokenId` must exist.
      * @param tokenId ID of the token for which to retrieve the token for
-     * @return Address of the account owning the token
+     * @return owner Address of the account owning the token
      */
-    function ownerOf(uint256 tokenId) public view virtual returns (address) {
-        address owner = _owners[tokenId];
+    function ownerOf(
+        uint256 tokenId
+    ) public view virtual returns (address owner) {
+        owner = _owners[tokenId];
         if (owner == address(0)) revert ERC721InvalidTokenId();
-        return owner;
     }
 
     /**
@@ -166,14 +167,14 @@ contract RMRKMultiAsset is IERC165, IERC721, AbstractMultiAsset, RMRKCore {
      *
      *  - `tokenId` must exist.
      * @param tokenId ID of the token to check for approval
-     * @return Address of the account approved to manage the token
+     * @return approved Address of the account approved to manage the token
      */
     function getApproved(
         uint256 tokenId
-    ) public view virtual returns (address) {
+    ) public view virtual returns (address approved) {
         _requireMinted(tokenId);
 
-        return _tokenApprovals[tokenId];
+        approved = _tokenApprovals[tokenId];
     }
 
     /**
@@ -194,14 +195,14 @@ contract RMRKMultiAsset is IERC165, IERC721, AbstractMultiAsset, RMRKCore {
      * @notice Used to check if the given address is allowed to manage the tokens of the specified address.
      * @param owner Address of the owner of the tokens
      * @param operator Address being checked for approval
-     * @return A boolean value signifying whether the *operator* is allowed to manage the tokens of the *owner* (`true`)
+     * @return isApproved A boolean value signifying whether the *operator* is allowed to manage the tokens of the *owner* (`true`)
      *  or not (`false`)
      */
     function isApprovedForAll(
         address owner,
         address operator
-    ) public view virtual returns (bool) {
-        return _operatorApprovals[owner][operator];
+    ) public view virtual returns (bool isApproved) {
+        isApproved = _operatorApprovals[owner][operator];
     }
 
     /**
@@ -306,10 +307,12 @@ contract RMRKMultiAsset is IERC165, IERC721, AbstractMultiAsset, RMRKCore {
      * @dev Tokens can be managed by their owner or approved accounts via {approve} or {setApprovalForAll}.
      * @dev Tokens start existing when they are minted (`_mint`) and stop existing when they are burned (`_burn`).
      * @param tokenId ID of the token being checked
-     * @return A boolean value signifying whether the token exists
+     * @return exists A boolean value signifying whether the token exists
      */
-    function _exists(uint256 tokenId) internal view virtual returns (bool) {
-        return _owners[tokenId] != address(0);
+    function _exists(
+        uint256 tokenId
+    ) internal view virtual returns (bool exists) {
+        exists = _owners[tokenId] != address(0);
     }
 
     /**
@@ -482,15 +485,15 @@ contract RMRKMultiAsset is IERC165, IERC721, AbstractMultiAsset, RMRKCore {
      * @param to Yarget address that will receive the tokens
      * @param tokenId ID of the token to be transferred
      * @param data Optional data to send along with the call
-     * @return Boolean value signifying whether the call correctly returned the expected magic value
+     * @return valid Boolean value signifying whether the call correctly returned the expected magic value
      */
     function _checkOnERC721Received(
         address from,
         address to,
         uint256 tokenId,
         bytes memory data
-    ) private returns (bool) {
-        if (to.isContract()) {
+    ) private returns (bool valid) {
+        if (to.code.length != 0) {
             try
                 IERC721Receiver(to).onERC721Received(
                     _msgSender(),
@@ -499,7 +502,7 @@ contract RMRKMultiAsset is IERC165, IERC721, AbstractMultiAsset, RMRKCore {
                     data
                 )
             returns (bytes4 retval) {
-                return retval == IERC721Receiver.onERC721Received.selector;
+                valid = retval == IERC721Receiver.onERC721Received.selector;
             } catch (bytes memory reason) {
                 if (reason.length == uint256(0)) {
                     revert ERC721TransferToNonReceiverImplementer();
@@ -511,7 +514,7 @@ contract RMRKMultiAsset is IERC165, IERC721, AbstractMultiAsset, RMRKCore {
                 }
             }
         } else {
-            return true;
+            valid = true;
         }
     }
 
@@ -591,9 +594,9 @@ contract RMRKMultiAsset is IERC165, IERC721, AbstractMultiAsset, RMRKCore {
      */
     function getApprovedForAssets(
         uint256 tokenId
-    ) public view virtual returns (address) {
+    ) public view virtual returns (address approved) {
         _requireMinted(tokenId);
-        return _tokenApprovalsForAssets[tokenId];
+        approved = _tokenApprovalsForAssets[tokenId];
     }
 
     /**

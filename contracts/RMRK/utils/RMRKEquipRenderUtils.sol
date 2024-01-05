@@ -2,13 +2,14 @@
 
 pragma solidity ^0.8.21;
 
-import "./RMRKRenderUtils.sol";
-import "./RMRKMultiAssetRenderUtils.sol";
-import "./RMRKNestableRenderUtils.sol";
-import "../catalog/IRMRKCatalog.sol";
-import "../equippable/IERC6220.sol";
-import "../nestable/IERC7401.sol";
-import "../library/RMRKLib.sol";
+import {RMRKRenderUtils} from "./RMRKRenderUtils.sol";
+import {RMRKMultiAssetRenderUtils} from "./RMRKMultiAssetRenderUtils.sol";
+import {RMRKNestableRenderUtils} from "./RMRKNestableRenderUtils.sol";
+import {IRMRKCatalog} from "../catalog/IRMRKCatalog.sol";
+import {IERC6220} from "../equippable/IERC6220.sol";
+import {IERC7401} from "../nestable/IERC7401.sol";
+import {IERC5773} from "../multiasset/IERC5773.sol";
+import {RMRKLib} from "../library/RMRKLib.sol";
 import "../library/RMRKErrors.sol";
 
 /**
@@ -144,12 +145,17 @@ contract RMRKEquipRenderUtils is
      *  ]
      * @param target Address of the smart contract of the given token
      * @param tokenId ID of the token to retrieve the extended active assets for
-     * @return An array of ExtendedEquippableActiveAssets present on the given token
+     * @return activeAssets An array of ExtendedEquippableActiveAssets present on the given token
      */
     function getExtendedEquippableActiveAssets(
         address target,
         uint256 tokenId
-    ) public view virtual returns (ExtendedEquippableActiveAsset[] memory) {
+    )
+        public
+        view
+        virtual
+        returns (ExtendedEquippableActiveAsset[] memory activeAssets)
+    {
         IERC6220 target_ = IERC6220(target);
 
         uint64[] memory assets = target_.getActiveAssets(tokenId);
@@ -159,8 +165,7 @@ contract RMRKEquipRenderUtils is
             revert RMRKTokenHasNoAssets();
         }
 
-        ExtendedEquippableActiveAsset[]
-            memory activeAssets = new ExtendedEquippableActiveAsset[](len);
+        activeAssets = new ExtendedEquippableActiveAsset[](len);
 
         for (uint256 i; i < len; ) {
             (
@@ -205,12 +210,17 @@ contract RMRKEquipRenderUtils is
      *  ]
      * @param target Address of the smart contract of the given token
      * @param tokenId ID of the token to retrieve the extended pending assets for
-     * @return An array of ExtendedPendingAssets present on the given token
+     * @return pendingAssets An array of ExtendedPendingAssets present on the given token
      */
     function getExtendedPendingAssets(
         address target,
         uint256 tokenId
-    ) public view virtual returns (ExtendedPendingAsset[] memory) {
+    )
+        public
+        view
+        virtual
+        returns (ExtendedPendingAsset[] memory pendingAssets)
+    {
         IERC6220 target_ = IERC6220(target);
 
         uint64[] memory assets = target_.getPendingAssets(tokenId);
@@ -219,8 +229,7 @@ contract RMRKEquipRenderUtils is
             revert RMRKTokenHasNoAssets();
         }
 
-        ExtendedPendingAsset[]
-            memory pendingAssets = new ExtendedPendingAsset[](len);
+        pendingAssets = new ExtendedPendingAsset[](len);
         uint64 replacesAssetWithId;
         for (uint256 i; i < len; ) {
             (
@@ -432,7 +441,7 @@ contract RMRKEquipRenderUtils is
         uint256 totalChildAssets = IERC5773(targetChild)
             .getActiveAssets(childId)
             .length;
-        uint256 totalMatchesForAll = 0;
+        uint256 totalMatchesForAll;
 
         // This is the most valid asset combinations that can be made. When we know the real total we'll recreate it
         EquippableData[] memory allTempAssetsWithSlots = new EquippableData[](
@@ -450,7 +459,7 @@ contract RMRKEquipRenderUtils is
                 parentId,
                 parentAssets[0]
             );
-            uint totalMatchesForParentAsset = assetsWithSlotsForParentAsset
+            uint256 totalMatchesForParentAsset = assetsWithSlotsForParentAsset
                 .length;
 
             // We move them to the temporary array of all matches. Optionally filtering for onlyEquipped
@@ -526,6 +535,7 @@ contract RMRKEquipRenderUtils is
             targetChild,
             childId
         );
+
         childIndex = getChildIndex(
             parentAddress,
             parentId,
@@ -578,6 +588,7 @@ contract RMRKEquipRenderUtils is
             targetChild,
             childId
         );
+
         childIndex = getPendingChildIndex(
             parentAddress,
             parentId,
@@ -693,8 +704,7 @@ contract RMRKEquipRenderUtils is
                 IERC6220(childAddress),
                 childId,
                 parentSlotPartIds,
-                parentAddress,
-                parentAssetCatalog
+                parentAddress
             );
         // Finally, we copy the matches into the final array which has the right lenght according to results
         equippableData = new EquippableData[](totalMatches);
@@ -779,7 +789,6 @@ contract RMRKEquipRenderUtils is
      * @param childId ID of the child token whose assets will be matched against parent's slot parts
      * @param parentSlotPartIds Array of slot part IDs of the parent token's asset
      * @param parentAddress Address of the parent smart contract
-     * @param parentAssetCatalog Address of the parent asset's catalog
      * @return allAssetsWithSlots An array of `EquippableData` structs containing info about the equippable child assets
      *  and their corresponding slot parts
      * @return totalMatches Total of valid matches found
@@ -788,8 +797,7 @@ contract RMRKEquipRenderUtils is
         IERC6220 childContract,
         uint256 childId,
         uint64[] memory parentSlotPartIds,
-        address parentAddress,
-        address parentAssetCatalog
+        address parentAddress
     )
         private
         view
@@ -809,9 +817,8 @@ contract RMRKEquipRenderUtils is
         allAssetsWithSlots = new EquippableData[](totalChildAssets);
 
         for (uint256 i; i < totalChildAssets; ) {
-            (, , address catalogAddress, ) = childContract
-                .getAssetAndEquippableData(childId, childAssets[i]);
-            for (uint256 j; j < parentSlotPartIds.length; ) {
+            uint256 slotsLength = parentSlotPartIds.length;
+            for (uint256 j; j < slotsLength; ) {
                 if (
                     childContract.canTokenBeEquippedWithAssetIntoSlot(
                         parentAddress,
@@ -1019,10 +1026,14 @@ contract RMRKEquipRenderUtils is
         for (uint256 i; i < numParts; ) {
             if (allParts[i].itemType == IRMRKCatalog.ItemType.Fixed) {
                 fixedPartIds[fixedPartsIndex] = allPartIds[i];
-                fixedPartsIndex += 1;
+                unchecked {
+                    ++fixedPartsIndex;
+                }
             } else if (allParts[i].itemType == IRMRKCatalog.ItemType.Slot) {
                 slotPartIds[slotPartsIndex] = allPartIds[i];
-                slotPartsIndex += 1;
+                unchecked {
+                    ++slotPartsIndex;
+                }
             }
             unchecked {
                 ++i;
@@ -1039,19 +1050,22 @@ contract RMRKEquipRenderUtils is
      *  ]
      * @param parentAddress Address of the collection smart contract of the parent token
      * @param parentId ID of the parent token
-     * @return An array of `ChildWithTopAssetMetadata` structs representing the children with their top asset metadata
+     * @return childrenWithMetadata An array of `ChildWithTopAssetMetadata` structs representing the children with their top asset metadata
      */
     function getChildrenWithTopMetadata(
         address parentAddress,
         uint256 parentId
-    ) public view returns (ChildWithTopAssetMetadata[] memory) {
+    )
+        public
+        view
+        returns (ChildWithTopAssetMetadata[] memory childrenWithMetadata)
+    {
         IERC7401.Child[] memory children = IERC7401(parentAddress).childrenOf(
             parentId
         );
         (parentId);
         uint256 len = children.length;
-        ChildWithTopAssetMetadata[]
-            memory childrenWithMetadata = new ChildWithTopAssetMetadata[](len);
+        childrenWithMetadata = new ChildWithTopAssetMetadata[](len);
 
         for (uint256 i; i < len; ) {
             string memory meta = getTopAssetMetaForToken(

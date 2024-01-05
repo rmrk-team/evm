@@ -13,10 +13,10 @@ Smart contract of the RMRK Equippable module, without utility internal functions
 ### RMRK_INTERFACE
 
 ```solidity
-function RMRK_INTERFACE() external view returns (bytes4)
+function RMRK_INTERFACE() external pure returns (bytes4 rmrkInterface)
 ```
 
-
+Interface identifier of the @rmrk-team/evm-contracts package
 
 
 
@@ -25,12 +25,12 @@ function RMRK_INTERFACE() external view returns (bytes4)
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bytes4 | undefined |
+| rmrkInterface | bytes4 | Interface identifier for implementations of the @rmrk-team/evm-contracts package |
 
 ### VERSION
 
 ```solidity
-function VERSION() external view returns (string)
+function VERSION() external pure returns (string version)
 ```
 
 Version of the @rmrk-team/evm-contracts package
@@ -42,7 +42,7 @@ Version of the @rmrk-team/evm-contracts package
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | undefined |
+| version | string | Version identifier for implementations of the @rmrk-team/evm-contracts package |
 
 ### acceptAsset
 
@@ -136,7 +136,7 @@ Used to grant approvals for specific tokens to a specified address.
 ### balanceOf
 
 ```solidity
-function balanceOf(address owner) external view returns (uint256)
+function balanceOf(address owner) external view returns (uint256 balance)
 ```
 
 Used to retrieve the number of tokens in `owner`&#39;s account.
@@ -153,7 +153,7 @@ Used to retrieve the number of tokens in `owner`&#39;s account.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | The balance of the given account |
+| balance | uint256 | The balance of the given account |
 
 ### burn
 
@@ -174,7 +174,7 @@ Used to burn a given token.
 ### burn
 
 ```solidity
-function burn(uint256 tokenId, uint256 maxChildrenBurns) external nonpayable returns (uint256)
+function burn(uint256 tokenId, uint256 maxChildrenBurns) external nonpayable returns (uint256 burnedChildren)
 ```
 
 Used to burn a given token.
@@ -192,12 +192,12 @@ Used to burn a given token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | Number of recursively burned children |
+| burnedChildren | uint256 | Number of recursively burned children |
 
 ### canTokenBeEquippedWithAssetIntoSlot
 
 ```solidity
-function canTokenBeEquippedWithAssetIntoSlot(address parent, uint256 tokenId, uint64 assetId, uint64 slotId) external view returns (bool)
+function canTokenBeEquippedWithAssetIntoSlot(address parent, uint256 tokenId, uint64 assetId, uint64 slotId) external view returns (bool canBeEquipped)
 ```
 
 Used to verify whether a token can be equipped into a given parent&#39;s slot.
@@ -217,12 +217,12 @@ Used to verify whether a token can be equipped into a given parent&#39;s slot.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | A boolean indicating whether the token with the given asset can be equipped into the desired slot |
+| canBeEquipped | bool | A boolean indicating whether the token with the given asset can be equipped into the desired slot |
 
 ### childOf
 
 ```solidity
-function childOf(uint256 parentId, uint256 index) external view returns (struct IERC7401.Child)
+function childOf(uint256 parentId, uint256 index) external view returns (struct IERC7401.Child child)
 ```
 
 Used to retrieve a specific active child token for a given parent token.
@@ -240,12 +240,12 @@ Used to retrieve a specific active child token for a given parent token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IERC7401.Child | A Child struct containing data about the specified child |
+| child | IERC7401.Child | A Child struct containing data about the specified child |
 
 ### childrenOf
 
 ```solidity
-function childrenOf(uint256 parentId) external view returns (struct IERC7401.Child[])
+function childrenOf(uint256 parentId) external view returns (struct IERC7401.Child[] children)
 ```
 
 Used to retrieve the active child tokens of a given parent token.
@@ -262,12 +262,12 @@ Used to retrieve the active child tokens of a given parent token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IERC7401.Child[] | An array of Child structs containing the parent token&#39;s active child tokens |
+| children | IERC7401.Child[] | An array of Child structs containing the parent token&#39;s active child tokens |
 
 ### directOwnerOf
 
 ```solidity
-function directOwnerOf(uint256 tokenId) external view returns (address, uint256, bool)
+function directOwnerOf(uint256 tokenId) external view returns (address owner_, uint256 parentId, bool isNFT)
 ```
 
 Used to retrieve the immediate owner of the given token.
@@ -284,9 +284,9 @@ Used to retrieve the immediate owner of the given token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | address | Address of the given token&#39;s owner |
-| _1 | uint256 | The ID of the parent token. Should be `0` if the owner is an externally owned account |
-| _2 | bool | The boolean value signifying whether the owner is an NFT or not |
+| owner_ | address | Address of the given token&#39;s owner |
+| parentId | uint256 | The ID of the parent token. Should be `0` if the owner is an externally owned account |
+| isNFT | bool | The boolean value signifying whether the owner is an NFT or not |
 
 ### equip
 
@@ -307,7 +307,7 @@ function equip(IERC6220.IntakeEquip data) external nonpayable
 ### getActiveAssetPriorities
 
 ```solidity
-function getActiveAssetPriorities(uint256 tokenId) external view returns (uint64[])
+function getActiveAssetPriorities(uint256 tokenId) external view returns (uint64[] priorities)
 ```
 
 Used to retrieve the priorities of the active resoources of a given token.
@@ -324,12 +324,12 @@ Used to retrieve the priorities of the active resoources of a given token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint64[] | An array of priorities of the active assets of the given token |
+| priorities | uint64[] | An array of priorities of the active assets of the given token |
 
 ### getActiveAssets
 
 ```solidity
-function getActiveAssets(uint256 tokenId) external view returns (uint64[])
+function getActiveAssets(uint256 tokenId) external view returns (uint64[] assetIds)
 ```
 
 Used to retrieve IDs of the active assets of given token.
@@ -346,12 +346,12 @@ Used to retrieve IDs of the active assets of given token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint64[] | An array of active asset IDs of the given token |
+| assetIds | uint64[] | An array of active asset IDs of the given token |
 
 ### getApproved
 
 ```solidity
-function getApproved(uint256 tokenId) external view returns (address)
+function getApproved(uint256 tokenId) external view returns (address approved)
 ```
 
 Used to retrieve the account approved to manage given token.
@@ -368,12 +368,12 @@ Used to retrieve the account approved to manage given token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | address | Address of the account approved to manage the token |
+| approved | address | Address of the account approved to manage the token |
 
 ### getApprovedForAssets
 
 ```solidity
-function getApprovedForAssets(uint256 tokenId) external view returns (address)
+function getApprovedForAssets(uint256 tokenId) external view returns (address approved)
 ```
 
 Used to get the address of the user that is approved to manage the specified token from the current  owner.
@@ -390,12 +390,12 @@ Used to get the address of the user that is approved to manage the specified tok
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | address | Address of the account that is approved to manage the token |
+| approved | address | Address of the account that is approved to manage the token |
 
 ### getAssetAndEquippableData
 
 ```solidity
-function getAssetAndEquippableData(uint256 tokenId, uint64 assetId) external view returns (string, uint64, address, uint64[])
+function getAssetAndEquippableData(uint256 tokenId, uint64 assetId) external view returns (string metadataURI, uint64 equippableGroupId, address catalogAddress, uint64[] partIds)
 ```
 
 Used to get the asset and equippable data associated with given `assetId`.
@@ -413,15 +413,15 @@ Used to get the asset and equippable data associated with given `assetId`.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | The metadata URI of the asset |
-| _1 | uint64 | ID of the equippable group this asset belongs to |
-| _2 | address | The address of the catalog the part belongs to |
-| _3 | uint64[] | An array of IDs of parts included in the asset |
+| metadataURI | string | The metadata URI of the asset |
+| equippableGroupId | uint64 | ID of the equippable group this asset belongs to |
+| catalogAddress | address | The address of the catalog the part belongs to |
+| partIds | uint64[] | An array of IDs of parts included in the asset |
 
 ### getAssetMetadata
 
 ```solidity
-function getAssetMetadata(uint256 tokenId, uint64 assetId) external view returns (string)
+function getAssetMetadata(uint256 tokenId, uint64 assetId) external view returns (string metadata)
 ```
 
 Used to fetch the asset metadata of the specified token&#39;s active asset with the given index.
@@ -439,12 +439,12 @@ Used to fetch the asset metadata of the specified token&#39;s active asset with 
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | The metadata of the asset belonging to the specified index in the token&#39;s active assets  array |
+| metadata | string | The metadata of the asset belonging to the specified index in the token&#39;s active assets  array |
 
 ### getAssetReplacements
 
 ```solidity
-function getAssetReplacements(uint256 tokenId, uint64 newAssetId) external view returns (uint64)
+function getAssetReplacements(uint256 tokenId, uint64 newAssetId) external view returns (uint64 replacedAssetId)
 ```
 
 Used to retrieve the asset that will be replaced if a given asset from the token&#39;s pending array  is accepted.
@@ -462,12 +462,12 @@ Used to retrieve the asset that will be replaced if a given asset from the token
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint64 | ID of the asset which will be replaced |
+| replacedAssetId | uint64 | ID of the asset which will be replaced |
 
 ### getEquipment
 
 ```solidity
-function getEquipment(uint256 tokenId, address targetCatalogAddress, uint64 slotPartId) external view returns (struct IERC6220.Equipment)
+function getEquipment(uint256 tokenId, address targetCatalogAddress, uint64 slotPartId) external view returns (struct IERC6220.Equipment equipment)
 ```
 
 Used to get the Equipment object equipped into the specified slot of the desired token.
@@ -486,12 +486,12 @@ Used to get the Equipment object equipped into the specified slot of the desired
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IERC6220.Equipment | The `Equipment` struct containing data about the equipped object |
+| equipment | IERC6220.Equipment | The `Equipment` struct containing data about the equipped object |
 
 ### getPendingAssets
 
 ```solidity
-function getPendingAssets(uint256 tokenId) external view returns (uint64[])
+function getPendingAssets(uint256 tokenId) external view returns (uint64[] assetIds)
 ```
 
 Used to retrieve IDs of the pending assets of given token.
@@ -508,12 +508,12 @@ Used to retrieve IDs of the pending assets of given token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint64[] | An array of pending asset IDs of the given token |
+| assetIds | uint64[] | An array of pending asset IDs of the given token |
 
 ### isApprovedForAll
 
 ```solidity
-function isApprovedForAll(address owner, address operator) external view returns (bool)
+function isApprovedForAll(address owner, address operator) external view returns (bool isApproved)
 ```
 
 Used to check if the given address is allowed to manage the tokens of the specified address.
@@ -531,12 +531,12 @@ Used to check if the given address is allowed to manage the tokens of the specif
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | A boolean value signifying whether the *operator* is allowed to manage the tokens of the *owner* (`true`)  or not (`false`) |
+| isApproved | bool | A boolean value signifying whether the *operator* is allowed to manage the tokens of the *owner* (`true`)  or not (`false`) |
 
 ### isApprovedForAllForAssets
 
 ```solidity
-function isApprovedForAllForAssets(address owner, address operator) external view returns (bool)
+function isApprovedForAllForAssets(address owner, address operator) external view returns (bool isApproved)
 ```
 
 Used to check whether the address has been granted the operator role by a given address or not.
@@ -554,12 +554,12 @@ Used to check whether the address has been granted the operator role by a given 
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | A boolean value indicating wehter the account we are checking has been granted the operator role |
+| isApproved | bool | A boolean value indicating whether the account we are checking has been granted the operator role |
 
 ### isChildEquipped
 
 ```solidity
-function isChildEquipped(uint256 tokenId, address childAddress, uint256 childId) external view returns (bool)
+function isChildEquipped(uint256 tokenId, address childAddress, uint256 childId) external view returns (bool isEquipped)
 ```
 
 Used to check whether the token has a given child equipped.
@@ -578,7 +578,7 @@ Used to check whether the token has a given child equipped.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | A boolean value indicating whether the child token is equipped into the given token or not |
+| isEquipped | bool | A boolean value indicating whether the child token is equipped into the given token or not |
 
 ### nestTransferFrom
 
@@ -603,12 +603,12 @@ Used to transfer the token into another token.
 ### ownerOf
 
 ```solidity
-function ownerOf(uint256 tokenId) external view returns (address)
+function ownerOf(uint256 tokenId) external view returns (address owner_)
 ```
 
 Used to retrieve the *root* owner of a given token.
 
-*The *root* owner of the token is an externally owned account (EOA). If the given token is child of another  NFT, this will return an EOA address. Otherwise, if the token is owned by an EOA, this EOA wil be returned.*
+*The *root* owner of the token is an externally owned account (EOA). If the given token is child of another  NFT, this will return an EOA address. Otherwise, if the token is owned by an EOA, this EOA will be returned.*
 
 #### Parameters
 
@@ -620,12 +620,12 @@ Used to retrieve the *root* owner of a given token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | address | The *root* owner of the token |
+| owner_ | address | The *root* owner of the token |
 
 ### pendingChildOf
 
 ```solidity
-function pendingChildOf(uint256 parentId, uint256 index) external view returns (struct IERC7401.Child)
+function pendingChildOf(uint256 parentId, uint256 index) external view returns (struct IERC7401.Child child)
 ```
 
 Used to retrieve a specific pending child token from a given parent token.
@@ -643,12 +643,12 @@ Used to retrieve a specific pending child token from a given parent token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IERC7401.Child | A Child struct containting data about the specified child |
+| child | IERC7401.Child | A Child struct containting data about the specified child |
 
 ### pendingChildrenOf
 
 ```solidity
-function pendingChildrenOf(uint256 parentId) external view returns (struct IERC7401.Child[])
+function pendingChildrenOf(uint256 parentId) external view returns (struct IERC7401.Child[] children)
 ```
 
 Used to retrieve the pending child tokens of a given parent token.
@@ -665,7 +665,7 @@ Used to retrieve the pending child tokens of a given parent token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IERC7401.Child[] | An array of Child structs containing the parent token&#39;s pending child tokens |
+| children | IERC7401.Child[] | An array of Child structs containing the parent token&#39;s pending child tokens |
 
 ### rejectAllAssets
 
@@ -1321,6 +1321,17 @@ error ERC721TransferToTheZeroAddress()
 ```
 
 Attempting to transfer the token to a 0x0 address
+
+
+
+
+### IndexOutOfBounds
+
+```solidity
+error IndexOutOfBounds()
+```
+
+
 
 
 

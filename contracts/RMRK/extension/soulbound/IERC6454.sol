@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.21;
 
-import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 
 /**
  * @title IERC6454
@@ -18,11 +18,11 @@ interface IERC6454 is IERC165 {
      * @param tokenId ID of the token being checked
      * @param from Address from which the token is being transferred
      * @param to Address to which the token is being transferred
-     * @return Boolean value indicating whether the given token is transferable
+     * @return isTransferable_ Boolean value indicating whether the given token is transferable
      */
     function isTransferable(
         uint256 tokenId,
         address from,
         address to
-    ) external view returns (bool);
+    ) external view returns (bool isTransferable_);
 }

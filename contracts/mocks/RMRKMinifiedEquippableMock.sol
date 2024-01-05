@@ -2,9 +2,7 @@
 
 pragma solidity ^0.8.21;
 
-import "../RMRK/equippable/RMRKMinifiedEquippable.sol";
-
-/* import "hardhat/console.sol"; */
+import {RMRKMinifiedEquippable} from "../RMRK/equippable/RMRKMinifiedEquippable.sol";
 
 //Minimal public implementation of RMRKEquippable for testing.
 contract RMRKMinifiedEquippableMock is RMRKMinifiedEquippable {

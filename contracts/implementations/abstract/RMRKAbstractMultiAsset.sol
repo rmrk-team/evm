@@ -2,9 +2,11 @@
 
 pragma solidity ^0.8.21;
 
-import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
-import "../../RMRK/multiasset/RMRKMultiAsset.sol";
-import "../utils/RMRKImplementationBase.sol";
+import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+import {IERC2981} from "@openzeppelin/contracts/interfaces/IERC2981.sol";
+import {IERC721Metadata} from "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
+import {RMRKMultiAsset} from "../../RMRK/multiasset/RMRKMultiAsset.sol";
+import {RMRKImplementationBase} from "../utils/RMRKImplementationBase.sol";
 
 /**
  * @title RMRKAbstractMultiAsset
@@ -37,16 +39,16 @@ abstract contract RMRKAbstractMultiAsset is
      * @notice Used to add a asset entry.
      * @dev The ID of the asset is automatically assigned to be the next available asset ID.
      * @param metadataURI Metadata URI of the asset
-     * @return ID of the newly added asset
+     * @return assetId The ID of the newly added asset
      */
     function addAssetEntry(
         string memory metadataURI
-    ) public virtual onlyOwnerOrContributor returns (uint256) {
+    ) public virtual onlyOwnerOrContributor returns (uint256 assetId) {
         unchecked {
             ++_totalAssets;
         }
         _addAssetEntry(uint64(_totalAssets), metadataURI);
-        return _totalAssets;
+        assetId = _totalAssets;
     }
 
     /**
@@ -70,7 +72,7 @@ abstract contract RMRKAbstractMultiAsset is
             super.supportsInterface(interfaceId) ||
             interfaceId == type(IERC2981).interfaceId ||
             interfaceId == type(IERC721Metadata).interfaceId ||
-            interfaceId == RMRK_INTERFACE;
+            interfaceId == RMRK_INTERFACE();
     }
 
     function _beforeTokenTransfer(

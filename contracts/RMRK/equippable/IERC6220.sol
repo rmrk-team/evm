@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.21;
 
-import "../multiasset/IERC5773.sol";
+import {IERC5773} from "../multiasset/IERC5773.sol";
 
 /**
  * @title IERC6220
@@ -127,13 +127,13 @@ interface IERC6220 is IERC5773 {
      * @param tokenId ID of the parent token for which we are querying for
      * @param childAddress Address of the child token's smart contract
      * @param childId ID of the child token
-     * @return A boolean value indicating whether the child token is equipped into the given token or not
+     * @return isEquipped A boolean value indicating whether the child token is equipped into the given token or not
      */
     function isChildEquipped(
         uint256 tokenId,
         address childAddress,
         uint256 childId
-    ) external view returns (bool);
+    ) external view returns (bool isEquipped);
 
     /**
      * @notice Used to verify whether a token can be equipped into a given parent's slot.
@@ -141,14 +141,14 @@ interface IERC6220 is IERC5773 {
      * @param tokenId ID of the token we want to equip
      * @param assetId ID of the asset associated with the token we want to equip
      * @param slotId ID of the slot that we want to equip the token into
-     * @return A boolean indicating whether the token with the given asset can be equipped into the desired slot
+     * @return canBeEquipped A boolean indicating whether the token with the given asset can be equipped into the desired slot
      */
     function canTokenBeEquippedWithAssetIntoSlot(
         address parent,
         uint256 tokenId,
         uint64 assetId,
         uint64 slotId
-    ) external view returns (bool);
+    ) external view returns (bool canBeEquipped);
 
     /**
      * @notice Used to get the Equipment object equipped into the specified slot of the desired token.
@@ -162,13 +162,13 @@ interface IERC6220 is IERC5773 {
      * @param tokenId ID of the token for which we are retrieving the equipped object
      * @param targetCatalogAddress Address of the `Catalog` associated with the `Slot` part of the token
      * @param slotPartId ID of the `Slot` part that we are checking for equipped objects
-     * @return The `Equipment` struct containing data about the equipped object
+     * @return equipment The `Equipment` struct containing data about the equipped object
      */
     function getEquipment(
         uint256 tokenId,
         address targetCatalogAddress,
         uint64 slotPartId
-    ) external view returns (Equipment memory);
+    ) external view returns (Equipment memory equipment);
 
     /**
      * @notice Used to get the asset and equippable data associated with given `assetId`.

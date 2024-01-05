@@ -13,10 +13,10 @@ Smart contract of the RMRK Reclaimable child module.
 ### RMRK_INTERFACE
 
 ```solidity
-function RMRK_INTERFACE() external view returns (bytes4)
+function RMRK_INTERFACE() external pure returns (bytes4 rmrkInterface)
 ```
 
-
+Interface identifier of the @rmrk-team/evm-contracts package
 
 
 
@@ -25,12 +25,12 @@ function RMRK_INTERFACE() external view returns (bytes4)
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bytes4 | undefined |
+| rmrkInterface | bytes4 | Interface identifier for implementations of the @rmrk-team/evm-contracts package |
 
 ### VERSION
 
 ```solidity
-function VERSION() external view returns (string)
+function VERSION() external pure returns (string version)
 ```
 
 Version of the @rmrk-team/evm-contracts package
@@ -42,7 +42,7 @@ Version of the @rmrk-team/evm-contracts package
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | undefined |
+| version | string | Version identifier for implementations of the @rmrk-team/evm-contracts package |
 
 ### acceptChild
 
@@ -101,7 +101,7 @@ Used to grant a one-time approval to manage one&#39;s token.
 ### balanceOf
 
 ```solidity
-function balanceOf(address owner) external view returns (uint256)
+function balanceOf(address owner) external view returns (uint256 balance)
 ```
 
 Used to retrieve the number of tokens in `owner`&#39;s account.
@@ -118,7 +118,7 @@ Used to retrieve the number of tokens in `owner`&#39;s account.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | The balance of the given account |
+| balance | uint256 | The balance of the given account |
 
 ### burn
 
@@ -139,7 +139,7 @@ Used to burn a given token.
 ### burn
 
 ```solidity
-function burn(uint256 tokenId, uint256 maxChildrenBurns) external nonpayable returns (uint256)
+function burn(uint256 tokenId, uint256 maxChildrenBurns) external nonpayable returns (uint256 burnedChildren)
 ```
 
 Used to burn a given token.
@@ -157,12 +157,12 @@ Used to burn a given token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | Number of recursively burned children |
+| burnedChildren | uint256 | Number of recursively burned children |
 
 ### childOf
 
 ```solidity
-function childOf(uint256 parentId, uint256 index) external view returns (struct IERC7401.Child)
+function childOf(uint256 parentId, uint256 index) external view returns (struct IERC7401.Child child)
 ```
 
 Used to retrieve a specific active child token for a given parent token.
@@ -180,12 +180,12 @@ Used to retrieve a specific active child token for a given parent token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IERC7401.Child | A Child struct containing data about the specified child |
+| child | IERC7401.Child | A Child struct containing data about the specified child |
 
 ### childrenOf
 
 ```solidity
-function childrenOf(uint256 parentId) external view returns (struct IERC7401.Child[])
+function childrenOf(uint256 parentId) external view returns (struct IERC7401.Child[] children)
 ```
 
 Used to retrieve the active child tokens of a given parent token.
@@ -202,12 +202,12 @@ Used to retrieve the active child tokens of a given parent token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IERC7401.Child[] | An array of Child structs containing the parent token&#39;s active child tokens |
+| children | IERC7401.Child[] | An array of Child structs containing the parent token&#39;s active child tokens |
 
 ### directOwnerOf
 
 ```solidity
-function directOwnerOf(uint256 tokenId) external view returns (address, uint256, bool)
+function directOwnerOf(uint256 tokenId) external view returns (address owner_, uint256 parentId, bool isNFT)
 ```
 
 Used to retrieve the immediate owner of the given token.
@@ -224,14 +224,14 @@ Used to retrieve the immediate owner of the given token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | address | Address of the given token&#39;s owner |
-| _1 | uint256 | The ID of the parent token. Should be `0` if the owner is an externally owned account |
-| _2 | bool | The boolean value signifying whether the owner is an NFT or not |
+| owner_ | address | Address of the given token&#39;s owner |
+| parentId | uint256 | The ID of the parent token. Should be `0` if the owner is an externally owned account |
+| isNFT | bool | The boolean value signifying whether the owner is an NFT or not |
 
 ### getApproved
 
 ```solidity
-function getApproved(uint256 tokenId) external view returns (address)
+function getApproved(uint256 tokenId) external view returns (address approved)
 ```
 
 Used to retrieve the account approved to manage given token.
@@ -248,12 +248,12 @@ Used to retrieve the account approved to manage given token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | address | Address of the account approved to manage the token |
+| approved | address | Address of the account approved to manage the token |
 
 ### isApprovedForAll
 
 ```solidity
-function isApprovedForAll(address owner, address operator) external view returns (bool)
+function isApprovedForAll(address owner, address operator) external view returns (bool isApproved)
 ```
 
 Used to check if the given address is allowed to manage the tokens of the specified address.
@@ -271,7 +271,7 @@ Used to check if the given address is allowed to manage the tokens of the specif
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | A boolean value signifying whether the *operator* is allowed to manage the tokens of the *owner* (`true`)  or not (`false`) |
+| isApproved | bool | A boolean value signifying whether the *operator* is allowed to manage the tokens of the *owner* (`true`)  or not (`false`) |
 
 ### nestTransferFrom
 
@@ -296,12 +296,12 @@ Used to transfer the token into another token.
 ### ownerOf
 
 ```solidity
-function ownerOf(uint256 tokenId) external view returns (address)
+function ownerOf(uint256 tokenId) external view returns (address owner_)
 ```
 
 Used to retrieve the *root* owner of a given token.
 
-*The *root* owner of the token is an externally owned account (EOA). If the given token is child of another  NFT, this will return an EOA address. Otherwise, if the token is owned by an EOA, this EOA wil be returned.*
+*The *root* owner of the token is an externally owned account (EOA). If the given token is child of another  NFT, this will return an EOA address. Otherwise, if the token is owned by an EOA, this EOA will be returned.*
 
 #### Parameters
 
@@ -313,12 +313,12 @@ Used to retrieve the *root* owner of a given token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | address | The *root* owner of the token |
+| owner_ | address | The *root* owner of the token |
 
 ### pendingChildOf
 
 ```solidity
-function pendingChildOf(uint256 parentId, uint256 index) external view returns (struct IERC7401.Child)
+function pendingChildOf(uint256 parentId, uint256 index) external view returns (struct IERC7401.Child child)
 ```
 
 Used to retrieve a specific pending child token from a given parent token.
@@ -336,12 +336,12 @@ Used to retrieve a specific pending child token from a given parent token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IERC7401.Child | A Child struct containting data about the specified child |
+| child | IERC7401.Child | A Child struct containting data about the specified child |
 
 ### pendingChildrenOf
 
 ```solidity
-function pendingChildrenOf(uint256 parentId) external view returns (struct IERC7401.Child[])
+function pendingChildrenOf(uint256 parentId) external view returns (struct IERC7401.Child[] children)
 ```
 
 Used to retrieve the pending child tokens of a given parent token.
@@ -358,7 +358,7 @@ Used to retrieve the pending child tokens of a given parent token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IERC7401.Child[] | An array of Child structs containing the parent token&#39;s pending child tokens |
+| children | IERC7401.Child[] | An array of Child structs containing the parent token&#39;s pending child tokens |
 
 ### reclaimChild
 

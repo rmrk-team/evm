@@ -18,4 +18,6 @@ interface IRMRKCollectionData {
     function symbol() external view returns (string memory);
 
     function collectionMetadata() external view returns (string memory);
+
+    function contractURI() external view returns (string memory);
 }

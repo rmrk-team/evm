@@ -83,6 +83,79 @@ Used to get a list of existing token IDs in the range between `pageStart` and `p
 |---|---|---|
 | page | uint256[] | An array of IDs of the existing tokens |
 
+### refreshCollectionTokensMetadata
+
+```solidity
+function refreshCollectionTokensMetadata(address collectionAddress, uint256 fromTokenId, uint256 toTokenId) external nonpayable
+```
+
+Triggers an event to refresh the collection metadata.
+
+*It will do nothing if the given collection address is not a contract.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| collectionAddress | address | Address of the collection to refresh the metadata from |
+| fromTokenId | uint256 | ID of the first token to refresh the metadata from |
+| toTokenId | uint256 | ID of the last token to refresh the metadata from |
+
+### refreshTokenMetadata
+
+```solidity
+function refreshTokenMetadata(address collectionAddress, uint256 tokenId) external nonpayable
+```
+
+Triggers an event to refresh the token metadata.
+
+*It will do nothing if the given collection address is not a contract.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| collectionAddress | address | Address of the collection to refresh the metadata from |
+| tokenId | uint256 | ID of the token to refresh the metadata from |
+
+
+
+## Events
+
+### BatchMetadataUpdate
+
+```solidity
+event BatchMetadataUpdate(address indexed collection, uint256 indexed fromTokenId, uint256 indexed toTokenId)
+```
+
+This event emits when the metadata of a range of tokens is changed. So that the third-party platforms such as NFT market could timely update the images and related attributes of the NFTs. Inspired on ERC4906, but adding collection.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| collection `indexed` | address | Address of the collection to emit the event from |
+| fromTokenId `indexed` | uint256 | ID of the first token to emit the event from |
+| toTokenId `indexed` | uint256 | ID of the last token to emit the event from |
+
+### MetadataUpdate
+
+```solidity
+event MetadataUpdate(address indexed collection, uint256 indexed tokenId)
+```
+
+This event emits when the metadata of a token is changed. So that the third-party platforms such as NFT market could timely update the images and related attributes of the NFT. Inspired on ERC4906, but adding collection.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| collection `indexed` | address | Address of the collection to emit the event from |
+| tokenId `indexed` | uint256 | ID of the token to emit the event from |
 
 
 

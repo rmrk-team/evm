@@ -11,22 +11,25 @@ interface IERC20 {
      * @notice Used to transfer tokens from the caller's account to another.
      * @param to Address of the account to which the tokens are being transferred
      * @param amount Amount of tokens that are being transferred
-     * @return A boolean value signifying whether the transfer was succesfull (`true`) or not (`false`)
+     * @return success A boolean value signifying whether the transfer was succesful (`true`) or not (`false`)
      */
-    function transfer(address to, uint256 amount) external returns (bool);
+    function transfer(
+        address to,
+        uint256 amount
+    ) external returns (bool success);
 
     /**
      * @notice Used to transfer tokens from one address to another.
      * @param from Address of the account from which the the tokens are being transferred
      * @param to Address of the account to which the tokens are being transferred
      * @param amount Amount of tokens that are being transferred
-     * @return A boolean value signifying whether the transfer was succesfull (`true`) or not (`false`)
+     * @return success A boolean value signifying whether the transfer was succesful (`true`) or not (`false`)
      */
     function transferFrom(
         address from,
         address to,
         uint256 amount
-    ) external returns (bool);
+    ) external returns (bool success);
 
     /**
      * @notice Used to grant permission to an account to spend the tokens of another

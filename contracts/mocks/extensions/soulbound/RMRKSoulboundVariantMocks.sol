@@ -2,18 +2,18 @@
 
 pragma solidity ^0.8.21;
 
-import "../../../RMRK/access/Ownable.sol";
-import "../../../RMRK/extension/soulbound/RMRKSoulboundAfterBlockNumber.sol";
-import "../../../RMRK/extension/soulbound/RMRKSoulboundAfterTransactions.sol";
-import "../../../RMRK/extension/soulbound/RMRKSoulboundPerToken.sol";
-import "../../RMRKMultiAssetMock.sol";
+import {Ownable} from "../../../RMRK/access/Ownable.sol";
+import {RMRKSoulboundAfterBlockNumber} from "../../../RMRK/extension/soulbound/RMRKSoulboundAfterBlockNumber.sol";
+import {RMRKSoulboundAfterTransactions} from "../../../RMRK/extension/soulbound/RMRKSoulboundAfterTransactions.sol";
+import {RMRKMultiAsset} from "../../../RMRK/multiasset/RMRKMultiAsset.sol";
+import {RMRKSoulboundPerToken} from "../../../RMRK/extension/soulbound/RMRKSoulboundPerToken.sol";
+import {RMRKMultiAssetMock} from "../../RMRKMultiAssetMock.sol";
+import {RMRKSoulbound} from "../../../RMRK/extension/soulbound/RMRKSoulbound.sol";
 
 contract RMRKSoulboundAfterBlockNumberMock is
     RMRKSoulboundAfterBlockNumber,
     RMRKMultiAssetMock
 {
-    mapping(uint256 => bool) soulboundExempt;
-
     constructor(
         uint256 lastBlockToTransfer
     ) RMRKSoulboundAfterBlockNumber(lastBlockToTransfer) {}
@@ -46,8 +46,6 @@ contract RMRKSoulboundAfterTransactionsMock is
     RMRKSoulboundAfterTransactions,
     RMRKMultiAssetMock
 {
-    mapping(uint256 => bool) soulboundExempt;
-
     constructor(
         uint256 numberOfTransfers
     ) RMRKSoulboundAfterTransactions(numberOfTransfers) {}
@@ -94,8 +92,6 @@ contract RMRKSoulboundPerTokenMock is
     RMRKMultiAssetMock,
     Ownable
 {
-    mapping(uint256 => bool) soulboundExempt;
-
     function supportsInterface(
         bytes4 interfaceId
     )

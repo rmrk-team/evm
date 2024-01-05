@@ -4,13 +4,12 @@
 
 pragma solidity ^0.8.21;
 
-import "./IERC7401.sol";
-import "../core/RMRKCore.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
-import "@openzeppelin/contracts/utils/Address.sol";
-import "@openzeppelin/contracts/utils/Context.sol";
-import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+import {IERC7401} from "./IERC7401.sol";
+import {RMRKCore} from "../core/RMRKCore.sol";
+import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import {IERC721Receiver} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
+import {Context} from "@openzeppelin/contracts/utils/Context.sol";
+import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import "../library/RMRKErrors.sol";
 
 /**
@@ -21,8 +20,6 @@ import "../library/RMRKErrors.sol";
  *  gas limits allow it.
  */
 contract RMRKNestable is Context, IERC165, IERC721, IERC7401, RMRKCore {
-    using Address for address;
-
     uint256 private constant _MAX_LEVELS_TO_CHECK_FOR_INHERITANCE_LOOP = 100;
 
     // Mapping owner address to token count
@@ -60,7 +57,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IERC7401, RMRKCore {
      *  reverted.
      * @param tokenId ID of the token to check
      */
-    function _onlyApprovedOrOwner(uint256 tokenId) private view {
+    function _onlyApprovedOrOwner(uint256 tokenId) internal view {
         if (!_isApprovedOrOwner(_msgSender(), tokenId))
             revert ERC721NotApprovedOrOwner();
     }
@@ -82,7 +79,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IERC7401, RMRKCore {
      * @dev Used for parent-scoped transfers.
      * @param tokenId ID of the token to check.
      */
-    function _onlyApprovedOrDirectOwner(uint256 tokenId) private view {
+    function _onlyApprovedOrDirectOwner(uint256 tokenId) internal view {
         if (!_isApprovedOrDirectOwner(_msgSender(), tokenId))
             revert RMRKNotApprovedOrDirectOwner();
     }
@@ -112,11 +109,13 @@ contract RMRKNestable is Context, IERC165, IERC721, IERC7401, RMRKCore {
     /**
      * @notice Used to retrieve the number of tokens in `owner`'s account.
      * @param owner Address of the account being checked
-     * @return The balance of the given account
+     * @return balance The balance of the given account
      */
-    function balanceOf(address owner) public view virtual returns (uint256) {
+    function balanceOf(
+        address owner
+    ) public view virtual returns (uint256 balance) {
         if (owner == address(0)) revert ERC721AddressZeroIsNotaValidOwner();
-        return _balances[owner];
+        balance = _balances[owner];
     }
 
     ////////////////////////////////////////
@@ -288,15 +287,10 @@ contract RMRKNestable is Context, IERC165, IERC721, IERC7401, RMRKCore {
     ) internal virtual {
         (address immediateOwner, uint256 parentId, ) = directOwnerOf(tokenId);
         if (immediateOwner != from) revert ERC721TransferFromIncorrectOwner();
-        if (to == address(0)) revert ERC721TransferToTheZeroAddress();
         if (to == address(this) && tokenId == destinationId)
             revert RMRKNestableTransferToSelf();
 
-        // Destination contract checks:
-        // It seems redundant, but otherwise it would revert with no error
-        if (!to.isContract()) revert RMRKIsNotContract();
-        if (!IERC165(to).supportsInterface(type(IERC7401).interfaceId))
-            revert RMRKNestableTransferToNonRMRKNestableImplementer();
+        _checkDestination(to);
         _checkForInheritanceLoop(tokenId, to, destinationId);
 
         _beforeTokenTransfer(from, to, tokenId);
@@ -452,11 +446,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IERC7401, RMRKCore {
         uint256 destinationId,
         bytes memory data
     ) internal virtual {
-        // It seems redundant, but otherwise it would revert with no error
-        if (!to.isContract()) revert RMRKIsNotContract();
-        if (!IERC165(to).supportsInterface(type(IERC7401).interfaceId))
-            revert RMRKMintToNonRMRKNestableImplementer();
-
+        _checkDestination(to);
         _innerMint(to, tokenId, destinationId, data);
         _sendToNFT(address(0), to, 0, destinationId, tokenId, data);
     }
@@ -509,14 +499,14 @@ contract RMRKNestable is Context, IERC165, IERC721, IERC7401, RMRKCore {
      */
     function ownerOf(
         uint256 tokenId
-    ) public view virtual override(IERC7401, IERC721) returns (address) {
+    ) public view virtual override(IERC7401, IERC721) returns (address owner_) {
         (address owner, uint256 ownerTokenId, bool isNft) = directOwnerOf(
             tokenId
         );
         if (isNft) {
             owner = IERC7401(owner).ownerOf(ownerTokenId);
         }
-        return owner;
+        owner_ = owner;
     }
 
     /**
@@ -524,11 +514,18 @@ contract RMRKNestable is Context, IERC165, IERC721, IERC7401, RMRKCore {
      */
     function directOwnerOf(
         uint256 tokenId
-    ) public view virtual returns (address, uint256, bool) {
+    )
+        public
+        view
+        virtual
+        returns (address owner_, uint256 parentId, bool isNFT)
+    {
         DirectOwner memory owner = _RMRKOwners[tokenId];
         if (owner.ownerAddress == address(0)) revert ERC721InvalidTokenId();
 
-        return (owner.ownerAddress, owner.tokenId, owner.tokenId != 0);
+        owner_ = owner.ownerAddress;
+        parentId = owner.tokenId;
+        isNFT = owner.tokenId != 0;
     }
 
     ////////////////////////////////////////
@@ -550,8 +547,13 @@ contract RMRKNestable is Context, IERC165, IERC721, IERC7401, RMRKCore {
     function burn(
         uint256 tokenId,
         uint256 maxChildrenBurns
-    ) public virtual onlyApprovedOrDirectOwner(tokenId) returns (uint256) {
-        return _burn(tokenId, maxChildrenBurns);
+    )
+        public
+        virtual
+        onlyApprovedOrDirectOwner(tokenId)
+        returns (uint256 burnedChildren)
+    {
+        burnedChildren = _burn(tokenId, maxChildrenBurns);
     }
 
     /**
@@ -675,14 +677,14 @@ contract RMRKNestable is Context, IERC165, IERC721, IERC7401, RMRKCore {
      *
      *  - `tokenId` must exist.
      * @param tokenId ID of the token to check for approval
-     * @return Address of the account approved to manage the token
+     * @return approved Address of the account approved to manage the token
      */
     function getApproved(
         uint256 tokenId
-    ) public view virtual returns (address) {
+    ) public view virtual returns (address approved) {
         _requireMinted(tokenId);
 
-        return _tokenApprovals[tokenId][ownerOf(tokenId)];
+        approved = _tokenApprovals[tokenId][ownerOf(tokenId)];
     }
 
     /**
@@ -705,14 +707,14 @@ contract RMRKNestable is Context, IERC165, IERC721, IERC7401, RMRKCore {
      * @notice Used to check if the given address is allowed to manage the tokens of the specified address.
      * @param owner Address of the owner of the tokens
      * @param operator Address being checked for approval
-     * @return A boolean value signifying whether the *operator* is allowed to manage the tokens of the *owner* (`true`)
+     * @return isApproved A boolean value signifying whether the *operator* is allowed to manage the tokens of the *owner* (`true`)
      *  or not (`false`)
      */
     function isApprovedForAll(
         address owner,
         address operator
-    ) public view virtual returns (bool) {
-        return _operatorApprovals[owner][operator];
+    ) public view virtual returns (bool isApproved) {
+        isApproved = _operatorApprovals[owner][operator];
     }
 
     /**
@@ -816,10 +818,12 @@ contract RMRKNestable is Context, IERC165, IERC721, IERC7401, RMRKCore {
      * @notice Used to check whether the given token exists.
      * @dev Tokens start existing when they are minted (`_mint`) and stop existing when they are burned (`_burn`).
      * @param tokenId ID of the token being checked
-     * @return A boolean value signifying whether the token exists
+     * @return exists A boolean value signifying whether the token exists
      */
-    function _exists(uint256 tokenId) internal view virtual returns (bool) {
-        return _RMRKOwners[tokenId].ownerAddress != address(0);
+    function _exists(
+        uint256 tokenId
+    ) internal view virtual returns (bool exists) {
+        exists = _RMRKOwners[tokenId].ownerAddress != address(0);
     }
 
     /**
@@ -829,15 +833,15 @@ contract RMRKNestable is Context, IERC165, IERC721, IERC7401, RMRKCore {
      * @param to Yarget address that will receive the tokens
      * @param tokenId ID of the token to be transferred
      * @param data Optional data to send along with the call
-     * @return Boolean value signifying whether the call correctly returned the expected magic value
+     * @return valid Boolean value signifying whether the call correctly returned the expected magic value
      */
     function _checkOnERC721Received(
         address from,
         address to,
         uint256 tokenId,
         bytes memory data
-    ) private returns (bool) {
-        if (to.isContract()) {
+    ) private returns (bool valid) {
+        if (to.code.length != 0) {
             try
                 IERC721Receiver(to).onERC721Received(
                     _msgSender(),
@@ -846,7 +850,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IERC7401, RMRKCore {
                     data
                 )
             returns (bytes4 retval) {
-                return retval == IERC721Receiver.onERC721Received.selector;
+                valid = retval == IERC721Receiver.onERC721Received.selector;
             } catch (bytes memory reason) {
                 if (reason.length == uint256(0)) {
                     revert ERC721TransferToNonReceiverImplementer();
@@ -858,7 +862,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IERC7401, RMRKCore {
                 }
             }
         } else {
-            return true;
+            valid = true;
         }
     }
 
@@ -877,7 +881,7 @@ contract RMRKNestable is Context, IERC165, IERC721, IERC7401, RMRKCore {
         _requireMinted(parentId);
 
         address childAddress = _msgSender();
-        if (!childAddress.isContract()) revert RMRKIsNotContract();
+        if (childAddress.code.length == 0) revert RMRKIsNotContract();
 
         Child memory child = Child({
             contractAddress: childAddress,
@@ -1137,9 +1141,8 @@ contract RMRKNestable is Context, IERC165, IERC721, IERC7401, RMRKCore {
 
     function childrenOf(
         uint256 parentId
-    ) public view virtual returns (Child[] memory) {
-        Child[] memory children = _activeChildren[parentId];
-        return children;
+    ) public view virtual returns (Child[] memory children) {
+        children = _activeChildren[parentId];
     }
 
     /**
@@ -1148,9 +1151,8 @@ contract RMRKNestable is Context, IERC165, IERC721, IERC7401, RMRKCore {
 
     function pendingChildrenOf(
         uint256 parentId
-    ) public view virtual returns (Child[] memory) {
-        Child[] memory pendingChildren = _pendingChildren[parentId];
-        return pendingChildren;
+    ) public view virtual returns (Child[] memory children) {
+        children = _pendingChildren[parentId];
     }
 
     /**
@@ -1159,11 +1161,10 @@ contract RMRKNestable is Context, IERC165, IERC721, IERC7401, RMRKCore {
     function childOf(
         uint256 parentId,
         uint256 index
-    ) public view virtual returns (Child memory) {
+    ) public view virtual returns (Child memory child) {
         if (childrenOf(parentId).length <= index)
             revert RMRKChildIndexOutOfRange();
-        Child memory child = _activeChildren[parentId][index];
-        return child;
+        child = _activeChildren[parentId][index];
     }
 
     /**
@@ -1172,11 +1173,22 @@ contract RMRKNestable is Context, IERC165, IERC721, IERC7401, RMRKCore {
     function pendingChildOf(
         uint256 parentId,
         uint256 index
-    ) public view virtual returns (Child memory) {
+    ) public view virtual returns (Child memory child) {
         if (pendingChildrenOf(parentId).length <= index)
             revert RMRKPendingChildIndexOutOfRange();
-        Child memory child = _pendingChildren[parentId][index];
-        return child;
+        child = _pendingChildren[parentId][index];
+    }
+
+    /**
+     * @notice Checks the destination is valid for a Nest Transfer/Mint.
+     * @dev The destination must be a contract that implements the IERC7401 interface.
+     * @param to Address of the destination
+     */
+    function _checkDestination(address to) internal view {
+        // Checking if it is a contract before calling it seems redundant, but otherwise it would revert with no error
+        if (to.code.length == 0) revert RMRKIsNotContract();
+        if (!IERC165(to).supportsInterface(type(IERC7401).interfaceId))
+            revert RMRKNestableTransferToNonRMRKNestableImplementer();
     }
 
     // HOOKS

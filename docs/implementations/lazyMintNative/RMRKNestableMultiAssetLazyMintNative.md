@@ -13,10 +13,10 @@ Implementation of joined RMRK nestable and multi asset modules with native token
 ### RMRK_INTERFACE
 
 ```solidity
-function RMRK_INTERFACE() external view returns (bytes4)
+function RMRK_INTERFACE() external pure returns (bytes4 rmrkInterface)
 ```
 
-
+Interface identifier of the @rmrk-team/evm-contracts package
 
 
 
@@ -25,12 +25,12 @@ function RMRK_INTERFACE() external view returns (bytes4)
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bytes4 | undefined |
+| rmrkInterface | bytes4 | Interface identifier for implementations of the @rmrk-team/evm-contracts package |
 
 ### VERSION
 
 ```solidity
-function VERSION() external view returns (string)
+function VERSION() external pure returns (string version)
 ```
 
 Version of the @rmrk-team/evm-contracts package
@@ -42,7 +42,7 @@ Version of the @rmrk-team/evm-contracts package
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | undefined |
+| version | string | Version identifier for implementations of the @rmrk-team/evm-contracts package |
 
 ### acceptAsset
 
@@ -84,7 +84,7 @@ Used to accept a pending child token for a given parent token.
 ### addAssetEntry
 
 ```solidity
-function addAssetEntry(string metadataURI) external nonpayable returns (uint256)
+function addAssetEntry(string metadataURI) external nonpayable returns (uint256 assetId)
 ```
 
 Used to add a asset entry.
@@ -101,7 +101,7 @@ Used to add a asset entry.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | ID of the newly added asset |
+| assetId | uint256 | The ID of the newly added asset |
 
 ### addAssetToToken
 
@@ -176,7 +176,7 @@ Used to grant permission to the user to manage token&#39;s assets.
 ### balanceOf
 
 ```solidity
-function balanceOf(address owner) external view returns (uint256)
+function balanceOf(address owner) external view returns (uint256 balance)
 ```
 
 Used to retrieve the number of tokens in `owner`&#39;s account.
@@ -193,7 +193,7 @@ Used to retrieve the number of tokens in `owner`&#39;s account.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | The balance of the given account |
+| balance | uint256 | The balance of the given account |
 
 ### burn
 
@@ -214,7 +214,7 @@ Used to burn a given token.
 ### burn
 
 ```solidity
-function burn(uint256 tokenId, uint256 maxChildrenBurns) external nonpayable returns (uint256)
+function burn(uint256 tokenId, uint256 maxChildrenBurns) external nonpayable returns (uint256 burnedChildren)
 ```
 
 Used to burn a given token.
@@ -232,12 +232,12 @@ Used to burn a given token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | Number of recursively burned children |
+| burnedChildren | uint256 | Number of recursively burned children |
 
 ### childOf
 
 ```solidity
-function childOf(uint256 parentId, uint256 index) external view returns (struct IERC7401.Child)
+function childOf(uint256 parentId, uint256 index) external view returns (struct IERC7401.Child child)
 ```
 
 Used to retrieve a specific active child token for a given parent token.
@@ -255,12 +255,12 @@ Used to retrieve a specific active child token for a given parent token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IERC7401.Child | A Child struct containing data about the specified child |
+| child | IERC7401.Child | A Child struct containing data about the specified child |
 
 ### childrenOf
 
 ```solidity
-function childrenOf(uint256 parentId) external view returns (struct IERC7401.Child[])
+function childrenOf(uint256 parentId) external view returns (struct IERC7401.Child[] children)
 ```
 
 Used to retrieve the active child tokens of a given parent token.
@@ -277,15 +277,15 @@ Used to retrieve the active child tokens of a given parent token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IERC7401.Child[] | An array of Child structs containing the parent token&#39;s active child tokens |
+| children | IERC7401.Child[] | An array of Child structs containing the parent token&#39;s active child tokens |
 
-### collectionMetadata
+### contractURI
 
 ```solidity
-function collectionMetadata() external view returns (string)
+function contractURI() external view returns (string contractURI_)
 ```
 
-Used to retrieve the metadata of the collection.
+Used to retrieve the metadata URI of the collection.
 
 
 
@@ -294,12 +294,12 @@ Used to retrieve the metadata of the collection.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | string The metadata URI of the collection |
+| contractURI_ | string | string The metadata URI of the collection |
 
 ### directOwnerOf
 
 ```solidity
-function directOwnerOf(uint256 tokenId) external view returns (address, uint256, bool)
+function directOwnerOf(uint256 tokenId) external view returns (address owner_, uint256 parentId, bool isNFT)
 ```
 
 Used to retrieve the immediate owner of the given token.
@@ -316,14 +316,14 @@ Used to retrieve the immediate owner of the given token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | address | Address of the given token&#39;s owner |
-| _1 | uint256 | The ID of the parent token. Should be `0` if the owner is an externally owned account |
-| _2 | bool | The boolean value signifying whether the owner is an NFT or not |
+| owner_ | address | Address of the given token&#39;s owner |
+| parentId | uint256 | The ID of the parent token. Should be `0` if the owner is an externally owned account |
+| isNFT | bool | The boolean value signifying whether the owner is an NFT or not |
 
 ### getActiveAssetPriorities
 
 ```solidity
-function getActiveAssetPriorities(uint256 tokenId) external view returns (uint64[])
+function getActiveAssetPriorities(uint256 tokenId) external view returns (uint64[] priorities)
 ```
 
 Used to retrieve the priorities of the active resoources of a given token.
@@ -340,12 +340,12 @@ Used to retrieve the priorities of the active resoources of a given token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint64[] | An array of priorities of the active assets of the given token |
+| priorities | uint64[] | An array of priorities of the active assets of the given token |
 
 ### getActiveAssets
 
 ```solidity
-function getActiveAssets(uint256 tokenId) external view returns (uint64[])
+function getActiveAssets(uint256 tokenId) external view returns (uint64[] assetIds)
 ```
 
 Used to retrieve IDs of the active assets of given token.
@@ -362,12 +362,12 @@ Used to retrieve IDs of the active assets of given token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint64[] | An array of active asset IDs of the given token |
+| assetIds | uint64[] | An array of active asset IDs of the given token |
 
 ### getApproved
 
 ```solidity
-function getApproved(uint256 tokenId) external view returns (address)
+function getApproved(uint256 tokenId) external view returns (address approved)
 ```
 
 Used to retrieve the account approved to manage given token.
@@ -384,12 +384,12 @@ Used to retrieve the account approved to manage given token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | address | Address of the account approved to manage the token |
+| approved | address | Address of the account approved to manage the token |
 
 ### getApprovedForAssets
 
 ```solidity
-function getApprovedForAssets(uint256 tokenId) external view returns (address)
+function getApprovedForAssets(uint256 tokenId) external view returns (address approved)
 ```
 
 Used to retrieve the address of the account approved to manage assets of a given token.
@@ -406,12 +406,12 @@ Used to retrieve the address of the account approved to manage assets of a given
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | address | Address of the account that is approved to manage the specified token&#39;s assets |
+| approved | address | Address of the account that is approved to manage the specified token&#39;s assets |
 
 ### getAssetMetadata
 
 ```solidity
-function getAssetMetadata(uint256 tokenId, uint64 assetId) external view returns (string)
+function getAssetMetadata(uint256 tokenId, uint64 assetId) external view returns (string metadata)
 ```
 
 Used to fetch the asset metadata of the specified token&#39;s active asset with the given index.
@@ -429,12 +429,12 @@ Used to fetch the asset metadata of the specified token&#39;s active asset with 
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | The metadata of the asset belonging to the specified index in the token&#39;s active assets  array |
+| metadata | string | The metadata of the asset belonging to the specified index in the token&#39;s active assets  array |
 
 ### getAssetReplacements
 
 ```solidity
-function getAssetReplacements(uint256 tokenId, uint64 newAssetId) external view returns (uint64)
+function getAssetReplacements(uint256 tokenId, uint64 newAssetId) external view returns (uint64 replacesAssetId)
 ```
 
 Used to retrieve the asset that will be replaced if a given asset from the token&#39;s pending array  is accepted.
@@ -452,12 +452,12 @@ Used to retrieve the asset that will be replaced if a given asset from the token
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint64 | ID of the asset which will be replaced |
+| replacesAssetId | uint64 | ID of the asset which will be replaced |
 
 ### getPendingAssets
 
 ```solidity
-function getPendingAssets(uint256 tokenId) external view returns (uint64[])
+function getPendingAssets(uint256 tokenId) external view returns (uint64[] assetIds)
 ```
 
 Used to retrieve IDs of the pending assets of given token.
@@ -474,12 +474,12 @@ Used to retrieve IDs of the pending assets of given token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint64[] | An array of pending asset IDs of the given token |
+| assetIds | uint64[] | An array of pending asset IDs of the given token |
 
 ### getRoyaltyPercentage
 
 ```solidity
-function getRoyaltyPercentage() external view returns (uint256)
+function getRoyaltyPercentage() external view returns (uint256 royaltyPercentageBps)
 ```
 
 Used to retrieve the specified royalty percentage.
@@ -491,12 +491,12 @@ Used to retrieve the specified royalty percentage.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | The royalty percentage expressed in the basis points |
+| royaltyPercentageBps | uint256 | The royalty percentage expressed in the basis points |
 
 ### getRoyaltyRecipient
 
 ```solidity
-function getRoyaltyRecipient() external view returns (address)
+function getRoyaltyRecipient() external view returns (address recipient)
 ```
 
 Used to retrieve the recipient of royalties.
@@ -508,12 +508,12 @@ Used to retrieve the recipient of royalties.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | address | Address of the recipient of royalties |
+| recipient | address | Address of the recipient of royalties |
 
 ### isApprovedForAll
 
 ```solidity
-function isApprovedForAll(address owner, address operator) external view returns (bool)
+function isApprovedForAll(address owner, address operator) external view returns (bool isApproved)
 ```
 
 Used to check if the given address is allowed to manage the tokens of the specified address.
@@ -531,12 +531,12 @@ Used to check if the given address is allowed to manage the tokens of the specif
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | A boolean value signifying whether the *operator* is allowed to manage the tokens of the *owner* (`true`)  or not (`false`) |
+| isApproved | bool | A boolean value signifying whether the *operator* is allowed to manage the tokens of the *owner* (`true`)  or not (`false`) |
 
 ### isApprovedForAllForAssets
 
 ```solidity
-function isApprovedForAllForAssets(address owner, address operator) external view returns (bool)
+function isApprovedForAllForAssets(address owner, address operator) external view returns (bool isApproved)
 ```
 
 Used to check whether the address has been granted the operator role by a given address or not.
@@ -554,12 +554,12 @@ Used to check whether the address has been granted the operator role by a given 
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | A boolean value indicating wehter the account we are checking has been granted the operator role |
+| isApproved | bool | A boolean value indicating whether the account we are checking has been granted the operator role |
 
 ### isContributor
 
 ```solidity
-function isContributor(address contributor) external view returns (bool)
+function isContributor(address contributor) external view returns (bool isContributor_)
 ```
 
 Used to check if the address is one of the contributors.
@@ -576,7 +576,7 @@ Used to check if the address is one of the contributors.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | Boolean value indicating whether the address is a contributor or not |
+| isContributor_ | bool | Boolean value indicating whether the address is a contributor or not |
 
 ### manageContributor
 
@@ -598,7 +598,7 @@ Adds or removes a contributor to the smart contract.
 ### maxSupply
 
 ```solidity
-function maxSupply() external view returns (uint256)
+function maxSupply() external view returns (uint256 maxSupply_)
 ```
 
 Used to retrieve the maximum supply of the collection.
@@ -610,12 +610,12 @@ Used to retrieve the maximum supply of the collection.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | The maximum supply of tokens in the collection |
+| maxSupply_ | uint256 | The maximum supply of tokens in the collection |
 
 ### mint
 
 ```solidity
-function mint(address to, uint256 numToMint) external payable returns (uint256)
+function mint(address to, uint256 numToMint) external payable returns (uint256 firstTokenId)
 ```
 
 Used to mint the desired number of tokens to the specified address.
@@ -633,12 +633,12 @@ Used to mint the desired number of tokens to the specified address.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | The ID of the first token to be minted in the current minting cycle |
+| firstTokenId | uint256 | The ID of the first token to be minted in the current minting cycle |
 
 ### name
 
 ```solidity
-function name() external view returns (string)
+function name() external view returns (string name_)
 ```
 
 Used to retrieve the collection name.
@@ -650,12 +650,12 @@ Used to retrieve the collection name.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | Name of the collection |
+| name_ | string | Name of the collection |
 
 ### nestMint
 
 ```solidity
-function nestMint(address to, uint256 numToMint, uint256 destinationId) external payable returns (uint256)
+function nestMint(address to, uint256 numToMint, uint256 destinationId) external payable returns (uint256 firstTokenId)
 ```
 
 Used to mint a desired number of child tokens to a given parent token.
@@ -674,7 +674,7 @@ Used to mint a desired number of child tokens to a given parent token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | The ID of the first token to be minted in the current minting cycle |
+| firstTokenId | uint256 | The ID of the first token to be minted in the current minting cycle |
 
 ### nestTransferFrom
 
@@ -699,7 +699,7 @@ Used to transfer the token into another token.
 ### owner
 
 ```solidity
-function owner() external view returns (address)
+function owner() external view returns (address owner_)
 ```
 
 Returns the address of the current owner.
@@ -711,17 +711,17 @@ Returns the address of the current owner.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | address | Address of the current owner |
+| owner_ | address | Address of the current owner |
 
 ### ownerOf
 
 ```solidity
-function ownerOf(uint256 tokenId) external view returns (address)
+function ownerOf(uint256 tokenId) external view returns (address owner_)
 ```
 
 Used to retrieve the *root* owner of a given token.
 
-*The *root* owner of the token is an externally owned account (EOA). If the given token is child of another  NFT, this will return an EOA address. Otherwise, if the token is owned by an EOA, this EOA wil be returned.*
+*The *root* owner of the token is an externally owned account (EOA). If the given token is child of another  NFT, this will return an EOA address. Otherwise, if the token is owned by an EOA, this EOA will be returned.*
 
 #### Parameters
 
@@ -733,12 +733,12 @@ Used to retrieve the *root* owner of a given token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | address | The *root* owner of the token |
+| owner_ | address | The *root* owner of the token |
 
 ### pendingChildOf
 
 ```solidity
-function pendingChildOf(uint256 parentId, uint256 index) external view returns (struct IERC7401.Child)
+function pendingChildOf(uint256 parentId, uint256 index) external view returns (struct IERC7401.Child child)
 ```
 
 Used to retrieve a specific pending child token from a given parent token.
@@ -756,12 +756,12 @@ Used to retrieve a specific pending child token from a given parent token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IERC7401.Child | A Child struct containting data about the specified child |
+| child | IERC7401.Child | A Child struct containting data about the specified child |
 
 ### pendingChildrenOf
 
 ```solidity
-function pendingChildrenOf(uint256 parentId) external view returns (struct IERC7401.Child[])
+function pendingChildrenOf(uint256 parentId) external view returns (struct IERC7401.Child[] children)
 ```
 
 Used to retrieve the pending child tokens of a given parent token.
@@ -778,12 +778,12 @@ Used to retrieve the pending child tokens of a given parent token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | IERC7401.Child[] | An array of Child structs containing the parent token&#39;s pending child tokens |
+| children | IERC7401.Child[] | An array of Child structs containing the parent token&#39;s pending child tokens |
 
 ### pricePerMint
 
 ```solidity
-function pricePerMint() external view returns (uint256)
+function pricePerMint() external view returns (uint256 price)
 ```
 
 Used to retrieve the price per mint.
@@ -795,7 +795,7 @@ Used to retrieve the price per mint.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | The price per mint of a single token expressed in the lowest denomination of a native currency |
+| price | uint256 | The price per mint of a single token expressed in the lowest denomination of a native currency |
 
 ### rejectAllAssets
 
@@ -997,7 +997,7 @@ function supportsInterface(bytes4 interfaceId) external view returns (bool)
 ### symbol
 
 ```solidity
-function symbol() external view returns (string)
+function symbol() external view returns (string symbol_)
 ```
 
 Used to retrieve the collection symbol.
@@ -1009,12 +1009,12 @@ Used to retrieve the collection symbol.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | Symbol of the collection |
+| symbol_ | string | Symbol of the collection |
 
 ### tokenURI
 
 ```solidity
-function tokenURI(uint256 tokenId) external view returns (string)
+function tokenURI(uint256 tokenId) external view returns (string tokenURI_)
 ```
 
 Used to retrieve the metadata URI of a token.
@@ -1031,12 +1031,12 @@ Used to retrieve the metadata URI of a token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | Metadata URI of the specified token |
+| tokenURI_ | string | Metadata URI of the specified token |
 
 ### totalAssets
 
 ```solidity
-function totalAssets() external view returns (uint256)
+function totalAssets() external view returns (uint256 totalAssets_)
 ```
 
 Used to retrieve the total number of assets.
@@ -1048,12 +1048,12 @@ Used to retrieve the total number of assets.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | The total number of assets |
+| totalAssets_ | uint256 | The total number of assets |
 
 ### totalSupply
 
 ```solidity
-function totalSupply() external view returns (uint256)
+function totalSupply() external view returns (uint256 totalSupply_)
 ```
 
 Used to retrieve the total supply of the tokens in a collection.
@@ -1065,7 +1065,7 @@ Used to retrieve the total supply of the tokens in a collection.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | The number of tokens in a collection |
+| totalSupply_ | uint256 | The number of tokens in a collection |
 
 ### transferChild
 
@@ -1140,10 +1140,10 @@ Used to update recipient of royalties.
 |---|---|---|
 | newRoyaltyRecipient | address | Address of the new recipient of royalties |
 
-### withdrawRaised
+### withdraw
 
 ```solidity
-function withdrawRaised(address to, uint256 amount) external nonpayable
+function withdraw(address to, uint256 amount) external nonpayable
 ```
 
 Used to withdraw the minting proceedings to a specified address.
@@ -1590,6 +1590,17 @@ Attempting to transfer the token to a 0x0 address
 
 
 
+### IndexOutOfBounds
+
+```solidity
+error IndexOutOfBounds()
+```
+
+
+
+
+
+
 ### RMRKApprovalForAssetsToCurrentOwner
 
 ```solidity
@@ -1735,17 +1746,6 @@ error RMRKMintOverMax()
 ```
 
 Attempting to mint a number of tokens that would cause the total supply to be greater than maximum supply
-
-
-
-
-### RMRKMintToNonRMRKNestableImplementer
-
-```solidity
-error RMRKMintToNonRMRKNestableImplementer()
-```
-
-Attempting to mint a nested token to a smart contract that doesn&#39;t support nesting
 
 
 
@@ -1966,6 +1966,17 @@ error RMRKWrongValueSent()
 ```
 
 Attempting to pay with native token with a value different than expected
+
+
+
+
+### TransferFailed
+
+```solidity
+error TransferFailed()
+```
+
+
 
 
 

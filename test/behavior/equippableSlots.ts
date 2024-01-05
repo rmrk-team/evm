@@ -33,13 +33,9 @@ async function shouldBehaveLikeEquippableWithSlots(
 ) {
   let catalog: Contract;
   let soldier: Contract;
-  let soldierEquip: Contract;
   let weapon: Contract;
-  let weaponEquip: Contract;
   let weaponGem: Contract;
-  let weaponGemEquip: Contract;
   let background: Contract;
-  let backgroundEquip: Contract;
   let view: Contract;
 
   let addrs: SignerWithAddress[];
@@ -50,13 +46,9 @@ async function shouldBehaveLikeEquippableWithSlots(
 
     catalog = this.catalog;
     soldier = this.soldier;
-    soldierEquip = this.soldierEquip;
     weapon = this.weapon;
-    weaponEquip = this.weaponEquip;
     weaponGem = this.weaponGem;
-    weaponGemEquip = this.weaponGemEquip;
     background = this.background;
-    backgroundEquip = this.backgroundEquip;
     view = this.view;
   });
 
@@ -64,8 +56,8 @@ async function shouldBehaveLikeEquippableWithSlots(
     it('can validate equips of weapons into soldiers', async function () {
       // This asset is not equippable
       expect(
-        await weaponEquip.canTokenBeEquippedWithAssetIntoSlot(
-          soldierEquip.address,
+        await weapon.canTokenBeEquippedWithAssetIntoSlot(
+          soldier.address,
           weaponsIds[0],
           weaponAssetsFull[0],
           partIdForWeapon,
@@ -74,8 +66,8 @@ async function shouldBehaveLikeEquippableWithSlots(
 
       // This asset is equippable into weapon part
       expect(
-        await weaponEquip.canTokenBeEquippedWithAssetIntoSlot(
-          soldierEquip.address,
+        await weapon.canTokenBeEquippedWithAssetIntoSlot(
+          soldier.address,
           weaponsIds[0],
           weaponAssetsEquip[0],
           partIdForWeapon,
@@ -84,8 +76,8 @@ async function shouldBehaveLikeEquippableWithSlots(
 
       // This asset is NOT equippable into weapon gem part
       expect(
-        await weaponEquip.canTokenBeEquippedWithAssetIntoSlot(
-          soldierEquip.address,
+        await weapon.canTokenBeEquippedWithAssetIntoSlot(
+          soldier.address,
           weaponsIds[0],
           weaponAssetsEquip[0],
           partIdForWeaponGem,
@@ -96,8 +88,8 @@ async function shouldBehaveLikeEquippableWithSlots(
     it('can validate equips of weapon gems into weapons', async function () {
       // This asset is not equippable
       expect(
-        await weaponGemEquip.canTokenBeEquippedWithAssetIntoSlot(
-          weaponEquip.address,
+        await weaponGem.canTokenBeEquippedWithAssetIntoSlot(
+          weapon.address,
           weaponGemsIds[0],
           weaponGemAssetFull,
           partIdForWeaponGem,
@@ -106,8 +98,8 @@ async function shouldBehaveLikeEquippableWithSlots(
 
       // This asset is equippable into weapon gem slot
       expect(
-        await weaponGemEquip.canTokenBeEquippedWithAssetIntoSlot(
-          weaponEquip.address,
+        await weaponGem.canTokenBeEquippedWithAssetIntoSlot(
+          weapon.address,
           weaponGemsIds[0],
           weaponGemAssetEquip,
           partIdForWeaponGem,
@@ -116,8 +108,8 @@ async function shouldBehaveLikeEquippableWithSlots(
 
       // This asset is NOT equippable into background slot
       expect(
-        await weaponGemEquip.canTokenBeEquippedWithAssetIntoSlot(
-          weaponEquip.address,
+        await weaponGem.canTokenBeEquippedWithAssetIntoSlot(
+          weapon.address,
           weaponGemsIds[0],
           weaponGemAssetEquip,
           partIdForBackground,
@@ -128,8 +120,8 @@ async function shouldBehaveLikeEquippableWithSlots(
     it('can validate equips of backgrounds into soldiers', async function () {
       // This asset is equippable into background slot
       expect(
-        await backgroundEquip.canTokenBeEquippedWithAssetIntoSlot(
-          soldierEquip.address,
+        await background.canTokenBeEquippedWithAssetIntoSlot(
+          soldier.address,
           backgroundsIds[0],
           backgroundAssetId,
           partIdForBackground,
@@ -138,8 +130,8 @@ async function shouldBehaveLikeEquippableWithSlots(
 
       // This asset is NOT equippable into weapon slot
       expect(
-        await backgroundEquip.canTokenBeEquippedWithAssetIntoSlot(
-          soldierEquip.address,
+        await background.canTokenBeEquippedWithAssetIntoSlot(
+          soldier.address,
           backgroundsIds[0],
           backgroundAssetId,
           partIdForWeapon,
@@ -182,10 +174,10 @@ async function shouldBehaveLikeEquippableWithSlots(
       const weaponChildIndex = 0;
       const backgroundChildIndex = 1;
       const weaponResId = weaponAssetsEquip[0]; // This asset is assigned to weapon first weapon
-      await soldierEquip
+      await soldier
         .connect(addrs[0])
         .equip([soldiersIds[0], weaponChildIndex, soldierResId, partIdForWeapon, weaponResId]);
-      await soldierEquip
+      await soldier
         .connect(addrs[0])
         .equip([
           soldiersIds[0],
@@ -197,22 +189,22 @@ async function shouldBehaveLikeEquippableWithSlots(
 
       const expectedSlots = [bn(partIdForWeapon), bn(partIdForBackground)];
       const expectedEquips = [
-        [bn(soldierResId), bn(weaponResId), weaponsIds[0], weaponEquip.address],
-        [bn(soldierResId), bn(backgroundAssetId), backgroundsIds[0], backgroundEquip.address],
+        [bn(soldierResId), bn(weaponResId), weaponsIds[0], weapon.address],
+        [bn(soldierResId), bn(backgroundAssetId), backgroundsIds[0], background.address],
       ];
       const expectedMetadata = ['ipfs:weapon/equip/5', 'ipfs:background/'];
-      expect(await view.getEquipped(soldierEquip.address, soldiersIds[0], soldierResId)).to.eql([
+      expect(await view.getEquipped(soldier.address, soldiersIds[0], soldierResId)).to.eql([
         expectedSlots,
         expectedEquips,
         expectedMetadata,
       ]);
 
       // Children are marked as equipped:
+      expect(await soldier.isChildEquipped(soldiersIds[0], weapon.address, weaponsIds[0])).to.eql(
+        true,
+      );
       expect(
-        await soldierEquip.isChildEquipped(soldiersIds[0], weapon.address, weaponsIds[0]),
-      ).to.eql(true);
-      expect(
-        await soldierEquip.isChildEquipped(soldiersIds[0], background.address, backgroundsIds[0]),
+        await soldier.isChildEquipped(soldiersIds[0], background.address, backgroundsIds[0]),
       ).to.eql(true);
     });
 
@@ -221,7 +213,7 @@ async function shouldBehaveLikeEquippableWithSlots(
       const badChildIndex = 3;
       const weaponResId = weaponAssetsEquip[0]; // This asset is assigned to weapon first weapon
       await expect(
-        soldierEquip
+        soldier
           .connect(addrs[0])
           .equip([soldiersIds[0], badChildIndex, soldierResId, partIdForWeapon, weaponResId]),
       ).to.be.reverted; // Bad index
@@ -231,12 +223,12 @@ async function shouldBehaveLikeEquippableWithSlots(
       const equippableGroupId = 0;
       // The malicious child indicates it can be equipped into soldier:
       await expect(
-        weaponGemEquip.setValidParentForEquippableGroup(
+        weaponGem.setValidParentForEquippableGroup(
           equippableGroupId,
-          soldierEquip.address,
+          soldier.address,
           partIdForWeaponGem,
         ),
-      ).to.be.revertedWithCustomError(weaponGemEquip, 'RMRKIdZeroForbidden');
+      ).to.be.revertedWithCustomError(weaponGem, 'RMRKIdZeroForbidden');
     });
 
     it('cannot set a valid equippable group with part id 0', async function () {
@@ -244,12 +236,8 @@ async function shouldBehaveLikeEquippableWithSlots(
       const partId = 0;
       // The malicious child indicates it can be equipped into soldier:
       await expect(
-        weaponGemEquip.setValidParentForEquippableGroup(
-          equippableGroupId,
-          soldierEquip.address,
-          partId,
-        ),
-      ).to.be.revertedWithCustomError(weaponGemEquip, 'RMRKIdZeroForbidden');
+        weaponGem.setValidParentForEquippableGroup(equippableGroupId, soldier.address, partId),
+      ).to.be.revertedWithCustomError(weaponGem, 'RMRKIdZeroForbidden');
     });
 
     it('cannot equip into a slot not set on the parent asset (gem into soldier)', async function () {
@@ -263,26 +251,24 @@ async function shouldBehaveLikeEquippableWithSlots(
         .acceptChild(soldierId, 0, weaponGem.address, newWeaponGemId);
 
       // Add assets to weapon
-      await weaponGemEquip.addAssetToToken(newWeaponGemId, weaponGemAssetFull, 0);
-      await weaponGemEquip.addAssetToToken(newWeaponGemId, weaponGemAssetEquip, 0);
-      await weaponGemEquip.connect(soldierOwner).acceptAsset(newWeaponGemId, 0, weaponGemAssetFull);
-      await weaponGemEquip
-        .connect(soldierOwner)
-        .acceptAsset(newWeaponGemId, 0, weaponGemAssetEquip);
+      await weaponGem.addAssetToToken(newWeaponGemId, weaponGemAssetFull, 0);
+      await weaponGem.addAssetToToken(newWeaponGemId, weaponGemAssetEquip, 0);
+      await weaponGem.connect(soldierOwner).acceptAsset(newWeaponGemId, 0, weaponGemAssetFull);
+      await weaponGem.connect(soldierOwner).acceptAsset(newWeaponGemId, 0, weaponGemAssetEquip);
 
       // The malicious child indicates it can be equipped into soldier:
-      await weaponGemEquip.setValidParentForEquippableGroup(
+      await weaponGem.setValidParentForEquippableGroup(
         1, // equippableGroupId for gems
-        soldierEquip.address,
+        soldier.address,
         partIdForWeaponGem,
       );
 
       // Weapon is child on index 0, background on index 1
       await expect(
-        soldierEquip
+        soldier
           .connect(addrs[0])
           .equip([soldierId, childIndex, soldierResId, partIdForWeaponGem, weaponGemAssetEquip]),
-      ).to.be.revertedWithCustomError(soldierEquip, 'RMRKTargetAssetCannotReceiveSlot');
+      ).to.be.revertedWithCustomError(soldier, 'RMRKTargetAssetCannotReceiveSlot');
     });
 
     it('cannot equip wrong child in slot (weapon in background)', async function () {
@@ -290,7 +276,7 @@ async function shouldBehaveLikeEquippableWithSlots(
       const backgroundChildIndex = 1;
       const weaponResId = weaponAssetsEquip[0]; // This asset is assigned to weapon first weapon
       await expect(
-        soldierEquip
+        soldier
           .connect(addrs[0])
           .equip([
             soldiersIds[0],
@@ -299,26 +285,26 @@ async function shouldBehaveLikeEquippableWithSlots(
             partIdForWeapon,
             weaponResId,
           ]),
-      ).to.be.revertedWithCustomError(soldierEquip, 'RMRKTokenCannotBeEquippedWithAssetIntoSlot');
+      ).to.be.revertedWithCustomError(soldier, 'RMRKTokenCannotBeEquippedWithAssetIntoSlot');
     });
 
     it('cannot equip child in wrong slot (weapon in background)', async function () {
       const childIndex = 0;
       const weaponResId = weaponAssetsEquip[0]; // This asset is assigned to weapon first weapon
       await expect(
-        soldierEquip
+        soldier
           .connect(addrs[0])
           .equip([soldiersIds[0], childIndex, soldierResId, partIdForBackground, weaponResId]),
-      ).to.be.revertedWithCustomError(soldierEquip, 'RMRKTokenCannotBeEquippedWithAssetIntoSlot');
+      ).to.be.revertedWithCustomError(soldier, 'RMRKTokenCannotBeEquippedWithAssetIntoSlot');
     });
 
     it('cannot equip child with wrong asset (weapon in background)', async function () {
       const childIndex = 0;
       await expect(
-        soldierEquip
+        soldier
           .connect(addrs[0])
           .equip([soldiersIds[0], childIndex, soldierResId, partIdForWeapon, backgroundAssetId]),
-      ).to.be.revertedWithCustomError(soldierEquip, 'RMRKTokenCannotBeEquippedWithAssetIntoSlot');
+      ).to.be.revertedWithCustomError(soldier, 'RMRKTokenCannotBeEquippedWithAssetIntoSlot');
     });
 
     it('cannot equip if not owner', async function () {
@@ -326,17 +312,17 @@ async function shouldBehaveLikeEquippableWithSlots(
       const childIndex = 0;
       const weaponResId = weaponAssetsEquip[0]; // This asset is assigned to weapon first weapon
       await expect(
-        soldierEquip
+        soldier
           .connect(addrs[1]) // Owner is addrs[0]
           .equip([soldiersIds[0], childIndex, soldierResId, partIdForWeapon, weaponResId]),
-      ).to.be.revertedWithCustomError(soldierEquip, 'RMRKNotApprovedForAssetsOrOwner');
+      ).to.be.revertedWithCustomError(soldier, 'RMRKNotApprovedForAssetsOrOwner');
     });
 
     it('cannot equip 2 children into the same slot', async function () {
       // Weapon is child on index 0, background on index 1
       const childIndex = 0;
       const weaponResId = weaponAssetsEquip[0]; // This asset is assigned to weapon first weapon
-      await soldierEquip
+      await soldier
         .connect(addrs[0])
         .equip([soldiersIds[0], childIndex, soldierResId, partIdForWeapon, weaponResId]);
 
@@ -346,7 +332,7 @@ async function shouldBehaveLikeEquippableWithSlots(
       const newWeaponChildIndex = 2;
       const newWeaponResId = weaponAssetsEquip[weaponAssetIndex];
       await expect(
-        soldierEquip
+        soldier
           .connect(addrs[0])
           .equip([
             soldiersIds[0],
@@ -355,7 +341,7 @@ async function shouldBehaveLikeEquippableWithSlots(
             partIdForWeapon,
             newWeaponResId,
           ]),
-      ).to.be.revertedWithCustomError(soldierEquip, 'RMRKSlotAlreadyUsed');
+      ).to.be.revertedWithCustomError(soldier, 'RMRKSlotAlreadyUsed');
     });
 
     it('cannot equip if not intented on catalog', async function () {
@@ -366,10 +352,10 @@ async function shouldBehaveLikeEquippableWithSlots(
       // Remove equippable addresses for part.
       await catalog.resetEquippableAddresses(partIdForWeapon);
       await expect(
-        soldierEquip
+        soldier
           .connect(addrs[0]) // Owner is addrs[0]
           .equip([soldiersIds[0], childIndex, soldierResId, partIdForWeapon, weaponResId]),
-      ).to.be.revertedWithCustomError(soldierEquip, 'RMRKEquippableEquipNotAllowedByCatalog');
+      ).to.be.revertedWithCustomError(soldier, 'RMRKEquippableEquipNotAllowedByCatalog');
     });
 
     describe('With equipped children', async function () {
@@ -383,10 +369,10 @@ async function shouldBehaveLikeEquippableWithSlots(
         soldierID = soldiersIds[0];
         soldierOwner = addrs[0];
 
-        await soldierEquip
+        await soldier
           .connect(soldierOwner)
           .equip([soldierID, weaponChildIndex, soldierResId, partIdForWeapon, weaponResId]);
-        await soldierEquip
+        await soldier
           .connect(soldierOwner)
           .equip([
             soldierID,
@@ -400,33 +386,31 @@ async function shouldBehaveLikeEquippableWithSlots(
       it('can replace parent equipped asset and still unequip it', async function () {
         // Weapon is child on index 0, background on index 1
         const newSoldierResId = soldierResId + 1;
-        await soldierEquip.addEquippableAssetEntry(
+        await soldier.addEquippableAssetEntry(
           newSoldierResId,
           0,
           catalog.address,
           'ipfs:soldier/',
           [partIdForBody, partIdForWeapon, partIdForBackground],
         );
-        await soldierEquip.addAssetToToken(soldierID, newSoldierResId, soldierResId);
-        await soldierEquip.connect(soldierOwner).acceptAsset(soldierID, 0, newSoldierResId);
+        await soldier.addAssetToToken(soldierID, newSoldierResId, soldierResId);
+        await soldier.connect(soldierOwner).acceptAsset(soldierID, 0, newSoldierResId);
 
         // Children still marked as equipped, so the cannot be transferred
-        expect(await soldierEquip.isChildEquipped(soldierID, weapon.address, weaponsIds[0])).to.eql(
+        expect(await soldier.isChildEquipped(soldierID, weapon.address, weaponsIds[0])).to.eql(
           true,
         );
         expect(
-          await soldierEquip.isChildEquipped(soldierID, background.address, backgroundsIds[0]),
+          await soldier.isChildEquipped(soldierID, background.address, backgroundsIds[0]),
         ).to.eql(true);
 
-        await soldierEquip.connect(soldierOwner).unequip(soldierID, soldierResId, partIdForWeapon);
-        await soldierEquip
-          .connect(soldierOwner)
-          .unequip(soldierID, soldierResId, partIdForBackground);
-        expect(await soldierEquip.isChildEquipped(soldierID, weapon.address, weaponsIds[0])).to.eql(
+        await soldier.connect(soldierOwner).unequip(soldierID, soldierResId, partIdForWeapon);
+        await soldier.connect(soldierOwner).unequip(soldierID, soldierResId, partIdForBackground);
+        expect(await soldier.isChildEquipped(soldierID, weapon.address, weaponsIds[0])).to.eql(
           false,
         );
         expect(
-          await soldierEquip.isChildEquipped(soldierID, background.address, backgroundsIds[0]),
+          await soldier.isChildEquipped(soldierID, background.address, backgroundsIds[0]),
         ).to.eql(false);
       });
 
@@ -434,24 +418,24 @@ async function shouldBehaveLikeEquippableWithSlots(
         // Weapon is child on index 0, background on index 1
         const newWeaponAssetId = weaponAssetsEquip[0] + 10;
         const weaponId = weaponsIds[0];
-        await weaponEquip.addEquippableAssetEntry(
+        await weapon.addEquippableAssetEntry(
           newWeaponAssetId,
           1, // equippableGroupId
           catalog.address,
           'ipfs:weapon/new',
           [],
         );
-        await weaponEquip.addAssetToToken(weaponId, newWeaponAssetId, weaponAssetsEquip[0]);
-        await weaponEquip.connect(soldierOwner).acceptAsset(weaponId, 0, newWeaponAssetId);
+        await weapon.addAssetToToken(weaponId, newWeaponAssetId, weaponAssetsEquip[0]);
+        await weapon.connect(soldierOwner).acceptAsset(weaponId, 0, newWeaponAssetId);
 
         // Children still marked as equipped, so the cannot be transferred
-        expect(await soldierEquip.isChildEquipped(soldierID, weapon.address, weaponsIds[0])).to.eql(
+        expect(await soldier.isChildEquipped(soldierID, weapon.address, weaponsIds[0])).to.eql(
           true,
         );
 
-        await soldierEquip.connect(soldierOwner).unequip(soldierID, soldierResId, partIdForWeapon);
+        await soldier.connect(soldierOwner).unequip(soldierID, soldierResId, partIdForWeapon);
 
-        expect(await soldierEquip.isChildEquipped(soldierID, weapon.address, weaponsIds[0])).to.eql(
+        expect(await soldier.isChildEquipped(soldierID, weapon.address, weaponsIds[0])).to.eql(
           false,
         );
       });
@@ -459,21 +443,21 @@ async function shouldBehaveLikeEquippableWithSlots(
       it('can replace parent equipped asset and cannot not re-equip on top', async function () {
         // Weapon is child on index 0, background on index 1
         const newSoldierResId = soldierResId + 1;
-        await soldierEquip.addEquippableAssetEntry(
+        await soldier.addEquippableAssetEntry(
           newSoldierResId,
           0,
           catalog.address,
           'ipfs:soldier/',
           [partIdForBody, partIdForWeapon, partIdForBackground],
         );
-        await soldierEquip.addAssetToToken(soldierID, newSoldierResId, soldierResId);
-        await soldierEquip.connect(soldierOwner).acceptAsset(soldierID, 0, newSoldierResId);
+        await soldier.addAssetToToken(soldierID, newSoldierResId, soldierResId);
+        await soldier.connect(soldierOwner).acceptAsset(soldierID, 0, newSoldierResId);
 
         await expect(
-          soldierEquip
+          soldier
             .connect(soldierOwner)
             .equip([soldierID, weaponChildIndex, newSoldierResId, partIdForWeapon, weaponResId]),
-        ).to.be.revertedWithCustomError(soldierEquip, 'RMRKSlotAlreadyUsed');
+        ).to.be.revertedWithCustomError(soldier, 'RMRKSlotAlreadyUsed');
       });
     });
   });
@@ -485,7 +469,7 @@ async function shouldBehaveLikeEquippableWithSlots(
       const childIndex = 0;
       const weaponResId = weaponAssetsEquip[0]; // This asset is assigned to weapon first weapon
 
-      await soldierEquip
+      await soldier
         .connect(soldierOwner)
         .equip([soldiersIds[0], childIndex, soldierResId, partIdForWeapon, weaponResId]);
 
@@ -499,7 +483,7 @@ async function shouldBehaveLikeEquippableWithSlots(
       const weaponResId = weaponAssetsEquip[0]; // This asset is assigned to weapon first weapon
       const approved = addrs[1];
 
-      await soldierEquip
+      await soldier
         .connect(soldierOwner)
         .equip([soldiersIds[0], childIndex, soldierResId, partIdForWeapon, weaponResId]);
 
@@ -514,7 +498,7 @@ async function shouldBehaveLikeEquippableWithSlots(
       const weaponResId = weaponAssetsEquip[0]; // This asset is assigned to weapon first weapon
       const approved = addrs[1];
 
-      await soldierEquip
+      await soldier
         .connect(soldierOwner)
         .equip([soldiersIds[0], childIndex, soldierResId, partIdForWeapon, weaponResId]);
 
@@ -524,21 +508,21 @@ async function shouldBehaveLikeEquippableWithSlots(
 
     it('cannot unequip if not equipped', async function () {
       await expect(
-        soldierEquip.connect(addrs[0]).unequip(soldiersIds[0], soldierResId, partIdForWeapon),
-      ).to.be.revertedWithCustomError(soldierEquip, 'RMRKNotEquipped');
+        soldier.connect(addrs[0]).unequip(soldiersIds[0], soldierResId, partIdForWeapon),
+      ).to.be.revertedWithCustomError(soldier, 'RMRKNotEquipped');
     });
 
     it('cannot unequip if not owner', async function () {
       // Weapon is child on index 0, background on index 1
       const childIndex = 0;
       const weaponResId = weaponAssetsEquip[0]; // This asset is assigned to weapon first weapon
-      await soldierEquip
+      await soldier
         .connect(addrs[0])
         .equip([soldiersIds[0], childIndex, soldierResId, partIdForWeapon, weaponResId]);
 
       await expect(
-        soldierEquip.connect(addrs[1]).unequip(soldiersIds[0], soldierResId, partIdForWeapon),
-      ).to.be.revertedWithCustomError(soldierEquip, 'RMRKNotApprovedForAssetsOrOwner');
+        soldier.connect(addrs[1]).unequip(soldiersIds[0], soldierResId, partIdForWeapon),
+      ).to.be.revertedWithCustomError(soldier, 'RMRKNotApprovedForAssetsOrOwner');
     });
   });
 
@@ -549,7 +533,7 @@ async function shouldBehaveLikeEquippableWithSlots(
       const childIndex = 0;
       const weaponResId = weaponAssetsEquip[0]; // This asset is assigned to weapon first weapon
 
-      await soldierEquip
+      await soldier
         .connect(soldierOwner)
         .equip([soldiersIds[0], childIndex, soldierResId, partIdForWeapon, weaponResId]);
 
@@ -573,7 +557,7 @@ async function shouldBehaveLikeEquippableWithSlots(
       // Weapon is child on index 0
       const childIndex = 0;
       const weaponResId = weaponAssetsEquip[0]; // This asset is assigned to weapon first weapon
-      await soldierEquip
+      await soldier
         .connect(addrs[0])
         .equip([soldiersIds[0], childIndex, soldierResId, partIdForWeapon, weaponResId]);
 
@@ -598,7 +582,7 @@ async function shouldBehaveLikeEquippableWithSlots(
     it('can compose equippables for soldier', async function () {
       const childIndex = 0;
       const weaponResId = weaponAssetsEquip[0]; // This asset is assigned to weapon first weapon
-      await soldierEquip
+      await soldier
         .connect(addrs[0])
         .equip([soldiersIds[0], childIndex, soldierResId, partIdForWeapon, weaponResId]);
 
@@ -614,7 +598,7 @@ async function shouldBehaveLikeEquippableWithSlots(
           bn(partIdForWeapon), // partId
           bn(weaponAssetsEquip[0]), // childAssetId
           2, // z
-          weaponEquip.address, // childAddress
+          weapon.address, // childAddress
           weaponsIds[0], // childTokenId
           'ipfs:weapon/equip/5', // childAssetMetadata
           '', // partMetadata
@@ -631,7 +615,7 @@ async function shouldBehaveLikeEquippableWithSlots(
         ],
       ];
       const allAssets = await view.composeEquippables(
-        soldierEquip.address,
+        soldier.address,
         soldiersIds[0],
         soldierResId,
       );
@@ -646,7 +630,7 @@ async function shouldBehaveLikeEquippableWithSlots(
 
     it('can compose equippables for simple asset', async function () {
       const allAssets = await view.composeEquippables(
-        backgroundEquip.address,
+        background.address,
         backgroundsIds[0],
         backgroundAssetId,
       );
@@ -662,8 +646,8 @@ async function shouldBehaveLikeEquippableWithSlots(
     it('cannot compose equippables for soldier with not associated asset', async function () {
       const wrongResId = weaponAssetsEquip[1];
       await expect(
-        view.composeEquippables(weaponEquip.address, weaponsIds[0], wrongResId),
-      ).to.be.revertedWithCustomError(weaponEquip, 'RMRKTokenDoesNotHaveAsset');
+        view.composeEquippables(weapon.address, weaponsIds[0], wrongResId),
+      ).to.be.revertedWithCustomError(weapon, 'RMRKTokenDoesNotHaveAsset');
     });
   });
 
@@ -674,7 +658,7 @@ async function shouldBehaveLikeEquippableWithSlots(
   ): Promise<void> {
     // It's ok if nothing equipped
     const expectedSlots = [bn(partIdForWeapon), bn(partIdForBackground)];
-    expect(await view.getEquipped(soldierEquip.address, soldiersIds[0], soldierResId)).to.eql([
+    expect(await view.getEquipped(soldier.address, soldiersIds[0], soldierResId)).to.eql([
       expectedSlots,
       [
         [bn(0), bn(0), bn(0), ethers.constants.AddressZero],
@@ -684,47 +668,47 @@ async function shouldBehaveLikeEquippableWithSlots(
     ]);
 
     await expect(
-      soldierEquip
+      soldier
         .connect(from)
         .equip([soldiersIds[0], childIndex, soldierResId, partIdForWeapon, weaponResId]),
     )
-      .to.emit(soldierEquip, 'ChildAssetEquipped')
+      .to.emit(soldier, 'ChildAssetEquipped')
       .withArgs(
         soldiersIds[0],
         soldierResId,
         partIdForWeapon,
         weaponsIds[0],
-        weaponEquip.address,
+        weapon.address,
         weaponAssetsEquip[0],
       );
     // All part slots are included on the response:
     // If a slot has nothing equipped, it returns an empty equip:
     const expectedEquips = [
-      [bn(soldierResId), bn(weaponResId), weaponsIds[0], weaponEquip.address],
+      [bn(soldierResId), bn(weaponResId), weaponsIds[0], weapon.address],
       [bn(0), bn(0), bn(0), ethers.constants.AddressZero],
     ];
     const expectedMetadata = ['ipfs:weapon/equip/5', ''];
-    expect(await view.getEquipped(soldierEquip.address, soldiersIds[0], soldierResId)).to.eql([
+    expect(await view.getEquipped(soldier.address, soldiersIds[0], soldierResId)).to.eql([
       expectedSlots,
       expectedEquips,
       expectedMetadata,
     ]);
 
     // Child is marked as equipped:
-    expect(
-      await soldierEquip.isChildEquipped(soldiersIds[0], weapon.address, weaponsIds[0]),
-    ).to.eql(true);
+    expect(await soldier.isChildEquipped(soldiersIds[0], weapon.address, weaponsIds[0])).to.eql(
+      true,
+    );
   }
 
   async function unequipWeaponAndCheckFromAddress(from: SignerWithAddress): Promise<void> {
-    await expect(soldierEquip.connect(from).unequip(soldiersIds[0], soldierResId, partIdForWeapon))
-      .to.emit(soldierEquip, 'ChildAssetUnequipped')
+    await expect(soldier.connect(from).unequip(soldiersIds[0], soldierResId, partIdForWeapon))
+      .to.emit(soldier, 'ChildAssetUnequipped')
       .withArgs(
         soldiersIds[0],
         soldierResId,
         partIdForWeapon,
         weaponsIds[0],
-        weaponEquip.address,
+        weapon.address,
         weaponAssetsEquip[0],
       );
 
@@ -735,16 +719,16 @@ async function shouldBehaveLikeEquippableWithSlots(
       [bn(0), bn(0), bn(0), ethers.constants.AddressZero],
     ];
     const expectedMetadata = ['', ''];
-    expect(await view.getEquipped(soldierEquip.address, soldiersIds[0], soldierResId)).to.eql([
+    expect(await view.getEquipped(soldier.address, soldiersIds[0], soldierResId)).to.eql([
       expectedSlots,
       expectedEquips,
       expectedMetadata,
     ]);
 
     // Child is marked as not equipped:
-    expect(
-      await soldierEquip.isChildEquipped(soldiersIds[0], weapon.address, weaponsIds[0]),
-    ).to.eql(false);
+    expect(await soldier.isChildEquipped(soldiersIds[0], weapon.address, weaponsIds[0])).to.eql(
+      false,
+    );
   }
 
   async function mintWeaponToSoldier(
@@ -757,14 +741,10 @@ async function shouldBehaveLikeEquippableWithSlots(
     await soldier.connect(soldierOwner).acceptChild(soldierId, 0, weapon.address, newWeaponId);
 
     // Add assets to weapon
-    await weaponEquip.addAssetToToken(newWeaponId, weaponAssetsFull[assetIndex], 0);
-    await weaponEquip.addAssetToToken(newWeaponId, weaponAssetsEquip[assetIndex], 0);
-    await weaponEquip
-      .connect(soldierOwner)
-      .acceptAsset(newWeaponId, 0, weaponAssetsFull[assetIndex]);
-    await weaponEquip
-      .connect(soldierOwner)
-      .acceptAsset(newWeaponId, 0, weaponAssetsEquip[assetIndex]);
+    await weapon.addAssetToToken(newWeaponId, weaponAssetsFull[assetIndex], 0);
+    await weapon.addAssetToToken(newWeaponId, weaponAssetsEquip[assetIndex], 0);
+    await weapon.connect(soldierOwner).acceptAsset(newWeaponId, 0, weaponAssetsFull[assetIndex]);
+    await weapon.connect(soldierOwner).acceptAsset(newWeaponId, 0, weaponAssetsEquip[assetIndex]);
 
     return newWeaponId;
   }

@@ -13,10 +13,10 @@ Smart contract of the RMRK Multi asset module.
 ### RMRK_INTERFACE
 
 ```solidity
-function RMRK_INTERFACE() external view returns (bytes4)
+function RMRK_INTERFACE() external pure returns (bytes4 rmrkInterface)
 ```
 
-
+Interface identifier of the @rmrk-team/evm-contracts package
 
 
 
@@ -25,12 +25,12 @@ function RMRK_INTERFACE() external view returns (bytes4)
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bytes4 | undefined |
+| rmrkInterface | bytes4 | Interface identifier for implementations of the @rmrk-team/evm-contracts package |
 
 ### VERSION
 
 ```solidity
-function VERSION() external view returns (string)
+function VERSION() external pure returns (string version)
 ```
 
 Version of the @rmrk-team/evm-contracts package
@@ -42,7 +42,7 @@ Version of the @rmrk-team/evm-contracts package
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | undefined |
+| version | string | Version identifier for implementations of the @rmrk-team/evm-contracts package |
 
 ### acceptAsset
 
@@ -99,7 +99,7 @@ Used to grant permission to the user to manage token&#39;s assets.
 ### balanceOf
 
 ```solidity
-function balanceOf(address owner) external view returns (uint256)
+function balanceOf(address owner) external view returns (uint256 balance)
 ```
 
 Used to retrieve the number of tokens in ``owner``&#39;s account.
@@ -116,12 +116,12 @@ Used to retrieve the number of tokens in ``owner``&#39;s account.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | The balance of the given account |
+| balance | uint256 | The balance of the given account |
 
 ### getActiveAssetPriorities
 
 ```solidity
-function getActiveAssetPriorities(uint256 tokenId) external view returns (uint64[])
+function getActiveAssetPriorities(uint256 tokenId) external view returns (uint64[] priorities)
 ```
 
 Used to retrieve the priorities of the active resoources of a given token.
@@ -138,12 +138,12 @@ Used to retrieve the priorities of the active resoources of a given token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint64[] | An array of priorities of the active assets of the given token |
+| priorities | uint64[] | An array of priorities of the active assets of the given token |
 
 ### getActiveAssets
 
 ```solidity
-function getActiveAssets(uint256 tokenId) external view returns (uint64[])
+function getActiveAssets(uint256 tokenId) external view returns (uint64[] assetIds)
 ```
 
 Used to retrieve IDs of the active assets of given token.
@@ -160,12 +160,12 @@ Used to retrieve IDs of the active assets of given token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint64[] | An array of active asset IDs of the given token |
+| assetIds | uint64[] | An array of active asset IDs of the given token |
 
 ### getApproved
 
 ```solidity
-function getApproved(uint256 tokenId) external view returns (address)
+function getApproved(uint256 tokenId) external view returns (address approved)
 ```
 
 Used to retrieve the account approved to manage given token.
@@ -182,12 +182,12 @@ Used to retrieve the account approved to manage given token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | address | Address of the account approved to manage the token |
+| approved | address | Address of the account approved to manage the token |
 
 ### getApprovedForAssets
 
 ```solidity
-function getApprovedForAssets(uint256 tokenId) external view returns (address)
+function getApprovedForAssets(uint256 tokenId) external view returns (address approved)
 ```
 
 Used to retrieve the address of the account approved to manage assets of a given token.
@@ -204,12 +204,12 @@ Used to retrieve the address of the account approved to manage assets of a given
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | address | Address of the account that is approved to manage the specified token&#39;s assets |
+| approved | address | Address of the account that is approved to manage the specified token&#39;s assets |
 
 ### getAssetMetadata
 
 ```solidity
-function getAssetMetadata(uint256 tokenId, uint64 assetId) external view returns (string)
+function getAssetMetadata(uint256 tokenId, uint64 assetId) external view returns (string metadata)
 ```
 
 Used to fetch the asset metadata of the specified token&#39;s active asset with the given index.
@@ -227,12 +227,12 @@ Used to fetch the asset metadata of the specified token&#39;s active asset with 
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | The metadata of the asset belonging to the specified index in the token&#39;s active assets  array |
+| metadata | string | The metadata of the asset belonging to the specified index in the token&#39;s active assets  array |
 
 ### getAssetReplacements
 
 ```solidity
-function getAssetReplacements(uint256 tokenId, uint64 newAssetId) external view returns (uint64)
+function getAssetReplacements(uint256 tokenId, uint64 newAssetId) external view returns (uint64 replacesAssetId)
 ```
 
 Used to retrieve the asset that will be replaced if a given asset from the token&#39;s pending array  is accepted.
@@ -250,12 +250,12 @@ Used to retrieve the asset that will be replaced if a given asset from the token
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint64 | ID of the asset which will be replaced |
+| replacesAssetId | uint64 | ID of the asset which will be replaced |
 
 ### getPendingAssets
 
 ```solidity
-function getPendingAssets(uint256 tokenId) external view returns (uint64[])
+function getPendingAssets(uint256 tokenId) external view returns (uint64[] assetIds)
 ```
 
 Used to retrieve IDs of the pending assets of given token.
@@ -272,12 +272,12 @@ Used to retrieve IDs of the pending assets of given token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint64[] | An array of pending asset IDs of the given token |
+| assetIds | uint64[] | An array of pending asset IDs of the given token |
 
 ### isApprovedForAll
 
 ```solidity
-function isApprovedForAll(address owner, address operator) external view returns (bool)
+function isApprovedForAll(address owner, address operator) external view returns (bool isApproved)
 ```
 
 Used to check if the given address is allowed to manage the tokens of the specified address.
@@ -295,12 +295,12 @@ Used to check if the given address is allowed to manage the tokens of the specif
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | A boolean value signifying whether the *operator* is allowed to manage the tokens of the *owner* (`true`)  or not (`false`) |
+| isApproved | bool | A boolean value signifying whether the *operator* is allowed to manage the tokens of the *owner* (`true`)  or not (`false`) |
 
 ### isApprovedForAllForAssets
 
 ```solidity
-function isApprovedForAllForAssets(address owner, address operator) external view returns (bool)
+function isApprovedForAllForAssets(address owner, address operator) external view returns (bool isApproved)
 ```
 
 Used to check whether the address has been granted the operator role by a given address or not.
@@ -318,12 +318,12 @@ Used to check whether the address has been granted the operator role by a given 
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | A boolean value indicating wehter the account we are checking has been granted the operator role |
+| isApproved | bool | A boolean value indicating whether the account we are checking has been granted the operator role |
 
 ### ownerOf
 
 ```solidity
-function ownerOf(uint256 tokenId) external view returns (address)
+function ownerOf(uint256 tokenId) external view returns (address owner)
 ```
 
 Used to retrieve the owner of the given token.
@@ -340,7 +340,7 @@ Used to retrieve the owner of the given token.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | address | Address of the account owning the token |
+| owner | address | Address of the account owning the token |
 
 ### rejectAllAssets
 
@@ -783,6 +783,17 @@ error ERC721TransferToTheZeroAddress()
 ```
 
 Attempting to transfer the token to a 0x0 address
+
+
+
+
+### IndexOutOfBounds
+
+```solidity
+error IndexOutOfBounds()
+```
+
+
 
 
 

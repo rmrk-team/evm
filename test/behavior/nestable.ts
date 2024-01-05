@@ -85,7 +85,7 @@ async function shouldBehaveLikeNestable(
 
       await expect(nestMint(child, nonReceiver.address, parentId)).to.be.revertedWithCustomError(
         child,
-        'RMRKMintToNonRMRKNestableImplementer',
+        'RMRKNestableTransferToNonRMRKNestableImplementer',
       );
     });
 
@@ -1037,7 +1037,7 @@ async function shouldBehaveLikeNestable(
     it('cannot nest tranfer to address 0', async function () {
       await expect(
         nestTransfer(child, firstOwner, ADDRESS_ZERO, childId, parentId),
-      ).to.be.revertedWithCustomError(child, 'ERC721TransferToTheZeroAddress');
+      ).to.be.revertedWithCustomError(child, 'RMRKIsNotContract');
     });
 
     it('cannot nest tranfer to a non contract', async function () {

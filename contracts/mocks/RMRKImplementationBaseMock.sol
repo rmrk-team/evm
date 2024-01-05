@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.21;
 
-import "../implementations/utils/RMRKImplementationBase.sol";
+import {RMRKImplementationBase} from "../implementations/utils/RMRKImplementationBase.sol";
 
 contract RMRKImplementationBaseMock is RMRKImplementationBase {
     constructor(
@@ -21,7 +21,7 @@ contract RMRKImplementationBaseMock is RMRKImplementationBase {
         )
     {}
 
-    function mockMint(uint256 total) external payable {
+    function mockMint(uint256 total) external {
         _prepareMint(total);
     }
 }

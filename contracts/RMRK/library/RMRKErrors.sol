@@ -14,8 +14,6 @@ error ERC721AddressZeroIsNotaValidOwner();
 error ERC721ApprovalToCurrentOwner();
 /// Attempting to grant approval when not being owner or approved for all should not be permitted
 error ERC721ApproveCallerIsNotOwnerNorApprovedForAll();
-/// Attempting to get approvals for a token owned by 0x0 (considered non-existent)
-error ERC721ApprovedQueryForNonexistentToken();
 /// Attempting to grant approval to self
 error ERC721ApproveToCaller();
 /// Attempting to use an invalid token ID
@@ -50,16 +48,8 @@ error RMRKChildAlreadyExists();
 error RMRKChildIndexOutOfRange();
 /// Attempting to find the index of a child token on a parent which does not own it.
 error RMRKChildNotFoundInParent();
-/// Attempting to pass collaborator address array and collaborator permission array of different lengths
-error RMRKCollaboratorArraysNotEqualLength();
-/// Attempting to register a collection that is already registered
-error RMRKCollectionAlreadyRegistered();
-/// Attempting to manage or interact with colleciton that is not registered
-error RMRKCollectionNotRegistered();
 /// Attempting to equip a `Part` with a child not approved by the Catalog
 error RMRKEquippableEquipNotAllowedByCatalog();
-/// Attempting to pass an epired ECDSA deadline
-error RMRKExpiredDeadline();
 /// Attempting to use ID 0, which is not supported
 /// @dev The ID 0 in RMRK suite is reserved for empty values. Guarding against its use ensures the expected operation
 error RMRKIdZeroForbidden();
@@ -67,8 +57,6 @@ error RMRKIdZeroForbidden();
 error RMRKIndexOutOfRange();
 /// Attempting to reclaim a child that can't be reclaimed
 error RMRKInvalidChildReclaim();
-/// Attempting to use and invalid ECDSA signature
-error RMRKInvalidSignature();
 /// Attempting to interact with an end-user account when the contract account is expected
 error RMRKIsNotContract();
 /// Attempting to interact with a contract that had its operation locked
@@ -84,8 +72,6 @@ error RMRKMaxPendingAssetsReached();
 error RMRKMaxRecursiveBurnsReached(address childContract, uint256 childId);
 /// Attempting to mint a number of tokens that would cause the total supply to be greater than maximum supply
 error RMRKMintOverMax();
-/// Attempting to mint a nested token to a smart contract that doesn't support nesting
-error RMRKMintToNonRMRKNestableImplementer();
 /// Attempting to mint zero tokens
 error RMRKMintZero();
 /// Attempting to pass complementary arrays of different lengths
@@ -109,12 +95,6 @@ error RMRKNotApprovedForAssetsOrOwner();
 /// @dev When a token is nested, only the direct owner (NFT parent) can mange it. In that case, approved addresses are
 ///  not allowed to manage it, in order to ensure the expected behaviour
 error RMRKNotApprovedOrDirectOwner();
-/// Attempting to manage a collection without being the collection's collaborator
-error RMRKNotCollectionCollaborator();
-/// Attemting to manage a collection without being the collection's issuer
-error RMRKNotCollectionIssuer();
-/// Attempting to manage a collection without being the collection's issuer or collaborator
-error RMRKNotCollectionIssuerOrCollaborator();
 /// Attempting to compose an asset wihtout having an associated Catalog
 error RMRKNotComposableAsset();
 /// Attempting to unequip an item that isn't equipped
@@ -123,16 +103,10 @@ error RMRKNotEquipped();
 error RMRKNotOwner();
 /// Attempting to interact with a function without being the owner or contributor of the collection
 error RMRKNotOwnerOrContributor();
-/// Attempting to manage a collection without being the specific address
-error RMRKNotSpecificAddress();
-/// Attempting to manage a token without being its owner
-error RMRKNotTokenOwner();
 /// Attempting to transfer the ownership to the 0x0 address
 error RMRKNewOwnerIsZeroAddress();
 /// Attempting to assign a 0x0 address as a contributor
 error RMRKNewContributorIsZeroAddress();
-/// Attemtping to use `Ownable` interface without implementing it
-error RMRKOwnableNotImplemented();
 /// Attempting an operation requiring the token being nested, while it is not
 error RMRKParentIsNotNFT();
 /// Attempting to add a `Part` with an ID that is already used
@@ -175,3 +149,5 @@ error RMRKCanOnlyDoBulkOperationsOnOwnedTokens();
 error RMRKCanOnlyDoBulkOperationsWithOneTokenAtATime();
 /// Attempting to pay with native token with a value different than expected
 error RMRKWrongValueSent();
+// Attempting to send native token to a recipient that is unable to receive it
+error TransferFailed();

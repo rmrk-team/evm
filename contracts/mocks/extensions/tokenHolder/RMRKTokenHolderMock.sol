@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 pragma solidity ^0.8.21;
-import "../../../RMRK/extension/tokenHolder/RMRKTokenHolder.sol";
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+
+import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import {RMRKTokenHolder} from "../../../RMRK/extension/tokenHolder/RMRKTokenHolder.sol";
+import {IRMRKTokenHolder} from "../../../RMRK/extension/tokenHolder/IRMRKTokenHolder.sol";
 
 error OnlyNFTOwnerCanTransferTokensFromIt();
-error OnlyNFTOwnerCanTransferTokensToIt();
 
 /**
  * @title RMRKTokenHolderMock
@@ -19,7 +20,7 @@ contract RMRKTokenHolderMock is RMRKTokenHolder, ERC721 {
     ) ERC721(name, symbol) {}
 
     function mint(address to, uint256 tokenId) public {
-        _mint(to, tokenId);
+        _safeMint(to, tokenId);
     }
 
     function supportsInterface(
@@ -63,7 +64,7 @@ contract RMRKTokenHolderMock is RMRKTokenHolder, ERC721 {
         address to,
         bytes memory data
     ) external {
-        if (msg.sender != ownerOf(tokenId)) {
+        if (_msgSender() != ownerOf(tokenId)) {
             revert OnlyNFTOwnerCanTransferTokensFromIt();
         }
         _transferHeldTokenFromToken(

@@ -2,9 +2,11 @@
 
 pragma solidity ^0.8.21;
 
-import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
-import "../../RMRK/equippable/RMRKMinifiedEquippable.sol";
-import "../utils/RMRKImplementationBase.sol";
+import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+import {IERC2981} from "@openzeppelin/contracts/interfaces/IERC2981.sol";
+import {IERC721Metadata} from "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
+import {RMRKMinifiedEquippable} from "../../RMRK/equippable/RMRKMinifiedEquippable.sol";
+import {RMRKImplementationBase} from "../utils/RMRKImplementationBase.sol";
 
 /**
  * @title RMRKAbstractEquippable
@@ -40,14 +42,14 @@ abstract contract RMRKAbstractEquippable is
      * @param catalogAddress Address of the `Catalog` smart contract this asset belongs to
      * @param metadataURI Metadata URI of the asset
      * @param partIds An array of IDs of fixed and slot parts to be included in the asset
-     * @return The total number of assets after this asset has been added
+     * @return assetId The ID of the newly added asset
      */
     function addEquippableAssetEntry(
         uint64 equippableGroupId,
         address catalogAddress,
         string memory metadataURI,
         uint64[] memory partIds
-    ) public virtual onlyOwnerOrContributor returns (uint256) {
+    ) public virtual onlyOwnerOrContributor returns (uint256 assetId) {
         unchecked {
             ++_totalAssets;
         }
@@ -58,23 +60,23 @@ abstract contract RMRKAbstractEquippable is
             metadataURI,
             partIds
         );
-        return _totalAssets;
+        assetId = _totalAssets;
     }
 
     /**
      * @notice Used to add a asset entry.
      * @dev The ID of the asset is automatically assigned to be the next available asset ID.
      * @param metadataURI Metadata URI of the asset
-     * @return ID of the newly added asset
+     * @return assetId ID of the newly added asset
      */
     function addAssetEntry(
         string memory metadataURI
-    ) public virtual onlyOwnerOrContributor returns (uint256) {
+    ) public virtual onlyOwnerOrContributor returns (uint256 assetId) {
         unchecked {
             ++_totalAssets;
         }
         _addAssetEntry(uint64(_totalAssets), metadataURI);
-        return _totalAssets;
+        assetId = _totalAssets;
     }
 
     /**
@@ -106,7 +108,7 @@ abstract contract RMRKAbstractEquippable is
             super.supportsInterface(interfaceId) ||
             interfaceId == type(IERC2981).interfaceId ||
             interfaceId == type(IERC721Metadata).interfaceId ||
-            interfaceId == RMRK_INTERFACE;
+            interfaceId == RMRK_INTERFACE();
     }
 
     function _beforeTokenTransfer(

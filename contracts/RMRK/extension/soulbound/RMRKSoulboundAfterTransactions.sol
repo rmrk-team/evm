@@ -2,7 +2,8 @@
 
 pragma solidity ^0.8.21;
 
-import "./RMRKSoulbound.sol";
+import {IERC6454} from "./IERC6454.sol";
+import {RMRKSoulbound} from "./RMRKSoulbound.sol";
 
 /**
  * @title RMRKSoulboundAfterTransactions
@@ -46,6 +47,7 @@ abstract contract RMRKSoulboundAfterTransactions is RMRKSoulbound {
         address to,
         uint256 tokenId
     ) internal virtual {
+        address(to); // Silence the warning about unused variable, needed for docs generation
         // We won't count minting:
         if (from != address(0)) {
             _transfersPerToken[tokenId]++;
@@ -79,7 +81,7 @@ abstract contract RMRKSoulboundAfterTransactions is RMRKSoulbound {
         uint256 tokenId,
         address,
         address
-    ) public view virtual override returns (bool) {
-        return _transfersPerToken[tokenId] < _maxNumberOfTransfers;
+    ) public view virtual override returns (bool isTransferable_) {
+        isTransferable_ = _transfersPerToken[tokenId] < _maxNumberOfTransfers;
     }
 }

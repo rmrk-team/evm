@@ -2,10 +2,9 @@
 
 pragma solidity ^0.8.21;
 
-import "../../../RMRK/extension/reclaimableChild/RMRKReclaimableChild.sol";
-import "../../RMRKNestableMock.sol";
-
-error RMRKTokenHasNoAssetsWithType();
+import {RMRKReclaimableChild} from "../../../RMRK/extension/reclaimableChild/RMRKReclaimableChild.sol";
+import {RMRKNestableMock} from "../../RMRKNestableMock.sol";
+import {RMRKNestable} from "../../../RMRK/nestable/RMRKNestable.sol";
 
 contract RMRKNestableClaimableChildMock is
     RMRKNestableMock,

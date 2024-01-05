@@ -4,7 +4,7 @@
 
 > Ownable
 
-A minimal ownable smart contractf or owner and contributors.
+A minimal ownable smart contract or owner and contributors.
 
 *This smart contract is based on &quot;openzeppelin&#39;s access/Ownable.sol&quot;.*
 
@@ -13,7 +13,7 @@ A minimal ownable smart contractf or owner and contributors.
 ### isContributor
 
 ```solidity
-function isContributor(address contributor) external view returns (bool)
+function isContributor(address contributor) external view returns (bool isContributor_)
 ```
 
 Used to check if the address is one of the contributors.
@@ -30,7 +30,7 @@ Used to check if the address is one of the contributors.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | Boolean value indicating whether the address is a contributor or not |
+| isContributor_ | bool | Boolean value indicating whether the address is a contributor or not |
 
 ### manageContributor
 
@@ -52,7 +52,7 @@ Adds or removes a contributor to the smart contract.
 ### owner
 
 ```solidity
-function owner() external view returns (address)
+function owner() external view returns (address owner_)
 ```
 
 Returns the address of the current owner.
@@ -64,7 +64,7 @@ Returns the address of the current owner.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | address | Address of the current owner |
+| owner_ | address | Address of the current owner |
 
 ### renounceOwnership
 

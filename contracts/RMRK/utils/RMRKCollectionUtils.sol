@@ -2,13 +2,15 @@
 
 pragma solidity ^0.8.21;
 
-import "@openzeppelin/contracts/interfaces/IERC2981.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import "../equippable/IERC6220.sol";
-import "../nestable/IERC7401.sol";
-import "../extension/soulbound/IERC6454.sol";
-import "./IRMRKCollectionData.sol";
+import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+import {IERC2981} from "@openzeppelin/contracts/interfaces/IERC2981.sol";
+import {IERC721Metadata} from "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
+import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import {IERC6220} from "../equippable/IERC6220.sol";
+import {IERC5773} from "../multiasset/IERC5773.sol";
+import {IERC7401} from "../nestable/IERC7401.sol";
+import {IERC6454} from "../extension/soulbound/IERC6454.sol";
+import {IRMRKCollectionData} from "./IRMRKCollectionData.sol";
 
 /**
  * @title RMRKCollectionUtils
@@ -17,6 +19,31 @@ import "./IRMRKCollectionData.sol";
  * @dev Extra utility functions for RMRK contracts.
  */
 contract RMRKCollectionUtils {
+    /**
+     * @notice This event emits when the metadata of a token is changed.
+     * So that the third-party platforms such as NFT market could
+     * timely update the images and related attributes of the NFT.
+     * Inspired on ERC4906, but adding collection.
+     * @param collection Address of the collection to emit the event from
+     * @param tokenId ID of the token to emit the event from
+     */
+    event MetadataUpdate(address indexed collection, uint256 indexed tokenId);
+
+    /**
+     * @notice This event emits when the metadata of a range of tokens is changed.
+     * So that the third-party platforms such as NFT market could
+     * timely update the images and related attributes of the NFTs.
+     * Inspired on ERC4906, but adding collection.
+     * @param collection Address of the collection to emit the event from
+     * @param fromTokenId ID of the first token to emit the event from
+     * @param toTokenId ID of the last token to emit the event from
+     */
+    event BatchMetadataUpdate(
+        address indexed collection,
+        uint256 indexed fromTokenId,
+        uint256 indexed toTokenId
+    );
+
     /**
      * notice Structure used to represent the collection data.
      * @return totalSupply The total supply of the collection
@@ -85,7 +112,13 @@ contract RMRKCollectionUtils {
             string memory collectionMetadata
         ) {
             data.collectionMetadata = collectionMetadata;
-        } catch {}
+        } catch {
+            try target.contractURI() returns (
+                string memory collectionMetadata
+            ) {
+                data.collectionMetadata = collectionMetadata;
+            } catch {}
+        }
     }
 
     /**
@@ -144,7 +177,7 @@ contract RMRKCollectionUtils {
         uint256 pageStart,
         uint256 pageSize
     ) public view returns (uint256[] memory page) {
-        uint256[] memory tmpIds = new uint[](pageSize);
+        uint256[] memory tmpIds = new uint256[](pageSize);
         uint256 found;
         for (uint256 i = 0; i < pageSize; ) {
             try IERC721(targetEquippable).ownerOf(pageStart + i) returns (
@@ -174,5 +207,41 @@ contract RMRKCollectionUtils {
                 ++i;
             }
         }
+    }
+
+    /**
+     * @notice Triggers an event to refresh the collection metadata.
+     * @dev It will do nothing if the given collection address is not a contract.
+     * @param collectionAddress Address of the collection to refresh the metadata from
+     * @param fromTokenId ID of the first token to refresh the metadata from
+     * @param toTokenId ID of the last token to refresh the metadata from
+     */
+    function refreshCollectionTokensMetadata(
+        address collectionAddress,
+        uint256 fromTokenId,
+        uint256 toTokenId
+    ) public {
+        // To avoid some spam
+        if (collectionAddress.code.length == 0) {
+            return;
+        }
+        emit BatchMetadataUpdate(collectionAddress, fromTokenId, toTokenId);
+    }
+
+    /**
+     * @notice Triggers an event to refresh the token metadata.
+     * @dev It will do nothing if the given collection address is not a contract.
+     * @param collectionAddress Address of the collection to refresh the metadata from
+     * @param tokenId ID of the token to refresh the metadata from
+     */
+    function refreshTokenMetadata(
+        address collectionAddress,
+        uint256 tokenId
+    ) public {
+        // To avoid some spam
+        if (collectionAddress.code.length == 0) {
+            return;
+        }
+        emit MetadataUpdate(collectionAddress, tokenId);
     }
 }

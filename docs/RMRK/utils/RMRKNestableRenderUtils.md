@@ -59,7 +59,7 @@ Used to retrieve the immediate owner of the given token, and whether it is on th
 ### getChildIndex
 
 ```solidity
-function getChildIndex(address parentAddress, uint256 parentId, address childAddress, uint256 childId) external view returns (uint256)
+function getChildIndex(address parentAddress, uint256 parentId, address childAddress, uint256 childId) external view returns (uint256 index)
 ```
 
 Used to retrieve the given child&#39;s index in its parent&#39;s child tokens array.
@@ -79,7 +79,7 @@ Used to retrieve the given child&#39;s index in its parent&#39;s child tokens ar
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | The index of the child token in the parent token&#39;s child tokens array |
+| index | uint256 | The index of the child token in the parent token&#39;s child tokens array |
 
 ### getParent
 
@@ -108,7 +108,7 @@ Used to retrieve the contract address and ID of the parent token of the specifie
 ### getPendingChildIndex
 
 ```solidity
-function getPendingChildIndex(address parentAddress, uint256 parentId, address childAddress, uint256 childId) external view returns (uint256)
+function getPendingChildIndex(address parentAddress, uint256 parentId, address childAddress, uint256 childId) external view returns (uint256 index)
 ```
 
 Used to retrieve the given child&#39;s index in its parent&#39;s pending child tokens array.
@@ -128,7 +128,7 @@ Used to retrieve the given child&#39;s index in its parent&#39;s pending child t
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | The index of the child token in the parent token&#39;s pending child tokens array |
+| index | uint256 | The index of the child token in the parent token&#39;s pending child tokens array |
 
 ### getTotalDescendants
 
@@ -157,7 +157,7 @@ Used to retrieve the total number of descendants of the given token and whether 
 ### hasMoreThanOneLevelOfNesting
 
 ```solidity
-function hasMoreThanOneLevelOfNesting(address collection, uint256 tokenId) external view returns (bool)
+function hasMoreThanOneLevelOfNesting(address collection, uint256 tokenId) external view returns (bool hasMoreThanOneLevelOfNesting_)
 ```
 
 Used to retrieve whether a token has more than one level of nesting.
@@ -175,7 +175,7 @@ Used to retrieve whether a token has more than one level of nesting.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | A boolean value indicating whether the given token has more than one level of nesting |
+| hasMoreThanOneLevelOfNesting_ | bool | A boolean value indicating whether the given token has more than one level of nesting |
 
 ### isTokenRejectedOrAbandoned
 
@@ -203,7 +203,7 @@ Used to identify if the given token is rejected or abandoned. That is, it&#39;s 
 ### validateChildOf
 
 ```solidity
-function validateChildOf(address parentAddress, address childAddress, uint256 parentId, uint256 childId) external view returns (bool)
+function validateChildOf(address parentAddress, address childAddress, uint256 parentId, uint256 childId) external view returns (bool validChild)
 ```
 
 Used to validate whether the specified child token is owned by a given parent token.
@@ -223,12 +223,12 @@ Used to validate whether the specified child token is owned by a given parent to
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | A boolean value indicating whether the child token is owned by the parent token or not |
+| validChild | bool | A boolean value indicating whether the child token is owned by the parent token or not |
 
 ### validateChildrenOf
 
 ```solidity
-function validateChildrenOf(address parentAddress, address[] childAddresses, uint256 parentId, uint256[] childIds) external view returns (bool, bool[])
+function validateChildrenOf(address parentAddress, address[] childAddresses, uint256 parentId, uint256[] childIds) external view returns (bool isValid, bool[] validityOfChildren)
 ```
 
 Used to validate whether the specified child token is owned by a given parent token.
@@ -248,8 +248,8 @@ Used to validate whether the specified child token is owned by a given parent to
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | A boolean value indicating whether all of the child tokens are owned by the parent token or not |
-| _1 | bool[] | An array of boolean values indicating whether each of the child tokens are owned by the parent token or  not |
+| isValid | bool | A boolean value indicating whether all of the child tokens are owned by the parent token or not |
+| validityOfChildren | bool[] | An array of boolean values indicating whether each of the child tokens are owned by the parent token or  not |
 
 
 

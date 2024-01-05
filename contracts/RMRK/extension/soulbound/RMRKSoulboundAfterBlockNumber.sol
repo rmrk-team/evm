@@ -2,7 +2,8 @@
 
 pragma solidity ^0.8.21;
 
-import "./RMRKSoulbound.sol";
+import {IERC6454} from "./IERC6454.sol";
+import {RMRKSoulbound} from "./RMRKSoulbound.sol";
 
 /**
  * @title RMRKSoulboundAfterBlockNumber
@@ -36,7 +37,7 @@ abstract contract RMRKSoulboundAfterBlockNumber is RMRKSoulbound {
         uint256,
         address,
         address
-    ) public view virtual override returns (bool) {
-        return _lastBlockToTransfer > block.number;
+    ) public view virtual override returns (bool isTransferable_) {
+        isTransferable_ = _lastBlockToTransfer > block.number;
     }
 }

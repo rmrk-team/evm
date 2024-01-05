@@ -2,10 +2,11 @@
 
 pragma solidity ^0.8.21;
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "../abstract/RMRKAbstractNestable.sol";
-import "../utils/RMRKTokenURIEnumerated.sol";
-import "./InitDataERC20Pay.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {RMRKAbstractNestable} from "../abstract/RMRKAbstractNestable.sol";
+import {RMRKImplementationBase} from "../utils/RMRKImplementationBase.sol";
+import {RMRKTokenURIEnumerated} from "../utils/RMRKTokenURIEnumerated.sol";
+import {InitDataERC20Pay} from "./InitDataERC20Pay.sol";
 
 /**
  * @title RMRKNestableLazyMintErc20
@@ -17,8 +18,8 @@ contract RMRKNestableLazyMintErc20 is
     RMRKTokenURIEnumerated,
     RMRKAbstractNestable
 {
-    uint256 private _pricePerMint;
-    address private _erc20TokenAddress;
+    uint256 internal _pricePerMint;
+    address internal _erc20TokenAddress;
 
     /**
      * @notice Used to initialize the smart contract.
@@ -55,12 +56,12 @@ contract RMRKNestableLazyMintErc20 is
      * @dev Can only be called while the open sale is open.
      * @param to Address to which to mint the token
      * @param numToMint Number of tokens to mint
-     * @return The ID of the first token to be minted in the current minting cycle
+     * @return firstTokenId The ID of the first token to be minted in the current minting cycle
      */
     function mint(
         address to,
         uint256 numToMint
-    ) public payable virtual returns (uint256) {
+    ) public payable virtual returns (uint256 firstTokenId) {
         (uint256 nextToken, uint256 totalSupplyOffset) = _prepareMint(
             numToMint
         );
@@ -73,7 +74,7 @@ contract RMRKNestableLazyMintErc20 is
             }
         }
 
-        return nextToken;
+        firstTokenId = nextToken;
     }
 
     /**
@@ -83,13 +84,13 @@ contract RMRKNestableLazyMintErc20 is
      * @param to Address of the collection smart contract of the token into which to mint the child token
      * @param numToMint Number of tokens to mint
      * @param destinationId ID of the token into which to mint the new child token
-     * @return The ID of the first token to be minted in the current minting cycle
+     * @return firstTokenId The ID of the first token to be minted in the current minting cycle
      */
     function nestMint(
         address to,
         uint256 numToMint,
         uint256 destinationId
-    ) public payable virtual returns (uint256) {
+    ) public payable virtual returns (uint256 firstTokenId) {
         (uint256 nextToken, uint256 totalSupplyOffset) = _prepareMint(
             numToMint
         );
@@ -102,13 +103,13 @@ contract RMRKNestableLazyMintErc20 is
             }
         }
 
-        return nextToken;
+        firstTokenId = nextToken;
     }
 
     function _chargeMints(uint256 numToMint) internal {
         uint256 price = numToMint * _pricePerMint;
         IERC20(_erc20TokenAddress).transferFrom(
-            msg.sender,
+            _msgSender(),
             address(this),
             price
         );
@@ -116,18 +117,23 @@ contract RMRKNestableLazyMintErc20 is
 
     /**
      * @notice Used to retrieve the address of the ERC20 token this smart contract supports.
-     * @return Address of the ERC20 token's smart contract
+     * @return erc20Token Address of the ERC20 token's smart contract
      */
-    function erc20TokenAddress() public view virtual returns (address) {
-        return _erc20TokenAddress;
+    function erc20TokenAddress()
+        public
+        view
+        virtual
+        returns (address erc20Token)
+    {
+        erc20Token = _erc20TokenAddress;
     }
 
     /**
      * @notice Used to retrieve the price per mint.
-     * @return The price per mint of a single token expressed in the lowest denomination of a native currency
+     * @return price The price per mint of a single token expressed in the lowest denomination of a native currency
      */
-    function pricePerMint() public view returns (uint256) {
-        return _pricePerMint;
+    function pricePerMint() public view returns (uint256 price) {
+        price = _pricePerMint;
     }
 
     /**

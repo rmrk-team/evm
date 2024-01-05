@@ -10,3 +10,17 @@ RMRK library smart contract.
 
 
 
+## Errors
+
+### IndexOutOfBounds
+
+```solidity
+error IndexOutOfBounds()
+```
+
+
+
+
+
+
+

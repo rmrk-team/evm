@@ -2,19 +2,18 @@
 
 pragma solidity ^0.8.21;
 
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
-import "@openzeppelin/contracts/utils/Address.sol";
-import "@openzeppelin/contracts/utils/Context.sol";
-import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
-
-import "../catalog/IRMRKCatalog.sol";
-import "../core/RMRKCore.sol";
-import "../equippable/IERC6220.sol";
+import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+import {IERC5773} from "../multiasset/IERC5773.sol";
+import {IERC6220} from "../equippable/IERC6220.sol";
+import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import {IERC721Receiver} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
+import {IERC7401} from "../nestable/IERC7401.sol";
+import {Context} from "@openzeppelin/contracts/utils/Context.sol";
+import {IRMRKCatalog} from "../catalog/IRMRKCatalog.sol";
+import {RMRKCore} from "../core/RMRKCore.sol";
+import {RMRKLib} from "../library/RMRKLib.sol";
+import {ReentrancyGuard} from "../security/ReentrancyGuard.sol";
 import "../library/RMRKErrors.sol";
-import "../library/RMRKLib.sol";
-import "../nestable/IERC7401.sol";
-import "../security/ReentrancyGuard.sol";
 
 /**
  * @title RMRKMinifiedEquippable
@@ -33,7 +32,6 @@ contract RMRKMinifiedEquippable is
     RMRKCore
 {
     using RMRKLib for uint64[];
-    using Address for address;
 
     uint256 private constant _MAX_LEVELS_TO_CHECK_FOR_INHERITANCE_LOOP = 100;
 
@@ -72,7 +70,7 @@ contract RMRKMinifiedEquippable is
      *  reverted.
      * @param tokenId ID of the token to check
      */
-    function _onlyApprovedOrOwner(uint256 tokenId) private view {
+    function _onlyApprovedOrOwner(uint256 tokenId) internal view {
         address owner = ownerOf(tokenId);
         if (
             !(_msgSender() == owner ||
@@ -98,7 +96,7 @@ contract RMRKMinifiedEquippable is
      * @dev Used for parent-scoped transfers.
      * @param tokenId ID of the token to check.
      */
-    function _onlyApprovedOrDirectOwner(uint256 tokenId) private view {
+    function _onlyApprovedOrDirectOwner(uint256 tokenId) internal view {
         (address owner, uint256 parentId, ) = directOwnerOf(tokenId);
         // When the parent is an NFT, only it can do operations. Otherwise, the owner or approved address can
         if (
@@ -125,11 +123,13 @@ contract RMRKMinifiedEquippable is
     /**
      * @notice Used to retrieve the number of tokens in `owner`'s account.
      * @param owner Address of the account being checked
-     * @return The balance of the given account
+     * @return balance The balance of the given account
      */
-    function balanceOf(address owner) public view virtual returns (uint256) {
+    function balanceOf(
+        address owner
+    ) public view virtual returns (uint256 balance) {
         if (owner == address(0)) revert ERC721AddressZeroIsNotaValidOwner();
-        return _balances[owner];
+        balance = _balances[owner];
     }
 
     ////////////////////////////////////////
@@ -217,15 +217,10 @@ contract RMRKMinifiedEquippable is
     ) public virtual onlyApprovedOrDirectOwner(tokenId) {
         (address immediateOwner, uint256 parentId, ) = directOwnerOf(tokenId);
         if (immediateOwner != from) revert ERC721TransferFromIncorrectOwner();
-        if (to == address(0)) revert ERC721TransferToTheZeroAddress();
         if (to == address(this) && tokenId == destinationId)
             revert RMRKNestableTransferToSelf();
 
-        // Destination contract checks:
-        // It seems redundant, but otherwise it would revert with no error
-        if (!to.isContract()) revert RMRKIsNotContract();
-        if (!IERC165(to).supportsInterface(type(IERC7401).interfaceId))
-            revert RMRKNestableTransferToNonRMRKNestableImplementer();
+        _checkDestination(to);
         _checkForInheritanceLoop(tokenId, to, destinationId);
 
         _beforeTokenTransfer(from, to, tokenId);
@@ -247,7 +242,7 @@ contract RMRKMinifiedEquippable is
 
     /**
      * @notice Used to transfer the token from `from` to `to`.
-     * @dev As opposed to {transferFrom}, this imposes no restrictions on msg.sender.
+     * @dev As opposed to {transferFrom}, this imposes no restrictions on msg.sender
      * @dev Requirements:
      *
      *  - `to` cannot be the zero address.
@@ -397,11 +392,7 @@ contract RMRKMinifiedEquippable is
         uint256 destinationId,
         bytes memory data
     ) internal virtual {
-        // It seems redundant, but otherwise it would revert with no error
-        if (!to.isContract()) revert RMRKIsNotContract();
-        if (!IERC165(to).supportsInterface(type(IERC7401).interfaceId))
-            revert RMRKMintToNonRMRKNestableImplementer();
-
+        _checkDestination(to);
         _innerMint(to, tokenId, destinationId, data);
         _sendToNFT(address(0), to, 0, destinationId, tokenId, data);
     }
@@ -454,14 +445,14 @@ contract RMRKMinifiedEquippable is
      */
     function ownerOf(
         uint256 tokenId
-    ) public view virtual override(IERC7401, IERC721) returns (address) {
+    ) public view virtual override(IERC7401, IERC721) returns (address owner_) {
         (address owner, uint256 ownerTokenId, bool isNft) = directOwnerOf(
             tokenId
         );
         if (isNft) {
             owner = IERC7401(owner).ownerOf(ownerTokenId);
         }
-        return owner;
+        owner_ = owner;
     }
 
     /**
@@ -469,11 +460,18 @@ contract RMRKMinifiedEquippable is
      */
     function directOwnerOf(
         uint256 tokenId
-    ) public view virtual returns (address, uint256, bool) {
+    )
+        public
+        view
+        virtual
+        returns (address owner_, uint256 parentId, bool isNFT)
+    {
         DirectOwner memory owner = _RMRKOwners[tokenId];
         if (owner.ownerAddress == address(0)) revert ERC721InvalidTokenId();
 
-        return (owner.ownerAddress, owner.tokenId, owner.tokenId != 0);
+        owner_ = owner.ownerAddress;
+        parentId = owner.tokenId;
+        isNFT = owner.tokenId != 0;
     }
 
     ////////////////////////////////////////
@@ -495,7 +493,12 @@ contract RMRKMinifiedEquippable is
     function burn(
         uint256 tokenId,
         uint256 maxChildrenBurns
-    ) public virtual onlyApprovedOrDirectOwner(tokenId) returns (uint256) {
+    )
+        public
+        virtual
+        onlyApprovedOrDirectOwner(tokenId)
+        returns (uint256 burnedChildren)
+    {
         (address immediateOwner, uint256 parentId, ) = directOwnerOf(tokenId);
         address rootOwner = ownerOf(tokenId);
 
@@ -520,11 +523,10 @@ contract RMRKMinifiedEquippable is
         delete _tokenApprovals[tokenId][rootOwner];
 
         uint256 pendingRecursiveBurns;
-        uint256 totalChildBurns;
 
         uint256 length = children.length; //gas savings
         for (uint256 i; i < length; ) {
-            if (totalChildBurns >= maxChildrenBurns)
+            if (burnedChildren >= maxChildrenBurns)
                 revert RMRKMaxRecursiveBurnsReached(
                     children[i].contractAddress,
                     children[i].tokenId
@@ -534,11 +536,11 @@ contract RMRKMinifiedEquippable is
             ];
             unchecked {
                 // At this point we know pendingRecursiveBurns must be at least 1
-                pendingRecursiveBurns = maxChildrenBurns - totalChildBurns;
+                pendingRecursiveBurns = maxChildrenBurns - burnedChildren;
             }
             // We substract one to the next level to count for the token being burned, then add it again on returns
             // This is to allow the behavior of 0 recursive burns meaning only the current token is deleted.
-            totalChildBurns +=
+            burnedChildren +=
                 IERC7401(children[i].contractAddress).burn(
                     children[i].tokenId,
                     pendingRecursiveBurns - 1
@@ -563,8 +565,6 @@ contract RMRKMinifiedEquippable is
             tokenId,
             ""
         );
-
-        return totalChildBurns;
     }
 
     ////////////////////////////////////////
@@ -600,14 +600,14 @@ contract RMRKMinifiedEquippable is
      *
      *  - `tokenId` must exist.
      * @param tokenId ID of the token to check for approval
-     * @return Address of the account approved to manage the token
+     * @return approved Address of the account approved to manage the token
      */
     function getApproved(
         uint256 tokenId
-    ) public view virtual returns (address) {
+    ) public view virtual returns (address approved) {
         _requireMinted(tokenId);
 
-        return _tokenApprovals[tokenId][ownerOf(tokenId)];
+        approved = _tokenApprovals[tokenId][ownerOf(tokenId)];
     }
 
     /**
@@ -630,14 +630,14 @@ contract RMRKMinifiedEquippable is
      * @notice Used to check if the given address is allowed to manage the tokens of the specified address.
      * @param owner Address of the owner of the tokens
      * @param operator Address being checked for approval
-     * @return A boolean value signifying whether the *operator* is allowed to manage the tokens of the *owner* (`true`)
+     * @return isApproved A boolean value signifying whether the *operator* is allowed to manage the tokens of the *owner* (`true`)
      *  or not (`false`)
      */
     function isApprovedForAll(
         address owner,
         address operator
-    ) public view virtual returns (bool) {
-        return _operatorApprovals[owner][operator];
+    ) public view virtual returns (bool isApproved) {
+        isApproved = _operatorApprovals[owner][operator];
     }
 
     /**
@@ -694,10 +694,12 @@ contract RMRKMinifiedEquippable is
      * @notice Used to check whether the given token exists.
      * @dev Tokens start existing when they are minted (`_mint`) and stop existing when they are burned (`_burn`).
      * @param tokenId ID of the token being checked
-     * @return A boolean value signifying whether the token exists
+     * @return exists A boolean value signifying whether the token exists
      */
-    function _exists(uint256 tokenId) internal view virtual returns (bool) {
-        return _RMRKOwners[tokenId].ownerAddress != address(0);
+    function _exists(
+        uint256 tokenId
+    ) internal view virtual returns (bool exists) {
+        exists = _RMRKOwners[tokenId].ownerAddress != address(0);
     }
 
     /**
@@ -707,15 +709,15 @@ contract RMRKMinifiedEquippable is
      * @param to Yarget address that will receive the tokens
      * @param tokenId ID of the token to be transferred
      * @param data Optional data to send along with the call
-     * @return Boolean value signifying whether the call correctly returned the expected magic value
+     * @return valid Boolean value signifying whether the call correctly returned the expected magic value
      */
     function _checkOnERC721Received(
         address from,
         address to,
         uint256 tokenId,
         bytes memory data
-    ) private returns (bool) {
-        if (to.isContract()) {
+    ) private returns (bool valid) {
+        if (to.code.length != 0) {
             try
                 IERC721Receiver(to).onERC721Received(
                     _msgSender(),
@@ -724,7 +726,7 @@ contract RMRKMinifiedEquippable is
                     data
                 )
             returns (bytes4 retval) {
-                return retval == IERC721Receiver.onERC721Received.selector;
+                valid = retval == IERC721Receiver.onERC721Received.selector;
             } catch (bytes memory reason) {
                 if (reason.length == uint256(0)) {
                     revert ERC721TransferToNonReceiverImplementer();
@@ -736,7 +738,7 @@ contract RMRKMinifiedEquippable is
                 }
             }
         } else {
-            return true;
+            valid = true;
         }
     }
 
@@ -755,7 +757,7 @@ contract RMRKMinifiedEquippable is
         _requireMinted(parentId);
 
         address childAddress = _msgSender();
-        if (!childAddress.isContract()) revert RMRKIsNotContract();
+        if (childAddress.code.length == 0) revert RMRKIsNotContract();
 
         Child memory child = Child({
             contractAddress: childAddress,
@@ -956,9 +958,8 @@ contract RMRKMinifiedEquippable is
 
     function childrenOf(
         uint256 parentId
-    ) public view virtual returns (Child[] memory) {
-        Child[] memory children = _activeChildren[parentId];
-        return children;
+    ) public view virtual returns (Child[] memory children) {
+        children = _activeChildren[parentId];
     }
 
     /**
@@ -967,9 +968,8 @@ contract RMRKMinifiedEquippable is
 
     function pendingChildrenOf(
         uint256 parentId
-    ) public view virtual returns (Child[] memory) {
-        Child[] memory pendingChildren = _pendingChildren[parentId];
-        return pendingChildren;
+    ) public view virtual returns (Child[] memory children) {
+        children = _pendingChildren[parentId];
     }
 
     /**
@@ -978,11 +978,10 @@ contract RMRKMinifiedEquippable is
     function childOf(
         uint256 parentId,
         uint256 index
-    ) public view virtual returns (Child memory) {
+    ) public view virtual returns (Child memory child) {
         if (childrenOf(parentId).length <= index)
             revert RMRKChildIndexOutOfRange();
-        Child memory child = _activeChildren[parentId][index];
-        return child;
+        child = _activeChildren[parentId][index];
     }
 
     /**
@@ -991,11 +990,10 @@ contract RMRKMinifiedEquippable is
     function pendingChildOf(
         uint256 parentId,
         uint256 index
-    ) public view virtual returns (Child memory) {
+    ) public view virtual returns (Child memory child) {
         if (pendingChildrenOf(parentId).length <= index)
             revert RMRKPendingChildIndexOutOfRange();
-        Child memory child = _pendingChildren[parentId][index];
-        return child;
+        child = _pendingChildren[parentId][index];
     }
 
     // HOOKS
@@ -1280,9 +1278,9 @@ contract RMRKMinifiedEquippable is
     function getAssetMetadata(
         uint256 tokenId,
         uint64 assetId
-    ) public view virtual returns (string memory) {
+    ) public view virtual returns (string memory metadata) {
         if (!_tokenAssets[tokenId][assetId]) revert RMRKTokenDoesNotHaveAsset();
-        return _assets[assetId];
+        metadata = _assets[assetId];
     }
 
     /**
@@ -1290,8 +1288,8 @@ contract RMRKMinifiedEquippable is
      */
     function getActiveAssets(
         uint256 tokenId
-    ) public view virtual returns (uint64[] memory) {
-        return _activeAssets[tokenId];
+    ) public view virtual returns (uint64[] memory assetIds) {
+        assetIds = _activeAssets[tokenId];
     }
 
     /**
@@ -1299,8 +1297,8 @@ contract RMRKMinifiedEquippable is
      */
     function getPendingAssets(
         uint256 tokenId
-    ) public view virtual returns (uint64[] memory) {
-        return _pendingAssets[tokenId];
+    ) public view virtual returns (uint64[] memory assetIds) {
+        assetIds = _pendingAssets[tokenId];
     }
 
     /**
@@ -1308,8 +1306,8 @@ contract RMRKMinifiedEquippable is
      */
     function getActiveAssetPriorities(
         uint256 tokenId
-    ) public view virtual returns (uint64[] memory) {
-        return _activeAssetPriorities[tokenId];
+    ) public view virtual returns (uint64[] memory priorities) {
+        priorities = _activeAssetPriorities[tokenId];
     }
 
     /**
@@ -1318,8 +1316,8 @@ contract RMRKMinifiedEquippable is
     function getAssetReplacements(
         uint256 tokenId,
         uint64 newAssetId
-    ) public view virtual returns (uint64) {
-        return _assetReplacements[tokenId][newAssetId];
+    ) public view virtual returns (uint64 replacedAssetId) {
+        replacedAssetId = _assetReplacements[tokenId][newAssetId];
     }
 
     /**
@@ -1328,8 +1326,8 @@ contract RMRKMinifiedEquippable is
     function isApprovedForAllForAssets(
         address owner,
         address operator
-    ) public view virtual returns (bool) {
-        return _operatorApprovalsForAssets[owner][operator];
+    ) public view virtual returns (bool isApproved) {
+        isApproved = _operatorApprovalsForAssets[owner][operator];
     }
 
     /**
@@ -1601,7 +1599,7 @@ contract RMRKMinifiedEquippable is
      *  of the owner.
      * @param tokenId ID of the token that we are checking
      */
-    function _onlyApprovedForAssetsOrOwner(uint256 tokenId) private view {
+    function _onlyApprovedForAssetsOrOwner(uint256 tokenId) internal view {
         address owner = ownerOf(tokenId);
         if (
             !(_msgSender() == owner ||
@@ -1848,13 +1846,13 @@ contract RMRKMinifiedEquippable is
      * @notice Used to get the address of the user that is approved to manage the specified token from the current
      *  owner.
      * @param tokenId ID of the token we are checking
-     * @return Address of the account that is approved to manage the token
+     * @return approved Address of the account that is approved to manage the token
      */
     function getApprovedForAssets(
         uint256 tokenId
-    ) public view virtual returns (address) {
+    ) public view virtual returns (address approved) {
         _requireMinted(tokenId);
-        return _tokenApprovalsForAssets[tokenId][ownerOf(tokenId)];
+        approved = _tokenApprovalsForAssets[tokenId][ownerOf(tokenId)];
     }
 
     /**
@@ -1985,8 +1983,8 @@ contract RMRKMinifiedEquippable is
         uint256 tokenId,
         address childAddress,
         uint256 childId
-    ) public view virtual returns (bool) {
-        return _equipCountPerChild[tokenId][childAddress][childId] != 0;
+    ) public view virtual returns (bool isEquipped) {
+        isEquipped = _equipCountPerChild[tokenId][childAddress][childId] != 0;
     }
 
     // --------------------- ADMIN VALIDATION ---------------------
@@ -2022,14 +2020,13 @@ contract RMRKMinifiedEquippable is
         uint256 tokenId,
         uint64 assetId,
         uint64 slotId
-    ) public view virtual returns (bool) {
+    ) public view virtual returns (bool canBeEquipped) {
         uint64 equippableGroupId = _equippableGroupIds[assetId];
         uint64 equippableSlot = _validParentSlots[equippableGroupId][parent];
         if (equippableSlot == slotId) {
             (, bool found) = getActiveAssets(tokenId).indexOf(assetId);
-            return found;
+            canBeEquipped = found;
         }
-        return false;
     }
 
     // --------------------- Getting Extended Assets ---------------------
@@ -2044,14 +2041,17 @@ contract RMRKMinifiedEquippable is
         public
         view
         virtual
-        returns (string memory, uint64, address, uint64[] memory)
+        returns (
+            string memory metadataURI,
+            uint64 equippableGroupId,
+            address catalogAddress,
+            uint64[] memory partIds
+        )
     {
-        return (
-            getAssetMetadata(tokenId, assetId),
-            _equippableGroupIds[assetId],
-            _catalogAddresses[assetId],
-            _partIds[assetId]
-        );
+        metadataURI = getAssetMetadata(tokenId, assetId);
+        equippableGroupId = _equippableGroupIds[assetId];
+        catalogAddress = _catalogAddresses[assetId];
+        partIds = _partIds[assetId];
     }
 
     ////////////////////////////////////////
@@ -2065,8 +2065,20 @@ contract RMRKMinifiedEquippable is
         uint256 tokenId,
         address targetCatalogAddress,
         uint64 slotPartId
-    ) public view virtual returns (Equipment memory) {
-        return _equipments[tokenId][targetCatalogAddress][slotPartId];
+    ) public view virtual returns (Equipment memory equipment) {
+        equipment = _equipments[tokenId][targetCatalogAddress][slotPartId];
+    }
+
+    /**
+     * @notice Checks the destination is valid for a Nest Transfer/Mint.
+     * @dev The destination must be a contract that implements the IERC7401 interface.
+     * @param to Address of the destination
+     */
+    function _checkDestination(address to) internal view {
+        // Checking if it is a contract before calling it seems redundant, but otherwise it would revert with no error
+        if (to.code.length == 0) revert RMRKIsNotContract();
+        if (!IERC165(to).supportsInterface(type(IERC7401).interfaceId))
+            revert RMRKNestableTransferToNonRMRKNestableImplementer();
     }
 
     // HOOKS

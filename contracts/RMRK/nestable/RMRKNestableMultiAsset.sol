@@ -4,10 +4,11 @@
 
 pragma solidity ^0.8.21;
 
-import "../multiasset/AbstractMultiAsset.sol";
-import "./IERC7401.sol";
-import "./RMRKNestable.sol";
-import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+import {AbstractMultiAsset} from "../multiasset/AbstractMultiAsset.sol";
+import {IERC5773} from "../multiasset/IERC5773.sol";
+import {RMRKNestable} from "./RMRKNestable.sol";
+import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+import "../library/RMRKErrors.sol";
 
 /**
  * @title RMRKNestableMultiAsset
@@ -30,7 +31,7 @@ contract RMRKNestableMultiAsset is RMRKNestable, AbstractMultiAsset {
      *  given token, the execution will be reverted.
      * @param tokenId ID of the token being checked
      */
-    function _onlyApprovedForAssetsOrOwner(uint256 tokenId) private view {
+    function _onlyApprovedForAssetsOrOwner(uint256 tokenId) internal view {
         if (!_isApprovedForAssetsOrOwner(_msgSender(), tokenId))
             revert RMRKNotApprovedForAssetsOrOwner();
     }
@@ -123,9 +124,9 @@ contract RMRKNestableMultiAsset is RMRKNestable, AbstractMultiAsset {
      */
     function getApprovedForAssets(
         uint256 tokenId
-    ) public view virtual returns (address) {
+    ) public view virtual returns (address approved) {
         _requireMinted(tokenId);
-        return _tokenApprovalsForAssets[tokenId][ownerOf(tokenId)];
+        approved = _tokenApprovalsForAssets[tokenId][ownerOf(tokenId)];
     }
 
     /**

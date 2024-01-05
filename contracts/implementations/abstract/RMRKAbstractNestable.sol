@@ -2,9 +2,11 @@
 
 pragma solidity ^0.8.21;
 
-import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
-import "../../RMRK/nestable/RMRKNestable.sol";
-import "../utils/RMRKImplementationBase.sol";
+import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+import {IERC2981} from "@openzeppelin/contracts/interfaces/IERC2981.sol";
+import {IERC721Metadata} from "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
+import {RMRKNestable} from "../../RMRK/nestable/RMRKNestable.sol";
+import {RMRKImplementationBase} from "../utils/RMRKImplementationBase.sol";
 
 /**
  * @title RMRKAbstractNestable
@@ -22,7 +24,7 @@ abstract contract RMRKAbstractNestable is RMRKImplementationBase, RMRKNestable {
             super.supportsInterface(interfaceId) ||
             interfaceId == type(IERC2981).interfaceId ||
             interfaceId == type(IERC721Metadata).interfaceId ||
-            interfaceId == RMRK_INTERFACE;
+            interfaceId == RMRK_INTERFACE();
     }
 
     function _beforeTokenTransfer(

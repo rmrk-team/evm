@@ -2,8 +2,9 @@
 
 pragma solidity ^0.8.21;
 
-import "../equippable/IERC6220.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import {Context} from "@openzeppelin/contracts/utils/Context.sol";
+import {IERC6220} from "../equippable/IERC6220.sol";
 
 error RMRKCanOnlyDoBulkOperationsOnOwnedTokens();
 error RMRKCanOnlyDoBulkOperationsWithOneTokenAtATime();
@@ -14,7 +15,7 @@ error RMRKCanOnlyDoBulkOperationsWithOneTokenAtATime();
  * @notice Smart contract of the RMRK Bulk Writer per collection module.
  * @dev Extra utility functions for RMRK contracts.
  */
-contract RMRKBulkWriterPerCollection {
+contract RMRKBulkWriterPerCollection is Context {
     /**
      * @notice Used to provide a struct for inputing unequip data.
      * @dev Only used for input and not storage of data
@@ -47,10 +48,10 @@ contract RMRKBulkWriterPerCollection {
 
     /**
      * @notice Returns the address of the collection that this contract is managing
-     * @return Address of the collection that this contract is managing
+     * @return collection Address of the collection that this contract is managing
      */
-    function getCollection() public view returns (address) {
-        return _collection;
+    function getCollection() public view returns (address collection) {
+        collection = _collection;
     }
 
     /**
@@ -133,7 +134,7 @@ contract RMRKBulkWriterPerCollection {
      */
     function _checkTokenOwner(uint256 tokenId) internal view {
         address tokenOwner = IERC721(_collection).ownerOf(tokenId);
-        if (tokenOwner != msg.sender) {
+        if (tokenOwner != _msgSender()) {
             revert RMRKCanOnlyDoBulkOperationsOnOwnedTokens();
         }
     }

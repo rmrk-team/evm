@@ -4,12 +4,16 @@
 
 pragma solidity ^0.8.21;
 
-import "../catalog/IRMRKCatalog.sol";
-import "../library/RMRKLib.sol";
-import "../multiasset/AbstractMultiAsset.sol";
-import "../nestable/RMRKNestable.sol";
-import "../security/ReentrancyGuard.sol";
-import "./IERC6220.sol";
+import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+import {IERC5773} from "../multiasset/IERC5773.sol";
+import {IERC6220} from "./IERC6220.sol";
+import {IERC7401} from "../nestable/IERC7401.sol";
+import {IRMRKCatalog} from "../catalog/IRMRKCatalog.sol";
+import {RMRKLib} from "../library/RMRKLib.sol";
+import {AbstractMultiAsset} from "../multiasset/AbstractMultiAsset.sol";
+import {RMRKNestable} from "../nestable/RMRKNestable.sol";
+import {ReentrancyGuard} from "../security/ReentrancyGuard.sol";
+import "../library/RMRKErrors.sol";
 
 /**
  * @title RMRKEquippable
@@ -60,7 +64,7 @@ contract RMRKEquippable is
      *  of the owner.
      * @param tokenId ID of the token that we are checking
      */
-    function _onlyApprovedForAssetsOrOwner(uint256 tokenId) private view {
+    function _onlyApprovedForAssetsOrOwner(uint256 tokenId) internal view {
         if (!_isApprovedForAssetsOrOwner(_msgSender(), tokenId))
             revert RMRKNotApprovedForAssetsOrOwner();
     }
@@ -225,16 +229,13 @@ contract RMRKEquippable is
     }
 
     /**
-     * @notice Used to get the address of the user that is approved to manage the specified token from the current
-     *  owner.
-     * @param tokenId ID of the token we are checking
-     * @return Address of the account that is approved to manage the token
+     * @inheritdoc IERC5773
      */
     function getApprovedForAssets(
         uint256 tokenId
-    ) public view virtual returns (address) {
+    ) public view virtual returns (address approved) {
         _requireMinted(tokenId);
-        return _tokenApprovalsForAssets[tokenId][ownerOf(tokenId)];
+        approved = _tokenApprovalsForAssets[tokenId][ownerOf(tokenId)];
     }
 
     /**
@@ -456,8 +457,8 @@ contract RMRKEquippable is
         uint256 tokenId,
         address childAddress,
         uint256 childId
-    ) public view virtual returns (bool) {
-        return _equipCountPerChild[tokenId][childAddress][childId] != 0;
+    ) public view virtual returns (bool isEquipped) {
+        isEquipped = _equipCountPerChild[tokenId][childAddress][childId] != 0;
     }
 
     // --------------------- ADMIN VALIDATION ---------------------
@@ -493,14 +494,13 @@ contract RMRKEquippable is
         uint256 tokenId,
         uint64 assetId,
         uint64 slotId
-    ) public view virtual returns (bool) {
+    ) public view virtual returns (bool canBeEquipped) {
         uint64 equippableGroupId = _equippableGroupIds[assetId];
         uint64 equippableSlot = _validParentSlots[equippableGroupId][parent];
         if (equippableSlot == slotId) {
             (, bool found) = getActiveAssets(tokenId).indexOf(assetId);
-            return found;
+            canBeEquipped = found;
         }
-        return false;
     }
 
     // --------------------- Getting Extended Assets ---------------------
@@ -515,14 +515,17 @@ contract RMRKEquippable is
         public
         view
         virtual
-        returns (string memory, uint64, address, uint64[] memory)
+        returns (
+            string memory metadataURI,
+            uint64 equippableGroupId,
+            address catalogAddress,
+            uint64[] memory partIds
+        )
     {
-        return (
-            getAssetMetadata(tokenId, assetId),
-            _equippableGroupIds[assetId],
-            _catalogAddresses[assetId],
-            _partIds[assetId]
-        );
+        metadataURI = getAssetMetadata(tokenId, assetId);
+        equippableGroupId = _equippableGroupIds[assetId];
+        catalogAddress = _catalogAddresses[assetId];
+        partIds = _partIds[assetId];
     }
 
     ////////////////////////////////////////
@@ -536,8 +539,8 @@ contract RMRKEquippable is
         uint256 tokenId,
         address targetCatalogAddress,
         uint64 slotPartId
-    ) public view virtual returns (Equipment memory) {
-        return _equipments[tokenId][targetCatalogAddress][slotPartId];
+    ) public view virtual returns (Equipment memory equipment) {
+        equipment = _equipments[tokenId][targetCatalogAddress][slotPartId];
     }
 
     // HOOKS

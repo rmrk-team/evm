@@ -2,10 +2,9 @@
 
 pragma solidity ^0.8.21;
 
-import "../../../RMRK/extension/typedMultiAsset/RMRKTypedMultiAsset.sol";
-import "../../RMRKNestableMultiAssetMock.sol";
-
-error RMRKTokenHasNoAssetsWithType();
+import {RMRKTypedMultiAsset} from "../../../RMRK/extension/typedMultiAsset/RMRKTypedMultiAsset.sol";
+import {RMRKNestableMultiAssetMock} from "../../RMRKNestableMultiAssetMock.sol";
+import {RMRKNestableMultiAsset} from "../../../RMRK/nestable/RMRKNestableMultiAsset.sol";
 
 contract RMRKNestableTypedMultiAssetMock is
     RMRKNestableMultiAssetMock,

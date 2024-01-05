@@ -10,13 +10,13 @@ Smart contract of the RMRK minting utils module.
 
 ## Methods
 
-### collectionMetadata
+### contractURI
 
 ```solidity
-function collectionMetadata() external view returns (string)
+function contractURI() external view returns (string contractURI_)
 ```
 
-Used to retrieve the metadata of the collection.
+Used to retrieve the metadata URI of the collection.
 
 
 
@@ -25,12 +25,12 @@ Used to retrieve the metadata of the collection.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | string The metadata URI of the collection |
+| contractURI_ | string | string The metadata URI of the collection |
 
 ### getRoyaltyPercentage
 
 ```solidity
-function getRoyaltyPercentage() external view returns (uint256)
+function getRoyaltyPercentage() external view returns (uint256 royaltyPercentageBps)
 ```
 
 Used to retrieve the specified royalty percentage.
@@ -42,12 +42,12 @@ Used to retrieve the specified royalty percentage.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | The royalty percentage expressed in the basis points |
+| royaltyPercentageBps | uint256 | The royalty percentage expressed in the basis points |
 
 ### getRoyaltyRecipient
 
 ```solidity
-function getRoyaltyRecipient() external view returns (address)
+function getRoyaltyRecipient() external view returns (address recipient)
 ```
 
 Used to retrieve the recipient of royalties.
@@ -59,12 +59,12 @@ Used to retrieve the recipient of royalties.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | address | Address of the recipient of royalties |
+| recipient | address | Address of the recipient of royalties |
 
 ### isContributor
 
 ```solidity
-function isContributor(address contributor) external view returns (bool)
+function isContributor(address contributor) external view returns (bool isContributor_)
 ```
 
 Used to check if the address is one of the contributors.
@@ -81,7 +81,7 @@ Used to check if the address is one of the contributors.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | bool | Boolean value indicating whether the address is a contributor or not |
+| isContributor_ | bool | Boolean value indicating whether the address is a contributor or not |
 
 ### manageContributor
 
@@ -103,7 +103,7 @@ Adds or removes a contributor to the smart contract.
 ### maxSupply
 
 ```solidity
-function maxSupply() external view returns (uint256)
+function maxSupply() external view returns (uint256 maxSupply_)
 ```
 
 Used to retrieve the maximum supply of the collection.
@@ -115,12 +115,12 @@ Used to retrieve the maximum supply of the collection.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | The maximum supply of tokens in the collection |
+| maxSupply_ | uint256 | The maximum supply of tokens in the collection |
 
 ### name
 
 ```solidity
-function name() external view returns (string)
+function name() external view returns (string name_)
 ```
 
 Used to retrieve the collection name.
@@ -132,12 +132,12 @@ Used to retrieve the collection name.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | Name of the collection |
+| name_ | string | Name of the collection |
 
 ### owner
 
 ```solidity
-function owner() external view returns (address)
+function owner() external view returns (address owner_)
 ```
 
 Returns the address of the current owner.
@@ -149,7 +149,7 @@ Returns the address of the current owner.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | address | Address of the current owner |
+| owner_ | address | Address of the current owner |
 
 ### renounceOwnership
 
@@ -189,7 +189,7 @@ Used to retrieve the information about who shall receive royalties of a sale of 
 ### symbol
 
 ```solidity
-function symbol() external view returns (string)
+function symbol() external view returns (string symbol_)
 ```
 
 Used to retrieve the collection symbol.
@@ -201,12 +201,12 @@ Used to retrieve the collection symbol.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | string | Symbol of the collection |
+| symbol_ | string | Symbol of the collection |
 
 ### totalAssets
 
 ```solidity
-function totalAssets() external view returns (uint256)
+function totalAssets() external view returns (uint256 totalAssets_)
 ```
 
 Used to retrieve the total number of assets.
@@ -218,12 +218,12 @@ Used to retrieve the total number of assets.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | The total number of assets |
+| totalAssets_ | uint256 | The total number of assets |
 
 ### totalSupply
 
 ```solidity
-function totalSupply() external view returns (uint256)
+function totalSupply() external view returns (uint256 totalSupply_)
 ```
 
 Used to retrieve the total supply of the tokens in a collection.
@@ -235,7 +235,7 @@ Used to retrieve the total supply of the tokens in a collection.
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | The number of tokens in a collection |
+| totalSupply_ | uint256 | The number of tokens in a collection |
 
 ### transferOwnership
 

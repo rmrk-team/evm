@@ -2,8 +2,8 @@
 
 pragma solidity ^0.8.21;
 
-import "./IRMRKCatalog.sol";
-import "@openzeppelin/contracts/utils/Address.sol";
+import {IRMRKCatalog, IERC165} from "./IRMRKCatalog.sol";
+import {Address} from "@openzeppelin/contracts/utils/Address.sol";
 import "../library/RMRKErrors.sol";
 
 /**
@@ -108,7 +108,7 @@ contract RMRKCatalog is IRMRKCatalog {
      * @dev Delegates to { _addPart } below.
      * @param partIntake An array of `IntakeStruct` structs, consisting of `partId` and a nested `Part` struct
      */
-    function _addPartList(IntakeStruct[] calldata partIntake) internal {
+    function _addPartList(IntakeStruct[] memory partIntake) internal {
         uint256 len = partIntake.length;
         for (uint256 i; i < len; ) {
             _addPart(partIntake[i]);
@@ -123,7 +123,7 @@ contract RMRKCatalog is IRMRKCatalog {
      * @param partIntake `IntakeStruct` struct consisting of `partId` and a nested `Part` struct
      *
      */
-    function _addPart(IntakeStruct calldata partIntake) internal {
+    function _addPart(IntakeStruct memory partIntake) internal {
         uint64 partId = partIntake.partId;
         Part memory part = partIntake.part;
 
@@ -155,7 +155,7 @@ contract RMRKCatalog is IRMRKCatalog {
      */
     function _addEquippableAddresses(
         uint64 partId,
-        address[] calldata equippableAddresses
+        address[] memory equippableAddresses
     ) internal onlySlot(partId) {
         if (equippableAddresses.length <= 0) revert RMRKZeroLengthIdsPassed();
 
@@ -181,7 +181,7 @@ contract RMRKCatalog is IRMRKCatalog {
      */
     function _setEquippableAddresses(
         uint64 partId,
-        address[] calldata equippableAddresses
+        address[] memory equippableAddresses
     ) internal onlySlot(partId) {
         if (equippableAddresses.length <= 0) revert RMRKZeroLengthIdsPassed();
         _parts[partId].equippable = equippableAddresses;
@@ -220,8 +220,10 @@ contract RMRKCatalog is IRMRKCatalog {
     /**
      * @inheritdoc IRMRKCatalog
      */
-    function checkIsEquippableToAll(uint64 partId) public view returns (bool) {
-        return _isEquippableToAll[partId];
+    function checkIsEquippableToAll(
+        uint64 partId
+    ) public view returns (bool isEquippable) {
+        isEquippable = _isEquippableToAll[partId];
     }
 
     /**
@@ -230,9 +232,9 @@ contract RMRKCatalog is IRMRKCatalog {
     function checkIsEquippable(
         uint64 partId,
         address targetAddress
-    ) public view returns (bool) {
+    ) public view returns (bool isEquippable) {
         // If this is equippable to all, we're good
-        bool isEquippable = _isEquippableToAll[partId];
+        isEquippable = _isEquippableToAll[partId];
 
         // Otherwise, must check against each of the equippable for the part
         if (!isEquippable && _parts[partId].itemType == ItemType.Slot) {
@@ -248,14 +250,13 @@ contract RMRKCatalog is IRMRKCatalog {
                 }
             }
         }
-        return isEquippable;
     }
 
     /**
      * @inheritdoc IRMRKCatalog
      */
-    function getPart(uint64 partId) public view returns (Part memory) {
-        return (_parts[partId]);
+    function getPart(uint64 partId) public view returns (Part memory part) {
+        part = (_parts[partId]);
     }
 
     /**
@@ -263,9 +264,9 @@ contract RMRKCatalog is IRMRKCatalog {
      */
     function getParts(
         uint64[] memory partIds
-    ) public view returns (Part[] memory) {
+    ) public view returns (Part[] memory parts) {
         uint256 numParts = partIds.length;
-        Part[] memory parts = new Part[](numParts);
+        parts = new Part[](numParts);
 
         for (uint256 i; i < numParts; ) {
             uint64 partId = partIds[i];
@@ -274,7 +275,5 @@ contract RMRKCatalog is IRMRKCatalog {
                 ++i;
             }
         }
-
-        return parts;
     }
 }

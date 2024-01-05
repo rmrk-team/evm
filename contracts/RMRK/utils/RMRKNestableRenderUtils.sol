@@ -2,9 +2,11 @@
 
 pragma solidity ^0.8.21;
 
-import "../nestable/IERC7401.sol";
+import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+import {IERC5773} from "../multiasset/IERC5773.sol";
+import {IERC7401} from "../nestable/IERC7401.sol";
 import "../library/RMRKErrors.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
+import {IERC721Metadata} from "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
 
 /**
  * @title RMRKNestableRenderUtils
@@ -18,14 +20,14 @@ contract RMRKNestableRenderUtils {
      * @param parentId ID of the parent token
      * @param childAddress Address of the child token's colection smart contract
      * @param childId ID of the child token
-     * @return The index of the child token in the parent token's child tokens array
+     * @return index The index of the child token in the parent token's child tokens array
      */
     function getChildIndex(
         address parentAddress,
         uint256 parentId,
         address childAddress,
         uint256 childId
-    ) public view returns (uint256) {
+    ) public view returns (uint256 index) {
         IERC7401.Child[] memory children = IERC7401(parentAddress).childrenOf(
             parentId
         );
@@ -35,7 +37,9 @@ contract RMRKNestableRenderUtils {
             if (
                 children[i].tokenId == childId &&
                 children[i].contractAddress == childAddress
-            ) return i;
+            ) {
+                return i;
+            }
             unchecked {
                 ++i;
             }
@@ -49,14 +53,14 @@ contract RMRKNestableRenderUtils {
      * @param parentId ID of the parent token
      * @param childAddress Address of the child token's colection smart contract
      * @param childId ID of the child token
-     * @return The index of the child token in the parent token's pending child tokens array
+     * @return index The index of the child token in the parent token's pending child tokens array
      */
     function getPendingChildIndex(
         address parentAddress,
         uint256 parentId,
         address childAddress,
         uint256 childId
-    ) public view returns (uint256) {
+    ) public view returns (uint256 index) {
         IERC7401.Child[] memory children = IERC7401(parentAddress)
             .pendingChildrenOf(parentId);
         (parentId);
@@ -65,7 +69,9 @@ contract RMRKNestableRenderUtils {
             if (
                 children[i].tokenId == childId &&
                 children[i].contractAddress == childAddress
-            ) return i;
+            ) {
+                return i;
+            }
             unchecked {
                 ++i;
             }
@@ -213,24 +219,23 @@ contract RMRKNestableRenderUtils {
      * @param childAddress Address of the child token's collection smart contract
      * @param parentId ID of the parent token
      * @param childId ID of the child token
-     * @return A boolean value indicating whether the child token is owned by the parent token or not
+     * @return validChild A boolean value indicating whether the child token is owned by the parent token or not
      */
     function validateChildOf(
         address parentAddress,
         address childAddress,
         uint256 parentId,
         uint256 childId
-    ) public view returns (bool) {
+    ) public view returns (bool validChild) {
         if (
             !IERC165(childAddress).supportsInterface(type(IERC7401).interfaceId)
         ) {
-            return false;
+            validChild = false;
+        } else {
+            (address directOwner, uint256 ownerId, ) = IERC7401(childAddress)
+                .directOwnerOf(childId);
+            validChild = (directOwner == parentAddress && ownerId == parentId);
         }
-
-        (address directOwner, uint256 ownerId, ) = IERC7401(childAddress)
-            .directOwnerOf(childId);
-
-        return (directOwner == parentAddress && ownerId == parentId);
     }
 
     /**
@@ -239,8 +244,8 @@ contract RMRKNestableRenderUtils {
      * @param childAddresses An array of the child token's collection smart contract addresses
      * @param parentId ID of the parent token
      * @param childIds An array of child token IDs to verify
-     * @return A boolean value indicating whether all of the child tokens are owned by the parent token or not
-     * @return An array of boolean values indicating whether each of the child tokens are owned by the parent token or
+     * @return isValid A boolean value indicating whether all of the child tokens are owned by the parent token or not
+     * @return validityOfChildren An array of boolean values indicating whether each of the child tokens are owned by the parent token or
      *  not
      */
     function validateChildrenOf(
@@ -248,15 +253,13 @@ contract RMRKNestableRenderUtils {
         address[] memory childAddresses,
         uint256 parentId,
         uint256[] memory childIds
-    ) public view returns (bool, bool[] memory) {
+    ) public view returns (bool isValid, bool[] memory validityOfChildren) {
         if (childAddresses.length != childIds.length) {
             revert RMRKMismachedArrayLength();
         }
 
-        address directOwner;
-        uint256 ownerId;
-        bool[] memory validityOfChildren = new bool[](childAddresses.length);
-        bool isValid = true;
+        validityOfChildren = new bool[](childAddresses.length);
+        isValid = true;
 
         for (uint256 i; i < childAddresses.length; ) {
             validityOfChildren[i] = validateChildOf(
@@ -270,15 +273,10 @@ contract RMRKNestableRenderUtils {
                 isValid = false;
             }
 
-            delete directOwner;
-            delete ownerId;
-
             unchecked {
                 ++i;
             }
         }
-
-        return (isValid, validityOfChildren);
     }
 
     /**
@@ -319,12 +317,12 @@ contract RMRKNestableRenderUtils {
      * @notice Used to retrieve whether a token has more than one level of nesting.
      * @param collection Address of the token's collection smart contract
      * @param tokenId ID of the token
-     * @return A boolean value indicating whether the given token has more than one level of nesting
+     * @return hasMoreThanOneLevelOfNesting_ A boolean value indicating whether the given token has more than one level of nesting
      */
     function hasMoreThanOneLevelOfNesting(
         address collection,
         uint256 tokenId
-    ) public view returns (bool) {
+    ) public view returns (bool hasMoreThanOneLevelOfNesting_) {
         IERC7401.Child[] memory children = IERC7401(collection).childrenOf(
             tokenId
         );
@@ -336,12 +334,12 @@ contract RMRKNestableRenderUtils {
                     .childrenOf(children[i].tokenId)
                     .length > 0
             ) {
-                return true;
+                hasMoreThanOneLevelOfNesting_ = true;
+                break;
             }
             unchecked {
                 ++i;
             }
         }
-        return false;
     }
 }

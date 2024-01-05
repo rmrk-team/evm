@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.21;
 
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
 /**
  * @title ERC721Mock
@@ -15,6 +15,6 @@ contract ERC721Mock is ERC721 {
     ) ERC721(name, symbol) {}
 
     function mint(address to, uint256 tokenId) public {
-        _mint(to, tokenId);
+        _safeMint(to, tokenId);
     }
 }

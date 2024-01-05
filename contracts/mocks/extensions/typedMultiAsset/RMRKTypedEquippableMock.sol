@@ -2,10 +2,9 @@
 
 pragma solidity ^0.8.21;
 
-import "../../../RMRK/extension/typedMultiAsset/RMRKTypedMultiAsset.sol";
-import "../../RMRKEquippableMock.sol";
-
-error RMRKTokenHasNoAssetsWithType();
+import {RMRKTypedMultiAsset} from "../../../RMRK/extension/typedMultiAsset/RMRKTypedMultiAsset.sol";
+import {RMRKEquippableMock} from "../../RMRKEquippableMock.sol";
+import {RMRKEquippable} from "../../../RMRK/equippable/RMRKEquippable.sol";
 
 contract RMRKTypedEquippableMock is RMRKEquippableMock, RMRKTypedMultiAsset {
     function supportsInterface(

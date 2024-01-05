@@ -2,8 +2,10 @@
 
 pragma solidity ^0.8.21;
 
-import "./RMRKEquippableLazyMintNative.sol";
-import "../../RMRK/extension/soulbound/RMRKSoulbound.sol";
+import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+import {RMRKAbstractEquippable} from "../abstract/RMRKAbstractEquippable.sol";
+import {RMRKEquippableLazyMintNative} from "./RMRKEquippableLazyMintNative.sol";
+import {RMRKSoulbound} from "../../RMRK/extension/soulbound/RMRKSoulbound.sol";
 
 /**
  * @title RMRKEquippableLazyMintNativeSoulbound

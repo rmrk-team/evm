@@ -5,6 +5,60 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.3.2] - 2024-01-04
+
+### Changed
+
+- Uses `msgSender()` instead of `msg.sender` where possible.
+- Uses explicit imports.
+- Removes several unused errors.
+- Uses named returns in most places.
+- Metadata updates from collection utils are now inspired by `ERC4906`
+- Updates configuration files to include more networks.
+- Improves docs for `directOwnerOf` method on `ERC7401`.
+- Adds methods to identify equipments where the parent or child asset was replaced.
+- Removes annoying warnings about unused variables.
+
+## [2.3.1] - 2023-12-04
+
+### Changed
+
+- Upgrades to Openzeppelin v5.
+
+## [2.3.0] - 2023-11-09
+
+### Added
+- Adds `RMRKRoyaltiesSplitter` to split native and ERC20 payments into multiple beneficiaries with customizable shares.
+- Adds `CatalogUtils` contract, to retrieve multiple data points from a catalog in a single call.
+- `CollectionUtils` now includes methods to trigger events to refresh metadata.
+
+### Changed
+
+- On implementation base `collectionMetadata` was replaced by `contractURI`, to be compatible with suggestion from OpenSea.
+- Uses `memory` instead of `callback` for catalog core and implementation methods.
+- On `ERC-7508` (draft) Removes 'Token' from getter methods for consistency.
+
+### Fixed
+
+- Changelog had truncated version headers for 2.2.0 and 2.1.1
+
+### Removed
+
+- TokenProperties extension in favor of `ERC-7508`
+
+## [2.2.0] - 2023-10-06
+
+### Added
+
+- Adds Revealable and Revealer Interfaces, with Abstract implementation for Revealable. The purpose is to make the reveal flow much easier for the holders and cheaper for the issuer.
+
+### Changed
+
+- Makes methods to check for permissions internal instead of private on core implementations:
+  - \_onlyApprovedForAssetsOrOwner
+  - \_onlyApprovedOrDirectOwner
+  - \_onlyApprovedOrOwner
+
 ## [2.1.1] - 2023-09-21
 
 ### Changed

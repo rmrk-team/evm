@@ -2,9 +2,11 @@
 
 pragma solidity ^0.8.21;
 
-import "../abstract/RMRKAbstractNestableMultiAsset.sol";
-import "../utils/RMRKTokenURIEnumerated.sol";
-import "./InitDataNativePay.sol";
+import {RMRKAbstractNestableMultiAsset} from "../abstract/RMRKAbstractNestableMultiAsset.sol";
+import {RMRKImplementationBase} from "../utils/RMRKImplementationBase.sol";
+import {RMRKTokenURIEnumerated} from "../utils/RMRKTokenURIEnumerated.sol";
+import {InitDataNativePay} from "./InitDataNativePay.sol";
+import "../../RMRK/library/RMRKErrors.sol";
 
 /**
  * @title RMRKNestableMultiAssetLazyMintNative
@@ -65,12 +67,12 @@ contract RMRKNestableMultiAssetLazyMintNative is
      * @dev Can only be called while the open sale is open.
      * @param to Address to which to mint the token
      * @param numToMint Number of tokens to mint
-     * @return The ID of the first token to be minted in the current minting cycle
+     * @return firstTokenId The ID of the first token to be minted in the current minting cycle
      */
     function mint(
         address to,
         uint256 numToMint
-    ) public payable virtual returns (uint256) {
+    ) public payable virtual returns (uint256 firstTokenId) {
         (uint256 nextToken, uint256 totalSupplyOffset) = _prepareMint(
             numToMint
         );
@@ -83,7 +85,7 @@ contract RMRKNestableMultiAssetLazyMintNative is
             }
         }
 
-        return nextToken;
+        firstTokenId = nextToken;
     }
 
     /**
@@ -93,13 +95,13 @@ contract RMRKNestableMultiAssetLazyMintNative is
      * @param to Address of the collection smart contract of the token into which to mint the child token
      * @param numToMint Number of tokens to mint
      * @param destinationId ID of the token into which to mint the new child token
-     * @return The ID of the first token to be minted in the current minting cycle
+     * @return firstTokenId The ID of the first token to be minted in the current minting cycle
      */
     function nestMint(
         address to,
         uint256 numToMint,
         uint256 destinationId
-    ) public payable virtual returns (uint256) {
+    ) public payable virtual returns (uint256 firstTokenId) {
         (uint256 nextToken, uint256 totalSupplyOffset) = _prepareMint(
             numToMint
         );
@@ -112,7 +114,7 @@ contract RMRKNestableMultiAssetLazyMintNative is
             }
         }
 
-        return nextToken;
+        firstTokenId = nextToken;
     }
 
     function _chargeMints(uint256 numToMint) internal {
@@ -122,10 +124,10 @@ contract RMRKNestableMultiAssetLazyMintNative is
 
     /**
      * @notice Used to retrieve the price per mint.
-     * @return The price per mint of a single token expressed in the lowest denomination of a native currency
+     * @return price The price per mint of a single token expressed in the lowest denomination of a native currency
      */
-    function pricePerMint() public view returns (uint256) {
-        return _pricePerMint;
+    function pricePerMint() public view returns (uint256 price) {
+        price = _pricePerMint;
     }
 
     /**
@@ -134,17 +136,8 @@ contract RMRKNestableMultiAssetLazyMintNative is
      * @param to Address to receive the given amount of minting proceedings
      * @param amount The amount to withdraw
      */
-    function withdrawRaised(address to, uint256 amount) external onlyOwner {
-        _withdraw(to, amount);
-    }
-
-    /**
-     * @notice Used to withdraw the minting proceedings to a specified address.
-     * @param _address Address to receive the given amount of minting proceedings
-     * @param _amount The amount to withdraw
-     */
-    function _withdraw(address _address, uint256 _amount) private {
-        (bool success, ) = _address.call{value: _amount}("");
-        require(success, "Transfer failed.");
+    function withdraw(address to, uint256 amount) external onlyOwner {
+        (bool success, ) = to.call{value: amount}("");
+        if (!success) revert TransferFailed();
     }
 }
