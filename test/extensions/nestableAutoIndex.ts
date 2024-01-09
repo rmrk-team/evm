@@ -1,7 +1,7 @@
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { bn } from '../utils';
 import { IERC165, IERC7401, IRMRKNestableAutoIndex, IOtherInterface } from '../interfaces';
 import { RMRKNestableAutoIndexMock } from '../../typechain-types';
@@ -11,7 +11,7 @@ import { RMRKNestableAutoIndexMock } from '../../typechain-types';
 async function nestableAutoIndexFixture() {
   const factory = await ethers.getContractFactory('RMRKNestableAutoIndexMock');
   const token = await factory.deploy();
-  await token.deployed();
+  await token.waitForDeployment();
 
   return token;
 }
@@ -47,43 +47,59 @@ describe('RMRKNestableAutoIndexMock', async function () {
 
   describe('With minted tokens', async function () {
     beforeEach(async function () {
-      await token.mint(owner.address, parentId);
-      await token.nestMint(token.address, childId1, parentId);
-      await token.nestMint(token.address, childId2, parentId);
-      await token.nestMint(token.address, childId3, parentId);
+      await token.mint(await owner.getAddress(), parentId);
+      await token.nestMint(await token.getAddress(), childId1, parentId);
+      await token.nestMint(await token.getAddress(), childId2, parentId);
+      await token.nestMint(await token.getAddress(), childId3, parentId);
     });
 
     it('can accept child in first position and result is ok', async function () {
-      await token['acceptChild(uint256,address,uint256)'](parentId, token.address, childId1);
+      await token['acceptChild(uint256,address,uint256)'](
+        parentId,
+        await token.getAddress(),
+        childId1,
+      );
       expect(await token.pendingChildrenOf(parentId)).to.eql([
-        [childId3, token.address],
-        [childId2, token.address],
+        [childId3, await token.getAddress()],
+        [childId2, await token.getAddress()],
       ]);
-      expect(await token.childrenOf(parentId)).to.eql([[childId1, token.address]]);
+      expect(await token.childrenOf(parentId)).to.eql([[childId1, await token.getAddress()]]);
     });
 
     it('can accept child in middle position and result is ok', async function () {
-      await token['acceptChild(uint256,address,uint256)'](parentId, token.address, childId2);
+      await token['acceptChild(uint256,address,uint256)'](
+        parentId,
+        await token.getAddress(),
+        childId2,
+      );
       expect(await token.pendingChildrenOf(parentId)).to.eql([
-        [childId1, token.address],
-        [childId3, token.address],
+        [childId1, await token.getAddress()],
+        [childId3, await token.getAddress()],
       ]);
-      expect(await token.childrenOf(parentId)).to.eql([[childId2, token.address]]);
+      expect(await token.childrenOf(parentId)).to.eql([[childId2, await token.getAddress()]]);
     });
 
     it('can accept child in last position and result is ok', async function () {
-      await token['acceptChild(uint256,address,uint256)'](parentId, token.address, childId3);
+      await token['acceptChild(uint256,address,uint256)'](
+        parentId,
+        await token.getAddress(),
+        childId3,
+      );
       expect(await token.pendingChildrenOf(parentId)).to.eql([
-        [childId1, token.address],
-        [childId2, token.address],
+        [childId1, await token.getAddress()],
+        [childId2, await token.getAddress()],
       ]);
-      expect(await token.childrenOf(parentId)).to.eql([[childId3, token.address]]);
+      expect(await token.childrenOf(parentId)).to.eql([[childId3, await token.getAddress()]]);
     });
 
     it('cannot accept not existing pending child', async function () {
       const otherChildId = bn(4);
       await expect(
-        token['acceptChild(uint256,address,uint256)'](parentId, token.address, otherChildId),
+        token['acceptChild(uint256,address,uint256)'](
+          parentId,
+          await token.getAddress(),
+          otherChildId,
+        ),
       ).to.be.revertedWithCustomError(token, 'RMRKUnexpectedChildId');
     });
 
@@ -91,75 +107,75 @@ describe('RMRKNestableAutoIndexMock', async function () {
       it('can transfer pending child in first position and result is ok', async function () {
         await token['transferChild(uint256,address,uint256,address,uint256,bool,bytes)'](
           parentId,
-          owner.address,
+          await owner.getAddress(),
           0,
-          token.address,
+          await token.getAddress(),
           childId1,
           true,
           '0x',
         );
         expect(await token.pendingChildrenOf(parentId)).to.eql([
-          [childId3, token.address],
-          [childId2, token.address],
+          [childId3, await token.getAddress()],
+          [childId2, await token.getAddress()],
         ]);
       });
 
       it('can transfer pending child in middle position and result is ok', async function () {
         await token['transferChild(uint256,address,uint256,address,uint256,bool,bytes)'](
           parentId,
-          owner.address,
+          await owner.getAddress(),
           0,
-          token.address,
+          await token.getAddress(),
           childId2,
           true,
           '0x',
         );
         expect(await token.pendingChildrenOf(parentId)).to.eql([
-          [childId1, token.address],
-          [childId3, token.address],
+          [childId1, await token.getAddress()],
+          [childId3, await token.getAddress()],
         ]);
       });
 
       it('can transfer pending child in last position and result is ok', async function () {
         await token['transferChild(uint256,address,uint256,address,uint256,bool,bytes)'](
           parentId,
-          owner.address,
+          await owner.getAddress(),
           0,
-          token.address,
+          await token.getAddress(),
           childId3,
           true,
           '0x',
         );
         expect(await token.pendingChildrenOf(parentId)).to.eql([
-          [childId1, token.address],
-          [childId2, token.address],
+          [childId1, await token.getAddress()],
+          [childId2, await token.getAddress()],
         ]);
       });
 
       it('can transfer all pending children result is ok', async function () {
         await token['transferChild(uint256,address,uint256,address,uint256,bool,bytes)'](
           parentId,
-          owner.address,
+          await owner.getAddress(),
           0,
-          token.address,
+          await token.getAddress(),
           childId1,
           true,
           '0x',
         );
         await token['transferChild(uint256,address,uint256,address,uint256,bool,bytes)'](
           parentId,
-          owner.address,
+          await owner.getAddress(),
           0,
-          token.address,
+          await token.getAddress(),
           childId2,
           true,
           '0x',
         );
         await token['transferChild(uint256,address,uint256,address,uint256,bool,bytes)'](
           parentId,
-          owner.address,
+          await owner.getAddress(),
           0,
-          token.address,
+          await token.getAddress(),
           childId3,
           true,
           '0x',
@@ -173,9 +189,9 @@ describe('RMRKNestableAutoIndexMock', async function () {
         await expect(
           token['transferChild(uint256,address,uint256,address,uint256,bool,bytes)'](
             parentId,
-            owner.address,
+            await owner.getAddress(),
             0,
-            token.address,
+            await token.getAddress(),
             otherChildId,
             true,
             '0x',
@@ -186,83 +202,95 @@ describe('RMRKNestableAutoIndexMock', async function () {
 
     describe('With accepted tokens', async function () {
       beforeEach(async function () {
-        await token['acceptChild(uint256,address,uint256)'](parentId, token.address, childId1);
-        await token['acceptChild(uint256,address,uint256)'](parentId, token.address, childId2);
-        await token['acceptChild(uint256,address,uint256)'](parentId, token.address, childId3);
+        await token['acceptChild(uint256,address,uint256)'](
+          parentId,
+          await token.getAddress(),
+          childId1,
+        );
+        await token['acceptChild(uint256,address,uint256)'](
+          parentId,
+          await token.getAddress(),
+          childId2,
+        );
+        await token['acceptChild(uint256,address,uint256)'](
+          parentId,
+          await token.getAddress(),
+          childId3,
+        );
       });
 
       it('can transfer active child in first position and result is ok', async function () {
         await token['transferChild(uint256,address,uint256,address,uint256,bool,bytes)'](
           parentId,
-          owner.address,
+          await owner.getAddress(),
           0,
-          token.address,
+          await token.getAddress(),
           childId1,
           false,
           '0x',
         );
         expect(await token.childrenOf(parentId)).to.eql([
-          [childId3, token.address],
-          [childId2, token.address],
+          [childId3, await token.getAddress()],
+          [childId2, await token.getAddress()],
         ]);
       });
 
       it('can transfer active child in middle position and result is ok', async function () {
         await token['transferChild(uint256,address,uint256,address,uint256,bool,bytes)'](
           parentId,
-          owner.address,
+          await owner.getAddress(),
           0,
-          token.address,
+          await token.getAddress(),
           childId2,
           false,
           '0x',
         );
         expect(await token.childrenOf(parentId)).to.eql([
-          [childId1, token.address],
-          [childId3, token.address],
+          [childId1, await token.getAddress()],
+          [childId3, await token.getAddress()],
         ]);
       });
 
       it('can transfer active child in last position and result is ok', async function () {
         await token['transferChild(uint256,address,uint256,address,uint256,bool,bytes)'](
           parentId,
-          owner.address,
+          await owner.getAddress(),
           0,
-          token.address,
+          await token.getAddress(),
           childId3,
           false,
           '0x',
         );
         expect(await token.childrenOf(parentId)).to.eql([
-          [childId1, token.address],
-          [childId2, token.address],
+          [childId1, await token.getAddress()],
+          [childId2, await token.getAddress()],
         ]);
       });
 
       it('can transfer all active children result is ok', async function () {
         await token['transferChild(uint256,address,uint256,address,uint256,bool,bytes)'](
           parentId,
-          owner.address,
+          await owner.getAddress(),
           0,
-          token.address,
+          await token.getAddress(),
           childId1,
           false,
           '0x',
         );
         await token['transferChild(uint256,address,uint256,address,uint256,bool,bytes)'](
           parentId,
-          owner.address,
+          await owner.getAddress(),
           0,
-          token.address,
+          await token.getAddress(),
           childId2,
           false,
           '0x',
         );
         await token['transferChild(uint256,address,uint256,address,uint256,bool,bytes)'](
           parentId,
-          owner.address,
+          await owner.getAddress(),
           0,
-          token.address,
+          await token.getAddress(),
           childId3,
           false,
           '0x',
@@ -276,9 +304,9 @@ describe('RMRKNestableAutoIndexMock', async function () {
         await expect(
           token['transferChild(uint256,address,uint256,address,uint256,bool,bytes)'](
             parentId,
-            owner.address,
+            await owner.getAddress(),
             0,
-            token.address,
+            await token.getAddress(),
             otherChildId,
             false,
             '0x',

@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { ethers } from 'hardhat';
 import { Contract } from 'ethers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import {
   addAssetEntryFromMock,
   addAssetToToken,
@@ -24,7 +24,7 @@ async function singleFixture(): Promise<{
 }> {
   const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiAssetRenderUtils');
   const renderUtils = <RMRKMultiAssetRenderUtils>await renderUtilsFactory.deploy();
-  await renderUtils.deployed();
+  await renderUtils.waitForDeployment();
 
   const token = <RMRKNestableMultiAssetMock>(
     await singleFixtureWithArgs('RMRKNestableMultiAssetMock', [])
@@ -86,29 +86,31 @@ describe('NestableMultiAssetMock Other Behavior', function () {
       const tokenOwner = addrs[1];
       const newOwner = addrs[2];
       const approved = addrs[3];
-      await token.mint(tokenOwner.address, tokenId);
-      await token.connect(tokenOwner).approve(approved.address, tokenId);
-      await token.connect(tokenOwner).approveForAssets(approved.address, tokenId);
+      await token.mint(await tokenOwner.getAddress(), tokenId);
+      await token.connect(tokenOwner).approve(await approved.getAddress(), tokenId);
+      await token.connect(tokenOwner).approveForAssets(await approved.getAddress(), tokenId);
 
-      expect(await token.getApproved(tokenId)).to.eql(approved.address);
-      expect(await token.getApprovedForAssets(tokenId)).to.eql(approved.address);
+      expect(await token.getApproved(tokenId)).to.eql(await approved.getAddress());
+      expect(await token.getApprovedForAssets(tokenId)).to.eql(await approved.getAddress());
 
-      await token.connect(tokenOwner).transferFrom(tokenOwner.address, newOwner.address, tokenId);
+      await token
+        .connect(tokenOwner)
+        .transferFrom(await tokenOwner.getAddress(), await newOwner.getAddress(), tokenId);
 
-      expect(await token.getApproved(tokenId)).to.eql(ethers.constants.AddressZero);
-      expect(await token.getApprovedForAssets(tokenId)).to.eql(ethers.constants.AddressZero);
+      expect(await token.getApproved(tokenId)).to.eql(ethers.ZeroAddress);
+      expect(await token.getApprovedForAssets(tokenId)).to.eql(ethers.ZeroAddress);
     });
 
     it('cleans token and assets approvals on burn', async function () {
       const tokenId = 1;
       const tokenOwner = addrs[1];
       const approved = addrs[3];
-      await token.mint(tokenOwner.address, tokenId);
-      await token.connect(tokenOwner).approve(approved.address, tokenId);
-      await token.connect(tokenOwner).approveForAssets(approved.address, tokenId);
+      await token.mint(await tokenOwner.getAddress(), tokenId);
+      await token.connect(tokenOwner).approve(await approved.getAddress(), tokenId);
+      await token.connect(tokenOwner).approveForAssets(await approved.getAddress(), tokenId);
 
-      expect(await token.getApproved(tokenId)).to.eql(approved.address);
-      expect(await token.getApprovedForAssets(tokenId)).to.eql(approved.address);
+      expect(await token.getApproved(tokenId)).to.eql(await approved.getAddress());
+      expect(await token.getApprovedForAssets(tokenId)).to.eql(await approved.getAddress());
 
       await token.connect(tokenOwner)['burn(uint256)'](tokenId);
 

@@ -1,11 +1,10 @@
 import * as dotenv from 'dotenv';
 
 import { HardhatUserConfig, task } from 'hardhat/config';
-import '@nomiclabs/hardhat-etherscan';
-import '@nomicfoundation/hardhat-chai-matchers';
-import '@typechain/hardhat';
-import 'hardhat-gas-reporter';
-import 'solidity-coverage';
+// import '@nomiclabs/hardhat-etherscan';
+import '@nomicfoundation/hardhat-ethers';
+// import '@nomicfoundation/hardhat-chai-matchers';
+import '@nomicfoundation/hardhat-toolbox';
 import 'hardhat-contract-sizer';
 import '@primitivefi/hardhat-dodoc';
 

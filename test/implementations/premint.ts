@@ -1,6 +1,6 @@
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { ADDRESS_ZERO, singleFixtureWithArgs } from '../utils';
 import { Contract } from 'ethers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
@@ -92,7 +92,7 @@ async function shouldControlValidPreMinting(): Promise<void> {
   it('cannot mint if not owner', async function () {
     const notOwner = addrs[0];
     await expect(
-      this.token.connect(notOwner).mint(notOwner.address, 1, 'ipfs://tokenURI'),
+      this.token.connect(notOwner).mint(await notOwner.getAddress(), 1, 'ipfs://tokenURI'),
     ).to.be.revertedWithCustomError(this.token, 'RMRKNotOwnerOrContributor');
   });
 
@@ -116,7 +116,7 @@ async function shouldControlValidPreMinting(): Promise<void> {
   });
 
   it('reduces total supply on burn', async function () {
-    await this.token.connect(owner).mint(owner.address, 1, 'ipfs://tokenURI');
+    await this.token.connect(owner).mint(await owner.getAddress(), 1, 'ipfs://tokenURI');
     const tokenId = this.token.totalSupply();
     expect(await tokenId).to.equal(1);
     await this.token.connect(owner)['burn(uint256)'](tokenId);
@@ -124,16 +124,16 @@ async function shouldControlValidPreMinting(): Promise<void> {
   });
 
   it('reduces total supply on burn and does not reuse ID', async function () {
-    let tx = await this.token.connect(owner).mint(owner.address, 1, 'ipfs://tokenURI');
+    let tx = await this.token.connect(owner).mint(await owner.getAddress(), 1, 'ipfs://tokenURI');
     let event = (await tx.wait()).events?.find((e) => e.event === 'Transfer');
     const tokenId = event?.args?.tokenId;
     await this.token.connect(owner)['burn(uint256)'](tokenId);
 
-    tx = await this.token.connect(owner).mint(owner.address, 1, 'ipfs://tokenURI');
+    tx = await this.token.connect(owner).mint(await owner.getAddress(), 1, 'ipfs://tokenURI');
     event = (await tx.wait()).events?.find((e) => e.event === 'Transfer');
     const newTokenId = event?.args?.tokenId;
 
-    expect(newTokenId).to.equal(tokenId.add(1));
+    expect(newTokenId).to.equal(tokenId + 1n);
     expect(await this.token.totalSupply()).to.equal(1);
   });
 
@@ -148,18 +148,24 @@ async function shouldControlValidPreMinting(): Promise<void> {
     it('cannot nest mint if not owner', async function () {
       const notOwner = addrs[0];
       await expect(
-        this.token.connect(notOwner).nestMint(this.token.address, 1, 1, 'ipfs://tokenURI'),
+        this.token
+          .connect(notOwner)
+          .nestMint(await this.token.getAddress(), 1, 1, 'ipfs://tokenURI'),
       ).to.be.revertedWithCustomError(this.token, 'RMRKNotOwnerOrContributor');
     });
 
     it('can nest mint if owner', async function () {
       this.token.connect(owner).mint(addrs[0].address, 1, 'ipfs://tokenURI');
-      await this.token.connect(owner).nestMint(this.token.address, 1, 1, 'ipfs://tokenURI');
+      await this.token
+        .connect(owner)
+        .nestMint(await this.token.getAddress(), 1, 1, 'ipfs://tokenURI');
     });
 
     it('cannot nest mint over max supply', async function () {
       await expect(
-        this.token.connect(owner).nestMint(this.token.address, 99999, 1, 'ipfs://tokenURI'),
+        this.token
+          .connect(owner)
+          .nestMint(await this.token.getAddress(), 99999, 1, 'ipfs://tokenURI'),
       ).to.be.revertedWithCustomError(this.token, 'RMRKMintOverMax');
     });
   });

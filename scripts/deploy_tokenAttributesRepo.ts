@@ -12,14 +12,16 @@ async function main() {
   const owner = accounts[0];
   console.log('Deployer address: ' + (await owner.getAddress()));
   // We get the contract to deploy
-  const renderUtilsFactory = await ethers.getContractFactory('RMRKEquipRenderUtils');
-  const renderUtils = await renderUtilsFactory.deploy();
-  await renderUtils.waitForDeployment();
-  console.log('RMRK Equip Render Utils deployed to:', await renderUtils.getAddress());
-  await sleep(1000);
+  const tokenAttributesRepoFactory = await ethers.getContractFactory(
+    'RMRKTokenAttributesRepository',
+  );
+  const tokenAttributesRepo = await tokenAttributesRepoFactory.deploy();
+  await tokenAttributesRepo.waitForDeployment();
+  console.log('RMRKTokenAttributesRepository deployed to:', await tokenAttributesRepo.getAddress());
+  await sleep(10000);
 
   await run('verify:verify', {
-    address: await renderUtils.getAddress(),
+    address: await tokenAttributesRepo.getAddress(),
     constructorArguments: [],
   });
 }

@@ -1,7 +1,7 @@
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { IOtherInterface, IRMRKRevealable, IRMRKRevealer, IERC5773 } from '../interfaces';
 import { RMRKMultiAssetRevealableMock, RMRKRevealerMock } from '../../typechain-types';
 import { bn } from '../utils';
@@ -20,16 +20,16 @@ async function revealableFixture(): Promise<{
   const revealableFactory = await ethers.getContractFactory('RMRKMultiAssetRevealableMock');
   const revealerFactory = await ethers.getContractFactory('RMRKRevealerMock');
   const revealable = await revealableFactory.deploy();
-  await revealable.deployed();
+  await revealable.waitForDeployment();
 
-  const revealer = await revealerFactory.deploy(REVEALED_ASSET_ID, revealable.address);
-  await revealer.deployed();
+  const revealer = await revealerFactory.deploy(REVEALED_ASSET_ID, await revealable.getAddress());
+  await revealer.waitForDeployment();
 
-  await revealable.setRevealer(revealer.address);
+  await revealable.setRevealer(await revealer.getAddress());
 
-  await revealable.mint(user1.address, 1);
-  await revealable.mint(user1.address, 2);
-  await revealable.mint(user2.address, 3);
+  await revealable.mint(await user1.getAddress(), 1);
+  await revealable.mint(await user1.getAddress(), 2);
+  await revealable.mint(await user2.getAddress(), 3);
 
   await revealable.addAssetEntry(UNREVEALED_ASSET_ID, 'ipfs://unrevealed');
   await revealable.addAssetEntry(REVEALED_ASSET_ID, 'ipfs://revealed');
@@ -88,7 +88,7 @@ describe('RMRKRevealables', async function () {
   });
 
   it('can get revealer address', async function () {
-    expect(await revealable.getRevealer()).to.eql(revealer.address);
+    expect(await revealable.getRevealer()).to.eql(await revealer.getAddress());
   });
 
   it('supports revealable interface', async function () {

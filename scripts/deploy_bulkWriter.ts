@@ -1,4 +1,4 @@
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { ethers, run } from 'hardhat';
 
 export const sleep = (ms: number): Promise<void> => {
@@ -10,16 +10,16 @@ export const sleep = (ms: number): Promise<void> => {
 async function main() {
   const accounts: SignerWithAddress[] = await ethers.getSigners();
   const owner = accounts[0];
-  console.log('Deployer address: ' + owner.address);
+  console.log('Deployer address: ' + (await owner.getAddress()));
   // We get the contract to deploy
   const factory = await ethers.getContractFactory('RMRKBulkWriter');
   const bulkwriter = await factory.deploy();
-  await bulkwriter.deployed();
-  console.log('RMRK Bulk Writer deployed to:', bulkwriter.address);
+  await bulkwriter.waitForDeployment();
+  console.log('RMRK Bulk Writer deployed to:', await bulkwriter.getAddress());
   await sleep(1000);
 
   await run('verify:verify', {
-    address: bulkwriter.address,
+    address: await bulkwriter.getAddress(),
     constructorArguments: [],
   });
 }

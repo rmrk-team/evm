@@ -28,8 +28,8 @@ import {
   RMRKNestablePreMint,
   RMRKNestablePreMintSoulbound,
 } from '../../typechain-types';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { BigNumber, Contract } from 'ethers';
+import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
+import { Contract } from 'ethers';
 import {
   IRMRKImplementation,
   IERC165,
@@ -60,7 +60,7 @@ export enum MintingType {
   Custom,
 }
 
-const pricePerMint = ethers.utils.parseEther('0.1');
+const pricePerMint = ethers.parseEther('0.1');
 
 describe('RMRKImplementations', async () => {
   const name = 'RmrkTest';
@@ -103,7 +103,7 @@ describe('RMRKImplementations', async () => {
 
     const ERC20Factory = await ethers.getContractFactory('contracts/mocks/ERC20Mock.sol:ERC20Mock');
     const rmrkERC20 = <ERC20Mock>await ERC20Factory.deploy();
-    await rmrkERC20.mint(owner.address, ethers.utils.parseEther('1000000'));
+    await rmrkERC20.mint(await owner.getAddress(), ethers.parseEther('1000000'));
 
     // Pre Mint
     const multiAssetPreMintImplFactory = await ethers.getContractFactory('RMRKMultiAssetPreMint');
@@ -182,7 +182,7 @@ describe('RMRKImplementations', async () => {
       symbol,
       collectionMetadataUri,
       maxSupply,
-      royaltyRecipient.address,
+      await royaltyRecipient.getAddress(),
       500,
     ] as const;
 
@@ -195,8 +195,8 @@ describe('RMRKImplementations', async () => {
         maxSupply,
         pricePerMint,
         royaltyPercentageBps: 500,
-        royaltyRecipient: royaltyRecipient.address,
-        erc20TokenAddress: ethers.constants.AddressZero,
+        royaltyRecipient: await royaltyRecipient.getAddress(),
+        erc20TokenAddress: ethers.ZeroAddress,
       },
     ] as const;
 
@@ -209,7 +209,7 @@ describe('RMRKImplementations', async () => {
         maxSupply,
         pricePerMint,
         royaltyPercentageBps: 500,
-        royaltyRecipient: royaltyRecipient.address,
+        royaltyRecipient: await royaltyRecipient.getAddress(),
       },
     ] as const;
 
@@ -266,7 +266,7 @@ describe('RMRKImplementations', async () => {
     );
 
     // @ts-ignore
-    deployArgsLazyMintERC20Pay[4].erc20TokenAddress = rmrkERC20.address;
+    deployArgsLazyMintERC20Pay[4].erc20TokenAddress = await rmrkERC20.getAddress();
 
     const multiAssetLazyMintErc20Impl = <RMRKMultiAssetLazyMintErc20>(
       await multiAssetLazyMintErc20ImplFactory.deploy(...deployArgsLazyMintERC20Pay)
@@ -686,7 +686,7 @@ async function testMultiAssetBehavior(mintingType: MintingType) {
     });
 
     it('cannot add asset to token if not owner or contributor', async function () {
-      await mint(holder.address, contract, owner, rmrkERC20, mintingType);
+      await mint(await holder.getAddress(), contract, owner, rmrkERC20, mintingType);
       await contract.connect(owner).addAssetEntry('metadata');
       const assetId = await contract.totalAssets();
       const tokenId = await contract.totalSupply();
@@ -698,33 +698,30 @@ async function testMultiAssetBehavior(mintingType: MintingType) {
 
   describe('Auto Accept Behavior', async function () {
     it('auto accepts the first asset', async function () {
-      await mint(holder.address, contract, owner, rmrkERC20, mintingType);
+      await mint(await holder.getAddress(), contract, owner, rmrkERC20, mintingType);
       await contract.addAssetEntry('metadata');
       await contract.connect(owner).addAssetToToken(1, 1, 0);
 
-      expect(await contract.getActiveAssets(1)).to.eql([ethers.BigNumber.from(1)]);
+      expect(await contract.getActiveAssets(1)).to.eql([1n]);
     });
 
     it('auto accepts the other assets if sender is the holder', async function () {
-      await mint(owner.address, contract, owner, rmrkERC20, mintingType);
+      await mint(await owner.getAddress(), contract, owner, rmrkERC20, mintingType);
       await contract.addAssetEntry('metadata');
       await contract.addAssetEntry('metadata2');
       await contract.connect(owner).addAssetToToken(1, 1, 0);
       await contract.connect(owner).addAssetToToken(1, 2, 0);
-      expect(await contract.getActiveAssets(1)).to.eql([
-        ethers.BigNumber.from(1),
-        ethers.BigNumber.from(2),
-      ]);
+      expect(await contract.getActiveAssets(1)).to.eql([1n, 2n]);
     });
 
     it('does not auto accept the second asset', async function () {
-      await mint(holder.address, contract, owner, rmrkERC20, mintingType);
+      await mint(await holder.getAddress(), contract, owner, rmrkERC20, mintingType);
       await contract.addAssetEntry('metadata');
       await contract.addAssetEntry('metadata');
       await contract.connect(owner).addAssetToToken(1, 1, 0);
       await contract.connect(owner).addAssetToToken(1, 2, 0);
 
-      expect(await contract.getActiveAssets(1)).to.eql([ethers.BigNumber.from(1)]);
+      expect(await contract.getActiveAssets(1)).to.eql([1n]);
     });
   });
 }
@@ -744,9 +741,9 @@ async function testEquippableBehavior(mintingType: MintingType) {
 
   describe('Equippable Behavior', async function () {
     it('can add equippable assets', async function () {
-      await mint(holder.address, contract, owner, rmrkERC20, mintingType);
+      await mint(await holder.getAddress(), contract, owner, rmrkERC20, mintingType);
       const equippableGroupId = 1;
-      const catalogAddress = rmrkERC20.address; // Could be any address
+      const catalogAddress = await rmrkERC20.getAddress(); // Could be any address
       const metadataURI = 'ipfs://asset-metadata';
       const partIds = [1, 2, 3];
       await contract.addEquippableAssetEntry(
@@ -761,9 +758,9 @@ async function testEquippableBehavior(mintingType: MintingType) {
       await contract.connect(owner).addAssetToToken(tokenId, assetId, 0);
       expect(await contract.getAssetAndEquippableData(tokenId, assetId)).to.eql([
         metadataURI,
-        BigNumber.from(equippableGroupId),
+        equippableGroupId,
         catalogAddress,
-        partIds.map(BigNumber.from),
+        partIds.map(BigInt),
       ]);
     });
 
@@ -771,17 +768,26 @@ async function testEquippableBehavior(mintingType: MintingType) {
       const equippableGroupId = 1;
       const partId = 10;
       await expect(
-        contract.setValidParentForEquippableGroup(equippableGroupId, contract.address, partId),
+        contract.setValidParentForEquippableGroup(
+          equippableGroupId,
+          await contract.getAddress(),
+          partId,
+        ),
       )
         .to.emit(contract, 'ValidParentEquippableGroupIdSet')
-        .withArgs(equippableGroupId, partId, contract.address);
+        .withArgs(equippableGroupId, partId, await contract.getAddress());
     });
 
     it('cannot add equippable assets if not owner or contributor', async function () {
       await expect(
         contract
           .connect(holder)
-          .addEquippableAssetEntry(1, rmrkERC20.address, 'ipfs://asset-metadata', [1, 2, 3]),
+          .addEquippableAssetEntry(
+            1,
+            await rmrkERC20.getAddress(),
+            'ipfs://asset-metadata',
+            [1, 2, 3],
+          ),
       ).to.be.revertedWithCustomError(contract, 'RMRKNotOwnerOrContributor');
     });
 
@@ -791,7 +797,7 @@ async function testEquippableBehavior(mintingType: MintingType) {
       await expect(
         contract
           .connect(holder)
-          .setValidParentForEquippableGroup(equippableGroupId, contract.address, partId),
+          .setValidParentForEquippableGroup(equippableGroupId, await contract.getAddress(), partId),
       ).to.be.revertedWithCustomError(contract, 'RMRKNotOwnerOrContributor');
     });
   });
@@ -814,27 +820,27 @@ async function testGeneralBehavior(mintingType: MintingType) {
 
   describe('General Behavior', async function () {
     it('can update royalties recepient if owner or owner', async function () {
-      await contract.connect(owner).updateRoyaltyRecipient(holder.address);
-      expect(await contract.getRoyaltyRecipient()).to.eql(holder.address);
+      await contract.connect(owner).updateRoyaltyRecipient(await holder.getAddress());
+      expect(await contract.getRoyaltyRecipient()).to.eql(await holder.getAddress());
     });
 
     it('cannot update royalties recepient if owner or owner', async function () {
       await expect(
-        contract.connect(holder).updateRoyaltyRecipient(holder.address),
+        contract.connect(holder).updateRoyaltyRecipient(await holder.getAddress()),
       ).to.be.revertedWithCustomError(contract, 'RMRKNotOwner');
     });
 
     it('reduces total supply on burn and id not reduced', async function () {
-      await mint(holder.address, contract, owner, rmrkERC20, mintingType);
+      await mint(await holder.getAddress(), contract, owner, rmrkERC20, mintingType);
       await contract.connect(holder)['burn(uint256)'](1);
-      expect(await contract.totalSupply()).to.eql(BigNumber.from(0));
+      expect(await contract.totalSupply()).to.eql(0n);
 
-      await mint(holder.address, contract, owner, rmrkERC20, mintingType);
-      expect(await contract.ownerOf(2)).to.eql(holder.address);
+      await mint(await holder.getAddress(), contract, owner, rmrkERC20, mintingType);
+      expect(await contract.ownerOf(2)).to.eql(await holder.getAddress());
     });
 
     it('cannot burn if not token owner', async function () {
-      await mint(holder.address, contract, owner, rmrkERC20, mintingType);
+      await mint(await holder.getAddress(), contract, owner, rmrkERC20, mintingType);
       const expectedError = (await contract.supportsInterface(IERC7401))
         ? 'RMRKNotApprovedOrDirectOwner'
         : 'ERC721NotApprovedOrOwner';
@@ -847,23 +853,22 @@ async function testGeneralBehavior(mintingType: MintingType) {
     it('cannot mint 0 tokens', async function () {
       if (mintingType == MintingType.RMRKPreMint) {
         await expect(
-          contract.connect(owner).mint(holder.address, 0, 'ipfs://tokenURI'),
+          contract.connect(owner).mint(await holder.getAddress(), 0, 'ipfs://tokenURI'),
         ).to.be.revertedWithCustomError(contract, 'RMRKMintZero');
       } else if (mintingType == MintingType.RMRKLazyMintNativeToken) {
         await expect(
-          contract.connect(owner).mint(holder.address, 0, { value: pricePerMint }),
+          contract.connect(owner).mint(await holder.getAddress(), 0, { value: pricePerMint }),
         ).to.be.revertedWithCustomError(contract, 'RMRKMintZero');
       } else if (mintingType == MintingType.RMRKLazyMintERC20) {
-        await rmrkERC20.connect(owner).approve(contract.address, pricePerMint);
-        await expect(contract.connect(owner).mint(holder.address, 0)).to.be.revertedWithCustomError(
-          contract,
-          'RMRKMintZero',
-        );
+        await rmrkERC20.connect(owner).approve(await contract.getAddress(), pricePerMint);
+        await expect(
+          contract.connect(owner).mint(await holder.getAddress(), 0),
+        ).to.be.revertedWithCustomError(contract, 'RMRKMintZero');
       }
     });
 
     it('has expected tokenURI', async function () {
-      await mint(holder.address, contract, owner, rmrkERC20, mintingType);
+      await mint(await holder.getAddress(), contract, owner, rmrkERC20, mintingType);
       if (mintingType == MintingType.RMRKPreMint) {
         expect(await contract.tokenURI(1)).to.eql('ipfs://tokenURI');
       } else {
@@ -881,36 +886,44 @@ async function testGeneralBehavior(mintingType: MintingType) {
     });
 
     it('can withdraw raised', async function () {
-      await mint(holder.address, contract, owner, rmrkERC20, mintingType);
-      await mint(holder.address, contract, owner, rmrkERC20, mintingType);
+      await mint(await holder.getAddress(), contract, owner, rmrkERC20, mintingType);
+      await mint(await holder.getAddress(), contract, owner, rmrkERC20, mintingType);
       if (mintingType == MintingType.RMRKLazyMintNativeToken) {
-        const balanceBefore = await holder.getBalance();
-        await contract.connect(owner).withdraw(holder.address, pricePerMint.mul(2));
-        const balanceAfter = await holder.getBalance();
-        expect(balanceAfter).to.eql(balanceBefore.add(pricePerMint.mul(2)));
+        const balanceBefore = await ethers.provider.getBalance(holder.address);
+        await contract.connect(owner).withdraw(await holder.getAddress(), pricePerMint * 2n);
+        const balanceAfter = await ethers.provider.getBalance(holder.address);
+        expect(balanceAfter).to.eql(balanceBefore + pricePerMint * 2n);
       } else if (mintingType == MintingType.RMRKLazyMintERC20) {
-        const balanceBefore = await rmrkERC20.balanceOf(holder.address);
+        const balanceBefore = await rmrkERC20.balanceOf(await holder.getAddress());
         await contract
           .connect(owner)
-          .withdrawRaisedERC20(rmrkERC20.address, holder.address, pricePerMint.mul(2));
-        const balanceAfter = await rmrkERC20.balanceOf(holder.address);
-        expect(balanceAfter).to.eql(balanceBefore.add(pricePerMint.mul(2)));
+          .withdrawRaisedERC20(
+            await rmrkERC20.getAddress(),
+            await holder.getAddress(),
+            pricePerMint * 2n,
+          );
+        const balanceAfter = await rmrkERC20.balanceOf(await holder.getAddress());
+        expect(balanceAfter).to.eql(balanceBefore + pricePerMint * 2n);
       } else {
         // premint collects nothing
       }
     });
 
     it('cannot withdraw raised if not owner', async function () {
-      await mint(holder.address, contract, owner, rmrkERC20, mintingType);
+      await mint(await holder.getAddress(), contract, owner, rmrkERC20, mintingType);
       if (mintingType == MintingType.RMRKLazyMintNativeToken) {
         await expect(
-          contract.connect(holder).withdraw(holder.address, pricePerMint),
+          contract.connect(holder).withdraw(await holder.getAddress(), pricePerMint),
         ).to.be.revertedWithCustomError(contract, 'RMRKNotOwner');
       } else if (mintingType == MintingType.RMRKLazyMintERC20) {
         await expect(
           contract
             .connect(holder)
-            .withdrawRaisedERC20(rmrkERC20.address, holder.address, pricePerMint),
+            .withdrawRaisedERC20(
+              await rmrkERC20.getAddress(),
+              await holder.getAddress(),
+              pricePerMint,
+            ),
         ).to.be.revertedWithCustomError(contract, 'RMRKNotOwner');
       } else {
         // premint collects nothing
@@ -920,16 +933,13 @@ async function testGeneralBehavior(mintingType: MintingType) {
 
   describe('Royalties', async function () {
     it('can get royalty recipient and percentage', async function () {
-      expect(await contract.getRoyaltyRecipient()).to.eql(royaltyRecipient.address);
-      expect(await contract.getRoyaltyPercentage()).to.eql(BigNumber.from(500));
+      expect(await contract.getRoyaltyRecipient()).to.eql(await royaltyRecipient.getAddress());
+      expect(await contract.getRoyaltyPercentage()).to.eql(500n);
     });
 
     it('can get royalty info for token', async function () {
-      await mint(holder.address, contract, owner, rmrkERC20, mintingType);
-      expect(await contract.royaltyInfo(1, BigNumber.from(100))).to.eql([
-        royaltyRecipient.address,
-        BigNumber.from(5),
-      ]);
+      await mint(await holder.getAddress(), contract, owner, rmrkERC20, mintingType);
+      expect(await contract.royaltyInfo(1, 100n)).to.eql([await royaltyRecipient.getAddress(), 5n]);
     });
   });
 }
@@ -946,7 +956,7 @@ async function mint(
   } else if (mintingType == MintingType.RMRKLazyMintNativeToken) {
     await contract.connect(owner).mint(to, 1, { value: pricePerMint });
   } else if (mintingType == MintingType.RMRKLazyMintERC20) {
-    await rmrkERC20.connect(owner).approve(contract.address, pricePerMint);
+    await rmrkERC20.connect(owner).approve(await contract.getAddress(), pricePerMint);
     await contract.connect(owner).mint(to, 1);
   }
 }

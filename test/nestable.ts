@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
 import { Contract } from 'ethers';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import {
   bn,
@@ -41,40 +41,40 @@ describe('NestableMock', function () {
     it('cannot mint id 0', async function () {
       const tokenId = 0;
       await expect(
-        child['mint(address,uint256)'](owner.address, tokenId),
+        child['mint(address,uint256)'](await owner.getAddress(), tokenId),
       ).to.be.revertedWithCustomError(child, 'RMRKIdZeroForbidden');
     });
 
     it('cannot nest mint id 0', async function () {
-      const parentId = await mintFromMock(child, owner.address);
+      const parentId = await mintFromMock(child, await owner.getAddress());
       const childId = 0;
       await expect(
-        child['nestMint(address,uint256,uint256)'](parent.address, childId, parentId),
+        child['nestMint(address,uint256,uint256)'](await parent.getAddress(), childId, parentId),
       ).to.be.revertedWithCustomError(child, 'RMRKIdZeroForbidden');
     });
 
     it('cannot mint already minted token', async function () {
-      const tokenId = await mintFromMock(child, owner.address);
+      const tokenId = await mintFromMock(child, await owner.getAddress());
       await expect(
-        child['mint(address,uint256)'](owner.address, tokenId),
+        child['mint(address,uint256)'](await owner.getAddress(), tokenId),
       ).to.be.revertedWithCustomError(child, 'ERC721TokenAlreadyMinted');
     });
 
     it('cannot nest mint already minted token', async function () {
-      const parentId = await mintFromMock(parent, owner.address);
-      const childId = await nestMintFromMock(child, parent.address, parentId);
+      const parentId = await mintFromMock(parent, await owner.getAddress());
+      const childId = await nestMintFromMock(child, await parent.getAddress(), parentId);
 
       await expect(
-        child['nestMint(address,uint256,uint256)'](parent.address, childId, parentId),
+        child['nestMint(address,uint256,uint256)'](await parent.getAddress(), childId, parentId),
       ).to.be.revertedWithCustomError(child, 'ERC721TokenAlreadyMinted');
     });
 
     it('cannot nest mint already minted token', async function () {
-      const parentId = await mintFromMock(parent, owner.address);
-      const childId = await nestMintFromMock(child, parent.address, parentId);
+      const parentId = await mintFromMock(parent, await owner.getAddress());
+      const childId = await nestMintFromMock(child, await parent.getAddress(), parentId);
 
       await expect(
-        child['nestMint(address,uint256,uint256)'](parent.address, childId, parentId),
+        child['nestMint(address,uint256,uint256)'](await parent.getAddress(), childId, parentId),
       ).to.be.revertedWithCustomError(child, 'ERC721TokenAlreadyMinted');
     });
   });
@@ -108,38 +108,44 @@ describe('NestableMock transfer hooks', function () {
   });
 
   it('keeps track of balances per NFTs', async function () {
-    const parentId = await mintFromMock(parent, owner.address);
-    const childId = await nestMintFromMock(child, parent.address, parentId);
+    const parentId = await mintFromMock(parent, await owner.getAddress());
+    const childId = await nestMintFromMock(child, await parent.getAddress(), parentId);
 
-    expect(await parent.balancePerNftOf(owner.address, 0)).to.eql(bn(1));
-    expect(await child.balancePerNftOf(parent.address, parentId)).to.eql(bn(1));
+    expect(await parent.balancePerNftOf(await owner.getAddress(), 0)).to.eql(bn(1));
+    expect(await child.balancePerNftOf(await parent.getAddress(), parentId)).to.eql(bn(1));
 
     await parent.transferChild(
       parentId,
-      otherOwner.address,
+      await otherOwner.getAddress(),
       0,
       0,
-      child.address,
+      await child.getAddress(),
       childId,
       true,
       '0x',
     );
-    expect(await child.balancePerNftOf(parent.address, parentId)).to.eql(bn(0));
-    expect(await child.balancePerNftOf(otherOwner.address, 0)).to.eql(bn(1));
+    expect(await child.balancePerNftOf(await parent.getAddress(), parentId)).to.eql(bn(0));
+    expect(await child.balancePerNftOf(await otherOwner.getAddress(), 0)).to.eql(bn(1));
 
     // Nest again
     await child
       .connect(otherOwner)
-      .nestTransferFrom(otherOwner.address, parent.address, childId, parentId, '0x');
+      .nestTransferFrom(
+        await otherOwner.getAddress(),
+        await parent.getAddress(),
+        childId,
+        parentId,
+        '0x',
+      );
 
-    expect(await child.balancePerNftOf(parent.address, parentId)).to.eql(bn(1));
-    expect(await child.balancePerNftOf(otherOwner.address, 0)).to.eql(bn(0));
+    expect(await child.balancePerNftOf(await parent.getAddress(), parentId)).to.eql(bn(1));
+    expect(await child.balancePerNftOf(await otherOwner.getAddress(), 0)).to.eql(bn(0));
 
-    await parent.acceptChild(parentId, 0, child.address, childId);
+    await parent.acceptChild(parentId, 0, await child.getAddress(), childId);
 
     await parent['burn(uint256,uint256)'](parentId, 1);
-    expect(await parent.balancePerNftOf(owner.address, 0)).to.eql(bn(0));
-    expect(await child.balancePerNftOf(parent.address, parentId)).to.eql(bn(0));
-    expect(await child.balancePerNftOf(otherOwner.address, 0)).to.eql(bn(0));
+    expect(await parent.balancePerNftOf(await owner.getAddress(), 0)).to.eql(bn(0));
+    expect(await child.balancePerNftOf(await parent.getAddress(), parentId)).to.eql(bn(0));
+    expect(await child.balancePerNftOf(await otherOwner.getAddress(), 0)).to.eql(bn(0));
   });
 });

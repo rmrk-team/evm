@@ -1,7 +1,6 @@
 import { ethers } from 'hardhat';
-import { BigNumber } from 'ethers';
-import { Contract } from 'ethers';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
+import { RMRKCatalogImpl, RMRKEquippableMock } from '../../typechain-types';
 
 const partIdForBody = 1;
 const partIdForWeapon = 2;
@@ -13,10 +12,10 @@ const uniqueWeapons = 4;
 // const uniqueWeaponGems = 2;
 // const uniqueBackgrounds = 3;
 
-const soldiersIds: BigNumber[] = [];
-const weaponsIds: BigNumber[] = [];
-const weaponGemsIds: BigNumber[] = [];
-const backgroundsIds: BigNumber[] = [];
+const soldiersIds: bigint[] = [];
+const weaponsIds: bigint[] = [];
+const weaponGemsIds: bigint[] = [];
+const backgroundsIds: bigint[] = [];
 
 const soldierResId = 100;
 const weaponAssetsFull = [1, 2, 3, 4]; // Must match the total of uniqueAssets
@@ -34,14 +33,14 @@ enum ItemType {
 let addrs: SignerWithAddress[];
 
 async function setupContextForSlots(
-  catalog: Contract,
-  catalogForWeapon: Contract,
-  soldier: Contract,
-  weapon: Contract,
-  weaponGem: Contract,
-  background: Contract,
-  mint: (token: Contract, to: string) => Promise<BigNumber>,
-  nestMint: (token: Contract, to: string, parentId: BigNumber) => Promise<BigNumber>,
+  catalog: RMRKCatalogImpl,
+  catalogForWeapon: RMRKCatalogImpl,
+  soldier: RMRKEquippableMock,
+  weapon: RMRKEquippableMock,
+  weaponGem: RMRKEquippableMock,
+  background: RMRKEquippableMock,
+  mint: (token: RMRKEquippableMock, to: string) => Promise<bigint>,
+  nestMint: (token: RMRKEquippableMock, to: string, parentId: bigint) => Promise<bigint>,
 ) {
   const [, ...signersAddr] = await ethers.getSigners();
   addrs = signersAddr;
@@ -80,19 +79,19 @@ async function setupContextForSlots(
     const partForWeapon = {
       itemType: ItemType.Slot,
       z: 2,
-      equippable: [weapon.address],
+      equippable: [await weapon.getAddress()],
       metadataURI: '',
     };
     const partForWeaponGem = {
       itemType: ItemType.Slot,
       z: 3,
-      equippable: [weaponGem.address],
+      equippable: [await weaponGem.getAddress()],
       metadataURI: 'noGem.png',
     };
     const partForBackground = {
       itemType: ItemType.Slot,
       z: 0,
-      equippable: [background.address],
+      equippable: [await background.getAddress()],
       metadataURI: 'noBackground.png',
     };
 
@@ -120,9 +119,11 @@ async function setupContextForSlots(
     weaponsIds.length = 0;
     // Mint one weapon to soldier
     for (let i = 0; i < uniqueSoldiers; i++) {
-      const newId = await nestMint(weapon, soldier.address, soldiersIds[i]);
+      const newId = await nestMint(weapon, await soldier.getAddress(), soldiersIds[i]);
       weaponsIds.push(newId);
-      await soldier.connect(addrs[i % 3]).acceptChild(soldiersIds[i], 0, weapon.address, newId);
+      await soldier
+        .connect(addrs[i % 3])
+        .acceptChild(soldiersIds[i], 0, await weapon.getAddress(), newId);
     }
   }
 
@@ -131,9 +132,11 @@ async function setupContextForSlots(
     weaponGemsIds.length = 0;
     // Mint one weapon gem for each weapon on each soldier
     for (let i = 0; i < uniqueSoldiers; i++) {
-      const newId = await nestMint(weaponGem, weapon.address, weaponsIds[i]);
+      const newId = await nestMint(weaponGem, await weapon.getAddress(), weaponsIds[i]);
       weaponGemsIds.push(newId);
-      await weapon.connect(addrs[i % 3]).acceptChild(weaponsIds[i], 0, weaponGem.address, newId);
+      await weapon
+        .connect(addrs[i % 3])
+        .acceptChild(weaponsIds[i], 0, await weaponGem.getAddress(), newId);
     }
   }
 
@@ -142,18 +145,22 @@ async function setupContextForSlots(
     backgroundsIds.length = 0;
     // Mint one background to soldier
     for (let i = 0; i < uniqueSoldiers; i++) {
-      const newId = await nestMint(background, soldier.address, soldiersIds[i]);
+      const newId = await nestMint(background, await soldier.getAddress(), soldiersIds[i]);
       backgroundsIds.push(newId);
-      await soldier.connect(addrs[i % 3]).acceptChild(soldiersIds[i], 0, background.address, newId);
+      await soldier
+        .connect(addrs[i % 3])
+        .acceptChild(soldiersIds[i], 0, await background.getAddress(), newId);
     }
   }
 
   async function addAssetsToSoldier(): Promise<void> {
-    await soldier.addEquippableAssetEntry(soldierResId, 0, catalog.address, 'ipfs:soldier/', [
-      partIdForBody,
-      partIdForWeapon,
-      partIdForBackground,
-    ]);
+    await soldier.addEquippableAssetEntry(
+      soldierResId,
+      0,
+      await catalog.getAddress(),
+      'ipfs:soldier/',
+      [partIdForBody, partIdForWeapon, partIdForBackground],
+    );
     for (let i = 0; i < uniqueSoldiers; i++) {
       await soldier.addAssetToToken(soldiersIds[i], soldierResId, 0);
       await soldier.connect(addrs[i % 3]).acceptAsset(soldiersIds[i], 0, soldierResId);
@@ -167,7 +174,7 @@ async function setupContextForSlots(
       await weapon.addEquippableAssetEntry(
         weaponAssetsFull[i],
         0, // Not meant to equip
-        ethers.constants.AddressZero, // Not meant to equip
+        ethers.ZeroAddress, // Not meant to equip
         `ipfs:weapon/full/${weaponAssetsFull[i]}`,
         [],
       );
@@ -176,7 +183,7 @@ async function setupContextForSlots(
       await weapon.addEquippableAssetEntry(
         weaponAssetsEquip[i],
         equippableGroupId,
-        catalogForWeapon.address,
+        await catalogForWeapon.getAddress(),
         `ipfs:weapon/equip/${weaponAssetsEquip[i]}`,
         [partIdForWeaponGem],
       );
@@ -185,7 +192,7 @@ async function setupContextForSlots(
     // Can be equipped into soldiers
     await weapon.setValidParentForEquippableGroup(
       equippableGroupId,
-      soldier.address,
+      await soldier.getAddress(),
       partIdForWeapon,
     );
 
@@ -208,21 +215,21 @@ async function setupContextForSlots(
     await weaponGem.addEquippableAssetEntry(
       weaponGemAssetFull,
       0, // Not meant to equip
-      ethers.constants.AddressZero, // Not meant to equip
+      ethers.ZeroAddress, // Not meant to equip
       'ipfs:weagponGem/full/',
       [],
     );
     await weaponGem.addEquippableAssetEntry(
       weaponGemAssetEquip,
       equippableGroupId,
-      catalog.address,
+      await catalog.getAddress(),
       'ipfs:weagponGem/equip/',
       [],
     );
     // Can be equipped into weapons
     await weaponGem.setValidParentForEquippableGroup(
       equippableGroupId,
-      weapon.address,
+      await weapon.getAddress(),
       partIdForWeaponGem,
     );
 
@@ -239,14 +246,14 @@ async function setupContextForSlots(
     await background.addEquippableAssetEntry(
       backgroundAssetId,
       equippableGroupId,
-      catalog.address,
+      await catalog.getAddress(),
       'ipfs:background/',
       [],
     );
     // Can be equipped into soldiers
     await background.setValidParentForEquippableGroup(
       equippableGroupId,
-      soldier.address,
+      await soldier.getAddress(),
       partIdForBackground,
     );
 

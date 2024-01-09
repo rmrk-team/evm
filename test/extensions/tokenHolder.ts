@@ -1,7 +1,7 @@
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { bn } from '../utils';
 import { IERC165, IERC7590, IOtherInterface } from '../interfaces';
 import { RMRKTokenHolderMock, ERC20Mock } from '../../typechain-types';
@@ -11,14 +11,14 @@ import { RMRKTokenHolderMock, ERC20Mock } from '../../typechain-types';
 async function tokenHolderFixture() {
   const tokenHolderFactory = await ethers.getContractFactory('RMRKTokenHolderMock');
   const tokenHolder = await tokenHolderFactory.deploy('Secure Token Transfer Protocol', 'STTP');
-  await tokenHolder.deployed();
+  await tokenHolder.waitForDeployment();
 
   const erc20Factory = await ethers.getContractFactory('ERC20Mock');
   const erc20A = await erc20Factory.deploy();
-  await erc20A.deployed();
+  await erc20A.waitForDeployment();
 
   const erc20B = await erc20Factory.deploy();
-  await erc20B.deployed();
+  await erc20B.waitForDeployment();
 
   return {
     tokenHolder,
@@ -37,7 +37,7 @@ describe('RMRKTokenHolder', async function () {
   const tokenHolderId = bn(1);
   const otherTokenHolderId = bn(2);
   const tokenId = bn(1);
-  const mockValue = ethers.utils.parseEther('10');
+  const mockValue = ethers.parseEther('10');
 
   beforeEach(async function () {
     [holder, otherHolder, ...addrs] = await ethers.getSigners();
@@ -58,56 +58,77 @@ describe('RMRKTokenHolder', async function () {
 
   describe('With minted tokens', async function () {
     beforeEach(async function () {
-      await tokenHolder.mint(holder.address, tokenHolderId);
-      await tokenHolder.mint(otherHolder.address, otherTokenHolderId);
-      await erc20A.mint(holder.address, mockValue);
-      await erc20A.mint(otherHolder.address, mockValue);
+      await tokenHolder.mint(await holder.getAddress(), tokenHolderId);
+      await tokenHolder.mint(await otherHolder.getAddress(), otherTokenHolderId);
+      await erc20A.mint(await holder.getAddress(), mockValue);
+      await erc20A.mint(await otherHolder.getAddress(), mockValue);
     });
 
     it('can receive ERC-20 tokens', async function () {
-      await erc20A.approve(tokenHolder.address, mockValue);
+      await erc20A.approve(await tokenHolder.getAddress(), mockValue);
       await expect(
-        tokenHolder.transferERC20ToToken(erc20A.address, tokenHolderId, mockValue, '0x00'),
+        tokenHolder.transferERC20ToToken(
+          await erc20A.getAddress(),
+          tokenHolderId,
+          mockValue,
+          '0x00',
+        ),
       )
         .to.emit(tokenHolder, 'ReceivedERC20')
-        .withArgs(erc20A.address, tokenHolderId, holder.address, mockValue);
-      expect(await erc20A.balanceOf(tokenHolder.address)).to.equal(mockValue);
+        .withArgs(await erc20A.getAddress(), tokenHolderId, await holder.getAddress(), mockValue);
+      expect(await erc20A.balanceOf(await tokenHolder.getAddress())).to.equal(mockValue);
     });
 
     it('can transfer ERC-20 tokens', async function () {
-      await erc20A.approve(tokenHolder.address, mockValue);
-      await tokenHolder.transferERC20ToToken(erc20A.address, tokenHolderId, mockValue, '0x00');
+      await erc20A.approve(await tokenHolder.getAddress(), mockValue);
+      await tokenHolder.transferERC20ToToken(
+        await erc20A.getAddress(),
+        tokenHolderId,
+        mockValue,
+        '0x00',
+      );
       await expect(
         tokenHolder.transferHeldERC20FromToken(
-          erc20A.address,
+          await erc20A.getAddress(),
           tokenHolderId,
-          holder.address,
-          mockValue.div(2),
+          await holder.getAddress(),
+          mockValue / 2n,
           '0x00',
         ),
       )
         .to.emit(tokenHolder, 'TransferredERC20')
-        .withArgs(erc20A.address, tokenHolderId, holder.address, mockValue.div(2));
-      expect(await erc20A.balanceOf(tokenHolder.address)).to.equal(mockValue.div(2));
+        .withArgs(
+          await erc20A.getAddress(),
+          tokenHolderId,
+          await holder.getAddress(),
+          mockValue / 2n,
+        );
+      expect(await erc20A.balanceOf(await tokenHolder.getAddress())).to.equal(mockValue / 2n);
       expect(await tokenHolder.erc20TransferOutNonce(tokenHolderId)).to.equal(1);
     });
 
     it('cannot transfer 0 value', async function () {
       await expect(
-        tokenHolder.transferERC20ToToken(erc20A.address, tokenId, 0, '0x00'),
+        tokenHolder.transferERC20ToToken(await erc20A.getAddress(), tokenId, 0, '0x00'),
       ).to.be.revertedWithCustomError(tokenHolder, 'InvalidValue');
 
       await expect(
-        tokenHolder.transferHeldERC20FromToken(erc20A.address, tokenId, holder.address, 0, '0x00'),
+        tokenHolder.transferHeldERC20FromToken(
+          await erc20A.getAddress(),
+          tokenId,
+          await holder.getAddress(),
+          0,
+          '0x00',
+        ),
       ).to.be.revertedWithCustomError(tokenHolder, 'InvalidValue');
     });
 
     it('cannot transfer to address 0', async function () {
       await expect(
         tokenHolder.transferHeldERC20FromToken(
-          erc20A.address,
+          await erc20A.getAddress(),
           tokenId,
-          ethers.constants.AddressZero,
+          ethers.ZeroAddress,
           1,
           '0x00',
         ),
@@ -117,34 +138,39 @@ describe('RMRKTokenHolder', async function () {
     it('cannot transfer a token at address 0', async function () {
       await expect(
         tokenHolder.transferHeldERC20FromToken(
-          ethers.constants.AddressZero,
+          ethers.ZeroAddress,
           tokenId,
-          holder.address,
+          await holder.getAddress(),
           1,
           '0x00',
         ),
       ).to.be.revertedWithCustomError(tokenHolder, 'InvalidAddress');
 
       await expect(
-        tokenHolder.transferERC20ToToken(ethers.constants.AddressZero, tokenId, 1, '0x00'),
+        tokenHolder.transferERC20ToToken(ethers.ZeroAddress, tokenId, 1, '0x00'),
       ).to.be.revertedWithCustomError(tokenHolder, 'InvalidAddress');
     });
 
     it('cannot transfer more balance than the token has', async function () {
-      await erc20A.approve(tokenHolder.address, mockValue);
+      await erc20A.approve(await tokenHolder.getAddress(), mockValue);
 
-      await tokenHolder.transferERC20ToToken(erc20A.address, tokenId, mockValue.div(2), '0x00');
       await tokenHolder.transferERC20ToToken(
-        erc20A.address,
+        await erc20A.getAddress(),
+        tokenId,
+        mockValue / 2n,
+        '0x00',
+      );
+      await tokenHolder.transferERC20ToToken(
+        await erc20A.getAddress(),
         otherTokenHolderId,
-        mockValue.div(2),
+        mockValue / 2n,
         '0x00',
       );
       await expect(
         tokenHolder.transferHeldERC20FromToken(
-          erc20A.address,
+          await erc20A.getAddress(),
           tokenId,
-          holder.address,
+          await holder.getAddress(),
           mockValue, // The token only owns half of this value
           '0x00',
         ),
@@ -152,16 +178,21 @@ describe('RMRKTokenHolder', async function () {
     });
 
     it('cannot transfer balance from not owned token', async function () {
-      await erc20A.approve(tokenHolder.address, mockValue);
-      await tokenHolder.transferERC20ToToken(erc20A.address, tokenHolderId, mockValue, '0x00');
+      await erc20A.approve(await tokenHolder.getAddress(), mockValue);
+      await tokenHolder.transferERC20ToToken(
+        await erc20A.getAddress(),
+        tokenHolderId,
+        mockValue,
+        '0x00',
+      );
       // Other holder is not the owner of tokenId
       await expect(
         tokenHolder
           .connect(otherHolder)
           .transferHeldERC20FromToken(
-            erc20A.address,
+            await erc20A.getAddress(),
             tokenHolderId,
-            otherHolder.address,
+            await otherHolder.getAddress(),
             mockValue,
             '0x00',
           ),
@@ -169,28 +200,28 @@ describe('RMRKTokenHolder', async function () {
     });
 
     it('can manage multiple ERC20s', async function () {
-      await erc20B.mint(holder.address, mockValue);
-      await erc20A.approve(tokenHolder.address, mockValue);
-      await erc20B.approve(tokenHolder.address, mockValue);
+      await erc20B.mint(await holder.getAddress(), mockValue);
+      await erc20A.approve(await tokenHolder.getAddress(), mockValue);
+      await erc20B.approve(await tokenHolder.getAddress(), mockValue);
 
       await tokenHolder.transferERC20ToToken(
-        erc20A.address,
+        await erc20A.getAddress(),
         tokenHolderId,
-        ethers.utils.parseEther('3'),
+        ethers.parseEther('3'),
         '0x00',
       );
       await tokenHolder.transferERC20ToToken(
-        erc20B.address,
+        await erc20B.getAddress(),
         tokenHolderId,
-        ethers.utils.parseEther('5'),
+        ethers.parseEther('5'),
         '0x00',
       );
 
-      expect(await tokenHolder.balanceOfERC20(erc20A.address, tokenHolderId)).to.equal(
-        ethers.utils.parseEther('3'),
+      expect(await tokenHolder.balanceOfERC20(await erc20A.getAddress(), tokenHolderId)).to.equal(
+        ethers.parseEther('3'),
       );
-      expect(await tokenHolder.balanceOfERC20(erc20B.address, tokenHolderId)).to.equal(
-        ethers.utils.parseEther('5'),
+      expect(await tokenHolder.balanceOfERC20(await erc20B.getAddress(), tokenHolderId)).to.equal(
+        ethers.parseEther('5'),
       );
     });
   });

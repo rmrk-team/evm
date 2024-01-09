@@ -1,12 +1,12 @@
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { BigNumber, Contract } from 'ethers';
+import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
+import { Contract } from 'ethers';
 import { ADDRESS_ZERO, bn } from '../utils';
 import { IERC165, IERC6220, IOtherInterface } from '../interfaces';
 
 async function shouldBehaveLikeEquippableAssets(
-  mint: (token: Contract, to: string) => Promise<BigNumber>,
+  mint: (token: Contract, to: string) => Promise<bigint>,
 ) {
   let chunky: Contract;
   let chunkyEquip: Contract;
@@ -58,7 +58,7 @@ async function shouldBehaveLikeEquippableAssets(
     });
 
     it('cannot get extended assets for non existing asset or non existing token', async function () {
-      const tokenId = await mint(chunkyEquip, owner.address);
+      const tokenId = await mint(chunkyEquip, await owner.getAddress());
       const resId = 1;
       await chunkyEquip.addEquippableAssetEntry(
         resId,
@@ -72,7 +72,7 @@ async function shouldBehaveLikeEquippableAssets(
         chunkyEquip.getAssetAndEquippableData(tokenId, resId + 1),
       ).to.be.revertedWithCustomError(chunkyEquip, 'RMRKTokenDoesNotHaveAsset');
       await expect(
-        chunkyEquip.getAssetAndEquippableData(tokenId.add(1), resId),
+        chunkyEquip.getAssetAndEquippableData(tokenId + 1n, resId),
       ).to.be.revertedWithCustomError(chunkyEquip, 'RMRKTokenDoesNotHaveAsset');
     });
 
@@ -164,7 +164,7 @@ async function shouldBehaveLikeEquippableAssets(
     it('can add asset to token', async function () {
       const resId = bn(1);
       const resId2 = bn(2);
-      const tokenId = await mint(chunky, owner.address);
+      const tokenId = await mint(chunky, await owner.getAddress());
       await addAssets([resId, resId2]);
       await expect(chunkyEquip.addAssetToToken(tokenId, resId, 0)).to.emit(
         chunkyEquip,
@@ -180,7 +180,7 @@ async function shouldBehaveLikeEquippableAssets(
 
     it('cannot add non existing asset to token', async function () {
       const resId = bn(1);
-      const tokenId = await mint(chunky, owner.address);
+      const tokenId = await mint(chunky, await owner.getAddress());
       await expect(chunkyEquip.addAssetToToken(tokenId, resId, 0)).to.be.revertedWithCustomError(
         chunkyEquip,
         'RMRKNoAssetMatchingId',
@@ -189,19 +189,19 @@ async function shouldBehaveLikeEquippableAssets(
 
     it('can add asset to non existing token and it is pending when minted', async function () {
       const resId = bn(1);
-      const lastTokenId = await mint(chunky, owner.address);
-      const nextTokenId = lastTokenId.add(1); // not existing yet
+      const lastTokenId = await mint(chunky, await owner.getAddress());
+      const nextTokenId = lastTokenId + 1n; // not existing yet
 
       await addAssets([resId]);
       await chunkyEquip.addAssetToToken(nextTokenId, resId, 0);
-      await mint(chunky, owner.address);
+      await mint(chunky, await owner.getAddress());
 
       expect(await chunkyEquip.getPendingAssets(nextTokenId)).to.eql([resId]);
     });
 
     it('cannot add asset twice to the same token', async function () {
       const resId = bn(1);
-      const tokenId = await mint(chunky, owner.address);
+      const tokenId = await mint(chunky, await owner.getAddress());
       await addAssets([resId]);
       await chunkyEquip.addAssetToToken(tokenId, resId, 0);
       await expect(chunkyEquip.addAssetToToken(tokenId, resId, 0)).to.be.revertedWithCustomError(
@@ -211,7 +211,7 @@ async function shouldBehaveLikeEquippableAssets(
     });
 
     it('cannot add too many assets to the same token', async function () {
-      const tokenId = await mint(chunky, owner.address);
+      const tokenId = await mint(chunky, await owner.getAddress());
       for (let i = 1; i <= 128; i++) {
         await addAssets([bn(i)]);
         await chunkyEquip.addAssetToToken(tokenId, i, 0);
@@ -228,8 +228,8 @@ async function shouldBehaveLikeEquippableAssets(
 
     it('can add same asset to 2 different tokens', async function () {
       const resId = bn(1);
-      const tokenId1 = await mint(chunky, owner.address);
-      const tokenId2 = await mint(chunky, owner.address);
+      const tokenId1 = await mint(chunky, await owner.getAddress());
+      const tokenId2 = await mint(chunky, await owner.getAddress());
 
       await addAssets([resId]);
       await chunkyEquip.addAssetToToken(tokenId1, resId, 0);
@@ -243,7 +243,7 @@ async function shouldBehaveLikeEquippableAssets(
   describe('Accepting assets', async function () {
     it('can accept asset', async function () {
       const resId = bn(1);
-      const tokenId = await mint(chunky, owner.address);
+      const tokenId = await mint(chunky, await owner.getAddress());
       await addAssets([resId]);
       await chunkyEquip.addAssetToToken(tokenId, resId, 0);
       await expect(chunkyEquip.acceptAsset(tokenId, 0, resId))
@@ -257,7 +257,7 @@ async function shouldBehaveLikeEquippableAssets(
     it('can accept multiple assets', async function () {
       const resId = bn(1);
       const resId2 = bn(2);
-      const tokenId = await mint(chunky, owner.address);
+      const tokenId = await mint(chunky, await owner.getAddress());
       await addAssets([resId, resId2]);
       await chunkyEquip.addAssetToToken(tokenId, resId, 0);
       await chunkyEquip.addAssetToToken(tokenId, resId2, 0);
@@ -275,9 +275,9 @@ async function shouldBehaveLikeEquippableAssets(
     // approved not implemented yet
     it('can accept asset if approved', async function () {
       const resId = bn(1);
-      const tokenId = await mint(chunky, owner.address);
+      const tokenId = await mint(chunky, await owner.getAddress());
       const approvedAddress = addrs[1];
-      await chunkyEquip.approveForAssets(approvedAddress.address, tokenId);
+      await chunkyEquip.approveForAssets(await approvedAddress.getAddress(), tokenId);
       await addAssets([resId]);
 
       await chunkyEquip.addAssetToToken(tokenId, resId, 0);
@@ -288,7 +288,7 @@ async function shouldBehaveLikeEquippableAssets(
 
     it('cannot accept asset twice', async function () {
       const resId = bn(1);
-      const tokenId = await mint(chunky, owner.address);
+      const tokenId = await mint(chunky, await owner.getAddress());
       await addAssets([resId]);
       await chunkyEquip.addAssetToToken(tokenId, resId, 0);
       await chunkyEquip.acceptAsset(tokenId, 0, resId);
@@ -301,7 +301,7 @@ async function shouldBehaveLikeEquippableAssets(
 
     it('cannot accept asset if not owner', async function () {
       const resId = bn(1);
-      const tokenId = await mint(chunky, owner.address);
+      const tokenId = await mint(chunky, await owner.getAddress());
       await addAssets([resId]);
       await chunkyEquip.addAssetToToken(tokenId, resId, 0);
       await expect(
@@ -310,7 +310,7 @@ async function shouldBehaveLikeEquippableAssets(
     });
 
     it('cannot accept non existing asset', async function () {
-      const tokenId = await mint(chunky, owner.address);
+      const tokenId = await mint(chunky, await owner.getAddress());
       await expect(chunkyEquip.acceptAsset(tokenId, 0, 0)).to.be.revertedWithCustomError(
         chunkyEquip,
         'RMRKIndexOutOfRange',
@@ -322,7 +322,7 @@ async function shouldBehaveLikeEquippableAssets(
     it('can add asset to token replacing an existing one', async function () {
       const resId = bn(1);
       const resId2 = bn(2);
-      const tokenId = await mint(chunky, owner.address);
+      const tokenId = await mint(chunky, await owner.getAddress());
       await addAssets([resId, resId2]);
       await chunkyEquip.addAssetToToken(tokenId, resId, 0);
       await chunkyEquip.acceptAsset(tokenId, 0, resId);
@@ -346,7 +346,7 @@ async function shouldBehaveLikeEquippableAssets(
 
     it('can replace non existing asset to token, it could have been deleted', async function () {
       const resId = bn(1);
-      const tokenId = await mint(chunky, owner.address);
+      const tokenId = await mint(chunky, await owner.getAddress());
       await addAssets([resId]);
       await chunkyEquip.addAssetToToken(tokenId, resId, 1);
       await chunkyEquip.acceptAsset(tokenId, 0, resId);
@@ -359,7 +359,7 @@ async function shouldBehaveLikeEquippableAssets(
   describe('Rejecting assets', async function () {
     it('can reject asset', async function () {
       const resId = bn(1);
-      const tokenId = await mint(chunky, owner.address);
+      const tokenId = await mint(chunky, await owner.getAddress());
       await addAssets([resId]);
       await chunkyEquip.addAssetToToken(tokenId, resId, 0);
 
@@ -375,7 +375,7 @@ async function shouldBehaveLikeEquippableAssets(
     it('can reject asset and replacements are cleared', async function () {
       const resId = bn(1);
       const resId2 = bn(2);
-      const tokenId = await mint(chunky, owner.address);
+      const tokenId = await mint(chunky, await owner.getAddress());
       await addAssets([resId, resId2]);
       await chunkyEquip.addAssetToToken(tokenId, resId, 0);
       await chunkyEquip.acceptAsset(tokenId, 0, resId);
@@ -390,8 +390,8 @@ async function shouldBehaveLikeEquippableAssets(
     it('can reject asset if approved', async function () {
       const resId = bn(1);
       const approvedAddress = addrs[1];
-      const tokenId = await mint(chunky, owner.address);
-      await chunkyEquip.approveForAssets(approvedAddress.address, tokenId);
+      const tokenId = await mint(chunky, await owner.getAddress());
+      await chunkyEquip.approveForAssets(await approvedAddress.getAddress(), tokenId);
       await addAssets([resId]);
       await chunkyEquip.addAssetToToken(tokenId, resId, 0);
 
@@ -406,7 +406,7 @@ async function shouldBehaveLikeEquippableAssets(
     it('can reject all assets', async function () {
       const resId = bn(1);
       const resId2 = bn(2);
-      const tokenId = await mint(chunky, owner.address);
+      const tokenId = await mint(chunky, await owner.getAddress());
       await addAssets([resId, resId2]);
       await chunkyEquip.addAssetToToken(tokenId, resId, 0);
       await chunkyEquip.addAssetToToken(tokenId, resId2, 0);
@@ -420,7 +420,7 @@ async function shouldBehaveLikeEquippableAssets(
     it('can reject all assets and replacements are cleared', async function () {
       const resId = bn(1);
       const resId2 = bn(2);
-      const tokenId = await mint(chunky, owner.address);
+      const tokenId = await mint(chunky, await owner.getAddress());
       await addAssets([resId, resId2]);
       await chunkyEquip.addAssetToToken(tokenId, resId, 0);
       await chunkyEquip.acceptAsset(tokenId, 0, resId);
@@ -433,7 +433,7 @@ async function shouldBehaveLikeEquippableAssets(
     });
 
     it('can reject all pending assets at max capacity', async function () {
-      const tokenId = await mint(chunky, owner.address);
+      const tokenId = await mint(chunky, await owner.getAddress());
       const resArr = [];
 
       for (let i = 1; i < 128; i++) {
@@ -452,10 +452,10 @@ async function shouldBehaveLikeEquippableAssets(
     it('can reject all assets if approved', async function () {
       const resId = bn(1);
       const resId2 = bn(2);
-      const tokenId = await mint(chunky, owner.address);
+      const tokenId = await mint(chunky, await owner.getAddress());
       const approvedAddress = addrs[1];
 
-      await chunkyEquip.approveForAssets(approvedAddress.address, tokenId);
+      await chunkyEquip.approveForAssets(await approvedAddress.getAddress(), tokenId);
       await addAssets([resId, resId2]);
       await chunkyEquip.addAssetToToken(tokenId, resId, 0);
       await chunkyEquip.addAssetToToken(tokenId, resId2, 0);
@@ -471,7 +471,7 @@ async function shouldBehaveLikeEquippableAssets(
 
     it('cannot reject asset twice', async function () {
       const resId = bn(1);
-      const tokenId = await mint(chunky, owner.address);
+      const tokenId = await mint(chunky, await owner.getAddress());
       await addAssets([resId]);
       await chunkyEquip.addAssetToToken(tokenId, resId, 0);
       await chunkyEquip.rejectAsset(tokenId, 0, resId);
@@ -484,7 +484,7 @@ async function shouldBehaveLikeEquippableAssets(
 
     it('cannot reject asset nor reject all if not owner', async function () {
       const resId = bn(1);
-      const tokenId = await mint(chunky, owner.address);
+      const tokenId = await mint(chunky, await owner.getAddress());
       await addAssets([resId]);
       await chunkyEquip.addAssetToToken(tokenId, resId, 0);
 
@@ -497,7 +497,7 @@ async function shouldBehaveLikeEquippableAssets(
     });
 
     it('cannot reject non existing asset', async function () {
-      const tokenId = await mint(chunky, owner.address);
+      const tokenId = await mint(chunky, await owner.getAddress());
       await expect(chunkyEquip.rejectAsset(tokenId, 0, 0)).to.be.revertedWithCustomError(
         chunkyEquip,
         'RMRKIndexOutOfRange',
@@ -520,7 +520,7 @@ async function shouldBehaveLikeEquippableAssets(
       const approvedAddress = addrs[1];
       const tokenId = await addAssetsToToken();
 
-      await chunkyEquip.approveForAssets(approvedAddress.address, tokenId);
+      await chunkyEquip.approveForAssets(await approvedAddress.getAddress(), tokenId);
 
       expect(await chunkyEquip.getActiveAssetPriorities(tokenId)).to.be.eql([bn(0), bn(1)]);
       await expect(chunkyEquip.connect(approvedAddress).setPriority(tokenId, [1, 0]))
@@ -561,14 +561,16 @@ async function shouldBehaveLikeEquippableAssets(
       const tokenOwner = addrs[1];
       const newOwner = addrs[2];
       const approved = addrs[3];
-      const tokenId = await mint(chunky, tokenOwner.address);
-      await chunky.connect(tokenOwner).approve(approved.address, tokenId);
-      await chunkyEquip.connect(tokenOwner).approveForAssets(approved.address, tokenId);
+      const tokenId = await mint(chunky, await tokenOwner.getAddress());
+      await chunky.connect(tokenOwner).approve(await approved.getAddress(), tokenId);
+      await chunkyEquip.connect(tokenOwner).approveForAssets(await approved.getAddress(), tokenId);
 
-      expect(await chunky.getApproved(tokenId)).to.eql(approved.address);
-      expect(await chunkyEquip.getApprovedForAssets(tokenId)).to.eql(approved.address);
+      expect(await chunky.getApproved(tokenId)).to.eql(await approved.getAddress());
+      expect(await chunkyEquip.getApprovedForAssets(tokenId)).to.eql(await approved.getAddress());
 
-      await chunky.connect(tokenOwner).transferFrom(tokenOwner.address, newOwner.address, tokenId);
+      await chunky
+        .connect(tokenOwner)
+        .transferFrom(await tokenOwner.getAddress(), await newOwner.getAddress(), tokenId);
 
       expect(await chunky.getApproved(tokenId)).to.eql(ADDRESS_ZERO);
       expect(await chunkyEquip.getApprovedForAssets(tokenId)).to.eql(ADDRESS_ZERO);
@@ -577,12 +579,12 @@ async function shouldBehaveLikeEquippableAssets(
     it('cleans token and assets approvals on burn', async function () {
       const tokenOwner = addrs[1];
       const approved = addrs[3];
-      const tokenId = await mint(chunky, tokenOwner.address);
-      await chunky.connect(tokenOwner).approve(approved.address, tokenId);
-      await chunkyEquip.connect(tokenOwner).approveForAssets(approved.address, tokenId);
+      const tokenId = await mint(chunky, await tokenOwner.getAddress());
+      await chunky.connect(tokenOwner).approve(await approved.getAddress(), tokenId);
+      await chunkyEquip.connect(tokenOwner).approveForAssets(await approved.getAddress(), tokenId);
 
-      expect(await chunky.getApproved(tokenId)).to.eql(approved.address);
-      expect(await chunkyEquip.getApprovedForAssets(tokenId)).to.eql(approved.address);
+      expect(await chunky.getApproved(tokenId)).to.eql(await approved.getAddress());
+      expect(await chunkyEquip.getApprovedForAssets(tokenId)).to.eql(await approved.getAddress());
 
       await chunky.connect(tokenOwner)['burn(uint256)'](tokenId);
 
@@ -597,7 +599,7 @@ async function shouldBehaveLikeEquippableAssets(
     });
   });
 
-  async function addAssets(ids: BigNumber[]): Promise<void> {
+  async function addAssets(ids: bigint[]): Promise<void> {
     for (let i = 0; i < ids.length; i++) {
       await chunkyEquip.addEquippableAssetEntry(
         ids[i],
@@ -609,10 +611,10 @@ async function shouldBehaveLikeEquippableAssets(
     }
   }
 
-  async function addAssetsToToken(): Promise<BigNumber> {
+  async function addAssetsToToken(): Promise<bigint> {
     const resId = bn(1);
     const resId2 = bn(2);
-    const tokenId = await mint(chunky, owner.address);
+    const tokenId = await mint(chunky, await owner.getAddress());
     await addAssets([resId, resId2]);
     await chunkyEquip.addAssetToToken(tokenId, resId, 0);
     await chunkyEquip.addAssetToToken(tokenId, resId2, 0);
