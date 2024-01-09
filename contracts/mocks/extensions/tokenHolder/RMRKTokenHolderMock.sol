@@ -4,7 +4,7 @@ pragma solidity ^0.8.21;
 
 import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import {RMRKTokenHolder} from "../../../RMRK/extension/tokenHolder/RMRKTokenHolder.sol";
-import {IRMRKTokenHolder} from "../../../RMRK/extension/tokenHolder/IRMRKTokenHolder.sol";
+import {IERC7590} from "../../../RMRK/extension/tokenHolder/IERC7590.sol";
 
 error OnlyNFTOwnerCanTransferTokensFromIt();
 
@@ -20,7 +20,7 @@ contract RMRKTokenHolderMock is RMRKTokenHolder, ERC721 {
     ) ERC721(name, symbol) {}
 
     function mint(address to, uint256 tokenId) public {
-        _safeMint(to, tokenId);
+        _mint(to, tokenId);
     }
 
     function supportsInterface(
@@ -32,48 +32,23 @@ contract RMRKTokenHolderMock is RMRKTokenHolder, ERC721 {
     }
 
     /**
-     * @inheritdoc IRMRKTokenHolder
+     * @inheritdoc IERC7590
      */
-    function transferHeldTokenToToken(
-        address tokenContract,
-        TokenType tokenType,
-        uint256 tokenId,
-        uint256 heldTokenId,
-        uint256 amount,
-        bytes memory data
-    ) external {
-        _transferHeldTokenToToken(
-            tokenContract,
-            tokenType,
-            tokenId,
-            heldTokenId,
-            amount,
-            data
-        );
-    }
-
-    /**
-     * @inheritdoc IRMRKTokenHolder
-     */
-    function transferHeldTokenFromToken(
-        address tokenContract,
-        TokenType tokenType,
-        uint256 tokenId,
-        uint256 heldTokenId,
-        uint256 amount,
+    function transferHeldERC20FromToken(
+        address erc20Contract,
+        uint256 tokenHolderId,
         address to,
+        uint256 amount,
         bytes memory data
     ) external {
-        if (_msgSender() != ownerOf(tokenId)) {
+        if (msg.sender != ownerOf(tokenHolderId)) {
             revert OnlyNFTOwnerCanTransferTokensFromIt();
         }
-        _transferHeldTokenFromToken(
-            tokenContract,
-            tokenType,
-            tokenId,
-            heldTokenId,
-            amount,
+        _transferHeldERC20FromToken(
+            erc20Contract,
+            tokenHolderId,
             to,
+            amount,
             data
         );
     }
