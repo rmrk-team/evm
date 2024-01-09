@@ -4,7 +4,7 @@ import { BigNumber, Contract } from 'ethers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { ERC721Mock, RMRKEmotesRepository } from '../typechain-types';
-import { IRMRKEmotesRepository, IERC165, IOtherInterface } from './interfaces';
+import { IERC7409, IERC165, IOtherInterface } from './interfaces';
 
 function bn(x: number): BigNumber {
   return BigNumber.from(x);
@@ -41,8 +41,8 @@ describe('RMRKEmotesRepository', async function () {
     repository = await loadFixture(RMRKEmotesRepositoryFixture);
   });
 
-  it('can support IRMRKEmotesRepository', async function () {
-    expect(await repository.supportsInterface(IRMRKEmotesRepository)).to.equal(true);
+  it('can support IERC7409', async function () {
+    expect(await repository.supportsInterface(IERC7409)).to.equal(true);
   });
 
   it('can support IERC165', async function () {
