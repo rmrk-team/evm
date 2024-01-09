@@ -33,5 +33,6 @@ So far we have created 6 modules as ERC proposals, all of which are ERC721 compa
 - Soulbound: [ERC-6454: Minimal Transferable NFT detection interface](https://eips.ethereum.org/EIPS/eip-6454)
 - Emotable: [ERC-7409: Public Non-Fungible Tokens Emote Repository](https://eips.ethereum.org/EIPS/eip-7409)
 - Dynamic Attributes: [ERC-7508: Dynamic On-Chain Token Attributes Repository ](https://eips.ethereum.org/EIPS/eip-7508)
+- ERC20-Holder: [ERC-7590: ERC-20 Holder Extension for NFTs ](https://eips.ethereum.org/EIPS/eip-7590)
 
 ![RMRK Modules](/img/General_Overview_Modules.png)

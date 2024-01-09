@@ -104,7 +104,7 @@ function transferHeldERC20FromToken(address erc20Contract, uint256 tokenId, addr
 
 Transfer ERC-20 tokens from a specific token.
 
-*The balance MUST be transferred from this smart contract.Implementers should validate that the `msg.sender` is either the token owner or approved to manage it before calling this.Must increase the transfer-out-nonce for the tokenId*
+*The balance MUST be transferred from this smart contract.MUST increase the transfer-out-nonce for the tokenIdMUST revert if the `msg.sender` is not the owner of the NFT or approved to manage it.*
 
 #### Parameters
 
