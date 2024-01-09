@@ -1,14 +1,14 @@
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { RMRKCatalogImpl } from '../../typechain-types';
 import shouldBehaveLikeCatalog from '../behavior/catalog';
 
 async function catalogFixture(): Promise<RMRKCatalogImpl> {
   const factory = await ethers.getContractFactory('RMRKCatalogImpl');
   const catalog = await factory.deploy('ipfs://catalogMetadata', 'img/jpeg');
-  await catalog.deployed();
+  await catalog.waitForDeployment();
 
   return catalog;
 }
@@ -21,11 +21,11 @@ describe('CatalogImpl', async () => {
     let owner: SignerWithAddress;
     let contributor: SignerWithAddress;
     let other: SignerWithAddress;
-    const fixedType = 2;
-    const partId = 1;
+    const fixedType = 2n;
+    const partId = 1n;
     const partData = {
       itemType: fixedType,
-      z: 0,
+      z: 0n,
       equippable: [],
       metadataURI: 'ipfs://metadata',
     };
@@ -45,11 +45,11 @@ describe('CatalogImpl', async () => {
       ).to.be.revertedWithCustomError(catalog, 'RMRKNotOwnerOrContributor');
 
       await expect(
-        catalog.connect(other).addEquippableAddresses(partId, [other.address]),
+        catalog.connect(other).addEquippableAddresses(partId, [await other.getAddress()]),
       ).to.be.revertedWithCustomError(catalog, 'RMRKNotOwnerOrContributor');
 
       await expect(
-        catalog.connect(other).setEquippableAddresses(partId, [other.address]),
+        catalog.connect(other).setEquippableAddresses(partId, [await other.getAddress()]),
       ).to.be.revertedWithCustomError(catalog, 'RMRKNotOwnerOrContributor');
 
       await expect(catalog.connect(other).setEquippableToAll(partId)).to.be.revertedWithCustomError(
@@ -75,13 +75,13 @@ describe('CatalogImpl', async () => {
 
     it('can add part if owner', async function () {
       await catalog.connect(owner).addPart({ partId: partId, part: partData });
-      expect(await catalog.getPart(partId)).to.eql([fixedType, 0, [], 'ipfs://metadata']);
+      expect(await catalog.getPart(partId)).to.eql([fixedType, 0n, [], 'ipfs://metadata']);
     });
 
     it('can add part if contributor', async function () {
-      await catalog.connect(owner).manageContributor(contributor.address, true);
+      await catalog.connect(owner).manageContributor(await contributor.getAddress(), true);
       await catalog.connect(contributor).addPart({ partId: partId, part: partData });
-      expect(await catalog.getPart(partId)).to.eql([fixedType, 0, [], 'ipfs://metadata']);
+      expect(await catalog.getPart(partId)).to.eql([fixedType, 0n, [], 'ipfs://metadata']);
     });
   });
 });

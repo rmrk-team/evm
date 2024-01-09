@@ -2,7 +2,7 @@ import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { ADDRESS_ZERO, bn, mintFromMock, nestMintFromMock } from './utils';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import {
   RMRKCatalogUtils,
   RMRKCatalogImpl,
@@ -10,7 +10,7 @@ import {
   RMRKEquippableMock,
 } from '../typechain-types';
 import { setupContextForSlots } from './setup/equippableSlots';
-import { BigNumber, Contract } from 'ethers';
+import { Contract } from 'ethers';
 import {
   backgroundAssetId,
   backgroundsIds,
@@ -31,7 +31,7 @@ async function catalogUtilsFixture() {
   const catalogUtilsFactory = await ethers.getContractFactory('RMRKCatalogUtils');
 
   const catalog = <RMRKCatalogImpl>await catalogFactory.deploy(CATALOG_METADATA, CATALOG_TYPE);
-  await catalog.deployed();
+  await catalog.waitForDeployment();
 
   const catalogUtils = <RMRKCatalogUtils>await catalogUtilsFactory.deploy();
 
@@ -51,29 +51,29 @@ async function slotsFixture() {
 
   // View
   const view = <RMRKEquipRenderUtils>await viewFactory.deploy();
-  await view.deployed();
+  await view.waitForDeployment();
 
   // catalog
   const catalog = <RMRKCatalogImpl>await catalogFactory.deploy(catalogSymbol, catalogType);
-  await catalog.deployed();
+  await catalog.waitForDeployment();
   const catalogForWeapon = <RMRKCatalogImpl>await catalogFactory.deploy(catalogSymbol, catalogType);
-  await catalogForWeapon.deployed();
+  await catalogForWeapon.waitForDeployment();
 
   // Soldier token
   const soldier = <RMRKEquippableMock>await equipFactory.deploy();
-  await soldier.deployed();
+  await soldier.waitForDeployment();
 
   // Weapon
   const weapon = <RMRKEquippableMock>await equipFactory.deploy();
-  await weapon.deployed();
+  await weapon.waitForDeployment();
 
   // Weapon Gem
   const weaponGem = <RMRKEquippableMock>await equipFactory.deploy();
-  await weaponGem.deployed();
+  await weaponGem.waitForDeployment();
 
   // Background
   const background = <RMRKEquippableMock>await equipFactory.deploy();
-  await background.deployed();
+  await background.waitForDeployment();
 
   await setupContextForSlots(
     catalog,
@@ -134,8 +134,8 @@ describe('Collection Utils', function () {
   });
 
   it('can get catalog data', async function () {
-    expect(await catalogUtils.getCatalogData(catalog.address)).to.eql([
-      deployer.address,
+    expect(await catalogUtils.getCatalogData(await catalog.getAddress())).to.eql([
+      await deployer.getAddress(),
       CATALOG_TYPE,
       CATALOG_METADATA,
     ]);
@@ -144,54 +144,56 @@ describe('Collection Utils', function () {
   it('can get catalog data if the catalog is not ownable', async function () {
     const catalogFactory = await ethers.getContractFactory('RMRKCatalog');
     const notOwnableCatalog = await catalogFactory.deploy(CATALOG_METADATA, CATALOG_TYPE);
-    expect(await catalogUtils.getCatalogData(notOwnableCatalog.address)).to.eql([
+    expect(await catalogUtils.getCatalogData(await notOwnableCatalog.getAddress())).to.eql([
       ADDRESS_ZERO,
       CATALOG_TYPE,
       CATALOG_METADATA,
     ]);
   });
 
-  it('can parts data', async function () {
-    expect(await catalogUtils.getExtendedParts(catalog.address, [partId, partId2, partId3])).to.eql(
+  it('can get parts data', async function () {
+    expect(
+      await catalogUtils.getExtendedParts(await catalog.getAddress(), [partId, partId2, partId3]),
+    ).to.eql([
       [
-        [
-          bn(partId), // partId
-          partData1.itemType, // itemType
-          partData1.z, // z
-          partData1.equippable, // equippable
-          true, // equippableToAll (set on beforeEach)
-          partData1.metadataURI, // metadataURI
-        ],
-        [
-          bn(partId2), // partId
-          partData2.itemType, // itemType
-          partData2.z, // z
-          [addrs[0].address, addrs[1].address], // equippable (set on beforeEach)
-          false, // equippableToAll
-          partData2.metadataURI, // metadataURI
-        ],
-        [
-          bn(partId3), // partId
-          partData3.itemType, // itemType
-          partData3.z, // z
-          partData3.equippable, // equippable
-          false, // equippableToAll (set on beforeEach)
-          partData3.metadataURI, // metadataURI
-        ],
+        bn(partId), // partId
+        bn(partData1.itemType), // itemType
+        bn(partData1.z), // z
+        partData1.equippable, // equippable
+        true, // equippableToAll (set on beforeEach)
+        partData1.metadataURI, // metadataURI
       ],
-    );
+      [
+        bn(partId2), // partId
+        bn(partData2.itemType), // itemType
+        bn(partData2.z), // z
+        [addrs[0].address, addrs[1].address], // equippable (set on beforeEach)
+        false, // equippableToAll
+        partData2.metadataURI, // metadataURI
+      ],
+      [
+        bn(partId3), // partId
+        bn(partData3.itemType), // itemType
+        bn(partData3.z), // z
+        partData3.equippable, // equippable
+        false, // equippableToAll (set on beforeEach)
+        partData3.metadataURI, // metadataURI
+      ],
+    ]);
   });
 
   it('can get catalog and parts data', async function () {
-    expect(await catalogUtils.getCatalogDataAndExtendedParts(catalog.address, [partId])).to.eql([
-      deployer.address,
+    expect(
+      await catalogUtils.getCatalogDataAndExtendedParts(await catalog.getAddress(), [partId]),
+    ).to.eql([
+      await deployer.getAddress(),
       CATALOG_TYPE,
       CATALOG_METADATA,
       [
         [
           bn(partId), // partId
-          partData1.itemType, // itemType
-          partData1.z, // z
+          bn(partData1.itemType), // itemType
+          bn(partData1.z), // z
           partData1.equippable, // equippable
           true, // equippableToAll (set on beforeEach)
           partData1.metadataURI, // metadataURI
@@ -202,15 +204,15 @@ describe('Collection Utils', function () {
 });
 
 describe('Collection Utils For Orphans', function () {
-  let catalog: Contract;
-  let soldier: Contract;
-  let weapon: Contract;
-  let background: Contract;
+  let catalog: RMRKCatalogImpl;
+  let soldier: RMRKEquippableMock;
+  let weapon: RMRKEquippableMock;
+  let background: RMRKEquippableMock;
   let catalogUtils: RMRKCatalogUtils;
 
   let addrs: SignerWithAddress[];
 
-  let soldierID: BigNumber;
+  let soldierID: bigint;
   let soldierOwner: SignerWithAddress;
   let weaponChildIndex = 0;
   let backgroundChildIndex = 1;
@@ -244,24 +246,28 @@ describe('Collection Utils For Orphans', function () {
   it('can replace parent equipped asset and detect it as orphan', async function () {
     // Weapon is child on index 0, background on index 1
     const newSoldierResId = soldierResId + 1;
-    await soldier.addEquippableAssetEntry(newSoldierResId, 0, catalog.address, 'ipfs:soldier/', [
-      partIdForBody,
-      partIdForWeapon,
-      partIdForBackground,
-    ]);
+    await soldier.addEquippableAssetEntry(
+      newSoldierResId,
+      0,
+      await catalog.getAddress(),
+      'ipfs:soldier/',
+      [partIdForBody, partIdForWeapon, partIdForBackground],
+    );
     await soldier.addAssetToToken(soldierID, newSoldierResId, soldierResId);
     await soldier.connect(soldierOwner).acceptAsset(soldierID, 0, newSoldierResId);
 
     // Children still marked as equipped, so the cannot be transferred
-    expect(await soldier.isChildEquipped(soldierID, weapon.address, weaponsIds[0])).to.eql(true);
-    expect(await soldier.isChildEquipped(soldierID, background.address, backgroundsIds[0])).to.eql(
-      true,
-    );
+    expect(
+      await soldier.isChildEquipped(soldierID, await weapon.getAddress(), weaponsIds[0]),
+    ).to.eql(true);
+    expect(
+      await soldier.isChildEquipped(soldierID, await background.getAddress(), backgroundsIds[0]),
+    ).to.eql(true);
 
     const equipments = await catalogUtils.getOrphanEquipmentsFromParentAsset(
-      soldier.address,
+      await soldier.getAddress(),
       soldierID,
-      catalog.address,
+      await catalog.getAddress(),
       [partIdForBody, partIdForWeapon, partIdForBackground],
     );
 
@@ -269,14 +275,14 @@ describe('Collection Utils For Orphans', function () {
       [
         bn(soldierResId),
         bn(partIdForWeapon),
-        weapon.address,
+        await weapon.getAddress(),
         weaponsIds[0],
         bn(weaponAssetsEquip[0]),
       ],
       [
         bn(soldierResId),
         bn(partIdForBackground),
-        background.address,
+        await background.getAddress(),
         backgroundsIds[0],
         bn(backgroundAssetId),
       ],
@@ -290,7 +296,7 @@ describe('Collection Utils For Orphans', function () {
     await weapon.addEquippableAssetEntry(
       newWeaponAssetId,
       1, // equippableGroupId
-      catalog.address,
+      await catalog.getAddress(),
       'ipfs:weapon/new',
       [],
     );
@@ -298,18 +304,20 @@ describe('Collection Utils For Orphans', function () {
     await weapon.connect(soldierOwner).acceptAsset(weaponId, 0, newWeaponAssetId);
 
     // Children still marked as equipped, so it cannot be transferred or equip something else into the slot
-    expect(await soldier.isChildEquipped(soldierID, weapon.address, weaponsIds[0])).to.eql(true);
+    expect(
+      await soldier.isChildEquipped(soldierID, await weapon.getAddress(), weaponsIds[0]),
+    ).to.eql(true);
 
-    expect(await catalogUtils.getOrphanEquipmentsFromChildAsset(soldier.address, soldierID)).to.eql(
+    expect(
+      await catalogUtils.getOrphanEquipmentsFromChildAsset(await soldier.getAddress(), soldierID),
+    ).to.eql([
       [
-        [
-          bn(soldierResId),
-          bn(partIdForWeapon),
-          weapon.address,
-          weaponsIds[0],
-          bn(weaponAssetsEquip[0]),
-        ],
+        bn(soldierResId),
+        bn(partIdForWeapon),
+        await weapon.getAddress(),
+        weaponsIds[0],
+        bn(weaponAssetsEquip[0]),
       ],
-    );
+    ]);
   });
 });

@@ -11,7 +11,7 @@ describe('Ownable Lock', async () => {
   beforeEach(async function () {
     const OLOCK = await ethers.getContractFactory('OwnableLockMock');
     token = await OLOCK.deploy();
-    await token.deployed();
+    await token.waitForDeployment();
     this.token = token;
   });
 

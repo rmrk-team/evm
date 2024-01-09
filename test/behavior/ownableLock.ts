@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { Contract } from 'ethers';
 
 async function shouldBehaveOwnableLock(ismock: boolean) {
@@ -19,7 +19,7 @@ async function shouldBehaveOwnableLock(ismock: boolean) {
 
   describe('Init', async function () {
     it('can get owner', async function () {
-      expect(await ownableLock.owner()).to.equal(owner.address);
+      expect(await ownableLock.owner()).to.equal(await owner.getAddress());
     });
 
     it('emits LockSet event when the lock is set', async function () {

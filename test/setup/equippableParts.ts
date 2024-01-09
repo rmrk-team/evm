@@ -1,6 +1,6 @@
 import { ethers } from 'hardhat';
-import { BigNumber, Contract } from 'ethers';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { Contract } from 'ethers';
+import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 
 let addrs: SignerWithAddress[];
 
@@ -33,8 +33,8 @@ const partIdForMask = 25;
 const uniqueNeons = 10;
 const uniqueMasks = 4;
 // Ids could be the same since they are different collections, but to avoid log problems we have them unique
-const neons: BigNumber[] = [];
-const masks: BigNumber[] = [];
+const neons: bigint[] = [];
+const masks: bigint[] = [];
 
 const neonResIds = [100, 101, 102, 103, 104];
 const maskAssetsFull = [1, 2, 3, 4]; // Must match the total of uniqueAssets
@@ -51,8 +51,8 @@ async function setupContextForParts(
   catalog: Contract,
   neon: Contract,
   mask: Contract,
-  mint: (token: Contract, to: string) => Promise<BigNumber>,
-  nestMint: (token: Contract, to: string, parentId: BigNumber) => Promise<BigNumber>,
+  mint: (token: Contract, to: string) => Promise<bigint>,
+  nestMint: (token: Contract, to: string, parentId: bigint) => Promise<bigint>,
 ) {
   const [, ...signersAddr] = await ethers.getSigners();
   addrs = signersAddr;
@@ -213,7 +213,7 @@ async function setupContextForParts(
     const partForMask = {
       itemType: ItemType.Slot,
       z: 2,
-      equippable: [mask.address],
+      equippable: [await mask.getAddress()],
       metadataURI: '',
     };
 
@@ -261,43 +261,48 @@ async function setupContextForParts(
     masks.length = 0;
     // Mint one weapon to neon
     for (let i = 0; i < uniqueNeons; i++) {
-      const newId = await nestMint(mask, neon.address, neons[i]);
+      const newId = await nestMint(mask, await neon.getAddress(), neons[i]);
       masks.push(newId);
-      await neon.connect(addrs[i % 3]).acceptChild(neons[i], 0, mask.address, newId);
+      await neon.connect(addrs[i % 3]).acceptChild(neons[i], 0, await mask.getAddress(), newId);
     }
   }
 
   async function addAssetsToNeon(): Promise<void> {
-    await neon.addEquippableAssetEntry(neonResIds[0], 0, catalog.address, 'ipfs:neonRes/1', [
-      partIdForHead1,
-      partIdForBody1,
-      partIdForHair1,
-      partIdForMask,
-    ]);
-    await neon.addEquippableAssetEntry(neonResIds[1], 0, catalog.address, 'ipfs:neonRes/2', [
-      partIdForHead2,
-      partIdForBody2,
-      partIdForHair2,
-      partIdForMask,
-    ]);
-    await neon.addEquippableAssetEntry(neonResIds[2], 0, catalog.address, 'ipfs:neonRes/3', [
-      partIdForHead3,
-      partIdForBody1,
-      partIdForHair3,
-      partIdForMask,
-    ]);
-    await neon.addEquippableAssetEntry(neonResIds[3], 0, catalog.address, 'ipfs:neonRes/4', [
-      partIdForHead1,
-      partIdForBody2,
-      partIdForHair2,
-      partIdForMask,
-    ]);
-    await neon.addEquippableAssetEntry(neonResIds[4], 0, catalog.address, 'ipfs:neonRes/1', [
-      partIdForHead2,
-      partIdForBody1,
-      partIdForHair1,
-      partIdForMask,
-    ]);
+    await neon.addEquippableAssetEntry(
+      neonResIds[0],
+      0,
+      await catalog.getAddress(),
+      'ipfs:neonRes/1',
+      [partIdForHead1, partIdForBody1, partIdForHair1, partIdForMask],
+    );
+    await neon.addEquippableAssetEntry(
+      neonResIds[1],
+      0,
+      await catalog.getAddress(),
+      'ipfs:neonRes/2',
+      [partIdForHead2, partIdForBody2, partIdForHair2, partIdForMask],
+    );
+    await neon.addEquippableAssetEntry(
+      neonResIds[2],
+      0,
+      await catalog.getAddress(),
+      'ipfs:neonRes/3',
+      [partIdForHead3, partIdForBody1, partIdForHair3, partIdForMask],
+    );
+    await neon.addEquippableAssetEntry(
+      neonResIds[3],
+      0,
+      await catalog.getAddress(),
+      'ipfs:neonRes/4',
+      [partIdForHead1, partIdForBody2, partIdForHair2, partIdForMask],
+    );
+    await neon.addEquippableAssetEntry(
+      neonResIds[4],
+      0,
+      await catalog.getAddress(),
+      'ipfs:neonRes/1',
+      [partIdForHead2, partIdForBody1, partIdForHair1, partIdForMask],
+    );
 
     for (let i = 0; i < uniqueNeons; i++) {
       await neon.addAssetToToken(neons[i], neonResIds[i % neonResIds.length], 0);
@@ -310,28 +315,28 @@ async function setupContextForParts(
     await mask.addEquippableAssetEntry(
       maskAssetsFull[0],
       0, // Not meant to equip
-      catalog.address, // Not meant to equip, but catalog needed for parts
+      await catalog.getAddress(), // Not meant to equip, but catalog needed for parts
       `ipfs:weapon/full/${maskAssetsFull[0]}`,
       [partIdForMaskCatalog1, partIdForHorns1, partIdForEars1],
     );
     await mask.addEquippableAssetEntry(
       maskAssetsFull[1],
       0, // Not meant to equip
-      catalog.address, // Not meant to equip, but catalog needed for parts
+      await catalog.getAddress(), // Not meant to equip, but catalog needed for parts
       `ipfs:weapon/full/${maskAssetsFull[1]}`,
       [partIdForMaskCatalog2, partIdForHorns2, partIdForEars2],
     );
     await mask.addEquippableAssetEntry(
       maskAssetsFull[2],
       0, // Not meant to equip
-      catalog.address, // Not meant to equip, but catalog needed for parts
+      await catalog.getAddress(), // Not meant to equip, but catalog needed for parts
       `ipfs:weapon/full/${maskAssetsFull[2]}`,
       [partIdForMaskCatalog3, partIdForHorns1, partIdForEars2],
     );
     await mask.addEquippableAssetEntry(
       maskAssetsFull[3],
       0, // Not meant to equip
-      catalog.address, // Not meant to equip, but catalog needed for parts
+      await catalog.getAddress(), // Not meant to equip, but catalog needed for parts
       `ipfs:weapon/full/${maskAssetsFull[3]}`,
       [partIdForMaskCatalog2, partIdForHorns2, partIdForEars1],
     );
@@ -340,7 +345,7 @@ async function setupContextForParts(
     await mask.addEquippableAssetEntry(
       maskAssetsEquip[0],
       maskEquippableGroupId,
-      catalog.address,
+      await catalog.getAddress(),
       `ipfs:weapon/equip/${maskAssetsEquip[0]}`,
       [partIdForMaskCatalog1, partIdForHorns1, partIdForEars1],
     );
@@ -349,7 +354,7 @@ async function setupContextForParts(
     await mask.addEquippableAssetEntry(
       maskAssetsEquip[1],
       maskEquippableGroupId,
-      catalog.address,
+      await catalog.getAddress(),
       `ipfs:weapon/equip/${maskAssetsEquip[1]}`,
       [partIdForMaskCatalog2, partIdForHorns2, partIdForEars2],
     );
@@ -358,7 +363,7 @@ async function setupContextForParts(
     await mask.addEquippableAssetEntry(
       maskAssetsEquip[2],
       maskEquippableGroupId,
-      catalog.address,
+      await catalog.getAddress(),
       `ipfs:weapon/equip/${maskAssetsEquip[2]}`,
       [partIdForMaskCatalog3, partIdForHorns1, partIdForEars2],
     );
@@ -367,13 +372,17 @@ async function setupContextForParts(
     await mask.addEquippableAssetEntry(
       maskAssetsEquip[3],
       maskEquippableGroupId,
-      catalog.address,
+      await catalog.getAddress(),
       `ipfs:weapon/equip/${maskAssetsEquip[3]}`,
       [partIdForMaskCatalog2, partIdForHorns2, partIdForEars1],
     );
 
     // Can be equipped into neons
-    await mask.setValidParentForEquippableGroup(maskEquippableGroupId, neon.address, partIdForMask);
+    await mask.setValidParentForEquippableGroup(
+      maskEquippableGroupId,
+      await neon.getAddress(),
+      partIdForMask,
+    );
 
     // Add 2 assets to each weapon, one full, one for equip
     // There are 10 weapon tokens for 4 unique assets so we use %

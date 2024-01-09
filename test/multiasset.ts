@@ -1,7 +1,7 @@
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import {
   addAssetEntryFromMock,
   addAssetToToken,
@@ -20,7 +20,7 @@ async function singleFixture(): Promise<{
 }> {
   const renderUtilsFactory = await ethers.getContractFactory('RMRKMultiAssetRenderUtils');
   const renderUtils = await renderUtilsFactory.deploy();
-  await renderUtils.deployed();
+  await renderUtils.waitForDeployment();
 
   const token = <RMRKMultiAssetMock>await singleFixtureWithArgs('RMRKMultiAssetMock', []);
   return { token, renderUtils };
@@ -65,14 +65,14 @@ describe('MultiAssetMock Other Behavior', async function () {
     });
 
     it('cannot get metadata for non existing asset or non existing token', async function () {
-      const tokenId = await mintFromMock(token, tokenOwner.address);
+      const tokenId = await mintFromMock(token, await tokenOwner.getAddress());
       const resId = await addAssetEntryFromMock(token, 'metadata');
       await token.addAssetToToken(tokenId, resId, 0);
-      await expect(token.getAssetMetadata(tokenId, resId.add(bn(1)))).to.be.revertedWithCustomError(
+      await expect(token.getAssetMetadata(tokenId, resId + 1n)).to.be.revertedWithCustomError(
         token,
         'RMRKTokenDoesNotHaveAsset',
       );
-      await expect(token.getAssetMetadata(tokenId.add(1), resId)).to.be.revertedWithCustomError(
+      await expect(token.getAssetMetadata(tokenId + 1n, resId)).to.be.revertedWithCustomError(
         token,
         'RMRKTokenDoesNotHaveAsset',
       );
@@ -113,12 +113,12 @@ describe('MultiAssetMock Other Behavior', async function () {
     it('can add asset to token', async function () {
       const resId = await addAssetEntryFromMock(token, 'data1');
       const resId2 = await addAssetEntryFromMock(token, 'data2');
-      const tokenId = await mintFromMock(token, tokenOwner.address);
+      const tokenId = await mintFromMock(token, await tokenOwner.getAddress());
 
       await expect(token.addAssetToToken(tokenId, resId, 0)).to.emit(token, 'AssetAddedToTokens');
       await expect(token.addAssetToToken(tokenId, resId2, 0)).to.emit(token, 'AssetAddedToTokens');
 
-      expect(await renderUtils.getPendingAssets(token.address, tokenId)).to.eql([
+      expect(await renderUtils.getPendingAssets(await token.getAddress(), tokenId)).to.eql([
         [resId, bn(0), bn(0), 'data1'],
         [resId2, bn(1), bn(0), 'data2'],
       ]);
@@ -126,7 +126,7 @@ describe('MultiAssetMock Other Behavior', async function () {
 
     it('cannot add non existing asset to token', async function () {
       const resId = bn(9999);
-      const tokenId = await mintFromMock(token, tokenOwner.address);
+      const tokenId = await mintFromMock(token, await tokenOwner.getAddress());
 
       await expect(token.addAssetToToken(tokenId, resId, 0)).to.be.revertedWithCustomError(
         token,
@@ -136,17 +136,17 @@ describe('MultiAssetMock Other Behavior', async function () {
 
     it('can add asset to non existing token and it is pending when minted', async function () {
       const resId = await addAssetEntryFromMock(token);
-      const lastTokenId = await mintFromMock(token, tokenOwner.address);
-      const nextTokenId = lastTokenId.add(1); // not existing yet
+      const lastTokenId = await mintFromMock(token, await tokenOwner.getAddress());
+      const nextTokenId = lastTokenId + 1n; // not existing yet
 
       await token.addAssetToToken(nextTokenId, resId, 0);
-      await mintFromMock(token, tokenOwner.address);
+      await mintFromMock(token, await tokenOwner.getAddress());
       expect(await token.getPendingAssets(nextTokenId)).to.eql([resId]);
     });
 
     it('cannot add asset twice to the same token', async function () {
       const resId = await addAssetEntryFromMock(token);
-      const tokenId = await mintFromMock(token, tokenOwner.address);
+      const tokenId = await mintFromMock(token, await tokenOwner.getAddress());
 
       await token.addAssetToToken(tokenId, resId, 0);
       await expect(token.addAssetToToken(tokenId, resId, 0)).to.be.revertedWithCustomError(
@@ -156,7 +156,7 @@ describe('MultiAssetMock Other Behavior', async function () {
     });
 
     it('cannot add too many assets to the same token', async function () {
-      const tokenId = await mintFromMock(token, tokenOwner.address);
+      const tokenId = await mintFromMock(token, await tokenOwner.getAddress());
 
       for (let i = 1; i <= 128; i++) {
         const resId = await addAssetEntryFromMock(token);
@@ -173,8 +173,8 @@ describe('MultiAssetMock Other Behavior', async function () {
 
     it('can add same asset to 2 different tokens', async function () {
       const resId = await addAssetEntryFromMock(token);
-      const tokenId1 = await mintFromMock(token, tokenOwner.address);
-      const tokenId2 = await mintFromMock(token, tokenOwner.address);
+      const tokenId1 = await mintFromMock(token, await tokenOwner.getAddress());
+      const tokenId2 = await mintFromMock(token, await tokenOwner.getAddress());
 
       await token.addAssetToToken(tokenId1, resId, 0);
       await token.addAssetToToken(tokenId2, resId, 0);
@@ -199,28 +199,30 @@ describe('MultiAssetMock Other Behavior', async function () {
       const tokenOwner = addrs[1];
       const newOwner = addrs[2];
       const approved = addrs[3];
-      const tokenId = await mintFromMock(token, tokenOwner.address);
-      await token.connect(tokenOwner).approve(approved.address, tokenId);
-      await token.connect(tokenOwner).approveForAssets(approved.address, tokenId);
+      const tokenId = await mintFromMock(token, await tokenOwner.getAddress());
+      await token.connect(tokenOwner).approve(await approved.getAddress(), tokenId);
+      await token.connect(tokenOwner).approveForAssets(await approved.getAddress(), tokenId);
 
-      expect(await token.getApproved(tokenId)).to.eql(approved.address);
-      expect(await token.getApprovedForAssets(tokenId)).to.eql(approved.address);
+      expect(await token.getApproved(tokenId)).to.eql(await approved.getAddress());
+      expect(await token.getApprovedForAssets(tokenId)).to.eql(await approved.getAddress());
 
-      await token.connect(tokenOwner).transferFrom(tokenOwner.address, newOwner.address, tokenId);
+      await token
+        .connect(tokenOwner)
+        .transferFrom(await tokenOwner.getAddress(), await newOwner.getAddress(), tokenId);
 
-      expect(await token.getApproved(tokenId)).to.eql(ethers.constants.AddressZero);
-      expect(await token.getApprovedForAssets(tokenId)).to.eql(ethers.constants.AddressZero);
+      expect(await token.getApproved(tokenId)).to.eql(ethers.ZeroAddress);
+      expect(await token.getApprovedForAssets(tokenId)).to.eql(ethers.ZeroAddress);
     });
 
     it('cleans token and assets approvals on burn', async function () {
       const tokenOwner = addrs[1];
       const approved = addrs[3];
-      const tokenId = await mintFromMock(token, tokenOwner.address);
-      await token.connect(tokenOwner).approve(approved.address, tokenId);
-      await token.connect(tokenOwner).approveForAssets(approved.address, tokenId);
+      const tokenId = await mintFromMock(token, await tokenOwner.getAddress());
+      await token.connect(tokenOwner).approve(await approved.getAddress(), tokenId);
+      await token.connect(tokenOwner).approveForAssets(await approved.getAddress(), tokenId);
 
-      expect(await token.getApproved(tokenId)).to.eql(approved.address);
-      expect(await token.getApprovedForAssets(tokenId)).to.eql(approved.address);
+      expect(await token.getApproved(tokenId)).to.eql(await approved.getAddress());
+      expect(await token.getApprovedForAssets(tokenId)).to.eql(await approved.getAddress());
 
       await token.connect(tokenOwner).burn(tokenId);
 

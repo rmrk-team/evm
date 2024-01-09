@@ -1,6 +1,6 @@
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import {
   ADDRESS_ZERO,
   mintFromErc20Pay,
@@ -8,63 +8,63 @@ import {
   ONE_ETH,
   singleFixtureWithArgs,
 } from '../utils';
-import { BigNumber, Contract } from 'ethers';
+import { Contract } from 'ethers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { ERC20Mock } from '../../typechain-types';
 
 async function multiAssetFixture(): Promise<Contract> {
   const erc20Factory = await ethers.getContractFactory('ERC20Mock');
   const erc20 = <ERC20Mock>await erc20Factory.deploy();
-  await erc20.deployed();
+  await erc20.waitForDeployment();
 
   return await singleFixtureWithArgs('RMRKMultiAssetLazyMintErc20', [
     'MultiAsset',
     'MA',
     'ipfs://collection-meta',
     'ipfs://tokenURI',
-    [erc20.address, ADDRESS_ZERO, 0, 10000, ONE_ETH],
+    [await erc20.getAddress(), ADDRESS_ZERO, 0, 10000, ONE_ETH],
   ]);
 }
 
 async function nestableFixture(): Promise<Contract> {
   const erc20Factory = await ethers.getContractFactory('ERC20Mock');
   const erc20 = <ERC20Mock>await erc20Factory.deploy();
-  await erc20.deployed();
+  await erc20.waitForDeployment();
 
   return await singleFixtureWithArgs('RMRKNestableLazyMintErc20', [
     'Nestable',
     'N',
     'ipfs://collection-meta',
     'ipfs://tokenURI',
-    [erc20.address, ADDRESS_ZERO, 0, 10000, ONE_ETH],
+    [await erc20.getAddress(), ADDRESS_ZERO, 0, 10000, ONE_ETH],
   ]);
 }
 
 async function nestableMultiAssetFixture(): Promise<Contract> {
   const erc20Factory = await ethers.getContractFactory('ERC20Mock');
   const erc20 = <ERC20Mock>await erc20Factory.deploy();
-  await erc20.deployed();
+  await erc20.waitForDeployment();
 
   return await singleFixtureWithArgs('RMRKNestableMultiAssetLazyMintErc20', [
     'MultiAsset',
     'MA',
     'ipfs://collection-meta',
     'ipfs://tokenURI',
-    [erc20.address, ADDRESS_ZERO, 0, 10000, ONE_ETH],
+    [await erc20.getAddress(), ADDRESS_ZERO, 0, 10000, ONE_ETH],
   ]);
 }
 
 async function equippableFixture(): Promise<Contract> {
   const erc20Factory = await ethers.getContractFactory('ERC20Mock');
   const erc20 = await erc20Factory.deploy();
-  await erc20.deployed();
+  await erc20.waitForDeployment();
 
   return await singleFixtureWithArgs('RMRKEquippableLazyMintErc20', [
     'MultiAsset',
     'MA',
     'ipfs://collection-meta',
     'ipfs://tokenURI',
-    [erc20.address, ADDRESS_ZERO, 0, 10000, ONE_ETH],
+    [await erc20.getAddress(), ADDRESS_ZERO, 0, 10000, ONE_ETH],
   ]);
 }
 
@@ -107,16 +107,16 @@ async function shouldControlValidMintingErc20Pay(): Promise<void> {
   beforeEach(async function () {
     const [, ...signersAddr] = await ethers.getSigners();
     addrs = signersAddr;
-    const erc20Address = this.token.erc20TokenAddress();
+    const erc20Address = await this.token.getAddress();
     const erc20Factory = await ethers.getContractFactory('ERC20Mock');
     erc20 = <ERC20Mock>erc20Factory.attach(erc20Address);
   });
 
   it('cannot mint under price', async function () {
-    const HALF_ETH = ethers.utils.parseEther('0.05');
+    const HALF_ETH = ethers.parseEther('0.05');
 
     await erc20.mint(addrs[0].address, ONE_ETH);
-    await erc20.approve(this.token.address, HALF_ETH);
+    await erc20.approve(await this.token.getAddress(), HALF_ETH);
     await expect(this.token.mint(addrs[0].address, 1)).to.be.revertedWithCustomError(
       erc20,
       'ERC20InsufficientAllowance',
@@ -146,14 +146,16 @@ async function shouldControlValidMintingErc20Pay(): Promise<void> {
 
   it('can withdraw raised funds', async function () {
     await mintFromErc20Pay(this.token, addrs[0].address);
-    const contractBalance = await erc20.balanceOf(this.token.address);
+    const contractBalance = await erc20.balanceOf(await this.token.getAddress());
     const initAddressBalance = await erc20.balanceOf(addrs[0].address);
     expect(contractBalance).to.equal(ONE_ETH);
-    await this.token.withdrawRaisedERC20(erc20.address, addrs[0].address, contractBalance);
-    expect(await erc20.balanceOf(this.token.address)).to.equal(0);
-    expect(await erc20.balanceOf(addrs[0].address)).to.equal(
-      initAddressBalance.add(contractBalance),
+    await this.token.withdrawRaisedERC20(
+      await erc20.getAddress(),
+      addrs[0].address,
+      contractBalance,
     );
+    expect(await erc20.balanceOf(await this.token.getAddress())).to.equal(0);
+    expect(await erc20.balanceOf(addrs[0].address)).to.equal(initAddressBalance + contractBalance);
   });
 
   it('reduces total supply on burn', async function () {
@@ -168,13 +170,13 @@ async function shouldControlValidMintingErc20Pay(): Promise<void> {
     await this.token.connect(addrs[0])['burn(uint256)'](tokenId);
 
     const newTokenId = await mintFromErc20Pay(this.token, addrs[0].address);
-    expect(newTokenId).to.equal(tokenId.add(1));
+    expect(newTokenId).to.equal(tokenId + 1n);
     expect(await this.token.totalSupply()).to.equal(1);
   });
 
   it('can mint multiple tokens through sale logic', async function () {
-    await erc20.mint(addrs[0].address, ONE_ETH.mul(10));
-    await erc20.connect(addrs[0]).approve(this.token.address, ONE_ETH.mul(10));
+    await erc20.mint(addrs[0].address, ONE_ETH * 10n);
+    await erc20.connect(addrs[0]).approve(await this.token.getAddress(), ONE_ETH * 10n);
 
     await this.token.connect(addrs[0]).mint(addrs[0].address, 10);
     expect(await this.token.totalSupply()).to.equal(10);
@@ -186,7 +188,7 @@ async function shouldControlValidMintingErc20Pay(): Promise<void> {
   });
 
   describe('Nest minting', async () => {
-    let parentId: BigNumber;
+    let parentId: bigint;
 
     beforeEach(async function () {
       if (this.token.nestMint === undefined) {
@@ -196,16 +198,19 @@ async function shouldControlValidMintingErc20Pay(): Promise<void> {
     });
 
     it('can nest mint tokens through sale logic', async function () {
-      const childId = await nestMintFromErc20Pay(this.token, this.token.address, parentId);
+      const childId = await nestMintFromErc20Pay(
+        this.token,
+        await this.token.getAddress(),
+        parentId,
+      );
       expect(await this.token.ownerOf(childId)).to.equal(addrs[0].address);
       expect(await this.token.totalSupply()).to.equal(2);
     });
 
     it('cannot nest mint over max supply', async function () {
-      await expect(this.token.nestMint(this.token.address, 99999, 1)).to.be.revertedWithCustomError(
-        this.token,
-        'RMRKMintOverMax',
-      );
+      await expect(
+        this.token.nestMint(await this.token.getAddress(), 99999, 1),
+      ).to.be.revertedWithCustomError(this.token, 'RMRKMintOverMax');
     });
   });
 }

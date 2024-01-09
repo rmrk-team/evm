@@ -11,7 +11,7 @@ async function main() {
   // // Send eth to this address:0xfbea1b97406c6945d07f50f588e54144ea8b684f
   // let tx = {
   //   to: '0xfbea1b97406c6945d07f50f588e54144ea8b684f',
-  //   value: ethers.utils.parseEther('0.03'),
+  //   value: ethers.parseEther('0.03'),
   //   nonce: 235,
   // };
   // const [signer] = await ethers.getSigners();
@@ -21,12 +21,12 @@ async function main() {
 
   const catalogUtilsFactory = await ethers.getContractFactory('RMRKCatalogUtils');
   const catalogUtils = await catalogUtilsFactory.deploy();
-  await catalogUtils.deployed();
-  console.log('RMRK Catalog Utils deployed to:', catalogUtils.address);
+  await catalogUtils.waitForDeployment();
+  console.log('RMRK Catalog Utils deployed to:', await catalogUtils.getAddress());
   await sleep(1000);
 
   await run('verify:verify', {
-    address: catalogUtils.address,
+    address: await catalogUtils.getAddress(),
     constructorArguments: [],
   });
 }

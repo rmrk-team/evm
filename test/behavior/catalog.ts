@@ -1,7 +1,7 @@
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { Contract } from 'ethers';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { IOtherInterface, IERC165, IRMRKCatalog } from '../interfaces';
 
 async function shouldBehaveLikeCatalog(contractName: string, metadataURI: string, type: string) {
@@ -34,7 +34,7 @@ async function shouldBehaveLikeCatalog(contractName: string, metadataURI: string
 
     const Catalog = await ethers.getContractFactory(contractName);
     testCatalog = await Catalog.deploy(metadataURI, type);
-    await testCatalog.deployed();
+    await testCatalog.waitForDeployment();
   });
 
   describe('Init Catalog', async function () {

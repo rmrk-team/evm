@@ -2,7 +2,7 @@ import { Contract } from 'ethers';
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { bn, mintFromMock } from '../utils';
 import {
   IERC165,
@@ -18,7 +18,7 @@ import {
 async function typeMultiAssetFixture() {
   const factory = await ethers.getContractFactory('RMRKTypedMultiAssetMock');
   const typedMultiAsset = await factory.deploy();
-  await typedMultiAsset.deployed();
+  await typedMultiAsset.waitForDeployment();
 
   return { typedMultiAsset };
 }
@@ -26,7 +26,7 @@ async function typeMultiAssetFixture() {
 async function nestableTypedMultiAssetFixture() {
   const factory = await ethers.getContractFactory('RMRKNestableTypedMultiAssetMock');
   const typedNestableMultiAsset = await factory.deploy();
-  await typedNestableMultiAsset.deployed();
+  await typedNestableMultiAsset.waitForDeployment();
 
   return { typedNestableMultiAsset };
 }
@@ -34,7 +34,7 @@ async function nestableTypedMultiAssetFixture() {
 async function typedEquippableFixture() {
   const factory = await ethers.getContractFactory('RMRKTypedEquippableMock');
   const typedEquippable = await factory.deploy();
-  await typedEquippable.deployed();
+  await typedEquippable.waitForDeployment();
 
   return { typedEquippable };
 }
@@ -65,7 +65,7 @@ describe('RMRKTypedMultiAssetMock', async function () {
       const signers = await ethers.getSigners();
       owner = signers[0];
 
-      tokenId = await mintFromMock(typedMultiAsset, owner.address);
+      tokenId = await mintFromMock(typedMultiAsset, await owner.getAddress());
     });
 
     it('can get top asset by priority and type', async function () {
@@ -160,7 +160,7 @@ async function shouldBehaveLikeTypedMultiAsset(
     const signers = await ethers.getSigners();
     owner = signers[0];
 
-    tokenId = await mint(this.assets, owner.address);
+    tokenId = await mint(this.assets, await owner.getAddress());
   });
 
   it('can add typed assets', async function () {
@@ -188,7 +188,7 @@ async function shouldBehaveLikeTypedEquippable(
     const signers = await ethers.getSigners();
     owner = signers[0];
 
-    tokenId = await mint(this.nestable, owner.address);
+    tokenId = await mint(this.nestable, await owner.getAddress());
   });
 
   it('can add typed assets', async function () {
@@ -196,7 +196,7 @@ async function shouldBehaveLikeTypedEquippable(
     await this.assets.addTypedAssetEntry(
       resId,
       0,
-      ethers.constants.AddressZero,
+      ethers.ZeroAddress,
       'fallback.json',
       [],
       'image/jpeg',
@@ -209,7 +209,7 @@ async function shouldBehaveLikeTypedEquippable(
     await this.assets.addTypedAssetEntry(
       resId,
       0,
-      ethers.constants.AddressZero,
+      ethers.ZeroAddress,
       'fallback.json',
       [],
       'image/jpeg',

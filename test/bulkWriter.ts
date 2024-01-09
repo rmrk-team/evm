@@ -1,9 +1,8 @@
 import { ethers } from 'hardhat';
-import { BigNumber } from 'ethers';
 import { expect } from 'chai';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { ADDRESS_ZERO, bn, mintFromMock, nestMintFromMock } from './utils';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import {
   RMRKCatalogImpl,
   RMRKEquippableMock,
@@ -41,32 +40,39 @@ async function bulkWriterFixture() {
   const catalog = <RMRKCatalogImpl>await catalogFactory.deploy('ipfs://catalog.json', 'misc');
 
   const kanaria = <RMRKEquippableMock>await equipFactory.deploy();
-  kanaria.deployed();
+  await kanaria.waitForDeployment();
 
   const gem = <RMRKEquippableMock>await equipFactory.deploy();
-  gem.deployed();
+  await gem.waitForDeployment();
 
   const bulkWriterPerCollection = <RMRKBulkWriterPerCollection>(
-    await bulkWriterPerCollectionFactory.deploy(kanaria.address)
+    await bulkWriterPerCollectionFactory.deploy(await kanaria.getAddress())
   );
-  await bulkWriterPerCollection.deployed();
+  await bulkWriterPerCollection.waitForDeployment();
 
   const bulkWriter = <RMRKBulkWriter>await bulkWriterFactory.deploy();
-  await bulkWriter.deployed();
+  await bulkWriter.waitForDeployment();
 
   const [owner] = await ethers.getSigners();
 
-  const kanariaId = await mintFromMock(kanaria, owner.address);
-  const gemId1 = await nestMintFromMock(gem, kanaria.address, kanariaId);
-  const gemId2 = await nestMintFromMock(gem, kanaria.address, kanariaId);
-  const gemId3 = await nestMintFromMock(gem, kanaria.address, kanariaId);
-  await kanaria.acceptChild(kanariaId, 0, gem.address, gemId1);
-  await kanaria.acceptChild(kanariaId, 1, gem.address, gemId2);
-  await kanaria.acceptChild(kanariaId, 0, gem.address, gemId3);
+  const kanariaId = await mintFromMock(kanaria, await owner.getAddress());
+  const gemId1 = await nestMintFromMock(gem, await kanaria.getAddress(), kanariaId);
+  const gemId2 = await nestMintFromMock(gem, await kanaria.getAddress(), kanariaId);
+  const gemId3 = await nestMintFromMock(gem, await kanaria.getAddress(), kanariaId);
+  await kanaria.acceptChild(kanariaId, 0, await gem.getAddress(), gemId1);
+  await kanaria.acceptChild(kanariaId, 1, await gem.getAddress(), gemId2);
+  await kanaria.acceptChild(kanariaId, 0, await gem.getAddress(), gemId3);
 
-  await setUpCatalog(catalog, gem.address);
-  await setUpKanariaAsset(kanaria, kanariaId, catalog.address);
-  await setUpGemAssets(gem, gemId1, gemId2, gemId3, kanaria.address, catalog.address);
+  await setUpCatalog(catalog, await gem.getAddress());
+  await setUpKanariaAsset(kanaria, kanariaId, await catalog.getAddress());
+  await setUpGemAssets(
+    gem,
+    gemId1,
+    gemId2,
+    gemId3,
+    await kanaria.getAddress(),
+    await catalog.getAddress(),
+  );
 
   await kanaria.equip({
     tokenId: kanariaId,
@@ -97,10 +103,10 @@ describe('Advanced Equip Render Utils', async function () {
   let gem: RMRKEquippableMock;
   let bulkWriter: RMRKBulkWriter;
   let bulkWriterPerCollection: RMRKBulkWriterPerCollection;
-  let kanariaId: BigNumber;
-  let gemId1: BigNumber;
-  let gemId2: BigNumber;
-  let gemId3: BigNumber;
+  let kanariaId: bigint;
+  let gemId1: bigint;
+  let gemId2: bigint;
+  let gemId3: bigint;
 
   beforeEach(async function () {
     ({
@@ -119,11 +125,11 @@ describe('Advanced Equip Render Utils', async function () {
 
   describe('With General Bulk Writer', async function () {
     beforeEach(async function () {
-      await kanaria.setApprovalForAllForAssets(bulkWriter.address, true);
+      await kanaria.setApprovalForAllForAssets(await bulkWriter.getAddress(), true);
     });
 
     it('can replace equip', async function () {
-      await bulkWriter.replaceEquip(kanaria.address, {
+      await bulkWriter.replaceEquip(await kanaria.getAddress(), {
         tokenId: kanariaId,
         childIndex: 1,
         assetId: assetForKanariaFull,
@@ -131,18 +137,15 @@ describe('Advanced Equip Render Utils', async function () {
         childAssetId: assetForGemALeft,
       });
 
-      expect(await kanaria.getEquipment(kanariaId, catalog.address, slotIdGemLeft)).to.eql([
-        bn(assetForKanariaFull),
-        bn(assetForGemALeft),
-        gemId2,
-        gem.address,
-      ]);
+      expect(
+        await kanaria.getEquipment(kanariaId, await catalog.getAddress(), slotIdGemLeft),
+      ).to.eql([bn(assetForKanariaFull), bn(assetForGemALeft), gemId2, await gem.getAddress()]);
     });
 
     it('can unequip and equip in bulk', async function () {
       // On a single call we remove the gem from the first slot and add 2 gems on the other 2 slots
       await bulkWriter.bulkEquip(
-        kanaria.address,
+        await kanaria.getAddress(),
         kanariaId,
         [
           {
@@ -168,30 +171,21 @@ describe('Advanced Equip Render Utils', async function () {
         ],
       );
 
-      expect(await kanaria.getEquipment(kanariaId, catalog.address, slotIdGemLeft)).to.eql([
-        bn(0),
-        bn(0),
-        bn(0),
-        ADDRESS_ZERO,
-      ]);
-      expect(await kanaria.getEquipment(kanariaId, catalog.address, slotIdGemMid)).to.eql([
-        bn(assetForKanariaFull),
-        bn(assetForGemAMid),
-        gemId2,
-        gem.address,
-      ]);
-      expect(await kanaria.getEquipment(kanariaId, catalog.address, slotIdGemRight)).to.eql([
-        bn(assetForKanariaFull),
-        bn(assetForGemBRight),
-        gemId3,
-        gem.address,
-      ]);
+      expect(
+        await kanaria.getEquipment(kanariaId, await catalog.getAddress(), slotIdGemLeft),
+      ).to.eql([bn(0), bn(0), bn(0), ADDRESS_ZERO]);
+      expect(
+        await kanaria.getEquipment(kanariaId, await catalog.getAddress(), slotIdGemMid),
+      ).to.eql([bn(assetForKanariaFull), bn(assetForGemAMid), gemId2, await gem.getAddress()]);
+      expect(
+        await kanaria.getEquipment(kanariaId, await catalog.getAddress(), slotIdGemRight),
+      ).to.eql([bn(assetForKanariaFull), bn(assetForGemBRight), gemId3, await gem.getAddress()]);
     });
 
     it('can use bulk with only unequip operations', async function () {
       // On a single call we remove the gem from the first slot and add 2 gems on the other 2 slots
       await bulkWriter.bulkEquip(
-        kanaria.address,
+        await kanaria.getAddress(),
         kanariaId,
         [
           {
@@ -202,18 +196,15 @@ describe('Advanced Equip Render Utils', async function () {
         [],
       );
 
-      expect(await kanaria.getEquipment(kanariaId, catalog.address, slotIdGemLeft)).to.eql([
-        bn(0),
-        bn(0),
-        bn(0),
-        ADDRESS_ZERO,
-      ]);
+      expect(
+        await kanaria.getEquipment(kanariaId, await catalog.getAddress(), slotIdGemLeft),
+      ).to.eql([bn(0), bn(0), bn(0), ADDRESS_ZERO]);
     });
 
     it('can use bulk with only equip operations', async function () {
       // On a single call we remove the gem from the first slot and add 2 gems on the other 2 slots
       await bulkWriter.bulkEquip(
-        kanaria.address,
+        await kanaria.getAddress(),
         kanariaId,
         [],
         [
@@ -234,33 +225,24 @@ describe('Advanced Equip Render Utils', async function () {
         ],
       );
 
-      expect(await kanaria.getEquipment(kanariaId, catalog.address, slotIdGemLeft)).to.eql([
-        bn(assetForKanariaFull),
-        bn(assetForGemALeft),
-        gemId1,
-        gem.address,
-      ]);
-      expect(await kanaria.getEquipment(kanariaId, catalog.address, slotIdGemMid)).to.eql([
-        bn(assetForKanariaFull),
-        bn(assetForGemAMid),
-        gemId2,
-        gem.address,
-      ]);
-      expect(await kanaria.getEquipment(kanariaId, catalog.address, slotIdGemRight)).to.eql([
-        bn(assetForKanariaFull),
-        bn(assetForGemBRight),
-        gemId3,
-        gem.address,
-      ]);
+      expect(
+        await kanaria.getEquipment(kanariaId, await catalog.getAddress(), slotIdGemLeft),
+      ).to.eql([bn(assetForKanariaFull), bn(assetForGemALeft), gemId1, await gem.getAddress()]);
+      expect(
+        await kanaria.getEquipment(kanariaId, await catalog.getAddress(), slotIdGemMid),
+      ).to.eql([bn(assetForKanariaFull), bn(assetForGemAMid), gemId2, await gem.getAddress()]);
+      expect(
+        await kanaria.getEquipment(kanariaId, await catalog.getAddress(), slotIdGemRight),
+      ).to.eql([bn(assetForKanariaFull), bn(assetForGemBRight), gemId3, await gem.getAddress()]);
     });
 
     it('cannot do operations if not writer is not approved', async function () {
-      await kanaria.setApprovalForAllForAssets(bulkWriter.address, false);
+      await kanaria.setApprovalForAllForAssets(await bulkWriter.getAddress(), false);
 
       // On a single call we remove the gem from the first slot and add 2 gems on the other 2 slots
       await expect(
         bulkWriter.bulkEquip(
-          kanaria.address,
+          await kanaria.getAddress(),
           kanariaId,
           [
             {
@@ -281,7 +263,7 @@ describe('Advanced Equip Render Utils', async function () {
       ).to.be.revertedWithCustomError(kanaria, 'RMRKNotApprovedForAssetsOrOwner');
 
       await expect(
-        bulkWriter.replaceEquip(kanaria.address, {
+        bulkWriter.replaceEquip(await kanaria.getAddress(), {
           tokenId: kanariaId,
           childIndex: 1,
           assetId: assetForKanariaFull,
@@ -296,7 +278,7 @@ describe('Advanced Equip Render Utils', async function () {
 
       await expect(
         bulkWriter.connect(notOwner).bulkEquip(
-          kanaria.address,
+          await kanaria.getAddress(),
           kanariaId,
           [
             {
@@ -317,7 +299,7 @@ describe('Advanced Equip Render Utils', async function () {
       ).to.be.revertedWithCustomError(bulkWriter, 'RMRKCanOnlyDoBulkOperationsOnOwnedTokens');
 
       await expect(
-        bulkWriter.connect(notOwner).replaceEquip(kanaria.address, {
+        bulkWriter.connect(notOwner).replaceEquip(await kanaria.getAddress(), {
           tokenId: kanariaId,
           childIndex: 1,
           assetId: assetForKanariaFull,
@@ -331,7 +313,7 @@ describe('Advanced Equip Render Utils', async function () {
       const otherId = 2;
       await expect(
         bulkWriter.bulkEquip(
-          kanaria.address,
+          await kanaria.getAddress(),
           kanariaId,
           [],
           [
@@ -350,11 +332,11 @@ describe('Advanced Equip Render Utils', async function () {
 
   describe('With Bulk Writer Per Collection', async function () {
     beforeEach(async function () {
-      await kanaria.setApprovalForAllForAssets(bulkWriterPerCollection.address, true);
+      await kanaria.setApprovalForAllForAssets(await bulkWriterPerCollection.getAddress(), true);
     });
 
     it('can get managed collection', async function () {
-      expect(await bulkWriterPerCollection.getCollection()).to.equal(kanaria.address);
+      expect(await bulkWriterPerCollection.getCollection()).to.equal(await kanaria.getAddress());
     });
 
     it('can replace equip', async function () {
@@ -366,12 +348,9 @@ describe('Advanced Equip Render Utils', async function () {
         childAssetId: assetForGemALeft,
       });
 
-      expect(await kanaria.getEquipment(kanariaId, catalog.address, slotIdGemLeft)).to.eql([
-        bn(assetForKanariaFull),
-        bn(assetForGemALeft),
-        gemId2,
-        gem.address,
-      ]);
+      expect(
+        await kanaria.getEquipment(kanariaId, await catalog.getAddress(), slotIdGemLeft),
+      ).to.eql([bn(assetForKanariaFull), bn(assetForGemALeft), gemId2, await gem.getAddress()]);
     });
 
     it('can unequip and equip in bulk', async function () {
@@ -402,24 +381,15 @@ describe('Advanced Equip Render Utils', async function () {
         ],
       );
 
-      expect(await kanaria.getEquipment(kanariaId, catalog.address, slotIdGemLeft)).to.eql([
-        bn(0),
-        bn(0),
-        bn(0),
-        ADDRESS_ZERO,
-      ]);
-      expect(await kanaria.getEquipment(kanariaId, catalog.address, slotIdGemMid)).to.eql([
-        bn(assetForKanariaFull),
-        bn(assetForGemAMid),
-        gemId2,
-        gem.address,
-      ]);
-      expect(await kanaria.getEquipment(kanariaId, catalog.address, slotIdGemRight)).to.eql([
-        bn(assetForKanariaFull),
-        bn(assetForGemBRight),
-        gemId3,
-        gem.address,
-      ]);
+      expect(
+        await kanaria.getEquipment(kanariaId, await catalog.getAddress(), slotIdGemLeft),
+      ).to.eql([bn(0), bn(0), bn(0), ADDRESS_ZERO]);
+      expect(
+        await kanaria.getEquipment(kanariaId, await catalog.getAddress(), slotIdGemMid),
+      ).to.eql([bn(assetForKanariaFull), bn(assetForGemAMid), gemId2, await gem.getAddress()]);
+      expect(
+        await kanaria.getEquipment(kanariaId, await catalog.getAddress(), slotIdGemRight),
+      ).to.eql([bn(assetForKanariaFull), bn(assetForGemBRight), gemId3, await gem.getAddress()]);
     });
 
     it('can use bulk with only unequip operations', async function () {
@@ -435,12 +405,9 @@ describe('Advanced Equip Render Utils', async function () {
         [],
       );
 
-      expect(await kanaria.getEquipment(kanariaId, catalog.address, slotIdGemLeft)).to.eql([
-        bn(0),
-        bn(0),
-        bn(0),
-        ADDRESS_ZERO,
-      ]);
+      expect(
+        await kanaria.getEquipment(kanariaId, await catalog.getAddress(), slotIdGemLeft),
+      ).to.eql([bn(0), bn(0), bn(0), ADDRESS_ZERO]);
     });
 
     it('can use bulk with only equip operations', async function () {
@@ -466,28 +433,19 @@ describe('Advanced Equip Render Utils', async function () {
         ],
       );
 
-      expect(await kanaria.getEquipment(kanariaId, catalog.address, slotIdGemLeft)).to.eql([
-        bn(assetForKanariaFull),
-        bn(assetForGemALeft),
-        gemId1,
-        gem.address,
-      ]);
-      expect(await kanaria.getEquipment(kanariaId, catalog.address, slotIdGemMid)).to.eql([
-        bn(assetForKanariaFull),
-        bn(assetForGemAMid),
-        gemId2,
-        gem.address,
-      ]);
-      expect(await kanaria.getEquipment(kanariaId, catalog.address, slotIdGemRight)).to.eql([
-        bn(assetForKanariaFull),
-        bn(assetForGemBRight),
-        gemId3,
-        gem.address,
-      ]);
+      expect(
+        await kanaria.getEquipment(kanariaId, await catalog.getAddress(), slotIdGemLeft),
+      ).to.eql([bn(assetForKanariaFull), bn(assetForGemALeft), gemId1, await gem.getAddress()]);
+      expect(
+        await kanaria.getEquipment(kanariaId, await catalog.getAddress(), slotIdGemMid),
+      ).to.eql([bn(assetForKanariaFull), bn(assetForGemAMid), gemId2, await gem.getAddress()]);
+      expect(
+        await kanaria.getEquipment(kanariaId, await catalog.getAddress(), slotIdGemRight),
+      ).to.eql([bn(assetForKanariaFull), bn(assetForGemBRight), gemId3, await gem.getAddress()]);
     });
 
     it('cannot do operations if not writer is not approved', async function () {
-      await kanaria.setApprovalForAllForAssets(bulkWriterPerCollection.address, false);
+      await kanaria.setApprovalForAllForAssets(await bulkWriterPerCollection.getAddress(), false);
 
       // On a single call we remove the gem from the first slot and add 2 gems on the other 2 slots
       await expect(

@@ -1,7 +1,7 @@
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { bn } from '../utils';
 import { IERC165, IERC5773, IRMRKMultiAssetAutoIndex, IOtherInterface } from '../interfaces';
 import { RMRKMultiAssetAutoIndexMock } from '../../typechain-types';
@@ -11,7 +11,7 @@ import { RMRKMultiAssetAutoIndexMock } from '../../typechain-types';
 async function multiAssetAutoIndexFixture() {
   const factory = await ethers.getContractFactory('RMRKMultiAssetAutoIndexMock');
   const token = await factory.deploy();
-  await token.deployed();
+  await token.waitForDeployment();
 
   return token;
 }
@@ -47,7 +47,7 @@ describe('RMRKMultiAssetAutoIndexMock', async function () {
     const assetId = bn(1);
 
     beforeEach(async function () {
-      await token.mint(user.address, tokenId);
+      await token.mint(await user.getAddress(), tokenId);
       await token.addAssetEntry(assetId, 'ipfs/something.json');
       await token.addAssetToToken(tokenId, assetId, 0);
     });

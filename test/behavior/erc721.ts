@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { BigNumber, Contract, ContractTransaction } from 'ethers';
+import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
+import { Contract, ContractTransaction } from 'ethers';
 import { bn } from '../utils';
 
 // Based on https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/test/token/ERC721/ERC721.behavior.js
@@ -33,8 +33,8 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
     beforeEach(async function () {
       [owner, approved, anotherApproved, operator, ...others] = await ethers.getSigners();
 
-      await this.token['mint(address,uint256)'](owner.address, firstTokenId);
-      await this.token['mint(address,uint256)'](owner.address, secondTokenId);
+      await this.token['mint(address,uint256)'](await owner.getAddress(), firstTokenId);
+      await this.token['mint(address,uint256)'](await owner.getAddress(), secondTokenId);
       toWhom = others[0]; // default to other for toWhom in context-dependent tests
     });
 
@@ -52,7 +52,7 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
     describe('balanceOf', function () {
       context('when the given address owns some tokens', function () {
         it('returns the amount of tokens owned by the given address', async function () {
-          expect(await this.token.balanceOf(owner.address)).to.eql(bn(2));
+          expect(await this.token.balanceOf(await owner.getAddress())).to.eql(bn(2));
         });
       });
 
@@ -64,9 +64,10 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
 
       context('when querying the zero address', function () {
         it('throws', async function () {
-          await expect(
-            this.token.balanceOf(ethers.constants.AddressZero),
-          ).to.be.revertedWithCustomError(this.token, 'ERC721AddressZeroIsNotaValidOwner');
+          await expect(this.token.balanceOf(ethers.ZeroAddress)).to.be.revertedWithCustomError(
+            this.token,
+            'ERC721AddressZeroIsNotaValidOwner',
+          );
         });
       });
     });
@@ -76,7 +77,7 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
         const tokenId = firstTokenId;
 
         it('returns the owner of the given token ID', async function () {
-          expect(await this.token.ownerOf(tokenId)).to.be.equal(owner.address);
+          expect(await this.token.ownerOf(tokenId)).to.be.equal(await owner.getAddress());
         });
       });
 
@@ -97,27 +98,27 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
       const data = '0x42';
 
       beforeEach(async function () {
-        await this.token.approve(approved.address, tokenId);
-        await this.token.setApprovalForAll(operator.address, true);
+        await this.token.approve(await approved.getAddress(), tokenId);
+        await this.token.setApprovalForAll(await operator.getAddress(), true);
       });
 
-      const transferWasSuccessful = function (owner: SignerWithAddress, tokenId: BigNumber) {
+      const transferWasSuccessful = function (owner: SignerWithAddress, tokenId: bigint) {
         it('transfers the ownership of the given token ID to the given address', async function () {
-          expect(await this.token.ownerOf(tokenId)).to.be.equal(toWhom.address);
+          expect(await this.token.ownerOf(tokenId)).to.be.equal(await toWhom.getAddress());
         });
 
         it('emits a Transfer event', async function () {
           await expect(receipt)
             .to.emit(this.token, 'Transfer')
-            .withArgs(owner.address, toWhom.address, tokenId);
+            .withArgs(await owner.getAddress(), await toWhom.getAddress(), tokenId);
         });
 
         it('clears the approval for the token ID', async function () {
-          expect(await this.token.getApproved(tokenId)).to.be.equal(ethers.constants.AddressZero);
+          expect(await this.token.getApproved(tokenId)).to.be.equal(ethers.ZeroAddress);
         });
 
         it('adjusts owners balances', async function () {
-          expect(await this.token.balanceOf(owner.address)).to.eql(bn(1));
+          expect(await this.token.balanceOf(await owner.getAddress())).to.eql(bn(1));
         });
       };
 
@@ -126,8 +127,8 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
           beforeEach(async function () {
             receipt = await transferFunction(
               this.token,
-              owner.address,
-              toWhom.address,
+              await owner.getAddress(),
+              await toWhom.getAddress(),
               tokenId,
               owner,
             );
@@ -141,8 +142,8 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
           beforeEach(async function () {
             receipt = await transferFunction(
               this.token,
-              owner.address,
-              toWhom.address,
+              await owner.getAddress(),
+              await toWhom.getAddress(),
               tokenId,
               approved,
             );
@@ -156,8 +157,8 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
           beforeEach(async function () {
             receipt = await transferFunction(
               this.token,
-              owner.address,
-              toWhom.address,
+              await owner.getAddress(),
+              await toWhom.getAddress(),
               tokenId,
               operator,
             );
@@ -169,11 +170,11 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
 
         context('when called by the owner without an approved user', function () {
           beforeEach(async function () {
-            await this.token.approve(ethers.constants.AddressZero, tokenId);
+            await this.token.approve(ethers.ZeroAddress, tokenId);
             receipt = await transferFunction(
               this.token,
-              owner.address,
-              toWhom.address,
+              await owner.getAddress(),
+              await toWhom.getAddress(),
               tokenId,
               operator,
             );
@@ -187,29 +188,29 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
           beforeEach(async function () {
             receipt = await transferFunction(
               this.token,
-              owner.address,
-              owner.address,
+              await owner.getAddress(),
+              await owner.getAddress(),
               tokenId,
               owner,
             );
           });
 
           it('keeps ownership of the token', async function () {
-            expect(await this.token.ownerOf(tokenId)).to.be.equal(owner.address);
+            expect(await this.token.ownerOf(tokenId)).to.be.equal(await owner.getAddress());
           });
 
           it('clears the approval for the token ID', async function () {
-            expect(await this.token.getApproved(tokenId)).to.be.equal(ethers.constants.AddressZero);
+            expect(await this.token.getApproved(tokenId)).to.be.equal(ethers.ZeroAddress);
           });
 
           it('emits only a transfer event', async function () {
             await expect(receipt)
               .to.emit(this.token, 'Transfer')
-              .withArgs(owner.address, owner.address, tokenId);
+              .withArgs(await owner.getAddress(), await owner.getAddress(), tokenId);
           });
 
           it('keeps the owner balance', async function () {
-            expect(await this.token.balanceOf(owner.address)).to.eql(bn(2));
+            expect(await this.token.balanceOf(await owner.getAddress())).to.eql(bn(2));
           });
         });
 
@@ -228,7 +229,13 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
               ? 'RMRKNotApprovedOrDirectOwner'
               : 'ERC721NotApprovedOrOwner';
             await expect(
-              transferFunction(this.token, owner.address, others[0].address, tokenId, others[0]),
+              transferFunction(
+                this.token,
+                await owner.getAddress(),
+                others[0].address,
+                tokenId,
+                others[0],
+              ),
             ).to.be.revertedWithCustomError(this.token, error);
           });
         });
@@ -238,7 +245,7 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
             await expect(
               transferFunction(
                 this.token,
-                owner.address,
+                await owner.getAddress(),
                 others[0].address,
                 nonExistentTokenId,
                 owner,
@@ -252,8 +259,8 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
             await expect(
               transferFunction(
                 this.token,
-                owner.address,
-                ethers.constants.AddressZero,
+                await owner.getAddress(),
+                ethers.ZeroAddress,
                 tokenId,
                 owner,
               ),
@@ -267,7 +274,7 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
           token: Contract,
           from: string,
           to: string,
-          tokenId: BigNumber,
+          tokenId: bigint,
           user: SignerWithAddress,
         ) {
           return token.connect(user)['transferFrom(address,address,uint256)'](from, to, tokenId);
@@ -279,7 +286,7 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
           token: Contract,
           from: string,
           to: string,
-          tokenId: BigNumber,
+          tokenId: bigint,
           user: SignerWithAddress,
         ) {
           return token
@@ -291,7 +298,7 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
           token: Contract,
           from: string,
           to: string,
-          tokenId: BigNumber,
+          tokenId: bigint,
           user: SignerWithAddress,
         ) {
           return token
@@ -307,7 +314,7 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
           describe('to a valid receiver contract', function () {
             beforeEach(async function () {
               receiver = await this.ERC721Receiver.deploy(RECEIVER_MAGIC_VALUE, Error.None);
-              await receiver.deployed();
+              await receiver.waitForDeployment();
               toWhom = receiver;
             });
 
@@ -316,28 +323,28 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
             it('calls onERC721Received', async function () {
               receipt = await transferFun(
                 this.token,
-                owner.address,
-                receiver.address,
+                await owner.getAddress(),
+                await receiver.getAddress(),
                 tokenId,
                 owner,
               );
 
               await expect(receipt)
                 .to.emit(receiver, 'Received')
-                .withArgs(owner.address, owner.address, tokenId, data);
+                .withArgs(await owner.getAddress(), await owner.getAddress(), tokenId, data);
             });
 
             it('calls onERC721Received from approved', async function () {
               receipt = await transferFun(
                 this.token,
-                owner.address,
-                receiver.address,
+                await owner.getAddress(),
+                await receiver.getAddress(),
                 tokenId,
                 approved,
               );
               await expect(receipt)
                 .to.emit(receiver, 'Received')
-                .withArgs(approved.address, owner.address, tokenId, data);
+                .withArgs(await approved.getAddress(), await owner.getAddress(), tokenId, data);
             });
 
             describe('with an invalid token id', function () {
@@ -345,8 +352,8 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
                 await expect(
                   transferFun(
                     this.token,
-                    owner.address,
-                    receiver.address,
+                    await owner.getAddress(),
+                    await receiver.getAddress(),
                     nonExistentTokenId,
                     owner,
                   ),
@@ -368,14 +375,14 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
           it('reverts', async function () {
             const ERC721Receiver = await ethers.getContractFactory('ERC721ReceiverMock');
             const invalidReceiver = await ERC721Receiver.deploy(
-              ethers.utils.hexZeroPad('0x42', 4),
+              ethers.zeroPadValue('0x42', 4),
               Error.None,
             );
-            await invalidReceiver.deployed();
+            await invalidReceiver.waitForDeployment();
             await expect(
               this.token['safeTransferFrom(address,address,uint256)'](
-                owner.address,
-                invalidReceiver.address,
+                await owner.getAddress(),
+                await invalidReceiver.getAddress(),
                 tokenId,
               ),
             ).to.be.revertedWithCustomError(this.token, 'ERC721TransferToNonReceiverImplementer');
@@ -386,16 +393,16 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
           it('reverts', async function () {
             const ERC721Receiver = await ethers.getContractFactory('ERC721ReceiverMock');
             const revertingReceiver = await ERC721Receiver.deploy(
-              ethers.utils.hexZeroPad('0x42', 4),
+              ethers.zeroPadValue('0x42', 4),
               Error.RevertWithMessage,
             );
-            await revertingReceiver.deployed();
+            await revertingReceiver.waitForDeployment();
             await expect(
               this.token
                 .connect(owner)
                 ['safeTransferFrom(address,address,uint256)'](
-                  owner.address,
-                  revertingReceiver.address,
+                  await owner.getAddress(),
+                  await revertingReceiver.getAddress(),
                   tokenId,
                 ),
             ).to.be.revertedWith('ERC721ReceiverMock: reverting');
@@ -409,13 +416,13 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
               RECEIVER_MAGIC_VALUE,
               Error.RevertWithoutMessage,
             );
-            await revertingReceiver.deployed();
+            await revertingReceiver.waitForDeployment();
             await expect(
               this.token
                 .connect(owner)
                 ['safeTransferFrom(address,address,uint256)'](
-                  owner.address,
-                  revertingReceiver.address,
+                  await owner.getAddress(),
+                  await revertingReceiver.getAddress(),
                   tokenId,
                 ),
             ).to.be.revertedWithCustomError(this.token, 'ERC721TransferToNonReceiverImplementer');
@@ -429,13 +436,13 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
               RECEIVER_MAGIC_VALUE,
               Error.Panic,
             );
-            await revertingReceiver.deployed();
+            await revertingReceiver.waitForDeployment();
             await expect(
               this.token
                 .connect(owner)
                 ['safeTransferFrom(address,address,uint256)'](
-                  owner.address,
-                  revertingReceiver.address,
+                  await owner.getAddress(),
+                  await revertingReceiver.getAddress(),
                   tokenId,
                 ),
             ).to.be.reverted;
@@ -447,8 +454,8 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
             const nonReceiver = this.token;
             await expect(
               this.token['safeTransferFrom(address,address,uint256)'](
-                owner.address,
-                nonReceiver.address,
+                await owner.getAddress(),
+                await nonReceiver.getAddress(),
                 tokenId,
               ),
             ).to.be.revertedWithCustomError(this.token, 'ERC721TransferToNonReceiverImplementer');
@@ -466,27 +473,30 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
         it('calls onERC721Received — with data', async function () {
           const ERC721Receiver = await ethers.getContractFactory('ERC721ReceiverMock');
           receiver = await ERC721Receiver.deploy(RECEIVER_MAGIC_VALUE, Error.None);
-          await receiver.deployed();
+          await receiver.waitForDeployment();
           const receipt = await this.token['safeMint(address,uint256,bytes)'](
-            receiver.address,
+            await receiver.getAddress(),
             tokenId,
             data,
           );
 
           await expect(receipt)
             .to.emit(receiver, 'Received')
-            .withArgs(owner.address, ethers.constants.AddressZero, tokenId, data);
+            .withArgs(await owner.getAddress(), ethers.ZeroAddress, tokenId, data);
         });
 
         it('calls onERC721Received — without data', async function () {
           const ERC721Receiver = await ethers.getContractFactory('ERC721ReceiverMock');
           receiver = await ERC721Receiver.deploy(RECEIVER_MAGIC_VALUE, Error.None);
-          await receiver.deployed();
-          const receipt = await this.token['safeMint(address,uint256)'](receiver.address, tokenId);
+          await receiver.waitForDeployment();
+          const receipt = await this.token['safeMint(address,uint256)'](
+            await receiver.getAddress(),
+            tokenId,
+          );
 
           await expect(receipt)
             .to.emit(receiver, 'Received')
-            .withArgs(owner.address, ethers.constants.AddressZero, tokenId, '0x');
+            .withArgs(await owner.getAddress(), ethers.ZeroAddress, tokenId, '0x');
         });
       });
 
@@ -494,13 +504,13 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
         it('reverts', async function () {
           const ERC721Receiver = await ethers.getContractFactory('ERC721ReceiverMock');
           const invalidReceiver = await ERC721Receiver.deploy(
-            ethers.utils.hexZeroPad('0x42', 4),
+            ethers.zeroPadValue('0x42', 4),
             Error.None,
           );
-          await invalidReceiver.deployed();
+          await invalidReceiver.waitForDeployment();
 
           await expect(
-            this.token['safeMint(address,uint256)'](invalidReceiver.address, tokenId),
+            this.token['safeMint(address,uint256)'](await invalidReceiver.getAddress(), tokenId),
           ).to.be.revertedWithCustomError(this.token, 'ERC721TransferToNonReceiverImplementer');
         });
       });
@@ -509,14 +519,14 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
         it('reverts', async function () {
           const ERC721Receiver = await ethers.getContractFactory('ERC721ReceiverMock');
           const revertingReceiver = await ERC721Receiver.deploy(
-            ethers.utils.hexZeroPad('0x42', 4),
+            ethers.zeroPadValue('0x42', 4),
             Error.RevertWithMessage,
           );
-          await revertingReceiver.deployed();
+          await revertingReceiver.waitForDeployment();
           await expect(
             this.token
               .connect(owner)
-              ['safeMint(address,uint256)'](revertingReceiver.address, tokenId),
+              ['safeMint(address,uint256)'](await revertingReceiver.getAddress(), tokenId),
           ).to.be.revertedWith('ERC721ReceiverMock: reverting');
         });
       });
@@ -528,11 +538,11 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
             RECEIVER_MAGIC_VALUE,
             Error.RevertWithoutMessage,
           );
-          await revertingReceiver.deployed();
+          await revertingReceiver.waitForDeployment();
           await expect(
             this.token
               .connect(owner)
-              ['safeMint(address,uint256)'](revertingReceiver.address, tokenId),
+              ['safeMint(address,uint256)'](await revertingReceiver.getAddress(), tokenId),
           ).to.be.revertedWithCustomError(this.token, 'ERC721TransferToNonReceiverImplementer');
         });
       });
@@ -541,11 +551,11 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
         it('reverts', async function () {
           const ERC721Receiver = await ethers.getContractFactory('ERC721ReceiverMock');
           const revertingReceiver = await ERC721Receiver.deploy(RECEIVER_MAGIC_VALUE, Error.Panic);
-          await revertingReceiver.deployed();
+          await revertingReceiver.waitForDeployment();
           await expect(
             this.token
               .connect(owner)
-              ['safeMint(address,uint256)'](revertingReceiver.address, tokenId),
+              ['safeMint(address,uint256)'](await revertingReceiver.getAddress(), tokenId),
           ).to.be.reverted;
         });
       });
@@ -554,7 +564,7 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
         it('reverts', async function () {
           const nonReceiver = this.token;
           await expect(
-            this.token['safeMint(address,uint256)'](nonReceiver.address, tokenId),
+            this.token['safeMint(address,uint256)'](await nonReceiver.getAddress(), tokenId),
           ).to.be.revertedWithCustomError(this.token, 'ERC721TransferToNonReceiverImplementer');
         });
       });
@@ -566,7 +576,7 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
 
         const itClearsApproval = function () {
           it('clears approval for the token', async function () {
-            expect(await this.token.getApproved(tokenId)).to.be.equal(ethers.constants.AddressZero);
+            expect(await this.token.getApproved(tokenId)).to.be.equal(ethers.ZeroAddress);
           });
         };
 
@@ -580,81 +590,80 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
           it('emits an approval event', async function () {
             await expect(receipt)
               .to.emit(this.token, 'Approval')
-              .withArgs(owner.address, address, tokenId);
+              .withArgs(await owner.getAddress(), address, tokenId);
           });
         };
 
         context('when clearing approval', function () {
           context('when there was no prior approval', function () {
             beforeEach(async function () {
-              receipt = await this.token.approve(ethers.constants.AddressZero, tokenId);
+              receipt = await this.token.approve(ethers.ZeroAddress, tokenId);
             });
 
             itClearsApproval();
-            itEmitsApprovalEvent(ethers.constants.AddressZero);
+            itEmitsApprovalEvent(ethers.ZeroAddress);
           });
 
           context('when there was a prior approval', function () {
             beforeEach(async function () {
-              await this.token.approve(approved.address, tokenId);
-              receipt = await this.token.approve(ethers.constants.AddressZero, tokenId);
+              await this.token.approve(await approved.getAddress(), tokenId);
+              receipt = await this.token.approve(ethers.ZeroAddress, tokenId);
             });
 
             itClearsApproval();
-            itEmitsApprovalEvent(ethers.constants.AddressZero);
+            itEmitsApprovalEvent(ethers.ZeroAddress);
           });
         });
 
         context('when approving a non-zero address', function () {
           context('when there was no prior approval', function () {
             beforeEach(async function () {
-              receipt = await this.token.approve(approved.address, tokenId);
+              receipt = await this.token.approve(await approved.getAddress(), tokenId);
             });
 
             afterEach(async function () {
-              itApproves(approved.address);
-              itEmitsApprovalEvent(approved.address);
+              itApproves(await approved.getAddress());
+              itEmitsApprovalEvent(await approved.getAddress());
             });
           });
 
           context('when there was a prior approval to the same address', function () {
             beforeEach(async function () {
-              await this.token.approve(approved.address, tokenId);
-              receipt = await this.token.approve(approved.address, tokenId);
+              await this.token.approve(await approved.getAddress(), tokenId);
+              receipt = await this.token.approve(await approved.getAddress(), tokenId);
             });
 
             afterEach(async function () {
-              itApproves(approved.address);
-              itEmitsApprovalEvent(approved.address);
+              itApproves(await approved.getAddress());
+              itEmitsApprovalEvent(await approved.getAddress());
             });
           });
 
           context('when there was a prior approval to a different address', function () {
             beforeEach(async function () {
-              await this.token.approve(anotherApproved.address, tokenId);
-              receipt = await this.token.approve(anotherApproved.address, tokenId);
+              await this.token.approve(await anotherApproved.getAddress(), tokenId);
+              receipt = await this.token.approve(await anotherApproved.getAddress(), tokenId);
             });
 
             afterEach(async function () {
-              itApproves(anotherApproved.address);
-              itEmitsApprovalEvent(anotherApproved.address);
+              itApproves(await anotherApproved.getAddress());
+              itEmitsApprovalEvent(await anotherApproved.getAddress());
             });
           });
         });
 
         context('when the address that receives the approval is the owner', function () {
           it('reverts', async function () {
-            await expect(this.token.approve(owner.address, tokenId)).to.be.revertedWithCustomError(
-              this.token,
-              'ERC721ApprovalToCurrentOwner',
-            );
+            await expect(
+              this.token.approve(await owner.getAddress(), tokenId),
+            ).to.be.revertedWithCustomError(this.token, 'ERC721ApprovalToCurrentOwner');
           });
         });
 
         context('when the sender does not own the given token ID', function () {
           it('reverts', async function () {
             await expect(
-              this.token.connect(others[0]).approve(approved.address, tokenId),
+              this.token.connect(others[0]).approve(await approved.getAddress(), tokenId),
             ).to.be.revertedWithCustomError(
               this.token,
               'ERC721ApproveCallerIsNotOwnerNorApprovedForAll',
@@ -664,9 +673,9 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
 
         context('when the sender is approved for the given token ID', function () {
           it('reverts', async function () {
-            await this.token.approve(approved.address, tokenId);
+            await this.token.approve(await approved.getAddress(), tokenId);
             await expect(
-              this.token.connect(approved).approve(anotherApproved.address, tokenId),
+              this.token.connect(approved).approve(await anotherApproved.getAddress(), tokenId),
             ).to.be.revertedWithCustomError(
               this.token,
               'ERC721ApproveCallerIsNotOwnerNorApprovedForAll',
@@ -676,20 +685,22 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
 
         context('when the sender is an operator', function () {
           beforeEach(async function () {
-            await this.token.setApprovalForAll(operator.address, true);
-            receipt = await this.token.connect(operator).approve(approved.address, tokenId);
+            await this.token.setApprovalForAll(await operator.getAddress(), true);
+            receipt = await this.token
+              .connect(operator)
+              .approve(await approved.getAddress(), tokenId);
           });
 
           afterEach(async function () {
-            itApproves(approved.address);
-            itEmitsApprovalEvent(approved.address);
+            itApproves(await approved.getAddress());
+            itEmitsApprovalEvent(await approved.getAddress());
           });
         });
 
         context('when the given token ID does not exist', function () {
           it('reverts', async function () {
             await expect(
-              this.token.connect(operator).approve(approved.address, nonExistentTokenId),
+              this.token.connect(operator).approve(await approved.getAddress(), nonExistentTokenId),
             ).to.be.revertedWithCustomError(this.token, 'ERC721InvalidTokenId');
           });
         });
@@ -699,71 +710,83 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
         context('when the operator willing to approve is not the owner', function () {
           context('when there is no operator approval set by the sender', function () {
             it('approves the operator', async function () {
-              await this.token.setApprovalForAll(operator.address, true);
+              await this.token.setApprovalForAll(await operator.getAddress(), true);
 
-              expect(await this.token.isApprovedForAll(owner.address, operator.address)).to.equal(
-                true,
-              );
+              expect(
+                await this.token.isApprovedForAll(
+                  await owner.getAddress(),
+                  await operator.getAddress(),
+                ),
+              ).to.equal(true);
             });
 
             it('emits an approval event', async function () {
-              const receipt = await this.token.setApprovalForAll(operator.address, true);
+              const receipt = await this.token.setApprovalForAll(await operator.getAddress(), true);
 
               await expect(receipt)
                 .to.emit(this.token, 'ApprovalForAll')
-                .withArgs(owner.address, operator.address, true);
+                .withArgs(await owner.getAddress(), await operator.getAddress(), true);
             });
           });
 
           context('when the operator was set as not approved', function () {
             beforeEach(async function () {
-              await this.token.setApprovalForAll(operator.address, false);
+              await this.token.setApprovalForAll(await operator.getAddress(), false);
             });
 
             it('approves the operator', async function () {
-              await this.token.setApprovalForAll(operator.address, true);
+              await this.token.setApprovalForAll(await operator.getAddress(), true);
 
-              expect(await this.token.isApprovedForAll(owner.address, operator.address)).to.equal(
-                true,
-              );
+              expect(
+                await this.token.isApprovedForAll(
+                  await owner.getAddress(),
+                  await operator.getAddress(),
+                ),
+              ).to.equal(true);
             });
 
             it('emits an approval event', async function () {
-              const receipt = await this.token.setApprovalForAll(operator.address, true);
+              const receipt = await this.token.setApprovalForAll(await operator.getAddress(), true);
 
               await expect(receipt)
                 .to.emit(this.token, 'ApprovalForAll')
-                .withArgs(owner.address, operator.address, true);
+                .withArgs(await owner.getAddress(), await operator.getAddress(), true);
             });
 
             it('can unset the operator approval', async function () {
-              await this.token.setApprovalForAll(operator.address, false);
+              await this.token.setApprovalForAll(await operator.getAddress(), false);
 
-              expect(await this.token.isApprovedForAll(owner.address, operator.address)).to.equal(
-                false,
-              );
+              expect(
+                await this.token.isApprovedForAll(
+                  await owner.getAddress(),
+                  await operator.getAddress(),
+                ),
+              ).to.equal(false);
             });
           });
 
           context('when the operator was already approved', function () {
             beforeEach(async function () {
-              await this.token.setApprovalForAll(operator.address, true);
+              await this.token.setApprovalForAll(await operator.getAddress(), true);
             });
 
             it('keeps the approval to the given address', async function () {
-              await this.token.setApprovalForAll(operator.address, true);
+              await this.token.setApprovalForAll(await operator.getAddress(), true);
 
-              expect(await this.token.isApprovedForAll(owner.address, operator.address)).to.equal(
-                true,
-              );
+              expect(
+                await this.token.isApprovedForAll(
+                  await owner.getAddress(),
+                  await operator.getAddress(),
+                ),
+              ).to.equal(true);
             });
 
             it('emits an approval event', async function () {
-              const receipt = await this.token.setApprovalForAll(operator.address, true);
+              const receipt = await this.token.setApprovalForAll(await operator.getAddress(), true);
 
               await expect(receipt)
                 .to.emit(this.token, 'ApprovalForAll')
-                .withArgs(owner.address, operator.address, true);
+                .withArgs(await owner.getAddress(), await operator.getAddress(), true);
             });
           });
         });
@@ -771,7 +794,7 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
         context('when the operator is the owner', function () {
           it('reverts', async function () {
             await expect(
-              this.token.setApprovalForAll(owner.address, true),
+              this.token.setApprovalForAll(await owner.getAddress(), true),
             ).to.be.revertedWithCustomError(this.token, 'ERC721ApproveToCaller');
           });
         });
@@ -789,18 +812,18 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
 
         context('when token has been minted ', async function () {
           it('should return the zero address', async function () {
-            expect(await this.token.getApproved(firstTokenId)).to.be.equal(
-              ethers.constants.AddressZero,
-            );
+            expect(await this.token.getApproved(firstTokenId)).to.be.equal(ethers.ZeroAddress);
           });
 
           context('when account has been approved', async function () {
             beforeEach(async function () {
-              await this.token.approve(approved.address, firstTokenId);
+              await this.token.approve(await approved.getAddress(), firstTokenId);
             });
 
             it('returns approved account', async function () {
-              expect(await this.token.getApproved(firstTokenId)).to.be.equal(approved.address);
+              expect(await this.token.getApproved(firstTokenId)).to.be.equal(
+                await approved.getAddress(),
+              );
             });
           });
         });
@@ -815,29 +838,29 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
 
     it('reverts with a null destination address', async function () {
       await expect(
-        this.token['mint(address,uint256)'](ethers.constants.AddressZero, firstTokenId),
+        this.token['mint(address,uint256)'](ethers.ZeroAddress, firstTokenId),
       ).to.be.revertedWithCustomError(this.token, 'ERC721MintToTheZeroAddress');
     });
 
     context('with minted token', async function () {
       beforeEach(async function () {
-        receipt = await this.token['mint(address,uint256)'](owner.address, firstTokenId);
+        receipt = await this.token['mint(address,uint256)'](await owner.getAddress(), firstTokenId);
       });
 
       it('emits a Transfer event', async function () {
         await expect(receipt)
           .to.emit(this.token, 'Transfer')
-          .withArgs(ethers.constants.AddressZero, owner.address, firstTokenId);
+          .withArgs(ethers.ZeroAddress, await owner.getAddress(), firstTokenId);
       });
 
       it('creates the token', async function () {
-        expect(await this.token.balanceOf(owner.address)).to.eql(bn(1));
-        expect(await this.token.ownerOf(firstTokenId)).to.equal(owner.address);
+        expect(await this.token.balanceOf(await owner.getAddress())).to.eql(bn(1));
+        expect(await this.token.ownerOf(firstTokenId)).to.equal(await owner.getAddress());
       });
 
       it('reverts when adding a token id that already exists', async function () {
         await expect(
-          this.token['mint(address,uint256)'](owner.address, firstTokenId),
+          this.token['mint(address,uint256)'](await owner.getAddress(), firstTokenId),
         ).to.be.revertedWithCustomError(this.token, 'ERC721TokenAlreadyMinted');
       });
     });
@@ -857,8 +880,8 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
 
     context('with minted tokens', function () {
       beforeEach(async function () {
-        await this.token['mint(address,uint256)'](owner.address, firstTokenId);
-        await this.token['mint(address,uint256)'](owner.address, secondTokenId);
+        await this.token['mint(address,uint256)'](await owner.getAddress(), firstTokenId);
+        await this.token['mint(address,uint256)'](await owner.getAddress(), secondTokenId);
       });
 
       context('with burnt token', function () {
@@ -869,17 +892,17 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
         it('emits a Transfer event', async function () {
           await expect(receipt)
             .to.emit(this.token, 'Transfer')
-            .withArgs(owner.address, ethers.constants.AddressZero, firstTokenId);
+            .withArgs(await owner.getAddress(), ethers.ZeroAddress, firstTokenId);
         });
 
         it('emits an Approval event', async function () {
           await expect(receipt)
             .to.emit(this.token, 'Approval')
-            .withArgs(owner.address, ethers.constants.AddressZero, firstTokenId);
+            .withArgs(await owner.getAddress(), ethers.ZeroAddress, firstTokenId);
         });
 
         it('deletes the token', async function () {
-          expect(await this.token.balanceOf(owner.address)).to.eql(bn(1));
+          expect(await this.token.balanceOf(await owner.getAddress())).to.eql(bn(1));
           await expect(this.token.ownerOf(firstTokenId)).to.be.revertedWithCustomError(
             this.token,
             'ERC721InvalidTokenId',

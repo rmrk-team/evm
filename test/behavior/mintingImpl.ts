@@ -1,6 +1,6 @@
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { ONE_ETH } from '../utils';
 
 async function shouldControlValidMinting(): Promise<void> {
@@ -12,7 +12,7 @@ async function shouldControlValidMinting(): Promise<void> {
   });
 
   it('cannot mint under price', async function () {
-    const HALF_ETH = ethers.utils.parseEther('0.05');
+    const HALF_ETH = ethers.parseEther('0.05');
     await expect(
       this.token.mint(addrs[0].address, 1, { value: HALF_ETH }),
     ).to.be.revertedWithCustomError(this.token, 'RMRKWrongValueSent');

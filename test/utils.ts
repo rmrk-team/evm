@@ -1,26 +1,40 @@
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { BigNumber, Contract } from 'ethers';
+import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
+import { Contract } from 'ethers';
 import { ethers } from 'hardhat';
+import {
+  RMRKEquippableMock,
+  RMRKEquippablePreMint,
+  RMRKMultiAssetPreMint,
+  RMRKNestableMultiAssetPreMint,
+  RMRKNestableMultiAssetPreMintSoulbound,
+} from '../typechain-types';
 
 let nextTokenId = 1;
 let nextChildTokenId = 100;
-const ONE_ETH = ethers.utils.parseEther('1.0');
-const ADDRESS_ZERO = ethers.constants.AddressZero;
+const ONE_ETH = ethers.parseEther('1.0');
+const ADDRESS_ZERO = ethers.ZeroAddress;
 
-function bn(x: number): BigNumber {
-  return BigNumber.from(x);
+function bn(x: number): bigint {
+  return BigInt(x);
 }
 
-async function mintFromMock(token: Contract, to: string): Promise<BigNumber> {
+async function mintFromMock(token: RMRKEquippableMock, to: string): Promise<bigint> {
   const tokenId = nextTokenId;
   nextTokenId++;
-  await token['mint(address,uint256)'](to, tokenId);
+  await token.mint(to, tokenId);
 
   return bn(tokenId);
 }
 
-async function mintFromMockPremint(token: Contract, to: string): Promise<BigNumber> {
-  const tx = await token['mint(address,uint256,string)'](to, 1, `ipfs://tokenURI`);
+async function mintFromMockPremint(
+  token:
+    | RMRKMultiAssetPreMint
+    | RMRKNestableMultiAssetPreMintSoulbound
+    | RMRKNestableMultiAssetPreMint
+    | RMRKEquippablePreMint,
+  to: string,
+): Promise<bigint> {
+  const tx = await token.mint(to, 1, `ipfs://tokenURI`);
   // Get the event from the tx
   const event = (await tx.wait()).events?.find((e) => e.event === 'Transfer');
   // Get the tokenId from the event
@@ -28,21 +42,21 @@ async function mintFromMockPremint(token: Contract, to: string): Promise<BigNumb
 }
 
 async function nestMintFromMock(
-  token: Contract,
+  token: RMRKEquippableMock,
   to: string,
-  parentId: BigNumber,
-): Promise<BigNumber> {
+  parentId: bigint,
+): Promise<bigint> {
   const childTokenId = nextChildTokenId;
   nextChildTokenId++;
-  await token['nestMint(address,uint256,uint256)'](to, childTokenId, parentId);
+  await token.nestMint(to, childTokenId, parentId);
   return bn(childTokenId);
 }
 
 async function nestMintFromMockPreMint(
   token: Contract,
   to: string,
-  parentId: BigNumber,
-): Promise<BigNumber> {
+  parentId: bigint,
+): Promise<bigint> {
   const tx = await token['nestMint(address,uint256,uint256,string)'](
     to,
     1,
@@ -55,14 +69,14 @@ async function nestMintFromMockPreMint(
   return bn(event?.args?.tokenId);
 }
 
-async function mintFromErc20Pay(token: Contract, to: string): Promise<BigNumber> {
-  const erc20Address = token.erc20TokenAddress();
+async function mintFromErc20Pay(token: Contract, to: string): Promise<bigint> {
+  const erc20Address = await token.erc20TokenAddress();
   const erc20Factory = await ethers.getContractFactory('ERC20Mock');
   const erc20 = erc20Factory.attach(erc20Address);
   const owner = (await ethers.getSigners())[0];
 
-  await erc20.mint(owner.address, ONE_ETH);
-  await erc20.approve(token.address, ONE_ETH);
+  await erc20.mint(await owner.getAddress(), ONE_ETH);
+  await erc20.approve(await token.getAddress(), ONE_ETH);
 
   const tx = await token.mint(to, 1);
   // Get the event from the tx
@@ -71,7 +85,7 @@ async function mintFromErc20Pay(token: Contract, to: string): Promise<BigNumber>
   return event?.args?.tokenId;
 }
 
-async function mintFromNativeToken(token: Contract, to: string): Promise<BigNumber> {
+async function mintFromNativeToken(token: Contract, to: string): Promise<bigint> {
   const tx = await token.mint(to, 1, { value: ONE_ETH });
   // Get the event from the tx
   const event = (await tx.wait()).events?.find((e) => e.event === 'Transfer');
@@ -82,15 +96,15 @@ async function mintFromNativeToken(token: Contract, to: string): Promise<BigNumb
 async function nestMintFromErc20Pay(
   token: Contract,
   to: string,
-  destinationId: BigNumber,
-): Promise<BigNumber> {
-  const erc20Address = token.erc20TokenAddress();
+  destinationId: bigint,
+): Promise<bigint> {
+  const erc20Address = await token.erc20TokenAddress();
   const erc20Factory = await ethers.getContractFactory('ERC20Mock');
   const erc20 = erc20Factory.attach(erc20Address);
   const owner = (await ethers.getSigners())[0];
 
-  await erc20.mint(owner.address, ONE_ETH);
-  await erc20.approve(token.address, ONE_ETH);
+  await erc20.mint(await owner.getAddress(), ONE_ETH);
+  await erc20.approve(await token.getAddress(), ONE_ETH);
 
   const tx = await token.nestMint(to, 1, destinationId);
   // Get the event from the tx
@@ -102,8 +116,8 @@ async function nestMintFromErc20Pay(
 async function nestMintFromNativeToken(
   token: Contract,
   to: string,
-  destinationId: BigNumber,
-): Promise<BigNumber> {
+  destinationId: bigint,
+): Promise<bigint> {
   const tx = await token.nestMint(to, 1, destinationId, { value: ONE_ETH });
   // Get the event from the tx
   const event = (await tx.wait()).events?.find((e) => e.event === 'Transfer');
@@ -115,48 +129,49 @@ async function transfer(
   token: Contract,
   caller: SignerWithAddress,
   to: string,
-  tokenId: BigNumber,
+  tokenId: bigint,
 ): Promise<void> {
-  await token.connect(caller)['transferFrom(address,address,uint256)'](caller.address, to, tokenId);
+  await token
+    .connect(caller)
+    ['transferFrom(address,address,uint256)'](await caller.getAddress(), to, tokenId);
 }
 
 async function nestTransfer(
   token: Contract,
   caller: SignerWithAddress,
   to: string,
-  tokenId: BigNumber,
-  parentId: BigNumber,
+  tokenId: bigint,
+  parentId: bigint,
 ): Promise<void> {
-  await token.connect(caller).nestTransferFrom(caller.address, to, tokenId, parentId, '0x');
+  await token
+    .connect(caller)
+    .nestTransferFrom(await caller.getAddress(), to, tokenId, parentId, '0x');
 }
 
 async function addAssetToToken(
   token: Contract,
-  tokenId: BigNumber,
-  resId: BigNumber,
-  replaces: BigNumber | number,
+  tokenId: bigint,
+  resId: bigint,
+  replaces: bigint | number,
 ): Promise<void> {
   return await token.addAssetToToken(tokenId, resId, replaces);
 }
 
 let nextAssetId = 1;
 
-async function addAssetEntryFromMock(token: Contract, data?: string): Promise<BigNumber> {
+async function addAssetEntryFromMock(token: Contract, data?: string): Promise<bigint> {
   const assetId = bn(nextAssetId);
   nextAssetId++;
   await token.addAssetEntry(assetId, data !== undefined ? data : 'metaURI');
   return assetId;
 }
 
-async function addAssetEntryFromImpl(token: Contract, data?: string): Promise<BigNumber> {
+async function addAssetEntryFromImpl(token: Contract, data?: string): Promise<bigint> {
   await token.addAssetEntry(data !== undefined ? data : 'metaURI');
   return await token.totalAssets();
 }
 
-async function addAssetEntryEquippablesFromMock(
-  token: Contract,
-  data?: string,
-): Promise<BigNumber> {
+async function addAssetEntryEquippablesFromMock(token: Contract, data?: string): Promise<bigint> {
   const assetId = bn(nextAssetId);
   const equippableGroupId = bn(1);
   nextAssetId++;
@@ -171,10 +186,7 @@ async function addAssetEntryEquippablesFromMock(
   return assetId;
 }
 
-async function addAssetEntryEquippablesFromImpl(
-  token: Contract,
-  data?: string,
-): Promise<BigNumber> {
+async function addAssetEntryEquippablesFromImpl(token: Contract, data?: string): Promise<bigint> {
   const equippableGroupId = bn(1);
   await token.addEquippableAssetEntry(
     equippableGroupId,
@@ -189,7 +201,7 @@ async function addAssetEntryEquippablesFromImpl(
 async function singleFixtureWithArgs(contractName: string, args: any[]): Promise<Contract> {
   const factory = await ethers.getContractFactory(contractName);
   const token = await factory.deploy(...args);
-  await token.deployed();
+  await token.waitForDeployment();
   return token;
 }
 
@@ -201,9 +213,9 @@ async function parentChildFixtureWithArgs(
   const factory = await ethers.getContractFactory(contractName);
 
   const parent = await factory.deploy(...parentArgs);
-  await parent.deployed();
+  await parent.waitForDeployment();
   const child = await factory.deploy(...childArgs);
-  await child.deployed();
+  await child.waitForDeployment();
 
   return { parent, child };
 }

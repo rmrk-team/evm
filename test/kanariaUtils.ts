@@ -1,5 +1,4 @@
 import { ethers } from 'hardhat';
-import { BigNumber } from 'ethers';
 import { RMRKCatalogImpl, RMRKEquippableMock } from '../typechain-types';
 
 // These refIds are used from the child's perspective, to group assets that can be equipped into a parent
@@ -60,7 +59,7 @@ async function setUpCatalog(catalog: RMRKCatalogImpl, gemAddress: string): Promi
 
 async function setUpKanariaAsset(
   kanaria: RMRKEquippableMock,
-  kanariaId: BigNumber,
+  kanariaId: bigint,
   catalogAddress: string,
 ): Promise<void> {
   await kanaria.addEquippableAssetEntry(
@@ -76,9 +75,9 @@ async function setUpKanariaAsset(
 
 async function setUpGemAssets(
   gem: RMRKEquippableMock,
-  gemId1: BigNumber,
-  gemId2: BigNumber,
-  gemId3: BigNumber,
+  gemId1: bigint,
+  gemId2: bigint,
+  gemId3: bigint,
   kanariaAddress: string,
   catalogAddress: string,
 ): Promise<void> {

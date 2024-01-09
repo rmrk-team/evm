@@ -2,7 +2,7 @@ import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { ADDRESS_ZERO, bn, mintFromMockPremint } from './utils';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import {
   RMRKCollectionUtils,
   RMRKEquippablePreMint,
@@ -10,7 +10,6 @@ import {
   RMRKNestableMultiAssetPreMint,
   RMRKNestableMultiAssetPreMintSoulbound,
 } from '../typechain-types';
-import { BigNumber } from 'ethers';
 
 const maxSupply = bn(10000);
 const royaltyBps = bn(500);
@@ -34,11 +33,11 @@ async function collectionUtilsFixture() {
       'MA',
       collectionMeta,
       maxSupply,
-      deployer.address,
+      await deployer.getAddress(),
       royaltyBps,
     )
   );
-  await multiAsset.deployed();
+  await multiAsset.waitForDeployment();
 
   const nestableMultiAssetSoulbound = <RMRKNestableMultiAssetPreMintSoulbound>(
     await nestableMultiAssetSoulboundFactory.deploy(
@@ -46,11 +45,11 @@ async function collectionUtilsFixture() {
       'NMAS',
       collectionMeta,
       maxSupply,
-      deployer.address,
+      await deployer.getAddress(),
       royaltyBps,
     )
   );
-  await nestableMultiAssetSoulbound.deployed();
+  await nestableMultiAssetSoulbound.waitForDeployment();
 
   const nestableMultiAsset = <RMRKNestableMultiAssetPreMint>(
     await nestableMultiAssetFactory.deploy(
@@ -58,11 +57,11 @@ async function collectionUtilsFixture() {
       'NMA',
       collectionMeta,
       maxSupply,
-      deployer.address,
+      await deployer.getAddress(),
       royaltyBps,
     )
   );
-  await nestableMultiAsset.deployed();
+  await nestableMultiAsset.waitForDeployment();
 
   const equip = <RMRKEquippablePreMint>(
     await equipFactory.deploy(
@@ -70,14 +69,14 @@ async function collectionUtilsFixture() {
       'EQ',
       collectionMeta,
       maxSupply,
-      deployer.address,
+      await deployer.getAddress(),
       royaltyBps,
     )
   );
-  await equip.deployed();
+  await equip.waitForDeployment();
 
   const collectionUtils = <RMRKCollectionUtils>await collectionUtilsFactory.deploy();
-  await collectionUtils.deployed();
+  await collectionUtils.waitForDeployment();
 
   return {
     multiAsset,
@@ -105,61 +104,63 @@ describe('Collection Utils', function () {
   });
 
   it('can get collection data', async function () {
-    await mintFromMockPremint(multiAsset, holder.address);
-    await mintFromMockPremint(nestableMultiAsset, holder.address);
-    await mintFromMockPremint(nestableMultiAssetSoulbound, holder.address);
-    await mintFromMockPremint(equip, holder.address);
+    await mintFromMockPremint(multiAsset, await holder.getAddress());
+    await mintFromMockPremint(nestableMultiAsset, await holder.getAddress());
+    await mintFromMockPremint(nestableMultiAssetSoulbound, await holder.getAddress());
+    await mintFromMockPremint(equip, await holder.getAddress());
 
-    expect(await collectionUtils.getCollectionData(multiAsset.address)).to.eql([
-      BigNumber.from(1),
+    expect(await collectionUtils.getCollectionData(await multiAsset.getAddress())).to.eql([
+      1n,
       maxSupply,
       royaltyBps,
-      issuer.address,
-      issuer.address,
+      await issuer.getAddress(),
+      await issuer.getAddress(),
       'MultiAsset',
       'MA',
       collectionMeta,
     ]);
 
-    expect(await collectionUtils.getCollectionData(multiAsset.address)).to.eql([
-      BigNumber.from(1),
+    expect(await collectionUtils.getCollectionData(await multiAsset.getAddress())).to.eql([
+      1n,
       maxSupply,
       royaltyBps,
-      issuer.address,
-      issuer.address,
+      await issuer.getAddress(),
+      await issuer.getAddress(),
       'MultiAsset',
       'MA',
       collectionMeta,
     ]);
 
-    expect(await collectionUtils.getCollectionData(nestableMultiAsset.address)).to.eql([
-      BigNumber.from(1),
+    expect(await collectionUtils.getCollectionData(await nestableMultiAsset.getAddress())).to.eql([
+      1n,
       maxSupply,
       royaltyBps,
-      issuer.address,
-      issuer.address,
+      await issuer.getAddress(),
+      await issuer.getAddress(),
       'NestableMultiAsset',
       'NMA',
       collectionMeta,
     ]);
 
-    expect(await collectionUtils.getCollectionData(nestableMultiAssetSoulbound.address)).to.eql([
-      BigNumber.from(1),
+    expect(
+      await collectionUtils.getCollectionData(await nestableMultiAssetSoulbound.getAddress()),
+    ).to.eql([
+      1n,
       maxSupply,
       royaltyBps,
-      issuer.address,
-      issuer.address,
+      await issuer.getAddress(),
+      await issuer.getAddress(),
       'NestableMultiAssetSoulbound',
       'NMAS',
       collectionMeta,
     ]);
 
-    expect(await collectionUtils.getCollectionData(equip.address)).to.eql([
-      BigNumber.from(1),
+    expect(await collectionUtils.getCollectionData(await equip.getAddress())).to.eql([
+      1n,
       maxSupply,
       royaltyBps,
-      issuer.address,
-      issuer.address,
+      await issuer.getAddress(),
+      await issuer.getAddress(),
       'Equippable',
       'EQ',
       collectionMeta,
@@ -167,7 +168,7 @@ describe('Collection Utils', function () {
   });
 
   it('can get different interface supports for collection', async function () {
-    expect(await collectionUtils.getInterfaceSupport(multiAsset.address)).to.eql([
+    expect(await collectionUtils.getInterfaceSupport(await multiAsset.getAddress())).to.eql([
       true,
       true,
       false,
@@ -175,23 +176,13 @@ describe('Collection Utils', function () {
       false,
       true,
     ]);
-    expect(await collectionUtils.getInterfaceSupport(nestableMultiAsset.address)).to.eql([
-      true,
-      true,
-      true,
-      false,
-      false,
-      true,
-    ]);
-    expect(await collectionUtils.getInterfaceSupport(nestableMultiAssetSoulbound.address)).to.eql([
-      true,
-      true,
-      true,
-      false,
-      true,
-      true,
-    ]);
-    expect(await collectionUtils.getInterfaceSupport(equip.address)).to.eql([
+    expect(await collectionUtils.getInterfaceSupport(await nestableMultiAsset.getAddress())).to.eql(
+      [true, true, true, false, false, true],
+    );
+    expect(
+      await collectionUtils.getInterfaceSupport(await nestableMultiAssetSoulbound.getAddress()),
+    ).to.eql([true, true, true, false, true, true]);
+    expect(await collectionUtils.getInterfaceSupport(await equip.getAddress())).to.eql([
       true,
       true,
       true,
@@ -202,35 +193,34 @@ describe('Collection Utils', function () {
   });
 
   it('can get pages of available ids', async function () {
-    await multiAsset.mint(holder.address, 9, '');
+    await multiAsset.mint(await holder.getAddress(), 9, '');
     await multiAsset.connect(holder).burn(3);
     await multiAsset.connect(holder).burn(8);
 
-    expect(await collectionUtils.getPaginatedMintedIds(multiAsset.address, 1, 5)).to.eql([
-      bn(1),
-      bn(2),
-      bn(4),
-      bn(5),
-    ]);
-    expect(await collectionUtils.getPaginatedMintedIds(multiAsset.address, 6, 10)).to.eql([
-      bn(6),
-      bn(7),
-      bn(9),
-    ]);
+    expect(await collectionUtils.getPaginatedMintedIds(await multiAsset.getAddress(), 1, 5)).to.eql(
+      [bn(1), bn(2), bn(4), bn(5)],
+    );
+    expect(
+      await collectionUtils.getPaginatedMintedIds(await multiAsset.getAddress(), 6, 10),
+    ).to.eql([bn(6), bn(7), bn(9)]);
   });
 
   it('can trigger collection metadata update', async function () {
     await expect(
-      collectionUtils.connect(issuer).refreshCollectionTokensMetadata(multiAsset.address, 1, 100),
+      collectionUtils
+        .connect(issuer)
+        .refreshCollectionTokensMetadata(await multiAsset.getAddress(), 1, 100),
     )
       .to.emit(collectionUtils, 'BatchMetadataUpdate')
-      .withArgs(multiAsset.address, 1, 100);
+      .withArgs(await multiAsset.getAddress(), 1, 100);
   });
 
   it('can trigger token metadata update', async function () {
-    await expect(collectionUtils.connect(issuer).refreshTokenMetadata(multiAsset.address, 1))
+    await expect(
+      collectionUtils.connect(issuer).refreshTokenMetadata(await multiAsset.getAddress(), 1),
+    )
       .to.emit(collectionUtils, 'MetadataUpdate')
-      .withArgs(multiAsset.address, 1);
+      .withArgs(await multiAsset.getAddress(), 1);
   });
 
   it('does not emit event if contract address is not a contract', async function () {

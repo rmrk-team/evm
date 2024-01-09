@@ -10,12 +10,12 @@ async function main() {
   // We get the contract to deploy
   const collectionUtilsFactory = await ethers.getContractFactory('RMRKCollectionUtils');
   const collectionUtils = await collectionUtilsFactory.deploy();
-  await collectionUtils.deployed();
-  console.log('RMRK Collection Utils deployed to:', collectionUtils.address);
+  await collectionUtils.waitForDeployment();
+  console.log('RMRK Collection Utils deployed to:', await collectionUtils.getAddress());
   await sleep(1000);
 
   await run('verify:verify', {
-    address: collectionUtils.address,
+    address: await collectionUtils.getAddress(),
     constructorArguments: [],
   });
 }

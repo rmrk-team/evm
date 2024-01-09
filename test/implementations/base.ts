@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { RMRKImplementationBaseMock } from '../../typechain-types';
 
@@ -15,7 +15,7 @@ describe('Implementation Base', async () => {
     const mintingUtilsContract = <RMRKImplementationBaseMock>(
       await MINT.deploy('Name', 'SBL', 'ipfs://collection-meta', 10)
     );
-    await mintingUtilsContract.deployed();
+    await mintingUtilsContract.waitForDeployment();
 
     return { mintingUtilsContract, signersOwner, signersAddrs };
   }
@@ -37,58 +37,68 @@ describe('Implementation Base', async () => {
 
   it('can transfer ownership', async function () {
     const newOwner = addrs[1];
-    await implementation_base.connect(owner).transferOwnership(newOwner.address);
-    expect(await implementation_base.owner()).to.eql(newOwner.address);
+    await implementation_base.connect(owner).transferOwnership(await newOwner.getAddress());
+    expect(await implementation_base.owner()).to.eql(await newOwner.getAddress());
   });
 
   it('emits OwnershipTransferred event when transferring ownership', async function () {
     const newOwner = addrs[1];
-    await expect(implementation_base.connect(owner).transferOwnership(newOwner.address))
+    await expect(implementation_base.connect(owner).transferOwnership(await newOwner.getAddress()))
       .to.emit(implementation_base, 'OwnershipTransferred')
-      .withArgs(owner.address, newOwner.address);
+      .withArgs(await owner.getAddress(), await newOwner.getAddress());
   });
 
   it('cannot transfer ownership to address 0', async function () {
     await expect(
-      implementation_base.connect(owner).transferOwnership(ethers.constants.AddressZero),
+      implementation_base.connect(owner).transferOwnership(ethers.ZeroAddress),
     ).to.be.revertedWithCustomError(implementation_base, 'RMRKNewOwnerIsZeroAddress');
   });
 
   it('can renounce ownership', async function () {
     await implementation_base.connect(owner).renounceOwnership();
-    expect(await implementation_base.owner()).to.eql(ethers.constants.AddressZero);
+    expect(await implementation_base.owner()).to.eql(ethers.ZeroAddress);
   });
 
   it('can add and revoke contributor', async function () {
     const contributor = addrs[1];
-    await implementation_base.connect(owner).manageContributor(contributor.address, true);
-    expect(await implementation_base.connect(owner).isContributor(contributor.address)).to.eql(
-      true,
-    );
-    await implementation_base.connect(owner).manageContributor(contributor.address, false);
-    expect(await implementation_base.connect(owner).isContributor(contributor.address)).to.eql(
-      false,
-    );
+    await implementation_base
+      .connect(owner)
+      .manageContributor(await contributor.getAddress(), true);
+    expect(
+      await implementation_base.connect(owner).isContributor(await contributor.getAddress()),
+    ).to.eql(true);
+    await implementation_base
+      .connect(owner)
+      .manageContributor(await contributor.getAddress(), false);
+    expect(
+      await implementation_base.connect(owner).isContributor(await contributor.getAddress()),
+    ).to.eql(false);
   });
 
   it('emits ContributorUpdate when adding a contributor', async function () {
     const contributor = addrs[1];
-    await expect(implementation_base.connect(owner).manageContributor(contributor.address, true))
+    await expect(
+      implementation_base.connect(owner).manageContributor(await contributor.getAddress(), true),
+    )
       .to.emit(implementation_base, 'ContributorUpdate')
-      .withArgs(contributor.address, true);
+      .withArgs(await contributor.getAddress(), true);
   });
 
   it('emits ContributorUpdate when removing a contributor', async function () {
     const contributor = addrs[1];
-    await implementation_base.connect(owner).manageContributor(contributor.address, true);
-    await expect(implementation_base.connect(owner).manageContributor(contributor.address, false))
+    await implementation_base
+      .connect(owner)
+      .manageContributor(await contributor.getAddress(), true);
+    await expect(
+      implementation_base.connect(owner).manageContributor(await contributor.getAddress(), false),
+    )
       .to.emit(implementation_base, 'ContributorUpdate')
-      .withArgs(contributor.address, false);
+      .withArgs(await contributor.getAddress(), false);
   });
 
   it('cannot add zero address as contributor', async function () {
     await expect(
-      implementation_base.connect(owner).manageContributor(ethers.constants.AddressZero, true),
+      implementation_base.connect(owner).manageContributor(ethers.ZeroAddress, true),
     ).to.be.revertedWithCustomError(implementation_base, 'RMRKNewContributorIsZeroAddress');
   });
 
@@ -96,16 +106,16 @@ describe('Implementation Base', async () => {
     const notOwner = addrs[1];
     const otherUser = addrs[2];
     await expect(
-      implementation_base.connect(notOwner).transferOwnership(otherUser.address),
+      implementation_base.connect(notOwner).transferOwnership(await otherUser.getAddress()),
     ).to.be.revertedWithCustomError(implementation_base, 'RMRKNotOwner');
     await expect(
       implementation_base.connect(notOwner).renounceOwnership(),
     ).to.be.revertedWithCustomError(implementation_base, 'RMRKNotOwner');
     await expect(
-      implementation_base.connect(notOwner).manageContributor(otherUser.address, true),
+      implementation_base.connect(notOwner).manageContributor(await otherUser.getAddress(), true),
     ).to.be.revertedWithCustomError(implementation_base, 'RMRKNotOwner');
     await expect(
-      implementation_base.connect(notOwner).manageContributor(otherUser.address, false),
+      implementation_base.connect(notOwner).manageContributor(await otherUser.getAddress(), false),
     ).to.be.revertedWithCustomError(implementation_base, 'RMRKNotOwner');
   });
 });
