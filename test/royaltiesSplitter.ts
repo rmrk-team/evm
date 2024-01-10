@@ -27,8 +27,11 @@ describe('RMRKRoyaltiesSplitter', () => {
   });
 
   it('can get beneficiaries and shares', async () => {
-    expect(await royaltiesSplitter.getBenefiariesAndShares()).to.deep.equal([
+    const beneficiariesAddresses = await Promise.all(
       beneficiaries.map(async (b) => await b.getAddress()),
+    );
+    expect(await royaltiesSplitter.getBenefiariesAndShares()).to.deep.equal([
+      beneficiariesAddresses,
       SHARES_BPS,
     ]);
   });
@@ -37,12 +40,19 @@ describe('RMRKRoyaltiesSplitter', () => {
     const amount = ethers.parseEther('1');
     await expect(async () =>
       sender.sendTransaction({ to: await royaltiesSplitter.getAddress(), value: amount }),
+    ).to.changeEtherBalances(
+      [beneficiary1, beneficiary2, beneficiary3],
+      [(amount * 2500n) / 10000n, (amount * 2500n) / 10000n, (amount * 5000n) / 10000n],
+    );
+  });
+
+  it('should emit event on payments distributed', async () => {
+    const amount = ethers.parseEther('1');
+    expect(
+      await sender.sendTransaction({ to: await royaltiesSplitter.getAddress(), value: amount }),
     )
-      .to.changeEtherBalance(beneficiary1, (amount * 2500n) / 10000n)
-      .and.changeEtherBalance(beneficiary2, (amount * 2500n) / 10000n)
-      .and.changeEtherBalance(beneficiary3, (amount * 5000n) / 10000n)
       .to.emit(royaltiesSplitter, 'NativePaymentDistributed')
-      .withArgs(await sender.getAddress(), amount);
+      .withArgs(sender.address, amount);
   });
 
   it('should distribute ERC20 payment correctly', async () => {

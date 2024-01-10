@@ -1,10 +1,14 @@
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
-import { Contract } from 'ethers';
+import { Contract, EventLog } from 'ethers';
 import { ethers } from 'hardhat';
 import {
+  RMRKEquippableLazyMintNative,
   RMRKEquippableMock,
   RMRKEquippablePreMint,
+  RMRKMultiAssetLazyMintNative,
   RMRKMultiAssetPreMint,
+  RMRKNestableLazyMintNative,
+  RMRKNestableMultiAssetLazyMintNative,
   RMRKNestableMultiAssetPreMint,
   RMRKNestableMultiAssetPreMintSoulbound,
 } from '../typechain-types';
@@ -36,9 +40,10 @@ async function mintFromMockPremint(
 ): Promise<bigint> {
   const tx = await token.mint(to, 1, `ipfs://tokenURI`);
   // Get the event from the tx
-  const event = (await tx.wait()).events?.find((e) => e.event === 'Transfer');
+  const event = (await tx.wait()).logs.find((e) => e.eventName === 'Transfer');
   // Get the tokenId from the event
-  return bn(event?.args?.tokenId);
+  // @ts-ignore
+  return event.args[2];
 }
 
 async function nestMintFromMock(
@@ -64,9 +69,10 @@ async function nestMintFromMockPreMint(
     `ipfs://tokenURI`,
   );
   // Get the event from the tx
-  const event = (await tx.wait()).events?.find((e) => e.event === 'Transfer');
+  const event = (await tx.wait()).logs.find((e) => e.eventName === 'Transfer');
   // Get the tokenId from the event
-  return bn(event?.args?.tokenId);
+  // @ts-ignore
+  return event.args[2];
 }
 
 async function mintFromErc20Pay(token: Contract, to: string): Promise<bigint> {
@@ -80,17 +86,34 @@ async function mintFromErc20Pay(token: Contract, to: string): Promise<bigint> {
 
   const tx = await token.mint(to, 1);
   // Get the event from the tx
-  const event = (await tx.wait()).events?.find((e) => e.event === 'Transfer');
+  const event = (await tx.wait()).logs.find((e) => e.eventName === 'Transfer');
   // Get the tokenId from the event
-  return event?.args?.tokenId;
+  // @ts-ignore
+  return event.args[2];
 }
 
-async function mintFromNativeToken(token: Contract, to: string): Promise<bigint> {
+async function mintFromNativeToken(
+  token:
+    | RMRKMultiAssetLazyMintNative
+    | RMRKNestableLazyMintNative
+    | RMRKNestableMultiAssetLazyMintNative
+    | RMRKEquippableLazyMintNative,
+  to: string,
+): Promise<bigint> {
   const tx = await token.mint(to, 1, { value: ONE_ETH });
+  const receipt = await tx.wait();
+  if (receipt === null || receipt === undefined) {
+    throw new Error('No events in receipt');
+  }
   // Get the event from the tx
-  const event = (await tx.wait()).events?.find((e) => e.event === 'Transfer');
+  // @ts-ignore
+  const event = receipt.logs.find((e) => e.eventName === 'Transfer');
+  if (event === undefined) {
+    throw new Error('No Transfer event in receipt');
+  }
   // Get the tokenId from the event
-  return event?.args?.tokenId;
+  // @ts-ignore
+  return event.args[2];
 }
 
 async function nestMintFromErc20Pay(
@@ -108,21 +131,26 @@ async function nestMintFromErc20Pay(
 
   const tx = await token.nestMint(to, 1, destinationId);
   // Get the event from the tx
-  const event = (await tx.wait()).events?.find((e) => e.event === 'Transfer');
+  const event = (await tx.wait()).logs.find((e) => e.eventName === 'Transfer');
   // Get the tokenId from the event
-  return event?.args?.tokenId;
+  // @ts-ignore
+  return event.args[2];
 }
 
 async function nestMintFromNativeToken(
-  token: Contract,
+  token:
+    | RMRKNestableLazyMintNative
+    | RMRKNestableMultiAssetLazyMintNative
+    | RMRKEquippableLazyMintNative,
   to: string,
   destinationId: bigint,
 ): Promise<bigint> {
   const tx = await token.nestMint(to, 1, destinationId, { value: ONE_ETH });
   // Get the event from the tx
-  const event = (await tx.wait()).events?.find((e) => e.event === 'Transfer');
+  const event = (await tx.wait()).logs.find((e) => e.eventName === 'Transfer');
   // Get the tokenId from the event
-  return event?.args?.tokenId;
+  // @ts-ignore
+  return event.args[2];
 }
 
 async function transfer(
@@ -181,7 +209,6 @@ async function addAssetEntryEquippablesFromMock(token: Contract, data?: string):
     ADDRESS_ZERO,
     data !== undefined ? data : 'metaURI',
     [],
-    [],
   );
   return assetId;
 }
@@ -192,7 +219,6 @@ async function addAssetEntryEquippablesFromImpl(token: Contract, data?: string):
     equippableGroupId,
     ADDRESS_ZERO,
     data !== undefined ? data : 'metaURI',
-    [],
     [],
   );
   return await token.totalAssets();

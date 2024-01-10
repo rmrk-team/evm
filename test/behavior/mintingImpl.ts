@@ -12,7 +12,7 @@ async function shouldControlValidMinting(): Promise<void> {
   });
 
   it('cannot mint under price', async function () {
-    const HALF_ETH = ethers.parseEther('0.05');
+    const HALF_ETH = ONE_ETH / 2n;
     await expect(
       this.token.mint(addrs[0].address, 1, { value: HALF_ETH }),
     ).to.be.revertedWithCustomError(this.token, 'RMRKWrongValueSent');

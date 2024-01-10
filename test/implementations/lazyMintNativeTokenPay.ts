@@ -10,6 +10,13 @@ import {
   ONE_ETH,
   singleFixtureWithArgs,
 } from '../utils';
+import {
+  RMRKEquippableLazyMintNative,
+  RMRKMultiAssetLazyMintNative,
+  RMRKMultiAssetLazyMintNative,
+  RMRKNestableLazyMintNative,
+  RMRKNestableMultiAssetLazyMintNative,
+} from '../../typechain-types';
 
 async function multiAssetFixture(): Promise<Contract> {
   return await singleFixtureWithArgs('RMRKMultiAssetLazyMintNative', [
@@ -85,85 +92,88 @@ describe('EquippableNativeTokenPay Minting', async () => {
 
 async function shouldControlValidMintingNativeTokenPay(): Promise<void> {
   let addrs: SignerWithAddress[];
+  let token:
+    | RMRKMultiAssetLazyMintNative
+    | RMRKNestableLazyMintNative
+    | RMRKNestableMultiAssetLazyMintNative
+    | RMRKEquippableLazyMintNative;
 
   beforeEach(async function () {
     [, ...addrs] = await ethers.getSigners();
+    token = this.token;
   });
 
   it('cannot mint under price', async function () {
-    const HALF_ETH = ethers.parseEther('0.05');
+    const HALF_ETH = ONE_ETH / 2n;
     await expect(
-      this.token.mint(addrs[0].address, 1, { value: HALF_ETH }),
-    ).to.be.revertedWithCustomError(this.token, 'RMRKWrongValueSent');
+      token.mint(addrs[0].address, 1, { value: HALF_ETH }),
+    ).to.be.revertedWithCustomError(token, 'RMRKWrongValueSent');
   });
 
   it('cannot mint 0 units', async function () {
-    await expect(this.token.mint(addrs[0].address, 0)).to.be.revertedWithCustomError(
-      this.token,
+    await expect(token.mint(addrs[0].address, 0)).to.be.revertedWithCustomError(
+      token,
       'RMRKMintZero',
     );
   });
 
   it('cannot mint over max supply', async function () {
-    await expect(this.token.mint(addrs[0].address, 99999)).to.be.revertedWithCustomError(
-      this.token,
+    await expect(token.mint(addrs[0].address, 99999)).to.be.revertedWithCustomError(
+      token,
       'RMRKMintOverMax',
     );
   });
 
   it('can mint tokens through sale logic', async function () {
-    await mintFromNativeToken(this.token, addrs[0].address);
-    expect(await this.token.ownerOf(1)).to.equal(addrs[0].address);
-    expect(await this.token.totalSupply()).to.equal(1);
-    expect(await this.token.balanceOf(addrs[0].address)).to.equal(1);
+    await mintFromNativeToken(token, addrs[0].address);
+    expect(await token.ownerOf(1)).to.equal(addrs[0].address);
+    expect(await token.totalSupply()).to.equal(1);
+    expect(await token.balanceOf(addrs[0].address)).to.equal(1);
   });
 
   it('reduces total supply on burn', async function () {
-    const tokenId = await mintFromNativeToken(this.token, addrs[0].address);
-    expect(await this.token.totalSupply()).to.equal(1);
-    await this.token.connect(addrs[0]).burn(tokenId);
-    expect(await this.token.totalSupply()).to.equal(0);
+    const tokenId = await mintFromNativeToken(token, addrs[0].address);
+    expect(await token.totalSupply()).to.equal(1);
+    await token.connect(addrs[0])['burn(uint256)'](tokenId);
+
+    expect(await token.totalSupply()).to.equal(0);
   });
 
   it('reduces total supply on burn and does not reuse ID', async function () {
-    const tokenId = await mintFromNativeToken(this.token, addrs[0].address);
-    await this.token.connect(addrs[0]).burn(tokenId);
+    const tokenId = await mintFromNativeToken(token, addrs[0].address);
+    await token.connect(addrs[0])['burn(uint256)'](tokenId);
 
-    const newTokenId = await mintFromNativeToken(this.token, addrs[0].address);
+    const newTokenId = await mintFromNativeToken(token, addrs[0].address);
     expect(newTokenId).to.equal(tokenId + 1n);
-    expect(await this.token.totalSupply()).to.equal(1);
+    expect(await token.totalSupply()).to.equal(1);
   });
 
   it('can mint multiple tokens through sale logic', async function () {
-    await this.token.connect(addrs[0]).mint(addrs[0].address, 10, { value: ONE_ETH * 10n });
-    expect(await this.token.totalSupply()).to.equal(10);
-    expect(await this.token.balanceOf(addrs[0].address)).to.equal(10);
+    await token.connect(addrs[0]).mint(addrs[0].address, 10, { value: ONE_ETH * 10n });
+    expect(await token.totalSupply()).to.equal(10);
+    expect(await token.balanceOf(addrs[0].address)).to.equal(10);
   });
 
   describe('Nest minting', async () => {
     let parentId: bigint;
 
     beforeEach(async function () {
-      if (this.token.nestMint === undefined) {
+      if (token.nestMint === undefined) {
         this.skip();
       }
-      parentId = await mintFromNativeToken(this.token, addrs[0].address);
+      parentId = await mintFromNativeToken(token, addrs[0].address);
     });
 
     it('can nest mint tokens through sale logic', async function () {
-      const childId = await nestMintFromNativeToken(
-        this.token,
-        await this.token.getAddress(),
-        parentId,
-      );
-      expect(await this.token.ownerOf(childId)).to.equal(addrs[0].address);
-      expect(await this.token.totalSupply()).to.equal(2);
+      const childId = await nestMintFromNativeToken(token, await token.getAddress(), parentId);
+      expect(await token.ownerOf(childId)).to.equal(addrs[0].address);
+      expect(await token.totalSupply()).to.equal(2);
     });
 
     it('cannot nest mint over max supply', async function () {
       await expect(
-        this.token.nestMint(await this.token.getAddress(), 99999, 1),
-      ).to.be.revertedWithCustomError(this.token, 'RMRKMintOverMax');
+        token.nestMint(await token.getAddress(), 99999, 1),
+      ).to.be.revertedWithCustomError(token, 'RMRKMintOverMax');
     });
   });
 }

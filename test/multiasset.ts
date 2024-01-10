@@ -119,8 +119,8 @@ describe('MultiAssetMock Other Behavior', async function () {
       await expect(token.addAssetToToken(tokenId, resId2, 0)).to.emit(token, 'AssetAddedToTokens');
 
       expect(await renderUtils.getPendingAssets(await token.getAddress(), tokenId)).to.eql([
-        [resId, bn(0), bn(0), 'data1'],
-        [resId2, bn(1), bn(0), 'data2'],
+        [resId, 0n, 0n, 'data1'],
+        [resId2, bn(1), 0n, 'data2'],
       ]);
     });
 

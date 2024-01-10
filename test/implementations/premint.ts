@@ -125,12 +125,12 @@ async function shouldControlValidPreMinting(): Promise<void> {
 
   it('reduces total supply on burn and does not reuse ID', async function () {
     let tx = await this.token.connect(owner).mint(await owner.getAddress(), 1, 'ipfs://tokenURI');
-    let event = (await tx.wait()).events?.find((e) => e.event === 'Transfer');
+    let event = (await tx.wait()).logs.find((e) => e.eventName === 'Transfer');
     const tokenId = event?.args?.tokenId;
     await this.token.connect(owner)['burn(uint256)'](tokenId);
 
     tx = await this.token.connect(owner).mint(await owner.getAddress(), 1, 'ipfs://tokenURI');
-    event = (await tx.wait()).events?.find((e) => e.event === 'Transfer');
+    event = (await tx.wait()).logs.find((e) => e.eventName === 'Transfer');
     const newTokenId = event?.args?.tokenId;
 
     expect(newTokenId).to.equal(tokenId + 1n);

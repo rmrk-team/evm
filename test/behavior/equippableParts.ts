@@ -131,7 +131,7 @@ async function shouldBehaveLikeEquippableWithParts() {
       );
       expect(allAssets).to.eql([
         'ipfs:neonRes/1', // metadataURI
-        bn(0), // equippableGroupId
+        0n, // equippableGroupId
         await catalogContract.getAddress(), // catalogAddress,
         expectedFixedParts,
         expectedSlotParts,

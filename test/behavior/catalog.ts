@@ -10,9 +10,9 @@ async function shouldBehaveLikeCatalog(contractName: string, metadataURI: string
   let addrs: SignerWithAddress[];
   const metadataUriDefault = 'src';
 
-  const noType = 0;
-  const slotType = 1;
-  const fixedType = 2;
+  const noType = 0n;
+  const slotType = 1n;
+  const fixedType = 2n;
 
   const sampleSlotPartData = {
     itemType: slotType,
@@ -64,13 +64,13 @@ async function shouldBehaveLikeCatalog(contractName: string, metadataURI: string
       const partId = 1;
 
       await testCatalog.addPart({ partId: partId, part: sampleFixedPartData });
-      expect(await testCatalog.getPart(partId)).to.eql([2, 0, [], metadataUriDefault]);
+      expect(await testCatalog.getPart(partId)).to.eql([2n, 0n, [], metadataUriDefault]);
     });
 
     it('can add slot part', async function () {
       const partId = 2;
       await testCatalog.addPart({ partId: partId, part: sampleSlotPartData });
-      expect(await testCatalog.getPart(partId)).to.eql([1, 0, [], metadataUriDefault]);
+      expect(await testCatalog.getPart(partId)).to.eql([1n, 0n, [], metadataUriDefault]);
     });
 
     it('can add parts list', async function () {
@@ -93,8 +93,8 @@ async function shouldBehaveLikeCatalog(contractName: string, metadataURI: string
         { partId: partId2, part: partData2 },
       ]);
       expect(await testCatalog.getParts([partId, partId2])).to.eql([
-        [slotType, 0, [], 'src1'],
-        [fixedType, 1, [], 'src2'],
+        [slotType, 0n, [], 'src1'],
+        [fixedType, 1n, [], 'src2'],
       ]);
     });
 
@@ -249,7 +249,7 @@ async function shouldBehaveLikeCatalog(contractName: string, metadataURI: string
       await testCatalog.setEquippableToAll(partId);
 
       // This should reset it:
-      testCatalog.setEquippableAddresses(partId, [addrs[1].address]);
+      await testCatalog.setEquippableAddresses(partId, [addrs[1].address]);
       expect(await testCatalog.checkIsEquippableToAll(partId)).to.eql(false);
     });
 

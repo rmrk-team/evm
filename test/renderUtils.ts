@@ -221,7 +221,7 @@ describe('MultiAsset Nestable and Equip Render Utils', async function () {
 
     it('can get pending assets', async function () {
       expect(await renderUtils.getPendingAssets(await equip.getAddress(), tokenId)).to.eql([
-        [resId4, bn(0), bn(0), 'ipfs://res4.jpg'],
+        [resId4, 0n, 0n, 'ipfs://res4.jpg'],
         [resId3, bn(1), resId, 'ipfs://res3.jpg'],
       ]);
     });
@@ -318,7 +318,7 @@ describe('MultiAsset Nestable and Equip Render Utils', async function () {
       expect(
         await renderUtilsEquip.getExtendedEquippableActiveAssets(await equip.getAddress(), tokenId),
       ).to.eql([
-        [resId, bn(0), bn(10), ADDRESS_ZERO, 'ipfs://res1.jpg', []],
+        [resId, 0n, bn(10), ADDRESS_ZERO, 'ipfs://res1.jpg', []],
         [
           resId2,
           bn(1),
@@ -334,8 +334,8 @@ describe('MultiAsset Nestable and Equip Render Utils', async function () {
       expect(
         await renderUtilsEquip.getExtendedPendingAssets(await equip.getAddress(), tokenId),
       ).to.eql([
-        [resId4, bn(2), bn(0), bn(0), await catalog.getAddress(), 'ipfs://res4.jpg', [bn(4)]],
-        [resId3, bn(0), bn(1), resId, ADDRESS_ZERO, 'ipfs://res3.jpg', []],
+        [resId4, bn(2), 0n, 0n, await catalog.getAddress(), 'ipfs://res4.jpg', [bn(4)]],
+        [resId3, 0n, bn(1), resId, ADDRESS_ZERO, 'ipfs://res3.jpg', []],
       ]);
     });
 
@@ -468,14 +468,14 @@ describe('Advanced Equip Render Utils', async function () {
         assetForKanariaFull,
       ),
     ).to.eql([
-      bn(0), // child Index
+      0n, // child Index
       [
         // [Slot Id, child asset Id, parent asset Id, Asset priority, catalog address, isEquipped, partMetadata, childAssetMetadata, parentAssetMetadata]
         [
           bn(slotIdGemRight),
           bn(assetForGemARight),
           bn(assetForKanariaFull),
-          bn(0),
+          0n,
           await catalog.getAddress(),
           false,
           'ipfs://metadataSlotGemRight',
@@ -520,7 +520,7 @@ describe('Advanced Equip Render Utils', async function () {
           bn(slotIdGemRight),
           bn(assetForGemARight),
           bn(assetForKanariaFull),
-          bn(0),
+          0n,
           await catalog.getAddress(),
           false,
           'ipfs://metadataSlotGemRight',
@@ -562,7 +562,7 @@ describe('Advanced Equip Render Utils', async function () {
           bn(slotIdGemRight),
           bn(assetForGemBRight),
           bn(assetForKanariaFull),
-          bn(0),
+          0n,
           await catalog.getAddress(),
           true,
           'ipfs://metadataSlotGemRight',
@@ -605,7 +605,7 @@ describe('Advanced Equip Render Utils', async function () {
           bn(slotIdGemRight),
           bn(assetForGemBRight),
           bn(assetForKanariaFull),
-          bn(0),
+          0n,
           await catalog.getAddress(),
           true,
           'ipfs://metadataSlotGemRight',
@@ -701,14 +701,14 @@ describe('Advanced Equip Render Utils', async function () {
         assetForKanariaFull,
       ),
     ).to.eql([
-      bn(0), // child Index
+      0n, // child Index
       [
         // [Slot Id, child asset Id, parent asset Id, Asset priority, catalog address, isEquipped, partMetadata, childAssetMetadata, parentAssetMetadata]
         [
           bn(slotIdGemRight),
           bn(assetForGemBRight),
           bn(assetForKanariaFull),
-          bn(0),
+          0n,
           await catalog.getAddress(),
           false,
           'ipfs://metadataSlotGemRight',
@@ -784,7 +784,7 @@ describe('Advanced Equip Render Utils', async function () {
           bn(slotIdGemRight),
           bn(assetForGemBRight),
           bn(assetForKanariaFull),
-          bn(0),
+          0n,
           await catalog.getAddress(),
           false,
           'ipfs://metadataSlotGemRight',
@@ -936,8 +936,8 @@ describe('Extended NFT render utils', function () {
     expect(data.issuer).to.eql(await issuer.getAddress());
     expect(data.name).to.eql('MultiAsset');
     expect(data.symbol).to.eql('MA');
-    expect(data.activeChildrenNumber).to.eql(bn(0));
-    expect(data.pendingChildrenNumber).to.eql(bn(0));
+    expect(data.activeChildrenNumber).to.eql(0n);
+    expect(data.pendingChildrenNumber).to.eql(0n);
     expect(data.isSoulbound).to.be.false;
     expect(data.hasMultiAssetInterface).to.be.true;
     expect(data.hasNestingInterface).to.be.false;
@@ -979,8 +979,8 @@ describe('Extended NFT render utils', function () {
     expect(data.tokenMetadataUri).to.eql('ipfs://tokenURI');
     expect(data.directOwner).to.eql(await rootOwner.getAddress());
     expect(data.rootOwner).to.eql(await rootOwner.getAddress());
-    expect(data.activeAssetCount).to.eql(bn(0));
-    expect(data.pendingAssetCount).to.eql(bn(0));
+    expect(data.activeAssetCount).to.eql(0n);
+    expect(data.pendingAssetCount).to.eql(0n);
     expect(data.priorities).to.eql([]);
     expect(data.maxSupply).to.eql(bn(10000));
     expect(data.totalSupply).to.eql(bn(4));
@@ -1232,7 +1232,7 @@ describe('Extended NFT render utils', function () {
           await nestableMultiAsset.getAddress(),
           parentTokenOne,
         ),
-      ).to.eql([await rootOwner.getAddress(), ethers.BigInt(0), false, false, false]);
+      ).to.eql([await rootOwner.getAddress(), 0n, false, false, false]);
     });
 
     it('can identify rejected children', async function () {

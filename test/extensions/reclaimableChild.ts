@@ -85,7 +85,7 @@ async function shouldBehaveLikeReclaimableChild() {
       expect(await this.child.ownerOf(childId)).to.eql(await tokenOwner.getAddress());
       expect(await this.child.directOwnerOf(childId)).to.eql([
         await tokenOwner.getAddress(),
-        bn(0),
+        0n,
         false,
       ]);
     });
@@ -185,7 +185,7 @@ async function shouldBehaveLikeReclaimableChild() {
       expect(await this.child.ownerOf(childId)).to.eql(await tokenOwner.getAddress());
       expect(await this.child.directOwnerOf(childId)).to.eql([
         await tokenOwner.getAddress(),
-        bn(0),
+        0n,
         false,
       ]);
     });

@@ -107,31 +107,31 @@ async function shouldControlValidMintingErc20Pay(): Promise<void> {
   beforeEach(async function () {
     const [, ...signersAddr] = await ethers.getSigners();
     addrs = signersAddr;
-    const erc20Address = await this.token.getAddress();
+    const erc20Address = await this.token.erc20TokenAddress();
     const erc20Factory = await ethers.getContractFactory('ERC20Mock');
     erc20 = <ERC20Mock>erc20Factory.attach(erc20Address);
   });
 
   it('cannot mint under price', async function () {
-    const HALF_ETH = ethers.parseEther('0.05');
+    const HALF_ETH = ONE_ETH / 2n;
 
     await erc20.mint(addrs[0].address, ONE_ETH);
     await erc20.approve(await this.token.getAddress(), HALF_ETH);
-    await expect(this.token.mint(addrs[0].address, 1)).to.be.revertedWithCustomError(
+    await expect(this.token.mint(addrs[0].address, 1n)).to.be.revertedWithCustomError(
       erc20,
       'ERC20InsufficientAllowance',
     );
   });
 
   it('cannot mint 0 units', async function () {
-    await expect(this.token.mint(addrs[0].address, 0)).to.be.revertedWithCustomError(
+    await expect(this.token.mint(addrs[0].address, 0n)).to.be.revertedWithCustomError(
       this.token,
       'RMRKMintZero',
     );
   });
 
   it('cannot mint over max supply', async function () {
-    await expect(this.token.mint(addrs[0].address, 99999)).to.be.revertedWithCustomError(
+    await expect(this.token.mint(addrs[0].address, 99999n)).to.be.revertedWithCustomError(
       this.token,
       'RMRKMintOverMax',
     );
