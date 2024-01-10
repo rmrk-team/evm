@@ -124,7 +124,7 @@ describe('NestableMock transfer hooks', function () {
       true,
       '0x',
     );
-    expect(await child.balancePerNftOf(await parent.getAddress(), parentId)).to.eql(bn(0));
+    expect(await child.balancePerNftOf(await parent.getAddress(), parentId)).to.eql(0n);
     expect(await child.balancePerNftOf(await otherOwner.getAddress(), 0)).to.eql(bn(1));
 
     // Nest again
@@ -139,13 +139,13 @@ describe('NestableMock transfer hooks', function () {
       );
 
     expect(await child.balancePerNftOf(await parent.getAddress(), parentId)).to.eql(bn(1));
-    expect(await child.balancePerNftOf(await otherOwner.getAddress(), 0)).to.eql(bn(0));
+    expect(await child.balancePerNftOf(await otherOwner.getAddress(), 0)).to.eql(0n);
 
     await parent.acceptChild(parentId, 0, await child.getAddress(), childId);
 
     await parent['burn(uint256,uint256)'](parentId, 1);
-    expect(await parent.balancePerNftOf(await owner.getAddress(), 0)).to.eql(bn(0));
-    expect(await child.balancePerNftOf(await parent.getAddress(), parentId)).to.eql(bn(0));
-    expect(await child.balancePerNftOf(await otherOwner.getAddress(), 0)).to.eql(bn(0));
+    expect(await parent.balancePerNftOf(await owner.getAddress(), 0)).to.eql(0n);
+    expect(await child.balancePerNftOf(await parent.getAddress(), parentId)).to.eql(0n);
+    expect(await child.balancePerNftOf(await otherOwner.getAddress(), 0)).to.eql(0n);
   });
 });

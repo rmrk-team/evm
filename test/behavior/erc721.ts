@@ -3,6 +3,7 @@ import { ethers } from 'hardhat';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { Contract, ContractTransaction } from 'ethers';
 import { bn } from '../utils';
+import { RMRKNestableLazyMintErc20 } from '../../typechain-types';
 
 // Based on https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/test/token/ERC721/ERC721.behavior.js
 
@@ -58,7 +59,7 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
 
       context('when the given address does not own any tokens', function () {
         it('returns 0', async function () {
-          expect(await this.token.balanceOf(others[0].address)).to.eql(bn(0));
+          expect(await this.token.balanceOf(others[0].address)).to.eql(0n);
         });
       });
 
@@ -225,7 +226,7 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
         context('when the sender is not authorized for the token id', function () {
           it('reverts', async function () {
             // Standard ERC721 will use the latter. Every Nestable would have it defined and use it instead
-            const error = this.token.interface.errors['RMRKNotApprovedOrDirectOwner()']
+            const error = this.token.interface.getError('RMRKNotApprovedOrDirectOwner()')
               ? 'RMRKNotApprovedOrDirectOwner'
               : 'ERC721NotApprovedOrOwner';
             await expect(

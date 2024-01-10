@@ -173,7 +173,7 @@ describe('Advanced Equip Render Utils', async function () {
 
       expect(
         await kanaria.getEquipment(kanariaId, await catalog.getAddress(), slotIdGemLeft),
-      ).to.eql([bn(0), bn(0), bn(0), ADDRESS_ZERO]);
+      ).to.eql([0n, 0n, 0n, ADDRESS_ZERO]);
       expect(
         await kanaria.getEquipment(kanariaId, await catalog.getAddress(), slotIdGemMid),
       ).to.eql([bn(assetForKanariaFull), bn(assetForGemAMid), gemId2, await gem.getAddress()]);
@@ -198,7 +198,7 @@ describe('Advanced Equip Render Utils', async function () {
 
       expect(
         await kanaria.getEquipment(kanariaId, await catalog.getAddress(), slotIdGemLeft),
-      ).to.eql([bn(0), bn(0), bn(0), ADDRESS_ZERO]);
+      ).to.eql([0n, 0n, 0n, ADDRESS_ZERO]);
     });
 
     it('can use bulk with only equip operations', async function () {
@@ -383,7 +383,7 @@ describe('Advanced Equip Render Utils', async function () {
 
       expect(
         await kanaria.getEquipment(kanariaId, await catalog.getAddress(), slotIdGemLeft),
-      ).to.eql([bn(0), bn(0), bn(0), ADDRESS_ZERO]);
+      ).to.eql([0n, 0n, 0n, ADDRESS_ZERO]);
       expect(
         await kanaria.getEquipment(kanariaId, await catalog.getAddress(), slotIdGemMid),
       ).to.eql([bn(assetForKanariaFull), bn(assetForGemAMid), gemId2, await gem.getAddress()]);
@@ -407,7 +407,7 @@ describe('Advanced Equip Render Utils', async function () {
 
       expect(
         await kanaria.getEquipment(kanariaId, await catalog.getAddress(), slotIdGemLeft),
-      ).to.eql([bn(0), bn(0), bn(0), ADDRESS_ZERO]);
+      ).to.eql([0n, 0n, 0n, ADDRESS_ZERO]);
     });
 
     it('can use bulk with only equip operations', async function () {

@@ -145,10 +145,10 @@ async function shouldBehaveLikeMultiAsset(
           .withArgs(tokenId, resId3, resId2);
 
         expect(await this.token.getActiveAssets(tokenId)).to.be.eql([resId, resId3]);
-        expect(await this.token.getActiveAssetPriorities(tokenId)).to.be.eql([bn(0), bn(1)]);
+        expect(await this.token.getActiveAssetPriorities(tokenId)).to.be.eql([0n, bn(1)]);
 
         // Replacements should be gone
-        expect(await this.token.getAssetReplacements(tokenId, resId3)).to.eql(bn(0));
+        expect(await this.token.getAssetReplacements(tokenId, resId3)).to.eql(0n);
       });
 
       it('can replace non existing asset to token, it could have been deleted', async function () {
@@ -158,7 +158,7 @@ async function shouldBehaveLikeMultiAsset(
         await this.token.connect(tokenOwner).acceptAsset(tokenId, 0, resId);
 
         expect(await this.token.getActiveAssets(tokenId)).to.be.eql([resId]);
-        expect(await this.token.getActiveAssetPriorities(tokenId)).to.be.eql([bn(0)]);
+        expect(await this.token.getActiveAssetPriorities(tokenId)).to.be.eql([0n]);
       });
 
       it('can reject asset and replacements are cleared', async function () {
@@ -170,7 +170,7 @@ async function shouldBehaveLikeMultiAsset(
         await addAssetToTokenFunc(this.token, tokenId, resId2, resId);
         await this.token.connect(tokenOwner).rejectAsset(tokenId, 0, resId2);
 
-        expect(await this.token.getAssetReplacements(tokenId, resId2)).to.eql(bn(0));
+        expect(await this.token.getAssetReplacements(tokenId, resId2)).to.eql(0n);
       });
 
       it('can reject all assets and replacements are cleared', async function () {
@@ -182,7 +182,7 @@ async function shouldBehaveLikeMultiAsset(
         await addAssetToTokenFunc(this.token, tokenId, resId2, resId);
         await this.token.connect(tokenOwner).rejectAllAssets(tokenId, 1);
 
-        expect(await this.token.getAssetReplacements(tokenId, resId2)).to.eql(bn(0));
+        expect(await this.token.getAssetReplacements(tokenId, resId2)).to.eql(0n);
       });
     });
   });
@@ -207,8 +207,8 @@ async function shouldBehaveLikeMultiAsset(
         expect(
           await this.renderUtils.getPendingAssets(await this.token.getAddress(), tokenId),
         ).to.eql([
-          [resId1, bn(0), bn(0), resData1],
-          [resId2, bn(1), bn(0), resData2],
+          [resId1, 0n, 0n, resData1],
+          [resId2, bn(1), 0n, resData2],
         ]);
 
         await expect(this.token.connect(tokenOwner).acceptAsset(tokenId, 0, resId1))
@@ -217,7 +217,7 @@ async function shouldBehaveLikeMultiAsset(
 
         expect(
           await this.renderUtils.getPendingAssets(await this.token.getAddress(), tokenId),
-        ).to.eql([[resId2, bn(0), bn(0), resData2]]);
+        ).to.eql([[resId2, 0n, 0n, resData2]]);
         expect(await this.token.getActiveAssets(tokenId)).to.be.eql([resId1]);
         expect(await this.token.getAssetMetadata(tokenId, resId1)).equal(resData1);
       });
@@ -384,12 +384,12 @@ async function shouldBehaveLikeMultiAsset(
 
       describe('Priorities', async function () {
         it('can set and get priorities', async function () {
-          expect(await this.token.getActiveAssetPriorities(tokenId)).to.be.eql([bn(0), bn(1)]);
+          expect(await this.token.getActiveAssetPriorities(tokenId)).to.be.eql([0n, bn(1)]);
 
           await expect(this.token.connect(tokenOwner).setPriority(tokenId, [1, 0]))
             .to.emit(this.token, 'AssetPrioritySet')
             .withArgs(tokenId);
-          expect(await this.token.getActiveAssetPriorities(tokenId)).to.be.eql([bn(1), bn(0)]);
+          expect(await this.token.getActiveAssetPriorities(tokenId)).to.be.eql([bn(1), 0n]);
         });
 
         it('can set and get priorities if approved', async function () {
@@ -400,7 +400,7 @@ async function shouldBehaveLikeMultiAsset(
           await expect(this.token.connect(approved).setPriority(tokenId, [1, 0]))
             .to.emit(this.token, 'AssetPrioritySet')
             .withArgs(tokenId);
-          expect(await this.token.getActiveAssetPriorities(tokenId)).to.be.eql([bn(1), bn(0)]);
+          expect(await this.token.getActiveAssetPriorities(tokenId)).to.be.eql([bn(1), 0n]);
         });
 
         it('can set and get priorities if approved for all', async function () {
@@ -408,11 +408,11 @@ async function shouldBehaveLikeMultiAsset(
             .connect(tokenOwner)
             .setApprovalForAllForAssets(await operator.getAddress(), true);
 
-          expect(await this.token.getActiveAssetPriorities(tokenId)).to.be.eql([bn(0), bn(1)]);
+          expect(await this.token.getActiveAssetPriorities(tokenId)).to.be.eql([0n, bn(1)]);
           await expect(this.token.connect(operator).setPriority(tokenId, [1, 0]))
             .to.emit(this.token, 'AssetPrioritySet')
             .withArgs(tokenId);
-          expect(await this.token.getActiveAssetPriorities(tokenId)).to.be.eql([bn(1), bn(0)]);
+          expect(await this.token.getActiveAssetPriorities(tokenId)).to.be.eql([bn(1), 0n]);
         });
 
         it('cannot set priorities for non owned token', async function () {

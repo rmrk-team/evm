@@ -168,7 +168,7 @@ async function setupContextForSlots(
   }
 
   async function addAssetsToWeapon(): Promise<void> {
-    const equippableGroupId = 1; // Assets to equip will both use this
+    const equippableGroupId = 1n; // Assets to equip will both use this
 
     for (let i = 0; i < weaponAssetsFull.length; i++) {
       await weapon.addEquippableAssetEntry(
@@ -211,7 +211,7 @@ async function setupContextForSlots(
   }
 
   async function addAssetsToWeaponGem(): Promise<void> {
-    const equippableGroupId = 1; // Assets to equip will use this
+    const equippableGroupId = 1n; // Assets to equip will use this
     await weaponGem.addEquippableAssetEntry(
       weaponGemAssetFull,
       0, // Not meant to equip
@@ -242,7 +242,7 @@ async function setupContextForSlots(
   }
 
   async function addAssetsToBackground(): Promise<void> {
-    const equippableGroupId = 1; // Assets to equip will use this
+    const equippableGroupId = 1n; // Assets to equip will use this
     await background.addEquippableAssetEntry(
       backgroundAssetId,
       equippableGroupId,

@@ -40,11 +40,7 @@ async function shouldBehaveLikeNestable(
     it('can mint with no destination', async function () {
       const tokenId = await mint(child, await tokenOwner.getAddress());
       expect(await child.ownerOf(tokenId)).to.equal(await tokenOwner.getAddress());
-      expect(await child.directOwnerOf(tokenId)).to.eql([
-        await tokenOwner.getAddress(),
-        bn(0),
-        false,
-      ]);
+      expect(await child.directOwnerOf(tokenId)).to.eql([await tokenOwner.getAddress(), 0n, false]);
     });
 
     it('has right owners', async function () {
@@ -75,7 +71,7 @@ async function shouldBehaveLikeNestable(
 
     it('cannot nest mint to a non-contract destination', async function () {
       await expect(
-        nestMint(child, await tokenOwner.getAddress(), bn(0)),
+        nestMint(child, await tokenOwner.getAddress(), 0n),
       ).to.be.revertedWithCustomError(child, 'RMRKIsNotContract');
     });
 
@@ -125,7 +121,7 @@ async function shouldBehaveLikeNestable(
       // RMRK owner is an address for the parent
       expect(await parent.directOwnerOf(parentId)).to.eql([
         await tokenOwner.getAddress(),
-        bn(0),
+        0n,
         false,
       ]);
       // RMRK owner is a contract for the child
@@ -699,11 +695,7 @@ async function shouldBehaveLikeNestable(
 
       // New owner of child
       expect(await child.ownerOf(childId)).to.eql(await tokenOwner.getAddress());
-      expect(await child.directOwnerOf(childId)).to.eql([
-        await tokenOwner.getAddress(),
-        bn(0),
-        false,
-      ]);
+      expect(await child.directOwnerOf(childId)).to.eql([await tokenOwner.getAddress(), 0n, false]);
 
       // Grandchild is still owned by child
       expect(await child.ownerOf(grandchildId)).to.eql(await tokenOwner.getAddress());
@@ -739,7 +731,7 @@ async function shouldBehaveLikeNestable(
         rootOwnerAddress = await tokenOwner.getAddress();
       }
       expect(await child.ownerOf(childId)).to.eql(rootOwnerAddress);
-      expect(await child.directOwnerOf(childId)).to.eql([rootOwnerAddress, bn(0), false]);
+      expect(await child.directOwnerOf(childId)).to.eql([rootOwnerAddress, 0n, false]);
 
       // Transferring updates balances downstream
       expect(await child.balanceOf(rootOwnerAddress)).to.equal(1);
@@ -927,11 +919,7 @@ async function shouldBehaveLikeNestable(
 
       // New owner of child
       expect(await child.ownerOf(childId)).to.eql(await tokenOwner.getAddress());
-      expect(await child.directOwnerOf(childId)).to.eql([
-        await tokenOwner.getAddress(),
-        bn(0),
-        false,
-      ]);
+      expect(await child.directOwnerOf(childId)).to.eql([await tokenOwner.getAddress(), 0n, false]);
 
       // Grandchild is still owned by child
       expect(await child.ownerOf(grandchildId)).to.eql(await tokenOwner.getAddress());
@@ -967,7 +955,7 @@ async function shouldBehaveLikeNestable(
         rootOwnerAddress = await tokenOwner.getAddress();
       }
       expect(await child.ownerOf(childId)).to.eql(rootOwnerAddress);
-      expect(await child.directOwnerOf(childId)).to.eql([rootOwnerAddress, bn(0), false]);
+      expect(await child.directOwnerOf(childId)).to.eql([rootOwnerAddress, 0n, false]);
 
       // transferring updates balances downstream
       expect(await child.balanceOf(rootOwnerAddress)).to.equal(1);
@@ -1030,11 +1018,7 @@ async function shouldBehaveLikeNestable(
       expect(await parent.balanceOf(await newOwner.getAddress())).to.equal(1);
 
       expect(await parent.ownerOf(parentId)).to.eql(await newOwner.getAddress());
-      expect(await parent.directOwnerOf(parentId)).to.eql([
-        await newOwner.getAddress(),
-        bn(0),
-        false,
-      ]);
+      expect(await parent.directOwnerOf(parentId)).to.eql([await newOwner.getAddress(), 0n, false]);
 
       // New owner of child
       expect(await child.ownerOf(childId)).to.eql(await newOwner.getAddress());

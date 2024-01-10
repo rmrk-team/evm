@@ -9,7 +9,7 @@ async function shouldHaveRoyalties(
   it('can get royalty data', async function () {
     const owner = (await ethers.getSigners())[0];
     const tokenId = await mint(this.token, await owner.getAddress());
-    expect(await this.token.royaltyInfo(tokenId, ONE_ETH.mul(10))).to.eql([ADDRESS_ZERO, ONE_ETH]);
+    expect(await this.token.royaltyInfo(tokenId, ONE_ETH * 10n)).to.eql([ADDRESS_ZERO, ONE_ETH]);
   });
 
   it('can get royalty receipient and % in basis points', async function () {

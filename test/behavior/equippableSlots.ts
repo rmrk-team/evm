@@ -237,7 +237,7 @@ async function shouldBehaveLikeEquippableWithSlots(
     });
 
     it('cannot set a valid equippable group with part id 0', async function () {
-      const equippableGroupId = 1;
+      const equippableGroupId = 1n;
       const partId = 0;
       // The malicious child indicates it can be equipped into soldier:
       await expect(
@@ -610,7 +610,7 @@ async function shouldBehaveLikeEquippableWithSlots(
       const expectedFixedParts = [
         [
           bn(partIdForBody), // partId
-          1, // z
+          1n, // z
           'genericBody.png', // metadataURI
         ],
       ];
@@ -618,7 +618,7 @@ async function shouldBehaveLikeEquippableWithSlots(
         [
           bn(partIdForWeapon), // partId
           bn(weaponAssetsEquip[0]), // childAssetId
-          2, // z
+          2n, // z
           await weapon.getAddress(), // childAddress
           weaponsIds[0], // childTokenId
           'ipfs:weapon/equip/5', // childAssetMetadata
@@ -627,10 +627,10 @@ async function shouldBehaveLikeEquippableWithSlots(
         [
           // Nothing on equipped on background slot:
           bn(partIdForBackground), // partId
-          bn(0), // childAssetId
-          0, // z
+          0n, // childAssetId
+          0n, // z
           ethers.ZeroAddress, // childAddress
-          bn(0), // childTokenId
+          0n, // childTokenId
           '', // childAssetMetadata
           'noBackground.png', // partMetadata
         ],
@@ -642,7 +642,7 @@ async function shouldBehaveLikeEquippableWithSlots(
       );
       expect(allAssets).to.eql([
         'ipfs:soldier/', // metadataURI
-        bn(0), // equippableGroupId
+        0n, // equippableGroupId
         await catalog.getAddress(), // catalogAddress
         expectedFixedParts,
         expectedSlotParts,
@@ -683,8 +683,8 @@ async function shouldBehaveLikeEquippableWithSlots(
       [
         expectedSlots,
         [
-          [bn(0), bn(0), bn(0), ethers.ZeroAddress],
-          [bn(0), bn(0), bn(0), ethers.ZeroAddress],
+          [0n, 0n, 0n, ethers.ZeroAddress],
+          [0n, 0n, 0n, ethers.ZeroAddress],
         ],
         ['', ''],
       ],
@@ -708,7 +708,7 @@ async function shouldBehaveLikeEquippableWithSlots(
     // If a slot has nothing equipped, it returns an empty equip:
     const expectedEquips = [
       [bn(soldierResId), bn(weaponResId), weaponsIds[0], await weapon.getAddress()],
-      [bn(0), bn(0), bn(0), ethers.ZeroAddress],
+      [0n, 0n, 0n, ethers.ZeroAddress],
     ];
     const expectedMetadata = ['ipfs:weapon/equip/5', ''];
     expect(await view.getEquipped(await soldier.getAddress(), soldiersIds[0], soldierResId)).to.eql(
@@ -736,8 +736,8 @@ async function shouldBehaveLikeEquippableWithSlots(
     const expectedSlots = [bn(partIdForWeapon), bn(partIdForBackground)];
     // If a slot has nothing equipped, it returns an empty equip:
     const expectedEquips = [
-      [bn(0), bn(0), bn(0), ethers.ZeroAddress],
-      [bn(0), bn(0), bn(0), ethers.ZeroAddress],
+      [0n, 0n, 0n, ethers.ZeroAddress],
+      [0n, 0n, 0n, ethers.ZeroAddress],
     ];
     const expectedMetadata = ['', ''];
     expect(await view.getEquipped(await soldier.getAddress(), soldiersIds[0], soldierResId)).to.eql(

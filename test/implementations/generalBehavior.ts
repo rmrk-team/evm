@@ -742,10 +742,10 @@ async function testEquippableBehavior(mintingType: MintingType) {
   describe('Equippable Behavior', async function () {
     it('can add equippable assets', async function () {
       await mint(await holder.getAddress(), contract, owner, rmrkERC20, mintingType);
-      const equippableGroupId = 1;
+      const equippableGroupId = 1n;
       const catalogAddress = await rmrkERC20.getAddress(); // Could be any address
       const metadataURI = 'ipfs://asset-metadata';
-      const partIds = [1, 2, 3];
+      const partIds = [1n, 2n, 3n];
       await contract.addEquippableAssetEntry(
         equippableGroupId,
         catalogAddress,
@@ -765,8 +765,8 @@ async function testEquippableBehavior(mintingType: MintingType) {
     });
 
     it('can set valid parent for equippable group', async function () {
-      const equippableGroupId = 1;
-      const partId = 10;
+      const equippableGroupId = 1n;
+      const partId = 10n;
       await expect(
         contract.setValidParentForEquippableGroup(
           equippableGroupId,
@@ -792,7 +792,7 @@ async function testEquippableBehavior(mintingType: MintingType) {
     });
 
     it('cannot set valid parent for equippable group if not owner or contributor', async function () {
-      const equippableGroupId = 1;
+      const equippableGroupId = 1n;
       const partId = 10;
       await expect(
         contract
