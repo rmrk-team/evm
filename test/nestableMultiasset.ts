@@ -1,6 +1,5 @@
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
-import { Contract } from 'ethers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import {
@@ -27,13 +26,16 @@ async function singleFixture(): Promise<{
   await renderUtils.waitForDeployment();
 
   const token = <RMRKNestableMultiAssetMock>(
-    await singleFixtureWithArgs('RMRKNestableMultiAssetMock', [])
+    (<unknown>await singleFixtureWithArgs('RMRKNestableMultiAssetMock', []))
   );
   return { token, renderUtils };
 }
 
-async function parentChildFixture(): Promise<{ parent: Contract; child: Contract }> {
-  return parentChildFixtureWithArgs('RMRKNestableMultiAssetMock', [], []);
+async function parentChildFixture(): Promise<{
+  parent: RMRKNestableMultiAssetMock;
+  child: RMRKNestableMultiAssetMock;
+}> {
+  return await parentChildFixtureWithArgs('RMRKNestableMultiAssetMock', [], []);
 }
 
 describe('NestableMultiAssetMock Nestable Behavior', function () {
@@ -62,7 +64,7 @@ describe('NestableMultiAssetMock ERC721 behavior', function () {
   beforeEach(async function () {
     ({ token } = await loadFixture(singleFixture));
     this.token = token;
-    this.ERC721Receiver = await ethers.getContractFactory('ERC721ReceiverMock');
+    this.receiverFactory = await ethers.getContractFactory('ERC721ReceiverMock');
   });
 
   shouldBehaveLikeERC721('NestableMultiAsset', 'NMA');

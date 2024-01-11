@@ -1,10 +1,10 @@
 import { ethers } from 'hardhat';
-import { Contract } from 'ethers';
 
 import shouldBehaveLikeOwnableLock from './behavior/ownableLock';
+import { OwnableLockMock } from '../typechain-types';
 
 describe('Ownable Lock', async () => {
-  let token: Contract;
+  let token: OwnableLockMock;
 
   const ismock = true;
 

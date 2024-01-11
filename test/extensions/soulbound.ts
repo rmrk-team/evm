@@ -1,4 +1,3 @@
-import { Contract } from 'ethers';
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { loadFixture, mine } from '@nomicfoundation/hardhat-network-helpers';
@@ -8,8 +7,18 @@ import { IERC165, IERC6454, IOtherInterface } from '../interfaces';
 import {
   RMRKSoulboundAfterBlockNumberMock,
   RMRKSoulboundAfterTransactionsMock,
+  RMRKSoulboundEquippableMock,
+  RMRKSoulboundMultiAssetMock,
+  RMRKSoulboundNestableMock,
+  RMRKSoulboundNestableMultiAssetMock,
   RMRKSoulboundPerTokenMock,
 } from '../../typechain-types';
+
+type GenericSoulboundNestable =
+  | RMRKSoulboundNestableMock
+  | RMRKSoulboundNestableMultiAssetMock
+  | RMRKSoulboundEquippableMock;
+type GenericSoulbound = GenericSoulboundNestable | RMRKSoulboundMultiAssetMock;
 
 // --------------- FIXTURES -----------------------
 
@@ -206,7 +215,7 @@ describe('RMRKSoulbound variants', async function () {
 });
 
 async function shouldBehaveLikeSoulboundBasic() {
-  let soulbound: Contract;
+  let soulbound: GenericSoulbound;
   let owner: SignerWithAddress;
   let otherOwner: SignerWithAddress;
   let tokenId: bigint;
@@ -239,7 +248,7 @@ async function shouldBehaveLikeSoulboundBasic() {
   });
 
   it('can burn', async function () {
-    await soulbound.connect(owner)['burn(uint256)'](tokenId);
+    await (<GenericSoulboundNestable>soulbound).connect(owner)['burn(uint256)'](tokenId);
     await expect(soulbound.ownerOf(tokenId)).to.be.revertedWithCustomError(
       soulbound,
       'ERC721InvalidTokenId',
@@ -248,7 +257,7 @@ async function shouldBehaveLikeSoulboundBasic() {
 }
 
 async function shouldBehaveLikeSoulboundNestable() {
-  let soulbound: Contract;
+  let soulbound: GenericSoulboundNestable;
   let owner: SignerWithAddress;
   let tokenId: bigint;
 

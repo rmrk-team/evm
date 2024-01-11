@@ -31,8 +31,8 @@ describe('RMRKNestableClaimableChildMock', async function () {
 async function shouldBehaveLikeReclaimableChild() {
   let addrs: SignerWithAddress[];
   let tokenOwner: SignerWithAddress;
-  let parentId: number;
-  let childId: number;
+  let parentId: bigint;
+  let childId: bigint;
 
   beforeEach(async function () {
     addrs = await ethers.getSigners();

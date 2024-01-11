@@ -1,11 +1,11 @@
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
-import { Contract } from 'ethers';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { IOtherInterface, IERC165, IRMRKCatalog } from '../interfaces';
+import { RMRKCatalogImpl } from '../../typechain-types';
 
 async function shouldBehaveLikeCatalog(contractName: string, metadataURI: string, type: string) {
-  let testCatalog: Contract;
+  let testCatalog: RMRKCatalogImpl;
 
   let addrs: SignerWithAddress[];
   const metadataUriDefault = 'src';
@@ -33,7 +33,7 @@ async function shouldBehaveLikeCatalog(contractName: string, metadataURI: string
     addrs = signersAddr;
 
     const Catalog = await ethers.getContractFactory(contractName);
-    testCatalog = await Catalog.deploy(metadataURI, type);
+    testCatalog = <RMRKCatalogImpl>await Catalog.deploy(metadataURI, type);
     await testCatalog.waitForDeployment();
   });
 

@@ -1,7 +1,6 @@
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { expect } from 'chai';
-import { Contract } from 'ethers';
 import { ethers } from 'hardhat';
 import {
   ADDRESS_ZERO,
@@ -13,49 +12,64 @@ import {
 import {
   RMRKEquippableLazyMintNative,
   RMRKMultiAssetLazyMintNative,
-  RMRKMultiAssetLazyMintNative,
   RMRKNestableLazyMintNative,
   RMRKNestableMultiAssetLazyMintNative,
 } from '../../typechain-types';
 
-async function multiAssetFixture(): Promise<Contract> {
-  return await singleFixtureWithArgs('RMRKMultiAssetLazyMintNative', [
-    'MultiAsset',
-    'MA',
-    'ipfs://collection-meta',
-    'ipfs://tokenURI',
-    [ADDRESS_ZERO, 1000, 10000, ONE_ETH],
-  ]);
+async function multiAssetFixture(): Promise<RMRKMultiAssetLazyMintNative> {
+  return <RMRKMultiAssetLazyMintNative>(
+    (<unknown>(
+      await singleFixtureWithArgs('RMRKMultiAssetLazyMintNative', [
+        'MultiAsset',
+        'MA',
+        'ipfs://collection-meta',
+        'ipfs://tokenURI',
+        [ADDRESS_ZERO, 1000, 10000, ONE_ETH],
+      ])
+    ))
+  );
 }
 
-async function nestableFixture(): Promise<Contract> {
-  return await singleFixtureWithArgs('RMRKNestableLazyMintNative', [
-    'Nestable',
-    'N',
-    'ipfs://collection-meta',
-    'ipfs://tokenURI',
-    [ADDRESS_ZERO, 1000, 10000, ONE_ETH],
-  ]);
+async function nestableFixture(): Promise<RMRKNestableLazyMintNative> {
+  return <RMRKNestableLazyMintNative>(
+    (<unknown>(
+      await singleFixtureWithArgs('RMRKNestableLazyMintNative', [
+        'Nestable',
+        'N',
+        'ipfs://collection-meta',
+        'ipfs://tokenURI',
+        [ADDRESS_ZERO, 1000, 10000, ONE_ETH],
+      ])
+    ))
+  );
 }
 
-async function nestableMultiAssetFixture(): Promise<Contract> {
-  return await singleFixtureWithArgs('RMRKNestableMultiAssetLazyMintNative', [
-    'MultiAsset',
-    'NMA',
-    'ipfs://collection-meta',
-    'ipfs://tokenURI',
-    [ADDRESS_ZERO, 1000, 10000, ONE_ETH],
-  ]);
+async function nestableMultiAssetFixture(): Promise<RMRKNestableMultiAssetLazyMintNative> {
+  return <RMRKNestableMultiAssetLazyMintNative>(
+    (<unknown>(
+      await singleFixtureWithArgs('RMRKNestableMultiAssetLazyMintNative', [
+        'MultiAsset',
+        'NMA',
+        'ipfs://collection-meta',
+        'ipfs://tokenURI',
+        [ADDRESS_ZERO, 1000, 10000, ONE_ETH],
+      ])
+    ))
+  );
 }
 
-async function equippableFixture(): Promise<Contract> {
-  return await singleFixtureWithArgs('RMRKEquippableLazyMintNative', [
-    'Equippable',
-    'EQ',
-    'ipfs://collection-meta',
-    'ipfs://tokenURI',
-    [ADDRESS_ZERO, 1000, 10000, ONE_ETH],
-  ]);
+async function equippableFixture(): Promise<RMRKEquippableLazyMintNative> {
+  return <RMRKEquippableLazyMintNative>(
+    (<unknown>(
+      await singleFixtureWithArgs('RMRKEquippableLazyMintNative', [
+        'Equippable',
+        'EQ',
+        'ipfs://collection-meta',
+        'ipfs://tokenURI',
+        [ADDRESS_ZERO, 1000, 10000, ONE_ETH],
+      ])
+    ))
+  );
 }
 
 describe('MultiAssetNativeTokenPay Minting', async () => {
@@ -134,14 +148,14 @@ async function shouldControlValidMintingNativeTokenPay(): Promise<void> {
   it('reduces total supply on burn', async function () {
     const tokenId = await mintFromNativeToken(token, addrs[0].address);
     expect(await token.totalSupply()).to.equal(1);
-    await token.connect(addrs[0])['burn(uint256)'](tokenId);
+    await (<RMRKNestableLazyMintNative>token).connect(addrs[0])['burn(uint256)'](tokenId);
 
     expect(await token.totalSupply()).to.equal(0);
   });
 
   it('reduces total supply on burn and does not reuse ID', async function () {
     const tokenId = await mintFromNativeToken(token, addrs[0].address);
-    await token.connect(addrs[0])['burn(uint256)'](tokenId);
+    await (<RMRKNestableLazyMintNative>token).connect(addrs[0])['burn(uint256)'](tokenId);
 
     const newTokenId = await mintFromNativeToken(token, addrs[0].address);
     expect(newTokenId).to.equal(tokenId + 1n);
@@ -158,21 +172,25 @@ async function shouldControlValidMintingNativeTokenPay(): Promise<void> {
     let parentId: bigint;
 
     beforeEach(async function () {
-      if (token.nestMint === undefined) {
+      if ((<RMRKNestableLazyMintNative>token).nestMint === undefined) {
         this.skip();
       }
       parentId = await mintFromNativeToken(token, addrs[0].address);
     });
 
     it('can nest mint tokens through sale logic', async function () {
-      const childId = await nestMintFromNativeToken(token, await token.getAddress(), parentId);
+      const childId = await nestMintFromNativeToken(
+        <RMRKNestableLazyMintNative>token,
+        await token.getAddress(),
+        parentId,
+      );
       expect(await token.ownerOf(childId)).to.equal(addrs[0].address);
       expect(await token.totalSupply()).to.equal(2);
     });
 
     it('cannot nest mint over max supply', async function () {
       await expect(
-        token.nestMint(await token.getAddress(), 99999, 1),
+        (<RMRKNestableLazyMintNative>token).nestMint(await token.getAddress(), 99999, 1),
       ).to.be.revertedWithCustomError(token, 'RMRKMintOverMax');
     });
   });

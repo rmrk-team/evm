@@ -1,15 +1,15 @@
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
-import { Contract } from 'ethers';
 import { ADDRESS_ZERO, bn } from '../utils';
 import { IERC165, IERC6220, IOtherInterface } from '../interfaces';
+import { RMRKEquippableMock } from '../../typechain-types';
 
 async function shouldBehaveLikeEquippableAssets(
-  mint: (token: Contract, to: string) => Promise<bigint>,
+  mint: (token: RMRKEquippableMock, to: string) => Promise<bigint>,
 ) {
-  let chunky: Contract;
-  let chunkyEquip: Contract;
+  let chunky: RMRKEquippableMock;
+  let chunkyEquip: RMRKEquippableMock;
 
   let owner: SignerWithAddress;
   let addrs: SignerWithAddress[];

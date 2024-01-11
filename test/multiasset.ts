@@ -22,7 +22,9 @@ async function singleFixture(): Promise<{
   const renderUtils = await renderUtilsFactory.deploy();
   await renderUtils.waitForDeployment();
 
-  const token = <RMRKMultiAssetMock>await singleFixtureWithArgs('RMRKMultiAssetMock', []);
+  const token = <RMRKMultiAssetMock>(
+    (<unknown>await singleFixtureWithArgs('RMRKMultiAssetMock', []))
+  );
   return { token, renderUtils };
 }
 
@@ -49,9 +51,10 @@ describe('MultiAssetMock Other Behavior', async function () {
 
   describe('Minting', async function () {
     it('cannot mint id 0', async function () {
-      await expect(
-        token['mint(address,uint256)'](addrs[0].address, 0),
-      ).to.be.revertedWithCustomError(token, 'RMRKIdZeroForbidden');
+      await expect(token.mint(addrs[0].address, 0)).to.be.revertedWithCustomError(
+        token,
+        'RMRKIdZeroForbidden',
+      );
     });
   });
 
@@ -252,7 +255,7 @@ describe('RMRKMultiAssetMock ERC721 behavior', function () {
   beforeEach(async function () {
     const { token } = await loadFixture(singleFixture);
     this.token = token;
-    this.ERC721Receiver = await ethers.getContractFactory('ERC721ReceiverMock');
+    this.receiverFactory = await ethers.getContractFactory('ERC721ReceiverMock');
   });
 
   shouldBehaveLikeERC721('RmrkTest', 'RMRKTST');

@@ -1,21 +1,20 @@
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
-import { Contract } from 'ethers';
-import { bn, ADDRESS_ZERO } from '../utils';
+import { bn, ADDRESS_ZERO, GenericNestMintable } from '../utils';
 import { IERC165, IERC721, IERC7401, IOtherInterface } from '../interfaces';
 
 async function shouldBehaveLikeNestable(
-  mint: (token: Contract, to: string) => Promise<bigint>,
-  nestMint: (token: Contract, to: string, parentId: bigint) => Promise<bigint>,
+  mint: (token: GenericNestMintable, to: string) => Promise<bigint>,
+  nestMint: (token: GenericNestMintable, to: string, parentId: bigint) => Promise<bigint>,
   transfer: (
-    token: Contract,
+    token: GenericNestMintable,
     caller: SignerWithAddress,
     to: string,
     tokenId: bigint,
   ) => Promise<void>,
   nestTransfer: (
-    token: Contract,
+    token: GenericNestMintable,
     caller: SignerWithAddress,
     to: string,
     tokenId: bigint,
@@ -24,8 +23,8 @@ async function shouldBehaveLikeNestable(
 ) {
   let addrs: SignerWithAddress[];
   let tokenOwner: SignerWithAddress;
-  let parent: Contract;
-  let child: Contract;
+  let parent: GenericNestMintable;
+  let child: GenericNestMintable;
 
   beforeEach(async function () {
     const [, signerTokenOwner, ...signersAddr] = await ethers.getSigners();
@@ -1210,7 +1209,7 @@ async function shouldBehaveLikeNestable(
   }
 
   async function checkAcceptedAndPendingChildren(
-    contract: Contract,
+    contract: GenericNestMintable,
     tokenId: bigint,
     expectedAccepted: any[],
     expectedPending: any[],
