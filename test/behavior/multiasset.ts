@@ -1,15 +1,18 @@
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
-import { Contract } from 'ethers';
-import { bn } from '../utils';
+import { GenericEquippable, GenericMintable, GenericMultiAsset, bn } from '../utils';
 import { IERC165, IOtherInterface, IERC5773 } from '../interfaces';
+import { RMRKEquippableMock, RMRKMinifiedEquippableMock } from '../../typechain-types';
 
 async function shouldBehaveLikeMultiAsset(
-  mint: (token: Contract, to: string) => Promise<bigint>,
-  addAssetEntryFunc: (token: Contract, data?: string) => Promise<bigint>,
+  mint: (token: GenericMintable, to: string) => Promise<bigint>,
+  addAssetEntryFunc: (
+    token: GenericMultiAsset | GenericEquippable | RMRKEquippableMock | RMRKMinifiedEquippableMock,
+    data?: string,
+  ) => Promise<bigint>,
   addAssetToTokenFunc: (
-    token: Contract,
+    token: GenericMultiAsset,
     tokenId: bigint,
     resId: bigint,
     replaces: bigint | number,

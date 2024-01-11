@@ -2,8 +2,8 @@ import { expect } from 'chai';
 import { ethers } from 'hardhat';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { Contract, ContractTransaction } from 'ethers';
-import { bn } from '../utils';
-import { RMRKNestableLazyMintErc20 } from '../../typechain-types';
+import { GenericSafeTransferable, GenericTransferable, bn } from '../utils';
+import { ERC721ReceiverMock, RMRKNestableLazyMintErc20 } from '../../typechain-types';
 
 // Based on https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/test/token/ERC721/ERC721.behavior.js
 
@@ -12,10 +12,10 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
   let approved: SignerWithAddress;
   let anotherApproved: SignerWithAddress;
   let operator: SignerWithAddress;
-  let toWhom: SignerWithAddress | Contract;
+  let toWhom: SignerWithAddress | ERC721ReceiverMock;
   let others: SignerWithAddress[];
   let receipt: ContractTransaction;
-  let receiver: Contract;
+  let receiver: ERC721ReceiverMock;
 
   const firstTokenId = bn(5042);
   const secondTokenId = bn(79217);
@@ -272,19 +272,19 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
 
       describe('via transferFrom', function () {
         shouldTransferTokensByUsers(function (
-          token: Contract,
+          token: GenericTransferable,
           from: string,
           to: string,
           tokenId: bigint,
           user: SignerWithAddress,
         ) {
-          return token.connect(user)['transferFrom(address,address,uint256)'](from, to, tokenId);
+          return token.connect(user).transferFrom(from, to, tokenId);
         });
       });
 
       describe('via safeTransferFrom', function () {
         const safeTransferFromWithData = function (
-          token: Contract,
+          token: GenericTransferable,
           from: string,
           to: string,
           tokenId: bigint,
@@ -296,7 +296,7 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
         };
 
         const safeTransferFromWithoutData = function (
-          token: Contract,
+          token: GenericTransferable,
           from: string,
           to: string,
           tokenId: bigint,
@@ -314,7 +314,7 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
 
           describe('to a valid receiver contract', function () {
             beforeEach(async function () {
-              receiver = await this.ERC721Receiver.deploy(RECEIVER_MAGIC_VALUE, Error.None);
+              receiver = await this.receiverFactory.deploy(RECEIVER_MAGIC_VALUE, Error.None);
               await receiver.waitForDeployment();
               toWhom = receiver;
             });
@@ -374,8 +374,8 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
 
         describe('to a receiver contract returning unexpected value', function () {
           it('reverts', async function () {
-            const ERC721Receiver = await ethers.getContractFactory('ERC721ReceiverMock');
-            const invalidReceiver = await ERC721Receiver.deploy(
+            const receiverFactory = await ethers.getContractFactory('ERC721ReceiverMock');
+            const invalidReceiver = await receiverFactory.deploy(
               ethers.zeroPadValue('0x42', 4),
               Error.None,
             );
@@ -392,8 +392,8 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
 
         describe('to a receiver contract that reverts with message', function () {
           it('reverts', async function () {
-            const ERC721Receiver = await ethers.getContractFactory('ERC721ReceiverMock');
-            const revertingReceiver = await ERC721Receiver.deploy(
+            const receiverFactory = await ethers.getContractFactory('ERC721ReceiverMock');
+            const revertingReceiver = await receiverFactory.deploy(
               ethers.zeroPadValue('0x42', 4),
               Error.RevertWithMessage,
             );
@@ -412,8 +412,8 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
 
         describe('to a receiver contract that reverts without message', function () {
           it('reverts', async function () {
-            const ERC721Receiver = await ethers.getContractFactory('ERC721ReceiverMock');
-            const revertingReceiver = await ERC721Receiver.deploy(
+            const receiverFactory = await ethers.getContractFactory('ERC721ReceiverMock');
+            const revertingReceiver = await receiverFactory.deploy(
               RECEIVER_MAGIC_VALUE,
               Error.RevertWithoutMessage,
             );
@@ -432,8 +432,8 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
 
         describe('to a receiver contract that panics', function () {
           it('reverts', async function () {
-            const ERC721Receiver = await ethers.getContractFactory('ERC721ReceiverMock');
-            const revertingReceiver = await ERC721Receiver.deploy(
+            const receiverFactory = await ethers.getContractFactory('ERC721ReceiverMock');
+            const revertingReceiver = await receiverFactory.deploy(
               RECEIVER_MAGIC_VALUE,
               Error.Panic,
             );
@@ -472,8 +472,8 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
       describe('via safeMint', function () {
         // regular minting is tested in ERC721Mintable.test.js and others
         it('calls onERC721Received — with data', async function () {
-          const ERC721Receiver = await ethers.getContractFactory('ERC721ReceiverMock');
-          receiver = await ERC721Receiver.deploy(RECEIVER_MAGIC_VALUE, Error.None);
+          const receiverFactory = await ethers.getContractFactory('ERC721ReceiverMock');
+          receiver = await receiverFactory.deploy(RECEIVER_MAGIC_VALUE, Error.None);
           await receiver.waitForDeployment();
           const receipt = await this.token['safeMint(address,uint256,bytes)'](
             await receiver.getAddress(),
@@ -487,8 +487,8 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
         });
 
         it('calls onERC721Received — without data', async function () {
-          const ERC721Receiver = await ethers.getContractFactory('ERC721ReceiverMock');
-          receiver = await ERC721Receiver.deploy(RECEIVER_MAGIC_VALUE, Error.None);
+          const receiverFactory = await ethers.getContractFactory('ERC721ReceiverMock');
+          receiver = await receiverFactory.deploy(RECEIVER_MAGIC_VALUE, Error.None);
           await receiver.waitForDeployment();
           const receipt = await this.token['safeMint(address,uint256)'](
             await receiver.getAddress(),
@@ -503,8 +503,8 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
 
       context('to a receiver contract returning unexpected value', function () {
         it('reverts', async function () {
-          const ERC721Receiver = await ethers.getContractFactory('ERC721ReceiverMock');
-          const invalidReceiver = await ERC721Receiver.deploy(
+          const receiverFactory = await ethers.getContractFactory('ERC721ReceiverMock');
+          const invalidReceiver = await receiverFactory.deploy(
             ethers.zeroPadValue('0x42', 4),
             Error.None,
           );
@@ -518,8 +518,8 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
 
       context('to a receiver contract that reverts with message', function () {
         it('reverts', async function () {
-          const ERC721Receiver = await ethers.getContractFactory('ERC721ReceiverMock');
-          const revertingReceiver = await ERC721Receiver.deploy(
+          const receiverFactory = await ethers.getContractFactory('ERC721ReceiverMock');
+          const revertingReceiver = await receiverFactory.deploy(
             ethers.zeroPadValue('0x42', 4),
             Error.RevertWithMessage,
           );
@@ -534,8 +534,8 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
 
       context('to a receiver contract that reverts without message', function () {
         it('reverts', async function () {
-          const ERC721Receiver = await ethers.getContractFactory('ERC721ReceiverMock');
-          const revertingReceiver = await ERC721Receiver.deploy(
+          const receiverFactory = await ethers.getContractFactory('ERC721ReceiverMock');
+          const revertingReceiver = await receiverFactory.deploy(
             RECEIVER_MAGIC_VALUE,
             Error.RevertWithoutMessage,
           );
@@ -550,8 +550,8 @@ async function shouldBehaveLikeERC721(name: string, symbol: string) {
 
       context('to a receiver contract that panics', function () {
         it('reverts', async function () {
-          const ERC721Receiver = await ethers.getContractFactory('ERC721ReceiverMock');
-          const revertingReceiver = await ERC721Receiver.deploy(RECEIVER_MAGIC_VALUE, Error.Panic);
+          const receiverFactory = await ethers.getContractFactory('ERC721ReceiverMock');
+          const revertingReceiver = await receiverFactory.deploy(RECEIVER_MAGIC_VALUE, Error.Panic);
           await revertingReceiver.waitForDeployment();
           await expect(
             this.token

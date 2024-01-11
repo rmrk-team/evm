@@ -1,52 +1,73 @@
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
-import { ADDRESS_ZERO, singleFixtureWithArgs } from '../utils';
-import { Contract } from 'ethers';
+import { ADDRESS_ZERO, getTokenIdFromTx, singleFixtureWithArgs } from '../utils';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
+import {
+  RMRKEquippablePreMint,
+  RMRKMultiAssetPreMint,
+  RMRKNestableMultiAssetPreMint,
+  RMRKNestablePreMint,
+} from '../../typechain-types';
 
-async function multiAssetFixture(): Promise<Contract> {
-  return await singleFixtureWithArgs('RMRKMultiAssetPreMint', [
-    'MultiAsset',
-    'MA',
-    'ipfs://collection-meta',
-    10000,
-    ADDRESS_ZERO,
-    0,
-  ]);
+async function multiAssetFixture(): Promise<RMRKMultiAssetPreMint> {
+  return <RMRKMultiAssetPreMint>(
+    (<unknown>(
+      await singleFixtureWithArgs('RMRKMultiAssetPreMint', [
+        'MultiAsset',
+        'MA',
+        'ipfs://collection-meta',
+        10000,
+        ADDRESS_ZERO,
+        0,
+      ])
+    ))
+  );
 }
 
-async function nestableFixture(): Promise<Contract> {
-  return await singleFixtureWithArgs('RMRKNestablePreMint', [
-    'Nestable',
-    'N',
-    'ipfs://collection-meta',
-    10000,
-    ADDRESS_ZERO,
-    0,
-  ]);
+async function nestableFixture(): Promise<RMRKNestablePreMint> {
+  return <RMRKNestablePreMint>(
+    (<unknown>(
+      await singleFixtureWithArgs('RMRKNestablePreMint', [
+        'Nestable',
+        'N',
+        'ipfs://collection-meta',
+        10000,
+        ADDRESS_ZERO,
+        0,
+      ])
+    ))
+  );
 }
 
-async function nestableMultiAssetFixture(): Promise<Contract> {
-  return await singleFixtureWithArgs('RMRKNestableMultiAssetPreMint', [
-    'NestableMultiAsset',
-    'NMA',
-    'ipfs://collection-meta',
-    10000,
-    ADDRESS_ZERO,
-    0,
-  ]);
+async function nestableMultiAssetFixture(): Promise<RMRKNestableMultiAssetPreMint> {
+  return <RMRKNestableMultiAssetPreMint>(
+    (<unknown>(
+      await singleFixtureWithArgs('RMRKNestableMultiAssetPreMint', [
+        'NestableMultiAsset',
+        'NMA',
+        'ipfs://collection-meta',
+        10000,
+        ADDRESS_ZERO,
+        0,
+      ])
+    ))
+  );
 }
 
-async function equippableFixture(): Promise<Contract> {
-  return await singleFixtureWithArgs('RMRKEquippablePreMint', [
-    'Equippable',
-    'EQ',
-    'ipfs://collection-meta',
-    10000,
-    ADDRESS_ZERO,
-    0,
-  ]);
+async function equippableFixture(): Promise<RMRKEquippablePreMint> {
+  return <RMRKEquippablePreMint>(
+    (<unknown>(
+      await singleFixtureWithArgs('RMRKEquippablePreMint', [
+        'Equippable',
+        'EQ',
+        'ipfs://collection-meta',
+        10000,
+        ADDRESS_ZERO,
+        0,
+      ])
+    ))
+  );
 }
 
 describe('MultiAssetPreMint Minting', async () => {
@@ -125,13 +146,11 @@ async function shouldControlValidPreMinting(): Promise<void> {
 
   it('reduces total supply on burn and does not reuse ID', async function () {
     let tx = await this.token.connect(owner).mint(await owner.getAddress(), 1, 'ipfs://tokenURI');
-    let event = (await tx.wait()).logs.find((e) => e.eventName === 'Transfer');
-    const tokenId = event?.args?.tokenId;
+    const tokenId = await getTokenIdFromTx(tx);
     await this.token.connect(owner)['burn(uint256)'](tokenId);
 
     tx = await this.token.connect(owner).mint(await owner.getAddress(), 1, 'ipfs://tokenURI');
-    event = (await tx.wait()).logs.find((e) => e.eventName === 'Transfer');
-    const newTokenId = event?.args?.tokenId;
+    const newTokenId = await getTokenIdFromTx(tx);
 
     expect(newTokenId).to.equal(tokenId + 1n);
     expect(await this.token.totalSupply()).to.equal(1);

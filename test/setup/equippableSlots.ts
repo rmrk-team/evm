@@ -1,6 +1,7 @@
 import { ethers } from 'hardhat';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { RMRKCatalogImpl, RMRKEquippableMock } from '../../typechain-types';
+import { GenericEquippable } from '../utils';
 
 const partIdForBody = 1;
 const partIdForWeapon = 2;
@@ -35,12 +36,12 @@ let addrs: SignerWithAddress[];
 async function setupContextForSlots(
   catalog: RMRKCatalogImpl,
   catalogForWeapon: RMRKCatalogImpl,
-  soldier: RMRKEquippableMock,
-  weapon: RMRKEquippableMock,
-  weaponGem: RMRKEquippableMock,
-  background: RMRKEquippableMock,
-  mint: (token: RMRKEquippableMock, to: string) => Promise<bigint>,
-  nestMint: (token: RMRKEquippableMock, to: string, parentId: bigint) => Promise<bigint>,
+  soldier: GenericEquippable,
+  weapon: GenericEquippable,
+  weaponGem: GenericEquippable,
+  background: GenericEquippable,
+  mint: (token: GenericEquippable, to: string) => Promise<bigint>,
+  nestMint: (token: GenericEquippable, to: string, parentId: bigint) => Promise<bigint>,
 ) {
   const [, ...signersAddr] = await ethers.getSigners();
   addrs = signersAddr;

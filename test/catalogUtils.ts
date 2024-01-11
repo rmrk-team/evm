@@ -10,7 +10,6 @@ import {
   RMRKEquippableMock,
 } from '../typechain-types';
 import { setupContextForSlots } from './setup/equippableSlots';
-import { Contract } from 'ethers';
 import {
   backgroundAssetId,
   backgroundsIds,

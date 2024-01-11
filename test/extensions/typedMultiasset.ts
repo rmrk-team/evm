@@ -1,9 +1,8 @@
-import { Contract } from 'ethers';
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
-import { bn, mintFromMock } from '../utils';
+import { GenericTypedMultiAsset, bn, mintFromMock } from '../utils';
 import {
   IERC165,
   IERC6220,
@@ -12,6 +11,11 @@ import {
   IRMRKTypedMultiAsset,
   IOtherInterface,
 } from '../interfaces';
+import {
+  RMRKNestableTypedMultiAssetMock,
+  RMRKTypedEquippableMock,
+  RMRKTypedMultiAssetMock,
+} from '../../typechain-types';
 
 // --------------- FIXTURES -----------------------
 
@@ -40,7 +44,7 @@ async function typedEquippableFixture() {
 }
 
 describe('RMRKTypedMultiAssetMock', async function () {
-  let typedMultiAsset: Contract;
+  let typedMultiAsset: RMRKTypedMultiAssetMock;
 
   beforeEach(async function () {
     ({ typedMultiAsset } = await loadFixture(typeMultiAssetFixture));
@@ -53,7 +57,7 @@ describe('RMRKTypedMultiAssetMock', async function () {
 
   describe('RMRKTypedMultiAssetMock get top assets', async function () {
     let owner: SignerWithAddress;
-    let tokenId: number;
+    let tokenId: bigint;
 
     const resId = bn(1);
     const resId2 = bn(2);
@@ -98,7 +102,7 @@ describe('RMRKTypedMultiAssetMock', async function () {
 });
 
 describe('RMRKNestableTypedMultiAssetMock', async function () {
-  let typedNestableMultiAsset: Contract;
+  let typedNestableMultiAsset: RMRKNestableTypedMultiAssetMock;
 
   beforeEach(async function () {
     ({ typedNestableMultiAsset } = await loadFixture(nestableTypedMultiAssetFixture));
@@ -115,7 +119,7 @@ describe('RMRKNestableTypedMultiAssetMock', async function () {
 });
 
 describe('RMRKTypedEquippableMock', async function () {
-  let typedEquippable: Contract;
+  let typedEquippable: RMRKTypedEquippableMock;
 
   beforeEach(async function () {
     ({ typedEquippable } = await loadFixture(typedEquippableFixture));
@@ -151,10 +155,10 @@ async function shouldBehaveLikeTypedMultiAssetInterface() {
 }
 
 async function shouldBehaveLikeTypedMultiAsset(
-  mint: (token: Contract, to: string) => Promise<number>,
+  mint: (token: GenericTypedMultiAsset, to: string) => Promise<bigint>,
 ) {
   let owner: SignerWithAddress;
-  let tokenId: number;
+  let tokenId: bigint;
 
   beforeEach(async function () {
     const signers = await ethers.getSigners();
@@ -179,10 +183,10 @@ async function shouldBehaveLikeTypedMultiAsset(
 }
 
 async function shouldBehaveLikeTypedEquippable(
-  mint: (token: Contract, to: string) => Promise<number>,
+  mint: (token: RMRKTypedEquippableMock, to: string) => Promise<bigint>,
 ) {
   let owner: SignerWithAddress;
-  let tokenId: number;
+  let tokenId: bigint;
 
   beforeEach(async function () {
     const signers = await ethers.getSigners();

@@ -1,6 +1,5 @@
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
-import { Contract } from 'ethers';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import {
@@ -14,17 +13,22 @@ import {
 } from './utils';
 import shouldBehaveLikeNestable from './behavior/nestable';
 import shouldBehaveLikeERC721 from './behavior/erc721';
+import { RMRKNestableMock } from '../typechain-types';
 
-async function singleFixture(): Promise<Contract> {
-  return singleFixtureWithArgs('RMRKNestableMock', []);
+async function singleFixture(): Promise<RMRKNestableMock> {
+  return <RMRKNestableMock>(<unknown>await singleFixtureWithArgs('RMRKNestableMock', []));
 }
-function parentChildFixture(): Promise<{ parent: Contract; child: Contract }> {
-  return parentChildFixtureWithArgs('RMRKNestableMock', [], []);
+
+async function parentChildFixture(): Promise<{
+  parent: RMRKNestableMock;
+  child: RMRKNestableMock;
+}> {
+  return await parentChildFixtureWithArgs('RMRKNestableMock', [], []);
 }
 
 describe('NestableMock', function () {
-  let parent: Contract;
-  let child: Contract;
+  let parent: RMRKNestableMock;
+  let child: RMRKNestableMock;
   let owner: SignerWithAddress;
 
   beforeEach(async function () {
@@ -40,23 +44,34 @@ describe('NestableMock', function () {
   describe('Minting', async function () {
     it('cannot mint id 0', async function () {
       const tokenId = 0;
-      await expect(
-        child['mint(address,uint256)'](await owner.getAddress(), tokenId),
-      ).to.be.revertedWithCustomError(child, 'RMRKIdZeroForbidden');
+      await expect(child.mint(await owner.getAddress(), tokenId)).to.be.revertedWithCustomError(
+        child,
+        'RMRKIdZeroForbidden',
+      );
     });
 
     it('cannot nest mint id 0', async function () {
       const parentId = await mintFromMock(child, await owner.getAddress());
       const childId = 0;
       await expect(
-        child['nestMint(address,uint256,uint256)'](await parent.getAddress(), childId, parentId),
+        child.nestMint(await parent.getAddress(), childId, parentId),
       ).to.be.revertedWithCustomError(child, 'RMRKIdZeroForbidden');
     });
 
     it('cannot mint already minted token', async function () {
       const tokenId = await mintFromMock(child, await owner.getAddress());
+      await expect(child.mint(await owner.getAddress(), tokenId)).to.be.revertedWithCustomError(
+        child,
+        'ERC721TokenAlreadyMinted',
+      );
+    });
+
+    it('cannot nest mint already minted token', async function () {
+      const parentId = await mintFromMock(parent, await owner.getAddress());
+      const childId = await nestMintFromMock(child, await parent.getAddress(), parentId);
+
       await expect(
-        child['mint(address,uint256)'](await owner.getAddress(), tokenId),
+        child.nestMint(await parent.getAddress(), childId, parentId),
       ).to.be.revertedWithCustomError(child, 'ERC721TokenAlreadyMinted');
     });
 
@@ -65,35 +80,26 @@ describe('NestableMock', function () {
       const childId = await nestMintFromMock(child, await parent.getAddress(), parentId);
 
       await expect(
-        child['nestMint(address,uint256,uint256)'](await parent.getAddress(), childId, parentId),
-      ).to.be.revertedWithCustomError(child, 'ERC721TokenAlreadyMinted');
-    });
-
-    it('cannot nest mint already minted token', async function () {
-      const parentId = await mintFromMock(parent, await owner.getAddress());
-      const childId = await nestMintFromMock(child, await parent.getAddress(), parentId);
-
-      await expect(
-        child['nestMint(address,uint256,uint256)'](await parent.getAddress(), childId, parentId),
+        child.nestMint(await parent.getAddress(), childId, parentId),
       ).to.be.revertedWithCustomError(child, 'ERC721TokenAlreadyMinted');
     });
   });
 });
 
 describe('NestableMock ERC721 behavior', function () {
-  let token: Contract;
+  let token: RMRKNestableMock;
   beforeEach(async function () {
     token = await loadFixture(singleFixture);
     this.token = token;
-    this.ERC721Receiver = await ethers.getContractFactory('ERC721ReceiverMock');
+    this.receiverFactory = await ethers.getContractFactory('ERC721ReceiverMock');
   });
 
   shouldBehaveLikeERC721('Chunky', 'CHNKY');
 });
 
 describe('NestableMock transfer hooks', function () {
-  let parent: Contract;
-  let child: Contract;
+  let parent: RMRKNestableMock;
+  let child: RMRKNestableMock;
   let owner: SignerWithAddress;
   let otherOwner: SignerWithAddress;
 

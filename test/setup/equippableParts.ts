@@ -1,45 +1,46 @@
 import { ethers } from 'hardhat';
-import { Contract } from 'ethers';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
+import { RMRKCatalogImpl } from '../../typechain-types';
+import { GenericEquippable } from '../utils';
 
 let addrs: SignerWithAddress[];
 
-const partIdForHead1 = 1;
-const partIdForHead2 = 2;
-const partIdForHead3 = 3;
-const partIdForBody1 = 4;
-const partIdForBody2 = 5;
-const partIdForHair1 = 6;
-const partIdForHair2 = 7;
-const partIdForHair3 = 8;
-const partIdForMaskCatalog1 = 9;
-const partIdForMaskCatalog2 = 10;
-const partIdForMaskCatalog3 = 11;
-const partIdForEars1 = 12;
-const partIdForEars2 = 13;
-const partIdForHorns1 = 14;
-const partIdForHorns2 = 15;
-const partIdForHorns3 = 16;
-const partIdForMaskCatalogEquipped1 = 17;
-const partIdForMaskCatalogEquipped2 = 18;
-const partIdForMaskCatalogEquipped3 = 19;
-const partIdForEarsEquipped1 = 20;
-const partIdForEarsEquipped2 = 21;
-const partIdForHornsEquipped1 = 22;
-const partIdForHornsEquipped2 = 23;
-const partIdForHornsEquipped3 = 24;
-const partIdForMask = 25;
+const partIdForHead1 = 1n;
+const partIdForHead2 = 2n;
+const partIdForHead3 = 3n;
+const partIdForBody1 = 4n;
+const partIdForBody2 = 5n;
+const partIdForHair1 = 6n;
+const partIdForHair2 = 7n;
+const partIdForHair3 = 8n;
+const partIdForMaskCatalog1 = 9n;
+const partIdForMaskCatalog2 = 10n;
+const partIdForMaskCatalog3 = 11n;
+const partIdForEars1 = 12n;
+const partIdForEars2 = 13n;
+const partIdForHorns1 = 14n;
+const partIdForHorns2 = 15n;
+const partIdForHorns3 = 16n;
+const partIdForMaskCatalogEquipped1 = 17n;
+const partIdForMaskCatalogEquipped2 = 18n;
+const partIdForMaskCatalogEquipped3 = 19n;
+const partIdForEarsEquipped1 = 20n;
+const partIdForEarsEquipped2 = 21n;
+const partIdForHornsEquipped1 = 22n;
+const partIdForHornsEquipped2 = 23n;
+const partIdForHornsEquipped3 = 24n;
+const partIdForMask = 25n;
 
-const uniqueNeons = 10;
-const uniqueMasks = 4;
+const uniqueNeons = 10n;
+const uniqueMasks = 4n;
 // Ids could be the same since they are different collections, but to avoid log problems we have them unique
 const neons: bigint[] = [];
 const masks: bigint[] = [];
 
-const neonResIds = [100, 101, 102, 103, 104];
-const maskAssetsFull = [1, 2, 3, 4]; // Must match the total of uniqueAssets
-const maskAssetsEquip = [5, 6, 7, 8]; // Must match the total of uniqueAssets
-const maskEquippableGroupId = 1; // Assets to equip will all use this
+const neonResIds = [100n, 101n, 102n, 103n, 104n];
+const maskAssetsFull = [1n, 2n, 3n, 4n]; // Must match the total of uniqueAssets
+const maskAssetsEquip = [5n, 6n, 7n, 8n]; // Must match the total of uniqueAssets
+const maskEquippableGroupId = 1n; // Assets to equip will all use this
 
 enum ItemType {
   None,
@@ -48,11 +49,11 @@ enum ItemType {
 }
 
 async function setupContextForParts(
-  catalog: Contract,
-  neon: Contract,
-  mask: Contract,
-  mint: (token: Contract, to: string) => Promise<bigint>,
-  nestMint: (token: Contract, to: string, parentId: bigint) => Promise<bigint>,
+  catalog: RMRKCatalogImpl,
+  neon: GenericEquippable,
+  mask: GenericEquippable,
+  mint: (token: GenericEquippable, to: string) => Promise<bigint>,
+  nestMint: (token: GenericEquippable, to: string, parentId: bigint) => Promise<bigint>,
 ) {
   const [, ...signersAddr] = await ethers.getSigners();
   addrs = signersAddr;
@@ -387,10 +388,14 @@ async function setupContextForParts(
     // Add 2 assets to each weapon, one full, one for equip
     // There are 10 weapon tokens for 4 unique assets so we use %
     for (let i = 0; i < masks.length; i++) {
-      await mask.addAssetToToken(masks[i], maskAssetsFull[i % uniqueMasks], 0);
-      await mask.addAssetToToken(masks[i], maskAssetsEquip[i % uniqueMasks], 0);
-      await mask.connect(addrs[i % 3]).acceptAsset(masks[i], 0, maskAssetsFull[i % uniqueMasks]);
-      await mask.connect(addrs[i % 3]).acceptAsset(masks[i], 0, maskAssetsEquip[i % uniqueMasks]);
+      await mask.addAssetToToken(masks[i], maskAssetsFull[i % Number(uniqueMasks)], 0);
+      await mask.addAssetToToken(masks[i], maskAssetsEquip[i % Number(uniqueMasks)], 0);
+      await mask
+        .connect(addrs[i % 3])
+        .acceptAsset(masks[i], 0, maskAssetsFull[i % Number(uniqueMasks)]);
+      await mask
+        .connect(addrs[i % 3])
+        .acceptAsset(masks[i], 0, maskAssetsEquip[i % Number(uniqueMasks)]);
     }
   }
 }

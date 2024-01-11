@@ -1,4 +1,3 @@
-import { Contract } from 'ethers';
 import { ethers } from 'hardhat';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import {
@@ -6,6 +5,7 @@ import {
   mintFromMock,
   nestMintFromMock,
   addAssetEntryEquippablesFromMock,
+  GenericMintable,
 } from './utils';
 import { setupContextForParts } from './setup/equippableParts';
 import { setupContextForSlots } from './setup/equippableSlots';
@@ -160,7 +160,7 @@ describe('MinifiedEquippableMock Assets', async () => {
 // --------------- MULTI ASSET BEHAVIOR -----------------------
 
 describe('MinifiedEquippableMock MA behavior', async () => {
-  let nextTokenId = 1;
+  let nextTokenId = 1n;
   let equip: RMRKEquippableMock;
   let renderUtils: RMRKMultiAssetRenderUtils;
 
@@ -170,7 +170,7 @@ describe('MinifiedEquippableMock MA behavior', async () => {
     this.renderUtils = renderUtils;
   });
 
-  async function mintToNestable(token: Contract, to: string): Promise<bigint> {
+  async function mintToNestable(token: GenericMintable, to: string): Promise<bigint> {
     const tokenId = nextTokenId;
     nextTokenId++;
     await equip.mint(to, tokenId);

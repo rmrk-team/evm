@@ -1,10 +1,11 @@
 // Note: This is just a copy of the equippable test suit with the additional tests
 // for ERC721 and nestable behavior, but using MinifiedEquippable instead.
 
-import { Contract } from 'ethers';
 import { ethers } from 'hardhat';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import {
+  GenericEquippable,
+  GenericMintable,
   addAssetEntryEquippablesFromMock,
   addAssetToToken,
   mintFromMock,
@@ -124,7 +125,10 @@ async function equippableFixture() {
   return { equip, renderUtils };
 }
 
-async function parentChildFixture(): Promise<{ parent: Contract; child: Contract }> {
+async function parentChildFixture(): Promise<{
+  parent: GenericEquippable;
+  child: GenericEquippable;
+}> {
   return parentChildFixtureWithArgs('RMRKMinifiedEquippableMock', [], []);
 }
 
@@ -184,7 +188,7 @@ describe('MinifiedEquippableMock MA behavior', async () => {
     this.renderUtils = renderUtils;
   });
 
-  async function mintToNestable(token: Contract, to: string): Promise<bigint> {
+  async function mintToNestable(token: GenericMintable, to: string): Promise<bigint> {
     const tokenId = nextTokenId;
     nextTokenId++;
     await equip.mint(to, tokenId);
@@ -198,7 +202,7 @@ describe('MinifiedEquippableMock ERC721 behavior', function () {
   beforeEach(async function () {
     const { equip } = await loadFixture(equippableFixture);
     this.token = equip;
-    this.ERC721Receiver = await ethers.getContractFactory('ERC721ReceiverMock');
+    this.receiverFactory = await ethers.getContractFactory('ERC721ReceiverMock');
   });
 
   shouldBehaveLikeERC721('Chunky', 'CHNK');

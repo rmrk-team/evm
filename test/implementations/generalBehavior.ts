@@ -3,6 +3,7 @@ import { expect } from 'chai';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import {
   ERC20Mock,
+  RMRKAbstractEquippable,
   RMRKEquippableLazyMintErc20,
   RMRKEquippableLazyMintErc20Soulbound,
   RMRKEquippableLazyMintNative,
@@ -27,6 +28,7 @@ import {
   RMRKNestableMultiAssetPreMintSoulbound,
   RMRKNestablePreMint,
   RMRKNestablePreMintSoulbound,
+  RMRKImplementationBase,
 } from '../../typechain-types';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { Contract } from 'ethers';
@@ -41,6 +43,17 @@ import {
   IERC6454,
   IERC6220,
 } from '../interfaces';
+import {
+  GenericAbstractImplementation,
+  GenericEquippable,
+  GenericMintable,
+  GenericMintableERC20Pay,
+  GenericMintableNativeToken,
+  GenericMintablePreMint,
+  GenericMultiAsset,
+  GenericNestMintable,
+  GenericReadyToUse,
+} from '../utils';
 
 export enum LegoCombination {
   None,
@@ -666,7 +679,7 @@ async function testInterfaceSupport(legoCombination: LegoCombination, isSoulboun
 }
 
 async function testMultiAssetBehavior(mintingType: MintingType) {
-  let contract: Contract;
+  let contract: GenericMultiAsset;
   let owner: SignerWithAddress;
   let holder: SignerWithAddress;
   let rmrkERC20: ERC20Mock;
@@ -727,7 +740,7 @@ async function testMultiAssetBehavior(mintingType: MintingType) {
 }
 
 async function testEquippableBehavior(mintingType: MintingType) {
-  let contract: Contract;
+  let contract: RMRKAbstractEquippable;
   let owner: SignerWithAddress;
   let holder: SignerWithAddress;
   let rmrkERC20: ERC20Mock;
@@ -804,7 +817,7 @@ async function testEquippableBehavior(mintingType: MintingType) {
 }
 
 async function testGeneralBehavior(mintingType: MintingType) {
-  let contract: Contract;
+  let contract: GenericAbstractImplementation;
   let owner: SignerWithAddress;
   let holder: SignerWithAddress;
   let royaltyRecipient: SignerWithAddress;
@@ -832,7 +845,7 @@ async function testGeneralBehavior(mintingType: MintingType) {
 
     it('reduces total supply on burn and id not reduced', async function () {
       await mint(await holder.getAddress(), contract, owner, rmrkERC20, mintingType);
-      await contract.connect(holder)['burn(uint256)'](1);
+      await (<RMRKNestableMultiAssetPreMint>contract).connect(holder)['burn(uint256)'](1);
       expect(await contract.totalSupply()).to.eql(0n);
 
       await mint(await holder.getAddress(), contract, owner, rmrkERC20, mintingType);
@@ -844,25 +857,28 @@ async function testGeneralBehavior(mintingType: MintingType) {
       const expectedError = (await contract.supportsInterface(IERC7401))
         ? 'RMRKNotApprovedOrDirectOwner'
         : 'ERC721NotApprovedOrOwner';
-      await expect(contract.connect(owner)['burn(uint256)'](1)).to.be.revertedWithCustomError(
-        contract,
-        expectedError,
-      );
+      await expect(
+        (<RMRKNestableMultiAssetPreMint>contract).connect(owner)['burn(uint256)'](1),
+      ).to.be.revertedWithCustomError(contract, expectedError);
     });
 
     it('cannot mint 0 tokens', async function () {
       if (mintingType == MintingType.RMRKPreMint) {
         await expect(
-          contract.connect(owner).mint(await holder.getAddress(), 0, 'ipfs://tokenURI'),
+          (<GenericMintablePreMint>contract)
+            .connect(owner)
+            .mint(await holder.getAddress(), 0, 'ipfs://tokenURI'),
         ).to.be.revertedWithCustomError(contract, 'RMRKMintZero');
       } else if (mintingType == MintingType.RMRKLazyMintNativeToken) {
         await expect(
-          contract.connect(owner).mint(await holder.getAddress(), 0, { value: pricePerMint }),
+          (<GenericMintableNativeToken>contract)
+            .connect(owner)
+            .mint(await holder.getAddress(), 0, { value: pricePerMint }),
         ).to.be.revertedWithCustomError(contract, 'RMRKMintZero');
       } else if (mintingType == MintingType.RMRKLazyMintERC20) {
         await rmrkERC20.connect(owner).approve(await contract.getAddress(), pricePerMint);
         await expect(
-          contract.connect(owner).mint(await holder.getAddress(), 0),
+          (<GenericMintableERC20Pay>contract).connect(owner).mint(await holder.getAddress(), 0),
         ).to.be.revertedWithCustomError(contract, 'RMRKMintZero');
       }
     });
@@ -870,9 +886,9 @@ async function testGeneralBehavior(mintingType: MintingType) {
     it('has expected tokenURI', async function () {
       await mint(await holder.getAddress(), contract, owner, rmrkERC20, mintingType);
       if (mintingType == MintingType.RMRKPreMint) {
-        expect(await contract.tokenURI(1)).to.eql('ipfs://tokenURI');
+        expect(await (<GenericReadyToUse>contract).tokenURI(1)).to.eql('ipfs://tokenURI');
       } else {
-        expect(await contract.tokenURI(1)).to.eql('ipfs://tokenURI/1');
+        expect(await (<GenericReadyToUse>contract).tokenURI(1)).to.eql('ipfs://tokenURI/1');
       }
     });
 
@@ -881,7 +897,7 @@ async function testGeneralBehavior(mintingType: MintingType) {
         mintingType == MintingType.RMRKLazyMintERC20 ||
         mintingType == MintingType.RMRKLazyMintNativeToken
       ) {
-        expect(await contract.pricePerMint()).to.eql(pricePerMint);
+        expect(await (<GenericMintableERC20Pay>contract).pricePerMint()).to.eql(pricePerMint);
       }
     });
 
@@ -890,12 +906,14 @@ async function testGeneralBehavior(mintingType: MintingType) {
       await mint(await holder.getAddress(), contract, owner, rmrkERC20, mintingType);
       if (mintingType == MintingType.RMRKLazyMintNativeToken) {
         const balanceBefore = await ethers.provider.getBalance(holder.address);
-        await contract.connect(owner).withdraw(await holder.getAddress(), pricePerMint * 2n);
+        await (<GenericMintableNativeToken>contract)
+          .connect(owner)
+          .withdraw(await holder.getAddress(), pricePerMint * 2n);
         const balanceAfter = await ethers.provider.getBalance(holder.address);
         expect(balanceAfter).to.eql(balanceBefore + pricePerMint * 2n);
       } else if (mintingType == MintingType.RMRKLazyMintERC20) {
         const balanceBefore = await rmrkERC20.balanceOf(await holder.getAddress());
-        await contract
+        await (<GenericMintableERC20Pay>contract)
           .connect(owner)
           .withdrawRaisedERC20(
             await rmrkERC20.getAddress(),
@@ -913,11 +931,13 @@ async function testGeneralBehavior(mintingType: MintingType) {
       await mint(await holder.getAddress(), contract, owner, rmrkERC20, mintingType);
       if (mintingType == MintingType.RMRKLazyMintNativeToken) {
         await expect(
-          contract.connect(holder).withdraw(await holder.getAddress(), pricePerMint),
+          (<GenericMintableNativeToken>contract)
+            .connect(holder)
+            .withdraw(await holder.getAddress(), pricePerMint),
         ).to.be.revertedWithCustomError(contract, 'RMRKNotOwner');
       } else if (mintingType == MintingType.RMRKLazyMintERC20) {
         await expect(
-          contract
+          (<GenericMintableERC20Pay>contract)
             .connect(holder)
             .withdrawRaisedERC20(
               await rmrkERC20.getAddress(),
@@ -946,17 +966,19 @@ async function testGeneralBehavior(mintingType: MintingType) {
 
 async function mint(
   to: string,
-  contract: Contract,
+  contract: GenericAbstractImplementation,
   owner: SignerWithAddress,
   rmrkERC20: ERC20Mock,
   mintingType: MintingType,
 ) {
   if (mintingType == MintingType.RMRKPreMint) {
-    await contract.connect(owner).mint(to, 1, 'ipfs://tokenURI');
+    await (<GenericMintablePreMint>contract).connect(owner).mint(to, 1, 'ipfs://tokenURI');
   } else if (mintingType == MintingType.RMRKLazyMintNativeToken) {
-    await contract.connect(owner).mint(to, 1, { value: pricePerMint });
+    await (<GenericMintableNativeToken>contract)
+      .connect(owner)
+      .mint(to, 1, { value: pricePerMint });
   } else if (mintingType == MintingType.RMRKLazyMintERC20) {
     await rmrkERC20.connect(owner).approve(await contract.getAddress(), pricePerMint);
-    await contract.connect(owner).mint(to, 1);
+    await (<GenericMintableERC20Pay>contract).connect(owner).mint(to, 1);
   }
 }

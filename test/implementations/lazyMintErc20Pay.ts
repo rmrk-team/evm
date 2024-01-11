@@ -8,64 +8,85 @@ import {
   ONE_ETH,
   singleFixtureWithArgs,
 } from '../utils';
-import { Contract } from 'ethers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import { ERC20Mock } from '../../typechain-types';
+import {
+  ERC20Mock,
+  RMRKEquippableLazyMintErc20,
+  RMRKMultiAssetLazyMintErc20,
+  RMRKNestableLazyMintErc20,
+  RMRKNestableMultiAssetLazyMintErc20,
+} from '../../typechain-types';
 
-async function multiAssetFixture(): Promise<Contract> {
+async function multiAssetFixture(): Promise<RMRKMultiAssetLazyMintErc20> {
   const erc20Factory = await ethers.getContractFactory('ERC20Mock');
   const erc20 = <ERC20Mock>await erc20Factory.deploy();
   await erc20.waitForDeployment();
 
-  return await singleFixtureWithArgs('RMRKMultiAssetLazyMintErc20', [
-    'MultiAsset',
-    'MA',
-    'ipfs://collection-meta',
-    'ipfs://tokenURI',
-    [await erc20.getAddress(), ADDRESS_ZERO, 0, 10000, ONE_ETH],
-  ]);
+  return <RMRKMultiAssetLazyMintErc20>(
+    (<unknown>(
+      await singleFixtureWithArgs('RMRKMultiAssetLazyMintErc20', [
+        'MultiAsset',
+        'MA',
+        'ipfs://collection-meta',
+        'ipfs://tokenURI',
+        [await erc20.getAddress(), ADDRESS_ZERO, 0, 10000, ONE_ETH],
+      ])
+    ))
+  );
 }
 
-async function nestableFixture(): Promise<Contract> {
+async function nestableFixture(): Promise<RMRKNestableLazyMintErc20> {
   const erc20Factory = await ethers.getContractFactory('ERC20Mock');
   const erc20 = <ERC20Mock>await erc20Factory.deploy();
   await erc20.waitForDeployment();
 
-  return await singleFixtureWithArgs('RMRKNestableLazyMintErc20', [
-    'Nestable',
-    'N',
-    'ipfs://collection-meta',
-    'ipfs://tokenURI',
-    [await erc20.getAddress(), ADDRESS_ZERO, 0, 10000, ONE_ETH],
-  ]);
+  return <RMRKNestableLazyMintErc20>(
+    (<unknown>(
+      await singleFixtureWithArgs('RMRKNestableLazyMintErc20', [
+        'Nestable',
+        'N',
+        'ipfs://collection-meta',
+        'ipfs://tokenURI',
+        [await erc20.getAddress(), ADDRESS_ZERO, 0, 10000, ONE_ETH],
+      ])
+    ))
+  );
 }
 
-async function nestableMultiAssetFixture(): Promise<Contract> {
+async function nestableMultiAssetFixture(): Promise<RMRKNestableMultiAssetLazyMintErc20> {
   const erc20Factory = await ethers.getContractFactory('ERC20Mock');
   const erc20 = <ERC20Mock>await erc20Factory.deploy();
   await erc20.waitForDeployment();
 
-  return await singleFixtureWithArgs('RMRKNestableMultiAssetLazyMintErc20', [
-    'MultiAsset',
-    'MA',
-    'ipfs://collection-meta',
-    'ipfs://tokenURI',
-    [await erc20.getAddress(), ADDRESS_ZERO, 0, 10000, ONE_ETH],
-  ]);
+  return <RMRKNestableMultiAssetLazyMintErc20>(
+    (<unknown>(
+      await singleFixtureWithArgs('RMRKNestableMultiAssetLazyMintErc20', [
+        'MultiAsset',
+        'MA',
+        'ipfs://collection-meta',
+        'ipfs://tokenURI',
+        [await erc20.getAddress(), ADDRESS_ZERO, 0, 10000, ONE_ETH],
+      ])
+    ))
+  );
 }
 
-async function equippableFixture(): Promise<Contract> {
+async function equippableFixture(): Promise<RMRKEquippableLazyMintErc20> {
   const erc20Factory = await ethers.getContractFactory('ERC20Mock');
   const erc20 = await erc20Factory.deploy();
   await erc20.waitForDeployment();
 
-  return await singleFixtureWithArgs('RMRKEquippableLazyMintErc20', [
-    'MultiAsset',
-    'MA',
-    'ipfs://collection-meta',
-    'ipfs://tokenURI',
-    [await erc20.getAddress(), ADDRESS_ZERO, 0, 10000, ONE_ETH],
-  ]);
+  return <RMRKEquippableLazyMintErc20>(
+    (<unknown>(
+      await singleFixtureWithArgs('RMRKEquippableLazyMintErc20', [
+        'MultiAsset',
+        'MA',
+        'ipfs://collection-meta',
+        'ipfs://tokenURI',
+        [await erc20.getAddress(), ADDRESS_ZERO, 0, 10000, ONE_ETH],
+      ])
+    ))
+  );
 }
 
 describe('MultiAssetErc20Pay Minting', async () => {
