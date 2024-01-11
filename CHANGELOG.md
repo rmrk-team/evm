@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.4.0] - 2024-01-11
+
+### Changed
+
+  - Upgrades to Ethers V6
+  - Upgrades all packages to latest versions.
+  - Includes token holder interface and Abstract Implementation (EIP-7590)
+  - Updates packate README
+
 ## [2.3.2] - 2024-01-04
 
 ### Changed
