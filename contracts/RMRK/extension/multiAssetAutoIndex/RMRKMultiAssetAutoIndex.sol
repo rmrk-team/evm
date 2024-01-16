@@ -59,7 +59,8 @@ contract RMRKMultiAssetAutoIndex is IRMRKMultiAssetAutoIndex, RMRKMultiAsset {
     function _afterAcceptAsset(
         uint256 tokenId,
         uint256 index,
-        uint64 assetId
+        uint64 assetId,
+        uint64 replacedAssetId
     ) internal override {
         _removePendingIndex(tokenId, index, assetId);
     }
