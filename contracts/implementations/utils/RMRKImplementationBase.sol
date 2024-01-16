@@ -12,7 +12,7 @@ import {RMRKRoyalties} from "../../RMRK/extension/RMRKRoyalties.sol";
  * @dev This smart contract includes the top-level utilities for managing minting and implements Ownable by default.
  */
 abstract contract RMRKImplementationBase is RMRKRoyalties, Ownable {
-    string private _collectionMetadata;
+    string internal _contractURI;
     string private _name;
     string private _symbol;
 
@@ -25,7 +25,7 @@ abstract contract RMRKImplementationBase is RMRKRoyalties, Ownable {
      * @notice Initializes the smart contract with a given maximum supply and minting price.
      * @param name_ Name of the token collection
      * @param symbol_ Symbol of the token collection
-     * @param collectionMetadata_ The collection metadata URI
+     * @param contractURI_ The collection metadata URI
      * @param maxSupply_ The maximum supply of tokens
      * @param royaltyRecipient Address to which royalties should be sent
      * @param royaltyPercentageBps The royalty percentage expressed in basis points
@@ -33,14 +33,14 @@ abstract contract RMRKImplementationBase is RMRKRoyalties, Ownable {
     constructor(
         string memory name_,
         string memory symbol_,
-        string memory collectionMetadata_,
+        string memory contractURI_,
         uint256 maxSupply_,
         address royaltyRecipient,
         uint256 royaltyPercentageBps
     ) RMRKRoyalties(royaltyRecipient, royaltyPercentageBps) {
         _name = name_;
         _symbol = symbol_;
-        _collectionMetadata = collectionMetadata_;
+        _contractURI = contractURI_;
         _maxSupply = maxSupply_;
     }
 
@@ -78,7 +78,7 @@ abstract contract RMRKImplementationBase is RMRKRoyalties, Ownable {
         virtual
         returns (string memory contractURI_)
     {
-        contractURI_ = _collectionMetadata;
+        contractURI_ = _contractURI;
     }
 
     /**
