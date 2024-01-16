@@ -9,7 +9,7 @@ pragma solidity ^0.8.21;
  * @dev This is currently just a passthrough contract which allows for granular editing of base-level ERC721 functions.
  */
 contract RMRKCore {
-    string private constant _VERSION = "2.4.1";
+    string private constant _VERSION = "2.4.2";
     bytes4 private constant _RMRK_INTERFACE = 0x524D524B; // "RMRK" in ASCII hex
 
     /**
