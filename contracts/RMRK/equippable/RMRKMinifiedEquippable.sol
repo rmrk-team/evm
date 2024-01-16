@@ -1500,11 +1500,13 @@ contract RMRKMinifiedEquippable is
      * @param tokenId ID of the token for which the asset has been accepted
      * @param index Index of the asset in the token's pending assets array
      * @param assetId ID of the asset expected to have been located at the specified `index`
+     * @param replacedAssetId ID of the asset that has been replaced by the accepted asset
      */
     function _afterAcceptAsset(
         uint256 tokenId,
         uint256 index,
-        uint64 assetId
+        uint64 assetId,
+        uint64 replacedAssetId
     ) internal virtual {}
 
     /**
@@ -1699,7 +1701,7 @@ contract RMRKMinifiedEquippable is
         _removePendingAsset(tokenId, index, assetId);
 
         emit AssetAccepted(tokenId, assetId, replacesId);
-        _afterAcceptAsset(tokenId, index, assetId);
+        _afterAcceptAsset(tokenId, index, assetId, replacesId);
     }
 
     /**
