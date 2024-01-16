@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.4.1] - 2024-01-11
+
+### Changed
+
+  - Removes unnecessary package dependency.
+  - Adds replacedAssetId on _afterAcceptAsset hook.
+  - _contractURI is no internal on RMRKImplementationBase.
+
 ## [2.4.0] - 2024-01-11
 
 ### Changed
