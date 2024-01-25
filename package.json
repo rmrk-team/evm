@@ -7,15 +7,17 @@
     "contracts/implementations/*"
   ],
   "scripts": {
-    "test": "yarn typechain && hardhat test",
+    "test": "hardhat typechain && hardhat test",
+    "coverage": "hardhat typechain && NODE_OPTIONS='--max-old-space-size=8192' hardhat coverage",
     "typechain": "hardhat typechain",
     "prettier": "prettier --write .",
-    "prepare": "hardhat dodoc && prettier --write ."
+    "prepare:commit": "hardhat dodoc && prettier --write ."
   },
   "engines": {
-    "node": ">=16.0.0"
+    "node": ">=18"
   },
-  "dependencies": {
+  "dependencies": {},
+  "devDependencies": {
     "@nomicfoundation/hardhat-chai-matchers": "^2.0.3",
     "@nomicfoundation/hardhat-ethers": "^3.0.5",
     "@nomicfoundation/hardhat-network-helpers": "^1.0.10",
@@ -38,7 +40,19 @@
     "squirrelly": "^8.0.8",
     "ts-node": "^11.0.0-beta.1",
     "typechain": "^8.3.2",
-    "typescript": "^5.3.3"
-  },
-  "devDependencies": {}
+    "typescript": "^5.3.3",
+    "solc": "0.8.21",
+    "@typescript-eslint/eslint-plugin": "^6.19.0",
+    "@typescript-eslint/parser": "^6.19.0",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-config-standard": "^17.1.0",
+    "eslint-import-resolver-typescript": "^3.6.1",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-n": "^16.6.2",
+    "eslint-plugin-prettier": "^5.1.3",
+    "eslint-plugin-promise": "^6.1.1",
+    "prettier": "^3.2.4",
+    "prettier-plugin-solidity": "^1.3.1"
+  }
 }
