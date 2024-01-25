@@ -42,6 +42,8 @@
     "typechain": "^8.3.2",
     "typescript": "^5.3.3",
     "solc": "0.8.21",
+    "rimraf": "^5.0.5",
+    "walk-sync": "^3.0.0",
     "@typescript-eslint/eslint-plugin": "^6.19.0",
     "@typescript-eslint/parser": "^6.19.0",
     "eslint": "^8.56.0",
