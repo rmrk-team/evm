@@ -8,7 +8,7 @@ async function shouldHaveRoyalties(
 ): Promise<void> {
   it('can get royalty data', async function () {
     const owner = (await ethers.getSigners())[0];
-    const tokenId = await mint(this.token, await owner.getAddress());
+    const tokenId = await mint(this.token, owner.address);
     expect(await this.token.royaltyInfo(tokenId, ONE_ETH * 10n)).to.eql([ADDRESS_ZERO, ONE_ETH]);
   });
 

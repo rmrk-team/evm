@@ -8,7 +8,7 @@ async function shouldHaveMetadata(
 ): Promise<void> {
   it('can get tokenURI', async function () {
     const owner = (await ethers.getSigners())[0];
-    const tokenId = await mint(this.token, await owner.getAddress());
+    const tokenId = await mint(this.token, owner.address);
     if (isTokenUriEnumerated) {
       expect(await this.token.tokenURI(tokenId)).to.eql(`ipfs://tokenURI/${tokenId}`);
     } else {

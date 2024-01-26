@@ -134,7 +134,7 @@ describe('Collection Utils', function () {
 
   it('can get catalog data', async function () {
     expect(await catalogUtils.getCatalogData(await catalog.getAddress())).to.eql([
-      await deployer.getAddress(),
+      deployer.address,
       CATALOG_TYPE,
       CATALOG_METADATA,
     ]);
@@ -185,7 +185,7 @@ describe('Collection Utils', function () {
     expect(
       await catalogUtils.getCatalogDataAndExtendedParts(await catalog.getAddress(), [partId]),
     ).to.eql([
-      await deployer.getAddress(),
+      deployer.address,
       CATALOG_TYPE,
       CATALOG_METADATA,
       [

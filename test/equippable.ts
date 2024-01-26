@@ -114,7 +114,7 @@ async function equippableFixture() {
 
 // --------------- EQUIPPABLE BEHAVIOR -----------------------
 
-describe('MinifiedEquippableMock with Parts', async () => {
+describe('EquippableMock with Parts', async () => {
   beforeEach(async function () {
     const { catalog, neon, mask, view } = await loadFixture(partsFixture);
 
@@ -127,11 +127,10 @@ describe('MinifiedEquippableMock with Parts', async () => {
   shouldBehaveLikeEquippableWithParts();
 });
 
-describe('MinifiedEquippableMock with Slots', async () => {
+describe('EquippableMock with Slots', async () => {
   beforeEach(async function () {
-    const { catalog, soldier, weapon, weaponGem, background, view } = await loadFixture(
-      slotsFixture,
-    );
+    const { catalog, soldier, weapon, weaponGem, background, view } =
+      await loadFixture(slotsFixture);
 
     this.catalog = catalog;
     this.soldier = soldier;
@@ -144,7 +143,7 @@ describe('MinifiedEquippableMock with Slots', async () => {
   shouldBehaveLikeEquippableWithSlots(nestMintFromMock);
 });
 
-describe('MinifiedEquippableMock Assets', async () => {
+describe('EquippableMock Assets', async () => {
   beforeEach(async function () {
     const { equip, renderUtils } = await loadFixture(equippableFixture);
     this.nestable = equip;
@@ -159,7 +158,7 @@ describe('MinifiedEquippableMock Assets', async () => {
 
 // --------------- MULTI ASSET BEHAVIOR -----------------------
 
-describe('MinifiedEquippableMock MA behavior', async () => {
+describe('EquippableMock MA behavior', async () => {
   let nextTokenId = 1n;
   let equip: RMRKEquippableMock;
   let renderUtils: RMRKMultiAssetRenderUtils;

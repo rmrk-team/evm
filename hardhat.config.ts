@@ -1,12 +1,9 @@
-import * as dotenv from 'dotenv';
-
 import { HardhatUserConfig, task } from 'hardhat/config';
+import 'dotenv/config';
 import '@nomicfoundation/hardhat-ethers';
 import '@nomicfoundation/hardhat-toolbox';
 import 'hardhat-contract-sizer';
 import '@primitivefi/hardhat-dodoc';
-
-dotenv.config();
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html

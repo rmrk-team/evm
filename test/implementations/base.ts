@@ -21,9 +21,8 @@ describe('Implementation Base', async () => {
   }
 
   beforeEach(async function () {
-    const { mintingUtilsContract, signersOwner, signersAddrs } = await loadFixture(
-      deployMintingUtilsFixture,
-    );
+    const { mintingUtilsContract, signersOwner, signersAddrs } =
+      await loadFixture(deployMintingUtilsFixture);
     implementation_base = mintingUtilsContract;
     owner = signersOwner;
     addrs = signersAddrs;
@@ -37,15 +36,15 @@ describe('Implementation Base', async () => {
 
   it('can transfer ownership', async function () {
     const newOwner = addrs[1];
-    await implementation_base.connect(owner).transferOwnership(await newOwner.getAddress());
-    expect(await implementation_base.owner()).to.eql(await newOwner.getAddress());
+    await implementation_base.connect(owner).transferOwnership(newOwner.address);
+    expect(await implementation_base.owner()).to.eql(newOwner.address);
   });
 
   it('emits OwnershipTransferred event when transferring ownership', async function () {
     const newOwner = addrs[1];
-    await expect(implementation_base.connect(owner).transferOwnership(await newOwner.getAddress()))
+    await expect(implementation_base.connect(owner).transferOwnership(newOwner.address))
       .to.emit(implementation_base, 'OwnershipTransferred')
-      .withArgs(await owner.getAddress(), await newOwner.getAddress());
+      .withArgs(owner.address, newOwner.address);
   });
 
   it('cannot transfer ownership to address 0', async function () {
@@ -61,39 +60,29 @@ describe('Implementation Base', async () => {
 
   it('can add and revoke contributor', async function () {
     const contributor = addrs[1];
-    await implementation_base
-      .connect(owner)
-      .manageContributor(await contributor.getAddress(), true);
-    expect(
-      await implementation_base.connect(owner).isContributor(await contributor.getAddress()),
-    ).to.eql(true);
-    await implementation_base
-      .connect(owner)
-      .manageContributor(await contributor.getAddress(), false);
-    expect(
-      await implementation_base.connect(owner).isContributor(await contributor.getAddress()),
-    ).to.eql(false);
+    await implementation_base.connect(owner).manageContributor(contributor.address, true);
+    expect(await implementation_base.connect(owner).isContributor(contributor.address)).to.eql(
+      true,
+    );
+    await implementation_base.connect(owner).manageContributor(contributor.address, false);
+    expect(await implementation_base.connect(owner).isContributor(contributor.address)).to.eql(
+      false,
+    );
   });
 
   it('emits ContributorUpdate when adding a contributor', async function () {
     const contributor = addrs[1];
-    await expect(
-      implementation_base.connect(owner).manageContributor(await contributor.getAddress(), true),
-    )
+    await expect(implementation_base.connect(owner).manageContributor(contributor.address, true))
       .to.emit(implementation_base, 'ContributorUpdate')
-      .withArgs(await contributor.getAddress(), true);
+      .withArgs(contributor.address, true);
   });
 
   it('emits ContributorUpdate when removing a contributor', async function () {
     const contributor = addrs[1];
-    await implementation_base
-      .connect(owner)
-      .manageContributor(await contributor.getAddress(), true);
-    await expect(
-      implementation_base.connect(owner).manageContributor(await contributor.getAddress(), false),
-    )
+    await implementation_base.connect(owner).manageContributor(contributor.address, true);
+    await expect(implementation_base.connect(owner).manageContributor(contributor.address, false))
       .to.emit(implementation_base, 'ContributorUpdate')
-      .withArgs(await contributor.getAddress(), false);
+      .withArgs(contributor.address, false);
   });
 
   it('cannot add zero address as contributor', async function () {

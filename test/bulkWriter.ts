@@ -55,7 +55,7 @@ async function bulkWriterFixture() {
 
   const [owner] = await ethers.getSigners();
 
-  const kanariaId = await mintFromMock(kanaria, await owner.getAddress());
+  const kanariaId = await mintFromMock(kanaria, owner.address);
   const gemId1 = await nestMintFromMock(gem, await kanaria.getAddress(), kanariaId);
   const gemId2 = await nestMintFromMock(gem, await kanaria.getAddress(), kanariaId);
   const gemId3 = await nestMintFromMock(gem, await kanaria.getAddress(), kanariaId);

@@ -1,22 +1,19 @@
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
-import { GenericEquippable, GenericMintable, GenericMultiAsset, bn } from '../utils';
+import {
+  GenericEquippable,
+  GenericMintable,
+  GenericMultiAsset,
+  addAssetToToken,
+  bn,
+} from '../utils';
 import { IERC165, IOtherInterface, IERC5773 } from '../interfaces';
-import { RMRKEquippableMock, RMRKMinifiedEquippableMock } from '../../typechain-types';
 
-async function shouldBehaveLikeMultiAsset(
-  mint: (token: GenericMintable, to: string) => Promise<bigint>,
-  addAssetEntryFunc: (
-    token: GenericMultiAsset | GenericEquippable | RMRKEquippableMock | RMRKMinifiedEquippableMock,
-    data?: string,
-  ) => Promise<bigint>,
-  addAssetToTokenFunc: (
-    token: GenericMultiAsset,
-    tokenId: bigint,
-    resId: bigint,
-    replaces: bigint | number,
-  ) => Promise<void>,
+async function shouldBehaveLikeMultiAsset<T extends GenericMintable = GenericMintable>(
+  mint: (token: T, to: string) => Promise<bigint>,
+  addAssetEntryFunc: (token: T, data?: string) => Promise<bigint>,
+  addAssetToTokenFunc: typeof addAssetToToken,
 ) {
   let tokenId: bigint;
   let tokenOwner: SignerWithAddress;
@@ -48,7 +45,7 @@ async function shouldBehaveLikeMultiAsset(
 
   describe('With minted token', async function () {
     beforeEach(async function () {
-      tokenId = await mint(this.token, await tokenOwner.getAddress());
+      tokenId = await mint(this.token, tokenOwner.address);
     });
 
     describe('Add asset', async function () {
@@ -69,8 +66,8 @@ async function shouldBehaveLikeMultiAsset(
 
     describe('Approvals', async function () {
       it('can approve address for assets', async function () {
-        await this.token.connect(tokenOwner).approveForAssets(await approved.getAddress(), tokenId);
-        expect(await this.token.getApprovedForAssets(tokenId)).to.eql(await approved.getAddress());
+        await this.token.connect(tokenOwner).approveForAssets(approved.address, tokenId);
+        expect(await this.token.getApprovedForAssets(tokenId)).to.eql(approved.address);
       });
 
       it('can approve address for all for assets', async function () {
@@ -79,7 +76,7 @@ async function shouldBehaveLikeMultiAsset(
           .setApprovalForAllForAssets(await operator.getAddress(), true);
         expect(
           await this.token.isApprovedForAllForAssets(
-            await tokenOwner.getAddress(),
+            tokenOwner.address,
             await operator.getAddress(),
           ),
         ).to.eql(true);
@@ -89,7 +86,7 @@ async function shouldBehaveLikeMultiAsset(
           .setApprovalForAllForAssets(await operator.getAddress(), false);
         expect(
           await this.token.isApprovedForAllForAssets(
-            await tokenOwner.getAddress(),
+            tokenOwner.address,
             await operator.getAddress(),
           ),
         ).to.eql(false);
@@ -97,21 +94,19 @@ async function shouldBehaveLikeMultiAsset(
 
       it('cannot approve owner for assets', async function () {
         await expect(
-          this.token.connect(tokenOwner).approveForAssets(await tokenOwner.getAddress(), tokenId),
+          this.token.connect(tokenOwner).approveForAssets(tokenOwner.address, tokenId),
         ).to.be.revertedWithCustomError(this.token, 'RMRKApprovalForAssetsToCurrentOwner');
       });
 
       it('cannot approve owner for all assets', async function () {
         await expect(
-          this.token
-            .connect(tokenOwner)
-            .setApprovalForAllForAssets(await tokenOwner.getAddress(), true),
+          this.token.connect(tokenOwner).setApprovalForAllForAssets(tokenOwner.address, true),
         ).to.be.revertedWithCustomError(this.token, 'RMRKApprovalForAssetsToCurrentOwner');
       });
 
       it('cannot approve owner if not owner', async function () {
         await expect(
-          this.token.connect(notApproved).approveForAssets(await approved.getAddress(), tokenId),
+          this.token.connect(notApproved).approveForAssets(approved.address, tokenId),
         ).to.be.revertedWithCustomError(
           this.token,
           'RMRKApproveForAssetsCallerIsNotOwnerNorApprovedForAll',
@@ -122,8 +117,8 @@ async function shouldBehaveLikeMultiAsset(
         await this.token
           .connect(tokenOwner)
           .setApprovalForAllForAssets(await operator.getAddress(), true);
-        await this.token.connect(operator).approveForAssets(await approved.getAddress(), tokenId);
-        expect(await this.token.getApprovedForAssets(tokenId)).to.eql(await approved.getAddress());
+        await this.token.connect(operator).approveForAssets(approved.address, tokenId);
+        expect(await this.token.getApprovedForAssets(tokenId)).to.eql(approved.address);
       });
     });
 
@@ -198,7 +193,7 @@ async function shouldBehaveLikeMultiAsset(
 
     beforeEach(async function () {
       // Mint and add 2 assets to token
-      tokenId = await mint(this.token, await tokenOwner.getAddress());
+      tokenId = await mint(this.token, tokenOwner.address);
       resId1 = await addAssetEntryFunc(this.token, resData1);
       resId2 = await addAssetEntryFunc(this.token, resData2);
       await addAssetToTokenFunc(this.token, tokenId, resId1, 0);
@@ -238,7 +233,7 @@ async function shouldBehaveLikeMultiAsset(
       });
 
       it('can accept asset if approved', async function () {
-        await this.token.connect(tokenOwner).approveForAssets(await approved.getAddress(), tokenId);
+        await this.token.connect(tokenOwner).approveForAssets(approved.address, tokenId);
         await this.token.connect(approved).acceptAsset(tokenId, 0, resId1);
 
         expect(await this.token.getActiveAssets(tokenId)).to.be.eql([resId1]);
@@ -295,7 +290,7 @@ async function shouldBehaveLikeMultiAsset(
       });
 
       it('can reject asset if approved', async function () {
-        await this.token.connect(tokenOwner).approveForAssets(await approved.getAddress(), tokenId);
+        await this.token.connect(tokenOwner).approveForAssets(approved.address, tokenId);
         await this.token.connect(approved).rejectAsset(tokenId, 0, resId1);
 
         expect(await this.token.getActiveAssets(tokenId)).to.be.eql([]);
@@ -322,7 +317,7 @@ async function shouldBehaveLikeMultiAsset(
       });
 
       it('can reject all assets if approved', async function () {
-        await this.token.connect(tokenOwner).approveForAssets(await approved.getAddress(), tokenId);
+        await this.token.connect(tokenOwner).approveForAssets(approved.address, tokenId);
         await this.token.connect(approved).rejectAllAssets(tokenId, 2);
 
         expect(await this.token.getActiveAssets(tokenId)).to.be.eql([]);
@@ -396,9 +391,7 @@ async function shouldBehaveLikeMultiAsset(
         });
 
         it('can set and get priorities if approved', async function () {
-          await this.token
-            .connect(tokenOwner)
-            .approveForAssets(await approved.getAddress(), tokenId);
+          await this.token.connect(tokenOwner).approveForAssets(approved.address, tokenId);
 
           await expect(this.token.connect(approved).setPriority(tokenId, [1, 0]))
             .to.emit(this.token, 'AssetPrioritySet')

@@ -20,16 +20,14 @@ describe('RMRKRoyaltiesSplitter', () => {
 
     const royaltiesSplitterFactory = await ethers.getContractFactory('RMRKRoyaltiesSplitter');
     royaltiesSplitter = await royaltiesSplitterFactory.deploy(
-      beneficiaries.map(async (b) => await b.getAddress()),
+      beneficiaries.map(async (b) => b.address),
       SHARES_BPS,
     );
     await royaltiesSplitter.waitForDeployment();
   });
 
   it('can get beneficiaries and shares', async () => {
-    const beneficiariesAddresses = await Promise.all(
-      beneficiaries.map(async (b) => await b.getAddress()),
-    );
+    const beneficiariesAddresses = await Promise.all(beneficiaries.map(async (b) => b.address));
     expect(await royaltiesSplitter.getBenefiariesAndShares()).to.deep.equal([
       beneficiariesAddresses,
       SHARES_BPS,
@@ -61,7 +59,7 @@ describe('RMRKRoyaltiesSplitter', () => {
     await erc20Token.waitForDeployment();
 
     const amount = ethers.parseUnits('100', 18);
-    await erc20Token.mint(await sender.getAddress(), amount);
+    await erc20Token.mint(sender.address, amount);
     await erc20Token.connect(sender).transfer(await royaltiesSplitter.getAddress(), amount);
 
     expect(
@@ -70,16 +68,10 @@ describe('RMRKRoyaltiesSplitter', () => {
         .distributeERC20(await erc20Token.getAddress(), amount),
     )
       .to.emit(royaltiesSplitter, 'ERCPaymentDistributed')
-      .withArgs(await sender.getAddress(), await erc20Token.getAddress(), amount);
-    expect(await erc20Token.balanceOf(await beneficiary1.getAddress())).to.equal(
-      (amount * 2500n) / 10000n,
-    );
-    expect(await erc20Token.balanceOf(await beneficiary2.getAddress())).to.equal(
-      (amount * 2500n) / 10000n,
-    );
-    expect(await erc20Token.balanceOf(await beneficiary3.getAddress())).to.equal(
-      (amount * 5000n) / 10000n,
-    );
+      .withArgs(sender.address, await erc20Token.getAddress(), amount);
+    expect(await erc20Token.balanceOf(beneficiary1.address)).to.equal((amount * 2500n) / 10000n);
+    expect(await erc20Token.balanceOf(beneficiary2.address)).to.equal((amount * 2500n) / 10000n);
+    expect(await erc20Token.balanceOf(beneficiary3.address)).to.equal((amount * 5000n) / 10000n);
   });
 
   it('cannot distribute ERC20 if not beneficary', async () => {
@@ -88,7 +80,7 @@ describe('RMRKRoyaltiesSplitter', () => {
     await erc20Token.waitForDeployment();
 
     const amount = ethers.parseUnits('100', 18);
-    await erc20Token.mint(await sender.getAddress(), amount);
+    await erc20Token.mint(sender.address, amount);
     await erc20Token.connect(sender).transfer(await royaltiesSplitter.getAddress(), amount);
 
     await expect(
@@ -101,28 +93,28 @@ describe('RMRKRoyaltiesSplitter', () => {
     // Missmatch in length
     await expect(
       royaltiesSplitterFactory.deploy(
-        beneficiaries.map(async (b) => await b.getAddress()),
+        beneficiaries.map(async (b) => b.address),
         SHARES_BPS.slice(0, 2),
       ),
     ).to.be.reverted;
     // Missmatch in length
     await expect(
       royaltiesSplitterFactory.deploy(
-        beneficiaries.slice(0, 2).map(async (b) => await b.getAddress()),
+        beneficiaries.slice(0, 2).map(async (b) => b.address),
         SHARES_BPS,
       ),
     ).to.be.reverted;
     // Shares below 10000
     await expect(
       royaltiesSplitterFactory.deploy(
-        beneficiaries.map(async (b) => await b.getAddress()),
+        beneficiaries.map(async (b) => b.address),
         [2500, 2500, 2500],
       ),
     ).to.be.reverted;
     // Shares over 10000
     await expect(
       royaltiesSplitterFactory.deploy(
-        beneficiaries.map(async (b) => await b.getAddress()),
+        beneficiaries.map(async (b) => b.address),
         [2500, 2500, 5001],
       ),
     ).to.be.reverted;

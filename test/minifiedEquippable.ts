@@ -129,7 +129,8 @@ async function parentChildFixture(): Promise<{
   parent: GenericEquippable;
   child: GenericEquippable;
 }> {
-  return parentChildFixtureWithArgs('RMRKMinifiedEquippableMock', [], []);
+  const { parent, child } = await parentChildFixtureWithArgs('RMRKMinifiedEquippableMock', [], []);
+  return { parent: <RMRKMinifiedEquippableMock>parent, child: <RMRKMinifiedEquippableMock>child };
 }
 
 // --------------- END FIXTURES -----------------------
@@ -149,9 +150,8 @@ describe('MinifiedEquippableMock with Fixed Parts', async () => {
 
 describe('MinifiedEquippableMock with Slot Parts', async () => {
   beforeEach(async function () {
-    const { catalog, soldier, weapon, weaponGem, background, view } = await loadFixture(
-      slotsFixture,
-    );
+    const { catalog, soldier, weapon, weaponGem, background, view } =
+      await loadFixture(slotsFixture);
 
     this.catalog = catalog;
     this.soldier = soldier;

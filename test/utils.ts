@@ -108,6 +108,13 @@ type GenericMintable =
   | GenericNestMintable
   | RMRKMultiAssetMock
   | GenericTypedMultiAsset;
+// Mock
+type GenericNestMintableMock =
+  | RMRKNestableMock
+  | RMRKNestableMultiAssetMock
+  | RMRKEquippableMock
+  | RMRKMinifiedEquippableMock;
+type GenericMintableMock = RMRKMultiAssetMock | GenericNestMintableMock;
 
 // Pre-mint
 type GenericNestMintablePreMint =
@@ -150,7 +157,7 @@ function bn(x: number): bigint {
   return BigInt(x);
 }
 
-async function mintFromMock(token: GenericMintable, to: string): Promise<bigint> {
+async function mintFromMock(token: GenericMintableMock, to: string): Promise<bigint> {
   const tokenId = nextTokenId;
   nextTokenId++;
   await token.mint(to, tokenId);
@@ -164,7 +171,7 @@ async function mintFromMockPremint(token: GenericMintablePreMint, to: string): P
 }
 
 async function nestMintFromMock(
-  token: GenericNestMintable,
+  token: GenericNestMintableMock,
   to: string,
   parentId: bigint,
 ): Promise<bigint> {
@@ -205,7 +212,7 @@ async function mintFromErc20Pay(token: GenericMintableERC20Pay, to: string): Pro
   const erc20 = <ERC20Mock>erc20Factory.attach(erc20Address);
   const owner = (await ethers.getSigners())[0];
 
-  await erc20.mint(await owner.getAddress(), ONE_ETH);
+  await erc20.mint(owner.address, ONE_ETH);
   await erc20.approve(await token.getAddress(), ONE_ETH);
 
   const tx = await token.mint(to, 1);
@@ -227,7 +234,7 @@ async function nestMintFromErc20Pay(
   const erc20 = <ERC20Mock>erc20Factory.attach(erc20Address);
   const owner = (await ethers.getSigners())[0];
 
-  await erc20.mint(await owner.getAddress(), ONE_ETH);
+  await erc20.mint(owner.address, ONE_ETH);
   await erc20.approve(await token.getAddress(), ONE_ETH);
 
   const tx = await token.nestMint(to, 1, destinationId);
@@ -252,7 +259,7 @@ async function transfer(
   to: string,
   tokenId: bigint,
 ): Promise<void> {
-  await token.connect(caller).transferFrom(await caller.getAddress(), to, tokenId);
+  await token.connect(caller).transferFrom(caller.address, to, tokenId);
 }
 
 async function nestTransfer(
@@ -262,17 +269,15 @@ async function nestTransfer(
   tokenId: bigint,
   parentId: bigint,
 ): Promise<void> {
-  await token
-    .connect(caller)
-    .nestTransferFrom(await caller.getAddress(), to, tokenId, parentId, '0x');
+  await token.connect(caller).nestTransferFrom(caller.address, to, tokenId, parentId, '0x');
 }
 
 async function addAssetToToken(
-  token: Contract,
+  token: GenericMultiAsset,
   tokenId: bigint,
   resId: bigint,
   replaces: bigint | number,
-): Promise<void> {
+): Promise<ContractTransactionResponse> {
   return await token.addAssetToToken(tokenId, resId, replaces);
 }
 
@@ -332,12 +337,12 @@ async function parentChildFixtureWithArgs(
   contractName: string,
   parentArgs: any[],
   childArgs: any[],
-): Promise<{ parent: GenericEquippable; child: GenericEquippable }> {
+): Promise<{ parent: GenericNestMintable; child: GenericNestMintable }> {
   const factory = await ethers.getContractFactory(contractName);
 
-  const parent = <GenericEquippable>await factory.deploy(...parentArgs);
+  const parent = <GenericNestMintable>await factory.deploy(...parentArgs);
   await parent.waitForDeployment();
-  const child = <GenericEquippable>await factory.deploy(...childArgs);
+  const child = <GenericNestMintable>await factory.deploy(...childArgs);
   await child.waitForDeployment();
 
   return { parent, child };
@@ -382,4 +387,6 @@ export {
   GenericSafeTransferable,
   GenericTransferable,
   GenericTypedMultiAsset,
+  GenericMintableMock,
+  GenericNestMintableMock,
 };

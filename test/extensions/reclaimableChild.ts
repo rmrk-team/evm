@@ -38,7 +38,7 @@ async function shouldBehaveLikeReclaimableChild() {
     addrs = await ethers.getSigners();
     tokenOwner = addrs[1];
 
-    parentId = await mintFromMock(this.parent, await tokenOwner.getAddress());
+    parentId = await mintFromMock(this.parent, tokenOwner.address);
     childId = await nestMintFromMock(this.child, await this.parent.getAddress(), parentId);
   });
 
@@ -82,12 +82,8 @@ async function shouldBehaveLikeReclaimableChild() {
       await this.parent
         .connect(tokenOwner)
         .reclaimChild(parentId, await this.child.getAddress(), childId);
-      expect(await this.child.ownerOf(childId)).to.eql(await tokenOwner.getAddress());
-      expect(await this.child.directOwnerOf(childId)).to.eql([
-        await tokenOwner.getAddress(),
-        0n,
-        false,
-      ]);
+      expect(await this.child.ownerOf(childId)).to.eql(tokenOwner.address);
+      expect(await this.child.directOwnerOf(childId)).to.eql([tokenOwner.address, 0n, false]);
     });
 
     it('cannot reclaim active child', async function () {
@@ -132,7 +128,7 @@ async function shouldBehaveLikeReclaimableChild() {
           false,
           '0x',
         );
-      const otherParentId = await mintFromMock(this.parent, await tokenOwner.getAddress());
+      const otherParentId = await mintFromMock(this.parent, tokenOwner.address);
 
       await expect(
         this.parent
@@ -182,12 +178,8 @@ async function shouldBehaveLikeReclaimableChild() {
       await this.parent
         .connect(tokenOwner)
         .reclaimChild(parentId, await this.child.getAddress(), childId);
-      expect(await this.child.ownerOf(childId)).to.eql(await tokenOwner.getAddress());
-      expect(await this.child.directOwnerOf(childId)).to.eql([
-        await tokenOwner.getAddress(),
-        0n,
-        false,
-      ]);
+      expect(await this.child.ownerOf(childId)).to.eql(tokenOwner.address);
+      expect(await this.child.directOwnerOf(childId)).to.eql([tokenOwner.address, 0n, false]);
     });
 
     it('cannot reclaim pending child', async function () {
@@ -232,7 +224,7 @@ async function shouldBehaveLikeReclaimableChild() {
           true,
           '0x',
         );
-      const otherParentId = await mintFromMock(this.parent, await tokenOwner.getAddress());
+      const otherParentId = await mintFromMock(this.parent, tokenOwner.address);
 
       await expect(
         this.parent

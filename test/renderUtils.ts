@@ -102,7 +102,7 @@ async function extendedNftRenderUtilsFixture() {
       'MA',
       'ipfs://collection-meta',
       10000,
-      await deployer.getAddress(),
+      deployer.address,
       500,
     )
   );
@@ -114,7 +114,7 @@ async function extendedNftRenderUtilsFixture() {
       'NMAS',
       'ipfs://collection-meta',
       10000,
-      await deployer.getAddress(),
+      deployer.address,
       500,
     )
   );
@@ -126,7 +126,7 @@ async function extendedNftRenderUtilsFixture() {
       'NMA',
       'ipfs://collection-meta',
       10000,
-      await deployer.getAddress(),
+      deployer.address,
       500,
     )
   );
@@ -141,7 +141,7 @@ async function extendedNftRenderUtilsFixture() {
       'EQ',
       'ipfs://collection-meta',
       10000,
-      await deployer.getAddress(),
+      deployer.address,
       500,
     )
   );
@@ -182,7 +182,7 @@ describe('MultiAsset Nestable and Equip Render Utils', async function () {
     const signers = await ethers.getSigners();
     owner = signers[0];
 
-    tokenId = await mintFromMock(equip, await owner.getAddress());
+    tokenId = await mintFromMock(equip, owner.address);
     await equip.addEquippableAssetEntry(resId, 0, ADDRESS_ZERO, 'ipfs://res1.jpg', []);
     await equip.addEquippableAssetEntry(
       resId2,
@@ -246,7 +246,7 @@ describe('MultiAsset Nestable and Equip Render Utils', async function () {
     });
 
     it('cannot get active assets if token has no assets', async function () {
-      const otherTokenId = await mintFromMock(equip, await owner.getAddress());
+      const otherTokenId = await mintFromMock(equip, owner.address);
       await expect(
         renderUtils.getExtendedActiveAssets(await equip.getAddress(), otherTokenId),
       ).to.be.revertedWithCustomError(renderUtils, 'RMRKTokenHasNoAssets');
@@ -256,7 +256,7 @@ describe('MultiAsset Nestable and Equip Render Utils', async function () {
     });
 
     it('cannot get pending assets if token has no assets', async function () {
-      const otherTokenId = await mintFromMock(equip, await owner.getAddress());
+      const otherTokenId = await mintFromMock(equip, owner.address);
       await expect(
         renderUtils.getPendingAssets(await equip.getAddress(), otherTokenId),
       ).to.be.revertedWithCustomError(renderUtils, 'RMRKTokenHasNoAssets');
@@ -266,7 +266,7 @@ describe('MultiAsset Nestable and Equip Render Utils', async function () {
     });
 
     it('cannot get top asset if token has no assets', async function () {
-      const otherTokenId = await mintFromMock(equip, await owner.getAddress());
+      const otherTokenId = await mintFromMock(equip, owner.address);
       await expect(
         renderUtils.getTopAssetMetaForToken(await equip.getAddress(), otherTokenId),
       ).to.be.revertedWithCustomError(renderUtils, 'RMRKTokenHasNoAssets');
@@ -279,7 +279,7 @@ describe('MultiAsset Nestable and Equip Render Utils', async function () {
     let childId2: bigint;
 
     beforeEach(async function () {
-      parentId = await mintFromMock(equip, await owner.getAddress());
+      parentId = await mintFromMock(equip, owner.address);
       childId1 = await nestMintFromMock(equip, await equip.getAddress(), parentId);
       childId2 = await nestMintFromMock(equip, await equip.getAddress(), parentId);
       await equip.acceptChild(parentId, 0, await equip.getAddress(), childId1);
@@ -380,7 +380,7 @@ describe('Advanced Equip Render Utils', async function () {
     ));
     [owner] = await ethers.getSigners();
 
-    kanariaId = await mintFromMock(kanaria, await owner.getAddress());
+    kanariaId = await mintFromMock(kanaria, owner.address);
     gemId1 = await nestMintFromMock(gem, await kanaria.getAddress(), kanariaId);
     gemId2 = await nestMintFromMock(gem, await kanaria.getAddress(), kanariaId);
     gemId3 = await nestMintFromMock(gem, await kanaria.getAddress(), kanariaId);
@@ -669,7 +669,7 @@ describe('Advanced Equip Render Utils', async function () {
     // Transfer a gem out and then back so it becomes pending
     await kanaria.transferChild(
       kanariaId,
-      await owner.getAddress(),
+      owner.address,
       0,
       2,
       await gem.getAddress(),
@@ -677,13 +677,7 @@ describe('Advanced Equip Render Utils', async function () {
       false,
       '0x',
     );
-    await gem.nestTransferFrom(
-      await owner.getAddress(),
-      await kanaria.getAddress(),
-      gemId3,
-      kanariaId,
-      '0x',
-    );
+    await gem.nestTransferFrom(owner.address, await kanaria.getAddress(), gemId3, kanariaId, '0x');
 
     expect(
       await renderUtilsEquip.getPendingChildIndex(
@@ -911,7 +905,7 @@ describe('Extended NFT render utils', function () {
   });
 
   it('renders correct data for MultiAsset', async function () {
-    const tokenId = await mintFromMockPremint(multiAsset, await rootOwner.getAddress());
+    const tokenId = await mintFromMockPremint(multiAsset, rootOwner.address);
     await multiAsset.addAssetEntry(metaURI);
     await multiAsset.addAssetEntry(metaURI);
     await multiAsset.addAssetEntry(metaURI);
@@ -926,14 +920,14 @@ describe('Extended NFT render utils', function () {
     const data = await renderUtils.getExtendedNft(tokenId, await multiAsset.getAddress());
 
     expect(data.tokenMetadataUri).to.eql('ipfs://tokenURI');
-    expect(data.directOwner).to.eql(await rootOwner.getAddress());
-    expect(data.rootOwner).to.eql(await rootOwner.getAddress());
+    expect(data.directOwner).to.eql(rootOwner.address);
+    expect(data.rootOwner).to.eql(rootOwner.address);
     expect(data.activeAssetCount).to.eql(bn(2));
     expect(data.pendingAssetCount).to.eql(bn(2));
     expect(data.priorities).to.eql([bn(10), bn(42)]);
     expect(data.maxSupply).to.eql(bn(10000));
     expect(data.totalSupply).to.eql(bn(1));
-    expect(data.issuer).to.eql(await issuer.getAddress());
+    expect(data.issuer).to.eql(issuer.address);
     expect(data.name).to.eql('MultiAsset');
     expect(data.symbol).to.eql('MA');
     expect(data.activeChildrenNumber).to.eql(0n);
@@ -945,10 +939,7 @@ describe('Extended NFT render utils', function () {
   });
 
   it('renders correct data for soulbound Nestable', async function () {
-    const tokenId = await mintFromMockPremint(
-      nestableMultiAssetSoulbound,
-      await rootOwner.getAddress(),
-    );
+    const tokenId = await mintFromMockPremint(nestableMultiAssetSoulbound, rootOwner.address);
     const child1 = await nestMintFromMockPreMint(
       nestableMultiAssetSoulbound,
       await nestableMultiAssetSoulbound.getAddress(),
@@ -977,14 +968,14 @@ describe('Extended NFT render utils', function () {
     );
 
     expect(data.tokenMetadataUri).to.eql('ipfs://tokenURI');
-    expect(data.directOwner).to.eql(await rootOwner.getAddress());
-    expect(data.rootOwner).to.eql(await rootOwner.getAddress());
+    expect(data.directOwner).to.eql(rootOwner.address);
+    expect(data.rootOwner).to.eql(rootOwner.address);
     expect(data.activeAssetCount).to.eql(0n);
     expect(data.pendingAssetCount).to.eql(0n);
     expect(data.priorities).to.eql([]);
     expect(data.maxSupply).to.eql(bn(10000));
     expect(data.totalSupply).to.eql(bn(4));
-    expect(data.issuer).to.eql(await issuer.getAddress());
+    expect(data.issuer).to.eql(issuer.address);
     expect(data.name).to.eql('NestableMultiAssetSoulbound');
     expect(data.symbol).to.eql('NMAS');
     expect(data.activeChildrenNumber).to.eql(bn(2));
@@ -996,8 +987,8 @@ describe('Extended NFT render utils', function () {
   });
 
   it('renders correct data for Nestable with MultiAsset', async function () {
-    const parentId = await mintFromMockPremint(nestableMultiAsset, await rootOwner.getAddress());
-    const tokenId = await mintFromMockPremint(nestableMultiAsset, await rootOwner.getAddress());
+    const parentId = await mintFromMockPremint(nestableMultiAsset, rootOwner.address);
+    const tokenId = await mintFromMockPremint(nestableMultiAsset, rootOwner.address);
     await nestableMultiAsset.addAssetEntry(metaURI);
     await nestableMultiAsset.addAssetEntry(metaURI);
     await nestableMultiAsset.addAssetEntry(metaURI);
@@ -1032,7 +1023,7 @@ describe('Extended NFT render utils', function () {
     await nestableMultiAsset
       .connect(rootOwner)
       .nestTransferFrom(
-        await rootOwner.getAddress(),
+        rootOwner.address,
         await nestableMultiAsset.getAddress(),
         tokenId,
         parentId,
@@ -1046,13 +1037,13 @@ describe('Extended NFT render utils', function () {
 
     expect(data.tokenMetadataUri).to.eql('ipfs://tokenURI');
     expect(data.directOwner).to.eql(await nestableMultiAsset.getAddress());
-    expect(data.rootOwner).to.eql(await rootOwner.getAddress());
+    expect(data.rootOwner).to.eql(rootOwner.address);
     expect(data.activeAssetCount).to.eql(bn(2));
     expect(data.pendingAssetCount).to.eql(bn(2));
     expect(data.priorities).to.eql([bn(10), bn(42)]);
     expect(data.maxSupply).to.eql(bn(10000));
     expect(data.totalSupply).to.eql(bn(5));
-    expect(data.issuer).to.eql(await issuer.getAddress());
+    expect(data.issuer).to.eql(issuer.address);
     expect(data.name).to.eql('NestableMultiAsset');
     expect(data.symbol).to.eql('NMA');
     expect(data.activeChildrenNumber).to.eql(bn(2));
@@ -1064,8 +1055,8 @@ describe('Extended NFT render utils', function () {
   });
 
   it('renders correct data for Equippable', async function () {
-    const parentId = await mintFromMockPremint(equip, await rootOwner.getAddress());
-    const tokenId = await mintFromMockPremint(equip, await rootOwner.getAddress());
+    const parentId = await mintFromMockPremint(equip, rootOwner.address);
+    const tokenId = await mintFromMockPremint(equip, rootOwner.address);
     await equip.addEquippableAssetEntry(0, ADDRESS_ZERO, 'ipfs://res1.jpg', []);
     await equip.addEquippableAssetEntry(
       1,
@@ -1088,26 +1079,20 @@ describe('Extended NFT render utils', function () {
     await equip.connect(rootOwner).acceptChild(tokenId, 0, await equip.getAddress(), child3);
     await equip
       .connect(rootOwner)
-      .nestTransferFrom(
-        await rootOwner.getAddress(),
-        await equip.getAddress(),
-        tokenId,
-        parentId,
-        '0x',
-      );
+      .nestTransferFrom(rootOwner.address, await equip.getAddress(), tokenId, parentId, '0x');
     await equip.connect(rootOwner).acceptChild(parentId, 0, await equip.getAddress(), tokenId);
 
     const data = await renderUtils.getExtendedNft(tokenId, await equip.getAddress());
 
     expect(data.tokenMetadataUri).to.eql('ipfs://tokenURI');
     expect(data.directOwner).to.eql(await equip.getAddress());
-    expect(data.rootOwner).to.eql(await rootOwner.getAddress());
+    expect(data.rootOwner).to.eql(rootOwner.address);
     expect(data.activeAssetCount).to.eql(bn(2));
     expect(data.pendingAssetCount).to.eql(bn(2));
     expect(data.priorities).to.eql([bn(10), bn(42)]);
     expect(data.maxSupply).to.eql(bn(10000));
     expect(data.totalSupply).to.eql(bn(5));
-    expect(data.issuer).to.eql(await issuer.getAddress());
+    expect(data.issuer).to.eql(issuer.address);
     expect(data.name).to.eql('Equippable');
     expect(data.symbol).to.eql('EQ');
     expect(data.activeChildrenNumber).to.eql(bn(2));
@@ -1126,8 +1111,8 @@ describe('Extended NFT render utils', function () {
     let childTokenThree: bigint;
 
     beforeEach(async function () {
-      parentTokenOne = await mintFromMockPremint(nestableMultiAsset, await rootOwner.getAddress());
-      parentTokenTwo = await mintFromMockPremint(nestableMultiAsset, await rootOwner.getAddress());
+      parentTokenOne = await mintFromMockPremint(nestableMultiAsset, rootOwner.address);
+      parentTokenTwo = await mintFromMockPremint(nestableMultiAsset, rootOwner.address);
       childTokenOne = await nestMintFromMockPreMint(
         nestableMultiAsset,
         await nestableMultiAsset.getAddress(),
@@ -1232,7 +1217,7 @@ describe('Extended NFT render utils', function () {
           await nestableMultiAsset.getAddress(),
           parentTokenOne,
         ),
-      ).to.eql([await rootOwner.getAddress(), 0n, false, false, false]);
+      ).to.eql([rootOwner.address, 0n, false, false, false]);
     });
 
     it('can identify rejected children', async function () {

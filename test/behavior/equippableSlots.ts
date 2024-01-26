@@ -154,9 +154,7 @@ async function shouldBehaveLikeEquippableWithSlots(
       const approved = addrs[1];
       const childIndex = 0;
       const weaponResId = weaponAssetsEquip[0]; // This asset is assigned to weapon first weapon
-      await soldier
-        .connect(soldierOwner)
-        .approveForAssets(await approved.getAddress(), soldiersIds[0]);
+      await soldier.connect(soldierOwner).approveForAssets(approved.address, soldiersIds[0]);
       await equipWeaponAndCheckFromAddress(approved, childIndex, weaponResId);
     });
 
@@ -166,9 +164,7 @@ async function shouldBehaveLikeEquippableWithSlots(
       const approved = addrs[1];
       const childIndex = 0;
       const weaponResId = weaponAssetsEquip[0]; // This asset is assigned to weapon first weapon
-      await soldier
-        .connect(soldierOwner)
-        .setApprovalForAllForAssets(await approved.getAddress(), true);
+      await soldier.connect(soldierOwner).setApprovalForAllForAssets(approved.address, true);
       await equipWeaponAndCheckFromAddress(approved, childIndex, weaponResId);
     });
 
@@ -548,9 +544,7 @@ async function shouldBehaveLikeEquippableWithSlots(
         childAssetId: weaponResId,
       });
 
-      await soldier
-        .connect(soldierOwner)
-        .approveForAssets(await approved.getAddress(), soldiersIds[0]);
+      await soldier.connect(soldierOwner).approveForAssets(approved.address, soldiersIds[0]);
       await unequipWeaponAndCheckFromAddress(approved);
     });
 
@@ -569,9 +563,7 @@ async function shouldBehaveLikeEquippableWithSlots(
         childAssetId: weaponResId,
       });
 
-      await soldier
-        .connect(soldierOwner)
-        .setApprovalForAllForAssets(await approved.getAddress(), true);
+      await soldier.connect(soldierOwner).setApprovalForAllForAssets(approved.address, true);
       await unequipWeaponAndCheckFromAddress(approved);
     });
 

@@ -113,7 +113,7 @@ async function shouldControlValidPreMinting(): Promise<void> {
   it('cannot mint if not owner', async function () {
     const notOwner = addrs[0];
     await expect(
-      this.token.connect(notOwner).mint(await notOwner.getAddress(), 1, 'ipfs://tokenURI'),
+      this.token.connect(notOwner).mint(notOwner.address, 1, 'ipfs://tokenURI'),
     ).to.be.revertedWithCustomError(this.token, 'RMRKNotOwnerOrContributor');
   });
 
@@ -137,7 +137,7 @@ async function shouldControlValidPreMinting(): Promise<void> {
   });
 
   it('reduces total supply on burn', async function () {
-    await this.token.connect(owner).mint(await owner.getAddress(), 1, 'ipfs://tokenURI');
+    await this.token.connect(owner).mint(owner.address, 1, 'ipfs://tokenURI');
     const tokenId = this.token.totalSupply();
     expect(await tokenId).to.equal(1);
     await this.token.connect(owner)['burn(uint256)'](tokenId);
@@ -145,11 +145,11 @@ async function shouldControlValidPreMinting(): Promise<void> {
   });
 
   it('reduces total supply on burn and does not reuse ID', async function () {
-    let tx = await this.token.connect(owner).mint(await owner.getAddress(), 1, 'ipfs://tokenURI');
+    let tx = await this.token.connect(owner).mint(owner.address, 1, 'ipfs://tokenURI');
     const tokenId = await getTokenIdFromTx(tx);
     await this.token.connect(owner)['burn(uint256)'](tokenId);
 
-    tx = await this.token.connect(owner).mint(await owner.getAddress(), 1, 'ipfs://tokenURI');
+    tx = await this.token.connect(owner).mint(owner.address, 1, 'ipfs://tokenURI');
     const newTokenId = await getTokenIdFromTx(tx);
 
     expect(newTokenId).to.equal(tokenId + 1n);

@@ -27,9 +27,9 @@ async function revealableFixture(): Promise<{
 
   await revealable.setRevealer(await revealer.getAddress());
 
-  await revealable.mint(await user1.getAddress(), 1);
-  await revealable.mint(await user1.getAddress(), 2);
-  await revealable.mint(await user2.getAddress(), 3);
+  await revealable.mint(user1.address, 1);
+  await revealable.mint(user1.address, 2);
+  await revealable.mint(user2.address, 3);
 
   await revealable.addAssetEntry(UNREVEALED_ASSET_ID, 'ipfs://unrevealed');
   await revealable.addAssetEntry(REVEALED_ASSET_ID, 'ipfs://revealed');

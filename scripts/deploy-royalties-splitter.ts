@@ -1,22 +1,18 @@
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { ethers, run } from 'hardhat';
-
-export const sleep = (ms: number): Promise<void> => {
-  return new Promise((resolve) => {
-    setTimeout(() => resolve(), ms);
-  });
-};
+import { sleep } from './utils';
 
 async function main() {
   const accounts: SignerWithAddress[] = await ethers.getSigners();
   const owner = accounts[0];
-  console.log('Deployer address: ' + (await owner.getAddress()));
+  console.log(`Deployer address: ${owner.address}`);
   // We get the contract to deploy
+
+  const beneficiaries: string[] = []; // TODO: Set beneficiaries
+  const sharesBPS: number[] = []; // TODO: Set sharesBPS
+
   const royaltiesSplitterFactory = await ethers.getContractFactory('RMRKRoyaltiesSplitter');
-  const royaltiesSplitter = await royaltiesSplitterFactory.deploy(
-    ['0x147d79f1c9244b85cba959262fb71ad38069febb', '0xacD3d4b7b0706d39e6cA6E8c75dDdD446b8cdB1D'],
-    [7000, 3000],
-  );
+  const royaltiesSplitter = await royaltiesSplitterFactory.deploy(beneficiaries, sharesBPS);
   await royaltiesSplitter.waitForDeployment();
   console.log('RMRK Royalties Splitter deployed to:', await royaltiesSplitter.getAddress());
   await sleep(10000);

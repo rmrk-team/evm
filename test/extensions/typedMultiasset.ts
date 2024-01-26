@@ -69,7 +69,7 @@ describe('RMRKTypedMultiAssetMock', async function () {
       const signers = await ethers.getSigners();
       owner = signers[0];
 
-      tokenId = await mintFromMock(typedMultiAsset, await owner.getAddress());
+      tokenId = await mintFromMock(typedMultiAsset, owner.address);
     });
 
     it('can get top asset by priority and type', async function () {
@@ -164,7 +164,7 @@ async function shouldBehaveLikeTypedMultiAsset(
     const signers = await ethers.getSigners();
     owner = signers[0];
 
-    tokenId = await mint(this.assets, await owner.getAddress());
+    tokenId = await mint(this.assets, owner.address);
   });
 
   it('can add typed assets', async function () {
@@ -192,7 +192,7 @@ async function shouldBehaveLikeTypedEquippable(
     const signers = await ethers.getSigners();
     owner = signers[0];
 
-    tokenId = await mint(this.nestable, await owner.getAddress());
+    tokenId = await mint(this.nestable, owner.address);
   });
 
   it('can add typed assets', async function () {

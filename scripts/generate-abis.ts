@@ -1,10 +1,10 @@
 import fs from 'fs';
 import walkSync from 'walk-sync';
-import rimraf from 'rimraf';
+import { rimraf } from 'rimraf';
 
 const getTheAbi = () => {
   try {
-    rimraf(`${process.cwd()}/artifacts/abis`, () => {
+    rimraf(`${process.cwd()}/artifacts/abis`).then(() => {
       const implementations = walkSync(`${process.cwd()}/artifacts/contracts/implementations`, {
         directories: false,
       });

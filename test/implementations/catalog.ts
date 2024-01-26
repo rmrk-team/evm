@@ -45,11 +45,11 @@ describe('CatalogImpl', async () => {
       ).to.be.revertedWithCustomError(catalog, 'RMRKNotOwnerOrContributor');
 
       await expect(
-        catalog.connect(other).addEquippableAddresses(partId, [await other.getAddress()]),
+        catalog.connect(other).addEquippableAddresses(partId, [other.address]),
       ).to.be.revertedWithCustomError(catalog, 'RMRKNotOwnerOrContributor');
 
       await expect(
-        catalog.connect(other).setEquippableAddresses(partId, [await other.getAddress()]),
+        catalog.connect(other).setEquippableAddresses(partId, [other.address]),
       ).to.be.revertedWithCustomError(catalog, 'RMRKNotOwnerOrContributor');
 
       await expect(catalog.connect(other).setEquippableToAll(partId)).to.be.revertedWithCustomError(
@@ -79,7 +79,7 @@ describe('CatalogImpl', async () => {
     });
 
     it('can add part if contributor', async function () {
-      await catalog.connect(owner).manageContributor(await contributor.getAddress(), true);
+      await catalog.connect(owner).manageContributor(contributor.address, true);
       await catalog.connect(contributor).addPart({ partId: partId, part: partData });
       expect(await catalog.getPart(partId)).to.eql([fixedType, 0n, [], 'ipfs://metadata']);
     });

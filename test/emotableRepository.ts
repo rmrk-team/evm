@@ -50,7 +50,7 @@ describe('RMRKEmotesRepository', async function () {
 
   describe('With minted tokens', async function () {
     beforeEach(async function () {
-      await token.mint(await owner.getAddress(), tokenId);
+      await token.mint(owner.address, tokenId);
     });
 
     it('can emote', async function () {
@@ -75,7 +75,7 @@ describe('RMRKEmotesRepository', async function () {
 
       await expect(repository.emote(await token.getAddress(), tokenId, emoji1, false))
         .to.emit(repository, 'Emoted')
-        .withArgs(await owner.getAddress(), await token.getAddress(), tokenId, emoji1, false);
+        .withArgs(owner.address, await token.getAddress(), tokenId, emoji1, false);
       expect(await repository.emoteCountOf(await token.getAddress(), tokenId, emoji1)).to.equal(0n);
     });
 
@@ -126,7 +126,7 @@ describe('RMRKEmotesRepository', async function () {
 
       expect(
         await repository.haveEmotersUsedEmotes(
-          [await owner.getAddress(), await owner.getAddress()],
+          [owner.address, owner.address],
           [await token.getAddress(), await token.getAddress()],
           [tokenId, tokenId],
           [emoji1, emoji2],
@@ -142,9 +142,9 @@ describe('RMRKEmotesRepository', async function () {
         ),
       )
         .to.emit(repository, 'Emoted')
-        .withArgs(await owner.getAddress(), await token.getAddress(), tokenId, emoji1, true)
+        .withArgs(owner.address, await token.getAddress(), tokenId, emoji1, true)
         .to.emit(repository, 'Emoted')
-        .withArgs(await owner.getAddress(), await token.getAddress(), tokenId, emoji2, true);
+        .withArgs(owner.address, await token.getAddress(), tokenId, emoji2, true);
 
       expect(
         await repository.bulkEmoteCountOf(
@@ -156,7 +156,7 @@ describe('RMRKEmotesRepository', async function () {
 
       expect(
         await repository.haveEmotersUsedEmotes(
-          [await owner.getAddress(), await owner.getAddress()],
+          [owner.address, owner.address],
           [await token.getAddress(), await token.getAddress()],
           [tokenId, tokenId],
           [emoji1, emoji2],
@@ -174,9 +174,9 @@ describe('RMRKEmotesRepository', async function () {
         ),
       )
         .to.emit(repository, 'Emoted')
-        .withArgs(await owner.getAddress(), await token.getAddress(), tokenId, emoji1, true)
+        .withArgs(owner.address, await token.getAddress(), tokenId, emoji1, true)
         .to.emit(repository, 'Emoted')
-        .withArgs(await owner.getAddress(), await token.getAddress(), tokenId, emoji2, true);
+        .withArgs(owner.address, await token.getAddress(), tokenId, emoji2, true);
 
       expect(
         await repository.bulkEmoteCountOf(
@@ -188,7 +188,7 @@ describe('RMRKEmotesRepository', async function () {
 
       expect(
         await repository.haveEmotersUsedEmotes(
-          [await owner.getAddress(), await owner.getAddress()],
+          [owner.address, owner.address],
           [await token.getAddress(), await token.getAddress()],
           [tokenId, tokenId],
           [emoji1, emoji2],
@@ -204,9 +204,9 @@ describe('RMRKEmotesRepository', async function () {
         ),
       )
         .to.emit(repository, 'Emoted')
-        .withArgs(await owner.getAddress(), await token.getAddress(), tokenId, emoji1, false)
+        .withArgs(owner.address, await token.getAddress(), tokenId, emoji1, false)
         .to.emit(repository, 'Emoted')
-        .withArgs(await owner.getAddress(), await token.getAddress(), tokenId, emoji2, false);
+        .withArgs(owner.address, await token.getAddress(), tokenId, emoji2, false);
 
       expect(
         await repository.bulkEmoteCountOf(
@@ -218,7 +218,7 @@ describe('RMRKEmotesRepository', async function () {
 
       expect(
         await repository.haveEmotersUsedEmotes(
-          [await owner.getAddress(), await owner.getAddress()],
+          [owner.address, owner.address],
           [await token.getAddress(), await token.getAddress()],
           [tokenId, tokenId],
           [emoji1, emoji2],
@@ -239,7 +239,7 @@ describe('RMRKEmotesRepository', async function () {
 
       expect(
         await repository.haveEmotersUsedEmotes(
-          [await owner.getAddress(), await owner.getAddress()],
+          [owner.address, owner.address],
           [await token.getAddress(), await token.getAddress()],
           [tokenId, tokenId],
           [emoji1, emoji2],
@@ -255,9 +255,9 @@ describe('RMRKEmotesRepository', async function () {
         ),
       )
         .to.emit(repository, 'Emoted')
-        .withArgs(await owner.getAddress(), await token.getAddress(), tokenId, emoji1, true)
+        .withArgs(owner.address, await token.getAddress(), tokenId, emoji1, true)
         .to.emit(repository, 'Emoted')
-        .withArgs(await owner.getAddress(), await token.getAddress(), tokenId, emoji2, false);
+        .withArgs(owner.address, await token.getAddress(), tokenId, emoji2, false);
 
       expect(
         await repository.bulkEmoteCountOf(
@@ -269,7 +269,7 @@ describe('RMRKEmotesRepository', async function () {
 
       expect(
         await repository.haveEmotersUsedEmotes(
-          [await owner.getAddress(), await owner.getAddress()],
+          [owner.address, owner.address],
           [await token.getAddress(), await token.getAddress()],
           [tokenId, tokenId],
           [emoji1, emoji2],
@@ -450,7 +450,7 @@ describe('RMRKEmotesRepository', async function () {
         repository
           .connect(addrs[0])
           .presignedEmote(
-            await owner.getAddress(),
+            owner.address,
             await token.getAddress(),
             tokenId,
             emoji1,
@@ -462,7 +462,7 @@ describe('RMRKEmotesRepository', async function () {
           ),
       )
         .to.emit(repository, 'Emoted')
-        .withArgs(await owner.getAddress(), await token.getAddress(), tokenId, emoji1, true);
+        .withArgs(owner.address, await token.getAddress(), tokenId, emoji1, true);
     });
 
     it('does nothing if new state is the same as old state on presigned emote', async function () {
@@ -484,7 +484,7 @@ describe('RMRKEmotesRepository', async function () {
       await repository
         .connect(addrs[0])
         .presignedEmote(
-          await owner.getAddress(),
+          owner.address,
           await token.getAddress(),
           tokenId,
           emoji1,
@@ -517,7 +517,7 @@ describe('RMRKEmotesRepository', async function () {
         repository
           .connect(addrs[0])
           .presignedEmote(
-            await owner.getAddress(),
+            owner.address,
             await token.getAddress(),
             tokenId,
             emoji1,
@@ -529,11 +529,15 @@ describe('RMRKEmotesRepository', async function () {
           ),
       )
         .to.emit(repository, 'Emoted')
-        .withArgs(await owner.getAddress(), await token.getAddress(), tokenId, emoji1, false);
+        .withArgs(owner.address, await token.getAddress(), tokenId, emoji1, false);
     });
 
     it('cannot use expired presigned to emote', async function () {
       const block = await ethers.provider.getBlock('latest');
+      if (!block) {
+        throw new Error('Block not found');
+      }
+
       const previousBlockTime = block.timestamp;
       const message = await repository.prepareMessageToPresignEmote(
         await token.getAddress(),
@@ -553,7 +557,7 @@ describe('RMRKEmotesRepository', async function () {
         repository
           .connect(addrs[0])
           .presignedEmote(
-            await owner.getAddress(),
+            owner.address,
             await token.getAddress(),
             tokenId,
             emoji1,
@@ -597,7 +601,7 @@ describe('RMRKEmotesRepository', async function () {
 
       await expect(
         repository.connect(addrs[0]).presignedEmote(
-          await owner.getAddress(),
+          owner.address,
           addrs[2].address, // different collection
           tokenId,
           emoji1,
@@ -611,7 +615,7 @@ describe('RMRKEmotesRepository', async function () {
 
       await expect(
         repository.connect(addrs[0]).presignedEmote(
-          await owner.getAddress(),
+          owner.address,
           await token.getAddress(),
           tokenId + 1n, // different token
           emoji1,
@@ -625,7 +629,7 @@ describe('RMRKEmotesRepository', async function () {
 
       await expect(
         repository.connect(addrs[0]).presignedEmote(
-          await owner.getAddress(),
+          owner.address,
           await token.getAddress(),
           tokenId,
           emoji2, // different emoji
@@ -639,7 +643,7 @@ describe('RMRKEmotesRepository', async function () {
 
       await expect(
         repository.connect(addrs[0]).presignedEmote(
-          await owner.getAddress(),
+          owner.address,
           await token.getAddress(),
           tokenId,
           emoji1,
@@ -653,7 +657,7 @@ describe('RMRKEmotesRepository', async function () {
 
       await expect(
         repository.connect(addrs[0]).presignedEmote(
-          await owner.getAddress(),
+          owner.address,
           await token.getAddress(),
           tokenId,
           emoji1,
@@ -689,7 +693,7 @@ describe('RMRKEmotesRepository', async function () {
         repository
           .connect(addrs[0])
           .bulkPresignedEmote(
-            [await owner.getAddress(), await owner.getAddress()],
+            [owner.address, owner.address],
             [await token.getAddress(), await token.getAddress()],
             [tokenId, tokenId],
             [emoji1, emoji2],
@@ -701,9 +705,9 @@ describe('RMRKEmotesRepository', async function () {
           ),
       )
         .to.emit(repository, 'Emoted')
-        .withArgs(await owner.getAddress(), await token.getAddress(), tokenId, emoji1, true)
+        .withArgs(owner.address, await token.getAddress(), tokenId, emoji1, true)
         .to.emit(repository, 'Emoted')
-        .withArgs(await owner.getAddress(), await token.getAddress(), tokenId, emoji2, true);
+        .withArgs(owner.address, await token.getAddress(), tokenId, emoji2, true);
     });
 
     it('can use presigned emotes to undo reaction to token', async function () {
@@ -732,7 +736,7 @@ describe('RMRKEmotesRepository', async function () {
         repository
           .connect(addrs[0])
           .bulkPresignedEmote(
-            [await owner.getAddress(), await owner.getAddress()],
+            [owner.address, owner.address],
             [await token.getAddress(), await token.getAddress()],
             [tokenId, tokenId],
             [emoji1, emoji2],
@@ -744,9 +748,9 @@ describe('RMRKEmotesRepository', async function () {
           ),
       )
         .to.emit(repository, 'Emoted')
-        .withArgs(await owner.getAddress(), await token.getAddress(), tokenId, emoji1, false)
+        .withArgs(owner.address, await token.getAddress(), tokenId, emoji1, false)
         .to.emit(repository, 'Emoted')
-        .withArgs(await owner.getAddress(), await token.getAddress(), tokenId, emoji2, false);
+        .withArgs(owner.address, await token.getAddress(), tokenId, emoji2, false);
     });
 
     it('does nothing if new state is the same as old state on bulk presigned emote', async function () {
@@ -773,7 +777,7 @@ describe('RMRKEmotesRepository', async function () {
       await repository
         .connect(addrs[0])
         .bulkPresignedEmote(
-          [await owner.getAddress(), await owner.getAddress()],
+          [owner.address, owner.address],
           [await token.getAddress(), await token.getAddress()],
           [tokenId, tokenId],
           [emoji1, emoji2],
@@ -815,7 +819,7 @@ describe('RMRKEmotesRepository', async function () {
         repository
           .connect(addrs[0])
           .bulkPresignedEmote(
-            [await owner.getAddress()],
+            [owner.address],
             [await token.getAddress(), await token.getAddress()],
             [tokenId, tokenId],
             [emoji1, emoji2],
@@ -831,7 +835,7 @@ describe('RMRKEmotesRepository', async function () {
         repository
           .connect(addrs[0])
           .bulkPresignedEmote(
-            [await owner.getAddress(), await owner.getAddress()],
+            [owner.address, owner.address],
             [await token.getAddress()],
             [tokenId, tokenId],
             [emoji1, emoji2],
@@ -847,7 +851,7 @@ describe('RMRKEmotesRepository', async function () {
         repository
           .connect(addrs[0])
           .bulkPresignedEmote(
-            [await owner.getAddress(), await owner.getAddress()],
+            [owner.address, owner.address],
             [await token.getAddress(), await token.getAddress()],
             [tokenId],
             [emoji1, emoji2],
@@ -863,7 +867,7 @@ describe('RMRKEmotesRepository', async function () {
         repository
           .connect(addrs[0])
           .bulkPresignedEmote(
-            [await owner.getAddress(), await owner.getAddress()],
+            [owner.address, owner.address],
             [await token.getAddress(), await token.getAddress()],
             [tokenId, tokenId],
             [emoji1],
@@ -879,7 +883,7 @@ describe('RMRKEmotesRepository', async function () {
         repository
           .connect(addrs[0])
           .bulkPresignedEmote(
-            [await owner.getAddress(), await owner.getAddress()],
+            [owner.address, owner.address],
             [await token.getAddress(), await token.getAddress()],
             [tokenId, tokenId],
             [emoji1, emoji2],
@@ -895,7 +899,7 @@ describe('RMRKEmotesRepository', async function () {
         repository
           .connect(addrs[0])
           .bulkPresignedEmote(
-            [await owner.getAddress(), await owner.getAddress()],
+            [owner.address, owner.address],
             [await token.getAddress(), await token.getAddress()],
             [tokenId, tokenId],
             [emoji1, emoji2],
@@ -911,7 +915,7 @@ describe('RMRKEmotesRepository', async function () {
         repository
           .connect(addrs[0])
           .bulkPresignedEmote(
-            [await owner.getAddress(), await owner.getAddress()],
+            [owner.address, owner.address],
             [await token.getAddress(), await token.getAddress()],
             [tokenId, tokenId],
             [emoji1, emoji2],
@@ -927,7 +931,7 @@ describe('RMRKEmotesRepository', async function () {
         repository
           .connect(addrs[0])
           .bulkPresignedEmote(
-            [await owner.getAddress(), await owner.getAddress()],
+            [owner.address, owner.address],
             [await token.getAddress(), await token.getAddress()],
             [tokenId, tokenId],
             [emoji1, emoji2],
@@ -943,7 +947,7 @@ describe('RMRKEmotesRepository', async function () {
         repository
           .connect(addrs[0])
           .bulkPresignedEmote(
-            [await owner.getAddress(), await owner.getAddress()],
+            [owner.address, owner.address],
             [await token.getAddress(), await token.getAddress()],
             [tokenId, tokenId],
             [emoji1, emoji2],
@@ -958,6 +962,9 @@ describe('RMRKEmotesRepository', async function () {
 
     it('cannot use expired presigned to bulk emote', async function () {
       const block = await ethers.provider.getBlock('latest');
+      if (!block) {
+        throw new Error('Block not found');
+      }
       const previousBlockTime = block.timestamp;
 
       const messages = await repository.bulkPrepareMessagesToPresignEmote(
@@ -982,7 +989,7 @@ describe('RMRKEmotesRepository', async function () {
         repository
           .connect(addrs[0])
           .bulkPresignedEmote(
-            [await owner.getAddress(), await owner.getAddress()],
+            [owner.address, owner.address],
             [await token.getAddress(), await token.getAddress()],
             [tokenId, tokenId],
             [emoji1, emoji2],
@@ -997,6 +1004,9 @@ describe('RMRKEmotesRepository', async function () {
 
     it('cannot use bulk presigned emote for a different signer, collection, token, emoji, state or deadline', async function () {
       const block = await ethers.provider.getBlock('latest');
+      if (!block) {
+        throw new Error('Block not found');
+      }
       const previousBlockTime = block.timestamp;
 
       const messages = await repository.bulkPrepareMessagesToPresignEmote(
@@ -1019,7 +1029,7 @@ describe('RMRKEmotesRepository', async function () {
 
       await expect(
         repository.connect(addrs[0]).bulkPresignedEmote(
-          [await owner.getAddress(), addrs[1].address], // different signer
+          [owner.address, addrs[1].address], // different signer
           [await token.getAddress(), await token.getAddress()],
           [tokenId, tokenId],
           [emoji1, emoji2],
@@ -1033,7 +1043,7 @@ describe('RMRKEmotesRepository', async function () {
 
       await expect(
         repository.connect(addrs[0]).bulkPresignedEmote(
-          [await owner.getAddress(), await owner.getAddress()],
+          [owner.address, owner.address],
           [await token.getAddress(), addrs[2].address], // different collection
           [tokenId, tokenId],
           [emoji1, emoji2],
@@ -1047,7 +1057,7 @@ describe('RMRKEmotesRepository', async function () {
 
       await expect(
         repository.connect(addrs[0]).bulkPresignedEmote(
-          [await owner.getAddress(), await owner.getAddress()],
+          [owner.address, owner.address],
           [await token.getAddress(), await token.getAddress()],
           [tokenId, tokenId + 1n], // different token
           [emoji1, emoji2],
@@ -1061,7 +1071,7 @@ describe('RMRKEmotesRepository', async function () {
 
       await expect(
         repository.connect(addrs[0]).bulkPresignedEmote(
-          [await owner.getAddress(), await owner.getAddress()],
+          [owner.address, owner.address],
           [await token.getAddress(), await token.getAddress()],
           [tokenId, tokenId],
           [emoji1, '😎'], // different emoji
@@ -1075,7 +1085,7 @@ describe('RMRKEmotesRepository', async function () {
 
       await expect(
         repository.connect(addrs[0]).bulkPresignedEmote(
-          [await owner.getAddress(), await owner.getAddress()],
+          [owner.address, owner.address],
           [await token.getAddress(), await token.getAddress()],
           [tokenId, tokenId],
           [emoji1, emoji2],
@@ -1089,7 +1099,7 @@ describe('RMRKEmotesRepository', async function () {
 
       await expect(
         repository.connect(addrs[0]).bulkPresignedEmote(
-          [await owner.getAddress(), await owner.getAddress()],
+          [owner.address, owner.address],
           [await token.getAddress(), await token.getAddress()],
           [tokenId, tokenId],
           [emoji1, emoji2],

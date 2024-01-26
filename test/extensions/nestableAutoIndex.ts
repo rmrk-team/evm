@@ -47,7 +47,7 @@ describe('RMRKNestableAutoIndexMock', async function () {
 
   describe('With minted tokens', async function () {
     beforeEach(async function () {
-      await token.mint(await owner.getAddress(), parentId);
+      await token.mint(owner.address, parentId);
       await token.nestMint(await token.getAddress(), childId1, parentId);
       await token.nestMint(await token.getAddress(), childId2, parentId);
       await token.nestMint(await token.getAddress(), childId3, parentId);
@@ -107,7 +107,7 @@ describe('RMRKNestableAutoIndexMock', async function () {
       it('can transfer pending child in first position and result is ok', async function () {
         await token['transferChild(uint256,address,uint256,address,uint256,bool,bytes)'](
           parentId,
-          await owner.getAddress(),
+          owner.address,
           0,
           await token.getAddress(),
           childId1,
@@ -123,7 +123,7 @@ describe('RMRKNestableAutoIndexMock', async function () {
       it('can transfer pending child in middle position and result is ok', async function () {
         await token['transferChild(uint256,address,uint256,address,uint256,bool,bytes)'](
           parentId,
-          await owner.getAddress(),
+          owner.address,
           0,
           await token.getAddress(),
           childId2,
@@ -139,7 +139,7 @@ describe('RMRKNestableAutoIndexMock', async function () {
       it('can transfer pending child in last position and result is ok', async function () {
         await token['transferChild(uint256,address,uint256,address,uint256,bool,bytes)'](
           parentId,
-          await owner.getAddress(),
+          owner.address,
           0,
           await token.getAddress(),
           childId3,
@@ -155,7 +155,7 @@ describe('RMRKNestableAutoIndexMock', async function () {
       it('can transfer all pending children result is ok', async function () {
         await token['transferChild(uint256,address,uint256,address,uint256,bool,bytes)'](
           parentId,
-          await owner.getAddress(),
+          owner.address,
           0,
           await token.getAddress(),
           childId1,
@@ -164,7 +164,7 @@ describe('RMRKNestableAutoIndexMock', async function () {
         );
         await token['transferChild(uint256,address,uint256,address,uint256,bool,bytes)'](
           parentId,
-          await owner.getAddress(),
+          owner.address,
           0,
           await token.getAddress(),
           childId2,
@@ -173,7 +173,7 @@ describe('RMRKNestableAutoIndexMock', async function () {
         );
         await token['transferChild(uint256,address,uint256,address,uint256,bool,bytes)'](
           parentId,
-          await owner.getAddress(),
+          owner.address,
           0,
           await token.getAddress(),
           childId3,
@@ -189,7 +189,7 @@ describe('RMRKNestableAutoIndexMock', async function () {
         await expect(
           token['transferChild(uint256,address,uint256,address,uint256,bool,bytes)'](
             parentId,
-            await owner.getAddress(),
+            owner.address,
             0,
             await token.getAddress(),
             otherChildId,
@@ -222,7 +222,7 @@ describe('RMRKNestableAutoIndexMock', async function () {
       it('can transfer active child in first position and result is ok', async function () {
         await token['transferChild(uint256,address,uint256,address,uint256,bool,bytes)'](
           parentId,
-          await owner.getAddress(),
+          owner.address,
           0,
           await token.getAddress(),
           childId1,
@@ -238,7 +238,7 @@ describe('RMRKNestableAutoIndexMock', async function () {
       it('can transfer active child in middle position and result is ok', async function () {
         await token['transferChild(uint256,address,uint256,address,uint256,bool,bytes)'](
           parentId,
-          await owner.getAddress(),
+          owner.address,
           0,
           await token.getAddress(),
           childId2,
@@ -254,7 +254,7 @@ describe('RMRKNestableAutoIndexMock', async function () {
       it('can transfer active child in last position and result is ok', async function () {
         await token['transferChild(uint256,address,uint256,address,uint256,bool,bytes)'](
           parentId,
-          await owner.getAddress(),
+          owner.address,
           0,
           await token.getAddress(),
           childId3,
@@ -270,7 +270,7 @@ describe('RMRKNestableAutoIndexMock', async function () {
       it('can transfer all active children result is ok', async function () {
         await token['transferChild(uint256,address,uint256,address,uint256,bool,bytes)'](
           parentId,
-          await owner.getAddress(),
+          owner.address,
           0,
           await token.getAddress(),
           childId1,
@@ -279,7 +279,7 @@ describe('RMRKNestableAutoIndexMock', async function () {
         );
         await token['transferChild(uint256,address,uint256,address,uint256,bool,bytes)'](
           parentId,
-          await owner.getAddress(),
+          owner.address,
           0,
           await token.getAddress(),
           childId2,
@@ -288,7 +288,7 @@ describe('RMRKNestableAutoIndexMock', async function () {
         );
         await token['transferChild(uint256,address,uint256,address,uint256,bool,bytes)'](
           parentId,
-          await owner.getAddress(),
+          owner.address,
           0,
           await token.getAddress(),
           childId3,
@@ -304,7 +304,7 @@ describe('RMRKNestableAutoIndexMock', async function () {
         await expect(
           token['transferChild(uint256,address,uint256,address,uint256,bool,bytes)'](
             parentId,
-            await owner.getAddress(),
+            owner.address,
             0,
             await token.getAddress(),
             otherChildId,

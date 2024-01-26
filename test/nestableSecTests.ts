@@ -27,7 +27,7 @@ describe('Nestable with ChildAdder', function () {
 
   describe('add children', async function () {
     it('cannot add multiple children', async function () {
-      await parent.connect(owner).mint(await owner.getAddress(), 1);
+      await parent.connect(owner).mint(owner.address, 1);
       // Propose 10 children with the same params to the parent token
       await adder.addChild(await parent.getAddress(), 1, 1, 10);
 

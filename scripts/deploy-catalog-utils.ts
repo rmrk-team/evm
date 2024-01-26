@@ -1,10 +1,5 @@
 import { ethers, run } from 'hardhat';
-
-export const sleep = (ms: number): Promise<void> => {
-  return new Promise((resolve) => {
-    setTimeout(() => resolve(), ms);
-  });
-};
+import { sleep } from './utils';
 
 async function main() {
   // We get the contract to deploy

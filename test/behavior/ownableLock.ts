@@ -19,7 +19,7 @@ async function shouldBehaveOwnableLock(ismock: boolean) {
 
   describe('Init', async function () {
     it('can get owner', async function () {
-      expect(await ownableLock.owner()).to.equal(await owner.getAddress());
+      expect(await ownableLock.owner()).to.equal(owner.address);
     });
 
     it('emits LockSet event when the lock is set', async function () {

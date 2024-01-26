@@ -33,7 +33,7 @@ async function collectionUtilsFixture() {
       'MA',
       collectionMeta,
       maxSupply,
-      await deployer.getAddress(),
+      deployer.address,
       royaltyBps,
     )
   );
@@ -45,7 +45,7 @@ async function collectionUtilsFixture() {
       'NMAS',
       collectionMeta,
       maxSupply,
-      await deployer.getAddress(),
+      deployer.address,
       royaltyBps,
     )
   );
@@ -57,7 +57,7 @@ async function collectionUtilsFixture() {
       'NMA',
       collectionMeta,
       maxSupply,
-      await deployer.getAddress(),
+      deployer.address,
       royaltyBps,
     )
   );
@@ -69,7 +69,7 @@ async function collectionUtilsFixture() {
       'EQ',
       collectionMeta,
       maxSupply,
-      await deployer.getAddress(),
+      deployer.address,
       royaltyBps,
     )
   );
@@ -104,17 +104,17 @@ describe('Collection Utils', function () {
   });
 
   it('can get collection data', async function () {
-    await mintFromMockPremint(multiAsset, await holder.getAddress());
-    await mintFromMockPremint(nestableMultiAsset, await holder.getAddress());
-    await mintFromMockPremint(nestableMultiAssetSoulbound, await holder.getAddress());
-    await mintFromMockPremint(equip, await holder.getAddress());
+    await mintFromMockPremint(multiAsset, holder.address);
+    await mintFromMockPremint(nestableMultiAsset, holder.address);
+    await mintFromMockPremint(nestableMultiAssetSoulbound, holder.address);
+    await mintFromMockPremint(equip, holder.address);
 
     expect(await collectionUtils.getCollectionData(await multiAsset.getAddress())).to.eql([
       1n,
       maxSupply,
       royaltyBps,
-      await issuer.getAddress(),
-      await issuer.getAddress(),
+      issuer.address,
+      issuer.address,
       'MultiAsset',
       'MA',
       collectionMeta,
@@ -124,8 +124,8 @@ describe('Collection Utils', function () {
       1n,
       maxSupply,
       royaltyBps,
-      await issuer.getAddress(),
-      await issuer.getAddress(),
+      issuer.address,
+      issuer.address,
       'MultiAsset',
       'MA',
       collectionMeta,
@@ -135,8 +135,8 @@ describe('Collection Utils', function () {
       1n,
       maxSupply,
       royaltyBps,
-      await issuer.getAddress(),
-      await issuer.getAddress(),
+      issuer.address,
+      issuer.address,
       'NestableMultiAsset',
       'NMA',
       collectionMeta,
@@ -148,8 +148,8 @@ describe('Collection Utils', function () {
       1n,
       maxSupply,
       royaltyBps,
-      await issuer.getAddress(),
-      await issuer.getAddress(),
+      issuer.address,
+      issuer.address,
       'NestableMultiAssetSoulbound',
       'NMAS',
       collectionMeta,
@@ -159,8 +159,8 @@ describe('Collection Utils', function () {
       1n,
       maxSupply,
       royaltyBps,
-      await issuer.getAddress(),
-      await issuer.getAddress(),
+      issuer.address,
+      issuer.address,
       'Equippable',
       'EQ',
       collectionMeta,
@@ -193,7 +193,7 @@ describe('Collection Utils', function () {
   });
 
   it('can get pages of available ids', async function () {
-    await multiAsset.mint(await holder.getAddress(), 9, '');
+    await multiAsset.mint(holder.address, 9, '');
     await multiAsset.connect(holder).burn(3);
     await multiAsset.connect(holder).burn(8);
 

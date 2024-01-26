@@ -23,7 +23,8 @@ async function parentChildFixture(): Promise<{
   parent: RMRKNestableMock;
   child: RMRKNestableMock;
 }> {
-  return await parentChildFixtureWithArgs('RMRKNestableMock', [], []);
+  const { parent, child } = await parentChildFixtureWithArgs('RMRKNestableMock', [], []);
+  return { parent: <RMRKNestableMock>parent, child: <RMRKNestableMock>child };
 }
 
 describe('NestableMock', function () {
@@ -44,14 +45,14 @@ describe('NestableMock', function () {
   describe('Minting', async function () {
     it('cannot mint id 0', async function () {
       const tokenId = 0;
-      await expect(child.mint(await owner.getAddress(), tokenId)).to.be.revertedWithCustomError(
+      await expect(child.mint(owner.address, tokenId)).to.be.revertedWithCustomError(
         child,
         'RMRKIdZeroForbidden',
       );
     });
 
     it('cannot nest mint id 0', async function () {
-      const parentId = await mintFromMock(child, await owner.getAddress());
+      const parentId = await mintFromMock(child, owner.address);
       const childId = 0;
       await expect(
         child.nestMint(await parent.getAddress(), childId, parentId),
@@ -59,15 +60,15 @@ describe('NestableMock', function () {
     });
 
     it('cannot mint already minted token', async function () {
-      const tokenId = await mintFromMock(child, await owner.getAddress());
-      await expect(child.mint(await owner.getAddress(), tokenId)).to.be.revertedWithCustomError(
+      const tokenId = await mintFromMock(child, owner.address);
+      await expect(child.mint(owner.address, tokenId)).to.be.revertedWithCustomError(
         child,
         'ERC721TokenAlreadyMinted',
       );
     });
 
     it('cannot nest mint already minted token', async function () {
-      const parentId = await mintFromMock(parent, await owner.getAddress());
+      const parentId = await mintFromMock(parent, owner.address);
       const childId = await nestMintFromMock(child, await parent.getAddress(), parentId);
 
       await expect(
@@ -76,7 +77,7 @@ describe('NestableMock', function () {
     });
 
     it('cannot nest mint already minted token', async function () {
-      const parentId = await mintFromMock(parent, await owner.getAddress());
+      const parentId = await mintFromMock(parent, owner.address);
       const childId = await nestMintFromMock(child, await parent.getAddress(), parentId);
 
       await expect(
@@ -114,15 +115,15 @@ describe('NestableMock transfer hooks', function () {
   });
 
   it('keeps track of balances per NFTs', async function () {
-    const parentId = await mintFromMock(parent, await owner.getAddress());
+    const parentId = await mintFromMock(parent, owner.address);
     const childId = await nestMintFromMock(child, await parent.getAddress(), parentId);
 
-    expect(await parent.balancePerNftOf(await owner.getAddress(), 0)).to.eql(bn(1));
+    expect(await parent.balancePerNftOf(owner.address, 0)).to.eql(bn(1));
     expect(await child.balancePerNftOf(await parent.getAddress(), parentId)).to.eql(bn(1));
 
     await parent.transferChild(
       parentId,
-      await otherOwner.getAddress(),
+      otherOwner.address,
       0,
       0,
       await child.getAddress(),
@@ -131,27 +132,21 @@ describe('NestableMock transfer hooks', function () {
       '0x',
     );
     expect(await child.balancePerNftOf(await parent.getAddress(), parentId)).to.eql(0n);
-    expect(await child.balancePerNftOf(await otherOwner.getAddress(), 0)).to.eql(bn(1));
+    expect(await child.balancePerNftOf(otherOwner.address, 0)).to.eql(bn(1));
 
     // Nest again
     await child
       .connect(otherOwner)
-      .nestTransferFrom(
-        await otherOwner.getAddress(),
-        await parent.getAddress(),
-        childId,
-        parentId,
-        '0x',
-      );
+      .nestTransferFrom(otherOwner.address, await parent.getAddress(), childId, parentId, '0x');
 
     expect(await child.balancePerNftOf(await parent.getAddress(), parentId)).to.eql(bn(1));
-    expect(await child.balancePerNftOf(await otherOwner.getAddress(), 0)).to.eql(0n);
+    expect(await child.balancePerNftOf(otherOwner.address, 0)).to.eql(0n);
 
     await parent.acceptChild(parentId, 0, await child.getAddress(), childId);
 
     await parent['burn(uint256,uint256)'](parentId, 1);
-    expect(await parent.balancePerNftOf(await owner.getAddress(), 0)).to.eql(0n);
+    expect(await parent.balancePerNftOf(owner.address, 0)).to.eql(0n);
     expect(await child.balancePerNftOf(await parent.getAddress(), parentId)).to.eql(0n);
-    expect(await child.balancePerNftOf(await otherOwner.getAddress(), 0)).to.eql(0n);
+    expect(await child.balancePerNftOf(otherOwner.address, 0)).to.eql(0n);
   });
 });

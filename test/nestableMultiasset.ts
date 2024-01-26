@@ -35,7 +35,8 @@ async function parentChildFixture(): Promise<{
   parent: RMRKNestableMultiAssetMock;
   child: RMRKNestableMultiAssetMock;
 }> {
-  return await parentChildFixtureWithArgs('RMRKNestableMultiAssetMock', [], []);
+  const { parent, child } = await parentChildFixtureWithArgs('RMRKNestableMultiAssetMock', [], []);
+  return { parent: <RMRKNestableMultiAssetMock>parent, child: <RMRKNestableMultiAssetMock>child };
 }
 
 describe('NestableMultiAssetMock Nestable Behavior', function () {
@@ -88,16 +89,14 @@ describe('NestableMultiAssetMock Other Behavior', function () {
       const tokenOwner = addrs[1];
       const newOwner = addrs[2];
       const approved = addrs[3];
-      await token.mint(await tokenOwner.getAddress(), tokenId);
-      await token.connect(tokenOwner).approve(await approved.getAddress(), tokenId);
-      await token.connect(tokenOwner).approveForAssets(await approved.getAddress(), tokenId);
+      await token.mint(tokenOwner.address, tokenId);
+      await token.connect(tokenOwner).approve(approved.address, tokenId);
+      await token.connect(tokenOwner).approveForAssets(approved.address, tokenId);
 
-      expect(await token.getApproved(tokenId)).to.eql(await approved.getAddress());
-      expect(await token.getApprovedForAssets(tokenId)).to.eql(await approved.getAddress());
+      expect(await token.getApproved(tokenId)).to.eql(approved.address);
+      expect(await token.getApprovedForAssets(tokenId)).to.eql(approved.address);
 
-      await token
-        .connect(tokenOwner)
-        .transferFrom(await tokenOwner.getAddress(), await newOwner.getAddress(), tokenId);
+      await token.connect(tokenOwner).transferFrom(tokenOwner.address, newOwner.address, tokenId);
 
       expect(await token.getApproved(tokenId)).to.eql(ethers.ZeroAddress);
       expect(await token.getApprovedForAssets(tokenId)).to.eql(ethers.ZeroAddress);
@@ -107,12 +106,12 @@ describe('NestableMultiAssetMock Other Behavior', function () {
       const tokenId = 1;
       const tokenOwner = addrs[1];
       const approved = addrs[3];
-      await token.mint(await tokenOwner.getAddress(), tokenId);
-      await token.connect(tokenOwner).approve(await approved.getAddress(), tokenId);
-      await token.connect(tokenOwner).approveForAssets(await approved.getAddress(), tokenId);
+      await token.mint(tokenOwner.address, tokenId);
+      await token.connect(tokenOwner).approve(approved.address, tokenId);
+      await token.connect(tokenOwner).approveForAssets(approved.address, tokenId);
 
-      expect(await token.getApproved(tokenId)).to.eql(await approved.getAddress());
-      expect(await token.getApprovedForAssets(tokenId)).to.eql(await approved.getAddress());
+      expect(await token.getApproved(tokenId)).to.eql(approved.address);
+      expect(await token.getApprovedForAssets(tokenId)).to.eql(approved.address);
 
       await token.connect(tokenOwner)['burn(uint256)'](tokenId);
 

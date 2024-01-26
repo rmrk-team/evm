@@ -99,16 +99,11 @@ describe('RMRKTokenAttributesRepository', async function () {
           await ownedCollection.getAddress(),
           tokenId,
           'owner',
-          await tokenOwner.getAddress(),
+          tokenOwner.address,
         ),
       )
         .to.emit(tokenAttributes, 'AddressAttributeSet')
-        .withArgs(
-          await ownedCollection.getAddress(),
-          tokenId,
-          'owner',
-          await tokenOwner.getAddress(),
-        );
+        .withArgs(await ownedCollection.getAddress(), tokenId, 'owner', tokenOwner.address);
       expect(
         await tokenAttributes.setUintAttribute(
           await ownedCollection.getAddress(),
@@ -183,7 +178,7 @@ describe('RMRKTokenAttributesRepository', async function () {
           tokenId,
           'owner',
         ),
-      ).to.eql(await tokenOwner.getAddress());
+      ).to.eql(tokenOwner.address);
       expect(
         await tokenAttributes.getUintAttribute(await ownedCollection.getAddress(), tokenId, 'atk'),
       ).to.eql(100n);
@@ -235,7 +230,7 @@ describe('RMRKTokenAttributesRepository', async function () {
             { key: 'bool2', value: false },
           ],
           [
-            { key: 'address1', value: await tokenOwner.getAddress() },
+            { key: 'address1', value: tokenOwner.address },
             { key: 'address2', value: await collectionOwner.getAddress() },
           ],
           [
@@ -257,12 +252,7 @@ describe('RMRKTokenAttributesRepository', async function () {
         .to.emit(tokenAttributes, 'BoolAttributeUpdated')
         .withArgs(await ownedCollection.getAddress(), tokenId, 'bool2', false)
         .to.emit(tokenAttributes, 'AddressAttributeUpdated')
-        .withArgs(
-          await ownedCollection.getAddress(),
-          tokenId,
-          'address1',
-          await tokenOwner.getAddress(),
-        )
+        .withArgs(await ownedCollection.getAddress(), tokenId, 'address1', tokenOwner.address)
         .to.emit(tokenAttributes, 'AddressAttributeUpdated')
         .withArgs(
           await ownedCollection.getAddress(),
@@ -294,7 +284,7 @@ describe('RMRKTokenAttributesRepository', async function () {
         ],
         [
           { key: 'address1', value: await collectionOwner.getAddress() },
-          { key: 'address2', value: await tokenOwner.getAddress() },
+          { key: 'address2', value: tokenOwner.address },
         ],
         [
           { key: 'bytes1', value: '0x5678' },
@@ -319,7 +309,7 @@ describe('RMRKTokenAttributesRepository', async function () {
             { key: 'bool2', value: false },
           ],
           [
-            { key: 'address1', value: await tokenOwner.getAddress() },
+            { key: 'address1', value: tokenOwner.address },
             { key: 'address2', value: await collectionOwner.getAddress() },
           ],
           [
@@ -341,12 +331,7 @@ describe('RMRKTokenAttributesRepository', async function () {
         .to.emit(tokenAttributes, 'BoolAttributeUpdated')
         .withArgs(await ownedCollection.getAddress(), tokenId, 'bool2', false)
         .to.emit(tokenAttributes, 'AddressAttributeUpdated')
-        .withArgs(
-          await ownedCollection.getAddress(),
-          tokenId,
-          'address1',
-          await tokenOwner.getAddress(),
-        )
+        .withArgs(await ownedCollection.getAddress(), tokenId, 'address1', tokenOwner.address)
         .to.emit(tokenAttributes, 'AddressAttributeUpdated')
         .withArgs(
           await ownedCollection.getAddress(),
@@ -375,7 +360,7 @@ describe('RMRKTokenAttributesRepository', async function () {
         ],
         [
           { key: 'address1', value: await collectionOwner.getAddress() },
-          { key: 'address2', value: await tokenOwner.getAddress() },
+          { key: 'address2', value: tokenOwner.address },
         ],
         [],
       );
@@ -394,7 +379,7 @@ describe('RMRKTokenAttributesRepository', async function () {
             { key: 'bool2', value: false },
           ],
           [
-            { key: 'address1', value: await tokenOwner.getAddress() },
+            { key: 'address1', value: tokenOwner.address },
             { key: 'address2', value: await collectionOwner.getAddress() },
           ],
           [
@@ -412,12 +397,7 @@ describe('RMRKTokenAttributesRepository', async function () {
         .to.emit(tokenAttributes, 'BoolAttributeUpdated')
         .withArgs(await ownedCollection.getAddress(), tokenId, 'bool2', false)
         .to.emit(tokenAttributes, 'AddressAttributeUpdated')
-        .withArgs(
-          await ownedCollection.getAddress(),
-          tokenId,
-          'address1',
-          await tokenOwner.getAddress(),
-        )
+        .withArgs(await ownedCollection.getAddress(), tokenId, 'address1', tokenOwner.address)
         .to.emit(tokenAttributes, 'AddressAttributeUpdated')
         .withArgs(
           await ownedCollection.getAddress(),
@@ -468,7 +448,7 @@ describe('RMRKTokenAttributesRepository', async function () {
             { key: 'bool2', value: false },
           ],
           [
-            { key: 'address1', value: await tokenOwner.getAddress() },
+            { key: 'address1', value: tokenOwner.address },
             { key: 'address2', value: await collectionOwner.getAddress() },
           ],
           [
@@ -490,12 +470,7 @@ describe('RMRKTokenAttributesRepository', async function () {
         .to.emit(tokenAttributes, 'BoolAttributeUpdated')
         .withArgs(await ownedCollection.getAddress(), tokenId, 'bool2', false)
         .to.emit(tokenAttributes, 'AddressAttributeUpdated')
-        .withArgs(
-          await ownedCollection.getAddress(),
-          tokenId,
-          'address1',
-          await tokenOwner.getAddress(),
-        )
+        .withArgs(await ownedCollection.getAddress(), tokenId, 'address1', tokenOwner.address)
         .to.emit(tokenAttributes, 'AddressAttributeUpdated')
         .withArgs(
           await ownedCollection.getAddress(),
@@ -526,7 +501,7 @@ describe('RMRKTokenAttributesRepository', async function () {
           { key: 'bool2', value: false },
         ],
         [
-          { key: 'address1', value: await tokenOwner.getAddress() },
+          { key: 'address1', value: tokenOwner.address },
           { key: 'address2', value: await collectionOwner.getAddress() },
         ],
         [
@@ -559,7 +534,7 @@ describe('RMRKTokenAttributesRepository', async function () {
           ['bool2', false],
         ],
         [
-          ['address1', await tokenOwner.getAddress()],
+          ['address1', tokenOwner.address],
           ['address2', await collectionOwner.getAddress()],
         ],
         [
@@ -674,17 +649,12 @@ describe('RMRKTokenAttributesRepository', async function () {
     it('can set multiple address attributes at the same time', async function () {
       await expect(
         tokenAttributes.setAddressAttributes(await ownedCollection.getAddress(), tokenId, [
-          { key: 'address1', value: await tokenOwner.getAddress() },
+          { key: 'address1', value: tokenOwner.address },
           { key: 'address2', value: await collectionOwner.getAddress() },
         ]),
       )
         .to.emit(tokenAttributes, 'AddressAttributeUpdated')
-        .withArgs(
-          await ownedCollection.getAddress(),
-          tokenId,
-          'address1',
-          await tokenOwner.getAddress(),
-        )
+        .withArgs(await ownedCollection.getAddress(), tokenId, 'address1', tokenOwner.address)
         .to.emit(tokenAttributes, 'AddressAttributeUpdated')
         .withArgs(
           await ownedCollection.getAddress(),
@@ -708,7 +678,7 @@ describe('RMRKTokenAttributesRepository', async function () {
         [],
         [],
         [
-          ['address1', await tokenOwner.getAddress()],
+          ['address1', tokenOwner.address],
           ['address2', await collectionOwner.getAddress()],
         ],
         [],
@@ -788,7 +758,7 @@ describe('RMRKTokenAttributesRepository', async function () {
         await ownedCollection.getAddress(),
         tokenId,
         'X',
-        await tokenOwner.getAddress(),
+        tokenOwner.address,
       );
       await tokenAttributes.setUintAttribute(
         await ownedCollection.getAddress(),
@@ -811,7 +781,7 @@ describe('RMRKTokenAttributesRepository', async function () {
       ).to.eql(true);
       expect(
         await tokenAttributes.getAddressAttribute(await ownedCollection.getAddress(), tokenId, 'X'),
-      ).to.eql(await tokenOwner.getAddress());
+      ).to.eql(tokenOwner.address);
       expect(
         await tokenAttributes.getUintAttribute(await ownedCollection.getAddress(), tokenId, 'X'),
       ).to.eql(100n);
@@ -874,7 +844,7 @@ describe('RMRKTokenAttributesRepository', async function () {
             await ownedCollection.getAddress(),
             tokenId,
             'X',
-            await tokenOwner.getAddress(),
+            tokenOwner.address,
           ),
       ).to.be.revertedWithCustomError(tokenAttributes, 'NotCollectionIssuer');
     });
@@ -943,7 +913,7 @@ describe('RMRKTokenAttributesRepository', async function () {
             await ownedCollection.getAddress(),
             'X',
             AccessType.IssuerOrCollaborator,
-            await tokenOwner.getAddress(),
+            tokenOwner.address,
           ),
       )
         .to.emit(tokenAttributes, 'AccessControlUpdate')
@@ -960,25 +930,17 @@ describe('RMRKTokenAttributesRepository', async function () {
       expect(
         await tokenAttributes
           .connect(collectionOwner)
-          .manageCollaborators(
-            await ownedCollection.getAddress(),
-            [await tokenOwner.getAddress()],
-            [true],
-          ),
+          .manageCollaborators(await ownedCollection.getAddress(), [tokenOwner.address], [true]),
       )
         .to.emit(tokenAttributes, 'CollaboratorUpdate')
-        .withArgs(await ownedCollection.getAddress(), [await tokenOwner.getAddress()], [true]);
+        .withArgs(await ownedCollection.getAddress(), [tokenOwner.address], [true]);
     });
 
     it('should not allow to manage collaborators of an unregistered collection', async function () {
       await expect(
         tokenAttributes
           .connect(collectionOwner)
-          .manageCollaborators(
-            await ownedCollection.getAddress(),
-            [await tokenOwner.getAddress()],
-            [true],
-          ),
+          .manageCollaborators(await ownedCollection.getAddress(), [tokenOwner.address], [true]),
       ).to.be.revertedWithCustomError(tokenAttributes, 'CollectionNotRegistered');
     });
 
@@ -992,11 +954,7 @@ describe('RMRKTokenAttributesRepository', async function () {
       await expect(
         tokenAttributes
           .connect(tokenOwner)
-          .manageCollaborators(
-            await ownedCollection.getAddress(),
-            [await tokenOwner.getAddress()],
-            [true],
-          ),
+          .manageCollaborators(await ownedCollection.getAddress(), [tokenOwner.address], [true]),
       ).to.be.revertedWithCustomError(tokenAttributes, 'NotCollectionIssuer');
     });
 
@@ -1012,7 +970,7 @@ describe('RMRKTokenAttributesRepository', async function () {
           .connect(collectionOwner)
           .manageCollaborators(
             await ownedCollection.getAddress(),
-            [await tokenOwner.getAddress(), await collectionOwner.getAddress()],
+            [tokenOwner.address, await collectionOwner.getAddress()],
             [true],
           ),
       ).to.be.revertedWithCustomError(tokenAttributes, 'CollaboratorArraysNotEqualLength');
@@ -1026,7 +984,7 @@ describe('RMRKTokenAttributesRepository', async function () {
             await ownedCollection.getAddress(),
             'X',
             AccessType.IssuerOrCollaborator,
-            await tokenOwner.getAddress(),
+            tokenOwner.address,
           ),
       ).to.be.revertedWithCustomError(tokenAttributes, 'CollectionNotRegistered');
     });
@@ -1045,7 +1003,7 @@ describe('RMRKTokenAttributesRepository', async function () {
             await ownedCollection.getAddress(),
             'X',
             AccessType.IssuerOrCollaborator,
-            await tokenOwner.getAddress(),
+            tokenOwner.address,
           ),
       ).to.be.revertedWithCustomError(tokenAttributes, 'NotCollectionIssuer');
     });
@@ -1064,7 +1022,7 @@ describe('RMRKTokenAttributesRepository', async function () {
             await ownedCollection.getAddress(),
             'X',
             AccessType.IssuerOrCollaborator,
-            await tokenOwner.getAddress(),
+            tokenOwner.address,
           ),
       ).to.be.revertedWithCustomError(tokenAttributes, 'NotCollectionIssuer');
     });
@@ -1078,22 +1036,18 @@ describe('RMRKTokenAttributesRepository', async function () {
 
       expect(
         await tokenAttributes.isCollaborator(
-          await tokenOwner.getAddress(),
+          tokenOwner.address,
           await ownedCollection.getAddress(),
         ),
       ).to.be.false;
 
       await tokenAttributes
         .connect(collectionOwner)
-        .manageCollaborators(
-          await ownedCollection.getAddress(),
-          [await tokenOwner.getAddress()],
-          [true],
-        );
+        .manageCollaborators(await ownedCollection.getAddress(), [tokenOwner.address], [true]);
 
       expect(
         await tokenAttributes.isCollaborator(
-          await tokenOwner.getAddress(),
+          tokenOwner.address,
           await ownedCollection.getAddress(),
         ),
       ).to.be.true;
@@ -1108,7 +1062,7 @@ describe('RMRKTokenAttributesRepository', async function () {
 
       expect(
         await tokenAttributes.isSpecificAddress(
-          await tokenOwner.getAddress(),
+          tokenOwner.address,
           await ownedCollection.getAddress(),
           'X',
         ),
@@ -1120,12 +1074,12 @@ describe('RMRKTokenAttributesRepository', async function () {
           await ownedCollection.getAddress(),
           'X',
           AccessType.IssuerOrCollaborator,
-          await tokenOwner.getAddress(),
+          tokenOwner.address,
         );
 
       expect(
         await tokenAttributes.isSpecificAddress(
-          await tokenOwner.getAddress(),
+          tokenOwner.address,
           await ownedCollection.getAddress(),
           'X',
         ),
@@ -1157,7 +1111,7 @@ describe('RMRKTokenAttributesRepository', async function () {
             await ownedCollection.getAddress(),
             tokenId,
             'X',
-            await tokenOwner.getAddress(),
+            tokenOwner.address,
           ),
       ).to.be.revertedWithCustomError(tokenAttributes, 'NotCollectionIssuer');
 
@@ -1168,7 +1122,7 @@ describe('RMRKTokenAttributesRepository', async function () {
             await ownedCollection.getAddress(),
             tokenId,
             'X',
-            await tokenOwner.getAddress(),
+            tokenOwner.address,
           ),
       ).to.be.revertedWithCustomError(tokenAttributes, 'NotCollectionIssuer');
     });
@@ -1193,20 +1147,11 @@ describe('RMRKTokenAttributesRepository', async function () {
 
       await tokenAttributes
         .connect(collectionOwner)
-        .manageCollaborators(
-          await ownedCollection.getAddress(),
-          [await tokenOwner.getAddress()],
-          [true],
-        );
+        .manageCollaborators(await ownedCollection.getAddress(), [tokenOwner.address], [true]);
 
       await tokenAttributes
         .connect(tokenOwner)
-        .setAddressAttribute(
-          await ownedCollection.getAddress(),
-          tokenId,
-          'X',
-          await tokenOwner.getAddress(),
-        );
+        .setAddressAttribute(await ownedCollection.getAddress(), tokenId, 'X', tokenOwner.address);
 
       await expect(
         tokenAttributes
@@ -1215,7 +1160,7 @@ describe('RMRKTokenAttributesRepository', async function () {
             await ownedCollection.getAddress(),
             tokenId,
             'X',
-            await tokenOwner.getAddress(),
+            tokenOwner.address,
           ),
       ).to.be.revertedWithCustomError(tokenAttributes, 'NotCollectionCollaborator');
     });
@@ -1240,12 +1185,7 @@ describe('RMRKTokenAttributesRepository', async function () {
 
       await tokenAttributes
         .connect(collectionOwner)
-        .setAddressAttribute(
-          await ownedCollection.getAddress(),
-          tokenId,
-          'X',
-          await tokenOwner.getAddress(),
-        );
+        .setAddressAttribute(await ownedCollection.getAddress(), tokenId, 'X', tokenOwner.address);
 
       await expect(
         tokenAttributes
@@ -1254,26 +1194,17 @@ describe('RMRKTokenAttributesRepository', async function () {
             await ownedCollection.getAddress(),
             tokenId,
             'X',
-            await tokenOwner.getAddress(),
+            tokenOwner.address,
           ),
       ).to.be.revertedWithCustomError(tokenAttributes, 'NotCollectionIssuerOrCollaborator');
 
       await tokenAttributes
         .connect(collectionOwner)
-        .manageCollaborators(
-          await ownedCollection.getAddress(),
-          [await tokenOwner.getAddress()],
-          [true],
-        );
+        .manageCollaborators(await ownedCollection.getAddress(), [tokenOwner.address], [true]);
 
       await tokenAttributes
         .connect(tokenOwner)
-        .setAddressAttribute(
-          await ownedCollection.getAddress(),
-          tokenId,
-          'X',
-          await tokenOwner.getAddress(),
-        );
+        .setAddressAttribute(await ownedCollection.getAddress(), tokenId, 'X', tokenOwner.address);
     });
 
     it('should only allow issuer and collaborator to modify the parameters if only issuer and collaborator is allowed to modify them even when using the ownable', async function () {
@@ -1296,12 +1227,7 @@ describe('RMRKTokenAttributesRepository', async function () {
 
       await tokenAttributes
         .connect(collectionOwner)
-        .setAddressAttribute(
-          await ownedCollection.getAddress(),
-          tokenId,
-          'X',
-          await tokenOwner.getAddress(),
-        );
+        .setAddressAttribute(await ownedCollection.getAddress(), tokenId, 'X', tokenOwner.address);
 
       await expect(
         tokenAttributes
@@ -1310,7 +1236,7 @@ describe('RMRKTokenAttributesRepository', async function () {
             await ownedCollection.getAddress(),
             tokenId,
             'X',
-            await tokenOwner.getAddress(),
+            tokenOwner.address,
           ),
       ).to.be.revertedWithCustomError(tokenAttributes, 'NotCollectionIssuerOrCollaborator');
 
@@ -1324,12 +1250,7 @@ describe('RMRKTokenAttributesRepository', async function () {
 
       await tokenAttributes
         .connect(collaborator)
-        .setAddressAttribute(
-          await ownedCollection.getAddress(),
-          tokenId,
-          'X',
-          await tokenOwner.getAddress(),
-        );
+        .setAddressAttribute(await ownedCollection.getAddress(), tokenId, 'X', tokenOwner.address);
     });
 
     it('should only allow token owner to modify the parameters if only token owner is allowed to modify them', async function () {
@@ -1357,7 +1278,7 @@ describe('RMRKTokenAttributesRepository', async function () {
             await ownedCollection.getAddress(),
             tokenId,
             'X',
-            await tokenOwner.getAddress(),
+            tokenOwner.address,
           ),
       ).to.be.revertedWithCustomError(tokenAttributes, 'NotTokenOwner');
 
@@ -1368,18 +1289,13 @@ describe('RMRKTokenAttributesRepository', async function () {
             await ownedCollection.getAddress(),
             tokenId,
             'X',
-            await tokenOwner.getAddress(),
+            tokenOwner.address,
           ),
       ).to.be.revertedWithCustomError(tokenAttributes, 'NotTokenOwner');
 
       await tokenAttributes
         .connect(tokenOwner)
-        .setAddressAttribute(
-          await ownedCollection.getAddress(),
-          tokenId,
-          'X',
-          await tokenOwner.getAddress(),
-        );
+        .setAddressAttribute(await ownedCollection.getAddress(), tokenId, 'X', tokenOwner.address);
     });
 
     it('should only allow specific address to modify the parameters if only specific address is allowed to modify them', async function () {
@@ -1407,7 +1323,7 @@ describe('RMRKTokenAttributesRepository', async function () {
             await ownedCollection.getAddress(),
             tokenId,
             'X',
-            await tokenOwner.getAddress(),
+            tokenOwner.address,
           ),
       ).to.be.revertedWithCustomError(tokenAttributes, 'NotSpecificAddress');
 
@@ -1417,17 +1333,12 @@ describe('RMRKTokenAttributesRepository', async function () {
           await ownedCollection.getAddress(),
           'X',
           AccessType.SpecificAddress,
-          await tokenOwner.getAddress(),
+          tokenOwner.address,
         );
 
       await tokenAttributes
         .connect(tokenOwner)
-        .setAddressAttribute(
-          await ownedCollection.getAddress(),
-          tokenId,
-          'X',
-          await tokenOwner.getAddress(),
-        );
+        .setAddressAttribute(await ownedCollection.getAddress(), tokenId, 'X', tokenOwner.address);
     });
 
     it('should allow to use presigned message to modify the parameters', async function () {
@@ -1471,7 +1382,7 @@ describe('RMRKTokenAttributesRepository', async function () {
         await ownedCollection.getAddress(),
         tokenId,
         'X',
-        await tokenOwner.getAddress(),
+        tokenOwner.address,
         9999999999n,
       );
 
@@ -1577,7 +1488,7 @@ describe('RMRKTokenAttributesRepository', async function () {
             await ownedCollection.getAddress(),
             tokenId,
             'X',
-            await tokenOwner.getAddress(),
+            tokenOwner.address,
             9999999999n,
             addressV,
             addressR,
@@ -1585,7 +1496,7 @@ describe('RMRKTokenAttributesRepository', async function () {
           ),
       )
         .to.emit(tokenAttributes, 'AddressAttributeUpdated')
-        .withArgs(await ownedCollection.getAddress(), 1, 'X', await tokenOwner.getAddress());
+        .withArgs(await ownedCollection.getAddress(), 1, 'X', tokenOwner.address);
     });
 
     it('should not allow to use presigned message to modify the parameters if the deadline has elapsed', async function () {
@@ -1631,7 +1542,7 @@ describe('RMRKTokenAttributesRepository', async function () {
         await ownedCollection.getAddress(),
         tokenId,
         'X',
-        await tokenOwner.getAddress(),
+        tokenOwner.address,
         10n,
       );
 
@@ -1729,7 +1640,7 @@ describe('RMRKTokenAttributesRepository', async function () {
             await ownedCollection.getAddress(),
             tokenId,
             'X',
-            await tokenOwner.getAddress(),
+            tokenOwner.address,
             10n,
             addressV,
             addressR,
@@ -1779,7 +1690,7 @@ describe('RMRKTokenAttributesRepository', async function () {
         await ownedCollection.getAddress(),
         tokenId,
         'X',
-        await tokenOwner.getAddress(),
+        tokenOwner.address,
         9999999999n,
       );
 
@@ -1877,7 +1788,7 @@ describe('RMRKTokenAttributesRepository', async function () {
             await ownedCollection.getAddress(),
             tokenId,
             'X',
-            await tokenOwner.getAddress(),
+            tokenOwner.address,
             9999999999n,
             addressV,
             addressR,
@@ -1919,7 +1830,7 @@ describe('RMRKTokenAttributesRepository', async function () {
         await ownedCollection.getAddress(),
         tokenId,
         'X',
-        await tokenOwner.getAddress(),
+        tokenOwner.address,
         9999999999n,
       );
 
@@ -2017,7 +1928,7 @@ describe('RMRKTokenAttributesRepository', async function () {
             await ownedCollection.getAddress(),
             tokenId,
             'X',
-            await tokenOwner.getAddress(),
+            tokenOwner.address,
             9999999999n,
             addressV,
             addressR,

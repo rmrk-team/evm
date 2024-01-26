@@ -47,7 +47,7 @@ describe('RMRKMultiAssetAutoIndexMock', async function () {
     const assetId = bn(1);
 
     beforeEach(async function () {
-      await token.mint(await user.getAddress(), tokenId);
+      await token.mint(user.address, tokenId);
       await token.addAssetEntry(assetId, 'ipfs/something.json');
       await token.addAssetToToken(tokenId, assetId, 0);
     });

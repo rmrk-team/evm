@@ -37,23 +37,23 @@ async function shouldBehaveLikeNestable(
 
   describe('Minting', async function () {
     it('can mint with no destination', async function () {
-      const tokenId = await mint(child, await tokenOwner.getAddress());
-      expect(await child.ownerOf(tokenId)).to.equal(await tokenOwner.getAddress());
-      expect(await child.directOwnerOf(tokenId)).to.eql([await tokenOwner.getAddress(), 0n, false]);
+      const tokenId = await mint(child, tokenOwner.address);
+      expect(await child.ownerOf(tokenId)).to.equal(tokenOwner.address);
+      expect(await child.directOwnerOf(tokenId)).to.eql([tokenOwner.address, 0n, false]);
     });
 
     it('has right owners', async function () {
       const otherOwner = addrs[2];
-      const tokenId = await mint(parent, await tokenOwner.getAddress());
-      const tokenId2 = await mint(parent, await otherOwner.getAddress());
-      const tokenId3 = await mint(parent, await otherOwner.getAddress());
+      const tokenId = await mint(parent, tokenOwner.address);
+      const tokenId2 = await mint(parent, otherOwner.address);
+      const tokenId3 = await mint(parent, otherOwner.address);
 
-      expect(await parent.ownerOf(tokenId)).to.equal(await tokenOwner.getAddress());
-      expect(await parent.ownerOf(tokenId2)).to.equal(await otherOwner.getAddress());
-      expect(await parent.ownerOf(tokenId3)).to.equal(await otherOwner.getAddress());
+      expect(await parent.ownerOf(tokenId)).to.equal(tokenOwner.address);
+      expect(await parent.ownerOf(tokenId2)).to.equal(otherOwner.address);
+      expect(await parent.ownerOf(tokenId3)).to.equal(otherOwner.address);
 
-      expect(await parent.balanceOf(await tokenOwner.getAddress())).to.equal(1);
-      expect(await parent.balanceOf(await otherOwner.getAddress())).to.equal(2);
+      expect(await parent.balanceOf(tokenOwner.address)).to.equal(1);
+      expect(await parent.balanceOf(otherOwner.address)).to.equal(2);
 
       await expect(parent.ownerOf(9999)).to.be.revertedWithCustomError(
         parent,
@@ -69,9 +69,10 @@ async function shouldBehaveLikeNestable(
     });
 
     it('cannot nest mint to a non-contract destination', async function () {
-      await expect(
-        nestMint(child, await tokenOwner.getAddress(), 0n),
-      ).to.be.revertedWithCustomError(child, 'RMRKIsNotContract');
+      await expect(nestMint(child, tokenOwner.address, 0n)).to.be.revertedWithCustomError(
+        child,
+        'RMRKIsNotContract',
+      );
     });
 
     it('cannot nest mint to non rmrk nestable receiver', async function () {
@@ -94,7 +95,7 @@ async function shouldBehaveLikeNestable(
     });
 
     it('cannot nest mint to zero address', async function () {
-      const parentId = await mint(parent, await tokenOwner.getAddress());
+      const parentId = await mint(parent, tokenOwner.address);
       await expect(nestMint(child, ADDRESS_ZERO, parentId)).to.be.revertedWithCustomError(
         child,
         'RMRKIsNotContract',
@@ -102,27 +103,23 @@ async function shouldBehaveLikeNestable(
     });
 
     it('can mint to contract and owners are ok', async function () {
-      const parentId = await mint(parent, await tokenOwner.getAddress());
+      const parentId = await mint(parent, tokenOwner.address);
       const childId = await nestMint(child, await parent.getAddress(), parentId);
 
       // owner is the same adress
-      expect(await parent.ownerOf(parentId)).to.equal(await tokenOwner.getAddress());
-      expect(await child.ownerOf(childId)).to.equal(await tokenOwner.getAddress());
+      expect(await parent.ownerOf(parentId)).to.equal(tokenOwner.address);
+      expect(await child.ownerOf(childId)).to.equal(tokenOwner.address);
 
-      expect(await parent.balanceOf(await tokenOwner.getAddress())).to.equal(1);
+      expect(await parent.balanceOf(tokenOwner.address)).to.equal(1);
       expect(await child.balanceOf(await parent.getAddress())).to.equal(1);
     });
 
     it('can mint to contract and RMRK owners are ok', async function () {
-      const parentId = await mint(parent, await tokenOwner.getAddress());
+      const parentId = await mint(parent, tokenOwner.address);
       const childId = await nestMint(child, await parent.getAddress(), parentId);
 
       // RMRK owner is an address for the parent
-      expect(await parent.directOwnerOf(parentId)).to.eql([
-        await tokenOwner.getAddress(),
-        0n,
-        false,
-      ]);
+      expect(await parent.directOwnerOf(parentId)).to.eql([tokenOwner.address, 0n, false]);
       // RMRK owner is a contract for the child
       expect(await child.directOwnerOf(childId)).to.eql([
         await parent.getAddress(),
@@ -132,7 +129,7 @@ async function shouldBehaveLikeNestable(
     });
 
     it("can mint to contract and parent's children are ok", async function () {
-      const parentId = await mint(parent, await tokenOwner.getAddress());
+      const parentId = await mint(parent, tokenOwner.address);
       const childId = await nestMint(child, await parent.getAddress(), parentId);
 
       const children = await parent.childrenOf(parentId);
@@ -144,7 +141,7 @@ async function shouldBehaveLikeNestable(
     });
 
     it('cannot get child out of index', async function () {
-      const parentId = await mint(parent, await tokenOwner.getAddress());
+      const parentId = await mint(parent, tokenOwner.address);
       await expect(parent.childOf(parentId, 0)).to.be.revertedWithCustomError(
         parent,
         'RMRKChildIndexOutOfRange',
@@ -152,7 +149,7 @@ async function shouldBehaveLikeNestable(
     });
 
     it('cannot get pending child out of index', async function () {
-      const parentId = await mint(parent, await tokenOwner.getAddress());
+      const parentId = await mint(parent, tokenOwner.address);
       await expect(parent.pendingChildOf(parentId, 0)).to.be.revertedWithCustomError(
         parent,
         'RMRKPendingChildIndexOutOfRange',
@@ -160,12 +157,12 @@ async function shouldBehaveLikeNestable(
     });
 
     it('can mint multiple children', async function () {
-      const parentId = await mint(parent, await tokenOwner.getAddress());
+      const parentId = await mint(parent, tokenOwner.address);
       const childId1 = await nestMint(child, await parent.getAddress(), parentId);
       const childId2 = await nestMint(child, await parent.getAddress(), parentId);
 
-      expect(await child.ownerOf(childId1)).to.equal(await tokenOwner.getAddress());
-      expect(await child.ownerOf(childId2)).to.equal(await tokenOwner.getAddress());
+      expect(await child.ownerOf(childId1)).to.equal(tokenOwner.address);
+      expect(await child.ownerOf(childId2)).to.equal(tokenOwner.address);
 
       expect(await child.balanceOf(await parent.getAddress())).to.equal(2);
 
@@ -177,7 +174,7 @@ async function shouldBehaveLikeNestable(
     });
 
     it('can mint child into child', async function () {
-      const parentId = await mint(parent, await tokenOwner.getAddress());
+      const parentId = await mint(parent, tokenOwner.address);
       const childId = await nestMint(child, await parent.getAddress(), parentId);
       const granchildId = await nestMint(child, await child.getAddress(), childId);
 
@@ -198,11 +195,11 @@ async function shouldBehaveLikeNestable(
         true,
       ]);
 
-      expect(await child.ownerOf(granchildId)).to.eql(await tokenOwner.getAddress());
+      expect(await child.ownerOf(granchildId)).to.eql(tokenOwner.address);
     });
 
     it('cannot have too many pending children', async () => {
-      const parentId = await mint(parent, await tokenOwner.getAddress());
+      const parentId = await mint(parent, tokenOwner.address);
 
       // First 127 should be fine.
       for (let i = 0; i <= 127; i++) {
@@ -237,8 +234,8 @@ async function shouldBehaveLikeNestable(
     it('cannot add child from user address', async function () {
       const tokenOwner1 = addrs[0];
       const tokenOwner2 = addrs[1];
-      const parentId = await mint(parent, await tokenOwner1.getAddress());
-      const childId = await mint(child, await tokenOwner2.getAddress());
+      const parentId = await mint(parent, tokenOwner1.address);
+      const childId = await mint(child, tokenOwner2.address);
       await expect(parent.addChild(parentId, childId, '0x')).to.be.revertedWithCustomError(
         parent,
         'RMRKIsNotContract',
@@ -251,7 +248,7 @@ async function shouldBehaveLikeNestable(
     let childId: bigint;
 
     beforeEach(async function () {
-      parentId = await mint(parent, await tokenOwner.getAddress());
+      parentId = await mint(parent, tokenOwner.address);
       childId = await nestMint(child, await parent.getAddress(), parentId);
     });
 
@@ -266,7 +263,7 @@ async function shouldBehaveLikeNestable(
 
     it('can accept child if approved', async function () {
       const approved = addrs[1];
-      await parent.connect(tokenOwner).approve(await approved.getAddress(), parentId);
+      await parent.connect(tokenOwner).approve(approved.address, parentId);
       await parent.connect(approved).acceptChild(parentId, 0, await child.getAddress(), childId);
       await checkChildWasAccepted();
     });
@@ -312,7 +309,7 @@ async function shouldBehaveLikeNestable(
     let parentId: bigint;
 
     beforeEach(async function () {
-      parentId = await mint(parent, await tokenOwner.getAddress());
+      parentId = await mint(parent, tokenOwner.address);
       await nestMint(child, await parent.getAddress(), parentId);
     });
 
@@ -375,18 +372,18 @@ async function shouldBehaveLikeNestable(
     let parentId: bigint;
 
     beforeEach(async function () {
-      parentId = await mint(parent, await tokenOwner.getAddress());
+      parentId = await mint(parent, tokenOwner.address);
     });
 
     it('can burn token', async function () {
-      expect(await parent.balanceOf(await tokenOwner.getAddress())).to.equal(1);
+      expect(await parent.balanceOf(tokenOwner.address)).to.equal(1);
       await parent.connect(tokenOwner)['burn(uint256)'](parentId);
       await checkBurntParent();
     });
 
     it('can burn token if approved', async function () {
       const approved = addrs[1];
-      await parent.connect(tokenOwner).approve(await approved.getAddress(), parentId);
+      await parent.connect(tokenOwner).approve(approved.address, parentId);
       await parent.connect(approved)['burn(uint256)'](parentId);
       await checkBurntParent();
     });
@@ -406,7 +403,7 @@ async function shouldBehaveLikeNestable(
         .connect(tokenOwner)
         .acceptChild(childId, 0, await child.getAddress(), granchildId);
 
-      expect(await parent.balanceOf(await tokenOwner.getAddress())).to.equal(1);
+      expect(await parent.balanceOf(tokenOwner.address)).to.equal(1);
       expect(await child.balanceOf(await parent.getAddress())).to.equal(1);
       expect(await child.balanceOf(await child.getAddress())).to.equal(1);
 
@@ -421,7 +418,7 @@ async function shouldBehaveLikeNestable(
       // Sets recursive burns to 2
       await parent.connect(tokenOwner)['burn(uint256,uint256)'](parentId, 2);
 
-      expect(await parent.balanceOf(await tokenOwner.getAddress())).to.equal(0);
+      expect(await parent.balanceOf(tokenOwner.address)).to.equal(0);
       expect(await child.balanceOf(await parent.getAddress())).to.equal(0);
       expect(await child.balanceOf(await child.getAddress())).to.equal(0);
 
@@ -516,7 +513,7 @@ async function shouldBehaveLikeNestable(
     let childId: bigint;
 
     beforeEach(async function () {
-      parentId = await mint(parent, await tokenOwner.getAddress());
+      parentId = await mint(parent, tokenOwner.address);
       childId = await nestMint(child, await parent.getAddress(), parentId);
       await parent.connect(tokenOwner).acceptChild(parentId, 0, await child.getAddress(), childId);
     });
@@ -527,7 +524,7 @@ async function shouldBehaveLikeNestable(
           .connect(tokenOwner)
           .transferChild(
             parentId,
-            await tokenOwner.getAddress(),
+            tokenOwner.address,
             0,
             0,
             await child.getAddress(),
@@ -663,8 +660,8 @@ async function shouldBehaveLikeNestable(
 
     it('can transfer child if approved', async function () {
       const transferer = addrs[1];
-      const toOwner = await tokenOwner.getAddress();
-      await parent.connect(tokenOwner).approve(await transferer.getAddress(), parentId);
+      const toOwner = tokenOwner.address;
+      await parent.connect(tokenOwner).approve(transferer.address, parentId);
 
       await parent
         .connect(transferer)
@@ -674,7 +671,7 @@ async function shouldBehaveLikeNestable(
 
     it('can transfer child if approved for all', async function () {
       const operator = addrs[2];
-      const toOwner = await tokenOwner.getAddress();
+      const toOwner = tokenOwner.address;
       await parent.connect(tokenOwner).setApprovalForAll(await operator.getAddress(), true);
 
       await parent
@@ -684,7 +681,7 @@ async function shouldBehaveLikeNestable(
     });
 
     it('can transfer child with grandchild and children are ok', async function () {
-      const toOwner = await tokenOwner.getAddress();
+      const toOwner = tokenOwner.address;
       const grandchildId = await nestMint(child, await child.getAddress(), childId);
 
       // Transfer child from parent.
@@ -693,11 +690,11 @@ async function shouldBehaveLikeNestable(
         .transferChild(parentId, toOwner, 0, 0, await child.getAddress(), childId, false, '0x');
 
       // New owner of child
-      expect(await child.ownerOf(childId)).to.eql(await tokenOwner.getAddress());
-      expect(await child.directOwnerOf(childId)).to.eql([await tokenOwner.getAddress(), 0n, false]);
+      expect(await child.ownerOf(childId)).to.eql(tokenOwner.address);
+      expect(await child.directOwnerOf(childId)).to.eql([tokenOwner.address, 0n, false]);
 
       // Grandchild is still owned by child
-      expect(await child.ownerOf(grandchildId)).to.eql(await tokenOwner.getAddress());
+      expect(await child.ownerOf(grandchildId)).to.eql(tokenOwner.address);
       expect(await child.directOwnerOf(grandchildId)).to.eql([
         await child.getAddress(),
         childId,
@@ -706,7 +703,7 @@ async function shouldBehaveLikeNestable(
     });
 
     it('cannot transfer child if not child root owner', async function () {
-      const toOwner = await tokenOwner.getAddress();
+      const toOwner = tokenOwner.address;
       const notOwner = addrs[3];
       await expect(
         parent
@@ -717,7 +714,7 @@ async function shouldBehaveLikeNestable(
 
     it('cannot transfer child from not existing parent', async function () {
       const badTokenId = 999;
-      const toOwner = await tokenOwner.getAddress();
+      const toOwner = tokenOwner.address;
       await expect(
         parent
           .connect(tokenOwner)
@@ -727,14 +724,14 @@ async function shouldBehaveLikeNestable(
 
     async function checkChildMovedToRootOwner(rootOwnerAddress?: string) {
       if (rootOwnerAddress === undefined) {
-        rootOwnerAddress = await tokenOwner.getAddress();
+        rootOwnerAddress = tokenOwner.address;
       }
       expect(await child.ownerOf(childId)).to.eql(rootOwnerAddress);
       expect(await child.directOwnerOf(childId)).to.eql([rootOwnerAddress, 0n, false]);
 
       // Transferring updates balances downstream
       expect(await child.balanceOf(rootOwnerAddress)).to.equal(1);
-      expect(await parent.balanceOf(await tokenOwner.getAddress())).to.equal(1);
+      expect(await parent.balanceOf(tokenOwner.address)).to.equal(1);
     }
   });
 
@@ -743,7 +740,7 @@ async function shouldBehaveLikeNestable(
     let childId: bigint;
 
     beforeEach(async function () {
-      parentId = await mint(parent, await tokenOwner.getAddress());
+      parentId = await mint(parent, tokenOwner.address);
       childId = await nestMint(child, await parent.getAddress(), parentId);
     });
 
@@ -753,7 +750,7 @@ async function shouldBehaveLikeNestable(
           .connect(tokenOwner)
           .transferChild(
             parentId,
-            await tokenOwner.getAddress(),
+            tokenOwner.address,
             0,
             0,
             await child.getAddress(),
@@ -887,8 +884,8 @@ async function shouldBehaveLikeNestable(
 
     it('can transfer child if approved', async function () {
       const transferer = addrs[1];
-      const toOwner = await tokenOwner.getAddress();
-      await parent.connect(tokenOwner).approve(await transferer.getAddress(), parentId);
+      const toOwner = tokenOwner.address;
+      await parent.connect(tokenOwner).approve(transferer.address, parentId);
 
       await parent
         .connect(transferer)
@@ -898,7 +895,7 @@ async function shouldBehaveLikeNestable(
 
     it('can transfer child if approved for all', async function () {
       const operator = addrs[2];
-      const toOwner = await tokenOwner.getAddress();
+      const toOwner = tokenOwner.address;
       await parent.connect(tokenOwner).setApprovalForAll(await operator.getAddress(), true);
 
       await parent
@@ -908,7 +905,7 @@ async function shouldBehaveLikeNestable(
     });
 
     it('can transfer child with grandchild and children are ok', async function () {
-      const toOwner = await tokenOwner.getAddress();
+      const toOwner = tokenOwner.address;
       const grandchildId = await nestMint(child, await child.getAddress(), childId);
 
       // Transfer child from parent.
@@ -917,11 +914,11 @@ async function shouldBehaveLikeNestable(
         .transferChild(parentId, toOwner, 0, 0, await child.getAddress(), childId, true, '0x');
 
       // New owner of child
-      expect(await child.ownerOf(childId)).to.eql(await tokenOwner.getAddress());
-      expect(await child.directOwnerOf(childId)).to.eql([await tokenOwner.getAddress(), 0n, false]);
+      expect(await child.ownerOf(childId)).to.eql(tokenOwner.address);
+      expect(await child.directOwnerOf(childId)).to.eql([tokenOwner.address, 0n, false]);
 
       // Grandchild is still owned by child
-      expect(await child.ownerOf(grandchildId)).to.eql(await tokenOwner.getAddress());
+      expect(await child.ownerOf(grandchildId)).to.eql(tokenOwner.address);
       expect(await child.directOwnerOf(grandchildId)).to.eql([
         await child.getAddress(),
         childId,
@@ -930,7 +927,7 @@ async function shouldBehaveLikeNestable(
     });
 
     it('cannot transfer child if not child root owner', async function () {
-      const toOwner = await tokenOwner.getAddress();
+      const toOwner = tokenOwner.address;
       const notOwner = addrs[3];
       await expect(
         parent
@@ -941,7 +938,7 @@ async function shouldBehaveLikeNestable(
 
     it('cannot transfer child from not existing parent', async function () {
       const badTokenId = 999;
-      const toOwner = await tokenOwner.getAddress();
+      const toOwner = tokenOwner.address;
       await expect(
         parent
           .connect(tokenOwner)
@@ -951,14 +948,14 @@ async function shouldBehaveLikeNestable(
 
     async function checkChildMovedToRootOwner(rootOwnerAddress?: string) {
       if (rootOwnerAddress === undefined) {
-        rootOwnerAddress = await tokenOwner.getAddress();
+        rootOwnerAddress = tokenOwner.address;
       }
       expect(await child.ownerOf(childId)).to.eql(rootOwnerAddress);
       expect(await child.directOwnerOf(childId)).to.eql([rootOwnerAddress, 0n, false]);
 
       // transferring updates balances downstream
       expect(await child.balanceOf(rootOwnerAddress)).to.equal(1);
-      expect(await parent.balanceOf(await tokenOwner.getAddress())).to.equal(1);
+      expect(await parent.balanceOf(tokenOwner.address)).to.equal(1);
     }
   });
 
@@ -966,27 +963,27 @@ async function shouldBehaveLikeNestable(
     it('can transfer token', async function () {
       const firstOwner = addrs[1];
       const newOwner = addrs[2];
-      const tokenId = await mint(parent, await firstOwner.getAddress());
-      await transfer(parent, firstOwner, await newOwner.getAddress(), tokenId);
+      const tokenId = await mint(parent, firstOwner.address);
+      await transfer(parent, firstOwner, newOwner.address, tokenId);
 
       // Balances and ownership are updated
-      expect(await parent.ownerOf(tokenId)).to.eql(await newOwner.getAddress());
-      expect(await parent.balanceOf(await firstOwner.getAddress())).to.equal(0);
-      expect(await parent.balanceOf(await newOwner.getAddress())).to.equal(1);
+      expect(await parent.ownerOf(tokenId)).to.eql(newOwner.address);
+      expect(await parent.balanceOf(firstOwner.address)).to.equal(0);
+      expect(await parent.balanceOf(newOwner.address)).to.equal(1);
     });
 
     it('cannot transfer not owned token', async function () {
       const firstOwner = addrs[1];
       const newOwner = addrs[2];
-      const tokenId = await mint(parent, await firstOwner.getAddress());
+      const tokenId = await mint(parent, firstOwner.address);
       await expect(
-        transfer(parent, newOwner, await newOwner.getAddress(), tokenId),
+        transfer(parent, newOwner, newOwner.address, tokenId),
       ).to.be.revertedWithCustomError(child, 'RMRKNotApprovedOrDirectOwner');
     });
 
     it('cannot transfer to address zero', async function () {
       const firstOwner = addrs[1];
-      const tokenId = await mint(parent, await firstOwner.getAddress());
+      const tokenId = await mint(parent, firstOwner.address);
       await expect(
         transfer(parent, firstOwner, ADDRESS_ZERO, tokenId),
       ).to.be.revertedWithCustomError(child, 'ERC721TransferToTheZeroAddress');
@@ -996,31 +993,31 @@ async function shouldBehaveLikeNestable(
       const firstOwner = addrs[1];
       const approved = addrs[2];
       const newOwner = addrs[3];
-      const tokenId = await mint(parent, await firstOwner.getAddress());
+      const tokenId = await mint(parent, firstOwner.address);
 
-      await parent.connect(firstOwner).approve(await approved.getAddress(), tokenId);
-      await transfer(parent, firstOwner, await newOwner.getAddress(), tokenId);
+      await parent.connect(firstOwner).approve(approved.address, tokenId);
+      await transfer(parent, firstOwner, newOwner.address, tokenId);
 
-      expect(await parent.ownerOf(tokenId)).to.eql(await newOwner.getAddress());
+      expect(await parent.ownerOf(tokenId)).to.eql(newOwner.address);
     });
 
     it('can transfer not nested token with child to address and owners/children are ok', async function () {
       const firstOwner = addrs[1];
       const newOwner = addrs[2];
-      const parentId = await mint(parent, await firstOwner.getAddress());
+      const parentId = await mint(parent, firstOwner.address);
       const childId = await nestMint(child, await parent.getAddress(), parentId);
 
-      await transfer(parent, firstOwner, await newOwner.getAddress(), parentId);
+      await transfer(parent, firstOwner, newOwner.address, parentId);
 
       // Balances and ownership are updated
-      expect(await parent.balanceOf(await firstOwner.getAddress())).to.equal(0);
-      expect(await parent.balanceOf(await newOwner.getAddress())).to.equal(1);
+      expect(await parent.balanceOf(firstOwner.address)).to.equal(0);
+      expect(await parent.balanceOf(newOwner.address)).to.equal(1);
 
-      expect(await parent.ownerOf(parentId)).to.eql(await newOwner.getAddress());
-      expect(await parent.directOwnerOf(parentId)).to.eql([await newOwner.getAddress(), 0n, false]);
+      expect(await parent.ownerOf(parentId)).to.eql(newOwner.address);
+      expect(await parent.directOwnerOf(parentId)).to.eql([newOwner.address, 0n, false]);
 
       // New owner of child
-      expect(await child.ownerOf(childId)).to.eql(await newOwner.getAddress());
+      expect(await child.ownerOf(childId)).to.eql(newOwner.address);
       expect(await child.directOwnerOf(childId)).to.eql([
         await parent.getAddress(),
         parentId,
@@ -1036,29 +1033,29 @@ async function shouldBehaveLikeNestable(
     it('cannot directly transfer nested child', async function () {
       const firstOwner = addrs[1];
       const newOwner = addrs[2];
-      const parentId = await mint(parent, await firstOwner.getAddress());
+      const parentId = await mint(parent, firstOwner.address);
       const childId = await nestMint(child, await parent.getAddress(), parentId);
 
       await expect(
-        transfer(child, firstOwner, await newOwner.getAddress(), childId),
+        transfer(child, firstOwner, newOwner.address, childId),
       ).to.be.revertedWithCustomError(child, 'RMRKNotApprovedOrDirectOwner');
     });
 
     it('can transfer parent token to token with same owner, family tree is ok', async function () {
       const firstOwner = addrs[1];
-      const grandParentId = await mint(parent, await firstOwner.getAddress());
-      const parentId = await mint(parent, await firstOwner.getAddress());
+      const grandParentId = await mint(parent, firstOwner.address);
+      const parentId = await mint(parent, firstOwner.address);
       const childId = await nestMint(child, await parent.getAddress(), parentId);
 
       // Check balances
-      expect(await parent.balanceOf(await firstOwner.getAddress())).to.equal(2);
+      expect(await parent.balanceOf(firstOwner.address)).to.equal(2);
       expect(await child.balanceOf(await parent.getAddress())).to.equal(1);
 
       // Transfers token parentId to (await parent.getAddress(), token grandParentId)
       await nestTransfer(parent, firstOwner, await parent.getAddress(), parentId, grandParentId);
 
       // Balances unchanged since root owner is the same
-      expect(await parent.balanceOf(await firstOwner.getAddress())).to.equal(1);
+      expect(await parent.balanceOf(firstOwner.address)).to.equal(1);
       expect(await child.balanceOf(await parent.getAddress())).to.equal(1);
       expect(await parent.balanceOf(await parent.getAddress())).to.equal(1);
 
@@ -1073,22 +1070,22 @@ async function shouldBehaveLikeNestable(
     it('can transfer parent token to token with different owner, family tree is ok', async function () {
       const firstOwner = addrs[1];
       const otherOwner = addrs[2];
-      const grandParentId = await mint(parent, await otherOwner.getAddress());
-      const parentId = await mint(parent, await firstOwner.getAddress());
+      const grandParentId = await mint(parent, otherOwner.address);
+      const parentId = await mint(parent, firstOwner.address);
       const childId = await nestMint(child, await parent.getAddress(), parentId);
 
       // Check balances
-      expect(await parent.balanceOf(await otherOwner.getAddress())).to.equal(1);
-      expect(await parent.balanceOf(await firstOwner.getAddress())).to.equal(1);
+      expect(await parent.balanceOf(otherOwner.address)).to.equal(1);
+      expect(await parent.balanceOf(firstOwner.address)).to.equal(1);
       expect(await child.balanceOf(await parent.getAddress())).to.equal(1);
 
       // firstOwner calls parent to transfer parent token parent
       await nestTransfer(parent, firstOwner, await parent.getAddress(), parentId, grandParentId);
 
       // Balances update
-      expect(await parent.balanceOf(await firstOwner.getAddress())).to.equal(0);
+      expect(await parent.balanceOf(firstOwner.address)).to.equal(0);
       expect(await parent.balanceOf(await parent.getAddress())).to.equal(1);
-      expect(await parent.balanceOf(await otherOwner.getAddress())).to.equal(1);
+      expect(await parent.balanceOf(otherOwner.address)).to.equal(1);
       expect(await child.balanceOf(await parent.getAddress())).to.equal(1);
 
       // Parent is still owner of child
@@ -1107,12 +1104,12 @@ async function shouldBehaveLikeNestable(
 
     beforeEach(async function () {
       firstOwner = addrs[1];
-      parentId = await mint(parent, await firstOwner.getAddress());
-      childId = await mint(child, await firstOwner.getAddress());
+      parentId = await mint(parent, firstOwner.address);
+      childId = await mint(child, firstOwner.address);
     });
 
     it('cannot nest tranfer from non immediate owner (owner of parent)', async function () {
-      const otherParentId = await mint(parent, await firstOwner.getAddress());
+      const otherParentId = await mint(parent, firstOwner.address);
       // We send it to the parent first
       await nestTransfer(child, firstOwner, await parent.getAddress(), childId, parentId);
       // We can no longer nest transfer it, even if we are the root owner:
@@ -1172,7 +1169,7 @@ async function shouldBehaveLikeNestable(
     it('cannot nest tranfer to a non contract', async function () {
       const newOwner = addrs[2];
       await expect(
-        nestTransfer(child, firstOwner, await newOwner.getAddress(), childId, parentId),
+        nestTransfer(child, firstOwner, newOwner.address, childId, parentId),
       ).to.be.revertedWithCustomError(child, 'RMRKIsNotContract');
     });
 
@@ -1187,7 +1184,7 @@ async function shouldBehaveLikeNestable(
 
     it('can nest tranfer to IERC7401 contract', async function () {
       await nestTransfer(child, firstOwner, await parent.getAddress(), childId, parentId);
-      expect(await child.ownerOf(childId)).to.eql(await firstOwner.getAddress());
+      expect(await child.ownerOf(childId)).to.eql(firstOwner.address);
       expect(await child.directOwnerOf(childId)).to.eql([
         await parent.getAddress(),
         parentId,
