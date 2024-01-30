@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.4.3] - 2024-01-30
+
+### Changed
+
+  - Now requires node>=18.
+  - Moves dependencies to devDependencies.
+  - Adds missing prettier and linting devDependencies.
+  - Renames prepare script to prepare:commit so prettier and dodoc do not run on installation.
+
 ## [2.4.2] - 2024-01-16
 
 ### Changed
