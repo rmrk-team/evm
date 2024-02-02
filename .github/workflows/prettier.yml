@@ -12,6 +12,6 @@ jobs:
       - name: Run prettier
         uses: actions/setup-node@v1
         with:
-          node-version: "16"
+          node-version: "18"
       - run: yarn install
       - run: yarn prettier
