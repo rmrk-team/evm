@@ -5,6 +5,8 @@ pragma solidity ^0.8.21;
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import {Context} from "@openzeppelin/contracts/utils/Context.sol";
 import {IERC6220} from "../equippable/IERC6220.sol";
+import {IERC7401} from "../nestable/IERC7401.sol";
+import {IERC6454} from "../extension/soulbound/IERC6454.sol";
 import "../library/RMRKErrors.sol";
 
 /**
@@ -50,6 +52,7 @@ contract RMRKBulkWriter is Context {
      *      slotPartId,
      *      childAssetId
      *  ]
+     * @dev This contract must have approval to manage the NFT assets, only the current owner can call this method (not an approved operator).
      * @param collection Address of the collection that this contract is managing
      * @param data An `IntakeEquip` struct specifying the equip data
      */
@@ -84,6 +87,7 @@ contract RMRKBulkWriter is Context {
      *      slotPartId,
      *      childAssetId
      *  ]
+     * @dev This contract must have approval to manage the NFT assets, only the current owner can call this method (not an approved operator).
      * @param collection Address of the collection that this contract is managing
      * @param tokenId ID of the token we are managing
      * @param unequips[] An array of `IntakeUnequip` structs specifying the slots to unequip
@@ -112,6 +116,100 @@ contract RMRKBulkWriter is Context {
                 revert RMRKCanOnlyDoBulkOperationsWithOneTokenAtATime();
             }
             IERC6220(collection).equip(equips[i]);
+            unchecked {
+                ++i;
+            }
+        }
+    }
+
+    /**
+     * @notice Transfers multiple children from one token.
+     * @dev If `destinationId` is 0, the destination can be an EoA or a contract implementing the IERC721Receiver interface.
+     * @dev If `destinationId` is not 0, the destination must be a contract implementing the IERC7401 interface.
+     * @dev `childrenIndexes` MUST be in ascending order, this method will transfer the children in reverse order to avoid index changes on children.
+     * @dev This methods works with active children only.
+     * @dev This contract must have approval to manage the NFT, only the current owner can call this method (not an approved operator).
+     * @param collection Address of the collection that this contract is managing
+     * @param tokenId ID of the token we are managing
+     * @param childrenIndexes An array of indexes of the children to transfer
+     * @param to Address of the destination token or contract
+     * @param destinationId ID of the destination token
+     */
+    function bulkTransferChildren(
+        address collection,
+        uint256 tokenId,
+        uint256[] memory childrenIndexes,
+        address to,
+        uint256 destinationId
+    ) public onlyTokenOwner(collection, tokenId) {
+        IERC7401 targetCollection = IERC7401(collection);
+        IERC7401.Child[] memory children = targetCollection.childrenOf(tokenId);
+        uint256 length = childrenIndexes.length;
+        for (uint256 i; i < length; ) {
+            uint256 lastIndex = length - 1 - i;
+            uint256 childIndex = childrenIndexes[lastIndex];
+            IERC7401.Child memory child = children[childIndex];
+            targetCollection.transferChild(
+                tokenId,
+                to,
+                destinationId,
+                childIndex,
+                child.contractAddress,
+                child.tokenId,
+                false,
+                ""
+            );
+            unchecked {
+                ++i;
+            }
+        }
+    }
+
+    /**
+     * @notice Transfers all children from one token.
+     * @dev If `destinationId` is 0, the destination can be an EoA or a contract implementing the IERC721Receiver interface.
+     * @dev If `destinationId` is not 0, the destination must be a contract implementing the IERC7401 interface.
+     * @dev This methods works with active children only.
+     * @dev This contract must have approval to manage the NFT, only the current owner can call this method (not an approved operator).
+     * @param collection Address of the collection that this contract is managing
+     * @param tokenId ID of the token we are managing
+     * @param to Address of the destination token or contract
+     * @param destinationId ID of the destination token
+     */
+    function bulkTransferAllChildren(
+        address collection,
+        uint256 tokenId,
+        address to,
+        uint256 destinationId
+    ) public onlyTokenOwner(collection, tokenId) {
+        IERC7401 targetCollection = IERC7401(collection);
+        IERC7401.Child[] memory children = targetCollection.childrenOf(tokenId);
+
+        uint256 length = children.length;
+        for (uint256 i; i < length; ) {
+            uint256 lastIndex = length - 1 - i;
+            IERC7401.Child memory child = children[lastIndex];
+            bool transferable = true;
+            IERC6454 targetChild = IERC6454(child.contractAddress);
+            if (targetChild.supportsInterface(type(IERC6454).interfaceId)) {
+                transferable = targetChild.isTransferable(
+                    tokenId,
+                    address(this),
+                    to
+                );
+            }
+            if (transferable) {
+                targetCollection.transferChild(
+                    tokenId,
+                    to,
+                    destinationId,
+                    lastIndex,
+                    child.contractAddress,
+                    child.tokenId,
+                    false,
+                    ""
+                );
+            }
             unchecked {
                 ++i;
             }
