@@ -2,7 +2,9 @@
 
 pragma solidity ^0.8.21;
 
-import {RMRKReclaimableChild} from "../../../RMRK/extension/reclaimableChild/RMRKReclaimableChild.sol";
+import {
+    RMRKReclaimableChild
+} from "../../../RMRK/extension/reclaimableChild/RMRKReclaimableChild.sol";
 import {RMRKNestableMock} from "../../RMRKNestableMock.sol";
 import {RMRKNestable} from "../../../RMRK/nestable/RMRKNestable.sol";
 

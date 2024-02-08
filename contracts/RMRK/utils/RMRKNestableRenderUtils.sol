@@ -6,7 +6,9 @@ import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import {IERC5773} from "../multiasset/IERC5773.sol";
 import {IERC7401} from "../nestable/IERC7401.sol";
 import "../library/RMRKErrors.sol";
-import {IERC721Metadata} from "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
+import {
+    IERC721Metadata
+} from "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
 
 /**
  * @title RMRKNestableRenderUtils

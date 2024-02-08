@@ -2,7 +2,9 @@
 
 pragma solidity ^0.8.21;
 
-import {RMRKAbstractNestableMultiAsset} from "../abstract/RMRKAbstractNestableMultiAsset.sol";
+import {
+    RMRKAbstractNestableMultiAsset
+} from "../abstract/RMRKAbstractNestableMultiAsset.sol";
 import {RMRKImplementationBase} from "../utils/RMRKImplementationBase.sol";
 import {RMRKTokenURIPerToken} from "../utils/RMRKTokenURIPerToken.sol";
 

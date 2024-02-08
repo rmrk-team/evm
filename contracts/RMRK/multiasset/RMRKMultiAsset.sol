@@ -6,7 +6,9 @@ pragma solidity ^0.8.21;
 import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import {IERC5773} from "./IERC5773.sol";
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import {IERC721Receiver} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
+import {
+    IERC721Receiver
+} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import {AbstractMultiAsset} from "./AbstractMultiAsset.sol";
 import {RMRKCore} from "../core/RMRKCore.sol";
 import "../library/RMRKErrors.sol";

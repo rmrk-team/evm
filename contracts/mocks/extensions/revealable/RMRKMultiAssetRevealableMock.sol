@@ -2,8 +2,12 @@
 
 pragma solidity ^0.8.21;
 
-import {IRMRKRevealable} from "../../../RMRK/extension/revealable/IRMRKRevealable.sol";
-import {RMRKRevealable} from "../../../RMRK/extension/revealable/RMRKRevealable.sol";
+import {
+    IRMRKRevealable
+} from "../../../RMRK/extension/revealable/IRMRKRevealable.sol";
+import {
+    RMRKRevealable
+} from "../../../RMRK/extension/revealable/RMRKRevealable.sol";
 import {RMRKMultiAssetMock} from "../../RMRKMultiAssetMock.sol";
 import {RMRKMultiAsset} from "../../../RMRK/multiasset/RMRKMultiAsset.sol";
 

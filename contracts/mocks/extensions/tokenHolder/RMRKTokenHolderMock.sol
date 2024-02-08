@@ -3,7 +3,9 @@
 pragma solidity ^0.8.21;
 
 import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import {RMRKTokenHolder} from "../../../RMRK/extension/tokenHolder/RMRKTokenHolder.sol";
+import {
+    RMRKTokenHolder
+} from "../../../RMRK/extension/tokenHolder/RMRKTokenHolder.sol";
 import {IERC7590} from "../../../RMRK/extension/tokenHolder/IERC7590.sol";
 
 error OnlyNFTOwnerCanTransferTokensFromIt();

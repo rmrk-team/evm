@@ -3,7 +3,9 @@
 pragma solidity ^0.8.21;
 
 import {Context} from "@openzeppelin/contracts/utils/Context.sol";
-import {IRMRKRevealer} from "../../../RMRK/extension/revealable/IRMRKRevealer.sol";
+import {
+    IRMRKRevealer
+} from "../../../RMRK/extension/revealable/IRMRKRevealer.sol";
 import {RMRKMultiAssetMock} from "../../RMRKMultiAssetMock.sol";
 
 error AlreadyRevealed(uint256 tokenId);

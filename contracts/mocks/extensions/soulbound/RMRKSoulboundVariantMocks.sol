@@ -3,12 +3,20 @@
 pragma solidity ^0.8.21;
 
 import {Ownable} from "../../../RMRK/access/Ownable.sol";
-import {RMRKSoulboundAfterBlockNumber} from "../../../RMRK/extension/soulbound/RMRKSoulboundAfterBlockNumber.sol";
-import {RMRKSoulboundAfterTransactions} from "../../../RMRK/extension/soulbound/RMRKSoulboundAfterTransactions.sol";
+import {
+    RMRKSoulboundAfterBlockNumber
+} from "../../../RMRK/extension/soulbound/RMRKSoulboundAfterBlockNumber.sol";
+import {
+    RMRKSoulboundAfterTransactions
+} from "../../../RMRK/extension/soulbound/RMRKSoulboundAfterTransactions.sol";
 import {RMRKMultiAsset} from "../../../RMRK/multiasset/RMRKMultiAsset.sol";
-import {RMRKSoulboundPerToken} from "../../../RMRK/extension/soulbound/RMRKSoulboundPerToken.sol";
+import {
+    RMRKSoulboundPerToken
+} from "../../../RMRK/extension/soulbound/RMRKSoulboundPerToken.sol";
 import {RMRKMultiAssetMock} from "../../RMRKMultiAssetMock.sol";
-import {RMRKSoulbound} from "../../../RMRK/extension/soulbound/RMRKSoulbound.sol";
+import {
+    RMRKSoulbound
+} from "../../../RMRK/extension/soulbound/RMRKSoulbound.sol";
 
 contract RMRKSoulboundAfterBlockNumberMock is
     RMRKSoulboundAfterBlockNumber,

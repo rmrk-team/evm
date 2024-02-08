@@ -11,5 +11,6 @@
     "resolveJsonModule": true,
   },
   "include": ["./scripts", "./test", "./typechain-types"],
+  "exclude": ["node_modules", "dist"],
   "files": ["./hardhat.config.ts"],
 }

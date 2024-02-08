@@ -2,7 +2,9 @@
 
 pragma solidity ^0.8.21;
 
-import {RMRKNestableMultiAsset} from "../RMRK/nestable/RMRKNestableMultiAsset.sol";
+import {
+    RMRKNestableMultiAsset
+} from "../RMRK/nestable/RMRKNestableMultiAsset.sol";
 
 //Minimal public implementation of RMRKNestableMultiAsset for testing.
 contract RMRKNestableMultiAssetMock is RMRKNestableMultiAsset {

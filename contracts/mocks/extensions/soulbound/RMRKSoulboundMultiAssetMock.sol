@@ -2,7 +2,9 @@
 
 pragma solidity ^0.8.21;
 
-import {RMRKSoulbound} from "../../../RMRK/extension/soulbound/RMRKSoulbound.sol";
+import {
+    RMRKSoulbound
+} from "../../../RMRK/extension/soulbound/RMRKSoulbound.sol";
 import {RMRKMultiAsset} from "../../../RMRK/multiasset/RMRKMultiAsset.sol";
 import {RMRKMultiAssetMock} from "../../RMRKMultiAssetMock.sol";
 

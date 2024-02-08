@@ -4,8 +4,12 @@ pragma solidity ^0.8.21;
 
 import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import {IERC2981} from "@openzeppelin/contracts/interfaces/IERC2981.sol";
-import {IERC721Metadata} from "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
-import {RMRKMinifiedEquippable} from "../../RMRK/equippable/RMRKMinifiedEquippable.sol";
+import {
+    IERC721Metadata
+} from "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
+import {
+    RMRKMinifiedEquippable
+} from "../../RMRK/equippable/RMRKMinifiedEquippable.sol";
 import {RMRKImplementationBase} from "../utils/RMRKImplementationBase.sol";
 
 /**

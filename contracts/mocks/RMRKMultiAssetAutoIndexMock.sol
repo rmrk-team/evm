@@ -2,7 +2,9 @@
 
 pragma solidity ^0.8.21;
 
-import {RMRKMultiAssetAutoIndex} from "../RMRK/extension/multiAssetAutoIndex/RMRKMultiAssetAutoIndex.sol";
+import {
+    RMRKMultiAssetAutoIndex
+} from "../RMRK/extension/multiAssetAutoIndex/RMRKMultiAssetAutoIndex.sol";
 
 contract RMRKMultiAssetAutoIndexMock is RMRKMultiAssetAutoIndex {
     function mint(address to, uint256 tokenId) external {

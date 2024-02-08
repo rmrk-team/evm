@@ -2,7 +2,9 @@
 
 pragma solidity ^0.8.21;
 
-import {RMRKTypedMultiAsset} from "../../../RMRK/extension/typedMultiAsset/RMRKTypedMultiAsset.sol";
+import {
+    RMRKTypedMultiAsset
+} from "../../../RMRK/extension/typedMultiAsset/RMRKTypedMultiAsset.sol";
 import {RMRKMultiAssetMock} from "../../RMRKMultiAssetMock.sol";
 import {RMRKMultiAsset} from "../../../RMRK/multiasset/RMRKMultiAsset.sol";
 

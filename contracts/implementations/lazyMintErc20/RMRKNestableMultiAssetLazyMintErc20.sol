@@ -3,7 +3,9 @@
 pragma solidity ^0.8.21;
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {RMRKAbstractNestableMultiAsset} from "../abstract/RMRKAbstractNestableMultiAsset.sol";
+import {
+    RMRKAbstractNestableMultiAsset
+} from "../abstract/RMRKAbstractNestableMultiAsset.sol";
 import {RMRKImplementationBase} from "../utils/RMRKImplementationBase.sol";
 import {RMRKTokenURIEnumerated} from "../utils/RMRKTokenURIEnumerated.sol";
 import {InitDataERC20Pay} from "./InitDataERC20Pay.sol";
