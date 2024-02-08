@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.4.4] - 2024-02-08
+
+### Changed
+
+  - Moves @openzeppelin/contracts from devDependencies to dependencies.
+
 ## [2.4.3] - 2024-01-30
 
 ### Changed
