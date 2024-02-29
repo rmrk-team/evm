@@ -25,10 +25,9 @@ contract RMRKCatalog is IRMRKCatalog {
      */
     mapping(uint64 => bool) private _isEquippableToAll;
 
-    uint64[] private _partIds;
-
-    string private _metadataURI;
-    string private _type;
+    uint64[] internal _partIds;
+    string internal _metadataURI;
+    string internal _type;
 
     /**
      * @notice Used to initialize the Catalog.

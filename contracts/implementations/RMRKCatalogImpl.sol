@@ -15,6 +15,17 @@ import {RMRKCatalog} from "../RMRK/catalog/RMRKCatalog.sol";
  */
 contract RMRKCatalogImpl is OwnableLock, RMRKCatalog {
     /**
+     * @notice From ERC7572 (Draft) Emitted when the contract-level metadata is updated
+     */
+    event ContractURIUpdated();
+
+    /**
+     * @notice Emited when the type of the catalog is updated
+     * @param newType The new type of the catalog
+     */
+    event TypeUpdated(string newType);
+
+    /**
      * @notice Used to initialize the smart contract.
      * @param metadataURI Base metadata URI of the contract
      * @param type_ The type of the catalog
@@ -120,5 +131,69 @@ contract RMRKCatalogImpl is OwnableLock, RMRKCatalog {
         uint64 partId
     ) public virtual onlyOwnerOrContributor {
         _resetEquippableAddresses(partId);
+    }
+
+    /**
+     * @notice Used to get all the part IDs in the catalog.
+     * @dev Can get at least 10k parts. Higher limits were not tested.
+     * @dev It may fail if there are too many parts, in that case use either `getPaginatedPartIds` or `getTotalParts` and `getPartByIndex`.
+     * @return partIds An array of all the part IDs in the catalog
+     */
+    function getAllPartIds() public view returns (uint64[] memory partIds) {
+        partIds = _partIds;
+    }
+
+    /**
+     * @notice Used to get all the part IDs in the catalog.
+     * @param offset The offset to start from
+     * @param limit The maximum number of parts to return
+     * @return partIds An array of all the part IDs in the catalog
+     */
+    function getPaginatedPartIds(
+        uint256 offset,
+        uint256 limit
+    ) public view returns (uint64[] memory partIds) {
+        if (offset >= _partIds.length) limit = 0; // Could revert but UI would have to handle it
+        if (offset + limit > _partIds.length) limit = _partIds.length - offset;
+        partIds = new uint64[](limit);
+        for (uint256 i; i < limit; ) {
+            partIds[i] = _partIds[offset + i];
+            unchecked {
+                ++i;
+            }
+        }
+    }
+
+    /**
+     * @notice Used to get the total number of parts in the catalog.
+     * @return totalParts The total number of parts in the catalog
+     */
+    function getTotalParts() public view returns (uint256 totalParts) {
+        totalParts = _partIds.length;
+    }
+
+    /**
+     * @notice Used to get a single `Part` by the index of its `partId`.
+     * @param index The index of the `partId`.
+     * @return part The `Part` struct associated with the `partId` at the given index
+     */
+    function getPartByIndex(
+        uint256 index
+    ) public view returns (Part memory part) {
+        part = getPart(_partIds[index]);
+    }
+
+    function setMetadataURI(
+        string memory newContractURI
+    ) public virtual onlyOwnerOrContributor {
+        _setMetadataURI(newContractURI);
+        emit ContractURIUpdated();
+    }
+
+    function setType(
+        string memory newType
+    ) public virtual onlyOwnerOrContributor {
+        _setType(newType);
+        emit TypeUpdated(newType);
     }
 }
