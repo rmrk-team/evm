@@ -277,7 +277,7 @@ contract RMRKEquipRenderUtils is
      */
     function getEquipped(
         address target,
-        uint64 tokenId,
+        uint256 tokenId,
         uint64 assetId
     )
         public
@@ -452,7 +452,7 @@ contract RMRKEquipRenderUtils is
         EquippableData[] memory assetsWithSlotsForParentAsset;
 
         for (uint256 i; i < totalParentAssets; ) {
-            assetsWithSlotsForParentAsset = _getEquippableSlotsFromParent(
+            assetsWithSlotsForParentAsset = getEquippableSlotsFromParent(
                 targetChild,
                 childId,
                 parentAddress,
@@ -543,7 +543,7 @@ contract RMRKEquipRenderUtils is
             childId
         );
 
-        equippableData = _getEquippableSlotsFromParent(
+        equippableData = getEquippableSlotsFromParent(
             targetChild,
             childId,
             parentAddress,
@@ -596,7 +596,7 @@ contract RMRKEquipRenderUtils is
             childId
         );
 
-        equippableData = _getEquippableSlotsFromParent(
+        equippableData = getEquippableSlotsFromParent(
             targetChild,
             childId,
             parentAddress,
@@ -685,13 +685,13 @@ contract RMRKEquipRenderUtils is
      * @return equippableData An array of `EquippableData` structs containing info about the equippable child assets and
      *  their corresponding slot parts
      */
-    function _getEquippableSlotsFromParent(
+    function getEquippableSlotsFromParent(
         address childAddress,
         uint256 childId,
         address parentAddress,
         uint256 parentId,
         uint64 parentAssetId
-    ) private view returns (EquippableData[] memory equippableData) {
+    ) public view returns (EquippableData[] memory equippableData) {
         (
             uint64[] memory parentSlotPartIds,
             address parentAssetCatalog

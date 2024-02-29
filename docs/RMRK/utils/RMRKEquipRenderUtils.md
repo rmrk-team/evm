@@ -232,6 +232,32 @@ function getChildrenWithTopMetadata(address parentAddress, uint256 parentId) ext
 ### getEquippableSlotsFromParent
 
 ```solidity
+function getEquippableSlotsFromParent(address childAddress, uint256 childId, address parentAddress, uint256 parentId, uint64 parentAssetId) external view returns (struct RMRKEquipRenderUtils.EquippableData[] equippableData)
+```
+
+Used to get the child&#39;s assets and slot parts pairs, identifying parts the said assets can be equipped into.
+
+*Reverts if child token is not owned by an NFT.The full `EquippableData` struct looks like this:  [       slotPartId       childAssetId       parentAssetId       priority       parentCatalogAddress       isEquipped       partMetadata,       childAssetMetadata,       parentAssetMetadata  ]*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| childAddress | address | Address of the smart contract of the given token |
+| childId | uint256 | ID of the child token whose assets will be matched against parent&#39;s slot parts |
+| parentAddress | address | Address of the parent token&#39;s smart contract |
+| parentId | uint256 | ID of the parent token |
+| parentAssetId | uint64 | ID of the target parent asset to use to equip the child |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| equippableData | RMRKEquipRenderUtils.EquippableData[] | An array of `EquippableData` structs containing info about the equippable child assets and  their corresponding slot parts |
+
+### getEquippableSlotsFromParent
+
+```solidity
 function getEquippableSlotsFromParent(address targetChild, uint256 childId, uint64 parentAssetId) external view returns (uint256 childIndex, struct RMRKEquipRenderUtils.EquippableData[] equippableData)
 ```
 
@@ -282,7 +308,7 @@ Used to get the child&#39;s assets and slot parts pairs, identifying parts the s
 ### getEquipped
 
 ```solidity
-function getEquipped(address target, uint64 tokenId, uint64 assetId) external view returns (uint64[] slotPartIds, struct IERC6220.Equipment[] childrenEquipped, string[] childrenAssetMetadata)
+function getEquipped(address target, uint256 tokenId, uint64 assetId) external view returns (uint64[] slotPartIds, struct IERC6220.Equipment[] childrenEquipped, string[] childrenAssetMetadata)
 ```
 
 Used to retrieve the equipped parts of the given token.
@@ -294,7 +320,7 @@ Used to retrieve the equipped parts of the given token.
 | Name | Type | Description |
 |---|---|---|
 | target | address | Address of the smart contract of the given token |
-| tokenId | uint64 | ID of the token to retrieve the equipped items in the asset for |
+| tokenId | uint256 | ID of the token to retrieve the equipped items in the asset for |
 | assetId | uint64 | ID of the asset being queried for equipped parts |
 
 #### Returns
