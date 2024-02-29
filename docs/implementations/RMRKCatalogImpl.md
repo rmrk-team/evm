@@ -104,6 +104,23 @@ Used to check if the part is equippable by all addresses.
 |---|---|---|
 | isEquippable | bool | The status indicating whether the part with `partId` can be equipped by any address or not |
 
+### getAllPartIds
+
+```solidity
+function getAllPartIds() external view returns (uint64[] partIds)
+```
+
+Used to get all the part IDs in the catalog.
+
+*Can get at least 10k parts. Higher limits were not tested.It may fail if there are too many parts, in that case use either `getPaginatedPartIds` or `getTotalParts` and `getPartByIndex`.*
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| partIds | uint64[] | An array of all the part IDs in the catalog |
+
 ### getLock
 
 ```solidity
@@ -138,6 +155,29 @@ Used to return the metadata URI of the associated Catalog.
 |---|---|---|
 | _0 | string | Catalog metadata URI |
 
+### getPaginatedPartIds
+
+```solidity
+function getPaginatedPartIds(uint256 offset, uint256 limit) external view returns (uint64[] partIds)
+```
+
+Used to get all the part IDs in the catalog.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| offset | uint256 | The offset to start from |
+| limit | uint256 | The maximum number of parts to return |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| partIds | uint64[] | An array of all the part IDs in the catalog |
+
 ### getPart
 
 ```solidity
@@ -160,6 +200,28 @@ Used to retrieve a `Part` with id `partId`
 |---|---|---|
 | part | IRMRKCatalog.Part | The `Part` struct associated with given `partId` |
 
+### getPartByIndex
+
+```solidity
+function getPartByIndex(uint256 index) external view returns (struct IRMRKCatalog.Part part)
+```
+
+Used to get a single `Part` by the index of its `partId`.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| index | uint256 | The index of the `partId`. |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| part | IRMRKCatalog.Part | The `Part` struct associated with the `partId` at the given index |
+
 ### getParts
 
 ```solidity
@@ -181,6 +243,23 @@ Used to retrieve multiple parts at the same time.
 | Name | Type | Description |
 |---|---|---|
 | parts | IRMRKCatalog.Part[] | An array of `Part` structs associated with given `partIds` |
+
+### getTotalParts
+
+```solidity
+function getTotalParts() external view returns (uint256 totalParts)
+```
+
+Used to get the total number of parts in the catalog.
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| totalParts | uint256 | The total number of parts in the catalog |
 
 ### getType
 
@@ -326,6 +405,38 @@ Locks the operation.
 *Once locked, functions using `notLocked` modifier cannot be executed.Emits ***LockSet*** event.*
 
 
+### setMetadataURI
+
+```solidity
+function setMetadataURI(string newContractURI) external nonpayable
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| newContractURI | string | undefined |
+
+### setType
+
+```solidity
+function setType(string newType) external nonpayable
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| newType | string | undefined |
+
 ### supportsInterface
 
 ```solidity
@@ -405,6 +516,17 @@ Event to announce addition of a new part.
 | equippableAddresses  | address[] | An array of addresses that can equip this part |
 | metadataURI  | string | The metadata URI of the part |
 
+### ContractURIUpdated
+
+```solidity
+event ContractURIUpdated()
+```
+
+From ERC7572 (Draft) Emitted when the contract-level metadata is updated
+
+
+
+
 ### ContributorUpdate
 
 ```solidity
@@ -482,6 +604,22 @@ Event to announce the overriding of equippable addresses of the part.
 |---|---|---|
 | partId `indexed` | uint64 | ID of the part whose list of equippable addresses was overwritten |
 | equippableAddresses  | address[] | The new, full, list of addresses that can equip this part |
+
+### TypeUpdated
+
+```solidity
+event TypeUpdated(string newType)
+```
+
+Emited when the type of the catalog is updated
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| newType  | string | The new type of the catalog |
 
 
 
