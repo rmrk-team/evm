@@ -326,13 +326,13 @@ interface IERC7508 is IERC165 {
      *      string key,
      *      string value
      *  ]
-     * @param collection Address of the collection
-     * @param tokenId ID of the token
+     * @param collections Addresses of the collections, in the same order as the attributes. If all tokens are from the same collection the array can contain a single element with the collection address.
+     * @param tokenIds IDs of the tokens, in the same order as the attributes. If all attributes are for the same token the array can contain a single element with the token ID.
      * @param attributes An array of `StringAttribute` structs to be assigned to the given token
      */
     function setStringAttributes(
-        address collection,
-        uint256 tokenId,
+        address[] memory collections,
+        uint256[] memory tokenIds,
         StringAttribute[] memory attributes
     ) external;
 
@@ -343,13 +343,13 @@ interface IERC7508 is IERC165 {
      *      string key,
      *      uint value
      *  ]
-     * @param collection Address of the collection
-     * @param tokenId ID of the token
+     * @param collections Addresses of the collections, in the same order as the attributes. If all tokens are from the same collection the array can contain a single element with the collection address.
+     * @param tokenIds IDs of the tokens, in the same order as the attributes. If all attributes are for the same token the array can contain a single element with the token ID.
      * @param attributes An array of `UintAttribute` structs to be assigned to the given token
      */
     function setUintAttributes(
-        address collection,
-        uint256 tokenId,
+        address[] memory collections,
+        uint256[] memory tokenIds,
         UintAttribute[] memory attributes
     ) external;
 
@@ -360,13 +360,13 @@ interface IERC7508 is IERC165 {
      *      string key,
      *      bool value
      *  ]
-     * @param collection Address of the collection
-     * @param tokenId ID of the token
+     * @param collections Addresses of the collections, in the same order as the attributes. If all tokens are from the same collection the array can contain a single element with the collection address.
+     * @param tokenIds IDs of the tokens, in the same order as the attributes. If all attributes are for the same token the array can contain a single element with the token ID.
      * @param attributes An array of `BoolAttribute` structs to be assigned to the given token
      */
     function setBoolAttributes(
-        address collection,
-        uint256 tokenId,
+        address[] memory collections,
+        uint256[] memory tokenIds,
         BoolAttribute[] memory attributes
     ) external;
 
@@ -377,13 +377,13 @@ interface IERC7508 is IERC165 {
      *      string key,
      *      address value
      *  ]
-     * @param collection Address of the collection
-     * @param tokenId ID of the token
+     * @param collections Addresses of the collections, in the same order as the attributes. If all tokens are from the same collection the array can contain a single element with the collection address.
+     * @param tokenIds IDs of the tokens, in the same order as the attributes. If all attributes are for the same token the array can contain a single element with the token ID.
      * @param attributes An array of `AddressAttribute` structs to be assigned to the given token
      */
     function setAddressAttributes(
-        address collection,
-        uint256 tokenId,
+        address[] memory collections,
+        uint256[] memory tokenIds,
         AddressAttribute[] memory attributes
     ) external;
 
@@ -394,13 +394,13 @@ interface IERC7508 is IERC165 {
      *      string key,
      *      bytes value
      *  ]
-     * @param collection Address of the collection
-     * @param tokenId ID of the token
+     * @param collections Addresses of the collections, in the same order as the attributes. If all tokens are from the same collection the array can contain a single element with the collection address.
+     * @param tokenIds IDs of the tokens, in the same order as the attributes. If all attributes are for the same token the array can contain a single element with the token ID.
      * @param attributes An array of `BytesAttribute` structs to be assigned to the given token
      */
     function setBytesAttributes(
-        address collection,
-        uint256 tokenId,
+        address[] memory collections,
+        uint256[] memory tokenIds,
         BytesAttribute[] memory attributes
     ) external;
 
@@ -780,15 +780,15 @@ interface IERC7508 is IERC165 {
      *     string key,
      *     string value
      *  ]
-     * @param collection Address of the collection the token belongs to
-     * @param tokenId ID of the token for which the attributes are being retrieved
-     * @param stringKeys An array of string keys to retrieve
+     * @param collections Addresses of the collections, in the same order as the attribute keys. If all tokens are from the same collection the array can contain a single element with the collection address.
+     * @param tokenIds IDs of the tokens, in the same order as the attribute keys. If all attributes are for the same token the array can contain a single element with the token ID.
+     * @param attributeKeys An array of string keys to retrieve
      * @return attributes An array of `StringAttribute` structs
      */
     function getStringAttributes(
-        address collection,
-        uint256 tokenId,
-        string[] memory stringKeys
+        address[] memory collections,
+        uint256[] memory tokenIds,
+        string[] memory attributeKeys
     ) external view returns (StringAttribute[] memory attributes);
 
     /**
@@ -798,15 +798,15 @@ interface IERC7508 is IERC165 {
      *     string key,
      *     uint value
      *  ]
-     * @param collection Address of the collection the token belongs to
-     * @param tokenId ID of the token for which the attributes are being retrieved
-     * @param uintKeys An array of uint keys to retrieve
+     * @param collections Addresses of the collections, in the same order as the attribute keys. If all tokens are from the same collection the array can contain a single element with the collection address.
+     * @param tokenIds IDs of the tokens, in the same order as the attribute keys. If all attributes are for the same token the array can contain a single element with the token ID.
+     * @param attributeKeys An array of uint keys to retrieve
      * @return attributes An array of `UintAttribute` structs
      */
     function getUintAttributes(
-        address collection,
-        uint256 tokenId,
-        string[] memory uintKeys
+        address[] memory collections,
+        uint256[] memory tokenIds,
+        string[] memory attributeKeys
     ) external view returns (UintAttribute[] memory attributes);
 
     /**
@@ -816,15 +816,15 @@ interface IERC7508 is IERC165 {
      *     string key,
      *     bool value
      *  ]
-     * @param collection Address of the collection the token belongs to
-     * @param tokenId ID of the token for which the attributes are being retrieved
-     * @param boolKeys An array of bool keys to retrieve
+     * @param collections Addresses of the collections, in the same order as the attribute keys. If all tokens are from the same collection the array can contain a single element with the collection address.
+     * @param tokenIds IDs of the tokens, in the same order as the attribute keys. If all attributes are for the same token the array can contain a single element with the token ID.
+     * @param attributeKeys An array of bool keys to retrieve
      * @return attributes An array of `BoolAttribute` structs
      */
     function getBoolAttributes(
-        address collection,
-        uint256 tokenId,
-        string[] memory boolKeys
+        address[] memory collections,
+        uint256[] memory tokenIds,
+        string[] memory attributeKeys
     ) external view returns (BoolAttribute[] memory attributes);
 
     /**
@@ -834,15 +834,15 @@ interface IERC7508 is IERC165 {
      *     string key,
      *     address value
      *  ]
-     * @param collection Address of the collection the token belongs to
-     * @param tokenId ID of the token for which the attributes are being retrieved
-     * @param addressKeys An array of address keys to retrieve
+     * @param collections Addresses of the collections, in the same order as the attribute keys. If all tokens are from the same collection the array can contain a single element with the collection address.
+     * @param tokenIds IDs of the tokens, in the same order as the attribute keys. If all attributes are for the same token the array can contain a single element with the token ID.
+     * @param attributeKeys An array of address keys to retrieve
      * @return attributes An array of `AddressAttribute` structs
      */
     function getAddressAttributes(
-        address collection,
-        uint256 tokenId,
-        string[] memory addressKeys
+        address[] memory collections,
+        uint256[] memory tokenIds,
+        string[] memory attributeKeys
     ) external view returns (AddressAttribute[] memory attributes);
 
     /**
@@ -852,14 +852,14 @@ interface IERC7508 is IERC165 {
      *     string key,
      *     bytes value
      *  ]
-     * @param collection Address of the collection the token belongs to
-     * @param tokenId ID of the token for which the attributes are being retrieved
-     * @param bytesKeys An array of bytes keys to retrieve
+     * @param collections Addresses of the collections, in the same order as the attribute keys. If all tokens are from the same collection the array can contain a single element with the collection address.
+     * @param tokenIds IDs of the tokens, in the same order as the attribute keys. If all attributes are for the same token the array can contain a single element with the token ID.
+     * @param attributeKeys An array of bytes keys to retrieve
      * @return attributes An array of `BytesAttribute` structs
      */
     function getBytesAttributes(
-        address collection,
-        uint256 tokenId,
-        string[] memory bytesKeys
+        address[] memory collections,
+        uint256[] memory tokenIds,
+        string[] memory attributeKeys
     ) external view returns (BytesAttribute[] memory attributes);
 }
