@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.5.0] - 2024-03-01
+
+### Added
+
+  - Adds IRMRKCatalogExtended with several utility methods to retrieve and set data on the catalog.
+  - Adds RMRKCatalogFactory which allows anyone to deploy a RMRKCatalogImpl instance and keep tracks of the deployed instances per user.  
+
+### Changed
+
+  - Moves RMRKCatalogImpl to contracts/implementations/catalog/RMRKCatalogImpl.sol
+  - RMRKCatalogImpl now implements IRMRKCatalogExtended.
+  - Makes getEquippableSlotsFromParent public on render utils.
+
+### Fixed
+
+- Custom chain hardhat configuration for Shibuya and Astar.
+
 ## [2.4.4] - 2024-02-08
 
 ### Changed

@@ -1,6 +1,6 @@
 {
   "name": "@rmrk-team/evm-contracts",
-  "version": "2.4.4",
+  "version": "2.5.0",
   "license": "Apache-2.0",
   "files": [
     "contracts/RMRK/*",
@@ -17,7 +17,7 @@
     "node": ">=18"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "^5.0.1"
+    "@openzeppelin/contracts": "^5.0.2"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-chai-matchers": "^2.0.3",
