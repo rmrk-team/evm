@@ -2,8 +2,9 @@
 
 pragma solidity ^0.8.21;
 
-import {OwnableLock} from "../RMRK/access/OwnableLock.sol";
-import {RMRKCatalog} from "../RMRK/catalog/RMRKCatalog.sol";
+import {OwnableLock} from "../../RMRK/access/OwnableLock.sol";
+import {RMRKCatalog, IERC165} from "../../RMRK/catalog/RMRKCatalog.sol";
+import {IRMRKCatalogExtended} from "./IRMRKCatalogExtended.sol";
 
 /**
  * @title RMRKCatalogImpl
@@ -13,18 +14,7 @@ import {RMRKCatalog} from "../RMRK/catalog/RMRKCatalog.sol";
  *  This default implementation includes an OwnableLock dependency, which allows the deployer to freeze the state of the
  *  catalog contract.
  */
-contract RMRKCatalogImpl is OwnableLock, RMRKCatalog {
-    /**
-     * @notice From ERC7572 (Draft) Emitted when the contract-level metadata is updated
-     */
-    event ContractURIUpdated();
-
-    /**
-     * @notice Emited when the type of the catalog is updated
-     * @param newType The new type of the catalog
-     */
-    event TypeUpdated(string newType);
-
+contract RMRKCatalogImpl is OwnableLock, RMRKCatalog, IRMRKCatalogExtended {
     /**
      * @notice Used to initialize the smart contract.
      * @param metadataURI Base metadata URI of the contract
@@ -134,20 +124,14 @@ contract RMRKCatalogImpl is OwnableLock, RMRKCatalog {
     }
 
     /**
-     * @notice Used to get all the part IDs in the catalog.
-     * @dev Can get at least 10k parts. Higher limits were not tested.
-     * @dev It may fail if there are too many parts, in that case use either `getPaginatedPartIds` or `getTotalParts` and `getPartByIndex`.
-     * @return partIds An array of all the part IDs in the catalog
+     * @inheritdoc IRMRKCatalogExtended
      */
     function getAllPartIds() public view returns (uint64[] memory partIds) {
         partIds = _partIds;
     }
 
     /**
-     * @notice Used to get all the part IDs in the catalog.
-     * @param offset The offset to start from
-     * @param limit The maximum number of parts to return
-     * @return partIds An array of all the part IDs in the catalog
+     * @inheritdoc IRMRKCatalogExtended
      */
     function getPaginatedPartIds(
         uint256 offset,
@@ -165,17 +149,14 @@ contract RMRKCatalogImpl is OwnableLock, RMRKCatalog {
     }
 
     /**
-     * @notice Used to get the total number of parts in the catalog.
-     * @return totalParts The total number of parts in the catalog
+     * @inheritdoc IRMRKCatalogExtended
      */
     function getTotalParts() public view returns (uint256 totalParts) {
         totalParts = _partIds.length;
     }
 
     /**
-     * @notice Used to get a single `Part` by the index of its `partId`.
-     * @param index The index of the `partId`.
-     * @return part The `Part` struct associated with the `partId` at the given index
+     * @inheritdoc IRMRKCatalogExtended
      */
     function getPartByIndex(
         uint256 index
@@ -183,6 +164,9 @@ contract RMRKCatalogImpl is OwnableLock, RMRKCatalog {
         part = getPart(_partIds[index]);
     }
 
+    /**
+     * @inheritdoc IRMRKCatalogExtended
+     */
     function setMetadataURI(
         string memory newContractURI
     ) public virtual onlyOwnerOrContributor {
@@ -190,10 +174,24 @@ contract RMRKCatalogImpl is OwnableLock, RMRKCatalog {
         emit ContractURIUpdated();
     }
 
+    /**
+     * @inheritdoc IRMRKCatalogExtended
+     */
     function setType(
         string memory newType
     ) public virtual onlyOwnerOrContributor {
         _setType(newType);
         emit TypeUpdated(newType);
+    }
+
+    /**
+     * @inheritdoc IERC165
+     */
+    function supportsInterface(
+        bytes4 interfaceId
+    ) public view virtual override(RMRKCatalog, IERC165) returns (bool) {
+        return
+            interfaceId == type(IRMRKCatalogExtended).interfaceId ||
+            super.supportsInterface(interfaceId);
     }
 }

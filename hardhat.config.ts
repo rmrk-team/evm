@@ -91,7 +91,7 @@ const config: HardhatUserConfig = {
       url: process.env.ETHEREUM_URL || 'https://eth.drpc.org',
       chainId: 1,
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
-      gasPrice: 27000000000,
+      gasPrice: 55000000000,
     },
     polygon: {
       url: process.env.POLYGON_URL || 'https://polygon.drpc.org',
@@ -168,16 +168,16 @@ const config: HardhatUserConfig = {
         network: 'shibuya',
         chainId: 81,
         urls: {
-          apiURL: 'https://blockscout.com/shibuya/api',
-          browserURL: 'https://blockscout.com/shibuya',
+          apiURL: 'https://shibuya.blockscout.com//api',
+          browserURL: 'https://shibuya.blockscout.com/',
         },
       },
       {
         network: 'astar',
         chainId: 592,
         urls: {
-          apiURL: 'https://blockscout.com/astar/api',
-          browserURL: 'https://blockscout.com/astar/',
+          apiURL: 'https://astar.blockscout.com/api',
+          browserURL: 'https://astar.blockscout.com/',
         },
       },
       {

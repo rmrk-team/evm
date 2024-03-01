@@ -4,6 +4,7 @@ import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { RMRKCatalogImpl } from '../../typechain-types';
 import shouldBehaveLikeCatalog from '../behavior/catalog';
+import { IRMRKCatalogExtended } from '../interfaces';
 
 async function catalogFixture(): Promise<RMRKCatalogImpl> {
   const factory = await ethers.getContractFactory('RMRKCatalogImpl');
@@ -98,10 +99,14 @@ describe('CatalogImpl', async () => {
     }).timeout(120000);
   });
 
-  describe('Permissions', async () => {
+  describe('Interface and Permissions', async () => {
     beforeEach(async () => {
       [owner, contributor, other] = await ethers.getSigners();
       catalog = await loadFixture(catalogFixture);
+    });
+
+    it('supports catalog interface', async function () {
+      expect(await catalog.supportsInterface(IRMRKCatalogExtended)).to.equal(true);
     });
 
     it('cannot do admin operations if not owner or contributor', async function () {
