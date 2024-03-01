@@ -411,15 +411,15 @@ Locks the operation.
 function setMetadataURI(string newContractURI) external nonpayable
 ```
 
+Used to set the metadata URI of the catalog.
 
-
-
+*emits `ContractURIUpdated` event*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| newContractURI | string | undefined |
+| newContractURI | string | The new metadata URI |
 
 ### setType
 
@@ -427,15 +427,15 @@ function setMetadataURI(string newContractURI) external nonpayable
 function setType(string newType) external nonpayable
 ```
 
+Used to set the type of the catalog.
 
-
-
+*emits `TypeUpdated` event*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| newType | string | undefined |
+| newType | string | The new type of the catalog |
 
 ### supportsInterface
 
