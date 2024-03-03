@@ -123,8 +123,7 @@ interface IERC7401 is IERC165 {
 
     /**
      * @notice Used to retrieve the immediate owner of the given token.
-     * @dev If the immediate owner is another token, the address returned, should be the one of the parent token's
-     *  collection smart contract.
+     * @dev If the immediate owner is another token, the address returned will be the parent token's collection address.
      * @param tokenId ID of the token for which the RMRK owner is being retrieved
      * @return owner Address of the given token's owner
      * @return parentId The ID of the parent token. Should be `0` if the owner is an externally owned account
