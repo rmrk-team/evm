@@ -173,6 +173,17 @@ error InvalidAddress()
 
 
 
+### InvalidAmountTransferred
+
+```solidity
+error InvalidAmountTransferred()
+```
+
+
+
+
+
+
 ### InvalidValue
 
 ```solidity
