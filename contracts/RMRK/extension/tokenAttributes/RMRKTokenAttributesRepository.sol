@@ -44,19 +44,22 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
             "setAddressAttribute(address collection,uint256 tokenId,string memory key,address value)"
         );
 
-    mapping(address collection => mapping(uint256 => AccessType))
+    mapping(address collection => mapping(uint256 parameterId => AccessType accessType))
         private _parameterAccessType;
-    mapping(address collection => mapping(uint256 => address))
+    mapping(address collection => mapping(uint256 parameterId => address specificAddress))
         private _parameterSpecificAddress;
-    mapping(address collection => IssuerSetting) private _issuerSettings;
-    mapping(address collection => mapping(address collaborator => bool))
+    mapping(address collection => IssuerSetting setting)
+        private _issuerSettings;
+    mapping(address collection => mapping(address collaborator => bool isCollaborator))
         private _collaborators;
 
     // For keys, we use a mapping from strings to IDs.
     // The purpose is to store unique string keys only once, since they are more expensive.
-    mapping(string => uint256) private _keysToIds;
-    uint256 private _totalAttributes;
+    mapping(string key => uint256 id) private _keysToIds;
+    uint256 private _nextKeyId;
 
+    mapping(address collection => string attributesMetadataURI)
+        private _attributesMetadataURIs;
     mapping(address collection => mapping(uint256 => mapping(uint256 => address)))
         private _addressValues;
     mapping(address collection => mapping(uint256 => mapping(uint256 => bytes)))
@@ -175,6 +178,26 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
                 ++i;
             }
         }
+    }
+
+    /**
+     * @inheritdoc IERC7508
+     */
+    function getAttributesMetadataURI(
+        address collection
+    ) external view returns (string memory attributesMetadataURI) {
+        attributesMetadataURI = _attributesMetadataURIs[collection];
+    }
+
+    /**
+     * @inheritdoc IERC7508
+     */
+    function setAttributesMetadataURI(
+        address collection,
+        string memory attributesMetadataURI
+    ) external onlyIssuer(collection) {
+        _attributesMetadataURIs[collection] = attributesMetadataURI;
+        emit MetadataURIUpdated(collection, attributesMetadataURI);
     }
 
     /**
@@ -1287,9 +1310,9 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
      */
     function _getIdForKey(string memory key) internal returns (uint256 keyID) {
         if (_keysToIds[key] == 0) {
-            _totalAttributes++;
-            _keysToIds[key] = _totalAttributes;
-            keyID = _totalAttributes;
+            _nextKeyId++;
+            _keysToIds[key] = _nextKeyId;
+            keyID = _nextKeyId;
         } else {
             keyID = _keysToIds[key];
         }

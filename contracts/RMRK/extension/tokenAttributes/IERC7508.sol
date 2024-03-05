@@ -106,6 +106,16 @@ interface IERC7508 is IERC165 {
     );
 
     /**
+     * @notice Used to notify listeners that the metadata URI for a collection has been updated.
+     * @param collection Address of the collection
+     * @param attributesMetadataURI The new attributes metadata URI
+     */
+    event MetadataURIUpdated(
+        address indexed collection,
+        string attributesMetadataURI
+    );
+
+    /**
      * @notice Used to notify listeners that a new collaborator has been added or removed.
      * @param collection Address of the collection
      * @param collaborator Address of the collaborator
@@ -242,6 +252,26 @@ interface IERC7508 is IERC165 {
         address collection,
         address[] memory collaboratorAddresses,
         bool[] memory collaboratorAddressAccess
+    ) external;
+
+    /**
+     * @notice Used to retrieve the attributes metadata URI for a collection, which contains all the information about the collection attributes.
+     * @param collection Address of the collection
+     * @return attributesMetadataURI The URI of the attributes metadata
+     */
+    function getAttributesMetadataURI(
+        address collection
+    ) external view returns (string memory attributesMetadataURI);
+
+    /**
+     * @notice Used to set the metadata URI for a collection, which contains all the information about the collection attributes.
+     * @dev Emits a {MetadataURIUpdated} event.
+     * @param collection Address of the collection
+     * @param attributesMetadataURI The URI of the attributes metadata
+     */
+    function setAttributesMetadataURI(
+        address collection,
+        string memory attributesMetadataURI
     ) external;
 
     /**
