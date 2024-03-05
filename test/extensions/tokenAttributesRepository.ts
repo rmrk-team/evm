@@ -437,26 +437,11 @@ describe('RMRKTokenAttributesRepository', async function () {
           ['bytes1', 'bytes2'],
         ),
       ).to.eql([
-        [
-          ['string1', 'value1'],
-          ['string2', 'value2'],
-        ],
-        [
-          ['uint1', 1n],
-          ['uint2', 2n],
-        ],
-        [
-          ['bool1', true],
-          ['bool2', false],
-        ],
-        [
-          ['address1', tokenOwner.address],
-          ['address2', await collectionOwner.getAddress()],
-        ],
-        [
-          ['bytes1', '0x1234'],
-          ['bytes2', '0x5678'],
-        ],
+        ['value1', 'value2'],
+        [1n, 2n],
+        [true, false],
+        [tokenOwner.address, await collectionOwner.getAddress()],
+        ['0x1234', '0x5678'],
       ]);
     });
 
@@ -486,16 +471,7 @@ describe('RMRKTokenAttributesRepository', async function () {
           [],
           [],
         ),
-      ).to.eql([
-        [
-          ['string1', 'value1'],
-          ['string2', 'value2'],
-        ],
-        [],
-        [],
-        [],
-        [],
-      ]);
+      ).to.eql([['value1', 'value2'], [], [], [], []]);
     });
 
     it('can set multiple uint attributes at the same time', async function () {
@@ -524,16 +500,7 @@ describe('RMRKTokenAttributesRepository', async function () {
           [],
           [],
         ),
-      ).to.eql([
-        [],
-        [
-          ['uint1', 1n],
-          ['uint2', 2n],
-        ],
-        [],
-        [],
-        [],
-      ]);
+      ).to.eql([[], [1n, 2n], [], [], []]);
     });
 
     it('can set multiple bool attributes at the same time', async function () {
@@ -562,16 +529,7 @@ describe('RMRKTokenAttributesRepository', async function () {
           [],
           [],
         ),
-      ).to.eql([
-        [],
-        [],
-        [
-          ['bool1', true],
-          ['bool2', false],
-        ],
-        [],
-        [],
-      ]);
+      ).to.eql([[], [], [true, false], [], []]);
     });
 
     it('can set multiple address attributes at the same time', async function () {
@@ -600,16 +558,7 @@ describe('RMRKTokenAttributesRepository', async function () {
           ['address1', 'address2'],
           [],
         ),
-      ).to.eql([
-        [],
-        [],
-        [],
-        [
-          ['address1', tokenOwner.address],
-          ['address2', await collectionOwner.getAddress()],
-        ],
-        [],
-      ]);
+      ).to.eql([[], [], [], [tokenOwner.address, await collectionOwner.getAddress()], []]);
     });
 
     it('can set multiple bytes attributes at the same time', async function () {
@@ -638,16 +587,7 @@ describe('RMRKTokenAttributesRepository', async function () {
           [],
           ['bytes1', 'bytes2'],
         ),
-      ).to.eql([
-        [],
-        [],
-        [],
-        [],
-        [
-          ['bytes1', '0x1234'],
-          ['bytes2', '0x5678'],
-        ],
-      ]);
+      ).to.eql([[], [], [], [], ['0x1234', '0x5678']]);
     });
 
     it('can reuse keys and values are fine', async function () {
