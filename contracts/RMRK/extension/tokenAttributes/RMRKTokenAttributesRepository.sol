@@ -366,11 +366,11 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
         external
         view
         returns (
-            StringAttribute[] memory stringAttributes,
-            UintAttribute[] memory uintAttributes,
-            BoolAttribute[] memory boolAttributes,
-            AddressAttribute[] memory addressAttributes,
-            BytesAttribute[] memory bytesAttributes
+            string[] memory stringAttributes,
+            uint256[] memory uintAttributes,
+            bool[] memory boolAttributes,
+            address[] memory addressAttributes,
+            bytes[] memory bytesAttributes
         )
     {
         address[] memory collections = new address[](1);
@@ -400,24 +400,26 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
         address[] memory collections,
         uint256[] memory tokenIds,
         string[] memory attributeKeys
-    ) public view returns (StringAttribute[] memory attributes) {
-        uint256 length = attributeKeys.length;
+    ) public view returns (string[] memory attributes) {
         (
             bool multipleCollections,
-            bool multipleTokens
-        ) = _checkIfMultipleCollectionsAndTokens(collections, tokenIds, length);
+            bool multipleTokens,
+            bool multipleAttributes,
+            uint256 loopLength
+        ) = _checkIfMultipleCollectionsAndTokens(
+                collections,
+                tokenIds,
+                attributeKeys.length
+            );
 
-        attributes = new StringAttribute[](length);
+        attributes = new string[](loopLength);
 
-        for (uint256 i; i < length; ) {
-            attributes[i] = StringAttribute({
-                key: attributeKeys[i],
-                value: getStringAttribute(
-                    multipleCollections ? collections[i] : collections[0],
-                    multipleTokens ? tokenIds[i] : tokenIds[0],
-                    attributeKeys[i]
-                )
-            });
+        for (uint256 i; i < loopLength; ) {
+            attributes[i] = getStringAttribute(
+                multipleCollections ? collections[i] : collections[0],
+                multipleTokens ? tokenIds[i] : tokenIds[0],
+                multipleAttributes ? attributeKeys[i] : attributeKeys[0]
+            );
             unchecked {
                 ++i;
             }
@@ -431,24 +433,26 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
         address[] memory collections,
         uint256[] memory tokenIds,
         string[] memory attributeKeys
-    ) public view returns (UintAttribute[] memory attributes) {
-        uint256 length = attributeKeys.length;
+    ) public view returns (uint256[] memory attributes) {
         (
             bool multipleCollections,
-            bool multipleTokens
-        ) = _checkIfMultipleCollectionsAndTokens(collections, tokenIds, length);
+            bool multipleTokens,
+            bool multipleAttributes,
+            uint256 loopLength
+        ) = _checkIfMultipleCollectionsAndTokens(
+                collections,
+                tokenIds,
+                attributeKeys.length
+            );
 
-        attributes = new UintAttribute[](length);
+        attributes = new uint256[](loopLength);
 
-        for (uint256 i; i < length; ) {
-            attributes[i] = UintAttribute({
-                key: attributeKeys[i],
-                value: getUintAttribute(
-                    multipleCollections ? collections[i] : collections[0],
-                    multipleTokens ? tokenIds[i] : tokenIds[0],
-                    attributeKeys[i]
-                )
-            });
+        for (uint256 i; i < loopLength; ) {
+            attributes[i] = getUintAttribute(
+                multipleCollections ? collections[i] : collections[0],
+                multipleTokens ? tokenIds[i] : tokenIds[0],
+                multipleAttributes ? attributeKeys[i] : attributeKeys[0]
+            );
             unchecked {
                 ++i;
             }
@@ -462,24 +466,26 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
         address[] memory collections,
         uint256[] memory tokenIds,
         string[] memory attributeKeys
-    ) public view returns (BoolAttribute[] memory attributes) {
-        uint256 length = attributeKeys.length;
+    ) public view returns (bool[] memory attributes) {
         (
             bool multipleCollections,
-            bool multipleTokens
-        ) = _checkIfMultipleCollectionsAndTokens(collections, tokenIds, length);
+            bool multipleTokens,
+            bool multipleAttributes,
+            uint256 loopLength
+        ) = _checkIfMultipleCollectionsAndTokens(
+                collections,
+                tokenIds,
+                attributeKeys.length
+            );
 
-        attributes = new BoolAttribute[](length);
+        attributes = new bool[](loopLength);
 
-        for (uint256 i; i < length; ) {
-            attributes[i] = BoolAttribute({
-                key: attributeKeys[i],
-                value: getBoolAttribute(
-                    multipleCollections ? collections[i] : collections[0],
-                    multipleTokens ? tokenIds[i] : tokenIds[0],
-                    attributeKeys[i]
-                )
-            });
+        for (uint256 i; i < loopLength; ) {
+            attributes[i] = getBoolAttribute(
+                multipleCollections ? collections[i] : collections[0],
+                multipleTokens ? tokenIds[i] : tokenIds[0],
+                multipleAttributes ? attributeKeys[i] : attributeKeys[0]
+            );
             unchecked {
                 ++i;
             }
@@ -493,24 +499,26 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
         address[] memory collections,
         uint256[] memory tokenIds,
         string[] memory attributeKeys
-    ) public view returns (AddressAttribute[] memory attributes) {
-        uint256 length = attributeKeys.length;
+    ) public view returns (address[] memory attributes) {
         (
             bool multipleCollections,
-            bool multipleTokens
-        ) = _checkIfMultipleCollectionsAndTokens(collections, tokenIds, length);
+            bool multipleTokens,
+            bool multipleAttributes,
+            uint256 loopLength
+        ) = _checkIfMultipleCollectionsAndTokens(
+                collections,
+                tokenIds,
+                attributeKeys.length
+            );
 
-        attributes = new AddressAttribute[](length);
+        attributes = new address[](loopLength);
 
-        for (uint256 i; i < length; ) {
-            attributes[i] = AddressAttribute({
-                key: attributeKeys[i],
-                value: getAddressAttribute(
-                    multipleCollections ? collections[i] : collections[0],
-                    multipleTokens ? tokenIds[i] : tokenIds[0],
-                    attributeKeys[i]
-                )
-            });
+        for (uint256 i; i < loopLength; ) {
+            attributes[i] = getAddressAttribute(
+                multipleCollections ? collections[i] : collections[0],
+                multipleTokens ? tokenIds[i] : tokenIds[0],
+                multipleAttributes ? attributeKeys[i] : attributeKeys[0]
+            );
             unchecked {
                 ++i;
             }
@@ -524,24 +532,26 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
         address[] memory collections,
         uint256[] memory tokenIds,
         string[] memory attributeKeys
-    ) public view returns (BytesAttribute[] memory attributes) {
-        uint256 length = attributeKeys.length;
+    ) public view returns (bytes[] memory attributes) {
         (
             bool multipleCollections,
-            bool multipleTokens
-        ) = _checkIfMultipleCollectionsAndTokens(collections, tokenIds, length);
+            bool multipleTokens,
+            bool multipleAttributes,
+            uint256 loopLength
+        ) = _checkIfMultipleCollectionsAndTokens(
+                collections,
+                tokenIds,
+                attributeKeys.length
+            );
 
-        attributes = new BytesAttribute[](length);
+        attributes = new bytes[](loopLength);
 
-        for (uint256 i; i < length; ) {
-            attributes[i] = BytesAttribute({
-                key: attributeKeys[i],
-                value: getBytesAttribute(
-                    multipleCollections ? collections[i] : collections[0],
-                    multipleTokens ? tokenIds[i] : tokenIds[0],
-                    attributeKeys[i]
-                )
-            });
+        for (uint256 i; i < loopLength; ) {
+            attributes[i] = getBytesAttribute(
+                multipleCollections ? collections[i] : collections[0],
+                multipleTokens ? tokenIds[i] : tokenIds[0],
+                multipleAttributes ? attributeKeys[i] : attributeKeys[0]
+            );
             unchecked {
                 ++i;
             }
@@ -731,22 +741,26 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
         uint256[] memory tokenIds,
         BoolAttribute[] memory attributes
     ) external {
-        uint256 length = attributes.length;
         (
             bool multipleCollections,
-            bool multipleTokens
-        ) = _checkIfMultipleCollectionsAndTokens(collections, tokenIds, length);
-        for (uint256 i = 0; i < length; ) {
-            address collection = multipleCollections
-                ? collections[i]
-                : collections[0];
-            uint256 tokenId = multipleTokens ? tokenIds[i] : tokenIds[0];
+            bool multipleTokens,
+            bool multipleAttributes,
+            uint256 loopLength
+        ) = _checkIfMultipleCollectionsAndTokens(
+                collections,
+                tokenIds,
+                attributes.length
+            );
+        for (uint256 i; i < loopLength; ) {
+            BoolAttribute memory attribute = multipleAttributes
+                ? attributes[i]
+                : attributes[0];
             _setBoolAttribute(
                 _msgSender(),
-                collection,
-                tokenId,
-                attributes[i].key,
-                attributes[i].value
+                multipleCollections ? collections[i] : collections[0],
+                multipleTokens ? tokenIds[i] : tokenIds[0],
+                attribute.key,
+                attribute.value
             );
             unchecked {
                 ++i;
@@ -762,22 +776,26 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
         uint256[] memory tokenIds,
         BytesAttribute[] memory attributes
     ) external {
-        uint256 length = attributes.length;
         (
             bool multipleCollections,
-            bool multipleTokens
-        ) = _checkIfMultipleCollectionsAndTokens(collections, tokenIds, length);
-        for (uint256 i = 0; i < length; ) {
-            address collection = multipleCollections
-                ? collections[i]
-                : collections[0];
-            uint256 tokenId = multipleTokens ? tokenIds[i] : tokenIds[0];
+            bool multipleTokens,
+            bool multipleAttributes,
+            uint256 loopLength
+        ) = _checkIfMultipleCollectionsAndTokens(
+                collections,
+                tokenIds,
+                attributes.length
+            );
+        for (uint256 i; i < loopLength; ) {
+            BytesAttribute memory attribute = multipleAttributes
+                ? attributes[i]
+                : attributes[0];
             _setBytesAttribute(
                 _msgSender(),
-                collection,
-                tokenId,
-                attributes[i].key,
-                attributes[i].value
+                multipleCollections ? collections[i] : collections[0],
+                multipleTokens ? tokenIds[i] : tokenIds[0],
+                attribute.key,
+                attribute.value
             );
             unchecked {
                 ++i;
@@ -793,22 +811,26 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
         uint256[] memory tokenIds,
         StringAttribute[] memory attributes
     ) external {
-        uint256 length = attributes.length;
         (
             bool multipleCollections,
-            bool multipleTokens
-        ) = _checkIfMultipleCollectionsAndTokens(collections, tokenIds, length);
-        for (uint256 i = 0; i < length; ) {
-            address collection = multipleCollections
-                ? collections[i]
-                : collections[0];
-            uint256 tokenId = multipleTokens ? tokenIds[i] : tokenIds[0];
+            bool multipleTokens,
+            bool multipleAttributes,
+            uint256 loopLength
+        ) = _checkIfMultipleCollectionsAndTokens(
+                collections,
+                tokenIds,
+                attributes.length
+            );
+        for (uint256 i; i < loopLength; ) {
+            StringAttribute memory attribute = multipleAttributes
+                ? attributes[i]
+                : attributes[0];
             _setStringAttribute(
                 _msgSender(),
-                collection,
-                tokenId,
-                attributes[i].key,
-                attributes[i].value
+                multipleCollections ? collections[i] : collections[0],
+                multipleTokens ? tokenIds[i] : tokenIds[0],
+                attribute.key,
+                attribute.value
             );
             unchecked {
                 ++i;
@@ -824,22 +846,26 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
         uint256[] memory tokenIds,
         UintAttribute[] memory attributes
     ) external {
-        uint256 length = attributes.length;
         (
             bool multipleCollections,
-            bool multipleTokens
-        ) = _checkIfMultipleCollectionsAndTokens(collections, tokenIds, length);
-        for (uint256 i = 0; i < length; ) {
-            address collection = multipleCollections
-                ? collections[i]
-                : collections[0];
-            uint256 tokenId = multipleTokens ? tokenIds[i] : tokenIds[0];
+            bool multipleTokens,
+            bool multipleAttributes,
+            uint256 loopLength
+        ) = _checkIfMultipleCollectionsAndTokens(
+                collections,
+                tokenIds,
+                attributes.length
+            );
+        for (uint256 i; i < loopLength; ) {
+            UintAttribute memory attribute = multipleAttributes
+                ? attributes[i]
+                : attributes[0];
             _setUintAttribute(
                 _msgSender(),
-                collection,
-                tokenId,
-                attributes[i].key,
-                attributes[i].value
+                multipleCollections ? collections[i] : collections[0],
+                multipleTokens ? tokenIds[i] : tokenIds[0],
+                attribute.key,
+                attribute.value
             );
             unchecked {
                 ++i;
@@ -855,22 +881,26 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
         uint256[] memory tokenIds,
         AddressAttribute[] memory attributes
     ) external {
-        uint256 length = attributes.length;
         (
             bool multipleCollections,
-            bool multipleTokens
-        ) = _checkIfMultipleCollectionsAndTokens(collections, tokenIds, length);
-        for (uint256 i = 0; i < length; ) {
-            address collection = multipleCollections
-                ? collections[i]
-                : collections[0];
-            uint256 tokenId = multipleTokens ? tokenIds[i] : tokenIds[0];
+            bool multipleTokens,
+            bool multipleAttributes,
+            uint256 loopLength
+        ) = _checkIfMultipleCollectionsAndTokens(
+                collections,
+                tokenIds,
+                attributes.length
+            );
+        for (uint256 i; i < loopLength; ) {
+            AddressAttribute memory attribute = multipleAttributes
+                ? attributes[i]
+                : attributes[0];
             _setAddressAttribute(
                 _msgSender(),
-                collection,
-                tokenId,
-                attributes[i].key,
-                attributes[i].value
+                multipleCollections ? collections[i] : collections[0],
+                multipleTokens ? tokenIds[i] : tokenIds[0],
+                attribute.key,
+                attribute.value
             );
             unchecked {
                 ++i;
@@ -891,7 +921,7 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
         BytesAttribute[] memory bytesAttributes
     ) external {
         uint256 length = stringAttributes.length;
-        for (uint256 i = 0; i < length; ) {
+        for (uint256 i; i < length; ) {
             _setStringAttribute(
                 _msgSender(),
                 collection,
@@ -905,7 +935,7 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
         }
 
         length = uintAttributes.length;
-        for (uint256 i = 0; i < length; ) {
+        for (uint256 i; i < length; ) {
             _setUintAttribute(
                 _msgSender(),
                 collection,
@@ -919,7 +949,7 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
         }
 
         length = boolAttributes.length;
-        for (uint256 i = 0; i < length; ) {
+        for (uint256 i; i < length; ) {
             _setBoolAttribute(
                 _msgSender(),
                 collection,
@@ -933,7 +963,7 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
         }
 
         length = addressAttributes.length;
-        for (uint256 i = 0; i < length; ) {
+        for (uint256 i; i < length; ) {
             _setAddressAttribute(
                 _msgSender(),
                 collection,
@@ -947,7 +977,7 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
         }
 
         length = bytesAttributes.length;
-        for (uint256 i = 0; i < length; ) {
+        for (uint256 i; i < length; ) {
             _setBytesAttribute(
                 _msgSender(),
                 collection,
@@ -965,14 +995,39 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
         address[] memory collections,
         uint256[] memory tokenIds,
         uint256 attributesLength
-    ) internal pure returns (bool multipleCollections, bool multipleTokens) {
+    )
+        internal
+        pure
+        returns (
+            bool multipleCollections,
+            bool multipleTokens,
+            bool multipleAttributes,
+            uint256 loopLength
+        )
+    {
         multipleCollections = collections.length != 1;
         multipleTokens = tokenIds.length != 1;
+        multipleAttributes = attributesLength != 1;
         if (
-            (multipleCollections && collections.length != attributesLength) ||
-            (multipleTokens && tokenIds.length != attributesLength)
+            (multipleCollections &&
+                multipleAttributes &&
+                collections.length != attributesLength) ||
+            (multipleTokens &&
+                multipleAttributes &&
+                tokenIds.length != attributesLength) ||
+            (multipleCollections &&
+                multipleTokens &&
+                collections.length != tokenIds.length)
         ) {
             revert LengthsMismatch();
+        }
+
+        if (multipleCollections) {
+            loopLength = collections.length;
+        } else if (multipleTokens) {
+            loopLength = tokenIds.length;
+        } else {
+            loopLength = attributesLength;
         }
     }
 
