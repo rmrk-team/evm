@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.5.2] - 2024-03-08
+
+### Changed
+
+  - Token Attributes: Refactor on token attributes to reuse code and allow multiple collections and tokenIds on setters and getters.
+  - Token Attributes: No long uses structs as return values for batch getters.
+  - Token Attributes: Batch setters and getters can now receive multiple collections and tokenIds.
+  - Token Attributes: If a single collection, tokenId or attribute is sent on batch getter/setters it will use it for all.
+  - Token Attributes: Improved readability and consistency in function signatures
+
+## [2.5.1] - 2024-03-02
+
+### Changed
+
+  - RMRKTokenHolder (IERC7590-Draft Implementation) now reverts if transferred ERC-20 balance is not the specified amount.
+  - Improves @dev comment on IERC7401, directOwnerOf method.
+
 ## [2.5.0] - 2024-03-01
 
 ### Added
