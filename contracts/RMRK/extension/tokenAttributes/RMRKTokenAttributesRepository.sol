@@ -52,8 +52,7 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
         private _parameterAccessType;
     mapping(address collection => mapping(uint256 parameterId => address specificAddress))
         private _parameterSpecificAddress;
-    mapping(address collection => IssuerSetting setting)
-        private _issuerSettings;
+    mapping(address collection => OwnerSetting setting) private _ownerSettings;
     mapping(address collection => mapping(address collaborator => bool isCollaborator))
         private _collaborators;
 
@@ -77,26 +76,26 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
     mapping(address collection => mapping(uint256 => mapping(uint256 => string)))
         private _stringValues;
 
-    struct IssuerSetting {
+    struct OwnerSetting {
         bool registered;
         bool useOwnable;
-        address issuer;
+        address owner;
     }
 
     /// Used to signal that the length of the arrays is not equal.
     error LengthsMismatch();
     /// Used to signal that the smart contract interacting with the repository does not implement Ownable pattern.
     error OwnableNotImplemented();
-    /// Used to signal that the caller is not the issuer of the collection.
-    error NotCollectionIssuer();
+    /// Used to signal that the caller is not the owner of the collection.
+    error NotCollectionOwner();
     /// Used to signal that the collaborator and collaborator rights array are not of equal length.
     error CollaboratorArraysNotEqualLength();
     /// Used to signal that the collection is not registered in the repository yet.
     error CollectionNotRegistered();
     /// Used to signal that the caller is not aa collaborator of the collection.
     error NotCollectionCollaborator();
-    /// Used to signal that the caller is not the issuer or a collaborator of the collection.
-    error NotCollectionIssuerOrCollaborator();
+    /// Used to signal that the caller is not the owner or a collaborator of the collection.
+    error NotCollectionOwnerOrCollaborator();
     /// Used to signal that the caller is not the owner of the token.
     error NotTokenOwner();
     /// Used to signal that the caller is not the specific address allowed to manage the attribute.
@@ -111,7 +110,7 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
      */
     function registerAccessControl(
         address collection,
-        address issuer,
+        address owner,
         bool useOwnable
     ) external {
         (bool ownableSuccess, bytes memory ownableReturn) = collection.call(
@@ -125,18 +124,18 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
             ownableSuccess &&
             address(uint160(uint256(bytes32(ownableReturn)))) != _msgSender()
         ) {
-            revert NotCollectionIssuer();
+            revert NotCollectionOwner();
         }
 
-        _issuerSettings[collection] = IssuerSetting({
+        _ownerSettings[collection] = OwnerSetting({
             registered: true,
-            issuer: issuer,
+            owner: owner,
             useOwnable: useOwnable
         });
 
         emit AccessControlRegistration(
             collection,
-            issuer,
+            owner,
             _msgSender(),
             useOwnable
         );
@@ -150,7 +149,7 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
         string memory key,
         AccessType accessType,
         address specificAddress
-    ) external onlyRegisteredCollection(collection) onlyIssuer(collection) {
+    ) external onlyRegisteredCollection(collection) onlyOwner(collection) {
         uint256 parameterId = _getIdForKey(key);
 
         _parameterAccessType[collection][parameterId] = accessType;
@@ -166,7 +165,7 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
         address collection,
         address[] memory collaboratorAddresses,
         bool[] memory collaboratorAddressAccess
-    ) external onlyRegisteredCollection(collection) onlyIssuer(collection) {
+    ) external onlyRegisteredCollection(collection) onlyOwner(collection) {
         uint256 length = collaboratorAddresses.length;
         if (length != collaboratorAddressAccess.length) {
             revert CollaboratorArraysNotEqualLength();
@@ -189,7 +188,7 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
     /**
      * @inheritdoc IERC7508
      */
-    function getAttributesMetadataURI(
+    function getAttributesMetadataURIForCollection(
         address collection
     ) external view returns (string memory attributesMetadataURI) {
         attributesMetadataURI = _attributesMetadataURIs[collection];
@@ -198,10 +197,10 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
     /**
      * @inheritdoc IERC7508
      */
-    function setAttributesMetadataURI(
+    function setAttributesMetadataURIForCollection(
         address collection,
         string memory attributesMetadataURI
-    ) external onlyIssuer(collection) {
+    ) external onlyOwner(collection) {
         _attributesMetadataURIs[collection] = attributesMetadataURI;
         emit MetadataURIUpdated(collection, attributesMetadataURI);
     }
@@ -230,46 +229,27 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
     }
 
     /**
-     * @notice Modifier to check if the caller is authorized to call the function.
-     * @dev If the authorization is set to TokenOwner and the tokenId provided is of the non-existent token, the
-     *  execution will revert with `ERC721InvalidTokenId` rather than `NotTokenOwner`.
-     * @dev The tokenId parameter is only needed for the TokenOwner authorization type, other authorization types ignore
-     *  it.
-     * @param collection The address of the collection.
-     * @param key Key of the attribute.
-     * @param tokenId The ID of the token.
-     */
-    modifier onlyAuthorizedCaller(
-        address collection,
-        string memory key,
-        uint256 tokenId
-    ) {
-        _onlyAuthorizedCaller(_msgSender(), collection, key, tokenId);
-        _;
-    }
-
-    /**
      * @notice Modifier to check if the collection is registered.
      * @param collection Address of the collection.
      */
     modifier onlyRegisteredCollection(address collection) {
-        if (!_issuerSettings[collection].registered) {
+        if (!_ownerSettings[collection].registered) {
             revert CollectionNotRegistered();
         }
         _;
     }
 
     /**
-     * @notice Modifier to check if the caller is the issuer of the collection.
+     * @notice Modifier to check if the caller is the owner of the collection.
      * @param collection Address of the collection.
      */
-    modifier onlyIssuer(address collection) {
-        if (_issuerSettings[collection].useOwnable) {
+    modifier onlyOwner(address collection) {
+        if (_ownerSettings[collection].useOwnable) {
             if (Ownable(collection).owner() != _msgSender()) {
-                revert NotCollectionIssuer();
+                revert NotCollectionOwner();
             }
-        } else if (_issuerSettings[collection].issuer != _msgSender()) {
-            revert NotCollectionIssuer();
+        } else if (_ownerSettings[collection].owner != _msgSender()) {
+            revert NotCollectionOwner();
         }
         _;
     }
@@ -291,27 +271,27 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
         ];
 
         if (
-            accessType == AccessType.Issuer &&
-            ((_issuerSettings[collection].useOwnable &&
+            accessType == AccessType.Owner &&
+            ((_ownerSettings[collection].useOwnable &&
                 Ownable(collection).owner() != caller) ||
-                (!_issuerSettings[collection].useOwnable &&
-                    _issuerSettings[collection].issuer != caller))
+                (!_ownerSettings[collection].useOwnable &&
+                    _ownerSettings[collection].owner != caller))
         ) {
-            revert NotCollectionIssuer();
+            revert NotCollectionOwner();
         } else if (
             accessType == AccessType.Collaborator &&
             !_collaborators[collection][caller]
         ) {
             revert NotCollectionCollaborator();
         } else if (
-            accessType == AccessType.IssuerOrCollaborator &&
-            ((_issuerSettings[collection].useOwnable &&
+            accessType == AccessType.OwnerOrCollaborator &&
+            ((_ownerSettings[collection].useOwnable &&
                 Ownable(collection).owner() != caller) ||
-                (!_issuerSettings[collection].useOwnable &&
-                    _issuerSettings[collection].issuer != caller)) &&
+                (!_ownerSettings[collection].useOwnable &&
+                    _ownerSettings[collection].owner != caller)) &&
             !_collaborators[collection][caller]
         ) {
-            revert NotCollectionIssuerOrCollaborator();
+            revert NotCollectionOwnerOrCollaborator();
         } else if (
             accessType == AccessType.TokenOwner &&
             IERC721(collection).ownerOf(tokenId) != caller
