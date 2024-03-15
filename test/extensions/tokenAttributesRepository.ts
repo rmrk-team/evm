@@ -54,7 +54,7 @@ describe('RMRKTokenAttributesRepository', async function () {
     this.ownedCollection = ownedCollection;
   });
 
-  shouldBehaveLikeTokenAttributesRepositoryInterface();
+  shouldBehaveLikeAttributesRepositoryInterface();
 
   describe('Registering attributes and setting values', async function () {
     beforeEach(async function () {
@@ -66,53 +66,59 @@ describe('RMRKTokenAttributesRepository', async function () {
     });
 
     it('can set and get token attributes', async function () {
-      expect(
-        await tokenAttributes.setStringAttribute(
+      await expect(
+        tokenAttributes.setStringAttribute(
           collectionAddress,
           tokenId,
           'description',
           'test description',
         ),
       )
-        .to.emit(tokenAttributes, 'StringAttributeSet')
+        .to.emit(tokenAttributes, 'StringAttributeUpdated')
         .withArgs(collectionAddress, tokenId, 'description', 'test description');
-      expect(
-        await tokenAttributes.setStringAttribute(
+      await expect(
+        tokenAttributes.setStringAttribute(
           collectionAddress,
           tokenId,
           'description1',
           'test description',
         ),
       )
-        .to.emit(tokenAttributes, 'StringAttributeSet')
+        .to.emit(tokenAttributes, 'StringAttributeUpdated')
         .withArgs(collectionAddress, tokenId, 'description1', 'test description');
-      expect(await tokenAttributes.setBoolAttribute(collectionAddress, tokenId, 'rare', true))
-        .to.emit(tokenAttributes, 'BoolAttributeSet')
+      await expect(tokenAttributes.setBoolAttribute(collectionAddress, tokenId, 'rare', true))
+        .to.emit(tokenAttributes, 'BoolAttributeUpdated')
         .withArgs(collectionAddress, tokenId, 'rare', true);
-      expect(
-        await tokenAttributes.setAddressAttribute(
+      await expect(
+        tokenAttributes.setAddressAttribute(
           collectionAddress,
           tokenId,
           'owner',
           tokenOwner.address,
         ),
       )
-        .to.emit(tokenAttributes, 'AddressAttributeSet')
+        .to.emit(tokenAttributes, 'AddressAttributeUpdated')
         .withArgs(collectionAddress, tokenId, 'owner', tokenOwner.address);
-      expect(await tokenAttributes.setUintAttribute(collectionAddress, tokenId, 'atk', 100n))
-        .to.emit(tokenAttributes, 'UintAttributeSet')
+      await expect(tokenAttributes.setUintAttribute(collectionAddress, tokenId, 'atk', 100n))
+        .to.emit(tokenAttributes, 'UintAttributeUpdated')
         .withArgs(collectionAddress, tokenId, 'atk', 100n);
-      expect(await tokenAttributes.setUintAttribute(collectionAddress, tokenId, 'health', 100n))
-        .to.emit(tokenAttributes, 'UintAttributeSet')
+      await expect(tokenAttributes.setUintAttribute(collectionAddress, tokenId, 'health', 100n))
+        .to.emit(tokenAttributes, 'UintAttributeUpdated')
         .withArgs(collectionAddress, tokenId, 'health', 100n);
-      expect(await tokenAttributes.setUintAttribute(collectionAddress, tokenId, 'health', 95n))
-        .to.emit(tokenAttributes, 'UintAttributeSet')
+      await expect(tokenAttributes.setUintAttribute(collectionAddress, tokenId, 'health', 95n))
+        .to.emit(tokenAttributes, 'UintAttributeUpdated')
         .withArgs(collectionAddress, tokenId, 'health', 95n);
-      expect(await tokenAttributes.setUintAttribute(collectionAddress, tokenId, 'health', 80n))
-        .to.emit(tokenAttributes, 'UintAttributeSet')
+      await expect(tokenAttributes.setUintAttribute(collectionAddress, tokenId, 'health', 80n))
+        .to.emit(tokenAttributes, 'UintAttributeUpdated')
         .withArgs(collectionAddress, tokenId, 'health', 80n);
-      expect(await tokenAttributes.setBytesAttribute(collectionAddress, tokenId, 'data', '0x1234'))
-        .to.emit(tokenAttributes, 'BytesAttributeSet')
+      await expect(tokenAttributes.setIntAttribute(collectionAddress, tokenId, 'int', 1n))
+        .to.emit(tokenAttributes, 'IntAttributeUpdated')
+        .withArgs(collectionAddress, tokenId, 'int', 1n);
+      await expect(tokenAttributes.setIntAttribute(collectionAddress, tokenId, 'int2', -10n))
+        .to.emit(tokenAttributes, 'IntAttributeUpdated')
+        .withArgs(collectionAddress, tokenId, 'int2', -10n);
+      await expect(tokenAttributes.setBytesAttribute(collectionAddress, tokenId, 'data', '0x1234'))
+        .to.emit(tokenAttributes, 'BytesAttributeUpdated')
         .withArgs(collectionAddress, tokenId, 'data', '0x1234');
 
       expect(
@@ -132,6 +138,10 @@ describe('RMRKTokenAttributesRepository', async function () {
       );
       expect(await tokenAttributes.getUintAttribute(collectionAddress, tokenId, 'health')).to.eql(
         80n,
+      );
+      expect(await tokenAttributes.getIntAttribute(collectionAddress, tokenId, 'int')).to.eql(1n);
+      expect(await tokenAttributes.getIntAttribute(collectionAddress, tokenId, 'int2')).to.eql(
+        -10n,
       );
       expect(await tokenAttributes.getBytesAttribute(collectionAddress, tokenId, 'data')).to.eql(
         '0x1234',
@@ -154,24 +164,28 @@ describe('RMRKTokenAttributesRepository', async function () {
           collectionAddress,
           tokenId,
           [
-            { key: 'string1', value: 'value1' },
-            { key: 'string2', value: 'value2' },
-          ],
-          [
-            { key: 'uint1', value: 1n },
-            { key: 'uint2', value: 2n },
+            { key: 'address1', value: tokenOwner.address },
+            { key: 'address2', value: await collectionOwner.getAddress() },
           ],
           [
             { key: 'bool1', value: true },
             { key: 'bool2', value: false },
           ],
           [
-            { key: 'address1', value: tokenOwner.address },
-            { key: 'address2', value: await collectionOwner.getAddress() },
-          ],
-          [
             { key: 'bytes1', value: '0x1234' },
             { key: 'bytes2', value: '0x5678' },
+          ],
+          [
+            { key: 'int1', value: -10n },
+            { key: 'int2', value: 2n },
+          ],
+          [
+            { key: 'string1', value: 'value1' },
+            { key: 'string2', value: 'value2' },
+          ],
+          [
+            { key: 'uint1', value: 1n },
+            { key: 'uint2', value: 2n },
           ],
         ),
       )
@@ -183,80 +197,10 @@ describe('RMRKTokenAttributesRepository', async function () {
         .withArgs(collectionAddress, tokenId, 'uint1', 1n)
         .to.emit(tokenAttributes, 'UintAttributeUpdated')
         .withArgs(collectionAddress, tokenId, 'uint2', 2n)
-        .to.emit(tokenAttributes, 'BoolAttributeUpdated')
-        .withArgs(collectionAddress, tokenId, 'bool1', true)
-        .to.emit(tokenAttributes, 'BoolAttributeUpdated')
-        .withArgs(collectionAddress, tokenId, 'bool2', false)
-        .to.emit(tokenAttributes, 'AddressAttributeUpdated')
-        .withArgs(collectionAddress, tokenId, 'address1', tokenOwner.address)
-        .to.emit(tokenAttributes, 'AddressAttributeUpdated')
-        .withArgs(collectionAddress, tokenId, 'address2', await collectionOwner.getAddress())
-        .to.emit(tokenAttributes, 'BytesAttributeUpdated')
-        .withArgs(collectionAddress, tokenId, 'bytes1', '0x1234')
-        .to.emit(tokenAttributes, 'BytesAttributeUpdated')
-        .withArgs(collectionAddress, tokenId, 'bytes2', '0x5678');
-    });
-
-    it('can update multiple attributes of multiple types at the same time', async function () {
-      await tokenAttributes.setAttributes(
-        collectionAddress,
-        tokenId,
-        [
-          { key: 'string1', value: 'value0' },
-          { key: 'string2', value: 'value1' },
-        ],
-        [
-          { key: 'uint1', value: 0n },
-          { key: 'uint2', value: 1n },
-        ],
-        [
-          { key: 'bool1', value: false },
-          { key: 'bool2', value: true },
-        ],
-        [
-          { key: 'address1', value: await collectionOwner.getAddress() },
-          { key: 'address2', value: tokenOwner.address },
-        ],
-        [
-          { key: 'bytes1', value: '0x5678' },
-          { key: 'bytes2', value: '0x1234' },
-        ],
-      );
-
-      await expect(
-        tokenAttributes.setAttributes(
-          collectionAddress,
-          tokenId,
-          [
-            { key: 'string1', value: 'value1' },
-            { key: 'string2', value: 'value2' },
-          ],
-          [
-            { key: 'uint1', value: 1n },
-            { key: 'uint2', value: 2n },
-          ],
-          [
-            { key: 'bool1', value: true },
-            { key: 'bool2', value: false },
-          ],
-          [
-            { key: 'address1', value: tokenOwner.address },
-            { key: 'address2', value: await collectionOwner.getAddress() },
-          ],
-          [
-            { key: 'bytes1', value: '0x1234' },
-            { key: 'bytes2', value: '0x5678' },
-          ],
-        ),
-      )
-        .to.emit(tokenAttributes, 'StringAttributeUpdated')
-        .withArgs(collectionAddress, tokenId, 'string1', 'value1')
-        .to.emit(tokenAttributes, 'StringAttributeUpdated')
-        .withArgs(collectionAddress, tokenId, 'string2', 'value2')
-        .to.emit(tokenAttributes, 'UintAttributeUpdated')
-        .withArgs(collectionAddress, tokenId, 'uint1', 1n)
-        .to.emit(tokenAttributes, 'UintAttributeUpdated')
-        .withArgs(collectionAddress, tokenId, 'uint2', 2n)
+        .to.emit(tokenAttributes, 'IntAttributeUpdated')
+        .withArgs(collectionAddress, tokenId, 'int1', -10n)
+        .to.emit(tokenAttributes, 'IntAttributeUpdated')
+        .withArgs(collectionAddress, tokenId, 'int2', 2n)
         .to.emit(tokenAttributes, 'BoolAttributeUpdated')
         .withArgs(collectionAddress, tokenId, 'bool1', true)
         .to.emit(tokenAttributes, 'BoolAttributeUpdated')
@@ -275,42 +219,44 @@ describe('RMRKTokenAttributesRepository', async function () {
       await tokenAttributes.setAttributes(
         collectionAddress,
         tokenId,
-        [{ key: 'string1', value: 'value0' }],
         [
-          { key: 'uint1', value: 0n },
-          { key: 'uint2', value: 1n },
+          { key: 'address1', value: await collectionOwner.getAddress() },
+          { key: 'address2', value: tokenOwner.address },
         ],
         [
           { key: 'bool1', value: false },
           { key: 'bool2', value: true },
         ],
-        [
-          { key: 'address1', value: await collectionOwner.getAddress() },
-          { key: 'address2', value: tokenOwner.address },
-        ],
         [],
+        [],
+        [{ key: 'string1', value: 'value0' }],
+        [
+          { key: 'uint1', value: 0n },
+          { key: 'uint2', value: 1n },
+        ],
       );
 
       await expect(
         tokenAttributes.setAttributes(
           collectionAddress,
           tokenId,
-          [],
           [
-            { key: 'uint1', value: 1n },
-            { key: 'uint2', value: 2n },
+            { key: 'address1', value: tokenOwner.address },
+            { key: 'address2', value: await collectionOwner.getAddress() },
           ],
           [
             { key: 'bool1', value: true },
             { key: 'bool2', value: false },
           ],
           [
-            { key: 'address1', value: tokenOwner.address },
-            { key: 'address2', value: await collectionOwner.getAddress() },
-          ],
-          [
             { key: 'bytes1', value: '0x1234' },
             { key: 'bytes2', value: '0x5678' },
+          ],
+          [],
+          [],
+          [
+            { key: 'uint1', value: 1n },
+            { key: 'uint2', value: 2n },
           ],
         ),
       )
@@ -336,11 +282,12 @@ describe('RMRKTokenAttributesRepository', async function () {
           collectionAddress,
           tokenId,
           [],
-          [],
           [
             { key: 'bool1', value: false },
             { key: 'bool2', value: true },
           ],
+          [],
+          [],
           [],
           [],
         ),
@@ -351,59 +298,26 @@ describe('RMRKTokenAttributesRepository', async function () {
         .withArgs(collectionAddress, tokenId, 'bool2', true);
     });
 
-    it('can set and update multiple attributes of multiple types at the same time', async function () {
-      await expect(
-        tokenAttributes.setAttributes(
-          collectionAddress,
-          tokenId,
-          [
-            { key: 'string1', value: 'value1' },
-            { key: 'string2', value: 'value2' },
-          ],
-          [
-            { key: 'uint1', value: 1n },
-            { key: 'uint2', value: 2n },
-          ],
-          [
-            { key: 'bool1', value: true },
-            { key: 'bool2', value: false },
-          ],
-          [
-            { key: 'address1', value: tokenOwner.address },
-            { key: 'address2', value: await collectionOwner.getAddress() },
-          ],
-          [
-            { key: 'bytes1', value: '0x1234' },
-            { key: 'bytes2', value: '0x5678' },
-          ],
-        ),
-      )
-        .to.emit(tokenAttributes, 'StringAttributeUpdated')
-        .withArgs(collectionAddress, tokenId, 'string1', 'value1')
-        .to.emit(tokenAttributes, 'StringAttributeUpdated')
-        .withArgs(collectionAddress, tokenId, 'string2', 'value2')
-        .to.emit(tokenAttributes, 'UintAttributeUpdated')
-        .withArgs(collectionAddress, tokenId, 'uint1', 1n)
-        .to.emit(tokenAttributes, 'UintAttributeUpdated')
-        .withArgs(collectionAddress, tokenId, 'uint2', 2n)
-        .to.emit(tokenAttributes, 'BoolAttributeUpdated')
-        .withArgs(collectionAddress, tokenId, 'bool1', true)
-        .to.emit(tokenAttributes, 'BoolAttributeUpdated')
-        .withArgs(collectionAddress, tokenId, 'bool2', false)
-        .to.emit(tokenAttributes, 'AddressAttributeUpdated')
-        .withArgs(collectionAddress, tokenId, 'address1', tokenOwner.address)
-        .to.emit(tokenAttributes, 'AddressAttributeUpdated')
-        .withArgs(collectionAddress, tokenId, 'address2', await collectionOwner.getAddress())
-        .to.emit(tokenAttributes, 'BytesAttributeUpdated')
-        .withArgs(collectionAddress, tokenId, 'bytes1', '0x1234')
-        .to.emit(tokenAttributes, 'BytesAttributeUpdated')
-        .withArgs(collectionAddress, tokenId, 'bytes2', '0x5678');
-    });
-
     it('should allow to retrieve multiple attributes at once', async function () {
       await tokenAttributes.setAttributes(
         collectionAddress,
         tokenId,
+        [
+          { key: 'address1', value: tokenOwner.address },
+          { key: 'address2', value: await collectionOwner.getAddress() },
+        ],
+        [
+          { key: 'bool1', value: true },
+          { key: 'bool2', value: false },
+        ],
+        [
+          { key: 'bytes1', value: '0x1234' },
+          { key: 'bytes2', value: '0x5678' },
+        ],
+        [
+          { key: 'int1', value: -10n },
+          { key: 'int2', value: 2n },
+        ],
         [
           { key: 'string1', value: 'value1' },
           { key: 'string2', value: 'value2' },
@@ -412,36 +326,26 @@ describe('RMRKTokenAttributesRepository', async function () {
           { key: 'uint1', value: 1n },
           { key: 'uint2', value: 2n },
         ],
-        [
-          { key: 'bool1', value: true },
-          { key: 'bool2', value: false },
-        ],
-        [
-          { key: 'address1', value: tokenOwner.address },
-          { key: 'address2', value: await collectionOwner.getAddress() },
-        ],
-        [
-          { key: 'bytes1', value: '0x1234' },
-          { key: 'bytes2', value: '0x5678' },
-        ],
       );
 
       expect(
         await tokenAttributes.getAttributes(
           collectionAddress,
           tokenId,
+          ['address1', 'address2'],
+          ['bool1', 'bool2'],
+          ['bytes1', 'bytes2'],
+          ['int1', 'int2'],
           ['string1', 'string2'],
           ['uint1', 'uint2'],
-          ['bool1', 'bool2'],
-          ['address1', 'address2'],
-          ['bytes1', 'bytes2'],
         ),
       ).to.eql([
+        [tokenOwner.address, await collectionOwner.getAddress()],
+        [true, false],
+        ['0x1234', '0x5678'],
+        [-10n, 2n],
         ['value1', 'value2'],
         [1n, 2n],
-        [true, false],
-        [tokenOwner.address, await collectionOwner.getAddress()],
-        ['0x1234', '0x5678'],
       ]);
     });
 
@@ -465,13 +369,14 @@ describe('RMRKTokenAttributesRepository', async function () {
         await tokenAttributes.getAttributes(
           collectionAddress,
           tokenId,
+          [],
+          [],
+          [],
+          [],
           ['string1', 'string2'],
           [],
-          [],
-          [],
-          [],
         ),
-      ).to.eql([['value1', 'value2'], [], [], [], []]);
+      ).to.eql([[], [], [], [], ['value1', 'value2'], []]);
     });
 
     it('can set multiple uint attributes at the same time', async function () {
@@ -495,12 +400,43 @@ describe('RMRKTokenAttributesRepository', async function () {
           collectionAddress,
           tokenId,
           [],
-          ['uint1', 'uint2'],
           [],
+          [],
+          [],
+          [],
+          ['uint1', 'uint2'],
+        ),
+      ).to.eql([[], [], [], [], [], [1n, 2n]]);
+    });
+
+    it('can set multiple int attributes at the same time', async function () {
+      await expect(
+        tokenAttributes.setIntAttributes(
+          [collectionAddress],
+          [tokenId],
+          [
+            { key: 'int1', value: -10n },
+            { key: 'int2', value: 2n },
+          ],
+        ),
+      )
+        .to.emit(tokenAttributes, 'IntAttributeUpdated')
+        .withArgs(collectionAddress, tokenId, 'int1', -10n)
+        .to.emit(tokenAttributes, 'IntAttributeUpdated')
+        .withArgs(collectionAddress, tokenId, 'int2', 2n);
+
+      expect(
+        await tokenAttributes.getAttributes(
+          collectionAddress,
+          tokenId,
+          [],
+          [],
+          [],
+          ['int1', 'int2'],
           [],
           [],
         ),
-      ).to.eql([[], [1n, 2n], [], [], []]);
+      ).to.eql([[], [], [], [-10n, 2n], [], []]);
     });
 
     it('can set multiple bool attributes at the same time', async function () {
@@ -524,12 +460,13 @@ describe('RMRKTokenAttributesRepository', async function () {
           collectionAddress,
           tokenId,
           [],
-          [],
           ['bool1', 'bool2'],
           [],
           [],
+          [],
+          [],
         ),
-      ).to.eql([[], [], [true, false], [], []]);
+      ).to.eql([[], [true, false], [], [], [], []]);
     });
 
     it('can set multiple address attributes at the same time', async function () {
@@ -552,13 +489,14 @@ describe('RMRKTokenAttributesRepository', async function () {
         await tokenAttributes.getAttributes(
           collectionAddress,
           tokenId,
-          [],
-          [],
-          [],
           ['address1', 'address2'],
           [],
+          [],
+          [],
+          [],
+          [],
         ),
-      ).to.eql([[], [], [], [tokenOwner.address, await collectionOwner.getAddress()], []]);
+      ).to.eql([[tokenOwner.address, await collectionOwner.getAddress()], [], [], [], [], []]);
     });
 
     it('can set multiple bytes attributes at the same time', async function () {
@@ -583,11 +521,12 @@ describe('RMRKTokenAttributesRepository', async function () {
           tokenId,
           [],
           [],
-          [],
-          [],
           ['bytes1', 'bytes2'],
+          [],
+          [],
+          [],
         ),
-      ).to.eql([[], [], [], [], ['0x1234', '0x5678']]);
+      ).to.eql([[], [], ['0x1234', '0x5678'], [], [], []]);
     });
 
     it('can reuse keys and values are fine', async function () {
@@ -1066,6 +1005,13 @@ describe('RMRKTokenAttributesRepository', async function () {
         1,
         9999999999n,
       );
+      const intMessage = await tokenAttributes.prepareMessageToPresignIntAttribute(
+        collectionAddress,
+        tokenId,
+        'X',
+        -10n,
+        9999999999n,
+      );
       const stringMessage = await tokenAttributes.prepareMessageToPresignStringAttribute(
         collectionAddress,
         tokenId,
@@ -1096,6 +1042,7 @@ describe('RMRKTokenAttributesRepository', async function () {
       );
 
       const uintSignature = await collectionOwner.signMessage(ethers.getBytes(uintMessage));
+      const intSignature = await collectionOwner.signMessage(ethers.getBytes(intMessage));
       const stringSignature = await collectionOwner.signMessage(ethers.getBytes(stringMessage));
       const boolSignature = await collectionOwner.signMessage(ethers.getBytes(boolMessage));
       const bytesSignature = await collectionOwner.signMessage(ethers.getBytes(bytesMessage));
@@ -1104,6 +1051,10 @@ describe('RMRKTokenAttributesRepository', async function () {
       const uintR: string = uintSignature.substring(0, 66);
       const uintS: string = '0x' + uintSignature.substring(66, 130);
       const uintV: string = parseInt(uintSignature.substring(130, 132), 16).toString();
+
+      const intR: string = intSignature.substring(0, 66);
+      const intS: string = '0x' + intSignature.substring(66, 130);
+      const intV: string = parseInt(intSignature.substring(130, 132), 16).toString();
 
       const stringR: string = stringSignature.substring(0, 66);
       const stringS: string = '0x' + stringSignature.substring(66, 130);
@@ -1138,6 +1089,24 @@ describe('RMRKTokenAttributesRepository', async function () {
       )
         .to.emit(tokenAttributes, 'UintAttributeUpdated')
         .withArgs(collectionAddress, 1, 'X', 1);
+
+      await expect(
+        tokenAttributes
+          .connect(tokenOwner)
+          .presignedSetIntAttribute(
+            await collectionOwner.getAddress(),
+            collectionAddress,
+            tokenId,
+            'X',
+            -10n,
+            9999999999n,
+            intV,
+            intR,
+            intS,
+          ),
+      )
+        .to.emit(tokenAttributes, 'IntAttributeUpdated')
+        .withArgs(collectionAddress, 1, 'X', -10);
       await expect(
         tokenAttributes
           .connect(tokenOwner)
@@ -1640,7 +1609,7 @@ describe('RMRKTokenAttributesRepository', async function () {
   });
 });
 
-async function shouldBehaveLikeTokenAttributesRepositoryInterface() {
+async function shouldBehaveLikeAttributesRepositoryInterface() {
   it('can support IERC165', async function () {
     expect(await this.tokenAttributes.supportsInterface(IERC165)).to.equal(true);
   });
