@@ -108,6 +108,31 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
     /**
      * @inheritdoc IERC7508
      */
+    function isCollaborator(
+        address collaborator,
+        address collection
+    ) external view returns (bool isCollaborator_) {
+        isCollaborator_ = _collaborators[collection][collaborator];
+    }
+
+    // ------------------- ACCESS CONTROL -------------------
+
+    /**
+     * @inheritdoc IERC7508
+     */
+    function isSpecificAddress(
+        address specificAddress,
+        address collection,
+        string memory key
+    ) external view returns (bool isSpecificAddress_) {
+        isSpecificAddress_ =
+            _parameterSpecificAddress[collection][_keysToIds[key]] ==
+            specificAddress;
+    }
+
+    /**
+     * @inheritdoc IERC7508
+     */
     function registerAccessControl(
         address collection,
         address owner,
@@ -185,6 +210,8 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
         }
     }
 
+    // ------------------- METADATA URI -------------------
+
     /**
      * @inheritdoc IERC7508
      */
@@ -194,148 +221,17 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
         attributesMetadataURI = _attributesMetadataURIs[collection];
     }
 
-    /**
-     * @inheritdoc IERC7508
-     */
-    function setAttributesMetadataURIForCollection(
-        address collection,
-        string memory attributesMetadataURI
-    ) external onlyOwner(collection) {
-        _attributesMetadataURIs[collection] = attributesMetadataURI;
-        emit MetadataURIUpdated(collection, attributesMetadataURI);
-    }
+    // ------------------- GETTERS -------------------
 
     /**
      * @inheritdoc IERC7508
      */
-    function isCollaborator(
-        address collaborator,
-        address collection
-    ) external view returns (bool isCollaborator_) {
-        isCollaborator_ = _collaborators[collection][collaborator];
-    }
-
-    /**
-     * @inheritdoc IERC7508
-     */
-    function isSpecificAddress(
-        address specificAddress,
-        address collection,
-        string memory key
-    ) external view returns (bool isSpecificAddress_) {
-        isSpecificAddress_ =
-            _parameterSpecificAddress[collection][_keysToIds[key]] ==
-            specificAddress;
-    }
-
-    /**
-     * @notice Modifier to check if the collection is registered.
-     * @param collection Address of the collection.
-     */
-    modifier onlyRegisteredCollection(address collection) {
-        if (!_ownerSettings[collection].registered) {
-            revert CollectionNotRegistered();
-        }
-        _;
-    }
-
-    /**
-     * @notice Modifier to check if the caller is the owner of the collection.
-     * @param collection Address of the collection.
-     */
-    modifier onlyOwner(address collection) {
-        if (_ownerSettings[collection].useOwnable) {
-            if (Ownable(collection).owner() != _msgSender()) {
-                revert NotCollectionOwner();
-            }
-        } else if (_ownerSettings[collection].owner != _msgSender()) {
-            revert NotCollectionOwner();
-        }
-        _;
-    }
-
-    /**
-     * @notice Function to check if the caller is authorized to mamage a given parameter.
-     * @param collection The address of the collection.
-     * @param key Key of the attribute.
-     * @param tokenId The ID of the token.
-     */
-    function _onlyAuthorizedCaller(
-        address caller,
-        address collection,
-        string memory key,
-        uint256 tokenId
-    ) private view {
-        AccessType accessType = _parameterAccessType[collection][
-            _keysToIds[key]
-        ];
-
-        if (
-            accessType == AccessType.Owner &&
-            ((_ownerSettings[collection].useOwnable &&
-                Ownable(collection).owner() != caller) ||
-                (!_ownerSettings[collection].useOwnable &&
-                    _ownerSettings[collection].owner != caller))
-        ) {
-            revert NotCollectionOwner();
-        } else if (
-            accessType == AccessType.Collaborator &&
-            !_collaborators[collection][caller]
-        ) {
-            revert NotCollectionCollaborator();
-        } else if (
-            accessType == AccessType.OwnerOrCollaborator &&
-            ((_ownerSettings[collection].useOwnable &&
-                Ownable(collection).owner() != caller) ||
-                (!_ownerSettings[collection].useOwnable &&
-                    _ownerSettings[collection].owner != caller)) &&
-            !_collaborators[collection][caller]
-        ) {
-            revert NotCollectionOwnerOrCollaborator();
-        } else if (
-            accessType == AccessType.TokenOwner &&
-            IERC721(collection).ownerOf(tokenId) != caller
-        ) {
-            revert NotTokenOwner();
-        } else if (
-            accessType == AccessType.SpecificAddress &&
-            !(_parameterSpecificAddress[collection][_keysToIds[key]] == caller)
-        ) {
-            revert NotSpecificAddress();
-        }
-    }
-
-    /**
-     * @inheritdoc IERC7508
-     */
-    function getStringAttribute(
+    function getAddressAttribute(
         address collection,
         uint256 tokenId,
         string memory key
-    ) public view returns (string memory attribute) {
-        attribute = _stringValues[collection][tokenId][_keysToIds[key]];
-    }
-
-    /**
-     * @inheritdoc IERC7508
-     */
-    function getUintAttribute(
-        address collection,
-        uint256 tokenId,
-        string memory key
-    ) public view returns (uint256 attribute) {
-        attribute = _uintValues[collection][tokenId][_keysToIds[key]];
-    }
-
-    /**
-     * @inheritdoc IERC7508
-     */
-    function getIntAttribute(
-        address collection,
-        uint256 tokenId,
-        string memory key
-    ) public view returns (int256 attribute) {
-        attribute = _intValues[collection][tokenId][_keysToIds[key]];
+    ) public view returns (address attribute) {
+        attribute = _addressValues[collection][tokenId][_keysToIds[key]];
     }
 
     /**
@@ -352,23 +248,245 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
     /**
      * @inheritdoc IERC7508
      */
-    function getAddressAttribute(
-        address collection,
-        uint256 tokenId,
-        string memory key
-    ) public view returns (address attribute) {
-        attribute = _addressValues[collection][tokenId][_keysToIds[key]];
-    }
-
-    /**
-     * @inheritdoc IERC7508
-     */
     function getBytesAttribute(
         address collection,
         uint256 tokenId,
         string memory key
     ) public view returns (bytes memory attribute) {
         attribute = _bytesValues[collection][tokenId][_keysToIds[key]];
+    }
+
+    /**
+     * @inheritdoc IERC7508
+     */
+    function getUintAttribute(
+        address collection,
+        uint256 tokenId,
+        string memory key
+    ) public view returns (uint256 attribute) {
+        attribute = _uintValues[collection][tokenId][_keysToIds[key]];
+    }
+
+    /**
+     * @inheritdoc IERC7508
+     */
+    function getStringAttribute(
+        address collection,
+        uint256 tokenId,
+        string memory key
+    ) public view returns (string memory attribute) {
+        attribute = _stringValues[collection][tokenId][_keysToIds[key]];
+    }
+
+    /**
+     * @inheritdoc IERC7508
+     */
+    function getIntAttribute(
+        address collection,
+        uint256 tokenId,
+        string memory key
+    ) public view returns (int256 attribute) {
+        attribute = _intValues[collection][tokenId][_keysToIds[key]];
+    }
+
+    // ------------------- BATCH GETTERS -------------------
+
+    /**
+     * @inheritdoc IERC7508
+     */
+    function getAddressAttributes(
+        address[] memory collections,
+        uint256[] memory tokenIds,
+        string[] memory attributeKeys
+    ) public view returns (address[] memory attributes) {
+        (
+            bool multipleCollections,
+            bool multipleTokens,
+            bool multipleAttributes,
+            uint256 loopLength
+        ) = _checkIfMultipleCollectionsAndTokens(
+                collections,
+                tokenIds,
+                attributeKeys.length
+            );
+
+        attributes = new address[](loopLength);
+
+        for (uint256 i; i < loopLength; ) {
+            attributes[i] = getAddressAttribute(
+                multipleCollections ? collections[i] : collections[0],
+                multipleTokens ? tokenIds[i] : tokenIds[0],
+                multipleAttributes ? attributeKeys[i] : attributeKeys[0]
+            );
+            unchecked {
+                ++i;
+            }
+        }
+    }
+
+    /**
+     * @inheritdoc IERC7508
+     */
+    function getBoolAttributes(
+        address[] memory collections,
+        uint256[] memory tokenIds,
+        string[] memory attributeKeys
+    ) public view returns (bool[] memory attributes) {
+        (
+            bool multipleCollections,
+            bool multipleTokens,
+            bool multipleAttributes,
+            uint256 loopLength
+        ) = _checkIfMultipleCollectionsAndTokens(
+                collections,
+                tokenIds,
+                attributeKeys.length
+            );
+
+        attributes = new bool[](loopLength);
+
+        for (uint256 i; i < loopLength; ) {
+            attributes[i] = getBoolAttribute(
+                multipleCollections ? collections[i] : collections[0],
+                multipleTokens ? tokenIds[i] : tokenIds[0],
+                multipleAttributes ? attributeKeys[i] : attributeKeys[0]
+            );
+            unchecked {
+                ++i;
+            }
+        }
+    }
+
+    /**
+     * @inheritdoc IERC7508
+     */
+    function getBytesAttributes(
+        address[] memory collections,
+        uint256[] memory tokenIds,
+        string[] memory attributeKeys
+    ) public view returns (bytes[] memory attributes) {
+        (
+            bool multipleCollections,
+            bool multipleTokens,
+            bool multipleAttributes,
+            uint256 loopLength
+        ) = _checkIfMultipleCollectionsAndTokens(
+                collections,
+                tokenIds,
+                attributeKeys.length
+            );
+
+        attributes = new bytes[](loopLength);
+
+        for (uint256 i; i < loopLength; ) {
+            attributes[i] = getBytesAttribute(
+                multipleCollections ? collections[i] : collections[0],
+                multipleTokens ? tokenIds[i] : tokenIds[0],
+                multipleAttributes ? attributeKeys[i] : attributeKeys[0]
+            );
+            unchecked {
+                ++i;
+            }
+        }
+    }
+
+    /**
+     * @inheritdoc IERC7508
+     */
+    function getIntAttributes(
+        address[] memory collections,
+        uint256[] memory tokenIds,
+        string[] memory attributeKeys
+    ) public view returns (int256[] memory attributes) {
+        (
+            bool multipleCollections,
+            bool multipleTokens,
+            bool multipleAttributes,
+            uint256 loopLength
+        ) = _checkIfMultipleCollectionsAndTokens(
+                collections,
+                tokenIds,
+                attributeKeys.length
+            );
+
+        attributes = new int256[](loopLength);
+
+        for (uint256 i; i < loopLength; ) {
+            attributes[i] = getIntAttribute(
+                multipleCollections ? collections[i] : collections[0],
+                multipleTokens ? tokenIds[i] : tokenIds[0],
+                multipleAttributes ? attributeKeys[i] : attributeKeys[0]
+            );
+            unchecked {
+                ++i;
+            }
+        }
+    }
+
+    /**
+     * @inheritdoc IERC7508
+     */
+    function getStringAttributes(
+        address[] memory collections,
+        uint256[] memory tokenIds,
+        string[] memory attributeKeys
+    ) public view returns (string[] memory attributes) {
+        (
+            bool multipleCollections,
+            bool multipleTokens,
+            bool multipleAttributes,
+            uint256 loopLength
+        ) = _checkIfMultipleCollectionsAndTokens(
+                collections,
+                tokenIds,
+                attributeKeys.length
+            );
+
+        attributes = new string[](loopLength);
+
+        for (uint256 i; i < loopLength; ) {
+            attributes[i] = getStringAttribute(
+                multipleCollections ? collections[i] : collections[0],
+                multipleTokens ? tokenIds[i] : tokenIds[0],
+                multipleAttributes ? attributeKeys[i] : attributeKeys[0]
+            );
+            unchecked {
+                ++i;
+            }
+        }
+    }
+
+    /**
+     * @inheritdoc IERC7508
+     */
+    function getUintAttributes(
+        address[] memory collections,
+        uint256[] memory tokenIds,
+        string[] memory attributeKeys
+    ) public view returns (uint256[] memory attributes) {
+        (
+            bool multipleCollections,
+            bool multipleTokens,
+            bool multipleAttributes,
+            uint256 loopLength
+        ) = _checkIfMultipleCollectionsAndTokens(
+                collections,
+                tokenIds,
+                attributeKeys.length
+            );
+
+        attributes = new uint256[](loopLength);
+
+        for (uint256 i; i < loopLength; ) {
+            attributes[i] = getUintAttribute(
+                multipleCollections ? collections[i] : collections[0],
+                multipleTokens ? tokenIds[i] : tokenIds[0],
+                multipleAttributes ? attributeKeys[i] : attributeKeys[0]
+            );
+            unchecked {
+                ++i;
+            }
+        }
     }
 
     /**
@@ -465,201 +583,95 @@ contract RMRKTokenAttributesRepository is IERC7508, Context {
         }
     }
 
+    // ------------------- SETTERS -------------------
+    // ------------------- BATCH SETTERS -------------------
+    // ------------------- PRESIGNED SETTERS -------------------
+
     /**
      * @inheritdoc IERC7508
      */
-    function getStringAttributes(
-        address[] memory collections,
-        uint256[] memory tokenIds,
-        string[] memory attributeKeys
-    ) public view returns (string[] memory attributes) {
-        (
-            bool multipleCollections,
-            bool multipleTokens,
-            bool multipleAttributes,
-            uint256 loopLength
-        ) = _checkIfMultipleCollectionsAndTokens(
-                collections,
-                tokenIds,
-                attributeKeys.length
-            );
-
-        attributes = new string[](loopLength);
-
-        for (uint256 i; i < loopLength; ) {
-            attributes[i] = getStringAttribute(
-                multipleCollections ? collections[i] : collections[0],
-                multipleTokens ? tokenIds[i] : tokenIds[0],
-                multipleAttributes ? attributeKeys[i] : attributeKeys[0]
-            );
-            unchecked {
-                ++i;
-            }
-        }
+    function setAttributesMetadataURIForCollection(
+        address collection,
+        string memory attributesMetadataURI
+    ) external onlyOwner(collection) {
+        _attributesMetadataURIs[collection] = attributesMetadataURI;
+        emit MetadataURIUpdated(collection, attributesMetadataURI);
     }
 
     /**
-     * @inheritdoc IERC7508
+     * @notice Modifier to check if the collection is registered.
+     * @param collection Address of the collection.
      */
-    function getUintAttributes(
-        address[] memory collections,
-        uint256[] memory tokenIds,
-        string[] memory attributeKeys
-    ) public view returns (uint256[] memory attributes) {
-        (
-            bool multipleCollections,
-            bool multipleTokens,
-            bool multipleAttributes,
-            uint256 loopLength
-        ) = _checkIfMultipleCollectionsAndTokens(
-                collections,
-                tokenIds,
-                attributeKeys.length
-            );
-
-        attributes = new uint256[](loopLength);
-
-        for (uint256 i; i < loopLength; ) {
-            attributes[i] = getUintAttribute(
-                multipleCollections ? collections[i] : collections[0],
-                multipleTokens ? tokenIds[i] : tokenIds[0],
-                multipleAttributes ? attributeKeys[i] : attributeKeys[0]
-            );
-            unchecked {
-                ++i;
-            }
+    modifier onlyRegisteredCollection(address collection) {
+        if (!_ownerSettings[collection].registered) {
+            revert CollectionNotRegistered();
         }
+        _;
     }
 
     /**
-     * @inheritdoc IERC7508
+     * @notice Modifier to check if the caller is the owner of the collection.
+     * @param collection Address of the collection.
      */
-    function getIntAttributes(
-        address[] memory collections,
-        uint256[] memory tokenIds,
-        string[] memory attributeKeys
-    ) public view returns (int256[] memory attributes) {
-        (
-            bool multipleCollections,
-            bool multipleTokens,
-            bool multipleAttributes,
-            uint256 loopLength
-        ) = _checkIfMultipleCollectionsAndTokens(
-                collections,
-                tokenIds,
-                attributeKeys.length
-            );
-
-        attributes = new int256[](loopLength);
-
-        for (uint256 i; i < loopLength; ) {
-            attributes[i] = getIntAttribute(
-                multipleCollections ? collections[i] : collections[0],
-                multipleTokens ? tokenIds[i] : tokenIds[0],
-                multipleAttributes ? attributeKeys[i] : attributeKeys[0]
-            );
-            unchecked {
-                ++i;
+    modifier onlyOwner(address collection) {
+        if (_ownerSettings[collection].useOwnable) {
+            if (Ownable(collection).owner() != _msgSender()) {
+                revert NotCollectionOwner();
             }
+        } else if (_ownerSettings[collection].owner != _msgSender()) {
+            revert NotCollectionOwner();
         }
+        _;
     }
 
     /**
-     * @inheritdoc IERC7508
+     * @notice Function to check if the caller is authorized to mamage a given parameter.
+     * @param collection The address of the collection.
+     * @param key Key of the attribute.
+     * @param tokenId The ID of the token.
      */
-    function getBoolAttributes(
-        address[] memory collections,
-        uint256[] memory tokenIds,
-        string[] memory attributeKeys
-    ) public view returns (bool[] memory attributes) {
-        (
-            bool multipleCollections,
-            bool multipleTokens,
-            bool multipleAttributes,
-            uint256 loopLength
-        ) = _checkIfMultipleCollectionsAndTokens(
-                collections,
-                tokenIds,
-                attributeKeys.length
-            );
+    function _onlyAuthorizedCaller(
+        address caller,
+        address collection,
+        string memory key,
+        uint256 tokenId
+    ) private view {
+        AccessType accessType = _parameterAccessType[collection][
+            _keysToIds[key]
+        ];
 
-        attributes = new bool[](loopLength);
-
-        for (uint256 i; i < loopLength; ) {
-            attributes[i] = getBoolAttribute(
-                multipleCollections ? collections[i] : collections[0],
-                multipleTokens ? tokenIds[i] : tokenIds[0],
-                multipleAttributes ? attributeKeys[i] : attributeKeys[0]
-            );
-            unchecked {
-                ++i;
-            }
-        }
-    }
-
-    /**
-     * @inheritdoc IERC7508
-     */
-    function getAddressAttributes(
-        address[] memory collections,
-        uint256[] memory tokenIds,
-        string[] memory attributeKeys
-    ) public view returns (address[] memory attributes) {
-        (
-            bool multipleCollections,
-            bool multipleTokens,
-            bool multipleAttributes,
-            uint256 loopLength
-        ) = _checkIfMultipleCollectionsAndTokens(
-                collections,
-                tokenIds,
-                attributeKeys.length
-            );
-
-        attributes = new address[](loopLength);
-
-        for (uint256 i; i < loopLength; ) {
-            attributes[i] = getAddressAttribute(
-                multipleCollections ? collections[i] : collections[0],
-                multipleTokens ? tokenIds[i] : tokenIds[0],
-                multipleAttributes ? attributeKeys[i] : attributeKeys[0]
-            );
-            unchecked {
-                ++i;
-            }
-        }
-    }
-
-    /**
-     * @inheritdoc IERC7508
-     */
-    function getBytesAttributes(
-        address[] memory collections,
-        uint256[] memory tokenIds,
-        string[] memory attributeKeys
-    ) public view returns (bytes[] memory attributes) {
-        (
-            bool multipleCollections,
-            bool multipleTokens,
-            bool multipleAttributes,
-            uint256 loopLength
-        ) = _checkIfMultipleCollectionsAndTokens(
-                collections,
-                tokenIds,
-                attributeKeys.length
-            );
-
-        attributes = new bytes[](loopLength);
-
-        for (uint256 i; i < loopLength; ) {
-            attributes[i] = getBytesAttribute(
-                multipleCollections ? collections[i] : collections[0],
-                multipleTokens ? tokenIds[i] : tokenIds[0],
-                multipleAttributes ? attributeKeys[i] : attributeKeys[0]
-            );
-            unchecked {
-                ++i;
-            }
+        if (
+            accessType == AccessType.Owner &&
+            ((_ownerSettings[collection].useOwnable &&
+                Ownable(collection).owner() != caller) ||
+                (!_ownerSettings[collection].useOwnable &&
+                    _ownerSettings[collection].owner != caller))
+        ) {
+            revert NotCollectionOwner();
+        } else if (
+            accessType == AccessType.Collaborator &&
+            !_collaborators[collection][caller]
+        ) {
+            revert NotCollectionCollaborator();
+        } else if (
+            accessType == AccessType.OwnerOrCollaborator &&
+            ((_ownerSettings[collection].useOwnable &&
+                Ownable(collection).owner() != caller) ||
+                (!_ownerSettings[collection].useOwnable &&
+                    _ownerSettings[collection].owner != caller)) &&
+            !_collaborators[collection][caller]
+        ) {
+            revert NotCollectionOwnerOrCollaborator();
+        } else if (
+            accessType == AccessType.TokenOwner &&
+            IERC721(collection).ownerOf(tokenId) != caller
+        ) {
+            revert NotTokenOwner();
+        } else if (
+            accessType == AccessType.SpecificAddress &&
+            !(_parameterSpecificAddress[collection][_keysToIds[key]] == caller)
+        ) {
+            revert NotSpecificAddress();
         }
     }
 
