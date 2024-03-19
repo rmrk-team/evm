@@ -65,7 +65,7 @@ abstract contract RMRKTokenHolder is IERC7590 {
 
         erc20.transfer(to, amount);
         uint256 newBalance = erc20.balanceOf(address(this));
-        // Here you can either use the difference as the amount, or revert if the difference is not equal to the amount and you don't want to support transfer fees
+        // Since a token transfer could be taxed (i.e. part of the value is taken by a 3rd party), we need to check the actual amount transferred. It is up to the implementer to either revert if the difference differs from the `amount` parameter or use the actual amount transferred instead of the `amount` parameter. We revert.
         if (newBalance + amount != initBalance) {
             revert InvalidAmountTransferred();
         }
@@ -106,7 +106,7 @@ abstract contract RMRKTokenHolder is IERC7590 {
         uint256 initBalance = erc20.balanceOf(address(this));
         erc20.transferFrom(msg.sender, address(this), amount);
         uint256 newBalance = erc20.balanceOf(address(this));
-        // Here you can either use the difference as the amount, or revert if the difference is not equal to the amount and you don't want to support transfer fees
+        // Since a token transfer could be taxed (i.e. part of the value is taken by a 3rd party), we need to check the actual amount transferred. It is up to the implementer to either revert if the difference differs from the `amount` parameter or use the actual amount transferred instead of the `amount` parameter. We revert.
         if (initBalance + amount != newBalance) {
             revert InvalidAmountTransferred();
         }
