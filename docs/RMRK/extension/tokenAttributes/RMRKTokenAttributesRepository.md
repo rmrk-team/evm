@@ -78,6 +78,23 @@ function SET_BYTES_ATTRIBUTE_TYPEHASH() external view returns (bytes32)
 |---|---|---|
 | _0 | bytes32 | undefined |
 
+### SET_INT_ATTRIBUTE_TYPEHASH
+
+```solidity
+function SET_INT_ATTRIBUTE_TYPEHASH() external view returns (bytes32)
+```
+
+
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | bytes32 | undefined |
+
 ### SET_STRING_ATTRIBUTE_TYPEHASH
 
 ```solidity
@@ -163,12 +180,12 @@ Used to get multiple address parameter values for a token.
 ### getAttributes
 
 ```solidity
-function getAttributes(address collection, uint256 tokenId, string[] stringKeys, string[] uintKeys, string[] boolKeys, string[] addressKeys, string[] bytesKeys) external view returns (string[] stringAttributes, uint256[] uintAttributes, bool[] boolAttributes, address[] addressAttributes, bytes[] bytesAttributes)
+function getAttributes(address collection, uint256 tokenId, string[] addressKeys, string[] boolKeys, string[] bytesKeys, string[] intKeys, string[] stringKeys, string[] uintKeys) external view returns (address[] addressAttributes, bool[] boolAttributes, bytes[] bytesAttributes, int256[] intAttributes, string[] stringAttributes, uint256[] uintAttributes)
 ```
 
 Used to retrieve multiple token attributes of any type at once.
 
-*The `StringAttribute`, `UintAttribute`, `BoolAttribute`, `AddressAttribute` and `BytesAttribute` structs consists  to the following fields (where `value` is of the appropriate type):  [      key,      value,  ]*
+*The `StringAttribute`, `UintAttribute`, `IntAttribute`, `BoolAttribute`, `AddressAttribute` and `BytesAttribute` structs consists  to the following fields (where `value` is of the appropriate type):  [      key,      value,  ]*
 
 #### Parameters
 
@@ -176,26 +193,28 @@ Used to retrieve multiple token attributes of any type at once.
 |---|---|---|
 | collection | address | The collection address |
 | tokenId | uint256 | The token ID |
+| addressKeys | string[] | An array of address type attribute keys to retrieve |
+| boolKeys | string[] | An array of bool type attribute keys to retrieve |
+| bytesKeys | string[] | An array of bytes type attribute keys to retrieve |
+| intKeys | string[] | An array of int type attribute keys to retrieve |
 | stringKeys | string[] | An array of string type attribute keys to retrieve |
 | uintKeys | string[] | An array of uint type attribute keys to retrieve |
-| boolKeys | string[] | An array of bool type attribute keys to retrieve |
-| addressKeys | string[] | An array of address type attribute keys to retrieve |
-| bytesKeys | string[] | An array of bytes type attribute keys to retrieve |
 
 #### Returns
 
 | Name | Type | Description |
 |---|---|---|
+| addressAttributes | address[] | An array of addresses, in the same order as the addressKeys |
+| boolAttributes | bool[] | An array of bools, in the same order as the boolKeys |
+| bytesAttributes | bytes[] | An array of bytes, in the same order as the bytesKeys |
+| intAttributes | int256[] | An array of ints, in the same order as the intKeys |
 | stringAttributes | string[] | An array of strings, in the same order as the stringKeys |
 | uintAttributes | uint256[] | An array of uints, in the same order as the uintKeys |
-| boolAttributes | bool[] | An array of bools, in the same order as the boolKeys |
-| addressAttributes | address[] | An array of addresses, in the same order as the addressKeys |
-| bytesAttributes | bytes[] | An array of bytes, in the same order as the bytesKeys |
 
-### getAttributesMetadataURI
+### getAttributesMetadataURIForCollection
 
 ```solidity
-function getAttributesMetadataURI(address collection) external view returns (string attributesMetadataURI)
+function getAttributesMetadataURIForCollection(address collection) external view returns (string attributesMetadataURI)
 ```
 
 Used to retrieve the attributes metadata URI for a collection, which contains all the information about the collection attributes.
@@ -310,6 +329,54 @@ Used to get multiple bytes parameter values for a token.
 |---|---|---|
 | attributes | bytes[] | An array of bytes, in the same order as the attribute keys |
 
+### getIntAttribute
+
+```solidity
+function getIntAttribute(address collection, uint256 tokenId, string key) external view returns (int256 attribute)
+```
+
+Used to retrieve the int type token attributes.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| collection | address | The collection address |
+| tokenId | uint256 | The token ID |
+| key | string | The key of the attribute |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| attribute | int256 | The value of the uint attribute |
+
+### getIntAttributes
+
+```solidity
+function getIntAttributes(address[] collections, uint256[] tokenIds, string[] attributeKeys) external view returns (int256[] attributes)
+```
+
+Used to get multiple int parameter values for a token.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| collections | address[] | Addresses of the collections, in the same order as the attribute keys. If all tokens are from the same collection the array can contain a single element with the collection address. |
+| tokenIds | uint256[] | IDs of the tokens, in the same order as the attribute keys. If all attributes are for the same token the array can contain a single element with the token ID. |
+| attributeKeys | string[] | An array of int keys to retrieve |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| attributes | int256[] | An array of ints, in the same order as the attribute keys |
+
 ### getStringAttribute
 
 ```solidity
@@ -342,7 +409,7 @@ function getStringAttributes(address[] collections, uint256[] tokenIds, string[]
 
 Used to get multiple sting parameter values for a token.
 
-*The `StringAttribute` struct contains the following fields:  [     string key,     string value  ]*
+
 
 #### Parameters
 
@@ -390,7 +457,7 @@ function getUintAttributes(address[] collections, uint256[] tokenIds, string[] a
 
 Used to get multiple uint parameter values for a token.
 
-*The `UintAttribute` struct contains the following fields:  [     string key,     uint value  ]*
+
 
 #### Parameters
 
@@ -461,7 +528,7 @@ function manageAccessControl(address collection, string key, enum IERC7508.Acces
 
 Used to manage the access control settings for a specific parameter.
 
-*Only the `issuer` of the collection can call this function.The possible `accessType` values are:  [      Issuer,      Collaborator,      IssuerOrCollaborator,      TokenOwner,      SpecificAddress,  ]Emits an {AccessControlUpdated} event.*
+*Only the `owner` of the collection can call this function.The possible `accessType` values are:  [      Owner,      Collaborator,      OwnerOrCollaborator,      TokenOwner,      SpecificAddress,  ]Emits an {AccessControlUpdated} event.*
 
 #### Parameters
 
@@ -560,6 +627,32 @@ Used to retrieve the message to be signed for submitting a presigned bytes attri
 | tokenId | uint256 | The ID of the token receiving the attribute |
 | key | string | The attribute key |
 | value | bytes | The attribute value |
+| deadline | uint256 | The deadline timestamp for the presigned transaction after which the message is invalid |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| message | bytes32 | Raw message to be signed by the authorized account |
+
+### prepareMessageToPresignIntAttribute
+
+```solidity
+function prepareMessageToPresignIntAttribute(address collection, uint256 tokenId, string key, int256 value, uint256 deadline) external view returns (bytes32 message)
+```
+
+Used to retrieve the message to be signed for submitting a presigned int attribute change.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| collection | address | The address of the collection smart contract of the token receiving the attribute |
+| tokenId | uint256 | The ID of the token receiving the attribute |
+| key | string | The attribute key |
+| value | int256 | The attribute value |
 | deadline | uint256 | The deadline timestamp for the presigned transaction after which the message is invalid |
 
 #### Returns
@@ -692,6 +785,30 @@ Used to set the bytes attribute on behalf of an authorized account.
 | r | bytes32 | `r` value of an ECDSA signature of the presigned message |
 | s | bytes32 | `s` value of an ECDSA signature of the presigned message |
 
+### presignedSetIntAttribute
+
+```solidity
+function presignedSetIntAttribute(address setter, address collection, uint256 tokenId, string key, int256 value, uint256 deadline, uint8 v, bytes32 r, bytes32 s) external nonpayable
+```
+
+Used to set the int attribute on behalf of an authorized account.
+
+*Emits a {IntAttributeUpdated} event.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| setter | address | Address of the account that presigned the attribute change |
+| collection | address | Address of the collection receiving the attribute |
+| tokenId | uint256 | The ID of the token receiving the attribute |
+| key | string | The attribute key |
+| value | int256 | The attribute value |
+| deadline | uint256 | The deadline timestamp for the presigned transaction |
+| v | uint8 | `v` value of an ECDSA signature of the presigned message |
+| r | bytes32 | `r` value of an ECDSA signature of the presigned message |
+| s | bytes32 | `s` value of an ECDSA signature of the presigned message |
+
 ### presignedSetStringAttribute
 
 ```solidity
@@ -743,7 +860,7 @@ Used to set the uint attribute on behalf of an authorized account.
 ### registerAccessControl
 
 ```solidity
-function registerAccessControl(address collection, address issuer, bool useOwnable) external nonpayable
+function registerAccessControl(address collection, address owner, bool useOwnable) external nonpayable
 ```
 
 Used to register a collection to use the RMRK token attributes repository.
@@ -755,8 +872,8 @@ Used to register a collection to use the RMRK token attributes repository.
 | Name | Type | Description |
 |---|---|---|
 | collection | address | The address of the collection that will use the RMRK token attributes repository. |
-| issuer | address | The address of the issuer of the collection. |
-| useOwnable | bool | The boolean value to indicate if the collection implements the Ownable interface and whether it  should be used to validate that the caller is the issuer (`true`) or to use the manually set issuer address  (`false`). |
+| owner | address | The address of the owner of the collection. |
+| useOwnable | bool | The boolean value to indicate if the collection implements the Ownable interface and whether it  should be used to validate that the caller is the owner (`true`) or to use the manually set owner address  (`false`). |
 
 ### setAddressAttribute
 
@@ -798,7 +915,7 @@ function setAddressAttributes(address[] collections, uint256[] tokenIds, IERC750
 ### setAttributes
 
 ```solidity
-function setAttributes(address collection, uint256 tokenId, IERC7508.StringAttribute[] stringAttributes, IERC7508.UintAttribute[] uintAttributes, IERC7508.BoolAttribute[] boolAttributes, IERC7508.AddressAttribute[] addressAttributes, IERC7508.BytesAttribute[] bytesAttributes) external nonpayable
+function setAttributes(address collection, uint256 tokenId, IERC7508.AddressAttribute[] addressAttributes, IERC7508.BoolAttribute[] boolAttributes, IERC7508.BytesAttribute[] bytesAttributes, IERC7508.IntAttribute[] intAttributes, IERC7508.StringAttribute[] stringAttributes, IERC7508.UintAttribute[] uintAttributes) external nonpayable
 ```
 
 
@@ -811,16 +928,17 @@ function setAttributes(address collection, uint256 tokenId, IERC7508.StringAttri
 |---|---|---|
 | collection | address | undefined |
 | tokenId | uint256 | undefined |
+| addressAttributes | IERC7508.AddressAttribute[] | undefined |
+| boolAttributes | IERC7508.BoolAttribute[] | undefined |
+| bytesAttributes | IERC7508.BytesAttribute[] | undefined |
+| intAttributes | IERC7508.IntAttribute[] | undefined |
 | stringAttributes | IERC7508.StringAttribute[] | undefined |
 | uintAttributes | IERC7508.UintAttribute[] | undefined |
-| boolAttributes | IERC7508.BoolAttribute[] | undefined |
-| addressAttributes | IERC7508.AddressAttribute[] | undefined |
-| bytesAttributes | IERC7508.BytesAttribute[] | undefined |
 
-### setAttributesMetadataURI
+### setAttributesMetadataURIForCollection
 
 ```solidity
-function setAttributesMetadataURI(address collection, string attributesMetadataURI) external nonpayable
+function setAttributesMetadataURIForCollection(address collection, string attributesMetadataURI) external nonpayable
 ```
 
 Used to set the metadata URI for a collection, which contains all the information about the collection attributes.
@@ -908,6 +1026,43 @@ function setBytesAttributes(address[] collections, uint256[] tokenIds, IERC7508.
 | tokenIds | uint256[] | undefined |
 | attributes | IERC7508.BytesAttribute[] | undefined |
 
+### setIntAttribute
+
+```solidity
+function setIntAttribute(address collection, uint256 tokenId, string key, int256 value) external nonpayable
+```
+
+Used to set a signed number attribute.
+
+*Emits a {IntAttributeUpdated} event.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| collection | address | Address of the collection receiving the attribute |
+| tokenId | uint256 | The token ID |
+| key | string | The attribute key |
+| value | int256 | The attribute value |
+
+### setIntAttributes
+
+```solidity
+function setIntAttributes(address[] collections, uint256[] tokenIds, IERC7508.IntAttribute[] attributes) external nonpayable
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| collections | address[] | undefined |
+| tokenIds | uint256[] | undefined |
+| attributes | IERC7508.IntAttribute[] | undefined |
+
 ### setStringAttribute
 
 ```solidity
@@ -951,7 +1106,7 @@ function setStringAttributes(address[] collections, uint256[] tokenIds, IERC7508
 function setUintAttribute(address collection, uint256 tokenId, string key, uint256 value) external nonpayable
 ```
 
-Used to set a number attribute.
+Used to set an unsigned number attribute.
 
 *Emits a {UintAttributeUpdated} event.*
 
@@ -1011,7 +1166,7 @@ function supportsInterface(bytes4 interfaceId) external view returns (bool)
 ### AccessControlRegistration
 
 ```solidity
-event AccessControlRegistration(address indexed collection, address indexed issuer, address indexed registeringAddress, bool useOwnable)
+event AccessControlRegistration(address indexed collection, address indexed owner, address indexed registeringAddress, bool useOwnable)
 ```
 
 Used to notify listeners that a new collection has been registered to use the repository.
@@ -1023,9 +1178,9 @@ Used to notify listeners that a new collection has been registered to use the re
 | Name | Type | Description |
 |---|---|---|
 | collection `indexed` | address | Address of the collection |
-| issuer `indexed` | address | Address of the issuer of the collection; the addess authorized to manage the access control |
+| owner `indexed` | address | Address of the owner of the collection; the addess authorized to manage the access control |
 | registeringAddress `indexed` | address | Address that registered the collection |
-| useOwnable  | bool | A boolean value indicating whether the collection uses the Ownable extension to verify the  issuer (`true`) or not (`false`) |
+| useOwnable  | bool | A boolean value indicating whether the collection uses the Ownable extension to verify the  owner (`true`) or not (`false`) |
 
 ### AccessControlUpdate
 
@@ -1120,6 +1275,25 @@ Used to notify listeners that a new collaborator has been added or removed.
 | collection `indexed` | address | Address of the collection |
 | collaborator `indexed` | address | Address of the collaborator |
 | isCollaborator  | bool | A boolean value indicating whether the collaborator has been added (`true`) or removed  (`false`) |
+
+### IntAttributeUpdated
+
+```solidity
+event IntAttributeUpdated(address indexed collection, uint256 indexed tokenId, string key, int256 value)
+```
+
+Used to notify listeners that an int attribute has been updated.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| collection `indexed` | address | The collection address |
+| tokenId `indexed` | uint256 | The token ID |
+| key  | string | The key of the attribute |
+| value  | int256 | The new value of the attribute |
 
 ### MetadataURIUpdated
 
@@ -1246,24 +1420,24 @@ Used to signal that the caller is not aa collaborator of the collection.
 
 
 
-### NotCollectionIssuer
+### NotCollectionOwner
 
 ```solidity
-error NotCollectionIssuer()
+error NotCollectionOwner()
 ```
 
-Used to signal that the caller is not the issuer of the collection.
+Used to signal that the caller is not the owner of the collection.
 
 
 
 
-### NotCollectionIssuerOrCollaborator
+### NotCollectionOwnerOrCollaborator
 
 ```solidity
-error NotCollectionIssuerOrCollaborator()
+error NotCollectionOwnerOrCollaborator()
 ```
 
-Used to signal that the caller is not the issuer or a collaborator of the collection.
+Used to signal that the caller is not the owner or a collaborator of the collection.
 
 
 
