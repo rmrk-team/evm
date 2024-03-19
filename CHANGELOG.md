@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.5.3] - 2024-03-19
+
+### Changed
+
+  - Token Attributes: Refactor on token attributes to reuse code and allow multiple collections and tokenIds on setters and getters.
+  - Token Attributes: Orders all methods by group and then alphabetically.
+  - Token Attributes: Includes methods for signed integers.
+  - Token Attributes: Improves tests and fixes emit assertions.
+  - Token Attributes: Renames Issuer for Owner in token attributes.
+  - Token Attributes: Renames methods to set and get collection attributes metadata to make it explicit they are per collection. Adds full test coverage for token attributes.
+  - Token Attributes: Updates interfaceId.
+
+
 ## [2.5.2] - 2024-03-08
 
 ### Changed
