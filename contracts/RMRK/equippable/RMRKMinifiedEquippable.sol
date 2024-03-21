@@ -1280,8 +1280,10 @@ contract RMRKMinifiedEquippable is
     function getAssetMetadata(
         uint256 tokenId,
         uint64 assetId
-    ) public view virtual returns (string memory metadata) {
-        if (!_tokenAssets[tokenId][assetId]) revert RMRKTokenDoesNotHaveAsset();
+    ) public view override returns (string memory metadata) {
+        // Allow to get the asset metadata without a token having it:
+        if (tokenId != 0 && !_tokenAssets[tokenId][assetId])
+            revert RMRKTokenDoesNotHaveAsset();
         metadata = _assets[assetId];
     }
 
