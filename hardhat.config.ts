@@ -191,7 +191,7 @@ const config: HardhatUserConfig = {
         network: 'astarZk',
         chainId: 3776,
         urls: {
-          apiURL: 'https://astar-zkevm.explorer.startale.com//api',
+          apiURL: 'https://astar-zkevm.explorer.startale.com/api',
           browserURL: 'https://astar-zkevm.explorer.startale.com/',
         },
       },
