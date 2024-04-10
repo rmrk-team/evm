@@ -5,6 +5,8 @@ import '@nomicfoundation/hardhat-toolbox';
 import 'hardhat-contract-sizer';
 import '@primitivefi/hardhat-dodoc';
 
+const accounts = process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [];
+
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
 task('accounts', 'Prints the list of accounts', async (taskArgs, hre) => {
@@ -34,30 +36,30 @@ const config: HardhatUserConfig = {
     modularium: {
       url: 'https://fraa-dancebox-3035-rpc.a.dancebox.tanssi.network',
       chainId: 776877,
-      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+      accounts: accounts,
       gasPrice: 1000000000,
     },
     moonbaseAlpha: {
       url: process.env.MOONBASE_URL || 'https://rpc.testnet.moonbeam.network',
       chainId: 1287,
-      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+      accounts: accounts,
       gasPrice: 1100000000,
     },
     sepolia: {
       url: process.env.SEPOLIA_URL || 'https://rpc.sepolia.dev',
       chainId: 11155111,
-      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+      accounts: accounts,
     },
     polygonMumbai: {
       url: process.env.MUMBAI_URL || 'https://rpc-mumbai.maticvigil.com',
       chainId: 80001,
-      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+      accounts: accounts,
       gasPrice: 2500000000,
     },
     baseGoerli: {
       chainId: 84531,
       url: process.env.BASE_GOERLI_URL || 'https://goerli.base.org',
-      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+      accounts: accounts,
       gasPrice: 2000000000,
     },
     baseSepolia: {
@@ -69,56 +71,54 @@ const config: HardhatUserConfig = {
     shibuya: {
       chainId: 81,
       url: process.env.SHIBUYA_URL || 'https://evm.shibuya.astar.network',
-      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
-      // gasPrice: 2000000000,
-    },
-    zkatana: {
-      chainId: 1261120,
-      url: process.env.ZKATANA_URL || 'https://rpc.startale.com/zkatana',
-      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
-      gasPrice: 650000000,
+      accounts: accounts,
     },
     moonriver: {
       url: process.env.MOONRIVER_URL || 'https://rpc.api.moonriver.moonbeam.network',
       chainId: 1285,
-      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+      accounts: accounts,
     },
     moonbeam: {
       url: process.env.MOONBEAM_URL || 'https://rpc.api.moonbeam.network',
       chainId: 1284,
-      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+      accounts: accounts,
     },
     mainnet: {
       url: process.env.ETHEREUM_URL || 'https://eth.drpc.org',
       chainId: 1,
-      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
-      gasPrice: 55000000000,
+      accounts: accounts,
+      gasPrice: 12000000000,
     },
     polygon: {
       url: process.env.POLYGON_URL || 'https://polygon.drpc.org',
       chainId: 137,
-      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+      accounts: accounts,
       gasPrice: 120000000000,
     },
     base: {
       chainId: 8453,
       url: process.env.BASE_URL || 'https://developer-access-mainnet.base.org',
-      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+      accounts: accounts,
     },
     astar: {
       url: process.env.ASTAR_URL || 'https://evm.astar.network',
       chainId: 592,
-      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+      accounts: accounts,
     },
     astarZk: {
       url: process.env.ASTAR_ZK_URL || 'https://rpc.startale.com/astar-zkevm',
       chainId: 3776,
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
+    zkyoto: {
+      url: process.env.ZKYOTO_URL || 'https://rpc.startale.com/zkyoto	',
+      chainId: 6038361,
+      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+    },
     bsc: {
       url: process.env.BSC_URL || 'https://bsc-dataseed.bnbchain.org',
       chainId: 56,
-      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+      accounts: accounts,
       gasPrice: 3000000000,
     },
   },
@@ -134,9 +134,8 @@ const config: HardhatUserConfig = {
       sepolia: process.env.ETHERSCAN_API_KEY || '', // Sepolia Etherscan API Key
       polygonMumbai: process.env.POLYGONSCAN_API_KEY || '', // Polygon Mumbai Etherscan API Key
       baseGoerli: process.env.BASESCAN_API_KEY || '', // Base Goerli Etherscan API Key
-      baseSepolia: process.env.BASESCAN_API_KEY || '', // Base Sepolia Etherscan API Key
-      shibuya: process.env.SHIBUYA_BLOCKSCOUT_API_KEY || '', // Shibuya blockscout API Key
-      zkatana: process.env.ZKATANA_BLOCKSCOUT_API_KEY || '', // ZKatana blockscout API Key
+      baseSepolia: process.env.BASESCAN_API_KEY || '', // Base Goerli Etherscan API Key
+      shibuya: process.env.SHIBUYA_BLOCKSCOUT_API_KEY || '', // Shibuya blockscout API KeyT
       moonriver: process.env.MOONSCAN_APIKEY || '', // Moonriver Moonscan API Key
       moonbeam: process.env.MOONSCAN_APIKEY || '', // Moonbeam Moonscan API Key
       mainnet: process.env.ETHERSCAN_API_KEY || '', // Ethereum Etherscan API Key
@@ -144,6 +143,7 @@ const config: HardhatUserConfig = {
       base: process.env.BASESCAN_API_KEY || '', // Base Etherscan API Key
       astar: process.env.ASTAR_BLOCKSCOUT_API_KEY || '', // Astar blockscout API Key
       astarZk: process.env.ASTAR_ZK_API_KEY || '', // Astar ZK API Key
+      zkyoto: process.env.ZKYOTO_API_KEY || '', // ZKYOTO API Key
       bsc: process.env.BSCSCAN_API_KEY || '', // BSC Etherscan API Key
     },
     customChains: [
@@ -196,11 +196,11 @@ const config: HardhatUserConfig = {
         },
       },
       {
-        network: 'zkatana',
+        network: 'zkyoto',
         chainId: 1261120,
         urls: {
-          apiURL: 'https://zkatana.blockscout.com/api',
-          browserURL: 'https://zkatana.blockscout.com',
+          apiURL: 'https://zkyoto.explorer.startale.com/api',
+          browserURL: 'https://zkyoto.explorer.startale.com/',
         },
       },
     ],
