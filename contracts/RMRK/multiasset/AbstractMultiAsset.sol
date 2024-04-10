@@ -45,7 +45,7 @@ abstract contract AbstractMultiAsset is Context, IERC5773 {
     function getAssetMetadata(
         uint256 tokenId,
         uint64 assetId
-    ) public view override returns (string memory metadata) {
+    ) public view virtual override returns (string memory metadata) {
         // Allow to get the asset metadata without a token having it:
         if (tokenId != 0 && !_tokenAssets[tokenId][assetId])
             revert RMRKTokenDoesNotHaveAsset();
