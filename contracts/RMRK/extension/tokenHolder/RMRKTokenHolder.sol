@@ -22,7 +22,7 @@ abstract contract RMRKTokenHolder is IERC7590 {
     function balanceOfERC20(
         address erc20Contract,
         uint256 tokenId
-    ) external view returns (uint256) {
+    ) public view returns (uint256) {
         return _balances[tokenId][erc20Contract];
     }
 
@@ -88,7 +88,7 @@ abstract contract RMRKTokenHolder is IERC7590 {
         uint256 tokenId,
         uint256 amount,
         bytes memory data
-    ) external {
+    ) public {
         if (amount == 0) {
             revert InvalidValue();
         }
@@ -127,7 +127,7 @@ abstract contract RMRKTokenHolder is IERC7590 {
      */
     function erc20TransferOutNonce(
         uint256 tokenId
-    ) external view returns (uint256) {
+    ) public view returns (uint256) {
         return _erc20TransferOutNonce[tokenId];
     }
 
