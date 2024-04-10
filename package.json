@@ -1,6 +1,6 @@
 {
   "name": "@rmrk-team/evm-contracts",
-  "version": "2.5.4",
+  "version": "2.5.5",
   "license": "Apache-2.0",
   "files": [
     "contracts/RMRK/*",

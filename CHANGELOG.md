@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.5.5] - 2024-04-10
+
+### Changed
+
+  - getAssetMetadata core implementation is now virtual.
+  - RMRKTokenHolder methods are made public instead of external.
+
 ## [2.5.4] - 2024-03-21
 
 ### Changed
