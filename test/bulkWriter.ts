@@ -26,7 +26,6 @@ import {
   setUpKanariaAsset,
   setUpGemAssets,
 } from './kanariaUtils';
-import { IERC6454 } from './interfaces';
 
 // --------------- FIXTURES -----------------------
 
@@ -84,12 +83,13 @@ async function bulkWriterFixture() {
   };
 }
 
-describe('Advanced Equip Render Utils', async function () {
+describe('Bulk writer', async function () {
   let owner: SignerWithAddress;
   let catalog: RMRKCatalogImpl;
   let kanaria: RMRKEquippableMock;
   let kanariaAddress: string;
   let gem: RMRKEquippableMock;
+  let gemAddress: string;
   let bulkWriter: RMRKBulkWriter;
   let bulkWritterAddress: string;
   let bulkWriterPerCollection: RMRKBulkWriterPerCollection;
@@ -112,6 +112,7 @@ describe('Advanced Equip Render Utils', async function () {
       gemId3,
     } = await loadFixture(bulkWriterFixture));
     kanariaAddress = await kanaria.getAddress();
+    gemAddress = await gem.getAddress();
     bulkWritterAddress = await bulkWriter.getAddress();
   });
 
@@ -399,6 +400,236 @@ describe('Advanced Equip Render Utils', async function () {
             .connect(notOwner)
             .bulkTransferAllChildren(kanariaAddress, kanariaId, owner.address, 0),
         ).to.be.revertedWithCustomError(bulkWriter, 'RMRKCanOnlyDoBulkOperationsOnOwnedTokens');
+      });
+    });
+
+    describe('Unequip+Transfer+Accept+Unequip+Equip', async function () {
+      let kanariaId2: bigint;
+      let gemId4: bigint;
+      let defaultEquipData = {
+        tokenId: 0n,
+        childIndex: 0n,
+        assetId: 0n,
+        slotPartId: 0n,
+        childAssetId: 0n,
+      };
+      beforeEach(async function () {
+        // Mint and configure a second kanaria
+        kanariaId2 = await mintFromMock(kanaria, owner.address);
+        await kanaria.addAssetToToken(kanariaId2, assetForKanariaFull, 0);
+        await kanaria.acceptAsset(kanariaId2, 0, assetForKanariaFull);
+
+        // Mint and configure a gem into the second kanaria
+        gemId4 = await nestMintFromMock(gem, kanariaAddress, kanariaId2);
+        await gem.addAssetToToken(gemId4, assetForGemALeft, 0);
+        await gem.acceptAsset(gemId4, 0, assetForGemALeft);
+
+        // Approve the bulk writer for all operations
+        await kanaria.setApprovalForAllForAssets(bulkWritterAddress, true); // For equip / unequip
+        await kanaria.setApprovalForAll(bulkWritterAddress, true); // For transfer and accepting children
+      });
+
+      it('can transfer and accept child', async function () {
+        // We unnest it first so it starts from EoA
+        await kanaria.transferChild(
+          kanariaId,
+          owner.address,
+          0,
+          0,
+          gemAddress,
+          gemId1,
+          false,
+          ethers.ZeroHash,
+        );
+        await gem.setApprovalForAll(bulkWritterAddress, true); // For transfer and accepting children
+
+        // Parent data must be empty in this case
+        const parentData = {
+          parentCollection: ethers.ZeroAddress,
+          parentTokenId: 0,
+          childIndexInParent: 0,
+          parentEquippedAssetId: 0,
+          parentEquippedSlotPartId: 0,
+        };
+
+        await bulkWriter.transferAndEquip(
+          gemAddress,
+          gemId1,
+          kanariaAddress,
+          kanariaId2,
+          parentData,
+          defaultEquipData,
+        );
+
+        expect(await gem.directOwnerOf(gemId1)).to.eql([kanariaAddress, kanariaId2, true]);
+        expect(await kanaria.childrenOf(kanariaId2)).to.eql([[gemId1, gemAddress]]);
+      });
+
+      it('cannot transfer and accept child if not owned', async function () {
+        const [, notOwner] = await ethers.getSigners();
+        const parentData = {
+          parentCollection: kanariaAddress,
+          parentTokenId: kanariaId,
+          childIndexInParent: 0,
+          parentEquippedAssetId: 0,
+          parentEquippedSlotPartId: 0,
+        };
+
+        await expect(
+          bulkWriter
+            .connect(notOwner)
+            .transferAndEquip(
+              gemAddress,
+              gemId1,
+              kanariaAddress,
+              kanariaId2,
+              parentData,
+              defaultEquipData,
+            ),
+        ).to.be.revertedWithCustomError(bulkWriter, 'RMRKCanOnlyDoBulkOperationsOnOwnedTokens');
+      });
+
+      it('can nest transfer and accept child', async function () {
+        const parentData = {
+          parentCollection: kanariaAddress,
+          parentTokenId: kanariaId,
+          childIndexInParent: 0,
+          parentEquippedAssetId: 0,
+          parentEquippedSlotPartId: 0,
+        };
+
+        await bulkWriter.transferAndEquip(
+          gemAddress,
+          gemId1,
+          kanariaAddress,
+          kanariaId2,
+          parentData,
+          defaultEquipData,
+        );
+
+        expect(await gem.directOwnerOf(gemId1)).to.eql([kanariaAddress, kanariaId2, true]);
+        expect(await kanaria.childrenOf(kanariaId2)).to.eql([[gemId1, gemAddress]]);
+      });
+
+      it('can unequip, nest transfer and accept child', async function () {
+        // The token we are moving is equipped
+        await kanaria.equip({
+          tokenId: kanariaId,
+          childIndex: 0,
+          assetId: assetForKanariaFull,
+          slotPartId: slotIdGemLeft,
+          childAssetId: assetForGemALeft,
+        });
+
+        const parentData = {
+          parentCollection: kanariaAddress,
+          parentTokenId: kanariaId,
+          childIndexInParent: 0,
+          parentEquippedAssetId: assetForKanariaFull,
+          parentEquippedSlotPartId: slotIdGemLeft,
+        };
+
+        await bulkWriter.transferAndEquip(
+          gemAddress,
+          gemId1,
+          kanariaAddress,
+          kanariaId2,
+          parentData,
+          defaultEquipData,
+        );
+
+        expect(await gem.directOwnerOf(gemId1)).to.eql([kanariaAddress, kanariaId2, true]);
+        expect(await kanaria.childrenOf(kanariaId2)).to.eql([[gemId1, gemAddress]]);
+      });
+
+      it('can unequip, nest transfer, accept child and equip in new parent', async function () {
+        // The token we are moving is equipped
+        await kanaria.equip({
+          tokenId: kanariaId,
+          childIndex: 0,
+          assetId: assetForKanariaFull,
+          slotPartId: slotIdGemLeft,
+          childAssetId: assetForGemALeft,
+        });
+
+        const parentData = {
+          parentCollection: kanariaAddress,
+          parentTokenId: kanariaId,
+          childIndexInParent: 0,
+          parentEquippedAssetId: assetForKanariaFull,
+          parentEquippedSlotPartId: slotIdGemLeft,
+        };
+        const newEquipData = {
+          tokenId: kanariaId2,
+          childIndex: 0,
+          assetId: assetForKanariaFull,
+          slotPartId: slotIdGemLeft,
+          childAssetId: assetForGemALeft,
+        };
+
+        await bulkWriter.transferAndEquip(
+          gemAddress,
+          gemId1,
+          kanariaAddress,
+          kanariaId2,
+          parentData,
+          newEquipData,
+        );
+
+        expect(await gem.directOwnerOf(gemId1)).to.eql([kanariaAddress, kanariaId2, true]);
+        expect(await kanaria.childrenOf(kanariaId2)).to.eql([[gemId1, gemAddress]]);
+        expect(await kanaria.isChildEquipped(kanariaId2, gemAddress, gemId1)).to.be.true;
+      });
+
+      it('can unequip, nest transfer, accept child, unequip destination slot and equip in new parent', async function () {
+        // The token we are moving is equipped
+        await kanaria.equip({
+          tokenId: kanariaId,
+          childIndex: 0,
+          assetId: assetForKanariaFull,
+          slotPartId: slotIdGemLeft,
+          childAssetId: assetForGemALeft,
+        });
+        // The destination slot is also equipped, the bulk writer should unequip it first
+        await kanaria.acceptChild(kanariaId2, 0, gemAddress, gemId4);
+        await kanaria.equip({
+          tokenId: kanariaId2,
+          childIndex: 0,
+          assetId: assetForKanariaFull,
+          slotPartId: slotIdGemLeft,
+          childAssetId: assetForGemALeft,
+        });
+
+        const parentData = {
+          parentCollection: kanariaAddress,
+          parentTokenId: kanariaId,
+          childIndexInParent: 0,
+          parentEquippedAssetId: assetForKanariaFull,
+          parentEquippedSlotPartId: slotIdGemLeft,
+        };
+        const newEquipData = {
+          tokenId: kanariaId2,
+          childIndex: 1,
+          assetId: assetForKanariaFull,
+          slotPartId: slotIdGemLeft,
+          childAssetId: assetForGemALeft,
+        };
+
+        await bulkWriter.transferAndEquip(
+          gemAddress,
+          gemId1,
+          kanariaAddress,
+          kanariaId2,
+          parentData,
+          newEquipData,
+        );
+
+        expect(await gem.directOwnerOf(gemId1)).to.eql([kanariaAddress, kanariaId2, true]);
+        expect(await kanaria.childrenOf(kanariaId2)).to.eql([
+          [gemId4, gemAddress],
+          [gemId1, gemAddress],
+        ]);
+        expect(await kanaria.isChildEquipped(kanariaId2, gemAddress, gemId1)).to.be.true;
       });
     });
   });
