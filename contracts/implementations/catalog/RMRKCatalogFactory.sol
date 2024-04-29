@@ -26,6 +26,7 @@ contract RMRKCatalogFactory {
     ) public returns (address) {
         RMRKCatalogImpl catalog = new RMRKCatalogImpl(metadataURI, type_);
         _deployerCatalogs[msg.sender].push(address(catalog));
+        catalog.transferOwnership(msg.sender);
         emit CatalogDeployed(msg.sender, address(catalog));
         return address(catalog);
     }
