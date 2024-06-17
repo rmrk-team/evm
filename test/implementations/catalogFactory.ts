@@ -32,11 +32,10 @@ describe('CatalogImpl', async () => {
       throw new Error('Catalog address not found');
     }
     const catalog = await ethers.getContractAt('RMRKCatalogImpl', catalogAddress);
-    const metadataURI = await catalog.getMetadataURI();
-    const mediaType = await catalog.getType();
 
-    expect(metadataURI).to.equal('ipfs://catalogMetadata');
-    expect(mediaType).to.equal('img/jpeg');
+    expect(await catalog.getMetadataURI()).to.equal('ipfs://catalogMetadata');
+    expect(await catalog.getType()).to.equal('img/jpeg');
+    expect(await catalog.owner()).to.equal(deployer1.address);
   });
 
   it('can get catalogs deployed by a deployer', async () => {
