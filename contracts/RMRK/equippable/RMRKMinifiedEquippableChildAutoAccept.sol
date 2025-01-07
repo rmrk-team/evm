@@ -18,13 +18,14 @@ import {ReentrancyGuard} from "../security/ReentrancyGuard.sol";
 import "../library/RMRKErrors.sol";
 
 /**
- * @title RMRKMinifiedEquippable
+ * @title RMRKMinifiedEquippableChildAutoAccept
  * @author RMRK team
  * @notice Smart contract of the RMRK Equippable module, without utility internal functions.
  * @dev This includes all the code for MultiAsset, Nestable and Equippable.
  * @dev Most of the code is duplicated from the other legos, this version is created to save size.
+ * @dev Children added go directly to the active children array.
  */
-contract RMRKMinifiedEquippable is
+contract RMRKMinifiedEquippableChildAutoAccept is
     ReentrancyGuard,
     Context,
     IERC165,
@@ -55,14 +56,6 @@ contract RMRKMinifiedEquippable is
 
     // Mapping of tokenId to array of active children structs
     mapping(uint256 => Child[]) internal _activeChildren;
-
-    // Mapping of tokenId to array of pending children structs
-    mapping(uint256 => Child[]) internal _pendingChildren;
-
-    // Mapping of child token address to child token ID to whether they are pending or active on any token
-    // We might have a first extra mapping from token ID, but since the same child cannot be nested into multiple tokens
-    //  we can strip it for size/gas savings.
-    mapping(address => mapping(uint256 => uint256)) internal _childIsInActive;
 
     // -------------------------- MODIFIERS ----------------------------
 
@@ -521,7 +514,6 @@ contract RMRKMinifiedEquippable is
         Child[] memory children = childrenOf(tokenId);
 
         delete _activeChildren[tokenId];
-        delete _pendingChildren[tokenId];
         delete _tokenApprovals[tokenId][rootOwner];
 
         uint256 pendingRecursiveBurns;
@@ -533,9 +525,6 @@ contract RMRKMinifiedEquippable is
                     children[i].contractAddress,
                     children[i].tokenId
                 );
-            delete _childIsInActive[children[i].contractAddress][
-                children[i].tokenId
-            ];
             unchecked {
                 // At this point we know pendingRecursiveBurns must be at least 1
                 pendingRecursiveBurns = maxChildrenBurns - burnedChildren;
@@ -770,14 +759,13 @@ contract RMRKMinifiedEquippable is
 
         uint256 length = pendingChildrenOf(parentId).length;
 
-        if (length < 128) {
-            _pendingChildren[parentId].push(child);
-        } else {
-            revert RMRKMaxPendingChildrenReached();
-        }
-
         // Previous length matches the index for the new child
         emit ChildProposed(parentId, length, childAddress, childId);
+
+        // Add to active:
+        _activeChildren[parentId].push(child);
+
+        emit ChildAccepted(parentId, 0, childAddress, childId);
 
         _afterAddChild(parentId, childAddress, childId, data);
     }
@@ -815,25 +803,7 @@ contract RMRKMinifiedEquippable is
         uint256 childIndex,
         address childAddress,
         uint256 childId
-    ) internal virtual {
-        Child memory child = pendingChildOf(parentId, childIndex);
-        _checkExpectedChild(child, childAddress, childId);
-        if (_childIsInActive[childAddress][childId] != 0)
-            revert RMRKChildAlreadyExists();
-
-        _beforeAcceptChild(parentId, childIndex, childAddress, childId);
-
-        // Remove from pending:
-        _removeChildByIndex(_pendingChildren[parentId], childIndex);
-
-        // Add to active:
-        _activeChildren[parentId].push(child);
-        _childIsInActive[childAddress][childId] = 1; // We use 1 as true
-
-        emit ChildAccepted(parentId, childIndex, childAddress, childId);
-
-        _afterAcceptChild(parentId, childIndex, childAddress, childId);
-    }
+    ) internal virtual {}
 
     /**
      * @inheritdoc IERC7401
@@ -841,15 +811,7 @@ contract RMRKMinifiedEquippable is
     function rejectAllChildren(
         uint256 tokenId,
         uint256 maxRejections
-    ) public virtual onlyApprovedOrOwner(tokenId) {
-        if (_pendingChildren[tokenId].length > maxRejections)
-            revert RMRKUnexpectedNumberOfChildren();
-
-        _beforeRejectAllChildren(tokenId);
-        delete _pendingChildren[tokenId];
-        emit AllChildrenRejected(tokenId);
-        _afterRejectAllChildren(tokenId);
-    }
+    ) public virtual onlyApprovedOrOwner(tokenId) {}
 
     /**
      * @inheritdoc IERC7401
@@ -883,12 +845,7 @@ contract RMRKMinifiedEquippable is
             data
         );
 
-        if (isPending) {
-            _removeChildByIndex(_pendingChildren[tokenId], childIndex);
-        } else {
-            delete _childIsInActive[childAddress][childId];
-            _removeChildByIndex(_activeChildren[tokenId], childIndex);
-        }
+        _removeChild(tokenId, childIndex);
 
         if (to != address(0)) {
             if (destinationId == uint256(0)) {
@@ -926,6 +883,19 @@ contract RMRKMinifiedEquippable is
             isPending,
             data
         );
+    }
+
+    function _removeChild(
+        uint256 tokenId,
+        uint256 childIndex
+    ) internal virtual {
+        uint256 lastIndex = _activeChildren[tokenId].length - 1;
+        if (childIndex != lastIndex) {
+            _activeChildren[tokenId][childIndex] = _activeChildren[tokenId][
+                lastIndex
+            ];
+        }
+        _activeChildren[tokenId].pop();
     }
 
     /**
@@ -970,9 +940,7 @@ contract RMRKMinifiedEquippable is
 
     function pendingChildrenOf(
         uint256 parentId
-    ) public view virtual returns (Child[] memory children) {
-        children = _pendingChildren[parentId];
-    }
+    ) public view virtual returns (Child[] memory children) {}
 
     /**
      * @inheritdoc IERC7401
@@ -990,12 +958,10 @@ contract RMRKMinifiedEquippable is
      * @inheritdoc IERC7401
      */
     function pendingChildOf(
-        uint256 parentId,
-        uint256 index
-    ) public view virtual returns (Child memory child) {
-        if (pendingChildrenOf(parentId).length <= index)
-            revert RMRKPendingChildIndexOutOfRange();
-        child = _pendingChildren[parentId][index];
+        uint256,
+        uint256
+    ) public view virtual returns (Child memory) {
+        revert RMRKPendingChildIndexOutOfRange();
     }
 
     // HOOKS
@@ -1121,50 +1087,6 @@ contract RMRKMinifiedEquippable is
     ) internal virtual {}
 
     /**
-     * @notice Hook that is called before a child is accepted to the active tokens array of a given token.
-     * @dev The Child struct consists of the following values:
-     *  [
-     *      tokenId,
-     *      contractAddress
-     *  ]
-     * @dev To learn more about hooks, head to xref:ROOT:extending-contracts.adoc#using-hooks[Using Hooks].
-     * @param parentId ID of the token that will accept a pending child token
-     * @param childIndex Index of the child token to accept in the given parent token's pending children array
-     * @param childAddress Address of the collection smart contract of the child token expected to be located at the
-     *  specified index of the given parent token's pending children array
-     * @param childId ID of the child token expected to be located at the specified index of the given parent token's
-     *  pending children array
-     */
-    function _beforeAcceptChild(
-        uint256 parentId,
-        uint256 childIndex,
-        address childAddress,
-        uint256 childId
-    ) internal virtual {}
-
-    /**
-     * @notice Hook that is called after a child is accepted to the active tokens array of a given token.
-     * @dev The Child struct consists of the following values:
-     *  [
-     *      tokenId,
-     *      contractAddress
-     *  ]
-     * @dev To learn more about hooks, head to xref:ROOT:extending-contracts.adoc#using-hooks[Using Hooks].
-     * @param parentId ID of the token that has accepted a pending child token
-     * @param childIndex Index of the child token that was accpeted in the given parent token's pending children array
-     * @param childAddress Address of the collection smart contract of the child token that was expected to be located
-     *  at the specified index of the given parent token's pending children array
-     * @param childId ID of the child token that was expected to be located at the specified index of the given parent
-     *  token's pending children array
-     */
-    function _afterAcceptChild(
-        uint256 parentId,
-        uint256 childIndex,
-        address childAddress,
-        uint256 childId
-    ) internal virtual {}
-
-    /**
      * @notice Hook that is called before a child is transferred from a given child token array of a given token.
      * @dev The Child struct consists of the following values:
      *  [
@@ -1233,22 +1155,6 @@ contract RMRKMinifiedEquippable is
     function _afterRejectAllChildren(uint256 tokenId) internal virtual {}
 
     // HELPERS
-
-    /**
-     * @notice Used to remove a specified child token form an array using its index within said array.
-     * @dev The caller must ensure that the length of the array is valid compared to the index passed.
-     * @dev The Child struct consists of the following values:
-     *  [
-     *      tokenId,
-     *      contractAddress
-     *  ]
-     * @param array An array od Child struct containing info about the child tokens in a given child tokens array
-     * @param index An index of the child token to remove in the accompanying array
-     */
-    function _removeChildByIndex(Child[] storage array, uint256 index) private {
-        array[index] = array[array.length - 1];
-        array.pop();
-    }
 
     /// Mapping of uint64 Ids to asset metadata
     mapping(uint64 => string) internal _assets;

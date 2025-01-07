@@ -81,6 +81,11 @@ describe('MultiAssetMock Other Behavior', async function () {
       );
     });
 
+    it('can get metadata for existing asset by using tokenId 0', async function () {
+      const resId = await addAssetEntryFromMock(token, 'metadata');
+      expect(await token.getAssetMetadata(0, resId)).to.equal('metadata');
+    });
+
     it('cannot add existing asset', async function () {
       const id = bn(12345);
 

@@ -27,6 +27,14 @@ contract RMRKBulkWriter is Context {
         uint64 slotPartId;
     }
 
+    struct ParentData {
+        address parentCollection;
+        uint256 parentTokenId;
+        uint256 childIndexInParent;
+        uint64 parentEquippedAssetId;
+        uint64 parentEquippedSlotPartId;
+    }
+
     /**
      * @notice Reverts if the caller is not the owner of the token.
      * @param collection Address of the collection that this contract is managing
@@ -214,6 +222,126 @@ contract RMRKBulkWriter is Context {
                 ++i;
             }
         }
+    }
+
+    /**
+     * @notice Transfers an NFT to and NFT and optionally equips it.
+     * @dev If the NFT is currently equipped, you MUST set full `parentData` and it will be unequipped before transfer.
+     * @dev If the NFT is currently nested, you MUST set `parentData` with `parentCollection`, `parentTokenId` and `childIndexInParent`. The child will be transferred directly to the destination NFT via `transferChild`.
+     * @dev If the NFT is not currently nested you MUST send empty `parentData` and the transfer will be done via `nestTransferFrom`.
+     * @dev If the destination contract does not have an auto accept mechanism for children, the child will be auto accepted.
+     * @dev If the `equipData` is set, the NFT will be equipped after the transfer. Mind that the child index equip data is the index after the transfer, so it MUST be set to the number of children the destination NFT has.
+     * @dev If equipping into destination, the `equipData.tokenId` will match the `destinationTokenId`.
+     * @dev This contract MUST have approval on the parent collection, if any, to transfer the NFT.
+     * @dev This contract MUST have approval for assets on the parent collection, if any, to unequip the NFT.
+     * @dev This contract MUST have approval on the NFT collection, if not nested, to transfer the NFT.
+     * @dev This contract MUST have approval on the destination collection to accept the NFT.
+     * @dev This contract MUST have approval for assets on the destination collection to equip the NFT.
+     * @param collection Address of the collection that this contract is managing
+     * @param tokenId ID of the token we are managing
+     * @param destinationCollection Address of the destination collection
+     * @param destinationTokenId ID of the destination token
+     * @param parentData A `ParentData` struct specifying the parent data
+     * @param equipData An `IntakeEquip` struct specifying the equip data
+     */
+    function transferAndEquip(
+        address collection,
+        uint256 tokenId,
+        address destinationCollection,
+        uint256 destinationTokenId,
+        ParentData memory parentData,
+        IERC6220.IntakeEquip memory equipData
+    ) public onlyTokenOwner(collection, tokenId) {
+        if (parentData.parentCollection != address(0)) {
+            if (
+                parentData.parentEquippedAssetId != 0 &&
+                parentData.parentEquippedSlotPartId != 0
+            ) {
+                IERC6220(parentData.parentCollection).unequip(
+                    parentData.parentTokenId,
+                    parentData.parentEquippedAssetId,
+                    parentData.parentEquippedSlotPartId
+                );
+            }
+            IERC7401(parentData.parentCollection).transferChild(
+                parentData.parentTokenId,
+                destinationCollection,
+                destinationTokenId,
+                parentData.childIndexInParent,
+                collection,
+                tokenId,
+                false,
+                ""
+            );
+        } else {
+            IERC7401(collection).nestTransferFrom(
+                _msgSender(),
+                destinationCollection,
+                tokenId,
+                destinationTokenId,
+                ""
+            );
+        }
+
+        _acceptChildIfNecessary(
+            destinationCollection,
+            destinationTokenId,
+            collection,
+            tokenId
+        );
+
+        if (equipData.assetId == 0) return;
+
+        _unequipSlotIfNecessary(
+            destinationCollection,
+            destinationTokenId,
+            equipData.assetId,
+            equipData.slotPartId
+        );
+
+        IERC6220(destinationCollection).equip(equipData);
+    }
+
+    function _acceptChildIfNecessary(
+        address parentCollection,
+        uint256 parentId,
+        address childCollection,
+        uint256 childId
+    ) private {
+        IERC7401 destination = IERC7401(parentCollection);
+        IERC7401.Child[] memory children = destination.pendingChildrenOf(
+            parentId
+        );
+        uint256 length = children.length;
+        for (uint256 i; i < length; ) {
+            IERC7401.Child memory child = children[i];
+            if (
+                child.contractAddress == childCollection &&
+                child.tokenId == childId
+            ) {
+                destination.acceptChild(parentId, i, childCollection, childId);
+                return;
+            }
+            unchecked {
+                ++i;
+            }
+        }
+    }
+
+    function _unequipSlotIfNecessary(
+        address collection,
+        uint256 tokenId,
+        uint64 assetId,
+        uint64 slotPartId
+    ) private {
+        IERC6220 targetCollection = IERC6220(collection);
+        (, , address catalogAddress, ) = targetCollection
+            .getAssetAndEquippableData(tokenId, assetId);
+        if (
+            targetCollection
+                .getEquipment(tokenId, catalogAddress, slotPartId)
+                .childId != 0
+        ) targetCollection.unequip(tokenId, assetId, slotPartId);
     }
 
     /**

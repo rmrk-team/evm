@@ -22,7 +22,7 @@ abstract contract RMRKTokenHolder is IERC7590 {
     function balanceOfERC20(
         address erc20Contract,
         uint256 tokenId
-    ) external view returns (uint256) {
+    ) public view returns (uint256) {
         return _balances[tokenId][erc20Contract];
     }
 
@@ -65,7 +65,7 @@ abstract contract RMRKTokenHolder is IERC7590 {
 
         erc20.transfer(to, amount);
         uint256 newBalance = erc20.balanceOf(address(this));
-        // Here you can either use the difference as the amount, or revert if the difference is not equal to the amount and you don't want to support transfer fees
+        // Since a token transfer could be taxed (i.e. part of the value is taken by a 3rd party), we need to check the actual amount transferred. It is up to the implementer to either revert if the difference differs from the `amount` parameter or use the actual amount transferred instead of the `amount` parameter. We revert.
         if (newBalance + amount != initBalance) {
             revert InvalidAmountTransferred();
         }
@@ -88,7 +88,7 @@ abstract contract RMRKTokenHolder is IERC7590 {
         uint256 tokenId,
         uint256 amount,
         bytes memory data
-    ) external {
+    ) public {
         if (amount == 0) {
             revert InvalidValue();
         }
@@ -106,7 +106,7 @@ abstract contract RMRKTokenHolder is IERC7590 {
         uint256 initBalance = erc20.balanceOf(address(this));
         erc20.transferFrom(msg.sender, address(this), amount);
         uint256 newBalance = erc20.balanceOf(address(this));
-        // Here you can either use the difference as the amount, or revert if the difference is not equal to the amount and you don't want to support transfer fees
+        // Since a token transfer could be taxed (i.e. part of the value is taken by a 3rd party), we need to check the actual amount transferred. It is up to the implementer to either revert if the difference differs from the `amount` parameter or use the actual amount transferred instead of the `amount` parameter. We revert.
         if (initBalance + amount != newBalance) {
             revert InvalidAmountTransferred();
         }
@@ -127,7 +127,7 @@ abstract contract RMRKTokenHolder is IERC7590 {
      */
     function erc20TransferOutNonce(
         uint256 tokenId
-    ) external view returns (uint256) {
+    ) public view returns (uint256) {
         return _erc20TransferOutNonce[tokenId];
     }
 

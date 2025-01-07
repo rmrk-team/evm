@@ -85,6 +85,27 @@ function replaceEquip(address collection, IERC6220.IntakeEquip data) external no
 | collection | address | undefined |
 | data | IERC6220.IntakeEquip | undefined |
 
+### transferAndEquip
+
+```solidity
+function transferAndEquip(address collection, uint256 tokenId, address destinationCollection, uint256 destinationTokenId, RMRKBulkWriter.ParentData parentData, IERC6220.IntakeEquip equipData) external nonpayable
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| collection | address | undefined |
+| tokenId | uint256 | undefined |
+| destinationCollection | address | undefined |
+| destinationTokenId | uint256 | undefined |
+| parentData | RMRKBulkWriter.ParentData | undefined |
+| equipData | IERC6220.IntakeEquip | undefined |
+
 
 
 
