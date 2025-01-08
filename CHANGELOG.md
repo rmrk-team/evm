@@ -5,8 +5,6 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-<<<<<<< HEAD
-=======
 ## [2.5.6] - 2024-06-17
 
 ### Added
@@ -26,7 +24,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
   - getAssetMetadata core implementation can now return the metadata disregarding tokenId by setting it to 0.
 
->>>>>>> dev
 ## [2.5.3] - 2024-03-19
 
 ### Changed
