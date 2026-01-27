@@ -1,0 +1,17 @@
+import Image from 'next/image'
+
+# On-Chain Attributes (ERC-7508)
+
+<Image src="/images/modules/6-Attributes.png" alt="On-Chain Attributes" width={500} height={500} />
+
+The Public On-Chain Non-Fungible Token Attributes Repository standard provides the ability for ERC-721 and ERC-1155 compatible tokens to store their attributes on-chain available to any external smart contract interacting with them.
+
+This proposal introduces the ability to assign attributes to NFTs in a public non-gated repository smart contract that is accessible at the same address in all of the networks. The repository smart contract is designed to be a common-good repository, meaning that it can be used by any ERC-721 or ERC-1155 compatible token.
+
+In our EVM package, we provide the [implementation](/evm-package/core/modular/tokenAttributes/RMRKTokenAttributesRepository.md) as well as the [interface](/evm-package/core/modular/tokenAttributes/IERC7508.md) needed in order to interact with the repository.
+
+The ERC-7508 repository is currently only deployed on test networks as main networks deployment awaits the proposal's finalization.
+
+## ERC-7508: Dynamic On-Chain Token Attributes Repository
+
+We published an Ethereum Improvement Proposal detailing the specification of the On-Chain Attributes extension. If you are interested, you can access it [here](https://eips.ethereum.org/EIPS/eip-7508). It is still on draft so it might suffer changes. We welcome your feedback on the [magicians forum](https://ethereum-magicians.org/t/dynamic-on-chain-token-attributes-repository/15667).

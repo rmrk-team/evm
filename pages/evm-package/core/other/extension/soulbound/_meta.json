@@ -1,0 +1,7 @@
+{
+  "IERC6454": "IERC6454",
+  "RMRKSoulbound": "Soulbound",
+  "RMRKSoulboundAfterBlockNumber": "Soulbound After Block Number",
+  "RMRKSoulboundAfterTransactions": "Soulbound After Transactions",
+  "RMRKSoulboundPerToken": "Soulbound Per Token"
+}

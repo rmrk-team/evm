@@ -1,0 +1,463 @@
+import { Tabs, Callout } from 'nextra/components'
+
+# Configuring-equipability
+
+Equippable & Composable is the most advanced module, as it requires both MultiAsset and Nestable ones. After you have deployed your NFT contract, you may add new equippable and/or composable assets. Equippable assets can receive children to be equipped or be equipped into a parent, or both.
+
+
+## Pre-requisites for equipment to be valid
+
+For a token to be equippable there are a series of conditions that need to be met. They are tailored to ensure that only assets from collections meant to be equipped are possible:
+1. The slot must be defined in the catalog and it must be configured so that child collection can use it. 
+2. The parent token must have an asset with slot parts.
+3. The child token must have an asset that is equippable into the parent's slot. This is done through the `equippableGroupId`.
+
+### Equippable Group Id
+
+To better understand the `equippableGroupId` paramater let's consider the following example. Let's say you have a collection of Soldiers and a collection of Weapons. You want to allow the Soldiers to equip the Weapons in either hand. You would need to:
+1. Create a catalog with a slot `WL` for the left hand and a slot `WR` for the right hand. You also configure this slot to be usable by the Weapons collection. This can be achieved by using when creating part with either `addPart` or `addPartList`, or later through `addEquippableAddresses`, `setEquippableAddresses` or `setEquippableToAll`. See the [Catalog section](./catalog) for more details.
+2. The parent token must have an asset which includes `WL` and `WR` in its `partIds` array. You do this exclusively with the `addEquippableAssetEntry` function.
+3. Each Weapon NFT will have 2 assets, one for the left hand and one for the right hand. All assets meant for the left hand will have the same `equippableGroupId:EGL` and all assets meant for the right hand will have the same `equippableGroupId:EGR`. You need to set the `equippableGroupId` when adding the asset with the `addEquippableAssetEntry` function and you configure each `equippableGroupId` to be equippable into the left and right hand slots of the Soldier collection, respectively. This can be achieved by using the `setValidParentForEquippableGroup` function.
+
+With these conditions met, any NFT from the Weapons collection, nested into any NFT from the Soldiers collection will be equippable into the left or right hand slots.
+
+These are the operations you may need to perform when working with equippable and composable assets:
+
+## Writing operations
+
+1. [Adding a new equippable/composable asset.](#add-new-asset)
+2. [Equipping a child asset.](#equip-child)
+3. [Unequipping a child asset.](#unequip-child)
+4. [Set valid parent for equippable group.](#set-valid-parent)
+
+### Adding a new equippable/composable asset  [#add-new-asset]
+
+<Callout type="info">
+    In our ready to use implementations, adding a new asset can be performed by the collection owner or a contributor. 
+</Callout>
+
+<Callout type="info">
+    For an asset to be equippable into a parent asset you need to use the `addEquippableAssetEntry` function instead of `addAssetEntry` and assign a non zero `equippableGroupId` to it.
+</Callout>
+
+<Callout type="info">
+    For an asset to be composable you need to use the `addEquippableAssetEntry` function instead of `addAssetEntry` and assign a `catalogAddress` and non empty `partIds` array to it.
+</Callout>
+
+The asset is added to the collection and can be later added into any token. Our implementations take care of assigning a unique Id, starting by 1. For more details on the contents of the metadata see the [metadata section](/metadata#asset-metadata-uri).
+
+<Tabs items={['Call', 'Definition', 'Emits']}>
+<Tabs.Tab>
+        ```typescript copy
+        // For equippable into parent
+        const equippableGroupId = 1;
+        const catalogAddress = '0x0000000000000000000000000000000000000000'; // Unless also composable
+        const metadataURI = 'ipfs://...';
+        const partIds = []; // Unless also composable
+
+        // For composables
+        const equippableGroupId = 0; // Unless you want it to be equippable into a parent.
+        const catalogAddress = '0x...';
+        const metadataURI = 'ipfs://...';
+        const partIds = [1, 2, 3];
+
+        await contract.addEquippableAssetEntry(
+            equippableGroupId,
+            catalogAddress,
+            metadataURI,
+            partIds
+        );
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab>
+        ```solidity
+        /**
+        * @notice Used to add an equippable asset entry.
+        * @dev The ID of the asset is automatically assigned to be the next available asset ID.
+        * @param equippableGroupId ID of the equippable group
+        * @param catalogAddress Address of the `Catalog` smart contract this asset belongs to
+        * @param metadataURI Metadata URI of the asset
+        * @param partIds An array of IDs of fixed and slot parts to be included in the asset
+        * @return assetId The ID of the newly added asset
+        */
+        function addEquippableAssetEntry(
+            uint64 equippableGroupId,
+            address catalogAddress,
+            string memory metadataURI,
+            uint64[] memory partIds
+        ) external returns (uint256 assetId);
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab>
+        ```solidity
+        /**
+        * @notice Used to notify listeners that an asset object at `assetId` is added to token's pending asset
+        *  array.
+        * @param tokenIds An array of token IDs that received a new pending asset
+        * @param assetId ID of the asset that has been added to the token's pending assets array
+        * @param replacesId ID of the asset that would be replaced
+        */
+        event AssetAddedToTokens(
+            uint256[] tokenIds,
+            uint64 indexed assetId,
+            uint64 indexed replacesId
+        );
+        ```
+    </Tabs.Tab>
+</Tabs>
+
+### Equipping a child asset  [#equip-child]
+
+Used to equip a child into a token.
+
+<Tabs items={['Call', 'Definition', 'Emits']}>
+<Tabs.Tab>
+        ```typescript copy
+        const parentId = 1;
+        const childId = 10;
+        const parentAssetId = 5;
+        const childAssetId = 15;
+        const slotPartId = 1;
+        
+        // Find childIndex on parent's active children
+        const childrenIds = (await parentContract.childrenOf(parentId)).map(
+            (child) => child.tokenId.toNumber()
+        )
+        const childIndex = childrenIds.indexOf(childId)
+
+        const data = {
+            tokenId: parentId,
+            childIndex,
+            assetId: parentAssetId,
+            slotPartId,
+            childAssetId
+        }
+        await parentContract.equip(data);
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab>
+        ```solidity
+        /**
+        * @notice Used to equip a child into a token.
+        * @dev The `IntakeEquip` stuct contains the following data:
+        *  [
+        *      tokenId,
+        *      childIndex,
+        *      assetId,
+        *      slotPartId,
+        *      childAssetId
+        *  ]
+        * @param data An `IntakeEquip` struct specifying the equip data
+        */
+        function equip(IntakeEquip memory data) external;
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab>
+        ```solidity
+        /**
+        * @notice Used to notify listeners that a child's asset has been equipped into one of its parent assets.
+        * @param tokenId ID of the token that had an asset equipped
+        * @param assetId ID of the asset associated with the token we are equipping into
+        * @param slotPartId ID of the slot we are using to equip
+        * @param childId ID of the child token we are equipping into the slot
+        * @param childAddress Address of the child token's collection
+        * @param childAssetId ID of the asset associated with the token we are equipping
+        */
+        event ChildAssetEquipped(
+            uint256 indexed tokenId,
+            uint64 indexed assetId,
+            uint64 indexed slotPartId,
+            uint256 childId,
+            address childAddress,
+            uint64 childAssetId
+        );
+        ```
+    </Tabs.Tab>
+</Tabs>
+
+### Unequipping a child asset  [#unequip-child]
+
+Used to unequip child from parent token.
+
+<Tabs items={['Call', 'Definition', 'Emits']}>
+<Tabs.Tab>
+        ```typescript copy
+        const parentId = 1;
+        const parentAssetId = 5;
+        const slotPartId = 1;
+
+        await parentContract.unequip(parentId, parentAssetId, slotPartId);
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab>
+        ```solidity
+        /**
+        * @notice Used to unequip child from parent token.
+        * @dev This can only be called by the owner of the token or by an account that has been granted permission to
+        *  manage the given token by the current owner.
+        * @param tokenId ID of the parent from which the child is being unequipped
+        * @param assetId ID of the parent's asset that contains the `Slot` into which the child is equipped
+        * @param slotPartId ID of the `Slot` from which to unequip the child
+        */
+        function unequip(
+            uint256 tokenId,
+            uint64 assetId,
+            uint64 slotPartId
+        ) external;
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab>
+        ```solidity
+        /**
+        * @notice Used to notify listeners that a child's asset has been unequipped from one of its parent assets.
+        * @param tokenId ID of the token that had an asset unequipped
+        * @param assetId ID of the asset associated with the token we are unequipping out of
+        * @param slotPartId ID of the slot we are unequipping from
+        * @param childId ID of the token being unequipped
+        * @param childAddress Address of the collection that a token that is being unequipped belongs to
+        * @param childAssetId ID of the asset associated with the token we are unequipping
+        */
+        event ChildAssetUnequipped(
+            uint256 indexed tokenId,
+            uint64 indexed assetId,
+            uint64 indexed slotPartId,
+            uint256 childId,
+            address childAddress,
+            uint64 childAssetId
+        );
+        ```
+    </Tabs.Tab>
+</Tabs>
+
+### Set valid parent for equippable group  [#set-valid-parent]
+
+Used to declare that the assets belonging to a given `equippableGroupId` are equippable into the `Slot` with `partId` on the collection at the specified `parentAddress`. Every child NFT which has an asset belonging to the equippable group will be equippable into the slot of the parent NFT.
+
+<Tabs items={['Call', 'Definition', 'Emits']}>
+<Tabs.Tab>
+        ```typescript copy
+        const equippableGroupId = 1;
+        const parentAddress = '0x...';
+        const partId = 1;
+
+        await childContract.setValidParentForEquippableGroup(
+            equippableGroupId,
+            parentAddress,
+            partId
+        );
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab>
+        ```solidity
+        /**
+        * @notice Used to declare that the assets belonging to a given `equippableGroupId` are equippable into the `Slot`
+        *  associated with the `partId` of the collection at the specified `parentAddress`
+        * @param equippableGroupId ID of the equippable group
+        * @param parentAddress Address of the parent into which the equippable group can be equipped into
+        * @param partId ID of the `Slot` that the items belonging to the equippable group can be equipped into
+        */
+        function setValidParentForEquippableGroup(
+            uint64 equippableGroupId,
+            address parentAddress,
+            uint64 partId
+        ) external;
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab>
+        ```solidity
+        /**
+        * @notice Used to notify listeners that the assets belonging to a `equippableGroupId` have been marked as
+        *  equippable into a given slot and parent
+        * @param equippableGroupId ID of the equippable group being marked as equippable into the slot associated with
+        *  `slotPartId` of the `parentAddress` collection
+        * @param slotPartId ID of the slot part of the catalog into which the parts belonging to the equippable group
+        *  associated with `equippableGroupId` can be equipped
+        * @param parentAddress Address of the collection into which the parts belonging to `equippableGroupId` can be
+        *  equipped
+        */
+        event ValidParentEquippableGroupIdSet(
+            uint64 indexed equippableGroupId,
+            uint64 indexed slotPartId,
+            address parentAddress
+        );
+        ```
+    </Tabs.Tab>
+</Tabs>
+
+## Reading operations
+
+1. [Check if a child is equipped.](#check-child-equipped)
+2. [Check if a child is equippable in a slot](#check-child-equippable)
+3. [Get asset and equippable data](#get-asset-equippable-data)
+4. [Get equipment](#get-equipment)
+
+### Check if a child is equipped  [#check-child-equipped]
+
+Used to check whether the token has a given child equipped. An equipped child will prevent the child token to be unnested.
+
+<Tabs items={['Call', 'Definition']}>
+    <Tabs.Tab>
+        ```typescript copy
+        const parentId = 1;
+        const childId = 10;
+        const childAddress = '0x...';
+
+        const isEquipped = await parentContract.isChildEquipped(
+            parentId,
+            childAddress,
+            childId
+        );
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab>
+        ```solidity
+        /**
+        * @notice Used to check whether the token has a given child equipped.
+        * @dev This is used to prevent from transferring a child that is equipped.
+        * @param tokenId ID of the parent token for which we are querying for
+        * @param childAddress Address of the child token's smart contract
+        * @param childId ID of the child token
+        * @return isEquipped A boolean value indicating whether the child token is equipped into the given token or not
+        */
+        function isChildEquipped(
+            uint256 tokenId,
+            address childAddress,
+            uint256 childId
+        ) external view returns (bool isEquipped);
+        ```
+    </Tabs.Tab>
+</Tabs>
+
+### Check if a child is equippable in a slot  [#check-child-equippable]
+
+Used to verify whether a token can be equipped into a given parent's slot. This is called from child contract.
+
+<Tabs items={['Call', 'Definition']}>
+    <Tabs.Tab>
+        ```typescript copy
+        const parentAddress = '0x...';
+        const parentId = 1;
+        const assetId = 10;
+        const slotId = 1;
+
+        const canBeEquipped = await childContract.canTokenBeEquippedWithAssetIntoSlot(
+            parentAddress,
+            parentId,
+            assetId,
+            slotId
+        );
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab>
+        ```solidity
+        /**
+        * @notice Used to verify whether a token can be equipped into a given parent's slot.
+        * @param parent Address of the parent token's smart contract
+        * @param tokenId ID of the token we want to equip
+        * @param assetId ID of the asset associated with the token we want to equip
+        * @param slotId ID of the slot that we want to equip the token into
+        * @return canBeEquipped A boolean indicating whether the token with the given asset can be equipped into the desired slot
+        */
+        function canTokenBeEquippedWithAssetIntoSlot(
+            address parent,
+            uint256 tokenId,
+            uint64 assetId,
+            uint64 slotId
+        ) external view returns (bool canBeEquipped);
+        ```
+    </Tabs.Tab>
+</Tabs>
+
+### Get asset and equippable data  [#get-asset-equippable-data]
+
+Used to get the asset and equippable data associated with given `assetId`. The metadata returned is the same as the one returned by the `getAssetMetadata` function.
+
+<Tabs items={['Call', 'Definition']}>
+    <Tabs.Tab>
+        ```typescript copy
+        const tokenId = 1;
+        const assetId = 10;
+
+        const {
+            metadataURI,
+            equippableGroupId,
+            catalogAddress,
+            partIds
+        } = await contract.getAssetAndEquippableData(tokenId, assetId);
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab>
+        ```solidity
+        /**
+         * @notice Used to get the asset and equippable data associated with given `assetId`.
+         * @param tokenId ID of the token for which to retrieve the asset
+         * @param assetId ID of the asset of which we are retrieving
+         * @return metadataURI The metadata URI of the asset
+         * @return equippableGroupId ID of the equippable group this asset belongs to
+         * @return catalogAddress The address of the catalog the part belongs to
+         * @return partIds An array of IDs of parts included in the asset
+         */
+        function getAssetAndEquippableData(
+            uint256 tokenId,
+            uint64 assetId
+        )
+            external
+            view
+            returns (
+                string memory metadataURI,
+                uint64 equippableGroupId,
+                address catalogAddress,
+                uint64[] memory partIds
+            );
+        ```
+    </Tabs.Tab>
+</Tabs>
+
+### Get equipment  [#get-equipment]
+
+Used to get the `Equipment` data for a token, catalog and slot combination. It returns an empty struct if no equipment is found.
+
+<Tabs items={['Call', 'Definition']}>
+    <Tabs.Tab>
+        ```typescript copy
+        const tokenId = 1;
+        const targetCatalogAddress = '0x...';
+        const slotPartId = 1;
+
+        const equipment = await parentContract.getEquipment(
+            tokenId,
+            targetCatalogAddress,
+            slotPartId
+        );
+        // equipment = [
+        //     assetId,
+        //     childAssetId,
+        //     childId,
+        //     childEquippableAddress
+        // ]
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab>
+        ```solidity
+        /**
+        * @notice Used to get the Equipment object equipped into the specified slot of the desired token.
+        * @dev The `Equipment` struct consists of the following data:
+        *  [
+        *      assetId,
+        *      childAssetId,
+        *      childId,
+        *      childEquippableAddress
+        *  ]
+        * @param tokenId ID of the token for which we are retrieving the equipped object
+        * @param targetCatalogAddress Address of the `Catalog` associated with the `Slot` part of the token
+        * @param slotPartId ID of the `Slot` part that we are checking for equipped objects
+        * @return equipment The `Equipment` struct containing data about the equipped object
+        */
+        function getEquipment(
+            uint256 tokenId,
+            address targetCatalogAddress,
+            uint64 slotPartId
+        ) external view returns (Equipment memory equipment);
+        ```
+    </Tabs.Tab>
+</Tabs>

@@ -1,0 +1,75 @@
+import { Feature, Features } from '@components/features'
+import { Callout, Card, Cards } from 'nextra/components'
+import { TbHexagons } from "react-icons/tb";
+import { LuReplace } from "react-icons/lu";
+import { MdOutlineRocketLaunch, MdListAlt, MdLineStyle } from "react-icons/md";
+import { BiGhost } from "react-icons/bi";
+
+# RMRK Modules Overview
+
+RMRK is a set of NFT standards that compose several NFT module primitives. Putting these modules together allows a user to create NFT systems of arbitrary complexity.
+So far we have created 7 modules as ERC proposals, all of which are ERC721 compatible. The first 5 are already standards, the 6th and 7th are still in Draft.
+
+* MultiAsset: [ERC-5773: Context-Dependent Multi-Asset Tokens](https://eips.ethereum.org/EIPS/eip-5773)
+* Nestable: [ERC-7401: Parent-Governed Non-Fungible Tokens Nesting](https://eips.ethereum.org/EIPS/eip-7401)
+* Composable & Equippable: [ERC-6220: Composable NFTs utilizing Equippable Parts](https://eips.ethereum.org/EIPS/eip-6220)
+* Soulbound: [ERC-6454: Minimal Transferable NFT detection interface](https://eips.ethereum.org/EIPS/eip-6454)
+* Emotable: [ERC-7409: Public Non-Fungible Tokens Emote Repository](https://eips.ethereum.org/EIPS/eip-7409)
+* Dynamic Attributes: [ERC-7508: Dynamic On-Chain Token Attributes Repository ](https://eips.ethereum.org/EIPS/eip-7508)
+* Token Holder: [ERC-7590: ERC-20 Holder Extension for NFTs](https://eips.ethereum.org/EIPS/eip-7508)
+
+
+![RMRK Modules](/images/General_Overview_Modules.png)
+
+<Cards>
+  <Card
+    icon={<TbHexagons />}
+    title="MultiAsset"
+    href="/multiasset"
+  />
+  <Card
+    icon={<MdLineStyle />}   
+    title="Nestable"
+    href="/nestable"
+  />
+  <Card
+    icon={<LuReplace />}
+    title="Composable & Equippable"
+    href="/composable-equippable"
+  />
+  <Card
+    icon={<MdOutlineRocketLaunch />}
+    title="Emotable"
+    href="/emotable"
+  />
+  <Card
+    icon={<BiGhost />}
+    title="Soulbound"
+    href="/soulbound"
+  />
+  <Card
+    icon={<MdListAlt />}
+    title="Attributes"
+    href="/attributes"
+  />
+  <Card
+    icon={<MdListAlt />}
+    title="ERC20 Holder"
+    href="/erc20holder"
+  />
+</Cards>
+
+### How to use them?
+1. **MultiAsset** and **Nestable** can be used as stand alones or can be combined.
+2. **Equippable** requires both **MultiAsset** and **Nestable**, so they 3 are always implemented together.
+3. **Soulbound** and **ERC20 Holder** are extensions which can be added to any of the former combinations.
+4. **Emotable** and **Dynamic Attributes** are stand alone repositories. You do not need to include them in your implementations to use them. They are compatible with all combinations, and even with plain 721s.
+
+<Callout type='info' emoji='⚙️'>
+    Check implementations [here](/implementations)
+</Callout>
+
+
+
+
+

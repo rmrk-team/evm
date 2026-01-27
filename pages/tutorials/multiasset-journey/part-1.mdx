@@ -1,0 +1,335 @@
+import { Steps, Callout, Tabs, FileTree } from 'nextra/components'
+
+# Multi-Asset Journey (Part 1, Setup)
+
+#### A contextualized user journey to explore and understand the Multi-Asset NFT features
+
+In this journey we will explore the main features of **Multi-Asset** standard. We will use **Ready to Use** implementation for [Multi-Asset with PreMint](/evm-package/readyToUse/premint/RMRKMultiAssetPreMint.md). For more information on the available implementations see the [implementations section](/implementations). 
+We have chosen the **PreMint** implementation because it allows us, contract owners, to mint tokens at no cost.
+
+
+##### The use cases that will be explored are:
+
+- Creation of an NFT collection that supports asset binding.
+- Creation of assets to addition to the NFTs of the collection.
+- Asset replacement.
+- NFT burning (with relative bound assets).
+
+We will guide you through the process using both Remix and Hardhat, starting from the code [wizard](/quick-start/wizard) in each case.
+Interactions will be done from either Remix or hardhat scripts.
+
+#### User journey context
+
+_Expert chefs **Master** and his student **Alice** are traveling the world to develop unique recipes. Their goal is to create a renowned cookbook showcasing their culinary innovations._
+
+
+{/* Every action will be performed with smart contract functions with the help of some Typescript code. */}
+
+
+### Creating the Smart Contract.
+
+Let's start by going to the [wizard.rmrk.app](https://wizard.rmrk.app/) and configuring our contract. 
+1. Set the name to "CookBook"
+2. Set the symbol "CB"
+3. Select *Module* to be **MultiAsset** 
+4. Select *Mint Method* to **Pre-Mint**
+
+![Wizard Configuration](/images/tutorials/multiasset-cookbook/wizard-config.png) 
+    
+Here you can decide to either use Remix or Hardhat. 
+Remix requires no installation, but Hardhat version will take care of verifying the contract and adding it to [Singular](https://singular.rmrk.app) marketplace, it also allows you to deploy the contracts locally and create unit tests if needed.
+
+<Tabs items={['Remix', 'Hardhat' ]}> 
+    <Tabs.Tab>
+        <Steps>
+        ### Open in Remix
+        Click **Open in Remix** and you will be redirected to Remix with the contract already loaded, installing all the packages might take a few minutes. You should then see a screen like this.
+
+        ![Remix](/images/tutorials/multiasset-cookbook/remix-compile.png)
+
+        ### Compile the contract
+        Hit **Compile** button and wait for it to process.
+
+        ### Configure the deployment
+        * Go to the **Deploy** section on the left. 
+        * In the **Environment** dropdown, select **Injected Provider** to use your wallet to deploy the contract.
+
+        ![Remix Deploy](/images/tutorials/multiasset-cookbook/remix-deploy-env.png)
+
+        <Callout>
+        Make sure you have the right network selected on your wallet, we recommend to use a test network. 
+        In this case we are using [Moonbase Alpha](https://moonbase.moonscan.io/).
+        </Callout>
+
+
+        ### Fill in the deployment data
+        Expand the deploy section and fill in all the data.
+            - Collection Metadata: `ipfs://QmSU2R1ewXA7vmxD17KQTLRG1nu63KPxDmnb6xdtZ2Hmq5`
+            - Max supply: 100
+            - Royalty receipient: Your address
+            - Royalty percentage: 500 * This is 5% in Base Points.
+            Your screen should look like this:
+            ![Wizard Configuration](/images/tutorials/multiasset-cookbook/remix-deploy.png)
+
+
+        ### Deploy the contract    
+        * Hit **transact** and confirm the transaction on your wallet.
+        * Your deployed contract will show on the **Deployed Contracts** section, where you can interact with it.
+        
+        ### Congratulations!
+        You have deployed your first **Multi-Asset** contract. We will refer to the account used for deployment as "Master". Additionally, a secondary account will be required for certain interactions, which we will name "Alice".
+
+        <Callout type="info">
+        Optionally you can add your collection to Singular. See the [Adding Collection to Singular](/tutorials/add-to-singular) tutorial for more information.
+        </Callout>
+        </Steps>
+    </Tabs.Tab>     
+    <Tabs.Tab >
+        <Steps>
+        ### Clone the template
+        Use the [evm-template repository](https://github.com/rmrk-team/evm-template) to create a new repository and clone it locally.
+            ![Wizard Configuration](/images/tutorials/multiasset-cookbook/hardhat-template.png)
+        
+        ### Install dependencies
+        Go to the project folder and install the dependencies with your favorite package manager: `yarn` | `npm i` | `pnpm i`. This tutorial will use yarn.
+
+        ### Download the contract
+
+        Download the CookBook contract from the wizard and place it in the `contracts` folder.
+
+        <FileTree>
+        <FileTree.Folder name="contracts" defaultOpen>
+            <FileTree.File name="CookBook.sol" />
+            <FileTree.File name="MockRMRKRegistry.sol" />
+        </FileTree.Folder>
+        <FileTree.Folder name="scripts">
+            <FileTree.File name="deploy-methods.ts" />
+            <FileTree.File name="get-gegistry.ts" />
+            <FileTree.File name="run-deploy-catalog.ts" />
+            <FileTree.File name="run-deploy-utils.ts" />
+            <FileTree.File name="run-deploy.ts" />
+            <FileTree.File name="utils.ts" />
+        </FileTree.Folder>
+        <FileTree.File name="hardhat.config.ts" />
+        <FileTree.File name="..." />
+        </FileTree>
+
+        <Callout type="info">
+         You can remove the `SimpleEquippable.sol` file.
+         </Callout>
+
+
+        ### Configure the deployment
+
+        Go the **Deploy script** section of the wizard and fill in the data.
+            - Collection Metadata: `ipfs://QmSU2R1ewXA7vmxD17KQTLRG1nu63KPxDmnb6xdtZ2Hmq5`
+            - Max supply: 100
+            - Royalty receipient: Leave empty to use the same address as the deployer, or set a custom address.
+            - Royalty percentage: 5%
+            - Enable the "Use 2 scripts" option. This will allow us to reuse the deploy method.
+            Your screen configuration panel should look like this:
+            ![Wizard Configuration](/images/tutorials/multiasset-cookbook/wizard-deploy-script.png)
+
+        ### Copy the deployment code
+        Copy the code from the top window into `scripts/deploy-methods.ts`. Some imports will be duplicated, remove them. The merged imports should look like this:
+        ```typescript copy
+import { ethers, run, network } from 'hardhat';
+import { delay, isHardhatNetwork } from './utils';
+import {
+    CookBook,
+    RMRKBulkWriter,
+    RMRKCatalogImpl,
+    RMRKCatalogUtils,
+    RMRKCollectionUtils,
+    RMRKEquipRenderUtils,
+} from '../typechain-types';
+import { getRegistry } from './get-gegistry';
+        ```
+
+        Copy the code from the bottom window into `scripts/run-deploy.ts`, replacing the original contents. This will be the main script to deploy the contract.
+
+        <FileTree>
+        <FileTree.Folder name="contracts">
+            <FileTree.File name="CookBook.sol" />
+            <FileTree.File name="MockRMRKRegistry.sol" />
+        </FileTree.Folder>
+        <FileTree.Folder name="scripts" defaultOpen>
+            <FileTree.File name="deploy-methods.ts" />
+            <FileTree.File name="get-gegistry.ts" />
+            <FileTree.File name="run-deploy-catalog.ts" />
+            <FileTree.File name="run-deploy-utils.ts" />
+            <FileTree.File name="run-deploy.ts" />
+            <FileTree.File name="utils.ts" />
+        </FileTree.Folder>
+        <FileTree.File name="hardhat.config.ts" />
+        <FileTree.File name="..." />
+        </FileTree>
+
+        ### Prepare the environment private keys
+
+        Create a `.env` file by copying and renaming the `.env.example` file. 
+        In this file, instead of using a single `PRIVATE_KEY`, set up two separate private keys: one for the Master account (`PRIVATE_KEY_MASTER`) and one for the Alice account (`PRIVATE_KEY_ALICE`), as these are the accounts we'll use in this tutorial.
+        
+        <FileTree>
+        <FileTree.Folder name="contracts">
+            <FileTree.File name="CookBook.sol" />
+            <FileTree.File name="MockRMRKRegistry.sol" />
+        </FileTree.Folder>
+        <FileTree.Folder name="scripts">
+            <FileTree.File name="run-deploy.ts" />
+            <FileTree.File name="getRegistry.ts" />
+        </FileTree.Folder>
+        <FileTree.File name="hardhat.config.ts" />
+        <FileTree.File name=".env" />
+        <FileTree.File name="..." />
+        </FileTree>
+
+
+        ### Update the hardhat config
+        In your `hardhat.config.ts` file, replace the accounts definition with the following:
+        ```ts copy
+        const accounts = process.env.PRIVATE_KEY_MASTER && process.env.PRIVATE_KEY_ALICE
+            ? [process.env.PRIVATE_KEY_MASTER, process.env.PRIVATE_KEY_ALICE]
+            : [];
+        ```
+        
+        ### Update block scanner API keys
+
+        In the `.env` file, set the `{BLOCK_SCANNER}_API_KEY` for the network you want to use. You can get keys easily from the block scanner of your network.
+
+        <Callout type="info">
+            `API_KEY` from block scanners can be acquired by signing in from the **mainnet** chain explorer, registration is free. The `API_KEY` you get from it works for production and testing networks. Here are the block scanners from the most common networks: [Ethereum](https://etherscan.io/), [Polgyon](https://polygonscan.com/), [Moonbeam](https://moonbeam.moonscan.io/), [Astar](https://blockscout.com/astar/), [Base](https://basescan.org/), [BSC](https://bscscan.com/).
+        </Callout>
+
+        ### Compile the contracts:
+        ```bash copy
+        yarn hardhat compile
+        ```
+        
+        ### Deploy the Cookbook:
+        ```bash copy
+        yarn hardhat run scripts/run-deploy.ts --network {NETWORK}
+        ```
+
+        - Available testing networks: `moonbaseAlpha`, `sepolia`, `polygonMumbai`, `baseGoerli`
+        - Available production networks: `moonbeam`, `mainnet`, `polygon`, `base`, `astar`, `bsc`
+        - After deploy you will see something like this (you may also see a message about the contract having been verified already):
+        
+        ```bash
+        Deploying CookBook to moonbaseAlpha blockchain...
+        Deploying contracts with master account: 0xA6cc9397d29b631b69782e5F7fB9801224C8FA90
+        CookBook deployed to 0x4B2236fF52B7d8D1E55199d8B2bD618706A96859.
+        Collection added to Singular Registry
+        Nothing to compile
+        No need to generate any newer typings.
+
+        Successfully submitted source code for contract
+        contracts/CookBook.sol:CookBook at 0xB4d3b179ACA978A7C0D22dd9E3cA8D6872B204A4
+        for verification on the block explorer. Waiting for verification result...
+
+        Successfully verified contract CookBook on Etherscan.
+        https://moonbase.moonscan.io/address/0xB4d3b179ACA978A7C0D22dd9E3cA8D6872B204A4#code
+        Done in 39.13s.
+        ```
+        
+
+        Congratulations! You have deployed your first **Multi-Asset** contract. 
+
+        <Callout type="info">
+            It is also already verified and registered in [Singular dev](https://dev.singular.rmrk.app).
+        </Callout>
+
+        ### Prepare contract interaction scripts
+
+        To interact with our smart contract we will need to create an instance of the CookBook and attach the deployed address. Since we might need this several times, let's create a script to get the instance. 
+        
+        * Create a `getCookbook.ts` file under the `scripts` folder and add the following code, replacing the cookbook address for the one you just deployed. When running unit tests in the local hardhat network, it will deploy a new cookbook, otherwise it will point to the deployed instance. We can use it to interact with the contract.
+
+        ```typescript copy
+import { ethers } from 'hardhat';
+import { CookBook } from '../typechain-types';
+import {deployCookBook} from './deploy-methods';
+
+export async function getCookbook(): Promise<CookBook> {
+let cookbook: CookBook;
+
+if ((await ethers.provider.getNetwork()).name === 'hardhat') {
+    cookbook = await deployCookBook();
+} else {
+    // REPLACE THE COOKBOOK ADDRESS FOR THE ONE YOU JUST DEPLOYED:
+    const cookbookAddress = '0xB4d3b179ACA978A7C0D22dd9E3cA8D6872B204A4';
+    const contractFactory = await ethers.getContractFactory('CookBook');
+    cookbook = <CookBook>contractFactory.attach(cookbookAddress);
+}
+return cookbook;
+}
+        ```
+
+        <Callout type="warning">
+        Make sure you replace the cookbook address for the one you just deployed.
+        </Callout>
+        
+        * Create a `run-journey.ts` file under the `scripts` folder.  We will start by importing some libraries and our method to get the cookbook. All the code will run under the `main` function. We will simply log the two accounts and the address of the cookbook, to make sure they are as expected: Add the following code to the file:
+
+        ```typescript copy
+        import { ethers, network } from 'hardhat';
+        import { getCookbook } from './get-cookbook';
+
+        async function main(): Promise<void> {
+        console.log(`Running cookbook journey on ${network.name} blockchain...`);
+
+        const [master, alice] = await ethers.getSigners();
+        console.log(`Deploying contracts with the account: ${master.address}`);
+        console.log(`Deploying contracts with the account: ${alice.address}`);
+
+        const cookbook = await getCookbook();
+        console.log(`Using Cookbook deployed at ${await cookbook.getAddress()}.`);
+
+        // Journey starts here:
+        }
+
+        main().catch((error) => {
+            console.error(error);
+            process.exitCode = 1;
+        });
+        ```
+
+        <FileTree>
+        <FileTree.Folder name="contracts">
+            <FileTree.File name="CookBook.sol" />
+            <FileTree.File name="MockRMRKRegistry.sol" />
+        </FileTree.Folder>
+        <FileTree.Folder name="scripts" defaultOpen>
+            <FileTree.File name="deploy-methods.ts" />
+            <FileTree.File name="get-cookbook.ts" />
+            <FileTree.File name="get-gegistry.ts" />
+            <FileTree.File name="run-deploy-catalog.ts" />
+            <FileTree.File name="run-deploy-utils.ts" />
+            <FileTree.File name="run-journey.ts" />
+            <FileTree.File name="run-deploy.ts" />
+            <FileTree.File name="utils.ts" />
+        </FileTree.Folder>
+        <FileTree.File name="hardhat.config.ts" />
+        <FileTree.File name=".env" />
+        <FileTree.File name="..." />
+        </FileTree>         
+       
+       ### Run the script
+       
+       You can safely run it on any network different to hardhat, since there will be no interactions. Running on hardhat will use the default accounts so let's use `moonbaseAlpha`:
+        ```bash
+        yarn hardhat run scripts/run-journey.ts --network moonbaseAlpha
+        ```
+        You should see a similar output:
+        ```bash
+        Running cookbook journey on moonbaseAlpha blockchain...
+        Deploying contracts with the account: 0xA6cc9397d29b631b69782e5F7fB9801224C8FA90
+        Deploying contracts with the account: 0x855dF0303Fec3a56c02fE35d8fb4d5e80A8c79A0
+        Using Cookbook deployed at 0xB4d3b179ACA978A7C0D22dd9E3cA8D6872B204A4.
+        Done in 1.68s.
+        ```
+        </Steps>
+    </Tabs.Tab>
+</Tabs>
+
+Great work on completing Part 1! Now, get ready for [Part 2](./part-2), where things get even more exciting.

@@ -1,0 +1,152 @@
+import { Tabs } from 'nextra/components'
+
+# Implementations
+
+In our NPM package ([EVM-contracts](https://www.npmjs.com/package/@rmrk-team/evm-contracts)), we provide a variety of implementations for each of the modules. They come in 3 levels of increasing complexity:
+
+
+<Tabs items={['Ready to Use', 'Abstract Implementation', 'Non opinionated (Core)' ]}>
+  <Tabs.Tab>
+ Ready to use implementations are opinionated and include:
+    * Everything from Base Implementation
+    * `mint`, `nestMint` and `tokenURI` implementation, varying depending on the implementation.
+    1. Premint: Opinionated implementation which includes:
+        * `mint` and `nestMint` (if Nestable included) implementation, which only the owner or contributor can call.
+        * `tokenURI` implementation, set on via parameter on mint for each NFT.
+    2. Lazy Mint Native Token: Opinionated implementation which includes:
+        * `mint` and `nestMint` (if Nestable included) implementation, where anyone can batch mint tokens by paying the price in native token. Price is set on creation.
+        * `tokenURI` implementation, via baseURI defined on creation. The tokenId is appended to the baseURI.
+    3. Lazy Mint ERC20:
+        * `mint` and `nestMint` (if Nestable included) implementation, where anyone can batch mint tokens by paying the price in ERC20 token. Price and ERC20 token are set on creation.
+        * `tokenURI` implementation, via baseURI defined on creation. The tokenId is appended to the baseURI.
+    4. Premint Soulbound:
+        * Everything from Premint
+        * Uses soulbound implementation, making all tokens soulbound by default.
+    5. Lazy Mint Native Token Soulbound:
+        * Everything from Lazy Mint Native Token
+        * Uses soulbound implementation, making all tokens soulbound by default.
+    6. Lazy Mint ERC20 Soulbound:
+        * Everything from Lazy Mint ERC20
+        * Uses soulbound implementation, making all tokens soulbound by default.
+  </Tabs.Tab>
+  <Tabs.Tab>
+    Abstract Implementation need to finish last details of implementation, namely: minting methods and tokenURI. They include:
+    * Core implementation.
+    * Royalties via [ERC-2981](https://eips.ethereum.org/EIPS/eip-2981).
+    * Permissions via custom [Ownable](./evm-package/core/other/access/Ownable) implementation, which allows to manage contributors.
+    * `name`, `symbol` and `contractURI` implementations.
+    * Auto incremented `tokenId`, `totalSupply` and `maxSupply` methods.
+    * Auto incremented `assetId` and `totalAssets` method for MultiAsset implementations
+    * _prepareMint helper method to get ids for batch minting.
+    * Does not include `tokenURI nor` minting implementation.
+  </Tabs.Tab>    
+  <Tabs.Tab>
+    Non opinionated are also referred to as "Core" implementations. These are the most basic implementations of the modules, which are not opinionated about the use case. They are the most flexible, but also the most complex to use. They do not include methods which are usually gated.
+  </Tabs.Tab>    
+</Tabs>
+
+-----
+
+The 3 levels of implementations can be found in this image as follows:
+1. The bottom-most layer is the non-opinionated implementation.
+2. Two layers above are the abstract implementations, together with the different extensions to manage tokenURI.
+3. The top-most layers are the ready to use implementations, available as soulbound or not.
+
+![RMRK Package Building Blocks](/images/General_Overview_Building_Blocks.png)
+
+
+## MultiAsset
+
+The multiasset implementations are available in the [@rmrk-team/evm-contracts package](https://www.npmjs.com/package/@rmrk-team/evm-contracts) at:
+
+<Tabs items={['Ready to Use', 'Abstract Implementation', 'Non opinionated (Core)' ]}>
+  <Tabs.Tab>
+      1. Premint: [implementations/premint/RMRKMultiAssetPreMint.sol](../evm-package/readyToUse/premint/RMRKMultiAssetPreMint.md)
+      2. Lazy Mint Native Token: [implementations/lazyMintNative/RMRKMultiAssetLazyMintNative.sol](../evm-package/readyToUse/lazyMintNative/RMRKMultiAssetLazyMintNative.md)
+      3. Lazy Mint ERC20: [implementations/lazyMintErc20/RMRKMultiAssetLazyMintErc20.sol](../evm-package/readyToUse/lazyMintErc20/RMRKMultiAssetLazyMintErc20.md)
+      4. Premint Soulbound: [implementations/premint/RMRKMultiAssetPreMintSoulbound.sol](../evm-package/readyToUse/premint/RMRKMultiAssetPreMintSoulbound.md)
+      5. Lazy Mint Native Token Soulbound: [implementations/lazyMintNative/RMRKMultiAssetLazyMintNativeSoulbound.sol](../evm-package/readyToUse/lazyMintNative/RMRKMultiAssetLazyMintNativeSoulbound.md)
+      6. Lazy Mint ERC20 Soulbound: [implementations/lazyMintErc20/RMRKMultiAssetLazyMintErc20Soulbound.sol](../evm-package/readyToUse/lazyMintErc20/RMRKMultiAssetLazyMintErc20Soulbound.md)
+  </Tabs.Tab>
+  <Tabs.Tab>
+    [implementations/abstract/RMRKAbstractMultiAsset.sol](../evm-package/readyToUse/abstract/RMRKAbstractMultiAsset.md)
+  </Tabs.Tab>
+  <Tabs.Tab>
+    [RMRK/multiasset/RMRKMultiAsset.sol](../evm-package/core/modular/multiasset/RMRKMultiAsset.md)
+  </Tabs.Tab>     
+</Tabs>
+
+
+## Nestable
+
+The **Nestable** implementations are available in the [@rmrk-team/evm-contracts package](https://www.npmjs.com/package/@rmrk-team/evm-contracts) at:
+
+<Tabs items={['Ready to Use', 'Abstract Implementation', 'Non opinionated (Core)' ]}>
+  <Tabs.Tab>
+        1. Premint: [implementations/premint/RMRKNestablePreMint.sol](../evm-package/readyToUse/premint/RMRKNestablePreMint.md)
+        2. Lazy Mint Native Token: [implementations/lazyMintNative/RMRKNestableLazyMintNative.sol](../evm-package/readyToUse/lazyMintNative/RMRKNestableLazyMintNative.md)
+        3. Lazy Mint ERC20: [implementations/lazyMintErc20/RMRKNestableLazyMintErc20.sol](../evm-package/readyToUse/lazyMintErc20/RMRKNestableLazyMintErc20.md)
+        4. Premint Soulbound: [implementations/premint/RMRKNestablePreMintSoulbound.sol](../evm-package/readyToUse/premint/RMRKNestablePreMintSoulbound.md)
+        5. Lazy Mint Native Token Soulbound: [implementations/lazyMintNative/RMRKNestableLazyMintNativeSoulbound.sol](../evm-package/readyToUse/lazyMintNative/RMRKNestableLazyMintNativeSoulbound.md)
+        6. Lazy Mint ERC20 Soulbound: [implementations/lazyMintErc20/RMRKNestableLazyMintErc20Soulbound.sol](../evm-package/readyToUse/lazyMintErc20/RMRKNestableLazyMintErc20Soulbound.md)
+  </Tabs.Tab>
+  <Tabs.Tab>
+    [implementations/abstract/RMRKAbstractNestable.sol](../evm-package/readyToUse/abstract/RMRKAbstractNestable.md)
+  </Tabs.Tab>
+  <Tabs.Tab>
+    [RMRK/nestable/RMRKNestable.sol](../evm-package/core/modular/nestable/RMRKNestable.md)
+  </Tabs.Tab>     
+</Tabs>
+
+----
+
+The **Nestable + MultiAsset** implementations are available at:
+
+<Tabs items={['Ready to Use', 'Abstract Implementation', 'Non opinionated (Core)' ]}>
+  <Tabs.Tab>
+        1. Premint: [implementations/premint/RMRKNestableMultiAssetPreMint.sol](../evm-package/readyToUse/premint/RMRKNestableMultiAssetPreMint.md)
+        2. Lazy Mint Native Token: [implementations/lazyMintNative/RMRKNestableMultiAssetLazyMintNative.sol](../evm-package/readyToUse/lazyMintNative/RMRKNestableMultiAssetLazyMintNative.md)
+        3. Lazy Mint ERC20: [implementations/lazyMintErc20/RMRKNestableMultiAssetLazyMintErc20.sol](../evm-package/readyToUse/lazyMintErc20/RMRKNestableMultiAssetLazyMintErc20.md)
+        4. Premint Soulbound: [implementations/premint/RMRKNestableMultiAssetPreMintSoulbound.sol](../evm-package/readyToUse/premint/RMRKNestableMultiAssetPreMintSoulbound.md)
+        5. Lazy Mint Native Token Soulbound: [implementations/lazyMintNative/RMRKNestableMultiAssetLazyMintNativeSoulbound.sol](../evm-package/readyToUse/lazyMintNative/RMRKNestableMultiAssetLazyMintNativeSoulbound.md)
+        6. Lazy Mint ERC20 Soulbound: [implementations/lazyMintErc20/RMRKNestableMultiAssetLazyMintErc20Soulbound.sol](../evm-package/readyToUse/lazyMintErc20/RMRKNestableMultiAssetLazyMintErc20Soulbound.md)
+  </Tabs.Tab>
+  <Tabs.Tab>
+    [implementations/abstract/RMRKAbstractNestable.sol](../evm-package/readyToUse/abstract/RMRKAbstractNestable.md)
+  </Tabs.Tab>
+  <Tabs.Tab>
+    [RMRK/nestable/RMRKNestableMultiAsset.sol](../evm-package/core/modular/nestable/RMRKNestableMultiAsset.md)
+  </Tabs.Tab>      
+</Tabs>
+
+
+## Composable & Equippable
+
+The equippable implementations are available in the [@rmrk-team/evm-contracts package](https://www.npmjs.com/package/@rmrk-team/evm-contracts) at:
+
+
+<Tabs items={['Ready to Use', 'Abstract Implementation', 'Non opinionated (Core)' ]}>
+  <Tabs.Tab>
+        1. Premint: [implementations/premint/RMRKEquippablePreMint.sol](../evm-package/readyToUse/premint/RMRKEquippablePreMint.md)
+        2. Lazy Mint Native Token: [implementations/lazyMintNative/RMRKEquippableLazyMintNative.sol](../evm-package/readyToUse/lazyMintNative/RMRKEquippableLazyMintNative.md)
+        3. Lazy Mint ERC20: [implementations/lazyMintErc20/RMRKEquippableLazyMintErc20.sol](../evm-package/readyToUse/lazyMintErc20/RMRKEquippableLazyMintErc20.md)
+        4. Premint Soulbound: [implementations/premint/RMRKEquippablePreMintSoulbound.sol](../evm-package/readyToUse/premint/RMRKEquippablePreMintSoulbound.md)
+        5. Lazy Mint Native Token Soulbound: [implementations/lazyMintNative/RMRKEquippableLazyMintNativeSoulbound.sol](../evm-package/readyToUse/lazyMintNative/RMRKEquippableLazyMintNativeSoulbound.md)
+        6. Lazy Mint ERC20 Soulbound: [implementations/lazyMintErc20/RMRKEquippableLazyMintErc20Soulbound.sol](../evm-package/readyToUse/lazyMintErc20/RMRKEquippableLazyMintErc20Soulbound.md)
+  </Tabs.Tab>
+  <Tabs.Tab>
+    [implementations/abstract/RMRKAbstractMultiAsset.sol](../evm-package/readyToUse/abstract/RMRKAbstractMultiAsset.md)
+  </Tabs.Tab>
+  <Tabs.Tab>
+    [RMRK/equippable/RMRKEquippable.sol](../evm-package/core/modular/equippable/RMRKEquippable.md)
+  </Tabs.Tab>     
+</Tabs>
+
+## Soulbound
+
+We provide implementations for multiple approaches to making a token non-transferable:
+
+1. Tokens are non-transferable from when they are minted: [RMRKSoulbound](/evm-package/core/other/extension/soulbound/RMRKSoulbound)
+2. Tokens become non-transferable after a specified block: [RMRKSoulboundAfterBlockNumber](/evm-package/core/other/extension/soulbound/RMRKSoulboundAfterBlockNumber)
+3. Tokens become non-transferable after a predefined number of transactions: [RMRKSoulboundAfterTransactions](/evm-package/core/other/extension/soulbound/RMRKSoulboundAfterTransactions)
+4. Tokens can be set as non-transferable on a per-token basis: [RMRKSoulboundPerToken](/evm-package/core/other/extension/soulbound/RMRKSoulboundPerToken)

@@ -1,0 +1,104 @@
+import { Feature, Features } from '@components/features'
+import { Card, Cards } from 'nextra/components'
+import Image from 'next/image'
+
+
+# Welcome to RMRK EVM Docs
+
+Here you'll find guides, explanations, resources, and references to build with RMRK’s Modular NFT EVM Standards.
+
+----
+
+<style jsx>{`
+    .features-container {
+      margin: 8rem 0 0;
+      padding: 4rem 0;
+    }
+    .features-container .content-container {
+      margin-top: -8rem;
+    }
+  `}</style>
+
+<div className="features-container">
+  <div className="content-container">
+    <Features>
+      <Feature index={0} href="/use-cases/character-progression">
+        <h3>Use Cases</h3>
+        <p className='mr-6'>Learn about RMRK’s key Modular NFT concepts and use-cases.</p>
+      </Feature>
+      <Feature index={1} href="/tutorials/multiasset-journey/part-1">
+        <h3>Tutorials</h3>
+        <p className='mr-6'>Head straight to Modular NFT development.</p>
+      </Feature>
+      <Feature index={2} href="/quick-start">
+        <h3>How-To Guides</h3>
+        <p className='mr-6'>Practical How-To guides for every skill level.</p>
+      </Feature>      
+      <Feature index={3} href="/modules-overview">
+        <h3>RMRK Modules</h3>
+        <p className='mr-6'>Read more about the modules you can build your NFTs with.</p>
+      </Feature>
+      <Feature index={4} href="/implementations">
+        <h3>References</h3>
+        <p className='mr-6'>Deeper learning materials to learn more about Modular NFTs.</p>
+      </Feature>
+      <Feature index={5} href="/faq">
+        <h3>Support</h3>
+        <p className='mr-6'>Check common questions or chat with developers.</p>
+      </Feature>              
+    </Features>
+  </div>
+</div>
+
+
+# External Links
+
+<Cards>
+  <Card
+    icon={<Image src="/images/landing/rmrk.png" width={25} height={25} />}
+    title="RMRK.app"
+    arrow
+    href="https://www.rmrk.app"
+  />
+  <Card
+    icon={<Image src="/images/landing/singular.png" width={25} height={25} />}
+    title="Singular"
+    arrow
+    href="https://singular.rmrk.app"
+  />  
+  <Card
+    icon={<Image src="/images/landing/upgradoor.png" width={25} height={25} />}
+    title="Upgradooor"
+    arrow
+    href="https://upgradooor.app"
+  />   
+  <Card
+    icon={<Image src="/images/landing/mintaur.png" width={25} height={25} />}
+    title="Mintaur"
+    arrow
+    href="https://mintaur.app"
+  />  
+  <Card
+    icon={<Image src="/images/landing/wizard.png" width={25} height={25} />}
+    title="RMRK Wizard"
+    arrow
+    href="https://wizard.rmrk.app"
+  /> 
+  <Card
+    icon={
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        x="0px"
+        y="0px"
+        width="24"
+        height="24"
+        viewBox="0 0 50 50"
+        fill="currentColor"
+      >
+        <path d="M46.137,6.552c-0.75-0.636-1.928-0.727-3.146-0.238l-0.002,0C41.708,6.828,6.728,21.832,5.304,22.445	c-0.259,0.09-2.521,0.934-2.288,2.814c0.208,1.695,2.026,2.397,2.248,2.478l8.893,3.045c0.59,1.964,2.765,9.21,3.246,10.758	c0.3,0.965,0.789,2.233,1.646,2.494c0.752,0.29,1.5,0.025,1.984-0.355l5.437-5.043l8.777,6.845l0.209,0.125	c0.596,0.264,1.167,0.396,1.712,0.396c0.421,0,0.825-0.079,1.211-0.237c1.315-0.54,1.841-1.793,1.896-1.935l6.556-34.077	C47.231,7.933,46.675,7.007,46.137,6.552z M22,32l-3,8l-3-10l23-17L22,32z"></path>
+      </svg>}
+    title="Developers Channel"
+    arrow
+    href="https://t.me/rmrkimpl"
+  />         
+</Cards>

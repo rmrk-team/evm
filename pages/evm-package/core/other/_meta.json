@@ -1,0 +1,9 @@
+{
+  "access": "Access",
+  "catalog": "Catalog",
+  "core": "Core",
+  "extension": "Extension",
+  "library": "Library",
+  "security": "Security",
+  "utils": "Utils"
+}

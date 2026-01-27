@@ -10,17 +10,54 @@ A set of Solidity smart contracts implementing [RMRK](https://rmrk.app) modular 
 To use the RMRK legos and smart contracts contained in this repository, simply add them to your project:
 
 ```shell
-yarn add @rmrk-team/evm-contracts
-```
-
-or
-
-```shell
-npm -i @rmrk-team/evm-contracts
+bun add @rmrk-team/evm-contracts
 ```
 
 Once the dependency is added to your project, simply import the smart contracts you wish to utilize into your own smart
 contract.
+
+## Development
+
+```shell
+bun install
+bun run docs:import
+bun run test
+bun run coverage
+bun run build:artifacts
+bun run docs:prepare
+bun run docs:build
+```
+
+## Docs workflow
+
+Docs are built with Nextra/Next.js using the content in `pages/` plus the contract docs generated
+from `docs/`:
+
+- `bun run docs:import` pulls the original `evm-docs` pages/components/public assets into this repo
+  (run once, then edit locally).
+- `bun run docs:prepare` runs `hardhat dodoc`, syncs the generated contract docs into
+  `pages/evm-package/`, and generates `_meta.json` navigation.
+- `bun run docs:build` runs `docs:prepare`, then `next build && next export` to emit the static site
+  in `out/`.
+- `bun run docs:dev` runs the local docs dev server.
+
+## Automation
+
+On each push to `master`, Cloudflare Pages builds and deploys the docs using the repo settings from
+the CF UI.
+
+On each published GitHub Release, GitHub Actions publishes the npm package: it installs
+dependencies with Bun, runs `bun run test`, runs `bun run build:artifacts`, and publishes the
+package with `bun publish --access public` when the package version is not already on npm.
+
+Cloudflare Pages settings:
+
+- **Build command**: `bun run docs:build`
+- **Output directory**: `out`
+
+Required secrets for automation:
+
+- `NPM_TOKEN` for npm publishing
 
 ## RMRK Legos
 
@@ -32,7 +69,7 @@ So far we have created 6 modules as ERC proposals, all of which are ERC721 compa
 - Composable & Equippable: [ERC-6220: Composable NFTs utilizing Equippable Parts](https://eips.ethereum.org/EIPS/eip-6220)
 - Soulbound: [ERC-6454: Minimal Transferable NFT detection interface](https://eips.ethereum.org/EIPS/eip-6454)
 - Emotable: [ERC-7409: Public Non-Fungible Tokens Emote Repository](https://eips.ethereum.org/EIPS/eip-7409)
-- Dynamic Attributes: [ERC-7508: Dynamic On-Chain Token Attributes Repository ](https://eips.ethereum.org/EIPS/eip-7508)
-- ERC20-Holder: [ERC-7590: ERC-20 Holder Extension for NFTs ](https://eips.ethereum.org/EIPS/eip-7590)
+- Dynamic Attributes: [ERC-7508: Dynamic On-Chain Token Attributes Repository](https://eips.ethereum.org/EIPS/eip-7508)
+- ERC20-Holder: [ERC-7590: ERC-20 Holder Extension for NFTs](https://eips.ethereum.org/EIPS/eip-7590)
 
 ![RMRK Modules](/img/General_Overview_Modules.png)

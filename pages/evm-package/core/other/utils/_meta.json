@@ -1,0 +1,12 @@
+{
+  "IERC20": "IERC20",
+  "IRMRKCollectionData": "Collection Data",
+  "RMRKBulkWriter": "Bulk Writer",
+  "RMRKBulkWriterPerCollection": "Bulk Writer Per Collection",
+  "RMRKCatalogUtils": "Catalog Utils",
+  "RMRKCollectionUtils": "Collection Utils",
+  "RMRKEquipRenderUtils": "Equip Render Utils",
+  "RMRKMultiAssetRenderUtils": "Multi Asset Render Utils",
+  "RMRKNestableRenderUtils": "Nestable Render Utils",
+  "RMRKRenderUtils": "Render Utils"
+}

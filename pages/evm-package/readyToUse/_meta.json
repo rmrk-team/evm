@@ -1,0 +1,8 @@
+{
+  "abstract": "Abstract",
+  "catalog": "Catalog",
+  "lazyMintErc20": "Lazy Mint ERC 2 0",
+  "lazyMintNative": "Lazy Mint Native",
+  "premint": "Premint",
+  "utils": "Utils"
+}

@@ -1,0 +1,553 @@
+import { Steps, Callout, Tabs } from 'nextra/components'
+
+# Nestable-Asset Journey ( Part 2, Kingdom )
+
+
+#### User journey context 
+
+_We are in the Medieval epoch and in the universe there is an omnipotent and all-powerful Wizard. During a special day, the wizard decided to create two Kingdoms. Every action that unfolded later is included in the user journey. Have fun and happy learning!_
+
+<Steps>
+
+### The Kingdoms genesis - Minting the Kingdoms
+
+The Wizard decided that the universe will be structured in this way:
+
+- 2 Kingdoms.
+- 5 Armies: 3 for the first kingdom and 2 for the second one.
+- 90 Soldiers: distributed between the 5 armies, but not in equal parts.
+
+The first action was to create the two kingdoms.
+
+<Callout type="info">
+    We provide valid IPFS URI throughout all of steps, feel free to use them, they point to a JSON file with the corresponding metadata for the step. For soldiers and armies, we will use a generic image for every NFT and the collection.
+</Callout>
+
+<Callout type="info">
+    We will run the journey only at the end, so we do not need to comment past steps or add multiple scripts.
+</Callout>
+
+On your `run-journey.ts` script, under the `// Journey starts here:` line, add the following code.
+
+<Tabs items={['Remix', 'Hardhat' ]}> 
+    <Tabs.Tab>
+    ```typescript copy
+    // 1. Minting the kingdoms
+    const kingdom1Id = 1
+    const kingdom2Id = 2
+
+    let tx = await kingdom.connect(wizard).mint(
+        wizardAddress,
+        1,
+        'ipfs://QmQhDyuSvd49pxe5v2KnmvWT39TFyoqEQyBkhjYC7imHUs/kingdom/1.json'
+    )
+    await tx.wait()
+    console.log('Minted Kingdom #1')
+    tx = await kingdom.connect(wizard).mint(
+        wizardAddress,
+        1,
+        'ipfs://QmQhDyuSvd49pxe5v2KnmvWT39TFyoqEQyBkhjYC7imHUs/kingdom/2.json'
+    )
+    await tx.wait()
+    console.log('Minted Kingdom #2')
+    ```
+    </Tabs.Tab>
+    <Tabs.Tab>
+    ```typescript copy
+    // 1. Minting the kingdoms
+    const kingdom1Id = 1;
+    const kingdom2Id = 2;
+
+    let tx = await kingdom.connect(wizard).mint(
+        wizard.address,
+        1,
+        'ipfs://QmQhDyuSvd49pxe5v2KnmvWT39TFyoqEQyBkhjYC7imHUs/kingdom/1.json',
+    );
+    await tx.wait();
+    console.log('Minted Kingdom #1');
+    tx = await kingdom.connect(wizard).mint(
+        wizard.address,
+        1,
+        'ipfs://QmQhDyuSvd49pxe5v2KnmvWT39TFyoqEQyBkhjYC7imHUs/kingdom/2.json',
+    );
+    await tx.wait();
+    console.log('Minted Kingdom #2');
+    ```
+    </Tabs.Tab>
+</Tabs>
+
+{/* TODO: Mermaid graph */}
+
+### Army creation - Nest Minting the Armies
+
+After that, the Wizard decided to create the armies and did it by making them appear directly in their respective kingdoms. Since armies are trusted among the kingdoms, we will first configure auto acceptance, so the `acceptChild` method doesn't need to be called. That means every NFT from the the Army collection, which is sent to any Kingdom NFT, will be automatically accepted.
+
+On your `run-journey.ts` script, let's add the code to nest mint the armies.
+
+<Tabs items={['Remix', 'Hardhat' ]}> 
+    <Tabs.Tab>
+    ```typescript copy
+    // 2. Nest minting the armies
+    tx = await kingdom.connect(wizard).setAutoAcceptCollection(army.address, true)
+    await tx.wait()
+    console.log('Kingdoms will now auto-accept armies')
+
+    tx = await army.connect(wizard).nestMint(
+        kingdom.address,
+        3, // Number to mint
+        kingdom1Id,
+        'ipfs://Qma8tB38iAiqFAJpwz55d7sRQx4q7zZq1gzXkkK9wjehCg/generic.json'
+    )
+    await tx.wait()
+    console.log('Minted 3 armies for Kingdom #1')
+    tx = await army.connect(wizard).nestMint(
+        kingdom.address,
+        2, // Number to mint
+        kingdom2Id,
+        'ipfs://Qma8tB38iAiqFAJpwz55d7sRQx4q7zZq1gzXkkK9wjehCg/generic.json'
+    )
+    await tx.wait()
+    console.log('Minted 2 armies for Kingdom #2')
+    ```
+    </Tabs.Tab>
+    <Tabs.Tab>
+    ```typescript copy
+    // 2. Nest minting the armies
+    tx = await kingdom.connect(wizard).setAutoAcceptCollection(await army.getAddress(), true);
+    await tx.wait();
+    console.log('Kingdoms will now auto-accept armies');
+
+    tx = await army.connect(wizard).nestMint(
+        await kingdom.getAddress(),
+        3, // Number to mint
+        kingdom1Id,
+        'ipfs://Qma8tB38iAiqFAJpwz55d7sRQx4q7zZq1gzXkkK9wjehCg/generic.json',
+    );
+    await tx.wait();
+    console.log('Minted 3 armies for Kingdom #1');
+    tx = await army.connect(wizard).nestMint(
+        await kingdom.getAddress(),
+        2, // Number to mint
+        kingdom2Id,
+        'ipfs://Qma8tB38iAiqFAJpwz55d7sRQx4q7zZq1gzXkkK9wjehCg/generic.json',
+    );
+    await tx.wait();
+    console.log('Minted 2 armies for Kingdom #2');
+    ```
+    </Tabs.Tab>
+</Tabs>
+
+{/* TODO: Mermaid graph */}
+
+### Soldiers creation - Nest Minting the Soldiers
+
+Just as before, we will enable auto acceptance for Soldiers added to Armies. Then we will proceed to nest mint the Soldiers into the different Armies.
+
+On your `run-journey.ts` script, let's add the code to nest mint the soldiers.
+
+<Tabs items={['Remix', 'Hardhat' ]}> 
+    <Tabs.Tab>
+    ```typescript copy
+    // 3. Nest minting the soldiers
+    tx = await army.connect(wizard).setAutoAcceptCollection(soldier.address, true)
+    await tx.wait()
+    console.log('Armies will now auto-accept soldiers')
+
+    const armies = [1, 2, 3, 4, 5]
+    const soldiersPerArmy = [10, 20, 30, 14, 16]
+
+    for (let i = 0; i < armies.length; i++) {
+        tx = await soldier.connect(wizard).nestMint(
+            army.address,
+            soldiersPerArmy[i],
+            armies[i],
+            'ipfs://QmQhDyuSvd49pxe5v2KnmvWT39TFyoqEQyBkhjYC7imHUs/soldiers/generic.json'
+        )
+        await tx.wait()
+        console.log(
+            `Minted ${soldiersPerArmy[i]} soldiers for Army #${armies[i]}`
+        )
+    }
+    ```
+    </Tabs.Tab>
+    <Tabs.Tab>
+    ```typescript copy
+    // 3. Nest minting the soldiers
+    // We will start omitting the connect(wizard) part, since hardhat will use the default signer (the wizard in this case) when it's not specified.
+    tx = await army.setAutoAcceptCollection(await soldier.getAddress(), true);
+    await tx.wait();
+    console.log('Armies will now auto-accept soldiers');
+
+    const armies = [1, 2, 3, 4, 5];
+    const soldiersPerArmy = [10, 20, 30, 14, 16];
+
+    for (let i = 0; i < armies.length; i++) {
+        tx = await soldier.nestMint(
+            await army.getAddress(),
+            soldiersPerArmy[i],
+            armies[i],
+            'ipfs://QmQhDyuSvd49pxe5v2KnmvWT39TFyoqEQyBkhjYC7imHUs/soldiers/generic.json',
+        );
+        await tx.wait();
+        console.log(`Minted ${soldiersPerArmy[i]} soldiers for Army #${armies[i]}`);
+    }
+    ```
+    </Tabs.Tab>
+</Tabs>
+
+{/* TODO: Mermaid graph */}
+
+### Armies balancing - Transfer NFTs inside and outside the hierarchy
+
+The two Kingdoms have been created and populated, but the wizard isn't happy. He noticed that the 3 armies of the first kingdom are grossly imbalanced. In particular he noticed that there is a big difference between the first and the third army (which contain 30 and 10 soldiers respectively).
+
+{/* TODO: Mermaid graph */}
+
+So he decided to re-balance these armies a bit. He did so by removing 5 soldiers from the third one and assigning them soldiers to the first one.
+
+
+On your `run-journey.ts` script, let's add the code to transfer the soldiers from one army to the other.
+
+<Tabs items={['Remix', 'Hardhat' ]}> 
+    <Tabs.Tab>
+    ```typescript copy
+    // 4. Armies balancing
+    let childrenIds = (await army.childrenOf(3)).map((child) =>
+        child.tokenId.toNumber()
+    ) // Get children of Army #3
+    let totalChildren = childrenIds.length
+    const childrenIdsToMove = childrenIds.slice(5).slice(-5) // Get the last 5 children
+    // Loop from length to 0
+    for (let i = 0; i < 5; i++) {
+        const indexOnActiveChildren = totalChildren - i - 1
+        const indexOnChildrenToMove = 5 - i - 1
+        const childId = childrenIdsToMove[indexOnChildrenToMove]
+        tx = await army.connect(wizard).transferChild(
+            3, // From Army #3
+            army.address, // To another army
+            1, // To Army #4
+            indexOnActiveChildren, // Child index
+            soldier.address, // Child contract
+            childId, // Child ID
+            false, // Not a pending child
+            [] // Empty data
+        )
+        await tx.wait()
+        console.log(
+            `Moved child #${childId} at position ${indexOnActiveChildren} from Army #3 to Army #1`
+        )
+    }
+    ```
+    </Tabs.Tab>
+    <Tabs.Tab>
+    ```typescript copy
+    // 4. Armies balancing
+    let childrenIds = (await army.childrenOf(3)).map((child) => child.tokenId); // Get children of Army #3
+    let totalChildren = childrenIds.length;
+    const childrenIdsToMove = childrenIds.slice(5).slice(-5); // Get the last 5 children
+    // Loop from length to 0
+    for (let i = 0; i < 5; i++) {
+    const indexOnActiveChildren = totalChildren - i - 1;
+    const indexOnChildrenToMove = 5 - i - 1;
+    const childId = childrenIdsToMove[indexOnChildrenToMove];
+    tx = await army.transferChild(
+        3, // From Army #3
+        await army.getAddress(), // To another army
+        1, // To Army #4
+        indexOnActiveChildren, // Child index
+        await soldier.getAddress(), // Child contract
+        childId, // Child ID
+        false, // Not a pending child
+        ethers.ZeroHash, // Empty data
+    );
+    await tx.wait();
+    console.log(
+        `Moved child #${childId} at position ${indexOnActiveChildren} from Army #3 to Army #1`,
+    );
+    }
+    ```
+    </Tabs.Tab>
+</Tabs>
+
+{/* TODO: Mermaid graph */}
+
+
+### The Black Death - Unnesting and burning NFTs
+
+A soldier, after coming back from an exploration mission, had contracted a mysterious illness. 💀 After seeing the state of the unlucky man the wizard decided to move it away from the second army and take him to the palace in order to observe the illness and try to find a cure.
+
+{/* TODO: Mermaid graph */}
+
+Several days passed and the soldier's health didn't get any better and finally, after 2 weeks of suffering, the soldier died. The wizard immediately decided to burn the body to contain the infection...
+
+On your `run-journey.ts` script, let's add the code to transfer a child soldier to the wizard and then burn it.
+
+<Tabs items={['Remix', 'Hardhat' ]}> 
+    <Tabs.Tab>
+    ```typescript copy
+    // 5. Unnesting and burning
+    const infectedSoldierId = 90
+    const [, infectedSoldiersArmyId] = await soldier.directOwnerOf(
+        infectedSoldierId
+    ) // Return arguments are parent contract, parent id and whether parent is an NFT.
+    childrenIds = (await army.childrenOf(infectedSoldiersArmyId)).map(
+        (child) => child.tokenId.toNumber()
+    )
+    const indexOfInfectedChild = childrenIds.indexOf(infectedSoldierId)
+    tx = await army.connect(wizard).transferChild(
+        infectedSoldiersArmyId, // From Army #5
+        wizardAddress, // To wizard
+        0, // No destination Id, since it's not an NFT
+        indexOfInfectedChild, // Child index
+        soldier.address, // Child contract
+        infectedSoldierId, // Child ID
+        false, // Not a pending child
+        [] // Empty data
+    )
+    await tx.wait()
+    console.log(
+        `Moved child #${infectedSoldierId} at position ${indexOfInfectedChild} from Army #5 to wizard`
+    )
+
+    tx = await soldier.connect(wizard)['burn(uint256)'](infectedSoldierId) // On ethers, when there are overloaded functions, you need to use the function signature.
+    await tx.wait()
+    console.log(`Burned soldier #${infectedSoldierId}`)
+    ```
+    </Tabs.Tab>
+    <Tabs.Tab>
+    ```typescript copy
+    // 5. Unnesting and burning
+    const infectedSoldierId = 90n;
+    const [, infectedSoldiersArmyId] = await soldier.directOwnerOf(infectedSoldierId); // Return arguments are parent contract, parent id and whether parent is an NFT.
+    childrenIds = (await army.childrenOf(infectedSoldiersArmyId)).map((child) => child.tokenId);
+    const indexOfInfectedChild = childrenIds.indexOf(infectedSoldierId);
+    tx = await army.transferChild(
+        infectedSoldiersArmyId, // From Army #5
+        wizard.address, // To wizard
+        0, // No destination Id, since it's not an NFT
+        indexOfInfectedChild, // Child index
+        await soldier.getAddress(), // Child contract
+        infectedSoldierId, // Child ID
+        false, // Not a pending child
+        ethers.ZeroHash, // Empty data
+    );
+    await tx.wait();
+    console.log(
+        `Moved child #${infectedSoldierId} at position ${indexOfInfectedChild} from Army #5 to wizard`,
+    );
+
+    tx = await soldier['burn(uint256)'](infectedSoldierId); // On ethers, when there are overloaded functions, you need to use the function signature.
+    await tx.wait();
+    console.log(`Burned soldier #${infectedSoldierId}`);
+    ```
+    </Tabs.Tab>
+</Tabs>
+
+{/* TODO: Mermaid graph */}
+
+### The Black Death Spreads - Burn NFTs recursively
+
+But this wasn't enough. The infection has already spread throughout the second army. A decision had to be made. The sad wizard decided to push the entire army away to an isolated place within the kingdom, including every object and thing related to it, and this was a wise choice.
+
+On your `run-journey.ts` script, let's add the code to transfer a child army to the wizard and then burn it.
+
+<Tabs items={['Remix', 'Hardhat' ]}> 
+    <Tabs.Tab>
+    ```typescript copy
+    // 6. Burn NFTs recursively
+
+    // Transfer infected army
+    tx = await kingdom.connect(wizard).transferChild(
+        kingdom2Id, // From Kingdom #2
+        wizardAddress, // To wizard
+        0, // No destination Id, since it's not an NFT
+        1, // Child index
+        army.address, // Child contract
+        infectedSoldiersArmyId, // Child ID
+        false, // Not a pending child
+        [] // Empty data
+    )
+    await tx.wait()
+    console.log(
+        `Moved Army #${infectedSoldiersArmyId} from Kingdom #2 to wizard`
+    )
+    ```
+    </Tabs.Tab>
+    <Tabs.Tab>
+    ```typescript copy
+    // 6. Burn NFTs recursively
+
+    // Transfer infected army
+    tx = await kingdom.transferChild(
+        kingdom2Id, // From Kingdom #2
+        wizard.address, // To wizard
+        0, // No destination Id, since it's not an NFT
+        1, // Child index
+        await army.getAddress(), // Child contract
+        infectedSoldiersArmyId, // Child ID
+        false, // Not a pending child
+        ethers.ZeroHash, // Empty data
+    );
+    await tx.wait();
+    console.log(`Moved Army #${infectedSoldiersArmyId} from Kingdom #2 to wizard`);
+    ```
+    </Tabs.Tab>
+</Tabs>
+
+{/* TODO: Mermaid graph */}
+
+The entire army died before a month passed and the wizard burned every man and object to prevent the plague to resurface and do more damage to the kingdom.
+
+
+On your `run-journey.ts` script, let's add the code to burn the army.
+
+<Tabs items={['Remix', 'Hardhat' ]}> 
+    <Tabs.Tab>
+    ```typescript copy
+    // Burn infected army with all of it's children
+    totalChildren = (await army.childrenOf(infectedSoldiersArmyId)).length
+    tx = await army.connect(wizard)['burn(uint256,uint256)'](
+        infectedSoldiersArmyId,
+        totalChildren
+    ) // If there are more children to burn, the function would revert to prevent from burning new arrivals.
+    await tx.wait()
+    console.log(
+        `Burned Army #${infectedSoldiersArmyId} with all of it's children`
+    )
+    ```
+    </Tabs.Tab>
+    <Tabs.Tab>
+    ```typescript copy
+    // Burn infected army with all of it's children
+    totalChildren = (await army.childrenOf(infectedSoldiersArmyId)).length;
+    tx = await army['burn(uint256,uint256)'](infectedSoldiersArmyId, totalChildren); // If there are more children to burn, the function would revert to prevent from burning new arrivals.
+    await tx.wait();
+    console.log(`Burned Army #${infectedSoldiersArmyId} with all of it's children`);
+    ```
+    </Tabs.Tab>
+</Tabs>
+
+{/* TODO: Mermaid graph */}
+
+### Preventing future diseases - Remove auto accepting
+
+The wise wizard realized that other soldiers with any kind of illness could arrive to any of the armies and infect them. So he decided to stop accepting directly every new soldier. He did so by removing the auto acceptance from the armies.
+
+On your `run-journey.ts` script, let's add the code to remove the auto acceptance of soldiers into the armies.
+
+<Tabs items={['Remix', 'Hardhat' ]}> 
+    <Tabs.Tab>
+    ```typescript copy
+    // 7. Remove auto accepting
+    tx = await army.connect(wizard).setAutoAcceptCollection(soldier.address, false)
+    await tx.wait()
+    console.log('Armies will no longer auto-accept soldiers')
+    ```
+    </Tabs.Tab>
+    <Tabs.Tab>
+    ```typescript copy
+    // 7. Remove auto accepting
+    tx = await army.setAutoAcceptCollection(await soldier.getAddress(), false);
+    await tx.wait();
+    console.log('Armies will no longer auto-accept soldiers');
+    ```
+    </Tabs.Tab>
+</Tabs>
+
+### Running the journey
+
+We can now run the full journey:
+
+<Tabs items={['Remix', 'Hardhat' ]}>
+    <Tabs.Tab>
+    From the _File Explorer_, right click on the script and hit _Run_. You will be asked to signed several transactions (a total of 21, don't worry it takes just a couple of minutes). On each step you will see the console log of what has been executed. The final output should be the following:
+
+    ```bash
+    Running journey with account: 0x855dF0303Fec3a56c02fE35d8fb4d5e80A8c79A0
+    Using Kingdom deployed at 0x410EeA6EF48bA0f54F925BC01665D732203E57Ad
+    Using Army deployed at 0x6dE36644b5B73106c99C43a2669ae93b5d37b677
+    Using Soldier deployed at 0xE7dBc708fC483882c88bb0f86628f90Ef6A06117
+    Minted Kingdom #1
+    Minted Kingdom #2
+    Kingdoms will now auto-accept armies
+    Minted 3 armies for Kingdom #1
+    Minted 2 armies for Kingdom #2
+    Armies will now auto-accept soldiers
+    Minted 10 soldiers for Army #1
+    Minted 20 soldiers for Army #2
+    Minted 30 soldiers for Army #3
+    Minted 14 soldiers for Army #4
+    Minted 16 soldiers for Army #5
+    Moved child #60 at position 29 from Army #3 to Army #1
+    Moved child #59 at position 28 from Army #3 to Army #1
+    Moved child #58 at position 27 from Army #3 to Army #1
+    Moved child #57 at position 26 from Army #3 to Army #1
+    Moved child #56 at position 25 from Army #3 to Army #1
+    Moved child #90 at position 15 from Army #5 to wizard
+    Burned soldier #90
+    Moved Army #5 from Kingdom #2 to wizard
+    Burned Army #5 with all of it's children
+    Armies will no longer auto-accept soldiers
+    ```
+    </Tabs.Tab>
+    <Tabs.Tab>
+    You can now run the journey. First give it a try using local hardhat network, then run it on the testing network you are using.
+    ```bash copy
+    // If you don't specify a network it will use the local hardhat network:
+    yarn hardhat run scripts/run-journey.ts
+    // Or you can specify the network:
+    yarn hardhat run scripts/run-journey.ts --network polygonMumbai
+    ```
+
+    You should see the following output (except for the addresses):
+    ```bash
+    Running kingdom journey on polygonMumbai blockchain...
+    Running journey with account: 0x855dF0303Fec3a56c02fE35d8fb4d5e80A8c79A0
+    Using Kingdom deployed at 0x1199844a6d09240cbaEb0fd0Ba64Fb089cd23Ae2
+    Using Army deployed at 0x2504e3Dba8094B03eA4AD92fd50cCfdf4D2F9043
+    Using Soldier deployed at 0x3FaA4C4824790a48c67888cc54FfE5b3C729f870
+    Minted Kingdom #1
+    Minted Kingdom #2
+    Kingdoms will now auto-accept armies
+    Minted 3 armies for Kingdom #1
+    Minted 2 armies for Kingdom #2
+    Armies will now auto-accept soldiers
+    Minted 10 soldiers for Army #1
+    Minted 20 soldiers for Army #2
+    Minted 30 soldiers for Army #3
+    Minted 14 soldiers for Army #4
+    Minted 16 soldiers for Army #5
+    Moved child #60 at position 29 from Army #3 to Army #1
+    Moved child #59 at position 28 from Army #3 to Army #1
+    Moved child #58 at position 27 from Army #3 to Army #1
+    Moved child #57 at position 26 from Army #3 to Army #1
+    Moved child #56 at position 25 from Army #3 to Army #1
+    Moved child #90 at position 15 from Army #5 to wizard
+    Burned soldier #90
+    Moved Army #5 from Kingdom #2 to wizard
+    Burned Army #5 with all of it's children
+    Done in 4.39s.
+    ```
+
+    <Callout type="info">
+    All the code is available at [RMRK's examples repository](https://github.com/rmrk-team/rmrk-examples/tree/master/contract-examples/multiasset-cookbook) on Github. The collections are visible on singular: [Kingdoms](https://dev.singular.rmrk.app/collectibles/maticmum/0x1199844a6d09240cbaeb0fd0ba64fb089cd23ae2), [Armies](https://dev.singular.rmrk.app/collectibles/maticmum/0x2504e3dba8094b03ea4ad92fd50ccfdf4d2f9043) and [Soldiers](https://dev.singular.rmrk.app/collectibles/maticmum/0x3faa4c4824790a48c67888cc54ffe5b3c729f870), 
+    </Callout>
+    </Tabs.Tab>
+</Tabs>
+
+</Steps>
+
+## User journey summary
+
+In this tutorial we have learned how to interact with the Nestable implementation in order to:
+
+- Create multi-level hierarchies using the kingdoms and their composition.
+- Transfer NFTs between different parts of the hierarchy and also how to remove them (soldiers movements between the first and the third army);
+- Burn NFTs at the lowest level of a hierarchy (the first soldier affected by the Black Death) and entire sub-hierarchies (like the second army after the infection).
+
+
+
+## Bugs, doubts and help
+
+For clarifications, bug reporting or help please open a Github issue or write a message here:
+- **Telegram**: https://t.me/rmrkimpl

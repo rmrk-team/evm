@@ -1,0 +1,509 @@
+import { Tabs, Callout } from 'nextra/components';
+
+# Metadata
+
+In order for your NFTs to render correctly, you need to set the proper metadata for them. There are different types of metadata: Collection, Token, Asset and Catalog. You can find the definition and an example for each of them in the metadata tab of the wizard.
+
+RMRK Metadata standard extends Opensea's Metadata standard, adding few additional fields for convenience, however we still recommend to add all the Opensea's metadata fields to ensure backward compatibility with any marketplaces that don't yet support RMRK's metadata standard. For the sake of simplicity, this document doesn't list all the Opensea's metadata fields, but you can find them [here](https://docs.opensea.io/docs/metadata-standards) or check [this handy cheatsheet](https://www.pob.studio/learn/metadata-cheat-sheet).
+
+## Collection metadata
+
+This is for marketplaces, wallets and dApps in general to properly display your collection. While not a standard, we recommend you include it and expect a URI to it in all of our ready to use implementations. This way, the information about your collection is kept in a decentralized manner.
+
+<Tabs items={['Schema', 'Minimal Example', 'Full example']}>
+  <Tabs.Tab>
+    ```json copy
+    {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "RMRK Collection Metadata Schema",
+      "description": "Metadata to describe a collection and help visualization on various platforms.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+            "description": "Name of the collection, e.g. 'Dot Leap badges'."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the collection as a whole. Markdown is supported."
+        },
+        "externalUri": {
+          "type": "string",
+          "description": "HTTP or IPFS URL for finding out more about this project. If IPFS, MUST be in the format of ipfs://HASH"
+        },
+        "mediaUri": {
+          "type": "string",
+          "description": "HTTP or IPFS URL to project's main image, in the vein of og:image. If IPFS, MUST be in the format of ipfs://HASH"
+        },
+        "thumbnailUri": {
+          "type": "string",
+          "description": "A URI to an image of the NFT for wallets and client applications to have a scaled down image to present to end-users. Recommend maximum size of 350x350px."
+        },
+        "license": {
+          "type": "string",
+          "description": "A statement about the NFT license."
+        },
+        "licenseUri": {
+          "type": "string",
+          "description": "A URI to a statement of license."
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "An array of string values, used to help marketplaces to categorize your NFT."
+        }
+      },
+      "additionalProperties": true,
+      "required": ["description", "mediaUri"]
+    }
+    ```
+    <Callout type="info" emoji="ℹ️">
+      You can validate your metadata using `jsonschema` [here](https://www.jsonschemavalidator.net/s/CvwhBQwE)
+    </Callout>
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```json copy
+    {
+      "description": "A collection of RMRK NFTs",
+      "mediaUri": "ipfs://ABC"
+    }
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```json copy
+    {
+      "name": "Dot Leap badges",
+      "description": "A collection of RMRK NFTs",
+      "mediaUri": "ipfs://ABC",
+      "externalUri": "https://rmrk.app",
+      "thumbnailUri": "ipfs://DEF",
+      "license": "MIT",
+      "licenseUri": "https://rmrk.app/license",
+      "tags": ["dotleap", "nft", "rmrk"]
+    }
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Token URI
+
+For backwards compatibility with `ERC721Metadata`, smart contracts are expected to implement a `tokenURI` method which points to a json file with the information about the token. For RMRK implementations of MultiAsset module, implementations often do the trick of using one of the token's assets as the `tokenURI`. However, this is not always doable, as a token might initially have no assets, or be composed from fixed parts defined in a catalog (in the case of 6220), which cannot be predicted before the token is minted, in this case, we recommend using a fallback which returns the same information for every token.
+
+<Tabs items={['Schema', 'Example']}>
+  <Tabs.Tab>
+    Inspired by [ERC721Metadata](https://eips.ethereum.org/EIPS/eip-721#specification) extension.
+
+    ```json copy
+    {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Token URI Schema",
+      "description": "From ERC721Metadata: A distinct Uniform Resource Identifier (URI) for a given asset.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Identifies the asset to which this NFT represents"
+        },
+        "description": {
+          "type": "string",
+          "description": "Describes the asset to which this NFT represents"
+        },
+        "image": {
+          "type": "string",
+          "description": "A URI pointing to a resource with mime type image/* representing the asset to which this NFT represents. Consider making any images at a width between 320 and 1080 pixels and aspect ratio between 1.91:1 and 4:5 inclusive."
+        },
+        "attributes": {
+          "type": "array",
+          "description": "Custom attributes about the subject or content of the asset.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "label": {
+                "type": "string",
+                "description": "Name of the attribute, e.g. 'Level'"
+              },
+              "value": {
+                "type": "string",
+                "description": "Value of the attribute, e.g. '1'"
+              },
+              "type": {
+                "type": "string",
+                "description": "Type of the attribute, e.g. 'number', 'float', 'integer', 'string', 'date', 'percentage', 'boolean'"
+              },
+              "trait_type": {
+                "type": "string",
+                "description": "For backwards compatibility with ERC721Metadata. Can be the same as label"
+              },
+              "display_type": {
+                "type": "string",
+                "description": "For backwards compatibility with ERC721Metadata. [See here for more](https://docs.opensea.io/docs/metadata-standards#attributes)"
+              }
+            },
+            "additionalProperties": true
+          }
+        }
+      },
+      "additionalProperties": true
+    }
+    ```
+    <Callout type="info" emoji="ℹ️">
+      You can validate your metadata using `jsonschema` [here](https://www.jsonschemavalidator.net/s/AdoU5rr7)
+    </Callout>
+
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```json copy
+    {
+      "name": "Spacer Admiral",
+      "description": "This Spacer Admiral is one of the highest-ranking commanders in The Spacer Fleet. It is responsible for ensuring the fleet maintains a trajectory towards its goals. Overseeing 90 Captains, the Admiral provides strategic guidance and leadership to ensure the success of the entire fleet.",
+      "externalUri": "https://spacers.app/",
+      "external_url": "https://spacers.app/",
+      "image": "ipfs://QmZsmy2a54ybyff7cVa67kEQFU9zzwQqQ7cjF7HSF97A77/prerender/2.png",
+      "mediaUri": "ipfs://QmZsmy2a54ybyff7cVa67kEQFU9zzwQqQ7cjF7HSF97A77/prerender/2.png",
+      "thumbnailUri": "ipfs://QmZsmy2a54ybyff7cVa67kEQFU9zzwQqQ7cjF7HSF97A77/prerender/2.png",
+      "license": "PERSONAL LICENSE (\"CBE-PERSONAL\")",
+      "licenseUri": "https://arweave.net/zmc1WTspIhFyVY82bwfAIcIExLFH5lUcHHUN0wXg4W8/4",
+      "attributes": [
+        {
+          "label": "Body",
+          "type": "string",
+          "value": "Subsocial",
+          "trait_type": "Body"
+        },
+        {
+          "label": "Hand",
+          "type": "string",
+          "value": "Subsocial",
+          "trait_type": "Hand"
+        },
+        {
+          "label": "Head",
+          "type": "string",
+          "value": "Subsocial",
+          "trait_type": "Head"
+        },
+        {
+          "label": "Belt",
+          "type": "string",
+          "value": "Backpack Smiley",
+          "trait_type": "Belt"
+        }
+      ]
+    }
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Asset Metadata URI
+
+To properly manage multiple assets, we have defined new fields and renamed some from the original ones expected on `tokenURI`. Since assets may be used as a response for `tokenURI`, you will notice some fields are duplicated for backwards compatibility.
+
+<Tabs items={['Schema', 'Minimal Example', 'Full example']}>
+  <Tabs.Tab>
+    ```json copy
+    {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "RMRK Asset Metadata Schema",
+      "description": "Metadata to describe an asset and help visualization on various platforms.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the asset, e.g. 'Kanaria Founder'"
+        },
+        "description": {
+          "type": "string",
+          "description": "General notes, abstracts, or summaries about the contents of the asset. Markdown is supported."
+        },
+        "externalUri": {
+          "type": "string",
+          "description": "HTTP or IPFS URL for finding out more about this project. If IPFS, MUST be in the format of ipfs://HASH"
+        },
+        "external_url": {
+          "type": "string",
+          "description": "For backwards compatibility with ERC721Metadata. A URI with additional information about the subject or content of the Asset. Can be the same as externalUri."
+        },
+        "mediaUri": {
+          "type": "string",
+          "description": "A URI to a main media file of the Asset."
+        },
+        "image": {
+          "type": "string",
+          "description": "For backwards compatibility with ERC721Metadata. A URI to a main media file of the NFT. Can be the same as mediaURI."
+        },
+        "animation_url": {
+          "type": "string",
+          "description": "For backwards compatibility with ERC721Metadata. A URL to a multi-media attachment for the asset. The file extensions GLTF, GLB, WEBM, MP4, M4V, OGV, and OGG are supported, along with the audio-only extensions MP3, WAV, and OGA."
+        },
+        "thumbnailUri": {
+          "type": "string",
+          "description": "A URI to an image of the asset for wallets and client applications to have a scaled down image to present to end-users. Recommend maximum size of 350x350px."
+        },
+        "preferThumb": {
+          "type": "boolean",
+          "description": "This flag will signal to UIs to prefer thumbnailUri instead of mediaUri wherever applicable."
+        },
+        "license": {
+          "type": "string",
+          "description": "A statement about the asset license."
+        },
+        "licenseUri": {
+          "type": "string",
+          "description": "A URI to a statement of license."
+        },
+        "attributes": {
+          "type": "array",
+          "description": "Custom attributes about the subject or content of the asset.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "label": {
+                "type": "string",
+                "description": "Name of the attribute, e.g. 'Level'"
+              },
+              "value": {
+                "type": "string",
+                "description": "Value of the attribute, e.g. '1'"
+              },
+              "type": {
+                "type": "string",
+                "description": "Type of the attribute, e.g. 'number', 'float', 'integer', 'string', 'date', 'percentage', 'boolean'"
+              },
+              "trait_type": {
+                "type": "string",
+                "description": "For backwards compatibility with ERC721Metadata. Can be the same as label"
+              },
+              "display_type": {
+                "type": "string",
+                "description": "For backwards compatibility with ERC721Metadata. [See here for more](https://docs.opensea.io/docs/metadata-standards#attributes)"
+              }
+            },
+            "additionalProperties": true
+          }
+        }
+      },
+      "additionalProperties": true,
+      "required": [
+        "description",
+        "mediaUri"
+      ]
+    }
+    ```
+    <Callout type="info" emoji="ℹ️">
+      You can validate your metadata using `jsonschema` [here](https://www.jsonschemavalidator.net/s/BHdEhpEk)
+    </Callout>
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```json copy
+    {
+      "description": "A collection of RMRK NFTs",
+      "mediaUri": "ipfs://ABC"
+    }
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```json copy
+    {
+      "name": "Kanaria Founder #1",
+      "description": "A unique Kanaria Founder",
+      "externalUri": "https://rmrk.app",
+      "external_url": "https://rmrk.app",
+      "mediaUri": "ipfs://ABC",
+      "image": "ipfs://ABC",
+      "animation_url": "ipfs://DEF",
+      "thumbnailUri": "ipfs://GHI",
+      "preferThumb": true,
+      "license": "MIT",
+      "licenseUri": "https://rmrk.app/license",
+      "attributes": [
+        {
+          "label": "Color",
+          "type": "string",
+          "value": "Red",
+          "trait_type": "Color"
+        },
+        {
+          "label": "Rarity",
+          "type": "string",
+          "value": "Uncommon",
+          "trait_type": "Rarity"
+        },
+        {
+          "label": "Generation",
+          "type": "number",
+          "value": 2,
+          "trait_type": "Generation",
+          "display_type": "number"
+        }
+      ]
+    }
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Catalog
+
+### Catalog Metadata
+
+For Composable and Equippable NFTs, we need to use a catalog Just as with collection metadata, we want to keep the information about the catalog in a decentralized manner, so the standard expects the catalog contract to implement a `getMetadataURI` method which returns a URI to a json file with the catalog metadata.
+
+<Tabs items={['Schema', 'Example']}>
+  <Tabs.Tab>
+    ```json copy
+    {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "RMRK Catalog Metadata Schema",
+      "description": "Metadata to describe a catalog and help visualization on various platforms.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the catalog, e.g. 'Kanaria Catalog'."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the catalog as a whole. Markdown is supported."
+        },
+        "type": {
+          "type": "string",
+          "description": " optional and arbitrary type to help clients with rendering instructions. We recommend following types svg, audio, mixed, video, png"
+        },
+        "externalUri": {
+          "type": "string",
+          "description": "HTTP or IPFS URL for finding out more about this project. If IPFS, MUST be in the format of ipfs://HASH"
+        },
+        "mediaUri": {
+          "type": "string",
+          "description": "HTTP or IPFS URL to catalog's main image, in the vein of og:image. If IPFS, MUST be in the format of ipfs://ipfs/HASH"
+        },
+        "thumbnailUri": {
+          "type": "string",
+          "description": "A URI to an image of the NFT for wallets and client applications to have a scaled down image to present to end-users. Recommend maximum size of 350x350px."
+        },
+        "license": {
+          "type": "string",
+          "description": "A statement about the NFT license."
+        },
+        "licenseUri": {
+          "type": "string",
+          "description": "A URI to a statement of license."
+        }
+      },
+      "additionalProperties": true,
+      "required": [
+        "name"
+      ]
+    }
+    ```
+    <Callout type="info" emoji="ℹ️">
+      You can validate your metadata using `jsonschema` [here](https://www.jsonschemavalidator.net/s/E13QFuk3)
+    </Callout>
+
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```json copy
+    {
+      "name": "Kanaria Catalog",
+      "description": "A catalog of Kanaria NFTs",
+      "type": "svg",
+      "externalUri": "https://rmrk.app",
+      "mediaUri": "ipfs://ABC",
+      "thumbnailUri": "ipfs://DEF",
+      "license": "MIT",
+      "licenseUri": "https://rmrk.app/license"
+    }
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+### Slot Parts Metadata
+
+We need the metadata for each slot, since the contract only stores the slot ID. You can include additional information here, but the only thing required is the name, except for parts of of type `slot` where fallback media is required, which is displayed when nothing is equipped in the slot.
+
+<Tabs items={['Schema', 'Example']}>
+  <Tabs.Tab>
+    ```json copy
+    {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "RMRK Slot Metadata Schema",
+      "description": "Metadata to describe a slot in a catalog and help visualization on various platforms.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the slot.",
+        },
+        "mediaUri": {
+          "type": "string",
+          "description": "Fallback image to display when nothing is equipped in the slot. If IPFS, MUST be in the format of ipfs://HASH",
+        }
+      },
+      "additionalProperties": true,
+      "required": [
+        "name"
+      ]
+    }
+    ```
+
+    <Callout type="info" emoji="ℹ️">
+      You can validate your metadata using `jsonschema` [here](https://www.jsonschemavalidator.net/s/L5aNXaEC)
+    </Callout>
+
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```json copy
+    {
+      "name": "Left hand weapon",
+      "mediaUri": "ipfs://ABC"
+    }
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+
+### Fixed Parts Metadata
+
+We need the metadata for each fixed part, since the contract only stores the part ID. You can include additional information here, but the only thing required is the name and the media URI.
+
+<Tabs items={['Schema', 'Example']}>
+  <Tabs.Tab>
+    ```json copy
+    {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "RMRK Fixed Metadata Schema",
+      "description": "Metadata to describe a fixed part in a catalog and help visualization on various platforms.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the slot.",
+        },
+        "mediaUri": {
+          "type": "string",
+          "description": "Image to display. MUST be in the format of ipfs://HASH",
+        }
+      },
+      "additionalProperties": true,
+      "required": [
+        "name",
+        "mediaUri"
+      ]
+    }
+    ```
+
+    <Callout type="info" emoji="ℹ️">
+      You can validate your metadata using `jsonschema` [here](https://www.jsonschemavalidator.net/s/L5aNXaEC)
+    </Callout>
+
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```json copy
+    {
+      "name": "Head type 1",
+      "mediaUri": "ipfs://ABC"
+    }
+    ```
+  </Tabs.Tab>
+</Tabs>

@@ -1,0 +1,792 @@
+import { Steps, Callout } from 'nextra/components'
+
+# Equippable & Composable Journey ( Part 2, Configuration & Minting )
+
+#### User journey context
+
+Chunkies are mystical creatures with 3 attributes which can have different color variations: Head, Body and Hands. For our test case, each variation may come in 4 different colors. Chunkies are also able to equip items in both of their hands.
+
+For the combination of attributes we will be using Fixed parts, these must be defined in the catalog and every chunky asset will pick one of each. This is in a nutshell what composable NFTs are about: You define a set of possible fixed parts on the catalog and you can compose assets from it.
+
+To have the chunkies be able to equip items, we will use the equippable feature. The slot parts in this case, must also be defined in the catalog and the chunky asset must also point at them. The collections which can be equipped into such slot must be configured, and the equippable groups assigned to the items assets also need to point at the slot they can be equipped into. It sounds like a lot, but it ensures that only compatible assets can be equipped into each other.
+
+<Steps>
+
+### Configuring Catalog
+
+The fixed parts and slot parts must be defined in the catalog. The fixed parts are the attributes of the chunky: head, body and hands. The slot parts are the slots where the chunky can equip items: left hand and right hand.
+
+On our `scripts/deploy-methods.ts` file, let's import the constants and the type for the catalog. Imports will now look lke this:
+
+```typescript copy
+import { ethers, run, network } from 'hardhat';
+import {
+  Chunkies,
+  ChunkyItems,
+  RMRKCatalogImpl,
+  RMRKBulkWriter,
+  RMRKCatalogUtils,
+  RMRKCollectionUtils,
+  RMRKEquipRenderUtils,
+  RMRKRoyaltiesSplitter,
+} from '../typechain-types';
+import { getRegistry } from './get-gegistry';
+import { delay, isHardhatNetwork } from './utils';
+import * as C from './constants';
+```
+
+<Callout type="info">
+    `RMRKCatalogImpl` is our ready to use implementation of the catalog, in most cases you do not need any customization so we can use it as it is. Typechain is aware of it since we conveniently import it together with utilities inside the `MockRMRKRegistry.sol` file.
+</Callout>
+
+Next we will define a method to configure the catalog, where we will simply add all parts to it. We will be adding 2 slot parts and 9 fixed parts: 3 heads, 3 bodies and 3 hands. For each of them we will use the ID we defined in the constants file, a good practice is to have a big gap between the IDs of the fixed parts and the slot parts to avoid confusions, so we start the slot parts at 1000. For each part we need to set the type, be it Slot (1) or Fixed (2), the z-index (which is the order in which they will be rendered) and the metadata URI of the part. For slot parts the contract address of equippable items also needs to be added.
+
+<Callout type="info">
+    The contents of the metadata for slot parts simply need the name of the slot, while fixed parts also need the mediaURI pointing to the media file to be used to render any asset that includes it, both can have additional data. See [Fixed Parts](../../metadata#fixed-parts-metadata) and [Slot Parts](../../metadata#slot-parts-metadata) Metadata for more information.
+</Callout>
+
+You can use the metadata we provide. The contents are included in the [github project](https://github.com/rmrk-team/rmrk-examples/tree/master/contract-examples/chunkies). The method will look like this:
+
+```typescript copy
+export async function configureCatalog(catalog: RMRKCatalogImpl, itemsAddress: string) {
+  let tx = await catalog.addPartList([
+    {
+      partId: C.CHUNKY_LEFT_HAND_SLOT_PART_ID,
+      part: {
+        itemType: C.PART_TYPE_SLOT,
+        z: C.Z_INDEX_HAND_ITEMS,
+        equippable: [itemsAddress],
+        metadataURI: `${C.BASE_IPFS_URI}/catalog/slots/left_hand.json`,
+      },
+    },
+    {
+      partId: C.CHUNKY_RIGHT_HAND_SLOT_PART_ID,
+      part: {
+        itemType: C.PART_TYPE_SLOT,
+        z: C.Z_INDEX_HAND_ITEMS,
+        equippable: [itemsAddress],
+        metadataURI: `${C.BASE_IPFS_URI}/catalog/slots/right_hand.json`,
+      },
+    },
+    {
+      partId: C.CHUNKY_V1_HEAD_FIXED_PART_ID,
+      part: {
+        itemType: C.PART_TYPE_FIXED,
+        z: C.Z_INDEX_HEAD,
+        equippable: [],
+        metadataURI: `${C.BASE_IPFS_URI}/catalog/fixed/v1/head.json`,
+      },
+    },
+    {
+      partId: C.CHUNKY_V1_BODY_FIXED_PART_ID,
+      part: {
+        itemType: C.PART_TYPE_FIXED,
+        z: C.Z_INDEX_BODY,
+        equippable: [],
+        metadataURI: `${C.BASE_IPFS_URI}/catalog/fixed/v1/body.json`,
+      },
+    },
+    {
+      partId: C.CHUNKY_V1_HANDS_FIXED_PART_ID,
+      part: {
+        itemType: C.PART_TYPE_FIXED,
+        z: C.Z_INDEX_HANDS,
+        equippable: [],
+        metadataURI: `${C.BASE_IPFS_URI}/catalog/fixed/v1/hand.json`,
+      },
+    },
+    {
+      partId: C.CHUNKY_V2_HEAD_FIXED_PART_ID,
+      part: {
+        itemType: C.PART_TYPE_FIXED,
+        z: C.Z_INDEX_HEAD,
+        equippable: [],
+        metadataURI: `${C.BASE_IPFS_URI}/catalog/fixed/v2/head.json`,
+      },
+    },
+    {
+      partId: C.CHUNKY_V2_BODY_FIXED_PART_ID,
+      part: {
+        itemType: C.PART_TYPE_FIXED,
+        z: C.Z_INDEX_BODY,
+        equippable: [],
+        metadataURI: `${C.BASE_IPFS_URI}/catalog/fixed/v2/body.json`,
+      },
+    },
+    {
+      partId: C.CHUNKY_V2_HANDS_FIXED_PART_ID,
+      part: {
+        itemType: C.PART_TYPE_FIXED,
+        z: C.Z_INDEX_HANDS,
+        equippable: [],
+        metadataURI: `${C.BASE_IPFS_URI}/catalog/fixed/v2/hand.json`,
+      },
+    },
+    {
+      partId: C.CHUNKY_V3_HEAD_FIXED_PART_ID,
+      part: {
+        itemType: C.PART_TYPE_FIXED,
+        z: C.Z_INDEX_HEAD,
+        equippable: [],
+        metadataURI: `${C.BASE_IPFS_URI}/catalog/fixed/v3/head.json`,
+      },
+    },
+    {
+      partId: C.CHUNKY_V3_BODY_FIXED_PART_ID,
+      part: {
+        itemType: C.PART_TYPE_FIXED,
+        z: C.Z_INDEX_BODY,
+        equippable: [],
+        metadataURI: `${C.BASE_IPFS_URI}/catalog/fixed/v3/body.json`,
+      },
+    },
+    {
+      partId: C.CHUNKY_V3_HANDS_FIXED_PART_ID,
+      part: {
+        itemType: C.PART_TYPE_FIXED,
+        z: C.Z_INDEX_HANDS,
+        equippable: [],
+        metadataURI: `${C.BASE_IPFS_URI}/catalog/fixed/v3/hand.json`,
+      },
+    },
+    {
+      partId: C.CHUNKY_V4_HEAD_FIXED_PART_ID,
+      part: {
+        itemType: C.PART_TYPE_FIXED,
+        z: C.Z_INDEX_HEAD,
+        equippable: [],
+        metadataURI: `${C.BASE_IPFS_URI}/catalog/fixed/v4/head.json`,
+      },
+    },
+    {
+      partId: C.CHUNKY_V4_BODY_FIXED_PART_ID,
+      part: {
+        itemType: C.PART_TYPE_FIXED,
+        z: C.Z_INDEX_BODY,
+        equippable: [],
+        metadataURI: `${C.BASE_IPFS_URI}/catalog/fixed/v4/body.json`,
+      },
+    },
+    {
+      partId: C.CHUNKY_V4_HANDS_FIXED_PART_ID,
+      part: {
+        itemType: C.PART_TYPE_FIXED,
+        z: C.Z_INDEX_HANDS,
+        equippable: [],
+        metadataURI: `${C.BASE_IPFS_URI}/catalog/fixed/v4/hand.json`,
+      },
+    },
+  ]);
+  await tx.wait();
+}
+```
+
+### Minting Chunkies
+
+Now we will mint chunkies and add assets with those fixed and slot parts.
+
+First let's see the typical way to do it in 3-4 steps.
+1. Add the equippable asset entry
+2. Mint the chunky
+3. Add the asset to the token
+4. Accept the asset. This is not necessary if using one of the ready to use implementations since they automatically accept the first asset added to a token.
+
+<Callout>
+    Equippable Group Id. This value is only important when the asset is meant to be equipped into another one. For chunkies we could simply set it to zero, but we give the same value to every asset in case we later want to allow chunkies to be equipped into some other collection.
+</Callout>
+
+```typescript copy
+let tx = await chunkies.addEquippableAssetEntry(
+    C.EQUIPPABLE_GROUP_FOR_CHUNKIES_DEFAULT, // Equippable group
+    catalogAddress, // Catalog address
+    `${C.BASE_IPFS_URI}/chunkies/full/1.json`, // Metadata URI, we are using the same as tokenURI. We could also use a fallback one for all.
+    [
+      // Fixed and slots part ids:
+      C.CHUNKY_V1_HEAD_FIXED_PART_ID,
+      C.CHUNKY_V1_BODY_FIXED_PART_ID,
+      C.CHUNKY_V1_HANDS_FIXED_PART_ID,
+      C.CHUNKY_LEFT_HAND_SLOT_PART_ID,
+      C.CHUNKY_RIGHT_HAND_SLOT_PART_ID,
+    ],
+);
+await tx.wait();
+// WARNING: If any asset is added in between, this no longer matches the id of the newly added asset, you can listen to the AssetAdded event and get the assetId from, there.
+const newAssetId = await chunkies.totalAssets();
+tx = await chunkies.mint(mintTo.address, 1, `${C.BASE_IPFS_URI}/chunkies/full/1.json`);
+await tx.wait();
+// WARNING: If any token is burnt or minted this no longer matches the id of the newly minted token, you can listen to the Transfer event and get the tokenId from, there.
+const newTokenId = await chunkies.totalSupply();
+tx = await chunkies.addAssetToToken(newTokenId, newAssetId, 0);
+await tx.wait();
+```
+
+This will work, but it is a bit cumbersome to do 3 calls for each chunky and to make it work properly we'd need to listen to events. Since we haven't deployed our contract we can add a custom method to do this 3 operations in a single call. Let's go to `contracts/Chunkies.sol` and add the following method:
+
+```solidity copy
+    function mintWithEquippableAsset(
+        address to,
+        string memory tokenURI,
+        uint64 equippableGroupId,
+        address catalogAddress,
+        string memory metadataURI,
+        uint64[] memory partIds
+    ) public onlyOwner {
+        uint256 tokenId = mint(to, 1, tokenURI);
+        uint256 assetId = addEquippableAssetEntry(equippableGroupId, catalogAddress, metadataURI, partIds);
+        addAssetToToken(tokenId, uint64(assetId), 0);
+        // This implementation auto accepts first asset, if it weren't the case we could do:
+        // _acceptAsset(tokenId, 0, uint64(assetId)); // This is an internal call which bypasses accepting by owner. Recommended only during minting.
+    }
+```
+
+That's it, compile the contract so typechain gets the updated ABI.
+
+```bash copy
+pnpm compile
+```
+
+Now let's create our method to mint chunkies on `scripts/deploy-methods.ts`:
+
+
+```typescript copy
+export async function mintChunkies(chunkies: Chunkies, catalogAddress: string, mintTo: string) {
+  let tx = await chunkies.mintWithEquippableAsset(
+    mintTo,
+    `${C.BASE_IPFS_URI}/chunkies/full/1.json`, // TokenURI
+    C.EQUIPPABLE_GROUP_FOR_CHUNKIES_DEFAULT, // Equippable group
+    catalogAddress, // Catalog address
+    `${C.BASE_IPFS_URI}/chunkies/full/1.json`, // Metadata URI, we are using the same as tokenURI. We could use a fallback one for all.
+    [
+      // Fixed and slots part ids:
+      C.CHUNKY_V1_HEAD_FIXED_PART_ID,
+      C.CHUNKY_V1_BODY_FIXED_PART_ID,
+      C.CHUNKY_V1_HANDS_FIXED_PART_ID,
+      C.CHUNKY_LEFT_HAND_SLOT_PART_ID,
+      C.CHUNKY_RIGHT_HAND_SLOT_PART_ID,
+    ],
+  );
+  await tx.wait();
+  tx = await chunkies.mintWithEquippableAsset(
+    mintTo, // To
+    `${C.BASE_IPFS_URI}/chunkies/full/2.json`, // TokenURI
+    C.EQUIPPABLE_GROUP_FOR_CHUNKIES_DEFAULT, // Equippable group
+    catalogAddress, // Catalog address
+    `${C.BASE_IPFS_URI}/chunkies/full/2.json`, // Metadata URI, we are using the same as tokenURI. We could use a fallback one for all.
+    [
+      // Fixed and slots part ids:
+      C.CHUNKY_V2_HEAD_FIXED_PART_ID,
+      C.CHUNKY_V2_BODY_FIXED_PART_ID,
+      C.CHUNKY_V2_HANDS_FIXED_PART_ID,
+      C.CHUNKY_LEFT_HAND_SLOT_PART_ID,
+      C.CHUNKY_RIGHT_HAND_SLOT_PART_ID,
+    ],
+  );
+  await tx.wait();
+  tx = await chunkies.mintWithEquippableAsset(
+    mintTo, // To
+    `${C.BASE_IPFS_URI}/chunkies/full/3.json`, // TokenURI
+    C.EQUIPPABLE_GROUP_FOR_CHUNKIES_DEFAULT, // Equippable group
+    catalogAddress, // Catalog address
+    `${C.BASE_IPFS_URI}/chunkies/full/3.json`, // Metadata URI, we are using the same as tokenURI. We could use a fallback one for all.
+    [
+      // Fixed and slots part ids:
+      C.CHUNKY_V3_HEAD_FIXED_PART_ID,
+      C.CHUNKY_V3_BODY_FIXED_PART_ID,
+      C.CHUNKY_V3_HANDS_FIXED_PART_ID,
+      C.CHUNKY_LEFT_HAND_SLOT_PART_ID,
+      C.CHUNKY_RIGHT_HAND_SLOT_PART_ID,
+    ],
+  );
+  await tx.wait();
+  tx = await chunkies.mintWithEquippableAsset(
+    mintTo, // To
+    `${C.BASE_IPFS_URI}/chunkies/full/4.json`, // TokenURI
+    C.EQUIPPABLE_GROUP_FOR_CHUNKIES_DEFAULT, // Equippable group
+    catalogAddress, // Catalog address
+    `${C.BASE_IPFS_URI}/chunkies/full/4.json`, // Metadata URI, we are using the same as tokenURI. We could use a fallback one for all.
+    [
+      // Fixed and slots part ids:
+      C.CHUNKY_V4_HEAD_FIXED_PART_ID,
+      C.CHUNKY_V3_BODY_FIXED_PART_ID,
+      C.CHUNKY_V3_HANDS_FIXED_PART_ID,
+      C.CHUNKY_LEFT_HAND_SLOT_PART_ID,
+      C.CHUNKY_RIGHT_HAND_SLOT_PART_ID,
+    ],
+  );
+  await tx.wait();
+  tx = await chunkies.mintWithEquippableAsset(
+    mintTo, // To
+    `${C.BASE_IPFS_URI}/chunkies/full/5.json`, // TokenURI
+    C.EQUIPPABLE_GROUP_FOR_CHUNKIES_DEFAULT, // Equippable group
+    catalogAddress, // Catalog address
+    `${C.BASE_IPFS_URI}/chunkies/full/5.json`, // Metadata URI, we are using the same as tokenURI. We could use a fallback one for all.
+    [
+      // Fixed and slots part ids:
+      C.CHUNKY_V3_HEAD_FIXED_PART_ID,
+      C.CHUNKY_V4_BODY_FIXED_PART_ID,
+      C.CHUNKY_V4_HANDS_FIXED_PART_ID,
+      C.CHUNKY_LEFT_HAND_SLOT_PART_ID,
+      C.CHUNKY_RIGHT_HAND_SLOT_PART_ID,
+    ],
+  );
+  await tx.wait();
+}
+```
+
+### Adding Item Assets
+
+Each Chunky was unique, so we wanted to add a new asset for each one. In practice, you might want to keep track of the asset id for each combination of head, body and hands to reuse those assets, but it is beyond the purpose of this tutorial. For Items on the other hand, we will reuse assets constantly, so we will add them in a separate step.
+
+We will have 4 items in this tutorial: Bone, Flag, Pencil and Spear. For each of them, we will have versions to be equipped on left and right hand, so that makes a total of 8 assets. We can mint any number of NFTs and reuse the pair of assets for the item.
+
+The common way we might do this is by doing 2 calls to add equippable asset entries:
+
+```typescript copy
+  let tx = await items.addEquippableAssetEntry(
+    C.EQUIPPABLE_GROUP_FOR_ITEMS_LEFT_HAND, // Equippable group
+    ethers.ZeroAddress, // Catalog address
+    `${C.BASE_IPFS_URI}/items/bone/left.json`, // Metadata URI
+    [], // Part ids, none since this is not meant to receive any equippable and it is not composed
+  );
+  await tx.wait();
+  tx = await items.addEquippableAssetEntry(
+    C.EQUIPPABLE_GROUP_FOR_ITEMS_RIGHT_HAND, // Equippable group
+    ethers.ZeroAddress, // Catalog address
+    `${C.BASE_IPFS_URI}/items/bone/right.json`, // Metadata URI
+    [], // Part ids, none since this is not meant to receive any equippable and it is not composed
+  );
+  await tx.wait();
+```
+
+This is fine, but we can make it easier by adding a custom method. We know for each type of item we will need 2 assets and that catalog and part ids are not needed since these assets are not composed. Let's go to `contracts/ChunkyItems.sol` and add the following method:
+
+```solidity copy
+    function addHandItemAssets(
+        uint64 slotForLeftHand,
+        uint64 slotForRightHand,
+        string memory assetForLeftHand,
+        string memory assetForRightHand
+    ) public {
+        addEquippableAssetEntry(slotForLeftHand, address(0), assetForLeftHand, new uint64[](0));
+        addEquippableAssetEntry(slotForRightHand, address(0), assetForRightHand, new uint64[](0));
+    }
+```
+
+That's it, we'll have an easier time on scripts. Compile the contract so typechain gets the updated ABI.
+
+```bash copy
+pnpm compile
+```
+Now let's create our method to mint chunkies on `scripts/deploy-methods.ts`. Besides adding all the necessary assets, we will configure that items with equippable group for right hand can be equipped into the right hand slot on Chunkies. We do the same for the left hand. This is necessary to show the intention of groups of assets to be equipped into specific collection and slots. This is the reason we have equippable group ids, so we don't need to do it for each asset.
+
+```typescript copy
+export async function addItemAssets(items: ChunkyItems, chunkiesAddress: string) {
+  let tx = await items.addHandItemAssets(
+    C.EQUIPPABLE_GROUP_FOR_ITEMS_LEFT_HAND,
+    C.EQUIPPABLE_GROUP_FOR_ITEMS_RIGHT_HAND,
+    `${C.BASE_IPFS_URI}/items/bone/left.json`, // Asset for left hand
+    `${C.BASE_IPFS_URI}/items/bone/right.json`, // Asset for right hand
+  );
+
+  tx = await items.addHandItemAssets(
+    C.EQUIPPABLE_GROUP_FOR_ITEMS_LEFT_HAND,
+    C.EQUIPPABLE_GROUP_FOR_ITEMS_RIGHT_HAND,
+    `${C.BASE_IPFS_URI}/items/flag/left.json`, // Asset for left hand
+    `${C.BASE_IPFS_URI}/items/flag/right.json`, // Asset for right hand
+  );
+  await tx.wait();
+  tx = await items.addHandItemAssets(
+    C.EQUIPPABLE_GROUP_FOR_ITEMS_LEFT_HAND,
+    C.EQUIPPABLE_GROUP_FOR_ITEMS_RIGHT_HAND,
+    `${C.BASE_IPFS_URI}/items/pencil/left.json`, // Asset for left hand
+    `${C.BASE_IPFS_URI}/items/pencil/right.json`, // Asset for right hand
+  );
+  await tx.wait();
+  tx = await items.addHandItemAssets(
+    C.EQUIPPABLE_GROUP_FOR_ITEMS_LEFT_HAND,
+    C.EQUIPPABLE_GROUP_FOR_ITEMS_RIGHT_HAND,
+    `${C.BASE_IPFS_URI}/items/spear/left.json`, // Asset for left hand
+    `${C.BASE_IPFS_URI}/items/spear/right.json`, // Asset for right hand
+  );
+  await tx.wait();
+
+  // WARNING: This is necessary to show the intention of groups of assets to be equipped into specific collection and slots. This is the reason we have equippable group ids.
+  await items.setValidParentForEquippableGroup(
+    C.EQUIPPABLE_GROUP_FOR_ITEMS_LEFT_HAND,
+    chunkiesAddress,
+    C.CHUNKY_LEFT_HAND_SLOT_PART_ID,
+  );
+  await items.setValidParentForEquippableGroup(
+    C.EQUIPPABLE_GROUP_FOR_ITEMS_RIGHT_HAND,
+    chunkiesAddress,
+    C.CHUNKY_RIGHT_HAND_SLOT_PART_ID,
+  );
+}
+```
+
+### Minting Items
+
+In order to mint assets, we once again have the chance to do multiple operations in a single call. We need to:
+1. Mint Item NFT to ourselves.
+2. Add asset for right hand to the token.
+3. Add asset for left hand to the token.
+4. Nest transfer the NFT to the Chunky.
+
+We first mint to ourselves so we can add and accept both assets. Our ready to use implementation also auto accepts assets when the NFT owner is the same account adding the asset. The alternative would be to Nest Mint first, then add both assets, then accept the second asset, but might not be able to do that if the owner of the destination chunky is not in our control, so let's try the first way:
+
+```typescript copy
+let tx = await items.mint(deployer.address, 1, `${C.BASE_IPFS_URI}/items/bone/left.json`);
+await tx.wait();
+const newTokenId = await items.totalSupply();
+tx = await items.addAssetToToken(newTokenId, boneLeftAssetId, 0);
+await tx.wait();
+tx = await items.addAssetToToken(newTokenId, boneRightAssetId, 0);
+await tx.wait();
+tx = await items.nestTransferFrom(
+    await deployer.getAddress(),
+    chunkiesAddress,
+    newTokenId,
+    1, // Destination Chunky Id
+    ethers.ZeroHash,
+);
+await tx.wait();
+```
+
+This works, but let's see how to make it a single step by going to `contracts/ChunkyItems.sol` and adding the following method which does all the operations.
+
+```solidity copy
+    function nestMintWithAssets(
+        address to,
+        uint256 destinationId,
+        string memory tokenURI,
+        uint64[] memory assetIds
+    ) public virtual onlyOwnerOrContributor returns (uint256) {
+        uint256 tokenId = nestMint(to, 1, destinationId, tokenURI);
+        uint256 length = assetIds.length;
+        for (uint256 i = 0; i < length; i++) {
+            addAssetToToken(tokenId, assetIds[i], 0);
+            // Only first asset or assets added by token owner are auto-accepted, so we might need to accept for the rest of cases
+            if (_pendingAssets[tokenId].length != 0) {
+                _acceptAsset(tokenId, 0 , assetIds[i]);
+            }
+        }
+    }
+```
+
+Compile the contract so typechain gets the updated ABI.
+
+```bash copy
+pnpm compile
+```
+Now let's create our method to nest mint items on `scripts/deploy-methods.ts`. See the comments on the code for more details.
+
+
+```typescript copy
+export async function mintItems(items: ChunkyItems, chunkiesAddress: string) {
+  // By the order we minted assets, we can know that these are the ids. We could have custom methods to assets to names or to set the asset ids ourselves but since only the issuer can add assets, we can trust the order.
+  const boneLeftAssetId = 1;
+  const boneRightAssetId = 2;
+  const flagLeftAssetId = 3;
+  const flagRightAssetId = 4;
+  const pencilLeftAssetId = 5;
+  const pencilRightAssetId = 6;
+  const spearLeftAssetId = 7;
+  const spearRightAssetId = 8;
+
+  const [deployer] = await ethers.getSigners();
+
+  // We are using left hand asset as tokenURI. This is the simplest path. Alternatively, we could have used a custom implementation which does not require tokenURI on mint, but gets it from the the asset with the highest priority or the first asset. Both options can easily be created on wizard.rmrk.app
+
+  // Sending a bone NFT to the first chunky, with 2 assets, one for each hand
+  let tx = await items.nestMintWithAssets(
+    chunkiesAddress, // To
+    1, // destinationId
+    `${C.BASE_IPFS_URI}/items/bone/left.json`, // TokenURI,
+    [boneLeftAssetId, boneRightAssetId], // Assets
+  );
+
+  // Sending a flag NFT to the second chunky, with 2 assets, one for each hand
+  tx = await items.nestMintWithAssets(
+    chunkiesAddress, // To
+    2, // destinationId
+    `${C.BASE_IPFS_URI}/items/flag/left.json`, // TokenURI,
+    [flagLeftAssetId, flagRightAssetId], // Assets
+  );
+  await tx.wait();
+  // Sending a pencil NFT to the third chunky, with 2 assets, one for each hand
+  tx = await items.nestMintWithAssets(
+    chunkiesAddress, // To
+    3, // destinationId
+    `${C.BASE_IPFS_URI}/items/pencil/left.json`, // TokenURI,
+    [pencilLeftAssetId, pencilRightAssetId], // Assets
+  );
+  await tx.wait();
+  // Sending a spear NFT to the fourth chunky, with 2 assets, one for each hand
+  tx = await items.nestMintWithAssets(
+    chunkiesAddress, // To
+    4, // destinationId
+    `${C.BASE_IPFS_URI}/items/spear/left.json`, // TokenURI,
+    [spearLeftAssetId, spearRightAssetId], // Assets
+  );
+  await tx.wait();
+  // Sending a spear NFT to the fifth chunky, with 2 assets, one for each hand
+  tx = await items.nestMintWithAssets(
+    chunkiesAddress, // To
+    5, // destinationId
+    `${C.BASE_IPFS_URI}/items/spear/left.json`, // TokenURI,
+    [spearLeftAssetId, spearRightAssetId], // Assets
+  );
+  await tx.wait();
+  // Sending a flag NFT to the first chunky, with 2 assets, one for each hand
+  tx = await items.nestMintWithAssets(
+    chunkiesAddress, // To
+    1, // destinationId
+    `${C.BASE_IPFS_URI}/items/flag/left.json`, // TokenURI,
+    [flagLeftAssetId, flagRightAssetId], // Assets
+  );
+  await tx.wait();
+}
+```
+
+### Putting it all together
+
+Let's create 2 more scripts. First one to easily get the instances deployed contracts, we will update the addresses once we deploy. We will use constants to define the addresses for our contracts in hardhat local network and in production. You may also add a testing blockchain or multiple ones if that suits your use case. Create a new file `scripts/get-deployed-contracts.ts` and add the following code:
+
+```typescript copy
+import { ethers, network } from 'hardhat';
+import { Chunkies, ChunkyItems, RMRKCatalogImpl } from '../typechain-types';
+
+const CHUNKIES_ADDRESS_HARDHAT = '';
+const CHUNKY_ITEMS_ADDRESS_HARDHAT = '';
+const CATALOG_ADDRESS_HARDHAT = '';
+
+const CHUNKIES_ADDRESS_PROD = '';
+const CHUNKY_ITEMS_ADDRESS_PROD = '';
+const CATALOG_ADDRESS_PROD = '';
+
+export default async function getDeployedContracts(): Promise<{
+  chunkies: Chunkies;
+  chunkyItems: ChunkyItems;
+  catalog: RMRKCatalogImpl;
+}> {
+  const chunkiesAddress = ['hardhat', 'localhost'].includes(network.name)
+    ? CHUNKIES_ADDRESS_HARDHAT
+    : CHUNKIES_ADDRESS_PROD;
+  const chunkiesFactory = await ethers.getContractFactory('Chunkies');
+  const chunkies = <Chunkies>chunkiesFactory.attach(chunkiesAddress);
+
+  const chunkyItemsAddress = ['hardhat', 'localhost'].includes(network.name)
+    ? CHUNKY_ITEMS_ADDRESS_HARDHAT
+    : CHUNKY_ITEMS_ADDRESS_PROD;
+  const chunkyItemsFactory = await ethers.getContractFactory('ChunkyItems');
+  const chunkyItems = <ChunkyItems>chunkyItemsFactory.attach(chunkyItemsAddress);
+
+  const catalogAddress = ['hardhat', 'localhost'].includes(network.name)
+    ? CATALOG_ADDRESS_HARDHAT
+    : CATALOG_ADDRESS_PROD;
+  const catalogFactory = await ethers.getContractFactory('RMRKCatalogImpl');
+  const catalog = <RMRKCatalogImpl>catalogFactory.attach(catalogAddress);
+
+  return {
+    chunkies,
+    chunkyItems,
+    catalog,
+  };
+}
+```
+
+Now let's create a script to configure everything and mint NFTs. We could also include the deploy here but we will keep it separate for clarity. Create a new file `scripts/run-configure-and-mint.ts` and add the following code:
+
+```typescript copy
+import { ethers } from 'hardhat';
+import getDeployedContracts from './get-deployed-contracts';
+import { configureCatalog, mintChunkies, addItemAssets, mintItems } from './deploy-methods';
+
+async function main() {
+  const { chunkies, chunkyItems, catalog } = await getDeployedContracts();
+  const [deployer] = await ethers.getSigners();
+
+  let tx = await chunkies.setAutoAcceptCollection(await chunkyItems.getAddress(), true);
+  await tx.wait();
+  console.log('Chunkies set to auto accept ChunkyItems');
+
+  await configureCatalog(catalog, await chunkyItems.getAddress());
+  console.log('Catalog configured');
+
+  await mintChunkies(chunkies, await catalog.getAddress(), deployer.address);
+  console.log(`Chunkies minted to ${deployer.address}`);
+
+  await addItemAssets(chunkyItems, await chunkies.getAddress());
+  console.log('Item assets added');
+
+  await mintItems(chunkyItems, await chunkies.getAddress());
+  console.log('Items minted into chunkies');
+}
+
+main().catch((error) => {
+  console.error(error);
+  process.exitCode = 1;
+});   
+```
+
+Notice that we are using all methods we previously defined, and additionally we are setting the chunkies to auto accept the chunky items. Before moving on to the deploy, let's open the `scripts/run-deploy-catalog.ts` file and set the `catalogMetadataUri` and `catalogType` for our catalog.
+
+We can import them from our previously created constants file, then set them on the placeholder variables.
+
+```typescript copy
+import {CHUNKY_CATALOG_METADATA, CHUNKY_CATALOG_TYPE} from './constants';
+
+...
+const catalogMetadataUri = CHUNKY_CATALOG_METADATA;
+const catalogType = CHUNKY_CATALOG_TYPE;
+...
+```
+
+We have everything ready now.
+
+### Running on hardhat blockchain
+
+We will need 2 terminals. On one of them let's run a local hardhat blockchain. You will see several accounts and private keys logged into the terminal, with a warning not to use them on any a live network.
+
+```bash copy
+pnpm hardhat node
+```
+
+On the other terminal let's first run 3 scripts to:
+1. Deploy the contracts.
+2. Deploy a catalog.
+3. Deploy utils, we will need them to render NFTs.
+
+```bash copy
+pnpm hardhat run scripts/run-deploy.ts --network localhost
+pnpm hardhat run scripts/run-deploy-catalog.ts --network localhost
+pnpm hardhat run scripts/run-deploy-utils.ts --network localhost
+```
+
+You will see a outputs similar to:
+    
+```bash
+Deploying Chunkies to localhost blockchain...
+Chunkies deployed to 0x5FbDB2315678afecb367f032d93F642f64180aa3.
+Deploying ChunkyItems to localhost blockchain...
+ChunkyItems deployed to 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512.
+...
+Deployer address: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Catalog deployed to: 0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0
+...
+Deployer address: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Bulk Writer deployed to: 0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9
+Catalog Utils deployed to: 0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9
+Collection Utils deployed to: 0x5FC8d32690cc91D4c39d9d3abcBD16989F875707
+Equip Render Utils deployed to: 0x0165878A594ca255338adfa4d48449f69242Eb8F
+```
+
+Go back to your `get-deployed-contracts.ts` script and set the addresses for Chunkies, ChunkyItems and Catalog on hardhat network. Then run the `run-configure-and-mint.ts` script. Keep at hand the addresses for utils, we will need them in the next step.
+
+```bash copy
+pnpm hardhat run scripts/run-configure-and-mint.ts --network localhost
+```
+
+You will see a similar output:
+```bash
+Chunkies set to auto accept ChunkyItems
+Catalog configured
+Chunkies minted to 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Item assets added
+Items minted into chunkies
+```
+
+Don't stop the hardhat network yet, we will need it to render the NFTs.
+
+Congratulations you have just deployed your first composable and equippable collection and minted some NFTs successfully! You can replicate the same steps on a testnet or mainnet already by setting the network instead of localhost. These networks are available in configuration files and also in Singular:
+- Testing: `moonbaseAlpha`, `sepolia`, `polygonMumbai`, `baseSepolia`
+- Production: `moonbeam`, `mainnet`, `polygon`, `base`, `astar`, `bsc`
+
+### Rendering your NFTs
+
+To render your NFTs in a test environment we will use a local hardhat network, deploy everything there and then render it with a utility available in the [RMRK's examples repo](https://github.com/rmrk-team/rmrk-examples/tree/master/react-nextjs-example) on Github. You can also use the same utility to render your NFTs on a testnet or mainnet.
+
+We already have hardhat node running and have deployed our main and utility contracts deployed. The next step is to clone the [RMRK's examples repository](https://github.com/rmrk-team/rmrk-examples), go to the `react-nextjs-example` and install dependencies.
+
+Now in the go to the configuration file at `react-nextjs-example/src/app/providers.tsx` and set the right addresses for the utility contracts we deployed earlier: `RMRKEquipRenderUtils`, `RMRKBulkWriter`, `RMRKCollectionUtils` and `RMRKCatalogUtils`.
+
+Run the utility to render the NFTs:
+
+```bash copy
+pnpm dev
+```
+
+Check the port, it might change depending on what you are running. In our case it is 3001. You will see a similar output:
+```bash
+> react-nextjs-example@0.0.0 dev /path/to/react-nextjs-example
+> next dev
+
+  ▲ Next.js 13.5.3
+  - Local:        http://localhost:3001
+
+ ✓ Ready in 2.1s
+```
+
+Once the process is running you can go to http://localhost:3001/{NETWORK}/{COLLECTION_ADDRESS}/{ID} to render your NFTs. In our case, the network is 31337 (hardhat), the collection address is `0x5FbDB2315678afecb367f032d93F642f64180aa3` and we have 5 NFTs with IDs 1 to 5. You can see the first one at:
+
+http://localhost:3001/31337/0x5FbDB2315678afecb367f032d93F642f64180aa3/1
+
+
+### Equipping your NFTs
+
+Let's do a final step to actually see the magic of equipping NFTs. Let's add a new script on our chunkies project: `scripts/run-equip.ts` and add the following code to equip 2 items into the first chunky:
+
+```typescript copy
+import * as C from './constants';
+import getDeployedContracts from './get-deployed-contracts';
+
+async function main() {
+  const { chunkies, chunkyItems } = await getDeployedContracts();
+
+  await chunkies.equip({
+    tokenId: 1,
+    childIndex: 0, // Bone is first item
+    assetId: 1, // First parent's asset
+    slotPartId: C.CHUNKY_LEFT_HAND_SLOT_PART_ID,
+    childAssetId: 1, // Bone's asset for left hand
+  });
+  await chunkies.equip({
+    tokenId: 1,
+    childIndex: 1, // Flag is second item
+    assetId: 1, // First parent's asset
+    slotPartId: C.CHUNKY_RIGHT_HAND_SLOT_PART_ID,
+    childAssetId: 4, // Flag's asset for right hand
+  });
+}
+
+main().catch((error) => {
+  console.error(error);
+  process.exitCode = 1;
+});
+```
+
+Now run the script:
+
+```bash copy
+pnpm hardhat run scripts/run-equip.ts --network localhost
+```
+
+If you refresh the renderer you will see the first chunky with a bone on the left hand and a flag on the right hand.
+
+<Callout type="warning">
+  The renderer utility works only for composable and equippable NFTs
+</Callout>
+
+
+</Steps>
+
+## User journey summary
+
+In this tutorial we learned how to create a composable and equippable collection of NFTs. We learned how to deploy the contracts, configure the catalog, mint NFTs and render them. We also learned how to equip NFTs into other NFTs.
+
+The final code for this tutorial can be found in the [RMRK's examples repository](https://github.com/rmrk-team/rmrk-examples/tree/master/contract-examples/chunkies) on Github. It additionaly includes assets, metadata and a simple unit test demonstrating a few points.
+
+## Bugs, doubts and help
+
+For clarifications, bug reporting or help please open a Github issue or write a message here:
+- **Telegram**: https://t.me/rmrkimpl

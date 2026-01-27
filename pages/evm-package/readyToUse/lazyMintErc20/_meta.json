@@ -1,0 +1,11 @@
+{
+  "InitDataERC20Pay": "Init Data ERC 2 0 Pay",
+  "RMRKEquippableLazyMintErc20": "Equippable Lazy Mint ERC 2 0",
+  "RMRKEquippableLazyMintErc20Soulbound": "Equippable Lazy Mint ERC 2 0 Soulbound",
+  "RMRKMultiAssetLazyMintErc20": "Multi Asset Lazy Mint ERC 2 0",
+  "RMRKMultiAssetLazyMintErc20Soulbound": "Multi Asset Lazy Mint ERC 2 0 Soulbound",
+  "RMRKNestableLazyMintErc20": "Nestable Lazy Mint ERC 2 0",
+  "RMRKNestableLazyMintErc20Soulbound": "Nestable Lazy Mint ERC 2 0 Soulbound",
+  "RMRKNestableMultiAssetLazyMintErc20": "Nestable Multi Asset Lazy Mint ERC 2 0",
+  "RMRKNestableMultiAssetLazyMintErc20Soulbound": "Nestable Multi Asset Lazy Mint ERC 2 0 Soulbound"
+}

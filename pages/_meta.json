@@ -1,0 +1,54 @@
+{
+  "-- getting-started": {
+    "type": "separator",
+    "title": "Getting Started"
+  },
+  "index": {
+    "title": "Welcome"
+  },
+  "use-cases": {
+    "title": "Use Cases"
+  },
+  "tutorials": "Tutorials",
+  "-- HowTo": {
+    "type": "separator",
+    "title": "How-To Guides"
+  },
+  "quick-start": "Quick-start",
+  "basic-usage": "Basic Usage",
+  "-- modules": {
+    "type": "separator",
+    "title": "RMRK Modules"
+  },
+  "modules-overview": "Overview",
+  "multiasset": "MultiAsset",
+  "nestable": "Nestable",
+  "composable-equippable": "Composable & Equippable",
+  "emotable": "Emotable",
+  "soulbound": "Soulbound",
+  "attributes": "Attributes",
+  "erc20holder": "ERC20-Holder",
+  "-- Reference": {
+    "type": "separator",
+    "title": "References"
+  },
+  "implementations": "Implementations",
+  "metadata": "Metadata",
+  "evm-package": "EVM Package",
+  "-- More": {
+    "type": "separator",
+    "title": "More"
+  },
+  "faq": "FAQ",
+  "glossary": "Glossary",
+  "dev-support": {
+    "title": "Support ↗",
+    "href": "https://t.me/rmrkimpl",
+    "newWindow": true
+  },
+  "about": {
+    "title": "About ↗",
+    "href": "https://www.rmrk.app",
+    "newWindow": true
+  }
+}

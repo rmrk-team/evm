@@ -1,0 +1,36 @@
+import { Callout } from 'nextra/components'
+import Image from 'next/image'
+
+# Composable & Equippable (ERC-6220)
+
+<Image src="/images/modules/3-Equippable.png" alt="Equippable" width={500} height={500} />
+
+
+The Composable NFTs utilizing equippable parts standard extends ERC-721 by allowing the NFTs to selectively add parts to themselves via equipping.
+
+Tokens can be composed by cherry picking the list of parts from a Catalog for each NFT instance, and are able to equip other NFTs into slots, which are also defined within the Catalog. Catalogs contain parts from which NFTs can be composed.
+
+This proposal introduces two types of parts; slot type of parts and fixed type of parts. The slot type of parts allow for other NFT collections to be equipped into them, while fixed parts are full components with their own metadata.
+
+There are two important terms when talking about ERC-6220: **composing** and **equipping**.\
+\
+**Composing** refers to the composition of a token using fixed parts. This allows tokens to be built from multiple pre-defined fixed parts from a catalog.\
+\
+**Equipping** refers to the augmentation of the token using slot parts. This allows for the modification of tokens by equipping child tokens into the slot parts from the catalog. Equipping a part into an NFT doesn't generate a new token, but rather adds another component to be rendered when retrieving the token.
+
+## Catalogs
+
+To achieve composability and equippability, we rely on Catalogs. A Catalog can be considered a _colleciton of parts_ from which an NFT can be composed. Parts can be either of the `slot` type or `fixed` type. Slots are intended for equippables.
+
+<Callout type='info'>
+    A catalog is referenced in a RMRK NFT collection by [adding equippable assets](../basic-usage/configuring-equippability#add-new-asset). Equippable assets define the catalog and the list of slot and fixed parts to be used. These assets can later be [added to tokens](../basic-usage/asset-management#adding-an-asset-to-a-token).
+</Callout>
+
+<Callout type='info' emoji='⚙️'>
+    Check implementations [here](/implementations#composable--equippable)
+</Callout>
+
+## ERC-6220: Composable NFTs utilizing Equippable Parts
+
+We published an Ethereum Improvement Proposal detailing the specification of the Equippable RMRK module. If you are interested, you can access it [here](https://eips.ethereum.org/EIPS/eip-6220).
+
