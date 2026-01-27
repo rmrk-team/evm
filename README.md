@@ -33,8 +33,6 @@ bun run docs:build
 Docs are built with Nextra/Next.js using the content in `pages/` plus the contract docs generated
 from `docs/`:
 
-- `bun run docs:import` pulls the original `evm-docs` pages/components/public assets into this repo
-  (run once, then edit locally).
 - `bun run docs:prepare` runs `hardhat dodoc`, syncs the generated contract docs into
   `pages/evm-package/`, and generates `_meta.json` navigation.
 - `bun run docs:build` runs `docs:prepare`, then `next build && next export` to emit the static site
