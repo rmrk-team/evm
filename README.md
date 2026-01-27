@@ -20,7 +20,6 @@ contract.
 
 ```shell
 bun install
-bun run docs:import
 bun run test
 bun run coverage
 bun run build:artifacts
@@ -50,12 +49,10 @@ package with `bun publish --access public` when the package version is not alrea
 
 Cloudflare Pages settings:
 
-- **Build command**: `bun run docs:build`
+- **Build command**: `bun install && bun run docs:build`
 - **Output directory**: `out`
 
-Required secrets for automation:
-
-- `NPM_TOKEN` for npm publishing
+npm publishing uses OIDC Trusted Publishing (no secrets required).
 
 ## RMRK Legos
 
