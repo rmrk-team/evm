@@ -1,0 +1,21 @@
+import { Callout } from 'nextra/components'
+import Image from 'next/image'
+
+# Soulbound (ERC-6454)
+
+<Image src="/images/modules/5-Soulbound.png" alt="Soulbound" width={500} height={500} />
+
+
+The Minimalistic Transferable interface for Non-Fungible Tokens standard extends ERC-721 by introducing the ability to identify whether an NFT can be transferred or not.
+
+This proposal introduces the ability to prevent a token from being transferred from their owner, making them bound to the externally owned account, abstracted account, smart contract or token that owns it.
+
+This is meant to be used as an extension and supports limiting transferability based on the sending and receiving address.
+
+<Callout type='info' emoji='⚙️'>
+    Check implementations [here](/implementations#soulbound)
+</Callout>
+
+## ERC-6454: Minimal Transferable NFT detection interface
+
+We published an Ethereum Improvement Proposal detailing the specification of the Soulbound RMRK extension. If you are interested, you can access it [here](https://eips.ethereum.org/EIPS/eip-6454).

@@ -1,0 +1,495 @@
+import { Tabs, Callout } from 'nextra/components'
+
+# Catalog
+
+
+
+## Writing operations
+
+1. [Adding parts](#add-parts)
+2. [Managing equippable addresses](#manage-equippable-addresses)
+    1. [Adding equippable addresses](#add-equippable-addresses)
+    2. [Setting equippable addresses](#set-equippable-addresses)
+    3. [Resetting equippable addresses](#reset-equippable-addresses)
+    4. [Setting equippable to all](#set-equippable-to-all)
+
+### Add parts
+
+Parts can be added individually or in batches. In both cases you need to use an `IntakeStruct` struct which consists of a `partId` and a nested `Part` struct. The `Part` struct consists of the following fields: `itemType`, `z`, `equippableAddresses` and `metadataURI`.
+
+* Parts can have `itemType` either `Slot` or `Fixed`. `Slots` are meant to receive equipments from child NFTs, whereas `Fixed` are used to compose the final NFT.
+* The `z` field is used to specify the z-index which the part should be rendered at. The higher the `z` value, the more in the front the part will be rendered.
+* The `equippableAddresses` field is used to specify which collections can be equipped into the part. These can be later modified using the [Manage equippable addresses](#manage-equippable-addresses) methods.
+* The `metadataURI` field is used to specify the metadata URI of the part. See [Fixed Parts](../metadata#fixed-parts-metadata) and [Slot Parts](../metadata#slot-parts-metadata) Metadata for more information.
+
+<Tabs items={['Call', 'Definition', 'Emits']}>
+    <Tabs.Tab>
+        ```typescript copy
+        const SLOT_PART_TYPE = 1;
+        const FIXED_PART_TYPE = 2;
+
+        // Single part
+        const intakeStruct = {
+            partId: 1,
+            part: {
+                itemType: SLOT_PART_TYPE,
+                z: 1,
+                equippable: ['0x...'],
+                metadataURI: 'ipfs://...'
+            }
+        }
+        await catalog.addPart(intakeStruct)
+
+        // Multiple parts
+        const partList = [
+            {
+                partId: 1,
+                part: {
+                    itemType: SLOT_PART_TYPE,
+                    z: 1,
+                    equippable: ['0x...'],
+                    metadataURI: 'ipfs://fallback'
+                }
+            },
+            {
+                partId: 2,
+                part: {
+                    itemType: FIXED_PART_TYPE,
+                    z: 2,
+                    equippable: [],
+                    metadataURI: 'ipfs://composablePart'
+                }
+            },
+            {
+                partId: 3,
+                part: {
+                    itemType: FIXED_PART_TYPE,
+                    z: 3,
+                    equippable: [],
+                    metadataURI: 'ipfs://composablePart'
+                }
+            }
+        ]
+        await catalog.addPartList(partList)
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab>
+        ```solidity
+        /**
+        * @notice The structure used to add a new `Part`.
+        * @dev The part is added with specified ID, so you have to make sure that you are using an unused `partId`,
+        *  otherwise the addition of the part vill be reverted.
+        * @dev The full `IntakeStruct` looks like this:
+        *  [
+        *          partID,
+        *      [
+        *          itemType,
+        *          z,
+        *          [
+        *               permittedCollectionAddress0,
+        *               permittedCollectionAddress1,
+        *               permittedCollectionAddress2
+        *           ],
+        *           metadataURI
+        *       ]
+        *   ]
+        * @return partId ID to be assigned to the `Part`
+        * @return part A `Part` to be added
+        */
+        struct IntakeStruct {
+            uint64 partId;
+            Part part;
+        }
+
+        /**
+        * @notice The integral structure of a standard RMRK catalog item defining it.
+        * @return itemType The item type of the part
+        * @return z The z value of the part defining how it should be rendered when presenting the full NFT
+        * @return equippable The array of addresses allowed to be equipped in this part
+        * @return metadataURI The metadata URI of the part
+        */
+        struct Part {
+            ItemType itemType; //1 byte
+            uint8 z; //1 byte
+            address[] equippable; //n Collections that can be equipped into this slot
+            string metadataURI; //n bytes 32+
+        }
+
+        /**
+        * @notice Used to add a single `Part` to storage.
+        * @param intakeStruct `IntakeStruct` struct consisting of `partId` and a nested `Part` struct
+        */
+        function addPart(
+            IntakeStruct memory intakeStruct
+        ) external;
+
+        /**
+        * @notice Used to add multiple `Part`s to storage.
+        * @param intakeStructs[] An array of `IntakeStruct` structs consisting of `partId` and a nested `Part` struct
+        */
+        function addPartList(
+            IntakeStruct[] memory intakeStructs
+        ) external;
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab>
+        ```solidity
+        /**
+        * @notice Event to announce addition of a new part.
+        * @dev It is emitted when a new part is added.
+        * @param partId ID of the part that was added
+        * @param itemType Enum value specifying whether the part is `None`, `Slot` and `Fixed`
+        * @param zIndex An uint specifying the z value of the part. It is used to specify the depth which the part should
+        *  be rendered at
+        * @param equippableAddresses An array of addresses that can equip this part
+        * @param metadataURI The metadata URI of the part
+        */
+        event AddedPart(
+            uint64 indexed partId,
+            ItemType indexed itemType,
+            uint8 zIndex,
+            address[] equippableAddresses,
+            string metadataURI
+        );
+        ```
+    </Tabs.Tab>
+</Tabs>
+
+### Manage equippable addresses
+
+There are multiple methods to manage the equippable addresses of a part. You can add, set or reset the equippable addresses of a part. You can also set a part as equippable to all.
+
+#### Add equippable addresses
+
+Used to add multiple equippable addresses. This method is additive, meaning that it will add the new addresses to the existing list of equippable addresses. It will unset the equippable to all flag, if it was set.
+
+<Tabs items={['Call', 'Definition', 'Emits']}>
+    <Tabs.Tab>
+        ```typescript copy
+        const partId = 1
+        const equippableAddresses = ['0x...']
+        await catalog.addEquippableAddresses(partId, equippableAddresses)
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab>
+        ```solidity
+        /**
+        * @notice Used to add multiple `equippableAddresses` to a single catalog entry.
+        * @dev Can only be called on `Part`s of `Slot` type.
+        * @param partId ID of the `Part` that we are adding the equippable addresses to
+        * @param equippableAddresses An array of addresses that can be equipped into the `Part` associated with the `partId`
+        */
+        function addEquippableAddresses(
+            uint64 partId,
+            address[] memory equippableAddresses
+        ) external;
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab>
+        ```solidity
+        /**
+        * @notice Event to announce new equippables to the part.
+        * @dev It is emitted when new addresses are marked as equippable for `partId`.
+        * @param partId ID of the part that had new equippable addresses added
+        * @param equippableAddresses An array of the new addresses that can equip this part
+        */
+        event AddedEquippables(
+            uint64 indexed partId,
+            address[] equippableAddresses
+        );
+        ```
+    </Tabs.Tab>
+</Tabs>
+
+#### Set equippable addresses
+
+Used to set the equippable addresses of a part. This method will overwrite the existing list of equippable addresses and unset the equippable to all flag, if it was set.
+
+<Tabs items={['Call', 'Definition', 'Emits']}>
+    <Tabs.Tab>
+        ```typescript copy
+        const partId = 1
+        const equippableAddresses = ['0x...']
+        await catalog.setEquippableAddresses(partId, equippableAddresses)
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab>
+        ```solidity
+        /**
+        * @notice Function used to set the new list of `equippableAddresses`.
+        * @dev Overwrites existing `equippableAddresses`.
+        * @dev Can only be called on `Part`s of `Slot` type.
+        * @param partId ID of the `Part`s that we are overwiting the `equippableAddresses` for
+        * @param equippableAddresses A full array of addresses that can be equipped into this `Part`
+        */
+        function setEquippableAddresses(
+            uint64 partId,
+            address[] memory equippableAddresses
+        ) external;
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab>
+        ```solidity
+        /**
+        * @notice Event to announce the overriding of equippable addresses of the part.
+        * @dev It is emitted when the existing list of addresses marked as equippable for `partId` is overwritten by a new one.
+        * @param partId ID of the part whose list of equippable addresses was overwritten
+        * @param equippableAddresses The new, full, list of addresses that can equip this part
+        */
+        event SetEquippables(uint64 indexed partId, address[] equippableAddresses);
+        ```
+    </Tabs.Tab>
+</Tabs>
+
+#### Reset equippable addresses
+
+Used to reset the equippable addresses of a part. This method will remove all of the existing equippable addresses and unset the equippable to all flag, if it was set.
+
+<Tabs items={['Call', 'Definition', 'Emits']}>
+    <Tabs.Tab>
+        ```typescript copy
+        const partId = 1
+        await catalog.resetEquippableAddresses(partId)
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab>
+        ```solidity
+        /**
+        * @notice Used to remove all of the `equippableAddresses` for a `Part` associated with the `partId`.
+        * @dev Can only be called on `Part`s of `Slot` type.
+        * @param partId ID of the part that we are clearing the `equippableAddresses` from
+        */
+        function resetEquippableAddresses(
+            uint64 partId
+        ) external;
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab>
+        ```solidity
+        /**
+        * @notice Event to announce the overriding of equippable addresses of the part.
+        * @dev It is emitted when the existing list of addresses marked as equippable for `partId` is overwritten by a new one.
+        * @param partId ID of the part whose list of equippable addresses was overwritten
+        * @param equippableAddresses The new, full, list of addresses that can equip this part
+        */
+        event SetEquippables(uint64 indexed partId, address[] equippableAddresses);
+        ```
+    </Tabs.Tab>
+</Tabs>
+
+#### Set equippable to all
+
+Used to set the equippable to all flag of a part. This method will allow any collection to be equipped into the part. The flag is reset if any of these methods is called: [Set equippable addresses](#set-equippable-addresses), [Add equippable addresses](#add-equippable-addresses), [Reset equippable addresses](#reset-equippable-addresses).
+
+<Tabs items={['Call', 'Definition', 'Emits']}>
+    <Tabs.Tab>
+        ```typescript copy
+        const partId = 1
+        await catalog.setEquippableToAll(partId)
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab>
+        ```solidity
+        /**
+        * @notice Sets the isEquippableToAll flag to true, meaning that any collection may be equipped into the `Part` with
+        *  this `partId`.
+        * @dev Can only be called on `Part`s of `Slot` type.
+        * @param partId ID of the `Part` that we are setting as equippable by any address
+        */
+        function setEquippableToAll(
+            uint64 partId
+        ) external;
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab>
+        ```solidity
+        /**
+        * @notice Event to announce that a given part can be equipped by any address.
+        * @dev It is emitted when a given part is marked as equippable by any.
+        * @param partId ID of the part marked as equippable by any address
+        */
+        event SetEquippableToAll(uint64 indexed partId);
+        ```
+    </Tabs.Tab>
+</Tabs>
+
+
+## Reading operations
+
+1. [Getting parts](#get-parts)
+2. [Checking if equippable](#check-equippable)
+3. [Checking if equippable to all](#check-equippable-to-all)
+4. [Getting Metadata URI](#get-metadata-uri)
+5. [Getting Type](#get-type)
+
+### Get parts
+
+Used to retrieve a `Part` with id `partId`. You can also retrieve multiple parts at the same time.
+
+<Tabs items={['Call', 'Definition']}>
+    <Tabs.Tab>
+        ```typescript copy
+        const partId = 1
+        const part = await catalog.getPart(partId)
+        // part = {
+        //     itemType: 1,
+        //     z: 1,
+        //     equippable: ['0x...'],
+        //     metadataURI: 'ipfs://...'
+        // }
+
+        const partIds = [1, 2]
+        const parts = await catalog.getParts(partIds)
+        // parts = [
+        //     {
+            //         itemType: 1,
+            //         z: 1,
+            //         equippable: ['0x...'],
+            //         metadataURI: 'ipfs://...'
+            //     },
+            //     {
+            //         itemType: 2,
+            //         z: 2,
+            //         equippable: [],
+            //         metadataURI: 'ipfs://...'
+            //     }
+            // ]
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab>
+        ```solidity
+        /**
+        * @notice The integral structure of a standard RMRK catalog item defining it.
+        *  This will result in between 25,000,000 and 35,000,000 gas per 250 assets--the maximum block size of Ethereum
+        *  mainnet is 30M at peak usage.
+        * @return itemType The item type of the part
+        * @return z The z value of the part defining how it should be rendered when presenting the full NFT
+        * @return equippable The array of addresses allowed to be equipped in this part
+        * @return metadataURI The metadata URI of the part
+        */
+        struct Part {
+            ItemType itemType; //1 byte
+            uint8 z; //1 byte
+            address[] equippable; //n Collections that can be equipped into this slot
+            string metadataURI; //n bytes 32+
+        }
+
+        /**
+        * @notice Used to retrieve a `Part` with id `partId`
+        * @param partId ID of the part that we are retrieving
+        * @return part The `Part` struct associated with given `partId`
+        */
+        function getPart(uint64 partId) external view returns (Part memory part);
+
+        /**
+        * @notice Used to retrieve multiple parts at the same time.
+        * @param partIds An array of part IDs that we want to retrieve
+        * @return part An array of `Part` structs associated with given `partIds`
+        */
+        function getParts(
+            uint64[] memory partIds
+        ) external view returns (Part[] memory part);
+        ```
+    </Tabs.Tab>
+</Tabs>
+
+### Check if Equippable [#check-equippable]
+
+Used to check whether the given address is allowed to equip the desired part.
+
+<Tabs items={['Call', 'Definition']}>
+    <Tabs.Tab>
+        ```typescript copy
+        const partId = 1
+        const targetAddress = '0x...'
+        const isEquippable = await catalog.checkIsEquippable(partId, targetAddress)
+        // isEquippable = true|false
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab>
+        ```solidity
+        /**
+        * @notice Used to check whether the given address is allowed to equip the desired `Part`.
+        * @dev Returns true if a collection may equip asset with `partId`.
+        * @param partId The ID of the part that we are checking
+        * @param targetAddress The address that we are checking for whether the part can be equipped into it or not
+        * @return isEquippable The status indicating whether the `targetAddress` can be equipped into `Part` with `partId` or not
+        */
+        function checkIsEquippable(
+            uint64 partId,
+            address targetAddress
+        ) external view returns (bool isEquippable);
+        ```
+    </Tabs.Tab>
+</Tabs>
+
+### Check if Equippable to all [#check-equippable-to-all]
+
+Used to check if any child can be equipped into the part.
+
+<Tabs items={['Call', 'Definition']}>
+    <Tabs.Tab>
+        ```typescript copy
+        const partId = 1
+        const isEquippableToAll = await catalog.checkIsEquippableToAll(partId)
+        // isEquippableToAll = true|false
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab>
+        ```solidity
+        /**
+        * @notice Used to check if the part is equippable by all addresses.
+        * @dev Returns true if part is equippable to all.
+        * @param partId ID of the part that we are checking
+        * @return isEquippableToAll The status indicating whether the part with `partId` can be equipped by any address or not
+        */
+        function checkIsEquippableToAll(
+            uint64 partId
+        ) external view returns (bool isEquippableToAll);
+        ```
+    </Tabs.Tab>
+</Tabs>
+
+### Get Metadata URI
+
+Used to return the metadata URI of the associated Catalog. See [Catalog Metadata](../metadata#catalog-metadata) for more information.
+
+<Tabs items={['Call', 'Definition']}>
+    <Tabs.Tab>
+        ```typescript copy
+        const metadataURI = await catalog.getMetadataURI()
+        // metadataURI = 'ipfs://...'
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab>
+        ```solidity
+        /**
+        * @notice Used to return the metadata URI of the associated Catalog.
+        * @return Catalog metadata URI
+        */
+        function getMetadataURI() external view returns (string memory);
+        ```
+    </Tabs.Tab>
+</Tabs>
+
+### Get Type
+
+Used to return the `itemType` of the associated Catalog.
+
+<Tabs items={['Call', 'Definition']}>
+    <Tabs.Tab>
+        ```typescript copy
+        const itemType = await catalog.getType()
+        // itemType = 'image/gif'
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab>
+        ```solidity
+        /**
+        * @notice Used to return the `itemType` of the associated Catalog
+        * @return `itemType` of the associated Catalog
+        */
+        function getType() external view returns (string memory);
+        ```
+    </Tabs.Tab>
+</Tabs>

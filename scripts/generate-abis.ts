@@ -1,4 +1,5 @@
 import fs from 'fs';
+import path from 'path';
 import walkSync from 'walk-sync';
 import { rimraf } from 'rimraf';
 
@@ -13,20 +14,8 @@ const getTheAbi = () => {
         directories: false,
       });
 
-      const dirExists = fs.existsSync(`${process.cwd()}/artifacts/abis/implementations`);
-      if (!dirExists) {
-        fs.mkdirSync(`${process.cwd()}/artifacts/abis`);
-        fs.mkdirSync(`${process.cwd()}/artifacts/abis/implementations`);
-        fs.mkdirSync(`${process.cwd()}/artifacts/abis/implementations/abstract`);
-        fs.mkdirSync(`${process.cwd()}/artifacts/abis/implementations/lazyMintErc20`);
-        fs.mkdirSync(`${process.cwd()}/artifacts/abis/implementations/lazyMintNative`);
-        fs.mkdirSync(`${process.cwd()}/artifacts/abis/implementations/nativeTokenPay`);
-        fs.mkdirSync(`${process.cwd()}/artifacts/abis/implementations/erc20Pay`);
-        fs.mkdirSync(`${process.cwd()}/artifacts/abis/implementations/premint`);
-        fs.mkdirSync(`${process.cwd()}/artifacts/abis/implementations/utils`);
-        fs.mkdirSync(`${process.cwd()}/artifacts/abis/RMRK`);
-        fs.mkdirSync(`${process.cwd()}/artifacts/abis/RMRK/utils`);
-      }
+      const abisRoot = `${process.cwd()}/artifacts/abis`;
+      fs.mkdirSync(abisRoot, { recursive: true });
 
       implementations.forEach((implementation) => {
         const filename = implementation.slice(0, implementation.indexOf('.sol'));
@@ -37,10 +26,9 @@ const getTheAbi = () => {
         const json = JSON.parse(file);
 
         if (json.abi) {
-          fs.writeFileSync(
-            `${process.cwd()}/artifacts/abis/implementations/${filename}.json`,
-            JSON.stringify(json.abi),
-          );
+          const targetPath = path.join(abisRoot, 'implementations', `${filename}.json`);
+          fs.mkdirSync(path.dirname(targetPath), { recursive: true });
+          fs.writeFileSync(targetPath, JSON.stringify(json.abi));
         }
       });
 
@@ -53,10 +41,9 @@ const getTheAbi = () => {
         const json = JSON.parse(file);
 
         if (json.abi) {
-          fs.writeFileSync(
-            `${process.cwd()}/artifacts/abis/RMRK/utils/${filename}.json`,
-            JSON.stringify(json.abi),
-          );
+          const targetPath = path.join(abisRoot, 'RMRK', 'utils', `${filename}.json`);
+          fs.mkdirSync(path.dirname(targetPath), { recursive: true });
+          fs.writeFileSync(targetPath, JSON.stringify(json.abi));
         }
       });
     });

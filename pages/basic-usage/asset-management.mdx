@@ -1,0 +1,657 @@
+import { Tabs, Callout } from 'nextra/components'
+
+# Asset-management
+
+MultiAsset module is the simplest one to understand and use, yet extremely powerful. After you have deployed your NFT contract, you can any time expand its functionality by adding new assets. These are the  operations you may need to perform:
+
+## Writing operations
+
+1. [Adding a new asset.](#adding-a-new-asset)
+2. [Adding an asset to a token.](#adding-an-asset-to-a-token)
+3. [Adding an asset to a token, replacing an old one.](#add-asset-to-token-with-replace)
+4. [Accepting an asset.](#accepting-an-asset)
+5. [Rejecting an asset.](#rejecting-an-asset)
+6. [Rejecting all assets.](#rejecting-all-assets)
+7. [Setting priorities.](#setting-priorities)
+8. [Approving operators.](#approving-operators)
+
+
+The first 3 methods are not part of the standard (ERC-5773) since they are meant to be opinionated. You will not find them in the core implementations, but both our abstract and ready to use implementations include methods to add new assets and add them to tokens. In the two cases, they are gated to the collection owner or contributor. For more details on the implementation levels see the [implementation section](../implementations).
+
+Operations 4 to 8 are part of the standard and are implemented in the core implementations, and consequently in all the higher level ones.
+
+### Adding a new asset
+
+<Callout type="info">
+    In our ready to use implementations, adding a new asset can be performed by the collection owner or a contributor. 
+</Callout>
+
+The asset is added to the collection and can be later added into any token. Our implementations take care of assigning a unique Id, starting by 1. For more details on the contents of the metadata see the [metadata section](/metadata#asset-metadata-uri).
+
+<Tabs items={['Call', 'Definition', 'Emits']}>
+    <Tabs.Tab>
+        ```typescript copy
+        await contract.addAssetEntry('ipfs://metadataURI');
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab>
+        ```solidity
+        /**
+        * @notice Used to add a asset entry.
+        * @dev The ID of the asset is automatically assigned to be the next available asset ID.
+        * @param metadataURI Metadata URI of the asset
+        * @return assetId ID of the newly added asset
+        */
+        function addAssetEntry(
+            string memory metadataURI
+        ) external returns (uint256 assetId);
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab>
+        ```solidity
+        /**
+        * @notice Used to notify listeners that an asset object is initialized at `assetId`.
+        * @param assetId ID of the asset that was initialized
+        */
+        event AssetSet(uint64 indexed assetId);
+        ```
+    </Tabs.Tab>
+</Tabs>
+
+
+### Adding an asset to a token
+
+<Callout type="warning">
+    Adding an asset to a token sends it to the pending assets array. It is up to the token owner to accept or reject it. 
+</Callout>
+
+<Callout type="info">
+    In our ready to use implementations, adding an asset to a token can be performed by the collection owner or a contributor. 
+</Callout>
+
+The 3rd parameter is the asset to replace, in this case we are not replacing any asset, so we pass `0`.
+
+<Tabs items={['Call', 'Definition', 'Emits']}>
+    <Tabs.Tab>
+        ```typescript copy
+        const tokenId = 1;
+        const assetId = 1;
+        const assetToBeReplacedId = 0;
+        await contract.addAssetToToken(tokenId, assetId, assetToBeReplacedId);
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab>
+        ```solidity
+        /**
+        * @notice Used to add an asset to a token.
+        * @dev If the given asset is already added to the token, the execution will be reverted.
+        * @dev If the asset ID is invalid, the execution will be reverted.
+        * @dev If the token already has the maximum amount of pending assets (128), the execution will be
+        *  reverted.
+        * @param tokenId ID of the token to add the asset to
+        * @param assetId ID of the asset to add to the token
+        * @param replacesAssetWithId ID of the asset to replace from the token's list of active assets
+        */
+        function addAssetToToken(
+            uint256 tokenId,
+            uint64 assetId,
+            uint64 replacesAssetWithId
+        ) external;
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab>
+        ```solidity
+        /**
+        * @notice Used to notify listeners that an asset object at `assetId` is added to token's pending asset
+        *  array.
+        * @param tokenIds An array of token IDs that received a new pending asset
+        * @param assetId ID of the asset that has been added to the token's pending assets array
+        * @param replacesId ID of the asset that would be replaced
+        */
+        event AssetAddedToTokens(
+            uint256[] tokenIds,
+            uint64 indexed assetId,
+            uint64 indexed replacesId
+        );
+        ```
+    </Tabs.Tab>
+</Tabs>
+
+### Adding an asset to a token, replacing an old one [#add-asset-to-token-with-replace]
+
+<Callout type="info">
+    In our ready to use implementations, adding an asset to a token can be performed by the collection owner or a contributor. 
+</Callout>
+
+The 3rd parameter is the asset to replace. If the token does not have such asset, it will simply be added.
+
+<Tabs items={['Call', 'Definition', 'Emits']}>
+    <Tabs.Tab>
+        ```typescript copy
+        const tokenId = 1;
+        const assetId = 2;
+        const assetToBeReplacedId = 1;
+        await contract.addAssetToToken(tokenId, assetId, assetToBeReplacedId);
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab>
+        ```solidity
+        /**
+        * @notice Used to add an asset to a token.
+        * @dev If the given asset is already added to the token, the execution will be reverted.
+        * @dev If the asset ID is invalid, the execution will be reverted.
+        * @dev If the token already has the maximum amount of pending assets (128), the execution will be
+        *  reverted.
+        * @param tokenId ID of the token to add the asset to
+        * @param assetId ID of the asset to add to the token
+        * @param replacesAssetWithId ID of the asset to replace from the token's list of active assets
+        */
+        function addAssetToToken(
+            uint256 tokenId,
+            uint64 assetId,
+            uint64 replacesAssetWithId
+        ) external;
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab>
+        ```solidity
+        /**
+        * @notice Used to notify listeners that an asset object at `assetId` is added to token's pending asset
+        *  array.
+        * @param tokenIds An array of token IDs that received a new pending asset
+        * @param assetId ID of the asset that has been added to the token's pending assets array
+        * @param replacesId ID of the asset that would be replaced
+        */
+        event AssetAddedToTokens(
+            uint256[] tokenIds,
+            uint64 indexed assetId,
+            uint64 indexed replacesId
+        );
+        ```
+    </Tabs.Tab>
+</Tabs>
+
+### Accepting an asset
+<Callout type="info">
+    Accepting an asset can be performed by the token owner or an approved party. 
+</Callout>
+
+<Callout type="warning">
+    The `replacesId` value will be zero if the asset to replace is not in the array of active assets for the token.
+</Callout>
+
+<Callout type="warning">
+  The index MUST be the index of the asset in the token's pending asset list. 
+</Callout>
+
+The index parameter is an annoying detail, but it prevents the contract from having to do gas expensive operations, either:
+* Iterate over the list of pending assets to find the index.
+* Keep track of the index for each asset.
+
+We also require the `assetId` to validate that it is what you expected to be in the index, since another operation could potentially front-run yours.
+
+<Tabs items={['Call', 'Definition', 'Emits']}>
+    <Tabs.Tab>
+        ```typescript copy
+        const tokenId = 1;
+        const assetId = 1;
+        const pendingAssets = await contract.getPendingAssets(tokenId);
+        const index = pendingAssets.indexOf(assetId);
+        await contract.acceptAsset(tokenId, index, assetId);
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab>
+        ```solidity
+        /**
+        * @notice Accepts an asset at from the pending array of given token.
+        * @dev Migrates the asset from the token's pending asset array to the token's active asset array.
+        * @dev Active assets cannot be removed by anyone, but can be replaced by a new asset.
+        * @dev Requirements:
+        *
+        *  - The caller must own the token or be approved to manage the token's assets
+        *  - `tokenId` must exist.
+        *  - `index` must be in range of the length of the pending asset array.
+        * @dev Emits an {AssetAccepted} event.
+        * @param tokenId ID of the token for which to accept the pending asset
+        * @param index Index of the asset in the pending array to accept
+        * @param assetId ID of the asset expected to be in the index
+        */
+        function acceptAsset(
+            uint256 tokenId,
+            uint256 index,
+            uint64 assetId
+        ) external;
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab>
+        ```solidity
+        /**
+        * @notice Used to notify listeners that an asset object at `assetId` is accepted by the token and migrated
+        *  from token's pending assets array to active assets array of the token.
+        * @param tokenId ID of the token that had a new asset accepted
+        * @param assetId ID of the asset that was accepted
+        * @param replacesId ID of the asset that was replaced
+        */
+        event AssetAccepted(
+            uint256 indexed tokenId,
+            uint64 indexed assetId,
+            uint64 indexed replacesId
+        );
+        ```
+    </Tabs.Tab>
+</Tabs>
+
+### Rejecting an asset
+
+<Callout type="info">
+Rejecting an asset can be performed by the token owner or an approved party.
+</Callout>
+
+<Callout type="warning">
+  The index MUST be the index of the asset in the token's pending asset list. 
+</Callout>
+
+The index parameter is an annoying detail, but it prevents the contract from having to do gas expensive operations, either:
+* Iterate over the list of pending assets to find the index.
+* Keep track of the index for each asset.
+
+We also require the `assetId` to validate that it is what you expected to be in the index, since another operation could front-run yours.
+
+<Tabs items={['Call', 'Definition', 'Emits']}>
+    <Tabs.Tab>
+        ```typescript copy
+        const tokenId = 1;
+        const assetId = 1;
+        const pendingAssets = await contract.getPendingAssets(tokenId);
+        const index = pendingAssets.indexOf(assetId);
+        await contract.rejectAsset(tokenId, index, assetId);
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab>
+        ```solidity
+        /**
+        * @notice Rejects an asset from the pending array of given token.
+        * @dev Removes the asset from the token's pending asset array.
+        * @dev Requirements:
+        *
+        *  - The caller must own the token or be approved to manage the token's assets
+        *  - `tokenId` must exist.
+        *  - `index` must be in range of the length of the pending asset array.
+        * @dev Emits a {AssetRejected} event.
+        * @param tokenId ID of the token that the asset is being rejected from
+        * @param index Index of the asset in the pending array to be rejected
+        * @param assetId ID of the asset expected to be in the index
+        */
+        function rejectAsset(
+            uint256 tokenId,
+            uint256 index,
+            uint64 assetId
+        ) external;
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab>
+        ```solidity
+        /**
+        * @notice Used to notify listeners that an asset object at `assetId` is rejected from token and is dropped
+        *  from the pending assets array of the token.
+        * @param tokenId ID of the token that had an asset rejected
+        * @param assetId ID of the asset that was rejected
+        */
+        event AssetRejected(uint256 indexed tokenId, uint64 indexed assetId);
+
+        ```
+    </Tabs.Tab>
+</Tabs>
+
+### Rejecting all assets
+
+<Callout type="info">
+    Rejecting all assets can be performed by the token owner or an approved party.
+</Callout>
+
+Max rejections is the maximum number of assets to reject. If the token has fewer pending assets than max rejections, all pending assets will be rejected. If it has more, it will revert. This is to prevent untentionally rejecting an asset which arrived just before you called the method. The `assetId` on the `AssetRejected` event will be 0, meaning that all assets were rejected.
+
+<Tabs items={['Call', 'Definition', 'Emits']}>
+    <Tabs.Tab>
+        ```typescript copy
+        const tokenId = 1;
+        const pendingAssets = await contract.getPendingAssets(tokenId);
+        const maxRejections = pendingAssets.length;
+        await contract.rejectAllAssets(tokenId, maxRejections);
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab>
+        ```solidity
+        /**
+        * @notice Rejects all assets from the pending array of a given token.
+        * @dev Effecitvely deletes the pending array.
+        * @dev Requirements:
+        *
+        *  - The caller must own the token or be approved to manage the token's assets
+        *  - `tokenId` must exist.
+        * @dev Emits a {AssetRejected} event with assetId = 0.
+        * @param tokenId ID of the token of which to clear the pending array.
+        * @param maxRejections Maximum number of expected assets to reject, used to prevent from rejecting assets which
+        *  arrive just before this operation.
+        */
+        function rejectAllAssets(uint256 tokenId, uint256 maxRejections) external;
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab>
+        ```solidity
+        /**
+        * @notice Used to notify listeners that an asset object at `assetId` is rejected from token and is dropped
+        *  from the pending assets array of the token.
+        * @param tokenId ID of the token that had an asset rejected
+        * @param assetId ID of the asset that was rejected
+        */
+        event AssetRejected(uint256 indexed tokenId, uint64 indexed assetId);
+        ```
+    </Tabs.Tab>
+</Tabs>
+
+### Setting priorities
+
+Setting priorities allows the token owner to signal which of its NFT's assets are more important. For optimization purposes, the priorities must be set 1 to 1 in the same order of the active assets lists. 
+
+So if a token has assets `[A, B, C]`, and you set priorities to `[2, 1, 3]`, it means that asset B is the most important, followed by A and C. The length of priorities must match the length of the active assets list or the execution will revert.
+
+When new tokens are added, they are automatically assigned as priority the index they are in the active assets list, so by default every new asset is has a lower priority than the previous ones.
+
+<Tabs items={['Call', 'Definition', 'Emits']}>
+    <Tabs.Tab>
+        ```typescript copy
+        await contract.setPriority(tokenId, priorities);
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab>
+        ```solidity
+        /**
+        * @notice Sets a new priority array for a given token.
+        * @dev The priority array is a non-sequential list of `uint64`s, where the lowest value is considered highest
+        *  priority.
+        * @dev Value `0` of a priority is a special case equivalent to unitialized.
+        * @dev Requirements:
+        *
+        *  - The caller must own the token or be approved to manage the token's assets
+        *  - `tokenId` must exist.
+        *  - The length of `priorities` must be equal the length of the active assets array.
+        * @dev Emits a {AssetPrioritySet} event.
+        * @param tokenId ID of the token to set the priorities for
+        * @param priorities An array of priorities of active assets. The succesion of items in the priorities array
+        *  matches that of the succesion of items in the active array
+        */
+        function setPriority(
+            uint256 tokenId,
+            uint64[] calldata priorities
+        ) external;
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab>
+        ```solidity
+        /**
+        * @notice Used to notify listeners that token's prioritiy array is reordered.
+        * @param tokenId ID of the token that had the asset priority array updated
+        */
+        event AssetPrioritySet(uint256 indexed tokenId);
+        ```
+    </Tabs.Tab>
+</Tabs>
+
+
+### Approving operators
+
+Approving operators allows the token owner to allow other addresses to perform operations on their behalf. It works exactly as in the ERC-721, but we added specific methods to approve managing assets independently from the token itself. 
+* `approveForAssets` approves an operator to manage a specific asset.
+* `setApprovalForAllForAssets` allows an operator to manage all the assets of a token.
+
+To remove approvals for single token you call approve with address 0 as the operator. To remove approvals for all tokens you call `setApprovalForAll` with `approved:false`.
+
+The operations which an operator can perform are in our implementations are:
+1. Accepting an asset.
+2. Rejecting an asset.
+3. Rejecting all assets.
+4. Setting priorities.
+5. Equipping and unequipping, if Equippable module is used.
+
+<Tabs items={['Call', 'Definition', 'Emits']}>
+    <Tabs.Tab>
+        ```typescript copy
+        const to = '0x...';
+        const tokenId = 1;
+        await contract.approveForAssets(to, tokenId);
+
+        const operator = '0x...';
+        const approved = true;
+        await contract.setApprovalForAllForAssets(operator, approved);
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab>
+        ```solidity
+        /**
+        * @notice Used to grant permission to the user to manage token's assets.
+        * @dev This differs from transfer approvals, as approvals are not cleared when the approved party accepts or
+        *  rejects an asset, or sets asset priorities. This approval is cleared on token transfer.
+        * @dev Only a single account can be approved at a time, so approving the `0x0` address clears previous approvals.
+        * @dev Requirements:
+        *
+        *  - The caller must own the token or be an approved operator.
+        *  - `tokenId` must exist.
+        * @dev Emits an {ApprovalForAssets} event.
+        * @param to Address of the account to grant the approval to
+        * @param tokenId ID of the token for which the approval to manage the assets is granted
+        */
+        function approveForAssets(address to, uint256 tokenId) external;
+
+        /**
+        * @notice Used to add or remove an operator of assets for the caller.
+        * @dev Operators can call {acceptAsset}, {rejectAsset}, {rejectAllAssets} or {setPriority} for any token
+        *  owned by the caller.
+        * @dev Requirements:
+        *
+        *  - The `operator` cannot be the caller.
+        * @dev Emits an {ApprovalForAllForAssets} event.
+        * @param operator Address of the account to which the operator role is granted or revoked from
+        * @param approved The boolean value indicating whether the operator role is being granted (`true`) or revoked
+        *  (`false`)
+        */
+        function setApprovalForAllForAssets(
+            address operator,
+            bool approved
+        ) external;
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab>
+        ```solidity
+        /**
+        * @notice Used to notify listeners that owner has granted an approval to the user to manage the assets of a
+        *  given token.
+        * @dev Approvals must be cleared on transfer
+        * @param owner Address of the account that has granted the approval for all token's assets
+        * @param approved Address of the account that has been granted approval to manage the token's assets
+        * @param tokenId ID of the token on which the approval was granted
+        */
+        event ApprovalForAssets(
+            address indexed owner,
+            address indexed approved,
+            uint256 indexed tokenId
+        );
+
+        /**
+        * @notice Used to notify listeners that owner has granted approval to the user to manage assets of all of their
+        *  tokens.
+        * @param owner Address of the account that has granted the approval for all assets on all of their tokens
+        * @param operator Address of the account that has been granted the approval to manage the token's assets on all of
+        *  the tokens
+        * @param approved Boolean value signifying whether the permission has been granted (`true`) or revoked (`false`)
+        */
+        event ApprovalForAllForAssets(
+            address indexed owner,
+            address indexed operator,
+            bool approved
+        );
+        ```
+    </Tabs.Tab>
+</Tabs>
+
+## Reading operations
+
+1. [Gettting Active assets.](#getting-active-assets)
+2. [Getting Pending assets.](#getting-pending-assets)
+3. [Getting Asset Metadata URI.](#getting-asset-metadata)
+4. [Getting Asset priorities.](#getting-asset-priorities)
+5. [Getting Asset replacements](#getting-asset-replacements)
+
+
+### Getting active assets
+
+Used to retrieve IDs of the active assets of given token. To get the metadata of the asset, you need to then call [`getAssetMetadata(tokenId, assetId)`](#get-asset-metadata).
+
+<Tabs items={['Call', 'Definition']}>
+    <Tabs.Tab>
+        ```typescript copy
+        const tokenId = 1;
+        const activeAssets = await contract.getActiveAssets(tokenId);
+        // activeAssets = [1, 2, 3]
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab>
+        ```solidity
+        /**
+        * @notice Used to retrieve IDs of the active assets of given token.
+        * @dev Asset data is stored by reference, in order to access the data corresponding to the ID, call
+        *  `getAssetMetadata(tokenId, assetId)`.
+        * @dev You can safely get 10k
+        * @param tokenId ID of the token to retrieve the IDs of the active assets
+        * @return assetIds An array of active asset IDs of the given token
+        */
+        function getActiveAssets(
+            uint256 tokenId
+        ) external view returns (uint64[] memory assetIds);
+        ```
+    </Tabs.Tab>
+</Tabs>
+
+### Getting pending assets
+
+Used to retrieve IDs of the pending assets of given token. To get the metadata of the asset, you need to then call [`getAssetMetadata(tokenId, assetId)`](#get-asset-metadata).
+
+<Tabs items={['Call', 'Definition']}>
+    <Tabs.Tab>
+        ```typescript copy
+        const tokenId = 1;
+        const pendingAssets = await contract.getPendingAssets(tokenId);
+        // pendingAssets = [5, 6, 7]
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab>
+        ```solidity
+        /**
+        * @notice Used to retrieve IDs of the pending assets of given token.
+        * @dev Asset data is stored by reference, in order to access the data corresponding to the ID, call
+        *  `getAssetMetadata(tokenId, assetId)`.
+        * @param tokenId ID of the token to retrieve the IDs of the pending assets
+        * @return assetIds An array of pending asset IDs of the given token
+        */
+        function getPendingAssets(
+            uint256 tokenId
+        ) external view returns (uint64[] memory assetIds);
+        ```
+    </Tabs.Tab>
+</Tabs>
+
+### Getting asset metadata
+
+Used to retrieve the metadata URI of the asset. Even though our default implementations do not use `tokenId` to retrieve the metadata, it is required on the standard to allow more advanced implementations, where even the same asset Id could return different metadata depending on the token, for instance by appending the `tokenId` to get the metadata URI.
+
+<Tabs items={['Call', 'Definition']}>
+    <Tabs.Tab>
+        ```typescript copy
+        const tokenId = 1;
+        const assetId = 1;
+        const metadata = await contract.getAssetMetadata(tokenId, assetId);
+        // metadata = 'ipfs://metadataURI'
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab>
+        ```solidity
+        /**
+        * @notice Used to fetch the asset metadata of the specified token's active asset with the given index.
+        * @dev Assets are stored by reference mapping `_assets[assetId]`.
+        * @dev Can be overriden to implement enumerate, fallback or other custom logic.
+        * @param tokenId ID of the token from which to retrieve the asset metadata
+        * @param assetId Asset Id, must be in the active assets array
+        * @return metadata The metadata of the asset belonging to the specified index in the token's active assets
+        *  array
+        */
+        function getAssetMetadata(
+            uint256 tokenId,
+            uint64 assetId
+        ) external view returns (string memory metadata);
+        ```
+    </Tabs.Tab>
+</Tabs>
+
+### Getting asset priorities
+
+Used to retrieve the priorities of the active resources of a given token. The length of this array matches the length of the active assets array, each priority corresponds to the asset in the same index of the active assets array. A lower number means higher priority.
+
+<Tabs items={['Call', 'Definition']}>
+    <Tabs.Tab>
+        ```typescript copy
+        const tokenId = 1;
+        const priorities = await contract.getActiveAssetPriorities(tokenId);
+        const activeAssets = await contract.getActiveAssets(tokenId);
+        // activeAssets = [1, 2, 3]
+        // priorities = [0, 2, 1]
+        // This would mean that asset 1 is the most important, followed by 3 and 2.
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab>
+        ```solidity
+        /**
+        * @notice Used to retrieve the priorities of the active resources of a given token.
+        * @dev Asset priorities are a non-sequential array of uint64 values with an array size equal to active asset
+        *  priorites.
+        * @param tokenId ID of the token for which to retrieve the priorities of the active assets
+        * @return priorities An array of priorities of the active assets of the given token
+        */
+        function getActiveAssetPriorities(
+            uint256 tokenId
+        ) external view returns (uint64[] memory priorities);
+        ```
+    </Tabs.Tab>
+</Tabs>
+
+### Getting asset replacements
+
+Used to retrieve the asset that will be replaced if a given asset from the token's pending array is accepted. If the asset is not replacing any other asset, it will return `0`.
+ 
+<Tabs items={['Call', 'Definition']}>
+    <Tabs.Tab>
+        ```typescript copy
+        const tokenId = 1;
+        const newAssetId = 1;
+        const replacesAssetWithId = await contract.getAssetReplacements(tokenId, newAssetId);
+        // replacesAssetWithId = 0. This means that the asset is not replacing any other asset.
+        // replacesAssetWithId = 2. This means that accepting asset 1 on token 1, would replace asset 2 on the list of active assets.
+        ```
+    </Tabs.Tab>
+    <Tabs.Tab>
+        ```solidity
+        /**
+        * @notice Used to retrieve the asset that will be replaced if a given asset from the token's pending array
+        *  is accepted.
+        * @dev Asset data is stored by reference, in order to access the data corresponding to the ID, call
+        *  `getAssetMetadata(tokenId, assetId)`.
+        * @param tokenId ID of the token to check
+        * @param newAssetId ID of the pending asset which will be accepted
+        * @return replacesAssetWithId ID of the asset which will be replaced
+        */
+        function getAssetReplacements(
+            uint256 tokenId,
+            uint64 newAssetId
+        ) external view returns (uint64 replacesAssetWithId);
+        ```
+    </Tabs.Tab>
+</Tabs>

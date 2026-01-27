@@ -1,0 +1,634 @@
+import { Steps, Callout, Tabs, FileTree } from 'nextra/components'
+
+# Nestable-Asset Journey ( Part 1, Kingdom )
+
+#### A contextualized user journey to explore and understand the Nestable NFT features
+
+In this journey we will explore the main features of **Nestable** standard. We will use **Ready to Use** implementation for [Nestable with PreMint](/evm-package/readyToUse/premint/RMRKNestablePreMint.md). For more information on the available implementations see the [implementations section](/implementations). 
+We have chosen the **PreMint** implementation because it allows us to mint tokens at no cost. We will be using 3 contracts: Kingdom, Army and Soldier.
+
+
+##### The use cases that will be explored are:
+
+- Creation of a multi-level NFTs hierarchy.
+- Transferring of NFTs between hierarchy owners and/or hierarchy levels.
+- Burning NFTs at different hierarchy levels.
+
+We will guide you through the process using both Remix and Hardhat, starting from the code [wizard](/quick-start/wizard) in each case.
+Interactions will be done from either Remix or hardhat scripts.
+
+#### User journey context
+
+_We are in the Medieval epoch and in the universe there is an omnipotent and all-powerful Wizard. During a special day, the wizard decided to create two kings, each one with their own Kingdom and then he allowed the kings to govern their kingdoms. Every action that unfolded later is included in the user journey. Have fun and happy learning!_
+
+
+{/* Every action will be performed with smart contract functions with the help of some Typescript code. */}
+
+
+### Creating the Kingdom Contract.
+
+Let's start by going to the [wizard.rmrk.app](https://wizard.rmrk.app/) and configuring our contracts.
+1. Set the name to "Kingdom"
+2. Set the symbol "KD"
+3. Select *Module* to be **Nestable** 
+4. Select *Mint Method* to **Pre-Mint**
+5. Activate the *Auto-accept children* option, we will use it so armies are automatically accepted into the kingdom. 
+
+![Wizard Configuration Kingdom](/images/tutorials/nestable-kingdom/0-kingdom-config.png)
+    
+Here you can decide to either use Remix or Hardhat. 
+Remix requires no installation, but Hardhat version will take care of verifying the contract and adding it to [Singular](https://singular.rmrk.app) marketplace, it also allows you to deploy the contracts locally and create unit tests if needed.
+
+<Tabs items={['Remix', 'Hardhat' ]}> 
+    <Tabs.Tab>
+        <Steps>
+        ### Open in Remix
+        Click **Open in Remix** and you will be redirected to Remix with the contract already loaded, installing all the packages might take a few minutes. You should then see a screen like this.
+
+        ![Remix Kingdom Compile](/images/tutorials/nestable-kingdom/0-kingdom-compile-remix.png)
+
+        ### Compile the contract
+        Hit **Compile** button and wait for it to process.
+
+        ### Configure the deployment
+        * Go to the **Deploy** section on the left. 
+        * In the **Environment** dropdown, select **Injected Provider** to use your wallet to deploy the contract.
+
+        ![Remix Deploy Kingdom](/images/tutorials/nestable-kingdom/0-remix-deploy-env.png)
+
+        <Callout>
+        Make sure you have the right network selected on your wallet, we recommend to use a test network. 
+        In this case we are using [Polygon Mumbai](https://mumbai.polygonscan.com/).
+        </Callout>
+
+
+        ### Fill in the deployment data
+        Expand the deploy section and fill in all the data.
+            - Collection Metadata: `ipfs://QmQhDyuSvd49pxe5v2KnmvWT39TFyoqEQyBkhjYC7imHUs/kingdom/collection.json`
+            - Max supply: 1000
+            - Royalty receipient: Your address
+            - Royalty percentage: 300 * This is 3% in Base Points.
+        
+        Your screen should look like this:
+            ![Remix Deploy Configuration Kingdom](/images/tutorials/nestable-kingdom/0-kingdom-deploy-config-remix.png)
+
+
+        ### Deploy the contract    
+        * Hit **transact** and confirm the transaction on your wallet.
+        * Your deployed contract will show on the **Deployed Contracts** section, where you can interact with it.
+
+        ### Prepare Army contract
+
+        Back to the [wizard.rmrk.app](https://wizard.rmrk.app/).
+        1. Set the name to "Army"
+        2. Set the symbol "ARM"
+        3. Select *Module* to be **Nestable** 
+        4. Select *Mint Method* to **Pre-Mint**
+        5. Activate the *Auto-accept children* option, we will use it so soldiers are automatically accepted into the army. 
+
+        ![Wizard Army Config](/images/tutorials/nestable-kingdom/0-army-config.png)
+
+        ### Open in Remix and compile
+        Click **Open in Remix** and you will be redirected to Remix with the contract already loaded. Remix keeps data about your session so you should now have both contracts. You may rename them to make it easier to identify them.
+
+        With the Army contract open, hit **Compile** button and wait for it to process.
+
+        ![Remix Compile Army](/images/tutorials/nestable-kingdom/0-army-compile-remix.png)
+
+        ### Fill in the deployment data
+        * Go to the **Deploy** section on the left and expand the deploy section and fill in all the data.
+            - Collection Metadata: `ipfs://Qma8tB38iAiqFAJpwz55d7sRQx4q7zZq1gzXkkK9wjehCg/collection.json`
+            - Max supply: 1000
+            - Royalty receipient: Your address
+            - Royalty percentage: 300 * This is 3% in Base Points.
+
+        Your screen should look like this:
+            ![Remix Deploy Config Army](/images/tutorials/nestable-kingdom/0-army-deploy-config-remix.png)
+
+
+        ### Deploy the contract
+        * Hit **transact** and confirm the transaction on your wallet.
+        * Your deployed contract will show on the **Deployed Contracts** section, where you can interact with it.
+
+        ### Prepare Soldier contract
+
+        Back to the [wizard.rmrk.app](https://wizard.rmrk.app/).
+        1. Set the name to "Soldier"
+        2. Set the symbol "SD"
+        3. Select *Module* to be **Nestable** 
+        4. Select *Mint Method* to **Pre-Mint**
+        5. Disable the *Auto-accept children* option, we will not need it for this contract.
+
+        ![Wizard Soldiers Config](/images/tutorials/nestable-kingdom/0-soldiers-config.png)
+
+        ### Open in Remix and compile
+        Click **Open in Remix** and you will be redirected to Remix with the contract already loaded. Remix keeps data about your session so you should now have the 3 contracts. Remember to rename the files to make it easier to identify them.
+
+        With the Soldiers contract open, hit **Compile** button and wait for it to process.
+
+        ![Remix Compile Soldiers](/images/tutorials/nestable-kingdom/0-soldiers-compile-remix.png)
+
+        ### Fill in the deployment data
+        * Go to the **Deploy** section on the left and expand the deploy section and fill in all the data.
+            - Collection Metadata: `ipfs://QmQhDyuSvd49pxe5v2KnmvWT39TFyoqEQyBkhjYC7imHUs/soldiers/collection.json`
+            - Max supply: 1000
+            - Royalty receipient: Your address
+            - Royalty percentage: 300 * This is 3% in Base Points.
+        
+        Your screen should look like this:
+            ![Remix Deploy Config Soldiers](/images/tutorials/nestable-kingdom/0-soldiers-deploy-config-remix.png)
+
+
+        ### Deploy the contract
+        * Hit **transact** and confirm the transaction on your wallet.
+        * Your deployed contract will show on the **Deployed Contracts** section, where you can interact with it.
+
+        If all went well, you should see the 3 contracts under the _Deployed contracts_ section:
+            ![Deployed contracts Remix](/images/tutorials/nestable-kingdom/0-contracts-remix.png)
+
+        ### Congratulations!
+        You have deployed your first **Nestable** contracts. For practical reasons we will be doing all the operations with the same account.
+        
+        <Callout type="info">
+        Optionally you can add your collection to Singular. See the [Adding Collection to Singular](/tutorials/add-to-singular) tutorial for more information.
+        </Callout>
+
+        ### Prepare contract interaction scripts
+
+        We can do every step without further coding, by using the deployed contracts section on Remix, as we did on [MultiAsset Journey](./multiasset-journey/part-2). However, since there are several operations and some of involve reading the state and finding the children indexes, we will use a script to interact with the contracts.
+        
+        * Create a `run-journey.ts` file under the `scripts` folder.  We will start by importing some libraries and our method to get the contracts. All the code will run under the `main` function. We will simply log the account and the addresses of the kingdom and soldier contracts, to make sure they are as expected.
+        
+        * Add the following code to the `run-journey.ts` file:
+
+        ```typescript copy
+        import {ethers} from 'ethers'
+        ;(async function () {
+            try {
+                const kingdomMetadata = JSON.parse(
+                    await remix.call(
+                        'fileManager',
+                        'getFile',
+                        'browser/artifacts/Kingdom.json'
+                    )
+                )
+                const armyMetadata = JSON.parse(
+                    await remix.call(
+                        'fileManager',
+                        'getFile',
+                        'browser/artifacts/Army.json'
+                    )
+                )
+                const soldierMetadata = JSON.parse(
+                    await remix.call(
+                        'fileManager',
+                        'getFile',
+                        'browser/artifacts/Soldier.json'
+                    )
+                )
+        
+                const wizard = new ethers.providers.Web3Provider(
+                    web3Provider
+                ).getSigner()
+        
+                // Create an instance of a Contract Factory
+                const kingdomFactory = new ethers.ContractFactory(
+                    kingdomMetadata.abi,
+                    kingdomMetadata.data.bytecode.object,
+                    wizard
+                )
+                const kingdom = kingdomFactory.attach(
+                    '0xAC2D51fE04853eD784282744167c9568C065708E'
+                )
+        
+                const armyFactory = new ethers.ContractFactory(
+                    armyMetadata.abi,
+                    armyMetadata.data.bytecode.object,
+                    wizard
+                )
+                const army = armyFactory.attach(
+                    '0x735C40D5C71A9024AAFf1F667551Def02C549FaC'
+                )
+        
+                const soldierFactory = new ethers.ContractFactory(
+                    soldierMetadata.abi,
+                    soldierMetadata.data.bytecode.object,
+                    wizard
+                )
+                const soldier = soldierFactory.attach(
+                    '0x3FaA4C4824790a48c67888cc54FfE5b3C729f870'
+                )
+        
+                const wizardAddress = await wizard.getAddress()
+                console.log(`Running journey with account: ${wizardAddress}`)
+                console.log(`Using Kingdom deployed at ${kingdom.address}`)
+                console.log(`Using Army deployed at ${army.address}`)
+                console.log(`Using Soldier deployed at ${soldier.address}`)
+        
+                // Journey starts here:           
+            } catch (e) {
+                console.log(e.message)
+            }
+        })()
+        ```
+        <Callout type="warning">
+        Make sure you replace the 3 contract addresses for the ones you just deployed. You can find them on the _Deploy & Run_ Menu, below _Deployed Contracts_.
+        </Callout>
+
+       ### Run the script
+       
+       You can safely run the script since there will be no interactions. It will use the account you connected to deploy your contracts. From the _File Explorer_, right click on the script and hit _Run_.You should see a similar output:
+        ```bash
+        Running journey with account: 0x855dF0303Fec3a56c02fE35d8fb4d5e80A8c79A0
+        Using Kingdom deployed at 0x410EeA6EF48bA0f54F925BC01665D732203E57Ad
+        Using Army deployed at 0x6dE36644b5B73106c99C43a2669ae93b5d37b677
+        Using Soldier deployed at 0xE7dBc708fC483882c88bb0f86628f90Ef6A06117
+        ```
+        </Steps>
+    </Tabs.Tab>
+    <Tabs.Tab >
+        <Steps>
+        ### Clone the template
+        Use the [evm-template repository](https://github.com/rmrk-team/evm-template) to create a new repository and clone it locally.
+            ![EVM template](/images/tutorials/nestable-kingdom/hardhat-template.png)
+        
+        ### Install dependencies
+        Go to the project folder and install the dependencies with your favorite package manager: `yarn` | `npm i` | `pnpm i`. This tutorial will use yarn.
+
+        ### Download the contract
+
+        Download the Kingdom contract from the wizard and place it in the `contracts` folder.
+
+        <FileTree>
+        <FileTree.Folder name="contracts" defaultOpen>
+            <FileTree.File name="Kingdom.sol" />
+            <FileTree.File name="MockRMRKRegistry.sol" />
+        </FileTree.Folder>
+        <FileTree.Folder name="scripts">
+            <FileTree.File name="deploy-methods.ts" />
+            <FileTree.File name="get-gegistry.ts" />
+            <FileTree.File name="run-deploy-catalog.ts" />
+            <FileTree.File name="run-deploy-utils.ts" />
+            <FileTree.File name="run-deploy.ts" />
+            <FileTree.File name="utils.ts" />
+        </FileTree.Folder>
+        <FileTree.File name="hardhat.config.ts" />
+        <FileTree.File name="..." />
+        </FileTree>
+
+        <Callout type="info">
+         You can remove the `SimpleEquippable.sol` file.
+         </Callout>
+
+
+        ### Configure the deployment
+
+        Go the **Deploy script** section of the wizard and fill in the data.
+            - Collection Metadata: `ipfs://QmQhDyuSvd49pxe5v2KnmvWT39TFyoqEQyBkhjYC7imHUs/kingdom/collection.json`
+            - Max supply: 1000
+            - Royalty receipient: Leave empty to use the same address as the deployer, or set a custom address.
+            - Royalty percentage: 3%
+            - Enable the "Use 2 scripts" option. This will allow us to reuse the deploy method.
+
+            Your screen configuration panel should look like this:
+            ![Wizard Configuration](/images/tutorials/nestable-kingdom/0-kingdom-deploy-config.png)
+
+        ### Copy the deployment code
+        Copy the code from the top window into `scripts/deploy-methods.ts`. Some imports will be duplicated, remove them. The merged imports should look like this:
+        ```typescript copy
+        import { ethers, run, network } from 'hardhat';
+        import { delay, isHardhatNetwork } from './utils';
+        import {
+            Kingdom,
+            RMRKBulkWriter,
+            RMRKCatalogImpl,
+            RMRKCatalogUtils,
+            RMRKCollectionUtils,
+            RMRKEquipRenderUtils,
+        } from '../typechain-types';
+        import { getRegistry } from './get-gegistry';
+        ```
+
+        Copy the code from the bottom window into `scripts/run-deploy.ts`, replacing the original contents. This will be the main script to deploy the contracts.
+
+        <FileTree>
+        <FileTree.Folder name="contracts">
+            <FileTree.File name="Kingdom.sol" />
+            <FileTree.File name="MockRMRKRegistry.sol" />
+        </FileTree.Folder>
+        <FileTree.Folder name="scripts" defaultOpen>
+            <FileTree.File name="deploy-methods.ts" />
+            <FileTree.File name="get-gegistry.ts" />
+            <FileTree.File name="run-deploy-catalog.ts" />
+            <FileTree.File name="run-deploy-utils.ts" />
+            <FileTree.File name="run-deploy.ts" />
+            <FileTree.File name="utils.ts" />
+        </FileTree.Folder>
+        <FileTree.File name="hardhat.config.ts" />
+        <FileTree.File name="..." />
+        </FileTree>
+
+        ### Prepare Army contract
+
+        Back to the [wizard.rmrk.app](https://wizard.rmrk.app/), on Smart Contract tab.
+        1. Set the name to "Army"
+        2. Set the symbol "ARM"
+        3. Select *Module* to be **Nestable** 
+        4. Select *Mint Method* to **Pre-Mint**
+        5. Activate the *Auto-accept children* option, we will use it so soldiers are automatically accepted into the army. 
+
+        ![Wizard Army Config](/images/tutorials/nestable-kingdom/0-army-config.png)
+
+        ### Download the contract
+
+        Download the Army contract from the wizard and place it in the `contracts` folder.
+
+        ### Configure the deployment
+
+        Go the **Deploy script** section of the wizard and fill in the data.
+            - Collection Metadata: `ipfs://Qma8tB38iAiqFAJpwz55d7sRQx4q7zZq1gzXkkK9wjehCg/collection.json`
+            - Max supply: 1000
+            - Royalty receipient: Leave empty to use the same address as the deployer, or set a custom address.
+            - Royalty percentage: 3%
+            - Enable the "Use 2 scripts" option. This will allow us to reuse the deploy method.
+
+            Your screen configuration panel should look like this:
+            ![Wizard Configuration Army](/images/tutorials/nestable-kingdom/0-army-deploy-config.png)
+
+        ### Copy the deployment code
+        Copy the code from the top window into `scripts/deploy-methods.ts`. Some imports will be duplicated, remove them. The merged imports should look like this:
+        ```typescript copy
+        import { ethers, run, network } from 'hardhat';
+        import { delay, isHardhatNetwork } from './utils';
+        import {
+            Army,
+            Kingdom,
+            RMRKBulkWriter,
+            RMRKCatalogImpl,
+            RMRKCatalogUtils,
+            RMRKCollectionUtils,
+            RMRKEquipRenderUtils,
+        } from '../typechain-types';
+        import { getRegistry } from './get-gegistry';
+        ```
+
+        Add the import and the call from the bottom scripts into `scripts/run-deploy.ts`. It should now look like this:
+
+        ```typescript copy
+        import { deployKingdom, deployArmy } from './deploy-methods';
+
+        async function main() {
+            await deployKingdom();
+            await deployArmy();
+        }
+
+        main().catch((error) => {
+            console.error(error);
+            process.exitCode = 1;
+        });
+        ```
+
+        ### Prepare Soldier contract
+
+        Back to the [wizard.rmrk.app](https://wizard.rmrk.app/), on Smart Contract tab.
+        1. Set the name to "Soldier"
+        2. Set the symbol "SD"
+        3. Select *Module* to be **Nestable** 
+        4. Select *Mint Method* to **Pre-Mint**
+        5. Disable the *Auto-accept children* option, we will not need it for this contract.
+
+        ![Wizard Soldiers Config](/images/tutorials/nestable-kingdom/0-soldiers-config.png)
+
+        ### Download the contract
+
+        Download the Soldier contract from the wizard and place it in the `contracts` folder.
+
+        ### Configure the deployment
+
+        Go the **Deploy script** section of the wizard and fill in the data.
+            - Collection Metadata: `ipfs://QmQhDyuSvd49pxe5v2KnmvWT39TFyoqEQyBkhjYC7imHUs/soldiers/collection.json`
+            - Max supply: 1000
+            - Royalty receipient: Leave empty to use the same address as the deployer, or set a custom address.
+            - Royalty percentage: 3%
+            - Enable the "Use 2 scripts" option. This will allow us to reuse the deploy method.
+
+            Your screen configuration panel should look like this:
+            ![Wizard Configuration Soldiers](/images/tutorials/nestable-kingdom/0-soldiers-deploy-config.png)
+
+       ### Copy the deployment code
+        Copy the code from the top window into `scripts/deploy-methods.ts`. Some imports will be duplicated, remove them. The merged imports should look like this:
+        ```typescript copy
+        import { ethers, run, network } from 'hardhat';
+        import { delay, isHardhatNetwork } from './utils';
+        import {
+            Army,
+            Kingdom,
+            RMRKBulkWriter,
+            RMRKCatalogImpl,
+            RMRKCatalogUtils,
+            RMRKCollectionUtils,
+            RMRKEquipRenderUtils,
+            Soldier,
+        } from '../typechain-types';
+        import { getRegistry } from './get-gegistry';
+        ```
+
+        Add the import and the call from the bottom scripts into `scripts/run-deploy.ts`. It should now look like this:
+
+        ```typescript copy
+        import { deployKingdom, deployArmy, deploySoldier } from './deploy-methods';
+
+        async function main() {
+            await deployKingdom();
+            await deployArmy();
+            await deploySoldier();
+        }
+
+        main().catch((error) => {
+            console.error(error);
+            process.exitCode = 1;
+        });
+        ```
+
+        ### Prepare the environment private keys
+
+        Create a `.env` file by copying and renaming the `.env.example` file. Set your private key in the `PRIVATE_KEY` variable. This will be the account that deploys and interacts with the contracts.
+        
+        <FileTree>
+        <FileTree.Folder name="contracts">
+            <FileTree.File name="Army.sol" />
+            <FileTree.File name="Kingdom.sol" />
+            <FileTree.File name="MockRMRKRegistry.sol" />
+            <FileTree.File name="Soldier.sol" />
+        </FileTree.Folder>
+        <FileTree.Folder name="scripts">
+            <FileTree.File name="deploy-methods.ts" />
+            <FileTree.File name="get-gegistry.ts" />
+            <FileTree.File name="run-deploy-catalog.ts" />
+            <FileTree.File name="run-deploy-utils.ts" />
+            <FileTree.File name="run-deploy.ts" />
+            <FileTree.File name="utils.ts" />
+        </FileTree.Folder>
+        <FileTree.File name="hardhat.config.ts" />
+        <FileTree.File name=".env" />
+        <FileTree.File name="..." />
+        </FileTree>
+
+        
+        ### Update block scanner API keys
+
+        In the `.env` file, set the `{BLOCK_SCANNER}_API_KEY` for the network you want to use. You can get keys easily from the block scanner of your network.
+
+        <Callout type="info">
+            `API_KEY` from block scanners can be acquired by signing in from the **mainnet** chain explorer, registration is free. The `API_KEY` you get from it works for production and testing networks. Here are the block scanners from the most common networks: [Ethereum](https://etherscan.io/), [Polgyon](https://polygonscan.com/), [Moonbeam](https://moonbeam.moonscan.io/), [Astar](https://blockscout.com/astar/), [Base](https://basescan.org/), [BSC](https://bscscan.com/).
+        </Callout>
+
+        ### Compile the contracts:
+        ```bash copy
+        yarn hardhat compile
+        ```
+        
+        ### Deploy the 3 contracts:
+        ```bash copy
+        yarn hardhat run scripts/run-deploy.ts --network {NETWORK}
+        ```
+
+        - Available testing networks: `moonbaseAlpha`, `sepolia`, `polygonMumbai`, `baseGoerli`
+        - Available production networks: `moonbeam`, `mainnet`, `polygon`, `base`, `astar`, `bsc`
+        - You can also run a local network with `yarn hardhat node` and then using `--network localhost` or simply omit the network parameter so hardhat creates a local network which will exist only during the script execution.
+        
+        After deploy you will see something like this. If you are not using a hardhat network, you will also see messages about verification of the contracts and their registration in Singular.
+        
+        ```bash
+        Deploying Kingdom to hardhat blockchain...
+        Kingdom deployed to 0x5FbDB2315678afecb367f032d93F642f64180aa3.
+        Deploying Army to hardhat blockchain...
+        Army deployed to 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512.
+        Deploying Soldier to hardhat blockchain...
+        Soldier deployed to 0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0.
+        ```
+
+        Congratulations! You have deployed your first **Nestable** contracts. 
+
+        <Callout type="info">
+            If you used a blockchain different to hardhat, all contracts are now also already verified and registered in [Singular dev](https://dev.singular.rmrk.app).
+        </Callout>
+
+        ### Prepare contract interaction scripts
+
+        To interact with our smart contract we will need to create an instance of the Kingdom and Soldier and attach the deployed addresses. Since we might need this several times, let's create a script to get the instance. 
+        
+        Create a `get-contracts.ts` file under the `scripts` folder and add the following code, replacing the kingdom and soldier addresses for the one you just deployed. This will return intances of `Kingdom`, `Army` and `Soldier` that we can use to interact with the contracts. When running unit tests in the local hardhat network, it will create deploy new instances, otherwise it will point to the deployed ones.
+
+        ```typescript copy
+        import { ethers } from 'hardhat';
+        import { Kingdom, Army, Soldier } from '../typechain-types';
+        import { deployKingdom, deployArmy, deploySoldier } from './deploy-methods';
+
+        export default async function getContracts(): Promise<{ kingdom: Kingdom; army: Army; soldier: Soldier }> {
+            let kingdom: Kingdom;
+            let army: Army;
+            let soldier: Soldier;
+
+            // If we are on a local network, deploy the contracts and return them
+            if ((await ethers.provider.getNetwork()).name === 'hardhat') {
+                kingdom = await deployKingdom();
+                army = await deployArmy();
+                soldier = await deploySoldier();
+            } else {
+                // REPLACE THE ADDRESSSES FOR THE ONES YOU JUST DEPLOYED:
+                const kingdomAddress = '0x1199844a6d09240cbaEb0fd0Ba64Fb089cd23Ae2';
+                const kingdomFactory = await ethers.getContractFactory('Kingdom');
+                kingdom = <Kingdom>kingdomFactory.attach(kingdomAddress);
+
+                const armyAddress = '0x2504e3Dba8094B03eA4AD92fd50cCfdf4D2F9043';
+                const armyFactory = await ethers.getContractFactory('Army');
+                army = <Army>armyFactory.attach(armyAddress);
+
+                const soldierAddress = '0x3FaA4C4824790a48c67888cc54FfE5b3C729f870';
+                const soldierFactory = await ethers.getContractFactory('Soldier');
+                soldier = <Kingdom>soldierFactory.attach(soldierAddress);
+            }
+
+            return { kingdom, army, soldier };
+        }
+        ```
+
+        <Callout type="warning">
+        Make sure you replace the 3 contract addresses for the ones you just deployed.
+        </Callout>
+        
+        * Create a `run-journey.ts` file under the `scripts` folder.  We will start by importing some libraries and our method to get the contracts. All the code will run under the `main` function. We will simply log the account and the addresses of the kingdom and soldier contracts, to make sure they are as expected.
+        
+        Add the following code to the `run-journey.ts` file:
+
+        ```typescript copy
+        import { ethers, network } from 'hardhat';
+        import getContracts from './get-contracts';
+
+        async function main(): Promise<void> {
+        console.log(`Running kingdom journey on ${network.name} blockchain...`);
+
+        const [wizard] = await ethers.getSigners();
+        console.log(`Running journey with account: ${wizard.address}`);
+
+        const { kingdom, army, soldier } = await getContracts();
+
+        console.log(`Using Kingdom deployed at ${await kingdom.getAddress()}`);
+        console.log(`Using Army deployed at ${await army.getAddress()}`);
+        console.log(`Using Soldier deployed at ${await soldier.getAddress()}`);
+
+        // Journey starts here:
+        }
+
+        main().catch((error) => {
+          console.error(error);
+          process.exitCode = 1;
+        });
+
+        ```
+
+        <FileTree>
+        <FileTree.Folder name="contracts">
+            <FileTree.File name="Army.sol" />
+            <FileTree.File name="Kingdom.sol" />
+            <FileTree.File name="MockRMRKRegistry.sol" />
+            <FileTree.File name="Soldier.sol" />
+        </FileTree.Folder>
+        <FileTree.Folder name="scripts" defaultOpen>
+            <FileTree.File name="deploy-methods.ts" />
+            <FileTree.File name="get-contracts.ts" />
+            <FileTree.File name="get-gegistry.ts" />
+            <FileTree.File name="run-deploy-catalog.ts" />
+            <FileTree.File name="run-deploy-utils.ts" />
+            <FileTree.File name="run-deploy.ts" />
+            <FileTree.File name="utils.ts" />
+            <FileTree.File name="run-journey.ts" />
+        </FileTree.Folder>
+        <FileTree.File name="hardhat.config.ts" />
+        <FileTree.File name=".env" />
+        <FileTree.File name="..." />
+        </FileTree>         
+       
+       ### Run the script
+       
+        You can safely run it on any network different to hardhat, since there will be no interactions. Running on hardhat will use the default accounts so let's use `polygonMumbai`:
+        ```bash copy
+        yarn hardhat run scripts/run-journey.ts --network polygonMumbai
+        ```
+        You should see a similar output:
+        ```bash
+        Running kingdom journey on hardhat blockchain...
+        Running journey with account: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+        Using Kingdom deployed at 0x5FbDB2315678afecb367f032d93F642f64180aa3
+        Using Army deployed at 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512
+        Using Soldier deployed at 0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0
+        Done in 2.06s.
+        ```
+
+        If you run it on a local network, it will deploy new instances of the contracts and return their addresses. If you run it on a testnet or mainnet, it will point to the deployed contracts.
+        </Steps>
+    </Tabs.Tab>
+</Tabs>
+
+Great work on completing Part 1! Now, get ready for [Part 2](./part-2), where things get even more exciting.

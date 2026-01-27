@@ -1,0 +1,71 @@
+---
+description: A list of terms that might need some explanation in a public glossary. They might be specific to our standards, ambiguous, etc.
+---
+
+# Glossary
+
+## Asset
+In the context of RMRK, it can be a multimedia file, technical information, a land deed, or anything that the implementer has decided to be an asset of the token. Multiple assets can be attached to a single NFT with the MultiAsset module.
+
+## Attributes Repository
+A common good repository existing in every blockchain at the same address, which allows collection owners to define attributes to be managed by different parties. Events are emitted on every action so an indexer can have a full state of the attributes of an NFT at any time. This is possible thanks to RMRK's [Token Attributes Repository](./attributes) standard, defined in [ERC-7508](https://eips.ethereum.org/EIPS/eip-7508).
+
+## Catalog
+A Catalog defines fixed and/or slot parts to be used in the context of composable and equippable NFTs. A Catalog can be used by multiple collections, for example multiple characters using the same set of slots parts. A collection can use multiple Catalogs, for example, one for image assets and another one for 3D model assets.
+
+## Composable
+An asset that is composed of multiple fixed parts. This is especially useful when picking traits dynamically on mint. The fixed parts are defined in the Catalog. Composable NFT's are possible thanks to [RMRK's Composable & Equippable](./composable-equippable) standard, defined in [ERC-6220](https://eips.ethereum.org/EIPS/eip-6220).
+
+## Direct owner
+In the context of Nestable NFTs, the direct owner is the closest owner of an NFT. Ot can be another NFT, a smart contract or an EoA. For instance, if wallet X owns NFT A, which in turn owns NFT B, which in turn owns NFT C, the direct owner for C is B, for B is A and for A is X.
+
+## Emotes Repository
+A common good repository existing in every blockchain at the [same address](https://blockscan.com/address/0x3110735F0b8e71455bAe1356a33e428843bCb9A1), which allows any address to send emojis to any NFT. Events are emitted on every action so an indexer can have a full state of the emojis of an NFT at any time. This is possible thanks to RMRK's [Token Emotes Repository](./emotable), defined in [ERC-7409](https://eips.ethereum.org/EIPS/eip-7409).
+
+## EoA
+Externally Owned Accounts are the most common type of blockchain account that gives us direct control. These accounts are created using private keys. The associated key gives you a unique signature and access to the blockchain. You can use it to send and receive transactions and interact with applications.
+
+## Equippable Group
+When creating an equippable asset, you must assign an equippable group to it. The same group must be used for all assets meant to be equipped into a combination parent at a specific slot. This group is then used to define that all assets having it, can be equipped into a specific parent and slot.
+
+## Equippable
+The equippable standard is built on top of the MultiAsset and Nestable Standards. Assets can be configured on parents to receive equipments using slot parts. They can also be configured on children to be equipped into a parent asset at a specific slot part using equippable groups. The validity and the state of an equipment is stored on chain. This is possible thanks to [RMRK's Composable & Equippable](./composable-equippable) standard, defined in [ERC-6220](https://eips.ethereum.org/EIPS/eip-6220).
+
+## ERC-20 Holder
+An NFT which can receive, hold and transfer ERC-20 tokens. This is possible thanks to RMRK's [ERC-20 Holder](./erc20holder) standard, defined in [ERC-7590](https://eips.ethereum.org/EIPS/eip-7590).
+
+## ERC-721 Compatibility
+MultiAsset, Soulbound, ERC20-holder, Emotable Repository and Attributes Repotory modules, are fully compatible with ERC-721s, which means all the existing tools for regular NFTs can be used. Nestable and Equippable are also compatible with 2 caveats: Id zero is forbidden and `ownerOf` returns the root owner instead of the direct owner.
+
+## ERC
+Ethereum Request for Comments. Specify application layer standards, which determine how applications running on Ethereum can interact with each other. This allows any Dapp to interact in a predictable way with smart contracts.
+
+## Fixed parts
+Defined in the Catalog, these are the parts that compose an asset and cannot be changed after the asset is created. For example, for a composable game character there could be 10 available heads, 12 available bodies, 10 available legs, etc. In the context of music, there could be 10 options for base, 20 for voice, 15 for drums, etc. The combination of these composes the asset.
+
+## Modular NFT
+An NFT that uses one or more RMRK standards to create a more advanced and flexible NFT. 
+
+## MultiAsset
+An NFT that has multiple assets attached to it. This is possible thanks to [RMRK's MultiAsset](./multiasset) standard, defined in [ERC-5773](https://eips.ethereum.org/EIPS/eip-5773).
+
+## Nestable
+A standard that allows an NFT to own other NFTs, which in turn can own other NFTs and so on. Our implementations allow up to 100 levels. This is possible thanks to [RMRK's Nestable](./nestable) standard, defined in [ERC-7401](https://eips.ethereum.org/EIPS/eip-7401).
+
+## NFT Inventory
+Set of children NFTs owned by a parent NFT.
+
+## Parent/Child NFT
+A parent NFT is an NFT that has one or more child NFTs. A child NFT is an NFT that is owned by a parent NFT. This is possible thanks to [RMRK's Nestable](./nestable) standard, defined in [ERC-7401](https://eips.ethereum.org/EIPS/eip-7401).
+
+## Part
+In the context of ERC-6220, parts can be of type fixed (to define composable NFTs) and slot (for equippable NFTs). Both types are defined in a Catalog and are referenced by assets on the NFT. An asset can use multiple fixed and slot parts, only fixed, only slot or none (if not equippable nor composable).
+
+## Root owner
+In the context of a Nestable NFTs, the root owner is the first ancestor of an NFT which is not another NFT. That means the root owner must be either a non Nestable smart contract or an EoA. For instance, if wallet X owns NFT A, which in turns owns NFT B, which in turns owns NFT C, the root owner for A, B and C is wallet X.
+
+## Slot part
+Defined in the Catalog, these are the parts that an asset can receive equipments into. For example in images a base game character could have slots for each hand to equip items, a slot in the body to equip armor, in the head to equip a helmet, etc. In a the context of music, a base track could have slots to equip bass, voice, drums, etc.
+
+## Soulbound
+Non transferable. Regular ERC-721 can be soulbound to a contract or an EoA, meaning they cannot be transferred. Thanks to [RMRK's Soulbound](./soulbound) standard, defined in [ERC-6454](https://eips.ethereum.org/EIPS/eip-6454), the transferability can depend on any on chain condition and it's evaluated only at transfer time. It can be combined with Nestable module so that NFTs are soulbound to others, we call this Soulbound 2.0.

@@ -1,0 +1,236 @@
+import { Steps, Callout, Tabs, FileTree } from 'nextra/components'
+
+# Basic usage of on chain token attributes.
+
+#### A contextualized user journey to explore and understand the Token Attributes Repository features
+
+In this journey we will explore how to use the token attributes standard (ERC-7590, in draft). We will deploy a simple collection and configure a few attribites, then we will mint a few tokens and see how to set and get the attributes.
+
+
+##### The use cases that will be explored are:
+
+- Creation of simple NFT collection.
+- Configuring attributes for different parties to set, via hardhat tasks.
+- Setting and getting attributes, via hardhat tasks.
+
+We will guide you through the process using Hardhat, starting from [EVM-Template repository](https://github.com/rmrk-team/evm-template).
+
+#### User journey context
+
+_We have an NFT collection where each token will represent a character in a game. We want to store 3 attributes on chain: A rarity assigned by the issuer, a name which the holder can change, and a level which only the game contract can set._
+
+<Steps>
+
+### Creating the NFT Contract.
+Since we will focus on the attribute management, we will use the default SimpleEquippable contract that comes with the template. 
+Use the [evm-template repository](https://github.com/rmrk-team/evm-template) to create a new repository and clone it locally.
+    ![EVM template](/images/tutorials/nestable-kingdom/hardhat-template.png)
+
+### Install dependencies and compile.
+Go to the project folder and install the dependencies with your favorite package manager: `yarn` | `npm i` | `pnpm i`. This tutorial will use `pnpm`.
+```bash copy
+pnpm i
+pnpm compile
+```
+
+### Configure the deployment
+
+Go to `scripts/run-deploy.ts` and set a value for collection metadata and max supply. We will use the following values from the chunkies tutorial:
+
+```bash copy
+const collectionMeta = "ipfs://QmadB7RnpfXSd2JX1e6HZLBKwSkBR3PiXhTmkN9dE5DKur/chunkies/collection.json";
+const maxSupply = 1000n;
+```
+
+Let's also comment/remove the add to registry step on the `deployContracts` method, since we will not need them for this tutorial. The method should look like this:
+```typescript copy
+async function deployContracts(): Promise<SimpleEquippable> {
+  console.log(`Deploying SimpleEquippable to ${network.name} blockchain...`);
+
+  const contractFactory = await ethers.getContractFactory('SimpleEquippable');
+  const collectionMeta =
+    'ipfs://QmadB7RnpfXSd2JX1e6HZLBKwSkBR3PiXhTmkN9dE5DKur/chunkies/collection.json';
+  const maxSupply = 1000n;
+  const royaltyRecipient = (await ethers.getSigners())[0].address;
+  const royaltyPercentageBps = 300; // 3%
+
+  if (collectionMeta === undefined || maxSupply === undefined) {
+    throw new Error('Please set collectionMeta and maxSupply');
+  } else {
+    const args = [collectionMeta, maxSupply, royaltyRecipient, royaltyPercentageBps] as const;
+    const contract: SimpleEquippable = await contractFactory.deploy(...args);
+    await contract.waitForDeployment();
+    const contractAddress = await contract.getAddress();
+    console.log(`SimpleEquippable deployed to ${contractAddress}.`);
+
+    if (!isHardhatNetwork()) {
+      console.log('Waiting 10 seconds before verifying contract...');
+      delay(10000);
+      await run('verify:verify', {
+        address: contractAddress,
+        constructorArguments: args,
+        contract: 'contracts/SimpleEquippable.sol:SimpleEquippable',
+      });
+    }
+    return contract;
+  }
+}
+```
+
+### Add minting method
+Let's add a simple method to mint NFTs we will use for attributes. Since the scope of this tutorial is to show how to use attributes, we will just mint them in the same script which deploys. Add the following method to the `scripts/run-deploy.ts` script.
+
+```typescript copy
+async function mint(collection: SimpleEquippable): Promise<void> {
+  console.log(`Minting 5 tokens...`);
+  const [signer] = await ethers.getSigners();
+  await collection.connect(signer).mint(
+    signer.address, // to
+    5, // amount to mint
+    'ipfs://QmadB7RnpfXSd2JX1e6HZLBKwSkBR3PiXhTmkN9dE5DKur/chunkies/full/1.json', // token URI
+  );
+  console.log(`Minted 5 tokens.`);
+}
+```
+
+Additionally, on the same script, let's modify the main method so it calls the mint method after deploying the collection.
+
+```typescript copy
+async function main() {
+  const collection = await deployContracts();
+  await mint(collection);
+}
+```
+
+At this point you can test the deployment and minting locally by running:
+```bash copy
+pnpm deploy:contracts
+// Which is a shorcut for: pnpm hardhat run scripts/run-deploy.ts
+```
+
+You should see an output similar to this:
+```bash
+Deploying SimpleEquippable to hardhat blockchain...
+SimpleEquippable deployed to 0x5FbDB2315678afecb367f032d93F642f64180aa3.
+Minting 5 tokens...
+Minted 5 tokens.
+```
+
+### Configure .env and block scanner API keys
+Create a `.env` file by copying and renaming the `.env.example` file. Set your private key in the `PRIVATE_KEY` variable. This will be the account that deploys and interacts with the contracts.
+
+
+In the `.env` file, set the `{BLOCK_SCANNER}_API_KEY` for the network you want to use. You can get keys easily from the block scanner of your network. For this tutorial we will use Polygon Mumbai, so we will set the `POLYGONSCAN_API_KEY` variable.
+
+<Callout type="info">
+    `API_KEY` from block scanners can be acquired by signing in from the **mainnet** chain explorer, registration is free. The `API_KEY` you get from it works for production and testing networks. Here are the block scanners from the most common networks: [Ethereum](https://etherscan.io/), [Polgyon](https://polygonscan.com/), [Moonbeam](https://moonbeam.moonscan.io/), [Astar](https://blockscout.com/astar/), [Base](https://basescan.org/), [BSC](https://bscscan.com/).
+</Callout>
+
+### Deploying on a test network
+
+Now let's deploy to an actual test network, where the token attributes repo is deployed. We will use the Polygon Mumbai network for this tutorial. You can get test MATIC on Mumbai from [this faucet](https://faucet.quicknode.com/polygon/mumbai).
+
+```bash copy
+pnpm deploy:contracts --network polygonMumbai
+```
+
+You should see an output similar to this:
+```bash
+Deploying SimpleEquippable to polygonMumbai blockchain...
+SimpleEquippable deployed to 0xe020c035e3E6903370A52277257f83B9541712FA
+Waiting 20 seconds before verifying contract...
+The contract 0xe020c035e3E6903370A52277257f83B9541712FA has already been verified on Etherscan.
+https://mumbai.polygonscan.com/address/0xe020c035e3E6903370A52277257f83B9541712FA#code
+Minting 5 tokens...
+Minted 5 tokens.
+```
+
+### Configuring an attribute
+
+Before setting attributes, you must first configure them, you can do so by calling:
+
+```bash copy
+pnpm hardhat attributes:configure CONTRACT_ADDRESS ATTRIBUTE_NAME ACCESS_TYPE [SPECIFIC_ADDRESS] --network NETWORK
+```
+
+Access type defines who can write to the attribute:
+- 0: Owner
+- 1: Collaborator
+- 2: OwnerOrCollaborator
+- 3: TokenOwner
+- 4: SpecificAddress. In this case you must specify in the fourth argument.
+
+Let's configure our 3 attributes. Remember we have a rarity assigned by the owner, a name which the holder can change, and a level which only the game contract can set. We will use Owner, TokenOwner and SpecificAddress access types respectively. We will use the contract we just deployed, as for specific address we will use the account that deployed the contract to pretend it's the game contract.
+
+The first time you configure an attribute you will also need to register access control. This might removed from the final version, but for now you can do so by adding the `--first-time` flag to the command.
+
+```bash copy
+pnpm hardhat attributes:configure 0xe020c035e3E6903370A52277257f83B9541712FA Rarity 0 --first-time true --network polygonMumbai
+pnpm hardhat attributes:configure 0xe020c035e3E6903370A52277257f83B9541712FA Name 3 --network polygonMumbai
+pnpm hardhat attributes:configure 0xe020c035e3E6903370A52277257f83B9541712FA Level 4 0x855dF0303Fec3a56c02fE35d8fb4d5e80A8c79A0 --network polygonMumbai
+```
+
+You should see an output similar to this:
+```bash
+Configured attribute Rarity for 0xe020c035e3E6903370A52277257f83B9541712FA on polygonMumbai blockchain...
+Configured attribute Name for 0xe020c035e3E6903370A52277257f83B9541712FA on polygonMumbai blockchain...
+Configured attribute Level for 0xe020c035e3E6903370A52277257f83B9541712FA on polygonMumbai blockchain...
+```
+
+### Setting and getting attributes
+
+Now that we have configured the attributes, we can set and get them. We will use the `pnpm hardhat attributes:set` and `pnpm hardhat attributes:get` commands. Since we our the issuers, token holders and also specifica address, we can set all the attributes. This is just for demonstration purposes, in a real scenario you would have different accounts for each role.
+
+To set the attribute, you can call:
+
+```bash copy
+pnpm hardhat attributes:set CONTRACT_ADDRESS TOKEN_ID TYPE ATTRIBUTE_NAME ATTRIBUTE_VALUE --network NETWORK
+```
+
+Type is the type of the attribute, options are: 'boolean', 'uint', 'int', 'string', 'address', 'bytes'. For example, to set the values for the first token we would call the following (each with a different account in a real scenario):
+
+```bash copy
+pnpm hardhat attributes:set 0xe020c035e3E6903370A52277257f83B9541712FA 1 string Rarity Common --network polygonMumbai
+pnpm hardhat attributes:set 0xe020c035e3E6903370A52277257f83B9541712FA 1 string Name 'My Token' --network polygonMumbai
+pnpm hardhat attributes:set 0xe020c035e3E6903370A52277257f83B9541712FA 1 uint Level 5 --network polygonMumbai
+```
+
+You should see an output similar to this:
+```bash
+Set attribute Rarity for token 1 in 0xe020c035e3E6903370A52277257f83B9541712FA
+Set attribute Name for token 1 in 0xe020c035e3E6903370A52277257f83B9541712FA
+Set attribute Level for token 1 in 0xe020c035e3E6903370A52277257f83B9541712FA
+```
+
+To get the attributes, you can call:
+
+```bash copy
+pnpm hardhat attributes:get CONTRACT_ADDRESS TOKEN_ID TYPE ATTRIBUTE_NAME --network NETWORK
+```
+
+For our example:
+
+```bash copy
+pnpm hardhat attributes:get 0xe020c035e3E6903370A52277257f83B9541712FA 1 string Rarity --network polygonMumbai
+pnpm hardhat attributes:get 0xe020c035e3E6903370A52277257f83B9541712FA 1 string Name --network polygonMumbai
+pnpm hardhat attributes:get 0xe020c035e3E6903370A52277257f83B9541712FA 1 uint Level --network polygonMumbai
+```
+
+You should see an output similar to this:
+```bash
+Getting attribute Rarity for token 1 in 0xe020c035e3E6903370A52277257f83B9541712FA
+Common
+Getting attribute Name for token 1 in 0xe020c035e3E6903370A52277257f83B9541712FA
+My Token
+Getting attribute Level for token 1 in 0xe020c035e3E6903370A52277257f83B9541712FA
+5n
+```
+
+</Steps>
+
+That's it! You can now use the token attributes standard to store and retrieve data on chain. Remember this is a draft and the final version might have some changes. The full code for this tutorial can be found in the [RMRK's examples repository](https://github.com/rmrk-team/rmrk-examples/token-attributes).
+
+## Bugs, doubts and help
+
+For clarifications, bug reporting or help please open a Github issue or write a message here:
+- **Telegram**: https://t.me/rmrkimpl

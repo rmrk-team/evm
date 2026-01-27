@@ -1,0 +1,27 @@
+# Adding your Collection to Singular
+
+If you did not deploy your contract via hardhat and evm-template, you likely need to add your collection to singular manually. We plan to make this process simpler, but for know you can do it by directly calling the singular registry on the blockscanner of your blockchain.
+
+You need only the address of your collection and an IPFS metadata URI, you can use the same as for collection metadata on deploy. Connect your wallet and use the `addExternalCollection` method.
+
+![Call from Block scanner](/images/tutorials/add-to-singular/add-from-blockscanner.png)
+
+Next are all the available networks, with a link directly to the "Write as Proxy" tab of the corresponding Singular Registry contract.
+
+## Testing Networks:
+
+- [MoonbaseAlpha](https://moonbase.moonscan.io/address/0xCEd0e87a29A2570A5866f4a4F3e45fA1dd82FD53#writeProxyContract)
+- [Sepolia](https://sepolia.etherscan.io/address/0x46d4646f62B8FF9dF717DF40e98A08A0F3b270A5#writeProxyContract)
+- [Polygon Mumbai](https://mumbai.polygonscan.com/address/0x96f18a5F8C1657C6567bE498E41d2760552e3189#writeProxyContract)
+- [Base Goerli](https://goerli.basescan.org/address/0x0FB4A16AB622bd7BD9D3046d4C3c92C254f42beF#writeProxyContract)
+
+## Production Networks:
+
+For production, you need be added to the allowlist to deploy your collection. Please contact us through the [implementers Telegram](https://t.me/rmrkimpl) once you have tested your collection on a testnet.
+
+- [Ethereum](https://etherscan.io/address/0xa9c01de4f9c1E550E869E550d3B08498bA1D38F3#writeProxyContract)
+- [Moonbeam](https://moonbeam.moonscan.io/address/0x439b93AB25c95d97ccdd1F3c36317f7FC52aE55b#writeProxyContract)
+- [Polygon](https://polygonscan.com/address/0x6FF2297d733896cB3bF0432D8Cb829570233bD04#writeProxyContract)
+- [Base](https://basescan.org/address/0xcb79ff273170863b74eb126303cf1e4a61f68fae#writeProxyContract)
+- [Astar](https://blockscout.com/astar/address/0x96FB7Eb4419FccF7fD97Fc6E39Ee1f0541c12508/write-proxy#address-tabs)
+- [Binance Smart Chain](https://bscscan.com/address/0x415aEcB40E26Cda3D3Db8b475F56198A994501ea#writeProxyContract)

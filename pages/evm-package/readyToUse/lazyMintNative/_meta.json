@@ -1,0 +1,11 @@
+{
+  "InitDataNativePay": "Init Data Native Pay",
+  "RMRKEquippableLazyMintNative": "Equippable Lazy Mint Native",
+  "RMRKEquippableLazyMintNativeSoulbound": "Equippable Lazy Mint Native Soulbound",
+  "RMRKMultiAssetLazyMintNative": "Multi Asset Lazy Mint Native",
+  "RMRKMultiAssetLazyMintNativeSoulbound": "Multi Asset Lazy Mint Native Soulbound",
+  "RMRKNestableLazyMintNative": "Nestable Lazy Mint Native",
+  "RMRKNestableLazyMintNativeSoulbound": "Nestable Lazy Mint Native Soulbound",
+  "RMRKNestableMultiAssetLazyMintNative": "Nestable Multi Asset Lazy Mint Native",
+  "RMRKNestableMultiAssetLazyMintNativeSoulbound": "Nestable Multi Asset Lazy Mint Native Soulbound"
+}

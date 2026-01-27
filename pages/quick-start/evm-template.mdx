@@ -1,0 +1,60 @@
+import { Steps, Callout } from 'nextra/components'
+
+# EVM Template
+
+We provide a Github project template to help you get started with your own EVM contracts. This is the most advanced option and we recommend it only for experienced developers who want to add further custom logic to their contracts. The project uses hardhat and ethers.js.
+
+Once you have customized your contract from the wizard follow these steps:
+
+<Steps>
+
+### Create a repo
+
+Create a new repo from the [Github EVM Template](https://github.com/new?template_name=evm-template&template_owner=rmrk-team)
+
+### Install packages
+
+Install packages using your favorite package manager: e.g. `yarn`, `npm i`, `pnpm i`. The template uses yarn.
+
+### Download smart contract
+
+Download the smart contract code and put it under `contracts/` directory
+
+### Download deploy script
+
+Download the deploy script use it to replace the one under `scripts/` directory
+
+### Compile
+
+Test contracts compile: `yarn hardhat compile`
+
+### Check size
+
+Check contract size: `yarn hardhat size-contracts`
+
+### Write tests
+
+Write your own tests using the sample. Run them with: `yarn test`
+
+### Run prettier
+
+To run prettier use `yarn prettier`
+
+### Set up environment variables
+
+Copy `.env.example` into `.env` and set your own variables
+
+### Deploy
+
+Deploy: `yarn hardhat run scripts/deploy.ts --network YOUR_NETWORK`
+
+</Steps>
+
+<Callout type="info" emoji="ℹ️">
+If you want to trade your collection on [Singular](https://singular.rmrk.app), you must add it just after you deploy your contract. That is, before you add any asset or mint any token. This is a temporary restriction and the deploy script provided in the template or through wizard automatically does it. On production, it will only work if you are approved. Please contact us to either approve you before you deploy, or to add your collection afterwards.
+</Callout>
+
+<Callout>
+Remember to give credit to RMRK if you're using it's technology. Check the license and notice for more details.
+</Callout>
+
