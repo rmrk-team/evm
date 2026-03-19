@@ -53,7 +53,7 @@
     "hardhat": "^2.19.4",
     "hardhat-contract-sizer": "^2.10.0",
     "hardhat-gas-reporter": "^1.0.9",
-    "next": "13.0.6",
+    "next": "16.1.7",
     "nextra": "2.13.2",
     "nextra-theme-docs": "2.13.2",
     "prettier": "^3.2.4",
